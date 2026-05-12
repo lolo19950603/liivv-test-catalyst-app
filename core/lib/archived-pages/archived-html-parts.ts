@@ -14,22 +14,38 @@ export const getArchiveHtmlParts = cache(async (archiveFileName: string) => {
   const html = await readFile(filePath, 'utf-8');
 
   const bodyOpens = [...html.matchAll(/<body[^>]*>/gi)];
-  if (bodyOpens.length === 0) {
+
+  const firstOpen = bodyOpens.at(0);
+
+  if (firstOpen == null) {
     throw new Error(`Archived HTML has no <body> tag: ${archiveFileName}`);
   }
 
-  const headFragment = html.slice(0, bodyOpens[0].index);
+  const firstBodyStart = html.indexOf(firstOpen[0]);
+
+  if (firstBodyStart === -1) {
+    throw new Error(`Archived HTML has invalid <body> match: ${archiveFileName}`);
+  }
+
+  const headFragment = html.slice(0, firstBodyStart);
+  const afterFirstBody = firstBodyStart + firstOpen[0].length;
+
+  const secondOpen = bodyOpens[1];
+  const secondBodyStart =
+    secondOpen !== undefined ? html.indexOf(secondOpen[0], afterFirstBody) : -1;
 
   const bodyInner =
-    bodyOpens.length >= 2
-      ? html.slice(bodyOpens[0].index! + bodyOpens[0][0].length, bodyOpens[1].index!)
-      : html.slice(bodyOpens[0].index! + bodyOpens[0][0].length);
+    bodyOpens.length >= 2 && secondBodyStart !== -1
+      ? html.slice(afterFirstBody, secondBodyStart)
+      : html.slice(afterFirstBody);
 
   const headStyles: string[] = [];
   const styleRe = /<style[^>]*>([\s\S]*?)<\/style>/gi;
-  let sm: RegExpExecArray | null;
-  while ((sm = styleRe.exec(headFragment)) !== null) {
-    headStyles.push(sm[1] ?? '');
+  let styleMatch: RegExpExecArray | null = styleRe.exec(headFragment);
+
+  while (styleMatch !== null) {
+    headStyles.push(styleMatch[1] ?? '');
+    styleMatch = styleRe.exec(headFragment);
   }
 
   const titleMatch = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(headFragment);

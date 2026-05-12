@@ -7,7 +7,7 @@ import { CustomCatalystSkeleton } from './client';
 runtime.registerComponent(CustomCatalystSkeleton, {
   type: 'custom-catalyst-skeleton',
   label: 'Custom / Catalyst Skeleton',
-  icon: 'box',
+  icon: 'layout',
   props: {
     className: Style(),
     message: TextInput({
