@@ -14,6 +14,7 @@ const SECTIONS_WITH_DEDICATED_COMPONENT = new Set<DiabetesCareSectionSuffix>([
   'video_with_text_overlay_RnWXxE',
   'custom_section_WpXaJg',
   'number_counter_dTAx7w',
+  'timeline_nyTDKQ',
 ]);
 
 const sharedProps = {

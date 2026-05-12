@@ -7,6 +7,7 @@ import './components/custom-catalyst-skeleton/register';
 import './components/diabetes-care-video-hero/register';
 import './components/diabetes-care-custom-band/register';
 import './components/diabetes-care-number-counters/register';
+import './components/diabetes-care-timeline/register';
 import './components/diabetes-care-archived-section/register';
 import './components/stats-band/register';
 import './components/demo-hero/register';

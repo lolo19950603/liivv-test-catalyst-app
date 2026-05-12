@@ -18,7 +18,8 @@ interface Props {
 // SingleFile export `<head>` styles from `diabetes-care.html` so theme utilities apply. The hero
 // **Diabetes care / Video with text overlay** is a native `<video>`. **Diabetes care / Custom band (logo + heading)**
 // is an editable logo + two-line heading (with secondary color). **Diabetes care / Number counters** is an
-// editable list of stats. Remaining **Diabetes care / …** blocks are HTML slices from the export (13). Use
+// editable list of stats. **Diabetes care / Timeline** replaces export `timeline_nyTDKQ` (carousel, bullets,
+// CTA, image, bottom steps). Remaining **Diabetes care / …** blocks are HTML slices from the export. Use
 // **Stats band** when you want logo + heading + four stats together.
 // Legacy full export: `/diabetes-care`.
 
