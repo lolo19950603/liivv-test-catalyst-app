@@ -18,8 +18,15 @@ interface Props {
 // SingleFile export `<head>` styles from `diabetes-care.html` so theme utilities apply. The hero
 // **Diabetes care / Video with text overlay** is a native `<video>`. **Diabetes care / Custom band (logo + heading)**
 // is an editable logo + two-line heading (with secondary color). **Diabetes care / Number counters** is an
-// editable list of stats. **Diabetes care / Timeline** replaces export `timeline_nyTDKQ` (carousel, bullets,
-// CTA, image, bottom steps). Remaining **Diabetes care / …** blocks are HTML slices from the export. Use
+// editable list of stats. **Diabetes care / Multicolumn** replaces export `multicolumn_JtTdUn` (up to four
+// editable columns: image, heading, body, CTA). **Diabetes care / Reveal + story** replaces
+// `reveal_image_with_text_iXk7GQ` and the upper rich-text block `rich_text_FWVbN6` (banner line, hero image,
+// story heading, body, two CTAs). **Diabetes care / Timeline** replaces export `timeline_nyTDKQ` (carousel, bullets,
+// CTA, image, bottom steps). **Diabetes care / Blog posts collage** replaces `blog_posts_collage_bTyfPm` (large featured post + two
+// horizontal posts). **Diabetes care / Logo list** replaces `logo_list_BznDid` (heading + looping marquee of logos).
+// **Diabetes care / Featured collections** replaces `featured_collections_gQLnyz` (tabs + product cards, same section CSS as the export).
+// **Diabetes care / FAQ (first)** replaces `faq_VGRW8K`; **Diabetes care / FAQ (second)** replaces `faq_7B4B8U` (narrow + border vs plain + background; export section CSS).
+// Remaining **Diabetes care / …** blocks are HTML slices from the export. Use
 // **Stats band** when you want logo + heading + four stats together.
 // Legacy full export: `/diabetes-care`.
 

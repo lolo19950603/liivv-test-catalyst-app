@@ -3,6 +3,7 @@ import { AnonymousUser } from 'next-auth';
 import { decode, encode } from 'next-auth/jwt';
 
 const anonymousCookieName = 'authjs.anonymous-session-token';
+const secureAnonymousCookieName = `__Secure-${anonymousCookieName}`;
 
 const shouldUseSecureCookie = async () => {
   const headersList = await headers();
@@ -38,6 +39,24 @@ export const anonymousSignIn = async (user: Partial<AnonymousUser> = { cartId: n
   });
 };
 
+/** Removes both prefixed and non-prefixed cookies (handles http/https and secret rotation). */
+const clearAllAnonymousSessionCookies = async () => {
+  const cookieJar = await cookies();
+
+  cookieJar.delete({
+    name: anonymousCookieName,
+    secure: false,
+    sameSite: 'lax',
+    httpOnly: true,
+  });
+  cookieJar.delete({
+    name: secureAnonymousCookieName,
+    secure: true,
+    sameSite: 'lax',
+    httpOnly: true,
+  });
+};
+
 export const getAnonymousSession = async () => {
   const cookieJar = await cookies();
   const useSecureCookies = await shouldUseSecureCookie();
@@ -62,25 +81,16 @@ export const getAnonymousSession = async () => {
     });
 
     return session;
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error('Failed to decode anonymous session cookie', err);
+  } catch {
+    // Stale cookie (e.g. AUTH_SECRET changed) or salt/proto mismatch — drop cookies so a new session can be issued.
+    await clearAllAnonymousSessionCookies();
 
     return null;
   }
 };
 
 export const clearAnonymousSession = async () => {
-  const cookieJar = await cookies();
-  const useSecureCookies = await shouldUseSecureCookie();
-  const cookiePrefix = useSecureCookies ? '__Secure-' : '';
-
-  cookieJar.delete({
-    name: `${cookiePrefix}${anonymousCookieName}`,
-    secure: useSecureCookies,
-    sameSite: 'lax',
-    httpOnly: true,
-  });
+  await clearAllAnonymousSessionCookies();
 };
 
 export const updateAnonymousSession = async (user: AnonymousUser) => {

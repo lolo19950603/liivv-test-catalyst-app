@@ -15,6 +15,14 @@ const SECTIONS_WITH_DEDICATED_COMPONENT = new Set<DiabetesCareSectionSuffix>([
   'custom_section_WpXaJg',
   'number_counter_dTAx7w',
   'timeline_nyTDKQ',
+  'multicolumn_JtTdUn',
+  'reveal_image_with_text_iXk7GQ',
+  'rich_text_FWVbN6',
+  'blog_posts_collage_bTyfPm',
+  'logo_list_BznDid',
+  'featured_collections_gQLnyz',
+  'faq_VGRW8K',
+  'faq_7B4B8U',
 ]);
 
 const sharedProps = {
