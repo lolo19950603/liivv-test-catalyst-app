@@ -1,9 +1,12 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 
 const SECTION_VARS = `--section-padding-top:72px;--section-padding-bottom:72px;--section-grid-gap:70px`;
+
+/** Matches SingleFile section id for archive CSS. Only one logo-list per page (duplicate ids invalid). */
+const LOGO_LIST_SECTION_ID = 'shopify-section-template--26520397447459__logo_list_BznDid';
 
 function marqueeCursorScopedCss(sectionDomId: string) {
   const root = `#${sectionDomId}`;
@@ -60,7 +63,7 @@ export function DiabetesCareLogoList({
   logoMaxHeightPx,
   logoSlotWidthPx,
 }: DiabetesCareLogoListProps) {
-  const sectionDomId = useId().replace(/:/g, '');
+  const sectionDomId = LOGO_LIST_SECTION_ID;
 
   const title = heading?.trim() ?? 'Trusted Brands, Made for Everyday Life';
   const items = logosResolved(logos);

@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "npm run generate && next dev",
-    "generate": "dotenv -e .env.local -- node ./scripts/generate.cjs",
+    "generate": "dotenv -e .env.local -- node ./scripts/generate.cjs && node ./scripts/extract-diabetes-care-head-css.cjs",
+    "extract:diabetes-care-head-css": "node ./scripts/extract-diabetes-care-head-css.cjs",
     "build": "npm run generate && next build",
     "build:analyze": "ANALYZE=true npm run build",
     "start": "next start",
