@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
 import { locales } from '~/i18n/locales';
-import { getArchiveHtmlParts } from '~/lib/archived-pages/archived-html-parts';
 import { getMakeswiftPageMetadata, Page as MakeswiftPage } from '~/lib/makeswift';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
 
@@ -14,8 +13,10 @@ interface Props {
   params: Promise<Params>;
 }
 
-// Diabetes care page is **authored in Makeswift** at `/diabetes-care-editable`. Injects the
-// SingleFile export `<head>` styles from `diabetes-care.html` so theme utilities apply. The hero
+// Diabetes care page is **authored in Makeswift** at `/diabetes-care-editable`. Theme CSS from the
+// SingleFile export is served as `/archive/diabetes-care-head.css` (generated from
+// `public/archive/diabetes-care.html` when you run `pnpm generate` / `extract-diabetes-care-head-css`)
+// so we do not embed multi‑MB `<style>` tags in the RSC tree (avoids slow render / dev OOM). The hero
 // **Diabetes care / Video with text overlay** is a native `<video>`. **Diabetes care / Custom band (logo + heading)**
 // is an editable logo + two-line heading (with secondary color). **Diabetes care / Number counters** is an
 // editable list of stats. **Diabetes care / Multicolumn** replaces export `multicolumn_JtTdUn` (up to four
@@ -56,13 +57,9 @@ export default async function DiabetesCareEditablePage({ params }: Props) {
 
   setRequestLocale(locale);
 
-  const { headStyles } = await getArchiveHtmlParts('diabetes-care.html');
-
   return (
     <>
-      {headStyles.map((css, index) => (
-        <style dangerouslySetInnerHTML={{ __html: css }} key={index} />
-      ))}
+      <link href="/archive/diabetes-care-head.css" rel="stylesheet" />
       <MakeswiftPage locale={locale} path="/diabetes-care-editable" />
     </>
   );
