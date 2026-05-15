@@ -8,7 +8,7 @@ export const COMPONENT_TYPE = 'diabetes-care-blog-posts-collage';
 
 runtime.registerComponent(DiabetesCareBlogPostsCollage, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / Blog posts collage',
+  label: 'Diabetes care / 7. Blog posts collage',
   icon: 'layout',
   props: {
     className: Style(),

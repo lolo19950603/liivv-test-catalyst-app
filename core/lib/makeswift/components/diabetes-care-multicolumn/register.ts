@@ -9,7 +9,7 @@ export const COMPONENT_TYPE = 'diabetes-care-multicolumn';
 
 runtime.registerComponent(DiabetesCareMulticolumn, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / Multicolumn',
+  label: 'Diabetes care / 5. Multicolumn',
   icon: 'layout',
   props: {
     className: Style(),

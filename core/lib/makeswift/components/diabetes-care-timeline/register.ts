@@ -9,7 +9,7 @@ export const COMPONENT_TYPE = 'diabetes-care-timeline';
 
 runtime.registerComponent(DiabetesCareTimeline, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / Timeline',
+  label: 'Diabetes care / 4. Timeline',
   icon: 'carousel',
   props: {
     className: Style(),

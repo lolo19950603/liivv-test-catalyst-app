@@ -8,7 +8,7 @@ export const COMPONENT_TYPE = 'diabetes-care-reveal-image-text';
 
 runtime.registerComponent(DiabetesCareRevealImageWithText, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / Reveal + story',
+  label: 'Diabetes care / 6. Reveal + story',
   icon: 'image',
   props: {
     className: Style(),

@@ -9,7 +9,7 @@ export const COMPONENT_TYPE = 'diabetes-care-custom-band';
 
 runtime.registerComponent(DiabetesCareCustomBand, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / Custom band (logo + heading)',
+  label: 'Diabetes care / 2. Custom band (logo + heading)',
   icon: 'layout',
   props: {
     className: Style(),

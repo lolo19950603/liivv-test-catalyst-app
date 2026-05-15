@@ -8,7 +8,7 @@ export const COMPONENT_TYPE = 'diabetes-care-video-hero';
 
 runtime.registerComponent(DiabetesCareVideoHero, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / Video with text overlay',
+  label: 'Diabetes care / 1. Video with text overlay',
   icon: 'layout',
   props: {
     className: Style(),

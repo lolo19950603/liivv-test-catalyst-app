@@ -10,7 +10,7 @@ export const COMPONENT_TYPE = 'diabetes-care-featured-collections';
 
 runtime.registerComponent(DiabetesCareFeaturedCollections, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / Featured collections',
+  label: 'Diabetes care / 9. Featured collections',
   icon: 'layout',
   props: {
     className: Style(),

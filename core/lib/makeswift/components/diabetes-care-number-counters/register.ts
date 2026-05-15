@@ -8,7 +8,7 @@ export const COMPONENT_TYPE = 'diabetes-care-number-counters';
 
 runtime.registerComponent(DiabetesCareNumberCounters, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / Number counters',
+  label: 'Diabetes care / 3. Number counters',
   icon: 'layout',
   props: {
     className: Style(),
