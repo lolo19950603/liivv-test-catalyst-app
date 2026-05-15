@@ -6,7 +6,7 @@ import { clsx } from 'clsx';
 export const DIABETES_CARE_DEFAULT_VIDEO_URL =
   'https://liivv.ca/cdn/shop/videos/c/vp/2e66f0d8b94242388f3b690c1c727817/2e66f0d8b94242388f3b690c1c727817.HD-1080p-7.2Mbps-83428254.mp4?v=0';
 
-/** Matches archived section id so `diabetes-care-head.css` section rules apply. */
+/** Matches archived section id so `diabetes-care-sections.css` section rules apply. */
 export const VIDEO_HERO_SECTION_ID = 'shopify-section-template--26520397447459__video_with_text_overlay_RnWXxE';
 
 export interface DiabetesCareVideoHeroProps {

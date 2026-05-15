@@ -57,7 +57,14 @@ if (!existsSync(archiveDir)) {
   mkdirSync(archiveDir, { recursive: true });
 }
 
-writeFileSync(cssPath, out, 'utf-8');
-process.stdout.write(
-  `[extract-diabetes-care-head-css] Wrote ${cssPath} (${blocks.length} <style> blocks, ${out.length} bytes; storefront slice 0..${sliceEnd})\n`,
-);
+/** Skip write when unchanged so `pnpm dev` (which runs this script) does not bump mtime / confuse git. */
+if (existsSync(cssPath) && readFileSync(cssPath, 'utf-8') === out) {
+  process.stdout.write(
+    `[extract-diabetes-care-head-css] Up to date ${cssPath} (${blocks.length} <style> blocks)\n`,
+  );
+} else {
+  writeFileSync(cssPath, out, 'utf-8');
+  process.stdout.write(
+    `[extract-diabetes-care-head-css] Wrote ${cssPath} (${blocks.length} <style> blocks, ${out.length} bytes; storefront slice 0..${sliceEnd})\n`,
+  );
+}

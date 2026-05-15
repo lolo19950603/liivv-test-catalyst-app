@@ -20,7 +20,7 @@ export const config = {
     /*
      * Match all request paths except for the ones starting with:
      * - api (API routes)
-     * - archive (static assets under public/archive, e.g. diabetes-care-head.css)
+     * - archive (static assets under public/archive, e.g. diabetes-care-sections.css)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - _vercel (vercel internals, eg: web vitals)

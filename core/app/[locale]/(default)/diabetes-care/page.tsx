@@ -15,9 +15,10 @@ interface Props {
 
 const PAGE_PATH = '/diabetes-care';
 
-// Storefront CSS from SingleFile export (`public/archive/diabetes-care-head.css`): all `<style>`
-// blocks in the head **and** first `<body>` (section CSS), excluding a trailing admin `<body>` when
-// present. Run `pnpm extract:diabetes-care-head-css` in `core` after editing `diabetes-care.html`.
+// Section-scoped storefront CSS (`public/archive/diabetes-care-sections.css`): built from the full
+// head export with `pnpm build:diabetes-care-sections-css` (runs after extract in `pnpm generate`).
+// Omits unrelated header/footer/admin chunks and strips Tailwind-colliding utility rules from the
+// main theme block so the Catalyst header keeps working.
 
 // eslint-disable-next-line valid-jsdoc
 /** Next.js metadata (Makeswift title/description when set, plus alternates). */
@@ -47,7 +48,7 @@ export default async function DiabetesCarePage({ params }: Props) {
 
   return (
     <>
-      <link href="/archive/diabetes-care-head.css" rel="stylesheet" />
+      <link href="/archive/diabetes-care-sections.css" rel="stylesheet" />
       <MakeswiftPage locale={locale} path={PAGE_PATH} />
     </>
   );
