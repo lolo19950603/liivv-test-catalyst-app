@@ -1,7 +1,7 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Link } from '~/components/link';
 import { usePathname } from '~/i18n/routing';
@@ -12,6 +12,7 @@ import {
   DIABETES_CARE_HEADER_ARCHIVE_STYLE,
   DIABETES_CARE_HEADER_SECTION_ID,
 } from './archive-styles';
+import { useSectionHeaderPinAfterSlideshow } from './use-section-header-pin-after-slideshow';
 
 export interface DiabetesCareSectionNavLink {
   label: string;
@@ -201,8 +202,8 @@ export function DiabetesCareSectionHeader({
 }: DiabetesCareSectionHeaderProps) {
   const pathname = usePathname();
   const sectionRef = useRef<HTMLDivElement>(null);
+  const spacerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const [pinnedHeight, setPinnedHeight] = useState<number | null>(null);
   const [cartLineCount, setCartLineCount] = useState<number | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -326,29 +327,7 @@ export function DiabetesCareSectionHeader({
     return () => mq.removeEventListener('change', onBpChange);
   }, [mobileNavOpen, closeMobileNav]);
 
-  useLayoutEffect(() => {
-    if (!sticky) {
-      setPinnedHeight(null);
-
-      return;
-    }
-
-    const el = sectionRef.current;
-
-    if (!el) {
-      return;
-    }
-
-    const measure = () => setPinnedHeight(el.offsetHeight);
-
-    measure();
-
-    const ro = new ResizeObserver(measure);
-
-    ro.observe(el);
-
-    return () => ro.disconnect();
-  }, [sticky, links.length, logoVisible, showUtilityIcons, cartLineCount, mobileNavOpen, searchOpen]);
+  useSectionHeaderPinAfterSlideshow(sectionRef, spacerRef, sticky);
 
   if (!logoVisible && links.length === 0 && !showUtilityIcons) {
     return null;
@@ -365,7 +344,6 @@ export function DiabetesCareSectionHeader({
       className={clsx(
         'diabetes-care-section-header shopify-section shopify-section-group-header-group header-section header-opaque w-full min-w-0',
         hasNav && 'diabetes-care-has-nav',
-        sticky && 'header-pinned',
         className,
       )}
       id={DIABETES_CARE_HEADER_SECTION_ID}
@@ -583,12 +561,15 @@ export function DiabetesCareSectionHeader({
     return section;
   }
 
-  const spacerPx = pinnedHeight ?? 72;
-
   return (
     <>
       {section}
-      <div aria-hidden className="w-full shrink-0" style={{ height: spacerPx }} />
+      <div
+        aria-hidden
+        className="w-full shrink-0 overflow-hidden"
+        ref={spacerRef}
+        style={{ height: 0 }}
+      />
     </>
   );
 }

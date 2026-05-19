@@ -29,6 +29,7 @@ import './components/products-list/register';
 import './components/section/register';
 import './components/site-footer/register';
 import './components/site-header/register';
+import './components/site-header-slideshow/register';
 import './components/site-theme/register';
 import './components/slideshow/register';
 import './components/sticky-sidebar/register';
