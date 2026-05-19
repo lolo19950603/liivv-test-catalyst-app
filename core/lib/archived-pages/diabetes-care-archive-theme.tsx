@@ -4,7 +4,6 @@ import { useEffect, type ReactNode } from 'react';
 
 import { initShopifyButtonFillHover } from './init-shopify-button-fill-hover';
 import { SHOPIFY_BUTTON_HOVER_CSS } from './shopify-button-hover-css';
-
 const HTML_JS_CLASS = 'js';
 const BODY_DATA_ATTRIBUTES: Record<string, string> = {
   'data-button-hover': 'standard',

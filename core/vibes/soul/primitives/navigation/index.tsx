@@ -36,6 +36,7 @@ import { Price } from '@/vibes/soul/primitives/price-label';
 import { ProductCard } from '@/vibes/soul/primitives/product-card';
 import { Link } from '~/components/link';
 import { usePathname, useRouter } from '~/i18n/routing';
+import { LiivvIconAccount, LiivvIconCart, LiivvIconSearch } from '~/lib/liivv/header-icons';
 import { useSearch } from '~/lib/search';
 
 import { getLocalizedPathname } from './_actions/localized-pathname';
@@ -132,6 +133,8 @@ interface Props<S extends SearchResult> {
   giftCertificatesLabel?: string;
   giftCertificatesHref: string;
   giftCertificatesEnabled?: Streamable<boolean>;
+  /** Archive Liivv header icons + utility button layout (store header skin). */
+  headerIconSet?: 'lucide' | 'liivv';
 }
 
 const MobileMenuButton = forwardRef<
@@ -302,9 +305,18 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
     giftCertificatesLabel = 'Gift Certificates',
     giftCertificatesHref,
     giftCertificatesEnabled: streamableGiftCertificatesEnabled,
+    headerIconSet = 'lucide',
   }: Props<S>,
   ref: Ref<HTMLDivElement>,
 ) {
+  const useLiivvIcons = headerIconSet === 'liivv';
+  const utilityButtonClass = useLiivvIcons
+    ? 'relative flex shrink-0 items-center justify-center border-0 bg-transparent p-0 text-inherit outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2'
+    : navButtonClassName;
+  const cartCountClass = useLiivvIcons
+    ? 'count absolute right-0 top-0 text-xs tabular-nums'
+    : 'absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--nav-cart-count-background,hsl(var(--foreground)))] font-[family-name:var(--nav-cart-count-font-family,var(--font-family-body))] text-xs text-[var(--nav-cart-count-text,hsl(var(--background)))]';
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isSearchOpen, setIsSearchOpen } = useSearch();
 
@@ -561,12 +573,16 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
               <Popover.Trigger asChild>
                 <button
                   aria-label={openSearchPopupLabel}
-                  className={navButtonClassName}
+                  className={utilityButtonClass}
                   onPointerEnter={(e) => e.preventDefault()}
                   onPointerLeave={(e) => e.preventDefault()}
                   onPointerMove={(e) => e.preventDefault()}
                 >
-                  <Search size={20} strokeWidth={1} />
+                  {useLiivvIcons ? (
+                    <LiivvIconSearch className="icon icon-search icon-md" />
+                  ) : (
+                    <Search size={20} strokeWidth={1} />
+                  )}
                 </button>
               </Popover.Trigger>
               <Popover.Portal>
@@ -584,16 +600,32 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
               </Popover.Portal>
             </Popover.Root>
           ) : (
-            <Link aria-label={searchLabel} className={navButtonClassName} href={searchHref}>
-              <Search size={20} strokeWidth={1} />
+            <Link aria-label={searchLabel} className={utilityButtonClass} href={searchHref}>
+              {useLiivvIcons ? (
+                <LiivvIconSearch className="icon icon-search icon-md" />
+              ) : (
+                <Search size={20} strokeWidth={1} />
+              )}
             </Link>
           )}
 
-          <Link aria-label={accountLabel} className={navButtonClassName} href={accountHref}>
-            <User size={20} strokeWidth={1} />
+          <Link aria-label={accountLabel} className={utilityButtonClass} href={accountHref}>
+            {useLiivvIcons ? (
+              <LiivvIconAccount className="icon icon-account icon-md" />
+            ) : (
+              <User size={20} strokeWidth={1} />
+            )}
           </Link>
-          <Link aria-label={cartLabel} className={navButtonClassName} href={cartHref}>
-            <ShoppingBag size={20} strokeWidth={1} />
+          <Link
+            aria-label={cartLabel}
+            className={clsx(utilityButtonClass, useLiivvIcons && 'cart-drawer-button')}
+            href={cartHref}
+          >
+            {useLiivvIcons ? (
+              <LiivvIconCart className="icon icon-cart icon-md" />
+            ) : (
+              <ShoppingBag size={20} strokeWidth={1} />
+            )}
             <Stream
               fallback={
                 <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 animate-pulse items-center justify-center rounded-full bg-contrast-100 text-xs text-background" />
@@ -603,9 +635,7 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
               {(cartCount) =>
                 cartCount != null &&
                 cartCount > 0 && (
-                  <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--nav-cart-count-background,hsl(var(--foreground)))] font-[family-name:var(--nav-cart-count-font-family,var(--font-family-body))] text-xs text-[var(--nav-cart-count-text,hsl(var(--background)))]">
-                    {cartCount}
-                  </span>
+                  <span className={cartCountClass}>{cartCount}</span>
                 )
               }
             </Stream>

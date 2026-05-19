@@ -48,8 +48,8 @@ const logo = Group({
   label: 'Logo',
   preferredLayout: Group.Layout.Popover,
   props: {
-    desktop: logoGroup('Desktop', { width: 200, height: 40 }),
-    mobile: logoGroup('Mobile', { width: 100, height: 40 }),
+    desktop: logoGroup('Desktop', { width: 140, height: 140 }),
+    mobile: logoGroup('Mobile', { width: 140, height: 140 }),
     link: Link({ label: 'Logo link' }),
   },
 });
@@ -105,7 +105,7 @@ runtime.registerComponent(MakeswiftHeader, {
         { value: 'left', label: 'Left' },
         { value: 'right', label: 'Right' },
       ],
-      defaultValue: 'center',
+      defaultValue: 'left',
     }),
     hideOnPaths: List({
       label: 'Hide store header on pages',
