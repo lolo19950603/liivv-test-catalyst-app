@@ -3,7 +3,11 @@
 import { clsx } from 'clsx';
 import { useEffect, useState, type ComponentPropsWithoutRef } from 'react';
 
-import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import {
+  ScrollReveal,
+  SplitWordsHeading,
+  useInViewAnimate,
+} from '~/lib/makeswift/diabetes-care-scroll-animate';
 
 type VideoElementProps = ComponentPropsWithoutRef<'video'>;
 
@@ -61,6 +65,7 @@ export function DiabetesCareVideoHero({
   subheading = '',
 }: DiabetesCareVideoHeroProps) {
   const [clientReady, setClientReady] = useState(false);
+  const { ref: mediaRef, animated: mediaAnimated } = useInViewAnimate({ disabled: !clientReady });
 
   useEffect(() => {
     setClientReady(true);
@@ -85,7 +90,11 @@ export function DiabetesCareVideoHero({
       <div className="relative w-full [--section-padding-bottom:0px] [--section-padding-top:0px]">
         <div className="video-hero relative mx-auto w-full max-w-full">
           <div
-            className="relative mx-auto w-full max-w-full overflow-hidden bg-black [aspect-ratio:1.775/1]"
+            ref={mediaRef}
+            className={clsx(
+              'relative mx-auto w-full max-w-full overflow-hidden bg-black [aspect-ratio:1.775/1]',
+              mediaAnimated && 'dc-animated',
+            )}
             {...(clientReady ? { 'data-animate': 'zoom-out' as const } : {})}
             suppressHydrationWarning
           >

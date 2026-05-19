@@ -1,7 +1,10 @@
 'use client';
 
 import { clsx } from 'clsx';
-import type { CSSProperties, ReactNode } from 'react';
+import { useContext, type CSSProperties, type ReactNode } from 'react';
+
+import { SplittingBannerRevealContext } from './splitting-banner-reveal-context';
+import { useInViewAnimate } from './use-in-view-animate';
 
 const WORD_STAGGER_MS = 30;
 
@@ -51,15 +54,21 @@ function AnimatedWord({
   index,
   highlighted,
   highlightStyle = 'half_text',
+  animated = false,
 }: {
   word: string;
   index: number;
   highlighted?: boolean;
   highlightStyle?: HighlightStyle;
+  animated?: boolean;
 }) {
   const delayStyle = { '--dc-animate-delay': index * WORD_STAGGER_MS } as CSSProperties;
   const inner = (
-    <span className="block" data-dc-animate-child style={delayStyle}>
+    <span
+      className={clsx('block', animated && 'dc-animated')}
+      data-dc-animate-child
+      style={delayStyle}
+    >
       {word}
     </span>
   );
@@ -76,11 +85,13 @@ function SplitWordsBlock({
   highlightLastWord,
   highlightStyle,
   accentTokenIndexes,
+  animated,
 }: {
   words: string[];
   highlightLastWord?: boolean;
   highlightStyle?: HighlightStyle;
   accentTokenIndexes?: Set<number>;
+  animated: boolean;
 }) {
   if (words.length === 0) {
     return null;
@@ -92,6 +103,7 @@ function SplitWordsBlock({
         <span key={`${word}-${String(index)}`}>
           {index > 0 ? <span className="whitespace"> </span> : null}
           <AnimatedWord
+            animated={animated}
             highlightStyle={highlightStyle}
             highlighted={
               (highlightLastWord && index === words.length - 1) ||
@@ -145,9 +157,43 @@ function accentTokenIndexesForPhrase(text: string, phrase: string): Set<number> 
   return indexes;
 }
 
+function useSplitWordsAnimated(): { ref: ReturnType<typeof useInViewAnimate>['ref']; animated: boolean } {
+  const bannerReveal = useContext(SplittingBannerRevealContext);
+  const { ref, animated: inViewAnimated } = useInViewAnimate({
+    disabled: bannerReveal !== null,
+  });
+  const animated = bannerReveal === true || (bannerReveal === null && inViewAnimated);
+
+  return { ref, animated };
+}
+
+function SplitWordsRoot({
+  animate,
+  className,
+  wordTotal,
+  children,
+}: {
+  animate: 'fade-up-large' | 'fade-up';
+  className?: string;
+  wordTotal: number;
+  children: (animated: boolean) => ReactNode;
+}) {
+  const { ref, animated } = useSplitWordsAnimated();
+
+  return (
+    <span
+      ref={ref}
+      className={clsx('split-words words splitting block', animated && 'dc-animated', className)}
+      data-animate={animate}
+      style={{ '--word-total': wordTotal } as CSSProperties}
+    >
+      {children(animated)}
+    </span>
+  );
+}
+
 /**
  * Shopify-style split heading: per-word fade-up with optional theme accent.
- * Pair with `DiabetesCareScrollAnimateProvider` (via `MakeswiftPageShim` on all Makeswift pages).
  */
 export function SplitWordsHeading({
   text,
@@ -170,30 +216,35 @@ export function SplitWordsHeading({
     const totalWords = leadWords.length + emphasisWords.length;
 
     return (
-      <span
-        className={clsx('split-words words splitting block', className)}
-        data-animate={animate}
-        style={{ '--word-total': totalWords } as CSSProperties}
-      >
-        <SplitWordsBlock highlightStyle={highlightStyle} words={leadWords} />
-        {leadWords.length > 0 && emphasisWords.length > 0 ? (
-          <span className="whitespace"> </span>
-        ) : null}
-        {emphasisWords.length > 0 ? (
-          <HighlightedEm style={highlightStyle}>
-            {emphasisWords.map((word, i) => {
-              const index = leadWords.length + i;
+      <SplitWordsRoot animate={animate} className={className} wordTotal={totalWords}>
+        {(animated) => (
+          <>
+            <SplitWordsBlock animated={animated} highlightStyle={highlightStyle} words={leadWords} />
+            {leadWords.length > 0 && emphasisWords.length > 0 ? (
+              <span className="whitespace"> </span>
+            ) : null}
+            {emphasisWords.length > 0 ? (
+              <HighlightedEm style={highlightStyle}>
+                {emphasisWords.map((word, i) => {
+                  const index = leadWords.length + i;
 
-              return (
-                <span key={`emphasis-${word}-${String(i)}`}>
-                  {i > 0 ? <span className="whitespace"> </span> : null}
-                  <AnimatedWord highlightStyle={highlightStyle} index={index} word={word} />
-                </span>
-              );
-            })}
-          </HighlightedEm>
-        ) : null}
-      </span>
+                  return (
+                    <span key={`emphasis-${word}-${String(i)}`}>
+                      {i > 0 ? <span className="whitespace"> </span> : null}
+                      <AnimatedWord
+                        animated={animated}
+                        highlightStyle={highlightStyle}
+                        index={index}
+                        word={word}
+                      />
+                    </span>
+                  );
+                })}
+              </HighlightedEm>
+            ) : null}
+          </>
+        )}
+      </SplitWordsRoot>
     );
   }
 
@@ -207,35 +258,32 @@ export function SplitWordsHeading({
 
   if (highlightEntirePhrase) {
     return (
-      <span
-        className={clsx('split-words words splitting block', className)}
-        data-animate={animate}
-        style={{ '--word-total': words.length } as CSSProperties}
-      >
-        <HighlightedEm style={highlightStyle}>
-          {words.map((word, index) => (
-            <span key={`phrase-${word}-${String(index)}`}>
-              {index > 0 ? <span className="whitespace"> </span> : null}
-              <AnimatedWord index={index} word={word} />
-            </span>
-          ))}
-        </HighlightedEm>
-      </span>
+      <SplitWordsRoot animate={animate} className={className} wordTotal={words.length}>
+        {(animated) => (
+          <HighlightedEm style={highlightStyle}>
+            {words.map((word, index) => (
+              <span key={`phrase-${word}-${String(index)}`}>
+                {index > 0 ? <span className="whitespace"> </span> : null}
+                <AnimatedWord animated={animated} index={index} word={word} />
+              </span>
+            ))}
+          </HighlightedEm>
+        )}
+      </SplitWordsRoot>
     );
   }
 
   return (
-    <span
-      className={clsx('split-words words splitting block', className)}
-      data-animate={animate}
-      style={{ '--word-total': words.length } as CSSProperties}
-    >
-      <SplitWordsBlock
-        accentTokenIndexes={accentIndexes}
-        highlightLastWord={highlightLastWord && accentIndexes == null}
-        highlightStyle={highlightStyle}
-        words={words}
-      />
-    </span>
+    <SplitWordsRoot animate={animate} className={className} wordTotal={words.length}>
+      {(animated) => (
+        <SplitWordsBlock
+          accentTokenIndexes={accentIndexes}
+          animated={animated}
+          highlightLastWord={highlightLastWord && accentIndexes == null}
+          highlightStyle={highlightStyle}
+          words={words}
+        />
+      )}
+    </SplitWordsRoot>
   );
 }

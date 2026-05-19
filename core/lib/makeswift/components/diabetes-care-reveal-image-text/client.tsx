@@ -1,7 +1,11 @@
 import { clsx } from 'clsx';
 import { useId, type ReactNode } from 'react';
 
-import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import {
+  ScrollReveal,
+  SplittingBanner,
+  SplitWordsHeading,
+} from '~/lib/makeswift/diabetes-care-scroll-animate';
 
 function IconArrowRight() {
   return (
@@ -113,7 +117,7 @@ export function DiabetesCareRevealImageWithText({
       <div className="shopify-section contents" id={revealSectionId}>
         <div className="section inline">
           <div className="relative contents">
-            <splitting-banner className="splitting-banner reveal-banner relative inline">
+            <SplittingBanner className="splitting-banner reveal-banner relative inline">
               <span className="reveal-banner__tracker absolute top-0 h-full" />
               <div className="reveal-banner__scroller sticky top-0 overflow-hidden">
                 <div className="banner relative h-screen w-full">
@@ -130,7 +134,7 @@ export function DiabetesCareRevealImageWithText({
                   </div>
                 </div>
               </div>
-            </splitting-banner>
+            </SplittingBanner>
             <ScrollReveal className="section--padding relative w-full" delayMs={80}>
               {imageSrc.length > 0 ? (
                 <div className="page-width page-width--narrow relative mx-auto w-full">
