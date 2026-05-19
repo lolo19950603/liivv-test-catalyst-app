@@ -6,10 +6,12 @@ import { useMemo } from 'react';
 import {
   answerHtmlForRte,
   buildFaqPageJsonLd,
+  type FaqRow,
   faqRowsResolved,
   IconPlusAccordion,
-  type FaqRow,
 } from '../diabetes-care-faq/shared';
+
+import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
 
 import { FAQ_SECOND_ARCHIVE_STYLE, FAQ_SECOND_SECTION_ID } from './archive-styles';
 
@@ -35,9 +37,9 @@ export function DiabetesCareFaqSecond({ className, heading, items }: DiabetesCar
       })),
     );
 
-    const entity = payload.mainEntity as unknown[];
+    const entity = payload.mainEntity;
 
-    return entity.length > 0 ? payload : null;
+    return Array.isArray(entity) && entity.length > 0 ? payload : null;
   }, [rows]);
 
   return (
@@ -46,25 +48,28 @@ export function DiabetesCareFaqSecond({ className, heading, items }: DiabetesCar
         <style dangerouslySetInnerHTML={{ __html: FAQ_SECOND_ARCHIVE_STYLE }} />
         <div className="section section--padding section--plain">
           <div className="page-width relative">
-            <div className="faqs with-background relative z-1 flex flex-col lg:flex-row">
-              <div className="grow grid gap-8 md:gap-12">
+            <div className="faqs with-background z-1 relative flex flex-col lg:flex-row">
+              <div className="grid grow gap-8 md:gap-12">
                 <div className="grid gap-4 text-left md:flex-row md:items-end">
                   <div className="title-wrapper grid gap-4 text-left leading-none md:flex-row md:items-end">
-                    <h2 className="heading title-md">{headingText}</h2>
+                    <h2 className="heading title-md">
+                      <SplitWordsHeading text={headingText} />
+                    </h2>
                   </div>
                 </div>
 
+                <ScrollReveal delayMs={80}>
                 {rows.length === 0 ? (
-                  <p className="text-contrast-500 py-6 subtext-md">
+                  <p className="subtext-md py-6 text-contrast-500">
                     Add FAQ items in Makeswift (question + answer per row).
                   </p>
                 ) : (
-                  rows.map((row, index) => {
-                    const html = answerHtmlForRte(row.answer ?? '');
+                  <div className="faq">
+                    {rows.map((row, index) => {
+                      const html = answerHtmlForRte(row.answer ?? '');
 
-                    return (
-                      <div className="faq" key={`faq2-${String(index)}`}>
-                        <div className="accordion">
+                      return (
+                        <div className="accordion" key={`faq2-${String(index)}`}>
                           <details className="details" {...{ is: 'accordion-details' }}>
                             <summary className="details__summary flex cursor-pointer items-center justify-between gap-2">
                               <span className="text-base font-medium leading-tight lg:text-lg xl:text-xl">
@@ -74,22 +79,21 @@ export function DiabetesCareFaqSecond({ className, heading, items }: DiabetesCar
                             </summary>
                             <div
                               className="details__content rte text-base"
-                              // eslint-disable-next-line react/no-danger -- trusted Makeswift-authored markup
                               dangerouslySetInnerHTML={{ __html: html }}
                             />
                           </details>
                         </div>
-                      </div>
-                    );
-                  })
+                      );
+                    })}
+                  </div>
                 )}
+                </ScrollReveal>
               </div>
             </div>
           </div>
         </div>
         {jsonLd != null ? (
           <script
-            // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             type="application/ld+json"
           />

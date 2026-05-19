@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+import { SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+
 export function IconPlusAccordion() {
   return (
     <svg
@@ -28,25 +30,7 @@ export function highlightedLastWord(word: string): ReactNode {
 }
 
 export function headingWithLastWordHighlight(heading: string): ReactNode {
-  const tokens = heading.trim().split(/\s+/).filter((t) => t.length > 0);
-
-  if (tokens.length === 0) {
-    return null;
-  }
-
-  if (tokens.length === 1) {
-    return highlightedLastWord(tokens[0] ?? '');
-  }
-
-  const last = tokens[tokens.length - 1] ?? '';
-  const before = tokens.slice(0, -1).join(' ');
-
-  return (
-    <>
-      {before}{' '}
-      {highlightedLastWord(last)}
-    </>
-  );
+  return <SplitWordsHeading highlightLastWord text={heading} />;
 }
 
 /** Strip tags for FAQPage JSON-LD `text` fields. */

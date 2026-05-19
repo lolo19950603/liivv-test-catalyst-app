@@ -11,6 +11,8 @@ import {
 } from 'react';
 
 import { HeaderSection } from '@/vibes/soul/sections/header-section';
+import { shouldHideStoreHeader } from '~/lib/makeswift/site-header/should-hide-store-header';
+import { usePathname } from '~/i18n/routing';
 
 type HeaderSectionProps = ComponentPropsWithoutRef<typeof HeaderSection>;
 
@@ -72,6 +74,7 @@ interface Props {
     link?: { href: string };
   };
   linksPosition: 'center' | 'left' | 'right';
+  hideOnPaths?: string[];
 }
 
 function combineLinks(
@@ -93,8 +96,14 @@ function combineLinks(
 }
 
 export const MakeswiftHeader = forwardRef(
-  ({ banner, links, logo, linksPosition }: Props, ref: Ref<HTMLDivElement>) => {
+  ({ banner, links, logo, linksPosition, hideOnPaths }: Props, ref: Ref<HTMLDivElement>) => {
+    const pathname = usePathname();
     const { navigation: passedProps, banner: passedBanner } = useContext(PropsContext);
+
+    if (shouldHideStoreHeader(pathname, hideOnPaths)) {
+      return null;
+    }
+
     const combinedBanner = banner.show
       ? {
           ...passedBanner,
@@ -128,3 +137,5 @@ export const MakeswiftHeader = forwardRef(
     );
   },
 );
+
+MakeswiftHeader.displayName = 'MakeswiftHeader';

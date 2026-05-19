@@ -1,6 +1,8 @@
 import { clsx } from 'clsx';
 import { useId, type ReactNode } from 'react';
 
+import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+
 function IconArrowRight() {
   return (
     <svg
@@ -120,7 +122,7 @@ export function DiabetesCareRevealImageWithText({
                       <div className="banner__box banner__box--large text-center">
                         <div className="splitting-wrapper relative">
                           <h2 className="heading title-xl tracking-heading splitting words chars leading-none">
-                            {title}
+                            <SplitWordsHeading text={title} />
                           </h2>
                         </div>
                       </div>
@@ -129,7 +131,7 @@ export function DiabetesCareRevealImageWithText({
                 </div>
               </div>
             </splitting-banner>
-            <div className="section--padding relative w-full">
+            <ScrollReveal className="section--padding relative w-full" delayMs={80}>
               {imageSrc.length > 0 ? (
                 <div className="page-width page-width--narrow relative mx-auto w-full">
                   <picture className="media media--adapt media--transparent relative flex w-full justify-center overflow-hidden rounded-3xl">
@@ -145,7 +147,7 @@ export function DiabetesCareRevealImageWithText({
                   </picture>
                 </div>
               ) : null}
-            </div>
+            </ScrollReveal>
           </div>
         </div>
       </div>
@@ -156,32 +158,9 @@ export function DiabetesCareRevealImageWithText({
           <div className="page-width page-width--narrow relative">
             <div className="rich-text relative z-1 text-center md:text-center">
               <h2 className="heading title-md leading-none">
-                {lead.length > 0 ? (
-                  <>
-                    {lead}
-                    {highlight.length > 0 ? (
-                      <>
-                        {' '}
-                        <em
-                          className="highlighted-text animated relative not-italic"
-                          data-style="text"
-                          is="highlighted-text"
-                        >
-                          {highlight}
-                        </em>
-                      </>
-                    ) : null}
-                  </>
-                ) : highlight.length > 0 ? (
-                  <em
-                    className="highlighted-text animated relative not-italic"
-                    data-style="text"
-                    is="highlighted-text"
-                  >
-                    {highlight}
-                  </em>
-                ) : null}
+                <SplitWordsHeading emphasis={highlight} lead={lead} />
               </h2>
+              <ScrollReveal delayMs={80}>
               <div className="rte body subtext-md leading-normal">{renderBodyParagraphs(bodyText)}</div>
               {primaryLabel.length > 0 || secondaryLabel.length > 0 ? (
                 <div className="mt-6 flex flex-wrap justify-center gap-4">
@@ -215,6 +194,7 @@ export function DiabetesCareRevealImageWithText({
                   ) : null}
                 </div>
               ) : null}
+              </ScrollReveal>
             </div>
           </div>
         </div>

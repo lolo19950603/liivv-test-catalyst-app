@@ -11,6 +11,12 @@
 import { Page as MakeswiftPage } from '@makeswift/runtime/next';
 import { ComponentPropsWithoutRef } from 'react';
 
+import { MakeswiftScrollAnimateShell } from './makeswift-scroll-animate-shell';
+
 export function MakeswiftPageShim(props: ComponentPropsWithoutRef<typeof MakeswiftPage>) {
-  return <MakeswiftPage {...props} />;
+  return (
+    <MakeswiftScrollAnimateShell>
+      <MakeswiftPage {...props} />
+    </MakeswiftScrollAnimateShell>
+  );
 }

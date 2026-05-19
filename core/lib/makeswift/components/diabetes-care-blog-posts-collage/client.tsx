@@ -1,6 +1,8 @@
 import { clsx } from 'clsx';
 import { useId, type ReactNode } from 'react';
 
+import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+
 import {
   BLOG_POSTS_COLLAGE_ARCHIVE_CSS,
   BLOG_POSTS_COLLAGE_SECTION_VARS_TEMPLATE,
@@ -111,21 +113,14 @@ export function DiabetesCareBlogPostsCollage({
             <div className="title-wrapper relative z-1 flex flex-col gap-4 text-left leading-none lg:gap-8 md:flex-row md:items-end md:justify-between">
               <div className="grid gap-4">
                 <h2 className="heading title-md">
-                  {hb.length > 0 ? <>{hb} </> : null}
-                  {he.length > 0 ? (
-                    <em
-                      className="highlighted-text animated relative not-italic"
-                      data-style="half_text"
-                      is="highlighted-text"
-                    >
-                      {he}
-                    </em>
-                  ) : null}
-                  {ha.length > 0 ? <> {ha}</> : null}
+                  <SplitWordsHeading
+                    accentPhrase={he.length > 0 ? he : undefined}
+                    text={[hb, he, ha].filter((part) => part.length > 0).join(' ')}
+                  />
                 </h2>
               </div>
             </div>
-            <slider-element className="grid slider" selector=".card-grid>.card">
+            <ScrollReveal className="grid slider" delayMs={100}>
               <div className="blog-grid blog-collage with-only3 card-grid mobile:card-grid--1 grid">
                 <div
                   className={clsx(
@@ -248,7 +243,7 @@ export function DiabetesCareBlogPostsCollage({
                   );
                 })}
               </div>
-            </slider-element>
+            </ScrollReveal>
           </div>
         </div>
       </div>

@@ -1,5 +1,7 @@
 import { clsx } from 'clsx';
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties } from 'react';
+
+import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
 
 /** CSS variables used by migrated Shopify section markup (avoids `as CSSProperties`). */
 type ShopifyThemeStyle = CSSProperties & Record<string, string | number | undefined>;
@@ -79,42 +81,6 @@ function IconArrowRight() {
         strokeLinejoin="round"
       />
     </svg>
-  );
-}
-
-const highlightedLastWord = (word: string): ReactNode => (
-  <em
-    className="highlighted-text animated relative not-italic"
-    data-style="half_text"
-    is="highlighted-text"
-  >
-    {word}
-  </em>
-);
-
-/**
- * Renders the intro line with the same peach “half underline” as column titles: only the last
- * whitespace-separated token is wrapped in `highlighted-text` (e.g. “journey.” in “Diabetes is a journey.”).
- */
-function introHeadingWithLastWordHighlight(heading: string): ReactNode {
-  const tokens = heading.trim().split(/\s+/).filter((t) => t.length > 0);
-
-  if (tokens.length === 0) {
-    return null;
-  }
-
-  if (tokens.length === 1) {
-    return highlightedLastWord(tokens[0] ?? '');
-  }
-
-  const last = tokens[tokens.length - 1] ?? '';
-  const before = tokens.slice(0, -1).join(' ');
-
-  return (
-    <>
-      {before}{' '}
-      {highlightedLastWord(last)}
-    </>
   );
 }
 
@@ -207,7 +173,7 @@ export function DiabetesCareMulticolumn({
                 <div className="grid gap-4">
                   {introTitle.length > 0 ? (
                     <h2 className="heading title-xl tracking-heading">
-                      {introHeadingWithLastWordHighlight(introTitle)}
+                      <SplitWordsHeading highlightLastWord text={introTitle} />
                     </h2>
                   ) : null}
                   {intro.length > 0 ? (
@@ -225,10 +191,10 @@ export function DiabetesCareMulticolumn({
               </div>
             ) : null}
 
-            <slider-element
+            <ScrollReveal delayMs={100}>
+            <div
               className="grid slider slider--tablet"
               id={MULTICOLUMN_SLIDER_ID}
-              selector=".card-grid>.card"
             >
               <div
                 className={clsx(
@@ -340,7 +306,8 @@ export function DiabetesCareMulticolumn({
                   );
                 })}
               </div>
-            </slider-element>
+            </div>
+            </ScrollReveal>
           </div>
         </div>
       </div>

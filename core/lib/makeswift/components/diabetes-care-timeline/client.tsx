@@ -1,7 +1,9 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
 
 const SHOPIFY_SECTION_ID = 'shopify-section-template--26520397447459__timeline_nyTDKQ';
 const SLIDER_ID = 'Slider-template--26520397447459__timeline_nyTDKQ';
@@ -44,46 +46,6 @@ export interface DiabetesCareTimelineProps {
   topHeading?: string;
   headingAccentPhrase?: string;
   sections?: DiabetesCareTimelineSection[];
-}
-
-/**
- * Main title: accent substring wrapped in theme `highlighted-text` (matches export markup).
- * @param {string} heading Full heading text from the CMS.
- * @param {string | undefined} accentPhrase First case-insensitive match is wrapped in theme `<em>`.
- * @returns {ReactNode} Heading content inside `h2.heading.title-md`.
- */
-function headingWithThemeAccent(heading: string, accentPhrase?: string): ReactNode {
-  const phrase = accentPhrase?.trim();
-
-  if (!phrase) {
-    return heading;
-  }
-
-  const lowerHeading = heading.toLowerCase();
-  const lowerPhrase = phrase.toLowerCase();
-  const index = lowerHeading.indexOf(lowerPhrase);
-
-  if (index === -1) {
-    return heading;
-  }
-
-  const before = heading.slice(0, index);
-  const match = heading.slice(index, index + phrase.length);
-  const after = heading.slice(index + phrase.length);
-
-  return (
-    <>
-      {before}
-      <em
-        className="highlighted-text animated relative not-italic"
-        data-style="half_text"
-        is="highlighted-text"
-      >
-        {match}
-      </em>
-      {after}
-    </>
-  );
 }
 
 function IconChevronLeft() {
@@ -363,7 +325,7 @@ export function DiabetesCareTimeline({
             <div className="title-wrapper z-1 relative flex flex-col gap-4 text-left leading-none md:flex-row md:items-end md:justify-between lg:gap-8">
               <div className="grid gap-4">
                 <h2 className="heading title-md">
-                  {headingWithThemeAccent(heading, headingAccentPhrase)}
+                  <SplitWordsHeading accentPhrase={headingAccentPhrase} text={heading} />
                 </h2>
               </div>
 
@@ -418,6 +380,7 @@ export function DiabetesCareTimeline({
               </div>
             ) : (
               <>
+                <ScrollReveal delayMs={100}>
                 <div
                   aria-label={`Journey carousel, slide ${safeIndex + 1} of ${count}`}
                   aria-roledescription="carousel"
@@ -471,6 +434,7 @@ export function DiabetesCareTimeline({
                     })}
                   </div>
                 </div>
+                </ScrollReveal>
               </>
             )}
           </div>

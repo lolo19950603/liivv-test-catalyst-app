@@ -1,6 +1,8 @@
 'use client';
 
 import { clsx } from 'clsx';
+
+import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 
 const SECTION_VARS = `--section-padding-top:72px;--section-padding-bottom:72px;--section-grid-gap:70px`;
@@ -428,18 +430,13 @@ export function DiabetesCareLogoList({
             <div className="title-wrapper relative z-1 flex flex-col gap-4 text-center leading-none lg:gap-8 md:items-center md:justify-between">
               <div className="grid gap-4">
                 <h2 className="heading title-md">
-                  <em
-                    className="highlighted-text animated relative not-italic"
-                    data-style="half_text"
-                    is="highlighted-text"
-                  >
-                    {title}
-                  </em>
+                  <SplitWordsHeading highlightEntirePhrase text={title} />
                 </h2>
               </div>
             </div>
 
             {items.length > 0 ? (
+              <ScrollReveal delayMs={100}>
               <div
                 className="dcll-marquee-viewport touch-none overflow-hidden text-center select-none md:items-center"
                 ref={viewportRef}
@@ -452,6 +449,7 @@ export function DiabetesCareLogoList({
                   {Array.from({ length: stripCount }, (_, i) => renderStrip(i))}
                 </div>
               </div>
+              </ScrollReveal>
             ) : null}
           </div>
         </div>

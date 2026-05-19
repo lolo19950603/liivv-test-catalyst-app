@@ -1,6 +1,8 @@
 import { clsx } from 'clsx';
 import type { CSSProperties } from 'react';
 
+import { SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+
 /** CSS variables used by migrated Shopify section markup (avoids `as CSSProperties`). */
 type ShopifyThemeStyle = CSSProperties & Record<string, string | number | undefined>;
 
@@ -120,17 +122,21 @@ export function DiabetesCareCustomBand({
                 className="heading size-style title-lg tracking-heading w-full min-w-0 max-w-full text-balance text-center leading-snug md:text-center md:leading-none"
                 style={headingBoxStyle}
               >
-                <span className="block">
-                  {primary}{' '}
-                  <em
-                    className="highlighted-text animated relative not-italic"
-                    data-style="text"
-                    is="highlighted-text"
-                    style={secondaryEmStyle}
-                  >
-                    {secondary}
-                  </em>
-                </span>
+                {useThemeHighlight ? (
+                  <SplitWordsHeading emphasis={secondary} lead={primary} />
+                ) : (
+                  <span className="block">
+                    {primary}{' '}
+                    <em
+                      className="highlighted-text animated relative not-italic"
+                      data-style="text"
+                      is="highlighted-text"
+                      style={secondaryEmStyle}
+                    >
+                      {secondary}
+                    </em>
+                  </span>
+                )}
               </h2>
             </div>
           </div>

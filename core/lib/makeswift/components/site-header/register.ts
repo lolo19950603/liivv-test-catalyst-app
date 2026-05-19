@@ -107,5 +107,13 @@ runtime.registerComponent(MakeswiftHeader, {
       ],
       defaultValue: 'center',
     }),
+    hideOnPaths: List({
+      label: 'Hide store header on pages',
+      type: TextInput({
+        label: 'Path',
+        defaultValue: '/diabetes-care',
+      }),
+      getItemLabel: (item) => item ?? '/diabetes-care',
+    }),
   },
 });

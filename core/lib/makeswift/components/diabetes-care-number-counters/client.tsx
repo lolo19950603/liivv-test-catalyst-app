@@ -1,6 +1,12 @@
+'use client';
+
 import { clsx } from 'clsx';
 import type { CSSProperties } from 'react';
 
+import {
+  AnimatedNumberCounter,
+  ScrollReveal,
+} from '~/lib/makeswift/diabetes-care-scroll-animate';
 /** CSS variables used by migrated Shopify section markup (avoids `as CSSProperties`). */
 type ShopifyThemeStyle = CSSProperties & Record<string, string | number | undefined>;
 
@@ -120,10 +126,10 @@ export function DiabetesCareNumberCounters({
             key={`counter-${index}`}
           >
             <div className="grid w-full min-w-0 gap-3 sm:gap-4 lg:gap-6">
-              <div className="counter-heading heading title-lg font-bold leading-none tracking-tight sm:whitespace-nowrap">
-                <span>{row.value ?? ''}</span>
+              <p className="counter-heading heading title-lg font-bold leading-none tracking-tight sm:whitespace-nowrap">
+                <AnimatedNumberCounter value={row.value ?? ''} />
                 {showPercentSuffix ? '%' : null}
-              </div>
+              </p>
               <div className="heading text-xl leading-snug tracking-tight sm:text-2xl sm:leading-none lg:text-3xl">
                 {row.description ?? ''}
               </div>
@@ -139,7 +145,9 @@ export function DiabetesCareNumberCounters({
       <div className="shopify-section" id={NUMBER_COUNTER_SECTION_ID} style={sectionVars}>
         <style dangerouslySetInnerHTML={{ __html: numberCounterSectionStyle(rows.length) }} />
         <div className="section section--padding section--rounded relative">
-          <div className="page-width page-width--full relative px-4 sm:px-5 md:px-0">{grid}</div>
+          <div className="page-width page-width--full relative px-4 sm:px-5 md:px-0">
+            <ScrollReveal delayMs={80}>{grid}</ScrollReveal>
+          </div>
         </div>
       </div>
     </div>

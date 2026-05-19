@@ -8,12 +8,12 @@ export const COMPONENT_TYPE = 'diabetes-care-faq-first';
 
 runtime.registerComponent(DiabetesCareFaqFirst, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / 11. FAQ (first)',
+  label: 'Diabetes care / 10. FAQ (first)',
   icon: 'layout',
   props: {
     className: Style(),
     heading: TextInput({
-      label: 'Heading (last word gets accent underline)',
+      label: 'Heading',
       defaultValue: 'Support, Wherever You Are',
     }),
     intro: TextArea({

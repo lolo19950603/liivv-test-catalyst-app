@@ -15,6 +15,8 @@ export default async function DefaultLayout({ params, children }: Props) {
 
   return (
     <>
+      {/* Archived Shopify section theme (scoped ids; utility collisions stripped in build). */}
+      <link href="/archive/diabetes-care-sections.css" rel="stylesheet" />
       <Header />
 
       <main>{children}</main>

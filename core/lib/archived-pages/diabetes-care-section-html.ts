@@ -5,6 +5,23 @@ import type { DiabetesCareSectionSuffix } from './diabetes-care-section-allowlis
 
 const SECTION_ID_PREFIX = 'shopify-section-template--26520397447459__';
 
+/** Global Shopify layout footer (Liivv storefront), not part of the page template slice. */
+const STOREFRONT_FOOTER_MARKERS = ['<footer class="footer-group"', '<footer class=footer-group'] as const;
+
+function storefrontFooterOpenIndex(html: string, searchFrom: number): number | undefined {
+  let best: number | undefined;
+
+  for (const marker of STOREFRONT_FOOTER_MARKERS) {
+    const idx = html.indexOf(marker, searchFrom);
+
+    if (idx !== -1 && (best === undefined || idx < best)) {
+      best = idx;
+    }
+  }
+
+  return best;
+}
+
 function extractShopifySectionSlice(bodyInner: string, suffix: DiabetesCareSectionSuffix): string {
   const escapedPrefix = SECTION_ID_PREFIX.replace(/-/g, '\\-');
   const re = new RegExp(`<div id=${escapedPrefix}([a-zA-Z0-9_]+)`, 'g');
@@ -35,11 +52,15 @@ function extractShopifySectionSlice(bodyInner: string, suffix: DiabetesCareSecti
     throw new Error(`Invalid section index for suffix: ${suffix}`);
   }
 
-  const end = index + 1 < positions.length ? positions[index + 1]?.index : bodyInner.length;
+  const rawEnd = index + 1 < positions.length ? positions[index + 1]?.index : bodyInner.length;
 
-  if (end === undefined) {
+  if (rawEnd === undefined) {
     throw new Error(`Invalid section end for suffix: ${suffix}`);
   }
+
+  const footerStart = storefrontFooterOpenIndex(bodyInner, start);
+  const end =
+    footerStart !== undefined ? Math.min(rawEnd, footerStart) : rawEnd;
 
   return bodyInner.slice(start, end);
 }
