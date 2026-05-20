@@ -2,7 +2,17 @@
 
 import { clsx } from 'clsx';
 
-import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { ARCHIVE_SAGE_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
+import {
+  buildSectionTheme,
+  resolveBodyTextColor,
+  resolveHeadingTypography,
+  type BodyTextProps,
+  type HeadingTypographyProps,
+  type HeadingWithHighlightProps,
+  type SectionBackgroundProps,
+} from '~/lib/makeswift/utils/diabetes-care-section-style';
 
 import { RICH_TEXT_LOWER_SECTION_ID, RICH_TEXT_LOWER_VARS } from './archive-styles';
 
@@ -50,37 +60,50 @@ function IconArrowRight() {
   );
 }
 
-export interface DiabetesCareRichTextLowerProps {
+export type DiabetesCareRichTextLowerProps = {
   className?: string;
+  background?: SectionBackgroundProps;
+  primaryHeading?: HeadingTypographyProps;
+  secondaryHeading?: HeadingWithHighlightProps;
+  body?: {
+    html?: string;
+    ctaLabel?: string;
+    ctaLink?: { href?: string; target?: string };
+  };
   showSupportIcon?: boolean;
-  headingLead?: string;
-  headingAccent?: string;
-  /** Rich text / HTML for the body (Makeswift TextArea). */
-  bodyHtml?: string;
-  ctaLabel?: string;
-  ctaLink?: { href?: string; target?: string };
-}
+  bodyText?: BodyTextProps;
+};
 
 export function DiabetesCareRichTextLower({
   className,
+  background,
+  primaryHeading,
+  secondaryHeading,
+  body,
   showSupportIcon = true,
-  headingLead,
-  headingAccent,
-  bodyHtml,
-  ctaLabel,
-  ctaLink,
+  bodyText,
 }: DiabetesCareRichTextLowerProps) {
-  const lead = headingLead?.trim() ?? 'Put a stop to pain.';
-  const accent = headingAccent?.trim() ?? 'Period.';
-  const html = bodyHtml?.trim() ?? '';
-  const label = ctaLabel?.trim() ?? '';
-  const href = ctaLink?.href?.trim() ?? '';
+  const lead = resolveHeadingTypography(primaryHeading);
+  const accent = resolveHeadingTypography(secondaryHeading);
+  const bodyColor = resolveBodyTextColor(bodyText);
+  const { sectionCss, sectionStyle } = buildSectionTheme({
+    sectionId: RICH_TEXT_LOWER_SECTION_ID,
+    sectionCss: RICH_TEXT_LOWER_VARS,
+    background,
+    highlight: secondaryHeading,
+    defaultBackgroundChannels: ARCHIVE_SAGE_BACKGROUND_CHANNELS,
+  });
+  const leadText = lead.text.length > 0 ? lead.text : 'Put a stop to pain.';
+  const accentText = accent.text.length > 0 ? accent.text : 'Period.';
+  const html = body?.html?.trim() ?? '';
+  const label = body?.ctaLabel?.trim() ?? '';
+  const href = body?.ctaLink?.href?.trim() ?? '';
   const hasCta = label.length > 0 && href.length > 0;
 
   return (
     <div className={clsx('diabetes-care-rich-text-lower max-w-full overflow-x-hidden', className)}>
-      <div className="shopify-section" id={RICH_TEXT_LOWER_SECTION_ID}>
-        <style dangerouslySetInnerHTML={{ __html: RICH_TEXT_LOWER_VARS }} />
+      <div className="shopify-section" id={RICH_TEXT_LOWER_SECTION_ID} style={sectionStyle}>
+        <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding">
           <div className="page-width page-width--narrow relative">
             <div className="rich-text z-1 relative text-left md:text-left">
@@ -90,29 +113,34 @@ export function DiabetesCareRichTextLower({
                 </div>
               ) : null}
               <h2 className="heading title-lg tracking-heading leading-none">
-                <SplitWordsHeading emphasis={accent} lead={lead} />
+                <AccentSplitWordsHeading
+                  accentColors={secondaryHeading}
+                  emphasis={accentText}
+                  lead={leadText}
+                />
               </h2>
               <ScrollReveal delayMs={80}>
-              {html.length > 0 ? (
-                <div
-                  className="rte body subtext-md leading-normal"
-                  dangerouslySetInnerHTML={{ __html: html }}
-                />
-              ) : null}
-              {hasCta ? (
-                <a
-                  className="button button--primary button--lg icon-with-text"
-                  href={href}
-                  rel={ctaLink?.target === '_blank' ? 'noopener noreferrer' : undefined}
-                  target={ctaLink?.target}
-                >
-                  <span className="btn-fill" data-fill />
-                  <span className="btn-text">
-                    {label}
-                    <IconArrowRight />
-                  </span>
-                </a>
-              ) : null}
+                {html.length > 0 ? (
+                  <div
+                    className="rte body subtext-md leading-normal"
+                    dangerouslySetInnerHTML={{ __html: html }}
+                    style={bodyColor != null ? { color: bodyColor } : undefined}
+                  />
+                ) : null}
+                {hasCta ? (
+                  <a
+                    className="button button--primary button--lg icon-with-text"
+                    href={href}
+                    rel={body?.ctaLink?.target === '_blank' ? 'noopener noreferrer' : undefined}
+                    target={body?.ctaLink?.target}
+                  >
+                    <span className="btn-fill" data-fill />
+                    <span className="btn-text">
+                      {label}
+                      <IconArrowRight />
+                    </span>
+                  </a>
+                ) : null}
               </ScrollReveal>
             </div>
           </div>

@@ -1,6 +1,13 @@
 import { Combobox, Group, List, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
+import {
+  fontSizeFields,
+  headingPopoverControls,
+  sectionBackgroundControls,
+  textColorFields,
+} from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
+import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
 import { searchProducts } from '../../utils/search-products';
 
@@ -14,18 +21,35 @@ runtime.registerComponent(DiabetesCareFeaturedCollections, {
   icon: 'layout',
   props: {
     className: Style(),
-    eyebrow: TextInput({
-      label: 'Eyebrow (small line above heading)',
-      defaultValue: 'Your routine is personal',
+    ...sectionBackgroundControls(ARCHIVE_SAGE_BACKGROUND_HSL),
+    eyebrow: Group({
+      label: 'Eyebrow',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        text: TextInput({
+          label: 'Text (small line above heading)',
+          defaultValue: 'Your routine is personal',
+        }),
+        ...textColorFields(),
+        ...fontSizeFields(),
+      },
     }),
-    heading: TextInput({
-      label: 'Heading (last word gets accent underline)',
-      defaultValue: 'What Works, Every Day',
+    ...headingPopoverControls({
+      label: 'Heading',
+      textDefault: 'What Works, Every Day',
     }),
-    description: TextArea({
-      label: 'Intro copy (below heading)',
-      defaultValue:
-        'Whether you’re just starting out or refining what you use, the right essentials can make everything feel easier.',
+    body: Group({
+      label: 'Body',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        text: TextArea({
+          label: 'Intro copy (below heading)',
+          defaultValue:
+            'Whether you’re just starting out or refining what you use, the right essentials can make everything feel easier.',
+        }),
+        ...textColorFields(),
+        ...fontSizeFields(),
+      },
     }),
     collections: List({
       label: 'Tabs (each tab = one product row)',

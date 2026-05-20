@@ -1,11 +1,20 @@
 import { clsx } from 'clsx';
-import { useId, type ReactNode } from 'react';
+import { useId, type CSSProperties } from 'react';
 
 import {
+  AccentSplitWordsHeading,
   ScrollReveal,
   SplittingBanner,
   SplitWordsHeading,
 } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import {
+  buildSectionTheme,
+  resolveBodyTextColor,
+  resolveHeadingTypography,
+  type HeadingTypographyProps,
+  type HeadingWithHighlightProps,
+  type SectionBackgroundProps,
+} from '~/lib/makeswift/utils/diabetes-care-section-style';
 
 function IconArrowRight() {
   return (
@@ -26,94 +35,83 @@ function IconArrowRight() {
   );
 }
 
-const DEFAULT_BODY = `"I got diagnosed in March of 2020 at age 20.
+const DEFAULT_BODY_HTML =
+  '<p><em>"I got diagnosed in March of 2020 at age 20.</em></p><p><em>The first sign that something was wrong was in February where I was doing sprints on a treadmill to get ready for a soccer season and after finishing I felt sick and dizzy to where I might need to go to the hospital.</em></p><p><em>I thought maybe I just went "too hard" and I was upset because it meant that I was way out of shape for the upcoming soccer season. Then I was getting very thirsty and seeing my weight drop despite working out and bulking..."</em></p><p><strong>Sometimes the best resource is a conversation. Connect with community partners who have walked the path before you.</strong></p>';
 
-The first sign that something was wrong was in February where I was doing sprints on a treadmill to get ready for a soccer season and after finishing I felt sick and dizzy to where I might need to go to the hospital.
-
-I thought maybe I just went "too hard" and I was upset because it meant that I was way out of shape for the upcoming soccer season. Then I was getting very thirsty and seeing my weight drop despite working out and bulking..."
-
-**Sometimes the best resource is a conversation. Connect with community partners who have walked the path before you.**`;
-
-/** Split on blank lines; collapse single newlines inside a block into spaces. */
-function bodyParagraphStrings(body: string): string[] {
-  return body
-    .split(/\n\s*\n/)
-    .map((p) => p.replace(/\n/g, ' ').trim())
-    .filter((p) => p.length > 0);
-}
-
-function renderBodyParagraphs(body: string): ReactNode {
-  return bodyParagraphStrings(body).map((block, i) => {
-    const inner = block.trim();
-    const boldWrapped =
-      inner.startsWith('**') &&
-      inner.endsWith('**') &&
-      inner.length > 4 &&
-      !inner.slice(2, -2).includes('**');
-
-    if (boldWrapped) {
-      return (
-        <p key={`body-p-${i}`}>
-          <strong>{inner.slice(2, -2)}</strong>
-        </p>
-      );
-    }
-
-    return (
-      <p key={`body-p-${i}`}>
-        <em>{inner}</em>
-      </p>
-    );
-  });
-}
-
-export interface DiabetesCareRevealImageTextProps {
+export type DiabetesCareRevealImageTextProps = {
   className?: string;
-  bannerTitle?: string;
-  heroImageSrc?: string;
-  heroImageAlt?: string;
-  storyHeadingLead?: string;
-  storyHeadingHighlight?: string;
-  body?: string;
-  primaryButtonText?: string;
-  primaryButtonLink?: { href?: string; target?: string };
-  secondaryButtonText?: string;
-  secondaryButtonLink?: { href?: string; target?: string };
-}
+  background?: SectionBackgroundProps;
+  banner?: {
+    title?: string;
+    heroImageSrc?: string;
+    heroImageAlt?: string;
+  };
+  primaryHeading?: HeadingTypographyProps;
+  secondaryHeading?: HeadingWithHighlightProps;
+  body?: HeadingTypographyProps & { html?: string };
+  buttons?: {
+    primaryText?: string;
+    primaryLink?: { href?: string; target?: string };
+    secondaryText?: string;
+    secondaryLink?: { href?: string; target?: string };
+  };
+};
 
 export function DiabetesCareRevealImageWithText({
   className,
-  bannerTitle,
-  heroImageSrc,
-  heroImageAlt,
-  storyHeadingLead,
-  storyHeadingHighlight,
+  background,
+  banner,
+  primaryHeading,
+  secondaryHeading,
   body,
-  primaryButtonText,
-  primaryButtonLink,
-  secondaryButtonText,
-  secondaryButtonLink,
+  buttons,
 }: DiabetesCareRevealImageTextProps) {
+  const storyLead = resolveHeadingTypography(primaryHeading);
+  const storyAccent = resolveHeadingTypography(secondaryHeading);
+  const bodyColor = resolveBodyTextColor(body);
   const instance = useId().replace(/:/g, '');
+  const rootId = `dcrift-${instance}`;
   const revealSectionId = `dcrift-reveal-${instance}`;
   const richSectionId = `dcrift-rich-${instance}`;
 
-  const richSectionStyle = `#${richSectionId}{--section-padding-top:72px;--section-padding-bottom:100px;--color-button-background:142 165 141;--color-button-border:142 165 141}`;
+  /** Theme vars on the component root so reveal banner + image and rich text share background. */
+  const { sectionCss, sectionStyle } = buildSectionTheme({
+    sectionId: rootId,
+    sectionCss: `#${richSectionId}{--section-padding-top:72px;--section-padding-bottom:100px;--color-button-background:142 165 141;--color-button-border:142 165 141}`,
+    background,
+    highlight: secondaryHeading,
+    defaultBackgroundChannels: '255 255 255',
+  });
 
-  const title = bannerTitle?.trim() ?? 'Meet Armaan...';
-  const imageSrc = heroImageSrc?.trim() ?? '';
-  const imageAlt = heroImageAlt?.trim() ?? '';
-  const lead = storyHeadingLead?.trim() ?? 'You Are';
-  const highlight = storyHeadingHighlight?.trim() ?? 'Not Alone...';
-  const bodyText = (body?.trim().length ?? 0) > 0 ? (body ?? '').trim() : DEFAULT_BODY;
+  const rootThemeStyle = sectionStyle as CSSProperties & Record<string, string | number>;
 
-  const primaryLabel = primaryButtonText?.trim() ?? '';
-  const secondaryLabel = secondaryButtonText?.trim() ?? '';
-  const primaryHref = primaryButtonLink?.href ?? '#';
-  const secondaryHref = secondaryButtonLink?.href ?? '#';
+  const title = banner?.title?.trim() ?? 'Meet Armaan...';
+  const imageSrc = banner?.heroImageSrc?.trim() ?? '';
+  const imageAlt = banner?.heroImageAlt?.trim() ?? '';
+  const lead = storyLead.text.length > 0 ? storyLead.text : 'You Are';
+  const headingEmphasis = storyAccent.text.length > 0 ? storyAccent.text : 'Not Alone...';
+  const bodyHtml =
+    (body?.html?.trim().length ?? 0) > 0 ? (body?.html ?? '').trim() : DEFAULT_BODY_HTML;
+
+  const primaryLabel = buttons?.primaryText?.trim() ?? '';
+  const secondaryLabel = buttons?.secondaryText?.trim() ?? '';
+  const primaryHref = buttons?.primaryLink?.href ?? '#';
+  const secondaryHref = buttons?.secondaryLink?.href ?? '#';
+  const bannerHeadingStyle =
+    storyLead.color != null || storyLead.fontSize != null
+      ? {
+          ...(storyLead.color != null ? { color: storyLead.color } : {}),
+          ...(storyLead.fontSize != null ? { fontSize: storyLead.fontSize } : {}),
+        }
+      : undefined;
 
   return (
-    <div className={clsx('diabetes-care-reveal-image-text', className)}>
+    <div
+      className={clsx('diabetes-care-reveal-image-text', className)}
+      id={rootId}
+      style={rootThemeStyle}
+    >
+      <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
       <div className="shopify-section contents" id={revealSectionId}>
         <div className="section inline">
           <div className="relative contents">
@@ -125,7 +123,10 @@ export function DiabetesCareRevealImageWithText({
                     <div className="page-width flex h-full w-full items-center justify-center">
                       <div className="banner__box banner__box--large text-center">
                         <div className="splitting-wrapper relative">
-                          <h2 className="heading title-xl tracking-heading splitting words chars leading-none">
+                          <h2
+                            className="heading title-xl tracking-heading splitting words chars leading-none"
+                            style={bannerHeadingStyle}
+                          >
                             <SplitWordsHeading text={title} />
                           </h2>
                         </div>
@@ -157,47 +158,66 @@ export function DiabetesCareRevealImageWithText({
       </div>
 
       <div className="shopify-section" id={richSectionId}>
-        <style dangerouslySetInnerHTML={{ __html: richSectionStyle }} />
         <div className="section section--padding">
           <div className="page-width page-width--narrow relative">
             <div className="rich-text relative z-1 text-center md:text-center">
               <h2 className="heading title-md leading-none">
-                <SplitWordsHeading emphasis={highlight} lead={lead} />
+                <AccentSplitWordsHeading
+                  accentColors={secondaryHeading}
+                  emphasis={headingEmphasis}
+                  emphasisColor={storyAccent.color ?? storyAccent.emphasisColor}
+                  emphasisFontSize={storyAccent.fontSize}
+                  lead={lead}
+                  leadColor={storyLead.color}
+                  leadFontSize={storyLead.fontSize}
+                />
               </h2>
               <ScrollReveal delayMs={80}>
-              <div className="rte body subtext-md leading-normal">{renderBodyParagraphs(bodyText)}</div>
-              {primaryLabel.length > 0 || secondaryLabel.length > 0 ? (
-                <div className="mt-6 flex flex-wrap justify-center gap-4">
-                  {primaryLabel.length > 0 ? (
-                    <a
-                      className="button button--primary button--md icon-with-text"
-                      href={primaryHref}
-                      rel={primaryButtonLink?.target === '_blank' ? 'noopener noreferrer' : undefined}
-                      target={primaryButtonLink?.target}
-                    >
-                      <span className="btn-fill" data-fill />
-                      <span className="btn-text">
-                        {primaryLabel}
-                        <IconArrowRight />
-                      </span>
-                    </a>
-                  ) : null}
-                  {secondaryLabel.length > 0 ? (
-                    <a
-                      className="button button--secondary button--md icon-with-text"
-                      href={secondaryHref}
-                      rel={secondaryButtonLink?.target === '_blank' ? 'noopener noreferrer' : undefined}
-                      target={secondaryButtonLink?.target}
-                    >
-                      <span className="btn-fill" data-fill />
-                      <span className="btn-text">
-                        {secondaryLabel}
-                        <IconArrowRight />
-                      </span>
-                    </a>
-                  ) : null}
-                </div>
-              ) : null}
+                <div
+                  className="rte body subtext-md leading-normal"
+                  dangerouslySetInnerHTML={{ __html: bodyHtml }}
+                  style={bodyColor != null ? { color: bodyColor } : undefined}
+                />
+                {primaryLabel.length > 0 || secondaryLabel.length > 0 ? (
+                  <div className="mt-6 flex flex-wrap justify-center gap-4">
+                    {primaryLabel.length > 0 ? (
+                      <a
+                        className="button button--primary button--md icon-with-text"
+                        href={primaryHref}
+                        rel={
+                          buttons?.primaryLink?.target === '_blank'
+                            ? 'noopener noreferrer'
+                            : undefined
+                        }
+                        target={buttons?.primaryLink?.target}
+                      >
+                        <span className="btn-fill" data-fill />
+                        <span className="btn-text">
+                          {primaryLabel}
+                          <IconArrowRight />
+                        </span>
+                      </a>
+                    ) : null}
+                    {secondaryLabel.length > 0 ? (
+                      <a
+                        className="button button--secondary button--md icon-with-text"
+                        href={secondaryHref}
+                        rel={
+                          buttons?.secondaryLink?.target === '_blank'
+                            ? 'noopener noreferrer'
+                            : undefined
+                        }
+                        target={buttons?.secondaryLink?.target}
+                      >
+                        <span className="btn-fill" data-fill />
+                        <span className="btn-text">
+                          {secondaryLabel}
+                          <IconArrowRight />
+                        </span>
+                      </a>
+                    ) : null}
+                  </div>
+                ) : null}
               </ScrollReveal>
             </div>
           </div>

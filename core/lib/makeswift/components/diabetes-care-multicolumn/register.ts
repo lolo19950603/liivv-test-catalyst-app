@@ -1,11 +1,55 @@
 import { Group, Image, Link, List, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
+import {
+  fontSizeFields,
+  highlightSwashFields,
+  sectionBackgroundControls,
+  splitHeadingPopoverControls,
+  textColorFields,
+} from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
+import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
 import { DiabetesCareMulticolumn } from './client';
 
 /** Stable id aligned with `multicolumn_JtTdUn` in `diabetes-care.html` (dedicated slice, not HTML fetch). */
 export const COMPONENT_TYPE = 'diabetes-care-multicolumn';
+
+function multicolumnHeadingPopover(label: string, textDefault: string) {
+  return Group({
+    label,
+    preferredLayout: Group.Layout.Popover,
+    props: {
+      text: TextInput({
+        label: 'Text',
+        defaultValue: textDefault,
+      }),
+      ...textColorFields(),
+      ...fontSizeFields(),
+      ...highlightSwashFields(),
+    },
+  });
+}
+
+function multicolumnPlainTextPopover(label: string, textDefault: string, textArea = false) {
+  return Group({
+    label,
+    preferredLayout: Group.Layout.Popover,
+    props: {
+      text: textArea
+        ? TextArea({
+            label: 'Text',
+            defaultValue: textDefault,
+          })
+        : TextInput({
+            label: 'Text',
+            defaultValue: textDefault,
+          }),
+      ...textColorFields(),
+      ...fontSizeFields(),
+    },
+  });
+}
 
 runtime.registerComponent(DiabetesCareMulticolumn, {
   type: COMPONENT_TYPE,
@@ -13,38 +57,76 @@ runtime.registerComponent(DiabetesCareMulticolumn, {
   icon: 'layout',
   props: {
     className: Style(),
-    introHeading: TextInput({
-      label: 'Intro heading (optional)',
-      defaultValue: '',
+    ...sectionBackgroundControls(ARCHIVE_SAGE_BACKGROUND_HSL),
+    ...splitHeadingPopoverControls({
+      primaryLabel: 'Primary heading',
+      secondaryLabel: 'Secondary heading (swash)',
+      primaryDefault: 'Diabetes is a',
+      secondaryDefault: 'journey.',
     }),
-    introBody: TextArea({
-      label: 'Intro text (optional)',
-      defaultValue: '',
+    intro: Group({
+      label: 'Intro body',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        body: TextArea({
+          label: 'Text',
+          defaultValue:
+            'Add a short supporting paragraph here. Line breaks become separate paragraphs.',
+        }),
+        ...textColorFields(),
+        ...fontSizeFields(),
+      },
     }),
     columns: List({
       label: 'Columns (max 4; order = left to right on desktop)',
+      description:
+        'Add up to 4 columns. The builder may allow more, but only the first four render on the site.',
       type: Group({
         label: 'Column',
         props: {
-          title: TextInput({ label: 'Heading', defaultValue: 'Column heading' }),
-          subheading: TextInput({
-            label: 'Secondary heading (optional; bold, same size as body, tight under main heading)',
-            defaultValue: '',
+          heading: multicolumnHeadingPopover('Heading', 'Column heading'),
+          secondaryHeading: multicolumnPlainTextPopover(
+            'Secondary heading',
+            'The Gear. No Guesswork.',
+          ),
+          body: multicolumnPlainTextPopover(
+            'Body',
+            'Supporting copy for this column.\nSecond paragraph example.',
+            true,
+          ),
+          image: Group({
+            label: 'Image',
+            preferredLayout: Group.Layout.Popover,
+            props: {
+              imageSrc: Image({ label: 'Image' }),
+              imageAlt: TextInput({ label: 'Image alt text', defaultValue: '' }),
+            },
           }),
-          body: TextArea({
-            label: 'Body (line breaks become paragraphs)',
-            defaultValue: 'Supporting copy for this column.',
+          button: Group({
+            label: 'Button',
+            preferredLayout: Group.Layout.Popover,
+            props: {
+              buttonText: TextInput({ label: 'Button text', defaultValue: '' }),
+              buttonLink: Link({ label: 'Button link' }),
+            },
           }),
-          imageSrc: Image({ label: 'Image (optional)' }),
-          imageAlt: TextInput({ label: 'Image alt text', defaultValue: '' }),
-          buttonText: TextInput({ label: 'Button text (optional)', defaultValue: '' }),
-          buttonLink: Link({ label: 'Button link' }),
         },
       }),
       getItemLabel(item) {
-        const t = item?.title;
+        const fromHeading =
+          item?.heading?.text != null && String(item.heading.text).trim().length > 0
+            ? String(item.heading.text).trim()
+            : null;
+        const fromLegacyContent =
+          item?.content?.title != null && String(item.content.title).trim().length > 0
+            ? String(item.content.title).trim()
+            : null;
+        const fromLegacyTitle =
+          item?.title != null && String(item.title).trim().length > 0
+            ? String(item.title).trim()
+            : null;
 
-        return t != null && String(t).trim().length > 0 ? String(t).trim() : 'Column';
+        return fromHeading ?? fromLegacyContent ?? fromLegacyTitle ?? 'Column';
       },
     }),
   },

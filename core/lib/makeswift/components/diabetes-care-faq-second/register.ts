@@ -1,6 +1,12 @@
 import { Group, List, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
+import {
+  bodyTextPopoverControls,
+  headingPopoverControls,
+  sectionBackgroundControls,
+} from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
+import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
 import { DiabetesCareFaqSecond } from './client';
 
@@ -12,9 +18,11 @@ runtime.registerComponent(DiabetesCareFaqSecond, {
   icon: 'layout',
   props: {
     className: Style(),
-    heading: TextInput({
+    ...sectionBackgroundControls(ARCHIVE_SAGE_BACKGROUND_HSL),
+    ...headingPopoverControls({
       label: 'Heading',
-      defaultValue: 'We Thought You Might Ask',
+      textDefault: 'We Thought You Might Ask',
+      includeHighlightSwash: true,
     }),
     items: List({
       label: 'Questions',
@@ -35,5 +43,6 @@ runtime.registerComponent(DiabetesCareFaqSecond, {
         return q != null && String(q).trim().length > 0 ? String(q).trim() : 'Question';
       },
     }),
+    ...bodyTextPopoverControls(),
   },
 });

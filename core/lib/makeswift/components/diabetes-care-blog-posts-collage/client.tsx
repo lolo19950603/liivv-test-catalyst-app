@@ -1,7 +1,18 @@
 import { clsx } from 'clsx';
-import { useId, type ReactNode } from 'react';
+import { useId, type CSSProperties, type ReactNode } from 'react';
 
-import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { ARCHIVE_BLOG_COLLAGE_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
+import {
+  buildSectionTheme,
+  resolveBodyTextColor,
+  type BodyTextProps,
+  type HeadingTypographyProps,
+  type HeadingWithHighlightProps,
+  type SectionBackgroundProps,
+} from '~/lib/makeswift/utils/diabetes-care-section-style';
+import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
+import { resolvePlainTextColor } from '~/lib/makeswift/utils/heading-accent-color';
 
 import {
   BLOG_POSTS_COLLAGE_ARCHIVE_CSS,
@@ -23,225 +34,342 @@ function sectionVarsCss(domId: string): string {
   );
 }
 
-export interface DiabetesCareBlogPostsCollageSidePost {
+export type BlogPostsCollageHeadingProps = HeadingWithHighlightProps & {
+  before?: string;
+  emphasis?: string;
+  after?: string;
+};
+
+export type BlogPostsCollagePostTextProps = BodyTextProps & {
+  text?: string;
+  fontSize?: number;
+  fontSizeMobile?: number;
+};
+
+export type BlogPostsCollagePostImageProps = {
   imageSrc?: string;
   imageAlt?: string;
-  title?: string;
-  body?: string;
+};
+
+export type BlogPostsCollagePostLinkProps = {
   linkText?: string;
   link?: { href?: string; target?: string };
+};
+
+export interface DiabetesCareBlogPostsCollagePost {
+  image?: BlogPostsCollagePostImageProps;
+  /** @deprecated Use `image` popover. */
+  imageSrc?: string;
+  /** @deprecated Use `image` popover. */
+  imageAlt?: string;
+  /** Popover group (`text` + typography) or legacy plain string. */
+  title?: BlogPostsCollagePostTextProps | string;
+  /** Popover group (`text` + typography) or legacy plain string. */
+  body?: BlogPostsCollagePostTextProps | string;
+  link?: BlogPostsCollagePostLinkProps | { href?: string; target?: string };
+  /** @deprecated Use `link` popover. */
+  linkText?: string;
 }
 
-export interface DiabetesCareBlogPostsCollageProps {
+function resolvePostImage(post: DiabetesCareBlogPostsCollagePost) {
+  if (post.image != null) {
+    return {
+      src: post.image.imageSrc?.trim() ?? '',
+      alt: post.image.imageAlt?.trim() ?? '',
+    };
+  }
+
+  return {
+    src: post.imageSrc?.trim() ?? '',
+    alt: post.imageAlt?.trim() ?? '',
+  };
+}
+
+function resolvePostLink(post: DiabetesCareBlogPostsCollagePost) {
+  const linkGroup = post.link;
+
+  if (linkGroup != null && typeof linkGroup === 'object' && 'linkText' in linkGroup) {
+    const popover = linkGroup as BlogPostsCollagePostLinkProps;
+
+    return {
+      label: popover.linkText?.trim() ?? 'Read more',
+      href: popover.link?.href ?? '#',
+      target: popover.link?.target,
+    };
+  }
+
+  const legacyUrl = linkGroup as { href?: string; target?: string } | undefined;
+
+  return {
+    label: post.linkText?.trim() ?? 'Read more',
+    href: legacyUrl?.href ?? '#',
+    target: legacyUrl?.target,
+  };
+}
+
+export type DiabetesCareBlogPostsCollageProps = {
   className?: string;
-  headingBefore?: string;
-  headingEmphasis?: string;
-  headingAfter?: string;
-  featureImageSrc?: string;
-  featureImageAlt?: string;
-  featureTitle?: string;
-  featureBody?: string;
-  featureLinkText?: string;
-  featureLink?: { href?: string; target?: string };
-  sidePosts?: DiabetesCareBlogPostsCollageSidePost[];
+  background?: SectionBackgroundProps;
+  heading?: BlogPostsCollageHeadingProps;
+  posts?: DiabetesCareBlogPostsCollagePost[];
+  /** @deprecated Merged into `posts` (first item). */
+  feature?: DiabetesCareBlogPostsCollagePost;
+  /** @deprecated Merged into `posts` (items after the first). */
+  sidePosts?: DiabetesCareBlogPostsCollagePost[];
+  /** @deprecated Use per-post Body text color instead. */
+  bodyText?: BodyTextProps;
+};
+
+function mergeTypographyStyle(
+  color?: string,
+  fontSize?: string,
+): CSSProperties | undefined {
+  if (color == null && fontSize == null) {
+    return undefined;
+  }
+
+  return {
+    ...(color != null ? { color } : {}),
+    ...(fontSize != null ? { fontSize } : {}),
+  };
 }
 
-const DEFAULT_SIDE_POSTS: DiabetesCareBlogPostsCollageSidePost[] = [
+function resolvePostTextField(
+  value: BlogPostsCollagePostTextProps | string | undefined,
+): { text: string; color?: string; fontSize?: string } {
+  if (typeof value === 'string') {
+    return { text: value.trim() };
+  }
+
+  const group = value;
+
+  return {
+    text: group?.text?.trim() ?? '',
+    color: resolveBodyTextColor(group),
+    fontSize: resolveHeadingFontSizeCss(group?.fontSize, group?.fontSizeMobile),
+  };
+}
+
+const MAX_COLLAGE_POSTS = 3;
+
+const DEFAULT_POSTS: DiabetesCareBlogPostsCollagePost[] = [
   {
-    title: 'Starting Out with an Ostomy: Finding Your Rhythm',
-    body: 'No quick fixes. Just real progress, one step at a time. Starting something new can feel like a lot.',
-    linkText: 'Read more',
-    imageAlt: '',
+    title: { text: 'Ongoing Ostomy Support: Finding What Works, Every Day' },
+    body: {
+      text: 'Starting out is one thing. But what really shapes your experience over time is what comes next. The small adjustments. The routines that evolve.',
+    },
+    link: { linkText: 'Read more' },
+    image: { imageAlt: '' },
   },
   {
-    title: 'Understanding Different Types of Ostomy: Finding What Works for You',
-    body: 'No one-size-fits-all. Just what works for you. Living with an ostomy can feel like a big shift at first.',
-    linkText: 'Read more',
-    imageAlt: '',
+    title: { text: 'Starting Out with an Ostomy: Finding Your Rhythm' },
+    body: {
+      text: 'No quick fixes. Just real progress, one step at a time. Starting something new can feel like a lot.',
+    },
+    link: { linkText: 'Read more' },
+    image: { imageAlt: '' },
+  },
+  {
+    title: { text: 'Understanding Different Types of Ostomy: Finding What Works for You' },
+    body: {
+      text: 'No one-size-fits-all. Just what works for you. Living with an ostomy can feel like a big shift at first.',
+    },
+    link: { linkText: 'Read more' },
+    image: { imageAlt: '' },
   },
 ];
 
-function sidePostsResolved(sidePosts?: DiabetesCareBlogPostsCollageSidePost[]) {
-  const raw =
-    sidePosts != null && sidePosts.length > 0 ? [...sidePosts] : [...DEFAULT_SIDE_POSTS];
-
-  while (raw.length < 2) {
-    raw.push(DEFAULT_SIDE_POSTS[raw.length] ?? DEFAULT_SIDE_POSTS[0] ?? {});
+function collagePostsFromProps(props: {
+  posts?: DiabetesCareBlogPostsCollagePost[];
+  feature?: DiabetesCareBlogPostsCollagePost;
+  sidePosts?: DiabetesCareBlogPostsCollagePost[];
+}): DiabetesCareBlogPostsCollagePost[] {
+  if (props.posts != null && props.posts.length > 0) {
+    return props.posts.slice(0, MAX_COLLAGE_POSTS);
   }
 
-  return raw.slice(0, 2);
+  const legacy: DiabetesCareBlogPostsCollagePost[] = [];
+
+  if (props.feature != null) {
+    legacy.push(props.feature);
+  }
+
+  if (props.sidePosts != null && props.sidePosts.length > 0) {
+    legacy.push(...props.sidePosts);
+  }
+
+  if (legacy.length > 0) {
+    return legacy.slice(0, MAX_COLLAGE_POSTS);
+  }
+
+  return DEFAULT_POSTS;
+}
+
+function renderArticleCard(
+  post: DiabetesCareBlogPostsCollagePost,
+  options: {
+    key: string;
+    imageSizes: string;
+    imageHeight: number;
+    imageWidth: number;
+    defaultTitle: string;
+    defaultBody: string;
+  },
+) {
+  const { src: img, alt } = resolvePostImage(post);
+  const { label: linkLabel, href, target: linkTarget } = resolvePostLink(post);
+  const titleResolved = resolvePostTextField(post.title);
+  const bodyResolved = resolvePostTextField(post.body);
+  const title = titleResolved.text.length > 0 ? titleResolved.text : options.defaultTitle;
+  const body = bodyResolved.text.length > 0 ? bodyResolved.text : options.defaultBody;
+  const titleStyle = mergeTypographyStyle(titleResolved.color, titleResolved.fontSize);
+  const bodyStyle = mergeTypographyStyle(bodyResolved.color, bodyResolved.fontSize);
+  const hasImage = img.length > 0;
+
+  return (
+    <div
+      className={clsx(
+        'card article-card relative flex flex-col gap-5 leading-none md:gap-8',
+        !hasImage && 'without-image',
+      )}
+      key={options.key}
+    >
+      <div className="article-card__media relative overflow-hidden">
+        {hasImage ? (
+          <a
+            aria-label={title}
+            className="article-card__link relative block media media--square"
+            href={href}
+            rel={linkTarget === '_blank' ? 'noopener noreferrer' : undefined}
+            tabIndex={-1}
+            target={linkTarget}
+          >
+            <img
+              alt={alt || title}
+              className="article-card__image loaded"
+              height={options.imageHeight}
+              loading="lazy"
+              sizes={options.imageSizes}
+              src={img}
+              width={options.imageWidth}
+            />
+          </a>
+        ) : null}
+      </div>
+      <div className="article-card__content flex flex-col gap-5 md:gap-8">
+        <div className="grid gap-4 md:gap-5">
+          <a
+            className="article-card__title heading reversed-link block text-lg-2xl leading-tight tracking-tight"
+            href={href}
+            rel={linkTarget === '_blank' ? 'noopener noreferrer' : undefined}
+            style={titleStyle}
+            target={linkTarget}
+          >
+            {title}
+          </a>
+          <div className="article-card__bottom rte leading-normal" style={bodyStyle}>
+            {bodyParagraphs(body)}
+          </div>
+        </div>
+        <p>
+          <a
+            className="link text-sm font-medium leading-tight"
+            href={href}
+            rel={linkTarget === '_blank' ? 'noopener noreferrer' : undefined}
+            target={linkTarget}
+          >
+            {linkLabel}
+            <span className="sr-only">about {title}</span>
+          </a>
+        </p>
+      </div>
+    </div>
+  );
 }
 
 export function DiabetesCareBlogPostsCollage({
   className,
-  headingBefore,
-  headingEmphasis,
-  headingAfter,
-  featureImageSrc,
-  featureImageAlt,
-  featureTitle,
-  featureBody,
-  featureLinkText,
-  featureLink,
+  background,
+  heading,
+  posts,
+  feature,
   sidePosts,
 }: DiabetesCareBlogPostsCollageProps) {
   const instance = useId().replace(/:/g, '');
   const sectionDomId = `dccbpc-${instance}`;
-
-  const hb = headingBefore?.trim() ?? 'The';
+  const { sectionCss, sectionStyle } = buildSectionTheme({
+    sectionId: sectionDomId,
+    sectionCss: sectionVarsCss(sectionDomId),
+    background,
+    highlight: heading,
+    defaultBackgroundChannels: ARCHIVE_BLOG_COLLAGE_BACKGROUND_CHANNELS,
+  });
+  const headingColor = resolvePlainTextColor({
+    textColor: heading?.textColor,
+    textColorHex: heading?.textColorHex,
+  });
+  const headingFontSize = resolveHeadingFontSizeCss(heading?.fontSize, heading?.fontSizeMobile);
+  const headingStyle =
+    headingColor != null || headingFontSize != null
+      ? {
+          ...(headingColor != null ? { color: headingColor } : {}),
+          ...(headingFontSize != null ? { fontSize: headingFontSize } : {}),
+        }
+      : undefined;
+  const hb = heading?.before?.trim() ?? 'The';
   const he =
-    headingEmphasis != null && headingEmphasis.length > 0 ? headingEmphasis : '"Every Day" ';
-  const ha = headingAfter?.trim() ?? 'Feed';
+    heading?.emphasis != null && heading.emphasis.length > 0 ? heading.emphasis : '"Every Day" ';
+  const ha = heading?.after?.trim() ?? 'Feed';
 
-  const featureImg = featureImageSrc?.trim() ?? '';
-  const featureAlt = featureImageAlt?.trim() ?? '';
-  const fTitle = featureTitle?.trim() ?? 'Featured post title';
-  const fBody = featureBody?.trim() ?? 'Add supporting copy for the large featured post.';
-  const fLinkLabel = featureLinkText?.trim() ?? 'Read more';
-  const fHref = featureLink?.href ?? '#';
-  const featureHasImage = featureImg.length > 0;
-
-  const sides = sidePostsResolved(sidePosts);
+  const collagePosts = collagePostsFromProps({ posts, feature, sidePosts });
+  const featured = collagePosts[0];
+  const sideColumnPosts = collagePosts.slice(1, MAX_COLLAGE_POSTS);
 
   return (
     <div className={clsx('diabetes-care-blog-posts-collage', className)}>
-      <div className="shopify-section" id={sectionDomId}>
-        <style dangerouslySetInnerHTML={{ __html: sectionVarsCss(sectionDomId) }} />
+      <div className="shopify-section" id={sectionDomId} style={sectionStyle}>
+        <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <style dangerouslySetInnerHTML={{ __html: BLOG_POSTS_COLLAGE_ARCHIVE_CSS }} />
         <div className="section section--padding section--rounded relative">
           <div className="page-width relative">
             <div className="title-wrapper relative z-1 flex flex-col gap-4 text-left leading-none lg:gap-8 md:flex-row md:items-end md:justify-between">
               <div className="grid gap-4">
-                <h2 className="heading title-md">
-                  <SplitWordsHeading
-                    accentPhrase={he.length > 0 ? he : undefined}
-                    text={[hb, he, ha].filter((part) => part.length > 0).join(' ')}
+                <h2 className="heading title-md" style={headingStyle}>
+                  <AccentSplitWordsHeading
+                    accentColors={heading}
+                    emphasis={he}
+                    emphasisColor={headingColor}
+                    emphasisFontSize={headingFontSize}
+                    lead={hb}
+                    leadColor={headingColor}
+                    leadFontSize={headingFontSize}
+                    trail={ha}
                   />
                 </h2>
               </div>
             </div>
             <ScrollReveal className="grid slider" delayMs={100}>
               <div className="blog-grid blog-collage with-only3 card-grid mobile:card-grid--1 grid">
-                <div
-                  className={clsx(
-                    'card article-card relative flex flex-col gap-5 leading-none md:gap-8',
-                    !featureHasImage && 'without-image',
-                  )}
-                >
-                  <div className="article-card__media relative overflow-hidden">
-                    {featureHasImage ? (
-                      <a
-                        aria-label={fTitle}
-                        className="article-card__link relative block media media--square"
-                        href={fHref}
-                        rel={featureLink?.target === '_blank' ? 'noopener noreferrer' : undefined}
-                        tabIndex={-1}
-                        target={featureLink?.target}
-                      >
-                        <img
-                          alt={featureAlt || fTitle}
-                          className="article-card__image loaded"
-                          height={1200}
-                          loading="lazy"
-                          sizes="(max-width: 768px) 100vw, 60vw"
-                          src={featureImg}
-                          width={1600}
-                        />
-                      </a>
-                    ) : null}
-                  </div>
-                  <div className="article-card__content flex flex-col gap-5 md:gap-8">
-                    <div className="grid gap-4 md:gap-5">
-                      <a
-                        className="article-card__title heading reversed-link block text-lg-2xl leading-tight tracking-tight"
-                        href={fHref}
-                        rel={featureLink?.target === '_blank' ? 'noopener noreferrer' : undefined}
-                        target={featureLink?.target}
-                      >
-                        {fTitle}
-                      </a>
-                      <div className="article-card__bottom rte leading-normal">{bodyParagraphs(fBody)}</div>
-                    </div>
-                    <p>
-                      <a
-                        className="link text-sm font-medium leading-tight"
-                        href={fHref}
-                        rel={featureLink?.target === '_blank' ? 'noopener noreferrer' : undefined}
-                        target={featureLink?.target}
-                      >
-                        {fLinkLabel}
-                        <span className="sr-only">about {fTitle}</span>
-                      </a>
-                    </p>
-                  </div>
-                </div>
-
-                {sides.map((post, index) => {
-                  const img = post.imageSrc?.trim() ?? '';
-                  const alt = post.imageAlt?.trim() ?? '';
-                  const title = post.title?.trim() ?? 'Post title';
-                  const body = post.body?.trim() ?? 'Post summary.';
-                  const linkLabel = post.linkText?.trim() ?? 'Read more';
-                  const href = post.link?.href ?? '#';
-                  const hasImage = img.length > 0;
-
-                  return (
-                    <div
-                      className={clsx(
-                        'card article-card relative flex flex-col gap-5 leading-none md:gap-8',
-                        !hasImage && 'without-image',
-                      )}
-                      key={`side-${index}`}
-                    >
-                      <div className="article-card__media relative overflow-hidden">
-                        {hasImage ? (
-                          <a
-                            aria-label={title}
-                            className="article-card__link relative block media media--square"
-                            href={href}
-                            rel={post.link?.target === '_blank' ? 'noopener noreferrer' : undefined}
-                            tabIndex={-1}
-                            target={post.link?.target}
-                          >
-                            <img
-                              alt={alt || title}
-                              className="article-card__image loaded"
-                              height={900}
-                              loading="lazy"
-                              sizes="(max-width: 768px) 100vw, 35vw"
-                              src={img}
-                              width={900}
-                            />
-                          </a>
-                        ) : null}
-                      </div>
-                      <div className="article-card__content flex flex-col gap-5 md:gap-8">
-                        <div className="grid gap-4 md:gap-5">
-                          <a
-                            className="article-card__title heading reversed-link block text-lg-2xl leading-tight tracking-tight"
-                            href={href}
-                            rel={post.link?.target === '_blank' ? 'noopener noreferrer' : undefined}
-                            target={post.link?.target}
-                          >
-                            {title}
-                          </a>
-                          <div className="article-card__bottom rte leading-normal">{bodyParagraphs(body)}</div>
-                        </div>
-                        <p>
-                          <a
-                            className="link text-sm font-medium leading-tight"
-                            href={href}
-                            rel={post.link?.target === '_blank' ? 'noopener noreferrer' : undefined}
-                            target={post.link?.target}
-                          >
-                            {linkLabel}
-                            <span className="sr-only">about {title}</span>
-                          </a>
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
+                {featured != null
+                  ? renderArticleCard(featured, {
+                      key: 'featured',
+                      imageSizes: '(max-width: 768px) 100vw, 60vw',
+                      imageHeight: 1200,
+                      imageWidth: 1600,
+                      defaultTitle: 'Featured post title',
+                      defaultBody: 'Add supporting copy for the large featured post.',
+                    })
+                  : null}
+                {sideColumnPosts.map((post, index) =>
+                  renderArticleCard(post, {
+                    key: `side-${index}`,
+                    imageSizes: '(max-width: 768px) 100vw, 35vw',
+                    imageHeight: 900,
+                    imageWidth: 900,
+                    defaultTitle: 'Post title',
+                    defaultBody: 'Post summary.',
+                  }),
+                )}
               </div>
             </ScrollReveal>
           </div>

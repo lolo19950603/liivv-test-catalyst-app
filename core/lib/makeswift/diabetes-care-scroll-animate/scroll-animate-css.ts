@@ -29,6 +29,10 @@ export const DIABETES_CARE_SCROLL_ANIMATE_CSS = `
     transition-delay: calc(var(--dc-animate-delay, 0) * 1ms);
   }
 
+  .highlighted-text[data-style='half_text'] {
+    background-size: 100% 28%;
+  }
+
   .split-words.dc-animated .highlighted-text[data-style='half_text'] {
     background-size: 100% 28%;
   }

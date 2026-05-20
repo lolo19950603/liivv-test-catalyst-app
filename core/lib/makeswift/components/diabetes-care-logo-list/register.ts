@@ -1,5 +1,9 @@
 import { Group, Image, List, Number, Style, TextInput } from '@makeswift/runtime/controls';
 
+import {
+  headingPopoverControls,
+  sectionBackgroundControls,
+} from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
 
 import { DiabetesCareLogoList } from './client';
@@ -12,27 +16,35 @@ runtime.registerComponent(DiabetesCareLogoList, {
   icon: 'layout',
   props: {
     className: Style(),
-    heading: TextInput({
-      label: 'Heading (accent / half underline)',
-      defaultValue: 'Trusted Brands, Made for Everyday Life',
+    ...sectionBackgroundControls(),
+    ...headingPopoverControls({
+      label: 'Heading',
+      textDefault: 'Trusted by leading organizations',
+      includeHighlightSwash: true,
     }),
-    cycleDurationSeconds: Number({
-      label: 'Loop duration (one pass of the logo set)',
-      defaultValue: 45,
-      suffix: 's',
-    }),
-    logoMaxHeightPx: Number({
-      label: 'Logo max height (same for every logo)',
-      defaultValue: 56,
-      suffix: 'px',
-    }),
-    logoSlotWidthPx: Number({
-      label: 'Logo slot width (same for every logo)',
-      defaultValue: 176,
-      suffix: 'px',
+    marquee: Group({
+      label: 'Marquee',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        cycleDurationSeconds: Number({
+          label: 'Cycle duration',
+          suffix: 's',
+          defaultValue: 30,
+        }),
+        logoMaxHeightPx: Number({
+          label: 'Logo max height',
+          suffix: 'px',
+          defaultValue: 80,
+        }),
+        logoSlotWidthPx: Number({
+          label: 'Logo slot width',
+          suffix: 'px',
+          defaultValue: 160,
+        }),
+      },
     }),
     logos: List({
-      label: 'Logos (order = left to right in the strip)',
+      label: 'Logos',
       type: Group({
         label: 'Logo',
         props: {
@@ -41,9 +53,7 @@ runtime.registerComponent(DiabetesCareLogoList, {
         },
       }),
       getItemLabel(item) {
-        const alt = item?.imageAlt;
-
-        return alt != null && String(alt).trim().length > 0 ? String(alt).trim() : 'Logo';
+        return item?.imageAlt?.trim() || 'Logo';
       },
     }),
   },

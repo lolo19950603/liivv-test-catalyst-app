@@ -1,10 +1,77 @@
-import { Checkbox, Group, List, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
+import {
+  Checkbox,
+  Color,
+  Group,
+  List,
+  Number,
+  Style,
+  TextArea,
+  TextInput,
+} from '@makeswift/runtime/controls';
 
+import {
+  FONT_SIZE_DESCRIPTION,
+  HEX_OVERRIDE_DESCRIPTION,
+  sectionBackgroundControls,
+} from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
+import { hsl } from '~/lib/makeswift/utils/color';
 
 import { DiabetesCareNumberCounters } from './client';
 
 export const COMPONENT_TYPE = 'diabetes-care-number-counters';
+
+function counterNumberStyleFields() {
+  return {
+    numberColor: Color({
+      label: 'Number color',
+      defaultValue: hsl('0 2% 19%'),
+    }),
+    numberColorHex: TextInput({
+      label: 'Number color (hex override)',
+      defaultValue: '',
+      description: HEX_OVERRIDE_DESCRIPTION,
+    }),
+    numberFontSize: Number({
+      label: 'Number font size',
+      suffix: 'px',
+      defaultValue: 0,
+      description: FONT_SIZE_DESCRIPTION,
+    }),
+    numberFontSizeMobile: Number({
+      label: 'Number font size (mobile)',
+      suffix: 'px',
+      defaultValue: 0,
+      description: '0 = same as desktop, or theme default when desktop is 0.',
+    }),
+  };
+}
+
+function counterDescriptionStyleFields() {
+  return {
+    descriptionColor: Color({
+      label: 'Text below color',
+      defaultValue: hsl('0 2% 19%'),
+    }),
+    descriptionColorHex: TextInput({
+      label: 'Text below color (hex override)',
+      defaultValue: '',
+      description: HEX_OVERRIDE_DESCRIPTION,
+    }),
+    descriptionFontSize: Number({
+      label: 'Text below font size',
+      suffix: 'px',
+      defaultValue: 0,
+      description: FONT_SIZE_DESCRIPTION,
+    }),
+    descriptionFontSizeMobile: Number({
+      label: 'Text below font size (mobile)',
+      suffix: 'px',
+      defaultValue: 0,
+      description: '0 = same as desktop, or theme default when desktop is 0.',
+    }),
+  };
+}
 
 runtime.registerComponent(DiabetesCareNumberCounters, {
   type: COMPONENT_TYPE,
@@ -12,26 +79,46 @@ runtime.registerComponent(DiabetesCareNumberCounters, {
   icon: 'layout',
   props: {
     className: Style(),
-    showPercentSuffix: Checkbox({
-      label: 'Append % after each number',
-      defaultValue: true,
-    }),
+    ...sectionBackgroundControls(),
     counters: List({
       label: 'Counters (order = left to right on desktop)',
+      description: 'Maximum of 4 counters. Additional items are ignored on the live site.',
       type: Group({
         label: 'Counter',
         props: {
-          value: TextInput({ label: 'Number', defaultValue: '9.7' }),
-          description: TextArea({
+          number: Group({
+            label: 'Number',
+            preferredLayout: Group.Layout.Popover,
+            props: {
+              value: TextInput({
+                label: 'Number',
+                defaultValue: '9.7',
+                description: 'Numeric value only; use the checkbox below to append %.',
+              }),
+              showPercentSuffix: Checkbox({
+                label: 'Show % after number',
+                defaultValue: true,
+              }),
+              ...counterNumberStyleFields(),
+            },
+          }),
+          textBelow: Group({
             label: 'Text below',
-            defaultValue: 'Supporting line for this stat',
+            preferredLayout: Group.Layout.Popover,
+            props: {
+              description: TextArea({
+                label: 'Text',
+                defaultValue: 'Supporting line for this stat',
+              }),
+              ...counterDescriptionStyleFields(),
+            },
           }),
         },
       }),
       getItemLabel(item) {
-        return item?.value != null && String(item.value).length > 0
-          ? String(item.value)
-          : 'Counter';
+        const value = item?.number?.value;
+
+        return value != null && String(value).length > 0 ? String(value) : 'Counter';
       },
     }),
   },

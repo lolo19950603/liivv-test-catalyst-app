@@ -2,12 +2,23 @@ import { clsx } from 'clsx';
 import type { CSSProperties } from 'react';
 
 import { SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { resolveArchiveHighlightChannels } from '~/lib/makeswift/utils/archive-color';
+import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
+import {
+  appendHighlightToSectionCss,
+  resolveAccentColors,
+  resolvePlainTextColor,
+} from '~/lib/makeswift/utils/heading-accent-color';
+import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
 
 /** CSS variables used by migrated Shopify section markup (avoids `as CSSProperties`). */
 type ShopifyThemeStyle = CSSProperties & Record<string, string | number | undefined>;
 
-/** Matches inline `<style>` from `diabetes-care.html` for this section id. */
-const CUSTOM_SECTION_STYLE = `#shopify-section-template--26520397447459__custom_section_WpXaJg{--section-padding-top:32px;--section-padding-bottom:32px;--color-background:255 255 255}@media screen and (max-width: 767px){#shopify-section-template--26520397447459__custom_section_WpXaJg{--section-padding-top:24px;--section-padding-bottom:24px}}`;
+const CUSTOM_SECTION_ID = 'shopify-section-template--26520397447459__custom_section_WpXaJg';
+
+function buildCustomSectionStyle(backgroundChannels: string): string {
+  return `#${CUSTOM_SECTION_ID}{--section-padding-top:32px;--section-padding-bottom:32px;--color-background:${backgroundChannels}}@media screen and (max-width: 767px){#${CUSTOM_SECTION_ID}{--section-padding-top:24px;--section-padding-bottom:24px}}`;
+}
 
 const sectionContentGapStyle: ShopifyThemeStyle = {
   '--gap': '15px',
@@ -44,48 +55,95 @@ const headingBoxStyle: ShopifyThemeStyle = {
   '--size-style-width-mobile-min': '0px',
 };
 
-export interface DiabetesCareCustomBandProps {
-  className?: string;
-  logoImage?: string;
-  logoAlt?: string;
-  logoLink?: { href?: string; target?: string };
-  primaryHeading?: string;
-  secondaryHeading?: string;
-  /** When not `false`, secondary line uses theme highlight (`rgb(var(--color-highlight))`). */
-  useThemeHighlightForSecondary?: boolean;
-  /** Used when `useThemeHighlightForSecondary` is `false`. */
-  secondaryTextColor?: string;
+export type CustomBandBackgroundProps = {
+  color?: string;
+  colorHex?: string;
+};
+
+export type CustomBandLogoProps = {
+  image?: string;
+  altText?: string;
+  link?: { href?: string; target?: string };
+};
+
+export type CustomBandHeadingGroupProps = {
+  text?: string;
+  textColor?: string;
+  textColorHex?: string;
+  fontSize?: number;
+  fontSizeMobile?: number;
+};
+
+export type CustomBandSecondaryHeadingProps = CustomBandHeadingGroupProps &
+  HeadingAccentColorProps;
+
+function secondaryUsesHighlightSwash(heading?: CustomBandSecondaryHeadingProps): boolean {
+  const value = heading?.useCustomHighlightColor;
+
+  return value === true || value === 'true';
 }
+
+export interface DiabetesCareCustomBandContentProps {
+  className?: string;
+  background?: CustomBandBackgroundProps;
+  logo?: CustomBandLogoProps;
+  primaryHeading?: CustomBandHeadingGroupProps;
+  secondaryHeading?: CustomBandSecondaryHeadingProps;
+}
+
+export type DiabetesCareCustomBandProps = DiabetesCareCustomBandContentProps;
 
 export function DiabetesCareCustomBand({
   className,
-  logoImage,
-  logoAlt,
-  logoLink,
+  background,
+  logo,
   primaryHeading,
   secondaryHeading,
-  useThemeHighlightForSecondary,
-  secondaryTextColor,
 }: DiabetesCareCustomBandProps) {
-  const logoHref = logoLink?.href ?? 'https://liivv.ca/pages/diabetes-care';
-  const primary = primaryHeading ?? 'Diabetes and';
-  const secondary = secondaryHeading ?? 'Everyday Living';
-  const alt = logoAlt ?? 'Liivv Diabetes';
-  const useThemeHighlight = useThemeHighlightForSecondary !== false;
-  const secondaryEmStyle: ShopifyThemeStyle | undefined =
-    !useThemeHighlight &&
-    typeof secondaryTextColor === 'string' &&
-    secondaryTextColor.trim().length > 0
-      ? { color: secondaryTextColor }
-      : undefined;
+  const backgroundChannels =
+    resolveArchiveHighlightChannels(background?.colorHex, background?.color) ?? '255 255 255';
+  const logoHref = logo?.link?.href ?? 'https://liivv.ca/pages/diabetes-care';
+  const logoImage = logo?.image;
+  const primary = primaryHeading?.text?.trim() ?? 'Diabetes and';
+  const secondary = secondaryHeading?.text?.trim() ?? 'Everyday Living';
+  const alt = logo?.altText?.trim() ?? 'Liivv Diabetes';
+  const primaryColor = resolvePlainTextColor({
+    textColor: primaryHeading?.textColor,
+    textColorHex: primaryHeading?.textColorHex,
+  });
+  const secondaryColor = resolvePlainTextColor({
+    textColor: secondaryHeading?.textColor,
+    textColorHex: secondaryHeading?.textColorHex,
+  });
+  const primaryFontSize = resolveHeadingFontSizeCss(
+    primaryHeading?.fontSize,
+    primaryHeading?.fontSizeMobile,
+  );
+  const secondaryFontSize = resolveHeadingFontSizeCss(
+    secondaryHeading?.fontSize,
+    secondaryHeading?.fontSizeMobile,
+  );
+  const useHighlightSwash = secondaryUsesHighlightSwash(secondaryHeading);
+  const { highlightChannels } = resolveAccentColors(secondaryHeading);
+  const highlightStyle = useHighlightSwash ? 'half_text' : 'text';
+  const sectionStyle = appendHighlightToSectionCss(
+    buildCustomSectionStyle(backgroundChannels),
+    CUSTOM_SECTION_ID,
+    highlightChannels,
+  );
+  const sectionCssVars: ShopifyThemeStyle = {
+    '--color-background': backgroundChannels,
+    ...(highlightChannels != null ? { '--color-highlight': highlightChannels } : {}),
+  };
 
   return (
     <div className={clsx('diabetes-care-custom-band max-w-full overflow-x-hidden', className)}>
       <div
         className="shopify-section custom-section"
-        id="shopify-section-template--26520397447459__custom_section_WpXaJg"
+        id={CUSTOM_SECTION_ID}
+        style={sectionCssVars}
       >
-        <style dangerouslySetInnerHTML={{ __html: CUSTOM_SECTION_STYLE }} />
+        <style dangerouslySetInnerHTML={{ __html: sectionStyle }} />
         <div className="section section--padding">
           <div className="page-width page-width--page relative grid h-full px-4 sm:px-5 md:px-0">
             <div
@@ -122,21 +180,15 @@ export function DiabetesCareCustomBand({
                 className="heading size-style title-lg tracking-heading w-full min-w-0 max-w-full text-balance text-center leading-snug md:text-center md:leading-none"
                 style={headingBoxStyle}
               >
-                {useThemeHighlight ? (
-                  <SplitWordsHeading emphasis={secondary} lead={primary} />
-                ) : (
-                  <span className="block">
-                    {primary}{' '}
-                    <em
-                      className="highlighted-text animated relative not-italic"
-                      data-style="text"
-                      is="highlighted-text"
-                      style={secondaryEmStyle}
-                    >
-                      {secondary}
-                    </em>
-                  </span>
-                )}
+                <SplitWordsHeading
+                  emphasis={secondary}
+                  emphasisColor={secondaryColor}
+                  emphasisFontSize={secondaryFontSize}
+                  highlightStyle={highlightStyle}
+                  lead={primary}
+                  leadColor={primaryColor}
+                  leadFontSize={primaryFontSize}
+                />
               </h2>
             </div>
           </div>

@@ -1,5 +1,10 @@
 import { Group, Image, Link, List, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
+import {
+  bodyTextPopoverControls,
+  sectionBackgroundControls,
+  splitHeadingPopoverControls,
+} from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
 
 import { DiabetesCareCollectionList } from './client';
@@ -12,17 +17,22 @@ runtime.registerComponent(DiabetesCareCollectionList, {
   icon: 'layout',
   props: {
     className: Style(),
-    headingLead: TextInput({
-      label: 'Heading — before accent',
-      defaultValue: 'Care Designed for',
+    ...sectionBackgroundControls(),
+    ...splitHeadingPopoverControls({
+      primaryLabel: 'Heading',
+      secondaryLabel: 'Heading accent',
+      primaryDefault: 'Care Designed for',
+      secondaryDefault: 'Every Stage of Health',
     }),
-    headingEmphasis: TextInput({
-      label: 'Heading — accent (half underline)',
-      defaultValue: 'Every Stage of Health',
-    }),
-    descriptionHtml: TextArea({
-      label: 'Description (HTML)',
-      defaultValue: '<p>Liivv connects you to the care you need—when you need it.</p>',
+    body: Group({
+      label: 'Body',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        descriptionHtml: TextArea({
+          label: 'Description (HTML)',
+          defaultValue: '<p>Liivv connects you to the care you need—when you need it.</p>',
+        }),
+      },
     }),
     cards: List({
       label: 'Collections',
@@ -42,5 +52,6 @@ runtime.registerComponent(DiabetesCareCollectionList, {
         return t != null && String(t).trim().length > 0 ? String(t).trim() : 'Collection';
       },
     }),
+    ...bodyTextPopoverControls(),
   },
 });

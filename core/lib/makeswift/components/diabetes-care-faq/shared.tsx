@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
-import { SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { AccentSplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate/accent-split-words-heading';
+import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
 
 export function IconPlusAccordion() {
   return (
@@ -29,8 +30,13 @@ export function highlightedLastWord(word: string): ReactNode {
   );
 }
 
-export function headingWithLastWordHighlight(heading: string): ReactNode {
-  return <SplitWordsHeading highlightLastWord text={heading} />;
+export function headingWithLastWordHighlight(
+  heading: string,
+  accentColors?: HeadingAccentColorProps,
+): ReactNode {
+  return (
+    <AccentSplitWordsHeading accentColors={accentColors} highlightLastWord text={heading} />
+  );
 }
 
 /** Strip tags for FAQPage JSON-LD `text` fields. */

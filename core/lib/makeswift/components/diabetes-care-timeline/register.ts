@@ -1,5 +1,12 @@
 import { Group, Image, Link, List, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
+import {
+  fontSizeFields,
+  highlightSwashFields,
+  sectionBackgroundControls,
+  splitHeadingPopoverControls,
+  textColorFields,
+} from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
 
 import { DiabetesCareTimeline } from './client';
@@ -7,69 +14,109 @@ import { DiabetesCareTimeline } from './client';
 /** Stable id aligned with `timeline_nyTDKQ` in `diabetes-care.html` (dedicated slice, not HTML fetch). */
 export const COMPONENT_TYPE = 'diabetes-care-timeline';
 
+const DEFAULT_SECTION_BODY_HTML = `<p>Keep it simple and make it yours. Here's what we'd love to know:</p>
+<ul>
+<li>Name</li>
+</ul>`;
+
+function timelineTextPopover(label: string, textDefault: string) {
+  return Group({
+    label,
+    preferredLayout: Group.Layout.Popover,
+    props: {
+      text: TextInput({
+        label: 'Text',
+        defaultValue: textDefault,
+      }),
+      ...textColorFields(),
+      ...fontSizeFields(),
+    },
+  });
+}
+
+function timelineSectionHeadingPopover(label: string, textDefault: string) {
+  return Group({
+    label,
+    preferredLayout: Group.Layout.Popover,
+    props: {
+      text: TextInput({
+        label: 'Text',
+        defaultValue: textDefault,
+      }),
+      ...textColorFields(),
+      ...fontSizeFields(),
+      ...highlightSwashFields(),
+    },
+  });
+}
+
 runtime.registerComponent(DiabetesCareTimeline, {
   type: COMPONENT_TYPE,
   label: 'Diabetes care / 4. Timeline',
   icon: 'carousel',
   props: {
     className: Style(),
-    topHeading: TextInput({
-      label: 'Main heading',
-      defaultValue: 'Your Care Journey, Simp(liivv)fied',
-    }),
-    headingAccentPhrase: TextInput({
-      label: 'Heading accent phrase (highlighted segment)',
-      defaultValue: 'liivv',
+    ...sectionBackgroundControls(),
+    ...splitHeadingPopoverControls({
+      primaryDefault: 'Your Care Journey,',
+      secondaryDefault: 'Simp(liivv)fied',
     }),
     sections: List({
       label: 'Journey sections (order = timeline left to right)',
       type: Group({
         label: 'Section',
         props: {
-          editorLabel: TextInput({
-            label: 'Section label (left list in editor)',
-            defaultValue: 'Journey step',
-          }),
-          timelineLabel: TextInput({
-            label: 'Timeline label (bottom bar)',
-            defaultValue: 'Personalize Your Space',
-          }),
-          categoryLabel: TextInput({
-            label: 'Category label (small text above title)',
-            defaultValue: 'Personalize Your Space',
-          }),
-          sectionHeading: TextInput({
-            label: 'Section heading',
-            defaultValue: 'Your Liivv Account',
-          }),
-          subtext: TextArea({
-            label: 'Intro text',
-            defaultValue: "Keep it simple and make it yours. Here's what we'd love to know:",
-          }),
-          bulletPoints: List({
-            label: 'Bullet list',
-            type: Group({
-              label: 'Line',
-              props: {
-                text: TextInput({ label: 'Text', defaultValue: 'Name' }),
-              },
-            }),
-            getItemLabel(item) {
-              return item?.text != null && String(item.text).length > 0
-                ? String(item.text)
-                : 'Line';
+          slideContent: Group({
+            label: 'Slide content',
+            props: {
+              categoryLabel: timelineTextPopover('Category label', 'Personalize Your Space'),
+              sectionHeading: timelineSectionHeadingPopover(
+                'Section heading',
+                'Your Liivv Account',
+              ),
+              sectionBody: Group({
+                label: 'Section body',
+                preferredLayout: Group.Layout.Popover,
+                props: {
+                  html: TextArea({
+                    label: 'HTML',
+                    defaultValue: DEFAULT_SECTION_BODY_HTML,
+                    description: 'Supports HTML (e.g. <p>, <ul>, <li>).',
+                  }),
+                  ...textColorFields(),
+                  ...fontSizeFields(),
+                },
+              }),
             },
           }),
-          buttonText: TextInput({ label: 'Button text', defaultValue: 'Get Started' }),
-          buttonLink: Link({ label: 'Button link' }),
-          imageSrc: Image({ label: 'Image' }),
-          imageAlt: TextInput({ label: 'Image alt text', defaultValue: 'Care journey' }),
+          button: Group({
+            label: 'Button',
+            preferredLayout: Group.Layout.Popover,
+            props: {
+              buttonText: TextInput({ label: 'Button text', defaultValue: 'Get Started' }),
+              buttonLink: Link({ label: 'Button link' }),
+            },
+          }),
+          image: Group({
+            label: 'Image',
+            preferredLayout: Group.Layout.Popover,
+            props: {
+              imageSrc: Image({ label: 'Image' }),
+              imageAlt: TextInput({ label: 'Image alt text', defaultValue: 'Care journey' }),
+            },
+          }),
         },
       }),
       getItemLabel(section) {
-        return (
-          section?.editorLabel || section?.timelineLabel || section?.sectionHeading || 'Section'
-        );
+        const category = section?.slideContent?.categoryLabel?.text?.trim();
+
+        if (category != null && category.length > 0) {
+          return category;
+        }
+
+        const heading = section?.slideContent?.sectionHeading?.text?.trim();
+
+        return heading != null && heading.length > 0 ? heading : 'Section';
       },
     }),
   },

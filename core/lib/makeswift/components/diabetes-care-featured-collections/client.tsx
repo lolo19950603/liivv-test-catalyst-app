@@ -1,11 +1,20 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 
-import { ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
-
-import { headingWithLastWordHighlight } from '../diabetes-care-faq/shared';
+import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { ARCHIVE_SAGE_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
+import {
+  buildSectionTheme,
+  resolveBodyTextColor,
+  resolveHeadingTypography,
+  type BodyTextProps,
+  type HeadingWithHighlightProps,
+  type SectionBackgroundProps,
+} from '~/lib/makeswift/utils/diabetes-care-section-style';
+import { resolvePlainTextColor } from '~/lib/makeswift/utils/heading-accent-color';
+import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
 
 import {
   FEATURED_COLLECTIONS_ARCHIVE_STYLE,
@@ -23,14 +32,65 @@ export interface DiabetesCareFeaturedCollectionTab {
   products?: DiabetesCareFeaturedCollectionProduct[];
 }
 
-export interface DiabetesCareFeaturedCollectionsProps {
+export type FeaturedCollectionsBodyProps = BodyTextProps & {
+  text?: string;
+  fontSize?: number;
+  fontSizeMobile?: number;
+};
+
+export type DiabetesCareFeaturedCollectionsProps = {
   className?: string;
-  /** Small overline above the main heading (export: “Your routine is personal”). */
-  eyebrow?: string;
-  /** Main heading; last whitespace-separated token gets the half-underline accent. */
-  heading?: string;
+  background?: SectionBackgroundProps;
+  eyebrow?: {
+    text?: string;
+    textColor?: string;
+    textColorHex?: string;
+    fontSize?: number;
+    fontSizeMobile?: number;
+  };
+  heading?: HeadingWithHighlightProps;
+  body?: FeaturedCollectionsBodyProps;
+  /** @deprecated Use `body.text`. */
   description?: string;
   collections?: DiabetesCareFeaturedCollectionTab[];
+  /** @deprecated Use `body` popover colors. */
+  bodyText?: BodyTextProps;
+};
+
+function mergeTypographyStyle(
+  color?: string,
+  fontSize?: string,
+): CSSProperties | undefined {
+  if (color == null && fontSize == null) {
+    return undefined;
+  }
+
+  return {
+    ...(color != null ? { color } : {}),
+    ...(fontSize != null ? { fontSize } : {}),
+  };
+}
+
+function resolveFeaturedBody(props: {
+  body?: FeaturedCollectionsBodyProps;
+  description?: string;
+  bodyText?: BodyTextProps;
+}): { text: string; color?: string; fontSize?: string } {
+  const group = props.body;
+
+  if (group != null && typeof group === 'object') {
+    return {
+      text: group.text?.trim() ?? '',
+      color: resolveBodyTextColor(group),
+      fontSize: resolveHeadingFontSizeCss(group.fontSize, group.fontSizeMobile),
+    };
+  }
+
+  return {
+    text: props.description?.trim() ?? '',
+    color: resolveBodyTextColor(props.bodyText),
+    fontSize: undefined,
+  };
 }
 
 const DEFAULT_COLLECTIONS: DiabetesCareFeaturedCollectionTab[] = [
@@ -81,11 +141,38 @@ function productHasContent(p: DiabetesCareFeaturedCollectionProduct): boolean {
 
 export function DiabetesCareFeaturedCollections({
   className,
+  background,
   eyebrow,
   heading,
+  body,
   description,
   collections,
+  bodyText,
 }: DiabetesCareFeaturedCollectionsProps) {
+  const headingResolved = resolveHeadingTypography(heading);
+  const eyebrowStyle = mergeTypographyStyle(
+    resolvePlainTextColor({
+      textColor: eyebrow?.textColor,
+      textColorHex: eyebrow?.textColorHex,
+    }),
+    resolveHeadingFontSizeCss(eyebrow?.fontSize, eyebrow?.fontSizeMobile),
+  );
+  const bodyResolved = resolveFeaturedBody({ body, description, bodyText });
+  const bodyStyle = mergeTypographyStyle(bodyResolved.color, bodyResolved.fontSize);
+  const { sectionCss, sectionStyle } = buildSectionTheme({
+    sectionId: FEATURED_COLLECTIONS_SECTION_ID,
+    sectionCss: FEATURED_COLLECTIONS_ARCHIVE_STYLE,
+    background,
+    highlight: heading,
+    defaultBackgroundChannels: ARCHIVE_SAGE_BACKGROUND_CHANNELS,
+  });
+  const headingStyle =
+    headingResolved.color != null || headingResolved.fontSize != null
+      ? {
+          ...(headingResolved.color != null ? { color: headingResolved.color } : {}),
+          ...(headingResolved.fontSize != null ? { fontSize: headingResolved.fontSize } : {}),
+        }
+      : undefined;
   const reactId = useId().replace(/:/g, '');
   const tabs = useMemo(() => {
     const raw = collections != null && collections.length > 0 ? collections : DEFAULT_COLLECTIONS;
@@ -135,9 +222,10 @@ export function DiabetesCareFeaturedCollections({
     strip.scrollTo({ left: nextLeft, behavior: 'smooth' });
   }, [clampedIndex]);
 
-  const eyebrowText = eyebrow?.trim() ?? 'Your routine is personal';
-  const headingText = heading?.trim() ?? 'What Works, Every Day';
-  const body = description?.trim() ?? '';
+  const eyebrowText = eyebrow?.text?.trim() ?? 'Your routine is personal';
+  const headingText =
+    headingResolved.text.length > 0 ? headingResolved.text : 'What Works, Every Day';
+  const bodyCopy = bodyResolved.text;
 
   const sliderDomId = `Slider-fc-${reactId}-${String(clampedIndex)}`;
 
@@ -145,19 +233,28 @@ export function DiabetesCareFeaturedCollections({
     <div
       className={clsx('diabetes-care-featured-collections max-w-full overflow-x-hidden', className)}
     >
-      <div className="shopify-section featured-collections" id={FEATURED_COLLECTIONS_SECTION_ID}>
-        <style dangerouslySetInnerHTML={{ __html: FEATURED_COLLECTIONS_ARCHIVE_STYLE }} />
+      <div
+        className="shopify-section featured-collections"
+        id={FEATURED_COLLECTIONS_SECTION_ID}
+        style={sectionStyle}
+      >
+        <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding section--rounded relative">
           <div className="page-width relative">
             <div className="title-wrapper z-1 relative flex flex-col gap-4 text-left leading-none md:flex-row md:items-end md:justify-between lg:gap-8">
               <div className="grid gap-4">
-                <p className="heading subtext-lg tracking-none font-medium normal-case leading-none">
+                <p
+                  className="heading subtext-lg tracking-none font-medium normal-case leading-none"
+                  style={eyebrowStyle}
+                >
                   {eyebrowText}
                 </p>
-                <h2 className="heading title-md">{headingWithLastWordHighlight(headingText)}</h2>
-                {body.length > 0 ? (
-                  <div className="description rte subtext-md leading-normal">
-                    {body
+                <h2 className="heading title-md" style={headingStyle}>
+                  <SplitWordsHeading text={headingText} />
+                </h2>
+                {bodyCopy.length > 0 ? (
+                  <div className="description rte subtext-md leading-normal" style={bodyStyle}>
+                    {bodyCopy
                       .split(/\n+/)
                       .map((p) => p.trim())
                       .filter((p) => p.length > 0)

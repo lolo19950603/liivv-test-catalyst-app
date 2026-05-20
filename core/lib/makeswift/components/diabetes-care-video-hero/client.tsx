@@ -1,17 +1,25 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { useEffect, useState, type ComponentPropsWithoutRef } from 'react';
+import { useEffect, useState, type ComponentPropsWithoutRef, type RefObject } from 'react';
 
 import {
   ScrollReveal,
   SplitWordsHeading,
   useInViewAnimate,
 } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import {
+  buildSectionTheme,
+  resolveBodyTextColor,
+  resolveHeadingTypography,
+  type BodyTextProps,
+  type HeadingTypographyProps,
+  type SectionBackgroundProps,
+} from '~/lib/makeswift/utils/diabetes-care-section-style';
+import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
 
 type VideoElementProps = ComponentPropsWithoutRef<'video'>;
 
-/** Avoids Next.js hydration mismatches from `<video>` boolean attrs (autoplay, muted, etc.). */
 function DeferredVideo(props: VideoElementProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -32,38 +40,55 @@ function DeferredVideo(props: VideoElementProps) {
   return <video {...props} suppressHydrationWarning />;
 }
 
-/** Default MP4 from the archived `diabetes-care.html` hero section. */
 export const DIABETES_CARE_DEFAULT_VIDEO_URL =
   'https://liivv.ca/cdn/shop/videos/c/vp/2e66f0d8b94242388f3b690c1c727817/2e66f0d8b94242388f3b690c1c727817.HD-1080p-7.2Mbps-83428254.mp4?v=0';
 
-/** Matches archived section id so `diabetes-care-sections.css` section rules apply. */
-export const VIDEO_HERO_SECTION_ID = 'shopify-section-template--26520397447459__video_with_text_overlay_RnWXxE';
+export const VIDEO_HERO_SECTION_ID =
+  'shopify-section-template--26520397447459__video_with_text_overlay_RnWXxE';
 
-export interface DiabetesCareVideoHeroProps {
-  className?: string;
-  videoUrl?: string;
-  posterImage?: string;
+export type VideoSettingsProps = {
+  url?: string;
+  poster?: string;
   autoplay?: boolean;
   muted?: boolean;
   loop?: boolean;
   playsInline?: boolean;
   showControls?: boolean;
-  heading?: string;
+};
+
+export type OverlayBodyProps = BodyTextProps & {
   subheading?: string;
+  fontSize?: number;
+  fontSizeMobile?: number;
+};
+
+export interface DiabetesCareVideoHeroProps {
+  className?: string;
+  background?: SectionBackgroundProps;
+  video?: VideoSettingsProps;
+  heading?: HeadingTypographyProps;
+  overlayBody?: OverlayBodyProps;
 }
 
 export function DiabetesCareVideoHero({
   className,
-  videoUrl = DIABETES_CARE_DEFAULT_VIDEO_URL,
-  posterImage,
-  autoplay = true,
-  muted = true,
-  loop = true,
-  playsInline = true,
-  showControls = false,
-  heading = '',
-  subheading = '',
+  background,
+  video,
+  heading,
+  overlayBody,
 }: DiabetesCareVideoHeroProps) {
+  const headingResolved = resolveHeadingTypography(heading);
+  const bodyColor = resolveBodyTextColor(overlayBody);
+  const bodyFontSize = resolveHeadingFontSizeCss(
+    overlayBody?.fontSize,
+    overlayBody?.fontSizeMobile,
+  );
+  const { sectionCss, sectionStyle } = buildSectionTheme({
+    sectionId: VIDEO_HERO_SECTION_ID,
+    sectionCss: '',
+    background,
+    defaultBackgroundChannels: '0 0% 100%',
+  });
   const [clientReady, setClientReady] = useState(false);
   const { ref: mediaRef, animated: mediaAnimated } = useInViewAnimate({ disabled: !clientReady });
 
@@ -71,12 +96,34 @@ export function DiabetesCareVideoHero({
     setClientReady(true);
   }, []);
 
-  const src = videoUrl.trim().length > 0 ? videoUrl.trim() : DIABETES_CARE_DEFAULT_VIDEO_URL;
-  const poster = posterImage?.trim().length ? posterImage.trim() : undefined;
+  const autoplay = video?.autoplay ?? true;
+  const muted = video?.muted ?? true;
+  const loop = video?.loop ?? true;
+  const playsInline = video?.playsInline ?? true;
+  const showControls = video?.showControls ?? false;
+  const src =
+    video?.url != null && video.url.trim().length > 0
+      ? video.url.trim()
+      : DIABETES_CARE_DEFAULT_VIDEO_URL;
+  const poster = video?.poster?.trim().length ? video.poster.trim() : undefined;
   const effectiveMuted = autoplay ? true : Boolean(muted);
-  const headingText = heading.trim();
-  const subheadingText = subheading.trim();
+  const headingText = headingResolved.text;
+  const subheadingText = overlayBody?.subheading?.trim() ?? '';
   const hasOverlay = headingText.length > 0 || subheadingText.length > 0;
+  const headingStyle =
+    headingResolved.color != null || headingResolved.fontSize != null
+      ? {
+          ...(headingResolved.color != null ? { color: headingResolved.color } : {}),
+          ...(headingResolved.fontSize != null ? { fontSize: headingResolved.fontSize } : {}),
+        }
+      : undefined;
+  const bodyStyle =
+    bodyColor != null || bodyFontSize != null
+      ? {
+          ...(bodyColor != null ? { color: bodyColor } : {}),
+          ...(bodyFontSize != null ? { fontSize: bodyFontSize } : {}),
+        }
+      : undefined;
 
   return (
     <div
@@ -86,11 +133,15 @@ export function DiabetesCareVideoHero({
         className,
       )}
       id={VIDEO_HERO_SECTION_ID}
+      style={sectionStyle}
     >
+      {sectionCss.length > 0 ? (
+        <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
+      ) : null}
       <div className="relative w-full [--section-padding-bottom:0px] [--section-padding-top:0px]">
         <div className="video-hero relative mx-auto w-full max-w-full">
           <div
-            ref={mediaRef}
+            ref={mediaRef as RefObject<HTMLDivElement>}
             className={clsx(
               'relative mx-auto w-full max-w-full overflow-hidden bg-black [aspect-ratio:1.775/1]',
               mediaAnimated && 'dc-animated',
@@ -121,13 +172,19 @@ export function DiabetesCareVideoHero({
                     )}
                   >
                     {headingText.length > 0 ? (
-                      <h2 className="heading max-w-4xl text-balance text-3xl font-semibold tracking-tight md:text-4xl lg:text-5xl">
+                      <h2
+                        className="heading max-w-4xl text-balance text-3xl font-semibold tracking-tight md:text-4xl lg:text-5xl"
+                        style={headingStyle}
+                      >
                         <SplitWordsHeading text={headingText} />
                       </h2>
                     ) : null}
                     {subheadingText.length > 0 ? (
                       <ScrollReveal delayMs={120}>
-                        <p className="heading mt-3 max-w-3xl text-pretty text-base leading-relaxed text-white/90 md:text-lg">
+                        <p
+                          className="heading mt-3 max-w-3xl text-pretty text-base leading-relaxed text-white/90 md:text-lg"
+                          style={bodyStyle}
+                        >
                           {subheadingText}
                         </p>
                       </ScrollReveal>

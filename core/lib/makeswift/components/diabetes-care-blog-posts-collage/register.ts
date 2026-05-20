@@ -1,10 +1,57 @@
 import { Group, Image, Link, List, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
+import {
+  fontSizeFields,
+  highlightSwashFields,
+  sectionBackgroundControls,
+  textColorFields,
+} from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
+import { ARCHIVE_BLOG_COLLAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
 import { DiabetesCareBlogPostsCollage } from './client';
 
 export const COMPONENT_TYPE = 'diabetes-care-blog-posts-collage';
+
+const collagePostFields = {
+  image: Group({
+    label: 'Image',
+    preferredLayout: Group.Layout.Popover,
+    props: {
+      imageSrc: Image({ label: 'Image' }),
+      imageAlt: TextInput({ label: 'Image alt', defaultValue: '' }),
+    },
+  }),
+  title: Group({
+    label: 'Title',
+    preferredLayout: Group.Layout.Popover,
+    props: {
+      text: TextInput({ label: 'Text', defaultValue: 'Post title' }),
+      ...textColorFields('0 0% 100%'),
+      ...fontSizeFields(),
+    },
+  }),
+  body: Group({
+    label: 'Body',
+    preferredLayout: Group.Layout.Popover,
+    props: {
+      text: TextArea({
+        label: 'Body (line breaks become paragraphs)',
+        defaultValue: 'Short summary for this post.',
+      }),
+      ...textColorFields('0 0% 100%'),
+      ...fontSizeFields(),
+    },
+  }),
+  link: Group({
+    label: 'Link',
+    preferredLayout: Group.Layout.Popover,
+    props: {
+      linkText: TextInput({ label: 'Link label', defaultValue: 'Read more' }),
+      link: Link({ label: 'Link URL' }),
+    },
+  }),
+};
 
 runtime.registerComponent(DiabetesCareBlogPostsCollage, {
   type: COMPONENT_TYPE,
@@ -12,52 +59,39 @@ runtime.registerComponent(DiabetesCareBlogPostsCollage, {
   icon: 'layout',
   props: {
     className: Style(),
-    headingBefore: TextInput({
-      label: 'Section heading (before accent)',
-      defaultValue: 'The',
+    ...sectionBackgroundControls(ARCHIVE_BLOG_COLLAGE_BACKGROUND_HSL),
+    heading: Group({
+      label: 'Heading',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        before: TextInput({
+          label: 'Before accent',
+          defaultValue: 'The',
+        }),
+        emphasis: TextInput({
+          label: 'Accent (half underline)',
+          defaultValue: '"Every Day" ',
+        }),
+        after: TextInput({
+          label: 'After accent',
+          defaultValue: 'Feed',
+        }),
+        ...textColorFields('0 0% 100%'),
+        ...fontSizeFields(),
+        ...highlightSwashFields(),
+      },
     }),
-    headingEmphasis: TextInput({
-      label: 'Section heading (accent, half underline)',
-      defaultValue: '"Every Day" ',
-    }),
-    headingAfter: TextInput({
-      label: 'Section heading (after accent)',
-      defaultValue: 'Feed',
-    }),
-    featureImageSrc: Image({ label: 'Featured post — image (large, left)' }),
-    featureImageAlt: TextInput({ label: 'Featured post — image alt', defaultValue: '' }),
-    featureTitle: TextInput({
-      label: 'Featured post — title',
-      defaultValue: 'Ongoing Ostomy Support: Finding What Works, Every Day',
-    }),
-    featureBody: TextArea({
-      label: 'Featured post — body (line breaks become paragraphs)',
-      defaultValue:
-        'Starting out is one thing. But what really shapes your experience over time is what comes next. The small adjustments. The routines that evolve.',
-    }),
-    featureLinkText: TextInput({
-      label: 'Featured post — link label',
-      defaultValue: 'Read more',
-    }),
-    featureLink: Link({ label: 'Featured post — link URL' }),
-    sidePosts: List({
-      label: 'Right column posts (exactly two; image + text row on desktop)',
+    posts: List({
+      label: 'Posts',
+      description:
+        'Order = layout: the first post is the large featured card on the left; the next two are the right column on desktop. Additional items are ignored on the live site.',
       type: Group({
         label: 'Post',
-        props: {
-          imageSrc: Image({ label: 'Image' }),
-          imageAlt: TextInput({ label: 'Image alt', defaultValue: '' }),
-          title: TextInput({ label: 'Title', defaultValue: 'Post title' }),
-          body: TextArea({
-            label: 'Body (line breaks become paragraphs)',
-            defaultValue: 'Short summary for this post.',
-          }),
-          linkText: TextInput({ label: 'Link label', defaultValue: 'Read more' }),
-          link: Link({ label: 'Link URL' }),
-        },
+        props: collagePostFields,
       }),
       getItemLabel(item) {
-        const t = item?.title;
+        const raw = item?.title;
+        const t = typeof raw === 'string' ? raw : raw?.text;
 
         return t != null && String(t).trim().length > 0 ? String(t).trim() : 'Post';
       },

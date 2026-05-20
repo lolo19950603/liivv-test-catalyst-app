@@ -3,7 +3,15 @@
 import { clsx } from 'clsx';
 import { useMemo } from 'react';
 
-import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import {
+  buildSectionTheme,
+  resolveBodyTextColor,
+  resolveHeadingTypography,
+  type BodyTextProps,
+  type HeadingWithHighlightProps,
+  type SectionBackgroundProps,
+} from '~/lib/makeswift/utils/diabetes-care-section-style';
 
 import {
   answerHtmlForRte,
@@ -17,20 +25,40 @@ import { FAQ_FIRST_ARCHIVE_STYLE, FAQ_FIRST_SECTION_ID } from './archive-styles'
 
 export interface DiabetesCareFaqFirstProps {
   className?: string;
-  heading?: string;
-  intro?: string;
+  background?: SectionBackgroundProps;
+  heading?: HeadingWithHighlightProps;
+  intro?: { text?: string };
   items?: FaqRow[];
+  bodyText?: BodyTextProps;
 }
 
 export function DiabetesCareFaqFirst({
   className,
+  background,
   heading,
   intro,
   items,
+  bodyText,
 }: DiabetesCareFaqFirstProps) {
+  const headingResolved = resolveHeadingTypography(heading);
+  const { sectionCss, sectionStyle } = buildSectionTheme({
+    sectionId: FAQ_FIRST_SECTION_ID,
+    sectionCss: FAQ_FIRST_ARCHIVE_STYLE,
+    background,
+    highlight: heading,
+  });
+  const bodyColor = resolveBodyTextColor(bodyText);
   const rows = faqRowsResolved(items);
-  const headingText = heading?.trim() ?? 'Support, Wherever You Are';
-  const introText = intro?.trim() ?? '';
+  const headingText =
+    headingResolved.text.length > 0 ? headingResolved.text : 'Support, Wherever You Are';
+  const introText = intro?.text?.trim() ?? '';
+  const headingStyle =
+    headingResolved.color != null || headingResolved.fontSize != null
+      ? {
+          ...(headingResolved.color != null ? { color: headingResolved.color } : {}),
+          ...(headingResolved.fontSize != null ? { fontSize: headingResolved.fontSize } : {}),
+        }
+      : undefined;
 
   const jsonLd = useMemo(() => {
     if (rows.length === 0) {
@@ -51,17 +79,20 @@ export function DiabetesCareFaqFirst({
 
   return (
     <div className={clsx('diabetes-care-faq-first max-w-full overflow-x-hidden', className)}>
-      <div className="shopify-section" id={FAQ_FIRST_SECTION_ID}>
-        <style dangerouslySetInnerHTML={{ __html: FAQ_FIRST_ARCHIVE_STYLE }} />
+      <div className="shopify-section" id={FAQ_FIRST_SECTION_ID} style={sectionStyle}>
+        <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding">
           <div className="page-width page-width--narrow relative">
             <div className="title-wrapper z-1 relative flex flex-col gap-4 text-left leading-none md:flex-row md:items-end md:justify-between lg:gap-8">
               <div className="grid gap-4">
-                <h2 className="heading title-md">
-                  <SplitWordsHeading text={headingText} />
+                <h2 className="heading title-md" style={headingStyle}>
+                  <AccentSplitWordsHeading accentColors={heading} text={headingText} />
                 </h2>
                 {introText.length > 0 ? (
-                  <div className="description rte subtext-md leading-normal">
+                  <div
+                    className="description rte subtext-md leading-normal"
+                    style={bodyColor != null ? { color: bodyColor } : undefined}
+                  >
                     {introText
                       .split(/\n+/)
                       .map((p) => p.trim())

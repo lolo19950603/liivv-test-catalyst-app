@@ -1,9 +1,24 @@
 'use client';
 
 import { clsx } from 'clsx';
+import type { CSSProperties } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { ArchiveHighlightedText } from '~/lib/makeswift/components/diabetes-care-faq/archive-highlighted-text';
+import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import {
+  buildSectionTheme,
+  resolveHeadingTypography,
+  type HeadingTypographyProps,
+  type HeadingWithHighlightProps,
+  type SectionBackgroundProps,
+} from '~/lib/makeswift/utils/diabetes-care-section-style';
+import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
+import {
+  resolveAccentColors,
+  resolvePlainTextColor,
+} from '~/lib/makeswift/utils/heading-accent-color';
+import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
 
 const SHOPIFY_SECTION_ID = 'shopify-section-template--26520397447459__timeline_nyTDKQ';
 const SLIDER_ID = 'Slider-template--26520397447459__timeline_nyTDKQ';
@@ -24,29 +39,91 @@ function timelineSectionCss(blockCount: number): string {
   return `${id}{--section-padding-top:72px;--section-padding-bottom:72px;--section-blocks-count:${String(blockCount)}}@media screen and (min-width:768px){${id} .timeline__item>.timeline-slide-layout.flex{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}}${strip}${stripScrollbar}${id} .timeline-react-strip .timeline__item{flex:0 0 min(92%,1120px);max-width:100%;width:auto;scroll-snap-align:center;transition:opacity .28s ease}${id} .timeline-react-strip .timeline__item:not(.selected){opacity:.48}${id} .timeline-react-strip .timeline__item.selected{opacity:1}@media (prefers-reduced-motion:reduce){${id} .timeline-react-strip .timeline__item{transition:none}}`;
 }
 
-export interface DiabetesCareTimelineBullet {
+export type TimelineTypographyProps = {
+  textColor?: string;
+  textColorHex?: string;
+  fontSize?: number;
+  fontSizeMobile?: number;
+};
+
+export type TimelineTextBlockProps = TimelineTypographyProps & {
   text?: string;
+};
+
+export type TimelineSectionHeadingProps = TimelineTypographyProps &
+  HeadingAccentColorProps & {
+    text?: string;
+  };
+
+export type TimelineSectionBodyProps = TimelineTypographyProps & {
+  html?: string;
+};
+
+export interface DiabetesCareTimelineSlideContent {
+  categoryLabel?: TimelineTextBlockProps;
+  sectionHeading?: TimelineSectionHeadingProps;
+  sectionBody?: TimelineSectionBodyProps;
 }
 
 export interface DiabetesCareTimelineSection {
-  editorLabel?: string;
-  timelineLabel?: string;
-  categoryLabel?: string;
-  sectionHeading?: string;
-  subtext?: string;
-  bulletPoints?: DiabetesCareTimelineBullet[];
-  buttonText?: string;
-  buttonLink?: { href?: string; target?: string };
-  imageSrc?: string;
-  imageAlt?: string;
+  slideContent?: DiabetesCareTimelineSlideContent;
+  button?: {
+    buttonText?: string;
+    buttonLink?: { href?: string; target?: string };
+  };
+  image?: {
+    imageSrc?: string;
+    imageAlt?: string;
+  };
 }
 
-export interface DiabetesCareTimelineProps {
-  className?: string;
-  topHeading?: string;
-  headingAccentPhrase?: string;
-  sections?: DiabetesCareTimelineSection[];
+function timelineTypographyStyle(
+  typography?: TimelineTypographyProps | null,
+): CSSProperties | undefined {
+  const color = resolvePlainTextColor({
+    textColor: typography?.textColor,
+    textColorHex: typography?.textColorHex,
+  });
+  const fontSize = resolveHeadingFontSizeCss(typography?.fontSize, typography?.fontSizeMobile);
+
+  if (color == null && fontSize == null) {
+    return undefined;
+  }
+
+  return {
+    ...(color != null ? { color } : {}),
+    ...(fontSize != null ? { fontSize } : {}),
+  };
 }
+
+function timelineCategoryLabel(section: DiabetesCareTimelineSection): string {
+  return section.slideContent?.categoryLabel?.text?.trim() ?? '';
+}
+
+/** Per-slide heading: font size + optional custom swash via `--color-highlight`. */
+function timelineSectionHeadingStyle(
+  heading?: TimelineSectionHeadingProps | null,
+): CSSProperties | undefined {
+  const typography = timelineTypographyStyle(heading);
+  const { highlightChannels } = resolveAccentColors(heading);
+
+  if (typography == null && highlightChannels == null) {
+    return undefined;
+  }
+
+  return {
+    ...typography,
+    ...(highlightChannels != null ? { '--color-highlight': highlightChannels } : {}),
+  };
+}
+
+export type DiabetesCareTimelineProps = {
+  className?: string;
+  background?: SectionBackgroundProps;
+  primaryHeading?: HeadingTypographyProps;
+  secondaryHeading?: HeadingWithHighlightProps;
+  sections?: DiabetesCareTimelineSection[];
+};
 
 function IconChevronLeft() {
   return (
@@ -97,23 +174,6 @@ function IconArrowRight() {
   );
 }
 
-function slideBody(section: DiabetesCareTimelineSection) {
-  const bullets =
-    section.bulletPoints?.filter((b) => b.text != null && String(b.text).trim().length > 0) ?? [];
-  const subtextParagraphs =
-    section.subtext != null && section.subtext.trim().length > 0
-      ? section.subtext
-          .split(/\n+/)
-          .map((p) => p.trim())
-          .filter((p) => p.length > 0)
-      : [];
-  const showRteBlock = subtextParagraphs.length > 0 || bullets.length > 0;
-  const buttonHref = section.buttonLink?.href ?? '#';
-  const buttonLabel = section.buttonText?.trim() || 'Get Started';
-
-  return { bullets, subtextParagraphs, showRteBlock, buttonHref, buttonLabel };
-}
-
 interface TimelineSlideProps {
   section: DiabetesCareTimelineSection;
   index: number;
@@ -122,7 +182,14 @@ interface TimelineSlideProps {
 }
 
 function TimelineSlide({ section, index, isSelected, setSlideEl }: TimelineSlideProps) {
-  const { bullets, subtextParagraphs, showRteBlock, buttonHref, buttonLabel } = slideBody(section);
+  const content = section.slideContent;
+  const categoryLabel = content?.categoryLabel?.text?.trim() ?? '';
+  const sectionHeadingBlock = content?.sectionHeading;
+  const sectionHeading = sectionHeadingBlock?.text?.trim() ?? '';
+  const sectionHeadingAccent = resolveAccentColors(sectionHeadingBlock);
+  const sectionBodyHtml = content?.sectionBody?.html?.trim() ?? '';
+  const buttonHref = section.button?.buttonLink?.href ?? '#';
+  const buttonLabel = section.button?.buttonText?.trim() || 'Get Started';
 
   return (
     <div
@@ -133,56 +200,56 @@ function TimelineSlide({ section, index, isSelected, setSlideEl }: TimelineSlide
     >
       <div className="timeline-slide-layout md:grid-row-reverse flex flex-col overflow-hidden">
         <picture className="media media--portrait mobile:media--wide relative block overflow-hidden">
-          {section.imageSrc ? (
+          {section.image?.imageSrc ? (
             // eslint-disable-next-line @next/next/no-img-element -- Makeswift image URL
             <img
-              alt={section.imageAlt ?? ''}
+              alt={section.image.imageAlt ?? ''}
               loading={index === 0 ? 'eager' : 'lazy'}
-              src={section.imageSrc}
+              src={section.image.imageSrc}
             />
           ) : null}
         </picture>
 
         <div className="timeline__item-content flex flex-col gap-4">
-          {section.categoryLabel ? (
-            <p className="text-opacity text-base font-bold tracking-tight lg:text-lg">
-              {section.categoryLabel}
+          {categoryLabel.length > 0 ? (
+            <p
+              className="text-opacity text-base font-bold tracking-tight lg:text-lg"
+              style={timelineTypographyStyle(content?.categoryLabel)}
+            >
+              {categoryLabel}
             </p>
           ) : null}
 
-          {section.sectionHeading ? (
-            <h2 className="heading text-2xl leading-none tracking-tight lg:text-3xl">
-              <em
-                className="highlighted-text animated relative not-italic"
-                data-style="half_text"
-                is="highlighted-text"
+          {sectionHeading.length > 0 ? (
+            <h2
+              className="heading text-2xl leading-none tracking-tight lg:text-3xl"
+              style={timelineSectionHeadingStyle(sectionHeadingBlock)}
+            >
+              <ArchiveHighlightedText
+                color={resolvePlainTextColor(sectionHeadingBlock)}
+                highlightStyle={sectionHeadingAccent.highlightStyle}
               >
-                {section.sectionHeading}
-              </em>
+                {sectionHeading}
+              </ArchiveHighlightedText>
             </h2>
           ) : null}
 
-          {showRteBlock ? (
-            <div className="rte text-opacity text-base lg:text-lg">
-              {subtextParagraphs.map((para, i) => (
-                <p key={`${index}-sub-${i}`}>{para}</p>
-              ))}
-              {bullets.length > 0 ? (
-                <ul>
-                  {bullets.map((b, i) => (
-                    <li key={`${index}-b-${i}`}>{b.text}</li>
-                  ))}
-                </ul>
-              ) : null}
-            </div>
+          {sectionBodyHtml.length > 0 ? (
+            <div
+              className="rte text-opacity text-base lg:text-lg"
+              dangerouslySetInnerHTML={{ __html: sectionBodyHtml }}
+              style={timelineTypographyStyle(content?.sectionBody)}
+            />
           ) : null}
 
           <p>
             <a
               className="button button--primary button--md icon-with-text"
               href={buttonHref}
-              rel={section.buttonLink?.target === '_blank' ? 'noopener noreferrer' : undefined}
-              target={section.buttonLink?.target}
+              rel={
+                section.button?.buttonLink?.target === '_blank' ? 'noopener noreferrer' : undefined
+              }
+              target={section.button?.buttonLink?.target}
             >
               <span className="btn-fill" data-fill />
               <span className="btn-text">
@@ -199,10 +266,13 @@ function TimelineSlide({ section, index, isSelected, setSlideEl }: TimelineSlide
 
 export function DiabetesCareTimeline({
   className,
-  topHeading,
-  headingAccentPhrase,
+  background,
+  primaryHeading,
+  secondaryHeading,
   sections,
 }: DiabetesCareTimelineProps) {
+  const primaryResolved = resolveHeadingTypography(primaryHeading);
+  const secondaryResolved = resolveHeadingTypography(secondaryHeading);
   const list = useMemo(() => sections ?? [], [sections]);
   const count = list.length;
   const [activeIndex, setActiveIndex] = useState(0);
@@ -312,20 +382,36 @@ export function DiabetesCareTimeline({
     scrollSlideIntoView(next);
   }, [count, safeIndex, scrollSlideIntoView]);
 
-  const heading = topHeading ?? 'Your Care Journey, Simp(liivv)fied';
+  const primaryText =
+    primaryResolved.text.length > 0 ? primaryResolved.text : 'Your Care Journey,';
+  const secondaryText =
+    secondaryResolved.text.length > 0 ? secondaryResolved.text : 'Simp(liivv)fied';
   const prevDisabled = count === 0 || safeIndex === 0;
   const nextDisabled = count === 0 || safeIndex >= count - 1;
+  const { sectionCss, sectionStyle } = buildSectionTheme({
+    sectionId: SHOPIFY_SECTION_ID,
+    sectionCss: timelineSectionCss(count),
+    background,
+    highlight: secondaryHeading,
+  });
 
   return (
     <div className={clsx('diabetes-care-timeline max-w-full', className)}>
-      <div className="shopify-section" id={SHOPIFY_SECTION_ID}>
-        <style dangerouslySetInnerHTML={{ __html: timelineSectionCss(count) }} />
+      <div className="shopify-section" id={SHOPIFY_SECTION_ID} style={sectionStyle}>
+        <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding">
           <div className="page-width relative overflow-hidden md:overflow-visible">
             <div className="title-wrapper z-1 relative flex flex-col gap-4 text-left leading-none md:flex-row md:items-end md:justify-between lg:gap-8">
               <div className="grid gap-4">
                 <h2 className="heading title-md">
-                  <SplitWordsHeading accentPhrase={headingAccentPhrase} text={heading} />
+                  <AccentSplitWordsHeading
+                    accentColors={secondaryHeading}
+                    emphasis={secondaryText}
+                    emphasisFontSize={secondaryResolved.fontSize}
+                    lead={primaryText}
+                    leadColor={primaryResolved.color}
+                    leadFontSize={primaryResolved.fontSize}
+                  />
                 </h2>
               </div>
 
@@ -374,8 +460,9 @@ export function DiabetesCareTimeline({
             {count === 0 ? (
               <div className="rte text-opacity mt-8 text-base lg:text-lg">
                 <p>
-                  Add journey sections in the left panel. Each section can include copy, bullets, a
-                  button link, and an image. The bottom timeline uses the export theme styles.
+                  Add journey sections in the left panel. Each section can include category label,
+                  heading, HTML body, a button link, and an image. The bottom timeline label matches
+                  the category label.
                 </p>
               </div>
             ) : (
@@ -408,11 +495,12 @@ export function DiabetesCareTimeline({
                     role="tablist"
                   >
                     {list.map((section, index) => {
+                      const category = timelineCategoryLabel(section);
                       const label =
-                        section.timelineLabel?.trim() ||
-                        section.categoryLabel?.trim() ||
-                        section.sectionHeading?.trim() ||
-                        `Step ${index + 1}`;
+                        category.length > 0
+                          ? category
+                          : section.slideContent?.sectionHeading?.text?.trim() ||
+                            `Step ${index + 1}`;
                       const isActive = index === safeIndex;
 
                       return (

@@ -2,7 +2,15 @@
 
 import { clsx } from 'clsx';
 
-import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import {
+  buildSectionTheme,
+  resolveBodyTextColor,
+  resolveHeadingTypography,
+  type BodyTextProps,
+  type HeadingWithHighlightProps,
+  type SectionBackgroundProps,
+} from '~/lib/makeswift/utils/diabetes-care-section-style';
 
 import {
   IMAGE_TEXT_OVERLAY_FEATURES_VARS,
@@ -38,15 +46,19 @@ export interface DiabetesCareImageTextOverlayFeature {
 
 export interface DiabetesCareImageTextOverlayProps {
   className?: string;
-  /** Background image URL (Makeswift Image control). */
-  backgroundImageSrc?: string;
-  backgroundImageAlt?: string;
-  heading?: string;
-  /** Rich intro line(s); HTML ok. */
-  bodyHtml?: string;
-  buttonLabel?: string;
-  buttonLink?: { href?: string; target?: string };
+  background?: SectionBackgroundProps;
+  banner?: {
+    imageSrc?: string;
+    imageAlt?: string;
+  };
+  heading?: HeadingWithHighlightProps;
+  body?: { html?: string };
+  button?: {
+    label?: string;
+    link?: { href?: string; target?: string };
+  };
   features?: DiabetesCareImageTextOverlayFeature[];
+  bodyText?: BodyTextProps;
 }
 
 const DEFAULT_FEATURES: DiabetesCareImageTextOverlayFeature[] = [
@@ -126,20 +138,37 @@ function featuresGridClass(count: number): string {
 
 export function DiabetesCareImageTextOverlay({
   className,
-  backgroundImageSrc,
-  backgroundImageAlt,
+  background,
+  banner,
   heading,
-  bodyHtml,
-  buttonLabel,
-  buttonLink,
+  body,
+  button,
   features,
+  bodyText,
 }: DiabetesCareImageTextOverlayProps) {
-  const img = backgroundImageSrc?.trim() ?? '';
-  const imgAlt = backgroundImageAlt?.trim() ?? '';
-  const headingText = heading?.trim() ?? "We're Here if You Need Us";
-  const html = bodyHtml?.trim() ?? '';
-  const btn = buttonLabel?.trim() ?? '';
-  const btnHref = buttonLink?.href?.trim() ?? '';
+  const headingResolved = resolveHeadingTypography(heading);
+  const bodyColor = resolveBodyTextColor(bodyText);
+  const { sectionCss, sectionStyle } = buildSectionTheme({
+    sectionId: IMAGE_TEXT_OVERLAY_SECTION_ID,
+    sectionCss: `${IMAGE_TEXT_OVERLAY_VARS}${IMAGE_TEXT_OVERLAY_FEATURES_VARS}`,
+    background,
+    highlight: heading,
+    defaultBackgroundChannels: '0 0% 100%',
+  });
+  const img = banner?.imageSrc?.trim() ?? '';
+  const imgAlt = banner?.imageAlt?.trim() ?? '';
+  const headingText =
+    headingResolved.text.length > 0 ? headingResolved.text : "We're Here if You Need Us";
+  const html = body?.html?.trim() ?? '';
+  const btn = button?.label?.trim() ?? '';
+  const btnHref = button?.link?.href?.trim() ?? '';
+  const headingStyle =
+    headingResolved.color != null || headingResolved.fontSize != null
+      ? {
+          ...(headingResolved.color != null ? { color: headingResolved.color } : {}),
+          ...(headingResolved.fontSize != null ? { fontSize: headingResolved.fontSize } : {}),
+        }
+      : undefined;
   const hasBtn = btn.length > 0 && btnHref.length > 0;
   const featureRows = featuresResolved(features);
 
@@ -147,12 +176,8 @@ export function DiabetesCareImageTextOverlay({
     <div
       className={clsx('diabetes-care-image-text-overlay max-w-full overflow-x-hidden', className)}
     >
-      <div className="shopify-section" id={IMAGE_TEXT_OVERLAY_SECTION_ID}>
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `${IMAGE_TEXT_OVERLAY_VARS}${IMAGE_TEXT_OVERLAY_FEATURES_VARS}`,
-          }}
-        />
+      <div className="shopify-section" id={IMAGE_TEXT_OVERLAY_SECTION_ID} style={sectionStyle}>
+        <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding section--rounded relative">
           <div className="relative">
             <div className="banner media--450px mobile:media--auto relative">
@@ -177,21 +202,25 @@ export function DiabetesCareImageTextOverlay({
               <div className="banner__content z-1 absolute left-0 top-0 h-full w-full overflow-hidden">
                 <div className="page-width flex h-full w-full items-end justify-start md:items-center md:justify-center">
                   <div className="banner__box banner__box--small pb-10 pt-[min(35vh,12rem)] text-left md:py-0 md:text-center">
-                    <h2 className="banner__title heading title-lg tracking-heading leading-none text-white">
-                      <SplitWordsHeading text={headingText} />
+                    <h2
+                      className="banner__title heading title-lg tracking-heading leading-none text-white"
+                      style={headingStyle}
+                    >
+                      <AccentSplitWordsHeading accentColors={heading} text={headingText} />
                     </h2>
                     {html.length > 0 ? (
                       <div
                         className="rte body subtext-md leading-normal text-white"
                         dangerouslySetInnerHTML={{ __html: html }}
+                        style={bodyColor != null ? { color: bodyColor } : undefined}
                       />
                     ) : null}
                     {hasBtn ? (
                       <a
                         className="button button--primary button--fixed button--md icon-with-text mt-6"
                         href={btnHref}
-                        rel={buttonLink?.target === '_blank' ? 'noopener noreferrer' : undefined}
-                        target={buttonLink?.target}
+                        rel={button?.link?.target === '_blank' ? 'noopener noreferrer' : undefined}
+                        target={button?.link?.target}
                       >
                         <span className="btn-fill" data-fill />
                         <span className="btn-text">

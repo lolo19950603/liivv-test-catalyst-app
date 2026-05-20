@@ -3,7 +3,16 @@
 import { clsx } from 'clsx';
 import { type KeyboardEventHandler, useId, useRef } from 'react';
 
-import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import {
+  buildSectionTheme,
+  resolveBodyTextColor,
+  resolveHeadingTypography,
+  type BodyTextProps,
+  type HeadingTypographyProps,
+  type HeadingWithHighlightProps,
+  type SectionBackgroundProps,
+} from '~/lib/makeswift/utils/diabetes-care-section-style';
 
 import { COLLECTION_LIST_SECTION_ID, COLLECTION_LIST_VARS } from './archive-styles';
 
@@ -15,14 +24,15 @@ export interface DiabetesCareCollectionListCardProps {
   ariaLabel?: string;
 }
 
-export interface DiabetesCareCollectionListProps {
+export type DiabetesCareCollectionListProps = {
   className?: string;
-  headingLead?: string;
-  /** Text wrapped with the storefront “half underline” accent (can be multiple words). */
-  headingEmphasis?: string;
-  descriptionHtml?: string;
+  background?: SectionBackgroundProps;
+  primaryHeading?: HeadingTypographyProps;
+  secondaryHeading?: HeadingWithHighlightProps;
+  body?: { descriptionHtml?: string };
   cards?: DiabetesCareCollectionListCardProps[];
-}
+  bodyText?: BodyTextProps;
+};
 
 function IconChevronLeft() {
   return (
@@ -64,16 +74,27 @@ function cardHasMedia(c: DiabetesCareCollectionListCardProps): boolean {
 
 export function DiabetesCareCollectionList({
   className,
-  headingLead,
-  headingEmphasis,
-  descriptionHtml,
+  background,
+  primaryHeading,
+  secondaryHeading,
+  body,
   cards,
+  bodyText,
 }: DiabetesCareCollectionListProps) {
+  const lead = resolveHeadingTypography(primaryHeading);
+  const accent = resolveHeadingTypography(secondaryHeading);
+  const bodyColor = resolveBodyTextColor(bodyText);
+  const { sectionCss, sectionStyle } = buildSectionTheme({
+    sectionId: COLLECTION_LIST_SECTION_ID,
+    sectionCss: COLLECTION_LIST_VARS,
+    background,
+    highlight: secondaryHeading,
+  });
   const reactId = useId().replace(/:/g, '');
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const lead = headingLead?.trim() ?? 'Care Designed for';
-  const emphasis = headingEmphasis?.trim() ?? 'Every Stage of Health';
-  const desc = descriptionHtml?.trim() ?? '';
+  const leadText = lead.text.length > 0 ? lead.text : 'Care Designed for';
+  const emphasis = accent.text.length > 0 ? accent.text : 'Every Stage of Health';
+  const desc = body?.descriptionHtml?.trim() ?? '';
 
   const list = cards != null ? cards.filter(cardHasMedia) : [];
 
@@ -105,19 +126,24 @@ export function DiabetesCareCollectionList({
 
   return (
     <div className={clsx('diabetes-care-collection-list max-w-full overflow-x-hidden', className)}>
-      <div className="shopify-section" id={COLLECTION_LIST_SECTION_ID}>
-        <style dangerouslySetInnerHTML={{ __html: COLLECTION_LIST_VARS }} />
+      <div className="shopify-section" id={COLLECTION_LIST_SECTION_ID} style={sectionStyle}>
+        <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding">
           <div className="page-width relative">
             <div className="title-wrapper z-1 relative flex flex-col gap-4 text-left md:flex-row md:items-end md:justify-between lg:gap-8">
               <div className="grid gap-4 leading-none">
                 <h2 className="heading title-md leading-none">
-                  <SplitWordsHeading emphasis={emphasis} lead={lead} />
+                  <AccentSplitWordsHeading
+                    accentColors={secondaryHeading}
+                    emphasis={emphasis}
+                    lead={leadText}
+                  />
                 </h2>
                 {desc.length > 0 ? (
                   <div
                     className="description rte subtext-md leading-normal"
                     dangerouslySetInnerHTML={{ __html: desc }}
+                    style={bodyColor != null ? { color: bodyColor } : undefined}
                   />
                 ) : null}
               </div>
@@ -174,65 +200,64 @@ export function DiabetesCareCollectionList({
               tabIndex={list.length > 0 ? 0 : undefined}
             >
               <ScrollReveal delayMs={100}>
-              <div
-                className={clsx(
-                  'motion-list initialized card-grid grid max-w-full',
-                  // Mirrors archived template: horizontal snap on tablet, 1-up on mobile.
-                  'mobile:card-grid--1 gap-8 overflow-x-auto overscroll-contain scroll-smooth [scrollbar-width:none] lg:gap-12 [&::-webkit-scrollbar]:hidden',
-                  'card-grid--4 [--card-grid-template:auto/auto-flow_minmax(0,288px)]',
-                )}
-                ref={scrollerRef}
-              >
-                {list.length === 0 ? (
-                  <p className="subtext-md col-span-full py-8 text-center text-contrast-500">
-                    Add collections in Makeswift (image, title, and link).
-                  </p>
-                ) : (
-                  list.map((c, i) => {
-                    const href = c.cardLink?.href?.trim() ?? '#';
-                    const src = c.imageSrc?.trim() ?? '';
-                    const cardTitle = c.title?.trim() ?? '';
-                    const label =
-                      (c.ariaLabel?.trim() ?? cardTitle).length > 0
-                        ? (c.ariaLabel?.trim() ?? cardTitle)
-                        : undefined;
+                <div
+                  className={clsx(
+                    'motion-list initialized card-grid grid max-w-full',
+                    'mobile:card-grid--1 gap-8 overflow-x-auto overscroll-contain scroll-smooth [scrollbar-width:none] lg:gap-12 [&::-webkit-scrollbar]:hidden',
+                    'card-grid--4 [--card-grid-template:auto/auto-flow_minmax(0,288px)]',
+                  )}
+                  ref={scrollerRef}
+                >
+                  {list.length === 0 ? (
+                    <p className="subtext-md col-span-full py-8 text-center text-contrast-500">
+                      Add collections in Makeswift (image, title, and link).
+                    </p>
+                  ) : (
+                    list.map((c, i) => {
+                      const href = c.cardLink?.href?.trim() ?? '#';
+                      const src = c.imageSrc?.trim() ?? '';
+                      const cardTitle = c.title?.trim() ?? '';
+                      const label =
+                        (c.ariaLabel?.trim() ?? cardTitle).length > 0
+                          ? (c.ariaLabel?.trim() ?? cardTitle)
+                          : undefined;
 
-                    return (
-                      <div
-                        className="card media-card media-card--card shrink-0"
-                        key={`dcc-${reactId}-${String(i)}`}
-                      >
-                        <a
-                          aria-label={label}
-                          className="media-card__link relative flex h-full w-full flex-col"
-                          href={href}
-                          rel={c.cardLink?.target === '_blank' ? 'noopener noreferrer' : undefined}
-                          target={c.cardLink?.target}
+                      return (
+                        <div
+                          className="card media-card media-card--card shrink-0"
+                          key={`dcc-${reactId}-${String(i)}`}
                         >
-                          <div className="media media--wide relative overflow-hidden">
-                            <img
-                              alt={c.imageAlt?.trim() ?? cardTitle}
-                              className="aspect-[4/3] w-full object-cover"
-                              decoding="async"
-                              height={800}
-                              loading="lazy"
-                              src={src}
-                              width={1000}
-                            />
-                          </div>
-                          <div className="media-card__info flex justify-between gap-3 p-6">
-                            <p className="grow">
-                              <span className="heading reversed-link text-lg-md font-medium leading-tight">
-                                {cardTitle}
-                              </span>
-                            </p>
-                          </div>
-                        </a>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
+                          <a
+                            aria-label={label}
+                            className="media-card__link relative flex h-full w-full flex-col"
+                            href={href}
+                            rel={c.cardLink?.target === '_blank' ? 'noopener noreferrer' : undefined}
+                            target={c.cardLink?.target}
+                          >
+                            <div className="media media--wide relative overflow-hidden">
+                              <img
+                                alt={c.imageAlt?.trim() ?? cardTitle}
+                                className="aspect-[4/3] w-full object-cover"
+                                decoding="async"
+                                height={800}
+                                loading="lazy"
+                                src={src}
+                                width={1000}
+                              />
+                            </div>
+                            <div className="media-card__info flex justify-between gap-3 p-6">
+                              <p className="grow">
+                                <span className="heading reversed-link text-lg-md font-medium leading-tight">
+                                  {cardTitle}
+                                </span>
+                              </p>
+                            </div>
+                          </a>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
               </ScrollReveal>
             </div>
           </div>

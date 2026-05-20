@@ -8,7 +8,13 @@ import {
   TextInput,
 } from '@makeswift/runtime/controls';
 
+import {
+  bodyTextPopoverControls,
+  headingPopoverControls,
+  sectionBackgroundControls,
+} from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
+import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import { searchProducts } from '../../utils/search-products';
 
 import { DiabetesCareFloatingProductBundle } from './client';
@@ -21,25 +27,36 @@ runtime.registerComponent(DiabetesCareFloatingProductBundle, {
   icon: 'layout',
   props: {
     className: Style(),
-    bannerImageSrc: Image({ label: 'Desktop banner image (large screens)' }),
-    bannerImageAlt: TextInput({
-      label: 'Banner image alt',
-      defaultValue: '',
+    ...sectionBackgroundControls(ARCHIVE_SAGE_BACKGROUND_HSL),
+    banner: Group({
+      label: 'Banner',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        imageSrc: Image({ label: 'Desktop banner image (large screens)' }),
+        imageAlt: TextInput({
+          label: 'Banner image alt',
+          defaultValue: '',
+        }),
+      },
     }),
-    promoTitle: TextInput({
+    ...headingPopoverControls({
       label: 'Promo heading',
-      defaultValue: '🌱 Start Strong Kit',
+      textDefault: '🌱 Start Strong Kit',
+      textColorDefault: '0 0% 100%',
+      includeHighlightSwash: true,
     }),
-    promoBodyHtml: TextArea({
-      label: 'Promo body (HTML)',
-      defaultValue:
-        '<p>Everything you need to feel set up, comfortable, and ready for your day.</p>',
+    body: Group({
+      label: 'Body',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        html: TextArea({
+          label: 'Promo body (HTML)',
+          defaultValue:
+            '<p>Everything you need to feel set up, comfortable, and ready for your day.</p>',
+        }),
+      },
     }),
-    addToCartLabel: TextInput({
-      label: 'Add to cart button label',
-      defaultValue: 'Add to cart',
-    }),
-    bundleProducts: List({
+    products: List({
       label: 'Bundle products',
       type: Group({
         label: 'Product',
@@ -66,5 +83,16 @@ runtime.registerComponent(DiabetesCareFloatingProductBundle, {
           : 'Product';
       },
     }),
+    buttons: Group({
+      label: 'Buttons',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        addToCartLabel: TextInput({
+          label: 'Add to cart button label',
+          defaultValue: 'Add to cart',
+        }),
+      },
+    }),
+    ...bodyTextPopoverControls('0 0% 100%'),
   },
 });

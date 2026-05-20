@@ -2,7 +2,13 @@
 
 import { clsx } from 'clsx';
 
-import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import {
+  buildSectionTheme,
+  resolveHeadingTypography,
+  type HeadingWithHighlightProps,
+  type SectionBackgroundProps,
+} from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 
 const SECTION_VARS = `--section-padding-top:72px;--section-padding-bottom:72px;--section-grid-gap:70px`;
@@ -32,17 +38,17 @@ export interface DiabetesCareLogoListLogo {
   imageAlt?: string;
 }
 
-export interface DiabetesCareLogoListProps {
+export type DiabetesCareLogoListProps = {
   className?: string;
-  heading?: string;
+  background?: SectionBackgroundProps;
+  heading?: HeadingWithHighlightProps;
+  marquee?: {
+    cycleDurationSeconds?: number;
+    logoMaxHeightPx?: number;
+    logoSlotWidthPx?: number;
+  };
   logos?: DiabetesCareLogoListLogo[];
-  /** Seconds for the track to move one full “loop” (one copy of the logo set). */
-  cycleDurationSeconds?: number;
-  /** Same max height for every logo (px). */
-  logoMaxHeightPx?: number;
-  /** Same horizontal slot width for every logo (px). */
-  logoSlotWidthPx?: number;
-}
+};
 
 function logosResolved(logos?: DiabetesCareLogoListLogo[]) {
   if (logos == null || logos.length === 0) {
@@ -59,22 +65,36 @@ function logosResolved(logos?: DiabetesCareLogoListLogo[]) {
 
 export function DiabetesCareLogoList({
   className,
+  background,
   heading,
+  marquee,
   logos,
-  cycleDurationSeconds,
-  logoMaxHeightPx,
-  logoSlotWidthPx,
 }: DiabetesCareLogoListProps) {
+  const headingResolved = resolveHeadingTypography(heading);
   const sectionDomId = LOGO_LIST_SECTION_ID;
+  const { sectionCss, sectionStyle } = buildSectionTheme({
+    sectionId: sectionDomId,
+    sectionCss: `#${sectionDomId}{${SECTION_VARS}}${marqueeCursorScopedCss(sectionDomId)}`,
+    background,
+    highlight: heading,
+  });
 
-  const title = heading?.trim() ?? 'Trusted Brands, Made for Everyday Life';
+  const title =
+    headingResolved.text.length > 0
+      ? headingResolved.text
+      : 'Trusted Brands, Made for Everyday Life';
   const items = logosResolved(logos);
-  const duration = Math.min(120, Math.max(2, cycleDurationSeconds ?? 45));
+  const duration = Math.min(120, Math.max(2, marquee?.cycleDurationSeconds ?? 30));
 
-  const slotH = Math.min(120, Math.max(28, logoMaxHeightPx ?? 56));
-  const slotW = Math.min(280, Math.max(80, logoSlotWidthPx ?? 176));
-
-  const scopedCss = `#${sectionDomId}{${SECTION_VARS}}${marqueeCursorScopedCss(sectionDomId)}`;
+  const slotH = Math.min(120, Math.max(28, marquee?.logoMaxHeightPx ?? 80));
+  const slotW = Math.min(280, Math.max(80, marquee?.logoSlotWidthPx ?? 160));
+  const headingStyle =
+    headingResolved.color != null || headingResolved.fontSize != null
+      ? {
+          ...(headingResolved.color != null ? { color: headingResolved.color } : {}),
+          ...(headingResolved.fontSize != null ? { fontSize: headingResolved.fontSize } : {}),
+        }
+      : undefined;
 
   const stripStyle: CSSProperties = {
     gap: 'var(--section-grid-gap)',
@@ -423,14 +443,18 @@ export function DiabetesCareLogoList({
 
   return (
     <div className={clsx('diabetes-care-logo-list', className)}>
-      <div className="shopify-section" id={sectionDomId}>
-        <style dangerouslySetInnerHTML={{ __html: scopedCss }} />
+      <div className="shopify-section" id={sectionDomId} style={sectionStyle}>
+        <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--divider section--rounded section--padding relative">
           <div className="page-width relative">
             <div className="title-wrapper relative z-1 flex flex-col gap-4 text-center leading-none lg:gap-8 md:items-center md:justify-between">
               <div className="grid gap-4">
-                <h2 className="heading title-md">
-                  <SplitWordsHeading highlightEntirePhrase text={title} />
+                <h2 className="heading title-md" style={headingStyle}>
+                  <AccentSplitWordsHeading
+                    accentColors={heading}
+                    highlightEntirePhrase
+                    text={title}
+                  />
                 </h2>
               </div>
             </div>

@@ -3,6 +3,17 @@
 import { clsx } from 'clsx';
 import { useMemo } from 'react';
 
+import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { ARCHIVE_SAGE_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
+import {
+  buildSectionTheme,
+  resolveBodyTextColor,
+  resolveHeadingTypography,
+  type BodyTextProps,
+  type HeadingWithHighlightProps,
+  type SectionBackgroundProps,
+} from '~/lib/makeswift/utils/diabetes-care-section-style';
+
 import {
   answerHtmlForRte,
   buildFaqPageJsonLd,
@@ -11,19 +22,42 @@ import {
   IconPlusAccordion,
 } from '../diabetes-care-faq/shared';
 
-import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
-
 import { FAQ_SECOND_ARCHIVE_STYLE, FAQ_SECOND_SECTION_ID } from './archive-styles';
 
 export interface DiabetesCareFaqSecondProps {
   className?: string;
-  heading?: string;
+  background?: SectionBackgroundProps;
+  heading?: HeadingWithHighlightProps;
   items?: FaqRow[];
+  bodyText?: BodyTextProps;
 }
 
-export function DiabetesCareFaqSecond({ className, heading, items }: DiabetesCareFaqSecondProps) {
+export function DiabetesCareFaqSecond({
+  className,
+  background,
+  heading,
+  items,
+  bodyText,
+}: DiabetesCareFaqSecondProps) {
+  const headingResolved = resolveHeadingTypography(heading);
+  const { sectionCss, sectionStyle } = buildSectionTheme({
+    sectionId: FAQ_SECOND_SECTION_ID,
+    sectionCss: FAQ_SECOND_ARCHIVE_STYLE,
+    background,
+    highlight: heading,
+    defaultBackgroundChannels: ARCHIVE_SAGE_BACKGROUND_CHANNELS,
+  });
+  const bodyColor = resolveBodyTextColor(bodyText);
   const rows = faqRowsResolved(items);
-  const headingText = heading?.trim() ?? 'We Thought You Might Ask';
+  const headingText =
+    headingResolved.text.length > 0 ? headingResolved.text : 'We Thought You Might Ask';
+  const headingStyle =
+    headingResolved.color != null || headingResolved.fontSize != null
+      ? {
+          ...(headingResolved.color != null ? { color: headingResolved.color } : {}),
+          ...(headingResolved.fontSize != null ? { fontSize: headingResolved.fontSize } : {}),
+        }
+      : undefined;
 
   const jsonLd = useMemo(() => {
     if (rows.length === 0) {
@@ -44,49 +78,49 @@ export function DiabetesCareFaqSecond({ className, heading, items }: DiabetesCar
 
   return (
     <div className={clsx('diabetes-care-faq-second max-w-full overflow-x-hidden', className)}>
-      <div className="shopify-section" id={FAQ_SECOND_SECTION_ID}>
-        <style dangerouslySetInnerHTML={{ __html: FAQ_SECOND_ARCHIVE_STYLE }} />
+      <div className="shopify-section" id={FAQ_SECOND_SECTION_ID} style={sectionStyle}>
+        <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding section--plain">
           <div className="page-width relative">
             <div className="faqs with-background z-1 relative flex flex-col lg:flex-row">
               <div className="grid grow gap-8 md:gap-12">
                 <div className="grid gap-4 text-left md:flex-row md:items-end">
                   <div className="title-wrapper grid gap-4 text-left leading-none md:flex-row md:items-end">
-                    <h2 className="heading title-md">
-                      <SplitWordsHeading text={headingText} />
+                    <h2 className="heading title-md" style={headingStyle}>
+                      <AccentSplitWordsHeading accentColors={heading} text={headingText} />
                     </h2>
                   </div>
                 </div>
 
                 <ScrollReveal delayMs={80}>
-                {rows.length === 0 ? (
-                  <p className="subtext-md py-6 text-contrast-500">
-                    Add FAQ items in Makeswift (question + answer per row).
-                  </p>
-                ) : (
-                  <div className="faq">
-                    {rows.map((row, index) => {
-                      const html = answerHtmlForRte(row.answer ?? '');
+                  {rows.length === 0 ? (
+                    <p className="subtext-md py-6 text-contrast-500">
+                      Add FAQ items in Makeswift (question + answer per row).
+                    </p>
+                  ) : (
+                    <div className="faq">
+                      {rows.map((row, index) => {
+                        const html = answerHtmlForRte(row.answer ?? '');
 
-                      return (
-                        <div className="accordion" key={`faq2-${String(index)}`}>
-                          <details className="details" {...{ is: 'accordion-details' }}>
-                            <summary className="details__summary flex cursor-pointer items-center justify-between gap-2">
-                              <span className="text-base font-medium leading-tight lg:text-lg xl:text-xl">
-                                {row.question}
-                              </span>
-                              <IconPlusAccordion />
-                            </summary>
-                            <div
-                              className="details__content rte text-base"
-                              dangerouslySetInnerHTML={{ __html: html }}
-                            />
-                          </details>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                        return (
+                          <div className="accordion" key={`faq2-${String(index)}`}>
+                            <details className="details" {...{ is: 'accordion-details' }}>
+                              <summary className="details__summary flex cursor-pointer items-center justify-between gap-2">
+                                <span className="text-base font-medium leading-tight lg:text-lg xl:text-xl">
+                                  {row.question}
+                                </span>
+                                <IconPlusAccordion />
+                              </summary>
+                              <div
+                                className="details__content rte text-base"
+                                dangerouslySetInnerHTML={{ __html: html }}
+                              />
+                            </details>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </ScrollReveal>
               </div>
             </div>

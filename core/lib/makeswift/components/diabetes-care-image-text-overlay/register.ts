@@ -9,6 +9,11 @@ import {
   TextInput,
 } from '@makeswift/runtime/controls';
 
+import {
+  bodyTextPopoverControls,
+  headingPopoverControls,
+  sectionBackgroundControls,
+} from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
 
 import { DiabetesCareImageTextOverlay } from './client';
@@ -21,18 +26,39 @@ runtime.registerComponent(DiabetesCareImageTextOverlay, {
   icon: 'image',
   props: {
     className: Style(),
-    backgroundImageSrc: Image({ label: 'Background image' }),
-    backgroundImageAlt: TextInput({ label: 'Background image alt', defaultValue: '' }),
-    heading: TextInput({
+    ...sectionBackgroundControls('0 0% 100%'),
+    banner: Group({
+      label: 'Banner',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        imageSrc: Image({ label: 'Background image' }),
+        imageAlt: TextInput({ label: 'Background image alt', defaultValue: '' }),
+      },
+    }),
+    ...headingPopoverControls({
       label: 'Heading',
-      defaultValue: "We're Here if You Need Us",
+      textDefault: "We're Here if You Need Us",
+      textColorDefault: '0 0% 100%',
+      includeHighlightSwash: true,
     }),
-    bodyHtml: TextArea({
-      label: 'Body (HTML)',
-      defaultValue: '<p>If you have questions — or want a second opinion — we’re always here.</p>',
+    body: Group({
+      label: 'Body',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        html: TextArea({
+          label: 'Body (HTML)',
+          defaultValue: '<p>If you have questions — or want a second opinion — we’re always here.</p>',
+        }),
+      },
     }),
-    buttonLabel: TextInput({ label: 'Button label', defaultValue: 'Reach Out' }),
-    buttonLink: Link({ label: 'Button link' }),
+    button: Group({
+      label: 'Button',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        label: TextInput({ label: 'Button label', defaultValue: 'Reach Out' }),
+        link: Link({ label: 'Button link' }),
+      },
+    }),
     features: List({
       label: 'Feature columns (below banner)',
       type: Group({
@@ -61,5 +87,6 @@ runtime.registerComponent(DiabetesCareImageTextOverlay, {
         return t != null && String(t).trim().length > 0 ? String(t).trim() : 'Feature';
       },
     }),
+    ...bodyTextPopoverControls('0 0% 100%'),
   },
 });

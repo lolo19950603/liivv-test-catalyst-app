@@ -1,5 +1,10 @@
 import { Group, List, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
+import {
+  bodyTextPopoverControls,
+  headingPopoverControls,
+  sectionBackgroundControls,
+} from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
 
 import { DiabetesCareFaqFirst } from './client';
@@ -12,13 +17,21 @@ runtime.registerComponent(DiabetesCareFaqFirst, {
   icon: 'layout',
   props: {
     className: Style(),
-    heading: TextInput({
+    ...sectionBackgroundControls(),
+    ...headingPopoverControls({
       label: 'Heading',
-      defaultValue: 'Support, Wherever You Are',
+      textDefault: 'Support, Wherever You Are',
+      includeHighlightSwash: true,
     }),
-    intro: TextArea({
-      label: 'Intro (below heading; blank line = new paragraph)',
-      defaultValue: 'Access funding, programs, and resources available across Canada',
+    intro: Group({
+      label: 'Intro',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        text: TextArea({
+          label: 'Text (blank line = new paragraph)',
+          defaultValue: 'Access funding, programs, and resources available across Canada',
+        }),
+      },
     }),
     items: List({
       label: 'Questions',
@@ -39,5 +52,6 @@ runtime.registerComponent(DiabetesCareFaqFirst, {
         return q != null && String(q).trim().length > 0 ? String(q).trim() : 'Question';
       },
     }),
+    ...bodyTextPopoverControls(),
   },
 });

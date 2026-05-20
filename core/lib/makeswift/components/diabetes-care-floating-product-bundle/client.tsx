@@ -8,7 +8,16 @@ import {
   DiabetesCareCatalogProductCard,
 } from '../diabetes-care-featured-collections/catalog-product-card';
 
-import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { ARCHIVE_SAGE_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
+import {
+  buildSectionTheme,
+  resolveBodyTextColor,
+  resolveHeadingTypography,
+  type BodyTextProps,
+  type HeadingWithHighlightProps,
+  type SectionBackgroundProps,
+} from '~/lib/makeswift/utils/diabetes-care-section-style';
 
 import {
   FLOATING_PRODUCT_BUNDLE_LAYOUT_CSS,
@@ -22,14 +31,16 @@ export interface DiabetesCareFloatingProductBundleProduct {
 
 export interface DiabetesCareFloatingProductBundleProps {
   className?: string;
-  /** Large background visual for desktop (`hidden lg:block` in archived theme). */
-  bannerImageSrc?: string;
-  bannerImageAlt?: string;
-  promoTitle?: string;
-  /** Inline HTML supported. */
-  promoBodyHtml?: string;
-  bundleProducts?: DiabetesCareFloatingProductBundleProduct[];
-  addToCartLabel?: string;
+  background?: SectionBackgroundProps;
+  banner?: {
+    imageSrc?: string;
+    imageAlt?: string;
+  };
+  heading?: HeadingWithHighlightProps;
+  body?: { html?: string };
+  products?: DiabetesCareFloatingProductBundleProduct[];
+  buttons?: { addToCartLabel?: string };
+  bodyText?: BodyTextProps;
 }
 
 function BundlePlusDivider() {
@@ -61,24 +72,42 @@ function productSlots(products?: DiabetesCareFloatingProductBundleProduct[]) {
 
 export function DiabetesCareFloatingProductBundle({
   className,
-  bannerImageSrc,
-  bannerImageAlt,
-  promoTitle,
-  promoBodyHtml,
-  bundleProducts,
-  addToCartLabel,
+  background,
+  banner,
+  heading,
+  body,
+  products,
+  buttons,
+  bodyText,
 }: DiabetesCareFloatingProductBundleProps) {
-  const banner = bannerImageSrc?.trim() ?? '';
-  const bannerAlt = bannerImageAlt?.trim() ?? '';
-  const title = promoTitle?.trim() ?? '🌱 Start Strong Kit';
-  const promoHtml = promoBodyHtml?.trim() ?? '';
-  const cartLabel = addToCartLabel?.trim() ?? 'Add to cart';
-  const slots = productSlots(bundleProducts).filter(
+  const headingResolved = resolveHeadingTypography(heading);
+  const { sectionCss, sectionStyle } = buildSectionTheme({
+    sectionId: FLOATING_PRODUCT_BUNDLE_SECTION_ID,
+    sectionCss: `${FLOATING_PRODUCT_BUNDLE_VARS}${FLOATING_PRODUCT_BUNDLE_LAYOUT_CSS}`,
+    background,
+    highlight: heading,
+    defaultBackgroundChannels: ARCHIVE_SAGE_BACKGROUND_CHANNELS,
+  });
+  const bodyColor = resolveBodyTextColor(bodyText);
+  const bannerSrc = banner?.imageSrc?.trim() ?? '';
+  const bannerAlt = banner?.imageAlt?.trim() ?? '';
+  const title =
+    headingResolved.text.length > 0 ? headingResolved.text : '🌱 Start Strong Kit';
+  const promoHtml = body?.html?.trim() ?? '';
+  const cartLabel = buttons?.addToCartLabel?.trim() ?? 'Add to cart';
+  const headingStyle =
+    headingResolved.color != null || headingResolved.fontSize != null
+      ? {
+          ...(headingResolved.color != null ? { color: headingResolved.color } : {}),
+          ...(headingResolved.fontSize != null ? { fontSize: headingResolved.fontSize } : {}),
+        }
+      : undefined;
+  const slots = productSlots(products).filter(
     (p) => comboboxEntityIdFromMakeswift(p.entityId).length > 0,
   );
 
   const bannerPicture: ReactNode =
-    banner.length > 0 ? (
+    bannerSrc.length > 0 ? (
       <picture className="media media--height relative block h-full w-full overflow-hidden">
         <img
           alt={bannerAlt}
@@ -86,7 +115,7 @@ export function DiabetesCareFloatingProductBundle({
           decoding="async"
           height={1200}
           loading="lazy"
-          src={banner}
+          src={bannerSrc}
           width={2000}
         />
       </picture>
@@ -102,12 +131,9 @@ export function DiabetesCareFloatingProductBundle({
       <div
         className="shopify-section compact-product-bundle-section"
         id={FLOATING_PRODUCT_BUNDLE_SECTION_ID}
+        style={sectionStyle}
       >
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `${FLOATING_PRODUCT_BUNDLE_VARS}${FLOATING_PRODUCT_BUNDLE_LAYOUT_CSS}`,
-          }}
-        />
+        <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding">
           <div className="relative">
             <div className="banner media--adapt relative">
@@ -131,9 +157,12 @@ export function DiabetesCareFloatingProductBundle({
 
                       <div className="product-card__content z-1 absolute left-0 top-0 flex h-full w-full items-center justify-center md:items-center">
                         <div className="w-full text-center md:text-left">
-                          <div className="promo-box inline-block">
-                            <h2 className="banner__title heading title-md leading-none">
-                              <SplitWordsHeading text={title} />
+                          <div
+                            className="promo-box inline-block"
+                            style={bodyColor != null ? { color: bodyColor } : undefined}
+                          >
+                            <h2 className="banner__title heading title-md leading-none" style={headingStyle}>
+                              <AccentSplitWordsHeading accentColors={heading} text={title} />
                             </h2>
                             {promoHtml.length > 0 ? (
                               <div
