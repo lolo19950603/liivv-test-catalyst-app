@@ -1,9 +1,9 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { useMemo } from 'react';
+import { useMemo, type CSSProperties } from 'react';
 
-import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import {
   buildSectionTheme,
   resolveBodyTextColor,
@@ -12,30 +12,72 @@ import {
   type HeadingWithHighlightProps,
   type SectionBackgroundProps,
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
+import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
 
 import {
   answerHtmlForRte,
   buildFaqPageJsonLd,
   type FaqRow,
-  faqRowsResolved,
+  faqRowsResolvedStyled,
   IconPlusAccordion,
 } from '../diabetes-care-faq/shared';
 
 import { FAQ_FIRST_ARCHIVE_STYLE, FAQ_FIRST_SECTION_ID } from './archive-styles';
 
+export type FaqFirstIntroBodyProps = BodyTextProps & {
+  bodyHtml?: string;
+};
+
 export interface DiabetesCareFaqFirstProps {
   className?: string;
   background?: SectionBackgroundProps;
   heading?: HeadingWithHighlightProps;
+  introBody?: FaqFirstIntroBodyProps;
+  /** @deprecated Use `introBody.bodyHtml`. */
   intro?: { text?: string };
   items?: FaqRow[];
+  /** @deprecated Use `introBody` popover colors. */
   bodyText?: BodyTextProps;
+}
+
+function resolveIntroBody(props: {
+  introBody?: FaqFirstIntroBodyProps;
+  intro?: { text?: string };
+  bodyText?: BodyTextProps;
+}): { html: string; style: CSSProperties | undefined } {
+  const group = props.introBody;
+
+  if (group != null && typeof group === 'object') {
+    const html = answerHtmlForRte(group.bodyHtml?.trim() ?? '');
+    const color = resolveBodyTextColor(group);
+    const fontSize = resolveHeadingFontSizeCss(group.fontSize, group.fontSizeMobile);
+
+    return {
+      html,
+      style:
+        color != null || fontSize != null
+          ? {
+              ...(color != null ? { color } : {}),
+              ...(fontSize != null ? { fontSize } : {}),
+            }
+          : undefined,
+    };
+  }
+
+  const legacyText = props.intro?.text?.trim() ?? '';
+  const legacyColor = resolveBodyTextColor(props.bodyText);
+
+  return {
+    html: answerHtmlForRte(legacyText),
+    style: legacyColor != null ? { color: legacyColor } : undefined,
+  };
 }
 
 export function DiabetesCareFaqFirst({
   className,
   background,
   heading,
+  introBody,
   intro,
   items,
   bodyText,
@@ -47,11 +89,10 @@ export function DiabetesCareFaqFirst({
     background,
     highlight: heading,
   });
-  const bodyColor = resolveBodyTextColor(bodyText);
-  const rows = faqRowsResolved(items);
+  const introResolved = resolveIntroBody({ introBody, intro, bodyText });
+  const rows = faqRowsResolvedStyled(items);
   const headingText =
     headingResolved.text.length > 0 ? headingResolved.text : 'Support, Wherever You Are';
-  const introText = intro?.text?.trim() ?? '';
   const headingStyle =
     headingResolved.color != null || headingResolved.fontSize != null
       ? {
@@ -67,8 +108,8 @@ export function DiabetesCareFaqFirst({
 
     const payload = buildFaqPageJsonLd(
       rows.map((r) => ({
-        question: r.question ?? '',
-        answerHtml: answerHtmlForRte(r.answer ?? ''),
+        question: r.question,
+        answerHtml: r.answerHtml,
       })),
     );
 
@@ -86,21 +127,14 @@ export function DiabetesCareFaqFirst({
             <div className="title-wrapper z-1 relative flex flex-col gap-4 text-left leading-none md:flex-row md:items-end md:justify-between lg:gap-8">
               <div className="grid gap-4">
                 <h2 className="heading title-md" style={headingStyle}>
-                  <AccentSplitWordsHeading accentColors={heading} text={headingText} />
+                  <SplitWordsHeading text={headingText} />
                 </h2>
-                {introText.length > 0 ? (
+                {introResolved.html.length > 0 ? (
                   <div
                     className="description rte subtext-md leading-normal"
-                    style={bodyColor != null ? { color: bodyColor } : undefined}
-                  >
-                    {introText
-                      .split(/\n+/)
-                      .map((p) => p.trim())
-                      .filter((p) => p.length > 0)
-                      .map((p, i) => (
-                        <p key={`intro-${String(i)}`}>{p}</p>
-                      ))}
-                  </div>
+                    dangerouslySetInnerHTML={{ __html: introResolved.html }}
+                    style={introResolved.style}
+                  />
                 ) : null}
               </div>
             </div>
@@ -113,26 +147,26 @@ export function DiabetesCareFaqFirst({
                   </p>
                 ) : (
                   <div className="faq">
-                    {rows.map((row, index) => {
-                      const html = answerHtmlForRte(row.answer ?? '');
-
-                      return (
+                    {rows.map((row, index) => (
                         <div className="accordion" key={`faq1-${String(index)}`}>
                           <details className="details" {...{ is: 'accordion-details' }}>
                             <summary className="details__summary flex cursor-pointer items-center justify-between gap-2">
-                              <span className="text-base font-medium leading-tight lg:text-lg xl:text-xl">
+                              <span
+                                className="text-base font-medium leading-tight lg:text-lg xl:text-xl"
+                                style={row.questionStyle}
+                              >
                                 {row.question}
                               </span>
                               <IconPlusAccordion />
                             </summary>
                             <div
                               className="details__content rte text-base"
-                              dangerouslySetInnerHTML={{ __html: html }}
+                              dangerouslySetInnerHTML={{ __html: row.answerHtml }}
+                              style={row.answerStyle}
                             />
                           </details>
                         </div>
-                      );
-                    })}
+                      ))}
                   </div>
                 )}
               </div>

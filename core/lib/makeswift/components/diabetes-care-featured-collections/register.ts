@@ -11,7 +11,7 @@ import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care
 
 import { searchProducts } from '../../utils/search-products';
 
-import { DiabetesCareFeaturedCollections } from './client';
+import { DEFAULT_FEATURED_COLLECTION_TABS, DiabetesCareFeaturedCollections } from './client';
 
 export const COMPONENT_TYPE = 'diabetes-care-featured-collections';
 
@@ -56,7 +56,7 @@ runtime.registerComponent(DiabetesCareFeaturedCollections, {
       type: Group({
         label: 'Collection tab',
         props: {
-          tabLabel: TextInput({ label: 'Tab label', defaultValue: 'The Basics' }),
+          tabLabel: TextInput({ label: 'Tab label', defaultValue: '' }),
           products: List({
             label: 'Products',
             type: Group({
@@ -86,10 +86,11 @@ runtime.registerComponent(DiabetesCareFeaturedCollections, {
           }),
         },
       }),
+      defaultValue: DEFAULT_FEATURED_COLLECTION_TABS,
       getItemLabel(item) {
-        const t = item?.tabLabel;
+        const t = item?.tabLabel?.trim();
 
-        return t != null && String(t).trim().length > 0 ? String(t).trim() : 'Tab';
+        return t != null && t.length > 0 ? t : 'Collection tab';
       },
     }),
   },

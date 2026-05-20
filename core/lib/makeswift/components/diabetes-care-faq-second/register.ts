@@ -1,9 +1,10 @@
 import { Group, List, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
 import {
-  bodyTextPopoverControls,
+  fontSizeFields,
   headingPopoverControls,
   sectionBackgroundControls,
+  textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
 import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
@@ -22,27 +23,45 @@ runtime.registerComponent(DiabetesCareFaqSecond, {
     ...headingPopoverControls({
       label: 'Heading',
       textDefault: 'We Thought You Might Ask',
-      includeHighlightSwash: true,
     }),
     items: List({
       label: 'Questions',
       type: Group({
         label: 'FAQ item',
         props: {
-          question: TextInput({ label: 'Question', defaultValue: '' }),
-          answer: TextArea({
-            label:
-              'Answer (HTML allowed, e.g. <p>, <ul><li>; or plain text with blank lines for paragraphs)',
-            defaultValue: '',
+          question: Group({
+            label: 'Question',
+            preferredLayout: Group.Layout.Popover,
+            props: {
+              text: TextInput({ label: 'Question', defaultValue: '' }),
+              ...textColorFields(),
+              ...fontSizeFields(),
+            },
+          }),
+          answer: Group({
+            label: 'Answer',
+            preferredLayout: Group.Layout.Popover,
+            props: {
+              bodyHtml: TextArea({
+                label: 'Body (HTML)',
+                defaultValue: '',
+                description:
+                  'Supports HTML (e.g. &lt;p&gt;, &lt;ul&gt;&lt;li&gt;, &lt;h2&gt;). Plain text: blank lines = paragraphs.',
+              }),
+              ...textColorFields(),
+              ...fontSizeFields(),
+            },
           }),
         },
       }),
       getItemLabel(item) {
-        const q = item?.question;
+        const q =
+          typeof item?.question === 'string'
+            ? item.question.trim()
+            : (item?.question?.text?.trim() ?? '');
 
-        return q != null && String(q).trim().length > 0 ? String(q).trim() : 'Question';
+        return q.length > 0 ? q : 'Question';
       },
     }),
-    ...bodyTextPopoverControls(),
   },
 });

@@ -1,7 +1,9 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 import { AccentSplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate/accent-split-words-heading';
+import { resolveBodyTextColor } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
+import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
 
 export function IconPlusAccordion() {
   return (
@@ -107,20 +109,119 @@ export function buildFaqPageJsonLd(
   };
 }
 
+export type FaqQuestionProps = {
+  text?: string;
+  textColor?: string;
+  textColorHex?: string;
+  fontSize?: number;
+  fontSizeMobile?: number;
+};
+
+export type FaqAnswerProps = {
+  bodyHtml?: string;
+  textColor?: string;
+  textColorHex?: string;
+  fontSize?: number;
+  fontSizeMobile?: number;
+};
+
 export interface FaqRow {
-  question?: string;
-  answer?: string;
+  /** Plain string or Makeswift popover group with `text`. */
+  question?: string | FaqQuestionProps;
+  /** Plain string/HTML or Makeswift popover group with `bodyHtml`. */
+  answer?: string | FaqAnswerProps;
 }
 
-export function faqRowsResolved(rows?: FaqRow[]): FaqRow[] {
+export function faqQuestionText(question?: FaqRow['question']): string {
+  if (question == null) {
+    return '';
+  }
+
+  if (typeof question === 'string') {
+    return question.trim();
+  }
+
+  return question.text?.trim() ?? '';
+}
+
+export function faqAnswerText(answer?: FaqRow['answer']): string {
+  if (answer == null) {
+    return '';
+  }
+
+  if (typeof answer === 'string') {
+    return answer.trim();
+  }
+
+  return answer.bodyHtml?.trim() ?? '';
+}
+
+export function faqRowsResolved(rows?: FaqRow[]): Array<{ question: string; answer: string }> {
   if (rows == null || rows.length === 0) {
     return [];
   }
 
   return rows
     .map((r) => ({
-      question: r.question?.trim() ?? '',
-      answer: r.answer?.trim() ?? '',
+      question: faqQuestionText(r.question),
+      answer: faqAnswerText(r.answer),
     }))
     .filter((r) => r.question.length > 0 && r.answer.length > 0);
+}
+
+export type FaqResolvedRow = {
+  question: string;
+  answerHtml: string;
+  questionStyle?: CSSProperties;
+  answerStyle?: CSSProperties;
+};
+
+export function faqTypographyStyle(
+  props?: FaqQuestionProps | FaqAnswerProps | null,
+): CSSProperties | undefined {
+  const color = resolveBodyTextColor(props);
+  const fontSize = resolveHeadingFontSizeCss(props?.fontSize, props?.fontSizeMobile);
+
+  if (color == null && fontSize == null) {
+    return undefined;
+  }
+
+  return {
+    ...(color != null ? { color } : {}),
+    ...(fontSize != null ? { fontSize } : {}),
+  };
+}
+
+function resolveFaqStyledRow(row: FaqRow): FaqResolvedRow | null {
+  const questionText = faqQuestionText(row.question);
+  const answerRaw = faqAnswerText(row.answer);
+  const questionStyle =
+    typeof row.question === 'object' && row.question != null
+      ? faqTypographyStyle(row.question)
+      : undefined;
+  const answerStyle =
+    typeof row.answer === 'object' && row.answer != null
+      ? faqTypographyStyle(row.answer)
+      : undefined;
+
+  if (questionText.length === 0 || answerRaw.length === 0) {
+    return null;
+  }
+
+  return {
+    question: questionText,
+    answerHtml: answerHtmlForRte(answerRaw),
+    questionStyle,
+    answerStyle,
+  };
+}
+
+export function faqRowsResolvedStyled(rows?: FaqRow[]): FaqResolvedRow[] {
+  if (rows == null || rows.length === 0) {
+    return [];
+  }
+
+  return rows
+    .map((row) => resolveFaqStyledRow(row))
+    .filter((row): row is FaqResolvedRow => row != null);
 }

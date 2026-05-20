@@ -16,6 +16,8 @@ import {
 import { resolvePlainTextColor } from '~/lib/makeswift/utils/heading-accent-color';
 import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
 
+import { initShopifyButtonFillHover } from '~/lib/archived-pages/init-shopify-button-fill-hover';
+
 import {
   FEATURED_COLLECTIONS_ARCHIVE_STYLE,
   FEATURED_COLLECTIONS_SECTION_ID,
@@ -93,13 +95,51 @@ function resolveFeaturedBody(props: {
   };
 }
 
-const DEFAULT_COLLECTIONS: DiabetesCareFeaturedCollectionTab[] = [
+export const DEFAULT_FEATURED_COLLECTION_TABS: DiabetesCareFeaturedCollectionTab[] = [
   { tabLabel: 'The Basics', products: [] },
   { tabLabel: 'Continuous Glucose Monitors', products: [] },
   { tabLabel: 'Pump Supplies', products: [] },
   { tabLabel: 'Insulin', products: [] },
   { tabLabel: 'Skin Health', products: [] },
 ];
+
+function resolveCollectionTabs(
+  collections?: DiabetesCareFeaturedCollectionTab[],
+): DiabetesCareFeaturedCollectionTab[] {
+  const raw =
+    collections != null && collections.length > 0
+      ? collections
+      : DEFAULT_FEATURED_COLLECTION_TABS;
+
+  const withLabels = raw.map((tab, index) => {
+    const trimmed = tab.tabLabel?.trim() ?? '';
+    const fallback = DEFAULT_FEATURED_COLLECTION_TABS[index]?.tabLabel ?? `Tab ${String(index + 1)}`;
+
+    return {
+      ...tab,
+      tabLabel: trimmed.length > 0 ? trimmed : fallback,
+    };
+  });
+
+  if (withLabels.length === 0) {
+    return DEFAULT_FEATURED_COLLECTION_TABS;
+  }
+
+  const labels = withLabels.map((tab) => tab.tabLabel?.trim() ?? '');
+
+  /* Makeswift list items all inherit register defaultValue "The Basics". */
+  if (labels.length > 1 && new Set(labels).size === 1) {
+    return withLabels.map((tab, index) => ({
+      ...tab,
+      tabLabel:
+        DEFAULT_FEATURED_COLLECTION_TABS[index]?.tabLabel ??
+        tab.tabLabel ??
+        `Tab ${String(index + 1)}`,
+    }));
+  }
+
+  return withLabels;
+}
 
 function IconChevronLeft() {
   return (
@@ -129,10 +169,6 @@ function IconChevronRight() {
       <path d="M10 6L16 12L10 18" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
-}
-
-function tabHasLabel(tab: DiabetesCareFeaturedCollectionTab): boolean {
-  return (tab.tabLabel?.trim() ?? '').length > 0;
 }
 
 function productHasContent(p: DiabetesCareFeaturedCollectionProduct): boolean {
@@ -174,12 +210,7 @@ export function DiabetesCareFeaturedCollections({
         }
       : undefined;
   const reactId = useId().replace(/:/g, '');
-  const tabs = useMemo(() => {
-    const raw = collections != null && collections.length > 0 ? collections : DEFAULT_COLLECTIONS;
-    const labelled = raw.filter(tabHasLabel);
-
-    return labelled.length > 0 ? labelled : DEFAULT_COLLECTIONS;
-  }, [collections]);
+  const tabs = useMemo(() => resolveCollectionTabs(collections), [collections]);
 
   const safeTabs = tabs;
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -229,6 +260,22 @@ export function DiabetesCareFeaturedCollections({
 
     strip.scrollTo({ left: nextLeft, behavior: 'smooth' });
   }, [clampedIndex]);
+
+  useEffect(() => {
+    const strip = tabStripRef.current;
+
+    if (strip == null) {
+      return;
+    }
+
+    const frameId = requestAnimationFrame(() => {
+      initShopifyButtonFillHover(strip);
+    });
+
+    return () => {
+      cancelAnimationFrame(frameId);
+    };
+  }, [safeTabs.length, clampedIndex]);
 
   const eyebrowText = eyebrow?.text?.trim() ?? 'Your routine is personal';
   const headingText =
@@ -307,11 +354,7 @@ export function DiabetesCareFeaturedCollections({
                           tabIndex={selected ? 0 : -1}
                           type="button"
                         >
-                          {selected ? (
-                            <span className="btn-fill sf-hidden" data-fill />
-                          ) : (
-                            <span className="btn-fill" data-fill />
-                          )}
+                          <span className="btn-fill" data-fill />
                           <span className="btn-text">{label}</span>
                           <span className="btn-loader">
                             <span />

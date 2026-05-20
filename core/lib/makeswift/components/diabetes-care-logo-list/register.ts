@@ -6,6 +6,7 @@ import {
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
 
+import { DIABETES_CARE_ARCHIVE_DEFAULT_LOGOS } from './archive-default-logos';
 import { DiabetesCareLogoList } from './client';
 
 export const COMPONENT_TYPE = 'diabetes-care-logo-list';
@@ -52,6 +53,7 @@ runtime.registerComponent(DiabetesCareLogoList, {
           imageAlt: TextInput({ label: 'Alt text', defaultValue: '' }),
         },
       }),
+      defaultValue: DIABETES_CARE_ARCHIVE_DEFAULT_LOGOS,
       getItemLabel(item) {
         return item?.imageAlt?.trim() || 'Logo';
       },

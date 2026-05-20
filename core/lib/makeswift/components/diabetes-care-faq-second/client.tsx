@@ -3,22 +3,19 @@
 import { clsx } from 'clsx';
 import { useMemo } from 'react';
 
-import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import { ARCHIVE_SAGE_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import {
   buildSectionTheme,
-  resolveBodyTextColor,
   resolveHeadingTypography,
-  type BodyTextProps,
   type HeadingWithHighlightProps,
   type SectionBackgroundProps,
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
 
 import {
-  answerHtmlForRte,
   buildFaqPageJsonLd,
   type FaqRow,
-  faqRowsResolved,
+  faqRowsResolvedStyled,
   IconPlusAccordion,
 } from '../diabetes-care-faq/shared';
 
@@ -29,7 +26,6 @@ export interface DiabetesCareFaqSecondProps {
   background?: SectionBackgroundProps;
   heading?: HeadingWithHighlightProps;
   items?: FaqRow[];
-  bodyText?: BodyTextProps;
 }
 
 export function DiabetesCareFaqSecond({
@@ -37,7 +33,6 @@ export function DiabetesCareFaqSecond({
   background,
   heading,
   items,
-  bodyText,
 }: DiabetesCareFaqSecondProps) {
   const headingResolved = resolveHeadingTypography(heading);
   const { sectionCss, sectionStyle } = buildSectionTheme({
@@ -47,8 +42,7 @@ export function DiabetesCareFaqSecond({
     highlight: heading,
     defaultBackgroundChannels: ARCHIVE_SAGE_BACKGROUND_CHANNELS,
   });
-  const bodyColor = resolveBodyTextColor(bodyText);
-  const rows = faqRowsResolved(items);
+  const rows = faqRowsResolvedStyled(items);
   const headingText =
     headingResolved.text.length > 0 ? headingResolved.text : 'We Thought You Might Ask';
   const headingStyle =
@@ -66,8 +60,8 @@ export function DiabetesCareFaqSecond({
 
     const payload = buildFaqPageJsonLd(
       rows.map((r) => ({
-        question: r.question ?? '',
-        answerHtml: answerHtmlForRte(r.answer ?? ''),
+        question: r.question,
+        answerHtml: r.answerHtml,
       })),
     );
 
@@ -87,7 +81,7 @@ export function DiabetesCareFaqSecond({
                 <div className="grid gap-4 text-left md:flex-row md:items-end">
                   <div className="title-wrapper grid gap-4 text-left leading-none md:flex-row md:items-end">
                     <h2 className="heading title-md" style={headingStyle}>
-                      <AccentSplitWordsHeading accentColors={heading} text={headingText} />
+                      <SplitWordsHeading text={headingText} />
                     </h2>
                   </div>
                 </div>
@@ -99,26 +93,26 @@ export function DiabetesCareFaqSecond({
                     </p>
                   ) : (
                     <div className="faq">
-                      {rows.map((row, index) => {
-                        const html = answerHtmlForRte(row.answer ?? '');
-
-                        return (
-                          <div className="accordion" key={`faq2-${String(index)}`}>
-                            <details className="details" {...{ is: 'accordion-details' }}>
-                              <summary className="details__summary flex cursor-pointer items-center justify-between gap-2">
-                                <span className="text-base font-medium leading-tight lg:text-lg xl:text-xl">
-                                  {row.question}
-                                </span>
-                                <IconPlusAccordion />
-                              </summary>
-                              <div
-                                className="details__content rte text-base"
-                                dangerouslySetInnerHTML={{ __html: html }}
-                              />
-                            </details>
-                          </div>
-                        );
-                      })}
+                      {rows.map((row, index) => (
+                        <div className="accordion" key={`faq2-${String(index)}`}>
+                          <details className="details" {...{ is: 'accordion-details' }}>
+                            <summary className="details__summary flex cursor-pointer items-center justify-between gap-2">
+                              <span
+                                className="text-base font-medium leading-tight lg:text-lg xl:text-xl"
+                                style={row.questionStyle}
+                              >
+                                {row.question}
+                              </span>
+                              <IconPlusAccordion />
+                            </summary>
+                            <div
+                              className="details__content rte text-base"
+                              dangerouslySetInnerHTML={{ __html: row.answerHtml }}
+                              style={row.answerStyle}
+                            />
+                          </details>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </ScrollReveal>

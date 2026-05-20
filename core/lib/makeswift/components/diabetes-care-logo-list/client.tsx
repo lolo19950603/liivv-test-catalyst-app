@@ -11,6 +11,8 @@ import {
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 
+import { DIABETES_CARE_ARCHIVE_DEFAULT_LOGOS } from './archive-default-logos';
+
 const SECTION_VARS = `--section-padding-top:72px;--section-padding-bottom:72px;--section-grid-gap:70px`;
 
 /** Matches SingleFile section id for archive CSS. Only one logo-list per page (duplicate ids invalid). */
@@ -33,6 +35,9 @@ function marqueeCursorScopedCss(sectionDomId: string) {
 /** Enough copies to fill the viewport plus buffer so the seam never shows empty space. */
 const MAX_STRIPS = 32;
 
+/** Same count as the archive Shopify `logo-bar` (fills wide viewports without a bare right edge). */
+const MIN_LOGOS_PER_STRIP = 5;
+
 export interface DiabetesCareLogoListLogo {
   imageSrc?: string;
   imageAlt?: string;
@@ -50,17 +55,45 @@ export type DiabetesCareLogoListProps = {
   logos?: DiabetesCareLogoListLogo[];
 };
 
-function logosResolved(logos?: DiabetesCareLogoListLogo[]) {
-  if (logos == null || logos.length === 0) {
-    return [];
-  }
-
-  return logos
+function normalizeLogoRows(logos?: DiabetesCareLogoListLogo[]) {
+  return (logos ?? [])
     .map((row) => ({
       imageSrc: row.imageSrc?.trim() ?? '',
       imageAlt: row.imageAlt?.trim() ?? '',
     }))
     .filter((row) => row.imageSrc.length > 0);
+}
+
+/** Cycle logos until the strip is wide enough for the marquee (archive used five per row). */
+function expandLogosToMinimum(
+  logos: DiabetesCareLogoListLogo[],
+  minimum: number,
+): DiabetesCareLogoListLogo[] {
+  if (logos.length === 0 || logos.length >= minimum) {
+    return logos;
+  }
+
+  const expanded: DiabetesCareLogoListLogo[] = [];
+
+  while (expanded.length < minimum) {
+    for (const logo of logos) {
+      if (expanded.length >= minimum) {
+        break;
+      }
+
+      expanded.push(logo);
+    }
+  }
+
+  return expanded;
+}
+
+function logosResolved(logos?: DiabetesCareLogoListLogo[]) {
+  const fromProps = normalizeLogoRows(logos);
+  const base =
+    fromProps.length > 0 ? fromProps : normalizeLogoRows(DIABETES_CARE_ARCHIVE_DEFAULT_LOGOS);
+
+  return expandLogosToMinimum(base, MIN_LOGOS_PER_STRIP);
 }
 
 export function DiabetesCareLogoList({
