@@ -1,11 +1,13 @@
 import { Group, Image, Link, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
 import {
+  fontSizeFields,
   sectionBackgroundControls,
   splitHeadingPopoverControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
+import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
 import { DiabetesCareRevealImageWithText } from './client';
 
@@ -18,14 +20,22 @@ runtime.registerComponent(DiabetesCareRevealImageWithText, {
   props: {
     className: Style(),
     ...sectionBackgroundControls(),
-    banner: Group({
-      label: 'Banner',
+    bannerHeading: Group({
+      label: 'Banner heading',
       preferredLayout: Group.Layout.Popover,
       props: {
-        title: TextInput({
-          label: 'Banner headline (scroll reveal area)',
+        text: TextInput({
+          label: 'Headline (scroll reveal area)',
           defaultValue: 'Meet Armaan...',
         }),
+        ...textColorFields(),
+        ...fontSizeFields(),
+      },
+    }),
+    bannerImage: Group({
+      label: 'Banner image',
+      preferredLayout: Group.Layout.Popover,
+      props: {
         heroImageSrc: Image({ label: 'Hero image' }),
         heroImageAlt: TextInput({ label: 'Hero image alt text', defaultValue: '' }),
       },
@@ -35,6 +45,7 @@ runtime.registerComponent(DiabetesCareRevealImageWithText, {
       secondaryLabel: 'Story accent',
       primaryDefault: 'You Are',
       secondaryDefault: 'Not Alone...',
+      secondaryTextColorDefault: ARCHIVE_SAGE_BACKGROUND_HSL,
     }),
     body: Group({
       label: 'Body',
@@ -47,6 +58,7 @@ runtime.registerComponent(DiabetesCareRevealImageWithText, {
           description: 'Supports HTML (e.g. &lt;p&gt;, &lt;em&gt;, &lt;strong&gt;).',
         }),
         ...textColorFields(),
+        ...fontSizeFields(),
       },
     }),
     buttons: Group({

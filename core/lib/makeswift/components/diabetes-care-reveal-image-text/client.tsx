@@ -15,6 +15,14 @@ import {
   type HeadingWithHighlightProps,
   type SectionBackgroundProps,
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
+import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
+import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
+
+function storyAccentUsesHighlightSwash(heading?: HeadingWithHighlightProps | null): boolean {
+  const value = heading?.useCustomHighlightColor;
+
+  return value === true || value === 'true';
+}
 
 function IconArrowRight() {
   return (
@@ -38,9 +46,17 @@ function IconArrowRight() {
 const DEFAULT_BODY_HTML =
   '<p><em>"I got diagnosed in March of 2020 at age 20.</em></p><p><em>The first sign that something was wrong was in February where I was doing sprints on a treadmill to get ready for a soccer season and after finishing I felt sick and dizzy to where I might need to go to the hospital.</em></p><p><em>I thought maybe I just went "too hard" and I was upset because it meant that I was way out of shape for the upcoming soccer season. Then I was getting very thirsty and seeing my weight drop despite working out and bulking..."</em></p><p><strong>Sometimes the best resource is a conversation. Connect with community partners who have walked the path before you.</strong></p>';
 
+export type DiabetesCareRevealBannerImageProps = {
+  heroImageSrc?: string;
+  heroImageAlt?: string;
+};
+
 export type DiabetesCareRevealImageTextProps = {
   className?: string;
   background?: SectionBackgroundProps;
+  bannerHeading?: HeadingTypographyProps;
+  bannerImage?: DiabetesCareRevealBannerImageProps;
+  /** @deprecated Use `bannerHeading` + `bannerImage`. */
   banner?: {
     title?: string;
     heroImageSrc?: string;
@@ -57,18 +73,50 @@ export type DiabetesCareRevealImageTextProps = {
   };
 };
 
+function resolveBannerHeadingProps(props: {
+  bannerHeading?: HeadingTypographyProps;
+  banner?: DiabetesCareRevealImageTextProps['banner'];
+}): HeadingTypographyProps | null {
+  if (props.bannerHeading != null) {
+    return props.bannerHeading;
+  }
+
+  const legacyTitle = props.banner?.title?.trim();
+
+  if (legacyTitle != null && legacyTitle.length > 0) {
+    return { text: legacyTitle };
+  }
+
+  return null;
+}
+
 export function DiabetesCareRevealImageWithText({
   className,
   background,
+  bannerHeading,
+  bannerImage,
   banner,
   primaryHeading,
   secondaryHeading,
   body,
   buttons,
 }: DiabetesCareRevealImageTextProps) {
+  const bannerHeadline = resolveHeadingTypography(
+    resolveBannerHeadingProps({ bannerHeading, banner }),
+  );
   const storyLead = resolveHeadingTypography(primaryHeading);
   const storyAccent = resolveHeadingTypography(secondaryHeading);
+  const useStoryAccentSwash = storyAccentUsesHighlightSwash(secondaryHeading);
+  const storyAccentHighlightStyle = useStoryAccentSwash ? 'half_text' : 'text';
   const bodyColor = resolveBodyTextColor(body);
+  const bodyFontSize = resolveHeadingFontSizeCss(body?.fontSize, body?.fontSizeMobile);
+  const bodyStyle: CSSProperties | undefined =
+    bodyColor != null || bodyFontSize != null
+      ? {
+          ...(bodyColor != null ? { color: bodyColor } : {}),
+          ...(bodyFontSize != null ? { fontSize: bodyFontSize } : {}),
+        }
+      : undefined;
   const instance = useId().replace(/:/g, '');
   const rootId = `dcrift-${instance}`;
   const revealSectionId = `dcrift-reveal-${instance}`;
@@ -79,15 +127,16 @@ export function DiabetesCareRevealImageWithText({
     sectionId: rootId,
     sectionCss: `#${richSectionId}{--section-padding-top:72px;--section-padding-bottom:100px;--color-button-background:142 165 141;--color-button-border:142 165 141}`,
     background,
-    highlight: secondaryHeading,
+    highlight: useStoryAccentSwash ? secondaryHeading : null,
     defaultBackgroundChannels: '255 255 255',
   });
 
   const rootThemeStyle = sectionStyle as CSSProperties & Record<string, string | number>;
 
-  const title = banner?.title?.trim() ?? 'Meet Armaan...';
-  const imageSrc = banner?.heroImageSrc?.trim() ?? '';
-  const imageAlt = banner?.heroImageAlt?.trim() ?? '';
+  const title =
+    bannerHeadline.text.length > 0 ? bannerHeadline.text : 'Meet Armaan...';
+  const imageSrc = (bannerImage?.heroImageSrc ?? banner?.heroImageSrc)?.trim() ?? '';
+  const imageAlt = (bannerImage?.heroImageAlt ?? banner?.heroImageAlt)?.trim() ?? '';
   const lead = storyLead.text.length > 0 ? storyLead.text : 'You Are';
   const headingEmphasis = storyAccent.text.length > 0 ? storyAccent.text : 'Not Alone...';
   const bodyHtml =
@@ -98,10 +147,10 @@ export function DiabetesCareRevealImageWithText({
   const primaryHref = buttons?.primaryLink?.href ?? '#';
   const secondaryHref = buttons?.secondaryLink?.href ?? '#';
   const bannerHeadingStyle =
-    storyLead.color != null || storyLead.fontSize != null
+    bannerHeadline.color != null || bannerHeadline.fontSize != null
       ? {
-          ...(storyLead.color != null ? { color: storyLead.color } : {}),
-          ...(storyLead.fontSize != null ? { fontSize: storyLead.fontSize } : {}),
+          ...(bannerHeadline.color != null ? { color: bannerHeadline.color } : {}),
+          ...(bannerHeadline.fontSize != null ? { fontSize: bannerHeadline.fontSize } : {}),
         }
       : undefined;
 
@@ -167,6 +216,7 @@ export function DiabetesCareRevealImageWithText({
                   emphasis={headingEmphasis}
                   emphasisColor={storyAccent.color ?? storyAccent.emphasisColor}
                   emphasisFontSize={storyAccent.fontSize}
+                  highlightStyle={storyAccentHighlightStyle}
                   lead={lead}
                   leadColor={storyLead.color}
                   leadFontSize={storyLead.fontSize}
@@ -176,7 +226,7 @@ export function DiabetesCareRevealImageWithText({
                 <div
                   className="rte body subtext-md leading-normal"
                   dangerouslySetInnerHTML={{ __html: bodyHtml }}
-                  style={bodyColor != null ? { color: bodyColor } : undefined}
+                  style={bodyStyle}
                 />
                 {primaryLabel.length > 0 || secondaryLabel.length > 0 ? (
                   <div className="mt-6 flex flex-wrap justify-center gap-4">

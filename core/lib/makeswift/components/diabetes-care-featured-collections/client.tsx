@@ -186,6 +186,14 @@ export function DiabetesCareFeaturedCollections({
   const clampedIndex = Math.min(selectedIndex, Math.max(0, safeTabs.length - 1));
   const tabStripRef = useRef<HTMLDivElement>(null);
 
+  const selectTab = (index: number) => {
+    if (index === clampedIndex || index < 0 || index >= safeTabs.length) {
+      return;
+    }
+
+    setSelectedIndex(index);
+  };
+
   const goToAdjacentTab = (dir: -1 | 1) => {
     if (safeTabs.length <= 1) {
       return;
@@ -267,13 +275,12 @@ export function DiabetesCareFeaturedCollections({
             </div>
 
             <ScrollReveal className="tab-list flex justify-between gap-6" delayMs={100}>
-              <div className="scroll-shadow grid overflow-hidden">
-                <div className="scroll-area grid">
-                  <div
-                    className="flex gap-4 overflow-x-auto scroll-smooth"
-                    ref={tabStripRef}
-                    role="tablist"
-                  >
+              <div className="scroll-shadow grid min-w-0 flex-1 overflow-hidden">
+                <div
+                  className="fc-tab-strip flex gap-4 scroll-smooth"
+                  ref={tabStripRef}
+                  role="tablist"
+                >
                     {safeTabs.map((tab, index) => {
                       const label = tab.tabLabel?.trim() ?? `Tab ${String(index + 1)}`;
                       const selected = index === clampedIndex;
@@ -288,12 +295,16 @@ export function DiabetesCareFeaturedCollections({
                             selected ? 'button--primary' : 'button--secondary',
                           )}
                           data-fc-tab-index={index}
-                          disabled={selected}
                           key={`tab-${reactId}-${String(index)}`}
-                          onClick={() => {
-                            setSelectedIndex(index);
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            selectTab(index);
+                          }}
+                          onPointerDown={(event) => {
+                            event.stopPropagation();
                           }}
                           role="tab"
+                          tabIndex={selected ? 0 : -1}
                           type="button"
                         >
                           {selected ? (
@@ -310,18 +321,21 @@ export function DiabetesCareFeaturedCollections({
                         </button>
                       );
                     })}
-                  </div>
                 </div>
               </div>
 
-              <div className="indicators gap-2d5 hidden lg:flex" data-index={clampedIndex}>
+              <div className="indicators shrink-0 gap-2d5 hidden lg:flex" data-index={clampedIndex}>
                 <button
                   aria-controls={sliderDomId}
                   aria-label="Previous collection"
                   className="button button--secondary"
                   disabled={safeTabs.length <= 1}
-                  onClick={() => {
+                  onClick={(event) => {
+                    event.stopPropagation();
                     goToAdjacentTab(-1);
+                  }}
+                  onPointerDown={(event) => {
+                    event.stopPropagation();
                   }}
                   type="button"
                 >
@@ -340,8 +354,12 @@ export function DiabetesCareFeaturedCollections({
                   aria-label="Next collection"
                   className="button button--secondary"
                   disabled={safeTabs.length <= 1}
-                  onClick={() => {
+                  onClick={(event) => {
+                    event.stopPropagation();
                     goToAdjacentTab(1);
+                  }}
+                  onPointerDown={(event) => {
+                    event.stopPropagation();
                   }}
                   type="button"
                 >
