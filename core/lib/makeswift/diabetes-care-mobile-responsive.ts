@@ -8,6 +8,8 @@ import { RICH_TEXT_LOWER_SECTION_ID } from '~/lib/makeswift/components/diabetes-
 import { MULTICOLUMN_SECTION_ID } from '~/lib/makeswift/components/diabetes-care-multicolumn/client';
 import { VIDEO_HERO_SECTION_ID } from '~/lib/makeswift/components/diabetes-care-video-hero/client';
 
+const TIMELINE_SECTION_ID = 'shopify-section-template--26520397447459__timeline_nyTDKQ';
+
 /** Phone + small tablet — matches archive `mobile:` utilities (767px). */
 const MOBILE = '@media screen and (max-width: 767px)';
 
