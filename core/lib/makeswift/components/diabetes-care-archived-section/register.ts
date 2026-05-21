@@ -5,6 +5,7 @@ import {
   DIABETES_CARE_SECTION_OPTIONS,
   type DiabetesCareSectionSuffix,
 } from '~/lib/archived-pages/diabetes-care-section-allowlist';
+import { SPECIALIZED_PAGE_COMPONENT_GROUP } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 
 import { DiabetesCareSectionArchive } from './section-archive-client';
@@ -67,7 +68,7 @@ DIABETES_CARE_SECTION_OPTIONS.forEach((option) => {
 
   runtime.registerComponent(BoundSection, {
     type: diabetesCareArchiveComponentType(suffix),
-    label: `Diabetes care / ${option.label}`,
+    label: `${SPECIALIZED_PAGE_COMPONENT_GROUP} / ${option.label}`,
     icon: 'layout',
     props: sharedProps,
   });

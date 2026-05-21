@@ -6,6 +6,7 @@ import {
   splitHeadingPopoverControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
+import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
@@ -15,7 +16,7 @@ export const COMPONENT_TYPE = 'diabetes-care-reveal-image-text';
 
 runtime.registerComponent(DiabetesCareRevealImageWithText, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / 6. Reveal + story',
+  label: diabetesCareComponentLabel(6, 'Reveal + story'),
   icon: 'image',
   props: {
     className: Style(),

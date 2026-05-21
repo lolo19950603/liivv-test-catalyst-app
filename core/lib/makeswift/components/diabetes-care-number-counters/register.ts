@@ -14,6 +14,7 @@ import {
   HEX_OVERRIDE_DESCRIPTION,
   sectionBackgroundControls,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
+import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 import { hsl } from '~/lib/makeswift/utils/color';
 
@@ -75,7 +76,7 @@ function counterDescriptionStyleFields() {
 
 runtime.registerComponent(DiabetesCareNumberCounters, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / 3. Number counters',
+  label: diabetesCareComponentLabel(3, 'Number counters'),
   icon: 'layout',
   props: {
     className: Style(),

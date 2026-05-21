@@ -6,6 +6,7 @@ import {
   sectionBackgroundControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
+import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 
 import { DIABETES_CARE_DEFAULT_VIDEO_URL, DiabetesCareVideoHero } from './client';
@@ -14,7 +15,7 @@ export const COMPONENT_TYPE = 'diabetes-care-video-hero';
 
 runtime.registerComponent(DiabetesCareVideoHero, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / 1. Video with text overlay',
+  label: diabetesCareComponentLabel(1, 'Video with text overlay'),
   icon: 'layout',
   props: {
     className: Style(),

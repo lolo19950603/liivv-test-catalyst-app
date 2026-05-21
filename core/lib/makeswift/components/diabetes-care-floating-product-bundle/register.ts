@@ -14,6 +14,7 @@ import {
   sectionBackgroundControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
+import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import { searchProducts } from '../../utils/search-products';
@@ -24,7 +25,7 @@ export const COMPONENT_TYPE = 'diabetes-care-floating-product-bundle';
 
 runtime.registerComponent(DiabetesCareFloatingProductBundle, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / 11. Floating product bundle',
+  label: diabetesCareComponentLabel(11, 'Floating product bundle'),
   icon: 'layout',
   props: {
     className: Style(),

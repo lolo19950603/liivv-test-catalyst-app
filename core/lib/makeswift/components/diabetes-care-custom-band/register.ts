@@ -1,6 +1,7 @@
 import { Color, Group, Image, Link, Number, Style, TextInput } from '@makeswift/runtime/controls';
 
 import { highlightSwashFields } from '~/lib/makeswift/controls/diabetes-care-section-controls';
+import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import { hsl } from '~/lib/makeswift/utils/color';
@@ -14,7 +15,7 @@ const FONT_SIZE_DESCRIPTION = '0 = theme default (title-lg).';
 
 runtime.registerComponent(DiabetesCareCustomBand, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / 2. Custom band (logo + heading)',
+  label: diabetesCareComponentLabel(2, 'Custom band (logo + heading)'),
   icon: 'layout',
   props: {
     className: Style(),

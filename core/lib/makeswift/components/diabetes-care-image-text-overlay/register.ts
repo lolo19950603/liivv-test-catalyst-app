@@ -15,6 +15,7 @@ import {
   sectionBackgroundControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
+import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 
 import { DiabetesCareImageTextOverlay } from './client';
@@ -23,7 +24,7 @@ export const COMPONENT_TYPE = 'diabetes-care-image-text-overlay';
 
 runtime.registerComponent(DiabetesCareImageTextOverlay, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / 15. Image with text overlay',
+  label: diabetesCareComponentLabel(15, 'Image with text overlay'),
   icon: 'image',
   props: {
     className: Style(),

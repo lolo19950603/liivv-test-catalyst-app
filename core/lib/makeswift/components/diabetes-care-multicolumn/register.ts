@@ -7,6 +7,7 @@ import {
   splitHeadingPopoverControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
+import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
@@ -53,7 +54,7 @@ function multicolumnPlainTextPopover(label: string, textDefault: string, textAre
 
 runtime.registerComponent(DiabetesCareMulticolumn, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / 5. Multicolumn',
+  label: diabetesCareComponentLabel(5, 'Multicolumn'),
   icon: 'layout',
   props: {
     className: Style(),

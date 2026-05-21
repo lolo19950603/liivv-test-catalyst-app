@@ -6,6 +6,7 @@ import {
   sectionBackgroundControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
+import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 import {
   ARCHIVE_BLOG_COLLAGE_BACKGROUND_HSL,
@@ -58,7 +59,7 @@ const collagePostFields = {
 
 runtime.registerComponent(DiabetesCareBlogPostsCollage, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / 7. Blog posts collage',
+  label: diabetesCareComponentLabel(7, 'Blog posts collage'),
   icon: 'layout',
   props: {
     className: Style(),

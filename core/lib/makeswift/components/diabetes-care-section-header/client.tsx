@@ -60,7 +60,7 @@ export function DiabetesCareSectionHeader({
             }
           : null
       }
-      navAriaLabel="Diabetes care"
+      navAriaLabel="Specialized page"
       navLinks={links}
       searchPlaceholder={searchPlaceholder}
       sectionId={DIABETES_CARE_HEADER_SECTION_ID}

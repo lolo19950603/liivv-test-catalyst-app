@@ -6,6 +6,7 @@ import {
   sectionBackgroundControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
+import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
@@ -17,7 +18,7 @@ export const COMPONENT_TYPE = 'diabetes-care-featured-collections';
 
 runtime.registerComponent(DiabetesCareFeaturedCollections, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / 9. Featured collections',
+  label: diabetesCareComponentLabel(9, 'Featured collections'),
   icon: 'layout',
   props: {
     className: Style(),

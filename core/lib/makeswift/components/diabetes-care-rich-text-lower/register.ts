@@ -6,6 +6,7 @@ import {
   textColorFields,
   splitRichTextLowerHeadingControls,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
+import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
@@ -15,7 +16,7 @@ export const COMPONENT_TYPE = 'diabetes-care-rich-text-lower';
 
 runtime.registerComponent(DiabetesCareRichTextLower, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / 12. Rich text (lower)',
+  label: diabetesCareComponentLabel(12, 'Rich text (lower)'),
   icon: 'layout',
   props: {
     className: Style(),

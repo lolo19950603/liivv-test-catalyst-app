@@ -6,6 +6,7 @@ import {
   sectionBackgroundControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
+import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 
 import { DiabetesCareFaqFirst } from './client';
@@ -14,7 +15,7 @@ export const COMPONENT_TYPE = 'diabetes-care-faq-first';
 
 runtime.registerComponent(DiabetesCareFaqFirst, {
   type: COMPONENT_TYPE,
-  label: 'Diabetes care / 10. FAQ (first)',
+  label: diabetesCareComponentLabel(10, 'FAQ (first)'),
   icon: 'layout',
   props: {
     className: Style(),
