@@ -7,7 +7,10 @@ import {
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
-import { ARCHIVE_BLOG_COLLAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
+import {
+  ARCHIVE_BLOG_COLLAGE_BACKGROUND_HSL,
+  ARCHIVE_HIGHLIGHT_SWASH_HSL,
+} from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
 import { DiabetesCareBlogPostsCollage } from './client';
 
@@ -78,7 +81,7 @@ runtime.registerComponent(DiabetesCareBlogPostsCollage, {
         }),
         ...textColorFields('0 0% 100%'),
         ...fontSizeFields(),
-        ...highlightSwashFields(),
+        ...highlightSwashFields(ARCHIVE_HIGHLIGHT_SWASH_HSL),
       },
     }),
     posts: List({

@@ -5,6 +5,7 @@ import {
   sectionBackgroundControls,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
+import { ARCHIVE_HIGHLIGHT_SWASH_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
 import { DIABETES_CARE_ARCHIVE_DEFAULT_LOGOS } from './archive-default-logos';
 import { DiabetesCareLogoList } from './client';
@@ -22,6 +23,7 @@ runtime.registerComponent(DiabetesCareLogoList, {
       label: 'Heading',
       textDefault: 'Trusted by leading organizations',
       includeHighlightSwash: true,
+      highlightDefault: ARCHIVE_HIGHLIGHT_SWASH_HSL,
     }),
     marquee: Group({
       label: 'Marquee',

@@ -1,5 +1,6 @@
 import { Checkbox, Color, Group, TextInput } from '@makeswift/runtime/controls';
 
+import { ARCHIVE_HIGHLIGHT_SWASH_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import { hsl } from '~/lib/makeswift/utils/color';
 
 const HEX_OVERRIDE_DESCRIPTION = 'Optional. Overrides the picker when valid (e.g. `#4C7662`).';
@@ -21,7 +22,7 @@ export function highlightSwashControls(options?: {
         }),
         accentHighlightColor: Color({
           label: 'Highlight swash color',
-          defaultValue: hsl(options?.highlightDefault ?? '15 61% 85%'),
+          defaultValue: hsl(options?.highlightDefault ?? ARCHIVE_HIGHLIGHT_SWASH_HSL),
         }),
         accentHighlightColorHex: TextInput({
           label: 'Highlight swash color (hex override)',
@@ -60,7 +61,7 @@ export function accentColorControls(options?: {
         }),
         accentHighlightColor: Color({
           label: 'Highlight swash color',
-          defaultValue: hsl(options?.highlightDefault ?? '15 61% 85%'),
+          defaultValue: hsl(options?.highlightDefault ?? ARCHIVE_HIGHLIGHT_SWASH_HSL),
         }),
         accentHighlightColorHex: TextInput({
           label: 'Highlight swash color (hex override)',

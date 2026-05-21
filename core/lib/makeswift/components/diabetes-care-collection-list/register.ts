@@ -7,6 +7,7 @@ import {
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
+import { ARCHIVE_HIGHLIGHT_SWASH_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
 import { DiabetesCareCollectionList } from './client';
 
@@ -26,7 +27,7 @@ runtime.registerComponent(DiabetesCareCollectionList, {
       secondaryDefault: 'Every Stage of Health',
       primaryTextColorDefault: '0 2% 19%',
       secondaryTextColorDefault: '0 2% 19%',
-      highlightDefault: '120 12% 60%',
+      highlightDefault: ARCHIVE_HIGHLIGHT_SWASH_HSL,
     }),
     body: Group({
       label: 'Body',

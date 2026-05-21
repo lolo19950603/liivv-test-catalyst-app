@@ -5,6 +5,7 @@ import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-si
 import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
 import {
   appendHighlightToSectionCss,
+  isHighlightOverrideEnabled,
   resolveAccentColors,
   resolvePlainTextColor,
   resolveSectionHighlightChannels,
@@ -95,7 +96,10 @@ export function buildSectionTheme(options: {
     options.background,
     options.defaultBackgroundChannels,
   );
-  const highlightChannels = resolveSectionHighlightChannels(options.highlight);
+  const highlightChannels =
+    options.highlight != null && isHighlightOverrideEnabled(options.highlight.useCustomHighlightColor)
+      ? resolveSectionHighlightChannels(options.highlight)
+      : null;
 
   let sectionCss = options.sectionCss;
 

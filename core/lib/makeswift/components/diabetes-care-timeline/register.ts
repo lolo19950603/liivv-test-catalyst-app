@@ -8,6 +8,7 @@ import {
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
+import { ARCHIVE_HIGHLIGHT_SWASH_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
 import { DiabetesCareTimeline } from './client';
 
@@ -45,7 +46,7 @@ function timelineSectionHeadingPopover(label: string, textDefault: string) {
       }),
       ...textColorFields(),
       ...fontSizeFields(),
-      ...highlightSwashFields(),
+      ...highlightSwashFields(ARCHIVE_HIGHLIGHT_SWASH_HSL),
     },
   });
 }
@@ -60,6 +61,7 @@ runtime.registerComponent(DiabetesCareTimeline, {
     ...splitHeadingPopoverControls({
       primaryDefault: 'Your Care Journey,',
       secondaryDefault: 'Simp(liivv)fied',
+      highlightDefault: ARCHIVE_HIGHLIGHT_SWASH_HSL,
     }),
     sections: List({
       label: 'Journey sections (order = timeline left to right)',

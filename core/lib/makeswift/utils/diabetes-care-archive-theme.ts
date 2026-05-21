@@ -15,3 +15,9 @@ export const ARCHIVE_BLOG_COLLAGE_BACKGROUND_CHANNELS = '168 156 148';
 
 /** Picker default matching {@link ARCHIVE_BLOG_COLLAGE_BACKGROUND_CHANNELS}. */
 export const ARCHIVE_BLOG_COLLAGE_BACKGROUND_HSL = '22 10% 62%';
+
+/** Archive `--color-base-highlight` (`diabetes-care-sections.css` / `diabetes-care.html`). */
+export const ARCHIVE_HIGHLIGHT_CHANNELS = '142 165 141';
+
+/** Picker reset default for highlight swash controls (≈ {@link ARCHIVE_HIGHLIGHT_CHANNELS}). */
+export const ARCHIVE_HIGHLIGHT_SWASH_HSL = '120 12% 60%';

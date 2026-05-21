@@ -1,5 +1,6 @@
 import { Checkbox, Color, Group, Number, TextArea, TextInput } from '@makeswift/runtime/controls';
 
+import { ARCHIVE_HIGHLIGHT_SWASH_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import { hsl } from '~/lib/makeswift/utils/color';
 
 export const HEX_OVERRIDE_DESCRIPTION =
@@ -68,7 +69,7 @@ export function highlightSwashFields(highlightDefaultHsl?: string) {
     }),
     accentHighlightColor: Color({
       label: 'Highlight swash color',
-      defaultValue: hsl(highlightDefaultHsl ?? '15 61% 85%'),
+      defaultValue: hsl(highlightDefaultHsl ?? ARCHIVE_HIGHLIGHT_SWASH_HSL),
     }),
     accentHighlightColorHex: TextInput({
       label: 'Highlight swash color (hex override)',
@@ -237,6 +238,8 @@ export function splitRichTextLowerHeadingControls(options?: SplitRichTextLowerHe
 
 export type NestedSplitHeadingPopoverOptions = SplitHeadingPopoverOptions & {
   groupLabel?: string;
+  /** When false, secondary heading has no highlight swash controls (default true). */
+  includeHighlightSwash?: boolean;
 };
 
 /**
@@ -270,7 +273,9 @@ export function nestedSplitHeadingPopoverControls(options?: NestedSplitHeadingPo
             }),
             ...textColorFields(options?.secondaryTextColorDefault ?? '0 2% 19%'),
             ...fontSizeFields(),
-            ...highlightSwashFields(options?.highlightDefault),
+            ...(options?.includeHighlightSwash !== false
+              ? highlightSwashFields(options?.highlightDefault)
+              : {}),
           },
         }),
       },
