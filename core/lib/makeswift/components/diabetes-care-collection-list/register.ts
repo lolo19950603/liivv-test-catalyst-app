@@ -1,9 +1,10 @@
 import { Group, Image, Link, List, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
 import {
-  bodyTextPopoverControls,
+  fontSizeFields,
   sectionBackgroundControls,
-  splitHeadingPopoverControls,
+  nestedSplitHeadingPopoverControls,
+  textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
 
@@ -18,11 +19,14 @@ runtime.registerComponent(DiabetesCareCollectionList, {
   props: {
     className: Style(),
     ...sectionBackgroundControls(),
-    ...splitHeadingPopoverControls({
-      primaryLabel: 'Heading',
-      secondaryLabel: 'Heading accent',
+    ...nestedSplitHeadingPopoverControls({
+      primaryLabel: 'Primary heading',
+      secondaryLabel: 'Secondary heading (accent)',
       primaryDefault: 'Care Designed for',
       secondaryDefault: 'Every Stage of Health',
+      primaryTextColorDefault: '0 2% 19%',
+      secondaryTextColorDefault: '0 2% 19%',
+      highlightDefault: '120 12% 60%',
     }),
     body: Group({
       label: 'Body',
@@ -31,7 +35,10 @@ runtime.registerComponent(DiabetesCareCollectionList, {
         descriptionHtml: TextArea({
           label: 'Description (HTML)',
           defaultValue: '<p>Liivv connects you to the care you need—when you need it.</p>',
+          description: 'Supports HTML (e.g. &lt;p&gt;, &lt;em&gt;, &lt;strong&gt;).',
         }),
+        ...textColorFields(),
+        ...fontSizeFields(),
       },
     }),
     cards: List({
@@ -52,6 +59,5 @@ runtime.registerComponent(DiabetesCareCollectionList, {
         return t != null && String(t).trim().length > 0 ? String(t).trim() : 'Collection';
       },
     }),
-    ...bodyTextPopoverControls(),
   },
 });

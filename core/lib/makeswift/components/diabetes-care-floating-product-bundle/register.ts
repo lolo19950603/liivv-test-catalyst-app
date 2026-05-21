@@ -9,9 +9,10 @@ import {
 } from '@makeswift/runtime/controls';
 
 import {
-  bodyTextPopoverControls,
+  fontSizeFields,
   headingPopoverControls,
   sectionBackgroundControls,
+  textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
 import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
@@ -28,22 +29,11 @@ runtime.registerComponent(DiabetesCareFloatingProductBundle, {
   props: {
     className: Style(),
     ...sectionBackgroundControls(ARCHIVE_SAGE_BACKGROUND_HSL),
-    banner: Group({
-      label: 'Banner',
-      preferredLayout: Group.Layout.Popover,
-      props: {
-        imageSrc: Image({ label: 'Desktop banner image (large screens)' }),
-        imageAlt: TextInput({
-          label: 'Banner image alt',
-          defaultValue: '',
-        }),
-      },
-    }),
+    imageSrc: Image({ label: 'Background image' }),
     ...headingPopoverControls({
       label: 'Promo heading',
       textDefault: '🌱 Start Strong Kit',
       textColorDefault: '0 0% 100%',
-      includeHighlightSwash: true,
     }),
     body: Group({
       label: 'Body',
@@ -53,11 +43,14 @@ runtime.registerComponent(DiabetesCareFloatingProductBundle, {
           label: 'Promo body (HTML)',
           defaultValue:
             '<p>Everything you need to feel set up, comfortable, and ready for your day.</p>',
+          description: 'Supports HTML (e.g. &lt;p&gt;, &lt;em&gt;, &lt;strong&gt;).',
         }),
+        ...textColorFields('0 0% 100%'),
+        ...fontSizeFields(),
       },
     }),
     products: List({
-      label: 'Bundle products',
+      label: 'Bundle products (max 3)',
       type: Group({
         label: 'Product',
         props: {
@@ -93,6 +86,5 @@ runtime.registerComponent(DiabetesCareFloatingProductBundle, {
         }),
       },
     }),
-    ...bodyTextPopoverControls('0 0% 100%'),
   },
 });

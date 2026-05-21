@@ -7,6 +7,7 @@ import {
   appendHighlightToSectionCss,
   resolveAccentColors,
   resolvePlainTextColor,
+  resolveSectionHighlightChannels,
 } from '~/lib/makeswift/utils/heading-accent-color';
 
 export type SectionBackgroundProps = {
@@ -94,7 +95,7 @@ export function buildSectionTheme(options: {
     options.background,
     options.defaultBackgroundChannels,
   );
-  const { highlightChannels } = resolveAccentColors(options.highlight);
+  const highlightChannels = resolveSectionHighlightChannels(options.highlight);
 
   let sectionCss = options.sectionCss;
 

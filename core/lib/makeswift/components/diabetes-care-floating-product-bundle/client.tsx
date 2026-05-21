@@ -1,14 +1,14 @@
 'use client';
 
 import { clsx } from 'clsx';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 import {
   comboboxEntityIdFromMakeswift,
   DiabetesCareCatalogProductCard,
 } from '../diabetes-care-featured-collections/catalog-product-card';
 
-import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import { ARCHIVE_SAGE_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import {
   buildSectionTheme,
@@ -18,29 +18,67 @@ import {
   type HeadingWithHighlightProps,
   type SectionBackgroundProps,
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
+import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
+import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
 
 import {
+  FLOATING_PRODUCT_BUNDLE_BANNER_IMAGE_CSS,
   FLOATING_PRODUCT_BUNDLE_LAYOUT_CSS,
   FLOATING_PRODUCT_BUNDLE_SECTION_ID,
   FLOATING_PRODUCT_BUNDLE_VARS,
 } from './archive-styles';
 
+const MAX_BUNDLE_PRODUCTS = 3;
+
 export interface DiabetesCareFloatingProductBundleProduct {
   entityId?: unknown;
 }
 
+export type FloatingProductBundleBodyProps = BodyTextProps & {
+  html?: string;
+  fontSize?: number;
+  fontSizeMobile?: number;
+};
+
 export interface DiabetesCareFloatingProductBundleProps {
   className?: string;
   background?: SectionBackgroundProps;
+  imageSrc?: unknown;
+  /** @deprecated Use root `imageSrc`. */
   banner?: {
-    imageSrc?: string;
+    imageSrc?: unknown;
     imageAlt?: string;
   };
   heading?: HeadingWithHighlightProps;
-  body?: { html?: string };
+  body?: FloatingProductBundleBodyProps;
   products?: DiabetesCareFloatingProductBundleProduct[];
   buttons?: { addToCartLabel?: string };
+  /** @deprecated Use `body` text color fields. */
   bodyText?: BodyTextProps;
+}
+
+function resolveBannerImageSrc(props: {
+  imageSrc?: unknown;
+  banner?: DiabetesCareFloatingProductBundleProps['banner'];
+  background?: SectionBackgroundProps & {
+    imageSrc?: unknown;
+    backgroundType?: unknown;
+    type?: unknown;
+  };
+}): string {
+  const nestedBackgroundSrc =
+    props.background != null &&
+    ('imageSrc' in props.background ||
+      'backgroundType' in props.background ||
+      'type' in props.background)
+      ? resolveMakeswiftImageSrc(props.background.imageSrc)
+      : '';
+
+  return (
+    resolveMakeswiftImageSrc(props.imageSrc) ||
+    resolveMakeswiftImageSrc(props.banner?.imageSrc) ||
+    nestedBackgroundSrc
+  );
 }
 
 function BundlePlusDivider() {
@@ -62,17 +100,56 @@ function BundlePlusDivider() {
   );
 }
 
-function productSlots(products?: DiabetesCareFloatingProductBundleProduct[]) {
-  if (products != null && products.length > 0) {
-    return products;
+function resolvePromoBody(props: {
+  body?: FloatingProductBundleBodyProps;
+  bodyText?: BodyTextProps;
+}): { html: string; style: CSSProperties | undefined } {
+  const group = props.body;
+
+  if (group != null && typeof group === 'object') {
+    const html = group.html?.trim() ?? '';
+    const color = resolveBodyTextColor(group) ?? resolveBodyTextColor(props.bodyText);
+    const fontSize = resolveHeadingFontSizeCss(group.fontSize, group.fontSizeMobile);
+
+    return {
+      html,
+      style:
+        color != null || fontSize != null
+          ? {
+              ...(color != null ? { color } : {}),
+              ...(fontSize != null ? { fontSize } : {}),
+            }
+          : undefined,
+    };
   }
 
-  return [{ entityId: undefined }, { entityId: undefined }, { entityId: undefined }];
+  const legacyColor = resolveBodyTextColor(props.bodyText);
+
+  return {
+    html: '',
+    style: legacyColor != null ? { color: legacyColor } : undefined,
+  };
+}
+
+function bundleProductSlots(products?: DiabetesCareFloatingProductBundleProduct[]) {
+  return (products ?? [])
+    .filter((p) => comboboxEntityIdFromMakeswift(p.entityId).length > 0)
+    .slice(0, MAX_BUNDLE_PRODUCTS);
+}
+
+function productGridClassName(count: number) {
+  return clsx(
+    'product-grid swipe-on-mobile card-grid mobile:card-grid--1 grid justify-center',
+    count === 1 && 'bfb-products--1',
+    count === 2 && 'bfb-products--2',
+    count >= 3 && 'card-grid--3',
+  );
 }
 
 export function DiabetesCareFloatingProductBundle({
   className,
   background,
+  imageSrc,
   banner,
   heading,
   body,
@@ -81,19 +158,22 @@ export function DiabetesCareFloatingProductBundle({
   bodyText,
 }: DiabetesCareFloatingProductBundleProps) {
   const headingResolved = resolveHeadingTypography(heading);
+  const bannerSrc = resolveBannerImageSrc({ imageSrc, banner, background });
+  const showBannerImage = bannerSrc.length > 0;
+  const promoBody = resolvePromoBody({ body, bodyText });
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: FLOATING_PRODUCT_BUNDLE_SECTION_ID,
-    sectionCss: `${FLOATING_PRODUCT_BUNDLE_VARS}${FLOATING_PRODUCT_BUNDLE_LAYOUT_CSS}`,
+    sectionCss: `${FLOATING_PRODUCT_BUNDLE_VARS}${FLOATING_PRODUCT_BUNDLE_LAYOUT_CSS}${
+      showBannerImage ? FLOATING_PRODUCT_BUNDLE_BANNER_IMAGE_CSS : ''
+    }`,
     background,
-    highlight: heading,
-    defaultBackgroundChannels: ARCHIVE_SAGE_BACKGROUND_CHANNELS,
+    defaultBackgroundChannels: showBannerImage
+      ? undefined
+      : ARCHIVE_SAGE_BACKGROUND_CHANNELS,
   });
-  const bodyColor = resolveBodyTextColor(bodyText);
-  const bannerSrc = banner?.imageSrc?.trim() ?? '';
-  const bannerAlt = banner?.imageAlt?.trim() ?? '';
   const title =
     headingResolved.text.length > 0 ? headingResolved.text : '🌱 Start Strong Kit';
-  const promoHtml = body?.html?.trim() ?? '';
+  const promoHtml = promoBody.html;
   const cartLabel = buttons?.addToCartLabel?.trim() ?? 'Add to cart';
   const headingStyle =
     headingResolved.color != null || headingResolved.fontSize != null
@@ -102,15 +182,14 @@ export function DiabetesCareFloatingProductBundle({
           ...(headingResolved.fontSize != null ? { fontSize: headingResolved.fontSize } : {}),
         }
       : undefined;
-  const slots = productSlots(products).filter(
-    (p) => comboboxEntityIdFromMakeswift(p.entityId).length > 0,
-  );
+  const slots = bundleProductSlots(products);
+  const productCount = slots.length;
 
   const bannerPicture: ReactNode =
-    bannerSrc.length > 0 ? (
+    showBannerImage ? (
       <picture className="media media--height relative block h-full w-full overflow-hidden">
         <img
-          alt={bannerAlt}
+          alt=""
           className="h-full w-full object-cover object-center"
           decoding="async"
           height={1200}
@@ -129,7 +208,10 @@ export function DiabetesCareFloatingProductBundle({
       )}
     >
       <div
-        className="shopify-section compact-product-bundle-section"
+        className={clsx(
+          'shopify-section compact-product-bundle-section',
+          showBannerImage && 'bfb-has-banner-image',
+        )}
         id={FLOATING_PRODUCT_BUNDLE_SECTION_ID}
         style={sectionStyle}
       >
@@ -157,17 +239,15 @@ export function DiabetesCareFloatingProductBundle({
 
                       <div className="product-card__content z-1 absolute left-0 top-0 flex h-full w-full items-center justify-center md:items-center">
                         <div className="w-full text-center md:text-left">
-                          <div
-                            className="promo-box inline-block"
-                            style={bodyColor != null ? { color: bodyColor } : undefined}
-                          >
+                          <div className="promo-box inline-block">
                             <h2 className="banner__title heading title-md leading-none" style={headingStyle}>
-                              <AccentSplitWordsHeading accentColors={heading} text={title} />
+                              <SplitWordsHeading text={title} />
                             </h2>
                             {promoHtml.length > 0 ? (
                               <div
                                 className="rte body subtext-md leading-normal"
                                 dangerouslySetInnerHTML={{ __html: promoHtml }}
+                                style={promoBody.style}
                               />
                             ) : null}
                           </div>
@@ -176,7 +256,7 @@ export function DiabetesCareFloatingProductBundle({
                     </div>
 
                     <ScrollReveal className="compact-product-bundle flex w-full flex-col items-stretch gap-6 lg:mx-auto lg:w-fit lg:gap-10" delayMs={100}>
-                      <div className="product-grid swipe-on-mobile card-grid card-grid--3 mobile:card-grid--1 grid justify-center">
+                      <div className={productGridClassName(productCount)}>
                         {slots.length === 0 ? (
                           <p className="subtext-md col-span-full py-10 text-center text-contrast-500">
                             Add catalog products for this bundle in Makeswift.

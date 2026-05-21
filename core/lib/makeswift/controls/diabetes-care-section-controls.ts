@@ -59,20 +59,22 @@ export function fontSizeFields() {
   };
 }
 
-export function highlightSwashFields(highlightDefault?: string) {
+/** @param highlightDefaultHsl Space-separated HSL channels (e.g. `120 12% 60%` for `#8da58d`). */
+export function highlightSwashFields(highlightDefaultHsl?: string) {
   return {
     useCustomHighlightColor: Checkbox({
-      label: 'Use custom highlight swash color',
+      label: 'Override highlight swash color',
       defaultValue: false,
     }),
     accentHighlightColor: Color({
       label: 'Highlight swash color',
-      defaultValue: highlightDefault ?? hsl('15 61% 85%'),
+      defaultValue: hsl(highlightDefaultHsl ?? '15 61% 85%'),
     }),
     accentHighlightColorHex: TextInput({
       label: 'Highlight swash color (hex override)',
       defaultValue: '',
-      description: 'Optional. Example: `#F3C7BE`.',
+      description:
+        'Optional. Overrides the picker when valid. Reset on the picker above restores the theme swash color (e.g. `#8da58d`).',
     }),
   };
 }
@@ -131,10 +133,152 @@ export type SplitHeadingPopoverOptions = {
   primaryDefault?: string;
   secondaryDefault?: string;
   primaryTextColorDefault?: string;
+  /** Archive foreground / accent copy; default is dark gray, not theme sage. */
   secondaryTextColorDefault?: string;
+  /** HSL channels for highlight swash reset default (e.g. `#8da58d` → `120 12% 60%`). */
+  highlightDefault?: string;
 };
 
-/** Lead + emphasis headings (custom band style). */
+export type SplitRichTextLowerHeadingOptions = {
+  line1Label?: string;
+  line2Label?: string;
+  line1Default?: string;
+  line2Default?: string;
+  line1TextColorDefault?: string;
+  line2TextColorDefault?: string;
+  highlightDefault?: string;
+};
+
+export type CombinedHeadingPopoverOptions = {
+  label?: string;
+  line1Label?: string;
+  line2Label?: string;
+  line1Default?: string;
+  line2Default?: string;
+  line1TextColorDefault?: string;
+  line2TextColorDefault?: string;
+  highlightDefault?: string;
+};
+
+/** One heading popover: line 1 + line 2 (accent); swash on line 2 is opt-in. Renders inline on one line. */
+export function combinedHeadingPopoverControls(options?: CombinedHeadingPopoverOptions) {
+  return {
+    heading: Group({
+      label: options?.label ?? 'Heading',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        text: TextInput({
+          label: options?.line1Label ?? 'Line 1',
+          defaultValue: options?.line1Default ?? '',
+        }),
+        ...textColorFields(options?.line1TextColorDefault),
+        ...fontSizeFields(),
+        accentText: TextInput({
+          label: options?.line2Label ?? 'Line 2 (accent)',
+          defaultValue: options?.line2Default ?? '',
+        }),
+        accentTextColor: Color({
+          label: 'Line 2 text color',
+          defaultValue: hsl(options?.line2TextColorDefault ?? '0 2% 19%'),
+        }),
+        accentTextColorHex: TextInput({
+          label: 'Line 2 text color (hex override)',
+          defaultValue: '',
+          description: HEX_OVERRIDE_DESCRIPTION,
+        }),
+        accentFontSize: Number({
+          label: 'Line 2 font size',
+          suffix: 'px',
+          defaultValue: 0,
+          description: FONT_SIZE_DESCRIPTION,
+        }),
+        accentFontSizeMobile: Number({
+          label: 'Line 2 font size (mobile)',
+          suffix: 'px',
+          defaultValue: 0,
+          description: '0 = same as desktop, or theme default when desktop is 0.',
+        }),
+        ...highlightSwashFields(options?.highlightDefault),
+      },
+    }),
+  };
+}
+
+/** Rich text lower: line 1 and line 2 each get their own popover; swash on line 2 is opt-in. */
+export function splitRichTextLowerHeadingControls(options?: SplitRichTextLowerHeadingOptions) {
+  return {
+    headingLine1: Group({
+      label: options?.line1Label ?? 'Heading line 1',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        text: TextInput({
+          label: 'Text',
+          defaultValue: options?.line1Default ?? '',
+        }),
+        ...textColorFields(options?.line1TextColorDefault),
+        ...fontSizeFields(),
+      },
+    }),
+    headingLine2: Group({
+      label: options?.line2Label ?? 'Heading line 2',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        text: TextInput({
+          label: 'Text',
+          defaultValue: options?.line2Default ?? '',
+        }),
+        ...textColorFields(options?.line2TextColorDefault),
+        ...fontSizeFields(),
+        ...highlightSwashFields(options?.highlightDefault),
+      },
+    }),
+  };
+}
+
+export type NestedSplitHeadingPopoverOptions = SplitHeadingPopoverOptions & {
+  groupLabel?: string;
+};
+
+/**
+ * One sidebar "Heading" entry; opening it shows nested popovers for primary + secondary (accent).
+ */
+export function nestedSplitHeadingPopoverControls(options?: NestedSplitHeadingPopoverOptions) {
+  return {
+    heading: Group({
+      label: options?.groupLabel ?? 'Heading',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        primaryHeading: Group({
+          label: options?.primaryLabel ?? 'Primary heading',
+          preferredLayout: Group.Layout.Popover,
+          props: {
+            text: TextInput({
+              label: 'Text',
+              defaultValue: options?.primaryDefault ?? '',
+            }),
+            ...textColorFields(options?.primaryTextColorDefault),
+            ...fontSizeFields(),
+          },
+        }),
+        secondaryHeading: Group({
+          label: options?.secondaryLabel ?? 'Secondary heading (accent)',
+          preferredLayout: Group.Layout.Popover,
+          props: {
+            text: TextInput({
+              label: 'Text',
+              defaultValue: options?.secondaryDefault ?? '',
+            }),
+            ...textColorFields(options?.secondaryTextColorDefault ?? '0 2% 19%'),
+            ...fontSizeFields(),
+            ...highlightSwashFields(options?.highlightDefault),
+          },
+        }),
+      },
+    }),
+  };
+}
+
+/** Lead + emphasis headings (custom band style) — two top-level sidebar popovers. */
 export function splitHeadingPopoverControls(options?: SplitHeadingPopoverOptions) {
   return {
     primaryHeading: Group({
@@ -157,9 +301,9 @@ export function splitHeadingPopoverControls(options?: SplitHeadingPopoverOptions
           label: 'Text',
           defaultValue: options?.secondaryDefault ?? '',
         }),
-        ...textColorFields(options?.secondaryTextColorDefault ?? '152 22% 38%'),
+        ...textColorFields(options?.secondaryTextColorDefault ?? '0 2% 19%'),
         ...fontSizeFields(),
-        ...highlightSwashFields(),
+        ...highlightSwashFields(options?.highlightDefault),
       },
     }),
   };

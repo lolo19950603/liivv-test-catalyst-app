@@ -1,9 +1,13 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { type KeyboardEventHandler, useId, useRef } from 'react';
+import { type CSSProperties, type KeyboardEventHandler, useId, useRef } from 'react';
 
 import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import {
+  isHighlightOverrideEnabled,
+  type HeadingAccentColorProps,
+} from '~/lib/makeswift/utils/heading-accent-color';
 import {
   buildSectionTheme,
   resolveBodyTextColor,
@@ -13,6 +17,7 @@ import {
   type HeadingWithHighlightProps,
   type SectionBackgroundProps,
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
+import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
 
 import { COLLECTION_LIST_SECTION_ID, COLLECTION_LIST_VARS } from './archive-styles';
 
@@ -24,15 +29,179 @@ export interface DiabetesCareCollectionListCardProps {
   ariaLabel?: string;
 }
 
+/** @deprecated Flat combined heading; use `heading.primaryHeading` + `heading.secondaryHeading`. */
+export type CollectionListHeadingProps = HeadingTypographyProps &
+  HeadingAccentColorProps & {
+    accentText?: string;
+    accentTextColor?: string;
+    accentTextColorHex?: string;
+    accentFontSize?: number;
+    accentFontSizeMobile?: number;
+  };
+
+export type CollectionListHeadingGroupProps = {
+  primaryHeading?: HeadingTypographyProps;
+  secondaryHeading?: HeadingWithHighlightProps;
+};
+
+export type CollectionListBodyProps = BodyTextProps & {
+  descriptionHtml?: string;
+  fontSize?: number;
+  fontSizeMobile?: number;
+};
+
 export type DiabetesCareCollectionListProps = {
   className?: string;
   background?: SectionBackgroundProps;
+  heading?: CollectionListHeadingGroupProps | CollectionListHeadingProps;
+  /** @deprecated Use `heading.primaryHeading`. */
   primaryHeading?: HeadingTypographyProps;
+  /** @deprecated Use `heading.secondaryHeading`. */
   secondaryHeading?: HeadingWithHighlightProps;
-  body?: { descriptionHtml?: string };
+  /** @deprecated Use `heading.primaryHeading`. */
+  headingLine1?: HeadingTypographyProps;
+  /** @deprecated Use `heading.secondaryHeading`. */
+  headingLine2?: CollectionListHeadingProps;
+  body?: CollectionListBodyProps;
   cards?: DiabetesCareCollectionListCardProps[];
+  /** @deprecated Use `body` text color and font size. */
   bodyText?: BodyTextProps;
 };
+
+/** Opt-in custom `--color-highlight` for the line 2 swash (archive always uses `half_text`). */
+function line2UsesCustomHighlightColor(heading?: HeadingAccentColorProps | null): boolean {
+  return isHighlightOverrideEnabled(heading?.useCustomHighlightColor);
+}
+
+function isNestedHeadingGroup(
+  heading: CollectionListHeadingGroupProps | CollectionListHeadingProps,
+): heading is CollectionListHeadingGroupProps {
+  return 'primaryHeading' in heading || 'secondaryHeading' in heading;
+}
+
+function resolveCollectionListHeading(props: {
+  heading?: CollectionListHeadingGroupProps | CollectionListHeadingProps;
+  primaryHeading?: HeadingTypographyProps;
+  secondaryHeading?: HeadingWithHighlightProps;
+  headingLine1?: HeadingTypographyProps;
+  headingLine2?: CollectionListHeadingProps;
+}): {
+  line1: ReturnType<typeof resolveHeadingTypography>;
+  line2: ReturnType<typeof resolveHeadingTypography>;
+  headingAccent: HeadingWithHighlightProps | null;
+  useLine2CustomHighlight: boolean;
+} {
+  const nested = props.heading;
+
+  if (nested != null && typeof nested === 'object' && isNestedHeadingGroup(nested)) {
+    const line1 = resolveHeadingTypography(nested.primaryHeading);
+    const line2 = resolveHeadingTypography(nested.secondaryHeading);
+    const headingAccent = nested.secondaryHeading ?? null;
+
+    return {
+      line1,
+      line2: { ...line2, emphasisColor: line2.emphasisColor ?? line2.color },
+      headingAccent,
+      useLine2CustomHighlight: line2UsesCustomHighlightColor(headingAccent),
+    };
+  }
+
+  if (props.primaryHeading != null || props.secondaryHeading != null) {
+    const line1 = resolveHeadingTypography(props.primaryHeading);
+    const line2 = resolveHeadingTypography(props.secondaryHeading);
+    const headingAccent = props.secondaryHeading ?? null;
+
+    return {
+      line1,
+      line2: { ...line2, emphasisColor: line2.emphasisColor ?? line2.color },
+      headingAccent,
+      useLine2CustomHighlight: line2UsesCustomHighlightColor(headingAccent),
+    };
+  }
+
+  const combined = props.heading as CollectionListHeadingProps | undefined;
+
+  if (combined != null && typeof combined === 'object' && !isNestedHeadingGroup(combined)) {
+    const line1 = resolveHeadingTypography({
+      text: combined.text,
+      textColor: combined.textColor,
+      textColorHex: combined.textColorHex,
+      fontSize: combined.fontSize,
+      fontSizeMobile: combined.fontSizeMobile,
+    });
+    const line2 = resolveHeadingTypography({
+      text: combined.accentText,
+      textColor: combined.accentTextColor,
+      textColorHex: combined.accentTextColorHex,
+      fontSize: combined.accentFontSize,
+      fontSizeMobile: combined.accentFontSizeMobile,
+    });
+
+    return {
+      line1,
+      line2: { ...line2, emphasisColor: line2.color },
+      headingAccent: combined,
+      useLine2CustomHighlight: line2UsesCustomHighlightColor(combined),
+    };
+  }
+
+  if (props.headingLine1 != null || props.headingLine2 != null) {
+    const line1 = resolveHeadingTypography(props.headingLine1);
+    const line2 = resolveHeadingTypography({
+      text: props.headingLine2?.text,
+      textColor: props.headingLine2?.textColor,
+      textColorHex: props.headingLine2?.textColorHex,
+      fontSize: props.headingLine2?.fontSize,
+      fontSizeMobile: props.headingLine2?.fontSizeMobile,
+    });
+    const headingAccent = props.headingLine2 ?? null;
+
+    return {
+      line1,
+      line2: { ...line2, emphasisColor: line2.color },
+      headingAccent,
+      useLine2CustomHighlight: line2UsesCustomHighlightColor(headingAccent),
+    };
+  }
+
+  return {
+    line1: resolveHeadingTypography(undefined),
+    line2: resolveHeadingTypography(undefined),
+    headingAccent: null,
+    useLine2CustomHighlight: false,
+  };
+}
+
+function resolveCollectionListBody(props: {
+  body?: CollectionListBodyProps;
+  bodyText?: BodyTextProps;
+}): { html: string; style: CSSProperties | undefined } {
+  const group = props.body;
+
+  if (group != null && typeof group === 'object') {
+    const html = group.descriptionHtml?.trim() ?? '';
+    const color = resolveBodyTextColor(group) ?? resolveBodyTextColor(props.bodyText);
+    const fontSize = resolveHeadingFontSizeCss(group.fontSize, group.fontSizeMobile);
+
+    return {
+      html,
+      style:
+        color != null || fontSize != null
+          ? {
+              ...(color != null ? { color } : {}),
+              ...(fontSize != null ? { fontSize } : {}),
+            }
+          : undefined,
+    };
+  }
+
+  const legacyColor = resolveBodyTextColor(props.bodyText);
+
+  return {
+    html: '',
+    style: legacyColor != null ? { color: legacyColor } : undefined,
+  };
+}
 
 function IconChevronLeft() {
   return (
@@ -75,26 +244,34 @@ function cardHasMedia(c: DiabetesCareCollectionListCardProps): boolean {
 export function DiabetesCareCollectionList({
   className,
   background,
+  headingLine1,
+  headingLine2,
+  heading,
   primaryHeading,
   secondaryHeading,
   body,
   cards,
   bodyText,
 }: DiabetesCareCollectionListProps) {
-  const lead = resolveHeadingTypography(primaryHeading);
-  const accent = resolveHeadingTypography(secondaryHeading);
-  const bodyColor = resolveBodyTextColor(bodyText);
+  const { line1, line2, headingAccent, useLine2CustomHighlight } = resolveCollectionListHeading({
+    heading,
+    primaryHeading,
+    secondaryHeading,
+    headingLine1,
+    headingLine2,
+  });
+  const bodyResolved = resolveCollectionListBody({ body, bodyText });
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: COLLECTION_LIST_SECTION_ID,
     sectionCss: COLLECTION_LIST_VARS,
     background,
-    highlight: secondaryHeading,
+    highlight: useLine2CustomHighlight ? headingAccent : null,
   });
   const reactId = useId().replace(/:/g, '');
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const leadText = lead.text.length > 0 ? lead.text : 'Care Designed for';
-  const emphasis = accent.text.length > 0 ? accent.text : 'Every Stage of Health';
-  const desc = body?.descriptionHtml?.trim() ?? '';
+  const line1Text = line1.text.length > 0 ? line1.text : 'Care Designed for';
+  const line2Text = line2.text.length > 0 ? line2.text : 'Every Stage of Health';
+  const desc = bodyResolved.html;
 
   const list = cards != null ? cards.filter(cardHasMedia) : [];
 
@@ -134,16 +311,21 @@ export function DiabetesCareCollectionList({
               <div className="grid gap-4 leading-none">
                 <h2 className="heading title-md leading-none">
                   <AccentSplitWordsHeading
-                    accentColors={secondaryHeading}
-                    emphasis={emphasis}
-                    lead={leadText}
+                    accentColors={useLine2CustomHighlight ? (headingAccent ?? undefined) : undefined}
+                    emphasis={line2Text}
+                    emphasisColor={line2.emphasisColor ?? line2.color}
+                    emphasisFontSize={line2.fontSize}
+                    highlightStyle="half_text"
+                    lead={line1Text}
+                    leadColor={line1.color}
+                    leadFontSize={line1.fontSize}
                   />
                 </h2>
                 {desc.length > 0 ? (
                   <div
                     className="description rte subtext-md leading-normal"
                     dangerouslySetInnerHTML={{ __html: desc }}
-                    style={bodyColor != null ? { color: bodyColor } : undefined}
+                    style={bodyResolved.style}
                   />
                 ) : null}
               </div>

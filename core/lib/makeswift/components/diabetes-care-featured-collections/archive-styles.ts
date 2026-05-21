@@ -13,9 +13,9 @@ export const FEATURED_COLLECTIONS_ARCHIVE_STYLE =
   /* Keep label above the circle fill; hover motion stays on `.btn-fill` via initShopifyButtonFillHover. */
   `#${FEATURED_COLLECTIONS_SECTION_ID} .tab-list .tab__item .btn-text{position:relative;z-index:1}` +
   `#${FEATURED_COLLECTIONS_SECTION_ID} .tab-list .tab__item .btn-fill{z-index:0}` +
-  /* Active tab is not `disabled` (Makeswift must stay clickable). Hide fill at rest like archive. */
-  `#${FEATURED_COLLECTIONS_SECTION_ID} .tab-list .tab__item.button--primary[aria-selected=true]:not(:hover):not(:focus-within) .btn-fill{display:none}` +
-  /* Archive hover sets primary label to `--color-button-background` (often white here); keep dark text on the active tab. */
+  /* Selected tab: archive used `disabled` so fill stayed hidden. Keep clickable in Makeswift but never show the white primary fill on hover. */
+  `#${FEATURED_COLLECTIONS_SECTION_ID} .tab-list .tab__item.button--primary[aria-selected=true] .btn-fill{display:none !important}` +
+  /* Primary tab uses dark `--color-button-background`; label must stay `--color-button-text` (not foreground). */
   `#${FEATURED_COLLECTIONS_SECTION_ID} .tab-list .tab__item.button--primary[aria-selected=true],` +
   `#${FEATURED_COLLECTIONS_SECTION_ID} .tab-list .tab__item.button--primary[aria-selected=true]:hover,` +
   `#${FEATURED_COLLECTIONS_SECTION_ID} .tab-list .tab__item.button--primary[aria-selected=true]:focus-within{color:rgb(var(--color-button-text)) !important}` +

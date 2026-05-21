@@ -6,6 +6,7 @@ const HEX_OVERRIDE_DESCRIPTION = 'Optional. Overrides the picker when valid (e.g
 
 /** Swash-only highlight group (no accented text color pickers). */
 export function highlightSwashControls(options?: {
+  /** HSL channels (e.g. `120 12% 60%` for `#8da58d`). */
   highlightDefault?: string;
   groupLabel?: string;
 }) {
@@ -20,12 +21,12 @@ export function highlightSwashControls(options?: {
         }),
         accentHighlightColor: Color({
           label: 'Highlight swash color',
-          defaultValue: options?.highlightDefault ?? hsl('15 61% 85%'),
+          defaultValue: hsl(options?.highlightDefault ?? '15 61% 85%'),
         }),
         accentHighlightColorHex: TextInput({
           label: 'Highlight swash color (hex override)',
           defaultValue: '',
-          description: 'Optional. Example: `#F3C7BE`.',
+          description: 'Optional. Overrides the picker when valid.',
         }),
       },
     }),
@@ -35,6 +36,7 @@ export function highlightSwashControls(options?: {
 export function accentColorControls(options?: {
   accentTextLabel?: string;
   accentTextDefault?: string;
+  /** HSL channels (e.g. `120 12% 60%` for `#8da58d`). */
   highlightDefault?: string;
   groupLabel?: string;
 }) {
@@ -58,12 +60,12 @@ export function accentColorControls(options?: {
         }),
         accentHighlightColor: Color({
           label: 'Highlight swash color',
-          defaultValue: options?.highlightDefault ?? hsl('15 61% 85%'),
+          defaultValue: hsl(options?.highlightDefault ?? '15 61% 85%'),
         }),
         accentHighlightColorHex: TextInput({
           label: 'Highlight swash color (hex override)',
           defaultValue: '',
-          description: 'Optional. Example: `#F3C7BE`.',
+          description: 'Optional. Overrides the picker when valid.',
         }),
       },
     }),

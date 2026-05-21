@@ -20,19 +20,32 @@ export function resolvePlainTextColor(props: PlainTextColorProps): string | unde
   return resolveCssColor(props.textColorHex, props.textColor);
 }
 
-function useCustomHighlightSwash(settings: HeadingAccentColorProps): boolean {
-  const value = settings.useCustomHighlightColor;
+export function isHighlightOverrideEnabled(value: unknown): boolean {
+  return value === true || value === 'true' || value === 1 || value === '1';
+}
 
-  return value === true || value === 'true';
+function useCustomHighlightSwash(settings: HeadingAccentColorProps): boolean {
+  return isHighlightOverrideEnabled(settings.useCustomHighlightColor);
+}
+
+/** Resolves swash `--color-highlight` channels (hex wins, then picker). No checkbox gate. */
+export function resolveSectionHighlightChannels(
+  settings?: HeadingAccentColorProps | null,
+): string | null {
+  if (settings == null) {
+    return null;
+  }
+
+  return resolveArchiveHighlightChannels(
+    settings.accentHighlightColorHex,
+    settings.accentHighlightColor,
+  );
 }
 
 export function resolveAccentColors(props?: HeadingAccentColorProps | null) {
   const settings = props ?? {};
   const highlightChannels = useCustomHighlightSwash(settings)
-    ? resolveArchiveHighlightChannels(
-        settings.accentHighlightColorHex,
-        settings.accentHighlightColor,
-      )
+    ? resolveSectionHighlightChannels(settings)
     : null;
 
   return {

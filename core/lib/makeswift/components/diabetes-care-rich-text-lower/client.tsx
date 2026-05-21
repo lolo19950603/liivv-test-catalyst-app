@@ -1,9 +1,15 @@
 'use client';
 
 import { clsx } from 'clsx';
+import type { CSSProperties } from 'react';
 
-import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import {
+  AccentSplitWordsHeading,
+  ScrollReveal,
+  SplitWordsHeading,
+} from '~/lib/makeswift/diabetes-care-scroll-animate';
 import { ARCHIVE_SAGE_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
+import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
 import {
   buildSectionTheme,
   resolveBodyTextColor,
@@ -13,6 +19,7 @@ import {
   type HeadingWithHighlightProps,
   type SectionBackgroundProps,
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
+import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
 
 import { RICH_TEXT_LOWER_SECTION_ID, RICH_TEXT_LOWER_VARS } from './archive-styles';
 
@@ -60,45 +67,208 @@ function IconArrowRight() {
   );
 }
 
+/** @deprecated Combined heading popover; use `headingLine1` + `headingLine2`. */
+export type RichTextLowerHeadingProps = HeadingTypographyProps &
+  HeadingAccentColorProps & {
+    accentText?: string;
+    accentTextColor?: string;
+    accentTextColorHex?: string;
+    accentFontSize?: number;
+    accentFontSizeMobile?: number;
+  };
+
+export type RichTextLowerLine2HeadingProps = HeadingTypographyProps & HeadingAccentColorProps;
+
+export type RichTextLowerBodyProps = BodyTextProps & {
+  html?: string;
+  /** @deprecated Use `button.label`. */
+  ctaLabel?: string;
+  /** @deprecated Use `button.link`. */
+  ctaLink?: { href?: string; target?: string };
+  fontSize?: number;
+  fontSizeMobile?: number;
+};
+
+export type RichTextLowerButtonProps = {
+  label?: string;
+  link?: { href?: string; target?: string };
+};
+
 export type DiabetesCareRichTextLowerProps = {
   className?: string;
   background?: SectionBackgroundProps;
+  headingLine1?: HeadingTypographyProps;
+  headingLine2?: RichTextLowerLine2HeadingProps;
+  /** @deprecated Use `headingLine1` + `headingLine2`. */
+  heading?: RichTextLowerHeadingProps;
+  /** @deprecated Use `headingLine1`. */
   primaryHeading?: HeadingTypographyProps;
+  /** @deprecated Use `headingLine2`. */
   secondaryHeading?: HeadingWithHighlightProps;
-  body?: {
-    html?: string;
-    ctaLabel?: string;
-    ctaLink?: { href?: string; target?: string };
-  };
+  body?: RichTextLowerBodyProps;
+  button?: RichTextLowerButtonProps;
   showSupportIcon?: boolean;
+  /** @deprecated Use `body` text color and font size. */
   bodyText?: BodyTextProps;
 };
+
+function resolveRichTextLowerButton(props: {
+  button?: RichTextLowerButtonProps;
+  body?: RichTextLowerBodyProps;
+}): { label: string; link?: { href?: string; target?: string } } {
+  const label = props.button?.label?.trim() ?? props.body?.ctaLabel?.trim() ?? '';
+  const link = props.button?.link ?? props.body?.ctaLink;
+
+  return { label, link };
+}
+
+function line2UsesHighlightSwash(heading?: HeadingAccentColorProps | null): boolean {
+  const value = heading?.useCustomHighlightColor;
+
+  return value === true || value === 'true';
+}
+
+function resolveRichTextLowerHeading(props: {
+  headingLine1?: HeadingTypographyProps;
+  headingLine2?: RichTextLowerLine2HeadingProps;
+  heading?: RichTextLowerHeadingProps;
+  primaryHeading?: HeadingTypographyProps;
+  secondaryHeading?: HeadingWithHighlightProps;
+}): {
+  line1: ReturnType<typeof resolveHeadingTypography>;
+  line2: ReturnType<typeof resolveHeadingTypography>;
+  line2Accent: RichTextLowerLine2HeadingProps | null;
+  useLine2Swash: boolean;
+} {
+  if (props.headingLine1 != null || props.headingLine2 != null) {
+    const line1 = resolveHeadingTypography(props.headingLine1);
+    const line2 = resolveHeadingTypography(props.headingLine2);
+    const line2Accent = props.headingLine2 ?? null;
+
+    return {
+      line1,
+      line2: { ...line2, emphasisColor: line2.color },
+      line2Accent,
+      useLine2Swash: line2UsesHighlightSwash(line2Accent),
+    };
+  }
+
+  const combined = props.heading;
+
+  if (combined != null && typeof combined === 'object') {
+    const line1 = resolveHeadingTypography({
+      text: combined.text,
+      textColor: combined.textColor,
+      textColorHex: combined.textColorHex,
+      fontSize: combined.fontSize,
+      fontSizeMobile: combined.fontSizeMobile,
+    });
+    const line2 = resolveHeadingTypography({
+      text: combined.accentText,
+      textColor: combined.accentTextColor,
+      textColorHex: combined.accentTextColorHex,
+      fontSize: combined.accentFontSize,
+      fontSizeMobile: combined.accentFontSizeMobile,
+    });
+
+    return {
+      line1,
+      line2: { ...line2, emphasisColor: line2.color },
+      line2Accent: combined,
+      useLine2Swash: line2UsesHighlightSwash(combined),
+    };
+  }
+
+  const line1 = resolveHeadingTypography(props.primaryHeading);
+  const line2 = resolveHeadingTypography(props.secondaryHeading);
+  const line2Accent = props.secondaryHeading ?? null;
+
+  return {
+    line1,
+    line2: { ...line2, emphasisColor: line2.emphasisColor ?? line2.color },
+    line2Accent,
+    useLine2Swash: line2UsesHighlightSwash(line2Accent),
+  };
+}
+
+function resolveRichTextLowerBody(props: {
+  body?: RichTextLowerBodyProps;
+  bodyText?: BodyTextProps;
+}): { html: string; style: CSSProperties | undefined } {
+  const group = props.body;
+
+  if (group != null && typeof group === 'object') {
+    const html = group.html?.trim() ?? '';
+    const color = resolveBodyTextColor(group) ?? resolveBodyTextColor(props.bodyText);
+    const fontSize = resolveHeadingFontSizeCss(group.fontSize, group.fontSizeMobile);
+
+    return {
+      html,
+      style:
+        color != null || fontSize != null
+          ? {
+              ...(color != null ? { color } : {}),
+              ...(fontSize != null ? { fontSize } : {}),
+            }
+          : undefined,
+    };
+  }
+
+  const legacyColor = resolveBodyTextColor(props.bodyText);
+
+  return {
+    html: '',
+    style: legacyColor != null ? { color: legacyColor } : undefined,
+  };
+}
+
+function headingLineStyle(
+  resolved: ReturnType<typeof resolveHeadingTypography>,
+): CSSProperties | undefined {
+  return resolved.color != null || resolved.fontSize != null
+    ? {
+        ...(resolved.color != null ? { color: resolved.color } : {}),
+        ...(resolved.fontSize != null ? { fontSize: resolved.fontSize } : {}),
+      }
+    : undefined;
+}
 
 export function DiabetesCareRichTextLower({
   className,
   background,
+  headingLine1,
+  headingLine2,
+  heading,
   primaryHeading,
   secondaryHeading,
   body,
+  button,
   showSupportIcon = true,
   bodyText,
 }: DiabetesCareRichTextLowerProps) {
-  const lead = resolveHeadingTypography(primaryHeading);
-  const accent = resolveHeadingTypography(secondaryHeading);
-  const bodyColor = resolveBodyTextColor(bodyText);
+  const { line1, line2, line2Accent, useLine2Swash } = resolveRichTextLowerHeading({
+    headingLine1,
+    headingLine2,
+    heading,
+    primaryHeading,
+    secondaryHeading,
+  });
+  const bodyResolved = resolveRichTextLowerBody({ body, bodyText });
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: RICH_TEXT_LOWER_SECTION_ID,
     sectionCss: RICH_TEXT_LOWER_VARS,
     background,
-    highlight: secondaryHeading,
+    highlight: useLine2Swash ? line2Accent : null,
     defaultBackgroundChannels: ARCHIVE_SAGE_BACKGROUND_CHANNELS,
   });
-  const leadText = lead.text.length > 0 ? lead.text : 'Put a stop to pain.';
-  const accentText = accent.text.length > 0 ? accent.text : 'Period.';
-  const html = body?.html?.trim() ?? '';
-  const label = body?.ctaLabel?.trim() ?? '';
-  const href = body?.ctaLink?.href?.trim() ?? '';
-  const hasCta = label.length > 0 && href.length > 0;
+  const line1Text = line1.text.length > 0 ? line1.text : 'Put a stop to pain.';
+  const line2Text = line2.text.length > 0 ? line2.text : 'Period.';
+  const html = bodyResolved.html;
+  const cta = resolveRichTextLowerButton({ button, body });
+  const href = cta.link?.href?.trim() ?? '';
+  const hasCta = cta.label.length > 0 && href.length > 0;
+  const line1Style = headingLineStyle(line1);
+  const line2Style = headingLineStyle(line2);
 
   return (
     <div className={clsx('diabetes-care-rich-text-lower max-w-full overflow-x-hidden', className)}>
@@ -113,30 +283,52 @@ export function DiabetesCareRichTextLower({
                 </div>
               ) : null}
               <h2 className="heading title-lg tracking-heading leading-none">
-                <AccentSplitWordsHeading
-                  accentColors={secondaryHeading}
-                  emphasis={accentText}
-                  lead={leadText}
-                />
+                <span className="block" style={line1Style}>
+                  <SplitWordsHeading
+                    lead={line1Text}
+                    leadColor={line1.color}
+                    leadFontSize={line1.fontSize}
+                  />
+                </span>
+                {line2Text.length > 0 ? (
+                  <span className="block" style={line2Style}>
+                    {useLine2Swash ? (
+                      <AccentSplitWordsHeading
+                        accentColors={line2Accent ?? undefined}
+                        emphasisColor={line2.emphasisColor ?? line2.color}
+                        emphasisFontSize={line2.fontSize}
+                        highlightEntirePhrase
+                        highlightStyle="half_text"
+                        text={line2Text}
+                      />
+                    ) : (
+                      <SplitWordsHeading
+                        lead={line2Text}
+                        leadColor={line2.color}
+                        leadFontSize={line2.fontSize}
+                      />
+                    )}
+                  </span>
+                ) : null}
               </h2>
-              <ScrollReveal delayMs={80}>
+              <ScrollReveal className="flex flex-col gap-8" delayMs={80}>
                 {html.length > 0 ? (
                   <div
                     className="rte body subtext-md leading-normal"
                     dangerouslySetInnerHTML={{ __html: html }}
-                    style={bodyColor != null ? { color: bodyColor } : undefined}
+                    style={bodyResolved.style}
                   />
                 ) : null}
                 {hasCta ? (
                   <a
-                    className="button button--primary button--lg icon-with-text"
+                    className="button button--primary button--lg icon-with-text w-fit"
                     href={href}
-                    rel={body?.ctaLink?.target === '_blank' ? 'noopener noreferrer' : undefined}
-                    target={body?.ctaLink?.target}
+                    rel={cta.link?.target === '_blank' ? 'noopener noreferrer' : undefined}
+                    target={cta.link?.target}
                   >
                     <span className="btn-fill" data-fill />
                     <span className="btn-text">
-                      {label}
+                      {cta.label}
                       <IconArrowRight />
                     </span>
                   </a>
