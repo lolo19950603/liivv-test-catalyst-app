@@ -1,7 +1,13 @@
 import { clsx } from 'clsx';
 import type { CSSProperties } from 'react';
 
+import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
+import {
+  DC_MOBILE_STACK_CLASS,
+  DC_SECTION_ROOT_CLASS,
+} from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
 import { ArchiveHighlightedText } from '~/lib/makeswift/components/diabetes-care-faq/archive-highlighted-text';
 import { ARCHIVE_SAGE_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import {
@@ -33,7 +39,7 @@ const DEFAULT_BACKGROUND_CHANNELS = ARCHIVE_SAGE_BACKGROUND_CHANNELS;
  * Inline `<style>` from `diabetes-care.html` for this section id (theme color tokens + grid gap).
  * Appends `--section-blocks-count` and optional four-column media rule.
  */
-const MULTICOLUMN_ARCHIVE_STYLE = `#${MULTICOLUMN_SECTION_ID}{--section-padding-top:72px;--section-padding-bottom:72px;--color-background:${DEFAULT_BACKGROUND_CHANNELS};--color-foreground:49 47 47;--color-border:var(--color-foreground)/0.1;--color-border-dark:var(--color-foreground)/0.4;--color-border-light:var(--color-foreground)/0.06;--color-highlight:243 199 190;--color-button-background:255 255 255;--color-button-border:255 255 255;--color-button-text:49 47 47}@media screen and (min-width:1024px){#${MULTICOLUMN_SECTION_ID} .multicolumn{--card-grid-gap:clamp(40px,3.5vw,60px)}}`;
+const MULTICOLUMN_ARCHIVE_STYLE = `#${MULTICOLUMN_SECTION_ID}{--section-padding-top:72px;--section-padding-bottom:72px;--color-background:${DEFAULT_BACKGROUND_CHANNELS};--color-foreground:49 47 47;--color-border:var(--color-foreground)/0.1;--color-border-dark:var(--color-foreground)/0.4;--color-border-light:var(--color-foreground)/0.06;--color-highlight:243 199 190;--color-button-background:255 255 255;--color-button-border:255 255 255;--color-button-text:49 47 47}#${MULTICOLUMN_SECTION_ID} [data-dc-scroll-reveal]{overflow:hidden}@media screen and (min-width:1024px){#${MULTICOLUMN_SECTION_ID} .multicolumn{--card-grid-gap:clamp(40px,3.5vw,60px)}#${MULTICOLUMN_SECTION_ID} .slider.slider--tablet{overflow:visible;padding-inline:0;margin-inline:0;padding-block-end:0}}`;
 
 function multicolumnSectionStyle(blockCount: number): string {
   const id = `#${MULTICOLUMN_SECTION_ID}`;
@@ -123,7 +129,7 @@ export type MulticolumnColumnImageProps = {
   imageAlt?: string;
 };
 
-export type MulticolumnColumnButtonProps = {
+export type MulticolumnColumnButtonProps = ButtonColorProps & {
   buttonText?: string;
   buttonLink?: { href?: string; target?: string };
 };
@@ -242,9 +248,12 @@ function readColumnImage(row: DiabetesCareMulticolumnColumn): MulticolumnColumnI
 }
 
 function readColumnButton(row: DiabetesCareMulticolumnColumn): MulticolumnColumnButtonProps {
+  const group = row.button;
+
   return {
-    buttonText: row.button?.buttonText ?? row.buttonText,
-    buttonLink: row.button?.buttonLink ?? row.buttonLink,
+    ...(group != null && typeof group === 'object' ? group : {}),
+    buttonText: group?.buttonText ?? row.buttonText,
+    buttonLink: group?.buttonLink ?? row.buttonLink,
   };
 }
 
@@ -410,7 +419,14 @@ export function DiabetesCareMulticolumn({
   });
 
   return (
-    <div className={clsx('diabetes-care-multicolumn max-w-full overflow-x-hidden', className)}>
+    <div
+      className={clsx(
+        'diabetes-care-multicolumn',
+        DC_SECTION_ROOT_CLASS,
+        'max-w-full',
+        className,
+      )}
+    >
       <div
         className="shopify-section"
         id={MULTICOLUMN_SECTION_ID}
@@ -448,7 +464,10 @@ export function DiabetesCareMulticolumn({
             </div>
 
             <ScrollReveal delayMs={100}>
-              <div className="grid slider slider--tablet" id={MULTICOLUMN_SLIDER_ID}>
+              <div
+                className={clsx('grid slider slider--tablet', DC_MOBILE_STACK_CLASS)}
+                id={MULTICOLUMN_SLIDER_ID}
+              >
                 <div
                   className={clsx(
                     'multicolumn card-grid mobile:card-grid--1 relative z-1 grid items-stretch',
@@ -486,10 +505,10 @@ export function DiabetesCareMulticolumn({
                         key={`multicolumn-${index}`}
                       >
                         {showImage ? (
-                          <div className="media media--square relative w-full shrink-0 overflow-hidden rounded-3xl">
+                          <div className="media media--square mobile:media--wide relative w-full shrink-0 overflow-hidden rounded-3xl">
                             <img
                               alt={img.imageAlt?.trim() ?? ''}
-                              className="aspect-square w-full object-cover"
+                              className="aspect-square w-full object-cover md:aspect-square"
                               height={520}
                               loading="lazy"
                               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 520px"
@@ -570,8 +589,9 @@ export function DiabetesCareMulticolumn({
                                   : 'mt-1'
                               }
                             >
-                              <a
-                                className="button button--secondary button--md icon-with-text"
+                              <ArchiveShopifyButton
+                                className="button--secondary button--md icon-with-text"
+                                colors={btn}
                                 href={buttonHref}
                                 rel={
                                   btn.buttonLink?.target === '_blank'
@@ -579,13 +599,11 @@ export function DiabetesCareMulticolumn({
                                     : undefined
                                 }
                                 target={btn.buttonLink?.target}
+                                variant="secondary"
                               >
-                                <span className="btn-fill" data-fill />
-                                <span className="btn-text">
-                                  {buttonLabel}
-                                  <IconArrowRight />
-                                </span>
-                              </a>
+                                {buttonLabel}
+                                <IconArrowRight />
+                              </ArchiveShopifyButton>
                             </p>
                           ) : null}
                         </div>

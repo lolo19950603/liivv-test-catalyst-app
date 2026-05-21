@@ -9,6 +9,7 @@ import {
 } from '@makeswift/runtime/controls';
 
 import {
+  buttonColorFields,
   fontSizeFields,
   headingPopoverControls,
   sectionBackgroundControls,
@@ -16,6 +17,7 @@ import {
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
+import { ARCHIVE_BUTTON_SECONDARY_ON_SAGE } from '~/lib/makeswift/utils/archive-button-presets';
 import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import { searchProducts } from '../../utils/search-products';
 
@@ -85,6 +87,7 @@ runtime.registerComponent(DiabetesCareFloatingProductBundle, {
           label: 'Add to cart button label',
           defaultValue: 'Add to cart',
         }),
+        ...buttonColorFields(ARCHIVE_BUTTON_SECONDARY_ON_SAGE),
       },
     }),
   },

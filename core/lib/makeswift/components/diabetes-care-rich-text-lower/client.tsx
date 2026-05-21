@@ -3,11 +3,14 @@
 import { clsx } from 'clsx';
 import type { CSSProperties } from 'react';
 
+import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
+import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import {
   AccentSplitWordsHeading,
   ScrollReveal,
   SplitWordsHeading,
 } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
 import { ARCHIVE_SAGE_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
 import {
@@ -89,7 +92,7 @@ export type RichTextLowerBodyProps = BodyTextProps & {
   fontSizeMobile?: number;
 };
 
-export type RichTextLowerButtonProps = {
+export type RichTextLowerButtonProps = ButtonColorProps & {
   label?: string;
   link?: { href?: string; target?: string };
 };
@@ -271,11 +274,11 @@ export function DiabetesCareRichTextLower({
   const line2Style = headingLineStyle(line2);
 
   return (
-    <div className={clsx('diabetes-care-rich-text-lower max-w-full overflow-x-hidden', className)}>
+    <div className={clsx('diabetes-care-rich-text-lower', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}>
       <div className="shopify-section" id={RICH_TEXT_LOWER_SECTION_ID} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding">
-          <div className="page-width page-width--narrow relative">
+          <div className="page-width page-width--narrow relative px-4 sm:px-5 md:px-0">
             <div className="rich-text z-1 relative text-left md:text-left">
               {showSupportIcon ? (
                 <div className="leading-none">
@@ -320,18 +323,16 @@ export function DiabetesCareRichTextLower({
                   />
                 ) : null}
                 {hasCta ? (
-                  <a
-                    className="button button--primary button--lg icon-with-text w-fit"
+                  <ArchiveShopifyButton
+                    className="button--primary button--lg icon-with-text w-fit"
+                    colors={button}
                     href={href}
                     rel={cta.link?.target === '_blank' ? 'noopener noreferrer' : undefined}
                     target={cta.link?.target}
                   >
-                    <span className="btn-fill" data-fill />
-                    <span className="btn-text">
-                      {cta.label}
-                      <IconArrowRight />
-                    </span>
-                  </a>
+                    {cta.label}
+                    <IconArrowRight />
+                  </ArchiveShopifyButton>
                 ) : null}
               </ScrollReveal>
             </div>

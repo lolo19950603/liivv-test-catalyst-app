@@ -1,6 +1,10 @@
 import { clsx } from 'clsx';
 import { useId, type CSSProperties, type ReactNode } from 'react';
 
+import {
+  DC_MOBILE_STACK_CLASS,
+  DC_SECTION_ROOT_CLASS,
+} from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import { ARCHIVE_BLOG_COLLAGE_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import {
@@ -238,7 +242,7 @@ function renderArticleCard(
         {hasImage ? (
           <a
             aria-label={title}
-            className="article-card__link relative block media media--square"
+            className="article-card__link relative block media media--square mobile:media--wide"
             href={href}
             rel={linkTarget === '_blank' ? 'noopener noreferrer' : undefined}
             tabIndex={-1}
@@ -326,12 +330,12 @@ export function DiabetesCareBlogPostsCollage({
   const sideColumnPosts = collagePosts.slice(1, MAX_COLLAGE_POSTS);
 
   return (
-    <div className={clsx('diabetes-care-blog-posts-collage', className)}>
+    <div className={clsx('diabetes-care-blog-posts-collage', DC_SECTION_ROOT_CLASS, className)}>
       <div className="shopify-section" id={sectionDomId} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <style dangerouslySetInnerHTML={{ __html: BLOG_POSTS_COLLAGE_ARCHIVE_CSS }} />
         <div className="section section--padding section--rounded relative">
-          <div className="page-width relative">
+          <div className="page-width relative px-4 sm:px-5 md:px-0">
             <div className="title-wrapper relative z-1 flex flex-col gap-4 text-left leading-none lg:gap-8 md:flex-row md:items-end md:justify-between">
               <div className="grid gap-4">
                 <h2 className="heading title-md" style={headingStyle}>
@@ -348,8 +352,13 @@ export function DiabetesCareBlogPostsCollage({
                 </h2>
               </div>
             </div>
-            <ScrollReveal className="grid slider" delayMs={100}>
-              <div className="blog-grid blog-collage with-only3 card-grid mobile:card-grid--1 grid">
+            <ScrollReveal className={clsx('grid slider', DC_MOBILE_STACK_CLASS)} delayMs={100}>
+              <div
+                className={clsx(
+                  'blog-grid blog-collage with-only3 card-grid mobile:card-grid--1 grid',
+                  DC_MOBILE_STACK_CLASS,
+                )}
+              >
                 {featured != null
                   ? renderArticleCard(featured, {
                       key: 'featured',

@@ -2,6 +2,7 @@
 
 import { clsx } from 'clsx';
 
+import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import {
   buildSectionTheme,
@@ -475,11 +476,11 @@ export function DiabetesCareLogoList({
   );
 
   return (
-    <div className={clsx('diabetes-care-logo-list', className)}>
+    <div className={clsx('diabetes-care-logo-list', DC_SECTION_ROOT_CLASS, className)}>
       <div className="shopify-section" id={sectionDomId} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--divider section--rounded section--padding relative">
-          <div className="page-width relative">
+          <div className="page-width relative px-4 sm:px-5 md:px-0">
             <div className="title-wrapper relative z-1 flex flex-col gap-4 text-center leading-none lg:gap-8 md:items-center md:justify-between">
               <div className="grid gap-4">
                 <h2 className="heading title-md" style={headingStyle}>

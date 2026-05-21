@@ -3,7 +3,10 @@
 import { clsx } from 'clsx';
 import type { CSSProperties } from 'react';
 
+import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
+import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
 import {
   buildSectionTheme,
   resolveBodyTextColor,
@@ -104,7 +107,7 @@ export type DiabetesCareImageTextOverlayProps = {
   headingLine1?: HeadingTypographyProps;
   headingLine2?: ImageTextOverlayHeadingProps;
   body?: ImageTextOverlayBodyProps;
-  button?: {
+  button?: ButtonColorProps & {
     label?: string;
     link?: { href?: string; target?: string };
   };
@@ -425,7 +428,7 @@ export function DiabetesCareImageTextOverlay({
 
   return (
     <div
-      className={clsx('diabetes-care-image-text-overlay max-w-full overflow-x-hidden', className)}
+      className={clsx('diabetes-care-image-text-overlay', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}
     >
       <div className="shopify-section" id={IMAGE_TEXT_OVERLAY_SECTION_ID} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
@@ -451,7 +454,7 @@ export function DiabetesCareImageTextOverlay({
               </div>
               <span className="banner__overlay pointer-events-none absolute left-0 top-0 h-full w-full" />
               <div className="banner__content z-1 absolute left-0 top-0 h-full w-full overflow-hidden">
-                <div className="page-width flex h-full w-full items-end justify-start md:items-center md:justify-center">
+                <div className="page-width flex h-full w-full items-end justify-start px-4 sm:px-5 md:items-center md:justify-center md:px-0">
                   <div className="banner__box banner__box--small pb-10 pt-[min(35vh,12rem)] text-left md:py-0 md:text-center">
                     <h2 className="banner__title heading title-lg tracking-heading leading-none text-white">
                       {showLine2 ? (
@@ -489,18 +492,16 @@ export function DiabetesCareImageTextOverlay({
                       />
                     ) : null}
                     {hasBtn ? (
-                      <a
-                        className="button button--primary button--fixed button--md icon-with-text mt-6"
+                      <ArchiveShopifyButton
+                        className="button--primary button--fixed button--md icon-with-text mt-6"
+                        colors={button}
                         href={btnHref}
                         rel={button?.link?.target === '_blank' ? 'noopener noreferrer' : undefined}
                         target={button?.link?.target}
                       >
-                        <span className="btn-fill" data-fill />
-                        <span className="btn-text">
-                          {btn}
-                          <IconArrowRight />
-                        </span>
-                      </a>
+                        {btn}
+                        <IconArrowRight />
+                      </ArchiveShopifyButton>
                     ) : null}
                   </div>
                 </div>
@@ -515,7 +516,7 @@ export function DiabetesCareImageTextOverlay({
             delayMs={120}
             style={{ zIndex: 3 }}
           >
-            <div className="page-width relative">
+            <div className="page-width relative px-4 sm:px-5 md:px-0">
               <div
                 className={clsx(
                   'text-with-icons with-background z-1 relative block lg:grid',

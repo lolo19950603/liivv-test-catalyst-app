@@ -10,11 +10,13 @@ import {
 } from '@makeswift/runtime/controls';
 
 import {
+  buttonColorFields,
   fontSizeFields,
   nestedSplitHeadingPopoverControls,
   sectionBackgroundControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
+import { ARCHIVE_BUTTON_PRIMARY_WHITE_ON_BANNER } from '~/lib/makeswift/utils/archive-button-presets';
 import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 
@@ -59,6 +61,7 @@ runtime.registerComponent(DiabetesCareImageTextOverlay, {
       props: {
         label: TextInput({ label: 'Button label', defaultValue: 'Reach Out' }),
         link: Link({ label: 'Button link' }),
+        ...buttonColorFields(ARCHIVE_BUTTON_PRIMARY_WHITE_ON_BANNER),
       },
     }),
     features: List({

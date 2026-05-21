@@ -1,6 +1,7 @@
 import { Group, Image, Link, List, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
 import {
+  buttonColorFields,
   fontSizeFields,
   highlightSwashFields,
   sectionBackgroundControls,
@@ -9,6 +10,7 @@ import {
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
+import { ARCHIVE_BUTTON_PRIMARY_DARK } from '~/lib/makeswift/utils/archive-button-presets';
 import { ARCHIVE_HIGHLIGHT_SWASH_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
 import { DiabetesCareTimeline } from './client';
@@ -98,6 +100,7 @@ runtime.registerComponent(DiabetesCareTimeline, {
             props: {
               buttonText: TextInput({ label: 'Button text', defaultValue: 'Get Started' }),
               buttonLink: Link({ label: 'Button link' }),
+              ...buttonColorFields(ARCHIVE_BUTTON_PRIMARY_DARK),
             },
           }),
           image: Group({

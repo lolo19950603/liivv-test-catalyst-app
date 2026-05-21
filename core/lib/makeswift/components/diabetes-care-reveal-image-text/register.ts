@@ -1,6 +1,7 @@
 import { Group, Image, Link, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
 import {
+  buttonColorFields,
   fontSizeFields,
   sectionBackgroundControls,
   splitHeadingPopoverControls,
@@ -8,6 +9,10 @@ import {
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
+import {
+  ARCHIVE_BUTTON_PRIMARY_SAGE,
+  ARCHIVE_BUTTON_SECONDARY_ON_WHITE,
+} from '~/lib/makeswift/utils/archive-button-presets';
 import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
 import { DiabetesCareRevealImageWithText } from './client';
@@ -76,6 +81,16 @@ runtime.registerComponent(DiabetesCareRevealImageWithText, {
           defaultValue: 'Find Support',
         }),
         secondaryLink: Link({ label: 'Secondary button link' }),
+        primaryColors: Group({
+          label: 'Primary button colors',
+          preferredLayout: Group.Layout.Popover,
+          props: buttonColorFields(ARCHIVE_BUTTON_PRIMARY_SAGE),
+        }),
+        secondaryColors: Group({
+          label: 'Secondary button colors',
+          preferredLayout: Group.Layout.Popover,
+          props: buttonColorFields(ARCHIVE_BUTTON_SECONDARY_ON_WHITE),
+        }),
       },
     }),
   },

@@ -43,6 +43,56 @@ export function textColorFields(defaultHsl = '0 2% 19%') {
   };
 }
 
+export type ButtonColorFieldDefaults = {
+  backgroundHsl?: string;
+  textHsl?: string;
+  hoverBackgroundHsl?: string;
+  hoverTextHsl?: string;
+};
+
+/** Archive Shopify `.button` colors (resting + hover text/fill). */
+export function buttonColorFields(defaults?: ButtonColorFieldDefaults) {
+  return {
+    backgroundColor: Color({
+      label: 'Background color',
+      defaultValue: hsl(defaults?.backgroundHsl ?? '0 0% 100%'),
+    }),
+    backgroundColorHex: TextInput({
+      label: 'Background color (hex override)',
+      defaultValue: '',
+      description: HEX_OVERRIDE_DESCRIPTION,
+    }),
+    textColor: Color({
+      label: 'Text color',
+      defaultValue: hsl(defaults?.textHsl ?? '0 2% 19%'),
+    }),
+    textColorHex: TextInput({
+      label: 'Text color (hex override)',
+      defaultValue: '',
+      description: HEX_OVERRIDE_DESCRIPTION,
+    }),
+    hoverBackgroundColor: Color({
+      label: 'Hover background color',
+      defaultValue: hsl(defaults?.hoverBackgroundHsl ?? defaults?.backgroundHsl ?? '0 0% 100%'),
+      description: 'Primary: hover fill swatch. Secondary: hover fill behind text.',
+    }),
+    hoverBackgroundColorHex: TextInput({
+      label: 'Hover background color (hex override)',
+      defaultValue: '',
+      description: HEX_OVERRIDE_DESCRIPTION,
+    }),
+    hoverTextColor: Color({
+      label: 'Hover text color',
+      defaultValue: hsl(defaults?.hoverTextHsl ?? defaults?.textHsl ?? '0 2% 19%'),
+    }),
+    hoverTextColorHex: TextInput({
+      label: 'Hover text color (hex override)',
+      defaultValue: '',
+      description: HEX_OVERRIDE_DESCRIPTION,
+    }),
+  };
+}
+
 export function fontSizeFields() {
   return {
     fontSize: Number({

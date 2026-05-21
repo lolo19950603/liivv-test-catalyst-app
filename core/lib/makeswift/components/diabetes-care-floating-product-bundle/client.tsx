@@ -8,7 +8,13 @@ import {
   DiabetesCareCatalogProductCard,
 } from '../diabetes-care-featured-collections/catalog-product-card';
 
+import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
+import {
+  DC_MOBILE_CAROUSEL_CLASS,
+  DC_SECTION_ROOT_CLASS,
+} from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
 import { ARCHIVE_SAGE_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import {
   buildSectionTheme,
@@ -52,7 +58,7 @@ export interface DiabetesCareFloatingProductBundleProps {
   heading?: HeadingWithHighlightProps;
   body?: FloatingProductBundleBodyProps;
   products?: DiabetesCareFloatingProductBundleProduct[];
-  buttons?: { addToCartLabel?: string };
+  buttons?: ButtonColorProps & { addToCartLabel?: string };
   /** @deprecated Use `body` text color fields. */
   bodyText?: BodyTextProps;
 }
@@ -140,6 +146,7 @@ function bundleProductSlots(products?: DiabetesCareFloatingProductBundleProduct[
 function productGridClassName(count: number) {
   return clsx(
     'product-grid swipe-on-mobile card-grid mobile:card-grid--1 grid justify-center',
+    DC_MOBILE_CAROUSEL_CLASS,
     count === 1 && 'bfb-products--1',
     count === 2 && 'bfb-products--2',
     count >= 3 && 'card-grid--3',
@@ -187,7 +194,7 @@ export function DiabetesCareFloatingProductBundle({
 
   const bannerPicture: ReactNode =
     showBannerImage ? (
-      <picture className="media media--height relative block h-full w-full overflow-hidden">
+      <picture className="media media--height mobile:media--wide relative block h-full w-full overflow-hidden">
         <img
           alt=""
           className="h-full w-full object-cover object-center"
@@ -203,7 +210,9 @@ export function DiabetesCareFloatingProductBundle({
   return (
     <div
       className={clsx(
-        'diabetes-care-floating-product-bundle max-w-full overflow-x-hidden',
+        'diabetes-care-floating-product-bundle',
+        DC_SECTION_ROOT_CLASS,
+        'max-w-full',
         className,
       )}
     >
@@ -228,7 +237,7 @@ export function DiabetesCareFloatingProductBundle({
               <span className="banner__overlay pointer-events-none absolute left-0 top-0 hidden h-full w-full lg:block" />
 
               <div className="banner__content z-1 absolute left-0 top-0 h-full w-full overflow-hidden">
-                <div className="page-width h-full w-full lg:flex lg:items-center">
+                <div className="page-width h-full w-full px-4 sm:px-5 lg:flex lg:items-center md:px-0">
                   <div className="compact-product-bundle-wrapper flex w-full flex-col gap-6 lg:grid lg:gap-10">
                     <div className="card product-card product-card--promo relative block overflow-hidden leading-none">
                       {bannerPicture != null ? (
@@ -273,19 +282,21 @@ export function DiabetesCareFloatingProductBundle({
 
                       {slots.length > 0 ? (
                         <div className="flex flex-col gap-4">
-                          <button
-                            className="button button--secondary w-full"
+                          <ArchiveShopifyButton
+                            as="button"
+                            className="button--secondary w-full"
+                            colors={buttons}
                             data-product-bundle-submit=""
                             type="button"
+                            variant="secondary"
                           >
-                            <span className="btn-fill" data-fill />
-                            <span className="btn-text">{cartLabel}</span>
+                            {cartLabel}
                             <span className="btn-loader">
                               <span />
                               <span />
                               <span />
                             </span>
-                          </button>
+                          </ArchiveShopifyButton>
                         </div>
                       ) : null}
                     </ScrollReveal>

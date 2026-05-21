@@ -1,6 +1,7 @@
 import { clsx } from 'clsx';
 import type { CSSProperties } from 'react';
 
+import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import { resolveArchiveHighlightChannels } from '~/lib/makeswift/utils/archive-color';
 import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
@@ -137,7 +138,7 @@ export function DiabetesCareCustomBand({
   };
 
   return (
-    <div className={clsx('diabetes-care-custom-band max-w-full overflow-x-hidden', className)}>
+    <div className={clsx('diabetes-care-custom-band', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}>
       <div
         className="shopify-section custom-section"
         id={CUSTOM_SECTION_ID}

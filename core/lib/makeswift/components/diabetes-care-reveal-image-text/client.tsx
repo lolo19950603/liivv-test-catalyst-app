@@ -1,12 +1,15 @@
 import { clsx } from 'clsx';
 import { useId, type CSSProperties } from 'react';
 
+import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
+import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import {
   AccentSplitWordsHeading,
   ScrollReveal,
   SplittingBanner,
   SplitWordsHeading,
 } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
 import {
   buildSectionTheme,
   resolveBodyTextColor,
@@ -68,8 +71,10 @@ export type DiabetesCareRevealImageTextProps = {
   buttons?: {
     primaryText?: string;
     primaryLink?: { href?: string; target?: string };
+    primaryColors?: ButtonColorProps;
     secondaryText?: string;
     secondaryLink?: { href?: string; target?: string };
+    secondaryColors?: ButtonColorProps;
   };
 };
 
@@ -156,7 +161,7 @@ export function DiabetesCareRevealImageWithText({
 
   return (
     <div
-      className={clsx('diabetes-care-reveal-image-text', className)}
+      className={clsx('diabetes-care-reveal-image-text', DC_SECTION_ROOT_CLASS, className)}
       id={rootId}
       style={rootThemeStyle}
     >
@@ -167,9 +172,9 @@ export function DiabetesCareRevealImageWithText({
             <SplittingBanner className="splitting-banner reveal-banner relative inline">
               <span className="reveal-banner__tracker absolute top-0 h-full" />
               <div className="reveal-banner__scroller sticky top-0 overflow-hidden">
-                <div className="banner relative h-screen w-full">
+                <div className="banner relative h-[min(70dvh,520px)] w-full md:h-screen">
                   <div className="banner__content left-0 h-full w-full overflow-hidden">
-                    <div className="page-width flex h-full w-full items-center justify-center">
+                    <div className="page-width flex h-full w-full items-center justify-center px-4 sm:px-5 md:px-0">
                       <div className="banner__box banner__box--large text-center">
                         <div className="splitting-wrapper relative">
                           <h2
@@ -187,11 +192,11 @@ export function DiabetesCareRevealImageWithText({
             </SplittingBanner>
             <ScrollReveal className="section--padding relative w-full" delayMs={80}>
               {imageSrc.length > 0 ? (
-                <div className="page-width page-width--narrow relative mx-auto w-full">
-                  <picture className="media media--adapt media--transparent relative flex w-full justify-center overflow-hidden rounded-3xl">
+                <div className="page-width page-width--narrow relative mx-auto w-full px-4 sm:px-5 md:px-0">
+                  <picture className="media media--portrait mobile:media--wide media--transparent relative flex w-full justify-center overflow-hidden rounded-3xl">
                     <img
                       alt={imageAlt}
-                      className="aspect-adapt w-full max-w-full object-cover"
+                      className="aspect-[4/5] w-full max-w-full object-cover md:aspect-adapt"
                       height={900}
                       loading="lazy"
                       sizes="(max-width: 768px) 100vw, min(720px, 90vw)"
@@ -208,7 +213,7 @@ export function DiabetesCareRevealImageWithText({
 
       <div className="shopify-section" id={richSectionId}>
         <div className="section section--padding">
-          <div className="page-width page-width--narrow relative">
+          <div className="page-width page-width--narrow relative px-4 sm:px-5 md:px-0">
             <div className="rich-text relative z-1 text-center md:text-center">
               <h2 className="heading title-md leading-none">
                 <AccentSplitWordsHeading
@@ -231,8 +236,9 @@ export function DiabetesCareRevealImageWithText({
                 {primaryLabel.length > 0 || secondaryLabel.length > 0 ? (
                   <div className="mt-6 flex flex-wrap justify-center gap-4">
                     {primaryLabel.length > 0 ? (
-                      <a
-                        className="button button--primary button--md icon-with-text"
+                      <ArchiveShopifyButton
+                        className="button--primary button--md icon-with-text"
+                        colors={buttons?.primaryColors}
                         href={primaryHref}
                         rel={
                           buttons?.primaryLink?.target === '_blank'
@@ -241,16 +247,14 @@ export function DiabetesCareRevealImageWithText({
                         }
                         target={buttons?.primaryLink?.target}
                       >
-                        <span className="btn-fill" data-fill />
-                        <span className="btn-text">
-                          {primaryLabel}
-                          <IconArrowRight />
-                        </span>
-                      </a>
+                        {primaryLabel}
+                        <IconArrowRight />
+                      </ArchiveShopifyButton>
                     ) : null}
                     {secondaryLabel.length > 0 ? (
-                      <a
-                        className="button button--secondary button--md icon-with-text"
+                      <ArchiveShopifyButton
+                        className="button--secondary button--md icon-with-text"
+                        colors={buttons?.secondaryColors}
                         href={secondaryHref}
                         rel={
                           buttons?.secondaryLink?.target === '_blank'
@@ -258,13 +262,11 @@ export function DiabetesCareRevealImageWithText({
                             : undefined
                         }
                         target={buttons?.secondaryLink?.target}
+                        variant="secondary"
                       >
-                        <span className="btn-fill" data-fill />
-                        <span className="btn-text">
-                          {secondaryLabel}
-                          <IconArrowRight />
-                        </span>
-                      </a>
+                        {secondaryLabel}
+                        <IconArrowRight />
+                      </ArchiveShopifyButton>
                     ) : null}
                   </div>
                 ) : null}

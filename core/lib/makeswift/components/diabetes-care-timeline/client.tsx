@@ -4,8 +4,14 @@ import { clsx } from 'clsx';
 import type { CSSProperties } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
+import {
+  DC_MOBILE_CAROUSEL_CLASS,
+  DC_SECTION_ROOT_CLASS,
+} from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { ArchiveHighlightedText } from '~/lib/makeswift/components/diabetes-care-faq/archive-highlighted-text';
 import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
 import {
   buildSectionTheme,
   resolveHeadingTypography,
@@ -67,7 +73,7 @@ export interface DiabetesCareTimelineSlideContent {
 
 export interface DiabetesCareTimelineSection {
   slideContent?: DiabetesCareTimelineSlideContent;
-  button?: {
+  button?: ButtonColorProps & {
     buttonText?: string;
     buttonLink?: { href?: string; target?: string };
   };
@@ -243,20 +249,18 @@ function TimelineSlide({ section, index, isSelected, setSlideEl }: TimelineSlide
           ) : null}
 
           <p>
-            <a
-              className="button button--primary button--md icon-with-text"
+            <ArchiveShopifyButton
+              className="button--primary button--md icon-with-text"
+              colors={section.button}
               href={buttonHref}
               rel={
                 section.button?.buttonLink?.target === '_blank' ? 'noopener noreferrer' : undefined
               }
               target={section.button?.buttonLink?.target}
             >
-              <span className="btn-fill" data-fill />
-              <span className="btn-text">
-                {buttonLabel}
-                <IconArrowRight />
-              </span>
-            </a>
+              {buttonLabel}
+              <IconArrowRight />
+            </ArchiveShopifyButton>
           </p>
         </div>
       </div>
@@ -396,11 +400,11 @@ export function DiabetesCareTimeline({
   });
 
   return (
-    <div className={clsx('diabetes-care-timeline max-w-full', className)}>
+    <div className={clsx('diabetes-care-timeline', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}>
       <div className="shopify-section" id={SHOPIFY_SECTION_ID} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding">
-          <div className="page-width relative overflow-hidden md:overflow-visible">
+          <div className="page-width relative px-4 sm:px-5 md:px-0">
             <div className="title-wrapper z-1 relative flex flex-col gap-4 text-left leading-none md:flex-row md:items-end md:justify-between lg:gap-8">
               <div className="grid gap-4">
                 <h2 className="heading title-md">
@@ -475,7 +479,10 @@ export function DiabetesCareTimeline({
                   id={SLIDER_ID}
                   role="region"
                 >
-                  <div className="timeline timeline-react-strip" ref={scrollRef}>
+                  <div
+                    className={clsx('timeline timeline-react-strip', DC_MOBILE_CAROUSEL_CLASS)}
+                    ref={scrollRef}
+                  >
                     {list.map((section, index) => (
                       <TimelineSlide
                         index={index}

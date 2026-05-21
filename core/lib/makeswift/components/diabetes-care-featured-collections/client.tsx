@@ -3,6 +3,11 @@
 import { clsx } from 'clsx';
 import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 
+import {
+  DC_CAROUSEL_HOST_CLASS,
+  DC_MOBILE_CAROUSEL_CLASS,
+  DC_SECTION_ROOT_CLASS,
+} from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import { ARCHIVE_SAGE_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import {
@@ -286,7 +291,7 @@ export function DiabetesCareFeaturedCollections({
 
   return (
     <div
-      className={clsx('diabetes-care-featured-collections max-w-full overflow-x-hidden', className)}
+      className={clsx('diabetes-care-featured-collections', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}
     >
       <div
         className="shopify-section featured-collections"
@@ -295,7 +300,7 @@ export function DiabetesCareFeaturedCollections({
       >
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding section--rounded relative">
-          <div className="page-width relative">
+          <div className="page-width relative px-4 sm:px-5 md:px-0">
             <div className="title-wrapper z-1 relative flex flex-col gap-4 text-left leading-none md:flex-row md:items-end md:justify-between lg:gap-8">
               <div className="grid gap-4">
                 <p
@@ -434,7 +439,7 @@ export function DiabetesCareFeaturedCollections({
                   role="tabpanel"
                 >
                   <div
-                    className="slider slider--desktop slider--tablet grid"
+                    className={clsx('slider slider--desktop slider--tablet grid', DC_CAROUSEL_HOST_CLASS)}
                     id={
                       index === clampedIndex
                         ? sliderDomId
@@ -442,7 +447,13 @@ export function DiabetesCareFeaturedCollections({
                     }
                     tabIndex={0}
                   >
-                    <div className="product-grid card-grid card-grid--4 mobile:card-grid--1 initialized grid max-w-full overflow-x-auto scroll-smooth">
+                    <div
+                      className={clsx(
+                        'product-grid card-grid card-grid--4 mobile:card-grid--1 initialized grid max-w-full',
+                        DC_MOBILE_CAROUSEL_CLASS,
+                        'lg:overflow-x-auto lg:scroll-smooth',
+                      )}
+                    >
                       {rows.length === 0 ? (
                         <p className="subtext-md col-span-full py-8 text-center text-contrast-500">
                           Search and add catalog products for this tab in Makeswift.

@@ -3,6 +3,7 @@
 import { clsx } from 'clsx';
 import { useEffect, useState, type ComponentPropsWithoutRef, type RefObject } from 'react';
 
+import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import {
   ScrollReveal,
   SplitWordsHeading,
@@ -128,7 +129,8 @@ export function DiabetesCareVideoHero({
   return (
     <div
       className={clsx(
-        'diabetes-care-video-hero shopify-section w-full min-w-0 max-w-full overflow-x-hidden',
+        'diabetes-care-video-hero shopify-section w-full min-w-0 max-w-full',
+        DC_SECTION_ROOT_CLASS,
         '[--color-foreground:255_255_255] [--color-overlay:23_23_23] [--overlay-opacity:0.7]',
         className,
       )}
@@ -143,7 +145,7 @@ export function DiabetesCareVideoHero({
           <div
             ref={mediaRef as RefObject<HTMLDivElement>}
             className={clsx(
-              'relative mx-auto w-full max-w-full overflow-hidden bg-black [aspect-ratio:1.775/1]',
+              'dc-video-hero-media relative mx-auto w-full max-w-full overflow-hidden bg-black [aspect-ratio:16/9] md:[aspect-ratio:1.775/1]',
               mediaAnimated && 'dc-animated',
             )}
             {...(clientReady ? { 'data-animate': 'zoom-out' as const } : {})}

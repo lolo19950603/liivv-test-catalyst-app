@@ -1,6 +1,7 @@
 import { Group, Image, Link, List, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
 import {
+  buttonColorFields,
   fontSizeFields,
   highlightSwashFields,
   sectionBackgroundControls,
@@ -9,6 +10,7 @@ import {
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
+import { ARCHIVE_BUTTON_PRIMARY_WHITE_ON_TINT } from '~/lib/makeswift/utils/archive-button-presets';
 import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
 import { DiabetesCareMulticolumn } from './client';
@@ -109,6 +111,7 @@ runtime.registerComponent(DiabetesCareMulticolumn, {
             props: {
               buttonText: TextInput({ label: 'Button text', defaultValue: '' }),
               buttonLink: Link({ label: 'Button link' }),
+              ...buttonColorFields(ARCHIVE_BUTTON_PRIMARY_WHITE_ON_TINT),
             },
           }),
         },

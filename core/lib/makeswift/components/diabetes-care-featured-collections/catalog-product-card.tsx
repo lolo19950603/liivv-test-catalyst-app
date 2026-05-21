@@ -152,7 +152,7 @@ export function DiabetesCareCatalogProductCard({ entityId }: { entityId?: unknow
         {imgRaw.length > 0 ? (
           <a
             aria-hidden
-            className="media media--square relative block aspect-square overflow-hidden"
+            className="media media--square mobile:media--wide relative block aspect-square overflow-hidden md:aspect-square"
             href={safeHref}
             tabIndex={-1}
           >

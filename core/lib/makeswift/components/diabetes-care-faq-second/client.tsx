@@ -3,6 +3,7 @@
 import { clsx } from 'clsx';
 import { useMemo } from 'react';
 
+import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import { ARCHIVE_SAGE_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import {
@@ -71,11 +72,11 @@ export function DiabetesCareFaqSecond({
   }, [rows]);
 
   return (
-    <div className={clsx('diabetes-care-faq-second max-w-full overflow-x-hidden', className)}>
+    <div className={clsx('diabetes-care-faq-second', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}>
       <div className="shopify-section" id={FAQ_SECOND_SECTION_ID} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding section--plain">
-          <div className="page-width relative">
+          <div className="page-width relative px-4 sm:px-5 md:px-0">
             <div className="faqs with-background z-1 relative flex flex-col lg:flex-row">
               <div className="grid grow gap-8 md:gap-12">
                 <div className="grid gap-4 text-left md:flex-row md:items-end">

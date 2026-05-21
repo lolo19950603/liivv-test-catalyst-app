@@ -1,6 +1,7 @@
 import { Checkbox, Group, Link, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
 import {
+  buttonColorFields,
   fontSizeFields,
   sectionBackgroundControls,
   textColorFields,
@@ -8,6 +9,7 @@ import {
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
+import { ARCHIVE_BUTTON_PRIMARY_DARK } from '~/lib/makeswift/utils/archive-button-presets';
 import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
 import { DiabetesCareRichTextLower } from './client';
@@ -48,6 +50,7 @@ runtime.registerComponent(DiabetesCareRichTextLower, {
           defaultValue: 'Book a virtual appointment',
         }),
         link: Link({ label: 'Button link' }),
+        ...buttonColorFields(ARCHIVE_BUTTON_PRIMARY_DARK),
       },
     }),
     showSupportIcon: Checkbox({ label: 'Show support icon above heading', defaultValue: true }),

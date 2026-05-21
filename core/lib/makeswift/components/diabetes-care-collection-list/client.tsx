@@ -3,6 +3,11 @@
 import { clsx } from 'clsx';
 import { type CSSProperties, type KeyboardEventHandler, useId, useRef } from 'react';
 
+import {
+  DC_CAROUSEL_HOST_CLASS,
+  DC_MOBILE_CAROUSEL_CLASS,
+  DC_SECTION_ROOT_CLASS,
+} from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import {
   isHighlightOverrideEnabled,
@@ -302,11 +307,11 @@ export function DiabetesCareCollectionList({
   const sliderDomId = `dcl-carousel-${reactId}`;
 
   return (
-    <div className={clsx('diabetes-care-collection-list max-w-full overflow-x-hidden', className)}>
+    <div className={clsx('diabetes-care-collection-list', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}>
       <div className="shopify-section" id={COLLECTION_LIST_SECTION_ID} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding">
-          <div className="page-width relative">
+          <div className="page-width relative px-4 sm:px-5 md:px-0">
             <div className="title-wrapper z-1 relative flex flex-col gap-4 text-left md:flex-row md:items-end md:justify-between lg:gap-8">
               <div className="grid gap-4 leading-none">
                 <h2 className="heading title-md leading-none">
@@ -375,7 +380,10 @@ export function DiabetesCareCollectionList({
 
             <div
               aria-label="Collection carousel"
-              className="slider slider--desktop slider--tablet mt-10 grid lg:mt-14"
+              className={clsx(
+                'slider slider--desktop slider--tablet mt-10 grid lg:mt-14',
+                DC_CAROUSEL_HOST_CLASS,
+              )}
               id={sliderDomId}
               onKeyDown={list.length > 0 ? onKeyNav : undefined}
               role="region"
@@ -385,8 +393,10 @@ export function DiabetesCareCollectionList({
                 <div
                   className={clsx(
                     'motion-list initialized card-grid grid max-w-full',
-                    'mobile:card-grid--1 gap-8 overflow-x-auto overscroll-contain scroll-smooth [scrollbar-width:none] lg:gap-12 [&::-webkit-scrollbar]:hidden',
-                    'card-grid--4 [--card-grid-template:auto/auto-flow_minmax(0,288px)]',
+                    'mobile:card-grid--1 gap-8 lg:gap-12',
+                    'card-grid--4',
+                    DC_MOBILE_CAROUSEL_CLASS,
+                    'lg:[--card-grid-template:auto/auto-flow_minmax(0,288px)] lg:overflow-x-auto lg:overscroll-contain lg:scroll-smooth lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden',
                   )}
                   ref={scrollerRef}
                 >
@@ -416,10 +426,10 @@ export function DiabetesCareCollectionList({
                             rel={c.cardLink?.target === '_blank' ? 'noopener noreferrer' : undefined}
                             target={c.cardLink?.target}
                           >
-                            <div className="media media--wide relative overflow-hidden">
+                            <div className="media media--wide mobile:media--wide relative overflow-hidden">
                               <img
                                 alt={c.imageAlt?.trim() ?? cardTitle}
-                                className="aspect-[4/3] w-full object-cover"
+                                className="aspect-[4/3] w-full object-cover md:aspect-[4/3]"
                                 decoding="async"
                                 height={800}
                                 loading="lazy"

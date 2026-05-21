@@ -4,6 +4,10 @@ import { clsx } from 'clsx';
 import type { CSSProperties } from 'react';
 
 import {
+  DC_MOBILE_STACK_CLASS,
+  DC_SECTION_ROOT_CLASS,
+} from '~/lib/makeswift/diabetes-care-mobile-classes';
+import {
   AnimatedNumberCounter,
   ScrollReveal,
 } from '~/lib/makeswift/diabetes-care-scroll-animate';
@@ -200,7 +204,10 @@ export function DiabetesCareNumberCounters({
   const useThemeColumnsOnly = rows.length === 3 || rows.length === 4;
 
   const grid = (
-    <slider-element className="slider slider--tablet grid" selector=".card-grid>.card">
+    <slider-element
+      className={clsx('slider slider--tablet grid', DC_MOBILE_STACK_CLASS)}
+      selector=".card-grid>.card"
+    >
       <div
         className={clsx(
           'multicolumn card-grid mobile:card-grid--1 z-1 relative grid',
@@ -246,11 +253,13 @@ export function DiabetesCareNumberCounters({
   );
 
   return (
-    <div className={clsx('diabetes-care-number-counters max-w-full overflow-x-clip', className)}>
+    <div
+      className={clsx('diabetes-care-number-counters', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}
+    >
       <div className="shopify-section" id={NUMBER_COUNTER_SECTION_ID} style={sectionVars}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding section--rounded relative">
-          <div className="page-width page-width--full relative overflow-hidden px-4 sm:px-5 md:px-0">
+          <div className="page-width page-width--full relative px-4 sm:px-5 md:px-0">
             <ScrollReveal delayMs={80}>{grid}</ScrollReveal>
           </div>
         </div>
