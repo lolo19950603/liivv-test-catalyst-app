@@ -20,6 +20,7 @@ import { resolvePlainTextColor } from '~/lib/makeswift/utils/heading-accent-colo
 import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
 
 import {
+  IMAGE_TEXT_OVERLAY_BANNER_CSS,
   IMAGE_TEXT_OVERLAY_FEATURES_VARS,
   IMAGE_TEXT_OVERLAY_SECTION_ID,
   IMAGE_TEXT_OVERLAY_VARS,
@@ -411,7 +412,7 @@ export function DiabetesCareImageTextOverlay({
   const bodyResolved = resolveImageTextOverlayBody({ body, bodyText });
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: IMAGE_TEXT_OVERLAY_SECTION_ID,
-    sectionCss: `${IMAGE_TEXT_OVERLAY_VARS}${IMAGE_TEXT_OVERLAY_FEATURES_VARS}`,
+    sectionCss: `${IMAGE_TEXT_OVERLAY_VARS}${IMAGE_TEXT_OVERLAY_BANNER_CSS}${IMAGE_TEXT_OVERLAY_FEATURES_VARS}`,
     background,
     highlight: null,
     defaultBackgroundChannels: '0 0% 100%',
@@ -434,7 +435,7 @@ export function DiabetesCareImageTextOverlay({
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding section--rounded relative">
           <div className="relative">
-            <div className="banner media--450px mobile:media--auto relative">
+            <div className="banner media--450px dciw-banner relative">
               <div className="banner__media block h-full w-full overflow-hidden">
                 {img.length > 0 ? (
                   <picture className="media media--height relative block h-full w-full overflow-hidden">

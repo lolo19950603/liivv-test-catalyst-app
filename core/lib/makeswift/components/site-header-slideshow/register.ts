@@ -41,6 +41,13 @@ const slide = Group({
   },
 });
 
+const contentWidthOptions = [
+  { value: 'small', label: 'Small' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'large', label: 'Large' },
+  { value: 'full', label: 'Full width' },
+] as const;
+
 const mobileLayout = Group({
   label: 'Mobile layout',
   props: {
@@ -48,6 +55,11 @@ const mobileLayout = Group({
       label: 'Mobile height',
       defaultValue: 200,
       suffix: 'px',
+    }),
+    mobileContentWidth: Select({
+      label: 'Mobile content width',
+      options: [...contentWidthOptions],
+      defaultValue: 'full',
     }),
   },
 });
@@ -85,12 +97,7 @@ runtime.registerComponent(SiteHeaderSlideshow, {
     }),
     desktopContentWidth: Select({
       label: 'Desktop content width',
-      options: [
-        { value: 'small', label: 'Small' },
-        { value: 'medium', label: 'Medium' },
-        { value: 'large', label: 'Large' },
-        { value: 'full', label: 'Full width' },
-      ],
+      options: [...contentWidthOptions],
       defaultValue: 'large',
     }),
     mobileLayout,

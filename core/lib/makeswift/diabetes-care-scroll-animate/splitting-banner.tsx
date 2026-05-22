@@ -5,11 +5,14 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 import { SplittingBannerRevealContext } from './splitting-banner-reveal-context';
 
-function revealProgress(tracker: Element): number {
+const MOBILE_REVEAL_MQ = '(max-width: 1023px)';
+
+function revealProgress(tracker: Element, mobile: boolean): number {
   const { top } = tracker.getBoundingClientRect();
   const viewportHeight = window.innerHeight;
   const revealStart = viewportHeight;
-  const revealEnd = viewportHeight * 0.35;
+  /** Shorter scroll range on phone/tablet so the portrait image follows sooner. */
+  const revealEnd = viewportHeight * (mobile ? 0.5 : 0.35);
   const range = revealStart - revealEnd;
 
   if (range <= 0) {
@@ -51,9 +54,13 @@ export function SplittingBanner({
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const inEditorPreview = window.self !== window.top;
 
-    if (reducedMotion) {
+    const showImmediately = (): void => {
       wrapperEl.style.opacity = '1';
       setHeadlineRevealed(true);
+    };
+
+    if (reducedMotion) {
+      showImmediately();
 
       return;
     }
@@ -63,8 +70,9 @@ export function SplittingBanner({
     const update = (): void => {
       raf = 0;
 
-      let progress = revealProgress(tracker);
-      let revealed = progress >= 0.12;
+      const mobile = window.matchMedia(MOBILE_REVEAL_MQ).matches;
+      let progress = revealProgress(tracker, mobile);
+      let revealed = progress >= (mobile ? 0.08 : 0.12);
 
       if (inEditorPreview && progress < 0.85) {
         const scroller = root.querySelector('.reveal-banner__scroller');
@@ -75,7 +83,7 @@ export function SplittingBanner({
             Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
           const visibleRatio = rect.height > 0 ? visibleHeight / rect.height : 0;
 
-          if (visibleRatio > 0.25) {
+          if (visibleRatio > (mobile ? 0.12 : 0.25)) {
             progress = 1;
             revealed = true;
           }

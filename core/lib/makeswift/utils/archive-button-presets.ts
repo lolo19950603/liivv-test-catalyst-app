@@ -65,3 +65,14 @@ export const ARCHIVE_BUTTON_SECONDARY_ON_SAGE: ButtonColorFieldDefaults = {
   hoverBackgroundHsl: '0 0% 100%',
   hoverTextHsl: '0 2% 19%',
 };
+
+/**
+ * `.button--secondary` on dark banner image (floating product bundle).
+ * Resting label + outline use `--color-button-background` / `--color-button-border` (white).
+ */
+export const ARCHIVE_BUTTON_SECONDARY_ON_BANNER: ButtonColorFieldDefaults = {
+  backgroundHsl: '0 0% 100%',
+  textHsl: '0 2% 19%',
+  hoverBackgroundHsl: '0 0% 100%',
+  hoverTextHsl: '0 2% 19%',
+};

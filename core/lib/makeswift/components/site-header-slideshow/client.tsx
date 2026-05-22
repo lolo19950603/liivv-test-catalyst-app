@@ -33,15 +33,36 @@ export interface SiteHeaderSlideshowProps {
   desktopContentWidth?: ContentWidth;
   mobileLayout?: {
     mobileHeight?: number;
+    mobileContentWidth?: ContentWidth;
   };
 }
 
-const CONTENT_WIDTH_CLASS: Record<ContentWidth, string> = {
-  small: 'max-w-[45rem]',
-  medium: 'max-w-[64rem]',
-  large: 'max-w-[80rem]',
-  full: 'max-w-full',
+const MOBILE_CONTENT_WIDTH_CLASS: Record<ContentWidth, string> = {
+  small: 'max-md:mx-auto max-md:max-w-[45rem]',
+  medium: 'max-md:mx-auto max-md:max-w-[64rem]',
+  large: 'max-md:mx-auto max-md:max-w-[80rem]',
+  full: '',
 };
+
+const DESKTOP_CONTENT_WIDTH_CLASS: Record<ContentWidth, string> = {
+  small: 'md:mx-auto md:max-w-[45rem]',
+  medium: 'md:mx-auto md:max-w-[64rem]',
+  large: 'md:mx-auto md:max-w-[80rem]',
+  full: '',
+};
+
+function parseContentWidth(value: ContentWidth | undefined, fallback: ContentWidth): ContentWidth {
+  if (
+    value === 'small' ||
+    value === 'medium' ||
+    value === 'large' ||
+    value === 'full'
+  ) {
+    return value;
+  }
+
+  return fallback;
+}
 
 function parseHeightPx(value: number | undefined, fallback: number): number {
   if (value == null || Number.isNaN(value) || value <= 0) {
@@ -88,13 +109,8 @@ export function SiteHeaderSlideshow({
   const validSlides = slides.map(normalizeSlide).filter((slide): slide is SiteHeaderSlideshowSlide => slide != null);
   const desktopPx = parseHeightPx(desktopHeight, 450);
   const mobilePx = parseHeightPx(mobileLayout?.mobileHeight, 200);
-  const widthKey: ContentWidth =
-    desktopContentWidth === 'small' ||
-    desktopContentWidth === 'medium' ||
-    desktopContentWidth === 'large' ||
-    desktopContentWidth === 'full'
-      ? desktopContentWidth
-      : 'large';
+  const desktopWidthKey = parseContentWidth(desktopContentWidth, 'large');
+  const mobileWidthKey = parseContentWidth(mobileLayout?.mobileContentWidth, 'full');
   const intervalMs = Math.max(1, interval) * 1000;
   const hasMultiple = validSlides.length > 1;
 
@@ -154,24 +170,24 @@ export function SiteHeaderSlideshow({
     </div>
   ));
 
+  const trackWidthClass = clsx(
+    MOBILE_CONTENT_WIDTH_CLASS[mobileWidthKey],
+    DESKTOP_CONTENT_WIDTH_CLASS[desktopWidthKey],
+  );
+
   return (
     <section
       className={clsx(
-        'site-header-slideshow w-full min-w-0 overflow-hidden bg-black',
+        'site-header-slideshow w-full min-w-0 overflow-hidden bg-neutral-950',
         'h-[var(--site-header-slideshow-height-mobile)] md:h-[var(--site-header-slideshow-height-desktop)]',
         className,
       )}
       style={sectionStyle}
     >
-      <div
-        className={clsx(
-          'relative mx-auto h-full w-full px-4 sm:px-5 md:px-0',
-          CONTENT_WIDTH_CLASS[widthKey],
-        )}
-      >
+      <div className={clsx('relative h-full w-full', trackWidthClass)}>
         {hasMultiple ? (
-          <div className="h-full overflow-hidden" ref={emblaRef}>
-            <div className="flex h-full">{slideTrack}</div>
+          <div className="h-full w-full overflow-hidden" ref={emblaRef}>
+            <div className="flex h-full w-full">{slideTrack}</div>
           </div>
         ) : (
           <div className="relative h-full w-full">{slideTrack[0]}</div>

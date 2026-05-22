@@ -12,6 +12,7 @@ import {
   BcProductSchema,
   useBcProductToVibesProduct,
 } from '~/lib/makeswift/utils/use-bc-product-to-vibes-product/use-bc-product-to-vibes-product';
+import { comboboxEntityIdFromMakeswift } from '~/lib/makeswift/utils/combobox-entity-id';
 
 type BcProductData = z.infer<typeof BcProductSchema>;
 
@@ -53,37 +54,16 @@ export function resolveBcProductImageUrl(url: string, width = 640): string {
   return trimmed;
 }
 
-function comboboxNestedValue(value: object): string {
-  if (!('value' in value)) {
-    return '';
-  }
+export { comboboxEntityIdFromMakeswift };
 
-  const nested = value.value;
-
-  if (typeof nested === 'string' || typeof nested === 'number') {
-    return String(nested).trim();
-  }
-
-  return '';
-}
-
-export function comboboxEntityIdFromMakeswift(value?: unknown): string {
-  if (value == null) {
-    return '';
-  }
-
-  if (typeof value === 'string' || typeof value === 'number') {
-    return String(value).trim();
-  }
-
-  if (typeof value === 'object') {
-    return comboboxNestedValue(value);
-  }
-
-  return '';
-}
-
-export function DiabetesCareCatalogProductCard({ entityId }: { entityId?: unknown }) {
+export function DiabetesCareCatalogProductCard({
+  entityId,
+  mediaOverlay,
+}: {
+  entityId?: unknown;
+  /** Carousel prev/next controls; centered on the product image. */
+  mediaOverlay?: ReactNode;
+}) {
   const id = comboboxEntityIdFromMakeswift(entityId);
   const locale = useLocale();
   const bcToVibes = useBcProductToVibesProduct();
@@ -104,7 +84,7 @@ export function DiabetesCareCatalogProductCard({ entityId }: { entityId?: unknow
   );
 
   const cardShell = (children: ReactNode) => (
-    <div className="card product-card product-card--card relative flex flex-col leading-none opacity-100 [--motion-translateY:0px] [visibility:visible]">
+    <div className="card product-card product-card--card fc-product-card relative flex flex-col leading-none opacity-100 [--motion-translateY:0px] [visibility:visible]">
       {children}
     </div>
   );
@@ -116,8 +96,8 @@ export function DiabetesCareCatalogProductCard({ entityId }: { entityId?: unknow
   if (isLoading && data == null) {
     return cardShell(
       <>
-        <div className="product-card__media relative h-auto">
-          <div className="media media--square relative block aspect-square animate-pulse overflow-hidden bg-zinc-200" />
+        <div className="product-card__media relative w-full">
+          <div className="media media--square fc-product-card-media relative block aspect-square size-full max-w-full animate-pulse overflow-hidden bg-[rgb(var(--color-base-background))]" />
         </div>
         <div className="product-card__content flex w-full grow flex-col justify-start gap-3 p-4 text-center">
           <div className="mx-auto h-4 w-[75%] max-w-[12rem] animate-pulse rounded bg-zinc-200" />
@@ -148,23 +128,36 @@ export function DiabetesCareCatalogProductCard({ entityId }: { entityId?: unknow
 
   return cardShell(
     <>
-      <div className="product-card__media relative h-auto">
+      <div className="product-card__media relative w-full">
         {imgRaw.length > 0 ? (
           <a
             aria-hidden
-            className="media media--square mobile:media--wide relative block aspect-square overflow-hidden md:aspect-square"
+            className="media media--square fc-product-card-media relative block aspect-square size-full max-w-full overflow-hidden bg-[rgb(var(--color-base-background))]"
             href={safeHref}
             tabIndex={-1}
           >
+            {mediaOverlay != null ? (
+              <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-between px-3">
+                {mediaOverlay}
+              </div>
+            ) : null}
             <Image
               alt={altText}
-              className="object-cover"
+              className="object-cover object-center"
               fill
-              sizes="(max-width: 768px) 74vw, (max-width: 1023px) 300px, 33vw"
+              sizes="(max-width: 768px) 100vw, (max-width: 1023px) 100vw, 288px"
               src={imgRaw}
             />
           </a>
-        ) : null}
+        ) : (
+          mediaOverlay != null ? (
+            <div className="media media--square fc-product-card-media relative block aspect-square size-full max-w-full overflow-hidden bg-[rgb(var(--color-base-background))]">
+              <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-between px-3">
+                {mediaOverlay}
+              </div>
+            </div>
+          ) : null
+        )}
       </div>
       <div className="product-card__content flex w-full grow flex-col justify-start text-center">
         {vendor.length > 0 ? (
@@ -186,11 +179,12 @@ export function DiabetesCareCatalogProductCard({ entityId }: { entityId?: unknow
             )}
           </div>
         ) : null}
-        <div className="product-card__details flex w-full flex-col items-baseline gap-2 lg:flex-row">
-          <p className="grow">
+        <div className="product-card__details flex w-full min-w-0 flex-col items-baseline gap-2 lg:flex-row">
+          <p className="min-w-0 grow">
             <a
-              className="product-card__title reversed-link text-base-xl font-medium leading-tight"
+              className="product-card__title fc-product-card-title reversed-link line-clamp-1 block text-base-xl font-medium leading-tight"
               href={safeHref}
+              title={title}
             >
               {title}
             </a>

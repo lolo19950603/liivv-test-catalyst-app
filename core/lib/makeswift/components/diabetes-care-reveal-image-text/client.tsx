@@ -1,5 +1,7 @@
+'use client';
+
 import { clsx } from 'clsx';
-import { useId, type CSSProperties } from 'react';
+import { useId, useState, type CSSProperties } from 'react';
 
 import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
 import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
@@ -128,9 +130,18 @@ export function DiabetesCareRevealImageWithText({
   const richSectionId = `dcrift-rich-${instance}`;
 
   /** Theme vars on the component root so reveal banner + image and rich text share background. */
+  /** Shorter scroll runway on phone/tablet; portrait uses intrinsic ratio (no 16:9 crop). */
+  const revealMobileCss =
+    `@media screen and (max-width:1023px){#${revealSectionId} .splitting-banner .reveal-banner__scroller{position:sticky!important;top:0!important;height:100lvh!important;max-height:100dvh!important;overflow:hidden!important}` +
+    `#${revealSectionId} .reveal-banner__tracker{inset-block-start:12%!important;height:72lvh!important}@supports (height:100lvh){#${revealSectionId} .reveal-banner__tracker{height:72lvh!important}}` +
+    `#${revealSectionId} .reveal-banner .banner{height:100%!important;min-height:100%!important}}` +
+    `#${revealSectionId} .dcrift-reveal-media.media--adapt{height:0;width:100%;padding-block-end:var(--ratio-percent,125%)}` +
+    `#${revealSectionId} .dcrift-reveal-media.media--adapt>img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain!important;object-position:center center}` +
+    `@media screen and (max-width:1023px){#${revealSectionId} .dcrift-reveal-media.mobile\\:media--wide>img,#${revealSectionId} .dcrift-reveal-media>img{aspect-ratio:unset!important}}`;
+
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: rootId,
-    sectionCss: `#${richSectionId}{--section-padding-top:72px;--section-padding-bottom:100px;--color-button-background:142 165 141;--color-button-border:142 165 141}`,
+    sectionCss: `#${richSectionId}{--section-padding-top:72px;--section-padding-bottom:100px;--color-button-background:142 165 141;--color-button-border:142 165 141}${revealMobileCss}`,
     background,
     highlight: useStoryAccentSwash ? secondaryHeading : null,
     defaultBackgroundChannels: '255 255 255',
@@ -142,6 +153,14 @@ export function DiabetesCareRevealImageWithText({
     bannerHeadline.text.length > 0 ? bannerHeadline.text : 'Meet Armaan...';
   const imageSrc = (bannerImage?.heroImageSrc ?? banner?.heroImageSrc)?.trim() ?? '';
   const imageAlt = (bannerImage?.heroImageAlt ?? banner?.heroImageAlt)?.trim() ?? '';
+  const imageWidth = 1200;
+  const imageHeight = 900;
+  const [imageRatioPercent, setImageRatioPercent] = useState(
+    `${String((imageHeight / imageWidth) * 100)}%`,
+  );
+  const revealMediaStyle = {
+    '--ratio-percent': imageRatioPercent,
+  } as CSSProperties;
   const lead = storyLead.text.length > 0 ? storyLead.text : 'You Are';
   const headingEmphasis = storyAccent.text.length > 0 ? storyAccent.text : 'Not Alone...';
   const bodyHtml =
@@ -172,7 +191,7 @@ export function DiabetesCareRevealImageWithText({
             <SplittingBanner className="splitting-banner reveal-banner relative inline">
               <span className="reveal-banner__tracker absolute top-0 h-full" />
               <div className="reveal-banner__scroller sticky top-0 overflow-hidden">
-                <div className="banner relative h-[min(70dvh,520px)] w-full md:h-screen">
+                <div className="banner relative h-full min-h-[100dvh] w-full md:h-screen">
                   <div className="banner__content left-0 h-full w-full overflow-hidden">
                     <div className="page-width flex h-full w-full items-center justify-center px-4 sm:px-5 md:px-0">
                       <div className="banner__box banner__box--large text-center">
@@ -189,24 +208,36 @@ export function DiabetesCareRevealImageWithText({
                   </div>
                 </div>
               </div>
+              <ScrollReveal className="section--padding relative w-full" delayMs={80}>
+                {imageSrc.length > 0 ? (
+                  <div className="page-width page-width--narrow relative mx-auto w-full px-4 sm:px-5 md:px-0">
+                    <picture
+                      className="dcrift-reveal-media media media--adapt media--transparent relative block w-full overflow-hidden rounded-3xl"
+                      style={revealMediaStyle}
+                    >
+                      <img
+                        alt={imageAlt}
+                        className="h-full w-full"
+                        height={imageHeight}
+                        loading="lazy"
+                        onLoad={(event) => {
+                          const img = event.currentTarget;
+
+                          if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                            setImageRatioPercent(
+                              `${String((img.naturalHeight / img.naturalWidth) * 100)}%`,
+                            );
+                          }
+                        }}
+                        sizes="(max-width: 768px) 100vw, min(720px, 90vw)"
+                        src={imageSrc}
+                        width={imageWidth}
+                      />
+                    </picture>
+                  </div>
+                ) : null}
+              </ScrollReveal>
             </SplittingBanner>
-            <ScrollReveal className="section--padding relative w-full" delayMs={80}>
-              {imageSrc.length > 0 ? (
-                <div className="page-width page-width--narrow relative mx-auto w-full px-4 sm:px-5 md:px-0">
-                  <picture className="media media--portrait mobile:media--wide media--transparent relative flex w-full justify-center overflow-hidden rounded-3xl">
-                    <img
-                      alt={imageAlt}
-                      className="aspect-[4/5] w-full max-w-full object-cover md:aspect-adapt"
-                      height={900}
-                      loading="lazy"
-                      sizes="(max-width: 768px) 100vw, min(720px, 90vw)"
-                      src={imageSrc}
-                      width={1200}
-                    />
-                  </picture>
-                </div>
-              ) : null}
-            </ScrollReveal>
           </div>
         </div>
       </div>

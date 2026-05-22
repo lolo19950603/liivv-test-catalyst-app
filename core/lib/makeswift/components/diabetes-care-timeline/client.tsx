@@ -5,10 +5,7 @@ import type { CSSProperties } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
-import {
-  DC_MOBILE_CAROUSEL_CLASS,
-  DC_SECTION_ROOT_CLASS,
-} from '~/lib/makeswift/diabetes-care-mobile-classes';
+import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { ArchiveHighlightedText } from '~/lib/makeswift/components/diabetes-care-faq/archive-highlighted-text';
 import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
@@ -42,7 +39,25 @@ function timelineSectionCss(blockCount: number): string {
   const strip = `${id} .timeline-react-strip{display:flex;flex-flow:row nowrap;gap:clamp(16px,2.5vw,40px);overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-behavior:auto;-webkit-overflow-scrolling:touch;padding-block:var(--sp-2,8px);scrollbar-width:none;-ms-overflow-style:none}`;
   const stripScrollbar = `${id} .timeline-react-strip::-webkit-scrollbar{display:none;width:0;height:0}`;
 
-  return `${id}{--section-padding-top:72px;--section-padding-bottom:72px;--section-blocks-count:${String(blockCount)}}@media screen and (min-width:768px){${id} .timeline__item>.timeline-slide-layout.flex{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}}${strip}${stripScrollbar}${id} .timeline-react-strip .timeline__item{flex:0 0 min(92%,1120px);max-width:100%;width:auto;scroll-snap-align:center;transition:opacity .28s ease}${id} .timeline-react-strip .timeline__item:not(.selected){opacity:.48}${id} .timeline-react-strip .timeline__item.selected{opacity:1}@media (prefers-reduced-motion:reduce){${id} .timeline-react-strip .timeline__item{transition:none}}`;
+  const mobileDots = `@media screen and (max-width:1023px){${id} .timeline-dots--desktop{display:none}${id} .timeline-dots-mobile{display:block}${id} .scroll-area{overflow:visible;scroll-snap-type:none}${id} .scroll-area .scroll-area__inner{overflow:visible}${id} .slider.slider--tablet{overflow:visible;padding-inline:0;margin-inline:0;padding-block-end:0;scroll-snap-type:none}${id} .timeline-react-strip{overflow-x:auto!important;overflow-y:hidden;touch-action:pan-x pinch-zoom;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;scroll-padding-inline:1rem;overscroll-behavior-x:contain}}`;
+
+  return `${id}{--section-padding-top:72px;--section-padding-bottom:72px;--section-blocks-count:${String(blockCount)}}@media screen and (min-width:768px){${id} .timeline__item>.timeline-slide-layout.flex{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}}${strip}${stripScrollbar}${id} .timeline-react-strip .timeline__item{flex:0 0 min(92%,1120px);max-width:100%;width:auto;scroll-snap-align:center;transition:opacity .28s ease}${id} .timeline-react-strip .timeline__item:not(.selected){opacity:.48}${id} .timeline-react-strip .timeline__item.selected{opacity:1}@media (prefers-reduced-motion:reduce){${id} .timeline-react-strip .timeline__item{transition:none}}${mobileDots}`;
+}
+
+function timelineStepLabel(section: DiabetesCareTimelineSection, index: number): string {
+  const category = timelineCategoryLabel(section);
+
+  if (category.length > 0) {
+    return category;
+  }
+
+  const heading = section.slideContent?.sectionHeading?.text?.trim() ?? '';
+
+  if (heading.length > 0) {
+    return heading;
+  }
+
+  return `Step ${index + 1}`;
 }
 
 export type TimelineTypographyProps = {
@@ -392,6 +407,12 @@ export function DiabetesCareTimeline({
     secondaryResolved.text.length > 0 ? secondaryResolved.text : 'Simp(liivv)fied';
   const prevDisabled = count === 0 || safeIndex === 0;
   const nextDisabled = count === 0 || safeIndex >= count - 1;
+  const activeStepLabel =
+    count > 0 ? timelineStepLabel(list[safeIndex] ?? {}, safeIndex) : '';
+  const activeStepStyle =
+    count > 0
+      ? timelineTypographyStyle(list[safeIndex]?.slideContent?.categoryLabel)
+      : undefined;
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: SHOPIFY_SECTION_ID,
     sectionCss: timelineSectionCss(count),
@@ -405,8 +426,8 @@ export function DiabetesCareTimeline({
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding">
           <div className="page-width relative px-4 sm:px-5 md:px-0">
-            <div className="title-wrapper z-1 relative flex flex-col gap-4 text-left leading-none md:flex-row md:items-end md:justify-between lg:gap-8">
-              <div className="grid gap-4">
+            <div className="title-wrapper z-1 relative flex flex-row flex-wrap items-end justify-between gap-4 text-left leading-none lg:gap-8">
+              <div className="grid min-w-0 flex-1 gap-4">
                 <h2 className="heading title-md">
                   <AccentSplitWordsHeading
                     accentColors={secondaryHeading}
@@ -420,7 +441,7 @@ export function DiabetesCareTimeline({
               </div>
 
               {count > 0 ? (
-                <div className="indicators gap-2d5 hidden lg:flex">
+                <div className="indicators gap-2d5 flex shrink-0">
                   <button
                     aria-controls={SLIDER_ID}
                     aria-label="Previous"
@@ -473,14 +494,14 @@ export function DiabetesCareTimeline({
               <>
                 <ScrollReveal delayMs={100}>
                 <div
-                  aria-label={`Journey carousel, slide ${safeIndex + 1} of ${count}`}
+                  aria-label={`Journey carousel, slide ${safeIndex + 1} of ${count}. Swipe left or right to change steps.`}
                   aria-roledescription="carousel"
                   className="slider slider--desktop slider--tablet grid"
                   id={SLIDER_ID}
                   role="region"
                 >
                   <div
-                    className={clsx('timeline timeline-react-strip', DC_MOBILE_CAROUSEL_CLASS)}
+                    className="timeline timeline-react-strip touch-pan-x overscroll-x-contain"
                     ref={scrollRef}
                   >
                     {list.map((section, index) => (
@@ -496,37 +517,50 @@ export function DiabetesCareTimeline({
                 </div>
 
                 <div className="scroll-area">
-                  <div
-                    aria-label="Journey timeline"
-                    className="timeline-dots gap-2d5 grid"
-                    role="tablist"
-                  >
-                    {list.map((section, index) => {
-                      const category = timelineCategoryLabel(section);
-                      const label =
-                        category.length > 0
-                          ? category
-                          : section.slideContent?.sectionHeading?.text?.trim() ||
-                            `Step ${index + 1}`;
-                      const isActive = index === safeIndex;
+                  <div className="scroll-area__inner">
+                    <div
+                      aria-live="polite"
+                      className="timeline-dots-mobile mb-4 min-w-0 lg:hidden"
+                    >
+                      <p
+                        className="heading text-left text-lg font-bold leading-snug tracking-tight"
+                        style={activeStepStyle}
+                      >
+                        {activeStepLabel}
+                      </p>
+                      <p className="text-opacity mt-1 text-sm tabular-nums">
+                        {safeIndex + 1} of {count}
+                        <span className="text-opacity/80"> · Swipe the card above to explore</span>
+                      </p>
+                    </div>
 
-                      return (
-                        <button
-                          aria-controls={SLIDER_ID}
-                          aria-current={isActive ? 'true' : 'false'}
-                          className="heading gap-2d5 flex items-center text-left text-lg"
-                          data-index={index + 1}
-                          key={`dot-${index}`}
-                          onClick={() => {
-                            setActiveIndex(index);
-                            scrollSlideIntoView(index);
-                          }}
-                          type="button"
-                        >
-                          {label}
-                        </button>
-                      );
-                    })}
+                    <div
+                      aria-label="Journey timeline"
+                      className="timeline-dots timeline-dots--desktop hidden gap-2d5 lg:grid"
+                      role="tablist"
+                    >
+                      {list.map((section, index) => {
+                        const label = timelineStepLabel(section, index);
+                        const isActive = index === safeIndex;
+
+                        return (
+                          <button
+                            aria-controls={SLIDER_ID}
+                            aria-current={isActive ? 'true' : 'false'}
+                            className="heading gap-2d5 flex items-center text-left text-lg"
+                            data-index={index + 1}
+                            key={`dot-${index}`}
+                            onClick={() => {
+                              setActiveIndex(index);
+                              scrollSlideIntoView(index);
+                            }}
+                            type="button"
+                          >
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
                 </ScrollReveal>

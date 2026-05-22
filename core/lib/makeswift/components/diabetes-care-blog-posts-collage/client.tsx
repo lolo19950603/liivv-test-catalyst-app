@@ -20,6 +20,7 @@ import { resolvePlainTextColor } from '~/lib/makeswift/utils/heading-accent-colo
 
 import {
   BLOG_POSTS_COLLAGE_ARCHIVE_CSS,
+  BLOG_POSTS_COLLAGE_IMAGE_FILL_CSS,
   BLOG_POSTS_COLLAGE_SECTION_VARS_TEMPLATE,
 } from './archive-styles';
 
@@ -36,6 +37,11 @@ function sectionVarsCss(domId: string): string {
     '#shopify-section-template--26520397447459__blog_posts_collage_bTyfPm',
     `#${domId}`,
   );
+}
+
+/** Stack collage posts vertically on phone/tablet (archive uses multi-column grid + optional `.slider`). */
+function blogCollageMobileCss(domId: string): string {
+  return `@media screen and (max-width:1023px){#${domId} [data-dc-scroll-reveal]{overflow:visible;margin-inline:0;width:100%;max-width:100%}#${domId} .blog-collage{--card-grid-per-row:1!important;--card-grid-template:auto-flow dense/repeat(1,minmax(0,1fr))!important;--slider-grid:unset!important;--slider-item-width:100%!important;grid-template-columns:minmax(0,1fr)!important;grid-auto-flow:row!important;display:grid!important;gap:clamp(1.5rem,4vw,2.5rem)!important;width:100%!important;max-width:100%!important;overflow:visible!important}#${domId} .blog-collage>.article-card{grid-column:1/-1!important;width:100%!important;max-width:100%!important;min-width:0!important;flex-direction:column!important}#${domId} .blog-collage .article-card:is(:nth-child(2),:nth-child(3)) .article-card__media{flex:none!important;width:100%!important}}`;
 }
 
 export type BlogPostsCollageHeadingProps = HeadingWithHighlightProps & {
@@ -250,7 +256,7 @@ function renderArticleCard(
           >
             <img
               alt={alt || title}
-              className="article-card__image loaded"
+              className="article-card__image loaded size-full object-cover object-center"
               height={options.imageHeight}
               loading="lazy"
               sizes={options.imageSizes}
@@ -303,7 +309,7 @@ export function DiabetesCareBlogPostsCollage({
   const sectionDomId = `dccbpc-${instance}`;
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: sectionDomId,
-    sectionCss: sectionVarsCss(sectionDomId),
+    sectionCss: `${sectionVarsCss(sectionDomId)}${blogCollageMobileCss(sectionDomId)}`,
     background,
     highlight: heading,
     defaultBackgroundChannels: ARCHIVE_BLOG_COLLAGE_BACKGROUND_CHANNELS,
@@ -334,6 +340,7 @@ export function DiabetesCareBlogPostsCollage({
       <div className="shopify-section" id={sectionDomId} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <style dangerouslySetInnerHTML={{ __html: BLOG_POSTS_COLLAGE_ARCHIVE_CSS }} />
+        <style dangerouslySetInnerHTML={{ __html: BLOG_POSTS_COLLAGE_IMAGE_FILL_CSS }} />
         <div className="section section--padding section--rounded relative">
           <div className="page-width relative px-4 sm:px-5 md:px-0">
             <div className="title-wrapper relative z-1 flex flex-col gap-4 text-left leading-none lg:gap-8 md:flex-row md:items-end md:justify-between">
@@ -352,13 +359,8 @@ export function DiabetesCareBlogPostsCollage({
                 </h2>
               </div>
             </div>
-            <ScrollReveal className={clsx('grid slider', DC_MOBILE_STACK_CLASS)} delayMs={100}>
-              <div
-                className={clsx(
-                  'blog-grid blog-collage with-only3 card-grid mobile:card-grid--1 grid',
-                  DC_MOBILE_STACK_CLASS,
-                )}
-              >
+            <ScrollReveal className={clsx('grid', DC_MOBILE_STACK_CLASS)} delayMs={100}>
+              <div className="blog-grid blog-collage with-only3 card-grid mobile:card-grid--1 grid">
                 {featured != null
                   ? renderArticleCard(featured, {
                       key: 'featured',

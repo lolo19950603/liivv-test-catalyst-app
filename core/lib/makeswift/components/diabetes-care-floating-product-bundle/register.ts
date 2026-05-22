@@ -17,8 +17,10 @@ import {
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
-import { ARCHIVE_BUTTON_SECONDARY_ON_SAGE } from '~/lib/makeswift/utils/archive-button-presets';
+import { ARCHIVE_BUTTON_SECONDARY_ON_BANNER } from '~/lib/makeswift/utils/archive-button-presets';
 import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
+import { comboboxEntityIdFromMakeswift } from '~/lib/makeswift/utils/combobox-entity-id';
+
 import { searchProducts } from '../../utils/search-products';
 
 import { DiabetesCareFloatingProductBundle } from './client';
@@ -53,7 +55,7 @@ runtime.registerComponent(DiabetesCareFloatingProductBundle, {
       },
     }),
     products: List({
-      label: 'Bundle products (max 3)',
+      label: 'Bundle products',
       type: Group({
         label: 'Product',
         props: {
@@ -72,11 +74,9 @@ runtime.registerComponent(DiabetesCareFloatingProductBundle, {
         },
       }),
       getItemLabel(item) {
-        const id = item?.entityId;
+        const id = comboboxEntityIdFromMakeswift(item?.entityId);
 
-        return id != null && String(id).trim().length > 0
-          ? `Product #${String(id).trim()}`
-          : 'Product';
+        return id.length > 0 ? `Product #${id}` : 'Product';
       },
     }),
     buttons: Group({
@@ -85,9 +85,9 @@ runtime.registerComponent(DiabetesCareFloatingProductBundle, {
       props: {
         addToCartLabel: TextInput({
           label: 'Add to cart button label',
-          defaultValue: 'Add to cart',
+          defaultValue: 'Add kit to cart',
         }),
-        ...buttonColorFields(ARCHIVE_BUTTON_SECONDARY_ON_SAGE),
+        ...buttonColorFields(ARCHIVE_BUTTON_SECONDARY_ON_BANNER),
       },
     }),
   },

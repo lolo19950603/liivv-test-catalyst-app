@@ -30,7 +30,9 @@ export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
   '/*! specialized-page mobile v2 */',
 
   /* --- Global: avoid cut-off from overflow-x-hidden + slider bleed --- */
-  `${MOBILE_TABLET}{.dc-section-root{overflow-x:clip;overflow-y:visible;max-width:100%}}`,
+  `.dc-section-root{max-width:100%}`,
+  `${MOBILE_TABLET}{.dc-section-root{overflow-x:clip;overflow-y:visible}}`,
+  `@media screen and (min-width:1024px){.dc-section-root{overflow-x:clip;overflow-y:visible}}`,
   `${MOBILE_TABLET}{.dc-section-root .section--rounded,.dc-section-root .section{overflow:visible}}`,
   `${MOBILE_TABLET}{.dc-section-root .page-width{padding-inline:max(1rem,env(safe-area-inset-left,0px)) max(1rem,env(safe-area-inset-right,0px))}}`,
 
@@ -40,8 +42,10 @@ export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
   `${MOBILE}{.mobile\\:media--auto .banner__media img,.mobile\\:media--auto .media--height img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}}`,
 
   /* Vertical stack: multicolumn, number counters, blog collage (no 36vw peek strip) */
-  `${MOBILE_TABLET}{.dc-mobile-stack.slider--tablet,.dc-mobile-stack .slider--tablet,slider-element.dc-mobile-stack{overflow:visible!important;padding-inline:0!important;margin-inline:0!important;padding-block-end:0!important;scroll-snap-type:none!important}}`,
-  `${MOBILE_TABLET}{.dc-mobile-stack .card-grid,.dc-mobile-stack.slider--tablet .card-grid,.dc-mobile-stack .blog-grid{--slider-item-width:100%!important;--slider-grid:unset!important;--card-grid-per-row:1!important;grid-template-columns:minmax(0,1fr)!important;grid-auto-flow:row!important;grid:auto/repeat(1,minmax(0,1fr))!important;overflow:visible!important;display:grid!important;gap:clamp(1.5rem,4vw,2.5rem)!important;width:100%!important;max-width:100%!important}}`,
+  `${MOBILE_TABLET}{.dc-mobile-stack.slider--tablet,.dc-mobile-stack.slider,.dc-mobile-stack .slider--tablet,.dc-mobile-stack .slider,slider-element.dc-mobile-stack{overflow:visible!important;padding-inline:0!important;margin-inline:0!important;padding-block-end:0!important;scroll-snap-type:none!important}}`,
+  `${MOBILE_TABLET}{.dc-mobile-stack .card-grid,.dc-mobile-stack.slider--tablet .card-grid,.dc-mobile-stack .blog-grid{--slider-item-width:100%!important;--slider-grid:unset!important;--card-grid-per-row:1!important;grid-template-columns:minmax(0,1fr)!important;grid-auto-flow:row!important;overflow:visible!important;display:grid!important;gap:clamp(1.5rem,4vw,2.5rem)!important;width:100%!important;max-width:100%!important}}`,
+  `${MOBILE_TABLET}{.dc-mobile-stack .blog-collage>.article-card{grid-column:1/-1!important;flex-direction:column!important}}`,
+  `${MOBILE_TABLET}{.diabetes-care-blog-posts-collage{width:100%!important;max-width:100%!important;margin:0!important}}`,
   `${MOBILE_TABLET}{.dc-mobile-stack .card-grid>*,.dc-mobile-stack .blog-grid>*{width:100%!important;max-width:100%!important;min-width:0!important;flex:none!important;scroll-snap-align:unset!important}}`,
   `${MOBILE_TABLET}{.dc-mobile-stack .multicolumn-card,.dc-mobile-stack .counter-card,.dc-mobile-stack .article-card{min-width:0}}`,
 
@@ -70,19 +74,29 @@ export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
   mobileSectionPadding(TIMELINE_SECTION_ID),
   `${MOBILE_TABLET}{#${TIMELINE_SECTION_ID} .timeline-react-strip .timeline__item{flex:0 0 min(92vw,24rem)!important}}`,
   `${MOBILE_TABLET}{#${TIMELINE_SECTION_ID} .slider--tablet{overflow:visible;padding-inline:0;margin-inline:0}}`,
+  `${MOBILE_TABLET}{#${TIMELINE_SECTION_ID} .scroll-area{overflow:visible;scroll-snap-type:none}}`,
+  `${MOBILE_TABLET}{#${TIMELINE_SECTION_ID} .timeline-dots-mobile{margin-block-start:var(--sp-6)}}`,
+  `${MOBILE_TABLET}{#${TIMELINE_SECTION_ID} .timeline-react-strip{touch-action:pan-x pinch-zoom}}`,
 
   /* 05 — Multicolumn */
   mobileSectionPadding(MULTICOLUMN_SECTION_ID),
   `${MOBILE}{#${MULTICOLUMN_SECTION_ID} .multicolumn .media img{aspect-ratio:16/9!important;height:auto!important;object-fit:cover}}`,
 
-  /* 06 — Reveal */
-  `${MOBILE}{[id^="dcrift-reveal"] .reveal-banner .banner{height:auto;min-height:min(65dvh,480px);max-height:80dvh}}`,
+  /* 06 — Reveal + story (scroll-driven headline; shorter runway than desktop 120vh) */
+  `${MOBILE_TABLET}{[id^="dcrift-"] .splitting-banner .reveal-banner__scroller{position:sticky!important;top:0!important;height:100lvh!important;max-height:100dvh!important;overflow:hidden!important;padding-inline:0!important;margin-inline:0!important}}`,
+  `${MOBILE_TABLET}{[id^="dcrift-"] .reveal-banner__tracker{inset-block-start:12%!important;height:72lvh!important}}`,
+  `${MOBILE_TABLET}{[id^="dcrift-"] .reveal-banner .banner{height:100%!important;min-height:100%!important}}`,
   `${MOBILE}{[id^="dcrift-reveal"] .reveal-banner .banner__content{padding-block:2rem}}`,
   `${MOBILE}{[id^="dcrift-rich"]{--section-padding-top:48px;--section-padding-bottom:56px}}`,
   `${MOBILE}{[id^="dcrift-reveal"] .page-width--narrow,[id^="dcrift-rich"] .page-width--narrow{padding-inline:max(1rem,env(safe-area-inset-left,0px)) max(1rem,env(safe-area-inset-right,0px))}}`,
+  `${MOBILE}{[id^="dcrift-"] [data-dc-scroll-reveal].section--padding{padding-block:var(--sp-8)}}`,
+  `${MOBILE_TABLET}{[id^="dcrift-reveal"] .dcrift-reveal-media>img{aspect-ratio:unset!important;object-fit:contain!important}}`,
+  `${MOBILE_TABLET}{[id^="dcrift-reveal"] .dcrift-reveal-media.mobile\\:media--wide>img{aspect-ratio:unset!important}}`,
 
   /* 07 — Blog collage */
   `${MOBILE}{[id^="dccbpc-"]{--section-padding-top:48px;--section-padding-bottom:48px}}`,
+  `${MOBILE_TABLET}{[id^="dccbpc-"] .slider .blog-collage.with-only3,[id^="dccbpc-"] .blog-collage.with-only3{--card-grid-per-row:1!important}}`,
+  `${MOBILE_TABLET}{[id^="dccbpc-"] .blog-collage .article-card:nth-child(1){grid-column:1/-1!important}}`,
   `${MOBILE}{[id^="dccbpc-"] .blog-collage .article-card:not(:nth-child(1)) .article-card__image{aspect-ratio:16/9}}`,
 
   /* 08 — Logo list */
@@ -93,14 +107,12 @@ export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
   /* 09 — Featured collections */
   mobileSectionPadding(FEATURED_COLLECTIONS_SECTION_ID),
   `${MOBILE_TABLET}{#${FEATURED_COLLECTIONS_SECTION_ID} .scroll-shadow{overflow:visible}}`,
-  `${MOBILE_TABLET}{#${FEATURED_COLLECTIONS_SECTION_ID} .fc-tab-strip{overflow-x:auto;overflow-y:hidden;scroll-padding-inline:1rem;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:0.5rem;padding-block-end:0.25rem}}`,
+  `${MOBILE_TABLET}{#${FEATURED_COLLECTIONS_SECTION_ID} .fc-tab-strip{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;padding-block-end:0.25rem}}`,
   `${MOBILE_TABLET}{#${FEATURED_COLLECTIONS_SECTION_ID} .fc-tab-strip::-webkit-scrollbar{display:none}}`,
-  `${MOBILE_TABLET}{#${FEATURED_COLLECTIONS_SECTION_ID} .tab__item{flex-shrink:0}}`,
-  `${MOBILE}{#${FEATURED_COLLECTIONS_SECTION_ID} .product-card .media.aspect-square img{aspect-ratio:1/1!important}}`,
+  `${MOBILE}{#${FEATURED_COLLECTIONS_SECTION_ID} .fc-product-card .fc-product-card-media :is(img,svg,video-media){object-fit:cover!important;object-position:center!important}}`,
 
   /* 11 — Floating product bundle */
-  `${MOBILE}{#${FLOATING_PRODUCT_BUNDLE_SECTION_ID} .banner__media{aspect-ratio:16/9;min-height:200px}}`,
-  `${MOBILE_TABLET}{#${FLOATING_PRODUCT_BUNDLE_SECTION_ID} .compact-product-bundle .product-grid.swipe-on-mobile{--card-grid-template:unset}}`,
+  `${MOBILE_TABLET}{#${FLOATING_PRODUCT_BUNDLE_SECTION_ID} .compact-product-bundle .product-grid.swipe-on-mobile.dc-mobile-carousel{display:unset!important}}`,
 
   /* 12 — Rich text lower */
   `${MOBILE}{#${RICH_TEXT_LOWER_SECTION_ID}{--section-padding-top:40px;--section-padding-bottom:40px}}`,
@@ -114,10 +126,7 @@ export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
   mobileSectionPadding(FAQ_FIRST_SECTION_ID),
   mobileSectionPadding(FAQ_SECOND_SECTION_ID),
 
-  /* 15 — Image overlay */
-  `${MOBILE}{#${IMAGE_TEXT_OVERLAY_SECTION_ID} .banner.media--450px{height:auto!important}}`,
-  `${MOBILE}{#${IMAGE_TEXT_OVERLAY_SECTION_ID} .banner .banner__media{aspect-ratio:4/5;min-height:min(75vw,420px)}}`,
-  `${MOBILE}{#${IMAGE_TEXT_OVERLAY_SECTION_ID} .banner .banner__media img{aspect-ratio:4/5;height:100%;object-fit:cover}}`,
+  /* 15 — Image overlay (banner layout: component `IMAGE_TEXT_OVERLAY_BANNER_CSS`) */
   `${MOBILE}{#${IMAGE_TEXT_OVERLAY_SECTION_ID} .diabetes-care-image-text-overlay-features{--section-padding-top:40px;--section-padding-bottom:24px}}`,
   `${MOBILE}{#${IMAGE_TEXT_OVERLAY_SECTION_ID} .banner__box{padding-bottom:1.5rem}}`,
 ].join('');

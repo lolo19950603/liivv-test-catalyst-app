@@ -1,11 +1,19 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type RefObject,
+} from 'react';
 
 import {
   DC_CAROUSEL_HOST_CLASS,
-  DC_MOBILE_CAROUSEL_CLASS,
   DC_SECTION_ROOT_CLASS,
 } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
@@ -176,6 +184,161 @@ function IconChevronRight() {
   );
 }
 
+const MOBILE_CAROUSEL_MQ = '(max-width: 1023px)';
+
+function CarouselArrowButton({
+  ariaLabel,
+  controls,
+  direction,
+  disabled,
+  onClick,
+  variant = 'default',
+}: {
+  ariaLabel: string;
+  controls?: string;
+  direction: 'prev' | 'next';
+  disabled: boolean;
+  onClick: () => void;
+  variant?: 'default' | 'overlay';
+}) {
+  if (variant === 'overlay') {
+    return (
+      <button
+        aria-controls={controls}
+        aria-label={ariaLabel}
+        className="fc-carousel-arrow-overlay flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/45 bg-white/50 text-current shadow-md backdrop-blur-[2px] transition enabled:hover:bg-white/70 disabled:cursor-not-allowed disabled:opacity-40"
+        disabled={disabled}
+        onClick={(event) => {
+          event.stopPropagation();
+          onClick();
+        }}
+        onPointerDown={(event) => {
+          event.stopPropagation();
+        }}
+        type="button"
+      >
+        {direction === 'prev' ? <IconChevronLeft /> : <IconChevronRight />}
+      </button>
+    );
+  }
+
+  return (
+    <button
+      aria-controls={controls}
+      aria-label={ariaLabel}
+      className="button button--secondary"
+      disabled={disabled}
+      onClick={(event) => {
+        event.stopPropagation();
+        onClick();
+      }}
+      onPointerDown={(event) => {
+        event.stopPropagation();
+      }}
+      type="button"
+    >
+      <span className="btn-fill sf-hidden" data-fill />
+      <span className="btn-text">
+        {direction === 'prev' ? <IconChevronLeft /> : <IconChevronRight />}
+      </span>
+      <span className="btn-loader">
+        <span />
+        <span />
+        <span />
+      </span>
+    </button>
+  );
+}
+
+/** Debounced scroll-end sync for one-item-at-a-time horizontal carousels (mobile). */
+function useCarouselScrollSync(
+  stripRef: RefObject<HTMLDivElement | null>,
+  itemCount: number,
+  onIndexChange: (index: number) => void,
+  enabled: boolean,
+) {
+  const itemRefs = useRef<Array<HTMLElement | null>>([]);
+
+  const setItemRef = useCallback((el: HTMLElement | null, index: number) => {
+    itemRefs.current[index] = el;
+  }, []);
+
+  const resolveIndexFromScroll = useCallback(() => {
+    const strip = stripRef.current;
+
+    if (!strip || itemCount === 0) {
+      return;
+    }
+
+    const center = strip.scrollLeft + strip.clientWidth / 2;
+    let best = 0;
+    let bestDist = Number.POSITIVE_INFINITY;
+
+    for (let i = 0; i < itemCount; i += 1) {
+      const item = itemRefs.current[i];
+
+      if (item) {
+        const mid = item.offsetLeft + item.offsetWidth / 2;
+        const d = Math.abs(center - mid);
+
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      }
+    }
+
+    onIndexChange(best);
+  }, [itemCount, onIndexChange, stripRef]);
+
+  useEffect(() => {
+    const strip = stripRef.current;
+
+    if (!enabled || !strip || itemCount <= 1) {
+      return;
+    }
+
+    let idleTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const finish = () => {
+      clearTimeout(idleTimer);
+      idleTimer = undefined;
+      resolveIndexFromScroll();
+    };
+
+    const onScroll = () => {
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(finish, 220);
+    };
+
+    const onScrollEnd = () => {
+      finish();
+    };
+
+    strip.addEventListener('scroll', onScroll, { passive: true });
+    strip.addEventListener('scrollend', onScrollEnd);
+
+    return () => {
+      clearTimeout(idleTimer);
+      strip.removeEventListener('scroll', onScroll);
+      strip.removeEventListener('scrollend', onScrollEnd);
+    };
+  }, [enabled, itemCount, resolveIndexFromScroll, stripRef]);
+
+  const scrollItemIntoView = useCallback(
+    (index: number) => {
+      itemRefs.current[index]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'start',
+      });
+    },
+    [],
+  );
+
+  return { setItemRef, scrollItemIntoView };
+}
+
 function productHasContent(p: DiabetesCareFeaturedCollectionProduct): boolean {
   return String(p.entityId ?? '').trim().length > 0;
 }
@@ -219,28 +382,89 @@ export function DiabetesCareFeaturedCollections({
 
   const safeTabs = tabs;
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [productIndex, setProductIndex] = useState(0);
   const clampedIndex = Math.min(selectedIndex, Math.max(0, safeTabs.length - 1));
   const tabStripRef = useRef<HTMLDivElement>(null);
+  const productStripRef = useRef<HTMLDivElement>(null);
 
-  const selectTab = (index: number) => {
-    if (index === clampedIndex || index < 0 || index >= safeTabs.length) {
-      return;
-    }
+  const activeProducts = useMemo(
+    () => (safeTabs[clampedIndex]?.products ?? []).filter(productHasContent),
+    [safeTabs, clampedIndex],
+  );
+  const productCount = activeProducts.length;
+  const clampedProductIndex = Math.min(productIndex, Math.max(0, productCount - 1));
+  const [isMobileCarouselView, setIsMobileCarouselView] = useState(false);
 
-    setSelectedIndex(index);
-  };
+  useEffect(() => {
+    const mq = window.matchMedia(MOBILE_CAROUSEL_MQ);
+    const update = () => {
+      setIsMobileCarouselView(mq.matches);
+    };
 
-  const goToAdjacentTab = (dir: -1 | 1) => {
-    if (safeTabs.length <= 1) {
-      return;
-    }
+    update();
+    mq.addEventListener('change', update);
 
-    setSelectedIndex((i) => {
-      const n = safeTabs.length;
+    return () => {
+      mq.removeEventListener('change', update);
+    };
+  }, []);
 
-      return (i + dir + n) % n;
-    });
-  };
+  const productScrollSyncEnabled = productCount > 1;
+
+  const selectTab = useCallback(
+    (index: number) => {
+      if (index < 0 || index >= safeTabs.length) {
+        return;
+      }
+
+      setSelectedIndex(index);
+    },
+    [safeTabs.length],
+  );
+
+  const { setItemRef: setTabItemRef, scrollItemIntoView: scrollTabIntoView } =
+    useCarouselScrollSync(
+      tabStripRef,
+      safeTabs.length,
+      selectTab,
+      isMobileCarouselView && safeTabs.length > 1,
+    );
+
+  const selectProduct = useCallback(
+    (index: number) => {
+      if (index < 0 || index >= productCount) {
+        return;
+      }
+
+      setProductIndex(index);
+    },
+    [productCount],
+  );
+
+  const { setItemRef: setProductItemRef } = useCarouselScrollSync(
+      productStripRef,
+      productCount,
+      selectProduct,
+      productScrollSyncEnabled,
+    );
+
+  const goToAdjacentTab = useCallback(
+    (dir: -1 | 1) => {
+      if (safeTabs.length <= 1) {
+        return;
+      }
+
+      const next = (clampedIndex + dir + safeTabs.length) % safeTabs.length;
+
+      setSelectedIndex(next);
+      scrollTabIntoView(next);
+    },
+    [clampedIndex, safeTabs.length, scrollTabIntoView],
+  );
+
+  useEffect(() => {
+    setProductIndex(0);
+  }, [clampedIndex]);
 
   useEffect(() => {
     const strip = tabStripRef.current;
@@ -288,7 +512,11 @@ export function DiabetesCareFeaturedCollections({
   const bodyCopy = bodyResolved.text;
 
   const sliderDomId = `Slider-fc-${reactId}-${String(clampedIndex)}`;
-
+  const tabCarouselId = `fc-tabs-${reactId}`;
+  const activeTabLabel =
+    safeTabs[clampedIndex]?.tabLabel?.trim() ?? `Tab ${String(clampedIndex + 1)}`;
+  const tabPrevDisabled = safeTabs.length <= 1;
+  const tabNextDisabled = safeTabs.length <= 1;
   return (
     <div
       className={clsx('diabetes-care-featured-collections', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}
@@ -300,7 +528,7 @@ export function DiabetesCareFeaturedCollections({
       >
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding section--rounded relative">
-          <div className="page-width relative px-4 sm:px-5 md:px-0">
+          <div className="page-width relative min-w-0 max-w-full px-4 sm:px-5 md:px-0">
             <div className="title-wrapper z-1 relative flex flex-col gap-4 text-left leading-none md:flex-row md:items-end md:justify-between lg:gap-8">
               <div className="grid gap-4">
                 <p
@@ -326,13 +554,32 @@ export function DiabetesCareFeaturedCollections({
               </div>
             </div>
 
-            <ScrollReveal className="tab-list flex justify-between gap-6" delayMs={100}>
-              <div className="scroll-shadow grid min-w-0 flex-1 overflow-hidden">
-                <div
-                  className="fc-tab-strip flex gap-4 scroll-smooth"
-                  ref={tabStripRef}
-                  role="tablist"
-                >
+            <ScrollReveal className="tab-list flex flex-col gap-4 lg:flex-row lg:justify-between lg:gap-6" delayMs={100}>
+              <div
+                aria-label="Product collections"
+                className="flex min-w-0 items-center gap-2 lg:flex-1"
+                id={tabCarouselId}
+                role="region"
+              >
+                <div className="indicators shrink-0 gap-2d5 flex lg:hidden">
+                  <CarouselArrowButton
+                    ariaLabel="Previous collection"
+                    controls={sliderDomId}
+                    direction="prev"
+                    disabled={tabPrevDisabled}
+                    onClick={() => {
+                      goToAdjacentTab(-1);
+                    }}
+                  />
+                </div>
+
+                <div className="scroll-shadow grid min-w-0 flex-1 overflow-hidden">
+                  <div
+                    aria-label={`Collections, ${activeTabLabel}. Swipe or use arrows to change.`}
+                    className="fc-tab-strip flex touch-pan-x gap-4 scroll-smooth overscroll-x-contain lg:gap-4"
+                    ref={tabStripRef}
+                    role="tablist"
+                  >
                     {safeTabs.map((tab, index) => {
                       const label = tab.tabLabel?.trim() ?? `Tab ${String(index + 1)}`;
                       const selected = index === clampedIndex;
@@ -351,9 +598,13 @@ export function DiabetesCareFeaturedCollections({
                           onClick={(event) => {
                             event.stopPropagation();
                             selectTab(index);
+                            scrollTabIntoView(index);
                           }}
                           onPointerDown={(event) => {
                             event.stopPropagation();
+                          }}
+                          ref={(el) => {
+                            setTabItemRef(el, index);
                           }}
                           role="tab"
                           tabIndex={selected ? 0 : -1}
@@ -369,58 +620,48 @@ export function DiabetesCareFeaturedCollections({
                         </button>
                       );
                     })}
+                  </div>
+                </div>
+
+                <div className="indicators shrink-0 gap-2d5 flex lg:hidden">
+                  <CarouselArrowButton
+                    ariaLabel="Next collection"
+                    controls={sliderDomId}
+                    direction="next"
+                    disabled={tabNextDisabled}
+                    onClick={() => {
+                      goToAdjacentTab(1);
+                    }}
+                  />
                 </div>
               </div>
 
-              <div className="indicators shrink-0 gap-2d5 hidden lg:flex" data-index={clampedIndex}>
-                <button
-                  aria-controls={sliderDomId}
-                  aria-label="Previous collection"
-                  className="button button--secondary"
-                  disabled={safeTabs.length <= 1}
-                  onClick={(event) => {
-                    event.stopPropagation();
+              <p aria-live="polite" className="text-opacity text-center text-sm tabular-nums lg:hidden">
+                {clampedIndex + 1} of {safeTabs.length}
+              </p>
+
+              <div
+                className="indicators hidden shrink-0 gap-2d5 lg:flex"
+                data-index={clampedIndex}
+              >
+                <CarouselArrowButton
+                  ariaLabel="Previous collection"
+                  controls={sliderDomId}
+                  direction="prev"
+                  disabled={tabPrevDisabled}
+                  onClick={() => {
                     goToAdjacentTab(-1);
                   }}
-                  onPointerDown={(event) => {
-                    event.stopPropagation();
-                  }}
-                  type="button"
-                >
-                  <span className="btn-fill sf-hidden" data-fill />
-                  <span className="btn-text">
-                    <IconChevronLeft />
-                  </span>
-                  <span className="btn-loader">
-                    <span />
-                    <span />
-                    <span />
-                  </span>
-                </button>
-                <button
-                  aria-controls={sliderDomId}
-                  aria-label="Next collection"
-                  className="button button--secondary"
-                  disabled={safeTabs.length <= 1}
-                  onClick={(event) => {
-                    event.stopPropagation();
+                />
+                <CarouselArrowButton
+                  ariaLabel="Next collection"
+                  controls={sliderDomId}
+                  direction="next"
+                  disabled={tabNextDisabled}
+                  onClick={() => {
                     goToAdjacentTab(1);
                   }}
-                  onPointerDown={(event) => {
-                    event.stopPropagation();
-                  }}
-                  type="button"
-                >
-                  <span className="btn-fill" data-fill />
-                  <span className="btn-text">
-                    <IconChevronRight />
-                  </span>
-                  <span className="btn-loader">
-                    <span />
-                    <span />
-                    <span />
-                  </span>
-                </button>
+                />
               </div>
             </ScrollReveal>
 
@@ -439,34 +680,64 @@ export function DiabetesCareFeaturedCollections({
                   role="tabpanel"
                 >
                   <div
-                    className={clsx('slider slider--desktop slider--tablet grid', DC_CAROUSEL_HOST_CLASS)}
-                    id={
-                      index === clampedIndex
-                        ? sliderDomId
-                        : `Slider-fc-${reactId}-panel-${String(index)}`
-                    }
-                    tabIndex={0}
+                    className={clsx(
+                      'fc-product-carousel-host relative overflow-visible',
+                      rows.length > 1 && 'fc-product-carousel-host--peek overflow-x-clip',
+                    )}
                   >
                     <div
+                      aria-label={`Products in ${tab.tabLabel?.trim() ?? 'collection'}. Swipe to browse.`}
                       className={clsx(
-                        'product-grid card-grid card-grid--4 mobile:card-grid--1 initialized grid max-w-full',
-                        DC_MOBILE_CAROUSEL_CLASS,
-                        'lg:overflow-x-auto lg:scroll-smooth',
+                        'fc-product-panel grid min-w-0 w-full max-w-full',
+                        DC_CAROUSEL_HOST_CLASS,
+                        'slider slider--tablet slider--desktop',
                       )}
+                      id={
+                        index === clampedIndex
+                          ? sliderDomId
+                          : `Slider-fc-${reactId}-panel-${String(index)}`
+                      }
+                      role="region"
+                      tabIndex={0}
                     >
-                      {rows.length === 0 ? (
-                        <p className="subtext-md col-span-full py-8 text-center text-contrast-500">
-                          Search and add catalog products for this tab in Makeswift.
-                        </p>
-                      ) : (
-                        rows.map((p, pi) => (
-                          <DiabetesCareCatalogProductCard
-                            entityId={p.entityId}
-                            key={`${panelId}-p-${String(pi)}`}
-                          />
-                        ))
-                      )}
+                      <div
+                        className={clsx(
+                          'product-grid card-grid card-grid--4 mobile:card-grid--1 initialized grid min-w-0 max-w-full',
+                          'fc-product-strip fc-product-strip--scroll-row touch-pan-x overscroll-x-contain scroll-smooth',
+                          rows.length > 1 && 'fc-product-strip--peek-carousel',
+                        )}
+                        ref={index === clampedIndex ? productStripRef : undefined}
+                      >
+                        {rows.length === 0 ? (
+                          <p className="subtext-md col-span-full py-8 text-center text-contrast-500">
+                            Search and add catalog products for this tab in Makeswift.
+                          </p>
+                        ) : (
+                          rows.map((p, pi) => (
+                              <div
+                                className="fc-product-slide min-w-0"
+                                key={`${panelId}-p-${String(pi)}`}
+                                ref={(el) => {
+                                  if (index === clampedIndex) {
+                                    setProductItemRef(el, pi);
+                                  }
+                                }}
+                              >
+                                <DiabetesCareCatalogProductCard entityId={p.entityId} />
+                              </div>
+                            ))
+                        )}
+                      </div>
                     </div>
+
+                    {index === clampedIndex && rows.length > 1 ? (
+                      <p
+                        aria-live="polite"
+                        className="text-opacity mt-3 text-center text-sm tabular-nums"
+                      >
+                        Product {clampedProductIndex + 1} of {rows.length}
+                      </p>
+                    ) : null}
                   </div>
                 </div>
               );
