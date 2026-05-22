@@ -1,8 +1,12 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { type CSSProperties, type KeyboardEventHandler, useId, useRef } from 'react';
+import { type CSSProperties, type KeyboardEventHandler, useId, useRef, useState } from 'react';
 
+import {
+  CarouselArrowButton,
+  useCarouselScrollSync,
+} from '~/lib/makeswift/diabetes-care-carousel-controls';
 import {
   DC_CAROUSEL_HOST_CLASS,
   DC_MOBILE_CAROUSEL_CLASS,
@@ -24,7 +28,11 @@ import {
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
 
-import { COLLECTION_LIST_SECTION_ID, COLLECTION_LIST_VARS } from './archive-styles';
+import {
+  COLLECTION_LIST_CAROUSEL_CSS,
+  COLLECTION_LIST_SECTION_ID,
+  COLLECTION_LIST_VARS,
+} from './archive-styles';
 
 export interface DiabetesCareCollectionListCardProps {
   imageSrc?: string;
@@ -268,28 +276,32 @@ export function DiabetesCareCollectionList({
   const bodyResolved = resolveCollectionListBody({ body, bodyText });
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: COLLECTION_LIST_SECTION_ID,
-    sectionCss: COLLECTION_LIST_VARS,
+    sectionCss: COLLECTION_LIST_VARS + COLLECTION_LIST_CAROUSEL_CSS,
     background,
     highlight: useLine2CustomHighlight ? headingAccent : null,
   });
   const reactId = useId().replace(/:/g, '');
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
   const line1Text = line1.text.length > 0 ? line1.text : 'Care Designed for';
   const line2Text = line2.text.length > 0 ? line2.text : 'Every Stage of Health';
   const desc = bodyResolved.html;
 
   const list = cards != null ? cards.filter(cardHasMedia) : [];
+  const canScroll = list.length > 1;
+
+  const { setItemRef, scrollItemIntoView } = useCarouselScrollSync(
+    scrollerRef,
+    list.length,
+    setActiveIndex,
+    canScroll,
+    { scrollInline: 'start' },
+  );
 
   const slide = (direction: -1 | 1) => {
-    const el = scrollerRef.current;
+    const next = Math.min(list.length - 1, Math.max(0, activeIndex + direction));
 
-    if (el == null) {
-      return;
-    }
-
-    const delta = Math.max(260, Math.floor(el.clientWidth * 0.85)) * direction;
-
-    el.scrollBy({ left: delta, behavior: 'smooth' });
+    scrollItemIntoView(next);
   };
 
   const onKeyNav: KeyboardEventHandler<HTMLDivElement> = (e) => {
@@ -335,57 +347,36 @@ export function DiabetesCareCollectionList({
                 ) : null}
               </div>
               <div className="indicators gap-2d5 hidden lg:flex">
-                <button
-                  aria-controls={sliderDomId}
-                  aria-label="Previous"
-                  className="button button--secondary"
-                  disabled={list.length <= 1}
+                <CarouselArrowButton
+                  ariaLabel="Previous"
+                  controls={sliderDomId}
+                  direction="prev"
+                  disabled={!canScroll || activeIndex <= 0}
                   onClick={() => {
                     slide(-1);
                   }}
-                  type="button"
-                >
-                  <span className="btn-fill sf-hidden" data-fill />
-                  <span className="btn-text">
-                    <IconChevronLeft />
-                  </span>
-                  <span className="btn-loader">
-                    <span />
-                    <span />
-                    <span />
-                  </span>
-                </button>
-                <button
-                  aria-controls={sliderDomId}
-                  aria-label="Next"
-                  className="button button--secondary"
-                  disabled={list.length <= 1}
+                />
+                <CarouselArrowButton
+                  ariaLabel="Next"
+                  controls={sliderDomId}
+                  direction="next"
+                  disabled={!canScroll || activeIndex >= list.length - 1}
                   onClick={() => {
                     slide(1);
                   }}
-                  type="button"
-                >
-                  <span className="btn-fill" data-fill />
-                  <span className="btn-text">
-                    <IconChevronRight />
-                  </span>
-                  <span className="btn-loader">
-                    <span />
-                    <span />
-                    <span />
-                  </span>
-                </button>
+                />
               </div>
             </div>
 
             <div
               aria-label="Collection carousel"
               className={clsx(
-                'slider slider--desktop slider--tablet mt-10 grid lg:mt-14',
+                'slider slider--desktop slider--tablet dcl-collection-slider mt-10 lg:mt-14',
                 DC_CAROUSEL_HOST_CLASS,
               )}
               id={sliderDomId}
               onKeyDown={list.length > 0 ? onKeyNav : undefined}
+              ref={scrollerRef}
               role="region"
               tabIndex={list.length > 0 ? 0 : undefined}
             >
@@ -396,9 +387,7 @@ export function DiabetesCareCollectionList({
                     'mobile:card-grid--1 gap-8 lg:gap-12',
                     'card-grid--4',
                     DC_MOBILE_CAROUSEL_CLASS,
-                    'lg:[--card-grid-template:auto/auto-flow_minmax(0,288px)] lg:overflow-x-auto lg:overscroll-contain lg:scroll-smooth lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden',
                   )}
-                  ref={scrollerRef}
                 >
                   {list.length === 0 ? (
                     <p className="subtext-md col-span-full py-8 text-center text-contrast-500">
@@ -418,6 +407,9 @@ export function DiabetesCareCollectionList({
                         <div
                           className="card media-card media-card--card shrink-0"
                           key={`dcc-${reactId}-${String(i)}`}
+                          ref={(el) => {
+                            setItemRef(el, i);
+                          }}
                         >
                           <a
                             aria-label={label}
