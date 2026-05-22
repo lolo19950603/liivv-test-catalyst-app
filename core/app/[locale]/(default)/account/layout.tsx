@@ -2,7 +2,8 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PropsWithChildren } from 'react';
 
 import { SidebarMenu } from '@/vibes/soul/sections/sidebar-menu';
-import { StickySidebarLayout } from '@/vibes/soul/sections/sticky-sidebar-layout';
+
+import { AccountLayoutShell } from './account-layout-shell';
 
 interface Props extends PropsWithChildren {
   params: Promise<{ locale: string }>;
@@ -16,10 +17,11 @@ export default async function Layout({ children, params }: Props) {
   const t = await getTranslations('Account.Layout');
 
   return (
-    <StickySidebarLayout
+    <AccountLayoutShell
       sidebar={
         <SidebarMenu
           links={[
+            { href: '/account/dashboard/', label: t('dashboard') },
             { href: '/account/orders/', label: t('orders') },
             { href: '/account/addresses/', label: t('addresses') },
             { href: '/account/settings/', label: t('settings') },
@@ -28,9 +30,8 @@ export default async function Layout({ children, params }: Props) {
           ]}
         />
       }
-      sidebarSize="small"
     >
       {children}
-    </StickySidebarLayout>
+    </AccountLayoutShell>
   );
 }

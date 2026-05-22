@@ -179,10 +179,65 @@
   "Account": {
     "Layout": {
       "addresses": "Addresses",
+      "dashboard": "Dashboard",
       "logout": "Logout",
       "orders": "Orders",
       "settings": "Account",
       "wishlists": "Wish lists"
+    },
+    "Dashboard": {
+      "metaTitle": "Member dashboard",
+      "brandEyebrow": "Liivv care",
+      "brandTitle": "Your health dashboard",
+      "signOut": "Sign out",
+      "notifications": "Notifications",
+      "cart": "Cart",
+      "guestName": "Member",
+      "needHelp": {
+        "title": "Need help?",
+        "body": "Chat with our care team about orders, prescriptions, insurance, or your health profile. Typical reply time is under 5 minutes during business hours.",
+        "toggle": "Open help chat"
+      },
+      "nav": {
+        "main": "Main dashboard",
+        "health-profile": "Health profile",
+        "pharmacy": "Pharmacy",
+        "insurance": "Insurance",
+        "rewards": "Rewards",
+        "orders": "Orders",
+        "subscriptions": "Subscriptions"
+      },
+      "panels": {
+        "main": {
+          "title": "Welcome back",
+          "lead": "Hi {name} — here is a snapshot of your care, orders, and rewards."
+        },
+        "healthProfile": {
+          "title": "Health profile",
+          "lead": "Keep your care details current so we can personalize refills, coaching, and coverage checks."
+        },
+        "pharmacy": {
+          "title": "Pharmacy",
+          "lead": "Track prescriptions, refills, and fulfillment status in one place."
+        },
+        "insurance": {
+          "title": "Insurance",
+          "lead": "Review plan coverage, copays, and DME benefits before you check out."
+        },
+        "rewards": {
+          "title": "Rewards",
+          "lead": "Earn points on refills, subscriptions, and healthy habits."
+        },
+        "orders": {
+          "title": "Orders",
+          "lead": "Recent purchases and delivery updates. Full order history lives in your account orders area.",
+          "viewAll": "View all orders"
+        },
+        "subscriptions": {
+          "title": "Subscriptions",
+          "lead": "Manage auto-ship schedules, skip a delivery, or pause a subscription."
+        }
+      }
     },
     "Orders": {
       "title": "Orders",

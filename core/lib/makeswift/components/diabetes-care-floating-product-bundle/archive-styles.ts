@@ -1,6 +1,12 @@
+import { diabetesCareMinimalProductScrollbarCss } from '~/lib/makeswift/utils/diabetes-care-minimal-scrollbar';
+
 /** Stable id aligned with `floating_product_bundle_mYaf43` in `diabetes-care.html`. */
 export const FLOATING_PRODUCT_BUNDLE_SECTION_ID =
   'shopify-section-template--26520397447459__floating_product_bundle_mYaf43';
+
+/** Scrollable product rows only (desktop-static keeps overflow visible, no bar). */
+const BFB_PRODUCT_SCROLL_STRIP =
+  '.bfb-product-strip--peek-carousel:not(.bfb-product-strip--desktop-static)';
 
 export const FLOATING_PRODUCT_BUNDLE_VARS =
   `#${FLOATING_PRODUCT_BUNDLE_SECTION_ID}{--section-padding-top:0px;--section-padding-bottom:0px;--color-background:142 165 141;--color-foreground:255 255 255;--color-border:var(--color-foreground)/0.1;--color-border-dark:var(--color-foreground)/0.4;--color-border-light:var(--color-foreground)/0.06;--color-highlight:142 165 141;--color-button-text:255 255 255;--color-overlay:23 23 23;--overlay-opacity:0.4;--bfb-desktop-height:550px}`;
@@ -37,8 +43,8 @@ export const FLOATING_PRODUCT_BUNDLE_LAYOUT_CSS =
  * Horizontal product strip (same model as featured collections peek carousel).
  */
 export const FLOATING_PRODUCT_BUNDLE_PRODUCTS_CSS =
-  `#${FLOATING_PRODUCT_BUNDLE_SECTION_ID} .bfb-product-strip--peek-carousel{--bfb-peek-card:min(72vw,17.5rem);display:flex!important;flex-flow:row nowrap!important;align-items:center!important;justify-content:flex-start!important;gap:clamp(0.75rem,2.5vw,1rem)!important;overflow-x:auto!important;overflow-y:visible!important;scroll-snap-type:x mandatory;scroll-padding-inline-start:0;scroll-padding-inline-end:0.5rem;touch-action:pan-x pinch-zoom;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none;-ms-overflow-style:none;padding-block-end:0;width:100%!important;max-width:100%!important}` +
-  `#${FLOATING_PRODUCT_BUNDLE_SECTION_ID} .bfb-product-strip--peek-carousel::-webkit-scrollbar{display:none;height:0;width:0}` +
+  `#${FLOATING_PRODUCT_BUNDLE_SECTION_ID} .bfb-product-strip--peek-carousel{--bfb-peek-card:min(72vw,17.5rem);display:flex!important;flex-flow:row nowrap!important;align-items:center!important;justify-content:flex-start!important;gap:clamp(0.75rem,2.5vw,1rem)!important;overflow-x:auto!important;overflow-y:visible!important;scroll-snap-type:x mandatory;scroll-padding-inline-start:0;scroll-padding-inline-end:0.5rem;touch-action:pan-x pinch-zoom;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;width:100%!important;max-width:100%!important}` +
+  diabetesCareMinimalProductScrollbarCss(FLOATING_PRODUCT_BUNDLE_SECTION_ID, BFB_PRODUCT_SCROLL_STRIP) +
   `#${FLOATING_PRODUCT_BUNDLE_SECTION_ID} .bfb-product-strip--peek-carousel>.bfb-product-slide{flex:0 0 var(--bfb-peek-card)!important;width:var(--bfb-peek-card)!important;max-width:var(--bfb-peek-card)!important;min-width:0!important;scroll-snap-align:start!important;height:auto!important}` +
   `#${FLOATING_PRODUCT_BUNDLE_SECTION_ID} .bfb-product-strip--single{justify-content:center}` +
   `#${FLOATING_PRODUCT_BUNDLE_SECTION_ID} .bfb-product-strip--single>.bfb-product-slide{flex:0 0 var(--bfb-peek-card)!important;width:var(--bfb-peek-card)!important;max-width:var(--bfb-peek-card)!important}` +
