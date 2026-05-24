@@ -132,9 +132,14 @@ export function DiabetesCareRevealImageWithText({
   /** Theme vars on the component root so reveal banner + image and rich text share background. */
   /** Shorter scroll runway on phone/tablet; portrait uses intrinsic ratio (no 16:9 crop). */
   const revealMobileCss =
+    `#${revealSectionId} .reveal-banner__scroller{z-index:1}` +
+    `#${revealSectionId} [data-dc-scroll-reveal].section--padding{position:relative;z-index:2;background-color:rgb(var(--color-background))}` +
     `@media screen and (max-width:1023px){#${revealSectionId} .splitting-banner .reveal-banner__scroller{position:sticky!important;top:0!important;height:100lvh!important;max-height:100dvh!important;overflow:hidden!important}` +
     `#${revealSectionId} .reveal-banner__tracker{inset-block-start:12%!important;height:72lvh!important}@supports (height:100lvh){#${revealSectionId} .reveal-banner__tracker{height:72lvh!important}}` +
     `#${revealSectionId} .reveal-banner .banner{height:100%!important;min-height:100%!important}}` +
+    `@media screen and (max-width:500px){#${revealSectionId} .reveal-banner .banner__content .page-width--narrow{max-width:100%}` +
+    `#${revealSectionId} .reveal-banner .banner__box{max-width:100%;margin-inline:auto}` +
+    `#${revealSectionId} .reveal-banner .splitting-wrapper h2.title-xl{font-size:clamp(1.625rem,6.5vw,2rem)!important;line-height:1.05!important;letter-spacing:-0.02em;text-wrap:balance}}` +
     `#${revealSectionId} .dcrift-reveal-media.media--adapt{height:0;width:100%;padding-block-end:var(--ratio-percent,125%)}` +
     `#${revealSectionId} .dcrift-reveal-media.media--adapt>img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain!important;object-position:center center}` +
     `@media screen and (max-width:1023px){#${revealSectionId} .dcrift-reveal-media.mobile\\:media--wide>img,#${revealSectionId} .dcrift-reveal-media>img{aspect-ratio:unset!important}}`;
@@ -170,11 +175,22 @@ export function DiabetesCareRevealImageWithText({
   const secondaryLabel = buttons?.secondaryText?.trim() ?? '';
   const primaryHref = buttons?.primaryLink?.href ?? '#';
   const secondaryHref = buttons?.secondaryLink?.href ?? '#';
-  const bannerHeadingStyle =
-    bannerHeadline.color != null || bannerHeadline.fontSize != null
+  const bannerDesktopFontPx = bannerHeading?.fontSize;
+  const bannerMobileFontPx = bannerHeading?.fontSizeMobile;
+  const hasBannerDesktopFont = bannerDesktopFontPx != null && bannerDesktopFontPx > 0;
+  const hasBannerMobileFont = bannerMobileFontPx != null && bannerMobileFontPx > 0;
+  /** Inline size only when desktop is set (optional mobile pairs via clamp). Mobile-only uses CSS ≤500px. */
+  const bannerHeadingFontSize = hasBannerDesktopFont
+    ? resolveHeadingFontSizeCss(
+        bannerDesktopFontPx,
+        hasBannerMobileFont ? bannerMobileFontPx : undefined,
+      )
+    : undefined;
+  const bannerHeadingStyle: CSSProperties | undefined =
+    bannerHeadline.color != null || bannerHeadingFontSize != null
       ? {
           ...(bannerHeadline.color != null ? { color: bannerHeadline.color } : {}),
-          ...(bannerHeadline.fontSize != null ? { fontSize: bannerHeadline.fontSize } : {}),
+          ...(bannerHeadingFontSize != null ? { fontSize: bannerHeadingFontSize } : {}),
         }
       : undefined;
 
@@ -193,7 +209,7 @@ export function DiabetesCareRevealImageWithText({
               <div className="reveal-banner__scroller sticky top-0 overflow-hidden">
                 <div className="banner relative h-full min-h-[100dvh] w-full md:h-screen">
                   <div className="banner__content left-0 h-full w-full overflow-hidden">
-                    <div className="page-width flex h-full w-full items-center justify-center px-4 sm:px-5 md:px-0">
+                    <div className="page-width page-width--narrow flex h-full w-full items-center justify-center px-4 sm:px-5 md:px-0">
                       <div className="banner__box banner__box--large text-center">
                         <div className="splitting-wrapper relative">
                           <h2
@@ -212,7 +228,7 @@ export function DiabetesCareRevealImageWithText({
                 {imageSrc.length > 0 ? (
                   <div className="page-width page-width--narrow relative mx-auto w-full px-4 sm:px-5 md:px-0">
                     <picture
-                      className="dcrift-reveal-media media media--adapt media--transparent relative block w-full overflow-hidden rounded-3xl"
+                      className="dcrift-reveal-media reveal-banner__cover-media media media--adapt media--transparent relative block w-full overflow-hidden rounded-3xl"
                       style={revealMediaStyle}
                     >
                       <img

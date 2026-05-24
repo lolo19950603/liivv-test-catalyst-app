@@ -1,7 +1,8 @@
-import { Group, Image, Link, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
+import { Group, Image, Link, Number, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
 import {
   buttonColorFields,
+  FONT_SIZE_DESCRIPTION,
   fontSizeFields,
   sectionBackgroundControls,
   splitHeadingPopoverControls,
@@ -35,7 +36,18 @@ runtime.registerComponent(DiabetesCareRevealImageWithText, {
           defaultValue: 'Meet Armaan...',
         }),
         ...textColorFields(),
-        ...fontSizeFields(),
+        fontSize: Number({
+          label: 'Font size',
+          suffix: 'px',
+          defaultValue: 0,
+          description: FONT_SIZE_DESCRIPTION,
+        }),
+        fontSizeMobile: Number({
+          label: 'Font size (mobile)',
+          suffix: 'px',
+          defaultValue: 0,
+          description: '0 = theme default on desktop; ≤500px uses compact banner fit unless set.',
+        }),
       },
     }),
     bannerImage: Group({

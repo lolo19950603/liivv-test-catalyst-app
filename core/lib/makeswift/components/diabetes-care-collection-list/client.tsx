@@ -6,6 +6,7 @@ import { type CSSProperties, type KeyboardEventHandler, useId, useRef, useState 
 import {
   CarouselArrowButton,
   useCarouselScrollSync,
+  useHorizontalScrollOverflow,
 } from '~/lib/makeswift/diabetes-care-carousel-controls';
 import {
   DC_CAROUSEL_HOST_CLASS,
@@ -288,13 +289,17 @@ export function DiabetesCareCollectionList({
   const desc = bodyResolved.html;
 
   const list = cards != null ? cards.filter(cardHasMedia) : [];
-  const canScroll = list.length > 1;
+  const hasMultipleItems = list.length > 1;
+  const needsHorizontalScroll = useHorizontalScrollOverflow(scrollerRef, hasMultipleItems, {
+    minWidthPx: 1024,
+  });
+  const showArrows = hasMultipleItems && needsHorizontalScroll;
 
   const { setItemRef, scrollItemIntoView } = useCarouselScrollSync(
     scrollerRef,
     list.length,
     setActiveIndex,
-    canScroll,
+    showArrows,
     { scrollInline: 'start' },
   );
 
@@ -346,26 +351,28 @@ export function DiabetesCareCollectionList({
                   />
                 ) : null}
               </div>
-              <div className="indicators gap-2d5 hidden lg:flex">
-                <CarouselArrowButton
-                  ariaLabel="Previous"
-                  controls={sliderDomId}
-                  direction="prev"
-                  disabled={!canScroll || activeIndex <= 0}
-                  onClick={() => {
-                    slide(-1);
-                  }}
-                />
-                <CarouselArrowButton
-                  ariaLabel="Next"
-                  controls={sliderDomId}
-                  direction="next"
-                  disabled={!canScroll || activeIndex >= list.length - 1}
-                  onClick={() => {
-                    slide(1);
-                  }}
-                />
-              </div>
+              {showArrows ? (
+                <div className="indicators gap-2d5 hidden lg:flex">
+                  <CarouselArrowButton
+                    ariaLabel="Previous"
+                    controls={sliderDomId}
+                    direction="prev"
+                    disabled={activeIndex <= 0}
+                    onClick={() => {
+                      slide(-1);
+                    }}
+                  />
+                  <CarouselArrowButton
+                    ariaLabel="Next"
+                    controls={sliderDomId}
+                    direction="next"
+                    disabled={activeIndex >= list.length - 1}
+                    onClick={() => {
+                      slide(1);
+                    }}
+                  />
+                </div>
+              ) : null}
             </div>
 
             <div
@@ -375,7 +382,7 @@ export function DiabetesCareCollectionList({
                 DC_CAROUSEL_HOST_CLASS,
               )}
               id={sliderDomId}
-              onKeyDown={list.length > 0 ? onKeyNav : undefined}
+              onKeyDown={showArrows ? onKeyNav : undefined}
               ref={scrollerRef}
               role="region"
               tabIndex={list.length > 0 ? 0 : undefined}

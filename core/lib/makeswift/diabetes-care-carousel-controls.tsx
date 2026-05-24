@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 
 export function IconChevronLeft() {
   return (
@@ -100,6 +100,81 @@ export type CarouselScrollSyncOptions = {
   /** How scroll position maps to the active slide. Use `start` for left-aligned strips. */
   scrollInline?: 'start' | 'center';
 };
+
+export type HorizontalScrollOverflowOptions = {
+  /** Only treat overflow as scrollable at this min viewport width (px). */
+  minWidthPx?: number;
+  /** Subpixel slack before hiding arrows. */
+  tolerance?: number;
+};
+
+/** True when the element's content is wider than its viewport (horizontal scroll needed). */
+export function useHorizontalScrollOverflow(
+  ref: RefObject<HTMLElement | null>,
+  enabled: boolean,
+  options?: HorizontalScrollOverflowOptions,
+) {
+  const [overflows, setOverflows] = useState(false);
+  const tolerance = options?.tolerance ?? 2;
+  const minWidthPx = options?.minWidthPx;
+
+  useEffect(() => {
+    if (!enabled) {
+      setOverflows(false);
+
+      return;
+    }
+
+    const el = ref.current;
+
+    if (!el) {
+      setOverflows(false);
+
+      return;
+    }
+
+    const measure = () => {
+      if (minWidthPx != null && window.innerWidth < minWidthPx) {
+        setOverflows(false);
+
+        return;
+      }
+
+      setOverflows(el.scrollWidth > el.clientWidth + tolerance);
+    };
+
+    measure();
+
+    const ro = new ResizeObserver(measure);
+
+    ro.observe(el);
+
+    for (const child of el.children) {
+      ro.observe(child);
+    }
+
+    const mq =
+      minWidthPx != null ? window.matchMedia(`(min-width: ${String(minWidthPx)}px)`) : null;
+
+    mq?.addEventListener('change', measure);
+    window.addEventListener('resize', measure);
+
+    for (const img of el.querySelectorAll('img')) {
+      if (!img.complete) {
+        img.addEventListener('load', measure, { once: true });
+      }
+    }
+
+    return () => {
+      ro.disconnect();
+      mq?.removeEventListener('change', measure);
+      window.removeEventListener('resize', measure);
+    };
+  }, [enabled, minWidthPx, ref, tolerance]);
+
+  return overflows;
+}
+
 
 /** Debounced scroll-end sync for horizontal carousels. */
 export function useCarouselScrollSync(
