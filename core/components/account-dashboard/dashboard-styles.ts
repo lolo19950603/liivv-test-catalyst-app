@@ -82,14 +82,14 @@ body.adc-portal-active main{
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-logo__img{
   display:block;
-  height:2.75rem;
+  height:3.5rem;
   width:auto;
   object-fit:contain;
   flex-shrink:0;
 }
 @media screen and (min-width:900px){
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-logo__img{
-    height:3.25rem;
+    height:4.5rem;
   }
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-header__services{
@@ -451,6 +451,27 @@ body.adc-portal-active main{
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-empty__art svg{
   width:min(100%,12rem);
   height:auto;
+}
+/* Photo variant: fills card body edge-to-edge under the title, like the reference HTML. */
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-empty__art--photo{
+  display:block;
+  width:auto;
+  margin-inline:0;
+  padding-inline:0;
+}
+@media screen and (min-width:650px){
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-empty__art--photo{
+    margin-inline:1.25rem;
+  }
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-empty__photo{
+  display:block;
+  width:100%;
+  height:auto;
+  aspect-ratio:470/235;
+  object-fit:cover;
+  object-position:center;
+  border-radius:var(--mhd-radius-sm);
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-empty__text{
   display:flex;

@@ -7,8 +7,6 @@ import {
   IconAppointment,
   IconMetric,
   IconPrescription,
-  IllustrationAppointments,
-  IllustrationPrescriptions,
 } from './icons';
 
 function greetingPrefix(hour: number): 'morning' | 'afternoon' | 'evening' {
@@ -49,8 +47,14 @@ export function HealthDashboardMain({
             </div>
             <div className="mhd-empty">
               <div className="mhd-empty__body">
-                <div className="mhd-empty__art">
-                  <IllustrationPrescriptions />
+                <div className="mhd-empty__art mhd-empty__art--photo">
+                  <img
+                    alt=""
+                    className="mhd-empty__photo"
+                    height={235}
+                    src="/archive/images/dashboard-prescriptions.png"
+                    width={470}
+                  />
                 </div>
                 <div className="mhd-empty__text">
                   <p className="mhd-empty__heading">{labels.healthCenter.prescriptions.heading}</p>
@@ -74,8 +78,14 @@ export function HealthDashboardMain({
             </div>
             <div className="mhd-empty">
               <div className="mhd-empty__body">
-                <div className="mhd-empty__art">
-                  <IllustrationAppointments />
+                <div className="mhd-empty__art mhd-empty__art--photo">
+                  <img
+                    alt=""
+                    className="mhd-empty__photo"
+                    height={235}
+                    src="/archive/images/dashboard-appointments.png"
+                    width={465}
+                  />
                 </div>
                 <div className="mhd-empty__text">
                   <p className="mhd-empty__heading">{labels.healthCenter.appointments.heading}</p>
