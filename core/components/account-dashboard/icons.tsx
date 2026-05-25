@@ -38,3 +38,117 @@ export function IconCart({ className }: { className?: string }) {
     </svg>
   );
 }
+
+export function IconChevronDown({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z" />
+    </svg>
+  );
+}
+
+export function IconChevronRight({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M9.29 6.71a1 1 0 0 1 1.41 0L14.59 12l-3.89 3.88a1 1 0 0 1-1.41-1.41L12.17 12 9.29 9.12a1 1 0 0 1 0-1.41Z" />
+    </svg>
+  );
+}
+
+/** Tilted capsule outline (navy stroke), matches the PC Health "My Prescriptions" featured icon. */
+export function IconPrescription({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g transform="rotate(-45 12 12)">
+        <rect height="9" rx="4.5" width="16" x="4" y="5" />
+        <path d="M12 5v9" strokeLinecap="round" />
+      </g>
+    </svg>
+  );
+}
+
+export function IconAppointment({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect height="16" rx="2" width="16" x="4" y="5" />
+      <path d="M8 3v4M16 3v4M4 10h16" strokeLinecap="round" />
+      <circle cx="12" cy="15" fill="currentColor" r="1.5" stroke="none" />
+    </svg>
+  );
+}
+
+export function IconMetric({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M4 18V8l4 3 4-6 4 4 4-3v12"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function IllustrationPrescriptions() {
+  return (
+    <svg aria-hidden fill="none" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
+      <rect fill="#F5F2ED" height="160" rx="12" width="200" />
+      <rect fill="#fff" height="72" rx="8" stroke="#E6DCD5" width="48" x="44" y="44" />
+      <rect fill="#fff" height="72" rx="8" stroke="#E6DCD5" width="48" x="108" y="44" />
+      <path d="M56 68h24M56 76h24M56 84h16" stroke="#A89C94" strokeLinecap="round" />
+      <path d="M120 68h24M120 76h24" stroke="#312F2F" strokeLinecap="round" strokeWidth="2" />
+      <circle cx="132" cy="92" fill="#8EA58D" r="6" />
+    </svg>
+  );
+}
+
+export function IllustrationAppointments() {
+  return (
+    <svg aria-hidden fill="none" viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
+      <rect fill="#F5F2ED" height="160" rx="12" width="200" />
+      <rect fill="#fff" height="88" rx="10" stroke="#E6DCD5" width="112" x="44" y="36" />
+      <path d="M44 56h112" stroke="#E6DCD5" />
+      <circle cx="72" cy="48" fill="#312F2F" r="4" />
+      <circle cx="88" cy="48" fill="#312F2F" r="4" />
+      <rect fill="#312F2F" height="8" opacity="0.15" rx="2" width="24" x="60" y="72" />
+      <rect fill="#312F2F" height="8" opacity="0.15" rx="2" width="24" x="92" y="72" />
+      <rect fill="#8EA58D" height="8" rx="2" width="24" x="124" y="72" />
+    </svg>
+  );
+}

@@ -7,30 +7,43 @@ export type DashboardPanelId =
   | 'orders'
   | 'subscriptions';
 
-export interface DashboardNavItem {
-  id: DashboardPanelId;
-  label: string;
-  icon: string;
-}
-
 export interface AccountDashboardLabels {
-  brandEyebrow: string;
-  brandTitle: string;
   signOut: string;
   notifications: string;
   cart: string;
-  needHelpTitle: string;
-  needHelpBody: string;
-  needHelpToggle: string;
-  nav: Record<DashboardPanelId, string>;
-  panels: {
-    main: { title: string; lead: string };
-    healthProfile: { title: string; lead: string };
-    pharmacy: { title: string; lead: string };
-    insurance: { title: string; lead: string };
-    rewards: { title: string; lead: string };
-    orders: { title: string; lead: string; viewAll: string };
-    subscriptions: { title: string; lead: string };
+  myAccount: string;
+  accountSettings: string;
+  featuredNav: {
+    prescriptions: string;
+    appointments: string;
+    metrics: string;
+  };
+  megaNav: string[];
+  healthCenter: {
+    greeting: {
+      morning: string;
+      afternoon: string;
+      evening: string;
+    };
+    welcomeLead: string;
+    prescriptions: {
+      title: string;
+      heading: string;
+      description: string;
+      cta: string;
+    };
+    appointments: {
+      title: string;
+      heading: string;
+      description: string;
+      cta: string;
+    };
+    quickLinksTitle: string;
+    quickLinks: {
+      prescriptions: { title: string; description: string };
+      appointments: { title: string; description: string };
+      metrics: { title: string; description: string };
+    };
   };
 }
 

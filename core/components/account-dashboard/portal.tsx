@@ -1,46 +1,49 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 import { Link } from '~/components/link';
+import { initShopifyButtonFillHover } from '~/lib/archived-pages/init-shopify-button-fill-hover';
 
 import {
   ACCOUNT_DASHBOARD_ROOT_ID,
   ACCOUNT_DASHBOARD_STYLE,
 } from './dashboard-styles';
-import { IconBell, IconCart } from './icons';
-import { DashboardPanelContent } from './panel-content';
-import type { AccountDashboardProps, DashboardNavItem, DashboardPanelId } from './types';
+import { HealthDashboardMain } from './health-dashboard-main';
+import {
+  IconAppointment,
+  IconBell,
+  IconCart,
+  IconChevronDown,
+  IconMetric,
+  IconPrescription,
+} from './icons';
+import type { AccountDashboardProps } from './types';
 
-const NAV_ITEMS: DashboardNavItem[] = [
-  { id: 'main', label: '', icon: '◆' },
-  { id: 'health-profile', label: '', icon: '♥' },
-  { id: 'pharmacy', label: '', icon: '℞' },
-  { id: 'insurance', label: '', icon: '▣' },
-  { id: 'rewards', label: '', icon: '★' },
-  { id: 'orders', label: '', icon: '↗' },
-  { id: 'subscriptions', label: '', icon: '↻' },
-];
+function initialsFromName(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+
+  if (parts.length === 0) {
+    return 'LV';
+  }
+
+  return parts
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('');
+}
 
 export function AccountDashboardPortal({
   customerName,
   cartHref,
-  ordersHref,
   logoutHref,
   labels,
 }: AccountDashboardProps) {
-  const [activePanel, setActivePanel] = useState<DashboardPanelId>('main');
-  const [helpOpen, setHelpOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
 
-  const navItems = useMemo(
-    () =>
-      NAV_ITEMS.map((item) => ({
-        ...item,
-        label: labels.nav[item.id],
-      })),
-    [labels.nav],
-  );
+  const avatarInitials = useMemo(() => initialsFromName(customerName), [customerName]);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -54,142 +57,139 @@ export function AccountDashboardPortal({
     };
   }, []);
 
+  /** Sweep-fill hover (top → bottom on enter, exits bottom on leave) shared with rich-text-lower CTA. */
+  useEffect(() => {
+    if (rootRef.current == null) {
+      return;
+    }
+
+    return initShopifyButtonFillHover(rootRef.current);
+  }, []);
+
+  useEffect(() => {
+    if (!accountOpen) {
+      return;
+    }
+
+    const onPointerDown = (event: MouseEvent) => {
+      if (accountRef.current != null && !accountRef.current.contains(event.target as Node)) {
+        setAccountOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', onPointerDown);
+
+    return () => document.removeEventListener('mousedown', onPointerDown);
+  }, [accountOpen]);
+
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: ACCOUNT_DASHBOARD_STYLE }} />
-      <div className="liivv-account-dashboard-root" id={ACCOUNT_DASHBOARD_ROOT_ID}>
-        <header className="adc-topbar">
-          <div className="adc-topbar__brand">
-            <span className="adc-topbar__eyebrow">{labels.brandEyebrow}</span>
-            <h1 className="adc-topbar__title">{labels.brandTitle}</h1>
-          </div>
-          <div className="adc-topbar__actions">
-            <button
-              aria-expanded={notificationsOpen}
-              aria-label={labels.notifications}
-              className="adc-icon-btn"
-              onClick={() => setNotificationsOpen((open) => !open)}
-              type="button"
-            >
-              <IconBell />
-              <span className="adc-badge">3</span>
-            </button>
-            <Link aria-label={labels.cart} className="adc-icon-btn" href={cartHref}>
-              <IconCart />
-            </Link>
-            <Link className="adc-sign-out" href={logoutHref} prefetch="none">
-              {labels.signOut}
-            </Link>
-          </div>
-        </header>
-
-        <div className="adc-body">
-          <nav aria-label="Account sections" className="adc-sidebar">
-            {navItems.map((item) => (
-              <NavButton
-                active={activePanel === item.id}
-                icon={item.icon}
-                key={item.id}
-                label={item.label}
-                onSelect={() => setActivePanel(item.id)}
+      <div
+        className="liivv-account-dashboard-root"
+        data-button-hover="standard"
+        id={ACCOUNT_DASHBOARD_ROOT_ID}
+        ref={rootRef}
+      >
+        <header className="mhd-header">
+          <div className="mhd-header__top">
+            <Link aria-label="Liivv" className="mhd-logo" href="/">
+              <img
+                alt="Liivv"
+                className="mhd-logo__img"
+                height={40}
+                src="https://storage.googleapis.com/s.mkswft.com/RmlsZTo4NWQ4MGJiNi03MDZjLTQ4MWEtOGFmNi1kNDI2ZjBlNDYwOTQ=/Liivv_Favicon.png"
+                width={40}
               />
-            ))}
-          </nav>
+            </Link>
 
-          <div className="adc-main">
-            <nav aria-label="Account sections" className="adc-mobile-nav">
-              {navItems.map((item) => (
-                <NavButton
-                  active={activePanel === item.id}
-                  icon={item.icon}
-                  key={item.id}
-                  label={item.label}
-                  onSelect={() => setActivePanel(item.id)}
-                />
-              ))}
+            <nav aria-label="Featured services" className="mhd-header__services">
+              <FeaturedServiceLink icon={<IconPrescription />} label={labels.featuredNav.prescriptions} />
+              <FeaturedServiceLink icon={<IconAppointment />} label={labels.featuredNav.appointments} />
+              <FeaturedServiceLink icon={<IconMetric />} label={labels.featuredNav.metrics} />
             </nav>
 
-            {notificationsOpen ? (
-              <div className="adc-card" style={{ marginBottom: '1rem' }} role="status">
-                <p className="adc-card__label">Notifications</p>
-                <ul className="adc-list" style={{ marginTop: '0.75rem' }}>
-                  <li className="adc-list-item">
-                    <span>Prescription ready for pickup</span>
-                    <span className="adc-pill">New</span>
+            <div className="mhd-header__account">
+              <button
+                aria-expanded={false}
+                aria-label={labels.notifications}
+                className="mhd-icon-btn"
+                type="button"
+              >
+                <IconBell />
+                <span className="mhd-badge">3</span>
+              </button>
+              <Link aria-label={labels.cart} className="mhd-icon-btn" href={cartHref}>
+                <IconCart />
+              </Link>
+
+              <div className="mhd-account-wrap" ref={accountRef}>
+                <button
+                  aria-expanded={accountOpen}
+                  aria-haspopup="menu"
+                  className="mhd-account-btn"
+                  onClick={() => setAccountOpen((open) => !open)}
+                  type="button"
+                >
+                  <span aria-hidden className="mhd-avatar">
+                    {avatarInitials}
+                  </span>
+                  {labels.myAccount}
+                  <IconChevronDown className="mhd-chevron" />
+                </button>
+                <ul className="mhd-account-menu" hidden={!accountOpen} role="menu">
+                  <li role="none">
+                    <Link href="/account/settings/" onClick={() => setAccountOpen(false)} role="menuitem">
+                      {labels.accountSettings}
+                    </Link>
                   </li>
-                  <li className="adc-list-item">
-                    <span>Subscription ships in 6 days</span>
-                    <span className="adc-pill">Reminder</span>
-                  </li>
-                  <li className="adc-list-item">
-                    <span>You earned 50 rewards points</span>
-                    <span className="adc-pill">Rewards</span>
+                  <li role="none">
+                    <Link href={logoutHref} onClick={() => setAccountOpen(false)} prefetch="none" role="menuitem">
+                      {labels.signOut}
+                    </Link>
                   </li>
                 </ul>
               </div>
-            ) : null}
-
-            {navItems.map((item) => (
-              <section
-                aria-hidden={activePanel !== item.id}
-                className="adc-panel"
-                data-active={activePanel === item.id}
-                id={`adc-panel-${item.id}`}
-                key={item.id}
-              >
-                <DashboardPanelContent
-                  customerName={customerName}
-                  labels={labels}
-                  ordersHref={ordersHref}
-                  panel={item.id}
-                />
-              </section>
-            ))}
+            </div>
           </div>
-        </div>
 
-        <div className="adc-help">
-          <div className="adc-help-panel" data-open={helpOpen}>
-            <div className="adc-help-panel__head">{labels.needHelpTitle}</div>
-            <div className="adc-help-panel__body">{labels.needHelpBody}</div>
+          <nav aria-label="Main navigation" className="mhd-mega-nav">
+            <ul className="mhd-mega-nav__list" role="list">
+              {labels.megaNav.map((item) => (
+                <li className="mhd-mega-nav__item" key={item}>
+                  <button className="mhd-mega-nav__btn mhd-btn-fill" type="button">
+                    <span data-text>
+                      {item}
+                      <IconChevronDown />
+                    </span>
+                    <span aria-hidden className="mhd-btn-fill__dup">
+                      {item}
+                      <IconChevronDown />
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </header>
+
+        <main className="mhd-main">
+          <div className="mhd-container">
+            <HealthDashboardMain customerName={customerName} labels={labels} />
           </div>
-          <button
-            aria-expanded={helpOpen}
-            aria-label={labels.needHelpToggle}
-            className="adc-help-toggle"
-            onClick={() => setHelpOpen((open) => !open)}
-            type="button"
-          >
-            ?
-          </button>
-        </div>
+        </main>
       </div>
     </>
   );
 }
 
-function NavButton({
-  active,
-  icon,
-  label,
-  onSelect,
-}: {
-  active: boolean;
-  icon: string;
-  label: string;
-  onSelect: () => void;
-}) {
+function FeaturedServiceLink({ icon, label }: { icon: ReactNode; label: string }) {
   return (
-    <button
-      className="adc-nav-btn"
-      data-active={active}
-      onClick={onSelect}
-      type="button"
-    >
-      <span aria-hidden className="adc-nav-btn__icon">
+    <button className="mhd-service-link" type="button">
+      <span aria-hidden className="mhd-service-link__icon">
         {icon}
       </span>
-      {label}
+      <span className="mhd-service-link__label">{label}</span>
     </button>
   );
 }

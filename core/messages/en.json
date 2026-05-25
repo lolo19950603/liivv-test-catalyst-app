@@ -186,56 +186,60 @@
       "wishlists": "Wish lists"
     },
     "Dashboard": {
-      "metaTitle": "Member dashboard",
-      "brandEyebrow": "Liivv care",
-      "brandTitle": "Your health dashboard",
+      "metaTitle": "My Health Dashboard",
       "signOut": "Sign out",
       "notifications": "Notifications",
       "cart": "Cart",
       "guestName": "Member",
-      "needHelp": {
-        "title": "Need help?",
-        "body": "Chat with our care team about orders, prescriptions, insurance, or your health profile. Typical reply time is under 5 minutes during business hours.",
-        "toggle": "Open help chat"
+      "myAccount": "My Account",
+      "accountSettings": "Account settings",
+      "featuredNav": {
+        "prescriptions": "My Prescriptions",
+        "appointments": "My Appointments",
+        "metrics": "My Metric"
       },
-      "nav": {
-        "main": "Main dashboard",
-        "health-profile": "Health profile",
-        "pharmacy": "Pharmacy",
-        "insurance": "Insurance",
-        "rewards": "Rewards",
+      "megaNav": {
+        "healthDashboard": "My Health Dashboard",
+        "digitalPharmacy": "Digital Pharmacy",
+        "featuredServices": "Featured Services",
+        "bookHealthServices": "Book Health Services",
+        "healthResources": "Health Resources",
         "orders": "Orders",
-        "subscriptions": "Subscriptions"
+        "rewards": "Rewards"
       },
-      "panels": {
-        "main": {
-          "title": "Welcome back",
-          "lead": "Hi {name} — here is a snapshot of your care, orders, and rewards."
+      "healthCenter": {
+        "greeting": {
+          "morning": "Good morning, {name}",
+          "afternoon": "Good afternoon, {name}",
+          "evening": "Good evening, {name}"
         },
-        "healthProfile": {
-          "title": "Health profile",
-          "lead": "Keep your care details current so we can personalize refills, coaching, and coverage checks."
+        "welcomeLead": "Welcome to your Health Dashboard, where you can manage all your health needs.",
+        "prescriptions": {
+          "title": "My prescriptions",
+          "heading": "Save time, refill online.",
+          "description": "Refill or renew an existing prescription online when you set up your prescriptions. Plus, keep track of your medications in one place, view your prescription history, and more.",
+          "cta": "Set up my prescriptions"
         },
-        "pharmacy": {
-          "title": "Pharmacy",
-          "lead": "Track prescriptions, refills, and fulfillment status in one place."
+        "appointments": {
+          "title": "My appointments",
+          "heading": "How can we help?",
+          "description": "Book an appointment with your Pharmacist or get rehabilitation support from a trained healthcare provider.",
+          "cta": "Book Now"
         },
-        "insurance": {
-          "title": "Insurance",
-          "lead": "Review plan coverage, copays, and DME benefits before you check out."
-        },
-        "rewards": {
-          "title": "Rewards",
-          "lead": "Earn points on refills, subscriptions, and healthy habits."
-        },
-        "orders": {
-          "title": "Orders",
-          "lead": "Recent purchases and delivery updates. Full order history lives in your account orders area.",
-          "viewAll": "View all orders"
-        },
-        "subscriptions": {
-          "title": "Subscriptions",
-          "lead": "Manage auto-ship schedules, skip a delivery, or pause a subscription."
+        "quickLinksTitle": "My health quick links",
+        "quickLinks": {
+          "prescriptions": {
+            "title": "My Prescriptions",
+            "description": "Refill, renew, and manage your prescriptions with ease."
+          },
+          "appointments": {
+            "title": "Appointments",
+            "description": "Book, view, and stay on top of all your health appointments."
+          },
+          "metrics": {
+            "title": "Metrics",
+            "description": "Track and review your health metrics in one place."
+          }
         }
       }
     },

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { AccountDashboardPortal } from '~/components/account-dashboard';
-import type { AccountDashboardLabels, DashboardPanelId } from '~/components/account-dashboard/types';
+import type { AccountDashboardLabels } from '~/components/account-dashboard/types';
 
 import { getDashboardCustomer } from './page-data';
 
@@ -21,45 +21,61 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 function buildLabels(
   t: Awaited<ReturnType<typeof getTranslations<'Account.Dashboard'>>>,
-  customerName: string,
+  customerFirstName: string,
 ): AccountDashboardLabels {
-  const nav: Record<DashboardPanelId, string> = {
-    main: t('nav.main'),
-    'health-profile': t('nav.health-profile'),
-    pharmacy: t('nav.pharmacy'),
-    insurance: t('nav.insurance'),
-    rewards: t('nav.rewards'),
-    orders: t('nav.orders'),
-    subscriptions: t('nav.subscriptions'),
-  };
-
   return {
-    brandEyebrow: t('brandEyebrow'),
-    brandTitle: t('brandTitle'),
     signOut: t('signOut'),
     notifications: t('notifications'),
     cart: t('cart'),
-    needHelpTitle: t('needHelp.title'),
-    needHelpBody: t('needHelp.body'),
-    needHelpToggle: t('needHelp.toggle'),
-    nav,
-    panels: {
-      main: {
-        title: t('panels.main.title'),
-        lead: t('panels.main.lead', { name: customerName }),
+    myAccount: t('myAccount'),
+    accountSettings: t('accountSettings'),
+    featuredNav: {
+      prescriptions: t('featuredNav.prescriptions'),
+      appointments: t('featuredNav.appointments'),
+      metrics: t('featuredNav.metrics'),
+    },
+    megaNav: [
+      t('megaNav.healthDashboard'),
+      t('megaNav.digitalPharmacy'),
+      t('megaNav.featuredServices'),
+      t('megaNav.bookHealthServices'),
+      t('megaNav.healthResources'),
+      t('megaNav.orders'),
+      t('megaNav.rewards'),
+    ],
+    healthCenter: {
+      greeting: {
+        morning: t('healthCenter.greeting.morning', { name: customerFirstName }),
+        afternoon: t('healthCenter.greeting.afternoon', { name: customerFirstName }),
+        evening: t('healthCenter.greeting.evening', { name: customerFirstName }),
       },
-      healthProfile: { title: t('panels.healthProfile.title'), lead: t('panels.healthProfile.lead') },
-      pharmacy: { title: t('panels.pharmacy.title'), lead: t('panels.pharmacy.lead') },
-      insurance: { title: t('panels.insurance.title'), lead: t('panels.insurance.lead') },
-      rewards: { title: t('panels.rewards.title'), lead: t('panels.rewards.lead') },
-      orders: {
-        title: t('panels.orders.title'),
-        lead: t('panels.orders.lead'),
-        viewAll: t('panels.orders.viewAll'),
+      welcomeLead: t('healthCenter.welcomeLead'),
+      prescriptions: {
+        title: t('healthCenter.prescriptions.title'),
+        heading: t('healthCenter.prescriptions.heading'),
+        description: t('healthCenter.prescriptions.description'),
+        cta: t('healthCenter.prescriptions.cta'),
       },
-      subscriptions: {
-        title: t('panels.subscriptions.title'),
-        lead: t('panels.subscriptions.lead'),
+      appointments: {
+        title: t('healthCenter.appointments.title'),
+        heading: t('healthCenter.appointments.heading'),
+        description: t('healthCenter.appointments.description'),
+        cta: t('healthCenter.appointments.cta'),
+      },
+      quickLinksTitle: t('healthCenter.quickLinksTitle'),
+      quickLinks: {
+        prescriptions: {
+          title: t('healthCenter.quickLinks.prescriptions.title'),
+          description: t('healthCenter.quickLinks.prescriptions.description'),
+        },
+        appointments: {
+          title: t('healthCenter.quickLinks.appointments.title'),
+          description: t('healthCenter.quickLinks.appointments.description'),
+        },
+        metrics: {
+          title: t('healthCenter.quickLinks.metrics.title'),
+          description: t('healthCenter.quickLinks.metrics.description'),
+        },
       },
     },
   };
@@ -77,12 +93,13 @@ export default async function AccountDashboardPage({ params }: Props) {
   const lastName = customer?.lastName?.trim() ?? '';
   const customerName =
     [firstName, lastName].filter(Boolean).join(' ') || t('guestName');
+  const firstNameForGreeting = firstName.length > 0 ? firstName : customerName;
 
   return (
     <AccountDashboardPortal
       cartHref="/cart"
       customerName={customerName}
-      labels={buildLabels(t, customerName)}
+      labels={buildLabels(t, firstNameForGreeting)}
       logoutHref="/logout"
       ordersHref="/account/orders/"
     />
