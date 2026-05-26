@@ -130,6 +130,7 @@ export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
   mobileSectionPadding(FAQ_SECOND_SECTION_ID),
 
   /* 15 — Image overlay (banner layout: component `IMAGE_TEXT_OVERLAY_BANNER_CSS`) */
-  `${MOBILE}{#${IMAGE_TEXT_OVERLAY_SECTION_ID} .diabetes-care-image-text-overlay-features{--section-padding-top:40px;--section-padding-bottom:24px}}`,
   `${MOBILE}{#${IMAGE_TEXT_OVERLAY_SECTION_ID} .banner__box{padding-bottom:1.5rem}}`,
+
+  /* 16 — Feature columns footer mobile padding lives in its own archive-styles (cascade-safe) */
 ].join('');

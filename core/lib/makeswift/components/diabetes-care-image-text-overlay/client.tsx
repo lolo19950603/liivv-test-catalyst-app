@@ -5,7 +5,7 @@ import type { CSSProperties } from 'react';
 
 import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
 import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
-import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
 import {
   buildSectionTheme,
@@ -16,16 +16,13 @@ import {
   type SectionBackgroundProps,
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
-import { resolvePlainTextColor } from '~/lib/makeswift/utils/heading-accent-color';
 import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
 
 import {
   IMAGE_TEXT_OVERLAY_BANNER_CSS,
-  IMAGE_TEXT_OVERLAY_FEATURES_VARS,
   IMAGE_TEXT_OVERLAY_SECTION_ID,
   IMAGE_TEXT_OVERLAY_VARS,
 } from './archive-styles';
-import { FeatureIcon, type FeatureIconName, isFeatureIconName } from './feature-icons';
 
 function IconArrowRight() {
   return (
@@ -45,32 +42,6 @@ function IconArrowRight() {
     </svg>
   );
 }
-
-export type ImageTextOverlayFeatureTextProps = {
-  text?: string;
-  textColor?: string;
-  textColorHex?: string;
-  fontSize?: number;
-  fontSizeMobile?: number;
-};
-
-export type ImageTextOverlayFeatureResolved = {
-  icon: string;
-  title: string;
-  titleStyle: CSSProperties | undefined;
-  description: string;
-  descriptionStyle: CSSProperties | undefined;
-};
-
-export interface DiabetesCareImageTextOverlayFeature {
-  icon?: string;
-  /** Popover group or legacy plain string. */
-  title?: ImageTextOverlayFeatureTextProps | string;
-  /** Popover group or legacy plain string. */
-  description?: ImageTextOverlayFeatureTextProps | string;
-}
-
-const MAX_FEATURES = 4;
 
 /** @deprecated Flat combined heading; use `heading.primaryHeading` + `heading.secondaryHeading`. */
 export type ImageTextOverlayHeadingProps = HeadingTypographyProps & {
@@ -112,33 +83,9 @@ export type DiabetesCareImageTextOverlayProps = {
     label?: string;
     link?: { href?: string; target?: string };
   };
-  features?: DiabetesCareImageTextOverlayFeature[];
   /** @deprecated Use `body` text color and font size. */
   bodyText?: BodyTextProps;
 };
-
-const DEFAULT_FEATURES: DiabetesCareImageTextOverlayFeature[] = [
-  {
-    icon: 'support',
-    title: 'Here When You Need Us',
-    description: 'Friendly customer support to help answer questions or guide your care',
-  },
-  {
-    icon: 'box',
-    title: 'Easy, Reliable Shipping',
-    description: 'Fast, dependable delivery straight to your door.',
-  },
-  {
-    icon: 'heart',
-    title: 'Care You Can Trust',
-    description: 'Thoughtfully curated products and support designed for everyday life',
-  },
-  {
-    icon: 'shield',
-    title: 'Simple, Secure Payments',
-    description: 'Multiple payment options with safe, secure checkout',
-  },
-];
 
 function isNestedHeadingGroup(
   heading: ImageTextOverlayHeadingGroupProps | ImageTextOverlayHeadingProps,
@@ -281,112 +228,6 @@ function resolveBannerImageSrc(props: {
   );
 }
 
-function featureIconName(raw?: string): FeatureIconName {
-  const t = raw?.trim() ?? '';
-
-  return isFeatureIconName(t) ? t : 'support';
-}
-
-function featureTextBlockStyle(
-  block?: ImageTextOverlayFeatureTextProps | null,
-): CSSProperties | undefined {
-  const color = resolvePlainTextColor({
-    textColor: block?.textColor,
-    textColorHex: block?.textColorHex,
-  });
-  const fontSize = resolveHeadingFontSizeCss(block?.fontSize, block?.fontSizeMobile);
-
-  if (color == null && fontSize == null) {
-    return undefined;
-  }
-
-  return {
-    ...(color != null ? { color } : {}),
-    ...(fontSize != null ? { fontSize } : {}),
-  };
-}
-
-function resolveFeatureTextField(
-  field?: ImageTextOverlayFeatureTextProps | string,
-): { text: string; style: CSSProperties | undefined } {
-  if (field == null) {
-    return { text: '', style: undefined };
-  }
-
-  if (typeof field === 'string') {
-    return { text: field.trim(), style: undefined };
-  }
-
-  return {
-    text: field.text?.trim() ?? '',
-    style: featureTextBlockStyle(field),
-  };
-}
-
-function featureDescriptionHtml(raw?: string): string {
-  const t = raw?.trim() ?? '';
-
-  if (t.length === 0) {
-    return '';
-  }
-
-  if (/<[a-z][\s\S]*>/i.test(t)) {
-    return t;
-  }
-
-  return `<p>${t}</p>`;
-}
-
-function resolveFeatureRow(
-  feature: DiabetesCareImageTextOverlayFeature,
-): ImageTextOverlayFeatureResolved | null {
-  const title = resolveFeatureTextField(feature.title);
-  const description = resolveFeatureTextField(feature.description);
-
-  if (title.text.length === 0) {
-    return null;
-  }
-
-  return {
-    icon: feature.icon?.trim() ?? 'support',
-    title: title.text,
-    titleStyle: title.style,
-    description: description.text,
-    descriptionStyle: description.style,
-  };
-}
-
-function featuresResolved(features?: DiabetesCareImageTextOverlayFeature[]): ImageTextOverlayFeatureResolved[] {
-  if (features != null && features.length > 0) {
-    return features
-      .map(resolveFeatureRow)
-      .filter((row): row is ImageTextOverlayFeatureResolved => row != null)
-      .slice(0, MAX_FEATURES);
-  }
-
-  return DEFAULT_FEATURES.flatMap((f) => {
-    const row = resolveFeatureRow(f);
-
-    return row != null ? [row] : [];
-  });
-}
-
-function featuresGridClass(count: number): string {
-  if (count >= 4) {
-    return 'grid--4';
-  }
-
-  if (count === 3) {
-    return 'grid--3';
-  }
-
-  if (count === 2) {
-    return 'grid--2';
-  }
-
-  return 'grid--1';
-}
-
 export function DiabetesCareImageTextOverlay({
   className,
   background,
@@ -399,7 +240,6 @@ export function DiabetesCareImageTextOverlay({
   headingLine2,
   body,
   button,
-  features,
   bodyText,
 }: DiabetesCareImageTextOverlayProps) {
   const { line1, line2 } = resolveImageTextOverlayHeading({
@@ -412,7 +252,7 @@ export function DiabetesCareImageTextOverlay({
   const bodyResolved = resolveImageTextOverlayBody({ body, bodyText });
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: IMAGE_TEXT_OVERLAY_SECTION_ID,
-    sectionCss: `${IMAGE_TEXT_OVERLAY_VARS}${IMAGE_TEXT_OVERLAY_BANNER_CSS}${IMAGE_TEXT_OVERLAY_FEATURES_VARS}`,
+    sectionCss: `${IMAGE_TEXT_OVERLAY_VARS}${IMAGE_TEXT_OVERLAY_BANNER_CSS}`,
     background,
     highlight: null,
     defaultBackgroundChannels: '0 0% 100%',
@@ -424,7 +264,6 @@ export function DiabetesCareImageTextOverlay({
   const btn = button?.label?.trim() ?? '';
   const btnHref = button?.link?.href?.trim() ?? '';
   const hasBtn = btn.length > 0 && btnHref.length > 0;
-  const featureRows = featuresResolved(features);
   const showLine2 = line2Text.length > 0;
 
   return (
@@ -510,53 +349,6 @@ export function DiabetesCareImageTextOverlay({
             </div>
           </div>
         </div>
-
-        {featureRows.length > 0 ? (
-          <ScrollReveal
-            className="diabetes-care-image-text-overlay-features section section--padding section--next-rounded relative"
-            delayMs={120}
-            style={{ zIndex: 3 }}
-          >
-            <div className="page-width relative px-4 sm:px-5 md:px-0">
-              <div
-                className={clsx(
-                  'text-with-icons with-background z-1 relative block lg:grid',
-                  featuresGridClass(featureRows.length),
-                )}
-              >
-                {featureRows.map((row, index) => {
-                  const descHtml = featureDescriptionHtml(row.description);
-
-                  return (
-                    <div
-                      className="column flex w-full flex-col gap-5 text-center xl:flex-row xl:text-left"
-                      key={`overlay-feature-${String(index)}`}
-                    >
-                      <div className="column__icon">
-                        <FeatureIcon name={featureIconName(row.icon)} />
-                      </div>
-                      <div className="column__content">
-                        <p
-                          className="column__title heading tracking-none font-medium leading-tight"
-                          style={row.titleStyle}
-                        >
-                          {row.title}
-                        </p>
-                        {descHtml.length > 0 ? (
-                          <div
-                            className="column__text rte"
-                            dangerouslySetInnerHTML={{ __html: descHtml }}
-                            style={row.descriptionStyle}
-                          />
-                        ) : null}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </ScrollReveal>
-        ) : null}
       </div>
     </div>
   );

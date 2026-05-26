@@ -2,8 +2,6 @@ import {
   Group,
   Image,
   Link,
-  List,
-  Select,
   Style,
   TextArea,
   TextInput,
@@ -62,52 +60,6 @@ runtime.registerComponent(DiabetesCareImageTextOverlay, {
         label: TextInput({ label: 'Button label', defaultValue: 'Reach Out' }),
         link: Link({ label: 'Button link' }),
         ...buttonColorFields(ARCHIVE_BUTTON_PRIMARY_WHITE_ON_BANNER),
-      },
-    }),
-    features: List({
-      label: 'Feature columns (below banner)',
-      description: 'Maximum of 4 features. Additional items are ignored on the live site.',
-      type: Group({
-        label: 'Feature',
-        props: {
-          icon: Select({
-            label: 'Icon',
-            options: [
-              { value: 'support', label: 'Headset (support)' },
-              { value: 'box', label: 'Box (shipping)' },
-              { value: 'heart', label: 'Heart (care)' },
-              { value: 'shield', label: 'Shield (payments)' },
-            ],
-            defaultValue: 'support',
-          }),
-          title: Group({
-            label: 'Title',
-            preferredLayout: Group.Layout.Popover,
-            props: {
-              text: TextInput({ label: 'Text', defaultValue: '' }),
-              ...textColorFields(),
-              ...fontSizeFields(),
-            },
-          }),
-          description: Group({
-            label: 'Description',
-            preferredLayout: Group.Layout.Popover,
-            props: {
-              text: TextArea({
-                label: 'Text (plain text or HTML)',
-                defaultValue: '',
-              }),
-              ...textColorFields(),
-              ...fontSizeFields(),
-            },
-          }),
-        },
-      }),
-      getItemLabel(item) {
-        const raw = item?.title;
-        const text = typeof raw === 'string' ? raw : raw?.text;
-
-        return text != null && String(text).trim().length > 0 ? String(text).trim() : 'Feature';
       },
     }),
   },
