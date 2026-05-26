@@ -4,6 +4,7 @@ import './components/card/register';
 import './components/card-carousel/register';
 import './components/carousel/register';
 import './diabetes-care-registers';
+import './archive-registers';
 import './components/diabetes-care-archived-section/register';
 import './components/stats-band/register';
 import './components/customer-group-slot/register';

@@ -3,8 +3,17 @@ import { useEffect, type RefObject } from 'react';
 const SLIDESHOW_SELECTOR = '.site-header-slideshow';
 const PINNED_CLASS = 'header-pinned';
 
-/** Hysteresis (px) so pin/unpin does not flicker at the slideshow edge. */
-const PIN_ON_BELOW = -6;
+/**
+ * Pin/unpin thresholds (px from viewport top).
+ *
+ * - `PIN_ON_BELOW = 0`: pin the instant the slideshow's bottom reaches the
+ *   viewport top, so the first body component aligns cleanly to the bottom
+ *   of the now-fixed header without needing any post-hoc scroll correction.
+ * - `PIN_OFF_BELOW = 8`: unpin only when the slideshow bottom is well back
+ *   below the viewport top — keeps the 8 px hysteresis vs. pin so we don't
+ *   thrash on tiny scrolls.
+ */
+const PIN_ON_BELOW = 0;
 const PIN_OFF_BELOW = 8;
 
 function resolveShouldPin(

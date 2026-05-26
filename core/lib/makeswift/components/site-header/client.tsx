@@ -9,13 +9,11 @@ import {
   type ReactNode,
   type Ref,
   useContext,
-  useRef,
 } from 'react';
 
 import { usePathname } from '~/i18n/routing';
 import { LiivvArchiveHeader } from '~/lib/makeswift/liivv-archive-header/liivv-archive-header';
 import type { LiivvArchiveNavLink } from '~/lib/makeswift/liivv-archive-header/types';
-import { useHeaderPinAfterSlideshow } from '~/lib/makeswift/site-header/use-header-pin-after-slideshow';
 import { shouldHideStoreHeader } from '~/lib/makeswift/site-header/should-hide-store-header';
 
 export const LIIVV_SITE_HEADER_SECTION_ID = 'liivv-site-header';
@@ -149,11 +147,6 @@ export const MakeswiftHeader = forwardRef(
       banner: passedBanner,
     } = useContext(PropsContext);
 
-    const sectionRef = useRef<HTMLDivElement>(null);
-    const spacerRef = useRef<HTMLDivElement>(null);
-
-    useHeaderPinAfterSlideshow(sectionRef, spacerRef, true);
-
     if (shouldHideStoreHeader(pathname, hideOnPaths)) {
       return null;
     }
@@ -173,9 +166,13 @@ export const MakeswiftHeader = forwardRef(
     const navLinks = combineNavLinks(categoryLinks, links);
 
     return (
+      // Pin-on-scroll uses native CSS `position: sticky` via the
+      // `.header-sticky` class baked into the archived theme CSS — no JS
+      // scroll listener, no fixed-position fallback, no spacer required.
+      // `header-sticky` provides `position: sticky; top: 0; z-index: 20`.
       <LiivvArchiveHeader
         banner={bannerNode}
-        className="liivv-site-header"
+        className="liivv-site-header header-sticky"
         initialCartCount={cartCount}
         linksPosition={linksPosition ?? 'left'}
         logo={desktopLogo}
@@ -183,10 +180,8 @@ export const MakeswiftHeader = forwardRef(
         navLinks={navLinks}
         searchPlaceholder={searchPlaceholder}
         sectionId={LIIVV_SITE_HEADER_SECTION_ID}
-        sectionRef={sectionRef}
         showLogo={Boolean(desktopLogo?.src)}
-        spacerRef={spacerRef}
-        withPinSpacer
+        withPinSpacer={false}
       />
     );
   },

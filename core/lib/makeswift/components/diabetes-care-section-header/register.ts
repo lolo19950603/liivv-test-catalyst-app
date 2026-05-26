@@ -21,10 +21,6 @@ runtime.registerComponent(DiabetesCareSectionHeader, {
   icon: 'layout',
   props: {
     className: Style(),
-    sticky: Checkbox({
-      label: 'Pin to top while scrolling (viewport)',
-      defaultValue: true,
-    }),
     showLogo: Checkbox({
       label: 'Show logo',
       defaultValue: true,

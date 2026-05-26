@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { clsx } from 'clsx';
 
 import { LiivvArchiveHeader } from '~/lib/makeswift/liivv-archive-header/liivv-archive-header';
 import { resolveMakeswiftHref } from '~/lib/makeswift/utils/resolve-makeswift-href';
@@ -8,7 +8,6 @@ import { resolveMakeswiftHref } from '~/lib/makeswift/utils/resolve-makeswift-hr
 import {
   DIABETES_CARE_HEADER_SECTION_ID,
 } from './archive-styles';
-import { useSectionHeaderPinAfterSlideshow } from './use-section-header-pin-after-slideshow';
 
 export interface DiabetesCareSectionNavLink {
   label: string;
@@ -17,7 +16,6 @@ export interface DiabetesCareSectionNavLink {
 
 export interface DiabetesCareSectionHeaderProps {
   className?: string;
-  sticky?: boolean;
   showLogo?: boolean;
   logoImage?: string;
   logoAlt?: string;
@@ -29,7 +27,6 @@ export interface DiabetesCareSectionHeaderProps {
 
 export function DiabetesCareSectionHeader({
   className,
-  sticky = true,
   showLogo = true,
   logoImage,
   logoAlt = 'Liivv',
@@ -38,19 +35,19 @@ export function DiabetesCareSectionHeader({
   showUtilityIcons = true,
   searchPlaceholder = 'Search products',
 }: DiabetesCareSectionHeaderProps) {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const spacerRef = useRef<HTMLDivElement>(null);
-
-  useSectionHeaderPinAfterSlideshow(sectionRef, spacerRef, sticky);
-
   const links = (navLinks ?? []).map((item) => ({
     label: item.label,
     href: resolveMakeswiftHref(item.link.href, '/'),
   }));
 
   return (
+    // Pin-on-scroll uses native CSS `position: sticky` via the
+    // `.header-sticky` class baked into the archived theme CSS — no JS
+    // scroll listener, no fixed-position fallback, no spacer required.
+    // `header-sticky` provides `position: sticky; top: 0; z-index: 20`.
+    // Always applied: the section header is fixed to stick on top.
     <LiivvArchiveHeader
-      className={className}
+      className={clsx(className, 'header-sticky')}
       logo={
         showLogo && logoImage
           ? {
@@ -64,11 +61,9 @@ export function DiabetesCareSectionHeader({
       navLinks={links}
       searchPlaceholder={searchPlaceholder}
       sectionId={DIABETES_CARE_HEADER_SECTION_ID}
-      sectionRef={sectionRef}
       showLogo={showLogo}
       showUtilityIcons={showUtilityIcons}
-      spacerRef={spacerRef}
-      withPinSpacer={sticky}
+      withPinSpacer={false}
     />
   );
 }
