@@ -4,7 +4,7 @@ const path = require('path');
 const headPath = path.join(__dirname, '../public/archive/diabetes-care-head.css');
 const componentDir = path.join(
   __dirname,
-  '../lib/makeswift/components/diabetes-care-section-header',
+  '../lib/makeswift/components/site-header',
 );
 const outPath = path.join(componentDir, 'archive-header.css');
 const tsOutPath = path.join(componentDir, 'archive-header-css.ts');

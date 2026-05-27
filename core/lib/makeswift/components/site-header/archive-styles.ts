@@ -1,0 +1,10 @@
+/** Matches archived global header section id in `diabetes-care.html`. */
+export const ARCHIVE_HEADER_SECTION_ID = 'shopify-section-sections--26374736970019__header';
+
+/** @deprecated Use {@link ARCHIVE_HEADER_SECTION_ID}. */
+export const DIABETES_CARE_HEADER_SECTION_ID = ARCHIVE_HEADER_SECTION_ID;
+
+export const ARCHIVE_HEADER_STYLE = `#${ARCHIVE_HEADER_SECTION_ID},#liivv-site-header,.liivv-archive-header{--section-padding-top:0px;--section-padding-bottom:0px;--color-background:255 255 255;--color-foreground:49 47 47;--color-transparent:168 156 148;--color-localization:255 255 255}`;
+
+/** @deprecated Use {@link ARCHIVE_HEADER_STYLE}. */
+export const DIABETES_CARE_HEADER_ARCHIVE_STYLE = ARCHIVE_HEADER_STYLE;

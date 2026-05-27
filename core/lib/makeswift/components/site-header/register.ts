@@ -79,6 +79,18 @@ const groups = List({
   getItemLabel: (item) => item?.label ?? 'Text',
 });
 
+const sectionNavLinks = List({
+  label: 'Navigation links',
+  type: Group({
+    label: 'Link',
+    props: {
+      label: TextInput({ label: 'Label', defaultValue: 'Diabetes Essentials' }),
+      link: Link({ label: 'URL' }),
+    },
+  }),
+  getItemLabel: (item) => item?.label ?? 'Link',
+});
+
 runtime.registerComponent(MakeswiftHeader, {
   type: COMPONENT_TYPE,
   label: 'Site Header',
@@ -107,13 +119,39 @@ runtime.registerComponent(MakeswiftHeader, {
       ],
       defaultValue: 'left',
     }),
-    hideOnPaths: List({
-      label: 'Hide store header on pages',
-      type: TextInput({
-        label: 'Path',
-        defaultValue: '/diabetes-care',
+    pageOverrides: List({
+      label: 'Per-page header overrides',
+      type: Group({
+        label: 'Page',
+        props: {
+          paths: List({
+            label: 'Show on paths',
+            type: TextInput({
+              label: 'Path',
+              defaultValue: '/diabetes-care',
+            }),
+            getItemLabel: (item) => item ?? '/path',
+          }),
+          showLogo: Checkbox({ label: 'Show logo', defaultValue: true }),
+          logoImage: Image({ label: 'Logo image' }),
+          logoAlt: TextInput({ label: 'Logo alt text', defaultValue: 'Liivv' }),
+          logoLink: Link({ label: 'Logo link' }),
+          navLinks: sectionNavLinks,
+          showUtilityIcons: Checkbox({
+            label: 'Show search, account & cart icons',
+            defaultValue: true,
+          }),
+          searchPlaceholder: TextInput({
+            label: 'Search field placeholder',
+            defaultValue: 'Search products',
+          }),
+        },
       }),
-      getItemLabel: (item) => item ?? '/diabetes-care',
+      getItemLabel: (item) => {
+        const firstPath = item?.paths?.find((p): p is string => Boolean(p));
+
+        return firstPath ?? 'Page';
+      },
     }),
   },
 });

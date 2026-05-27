@@ -14,7 +14,10 @@ import {
 import { usePathname } from '~/i18n/routing';
 import { LiivvArchiveHeader } from '~/lib/makeswift/liivv-archive-header/liivv-archive-header';
 import type { LiivvArchiveNavLink } from '~/lib/makeswift/liivv-archive-header/types';
-import { shouldHideStoreHeader } from '~/lib/makeswift/site-header/should-hide-store-header';
+import { findMatchingPathConfig } from '~/lib/makeswift/site-header/should-hide-store-header';
+import { resolveMakeswiftHref } from '~/lib/makeswift/utils/resolve-makeswift-href';
+
+import { ARCHIVE_HEADER_SECTION_ID } from './archive-styles';
 
 export const LIIVV_SITE_HEADER_SECTION_ID = 'liivv-site-header';
 
@@ -58,6 +61,22 @@ interface ImageProps {
   height: number;
 }
 
+interface SectionNavLink {
+  label: string;
+  link: { href: string };
+}
+
+interface PageOverride {
+  paths?: ReadonlyArray<string | undefined>;
+  showLogo?: boolean;
+  logoImage?: string;
+  logoAlt?: string;
+  logoLink?: { href?: string };
+  navLinks?: SectionNavLink[];
+  showUtilityIcons?: boolean;
+  searchPlaceholder?: string;
+}
+
 interface Props {
   banner: {
     id: string;
@@ -83,7 +102,7 @@ interface Props {
     link?: { href: string };
   };
   linksPosition: 'center' | 'left' | 'right';
-  hideOnPaths?: string[];
+  pageOverrides?: PageOverride[];
 }
 
 function combineNavLinks(
@@ -135,9 +154,61 @@ function resolveLogo(
   };
 }
 
+function PageOverrideHeader({
+  override,
+  cartCount,
+  defaultSearchPlaceholder,
+}: {
+  override: PageOverride;
+  cartCount: number | null;
+  defaultSearchPlaceholder: string;
+}) {
+  const {
+    showLogo = true,
+    logoImage,
+    logoAlt = 'Liivv',
+    logoLink,
+    navLinks = [],
+    showUtilityIcons = true,
+    searchPlaceholder = defaultSearchPlaceholder,
+  } = override;
+
+  const links = navLinks.map((item) => ({
+    label: item.label,
+    href: resolveMakeswiftHref(item.link.href, '/'),
+  }));
+
+  return (
+    <LiivvArchiveHeader
+      className="liivv-site-header liivv-site-header--override"
+      initialCartCount={cartCount}
+      logo={
+        showLogo && logoImage
+          ? {
+              src: logoImage,
+              alt: logoAlt,
+              href: logoLink?.href,
+            }
+          : null
+      }
+      navAriaLabel="Specialized page"
+      navLinks={links}
+      searchPlaceholder={searchPlaceholder}
+      sectionId={ARCHIVE_HEADER_SECTION_ID}
+      showLogo={showLogo}
+      showUtilityIcons={showUtilityIcons}
+      sticky
+      withPinSpacer={false}
+    />
+  );
+}
+
 export const MakeswiftHeader = forwardRef(
-  ({ banner, links, logo, linksPosition, hideOnPaths }: Props, ref: Ref<HTMLDivElement>) => {
-    const pathname = usePathname();
+  (
+    { banner, links, logo, linksPosition, pageOverrides }: Props,
+    ref: Ref<HTMLDivElement>,
+  ) => {
+    const pathname = usePathname() ?? '/';
     const {
       categoryLinks,
       fallbackLogo,
@@ -147,8 +218,16 @@ export const MakeswiftHeader = forwardRef(
       banner: passedBanner,
     } = useContext(PropsContext);
 
-    if (shouldHideStoreHeader(pathname, hideOnPaths)) {
-      return null;
+    const override = findMatchingPathConfig(pathname, pageOverrides);
+
+    if (override) {
+      return (
+        <PageOverrideHeader
+          cartCount={cartCount}
+          defaultSearchPlaceholder={searchPlaceholder}
+          override={override}
+        />
+      );
     }
 
     const combinedBanner = banner.show
@@ -166,13 +245,9 @@ export const MakeswiftHeader = forwardRef(
     const navLinks = combineNavLinks(categoryLinks, links);
 
     return (
-      // Pin-on-scroll uses native CSS `position: sticky` via the
-      // `.header-sticky` class baked into the archived theme CSS — no JS
-      // scroll listener, no fixed-position fallback, no spacer required.
-      // `header-sticky` provides `position: sticky; top: 0; z-index: 20`.
       <LiivvArchiveHeader
         banner={bannerNode}
-        className="liivv-site-header header-sticky"
+        className="liivv-site-header"
         initialCartCount={cartCount}
         linksPosition={linksPosition ?? 'left'}
         logo={desktopLogo}
@@ -181,6 +256,7 @@ export const MakeswiftHeader = forwardRef(
         searchPlaceholder={searchPlaceholder}
         sectionId={LIIVV_SITE_HEADER_SECTION_ID}
         showLogo={Boolean(desktopLogo?.src)}
+        sticky
         withPinSpacer={false}
       />
     );

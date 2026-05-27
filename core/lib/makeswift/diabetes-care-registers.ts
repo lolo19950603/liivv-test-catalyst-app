@@ -17,4 +17,3 @@ import './components/diabetes-care-rich-text-lower/register';
 import './components/diabetes-care-collection-list/register';
 import './components/diabetes-care-faq-second/register';
 import './components/diabetes-care-image-text-overlay/register';
-import './components/diabetes-care-section-header/register';

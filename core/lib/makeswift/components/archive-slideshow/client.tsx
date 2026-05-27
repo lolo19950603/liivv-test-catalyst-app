@@ -18,7 +18,10 @@ import {
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
 
-import { ARCHIVE_SLIDESHOW_SECTION_ID, ARCHIVE_SLIDESHOW_VARS } from './archive-styles';
+import {
+  ARCHIVE_SLIDESHOW_SECTION_ID,
+  ARCHIVE_SLIDESHOW_VARS,
+} from './archive-styles';
 
 type ImageAlignX = 'left' | 'center' | 'right';
 type ImageAlignY = 'top' | 'center' | 'bottom';
@@ -401,7 +404,12 @@ export function ArchiveSlideshow({
                             : null),
                         }}
                       >
-                        <picture className="media media--height relative block h-full w-full overflow-hidden rounded-3xl">
+                        <picture
+                          className={clsx(
+                            'media media--height relative block h-full w-full overflow-hidden',
+                            'rounded-3xl',
+                          )}
+                        >
                           <img
                             alt={slide.alt}
                             className="absolute inset-0 block h-full w-full object-cover"

@@ -27,6 +27,15 @@ function mobileSectionPadding(sectionId: string, top = '48px', bottom = '48px'):
  * - Neutralizes archive slider negative margins that clip content
  */
 export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
+  /*
+   * The archived theme sets `body{overflow-x:hidden}`, which implicitly makes
+   * <body> a scrolling ancestor and silently breaks every descendant's
+   * `position: sticky` (the sticky element ends up pinned to body's edges, not
+   * the viewport). Swap to `overflow-x: clip` — it suppresses horizontal scroll
+   * the same way without creating a scroll container, restoring native sticky
+   * behavior for the site header, section header, and any future sticky UI.
+   */
+  'body{overflow-x:clip}',
   '/*! specialized-page mobile v2 */',
 
   /* --- Global: avoid cut-off from overflow-x-hidden + slider bleed --- */

@@ -2,6 +2,7 @@
 
 import { clsx } from 'clsx';
 import {
+  type CSSProperties,
   type ReactNode,
   type RefObject,
   useCallback,
@@ -47,6 +48,18 @@ export interface LiivvArchiveHeaderProps {
   banner?: ReactNode;
   /** Renders a spacer below the section when pin behavior is enabled externally. */
   withPinSpacer?: boolean;
+  /**
+   * Pin the header to the viewport top while scrolling using browser-native
+   * `position: sticky`. Applied as an inline style on the wrapper so it can't
+   * lose to higher-specificity rules from the archived Shopify CSS (e.g.
+   * `.shopify-section { position: relative }`) or to editor wrappers.
+   *
+   * Note: only works when the header is rendered outside Makeswift Box/Grid
+   * wrappers — otherwise the containing flex item shrink-wraps to the header
+   * height and sticky has no scroll range to pin within. Use the layout-level
+   * placement pattern (see `site-header`).
+   */
+  sticky?: boolean;
   sectionRef?: RefObject<HTMLDivElement | null>;
   spacerRef?: RefObject<HTMLDivElement | null>;
   children?: ReactNode;
@@ -171,6 +184,7 @@ export function LiivvArchiveHeader({
   initialCartCount = null,
   banner,
   withPinSpacer = false,
+  sticky = false,
   sectionRef: sectionRefProp,
   spacerRef: spacerRefProp,
   children,
@@ -332,15 +346,21 @@ export function LiivvArchiveHeader({
         }
       : undefined;
 
+  const pinStyle: CSSProperties | undefined = sticky
+    ? { position: 'sticky', insetBlockStart: 0, top: 0, zIndex: 50 }
+    : undefined;
+
   const section = (
     <div
       className={clsx(
         'liivv-archive-header diabetes-care-section-header liivv-header-skin shopify-section shopify-section-group-header-group header-section header-opaque w-full min-w-0',
         hasNav && 'diabetes-care-has-nav',
+        sticky && 'header-sticky',
         className,
       )}
       id={sectionId}
       ref={sectionRef}
+      style={pinStyle}
     >
       <style dangerouslySetInnerHTML={{ __html: LIIVV_ARCHIVE_HEADER_SECTION_VARS }} />
       <style dangerouslySetInnerHTML={{ __html: ARCHIVE_HEADER_CSS }} />

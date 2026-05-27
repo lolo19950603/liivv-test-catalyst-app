@@ -15,6 +15,7 @@ export const ARCHIVE_SLIDESHOW_SECTION_ID = 'archive-slideshow-section';
 export const ARCHIVE_SLIDESHOW_VARS =
   `#${ARCHIVE_SLIDESHOW_SECTION_ID}{--section-padding-top:0px;--section-padding-bottom:12px;` +
   `--color-foreground:255 255 255;--color-border:var(--color-foreground)/0.1;` +
-  `--color-border-dark:var(--color-foreground)/0.4;--color-border-light:var(--color-foreground)/0.06;` +
+  `--color-border-dark:var(--color-foreground)/0.4;` +
+  `--color-border-light:var(--color-foreground)/0.06;` +
   `--color-button-background:255 255 255;--color-button-border:255 255 255;` +
   `--color-button-text:23 23 23;--color-overlay:23 23 23;--overlay-opacity:0.2}`;

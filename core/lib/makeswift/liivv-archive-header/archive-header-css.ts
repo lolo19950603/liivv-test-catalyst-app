@@ -1,2 +1,2 @@
 /** Archive header styles extracted from the Shopify theme. */
-export { ARCHIVE_HEADER_CSS } from '~/lib/makeswift/components/diabetes-care-section-header/archive-header-css';
+export { ARCHIVE_HEADER_CSS } from '~/lib/makeswift/components/site-header/archive-header-css';

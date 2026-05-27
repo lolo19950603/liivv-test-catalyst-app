@@ -34,9 +34,49 @@ export function stripLocaleFromPathname(pathname: string): string {
   return pathname.startsWith('/') ? pathname : `/${pathname}`;
 }
 
+/** True when `pathname` matches `prefix` or any subpath (e.g. `/diabetes-care/foo`). */
+export function pathnameMatchesPrefix(pathname: string, prefix: string): boolean {
+  const current = normalizeHidePath(stripLocaleFromPathname(pathname));
+  const normalized = normalizeHidePath(prefix);
+
+  if (normalized.length === 0) {
+    return false;
+  }
+
+  return current === normalized || current.startsWith(`${normalized}/`);
+}
+
+/**
+ * Returns the first config whose `paths` list matches the current pathname.
+ * Each path entry matches that path and any subpath (e.g. `/diabetes-care/foo`).
+ */
+export function findMatchingPathConfig<T extends { paths?: readonly (string | undefined)[] }>(
+  pathname: string,
+  configs: readonly T[] | undefined,
+): T | null {
+  if (configs == null || configs.length === 0) {
+    return null;
+  }
+
+  for (const config of configs) {
+    const paths = (config.paths ?? []).filter(
+      (p): p is string => typeof p === 'string' && p.length > 0,
+    );
+
+    if (paths.some((path) => pathnameMatchesPrefix(pathname, path))) {
+      return config;
+    }
+  }
+
+  return null;
+}
+
 /**
  * True when the current page should not show the Catalyst store header.
  * Each entry matches that path and any subpath (e.g. `/diabetes-care/foo`).
+ *
+ * @deprecated Prefer `pageOverrides` on the Site Header — a matching override
+ * replaces the default header instead of hiding it.
  */
 export function shouldHideStoreHeader(
   pathname: string,
@@ -46,15 +86,5 @@ export function shouldHideStoreHeader(
     return false;
   }
 
-  const current = normalizeHidePath(stripLocaleFromPathname(pathname));
-
-  return hideOnPaths.some((entry) => {
-    const prefix = normalizeHidePath(entry);
-
-    if (prefix.length === 0) {
-      return false;
-    }
-
-    return current === prefix || current.startsWith(`${prefix}/`);
-  });
+  return hideOnPaths.some((entry) => pathnameMatchesPrefix(pathname, entry));
 }
