@@ -23,8 +23,9 @@ import {
 } from '~/lib/makeswift/utils/heading-accent-color';
 import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
 
-const SHOPIFY_SECTION_ID = 'shopify-section-template--26520397447459__timeline_nyTDKQ';
-const SLIDER_ID = 'Slider-template--26520397447459__timeline_nyTDKQ';
+export const DIABETES_CARE_TIMELINE_SECTION_ID =
+  'shopify-section-template--26520397447459__timeline_nyTDKQ';
+export const DIABETES_CARE_TIMELINE_resolvedSliderId = 'Slider-template--26520397447459__timeline_nyTDKQ';
 
 /**
  * Section-scoped CSS: export vars, desktop two-column grid for each slide, horizontal strip with
@@ -33,8 +34,8 @@ const SLIDER_ID = 'Slider-template--26520397447459__timeline_nyTDKQ';
  * @param {number} blockCount - `--section-blocks-count` for `.timeline-dots`.
  * @returns {string} Inline `<style>` payload.
  */
-function timelineSectionCss(blockCount: number): string {
-  const id = `#${SHOPIFY_SECTION_ID}`;
+function timelineSectionCss(sectionDomId: string, blockCount: number): string {
+  const id = `#${sectionDomId}`;
   /** Instant snap; arrows/dots still use `scrollIntoView({ behavior: 'smooth' })`. */
   const strip = `${id} .timeline-react-strip{display:flex;flex-flow:row nowrap;gap:clamp(16px,2.5vw,40px);overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-behavior:auto;-webkit-overflow-scrolling:touch;padding-block:var(--sp-2,8px);scrollbar-width:none;-ms-overflow-style:none}`;
   const stripScrollbar = `${id} .timeline-react-strip::-webkit-scrollbar{display:none;width:0;height:0}`;
@@ -140,10 +141,15 @@ function timelineSectionHeadingStyle(
 
 export type DiabetesCareTimelineProps = {
   className?: string;
+  /** Override Shopify section id when multiple timelines share a page. */
+  sectionDomId?: string;
+  /** Override slider `id` / `aria-controls` target. Defaults from section id when omitted. */
+  sliderDomId?: string;
   background?: SectionBackgroundProps;
   primaryHeading?: HeadingTypographyProps;
   secondaryHeading?: HeadingWithHighlightProps;
   sections?: DiabetesCareTimelineSection[];
+  roundedTop?: boolean;
 };
 
 function IconChevronLeft() {
@@ -285,11 +291,20 @@ function TimelineSlide({ section, index, isSelected, setSlideEl }: TimelineSlide
 
 export function DiabetesCareTimeline({
   className,
+  sectionDomId,
+  sliderDomId,
   background,
   primaryHeading,
   secondaryHeading,
   sections,
+  roundedTop = true,
 }: DiabetesCareTimelineProps) {
+  const resolvedSectionId =
+    sectionDomId?.trim().length ? sectionDomId.trim() : DIABETES_CARE_TIMELINE_SECTION_ID;
+  const resolvedSliderId =
+    sliderDomId?.trim().length
+      ? sliderDomId.trim()
+      : resolvedSectionId.replace(/^shopify-section-/, 'Slider-');
   const primaryResolved = resolveHeadingTypography(primaryHeading);
   const secondaryResolved = resolveHeadingTypography(secondaryHeading);
   const list = useMemo(() => sections ?? [], [sections]);
@@ -414,17 +429,17 @@ export function DiabetesCareTimeline({
       ? timelineTypographyStyle(list[safeIndex]?.slideContent?.categoryLabel)
       : undefined;
   const { sectionCss, sectionStyle } = buildSectionTheme({
-    sectionId: SHOPIFY_SECTION_ID,
-    sectionCss: timelineSectionCss(count),
+    sectionId: resolvedSectionId,
+    sectionCss: timelineSectionCss(resolvedSectionId, count),
     background,
     highlight: secondaryHeading,
   });
 
   return (
     <div className={clsx('diabetes-care-timeline', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}>
-      <div className="shopify-section" id={SHOPIFY_SECTION_ID} style={sectionStyle}>
+      <div className="shopify-section" id={resolvedSectionId} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <div className="section section--padding">
+        <div className={clsx('section section--padding', roundedTop && 'section--rounded')}>
           <div className="page-width relative px-4 sm:px-5 md:px-0">
             <div className="title-wrapper z-1 relative flex flex-row flex-wrap items-end justify-between gap-4 text-left leading-none lg:gap-8">
               <div className="grid min-w-0 flex-1 gap-4">
@@ -443,7 +458,7 @@ export function DiabetesCareTimeline({
               {count > 0 ? (
                 <div className="indicators gap-2d5 flex shrink-0">
                   <button
-                    aria-controls={SLIDER_ID}
+                    aria-controls={resolvedSliderId}
                     aria-label="Previous"
                     className="button button--secondary"
                     disabled={prevDisabled}
@@ -461,7 +476,7 @@ export function DiabetesCareTimeline({
                     </span>
                   </button>
                   <button
-                    aria-controls={SLIDER_ID}
+                    aria-controls={resolvedSliderId}
                     aria-label="Next"
                     className="button button--secondary"
                     disabled={nextDisabled}
@@ -497,7 +512,7 @@ export function DiabetesCareTimeline({
                   aria-label={`Journey carousel, slide ${safeIndex + 1} of ${count}. Swipe left or right to change steps.`}
                   aria-roledescription="carousel"
                   className="slider slider--desktop slider--tablet grid"
-                  id={SLIDER_ID}
+                  id={resolvedSliderId}
                   role="region"
                 >
                   <div
@@ -545,7 +560,7 @@ export function DiabetesCareTimeline({
 
                         return (
                           <button
-                            aria-controls={SLIDER_ID}
+                            aria-controls={resolvedSliderId}
                             aria-current={isActive ? 'true' : 'false'}
                             className="heading gap-2d5 flex items-center text-left text-lg"
                             data-index={index + 1}

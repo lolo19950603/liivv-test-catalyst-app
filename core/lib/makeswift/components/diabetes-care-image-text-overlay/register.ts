@@ -24,11 +24,11 @@ export const COMPONENT_TYPE = 'diabetes-care-image-text-overlay';
 
 runtime.registerComponent(DiabetesCareImageTextOverlay, {
   type: COMPONENT_TYPE,
-  label: diabetesCareComponentLabel(15, 'Image with text overlay'),
+  label: diabetesCareComponentLabel(14, 'Image with text overlay'),
   icon: 'image',
   props: {
     className: Style(),
-    ...sectionBackgroundControls('0 0% 100%'),
+    ...sectionBackgroundControls(),
     imageSrc: Image({ label: 'Background image' }),
     ...nestedSplitHeadingPopoverControls({
       primaryLabel: 'Primary heading',

@@ -5,7 +5,7 @@ import type { CSSProperties } from 'react';
 type ShopifyThemeStyle = CSSProperties & Record<string, string | number | undefined>;
 
 /** Matches inline `<style>` from `diabetes-care.html` for this section id. */
-const CUSTOM_SECTION_STYLE = `#shopify-section-template--26520397447459__custom_section_WpXaJg{--section-padding-top:32px;--section-padding-bottom:32px;--color-background:255 255 255}@media screen and (max-width: 767px){#shopify-section-template--26520397447459__custom_section_WpXaJg{--section-padding-top:24px;--section-padding-bottom:24px}}`;
+const CUSTOM_SECTION_STYLE = `#shopify-section-template--26520397447459__custom_section_WpXaJg{--section-padding-top:32px;--section-padding-bottom:32px;--color-background:245 242 237}@media screen and (max-width: 767px){#shopify-section-template--26520397447459__custom_section_WpXaJg{--section-padding-top:24px;--section-padding-bottom:24px}}`;
 
 /** Matches inline `<style>` from `diabetes-care.html` for this section id. */
 const NUMBER_COUNTER_STYLE = `#shopify-section-template--26520397447459__number_counter_dTAx7w{--section-padding-top:40px;--section-padding-bottom:40px;--section-blocks-count:4}@media screen and (min-width:1024px){#shopify-section-template--26520397447459__number_counter_dTAx7w .multicolumn{--card-grid-gap:clamp(40px,3.5vw,60px)}}@media screen and (max-width: 767px){#shopify-section-template--26520397447459__number_counter_dTAx7w{--section-padding-top:28px;--section-padding-bottom:32px}}`;

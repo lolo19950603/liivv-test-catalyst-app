@@ -4,11 +4,15 @@ import { clsx } from 'clsx';
 import Autoplay from 'embla-carousel-autoplay';
 import Fade from 'embla-carousel-fade';
 import useEmblaCarousel from 'embla-carousel-react';
-import { useCallback, useEffect, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
+
+import {
+  toImageObjectPosition,
+  type ImageAlignX,
+  type ImageAlignY,
+} from '~/lib/makeswift/utils/image-object-position';
 
 type ContentWidth = 'small' | 'medium' | 'large' | 'full';
-type ImageAlignX = 'left' | 'center' | 'right';
-type ImageAlignY = 'top' | 'center' | 'bottom';
 
 export type SiteHeaderSlideshowSlide = {
   image?: string;
@@ -72,16 +76,6 @@ function parseHeightPx(value: number | undefined, fallback: number): number {
   return Math.round(value);
 }
 
-function toObjectPosition(
-  alignX: ImageAlignX | undefined,
-  alignY: ImageAlignY | undefined,
-): string {
-  const x = alignX === 'left' || alignX === 'right' ? alignX : 'center';
-  const y = alignY === 'top' || alignY === 'bottom' ? alignY : 'center';
-
-  return `${x} ${y}`;
-}
-
 function normalizeSlide(slide: SiteHeaderSlideshowSlide): SiteHeaderSlideshowSlide | null {
   const image = slide.image?.trim() ?? slide.imageMedia?.image?.trim() ?? '';
 
@@ -113,12 +107,14 @@ export function SiteHeaderSlideshow({
   const mobileWidthKey = parseContentWidth(mobileLayout?.mobileContentWidth, 'full');
   const intervalMs = Math.max(1, interval) * 1000;
   const hasMultiple = validSlides.length > 1;
+  const autoplayPlugin = useMemo(
+    () => Autoplay({ delay: intervalMs, active: autoplay }),
+    [intervalMs, autoplay],
+  );
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: hasMultiple, duration: 20 },
-    hasMultiple
-      ? [Autoplay({ delay: intervalMs, active: autoplay }), Fade()]
-      : [],
+    hasMultiple ? [autoplayPlugin, Fade()] : [],
   );
 
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -144,6 +140,33 @@ export function SiteHeaderSlideshow({
     };
   }, [emblaApi, onSelect]);
 
+  useEffect(() => {
+    if (!hasMultiple || emblaApi == null) {
+      return;
+    }
+
+    const syncAutoplay = () => {
+      const plugin = emblaApi.plugins().autoplay;
+
+      if (plugin == null) {
+        return;
+      }
+
+      if (autoplay) {
+        plugin.play();
+      } else {
+        plugin.stop();
+      }
+    };
+
+    syncAutoplay();
+    emblaApi.on('reinit', syncAutoplay);
+
+    return () => {
+      emblaApi.off('reinit', syncAutoplay);
+    };
+  }, [autoplay, emblaApi, hasMultiple]);
+
   const sectionStyle = {
     '--site-header-slideshow-height-mobile': `${String(mobilePx)}px`,
     '--site-header-slideshow-height-desktop': `${String(desktopPx)}px`,
@@ -165,7 +188,7 @@ export function SiteHeaderSlideshow({
         fetchPriority={index === 0 ? 'high' : 'auto'}
         loading={index === 0 ? 'eager' : 'lazy'}
         src={slide.image}
-        style={{ objectPosition: toObjectPosition(slide.imageAlignX, slide.imageAlignY) }}
+        style={{ objectPosition: toImageObjectPosition(slide.imageAlignX, slide.imageAlignY) }}
       />
     </div>
   ));

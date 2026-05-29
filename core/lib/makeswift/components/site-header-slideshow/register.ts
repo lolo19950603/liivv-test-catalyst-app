@@ -10,6 +10,7 @@ import {
 } from '@makeswift/runtime/controls';
 
 import { runtime } from '~/lib/makeswift/runtime';
+import { IMAGE_ALIGN_Y_CONTROL_OPTIONS } from '~/lib/makeswift/utils/image-object-position';
 
 import { SiteHeaderSlideshow } from './client';
 
@@ -31,11 +32,7 @@ const slide = Group({
     }),
     imageAlignY: Select({
       label: 'Vertical alignment',
-      options: [
-        { value: 'top', label: 'Top' },
-        { value: 'center', label: 'Center' },
-        { value: 'bottom', label: 'Bottom' },
-      ],
+      options: [...IMAGE_ALIGN_Y_CONTROL_OPTIONS],
       defaultValue: 'center',
     }),
   },

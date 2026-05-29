@@ -5,6 +5,7 @@ import type { CSSProperties } from 'react';
 
 import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { ARCHIVE_CREAM_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import {
   buildSectionTheme,
   resolveBodyTextColor,
@@ -15,6 +16,7 @@ import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-si
 import { resolvePlainTextColor } from '~/lib/makeswift/utils/heading-accent-color';
 
 import {
+  SITE_FEATURED_COLUMNS_FOOTER_ROUNDED_BOTTOM_CSS,
   SITE_FEATURED_COLUMNS_FOOTER_SECTION_ID,
   SITE_FEATURED_COLUMNS_FOOTER_VARS,
 } from './archive-styles';
@@ -42,6 +44,7 @@ export type SiteFeaturedColumnsFooterProps = {
   features?: SiteFeaturedColumnsFooterFeature[];
   /** Optional fallback body color when feature description blocks omit one. */
   bodyText?: BodyTextProps;
+  roundedBottom?: boolean;
 };
 
 type SiteFeaturedColumnsFooterResolved = {
@@ -190,6 +193,7 @@ export function SiteFeaturedColumnsFooter({
   background,
   features,
   bodyText,
+  roundedBottom = true,
 }: SiteFeaturedColumnsFooterProps) {
   const featureRows = featuresResolved(features);
 
@@ -197,15 +201,74 @@ export function SiteFeaturedColumnsFooter({
     return null;
   }
 
-  const { sectionCss, sectionStyle } = buildSectionTheme({
+  const { sectionCss: themeCss, sectionStyle } = buildSectionTheme({
     sectionId: SITE_FEATURED_COLUMNS_FOOTER_SECTION_ID,
     sectionCss: SITE_FEATURED_COLUMNS_FOOTER_VARS,
     background,
     highlight: null,
-    defaultBackgroundChannels: '0 0% 100%',
+    defaultBackgroundChannels: ARCHIVE_CREAM_BACKGROUND_CHANNELS,
   });
 
+  const sectionCss =
+    roundedBottom === true
+      ? `${themeCss}${SITE_FEATURED_COLUMNS_FOOTER_ROUNDED_BOTTOM_CSS}`
+      : themeCss;
+
   const fallbackBodyColor = resolveBodyTextColor(bodyText);
+
+  const panel = (
+    <div
+      className={clsx(
+        'site-featured-columns-footer__panel section section--padding relative',
+        roundedBottom && 'site-featured-columns-footer__panel--rounded section--next-rounded',
+      )}
+      style={{ zIndex: 3 }}
+    >
+      <ScrollReveal className="site-featured-columns-footer__row relative" delayMs={120}>
+        <div className="page-width relative px-4 sm:px-5 md:px-0">
+          <div
+            className={clsx(
+              'text-with-icons with-background z-1 relative block lg:grid',
+              featuresGridClass(featureRows.length),
+            )}
+          >
+            {featureRows.map((row, index) => {
+              const descHtml = featureDescriptionHtml(row.description);
+              const descStyle: CSSProperties | undefined =
+                row.descriptionStyle ??
+                (fallbackBodyColor != null ? { color: fallbackBodyColor } : undefined);
+
+              return (
+                <div
+                  className="column flex w-full flex-col gap-5 text-center xl:flex-row xl:text-left"
+                  key={`feature-column-${String(index)}`}
+                >
+                  <div className="column__icon">
+                    <FeatureIcon name={featureIconName(row.icon)} />
+                  </div>
+                  <div className="column__content">
+                    <p
+                      className="column__title heading tracking-none font-medium leading-tight"
+                      style={row.titleStyle}
+                    >
+                      {row.title}
+                    </p>
+                    {descHtml.length > 0 ? (
+                      <div
+                        className="column__text rte"
+                        dangerouslySetInnerHTML={{ __html: descHtml }}
+                        style={descStyle}
+                      />
+                    ) : null}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </ScrollReveal>
+    </div>
+  );
 
   return (
     <div
@@ -213,6 +276,7 @@ export function SiteFeaturedColumnsFooter({
         'site-featured-columns-footer',
         DC_SECTION_ROOT_CLASS,
         'max-w-full',
+        roundedBottom && 'site-featured-columns-footer__shell',
         className,
       )}
     >
@@ -222,53 +286,7 @@ export function SiteFeaturedColumnsFooter({
         style={sectionStyle}
       >
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <ScrollReveal
-          className="site-featured-columns-footer__row section section--padding section--next-rounded relative"
-          delayMs={120}
-          style={{ zIndex: 3 }}
-        >
-          <div className="page-width relative px-4 sm:px-5 md:px-0">
-            <div
-              className={clsx(
-                'text-with-icons with-background z-1 relative block lg:grid',
-                featuresGridClass(featureRows.length),
-              )}
-            >
-              {featureRows.map((row, index) => {
-                const descHtml = featureDescriptionHtml(row.description);
-                const descStyle: CSSProperties | undefined =
-                  row.descriptionStyle ??
-                  (fallbackBodyColor != null ? { color: fallbackBodyColor } : undefined);
-
-                return (
-                  <div
-                    className="column flex w-full flex-col gap-5 text-center xl:flex-row xl:text-left"
-                    key={`feature-column-${String(index)}`}
-                  >
-                    <div className="column__icon">
-                      <FeatureIcon name={featureIconName(row.icon)} />
-                    </div>
-                    <div className="column__content">
-                      <p
-                        className="column__title heading tracking-none font-medium leading-tight"
-                        style={row.titleStyle}
-                      >
-                        {row.title}
-                      </p>
-                      {descHtml.length > 0 ? (
-                        <div
-                          className="column__text rte"
-                          dangerouslySetInnerHTML={{ __html: descHtml }}
-                          style={descStyle}
-                        />
-                      ) : null}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </ScrollReveal>
+        {panel}
       </div>
     </div>
   );

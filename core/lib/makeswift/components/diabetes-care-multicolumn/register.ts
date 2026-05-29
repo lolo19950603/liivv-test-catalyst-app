@@ -56,7 +56,7 @@ function multicolumnPlainTextPopover(label: string, textDefault: string, textAre
 
 runtime.registerComponent(DiabetesCareMulticolumn, {
   type: COMPONENT_TYPE,
-  label: diabetesCareComponentLabel(5, 'Multicolumn'),
+  label: diabetesCareComponentLabel(4, 'Multicolumn'),
   icon: 'layout',
   props: {
     className: Style(),
@@ -66,6 +66,7 @@ runtime.registerComponent(DiabetesCareMulticolumn, {
       secondaryLabel: 'Secondary heading (swash)',
       primaryDefault: 'Diabetes is a',
       secondaryDefault: 'journey.',
+      secondarySwashTransparentByDefault: true,
     }),
     intro: Group({
       label: 'Intro body',

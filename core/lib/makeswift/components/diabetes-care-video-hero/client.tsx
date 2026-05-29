@@ -9,6 +9,7 @@ import {
   SplitWordsHeading,
   useInViewAnimate,
 } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { ARCHIVE_CREAM_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import {
   buildSectionTheme,
   resolveBodyTextColor,
@@ -65,7 +66,10 @@ export type OverlayBodyProps = BodyTextProps & {
 
 export interface DiabetesCareVideoHeroProps {
   className?: string;
+  /** Override Shopify section id (required when multiple heroes appear on one page). */
+  sectionDomId?: string;
   background?: SectionBackgroundProps;
+  roundedTop?: boolean;
   video?: VideoSettingsProps;
   heading?: HeadingTypographyProps;
   overlayBody?: OverlayBodyProps;
@@ -73,11 +77,15 @@ export interface DiabetesCareVideoHeroProps {
 
 export function DiabetesCareVideoHero({
   className,
+  sectionDomId,
   background,
+  roundedTop = true,
   video,
   heading,
   overlayBody,
 }: DiabetesCareVideoHeroProps) {
+  const resolvedSectionId =
+    sectionDomId?.trim().length ? sectionDomId.trim() : VIDEO_HERO_SECTION_ID;
   const headingResolved = resolveHeadingTypography(heading);
   const bodyColor = resolveBodyTextColor(overlayBody);
   const bodyFontSize = resolveHeadingFontSizeCss(
@@ -85,10 +93,10 @@ export function DiabetesCareVideoHero({
     overlayBody?.fontSizeMobile,
   );
   const { sectionCss, sectionStyle } = buildSectionTheme({
-    sectionId: VIDEO_HERO_SECTION_ID,
+    sectionId: resolvedSectionId,
     sectionCss: '',
     background,
-    defaultBackgroundChannels: '0 0% 100%',
+    defaultBackgroundChannels: ARCHIVE_CREAM_BACKGROUND_CHANNELS,
   });
   const [clientReady, setClientReady] = useState(false);
   const { ref: mediaRef, animated: mediaAnimated } = useInViewAnimate({ disabled: !clientReady });
@@ -132,9 +140,10 @@ export function DiabetesCareVideoHero({
         'diabetes-care-video-hero shopify-section w-full min-w-0 max-w-full',
         DC_SECTION_ROOT_CLASS,
         '[--color-foreground:255_255_255] [--color-overlay:23_23_23] [--overlay-opacity:0.7]',
+        roundedTop && 'section section--rounded overflow-hidden',
         className,
       )}
-      id={VIDEO_HERO_SECTION_ID}
+      id={resolvedSectionId}
       style={sectionStyle}
     >
       {sectionCss.length > 0 ? (

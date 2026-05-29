@@ -16,7 +16,7 @@ export const COMPONENT_TYPE = 'diabetes-care-faq-second';
 
 runtime.registerComponent(DiabetesCareFaqSecond, {
   type: COMPONENT_TYPE,
-  label: diabetesCareComponentLabel(14, 'FAQ (second)'),
+  label: diabetesCareComponentLabel(13, 'FAQ (second)'),
   icon: 'layout',
   props: {
     className: Style(),

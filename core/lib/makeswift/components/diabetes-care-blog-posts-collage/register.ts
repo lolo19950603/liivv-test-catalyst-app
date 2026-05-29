@@ -59,7 +59,7 @@ const collagePostFields = {
 
 runtime.registerComponent(DiabetesCareBlogPostsCollage, {
   type: COMPONENT_TYPE,
-  label: diabetesCareComponentLabel(7, 'Blog posts collage'),
+  label: diabetesCareComponentLabel(6, 'Blog posts collage'),
   icon: 'layout',
   props: {
     className: Style(),

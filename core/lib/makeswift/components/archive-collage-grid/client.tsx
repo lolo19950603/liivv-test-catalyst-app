@@ -10,31 +10,71 @@ import {
   buildSectionTheme,
   type SectionBackgroundProps,
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
+import { resolveCssColor } from '~/lib/makeswift/utils/archive-color';
+import {
+  resolvePlainTextColor,
+  type PlainTextColorProps,
+} from '~/lib/makeswift/utils/heading-accent-color';
+import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
 import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
 
-import { ARCHIVE_COLLAGE_GRID_SECTION_ID, ARCHIVE_COLLAGE_GRID_VARS } from './archive-styles';
+import {
+  ARCHIVE_COLLAGE_GRID_IMAGE_FADE_CSS,
+  ARCHIVE_COLLAGE_GRID_SECTION_ID,
+  ARCHIVE_COLLAGE_GRID_VARS,
+} from './archive-styles';
 
 type ImageAlignX = 'left' | 'center' | 'right';
 type ImageAlignY = 'top' | 'center' | 'bottom';
 
+export type CollageTitlePartProps = {
+  text?: string;
+  textColor?: string;
+  textColorHex?: string;
+  fontSize?: number;
+  fontSizeMobile?: number;
+};
+
 export type ArchiveCollageItemProps = {
+  imageMedia?: {
+    image?: unknown;
+    imageAlt?: string;
+    imageAlignX?: ImageAlignX;
+    imageAlignY?: ImageAlignY;
+  };
   image?: unknown;
   imageAlt?: string;
   imageAlignX?: ImageAlignX;
   imageAlignY?: ImageAlignY;
+  titleContent?: {
+    primaryTitle?: CollageTitlePartProps | string;
+    secondaryTitle?: CollageTitlePartProps | string;
+    /** @deprecated Nested under `primaryTitle` / `secondaryTitle` groups. */
+    primaryTitleColor?: PlainTextColorProps | string;
+    /** @deprecated Nested under `primaryTitle` / `secondaryTitle` groups. */
+    secondaryTitleColor?: PlainTextColorProps | string;
+    link?: { href?: string; target?: string };
+  };
   link?: { href?: string; target?: string };
   /** Column span (1–12). Defaults to 3 (i.e. 4 across on desktop). */
   columnSpan?: number;
   /** Row span (1–4). Defaults to 2. */
   rowSpan?: number;
-  /** Overlay color (HSL channels, e.g. "49 47 47"). Falls back to section. */
-  overlayColor?: string;
-  /** Overlay opacity (0–1). Falls back to section default. */
-  overlayOpacity?: number;
-  /** Title shown over the image (optional). */
+  /** Text-only block background (picker + hex override). */
+  blockBackground?: {
+    color?: string;
+    colorHex?: string;
+  };
+  primaryTitle?: string;
+  secondaryTitle?: string;
+  primaryTitleColor?: PlainTextColorProps | string;
+  secondaryTitleColor?: PlainTextColorProps | string;
+  /** @deprecated Use `primaryTitle`. */
   title?: string;
-  /** Title color (HSL channels). */
+  /** @deprecated Use `primaryTitleColor` / `secondaryTitleColor`. */
   titleColor?: string;
+  /** @deprecated Use `blockBackground`. */
+  blockBackgroundColor?: string;
 };
 
 export type ArchiveCollageCtaButtonProps = ButtonColorProps & {
@@ -59,12 +99,15 @@ export interface ArchiveCollageGridProps {
   rowHeight?: number;
   desktopGap?: number;
   mobileGap?: number;
-  enableHoverDim?: boolean;
-  defaultOverlayOpacity?: number;
+  roundedTop?: boolean;
   cta?: ArchiveCollageCtaRowProps;
 }
 
-const DEFAULT_OVERLAY = 0.4;
+/** Matches `blockBackground` default in register.ts (`#f3eded`). */
+const DEFAULT_TEXT_BLOCK_BACKGROUND = '#f3eded';
+const DEFAULT_COLLAGE_TITLE_FONT_DESKTOP = 25;
+const DEFAULT_COLLAGE_TITLE_FONT_MOBILE = 18;
+
 const DEFAULT_ROW_HEIGHT = 150;
 const DEFAULT_DESKTOP_GAP = 24;
 const DEFAULT_MOBILE_GAP = 10;
@@ -87,20 +130,141 @@ function clampPx(value: number | undefined, fallback: number): number {
   return Math.round(value);
 }
 
-function clampOpacity(value: number | undefined, fallback: number): number {
-  if (value == null || Number.isNaN(value)) {
-    return fallback;
-  }
-
-  return Math.min(1, Math.max(0, value));
-}
-
 function clampPct(value: number | undefined, fallback: number): number {
   if (value == null || Number.isNaN(value)) {
     return fallback;
   }
 
   return Math.min(100, Math.max(0, Math.round(value)));
+}
+
+function resolveTitleColorValue(
+  color: PlainTextColorProps | string | undefined,
+  legacyHex?: string,
+): string | undefined {
+  if (typeof color === 'string') {
+    const input = color.trim() || legacyHex?.trim() || '';
+
+    if (input.length === 0) {
+      return undefined;
+    }
+
+    const resolved = resolveCssColor(input, undefined);
+
+    if (resolved != null) {
+      return resolved;
+    }
+
+    return input.startsWith('#') ? input : `rgb(${input})`;
+  }
+
+  return resolvePlainTextColor({
+    textColor: color?.textColor,
+    textColorHex: color?.textColorHex ?? legacyHex,
+  });
+}
+
+function resolveTitleColorStyle(
+  color: PlainTextColorProps | string | undefined,
+  legacyHex?: string,
+): CSSProperties | undefined {
+  const resolved = resolveTitleColorValue(color, legacyHex);
+
+  return resolved != null ? { color: resolved } : undefined;
+}
+
+function resolveBlockBackgroundStyle(item: ArchiveCollageItemProps): CSSProperties | undefined {
+  const legacyHex = item.blockBackgroundColor?.trim() ?? '';
+  const background = item.blockBackground;
+  const hasImage = resolveImageFields(item).src.length > 0;
+  const resolved = resolveCssColor(
+    background?.colorHex ?? legacyHex,
+    background?.color ?? (hasImage ? undefined : DEFAULT_TEXT_BLOCK_BACKGROUND),
+  );
+
+  return resolved != null ? { backgroundColor: resolved } : undefined;
+}
+
+function resolveImageFields(item: ArchiveCollageItemProps) {
+  const media = item.imageMedia;
+
+  return {
+    src: resolveMakeswiftImageSrc(media?.image ?? item.image),
+    alt: media?.imageAlt ?? item.imageAlt ?? '',
+    alignX: media?.imageAlignX ?? item.imageAlignX,
+    alignY: media?.imageAlignY ?? item.imageAlignY,
+  };
+}
+
+function resolveTitleText(
+  part: CollageTitlePartProps | string | undefined,
+  flatText?: string,
+  legacyTitle?: string,
+): string {
+  if (typeof part === 'string') {
+    return part.trim();
+  }
+
+  return part?.text?.trim() || flatText?.trim() || legacyTitle?.trim() || '';
+}
+
+function resolveCollageTitleFontSize(desktopPx?: number, mobilePx?: number): string {
+  const desktop =
+    desktopPx == null || desktopPx <= 0 ? DEFAULT_COLLAGE_TITLE_FONT_DESKTOP : desktopPx;
+  const mobile =
+    mobilePx == null || mobilePx <= 0 ? DEFAULT_COLLAGE_TITLE_FONT_MOBILE : mobilePx;
+
+  return resolveHeadingFontSizeCss(desktop, mobile) ?? `${String(desktop)}px`;
+}
+
+function resolveTitlePartStyle(
+  part: CollageTitlePartProps | string | undefined,
+  legacyColorGroup: PlainTextColorProps | string | undefined,
+  sharedLegacyColor?: string,
+): CSSProperties | undefined {
+  const colorProps =
+    typeof part === 'object' && part != null
+      ? { textColor: part.textColor, textColorHex: part.textColorHex }
+      : legacyColorGroup;
+  const colorStyle = resolveTitleColorStyle(colorProps, sharedLegacyColor);
+  const fontSize =
+    typeof part === 'object' && part != null
+      ? resolveCollageTitleFontSize(part.fontSize, part.fontSizeMobile)
+      : resolveCollageTitleFontSize();
+
+  return {
+    ...colorStyle,
+    fontSize,
+  };
+}
+
+function resolveCollageTitles(item: ArchiveCollageItemProps) {
+  const titleGroup = item.titleContent;
+  const legacyTitle = item.title?.trim() ?? '';
+  const legacyColor = item.titleColor?.trim() ?? '';
+  const primaryPart = titleGroup?.primaryTitle;
+  const secondaryPart = titleGroup?.secondaryTitle;
+
+  const primaryColorProps =
+    typeof primaryPart === 'object' && primaryPart != null
+      ? { textColor: primaryPart.textColor, textColorHex: primaryPart.textColorHex }
+      : (titleGroup?.primaryTitleColor ?? item.primaryTitleColor);
+
+  return {
+    primaryTitle: resolveTitleText(primaryPart, item.primaryTitle, legacyTitle),
+    secondaryTitle: resolveTitleText(secondaryPart, item.secondaryTitle),
+    primaryStyle: resolveTitlePartStyle(
+      primaryPart,
+      titleGroup?.primaryTitleColor ?? item.primaryTitleColor,
+      legacyColor,
+    ),
+    primaryUnderlineColor: resolveTitleColorValue(primaryColorProps, legacyColor),
+    secondaryStyle: resolveTitlePartStyle(
+      secondaryPart,
+      titleGroup?.secondaryTitleColor ?? item.secondaryTitleColor,
+      legacyColor,
+    ),
+  };
 }
 
 function toObjectPosition(alignX: ImageAlignX | undefined, alignY: ImageAlignY | undefined): string {
@@ -121,79 +285,127 @@ function resolveLink(link?: { href?: string; target?: string }) {
   return { href, target: target != null && target.length > 0 ? target : undefined };
 }
 
+function CollageItemTitles({
+  primaryTitle,
+  secondaryTitle,
+  primaryStyle,
+  primaryUnderlineColor,
+  secondaryStyle,
+  layout,
+}: {
+  primaryTitle: string;
+  secondaryTitle: string;
+  primaryStyle?: CSSProperties;
+  primaryUnderlineColor?: string;
+  secondaryStyle?: CSSProperties;
+  layout: 'overlay' | 'centered';
+}) {
+  if (primaryTitle.length === 0 && secondaryTitle.length === 0) {
+    return null;
+  }
+
+  const lineClass = clsx(
+    'collage-item-title heading leading-tight transition-[text-decoration]',
+    layout !== 'centered' && 'text-white',
+  );
+  const lineStyle =
+    primaryUnderlineColor != null
+      ? ({ '--collage-primary-underline': primaryUnderlineColor } as CSSProperties)
+      : undefined;
+  const line = (
+    <>
+      {primaryTitle.length > 0 ? <span style={primaryStyle}>{primaryTitle}</span> : null}
+      {primaryTitle.length > 0 && secondaryTitle.length > 0 ? ' ' : null}
+      {secondaryTitle.length > 0 ? <span style={secondaryStyle}>{secondaryTitle}</span> : null}
+    </>
+  );
+
+  if (layout === 'centered') {
+    return (
+      <div className="pointer-events-none relative z-10 flex h-full w-full items-center justify-center p-6 text-center md:p-8">
+        <p className={lineClass} style={lineStyle}>
+          {line}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="pointer-events-none absolute inset-0 z-10 flex items-end justify-start p-4 md:p-6">
+      <p className={lineClass} style={lineStyle}>
+        {line}
+      </p>
+    </div>
+  );
+}
+
 function CollageItemFrame({
   item,
   index,
   link,
-  defaultOverlayOpacity,
 }: {
   item: ArchiveCollageItemProps;
   index: number;
   link: ReturnType<typeof resolveLink>;
-  defaultOverlayOpacity: number;
 }) {
-  const src = resolveMakeswiftImageSrc(item.image);
+  const imageFields = resolveImageFields(item);
+  const src = imageFields.src;
+  const showImage = src.length > 0;
   const columnSpan = clamp(item.columnSpan, 1, MAX_COLUMNS, 3);
   const rowSpan = clamp(item.rowSpan, 1, MAX_ROWS, 2);
-  const overlayOpacity = clampOpacity(item.overlayOpacity, defaultOverlayOpacity);
-  const overlayColor = item.overlayColor?.trim() ?? '';
-  const titleColor = item.titleColor?.trim() ?? '';
-  const title = item.title?.trim() ?? '';
+  const { primaryTitle, secondaryTitle, primaryStyle, primaryUnderlineColor, secondaryStyle } =
+    resolveCollageTitles(item);
+  const blockBackgroundStyle = resolveBlockBackgroundStyle(item);
 
   const itemStyle = {
     '--column-span': String(columnSpan),
     '--row-span': String(rowSpan),
-    ...(overlayColor.length > 0 ? { '--color-overlay': overlayColor } : {}),
+    ...blockBackgroundStyle,
   } as CSSProperties;
 
-  const overlayStyle: CSSProperties = {
-    opacity: overlayOpacity,
-    backgroundColor:
-      overlayColor.length > 0 ? `rgb(${overlayColor})` : 'rgb(var(--color-overlay,49 47 47))',
-  };
+  const titles = (
+    <CollageItemTitles
+      layout={showImage ? 'overlay' : 'centered'}
+      primaryStyle={primaryStyle}
+      primaryTitle={primaryTitle}
+      primaryUnderlineColor={primaryUnderlineColor}
+      secondaryStyle={secondaryStyle}
+      secondaryTitle={secondaryTitle}
+    />
+  );
 
-  const titleStyle: CSSProperties | undefined =
-    titleColor.length > 0 ? { color: `rgb(${titleColor})` } : undefined;
-
-  const content: ReactNode = (
+  const content: ReactNode = showImage ? (
     <>
       <picture className="media media--height relative block h-full w-full overflow-hidden">
-        {src.length > 0 ? (
-          <img
-            alt={item.imageAlt?.trim() ?? ''}
-            className="absolute inset-0 block h-full w-full object-cover"
-            decoding="async"
-            loading={index < 4 ? 'eager' : 'lazy'}
-            src={src}
-            style={{ objectPosition: toObjectPosition(item.imageAlignX, item.imageAlignY) }}
-          />
-        ) : (
-          <span aria-hidden="true" className="absolute inset-0 block bg-neutral-300" />
-        )}
+        <img
+          alt={imageFields.alt.trim()}
+          className="absolute inset-0 block h-full w-full object-cover"
+          decoding="async"
+          loading={index < 4 ? 'eager' : 'lazy'}
+          src={src}
+          style={{ objectPosition: toObjectPosition(imageFields.alignX, imageFields.alignY) }}
+        />
       </picture>
       <span
         aria-hidden="true"
-        className="banner__overlay pointer-events-none absolute inset-0 transition-opacity duration-300"
-        style={overlayStyle}
+        className="banner__overlay pointer-events-none absolute inset-0 z-[1] h-full w-full"
       />
-      {title.length > 0 ? (
-        <div className="pointer-events-none absolute inset-0 z-10 flex items-end justify-start p-4 md:p-6">
-          <p className="heading text-white text-lg md:text-xl leading-tight" style={titleStyle}>
-            {title}
-          </p>
-        </div>
-      ) : null}
+      {titles}
     </>
+  ) : (
+    titles ?? <span aria-hidden="true" className="block h-full min-h-[inherit] w-full" />
   );
 
-  const baseClass =
-    'collage__item with-image banner relative block h-full w-full overflow-hidden rounded-lg';
+  const baseClass = clsx(
+    'collage__item banner group relative block h-full w-full overflow-hidden rounded-lg',
+    showImage ? 'with-image' : 'without-image',
+  );
   const wrapperStyle = itemStyle;
 
   if (link != null) {
     return (
       <a
-        className={clsx(baseClass, 'group')}
+        className={baseClass}
         href={link.href}
         rel={link.target === '_blank' ? 'noopener noreferrer' : undefined}
         style={wrapperStyle}
@@ -270,16 +482,10 @@ export function ArchiveCollageGrid({
   rowHeight,
   desktopGap,
   mobileGap,
-  enableHoverDim = true,
-  defaultOverlayOpacity,
+  roundedTop = true,
   cta,
 }: ArchiveCollageGridProps) {
-  const fallbackOverlay = clampOpacity(defaultOverlayOpacity, DEFAULT_OVERLAY);
-  const resolvedItems = (items ?? []).flatMap((item) => {
-    const src = resolveMakeswiftImageSrc(item.image);
-
-    return src.length > 0 ? [item] : [];
-  });
+  const resolvedItems = items ?? [];
 
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: ARCHIVE_COLLAGE_GRID_SECTION_ID,
@@ -299,8 +505,6 @@ export function ArchiveCollageGrid({
 
   const gridStyle = {
     '--row-height': `${String(rowHeightPx)}px`,
-    '--overlay-opacity': String(fallbackOverlay),
-    '--overlay-opacity-hover': enableHoverDim ? '0.1' : String(fallbackOverlay),
     gridAutoRows: `var(--row-height,${String(rowHeightPx)}px)`,
     rowGap: `${String(mobileGapPx)}px`,
     columnGap: `${String(mobileGapPx)}px`,
@@ -316,12 +520,13 @@ export function ArchiveCollageGrid({
         style={sectionStyle}
       >
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
+        <style dangerouslySetInnerHTML={{ __html: ARCHIVE_COLLAGE_GRID_IMAGE_FADE_CSS }} />
         <style
           dangerouslySetInnerHTML={{
             __html: `@media screen and (min-width:768px){#${ARCHIVE_COLLAGE_GRID_SECTION_ID} .collage.with-grid{row-gap:${String(desktopGapPx)}px;column-gap:${String(desktopGapPx)}px}#${ARCHIVE_COLLAGE_GRID_SECTION_ID} .collage__item{grid-column:span var(--column-span,3) / span var(--column-span,3);grid-row:span var(--row-span,2) / span var(--row-span,2)}}`,
           }}
         />
-        <div className="section section--padding">
+        <div className={clsx('section section--padding', roundedTop && 'section--rounded')}>
           <div className="page-width relative">
             {resolvedItems.length > 0 ? (
               <div
@@ -329,11 +534,10 @@ export function ArchiveCollageGrid({
                 style={gridStyle}
               >
                 {resolvedItems.map((item, index) => {
-                  const link = resolveLink(item.link);
+                  const link = resolveLink(item.titleContent?.link ?? item.link);
 
                   return (
                     <CollageItemFrame
-                      defaultOverlayOpacity={fallbackOverlay}
                       index={index}
                       item={item}
                       key={`collage-item-${String(index)}`}

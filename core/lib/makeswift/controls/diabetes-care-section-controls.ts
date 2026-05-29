@@ -1,6 +1,9 @@
 import { Checkbox, Color, Group, Number, TextArea, TextInput } from '@makeswift/runtime/controls';
 
-import { ARCHIVE_HIGHLIGHT_SWASH_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
+import {
+  ARCHIVE_CREAM_BACKGROUND_HSL,
+  ARCHIVE_HIGHLIGHT_SWASH_HSL,
+} from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import { hsl } from '~/lib/makeswift/utils/color';
 
 export const HEX_OVERRIDE_DESCRIPTION =
@@ -8,7 +11,25 @@ export const HEX_OVERRIDE_DESCRIPTION =
 
 export const FONT_SIZE_DESCRIPTION = '0 = theme default (title-lg).';
 
-export function sectionBackgroundControls(defaultHsl = '0 0% 100%') {
+export function roundedTopControl() {
+  return {
+    roundedTop: Checkbox({
+      label: 'Rounded top edges',
+      defaultValue: true,
+    }),
+  };
+}
+
+export function roundedBottomControl() {
+  return {
+    roundedBottom: Checkbox({
+      label: 'Rounded bottom edges',
+      defaultValue: true,
+    }),
+  };
+}
+
+export function sectionBackgroundControls(defaultHsl = ARCHIVE_CREAM_BACKGROUND_HSL) {
   return {
     background: Group({
       label: 'Background',
@@ -37,6 +58,21 @@ export function textColorFields(defaultHsl = '0 2% 19%') {
     }),
     textColorHex: TextInput({
       label: 'Text color (hex override)',
+      defaultValue: '',
+      description: HEX_OVERRIDE_DESCRIPTION,
+    }),
+  };
+}
+
+/** Sage accent copy (`highlightStyle="text"`). Defaults to archive `#8da58d`. */
+export function accentTextColorFields(defaultHsl = ARCHIVE_HIGHLIGHT_SWASH_HSL) {
+  return {
+    accentTextColor: Color({
+      label: 'Accent text color',
+      defaultValue: hsl(defaultHsl),
+    }),
+    accentTextColorHex: TextInput({
+      label: 'Accent text color (hex override)',
       defaultValue: '',
       description: HEX_OVERRIDE_DESCRIPTION,
     }),
@@ -93,25 +129,42 @@ export function buttonColorFields(defaults?: ButtonColorFieldDefaults) {
   };
 }
 
-export function fontSizeFields() {
+export type FontSizeFieldsOptions = {
+  desktopDefault?: number;
+  mobileDefault?: number;
+};
+
+export function fontSizeFields(options?: FontSizeFieldsOptions) {
   return {
     fontSize: Number({
       label: 'Font size',
       suffix: 'px',
-      defaultValue: 0,
+      defaultValue: options?.desktopDefault ?? 0,
       description: FONT_SIZE_DESCRIPTION,
     }),
     fontSizeMobile: Number({
       label: 'Font size (mobile)',
       suffix: 'px',
-      defaultValue: 0,
+      defaultValue: options?.mobileDefault ?? 0,
       description: '0 = same as desktop, or theme default when desktop is 0.',
     }),
   };
 }
 
+export type HighlightSwashFieldsOptions = {
+  /** When true, new instances default the swash picker to fully transparent. */
+  defaultTransparent?: boolean;
+};
+
 /** @param highlightDefaultHsl Space-separated HSL channels (e.g. `120 12% 60%` for `#8da58d`). */
-export function highlightSwashFields(highlightDefaultHsl?: string) {
+export function highlightSwashFields(
+  highlightDefaultHsl?: string,
+  options?: HighlightSwashFieldsOptions,
+) {
+  const swashDefault = options?.defaultTransparent
+    ? hsl('0 0% 0% / 0')
+    : hsl(highlightDefaultHsl ?? ARCHIVE_HIGHLIGHT_SWASH_HSL);
+
   return {
     useCustomHighlightColor: Checkbox({
       label: 'Override highlight swash color',
@@ -119,13 +172,14 @@ export function highlightSwashFields(highlightDefaultHsl?: string) {
     }),
     accentHighlightColor: Color({
       label: 'Highlight swash color',
-      defaultValue: hsl(highlightDefaultHsl ?? ARCHIVE_HIGHLIGHT_SWASH_HSL),
+      defaultValue: swashDefault,
     }),
     accentHighlightColorHex: TextInput({
       label: 'Highlight swash color (hex override)',
       defaultValue: '',
-      description:
-        'Optional. Overrides the picker when valid. Reset on the picker above restores the theme swash color (e.g. `#8da58d`).',
+      description: options?.defaultTransparent
+        ? 'Optional. Enable the override above to show a swash; defaults to transparent until you pick a color.'
+        : 'Optional. Overrides the picker when valid. Reset on the picker above restores the theme swash color (e.g. `#8da58d`).',
     }),
   };
 }
@@ -138,6 +192,10 @@ export type HeadingPopoverOptions = {
   accentPhraseLabel?: string;
   accentPhraseDefault?: string;
   textColorDefault?: string;
+  fontSizeDefault?: number;
+  fontSizeMobileDefault?: number;
+  includeAccentTextColor?: boolean;
+  accentTextColorDefault?: string;
   includeHighlightSwash?: boolean;
   highlightDefault?: string;
 };
@@ -169,7 +227,13 @@ export function headingPopoverControls(options: HeadingPopoverOptions) {
             }
           : {}),
         ...textColorFields(options.textColorDefault),
-        ...fontSizeFields(),
+        ...(options.includeAccentTextColor
+          ? accentTextColorFields(options.accentTextColorDefault)
+          : {}),
+        ...fontSizeFields({
+          desktopDefault: options.fontSizeDefault,
+          mobileDefault: options.fontSizeMobileDefault,
+        }),
         ...(options.includeHighlightSwash
           ? highlightSwashFields(options.highlightDefault)
           : {}),
@@ -188,6 +252,11 @@ export type SplitHeadingPopoverOptions = {
   secondaryTextColorDefault?: string;
   /** HSL channels for highlight swash reset default (e.g. `#8da58d` → `120 12% 60%`). */
   highlightDefault?: string;
+  /**
+   * Secondary line only: no visible swash until the editor enables the override.
+   * Swash color picker defaults to transparent when override is on.
+   */
+  secondarySwashTransparentByDefault?: boolean;
 };
 
 export type SplitRichTextLowerHeadingOptions = {
@@ -358,7 +427,12 @@ export function splitHeadingPopoverControls(options?: SplitHeadingPopoverOptions
         }),
         ...textColorFields(options?.secondaryTextColorDefault ?? '0 2% 19%'),
         ...fontSizeFields(),
-        ...highlightSwashFields(options?.highlightDefault),
+        ...highlightSwashFields(
+          options?.highlightDefault,
+          options?.secondarySwashTransparentByDefault
+            ? { defaultTransparent: true }
+            : undefined,
+        ),
       },
     }),
   };

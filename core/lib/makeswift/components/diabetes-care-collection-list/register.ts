@@ -16,7 +16,7 @@ export const COMPONENT_TYPE = 'diabetes-care-collection-list';
 
 runtime.registerComponent(DiabetesCareCollectionList, {
   type: COMPONENT_TYPE,
-  label: diabetesCareComponentLabel(13, 'Collection list'),
+  label: diabetesCareComponentLabel(12, 'Collection list'),
   icon: 'layout',
   props: {
     className: Style(),

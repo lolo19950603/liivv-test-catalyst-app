@@ -15,6 +15,7 @@ import { usePathname } from '~/i18n/routing';
 import { LiivvArchiveHeader } from '~/lib/makeswift/liivv-archive-header/liivv-archive-header';
 import type { LiivvArchiveNavLink } from '~/lib/makeswift/liivv-archive-header/types';
 import { findMatchingPathConfig } from '~/lib/makeswift/site-header/should-hide-store-header';
+import type { SectionBackgroundProps } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { resolveMakeswiftHref } from '~/lib/makeswift/utils/resolve-makeswift-href';
 
 import { ARCHIVE_HEADER_SECTION_ID } from './archive-styles';
@@ -78,6 +79,7 @@ interface PageOverride {
 }
 
 interface Props {
+  background?: SectionBackgroundProps;
   banner: {
     id: string;
     show: boolean;
@@ -155,10 +157,12 @@ function resolveLogo(
 }
 
 function PageOverrideHeader({
+  background,
   override,
   cartCount,
   defaultSearchPlaceholder,
 }: {
+  background?: SectionBackgroundProps;
   override: PageOverride;
   cartCount: number | null;
   defaultSearchPlaceholder: string;
@@ -180,6 +184,7 @@ function PageOverrideHeader({
 
   return (
     <LiivvArchiveHeader
+      background={background}
       className="liivv-site-header liivv-site-header--override"
       initialCartCount={cartCount}
       logo={
@@ -205,7 +210,7 @@ function PageOverrideHeader({
 
 export const MakeswiftHeader = forwardRef(
   (
-    { banner, links, logo, linksPosition, pageOverrides }: Props,
+    { background, banner, links, logo, linksPosition, pageOverrides }: Props,
     ref: Ref<HTMLDivElement>,
   ) => {
     const pathname = usePathname() ?? '/';
@@ -223,6 +228,7 @@ export const MakeswiftHeader = forwardRef(
     if (override) {
       return (
         <PageOverrideHeader
+          background={background}
           cartCount={cartCount}
           defaultSearchPlaceholder={searchPlaceholder}
           override={override}
@@ -246,6 +252,7 @@ export const MakeswiftHeader = forwardRef(
 
     return (
       <LiivvArchiveHeader
+        background={background}
         banner={bannerNode}
         className="liivv-site-header"
         initialCartCount={cartCount}

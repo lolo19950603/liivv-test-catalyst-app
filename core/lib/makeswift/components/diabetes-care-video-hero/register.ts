@@ -15,11 +15,11 @@ export const COMPONENT_TYPE = 'diabetes-care-video-hero';
 
 runtime.registerComponent(DiabetesCareVideoHero, {
   type: COMPONENT_TYPE,
-  label: diabetesCareComponentLabel(1, 'Video with text overlay'),
+  label: diabetesCareComponentLabel(0, 'Video with text overlay'),
   icon: 'layout',
   props: {
     className: Style(),
-    ...sectionBackgroundControls('0 0% 100%'),
+    ...sectionBackgroundControls(),
     video: Group({
       label: 'Video',
       preferredLayout: Group.Layout.Popover,

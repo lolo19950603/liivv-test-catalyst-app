@@ -29,7 +29,7 @@ export const COMPONENT_TYPE = 'diabetes-care-floating-product-bundle';
 
 runtime.registerComponent(DiabetesCareFloatingProductBundle, {
   type: COMPONENT_TYPE,
-  label: diabetesCareComponentLabel(11, 'Floating product bundle'),
+  label: diabetesCareComponentLabel(10, 'Floating product bundle'),
   icon: 'layout',
   props: {
     className: Style(),

@@ -32,16 +32,18 @@ export type BodyTextProps = {
 
 export function resolveHeadingTypography(heading?: HeadingWithHighlightProps | null) {
   const accent = resolveAccentColors(heading);
+  const plainColor = resolvePlainTextColor({
+    textColor: heading?.textColor,
+    textColorHex: heading?.textColorHex,
+  });
 
   return {
     text: heading?.text?.trim() ?? '',
     accentPhrase: heading?.accentPhrase?.trim() ?? '',
-    color: resolvePlainTextColor({
-      textColor: heading?.textColor,
-      textColorHex: heading?.textColorHex,
-    }),
+    color: plainColor,
     fontSize: resolveHeadingFontSizeCss(heading?.fontSize, heading?.fontSizeMobile),
-    emphasisColor: accent.emphasisColor,
+    // Split-heading popovers use `textColor` for the accent line; `accentTextColor` is optional.
+    emphasisColor: accent.emphasisColor ?? plainColor,
     highlightStyle: accent.highlightStyle,
     highlightChannels: accent.highlightChannels,
   };

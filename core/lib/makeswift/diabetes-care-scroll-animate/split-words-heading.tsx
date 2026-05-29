@@ -74,7 +74,7 @@ function HighlightedEm({
       data-style={style}
       style={Object.keys(emStyle).length > 0 ? emStyle : undefined}
     >
-      {children}
+      {style === 'text' ? <strong>{children}</strong> : children}
     </em>
   );
 }
@@ -161,26 +161,24 @@ function SplitWordsBlock({
   }
 
   return (
-    <>
+    <span className="split-words-segment">
       {words.map((word, index) => (
-        <span key={`${word}-${String(index)}`}>
-          {index > 0 ? <span className="whitespace"> </span> : null}
-          <AnimatedWord
-            animated={animated}
-            emphasisColor={emphasisColor}
-            highlightStyle={highlightStyle}
-            highlighted={
-              (highlightLastWord && index === words.length - 1) ||
-              accentTokenIndexes?.has(index) === true
-            }
-            fontSize={fontSize}
-            index={wordIndexOffset + index}
-            textColor={textColor}
-            word={word}
-          />
-        </span>
+        <AnimatedWord
+          key={`${word}-${String(index)}`}
+          animated={animated}
+          emphasisColor={emphasisColor}
+          highlightStyle={highlightStyle}
+          highlighted={
+            (highlightLastWord && index === words.length - 1) ||
+            accentTokenIndexes?.has(index) === true
+          }
+          fontSize={fontSize}
+          index={wordIndexOffset + index}
+          textColor={textColor}
+          word={word}
+        />
       ))}
-    </>
+    </span>
   );
 }
 
@@ -233,25 +231,53 @@ function useSplitWordsAnimated(): { ref: ReturnType<typeof useInViewAnimate>['re
   return { ref, animated };
 }
 
+function resolveSplitWordsRootFontSize(
+  leadFontSize?: string,
+  emphasisFontSize?: string,
+): string | undefined {
+  const lead = leadFontSize?.trim();
+  const emphasis = emphasisFontSize?.trim();
+
+  if (lead != null && lead.length > 0) {
+    return lead;
+  }
+
+  if (emphasis != null && emphasis.length > 0) {
+    return emphasis;
+  }
+
+  return undefined;
+}
+
 function SplitWordsRoot({
   animate,
   className,
+  rootFontSize,
   wordTotal,
   children,
 }: {
   animate: 'fade-up-large' | 'fade-up';
   className?: string;
+  rootFontSize?: string;
   wordTotal: number;
   children: (animated: boolean) => ReactNode;
 }) {
   const { ref, animated } = useSplitWordsAnimated();
+  const rootStyle = {
+    '--word-total': wordTotal,
+    ...(rootFontSize != null && rootFontSize.length > 0 ? { fontSize: rootFontSize } : {}),
+  } as CSSProperties;
 
   return (
     <span
       ref={ref}
-      className={clsx('split-words words splitting block', animated && 'dc-animated', className)}
+      className={clsx(
+        'split-words words splitting split-words--fluid-gap block',
+        animated && 'dc-animated',
+        className,
+      )}
       data-animate={animate}
-      style={{ '--word-total': wordTotal } as CSSProperties}
+      style={rootStyle}
     >
       {children(animated)}
     </span>
@@ -281,6 +307,7 @@ export function SplitWordsHeading({
   const emphasisText = emphasis?.trim() ?? '';
   const trailText = trail?.trim() ?? '';
   const fullText = text?.trim() ?? '';
+  const rootFontSize = resolveSplitWordsRootFontSize(leadFontSize, emphasisFontSize);
 
   if (leadText.length > 0 || emphasisText.length > 0 || trailText.length > 0) {
     const leadWords = tokensFromText(leadText);
@@ -289,7 +316,12 @@ export function SplitWordsHeading({
     const totalWords = leadWords.length + emphasisWords.length + trailWords.length;
 
     return (
-      <SplitWordsRoot animate={animate} className={className} wordTotal={totalWords}>
+      <SplitWordsRoot
+        animate={animate}
+        className={className}
+        rootFontSize={rootFontSize}
+        wordTotal={totalWords}
+      >
         {(animated) => (
           <>
             <SplitWordsBlock
@@ -300,9 +332,6 @@ export function SplitWordsHeading({
               textColor={leadColor}
               words={leadWords}
             />
-            {leadWords.length > 0 && emphasisWords.length > 0 ? (
-              <span className="whitespace"> </span>
-            ) : null}
             {emphasisWords.length > 0 ? (
               <HighlightedEm
                 animated={animated}
@@ -310,27 +339,15 @@ export function SplitWordsHeading({
                 fontSize={emphasisFontSize}
                 style={highlightStyle}
               >
-                {emphasisWords.map((word, i) => {
-                  const index = leadWords.length + i;
-
-                  return (
-                    <span key={`emphasis-${word}-${String(i)}`}>
-                      {i > 0 ? <span className="whitespace"> </span> : null}
-                      <AnimatedWord
-                        animated={animated}
-                        emphasisColor={emphasisColor}
-                        fontSize={emphasisFontSize}
-                        highlightStyle={highlightStyle}
-                        index={index}
-                        word={word}
-                      />
-                    </span>
-                  );
-                })}
+                <SplitWordsBlock
+                  animated={animated}
+                  emphasisColor={emphasisColor}
+                  fontSize={emphasisFontSize}
+                  highlightStyle={highlightStyle}
+                  wordIndexOffset={leadWords.length}
+                  words={emphasisWords}
+                />
               </HighlightedEm>
-            ) : null}
-            {(leadWords.length > 0 || emphasisWords.length > 0) && trailWords.length > 0 ? (
-              <span className="whitespace"> </span>
             ) : null}
             {trailWords.length > 0 ? (
               <SplitWordsBlock
@@ -358,7 +375,12 @@ export function SplitWordsHeading({
 
   if (highlightEntirePhrase) {
     return (
-      <SplitWordsRoot animate={animate} className={className} wordTotal={words.length}>
+      <SplitWordsRoot
+        animate={animate}
+        className={className}
+        rootFontSize={rootFontSize}
+        wordTotal={words.length}
+      >
         {(animated) => (
           <HighlightedEm
             animated={animated}
@@ -366,18 +388,13 @@ export function SplitWordsHeading({
             fontSize={emphasisFontSize}
             style={highlightStyle}
           >
-            {words.map((word, index) => (
-              <span key={`phrase-${word}-${String(index)}`}>
-                {index > 0 ? <span className="whitespace"> </span> : null}
-                <AnimatedWord
-                  animated={animated}
-                  emphasisColor={emphasisColor}
-                  fontSize={emphasisFontSize}
-                  index={index}
-                  word={word}
-                />
-              </span>
-            ))}
+            <SplitWordsBlock
+              animated={animated}
+              emphasisColor={emphasisColor}
+              fontSize={emphasisFontSize}
+              highlightStyle={highlightStyle}
+              words={words}
+            />
           </HighlightedEm>
         )}
       </SplitWordsRoot>
@@ -385,14 +402,21 @@ export function SplitWordsHeading({
   }
 
   return (
-    <SplitWordsRoot animate={animate} className={className} wordTotal={words.length}>
+    <SplitWordsRoot
+      animate={animate}
+      className={className}
+      rootFontSize={rootFontSize}
+      wordTotal={words.length}
+    >
       {(animated) => (
         <SplitWordsBlock
           accentTokenIndexes={accentIndexes}
           animated={animated}
           emphasisColor={emphasisColor}
+          fontSize={leadFontSize}
           highlightLastWord={highlightLastWord && accentIndexes == null}
           highlightStyle={highlightStyle}
+          textColor={leadColor}
           words={words}
         />
       )}

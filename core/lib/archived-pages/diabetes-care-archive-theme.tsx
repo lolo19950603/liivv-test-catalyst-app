@@ -2,6 +2,7 @@
 
 import { useEffect, type ReactNode } from 'react';
 
+import { DIABETES_CARE_SCROLL_ANIMATE_CSS } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import { DIABETES_CARE_MOBILE_RESPONSIVE_CSS } from '~/lib/makeswift/diabetes-care-mobile-responsive';
 
 import { initShopifyButtonFillHover } from './init-shopify-button-fill-hover';
@@ -55,6 +56,7 @@ export function DiabetesCareArchiveTheme({ children }: { children: ReactNode }) 
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: SHOPIFY_BUTTON_HOVER_CSS }} />
+      <style dangerouslySetInnerHTML={{ __html: DIABETES_CARE_SCROLL_ANIMATE_CSS }} />
       <style dangerouslySetInnerHTML={{ __html: DIABETES_CARE_MOBILE_RESPONSIVE_CSS }} />
       {children}
     </>

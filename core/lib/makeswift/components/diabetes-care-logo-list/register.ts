@@ -15,7 +15,7 @@ export const COMPONENT_TYPE = 'diabetes-care-logo-list';
 
 runtime.registerComponent(DiabetesCareLogoList, {
   type: COMPONENT_TYPE,
-  label: diabetesCareComponentLabel(8, 'Logo list'),
+  label: diabetesCareComponentLabel(7, 'Logo list'),
   icon: 'layout',
   props: {
     className: Style(),

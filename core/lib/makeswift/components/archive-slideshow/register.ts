@@ -10,8 +10,12 @@ import {
 } from '@makeswift/runtime/controls';
 
 import { archiveComponentLabel } from '~/lib/makeswift/archive-component-label';
-import { sectionBackgroundControls } from '~/lib/makeswift/controls/diabetes-care-section-controls';
+import {
+  roundedTopControl,
+  sectionBackgroundControls,
+} from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
+import { IMAGE_ALIGN_Y_CONTROL_OPTIONS } from '~/lib/makeswift/utils/image-object-position';
 
 import { ArchiveSlideshow } from './client';
 
@@ -33,11 +37,7 @@ const slide = Group({
     }),
     imageAlignY: Select({
       label: 'Vertical alignment',
-      options: [
-        { value: 'top', label: 'Top' },
-        { value: 'center', label: 'Center' },
-        { value: 'bottom', label: 'Bottom' },
-      ],
+      options: [...IMAGE_ALIGN_Y_CONTROL_OPTIONS],
       defaultValue: 'center',
     }),
   },
@@ -50,6 +50,7 @@ runtime.registerComponent(ArchiveSlideshow, {
   props: {
     className: Style(),
     ...sectionBackgroundControls('0 0% 100%'),
+    ...roundedTopControl(),
     slides: List({
       label: 'Slides',
       type: slide,

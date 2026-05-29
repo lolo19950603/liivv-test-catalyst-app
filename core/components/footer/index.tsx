@@ -7,9 +7,8 @@ import {
   SiYoutube,
 } from '@icons-pack/react-simple-icons';
 import { getTranslations } from 'next-intl/server';
-import { cache, JSX } from 'react';
+import { cache, JSX, type PropsWithChildren } from 'react';
 
-import { Streamable } from '@/vibes/soul/lib/streamable';
 import { GetLinksAndSectionsQuery, LayoutQuery } from '~/app/[locale]/(default)/page-data';
 import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
@@ -18,7 +17,9 @@ import { revalidate } from '~/client/revalidate-target';
 import { CurrencyCode } from '~/components/header/fragment';
 import { logoTransformer } from '~/data-transformers/logo-transformer';
 import { getPreferredCurrencyCode } from '~/lib/currency';
-import { SiteFooter as FooterSection } from '~/lib/makeswift/components/site-footer';
+import { SiteFooter } from '~/lib/makeswift/components/site-footer';
+import { SiteFooterBottomBar } from '~/lib/makeswift/components/site-footer-bottom-bar';
+import { PropsContextProvider } from '~/lib/makeswift/components/site-footer/client';
 
 import { FooterFragment, FooterSectionsFragment } from './fragment';
 import { AmazonIcon } from './payment-icons/amazon';
@@ -52,8 +53,6 @@ const getFooterSections = cache(
       document: GetLinksAndSectionsQuery,
       customerAccessToken,
       variables: { currencyCode },
-      // Since this query is needed on every page, it's a good idea not to validate the customer access token.
-      // The 'cache' function also caches errors, so we might get caught in a redirect loop if the cache saves an invalid token error response.
       validateCustomerAccessToken: false,
       fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate } },
     });
@@ -71,7 +70,7 @@ const getFooterData = cache(async () => {
   return readFragment(FooterFragment, response).site;
 });
 
-export const Footer = async () => {
+const getFooterContextValue = cache(async () => {
   const t = await getTranslations('Components.Footer');
   const data = await getFooterData();
 
@@ -93,57 +92,67 @@ export const Footer = async () => {
       icon: socialIcons[socialMediaLink.name]?.icon,
     }));
 
-  const streamableSections = Streamable.from(async () => {
-    const customerAccessToken = await getSessionCustomerAccessToken();
-    const currencyCode = await getPreferredCurrencyCode();
-    const sectionsData = await getFooterSections(customerAccessToken, currencyCode);
+  const customerAccessToken = await getSessionCustomerAccessToken();
+  const currencyCode = await getPreferredCurrencyCode();
+  const sectionsData = await getFooterSections(customerAccessToken, currencyCode);
 
-    return [
-      {
-        title: t('categories'),
-        links: sectionsData.categoryTree.map((category) => ({
-          label: category.name,
-          href: category.path,
+  const sections = [
+    {
+      title: t('categories'),
+      links: sectionsData.categoryTree.map((category) => ({
+        label: category.name,
+        href: category.path,
+      })),
+    },
+    {
+      title: t('brands'),
+      links: removeEdgesAndNodes(sectionsData.brands).map((brand) => ({
+        label: brand.name,
+        href: brand.path,
+      })),
+    },
+    {
+      title: t('navigate'),
+      links: [
+        ...(sectionsData.settings?.giftCertificates?.isEnabled
+          ? [
+              {
+                label: t('giftCertificates'),
+                href: '/gift-certificates',
+              },
+            ]
+          : []),
+        ...removeEdgesAndNodes(sectionsData.content.pages).map((page) => ({
+          label: page.name,
+          href: page.__typename === 'ExternalLinkPage' ? page.link : page.path,
         })),
-      },
-      {
-        title: t('brands'),
-        links: removeEdgesAndNodes(sectionsData.brands).map((brand) => ({
-          label: brand.name,
-          href: brand.path,
-        })),
-      },
-      {
-        title: t('navigate'),
-        links: [
-          ...(sectionsData.settings?.giftCertificates?.isEnabled
-            ? [
-                {
-                  label: t('giftCertificates'),
-                  href: '/gift-certificates',
-                },
-              ]
-            : []),
-          ...removeEdgesAndNodes(sectionsData.content.pages).map((page) => ({
-            label: page.name,
-            href: page.__typename === 'ExternalLinkPage' ? page.link : page.path,
-          })),
-        ],
-      },
-    ];
-  });
+      ],
+    },
+  ];
 
-  return (
-    <FooterSection
-      contactInformation={contactInformation}
-      contactTitle={t('contactUs')}
-      copyright={copyright}
-      logo={logo}
-      logoHref="/"
-      logoLabel={t('home')}
-      paymentIcons={paymentIcons}
-      sections={streamableSections}
-      socialMediaLinks={socialMediaLinks}
-    />
-  );
+  return {
+    contactInformation,
+    contactTitle: t('contactUs'),
+    copyright,
+    logo,
+    logoHref: '/',
+    logoLabel: t('home'),
+    paymentIcons,
+    sections,
+    socialMediaLinks,
+  };
+});
+
+export async function FooterContextProvider({ children }: PropsWithChildren) {
+  const value = await getFooterContextValue();
+
+  return <PropsContextProvider value={value}>{children}</PropsContextProvider>;
+}
+
+export const Footer = async () => {
+  return <SiteFooter />;
+};
+
+export const FooterBottomBar = async () => {
+  return <SiteFooterBottomBar />;
 };

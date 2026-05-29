@@ -1,5 +1,5 @@
 /**
- * Import diabetes-care Makeswift registers in page order (1–15).
+ * Import diabetes-care Makeswift registers in page order (0–14).
  * Registration order may still matter for some builder builds; label folders use {@link diabetesCareComponentLabel}.
  */
 import './components/diabetes-care-video-hero/register';

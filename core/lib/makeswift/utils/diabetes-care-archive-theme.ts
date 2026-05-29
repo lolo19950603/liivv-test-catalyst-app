@@ -16,6 +16,15 @@ export const ARCHIVE_BLOG_COLLAGE_BACKGROUND_CHANNELS = '168 156 148';
 /** Picker default matching {@link ARCHIVE_BLOG_COLLAGE_BACKGROUND_CHANNELS}. */
 export const ARCHIVE_BLOG_COLLAGE_BACKGROUND_HSL = '22 10% 62%';
 
+/** Warm off-white section fill (`#f5f2ed`). Default for custom section backgrounds. */
+export const ARCHIVE_CREAM_BACKGROUND_CHANNELS = '245 242 237';
+
+/** Picker default matching {@link ARCHIVE_CREAM_BACKGROUND_CHANNELS}. */
+export const ARCHIVE_CREAM_BACKGROUND_HSL = '37 29% 95%';
+
+/** Hex label for {@link ARCHIVE_CREAM_BACKGROUND_CHANNELS}. */
+export const ARCHIVE_CREAM_BACKGROUND_HEX = '#f5f2ed';
+
 /** Archive `--color-base-highlight` (`diabetes-care-sections.css` / `diabetes-care.html`). */
 export const ARCHIVE_HIGHLIGHT_CHANNELS = '142 165 141';
 

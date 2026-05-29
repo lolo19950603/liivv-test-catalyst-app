@@ -7,6 +7,7 @@ import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify
 import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
+import { ARCHIVE_CREAM_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import {
   buildSectionTheme,
   resolveBodyTextColor,
@@ -255,7 +256,7 @@ export function DiabetesCareImageTextOverlay({
     sectionCss: `${IMAGE_TEXT_OVERLAY_VARS}${IMAGE_TEXT_OVERLAY_BANNER_CSS}`,
     background,
     highlight: null,
-    defaultBackgroundChannels: '0 0% 100%',
+    defaultBackgroundChannels: ARCHIVE_CREAM_BACKGROUND_CHANNELS,
   });
   const img = resolveBannerImageSrc({ imageSrc, banner });
   const line1Text = line1.text.length > 0 ? line1.text : "We're Here if";

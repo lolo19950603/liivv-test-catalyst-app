@@ -76,7 +76,7 @@ function counterDescriptionStyleFields() {
 
 runtime.registerComponent(DiabetesCareNumberCounters, {
   type: COMPONENT_TYPE,
-  label: diabetesCareComponentLabel(3, 'Number counters'),
+  label: diabetesCareComponentLabel(2, 'Number counters'),
   icon: 'layout',
   props: {
     className: Style(),

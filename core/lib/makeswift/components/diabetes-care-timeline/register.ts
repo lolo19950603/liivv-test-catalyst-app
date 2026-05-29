@@ -56,7 +56,7 @@ function timelineSectionHeadingPopover(label: string, textDefault: string) {
 
 runtime.registerComponent(DiabetesCareTimeline, {
   type: COMPONENT_TYPE,
-  label: diabetesCareComponentLabel(4, 'Timeline'),
+  label: diabetesCareComponentLabel(3, 'Timeline'),
   icon: 'carousel',
   props: {
     className: Style(),

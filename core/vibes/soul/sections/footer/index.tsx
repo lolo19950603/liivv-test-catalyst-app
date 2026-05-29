@@ -194,29 +194,31 @@ export const Footer = ({
           </Stream>
         </div>
 
-        <div className="flex flex-col-reverse items-start gap-y-8 pt-16 @3xl:flex-row @3xl:items-center @3xl:pt-20">
-          {/* Copyright */}
-          <Stream fallback={<CopyrightSkeleton />} value={streamableCopyright}>
-            {(copyright) => {
-              if (copyright != null) {
-                return (
-                  <p className="flex-1 text-sm text-[var(--footer-copyright,hsl(var(--contrast-500)))]">
-                    {copyright}
-                  </p>
-                );
-              }
-            }}
-          </Stream>
+        {(streamableCopyright != null || streamablePaymentIcons != null) && (
+          <div className="flex flex-col-reverse items-start gap-y-8 pt-16 @3xl:flex-row @3xl:items-center @3xl:pt-20">
+            {/* Copyright */}
+            <Stream fallback={<CopyrightSkeleton />} value={streamableCopyright}>
+              {(copyright) => {
+                if (copyright != null) {
+                  return (
+                    <p className="flex-1 text-sm text-[var(--footer-copyright,hsl(var(--contrast-500)))]">
+                      {copyright}
+                    </p>
+                  );
+                }
+              }}
+            </Stream>
 
-          {/* Payment Icons */}
-          <Stream fallback={<PaymentIconsSkeleton />} value={streamablePaymentIcons}>
-            {(paymentIcons) => {
-              if (paymentIcons != null) {
-                return <div className="flex flex-wrap gap-2">{paymentIcons}</div>;
-              }
-            }}
-          </Stream>
-        </div>
+            {/* Payment Icons */}
+            <Stream fallback={<PaymentIconsSkeleton />} value={streamablePaymentIcons}>
+              {(paymentIcons) => {
+                if (paymentIcons != null) {
+                  return <div className="flex flex-wrap gap-2">{paymentIcons}</div>;
+                }
+              }}
+            </Stream>
+          </div>
+        )}
       </div>
     </footer>
   );

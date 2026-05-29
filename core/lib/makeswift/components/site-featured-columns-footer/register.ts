@@ -9,6 +9,7 @@ import {
 
 import {
   fontSizeFields,
+  roundedBottomControl,
   sectionBackgroundControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
@@ -24,7 +25,8 @@ runtime.registerComponent(SiteFeaturedColumnsFooter, {
   hidden: true,
   props: {
     className: Style(),
-    ...sectionBackgroundControls('0 0% 100%'),
+    ...sectionBackgroundControls(),
+    ...roundedBottomControl(),
     features: List({
       label: 'Feature columns',
       description: 'Maximum of 4 features. Additional items are ignored on the live site.',

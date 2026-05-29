@@ -10,6 +10,7 @@ import {
   TextInput,
 } from '@makeswift/runtime/controls';
 
+import { sectionBackgroundControls } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
 
 import { MakeswiftHeader } from './client';
@@ -96,6 +97,7 @@ runtime.registerComponent(MakeswiftHeader, {
   label: 'Site Header',
   hidden: true,
   props: {
+    ...sectionBackgroundControls('0 0% 100%'),
     banner,
     logo,
     links: List({

@@ -20,7 +20,11 @@ import {
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
 import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
-import { resolveAccentColors, resolvePlainTextColor } from '~/lib/makeswift/utils/heading-accent-color';
+import {
+  isHighlightOverrideEnabled,
+  resolveAccentColors,
+  resolvePlainTextColor,
+} from '~/lib/makeswift/utils/heading-accent-color';
 
 /** CSS variables used by migrated Shopify section markup (avoids `as CSSProperties`). */
 type ShopifyThemeStyle = CSSProperties & Record<string, string | number | undefined>;
@@ -39,7 +43,14 @@ const DEFAULT_BACKGROUND_CHANNELS = ARCHIVE_SAGE_BACKGROUND_CHANNELS;
  * Inline `<style>` from `diabetes-care.html` for this section id (theme color tokens + grid gap).
  * Appends `--section-blocks-count` and optional four-column media rule.
  */
-const MULTICOLUMN_ARCHIVE_STYLE = `#${MULTICOLUMN_SECTION_ID}{--section-padding-top:72px;--section-padding-bottom:72px;--color-background:${DEFAULT_BACKGROUND_CHANNELS};--color-foreground:49 47 47;--color-border:var(--color-foreground)/0.1;--color-border-dark:var(--color-foreground)/0.4;--color-border-light:var(--color-foreground)/0.06;--color-highlight:243 199 190;--color-button-background:255 255 255;--color-button-border:255 255 255;--color-button-text:49 47 47}#${MULTICOLUMN_SECTION_ID} [data-dc-scroll-reveal]{overflow:hidden}@media screen and (min-width:1024px){#${MULTICOLUMN_SECTION_ID} .multicolumn{--card-grid-gap:clamp(40px,3.5vw,60px)}#${MULTICOLUMN_SECTION_ID} .slider.slider--tablet{overflow:visible;padding-inline:0;margin-inline:0;padding-block-end:0}}`;
+/** Matches archive `card-grid` gap (home `multicolumn_xg87qF` uses ~`var(--sp-6)` at desktop, not 40–60px). */
+const MULTICOLUMN_CARD_GRID_GAP = 'clamp(var(--sp-4),1.263vw,var(--sp-6))';
+
+const MULTICOLUMN_ARCHIVE_STYLE =
+  `#${MULTICOLUMN_SECTION_ID}{--section-padding-top:72px;--section-padding-bottom:72px;--color-background:${DEFAULT_BACKGROUND_CHANNELS};--color-foreground:49 47 47;--color-border:var(--color-foreground)/0.1;--color-border-dark:var(--color-foreground)/0.4;--color-border-light:var(--color-foreground)/0.06;--color-highlight:243 199 190;--color-button-background:255 255 255;--color-button-border:255 255 255;--color-button-text:49 47 47}` +
+  `#${MULTICOLUMN_SECTION_ID} [data-dc-scroll-reveal]{overflow:hidden}` +
+  `@media screen and (min-width:768px){#${MULTICOLUMN_SECTION_ID} .multicolumn{--card-grid-gap:${MULTICOLUMN_CARD_GRID_GAP}}}` +
+  `@media screen and (min-width:1024px){#${MULTICOLUMN_SECTION_ID} .slider.slider--tablet{overflow:visible;padding-inline:0;margin-inline:0;padding-block-end:0}}`;
 
 function multicolumnSectionStyle(blockCount: number): string {
   const id = `#${MULTICOLUMN_SECTION_ID}`;
@@ -47,6 +58,12 @@ function multicolumnSectionStyle(blockCount: number): string {
 
   if (blockCount === 4) {
     style += `@media screen and (min-width:768px){${id} .multicolumn.with-4.card-grid.card-grid--4{--card-grid-per-row:4}}`;
+  }
+
+  if (blockCount === 3) {
+    style +=
+      `@media screen and (min-width:768px){${id} .multicolumn.with-3.card-grid.card-grid--3{--card-grid-per-row:3;--card-grid-gap:${MULTICOLUMN_CARD_GRID_GAP};--card-grid-template:auto-flow dense/repeat(3,minmax(0,1fr))}}` +
+      `@media screen and (min-width:768px){${id} .slider.slider--tablet .multicolumn.with-3.card-grid{--slider-item-width:unset;--slider-grid:unset;grid:var(--card-grid-template)}}`;
   }
 
   return style;
@@ -414,9 +431,20 @@ export function DiabetesCareMulticolumn({
     sectionId: MULTICOLUMN_SECTION_ID,
     sectionCss: multicolumnSectionStyle(rows.length),
     background,
-    highlight: secondaryHeading,
+    // Swash color is scoped to the section title only (see `sectionTitleStyle` below), not
+    // every `.highlighted-text` in the column cards.
     defaultBackgroundChannels: DEFAULT_BACKGROUND_CHANNELS,
   });
+
+  const useSecondaryTitleSwash = isHighlightOverrideEnabled(
+    secondaryHeading?.useCustomHighlightColor,
+  );
+  const sectionTitleStyle: ShopifyThemeStyle | undefined = useSecondaryTitleSwash
+    ? {
+        '--color-highlight':
+          secondaryResolved.highlightChannels ?? '0 0 0 / 0',
+      }
+    : undefined;
 
   return (
     <div
@@ -434,15 +462,16 @@ export function DiabetesCareMulticolumn({
       >
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className="section section--padding section--rounded relative">
-          <div className="page-width page-width--full relative px-4 sm:px-5 md:px-0">
+          <div className="page-width relative">
             <div className="title-wrapper relative z-1 mb-10 flex flex-col gap-4 text-center leading-none md:mb-12 md:items-center md:justify-between lg:gap-8">
               <div className="grid gap-4">
-                <h2 className="heading title-xl tracking-heading">
+                <h2 className="heading title-xl tracking-heading" style={sectionTitleStyle}>
                   <AccentSplitWordsHeading
-                    accentColors={secondaryHeading}
+                    accentColors={useSecondaryTitleSwash ? secondaryHeading : undefined}
                     emphasis={secondaryText}
                     emphasisColor={secondaryResolved.emphasisColor}
                     emphasisFontSize={secondaryResolved.fontSize}
+                    highlightStyle={useSecondaryTitleSwash ? 'half_text' : 'text'}
                     lead={primaryText}
                     leadColor={primaryResolved.color}
                     leadFontSize={primaryResolved.fontSize}
@@ -501,7 +530,7 @@ export function DiabetesCareMulticolumn({
 
                     return (
                       <div
-                        className="multicolumn-card with-border card flex h-full w-full min-h-0 flex-col gap-5 text-left"
+                        className="multicolumn-card with-border card flex h-full w-full min-h-0 flex-col items-start gap-5 text-left md:text-left"
                         key={`multicolumn-${index}`}
                       >
                         {showImage ? (
@@ -517,19 +546,20 @@ export function DiabetesCareMulticolumn({
                             />
                           </div>
                         ) : null}
-                        <div
-                          className={clsx(
-                            'multicolumn-card__info flex min-h-0 w-full flex-1 flex-col gap-4 lg:gap-6',
-                            showButton &&
-                              bodyText.length === 0 &&
-                              secondaryText.length === 0 &&
-                              (headingText.length > 0 || showImage) &&
-                              'justify-between',
-                          )}
-                        >
+                        <div className="grid w-full gap-4 lg:gap-6">
+                          <div
+                            className={clsx(
+                              'multicolumn-card__info grid min-h-0 w-full gap-4 lg:gap-6',
+                              showButton &&
+                                bodyText.length === 0 &&
+                                secondaryText.length === 0 &&
+                                (headingText.length > 0 || showImage) &&
+                                'h-full',
+                            )}
+                          >
                           {headingText.length > 0 ? (
                             <p
-                              className="heading text-lg-2xl leading-tight tracking-tight"
+                              className="heading text-2xl leading-tight tracking-tight lg:text-3xl"
                               style={multicolumnSwashBlockStyle(headingBlock)}
                             >
                               <ArchiveHighlightedText
@@ -606,6 +636,7 @@ export function DiabetesCareMulticolumn({
                               </ArchiveShopifyButton>
                             </p>
                           ) : null}
+                          </div>
                         </div>
                       </div>
                     );

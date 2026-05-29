@@ -1,21 +1,27 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from 'react';
 
 import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
-import { ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate/scroll-reveal';
 import { SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate/split-words-heading';
 import {
   buildSectionTheme,
-  resolveBodyTextColor,
-  type BodyTextProps,
+  resolveHeadingTypography,
   type HeadingWithHighlightProps,
   type SectionBackgroundProps,
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
 
 import {
+  ARCHIVE_REVEAL_TESTIMONIALS_BACKGROUND,
   ARCHIVE_REVEAL_TESTIMONIALS_SECTION_ID,
   ARCHIVE_REVEAL_TESTIMONIALS_VARS,
 } from './archive-styles';
@@ -25,29 +31,24 @@ export type ArchiveTestimonialItemProps = {
   author?: string;
   role?: string;
   avatar?: unknown;
-  /** Parallax start offset (px). Positive values translate the card downward at scroll start. */
   parallaxStartPx?: number;
-  /** Parallax stop offset (px). Negative values translate upward as the user scrolls past. */
   parallaxStopPx?: number;
 };
 
 export interface ArchiveRevealTestimonialsProps {
   className?: string;
   background?: SectionBackgroundProps;
-  heading?: HeadingWithHighlightProps;
-  bodyText?: BodyTextProps;
+  primaryHeading?: HeadingWithHighlightProps;
+  secondaryHeading?: HeadingWithHighlightProps;
   items?: ArchiveTestimonialItemProps[];
-  /** Max width of the testimonials column (px). Defaults to 720. */
-  columnMaxWidthPx?: number;
-  /** Vertical gap between cards on desktop (px). Defaults to 40. */
-  desktopGapPx?: number;
-  /** Vertical gap on mobile (px). Defaults to 16. */
-  mobileGapPx?: number;
-  /** Disable parallax (defaults to enabled). Useful for accessibility / preview. */
   disableParallax?: boolean;
+  roundedTop?: boolean;
+  /** @deprecated Legacy single heading; split into line 1 + line 2 when set. */
+  heading?: HeadingWithHighlightProps;
 }
 
-const DEFAULT_HEADING = 'What people are saying';
+const DEFAULT_LINE_1 = 'What people';
+const DEFAULT_LINE_2 = 'are saying';
 const DEFAULT_QUOTES: ArchiveTestimonialItemProps[] = [
   {
     quote: 'Add customer reviews and testimonials to showcase your store’s happy customers.',
@@ -75,23 +76,10 @@ const DEFAULT_QUOTES: ArchiveTestimonialItemProps[] = [
   },
 ];
 
-function clampPx(value: number | undefined, fallback: number): number {
-  if (value == null || Number.isNaN(value) || value < 0) {
-    return fallback;
-  }
-
-  return Math.round(value);
-}
-
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
 
-/**
- * Hook: returns a per-element scroll progress (0–1) where 0 = card top hits
- * viewport bottom and 1 = card bottom leaves viewport top. Throttled with rAF
- * for smoothness. SSR-safe (returns 0 server-side and on first paint).
- */
 function useScrollProgress(ref: React.RefObject<HTMLElement | null>): number {
   const [progress, setProgress] = useState(0);
   const frameRef = useRef<number | null>(null);
@@ -109,9 +97,8 @@ function useScrollProgress(ref: React.RefObject<HTMLElement | null>): number {
     const total = rect.height + viewport;
     const elapsed = viewport - rect.top;
     const raw = total > 0 ? elapsed / total : 0;
-    const clamped = Math.min(1, Math.max(0, raw));
 
-    setProgress(clamped);
+    setProgress(Math.min(1, Math.max(0, raw)));
   }, [ref]);
 
   const schedule = useCallback(() => {
@@ -145,16 +132,78 @@ function useScrollProgress(ref: React.RefObject<HTMLElement | null>): number {
   return progress;
 }
 
+function resolveTitleLines(props: ArchiveRevealTestimonialsProps): {
+  line1: string;
+  line2: string;
+} {
+  const legacy = props.heading?.text?.trim();
+
+  if (legacy != null && legacy.length > 0) {
+    const lower = legacy.toLowerCase();
+    const splitAt = lower.indexOf(' are ');
+
+    if (splitAt > 0) {
+      return {
+        line1: legacy.slice(0, splitAt).trim(),
+        line2: legacy.slice(splitAt + 1).trim(),
+      };
+    }
+  }
+
+  const line1 = props.primaryHeading?.text?.trim();
+  const line2 = props.secondaryHeading?.text?.trim();
+
+  return {
+    line1: line1 != null && line1.length > 0 ? line1 : DEFAULT_LINE_1,
+    line2: line2 != null && line2.length > 0 ? line2 : DEFAULT_LINE_2,
+  };
+}
+
+function TestimonialsSplitTitle({
+  line1,
+  line2,
+  line1Resolved,
+  line2Resolved,
+}: {
+  line1: string;
+  line2: string;
+  line1Resolved: ReturnType<typeof resolveHeadingTypography>;
+  line2Resolved: ReturnType<typeof resolveHeadingTypography>;
+}) {
+  return (
+    <span
+      className="split-words heading title-lg tracking-heading words splitting md:flex md:w-full md:justify-between"
+      data-animate="fade-up-large"
+    >
+      <SplitWordsHeading
+        animate="fade-up-large"
+        className="inline"
+        leadColor={line1Resolved.color}
+        leadFontSize={line1Resolved.fontSize}
+        text={line1}
+      />
+      {line2.length > 0 ? (
+        <>
+          <span aria-hidden className="whitespace inline-block" />
+          <SplitWordsHeading
+            animate="fade-up-large"
+            className="inline"
+            leadColor={line2Resolved.color}
+            leadFontSize={line2Resolved.fontSize}
+            text={line2}
+          />
+        </>
+      ) : null}
+    </span>
+  );
+}
+
 function TestimonialCard({
   item,
-  index,
   disableParallax,
-  bodyColor,
 }: {
   item: ArchiveTestimonialItemProps;
-  index: number;
   disableParallax: boolean;
-  bodyColor: string | undefined;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const progress = useScrollProgress(ref);
@@ -173,59 +222,45 @@ function TestimonialCard({
   const cardStyle: CSSProperties = {
     transform: `translate3d(0, ${translateY.toFixed(2)}px, 0)`,
     willChange: disableParallax ? undefined : 'transform',
-    color: bodyColor,
   };
 
   return (
-    <ScrollReveal
-      animate="fade-up"
-      className="testimonial with-quote w-full"
-      delayMs={index * 80}
-    >
-      <div ref={ref} style={cardStyle}>
-        <blockquote className="m-0 rounded-2xl bg-white/85 p-6 backdrop-blur-sm md:p-8 shadow-sm">
-          {(author.length > 0 || avatarSrc.length > 0) && (
-            <div className="mb-4 flex items-center gap-4 md:gap-6">
-              {avatarSrc.length > 0 ? (
+    <div className="testimonial with-quote w-full" ref={ref} style={cardStyle}>
+      <blockquote>
+        {(author.length > 0 || avatarSrc.length > 0) && (
+          <div className="flex items-center gap-4 md:gap-6">
+            {avatarSrc.length > 0 ? (
+              <figure className="m-0 shrink-0">
                 <img
                   alt={author.length > 0 ? author : ''}
-                  className="block h-12 w-12 shrink-0 rounded-full object-cover md:h-16 md:w-16"
+                  className="block h-12 w-12 rounded-full object-cover md:h-16 md:w-16"
                   decoding="async"
                   loading="lazy"
                   src={avatarSrc}
                 />
-              ) : null}
-              <div className="flex grow flex-col">
-                {author.length > 0 ? (
-                  <cite className="not-italic text-base md:text-2xl font-medium leading-tight">
-                    {author}
-                  </cite>
-                ) : null}
-                {role.length > 0 ? (
-                  <span className="text-sm opacity-70 md:text-base">{role}</span>
-                ) : null}
-              </div>
-            </div>
-          )}
-          {quote.length > 0 ? (
-            <p className="m-0 text-base leading-relaxed md:text-lg">{quote}</p>
-          ) : null}
-        </blockquote>
-      </div>
-    </ScrollReveal>
+              </figure>
+            ) : null}
+            {author.length > 0 ? (
+              <cite className="text-base-2xl grow shrink not-italic">{author}</cite>
+            ) : null}
+          </div>
+        )}
+        {role.length > 0 ? <p className="m-0 text-sm opacity-80 md:text-base">{role}</p> : null}
+        {quote.length > 0 ? <p>{quote}</p> : null}
+      </blockquote>
+    </div>
   );
 }
 
 export function ArchiveRevealTestimonials({
   className,
   background,
+  primaryHeading,
+  secondaryHeading,
   heading,
-  bodyText,
   items,
-  columnMaxWidthPx,
-  desktopGapPx,
-  mobileGapPx,
   disableParallax = false,
+  roundedTop = true,
 }: ArchiveRevealTestimonialsProps) {
   const resolvedItems = useMemo(() => {
     const trimmed = (items ?? []).filter((item) => {
@@ -242,15 +277,22 @@ export function ArchiveRevealTestimonials({
     sectionId: ARCHIVE_REVEAL_TESTIMONIALS_SECTION_ID,
     sectionCss: ARCHIVE_REVEAL_TESTIMONIALS_VARS,
     background,
-    highlight: heading,
-    defaultBackgroundChannels: '142 165 141',
+    defaultBackgroundChannels: ARCHIVE_REVEAL_TESTIMONIALS_BACKGROUND,
   });
 
-  const headingText = heading?.text?.trim() ?? DEFAULT_HEADING;
-  const bodyColor = resolveBodyTextColor(bodyText);
-  const columnMaxWidth = clampPx(columnMaxWidthPx, 720);
-  const desktopGap = clampPx(desktopGapPx, 40);
-  const mobileGap = clampPx(mobileGapPx, 16);
+  const { line1, line2 } = resolveTitleLines({ heading, primaryHeading, secondaryHeading });
+  const line1Resolved = resolveHeadingTypography(primaryHeading ?? heading);
+  const line2Resolved = resolveHeadingTypography(secondaryHeading);
+
+  const sectionBackgroundStyle: CSSProperties | undefined =
+    sectionStyle['--color-background'] != null
+      ? ({
+          '--color-background': sectionStyle['--color-background'],
+          backgroundColor: `rgb(${String(sectionStyle['--color-background'])})`,
+        } as CSSProperties)
+      : undefined;
+
+  const showTitle = line1.length > 0 || line2.length > 0;
 
   return (
     <div
@@ -262,39 +304,26 @@ export function ArchiveRevealTestimonials({
         style={sectionStyle}
       >
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <div className="section section--padding">
+        <div
+          className={clsx('section section--padding', roundedTop && 'section--rounded')}
+          style={sectionBackgroundStyle}
+        >
           <div className="page-width relative">
-            {headingText.length > 0 ? (
-              <h2 className="testimonials-title title-wrapper mb-10 md:mb-14 text-center">
-                <SplitWordsHeading
-                  accentPhrase={heading?.accentPhrase}
-                  animate="fade-up-large"
-                  className="heading title-lg tracking-heading inline-block"
-                  emphasisColor={heading?.textColorHex}
-                  text={headingText}
+            {showTitle ? (
+              <h2 className="testimonials-title title-wrapper">
+                <TestimonialsSplitTitle
+                  line1={line1}
+                  line1Resolved={line1Resolved}
+                  line2={line2}
+                  line2Resolved={line2Resolved}
                 />
               </h2>
             ) : null}
             <div className="flex justify-center">
-              <div
-                className="reveal-testimonials rte relative z-1 flex w-full flex-col"
-                style={
-                  {
-                    maxWidth: `${String(columnMaxWidth)}px`,
-                    rowGap: `${String(mobileGap)}px`,
-                  } as CSSProperties
-                }
-              >
-                <style
-                  dangerouslySetInnerHTML={{
-                    __html: `@media screen and (min-width:768px){#${ARCHIVE_REVEAL_TESTIMONIALS_SECTION_ID} .reveal-testimonials{row-gap:${String(desktopGap)}px}}`,
-                  }}
-                />
+              <div className="reveal-testimonials relative z-1 grid gap-4 md:gap-10 rte">
                 {resolvedItems.map((item, index) => (
                   <TestimonialCard
-                    bodyColor={bodyColor}
                     disableParallax={disableParallax}
-                    index={index}
                     item={item}
                     key={`testimonial-${String(index)}`}
                   />

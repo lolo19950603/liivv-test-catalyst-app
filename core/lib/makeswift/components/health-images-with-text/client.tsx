@@ -1,0 +1,214 @@
+'use client';
+
+import { clsx } from 'clsx';
+import type { CSSProperties } from 'react';
+
+import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
+import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
+import { SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import { resolveHealthSectionDomId } from '~/lib/makeswift/health-page-section-id';
+import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
+import {
+  buildSectionTheme,
+  resolveBodyTextColor,
+  resolveHeadingTypography,
+  type BodyTextProps,
+  type HeadingTypographyProps,
+  type SectionBackgroundProps,
+} from '~/lib/makeswift/utils/diabetes-care-section-style';
+import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
+import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
+
+import {
+  HEALTH_IMAGES_WITH_TEXT_SECTION_ID,
+  HEALTH_IMAGES_WITH_TEXT_VARS,
+} from './archive-styles';
+
+export type HealthImagesWithTextProps = {
+  className?: string;
+  instanceSuffix?: string;
+  sectionDomId?: string;
+  background?: SectionBackgroundProps;
+  layoutReverse?: boolean;
+  primaryImage?: unknown;
+  primaryImageAlt?: string;
+  secondaryImage?: unknown;
+  secondaryImageAlt?: string;
+  subheading?: HeadingTypographyProps;
+  heading?: HeadingTypographyProps;
+  body?: BodyTextProps & {
+    html?: string;
+    fontSize?: number;
+    fontSizeMobile?: number;
+  };
+  button?: ButtonColorProps & {
+    label?: string;
+    link?: { href?: string; target?: string };
+  };
+  roundedTop?: boolean;
+};
+
+function ArchiveImage({
+  src,
+  alt,
+  className,
+}: {
+  src: string;
+  alt: string;
+  className: string;
+}) {
+  if (src.length === 0) {
+    return null;
+  }
+
+  return (
+    <picture className={clsx('media media--height media--portrait relative block overflow-hidden', className)}>
+      <img
+        alt={alt}
+        className="absolute inset-0 block h-full w-full object-cover"
+        decoding="async"
+        loading="lazy"
+        src={src}
+      />
+    </picture>
+  );
+}
+
+export function HealthImagesWithText({
+  className,
+  instanceSuffix,
+  sectionDomId,
+  background,
+  roundedTop = true,
+  layoutReverse = false,
+  primaryImage,
+  primaryImageAlt = '',
+  secondaryImage,
+  secondaryImageAlt = '',
+  subheading,
+  heading,
+  body,
+  button,
+}: HealthImagesWithTextProps) {
+  const resolvedSectionId = resolveHealthSectionDomId(
+    sectionDomId ?? HEALTH_IMAGES_WITH_TEXT_SECTION_ID,
+    instanceSuffix,
+  );
+  const primarySrc = resolveMakeswiftImageSrc(primaryImage);
+  const secondarySrc = resolveMakeswiftImageSrc(secondaryImage);
+  const subheadingResolved = resolveHeadingTypography(subheading);
+  const headingResolved = resolveHeadingTypography(heading);
+  const bodyColor = resolveBodyTextColor(body);
+  const bodyFontSize = resolveHeadingFontSizeCss(body?.fontSize, body?.fontSizeMobile);
+  const bodyHtml = body?.html?.trim() ?? '';
+  const subheadingText = subheadingResolved.text.trim();
+  const headingText = headingResolved.text.trim();
+  const buttonLabel = button?.label?.trim() ?? 'Learn more';
+  const buttonHref = button?.link?.href?.trim() ?? '#';
+  const { sectionCss, sectionStyle } = buildSectionTheme({
+    sectionId: resolvedSectionId,
+    sectionCss: HEALTH_IMAGES_WITH_TEXT_VARS,
+    background,
+    defaultBackgroundChannels: '23 18% 62%',
+  });
+
+  const subheadingStyle: CSSProperties | undefined =
+    subheadingResolved.color != null || subheadingResolved.fontSize != null
+      ? {
+          ...(subheadingResolved.color != null ? { color: subheadingResolved.color } : {}),
+          ...(subheadingResolved.fontSize != null ? { fontSize: subheadingResolved.fontSize } : {}),
+        }
+      : undefined;
+  const headingStyle: CSSProperties | undefined =
+    headingResolved.color != null || headingResolved.fontSize != null
+      ? {
+          ...(headingResolved.color != null ? { color: headingResolved.color } : {}),
+          ...(headingResolved.fontSize != null ? { fontSize: headingResolved.fontSize } : {}),
+        }
+      : undefined;
+  const bodyStyle: CSSProperties | undefined =
+    bodyColor != null || bodyFontSize != null
+      ? {
+          ...(bodyColor != null ? { color: bodyColor } : {}),
+          ...(bodyFontSize != null ? { fontSize: bodyFontSize } : {}),
+        }
+      : undefined;
+
+  return (
+    <div className={clsx('health-images-with-text', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}>
+      <div className="shopify-section" id={resolvedSectionId} style={sectionStyle}>
+        <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
+        <div className={clsx('section section--padding', roundedTop && 'section--rounded')}>
+          <div className="page-width">
+            <div
+              className={clsx(
+                'image-with-text flex flex-col gap-8 overflow-hidden lg:gap-10',
+                layoutReverse ? 'lg:flex-row-reverse' : 'lg:flex-row',
+              )}
+            >
+              <div
+                className={clsx(
+                  'image-with-text__item image-with-text__media relative min-h-[280px] flex-1',
+                  secondarySrc.length > 0 && 'with-2nd-image',
+                )}
+              >
+                {secondarySrc.length > 0 ? (
+                  <ArchiveImage
+                    alt={secondaryImageAlt}
+                    className="image-with-text__image-second absolute inset-0 z-0"
+                    src={secondarySrc}
+                  />
+                ) : null}
+                <ArchiveImage
+                  alt={primaryImageAlt}
+                  className="image-with-text__image-first relative z-[1]"
+                  src={primarySrc}
+                />
+              </div>
+              <div className="image-with-text__item image-with-text__content relative z-[1] flex flex-1 flex-col justify-center">
+                <div className="rich-text relative z-[1] text-left lg:text-left">
+                  {subheadingText.length > 0 ? (
+                    <p
+                      className="banner__subheading banner__text--colored subtitle-md heading mb-3 uppercase leading-none tracking-widest"
+                      style={subheadingStyle}
+                    >
+                      {subheadingText}
+                    </p>
+                  ) : null}
+                  {headingText.length > 0 ? (
+                    <h2
+                      className="heading title-md mb-4 leading-none tracking-heading"
+                      style={headingStyle}
+                    >
+                      <SplitWordsHeading text={headingText} />
+                    </h2>
+                  ) : null}
+                  {bodyHtml.length > 0 ? (
+                    <div
+                      className="rte body subtext-md leading-normal"
+                      dangerouslySetInnerHTML={{ __html: bodyHtml }}
+                      style={bodyStyle}
+                    />
+                  ) : null}
+                  <p className="mt-6">
+                    <ArchiveShopifyButton
+                      className="button--primary button--md icon-with-text"
+                      colors={button}
+                      href={buttonHref}
+                      rel={
+                        button?.link?.target === '_blank' ? 'noopener noreferrer' : undefined
+                      }
+                      target={button?.link?.target}
+                    >
+                      {buttonLabel}
+                    </ArchiveShopifyButton>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -4,6 +4,7 @@ import type { CSSProperties } from 'react';
 import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import { resolveArchiveHighlightChannels } from '~/lib/makeswift/utils/archive-color';
+import { ARCHIVE_CREAM_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
 import {
   appendHighlightToSectionCss,
@@ -102,7 +103,8 @@ export function DiabetesCareCustomBand({
   secondaryHeading,
 }: DiabetesCareCustomBandProps) {
   const backgroundChannels =
-    resolveArchiveHighlightChannels(background?.colorHex, background?.color) ?? '255 255 255';
+    resolveArchiveHighlightChannels(background?.colorHex, background?.color) ??
+    ARCHIVE_CREAM_BACKGROUND_CHANNELS;
   const logoHref = logo?.link?.href ?? 'https://liivv.ca/pages/diabetes-care';
   const logoImage = logo?.image;
   const primary = primaryHeading?.text?.trim() ?? 'Diabetes and';

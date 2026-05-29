@@ -1,30 +1,38 @@
 'use client';
 
 import { clsx } from 'clsx';
-import Autoplay from 'embla-carousel-autoplay';
+import {
+  useStableAutoplayPlugins,
+  useSyncEmblaAutoplay,
+} from '~/lib/makeswift/utils/embla-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type CSSProperties,
 } from 'react';
 
 import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
+import { ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import {
   buildSectionTheme,
   type SectionBackgroundProps,
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
+import {
+  toImageObjectPosition,
+  type ImageAlignX,
+  type ImageAlignY,
+} from '~/lib/makeswift/utils/image-object-position';
 import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
+import { useSectionScrollParallaxX } from '~/lib/makeswift/utils/use-section-scroll-parallax-x';
 
 import {
   ARCHIVE_SLIDESHOW_SECTION_ID,
   ARCHIVE_SLIDESHOW_VARS,
 } from './archive-styles';
-
-type ImageAlignX = 'left' | 'center' | 'right';
-type ImageAlignY = 'top' | 'center' | 'bottom';
 
 export type ArchiveSlideshowSlide = {
   image?: unknown;
@@ -49,6 +57,7 @@ export interface ArchiveSlideshowProps {
    * prop name lets the new default (`true`) actually apply.
    */
   paginationVisible?: boolean;
+  roundedTop?: boolean;
 }
 
 /**
@@ -57,6 +66,11 @@ export interface ArchiveSlideshowProps {
  * without intruding on the active slide.
  */
 const FIXED_PEEK_FRACTION = 0.025;
+/** Horizontal parallax on slide images while the section scrolls through the viewport. */
+const SCROLL_PARALLAX_MAX_OFFSET_PX = 84;
+const SCROLL_PARALLAX_MAX_OFFSET_MOBILE_PX = 54;
+/** Slight scale so translated images do not expose empty edges inside rounded frames. */
+const SCROLL_PARALLAX_IMAGE_SCALE = 1.08;
 
 type ResolvedSlide = {
   src: string;
@@ -70,13 +84,6 @@ function clampPx(value: number | undefined, fallback: number): number {
   }
 
   return Math.round(value);
-}
-
-function toObjectPosition(alignX: ImageAlignX | undefined, alignY: ImageAlignY | undefined): string {
-  const x = alignX === 'left' || alignX === 'right' ? alignX : 'center';
-  const y = alignY === 'top' || alignY === 'bottom' ? alignY : 'center';
-
-  return `${x} ${y}`;
 }
 
 function resolveSlides(slides: ArchiveSlideshowSlide[] | undefined): ResolvedSlide[] {
@@ -95,7 +102,7 @@ function resolveSlides(slides: ArchiveSlideshowSlide[] | undefined): ResolvedSli
       {
         src,
         alt: slide.imageAlt?.trim() ?? '',
-        objectPosition: toObjectPosition(slide.imageAlignX, slide.imageAlignY),
+        objectPosition: toImageObjectPosition(slide.imageAlignX, slide.imageAlignY),
       },
     ];
   });
@@ -224,13 +231,15 @@ export function ArchiveSlideshow({
   showArrows = true,
   showPausePlay = false,
   paginationVisible = true,
+  roundedTop = true,
 }: ArchiveSlideshowProps) {
   const resolvedSlides = resolveSlides(slides);
   const desktopPx = clampPx(desktopHeight, 500);
   const mobilePx = clampPx(mobileHeight, 360);
   const intervalMs = Math.max(1, interval) * 1000;
   const hasMultiple = resolvedSlides.length > 1;
-  const autoplayPluginRef = useRef(Autoplay({ delay: intervalMs }));
+  const shouldAutoplay = autoplay !== false;
+  const autoplayPlugins = useStableAutoplayPlugins(hasMultiple, intervalMs);
 
   // Embla v9's loop algorithm needs more than 2 slides to clone cleanly at
   // the edges; with exactly 2 it stalls / freezes. We duplicate the source
@@ -254,11 +263,50 @@ export function ArchiveSlideshow({
       align: peekFraction > 0 ? 'center' : 'start',
       containScroll: peekFraction > 0 ? false : 'trimSnaps',
     },
-    hasMultiple ? [autoplayPluginRef.current] : [],
+    hasMultiple ? autoplayPlugins : [],
   );
 
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(autoplay);
+  const [isPlaying, setIsPlaying] = useState(shouldAutoplay);
+  const slideshowRef = useRef<HTMLDivElement>(null);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 767px)');
+
+    const sync = () => {
+      setIsMobileViewport(media.matches);
+    };
+
+    sync();
+    media.addEventListener('change', sync);
+
+    return () => {
+      media.removeEventListener('change', sync);
+    };
+  }, []);
+
+  const parallaxMaxOffsetPx = isMobileViewport
+    ? SCROLL_PARALLAX_MAX_OFFSET_MOBILE_PX
+    : SCROLL_PARALLAX_MAX_OFFSET_PX;
+  const scrollParallaxX = useSectionScrollParallaxX(slideshowRef, {
+    maxOffsetPx: parallaxMaxOffsetPx,
+  });
+
+  const slideImageParallaxStyle = useMemo((): CSSProperties => {
+    if (scrollParallaxX === 0) {
+      return {
+        transform: `scale(${SCROLL_PARALLAX_IMAGE_SCALE})`,
+      };
+    }
+
+    return {
+      transform: `translate3d(${scrollParallaxX.toFixed(2)}px, 0, 0) scale(${SCROLL_PARALLAX_IMAGE_SCALE})`,
+      willChange: 'transform',
+    };
+  }, [scrollParallaxX]);
+
+  useSyncEmblaAutoplay(emblaApi, hasMultiple, shouldAutoplay);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) {
@@ -284,31 +332,20 @@ export function ArchiveSlideshow({
     };
   }, [emblaApi, onSelect]);
 
-  // Sync autoplay state with the prop. Embla v9 starts the plugin
-  // automatically on init, so we have to stop it explicitly when the
-  // editor flips `autoplay` off. Gated on `hasMultiple` because the plugin
-  // is only attached to the carousel for multi-slide mode — calling
-  // `play()` / `stop()` on an unattached plugin reads from uninitialized
-  // internal state and throws.
   useEffect(() => {
-    if (!hasMultiple || emblaApi == null) {
+    if (!emblaApi) {
       return;
     }
 
-    const plugin = emblaApi.plugins().autoplay;
+    const onPlay = () => setIsPlaying(true);
+    const onStop = () => setIsPlaying(false);
 
-    if (plugin == null) {
-      return;
-    }
+    emblaApi.on('autoplay:play', onPlay).on('autoplay:stop', onStop);
 
-    if (autoplay) {
-      plugin.play();
-      setIsPlaying(true);
-    } else {
-      plugin.stop();
-      setIsPlaying(false);
-    }
-  }, [autoplay, emblaApi, hasMultiple]);
+    return () => {
+      emblaApi.off('autoplay:play', onPlay).off('autoplay:stop', onStop);
+    };
+  }, [emblaApi]);
 
   const onTogglePause = useCallback(() => {
     if (emblaApi == null) {
@@ -362,21 +399,23 @@ export function ArchiveSlideshow({
         style={sectionStyle}
       >
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <div className="section section--padding">
+        <div className={clsx('section section--padding', roundedTop && 'section--rounded')}>
           <div style={heightVarsStyle}>
-            <div
-              aria-label="Slideshow"
-              aria-roledescription="Carousel"
-              className={clsx(
-                // `relative` is on the slideshow region itself so absolutely
-                // positioned controls below are anchored to the exact image
-                // bounds — never to an outer wrapper that might pick up
-                // section padding or other vertical bleed.
-                'slideshow relative block w-full overflow-hidden',
-                'h-[var(--archive-slideshow-height-mobile)] md:h-[var(--archive-slideshow-height-desktop)]',
-              )}
-              role="region"
-            >
+            <ScrollReveal animate="fade-up-large" className="w-full" delayMs={80}>
+              <div
+                ref={slideshowRef}
+                aria-label="Slideshow"
+                aria-roledescription="Carousel"
+                className={clsx(
+                  // `relative` is on the slideshow region itself so absolutely
+                  // positioned controls below are anchored to the exact image
+                  // bounds — never to an outer wrapper that might pick up
+                  // section padding or other vertical bleed.
+                  'slideshow relative block w-full overflow-hidden',
+                  'h-[var(--archive-slideshow-height-mobile)] md:h-[var(--archive-slideshow-height-desktop)]',
+                )}
+                role="region"
+              >
               <div className="h-full w-full" ref={emblaRef}>
                 <div className="flex h-full w-full">
                   {displaySlides.map((slide, index) => {
@@ -417,7 +456,10 @@ export function ArchiveSlideshow({
                             fetchPriority={index === 0 ? 'high' : 'auto'}
                             loading={index === 0 ? 'eager' : 'lazy'}
                             src={slide.src}
-                            style={{ objectPosition: slide.objectPosition }}
+                            style={{
+                              objectPosition: slide.objectPosition,
+                              ...slideImageParallaxStyle,
+                            }}
                           />
                         </picture>
                       </div>
@@ -488,7 +530,8 @@ export function ArchiveSlideshow({
                   </div>
                 </div>
               ) : null}
-            </div>
+              </div>
+            </ScrollReveal>
           </div>
         </div>
       </div>

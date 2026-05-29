@@ -18,7 +18,7 @@ export const COMPONENT_TYPE = 'diabetes-care-rich-text-lower';
 
 runtime.registerComponent(DiabetesCareRichTextLower, {
   type: COMPONENT_TYPE,
-  label: diabetesCareComponentLabel(12, 'Rich text (lower)'),
+  label: diabetesCareComponentLabel(11, 'Rich text (lower)'),
   icon: 'layout',
   props: {
     className: Style(),

@@ -15,6 +15,11 @@ import {
 import { Link } from '~/components/link';
 import { usePathname } from '~/i18n/routing';
 import { LiivvIconAccount, LiivvIconCart, LiivvIconSearch } from '~/lib/liivv/header-icons';
+import {
+  resolveSectionBackgroundChannels,
+  type SectionBackgroundProps,
+} from '~/lib/makeswift/utils/diabetes-care-section-style';
+import { useHeaderStickyScrolled } from '~/lib/makeswift/site-header/use-header-sticky-scrolled';
 import { resolveMakeswiftHref } from '~/lib/makeswift/utils/resolve-makeswift-href';
 
 import { ARCHIVE_HEADER_CSS } from './archive-header-css';
@@ -34,9 +39,25 @@ const CART_ARIA_LABEL = 'Shopping cart';
 /** Archive header palette — scoped to each header root so vars are not inherited from page `:root`. */
 export const LIIVV_ARCHIVE_HEADER_SECTION_VARS = `#shopify-section-sections--26374736970019__header,#liivv-site-header,.liivv-archive-header{--section-padding-top:0px;--section-padding-bottom:0px;--color-background:255 255 255;--color-foreground:49 47 47;--color-transparent:168 156 148;--color-localization:255 255 255}`;
 
+/** Flatten top radii when sticky header is stuck (pairs with `header-scrolled` from useHeaderStickyScrolled). */
+const LIIVV_HEADER_STICKY_SCROLLED_CSS = `
+.header-section.header-sticky.header-scrolled {
+  background-color: rgb(var(--color-background));
+}
+.header-section.header-scrolled .section.section--rounded {
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+}
+.header-section.header-scrolled .section.section--rounded:before {
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+}
+`;
+
 export interface LiivvArchiveHeaderProps {
   className?: string;
   sectionId?: string;
+  background?: SectionBackgroundProps | null;
   navAriaLabel?: string;
   logo?: LiivvArchiveHeaderLogo | null;
   showLogo?: boolean;
@@ -174,6 +195,7 @@ function navigationJustifyClass(position: LiivvArchiveLinksPosition) {
 export function LiivvArchiveHeader({
   className,
   sectionId,
+  background,
   navAriaLabel = 'Main',
   logo,
   showLogo = true,
@@ -197,8 +219,11 @@ export function LiivvArchiveHeader({
   const pathname = usePathname();
   const internalSectionRef = useRef<HTMLDivElement>(null);
   const internalSpacerRef = useRef<HTMLDivElement>(null);
+  const stickySentinelRef = useRef<HTMLDivElement>(null);
   const sectionRef = sectionRefProp ?? internalSectionRef;
   const spacerRef = spacerRefProp ?? internalSpacerRef;
+
+  useHeaderStickyScrolled(sectionRef, stickySentinelRef, sticky);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [cartLineCount, setCartLineCount] = useState<number | null>(initialCartCount);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -346,9 +371,12 @@ export function LiivvArchiveHeader({
         }
       : undefined;
 
-  const pinStyle: CSSProperties | undefined = sticky
-    ? { position: 'sticky', insetBlockStart: 0, top: 0, zIndex: 50 }
-    : undefined;
+  const backgroundChannels = resolveSectionBackgroundChannels(background, '255 255 255');
+  const pinStyle: CSSProperties = {
+    ...(sticky ? { position: 'sticky', insetBlockStart: 0, top: 0, zIndex: 50 } : {}),
+    ...(backgroundChannels != null ? { '--color-background': backgroundChannels } : {}),
+  };
+  const sectionStyle = Object.keys(pinStyle).length > 0 ? pinStyle : undefined;
 
   const section = (
     <div
@@ -360,10 +388,13 @@ export function LiivvArchiveHeader({
       )}
       id={sectionId}
       ref={sectionRef}
-      style={pinStyle}
+      style={sectionStyle}
     >
       <style dangerouslySetInnerHTML={{ __html: LIIVV_ARCHIVE_HEADER_SECTION_VARS }} />
       <style dangerouslySetInnerHTML={{ __html: ARCHIVE_HEADER_CSS }} />
+      {sticky ? (
+        <style dangerouslySetInnerHTML={{ __html: LIIVV_HEADER_STICKY_SCROLLED_CSS }} />
+      ) : null}
       <style dangerouslySetInnerHTML={{ __html: buildSearchPanelStyle(searchPanelId) }} />
       {banner}
       {(mobileNavOpen || searchOpen) && (hasNav || searchOpen) ? (
@@ -573,12 +604,26 @@ export function LiivvArchiveHeader({
     </div>
   );
 
+  const stickySentinel = sticky ? (
+    <div
+      aria-hidden
+      className="header-sticky-sentinel pointer-events-none h-px w-full shrink-0"
+      ref={stickySentinelRef}
+    />
+  ) : null;
+
   if (!withPinSpacer) {
-    return section;
+    return (
+      <>
+        {stickySentinel}
+        {section}
+      </>
+    );
   }
 
   return (
     <>
+      {stickySentinel}
       {section}
       <div
         aria-hidden

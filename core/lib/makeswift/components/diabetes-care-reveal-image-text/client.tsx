@@ -12,6 +12,7 @@ import {
   SplitWordsHeading,
 } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
+import { ARCHIVE_CREAM_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import {
   buildSectionTheme,
   resolveBodyTextColor,
@@ -149,7 +150,7 @@ export function DiabetesCareRevealImageWithText({
     sectionCss: `#${richSectionId}{--section-padding-top:72px;--section-padding-bottom:100px;--color-button-background:142 165 141;--color-button-border:142 165 141}${revealMobileCss}`,
     background,
     highlight: useStoryAccentSwash ? secondaryHeading : null,
-    defaultBackgroundChannels: '255 255 255',
+    defaultBackgroundChannels: ARCHIVE_CREAM_BACKGROUND_CHANNELS,
   });
 
   const rootThemeStyle = sectionStyle as CSSProperties & Record<string, string | number>;

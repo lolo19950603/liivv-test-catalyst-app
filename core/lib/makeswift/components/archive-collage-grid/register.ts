@@ -1,21 +1,16 @@
-import {
-  Checkbox,
-  Group,
-  Image,
-  Link,
-  List,
-  Number,
-  Select,
-  Style,
-  TextInput,
-} from '@makeswift/runtime/controls';
+import { Checkbox, Color, Group, Image, Link, List, Number, Select, Style, TextInput } from '@makeswift/runtime/controls';
 
 import { archiveComponentLabel } from '~/lib/makeswift/archive-component-label';
 import {
   buttonColorFields,
+  FONT_SIZE_DESCRIPTION,
+  HEX_OVERRIDE_DESCRIPTION,
+  roundedTopControl,
   sectionBackgroundControls,
+  textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { runtime } from '~/lib/makeswift/runtime';
+import { hsl } from '~/lib/makeswift/utils/color';
 import {
   ARCHIVE_BUTTON_PRIMARY_DARK,
   ARCHIVE_BUTTON_SECONDARY_ON_WHITE,
@@ -25,30 +20,64 @@ import { ArchiveCollageGrid } from './client';
 
 export const COMPONENT_TYPE = 'archive-collage-grid';
 
+const COLLAGE_TITLE_FONT_SIZE_DESKTOP = 25;
+const COLLAGE_TITLE_FONT_SIZE_MOBILE = 18;
+
+const collageFontSizeFields = () => ({
+  fontSize: Number({
+    label: 'Font size',
+    suffix: 'px',
+    defaultValue: COLLAGE_TITLE_FONT_SIZE_DESKTOP,
+    description: FONT_SIZE_DESCRIPTION,
+  }),
+  fontSizeMobile: Number({
+    label: 'Font size (mobile)',
+    suffix: 'px',
+    defaultValue: COLLAGE_TITLE_FONT_SIZE_MOBILE,
+    description: '0 = same as desktop.',
+  }),
+});
+
+const collageTitlePart = (label: string, textColorDefaultHsl: string) =>
+  Group({
+    label,
+    preferredLayout: Group.Layout.Popover,
+    props: {
+      text: TextInput({ label: 'Text', defaultValue: '' }),
+      ...textColorFields(textColorDefaultHsl),
+      ...collageFontSizeFields(),
+    },
+  });
+
 const collageItem = Group({
   label: 'Collage item',
   props: {
-    image: Image({ label: 'Image' }),
-    imageAlt: TextInput({ label: 'Image alt text', defaultValue: '' }),
-    imageAlignX: Select({
-      label: 'Horizontal alignment',
-      options: [
-        { value: 'left', label: 'Left' },
-        { value: 'center', label: 'Center' },
-        { value: 'right', label: 'Right' },
-      ],
-      defaultValue: 'center',
+    imageMedia: Group({
+      label: 'Image',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        image: Image({ label: 'Image' }),
+        imageAlt: TextInput({ label: 'Image alt text', defaultValue: '' }),
+        imageAlignX: Select({
+          label: 'Horizontal alignment',
+          options: [
+            { value: 'left', label: 'Left' },
+            { value: 'center', label: 'Center' },
+            { value: 'right', label: 'Right' },
+          ],
+          defaultValue: 'center',
+        }),
+        imageAlignY: Select({
+          label: 'Vertical alignment',
+          options: [
+            { value: 'top', label: 'Top' },
+            { value: 'center', label: 'Center' },
+            { value: 'bottom', label: 'Bottom' },
+          ],
+          defaultValue: 'center',
+        }),
+      },
     }),
-    imageAlignY: Select({
-      label: 'Vertical alignment',
-      options: [
-        { value: 'top', label: 'Top' },
-        { value: 'center', label: 'Center' },
-        { value: 'bottom', label: 'Bottom' },
-      ],
-      defaultValue: 'center',
-    }),
-    link: Link({ label: 'Link (optional)' }),
     columnSpan: Number({
       label: 'Column span (desktop)',
       description: '1–12. Default 3 (i.e. 4 items per row in a 12-column grid).',
@@ -59,21 +88,29 @@ const collageItem = Group({
       description: '1–6. Default 2.',
       defaultValue: 2,
     }),
-    overlayColor: TextInput({
-      label: 'Overlay color (HSL channels)',
-      description: 'e.g. "49 47 47". Leave blank to inherit section default.',
-      defaultValue: '',
+    blockBackground: Group({
+      label: 'Block background (text-only)',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        color: Color({
+          label: 'Background color',
+          defaultValue: hsl('0 20% 94%'),
+        }),
+        colorHex: TextInput({
+          label: 'Background color (hex override)',
+          defaultValue: '#f3eded',
+          description: HEX_OVERRIDE_DESCRIPTION,
+        }),
+      },
     }),
-    overlayOpacity: Number({
-      label: 'Overlay opacity (per item)',
-      description: 'Leave blank to use the section default.',
-      suffix: '0–1',
-    }),
-    title: TextInput({ label: 'Title (optional)', defaultValue: '' }),
-    titleColor: TextInput({
-      label: 'Title color (HSL channels)',
-      description: 'e.g. "255 255 255". Leave blank to use white.',
-      defaultValue: '',
+    titleContent: Group({
+      label: 'Title',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        primaryTitle: collageTitlePart('Primary title', '0 0% 100%'),
+        secondaryTitle: collageTitlePart('Secondary title', '142 10% 55%'),
+        link: Link({ label: 'Link (optional)' }),
+      },
     }),
   },
 });
@@ -106,14 +143,34 @@ runtime.registerComponent(ArchiveCollageGrid, {
       type: collageItem,
       getItemLabel(item, index) {
         const fallback = `Item ${(index ?? 0) + 1}`;
-        const alt = item?.imageAlt?.trim();
-        const title = item?.title?.trim();
+        const alt = item?.imageMedia?.imageAlt?.trim() ?? item?.imageAlt?.trim();
+        const primaryPart = item?.titleContent?.primaryTitle;
+        const secondaryPart = item?.titleContent?.secondaryTitle;
+        const primary =
+          (typeof primaryPart === 'string' ? primaryPart : primaryPart?.text)?.trim() ??
+          item?.primaryTitle?.trim() ??
+          item?.title?.trim();
+        const secondary =
+          (typeof secondaryPart === 'string' ? secondaryPart : secondaryPart?.text)?.trim() ??
+          item?.secondaryTitle?.trim();
 
-        if (title != null && title.length > 0) {
-          return title;
+        if (primary != null && primary.length > 0 && secondary != null && secondary.length > 0) {
+          return `${primary} / ${secondary}`;
         }
 
-        return alt != null && alt.length > 0 ? alt : fallback;
+        if (primary != null && primary.length > 0) {
+          return primary;
+        }
+
+        if (secondary != null && secondary.length > 0) {
+          return secondary;
+        }
+
+        if (alt != null && alt.length > 0) {
+          return alt;
+        }
+
+        return 'Text block';
       },
     }),
     rowHeight: Number({
@@ -131,15 +188,7 @@ runtime.registerComponent(ArchiveCollageGrid, {
       defaultValue: 10,
       suffix: 'px',
     }),
-    defaultOverlayOpacity: Number({
-      label: 'Default overlay opacity',
-      defaultValue: 0.4,
-      suffix: '0–1',
-    }),
-    enableHoverDim: Checkbox({
-      label: 'Dim overlay on hover',
-      defaultValue: true,
-    }),
+    ...roundedTopControl(),
     cta: Group({
       label: 'CTA row (below collage)',
       preferredLayout: Group.Layout.Popover,

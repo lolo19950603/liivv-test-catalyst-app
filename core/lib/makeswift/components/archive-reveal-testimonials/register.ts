@@ -1,20 +1,12 @@
-import {
-  Checkbox,
-  Group,
-  Image,
-  List,
-  Number,
-  Style,
-  TextArea,
-  TextInput,
-} from '@makeswift/runtime/controls';
+import { Checkbox, Group, Image, List, Number, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
 import { archiveComponentLabel } from '~/lib/makeswift/archive-component-label';
 import {
-  bodyTextPopoverControls,
-  headingPopoverControls,
+  roundedTopControl,
   sectionBackgroundControls,
+  splitHeadingPopoverControls,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
+import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import { runtime } from '~/lib/makeswift/runtime';
 
 import { ArchiveRevealTestimonials } from './client';
@@ -52,13 +44,16 @@ runtime.registerComponent(ArchiveRevealTestimonials, {
   icon: 'cards',
   props: {
     className: Style(),
-    ...sectionBackgroundControls('142 165 141'),
-    ...headingPopoverControls({
-      label: 'Section heading',
-      textDefault: 'What people are saying',
-      textColorDefault: '0 2% 19%',
+    ...sectionBackgroundControls(ARCHIVE_SAGE_BACKGROUND_HSL),
+    ...roundedTopControl(),
+    ...splitHeadingPopoverControls({
+      primaryLabel: 'Heading line 1 (left)',
+      secondaryLabel: 'Heading line 2 (right)',
+      primaryDefault: 'What people',
+      secondaryDefault: 'are saying',
+      primaryTextColorDefault: '0 2% 19%',
+      secondaryTextColorDefault: '0 2% 19%',
     }),
-    ...bodyTextPopoverControls('0 2% 19%'),
     items: List({
       label: 'Testimonials',
       type: testimonialItem,
@@ -68,21 +63,6 @@ runtime.registerComponent(ArchiveRevealTestimonials, {
 
         return author != null && author.length > 0 ? author : fallback;
       },
-    }),
-    columnMaxWidthPx: Number({
-      label: 'Column max width',
-      defaultValue: 720,
-      suffix: 'px',
-    }),
-    desktopGapPx: Number({
-      label: 'Desktop gap',
-      defaultValue: 40,
-      suffix: 'px',
-    }),
-    mobileGapPx: Number({
-      label: 'Mobile gap',
-      defaultValue: 16,
-      suffix: 'px',
     }),
     disableParallax: Checkbox({
       label: 'Disable parallax',

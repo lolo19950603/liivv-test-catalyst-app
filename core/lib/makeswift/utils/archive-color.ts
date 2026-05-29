@@ -45,6 +45,10 @@ function asColorString(value: unknown): string | undefined {
     return trimmed.length > 0 ? trimmed : undefined;
   }
 
+  if (value != null && typeof value === 'object' && 'value' in value) {
+    return asColorString((value as { value: unknown }).value);
+  }
+
   return undefined;
 }
 
