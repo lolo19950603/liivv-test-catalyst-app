@@ -8,7 +8,7 @@ import {
 } from '@makeswift/runtime/controls';
 
 import {
-  buttonColorFields,
+  archiveButtonGroup,
   fontSizeFields,
   nestedSplitHeadingPopoverControls,
   roundedTopControl,
@@ -55,14 +55,8 @@ runtime.registerComponent(DiabetesCareImageTextOverlay, {
         ...fontSizeFields(),
       },
     }),
-    button: Group({
-      label: 'Button',
-      preferredLayout: Group.Layout.Popover,
-      props: {
-        label: TextInput({ label: 'Button label', defaultValue: 'Reach Out' }),
-        link: Link({ label: 'Button link' }),
-        ...buttonColorFields(ARCHIVE_BUTTON_PRIMARY_WHITE_ON_BANNER),
-      },
+    button: archiveButtonGroup('Button', ARCHIVE_BUTTON_PRIMARY_WHITE_ON_BANNER, {
+      textDefault: 'Reach Out',
     }),
   },
 });

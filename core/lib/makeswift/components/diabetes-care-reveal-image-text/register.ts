@@ -1,7 +1,7 @@
-import { Group, Image, Link, Number, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
+import { Group, Image, Number, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
 import {
-  buttonColorFields,
+  archiveButtonGroup,
   FONT_SIZE_DESCRIPTION,
   fontSizeFields,
   roundedTopControl,
@@ -81,31 +81,11 @@ runtime.registerComponent(DiabetesCareRevealImageWithText, {
         ...fontSizeFields(),
       },
     }),
-    buttons: Group({
-      label: 'Buttons',
-      preferredLayout: Group.Layout.Popover,
-      props: {
-        primaryText: TextInput({
-          label: 'Primary button label',
-          defaultValue: "Read Armaan's Full Story",
-        }),
-        primaryLink: Link({ label: 'Primary button link' }),
-        secondaryText: TextInput({
-          label: 'Secondary button label',
-          defaultValue: 'Find Support',
-        }),
-        secondaryLink: Link({ label: 'Secondary button link' }),
-        primaryColors: Group({
-          label: 'Primary button colors',
-          preferredLayout: Group.Layout.Popover,
-          props: buttonColorFields(ARCHIVE_BUTTON_PRIMARY_SAGE),
-        }),
-        secondaryColors: Group({
-          label: 'Secondary button colors',
-          preferredLayout: Group.Layout.Popover,
-          props: buttonColorFields(ARCHIVE_BUTTON_SECONDARY_ON_WHITE),
-        }),
-      },
+    primaryButton: archiveButtonGroup('Primary button', ARCHIVE_BUTTON_PRIMARY_SAGE, {
+      textDefault: "Read Armaan's Full Story",
+    }),
+    secondaryButton: archiveButtonGroup('Secondary button', ARCHIVE_BUTTON_SECONDARY_ON_WHITE, {
+      textDefault: 'Find Support',
     }),
   },
 });

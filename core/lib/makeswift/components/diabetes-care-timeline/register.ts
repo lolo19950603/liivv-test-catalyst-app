@@ -11,7 +11,7 @@ import {
 } from '@makeswift/runtime/controls';
 
 import {
-  buttonColorFields,
+  archiveButtonControls,
   fontSizeFields,
   highlightSwashColorFields,
   roundedTopControl,
@@ -164,11 +164,9 @@ runtime.registerComponent(DiabetesCareTimeline, {
           button: Group({
             label: 'Button',
             preferredLayout: Group.Layout.Popover,
-            props: {
-              buttonText: TextInput({ label: 'Button text', defaultValue: 'Get Started' }),
-              buttonLink: Link({ label: 'Button link' }),
-              ...buttonColorFields(ARCHIVE_BUTTON_PRIMARY_DARK),
-            },
+            props: archiveButtonControls(ARCHIVE_BUTTON_PRIMARY_DARK, {
+              textDefault: 'Get Started',
+            }),
           }),
           image: Group({
             label: 'Image',

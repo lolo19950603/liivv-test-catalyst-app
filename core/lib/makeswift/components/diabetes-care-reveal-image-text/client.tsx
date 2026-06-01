@@ -11,7 +11,10 @@ import {
   SplittingBanner,
   SplitWordsHeading,
 } from '~/lib/makeswift/diabetes-care-scroll-animate';
-import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
+import {
+  resolveArchiveButton,
+  type ArchiveButtonProps,
+} from '~/lib/makeswift/utils/archive-button';
 import { ARCHIVE_CREAM_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import {
   buildSectionTheme,
@@ -72,13 +75,16 @@ export type DiabetesCareRevealImageTextProps = {
   primaryHeading?: HeadingTypographyProps;
   secondaryHeading?: HeadingWithHighlightProps;
   body?: HeadingTypographyProps & { html?: string };
+  primaryButton?: ArchiveButtonProps;
+  secondaryButton?: ArchiveButtonProps;
+  /** @deprecated Use `primaryButton` and `secondaryButton`. */
   buttons?: {
     primaryText?: string;
     primaryLink?: { href?: string; target?: string };
-    primaryColors?: ButtonColorProps;
+    primaryColors?: ArchiveButtonProps;
     secondaryText?: string;
     secondaryLink?: { href?: string; target?: string };
-    secondaryColors?: ButtonColorProps;
+    secondaryColors?: ArchiveButtonProps;
   };
 };
 
@@ -109,6 +115,8 @@ export function DiabetesCareRevealImageWithText({
   primaryHeading,
   secondaryHeading,
   body,
+  primaryButton,
+  secondaryButton,
   buttons,
 }: DiabetesCareRevealImageTextProps) {
   const bannerHeadline = resolveHeadingTypography(
@@ -174,10 +182,28 @@ export function DiabetesCareRevealImageWithText({
   const bodyHtml =
     (body?.html?.trim().length ?? 0) > 0 ? (body?.html ?? '').trim() : DEFAULT_BODY_HTML;
 
-  const primaryLabel = buttons?.primaryText?.trim() ?? '';
-  const secondaryLabel = buttons?.secondaryText?.trim() ?? '';
-  const primaryHref = buttons?.primaryLink?.href ?? '#';
-  const secondaryHref = buttons?.secondaryLink?.href ?? '#';
+  const primary = resolveArchiveButton(
+    primaryButton ??
+      (buttons != null
+        ? {
+            buttonText: buttons.primaryText,
+            buttonLink: buttons.primaryLink,
+            ...buttons.primaryColors,
+          }
+        : undefined),
+    { requireHref: false },
+  );
+  const secondary = resolveArchiveButton(
+    secondaryButton ??
+      (buttons != null
+        ? {
+            buttonText: buttons.secondaryText,
+            buttonLink: buttons.secondaryLink,
+            ...buttons.secondaryColors,
+          }
+        : undefined),
+    { requireHref: false },
+  );
   const bannerDesktopFontPx = bannerHeading?.fontSize;
   const bannerMobileFontPx = bannerHeading?.fontSizeMobile;
   const hasBannerDesktopFont = bannerDesktopFontPx != null && bannerDesktopFontPx > 0;
@@ -283,38 +309,30 @@ export function DiabetesCareRevealImageWithText({
                   dangerouslySetInnerHTML={{ __html: bodyHtml }}
                   style={bodyStyle}
                 />
-                {primaryLabel.length > 0 || secondaryLabel.length > 0 ? (
+                {primary.visible || secondary.visible ? (
                   <div className="mt-6 flex flex-wrap justify-center gap-4">
-                    {primaryLabel.length > 0 ? (
+                    {primary.visible ? (
                       <ArchiveShopifyButton
                         className="button--primary button--md icon-with-text"
-                        colors={buttons?.primaryColors}
-                        href={primaryHref}
-                        rel={
-                          buttons?.primaryLink?.target === '_blank'
-                            ? 'noopener noreferrer'
-                            : undefined
-                        }
-                        target={buttons?.primaryLink?.target}
+                        colors={primary.colors}
+                        href={primary.href}
+                        rel={primary.rel}
+                        target={primary.target}
                       >
-                        {primaryLabel}
+                        {primary.text}
                         <IconArrowRight />
                       </ArchiveShopifyButton>
                     ) : null}
-                    {secondaryLabel.length > 0 ? (
+                    {secondary.visible ? (
                       <ArchiveShopifyButton
                         className="button--secondary button--md icon-with-text"
-                        colors={buttons?.secondaryColors}
-                        href={secondaryHref}
-                        rel={
-                          buttons?.secondaryLink?.target === '_blank'
-                            ? 'noopener noreferrer'
-                            : undefined
-                        }
-                        target={buttons?.secondaryLink?.target}
+                        colors={secondary.colors}
+                        href={secondary.href}
+                        rel={secondary.rel}
+                        target={secondary.target}
                         variant="secondary"
                       >
-                        {secondaryLabel}
+                        {secondary.text}
                         <IconArrowRight />
                       </ArchiveShopifyButton>
                     ) : null}

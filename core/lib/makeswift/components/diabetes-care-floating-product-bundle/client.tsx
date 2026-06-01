@@ -11,7 +11,12 @@ import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify
 import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { comboboxEntityIdFromMakeswift } from '~/lib/makeswift/utils/combobox-entity-id';
 import { ScrollReveal, SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
+import {
+  resolveArchiveButton,
+  type ArchiveButtonProps,
+} from '~/lib/makeswift/utils/archive-button';
 import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
+import { hsl } from '~/lib/makeswift/utils/color';
 import {
   ARCHIVE_BUTTON_SECONDARY_ON_BANNER,
   ARCHIVE_BUTTON_SECONDARY_ON_SAGE,
@@ -62,7 +67,9 @@ export interface DiabetesCareFloatingProductBundleProps {
   heading?: HeadingWithHighlightProps;
   body?: FloatingProductBundleBodyProps;
   products?: DiabetesCareFloatingProductBundleProduct[];
-  buttons?: ButtonColorProps & { addToCartLabel?: string };
+  button?: ArchiveButtonProps;
+  /** @deprecated Use `button`. */
+  buttons?: ButtonColorProps & { addToCartLabel?: string; buttonText?: string };
   /** @deprecated Use `body` text color fields. */
   bodyText?: BodyTextProps;
 }
@@ -145,20 +152,43 @@ function bundleProductSlots(products?: DiabetesCareFloatingProductBundleProduct[
   return (products ?? []).filter((p) => comboboxEntityIdFromMakeswift(p.entityId).length > 0);
 }
 
+function presetPickerColor(channels: string | undefined): string | undefined {
+  return channels != null && channels.length > 0 ? hsl(channels) : undefined;
+}
+
 function resolveBundleButtonColors(
-  buttons: ButtonColorProps | null | undefined,
+  colors: ButtonColorProps | null | undefined,
   showBannerImage: boolean,
 ): ButtonColorProps | undefined {
   const defaults = showBannerImage
     ? ARCHIVE_BUTTON_SECONDARY_ON_BANNER
     : ARCHIVE_BUTTON_SECONDARY_ON_SAGE;
 
+  const fallback: ButtonColorProps = {
+    outlineColor: presetPickerColor(defaults.outlineHsl ?? defaults.backgroundHsl),
+    backgroundColor: presetPickerColor(defaults.backgroundHsl),
+    textColor: presetPickerColor(defaults.textHsl),
+    hoverBackgroundColor: presetPickerColor(defaults.hoverBackgroundHsl),
+    hoverTextColor: presetPickerColor(defaults.hoverTextHsl),
+  };
+
+  if (colors == null) {
+    return fallback;
+  }
+
   return {
-    ...buttons,
-    backgroundColor: buttons?.backgroundColor ?? defaults.backgroundHsl,
-    textColor: buttons?.textColor ?? defaults.textHsl,
-    hoverBackgroundColor: buttons?.hoverBackgroundColor ?? defaults.hoverBackgroundHsl,
-    hoverTextColor: buttons?.hoverTextColor ?? defaults.hoverTextHsl,
+    ...fallback,
+    ...colors,
+    outlineColor: colors.outlineColor ?? fallback.outlineColor,
+    backgroundColor: colors.backgroundColor ?? fallback.backgroundColor,
+    textColor: colors.textColor ?? fallback.textColor,
+    hoverBackgroundColor: colors.hoverBackgroundColor ?? fallback.hoverBackgroundColor,
+    hoverTextColor: colors.hoverTextColor ?? fallback.hoverTextColor,
+    outlineColorHex: colors.outlineColorHex,
+    backgroundColorHex: colors.backgroundColorHex,
+    textColorHex: colors.textColorHex,
+    hoverBackgroundColorHex: colors.hoverBackgroundColorHex,
+    hoverTextColorHex: colors.hoverTextColorHex,
   };
 }
 
@@ -172,6 +202,7 @@ export function DiabetesCareFloatingProductBundle({
   heading,
   body,
   products,
+  button,
   buttons,
   bodyText,
 }: DiabetesCareFloatingProductBundleProps) {
@@ -193,8 +224,14 @@ export function DiabetesCareFloatingProductBundle({
   const title =
     headingResolved.text.length > 0 ? headingResolved.text : '🌱 Start Strong Kit';
   const promoHtml = promoBody.html;
-  const cartLabel = buttons?.addToCartLabel?.trim() ?? 'Add kit to cart';
-  const bundleButtonColors = resolveBundleButtonColors(buttons, showBannerImage);
+  const cartButton = resolveArchiveButton(
+    button ??
+      (buttons != null
+        ? { ...buttons, buttonText: buttons.buttonText ?? buttons.addToCartLabel }
+        : undefined),
+    { defaultText: 'Add kit to cart', requireHref: false },
+  );
+  const bundleButtonColors = resolveBundleButtonColors(cartButton.colors, showBannerImage);
   const headingStyle =
     headingResolved.color != null || headingResolved.fontSize != null
       ? {
@@ -378,7 +415,7 @@ export function DiabetesCareFloatingProductBundle({
                           type="button"
                           variant="secondary"
                         >
-                          {cartLabel}
+                          {cartButton.text}
                           <span className="btn-loader">
                             <span />
                             <span />

@@ -1,4 +1,4 @@
-import { Checkbox, Color, Group, Number, TextArea, TextInput } from '@makeswift/runtime/controls';
+import { Checkbox, Color, Group, Link, Number, TextArea, TextInput } from '@makeswift/runtime/controls';
 
 import {
   ARCHIVE_CREAM_BACKGROUND_HSL,
@@ -80,27 +80,41 @@ export function accentTextColorFields(defaultHsl = ARCHIVE_HIGHLIGHT_SWASH_HSL) 
 }
 
 export type ButtonColorFieldDefaults = {
+  outlineHsl?: string;
   backgroundHsl?: string;
   textHsl?: string;
   hoverBackgroundHsl?: string;
   hoverTextHsl?: string;
 };
 
-/** Archive Shopify `.button` colors (resting + hover text/fill). */
+/** Archive Shopify `.button` color pickers (outline, resting, hover). */
 export function buttonColorFields(defaults?: ButtonColorFieldDefaults) {
+  const restingBg = defaults?.backgroundHsl ?? '0 0% 100%';
+
   return {
+    outlineColor: Color({
+      label: 'Button outline color',
+      defaultValue: hsl(defaults?.outlineHsl ?? defaults?.backgroundHsl ?? restingBg),
+    }),
+    outlineColorHex: TextInput({
+      label: 'Button outline color (hex override)',
+      defaultValue: '',
+      description: HEX_OVERRIDE_DESCRIPTION,
+    }),
     backgroundColor: Color({
-      label: 'Background color',
-      defaultValue: hsl(defaults?.backgroundHsl ?? '0 0% 100%'),
+      label: 'Button background color',
+      defaultValue: hsl(restingBg),
+      description: 'When not hovered.',
     }),
     backgroundColorHex: TextInput({
-      label: 'Background color (hex override)',
+      label: 'Button background color (hex override)',
       defaultValue: '',
       description: HEX_OVERRIDE_DESCRIPTION,
     }),
     textColor: Color({
       label: 'Text color',
       defaultValue: hsl(defaults?.textHsl ?? '0 2% 19%'),
+      description: 'When not hovered.',
     }),
     textColorHex: TextInput({
       label: 'Text color (hex override)',
@@ -108,25 +122,66 @@ export function buttonColorFields(defaults?: ButtonColorFieldDefaults) {
       description: HEX_OVERRIDE_DESCRIPTION,
     }),
     hoverBackgroundColor: Color({
-      label: 'Hover background color',
-      defaultValue: hsl(defaults?.hoverBackgroundHsl ?? defaults?.backgroundHsl ?? '0 0% 100%'),
-      description: 'Primary: hover fill swatch. Secondary: hover fill behind text.',
+      label: 'Button background color (hover)',
+      defaultValue: hsl(defaults?.hoverBackgroundHsl ?? restingBg),
     }),
     hoverBackgroundColorHex: TextInput({
-      label: 'Hover background color (hex override)',
+      label: 'Button background color (hex override, hover)',
       defaultValue: '',
       description: HEX_OVERRIDE_DESCRIPTION,
     }),
     hoverTextColor: Color({
-      label: 'Hover text color',
+      label: 'Text color (hover)',
       defaultValue: hsl(defaults?.hoverTextHsl ?? defaults?.textHsl ?? '0 2% 19%'),
     }),
     hoverTextColorHex: TextInput({
-      label: 'Hover text color (hex override)',
+      label: 'Text color (hex override, hover)',
       defaultValue: '',
       description: HEX_OVERRIDE_DESCRIPTION,
     }),
   };
+}
+
+export type ArchiveButtonControlsOptions = {
+  textDefault?: string;
+  showButton?: boolean;
+  showButtonDefault?: boolean;
+};
+
+/** Standard archive CTA fields: text, link, and color pickers. */
+export function archiveButtonControls(
+  defaults?: ButtonColorFieldDefaults,
+  options?: ArchiveButtonControlsOptions,
+) {
+  return {
+    ...(options?.showButton === true
+      ? {
+          showButton: Checkbox({
+            label: 'Show button',
+            defaultValue: options.showButtonDefault ?? true,
+          }),
+        }
+      : {}),
+    buttonText: TextInput({
+      label: 'Button text',
+      defaultValue: options?.textDefault ?? '',
+    }),
+    buttonLink: Link({ label: 'Button link' }),
+    ...buttonColorFields(defaults),
+  };
+}
+
+/** Sidebar popover group for a single archive CTA. */
+export function archiveButtonGroup(
+  label: string,
+  defaults?: ButtonColorFieldDefaults,
+  options?: ArchiveButtonControlsOptions,
+) {
+  return Group({
+    label,
+    preferredLayout: Group.Layout.Popover,
+    props: archiveButtonControls(defaults, options),
+  });
 }
 
 export type FontSizeFieldsOptions = {

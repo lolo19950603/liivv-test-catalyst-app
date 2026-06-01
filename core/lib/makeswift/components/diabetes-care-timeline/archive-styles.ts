@@ -41,6 +41,7 @@ export function timelineSectionLayoutCss(sectionDomId: string, blockCount: numbe
     stripScrollbar +
     `${id} .timeline-react-strip .timeline__item{flex:0 0 min(92%,1120px);max-width:100%;width:auto;scroll-snap-align:center;transition:opacity .28s ease}` +
     `${id} .timeline-react-strip .timeline__item:not(.selected){opacity:.48}` +
+    `${id} .timeline-react-strip .timeline__item:not(.selected) a.button{pointer-events:none;cursor:default}` +
     `${id} .timeline-react-strip .timeline__item.selected{opacity:1}` +
     `@media (prefers-reduced-motion:reduce){${id} .timeline-react-strip .timeline__item{transition:none}}` +
     timelineDotsCss(sectionDomId) +

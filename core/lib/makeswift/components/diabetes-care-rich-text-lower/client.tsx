@@ -10,7 +10,10 @@ import {
   ScrollReveal,
   SplitWordsHeading,
 } from '~/lib/makeswift/diabetes-care-scroll-animate';
-import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
+import {
+  resolveArchiveButton,
+  type ArchiveButtonProps,
+} from '~/lib/makeswift/utils/archive-button';
 import { ARCHIVE_SAGE_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
 import {
@@ -92,10 +95,7 @@ export type RichTextLowerBodyProps = BodyTextProps & {
   fontSizeMobile?: number;
 };
 
-export type RichTextLowerButtonProps = ButtonColorProps & {
-  label?: string;
-  link?: { href?: string; target?: string };
-};
+export type RichTextLowerButtonProps = ArchiveButtonProps;
 
 export type DiabetesCareRichTextLowerProps = {
   className?: string;
@@ -119,11 +119,16 @@ export type DiabetesCareRichTextLowerProps = {
 function resolveRichTextLowerButton(props: {
   button?: RichTextLowerButtonProps;
   body?: RichTextLowerBodyProps;
-}): { label: string; link?: { href?: string; target?: string } } {
-  const label = props.button?.label?.trim() ?? props.body?.ctaLabel?.trim() ?? '';
-  const link = props.button?.link ?? props.body?.ctaLink;
+}) {
+  const legacyText = props.body?.ctaLabel?.trim();
+  const legacyLink = props.body?.ctaLink;
 
-  return { label, link };
+  return resolveArchiveButton(
+    props.button ??
+      (legacyText != null && legacyText.length > 0
+        ? { buttonText: legacyText, buttonLink: legacyLink }
+        : undefined),
+  );
 }
 
 function line2UsesHighlightSwash(heading?: HeadingAccentColorProps | null): boolean {
@@ -270,8 +275,6 @@ export function DiabetesCareRichTextLower({
   const line2Text = line2.text.length > 0 ? line2.text : 'Period.';
   const html = bodyResolved.html;
   const cta = resolveRichTextLowerButton({ button, body });
-  const href = cta.link?.href?.trim() ?? '';
-  const hasCta = cta.label.length > 0 && href.length > 0;
   const line1Style = headingLineStyle(line1);
   const line2Style = headingLineStyle(line2);
 
@@ -324,15 +327,15 @@ export function DiabetesCareRichTextLower({
                     style={bodyResolved.style}
                   />
                 ) : null}
-                {hasCta ? (
+                {cta.visible ? (
                   <ArchiveShopifyButton
                     className="button--primary button--lg icon-with-text w-fit"
-                    colors={button}
-                    href={href}
-                    rel={cta.link?.target === '_blank' ? 'noopener noreferrer' : undefined}
-                    target={cta.link?.target}
+                    colors={cta.colors}
+                    href={cta.href}
+                    rel={cta.rel}
+                    target={cta.target}
                   >
-                    {cta.label}
+                    {cta.text}
                     <IconArrowRight />
                   </ArchiveShopifyButton>
                 ) : null}

@@ -1,9 +1,8 @@
-import { Checkbox, Group, Image, Link, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
+import { Checkbox, Group, Image, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
 import {
-  buttonColorFields,
+  archiveButtonControls,
   fontSizeFields,
-  headingPopoverControls,
   roundedTopControl,
   sectionBackgroundControls,
   textColorFields,
@@ -81,12 +80,10 @@ runtime.registerComponent(HealthImagesWithText, {
     button: Group({
       label: 'Button (optional)',
       preferredLayout: Group.Layout.Popover,
-      props: {
-        showButton: Checkbox({ label: 'Show button', defaultValue: true }),
-        label: TextInput({ label: 'Button label', defaultValue: 'Explore CarePack' }),
-        link: Link({ label: 'Button link' }),
-        ...buttonColorFields(ARCHIVE_BUTTON_PRIMARY_DARK),
-      },
+      props: archiveButtonControls(ARCHIVE_BUTTON_PRIMARY_DARK, {
+        textDefault: 'Explore CarePack',
+        showButton: true,
+      }),
     }),
   },
 });

@@ -9,7 +9,7 @@ import {
 } from '@makeswift/runtime/controls';
 
 import {
-  buttonColorFields,
+  archiveButtonGroup,
   fontSizeFields,
   headingPopoverControls,
   roundedTopControl,
@@ -81,16 +81,8 @@ runtime.registerComponent(DiabetesCareFloatingProductBundle, {
         return id.length > 0 ? `Product #${id}` : 'Product';
       },
     }),
-    buttons: Group({
-      label: 'Buttons',
-      preferredLayout: Group.Layout.Popover,
-      props: {
-        addToCartLabel: TextInput({
-          label: 'Add to cart button label',
-          defaultValue: 'Add kit to cart',
-        }),
-        ...buttonColorFields(ARCHIVE_BUTTON_SECONDARY_ON_BANNER),
-      },
+    button: archiveButtonGroup('Button', ARCHIVE_BUTTON_SECONDARY_ON_BANNER, {
+      textDefault: 'Add kit to cart',
     }),
   },
 });

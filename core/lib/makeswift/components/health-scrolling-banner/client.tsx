@@ -13,7 +13,10 @@ import {
 import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
 import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { resolveHealthSectionDomId } from '~/lib/makeswift/health-page-section-id';
-import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
+import {
+  resolveArchiveButton,
+  type ArchiveButtonProps,
+} from '~/lib/makeswift/utils/archive-button';
 import { ARCHIVE_CREAM_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import {
   buildSectionTheme,
@@ -121,11 +124,7 @@ export type HealthScrollingBannerPanel = {
     fontSize?: number;
     fontSizeMobile?: number;
   };
-  button?: {
-    label?: string;
-    link?: { href?: string; target?: string };
-    colors?: ButtonColorProps;
-  };
+  button?: ArchiveButtonProps;
 };
 
 export type HealthScrollingBannerProps = {
@@ -138,10 +137,7 @@ export type HealthScrollingBannerProps = {
 };
 
 function resolvePanelButton(panel: HealthScrollingBannerPanel) {
-  const label = panel.button?.label?.trim() ?? '';
-  const href = panel.button?.link?.href?.trim() ?? '';
-
-  return { label, href, colors: panel.button?.colors };
+  return resolveArchiveButton(panel.button);
 }
 
 function PanelCopy({
@@ -156,7 +152,7 @@ function PanelCopy({
   const bodyHtml = panel.body?.html?.trim() ?? '';
   const bodyColor = resolveBodyTextColor(panel.body);
   const bodyFontSize = resolveHeadingFontSizeCss(panel.body?.fontSize, panel.body?.fontSizeMobile);
-  const { label: buttonLabel, href: buttonHref, colors: buttonColors } = resolvePanelButton(panel);
+  const panelButton = resolvePanelButton(panel);
 
   const headingStyle: CSSProperties | undefined =
     headingResolved.color != null || headingResolved.fontSize != null
@@ -193,15 +189,15 @@ function PanelCopy({
           style={bodyStyle}
         />
       ) : null}
-      {buttonLabel.length > 0 && buttonHref.length > 0 ? (
+      {panelButton.visible ? (
         <ArchiveShopifyButton
           className="button--primary button--md icon-with-text"
-          colors={buttonColors}
-          href={buttonHref}
-          rel={panel.button?.link?.target === '_blank' ? 'noopener noreferrer' : undefined}
-          target={panel.button?.link?.target}
+          colors={panelButton.colors}
+          href={panelButton.href}
+          rel={panelButton.rel}
+          target={panelButton.target}
         >
-          {buttonLabel}
+          {panelButton.text}
           <IconArrowRight />
         </ArchiveShopifyButton>
       ) : null}

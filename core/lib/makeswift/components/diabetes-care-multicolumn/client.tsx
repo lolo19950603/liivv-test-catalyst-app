@@ -7,7 +7,10 @@ import {
   DC_SECTION_ROOT_CLASS,
 } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
-import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
+import {
+  resolveArchiveButton,
+  type ArchiveButtonProps,
+} from '~/lib/makeswift/utils/archive-button';
 import { ArchiveHighlightedText } from '~/lib/makeswift/components/diabetes-care-faq/archive-highlighted-text';
 import { ARCHIVE_SAGE_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import {
@@ -156,10 +159,7 @@ export type MulticolumnColumnImageProps = {
   imageAlt?: string;
 };
 
-export type MulticolumnColumnButtonProps = ButtonColorProps & {
-  buttonText?: string;
-  buttonLink?: { href?: string; target?: string };
-};
+export type MulticolumnColumnButtonProps = ArchiveButtonProps;
 
 /** @deprecated Legacy nested `content` + `bodyText` */
 export type MulticolumnCardContentProps = {
@@ -280,8 +280,8 @@ function readColumnButton(row: DiabetesCareMulticolumnColumn): MulticolumnColumn
 
   return {
     ...(group != null && typeof group === 'object' ? group : {}),
-    buttonText: group?.buttonText ?? row.buttonText,
-    buttonLink: group?.buttonLink ?? row.buttonLink,
+    buttonText: group?.buttonText ?? group?.label ?? row.buttonText,
+    buttonLink: group?.buttonLink ?? group?.link ?? row.buttonLink,
   };
 }
 
@@ -539,9 +539,7 @@ export function DiabetesCareMulticolumn({
 
                     const imageSrc = img.imageSrc?.trim();
                     const showImage = imageSrc != null && imageSrc.length > 0;
-                    const buttonLabel = btn.buttonText?.trim() ?? '';
-                    const showButton = buttonLabel.length > 0;
-                    const buttonHref = btn.buttonLink?.href ?? '#';
+                    const columnButton = resolveArchiveButton(btn, { requireHref: false });
 
                     const headingAccent = resolveAccentColors(headingBlock);
 
@@ -567,7 +565,7 @@ export function DiabetesCareMulticolumn({
                           <div
                             className={clsx(
                               'multicolumn-card__info grid min-h-0 w-full gap-4 lg:gap-6',
-                              showButton &&
+                              columnButton.visible &&
                                 bodyText.length === 0 &&
                                 secondaryText.length === 0 &&
                                 (headingText.length > 0 || showImage) &&
@@ -592,7 +590,7 @@ export function DiabetesCareMulticolumn({
                             <div
                               className={clsx(
                                 'flex min-h-0 flex-col gap-0',
-                                showButton &&
+                                columnButton.visible &&
                                   (secondaryText.length > 0 || bodyText.length > 0) &&
                                   'flex-1',
                               )}
@@ -625,7 +623,7 @@ export function DiabetesCareMulticolumn({
                             </div>
                           ) : null}
 
-                          {showButton ? (
+                          {columnButton.visible ? (
                             <p
                               className={
                                 bodyText.length > 0 ||
@@ -638,17 +636,13 @@ export function DiabetesCareMulticolumn({
                             >
                               <ArchiveShopifyButton
                                 className="button--secondary button--md icon-with-text"
-                                colors={btn}
-                                href={buttonHref}
-                                rel={
-                                  btn.buttonLink?.target === '_blank'
-                                    ? 'noopener noreferrer'
-                                    : undefined
-                                }
-                                target={btn.buttonLink?.target}
+                                colors={columnButton.colors}
+                                href={columnButton.href}
+                                rel={columnButton.rel}
+                                target={columnButton.target}
                                 variant="secondary"
                               >
-                                {buttonLabel}
+                                {columnButton.text}
                                 <IconArrowRight />
                               </ArchiveShopifyButton>
                             </p>

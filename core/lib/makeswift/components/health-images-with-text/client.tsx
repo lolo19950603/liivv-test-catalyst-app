@@ -7,7 +7,10 @@ import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify
 import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import { resolveHealthSectionDomId } from '~/lib/makeswift/health-page-section-id';
-import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
+import {
+  resolveArchiveButton,
+  type ArchiveButtonProps,
+} from '~/lib/makeswift/utils/archive-button';
 import {
   buildSectionTheme,
   resolveBodyTextColor,
@@ -42,11 +45,7 @@ export type HealthImagesWithTextProps = {
     fontSize?: number;
     fontSizeMobile?: number;
   };
-  button?: ButtonColorProps & {
-    showButton?: boolean;
-    label?: string;
-    link?: { href?: string; target?: string };
-  };
+  button?: ArchiveButtonProps;
   roundedTop?: boolean;
 };
 
@@ -107,9 +106,7 @@ export function HealthImagesWithText({
   const bodyHtml = body?.html?.trim() ?? '';
   const subheadingText = subheadingResolved.text.trim();
   const headingText = headingResolved.text.trim();
-  const buttonLabel = button?.label?.trim() ?? '';
-  const buttonHref = button?.link?.href?.trim() ?? '#';
-  const showButton = button?.showButton !== false && buttonLabel.length > 0;
+  const resolvedButton = resolveArchiveButton(button, { requireHref: false });
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: resolvedSectionId,
     sectionCss: healthImagesWithTextSectionCss(resolvedSectionId),
@@ -202,18 +199,16 @@ export function HealthImagesWithText({
                       style={bodyStyle}
                     />
                   ) : null}
-                  {showButton ? (
+                  {resolvedButton.visible ? (
                     <p className="mt-6">
                       <ArchiveShopifyButton
                         className="button--primary button--md icon-with-text"
-                        colors={button}
-                        href={buttonHref}
-                        rel={
-                          button?.link?.target === '_blank' ? 'noopener noreferrer' : undefined
-                        }
-                        target={button?.link?.target}
+                        colors={resolvedButton.colors}
+                        href={resolvedButton.href}
+                        rel={resolvedButton.rel}
+                        target={resolvedButton.target}
                       >
-                        {buttonLabel}
+                        {resolvedButton.text}
                       </ArchiveShopifyButton>
                     </p>
                   ) : null}

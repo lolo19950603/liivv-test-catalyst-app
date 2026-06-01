@@ -1,7 +1,7 @@
-import { Checkbox, Group, Link, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
+import { Checkbox, Group, Style, TextArea } from '@makeswift/runtime/controls';
 
 import {
-  buttonColorFields,
+  archiveButtonGroup,
   fontSizeFields,
   roundedTopControl,
   sectionBackgroundControls,
@@ -43,17 +43,8 @@ runtime.registerComponent(DiabetesCareRichTextLower, {
         ...fontSizeFields(),
       },
     }),
-    button: Group({
-      label: 'Button',
-      preferredLayout: Group.Layout.Popover,
-      props: {
-        label: TextInput({
-          label: 'Button label',
-          defaultValue: 'Book a virtual appointment',
-        }),
-        link: Link({ label: 'Button link' }),
-        ...buttonColorFields(ARCHIVE_BUTTON_PRIMARY_DARK),
-      },
+    button: archiveButtonGroup('Button', ARCHIVE_BUTTON_PRIMARY_DARK, {
+      textDefault: 'Book a virtual appointment',
     }),
     showSupportIcon: Checkbox({ label: 'Show support icon above heading', defaultValue: true }),
   },

@@ -9,7 +9,11 @@ import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify
 import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { ArchiveHighlightedText } from '~/lib/makeswift/components/diabetes-care-faq/archive-highlighted-text';
 import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-care-scroll-animate';
-import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
+import {
+  resolveArchiveButton,
+  type ArchiveButtonProps,
+} from '~/lib/makeswift/utils/archive-button';
+import { resolveButtonTheme } from '~/lib/makeswift/utils/diabetes-care-button-theme';
 import {
   buildSectionTheme,
   resolveHeadingTypography,
@@ -184,10 +188,7 @@ export interface DiabetesCareTimelineSlideContent {
 
 export interface DiabetesCareTimelineSection {
   slideContent?: DiabetesCareTimelineSlideContent;
-  button?: ButtonColorProps & {
-    buttonText?: string;
-    buttonLink?: { href?: string; target?: string };
-  };
+  button?: ArchiveButtonProps;
   image?: {
     imageSrc?: string;
     imageAlt?: string;
@@ -424,12 +425,19 @@ function TimelineSlide({
   const sectionHeading = sectionHeadingBlock?.text?.trim() ?? '';
   const sectionHeadingAccent = resolveAccentColors(sectionHeadingBlock);
   const sectionBodyHtml = content?.sectionBody?.html?.trim() ?? '';
-  const buttonHref = section.button?.buttonLink?.href ?? '#';
-  const buttonLabel = section.button?.buttonText?.trim() || 'Get Started';
+  const slideButton = resolveArchiveButton(section.button, {
+    defaultText: 'Get Started',
+    requireHref: false,
+  });
+  const inactiveButtonTheme = useMemo(
+    () => resolveButtonTheme(slideButton.colors, { scopeId: `timeline-inactive-${index}`, variant: 'primary' }),
+    [index, slideButton.colors],
+  );
   const imageSrc = resolveMakeswiftImageSrc(section.image?.imageSrc);
   return (
     <div
       className={clsx('timeline__item card relative', isSelected && 'selected')}
+      {...(!isSelected ? { inert: true } : {})}
       ref={(el) => {
         setSlideEl(el, index);
       }}
@@ -484,20 +492,34 @@ function TimelineSlide({
             />
           ) : null}
 
-          <p>
-            <ArchiveShopifyButton
-              className="button--primary button--md icon-with-text"
-              colors={section.button}
-              href={buttonHref}
-              rel={
-                section.button?.buttonLink?.target === '_blank' ? 'noopener noreferrer' : undefined
-              }
-              target={section.button?.buttonLink?.target}
-            >
-              {buttonLabel}
-              <IconArrowRight />
-            </ArchiveShopifyButton>
-          </p>
+          {slideButton.visible ? (
+            <p>
+              {isSelected ? (
+                <ArchiveShopifyButton
+                  className="button--primary button--md icon-with-text"
+                  colors={slideButton.colors}
+                  href={slideButton.href}
+                  rel={slideButton.rel}
+                  target={slideButton.target}
+                >
+                  {slideButton.text}
+                  <IconArrowRight />
+                </ArchiveShopifyButton>
+              ) : (
+                <span
+                  aria-hidden="true"
+                  className="button button--primary button--md icon-with-text pointer-events-none"
+                  style={inactiveButtonTheme.style}
+                >
+                  <span className="btn-fill" data-fill />
+                  <span className="btn-text">
+                    {slideButton.text}
+                    <IconArrowRight />
+                  </span>
+                </span>
+              )}
+            </p>
+          ) : null}
         </div>
       </div>
     </div>

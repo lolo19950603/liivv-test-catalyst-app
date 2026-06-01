@@ -2,7 +2,7 @@ import { Checkbox, Color, Group, Image, Link, List, Number, Select, Style, TextI
 
 import { archiveComponentLabel } from '~/lib/makeswift/archive-component-label';
 import {
-  buttonColorFields,
+  archiveButtonControls,
   FONT_SIZE_DESCRIPTION,
   HEX_OVERRIDE_DESCRIPTION,
   roundedTopControl,
@@ -115,19 +115,17 @@ const collageItem = Group({
   },
 });
 
-const ctaButton = (defaultLabel: string, defaults = ARCHIVE_BUTTON_PRIMARY_DARK) =>
+const ctaButton = (groupLabel: string, defaults = ARCHIVE_BUTTON_PRIMARY_DARK, textDefault?: string) =>
   Group({
-    label: defaultLabel,
+    label: groupLabel,
     preferredLayout: Group.Layout.Popover,
     props: {
-      label: TextInput({ label: 'Button label', defaultValue: defaultLabel }),
-      link: Link({ label: 'Button link' }),
+      ...archiveButtonControls(defaults, { textDefault: textDefault ?? groupLabel }),
       widthPct: Number({
         label: 'Desktop width (%)',
         description: 'Leave blank for auto width.',
         suffix: '%',
       }),
-      ...buttonColorFields(defaults),
     },
   });
 

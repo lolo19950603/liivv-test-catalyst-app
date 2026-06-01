@@ -5,7 +5,10 @@ import type { CSSProperties, ReactNode } from 'react';
 
 import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
 import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
-import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
+import {
+  resolveArchiveButton,
+  type ArchiveButtonProps,
+} from '~/lib/makeswift/utils/archive-button';
 import {
   buildSectionTheme,
   type SectionBackgroundProps,
@@ -77,9 +80,7 @@ export type ArchiveCollageItemProps = {
   blockBackgroundColor?: string;
 };
 
-export type ArchiveCollageCtaButtonProps = ButtonColorProps & {
-  label?: string;
-  link?: { href?: string; target?: string };
+export type ArchiveCollageCtaButtonProps = ArchiveButtonProps & {
   /** Desktop width percentage of the row (0–100). */
   widthPct?: number;
 };
@@ -428,14 +429,10 @@ function CtaRow({ cta }: { cta: ArchiveCollageCtaRowProps | undefined }) {
     return null;
   }
 
-  const primaryLabel = cta.primary?.label?.trim() ?? '';
-  const primaryHref = cta.primary?.link?.href?.trim() ?? '';
-  const secondaryLabel = cta.secondary?.label?.trim() ?? '';
-  const secondaryHref = cta.secondary?.link?.href?.trim() ?? '';
-  const showPrimary = primaryLabel.length > 0 && primaryHref.length > 0;
-  const showSecondary = secondaryLabel.length > 0 && secondaryHref.length > 0;
+  const primary = resolveArchiveButton(cta.primary);
+  const secondary = resolveArchiveButton(cta.secondary);
 
-  if (!showPrimary && !showSecondary) {
+  if (!primary.visible && !secondary.visible) {
     return null;
   }
 
@@ -449,26 +446,27 @@ function CtaRow({ cta }: { cta: ArchiveCollageCtaRowProps | undefined }) {
       className="section-content media--auto mobile:media--auto flex flex-col items-center justify-center md:flex-row md:items-center md:justify-center"
       style={{ paddingTop, paddingBottom, gap: 10 }}
     >
-      {showPrimary ? (
+      {primary.visible ? (
         <ArchiveShopifyButton
           className="button--primary button--sm icon-with-text size-style"
-          colors={cta.primary}
-          href={primaryHref}
-          rel={cta.primary?.link?.target === '_blank' ? 'noopener noreferrer' : undefined}
-          target={cta.primary?.link?.target}
+          colors={primary.colors}
+          href={primary.href}
+          rel={primary.rel}
+          target={primary.target}
         >
-          {primaryLabel}
+          {primary.text}
         </ArchiveShopifyButton>
       ) : null}
-      {showSecondary ? (
+      {secondary.visible ? (
         <ArchiveShopifyButton
           className="button--secondary button--sm size-style"
-          colors={cta.secondary}
-          href={secondaryHref}
-          rel={cta.secondary?.link?.target === '_blank' ? 'noopener noreferrer' : undefined}
-          target={cta.secondary?.link?.target}
+          colors={secondary.colors}
+          href={secondary.href}
+          rel={secondary.rel}
+          target={secondary.target}
+          variant="secondary"
         >
-          {secondaryLabel}
+          {secondary.text}
         </ArchiveShopifyButton>
       ) : null}
     </div>

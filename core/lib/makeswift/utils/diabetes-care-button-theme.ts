@@ -3,6 +3,8 @@ import type { CSSProperties } from 'react';
 import { resolveArchiveHighlightChannels } from '~/lib/makeswift/utils/archive-color';
 
 export type ButtonColorProps = {
+  outlineColor?: string;
+  outlineColorHex?: string;
   backgroundColor?: string;
   backgroundColorHex?: string;
   textColor?: string;
@@ -39,24 +41,38 @@ export function resolveButtonTheme(
     variant: ArchiveButtonVariant;
   },
 ): ResolvedButtonTheme {
-  const bg = channels(colors?.backgroundColorHex, colors?.backgroundColor);
-  const text = channels(colors?.textColorHex, colors?.textColor);
+  const outline = channels(colors?.outlineColorHex, colors?.outlineColor);
+  const restingBg = channels(colors?.backgroundColorHex, colors?.backgroundColor);
+  const restingText = channels(colors?.textColorHex, colors?.textColor);
   const hoverBg = channels(colors?.hoverBackgroundColorHex, colors?.hoverBackgroundColor);
   const hoverText = channels(colors?.hoverTextColorHex, colors?.hoverTextColor);
 
   const style: CSSProperties & Record<string, string> = {};
+  const isSecondary = options.variant === 'secondary';
 
-  if (bg != null) {
-    style['--color-button-background'] = bg;
-    style['--color-button-border'] = bg;
+  /**
+   * Archive `.button--secondary` uses `--color-button-background` for the visible label
+   * and `--color-button-text` for the hover fill. Map editor fields to user-facing meaning.
+   */
+  const labelChannels = isSecondary ? restingText : restingBg;
+  const fillChannels = isSecondary ? restingBg : restingText;
+  const borderChannels = outline ?? (isSecondary ? labelChannels : restingBg);
+
+  if (borderChannels != null) {
+    style['--color-button-border'] = borderChannels;
   }
 
-  if (text != null) {
-    style['--color-button-text'] = text;
+  if (labelChannels != null) {
+    style['--color-button-background'] = labelChannels;
+  }
+
+  if (fillChannels != null) {
+    style['--color-button-text'] = fillChannels;
   }
 
   const hasHover = hoverBg != null || hoverText != null;
-  const hasAny = bg != null || text != null || hasHover;
+  const hasAny =
+    borderChannels != null || labelChannels != null || fillChannels != null || hasHover;
 
   if (!hasAny) {
     return { style: undefined, scopeCss: '', dataDcBtn: undefined };
@@ -69,12 +85,12 @@ export function resolveButtonTheme(
   let scopeCss = '';
 
   if (hoverText != null) {
-    scopeCss += `${selector}${variantClass}:hover:not([disabled]){color:rgb(var(--dc-btn-hover-text))!important}`;
+    scopeCss += `${selector}${variantClass}:hover:not([disabled]){color:rgb(var(--dc-btn-hover-text))!important;}`;
     style['--dc-btn-hover-text'] = hoverText;
   }
 
   if (hoverBg != null) {
-    scopeCss += `${selector}${variantClass} .btn-fill{background-color:rgb(var(--dc-btn-hover-fill))!important}`;
+    scopeCss += `${selector}${variantClass} .btn-fill{background-color:rgb(var(--dc-btn-hover-fill))!important;}`;
     style['--dc-btn-hover-fill'] = hoverBg;
   }
 

@@ -1,7 +1,7 @@
 import { Group, Image, Link, List, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
 import {
-  buttonColorFields,
+  archiveButtonControls,
   fontSizeFields,
   highlightSwashFields,
   roundedTopControl,
@@ -111,11 +111,7 @@ runtime.registerComponent(DiabetesCareMulticolumn, {
           button: Group({
             label: 'Button',
             preferredLayout: Group.Layout.Popover,
-            props: {
-              buttonText: TextInput({ label: 'Button text', defaultValue: '' }),
-              buttonLink: Link({ label: 'Button link' }),
-              ...buttonColorFields(ARCHIVE_BUTTON_PRIMARY_WHITE_ON_TINT),
-            },
+            props: archiveButtonControls(ARCHIVE_BUTTON_PRIMARY_WHITE_ON_TINT),
           }),
         },
       }),
