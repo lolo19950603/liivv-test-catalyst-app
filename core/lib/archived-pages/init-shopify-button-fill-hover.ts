@@ -1,5 +1,14 @@
-const BUTTON_SELECTOR =
-  '[data-button-hover="standard"] .button:not([disabled], .self-button)';
+/** Includes disabled buttons so enabling later (e.g. timeline prev arrow) still has listeners. */
+const BUTTON_BIND_SELECTOR =
+  '[data-button-hover="standard"] .button:not(.self-button)';
+
+function isButtonHoverable(button: HTMLElement): boolean {
+  return (
+    !button.disabled &&
+    !button.classList.contains('self-button') &&
+    button.closest('[data-button-hover="standard"]') != null
+  );
+}
 
 const FILL_TRANSITION =
   'transform var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1))';
@@ -73,6 +82,10 @@ function bindButton(button: HTMLElement): void {
   button.removeAttribute('data-dc-fill-bound');
 
   const onEnter = (): void => {
+    if (!isButtonHoverable(button)) {
+      return;
+    }
+
     const currentFill = fillForButton(button);
 
     if (currentFill == null) {
@@ -102,8 +115,8 @@ function bindButton(button: HTMLElement): void {
   button.addEventListener('focusout', onLeave);
 }
 
-function scanButtons(root: ParentNode): void {
-  root.querySelectorAll(BUTTON_SELECTOR).forEach((button) => {
+export function scanShopifyButtonFillHover(root: ParentNode = document): void {
+  root.querySelectorAll(BUTTON_BIND_SELECTOR).forEach((button) => {
     bindButton(button as HTMLElement);
   });
 }
@@ -118,17 +131,17 @@ export function initShopifyButtonFillHover(root: ParentNode = document): () => v
     return () => undefined;
   }
 
-  scanButtons(root);
+  scanShopifyButtonFillHover(root);
 
   const mutationObserver = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => {
         if (node instanceof HTMLElement) {
-          if (node.matches(BUTTON_SELECTOR)) {
+          if (node.matches(BUTTON_BIND_SELECTOR)) {
             bindButton(node);
           }
 
-          scanButtons(node);
+          scanShopifyButtonFillHover(node);
         }
       });
     });

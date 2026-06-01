@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import type { CSSProperties, ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { scanShopifyButtonFillHover } from '~/lib/archived-pages/init-shopify-button-fill-hover';
 import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
 import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { ArchiveHighlightedText } from '~/lib/makeswift/components/diabetes-care-faq/archive-highlighted-text';
@@ -75,19 +76,27 @@ export type TimelineTypographyProps = {
   fontSizeMobile?: number;
 };
 
-export type TimelineStepNavigationProps = {
+export type TimelineNavTextColorProps = {
   activeTextColor?: string;
   activeTextColorHex?: string;
 };
 
-const TIMELINE_STEP_INACTIVE_OPACITY = 0.25;
+export type TimelineStepNavigationProps = TimelineNavTextColorProps;
+export type TimelineArrowNavigationProps = TimelineNavTextColorProps & {
+  hoverTextColor?: string;
+  hoverTextColorHex?: string;
+};
 
-function resolveTimelineStepNavigationStyle(
-  stepNavigation?: TimelineStepNavigationProps | null,
+const TIMELINE_NAV_INACTIVE_OPACITY = 0.25;
+
+function resolveTimelineNavTextColorStyle(
+  colors: TimelineNavTextColorProps | null | undefined,
+  prefix: 'step' | 'arrow',
+  options?: { includeChannels?: boolean },
 ): CSSProperties | undefined {
   const active = resolvePlainTextColor({
-    textColor: stepNavigation?.activeTextColor,
-    textColorHex: stepNavigation?.activeTextColorHex,
+    textColor: colors?.activeTextColor,
+    textColorHex: colors?.activeTextColorHex,
   });
 
   if (active == null) {
@@ -95,15 +104,62 @@ function resolveTimelineStepNavigationStyle(
   }
 
   const muted =
-    cssColorWithOpacity(active, TIMELINE_STEP_INACTIVE_OPACITY) ??
-    `color-mix(in srgb, ${active} ${TIMELINE_STEP_INACTIVE_OPACITY * 100}%, transparent)`;
-  const activeChannels = toArchiveRgbChannels(active);
+    cssColorWithOpacity(active, TIMELINE_NAV_INACTIVE_OPACITY) ??
+    `color-mix(in srgb, ${active} ${TIMELINE_NAV_INACTIVE_OPACITY * 100}%, transparent)`;
+  const activeChannels =
+    options?.includeChannels === true ? toArchiveRgbChannels(active) : null;
 
   return {
-    '--timeline-step-active-color': active,
-    '--timeline-step-inactive-color': muted,
-    '--timeline-step-connector-color': muted,
-    ...(activeChannels != null ? { '--timeline-step-active-channels': activeChannels } : {}),
+    [`--timeline-${prefix}-active-color`]: active,
+    [`--timeline-${prefix}-inactive-color`]: muted,
+    ...(prefix === 'step' ? { '--timeline-step-connector-color': muted } : {}),
+    ...(activeChannels != null
+      ? { [`--timeline-${prefix}-active-channels`]: activeChannels }
+      : {}),
+  } as CSSProperties;
+}
+
+function resolveTimelineStepNavigationStyle(
+  stepNavigation?: TimelineStepNavigationProps | null,
+): CSSProperties | undefined {
+  return resolveTimelineNavTextColorStyle(stepNavigation, 'step');
+}
+
+function resolveTimelineArrowNavigationStyle(
+  arrowNavigation?: TimelineArrowNavigationProps | null,
+  stepNavigation?: TimelineStepNavigationProps | null,
+): CSSProperties | undefined {
+  const active =
+    resolvePlainTextColor({
+      textColor: arrowNavigation?.activeTextColor,
+      textColorHex: arrowNavigation?.activeTextColorHex,
+    }) ??
+    resolvePlainTextColor({
+      textColor: stepNavigation?.activeTextColor,
+      textColorHex: stepNavigation?.activeTextColorHex,
+    });
+
+  const hoverTextOnly = resolvePlainTextColor({
+    textColor: arrowNavigation?.hoverTextColor,
+    textColorHex: arrowNavigation?.hoverTextColorHex,
+  });
+
+  if (active == null && hoverTextOnly == null) {
+    return undefined;
+  }
+
+  const resolvedActive = active ?? hoverTextOnly;
+  const resolvedHoverText = hoverTextOnly ?? resolvedActive;
+  const muted =
+    cssColorWithOpacity(resolvedActive, TIMELINE_NAV_INACTIVE_OPACITY) ??
+    `color-mix(in srgb, ${resolvedActive} ${TIMELINE_NAV_INACTIVE_OPACITY * 100}%, transparent)`;
+  const activeChannels = toArchiveRgbChannels(resolvedActive);
+
+  return {
+    '--timeline-arrow-active-color': resolvedActive,
+    '--timeline-arrow-inactive-color': muted,
+    '--timeline-arrow-hover-text-color': resolvedHoverText,
+    ...(activeChannels != null ? { '--timeline-arrow-active-channels': activeChannels } : {}),
   } as CSSProperties;
 }
 
@@ -295,6 +351,7 @@ export type DiabetesCareTimelineProps = {
   /** When true, all slides show image left and copy right at md+ (omits `grid-row-reverse`). */
   layoutReverse?: boolean;
   stepNavigation?: TimelineStepNavigationProps;
+  arrowNavigation?: TimelineArrowNavigationProps;
 };
 
 function IconChevronLeft() {
@@ -459,6 +516,7 @@ export function DiabetesCareTimeline({
   roundedTop = true,
   layoutReverse = false,
   stepNavigation,
+  arrowNavigation,
 }: DiabetesCareTimelineProps) {
   const resolvedSectionId =
     sectionDomId?.trim().length ? sectionDomId.trim() : DIABETES_CARE_TIMELINE_SECTION_ID;
@@ -476,6 +534,7 @@ export function DiabetesCareTimeline({
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const slideRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const indicatorsRef = useRef<HTMLDivElement | null>(null);
 
   const safeIndex = Math.min(activeIndex, Math.max(0, count - 1));
 
@@ -582,9 +641,23 @@ export function DiabetesCareTimeline({
 
   const prevDisabled = count === 0 || safeIndex === 0;
   const nextDisabled = count === 0 || safeIndex >= count - 1;
+
+  useEffect(() => {
+    const indicators = indicatorsRef.current;
+
+    if (indicators == null || count === 0) {
+      return;
+    }
+
+    scanShopifyButtonFillHover(indicators);
+  }, [count, prevDisabled, nextDisabled]);
   const activeStepLabel =
     count > 0 ? timelineStepLabel(list[safeIndex] ?? {}, safeIndex) : '';
   const stepNavigationStyle = resolveTimelineStepNavigationStyle(stepNavigation);
+  const arrowNavigationStyle = resolveTimelineArrowNavigationStyle(
+    arrowNavigation,
+    stepNavigation,
+  );
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: resolvedSectionId,
     sectionCss: timelineSectionLayoutCss(resolvedSectionId, count),
@@ -618,7 +691,11 @@ export function DiabetesCareTimeline({
               </div>
 
               {count > 0 ? (
-                <div className="indicators gap-2d5 flex shrink-0">
+                <div
+                  className="indicators gap-2d5 flex shrink-0"
+                  ref={indicatorsRef}
+                  style={arrowNavigationStyle}
+                >
                   <button
                     aria-controls={resolvedSliderId}
                     aria-label="Previous"
@@ -627,7 +704,7 @@ export function DiabetesCareTimeline({
                     onClick={goPrev}
                     type="button"
                   >
-                    <span className="btn-fill sf-hidden" data-fill />
+                    <span className="btn-fill" data-fill />
                     <span className="btn-text">
                       <IconChevronLeft />
                     </span>

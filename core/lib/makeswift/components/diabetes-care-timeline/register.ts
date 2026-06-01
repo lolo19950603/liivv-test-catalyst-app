@@ -97,10 +97,37 @@ runtime.registerComponent(DiabetesCareTimeline, {
           label: 'Text color',
           defaultValue: hsl(TIMELINE_TEXT_COLOR_HSL),
           description:
-            'Active step labels and arrows. Inactive steps and connector lines use this color at 25% opacity.',
+            'Active step labels. Inactive steps and connector lines use this color at 25% opacity.',
         }),
         activeTextColorHex: TextInput({
           label: 'Text color (hex override)',
+          defaultValue: '',
+          description: HEX_OVERRIDE_DESCRIPTION,
+        }),
+      },
+    }),
+    arrowNavigation: Group({
+      label: 'Arrow navigation',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        activeTextColor: Color({
+          label: 'Text color',
+          defaultValue: hsl(TIMELINE_TEXT_COLOR_HSL),
+          description:
+            'Chevron and ring outline on enabled arrows, plus the hover fill background. Disabled arrows use this color at 25% opacity.',
+        }),
+        activeTextColorHex: TextInput({
+          label: 'Text color (hex override)',
+          defaultValue: '',
+          description: HEX_OVERRIDE_DESCRIPTION,
+        }),
+        hoverTextColor: Color({
+          label: 'Text color (hover)',
+          defaultValue: hsl('0 0% 100%'),
+          description: 'Chevron only while hovering enabled arrows (ring and fill keep Text color).',
+        }),
+        hoverTextColorHex: TextInput({
+          label: 'Text color (hover, hex override)',
           defaultValue: '',
           description: HEX_OVERRIDE_DESCRIPTION,
         }),
