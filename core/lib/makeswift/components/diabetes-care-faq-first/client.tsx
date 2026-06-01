@@ -32,6 +32,7 @@ export type FaqFirstIntroBodyProps = BodyTextProps & {
 export interface DiabetesCareFaqFirstProps {
   className?: string;
   background?: SectionBackgroundProps;
+  roundedTop?: boolean;
   heading?: HeadingWithHighlightProps;
   introBody?: FaqFirstIntroBodyProps;
   /** @deprecated Use `introBody.bodyHtml`. */
@@ -77,6 +78,7 @@ function resolveIntroBody(props: {
 export function DiabetesCareFaqFirst({
   className,
   background,
+  roundedTop = true,
   heading,
   introBody,
   intro,
@@ -123,7 +125,7 @@ export function DiabetesCareFaqFirst({
     <div className={clsx('diabetes-care-faq-first', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}>
       <div className="shopify-section" id={FAQ_FIRST_SECTION_ID} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <div className="section section--padding">
+        <div className={clsx('section section--padding', roundedTop && 'section--rounded')}>
           <div className="page-width page-width--narrow relative px-4 sm:px-5 md:px-0">
             <div className="title-wrapper z-1 relative flex flex-col gap-4 text-left leading-none md:flex-row md:items-end md:justify-between lg:gap-8">
               <div className="grid gap-4">

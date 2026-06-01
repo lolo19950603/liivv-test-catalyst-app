@@ -67,6 +67,7 @@ export type CollectionListBodyProps = BodyTextProps & {
 export type DiabetesCareCollectionListProps = {
   className?: string;
   background?: SectionBackgroundProps;
+  roundedTop?: boolean;
   heading?: CollectionListHeadingGroupProps | CollectionListHeadingProps;
   /** @deprecated Use `heading.primaryHeading`. */
   primaryHeading?: HeadingTypographyProps;
@@ -258,6 +259,7 @@ function cardHasMedia(c: DiabetesCareCollectionListCardProps): boolean {
 export function DiabetesCareCollectionList({
   className,
   background,
+  roundedTop = true,
   headingLine1,
   headingLine2,
   heading,
@@ -327,7 +329,7 @@ export function DiabetesCareCollectionList({
     <div className={clsx('diabetes-care-collection-list', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}>
       <div className="shopify-section" id={COLLECTION_LIST_SECTION_ID} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <div className="section section--padding">
+        <div className={clsx('section section--padding', roundedTop && 'section--rounded')}>
           <div className="page-width relative px-4 sm:px-5 md:px-0">
             <div className="title-wrapper z-1 relative flex flex-col gap-4 text-left md:flex-row md:items-end md:justify-between lg:gap-8">
               <div className="grid gap-4 leading-none">

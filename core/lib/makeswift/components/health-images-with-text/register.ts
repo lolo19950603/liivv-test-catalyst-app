@@ -11,9 +11,9 @@ import {
 import { healthPageComponentLabel } from '~/lib/makeswift/health-page-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 import { ARCHIVE_BUTTON_PRIMARY_DARK } from '~/lib/makeswift/utils/archive-button-presets';
-import { ARCHIVE_SAGE_BACKGROUND_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
 import { HealthImagesWithText } from './client';
+import { HEALTH_IMAGES_WITH_TEXT_BACKGROUND_HSL } from './archive-styles';
 
 export const COMPONENT_TYPE = 'health-images-with-text';
 
@@ -23,7 +23,7 @@ const DEFAULT_BODY_HTML = `<p>Experience a smarter way to manage your health wit
 
 runtime.registerComponent(HealthImagesWithText, {
   type: COMPONENT_TYPE,
-  label: healthPageComponentLabel(3, 'Images with text'),
+  label: healthPageComponentLabel(2, 'Images with text'),
   icon: 'layout',
   props: {
     className: Style(),
@@ -36,7 +36,7 @@ runtime.registerComponent(HealthImagesWithText, {
       label: 'Reverse layout on desktop (image right)',
       defaultValue: false,
     }),
-    ...sectionBackgroundControls(ARCHIVE_SAGE_BACKGROUND_HSL),
+    ...sectionBackgroundControls(HEALTH_IMAGES_WITH_TEXT_BACKGROUND_HSL),
     ...roundedTopControl(),
     primaryImage: Image({ label: 'Primary image' }),
     primaryImageAlt: TextInput({ label: 'Primary image alt', defaultValue: '' }),
@@ -79,9 +79,10 @@ runtime.registerComponent(HealthImagesWithText, {
       },
     }),
     button: Group({
-      label: 'Button',
+      label: 'Button (optional)',
       preferredLayout: Group.Layout.Popover,
       props: {
+        showButton: Checkbox({ label: 'Show button', defaultValue: true }),
         label: TextInput({ label: 'Button label', defaultValue: 'Explore CarePack' }),
         link: Link({ label: 'Button link' }),
         ...buttonColorFields(ARCHIVE_BUTTON_PRIMARY_DARK),

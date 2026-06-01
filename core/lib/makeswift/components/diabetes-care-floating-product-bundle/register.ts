@@ -12,6 +12,7 @@ import {
   buttonColorFields,
   fontSizeFields,
   headingPopoverControls,
+  roundedTopControl,
   sectionBackgroundControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
@@ -34,6 +35,7 @@ runtime.registerComponent(DiabetesCareFloatingProductBundle, {
   props: {
     className: Style(),
     ...sectionBackgroundControls(ARCHIVE_SAGE_BACKGROUND_HSL),
+    ...roundedTopControl(),
     imageSrc: Image({ label: 'Background image' }),
     ...headingPopoverControls({
       label: 'Promo heading',

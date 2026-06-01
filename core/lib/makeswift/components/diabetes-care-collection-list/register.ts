@@ -2,8 +2,9 @@ import { Group, Image, Link, List, Style, TextArea, TextInput } from '@makeswift
 
 import {
   fontSizeFields,
-  sectionBackgroundControls,
   nestedSplitHeadingPopoverControls,
+  roundedTopControl,
+  sectionBackgroundControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
@@ -21,6 +22,7 @@ runtime.registerComponent(DiabetesCareCollectionList, {
   props: {
     className: Style(),
     ...sectionBackgroundControls(),
+    ...roundedTopControl(),
     ...nestedSplitHeadingPopoverControls({
       primaryLabel: 'Primary heading',
       secondaryLabel: 'Secondary heading (accent)',

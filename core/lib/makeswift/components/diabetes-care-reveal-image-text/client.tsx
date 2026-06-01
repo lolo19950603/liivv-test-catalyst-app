@@ -60,6 +60,7 @@ export type DiabetesCareRevealBannerImageProps = {
 export type DiabetesCareRevealImageTextProps = {
   className?: string;
   background?: SectionBackgroundProps;
+  roundedTop?: boolean;
   bannerHeading?: HeadingTypographyProps;
   bannerImage?: DiabetesCareRevealBannerImageProps;
   /** @deprecated Use `bannerHeading` + `bannerImage`. */
@@ -101,6 +102,7 @@ function resolveBannerHeadingProps(props: {
 export function DiabetesCareRevealImageWithText({
   className,
   background,
+  roundedTop = true,
   bannerHeading,
   bannerImage,
   banner,
@@ -203,7 +205,7 @@ export function DiabetesCareRevealImageWithText({
     >
       <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
       <div className="shopify-section contents" id={revealSectionId}>
-        <div className="section inline">
+        <div className={clsx('section inline', roundedTop && 'section--rounded')}>
           <div className="relative contents">
             <SplittingBanner className="splitting-banner reveal-banner relative inline">
               <span className="reveal-banner__tracker absolute top-0 h-full" />

@@ -20,8 +20,9 @@ import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-si
 import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
 
 import {
+  HEALTH_IMAGES_WITH_TEXT_BACKGROUND_CHANNELS,
   HEALTH_IMAGES_WITH_TEXT_SECTION_ID,
-  HEALTH_IMAGES_WITH_TEXT_VARS,
+  healthImagesWithTextSectionCss,
 } from './archive-styles';
 
 export type HealthImagesWithTextProps = {
@@ -42,6 +43,7 @@ export type HealthImagesWithTextProps = {
     fontSizeMobile?: number;
   };
   button?: ButtonColorProps & {
+    showButton?: boolean;
     label?: string;
     link?: { href?: string; target?: string };
   };
@@ -51,26 +53,28 @@ export type HealthImagesWithTextProps = {
 function ArchiveImage({
   src,
   alt,
-  className,
+  wrapperClassName,
 }: {
   src: string;
   alt: string;
-  className: string;
+  wrapperClassName?: string;
 }) {
   if (src.length === 0) {
     return null;
   }
 
   return (
-    <picture className={clsx('media media--height media--portrait relative block overflow-hidden', className)}>
-      <img
-        alt={alt}
-        className="absolute inset-0 block h-full w-full object-cover"
-        decoding="async"
-        loading="lazy"
-        src={src}
-      />
-    </picture>
+    <div className={wrapperClassName}>
+      <picture className="media media--square relative block w-full overflow-hidden">
+        <img
+          alt={alt}
+          className="block h-auto w-full object-cover"
+          decoding="async"
+          loading="lazy"
+          src={src}
+        />
+      </picture>
+    </div>
   );
 }
 
@@ -103,14 +107,16 @@ export function HealthImagesWithText({
   const bodyHtml = body?.html?.trim() ?? '';
   const subheadingText = subheadingResolved.text.trim();
   const headingText = headingResolved.text.trim();
-  const buttonLabel = button?.label?.trim() ?? 'Learn more';
+  const buttonLabel = button?.label?.trim() ?? '';
   const buttonHref = button?.link?.href?.trim() ?? '#';
+  const showButton = button?.showButton !== false && buttonLabel.length > 0;
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: resolvedSectionId,
-    sectionCss: HEALTH_IMAGES_WITH_TEXT_VARS,
+    sectionCss: healthImagesWithTextSectionCss(resolvedSectionId),
     background,
-    defaultBackgroundChannels: '23 18% 62%',
+    defaultBackgroundChannels: HEALTH_IMAGES_WITH_TEXT_BACKGROUND_CHANNELS,
   });
+  const showImages = primarySrc.length > 0 || secondarySrc.length > 0;
 
   const subheadingStyle: CSSProperties | undefined =
     subheadingResolved.color != null || subheadingResolved.fontSize != null
@@ -143,29 +149,35 @@ export function HealthImagesWithText({
             <div
               className={clsx(
                 'image-with-text flex flex-col gap-8 overflow-hidden lg:gap-10',
-                layoutReverse ? 'lg:flex-row-reverse' : 'lg:flex-row',
+                layoutReverse && 'image-with-text--reverse',
               )}
             >
-              <div
-                className={clsx(
-                  'image-with-text__item image-with-text__media relative min-h-[280px] flex-1',
-                  secondarySrc.length > 0 && 'with-2nd-image',
-                )}
-              >
-                {secondarySrc.length > 0 ? (
-                  <ArchiveImage
-                    alt={secondaryImageAlt}
-                    className="image-with-text__image-second absolute inset-0 z-0"
-                    src={secondarySrc}
-                  />
-                ) : null}
-                <ArchiveImage
-                  alt={primaryImageAlt}
-                  className="image-with-text__image-first relative z-[1]"
-                  src={primarySrc}
-                />
-              </div>
-              <div className="image-with-text__item image-with-text__content relative z-[1] flex flex-1 flex-col justify-center">
+              {showImages ? (
+                <div className="image-with-text__item image-with-text__media-col relative shrink-0">
+                  <div
+                    className={clsx(
+                      'image-with-text__media relative',
+                      secondarySrc.length > 0 && 'with-2nd-image',
+                    )}
+                  >
+                    {secondarySrc.length > 0 ? (
+                      <ArchiveImage
+                        alt={secondaryImageAlt}
+                        src={secondarySrc}
+                        wrapperClassName="image-with-text__image-second absolute z-10"
+                      />
+                    ) : null}
+                    {primarySrc.length > 0 ? (
+                      <ArchiveImage
+                        alt={primaryImageAlt}
+                        src={primarySrc}
+                        wrapperClassName="image-with-text__image-first block"
+                      />
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
+              <div className="image-with-text__item image-with-text__content image-with-text__content-col relative z-[1] flex shrink-0 flex-col justify-center">
                 <div className="rich-text relative z-[1] text-left lg:text-left">
                   {subheadingText.length > 0 ? (
                     <p
@@ -190,19 +202,21 @@ export function HealthImagesWithText({
                       style={bodyStyle}
                     />
                   ) : null}
-                  <p className="mt-6">
-                    <ArchiveShopifyButton
-                      className="button--primary button--md icon-with-text"
-                      colors={button}
-                      href={buttonHref}
-                      rel={
-                        button?.link?.target === '_blank' ? 'noopener noreferrer' : undefined
-                      }
-                      target={button?.link?.target}
-                    >
-                      {buttonLabel}
-                    </ArchiveShopifyButton>
-                  </p>
+                  {showButton ? (
+                    <p className="mt-6">
+                      <ArchiveShopifyButton
+                        className="button--primary button--md icon-with-text"
+                        colors={button}
+                        href={buttonHref}
+                        rel={
+                          button?.link?.target === '_blank' ? 'noopener noreferrer' : undefined
+                        }
+                        target={button?.link?.target}
+                      >
+                        {buttonLabel}
+                      </ArchiveShopifyButton>
+                    </p>
+                  ) : null}
                 </div>
               </div>
             </div>

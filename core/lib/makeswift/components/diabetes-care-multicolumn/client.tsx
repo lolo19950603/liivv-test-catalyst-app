@@ -46,6 +46,16 @@ const DEFAULT_BACKGROUND_CHANNELS = ARCHIVE_SAGE_BACKGROUND_CHANNELS;
 /** Matches archive `card-grid` gap (home `multicolumn_xg87qF` uses ~`var(--sp-6)` at desktop, not 40–60px). */
 const MULTICOLUMN_CARD_GRID_GAP = 'clamp(var(--sp-4),1.263vw,var(--sp-6))';
 
+/** Uniform section title on mobile — overrides Makeswift inline sizes on split-word segments. */
+const MULTICOLUMN_MOBILE_TITLE_CSS =
+  `@media screen and (max-width:767px){#${MULTICOLUMN_SECTION_ID}{--title-xl:clamp(1.5rem,5.5vw,1.875rem)}` +
+  `#${MULTICOLUMN_SECTION_ID} .title-wrapper h2.title-xl,` +
+  `#${MULTICOLUMN_SECTION_ID} .title-wrapper h2.title-xl .split-words,` +
+  `#${MULTICOLUMN_SECTION_ID} .title-wrapper h2.title-xl .split-words :is(.word,[data-dc-animate-child],.highlighted-text){` +
+  `font-size:clamp(1.5rem,5.5vw,1.875rem)!important;line-height:1.08!important;letter-spacing:-0.02em}` +
+  `#${MULTICOLUMN_SECTION_ID} .title-wrapper.text-center h2.title-xl .split-words{` +
+  `display:flex;width:100%;justify-content:center;text-wrap:balance}}`;
+
 const MULTICOLUMN_ARCHIVE_STYLE =
   `#${MULTICOLUMN_SECTION_ID}{--section-padding-top:72px;--section-padding-bottom:72px;--color-background:${DEFAULT_BACKGROUND_CHANNELS};--color-foreground:49 47 47;--color-border:var(--color-foreground)/0.1;--color-border-dark:var(--color-foreground)/0.4;--color-border-light:var(--color-foreground)/0.06;--color-highlight:243 199 190;--color-button-background:255 255 255;--color-button-border:255 255 255;--color-button-text:49 47 47}` +
   `#${MULTICOLUMN_SECTION_ID} [data-dc-scroll-reveal]{overflow:hidden}` +
@@ -54,7 +64,7 @@ const MULTICOLUMN_ARCHIVE_STYLE =
 
 function multicolumnSectionStyle(blockCount: number): string {
   const id = `#${MULTICOLUMN_SECTION_ID}`;
-  let style = `${MULTICOLUMN_ARCHIVE_STYLE}${id}{--section-blocks-count:${String(blockCount)}}`;
+  let style = `${MULTICOLUMN_ARCHIVE_STYLE}${MULTICOLUMN_MOBILE_TITLE_CSS}${id}{--section-blocks-count:${String(blockCount)}}`;
 
   if (blockCount === 4) {
     style += `@media screen and (min-width:768px){${id} .multicolumn.with-4.card-grid.card-grid--4{--card-grid-per-row:4}}`;
@@ -183,6 +193,7 @@ export type IntroBodyTypographyProps = BodyTextProps & {
 export type DiabetesCareMulticolumnProps = {
   className?: string;
   background?: SectionBackgroundProps;
+  roundedTop?: boolean;
   primaryHeading?: HeadingTypographyProps;
   secondaryHeading?: HeadingWithHighlightProps;
   intro?: IntroBodyTypographyProps;
@@ -402,6 +413,7 @@ const COLUMN_COPY_TEXT =
 export function DiabetesCareMulticolumn({
   className,
   background,
+  roundedTop = true,
   primaryHeading,
   secondaryHeading,
   intro,
@@ -461,11 +473,16 @@ export function DiabetesCareMulticolumn({
         style={{ ...sectionVars, ...themeStyle }}
       >
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <div className="section section--padding section--rounded relative">
+        <div
+          className={clsx('section section--padding relative', roundedTop && 'section--rounded')}
+        >
           <div className="page-width relative">
             <div className="title-wrapper relative z-1 mb-10 flex flex-col gap-4 text-center leading-none md:mb-12 md:items-center md:justify-between lg:gap-8">
               <div className="grid gap-4">
-                <h2 className="heading title-xl tracking-heading" style={sectionTitleStyle}>
+                <h2
+                  className="heading title-xl tracking-heading text-center"
+                  style={sectionTitleStyle}
+                >
                   <AccentSplitWordsHeading
                     accentColors={useSecondaryTitleSwash ? secondaryHeading : undefined}
                     emphasis={secondaryText}

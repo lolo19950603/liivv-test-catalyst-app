@@ -4,6 +4,7 @@ import {
   buttonColorFields,
   FONT_SIZE_DESCRIPTION,
   fontSizeFields,
+  roundedTopControl,
   sectionBackgroundControls,
   splitHeadingPopoverControls,
   textColorFields,
@@ -27,6 +28,7 @@ runtime.registerComponent(DiabetesCareRevealImageWithText, {
   props: {
     className: Style(),
     ...sectionBackgroundControls(),
+    ...roundedTopControl(),
     bannerHeading: Group({
       label: 'Banner heading',
       preferredLayout: Group.Layout.Popover,

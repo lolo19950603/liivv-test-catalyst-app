@@ -5,15 +5,16 @@ import { useMemo, type CSSProperties } from 'react';
 
 import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
 import { resolveHealthSectionDomId } from '~/lib/makeswift/health-page-section-id';
-import { ARCHIVE_CREAM_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import {
   buildSectionTheme,
   type SectionBackgroundProps,
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
+import { buildScrollingTextMarqueeSequence } from '~/lib/makeswift/utils/scrolling-text-marquee';
 
 import {
   HEALTH_SCROLLING_TEXT_SECTION_ID,
+  HEALTH_SCROLLING_TEXT_TRACK_CLASS,
   HEALTH_SCROLLING_TEXT_VARS,
   healthScrollingTextMarqueeCss,
 } from './archive-styles';
@@ -35,7 +36,6 @@ export type HealthScrollingTextProps = {
   iconImage?: unknown;
   iconHeightPx?: number;
   items?: HealthScrollingTextItem[];
-  roundedTop?: boolean;
 };
 
 export const HEALTH_SCROLLING_TEXT_DEFAULT_ITEMS: HealthScrollingTextItem[] = [
@@ -53,13 +53,9 @@ export const HEALTH_SCROLLING_TEXT_DEFAULT_ITEMS: HealthScrollingTextItem[] = [
 
 function ScrollingTextItem({
   item,
-  iconSrc,
-  iconAlt,
   iconHeightPx,
 }: {
   item: HealthScrollingTextItem;
-  iconSrc: string;
-  iconAlt: string;
   iconHeightPx: number;
 }) {
   if (item.kind === 'image') {
@@ -75,8 +71,8 @@ function ScrollingTextItem({
         style={{ '--image-height': `${String(iconHeightPx)}px` } as CSSProperties}
       >
         <img
-          alt={item.imageAlt?.trim() ?? iconAlt}
-          className="block h-[var(--image-height)] w-auto object-contain"
+          alt={item.imageAlt?.trim() ?? 'Liivv'}
+          className="block h-[var(--image-height)] w-auto max-w-full object-contain"
           decoding="async"
           loading="lazy"
           src={src}
@@ -101,12 +97,27 @@ function ScrollingTextItem({
   );
 }
 
+function MarqueeStrip({
+  items,
+  iconHeightPx,
+}: {
+  items: HealthScrollingTextItem[];
+  iconHeightPx: number;
+}) {
+  return (
+    <div className="marquee flex shrink-0 items-center whitespace-nowrap">
+      {items.map((item, index) => (
+        <ScrollingTextItem iconHeightPx={iconHeightPx} item={item} key={`${item.kind ?? 'text'}-${item.text ?? 'img'}-${index}`} />
+      ))}
+    </div>
+  );
+}
+
 export function HealthScrollingText({
   className,
   instanceSuffix,
   sectionDomId,
   background,
-  roundedTop = true,
   direction = 'left',
   durationSeconds = 26,
   iconImage,
@@ -119,7 +130,7 @@ export function HealthScrollingText({
   );
   const duration = Math.min(120, Math.max(8, durationSeconds));
   const iconSrc = resolveMakeswiftImageSrc(iconImage);
-  const iconAlt = 'Category icon';
+  const iconAlt = 'Liivv';
   const rows = useMemo(() => {
     const fromProps = (items ?? []).filter(
       (item) =>
@@ -128,39 +139,20 @@ export function HealthScrollingText({
     );
 
     const base = fromProps.length > 0 ? fromProps : HEALTH_SCROLLING_TEXT_DEFAULT_ITEMS;
-    const withIcons: HealthScrollingTextItem[] = [];
 
-    for (const item of base) {
-      if (item.kind === 'image') {
-        withIcons.push(item);
-      } else {
-        if (iconSrc.length > 0) {
-          withIcons.push({ kind: 'image', image: iconImage, imageAlt: iconAlt });
-        }
-
-        withIcons.push(item);
-      }
-    }
-
-    return withIcons;
-  }, [iconAlt, iconImage, iconSrc.length, items]);
+    return buildScrollingTextMarqueeSequence(base, iconImage, iconSrc, iconAlt);
+  }, [iconAlt, iconImage, iconSrc, items]);
 
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: resolvedSectionId,
     sectionCss: `${HEALTH_SCROLLING_TEXT_VARS}${healthScrollingTextMarqueeCss(resolvedSectionId, duration)}`,
     background,
-    defaultBackgroundChannels: ARCHIVE_CREAM_BACKGROUND_CHANNELS,
+    defaultBackgroundChannels: '255 255 255',
   });
 
-  const renderedItems = rows.map((item, index) => (
-    <ScrollingTextItem
-      iconAlt={iconAlt}
-      iconHeightPx={iconHeightPx}
-      iconSrc={iconSrc}
-      item={item}
-      key={`${item.kind ?? 'text'}-${item.text ?? 'img'}-${index}`}
-    />
-  ));
+  if (rows.length === 0) {
+    return null;
+  }
 
   return (
     <div
@@ -173,26 +165,20 @@ export function HealthScrollingText({
     >
       <div className="shopify-section" id={resolvedSectionId} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <div
-          className={clsx(
-            'section section--padding section--solid',
-            roundedTop && 'section--rounded',
-          )}
-        >
+        <div className="section section--padding section--solid">
           <div className="relative z-[1]">
             <div
               className={clsx(
                 'scrolling-text flex items-center overflow-hidden',
                 direction === 'right' ? 'scrolling-text--right' : 'scrolling-text--left',
+                iconSrc.length === 0 && 'scrolling-text--no-icon',
               )}
+              style={{ '--duration': `${String(duration)}s` } as CSSProperties}
             >
-              <div className="health-scroll-marquee-track items-center gap-[var(--section-grid-gap,50px)]">
-                {renderedItems}
-                <div
-                  aria-hidden
-                  className="flex items-center gap-[var(--section-grid-gap,50px)]"
-                >
-                  {renderedItems}
+              <div className={clsx(HEALTH_SCROLLING_TEXT_TRACK_CLASS, 'flex items-center')}>
+                <MarqueeStrip iconHeightPx={iconHeightPx} items={rows} />
+                <div aria-hidden>
+                  <MarqueeStrip iconHeightPx={iconHeightPx} items={rows} />
                 </div>
               </div>
             </div>

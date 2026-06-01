@@ -11,6 +11,7 @@ import {
   buttonColorFields,
   fontSizeFields,
   nestedSplitHeadingPopoverControls,
+  roundedTopControl,
   sectionBackgroundControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
@@ -29,6 +30,7 @@ runtime.registerComponent(DiabetesCareImageTextOverlay, {
   props: {
     className: Style(),
     ...sectionBackgroundControls(),
+    ...roundedTopControl(),
     imageSrc: Image({ label: 'Background image' }),
     ...nestedSplitHeadingPopoverControls({
       primaryLabel: 'Primary heading',

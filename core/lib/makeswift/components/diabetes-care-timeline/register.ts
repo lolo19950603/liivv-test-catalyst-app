@@ -1,15 +1,28 @@
-import { Group, Image, Link, List, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
+import {
+  Checkbox,
+  Color,
+  Group,
+  Image,
+  Link,
+  List,
+  Style,
+  TextArea,
+  TextInput,
+} from '@makeswift/runtime/controls';
 
 import {
   buttonColorFields,
   fontSizeFields,
-  highlightSwashFields,
+  highlightSwashColorFields,
+  roundedTopControl,
   sectionBackgroundControls,
-  splitHeadingPopoverControls,
+  HEX_OVERRIDE_DESCRIPTION,
+  segmentedAccentHeadingPopoverControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
+import { hsl } from '~/lib/makeswift/utils/color';
 import { ARCHIVE_BUTTON_PRIMARY_DARK } from '~/lib/makeswift/utils/archive-button-presets';
 import { ARCHIVE_HIGHLIGHT_SWASH_HSL } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 
@@ -17,6 +30,9 @@ import { DiabetesCareTimeline } from './client';
 
 /** Stable id aligned with `timeline_nyTDKQ` in `diabetes-care.html` (dedicated slice, not HTML fetch). */
 export const COMPONENT_TYPE = 'diabetes-care-timeline';
+
+/** Archive heading/body copy (`rgb(49, 47, 47)`). */
+const TIMELINE_TEXT_COLOR_HSL = '0 2% 19%';
 
 const DEFAULT_SECTION_BODY_HTML = `<p>Keep it simple and make it yours. Here's what we'd love to know:</p>
 <ul>
@@ -47,9 +63,9 @@ function timelineSectionHeadingPopover(label: string, textDefault: string) {
         label: 'Text',
         defaultValue: textDefault,
       }),
-      ...textColorFields(),
+      ...textColorFields(TIMELINE_TEXT_COLOR_HSL),
       ...fontSizeFields(),
-      ...highlightSwashFields(ARCHIVE_HIGHLIGHT_SWASH_HSL),
+      ...highlightSwashColorFields(ARCHIVE_HIGHLIGHT_SWASH_HSL),
     },
   });
 }
@@ -61,10 +77,34 @@ runtime.registerComponent(DiabetesCareTimeline, {
   props: {
     className: Style(),
     ...sectionBackgroundControls(),
-    ...splitHeadingPopoverControls({
-      primaryDefault: 'Your Care Journey,',
-      secondaryDefault: 'Simp(liivv)fied',
+    ...roundedTopControl(),
+    ...segmentedAccentHeadingPopoverControls({
+      accentDefault: 'Simp(liivv)fied',
+      textColorDefault: TIMELINE_TEXT_COLOR_HSL,
       highlightDefault: ARCHIVE_HIGHLIGHT_SWASH_HSL,
+      accentTextColorDefault: TIMELINE_TEXT_COLOR_HSL,
+      swashColorOnly: true,
+    }),
+    layoutReverse: Checkbox({
+      label: 'Reverse layout on desktop (image left, text right)',
+      defaultValue: false,
+    }),
+    stepNavigation: Group({
+      label: 'Step navigation',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        activeTextColor: Color({
+          label: 'Text color',
+          defaultValue: hsl(TIMELINE_TEXT_COLOR_HSL),
+          description:
+            'Active step labels and arrows. Inactive steps and connector lines use this color at 25% opacity.',
+        }),
+        activeTextColorHex: TextInput({
+          label: 'Text color (hex override)',
+          defaultValue: '',
+          description: HEX_OVERRIDE_DESCRIPTION,
+        }),
+      },
     }),
     sections: List({
       label: 'Journey sections (order = timeline left to right)',

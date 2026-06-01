@@ -60,7 +60,7 @@ runtime.registerComponent(ArchiveImageComparison, {
       includeAccentTextColor: true,
       accentTextColorDefault: ARCHIVE_HIGHLIGHT_SWASH_HSL,
       fontSizeDefault: 50,
-      fontSizeMobileDefault: 0,
+      fontSizeMobileDefault: 32,
     }),
     beforeImage: comparisonImage('Before image'),
     afterImage: comparisonImage('After image'),

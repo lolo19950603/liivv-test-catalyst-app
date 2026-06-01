@@ -1,9 +1,6 @@
 import { Group, Image, List, Number, Select, Style, TextInput } from '@makeswift/runtime/controls';
 
-import {
-  roundedTopControl,
-  sectionBackgroundControls,
-} from '~/lib/makeswift/controls/diabetes-care-section-controls';
+import { sectionBackgroundControls } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { productSingularPageComponentLabel } from '~/lib/makeswift/product-singular-page-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 
@@ -39,7 +36,6 @@ runtime.registerComponent(ProductSingularScrollingText, {
       defaultValue: '',
     }),
     ...sectionBackgroundControls(),
-    ...roundedTopControl(),
     direction: Select({
       label: 'Scroll direction',
       options: [
@@ -53,7 +49,9 @@ runtime.registerComponent(ProductSingularScrollingText, {
       defaultValue: 26,
       suffix: 's',
     }),
-    iconImage: Image({ label: 'Repeating icon between labels (optional)' }),
+    iconImage: Image({
+      label: 'Liivv logo between label groups (every 5 labels)',
+    }),
     iconHeightPx: Number({
       label: 'Icon height',
       defaultValue: 80,

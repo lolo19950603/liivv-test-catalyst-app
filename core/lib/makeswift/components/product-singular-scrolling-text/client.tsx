@@ -11,9 +11,11 @@ import {
   type SectionBackgroundProps,
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
+import { buildScrollingTextMarqueeSequence } from '~/lib/makeswift/utils/scrolling-text-marquee';
 
 import {
   PRODUCT_SINGULAR_SCROLLING_TEXT_SECTION_ID,
+  PRODUCT_SINGULAR_SCROLLING_TEXT_TRACK_CLASS,
   PRODUCT_SINGULAR_SCROLLING_TEXT_VARS,
   productSingularScrollingTextMarqueeCss,
 } from './archive-styles';
@@ -35,7 +37,6 @@ export type ProductSingularScrollingTextProps = {
   iconImage?: unknown;
   iconHeightPx?: number;
   items?: ProductSingularScrollingTextItem[];
-  roundedTop?: boolean;
 };
 
 export const PRODUCT_SINGULAR_SCROLLING_TEXT_DEFAULT_ITEMS: ProductSingularScrollingTextItem[] =
@@ -54,13 +55,9 @@ export const PRODUCT_SINGULAR_SCROLLING_TEXT_DEFAULT_ITEMS: ProductSingularScrol
 
 function ScrollingTextItem({
   item,
-  iconSrc,
-  iconAlt,
   iconHeightPx,
 }: {
   item: ProductSingularScrollingTextItem;
-  iconSrc: string;
-  iconAlt: string;
   iconHeightPx: number;
 }) {
   if (item.kind === 'image') {
@@ -76,8 +73,8 @@ function ScrollingTextItem({
         style={{ '--image-height': `${String(iconHeightPx)}px` } as CSSProperties}
       >
         <img
-          alt={item.imageAlt?.trim() ?? iconAlt}
-          className="block h-[var(--image-height)] w-auto object-contain"
+          alt={item.imageAlt?.trim() ?? 'Liivv'}
+          className="block h-[var(--image-height)] w-auto max-w-full object-contain"
           decoding="async"
           loading="lazy"
           src={src}
@@ -102,6 +99,22 @@ function ScrollingTextItem({
   );
 }
 
+function MarqueeStrip({
+  items,
+  iconHeightPx,
+}: {
+  items: ProductSingularScrollingTextItem[];
+  iconHeightPx: number;
+}) {
+  return (
+    <div className="marquee flex shrink-0 items-center whitespace-nowrap">
+      {items.map((item, index) => (
+        <ScrollingTextItem iconHeightPx={iconHeightPx} item={item} key={`${item.kind ?? 'text'}-${item.text ?? 'img'}-${index}`} />
+      ))}
+    </div>
+  );
+}
+
 export function ProductSingularScrollingText({
   className,
   instanceSuffix,
@@ -112,7 +125,6 @@ export function ProductSingularScrollingText({
   iconImage,
   iconHeightPx = 80,
   items,
-  roundedTop = true,
 }: ProductSingularScrollingTextProps) {
   const resolvedSectionId = resolveProductSingularSectionDomId(
     sectionDomId ?? PRODUCT_SINGULAR_SCROLLING_TEXT_SECTION_ID,
@@ -120,7 +132,7 @@ export function ProductSingularScrollingText({
   );
   const duration = Math.min(120, Math.max(8, durationSeconds));
   const iconSrc = resolveMakeswiftImageSrc(iconImage);
-  const iconAlt = 'Category icon';
+  const iconAlt = 'Liivv';
   const rows = useMemo(() => {
     const fromProps = (items ?? []).filter(
       (item) =>
@@ -130,22 +142,9 @@ export function ProductSingularScrollingText({
 
     const base =
       fromProps.length > 0 ? fromProps : PRODUCT_SINGULAR_SCROLLING_TEXT_DEFAULT_ITEMS;
-    const withIcons: ProductSingularScrollingTextItem[] = [];
 
-    for (const item of base) {
-      if (item.kind === 'image') {
-        withIcons.push(item);
-      } else {
-        if (iconSrc.length > 0) {
-          withIcons.push({ kind: 'image', image: iconImage, imageAlt: iconAlt });
-        }
-
-        withIcons.push(item);
-      }
-    }
-
-    return withIcons;
-  }, [iconAlt, iconImage, iconSrc.length, items]);
+    return buildScrollingTextMarqueeSequence(base, iconImage, iconSrc, iconAlt);
+  }, [iconAlt, iconImage, iconSrc, items]);
 
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: resolvedSectionId,
@@ -154,15 +153,9 @@ export function ProductSingularScrollingText({
     defaultBackgroundChannels: ARCHIVE_CREAM_BACKGROUND_CHANNELS,
   });
 
-  const renderedItems = rows.map((item, index) => (
-    <ScrollingTextItem
-      iconAlt={iconAlt}
-      iconHeightPx={iconHeightPx}
-      iconSrc={iconSrc}
-      item={item}
-      key={`${item.kind ?? 'text'}-${item.text ?? 'img'}-${index}`}
-    />
-  ));
+  if (rows.length === 0) {
+    return null;
+  }
 
   return (
     <div
@@ -175,26 +168,20 @@ export function ProductSingularScrollingText({
     >
       <div className="shopify-section" id={resolvedSectionId} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <div
-          className={clsx(
-            'section section--padding section--solid',
-            roundedTop && 'section--rounded',
-          )}
-        >
+        <div className="section section--padding section--solid">
           <div className="relative z-[1]">
             <div
               className={clsx(
                 'scrolling-text flex items-center overflow-hidden',
                 direction === 'right' ? 'scrolling-text--right' : 'scrolling-text--left',
+                iconSrc.length === 0 && 'scrolling-text--no-icon',
               )}
+              style={{ '--duration': `${String(duration)}s` } as CSSProperties}
             >
-              <div className="product-singular-scroll-marquee-track items-center gap-[var(--section-grid-gap,50px)]">
-                {renderedItems}
-                <div
-                  aria-hidden
-                  className="flex items-center gap-[var(--section-grid-gap,50px)]"
-                >
-                  {renderedItems}
+              <div className={clsx(PRODUCT_SINGULAR_SCROLLING_TEXT_TRACK_CLASS, 'flex items-center')}>
+                <MarqueeStrip iconHeightPx={iconHeightPx} items={rows} />
+                <div aria-hidden>
+                  <MarqueeStrip iconHeightPx={iconHeightPx} items={rows} />
                 </div>
               </div>
             </div>

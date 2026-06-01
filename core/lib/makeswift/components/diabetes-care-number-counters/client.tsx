@@ -107,6 +107,7 @@ export interface DiabetesCareNumberCounterRow {
 export interface DiabetesCareNumberCountersProps {
   className?: string;
   background?: SectionBackgroundProps;
+  roundedTop?: boolean;
   counters?: DiabetesCareNumberCounterRow[];
 }
 
@@ -188,6 +189,7 @@ function counterRowTypography(row: DiabetesCareNumberCounterRow) {
 export function DiabetesCareNumberCounters({
   className,
   background,
+  roundedTop = true,
   counters,
 }: DiabetesCareNumberCountersProps) {
   const rowsRaw = counters !== undefined && counters.length > 0 ? counters : DEFAULT_COUNTERS;
@@ -258,7 +260,9 @@ export function DiabetesCareNumberCounters({
     >
       <div className="shopify-section" id={NUMBER_COUNTER_SECTION_ID} style={sectionVars}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <div className="section section--padding section--rounded relative">
+        <div
+          className={clsx('section section--padding relative', roundedTop && 'section--rounded')}
+        >
           <div className="page-width page-width--full relative px-4 sm:px-5 md:px-0">
             <ScrollReveal delayMs={80}>{grid}</ScrollReveal>
           </div>

@@ -161,15 +161,25 @@ export function highlightSwashFields(
   highlightDefaultHsl?: string,
   options?: HighlightSwashFieldsOptions,
 ) {
-  const swashDefault = options?.defaultTransparent
-    ? hsl('0 0% 0% / 0')
-    : hsl(highlightDefaultHsl ?? ARCHIVE_HIGHLIGHT_SWASH_HSL);
-
   return {
     useCustomHighlightColor: Checkbox({
       label: 'Override highlight swash color',
       defaultValue: false,
     }),
+    ...highlightSwashColorFields(highlightDefaultHsl, options),
+  };
+}
+
+/** Swash color pickers only (no override checkbox). Color applies on the heading element only. */
+export function highlightSwashColorFields(
+  highlightDefaultHsl?: string,
+  options?: HighlightSwashFieldsOptions,
+) {
+  const swashDefault = options?.defaultTransparent
+    ? hsl('0 0% 0% / 0')
+    : hsl(highlightDefaultHsl ?? ARCHIVE_HIGHLIGHT_SWASH_HSL);
+
+  return {
     accentHighlightColor: Color({
       label: 'Highlight swash color',
       defaultValue: swashDefault,
@@ -177,9 +187,8 @@ export function highlightSwashFields(
     accentHighlightColorHex: TextInput({
       label: 'Highlight swash color (hex override)',
       defaultValue: '',
-      description: options?.defaultTransparent
-        ? 'Optional. Enable the override above to show a swash; defaults to transparent until you pick a color.'
-        : 'Optional. Overrides the picker when valid. Reset on the picker above restores the theme swash color (e.g. `#8da58d`).',
+      description:
+        'Optional. Overrides the picker when valid (e.g. `#8da58d`). Applies to this heading only.',
     }),
   };
 }
@@ -279,6 +288,58 @@ export type CombinedHeadingPopoverOptions = {
   line2TextColorDefault?: string;
   highlightDefault?: string;
 };
+
+export type SegmentedAccentHeadingPopoverOptions = {
+  label?: string;
+  beforeLabel?: string;
+  accentLabel?: string;
+  afterLabel?: string;
+  beforeDefault?: string;
+  accentDefault?: string;
+  afterDefault?: string;
+  textColorDefault?: string;
+  highlightDefault?: string;
+  /** Swash pickers without the override checkbox (timeline-style). */
+  swashColorOnly?: boolean;
+  /** Accent phrase text color (separate from body/lead text color). */
+  accentTextColorDefault?: string;
+};
+
+/** One heading popover: text before / during / after the accent (half-underline swash). */
+export function segmentedAccentHeadingPopoverControls(
+  options?: SegmentedAccentHeadingPopoverOptions,
+) {
+  return {
+    heading: Group({
+      label: options?.label ?? 'Heading',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        before: TextInput({
+          label: options?.beforeLabel ?? 'Before accent',
+          defaultValue: options?.beforeDefault ?? '',
+        }),
+        emphasis: TextInput({
+          label: options?.accentLabel ?? 'Accent',
+          defaultValue: options?.accentDefault ?? '',
+        }),
+        after: TextInput({
+          label: options?.afterLabel ?? 'After accent',
+          defaultValue: options?.afterDefault ?? '',
+        }),
+        ...textColorFields(options?.textColorDefault),
+        ...(options?.swashColorOnly
+          ? accentTextColorFields(
+              options?.accentTextColorDefault ?? options?.highlightDefault,
+            )
+          : {}),
+        ...fontSizeFields(),
+        ...(options?.swashColorOnly
+          ? highlightSwashColorFields(options?.highlightDefault)
+          : highlightSwashFields(options?.highlightDefault)),
+      },
+    }),
+  };
+}
 
 /** One heading popover: line 1 + line 2 (accent); swash on line 2 is opt-in. Renders inline on one line. */
 export function combinedHeadingPopoverControls(options?: CombinedHeadingPopoverOptions) {

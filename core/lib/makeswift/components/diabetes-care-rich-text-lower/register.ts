@@ -3,6 +3,7 @@ import { Checkbox, Group, Link, Style, TextArea, TextInput } from '@makeswift/ru
 import {
   buttonColorFields,
   fontSizeFields,
+  roundedTopControl,
   sectionBackgroundControls,
   textColorFields,
   splitRichTextLowerHeadingControls,
@@ -23,6 +24,7 @@ runtime.registerComponent(DiabetesCareRichTextLower, {
   props: {
     className: Style(),
     ...sectionBackgroundControls(ARCHIVE_SAGE_BACKGROUND_HSL),
+    ...roundedTopControl(),
     ...splitRichTextLowerHeadingControls({
       line1Default: 'Put a stop to pain.',
       line2Default: 'Period.',

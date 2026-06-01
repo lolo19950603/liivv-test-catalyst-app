@@ -82,6 +82,7 @@ const DIVIDER_ENTRANCE_DURATION_MS = 1100;
 const DEFAULT_SECTION_HEADING = 'Support at every stage of your journey';
 const DEFAULT_ACCENT_PHRASE = 'every stage';
 const DEFAULT_HEADING_FONT_DESKTOP = 50;
+const DEFAULT_HEADING_FONT_MOBILE = 32;
 
 function resolveImageComparisonHeadingFontSize(
   desktopPx?: number,
@@ -89,7 +90,8 @@ function resolveImageComparisonHeadingFontSize(
 ): string | undefined {
   const desktop =
     desktopPx == null ? DEFAULT_HEADING_FONT_DESKTOP : desktopPx > 0 ? desktopPx : undefined;
-  const mobile = mobilePx == null || mobilePx <= 0 ? undefined : mobilePx;
+  const mobile =
+    mobilePx == null || mobilePx <= 0 ? DEFAULT_HEADING_FONT_MOBILE : mobilePx;
 
   return resolveHeadingFontSizeCss(desktop, mobile);
 }

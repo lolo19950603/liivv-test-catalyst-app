@@ -164,6 +164,17 @@ function hexToChannels(hex: string): string | null {
   return `${r} ${g} ${b}`;
 }
 
+/** Same color at a given opacity using archive `rgb(R G B / a)` syntax. */
+export function cssColorWithOpacity(color: string, opacity: number): string | null {
+  const channels = toArchiveRgbChannels(color);
+
+  if (channels == null) {
+    return null;
+  }
+
+  return `rgb(${channels} / ${opacity})`;
+}
+
 function hslToRgb(h: number, s: number, l: number): [number, number, number] {
   const saturation = s / 100;
   const lightness = l / 100;

@@ -81,6 +81,14 @@ export const DIABETES_CARE_SCROLL_ANIMATE_CSS = `
     gap: var(--dc-split-word-gap, 0.28em);
   }
 
+  @media screen and (max-width: 767px) {
+    .title-wrapper.text-center .split-words.words.split-words--fluid-gap {
+      display: flex;
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
   [data-animate='zoom-out']:not(.dc-animated) {
     transform: scale(1.08);
   }

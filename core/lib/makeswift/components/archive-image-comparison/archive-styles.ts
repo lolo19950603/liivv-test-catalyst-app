@@ -40,4 +40,6 @@ export const ARCHIVE_IMAGE_COMPARISON_VARS =
   `#${ARCHIVE_IMAGE_COMPARISON_SECTION_ID} .image-comparison__handle{height:2.75rem;width:3.5rem;border-radius:9999px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.12)}` +
   `#${ARCHIVE_IMAGE_COMPARISON_SECTION_ID} .image-comparison__grip span{height:1.25rem;width:1px;border-radius:1px;background:#9ca3af}` +
   `@media screen and (max-width:767px){#${ARCHIVE_IMAGE_COMPARISON_SECTION_ID}{` +
-  `--section-padding-top:16px;--section-padding-bottom:32px}}`;
+  `--section-padding-top:16px;--section-padding-bottom:32px}}` +
+  `@media screen and (max-width:767px){#${ARCHIVE_IMAGE_COMPARISON_SECTION_ID} .title-wrapper.heading{` +
+  `line-height:1.05;text-wrap:balance;letter-spacing:-0.02em}}`;

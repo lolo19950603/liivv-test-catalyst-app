@@ -1,7 +1,7 @@
 'use client';
 
 import { clsx } from 'clsx';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
@@ -17,33 +17,20 @@ import {
   type SectionBackgroundProps,
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
+import { cssColorWithOpacity, toArchiveRgbChannels } from '~/lib/makeswift/utils/archive-color';
+import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
 import {
   resolveAccentColors,
   resolvePlainTextColor,
+  resolveSectionHighlightChannels,
 } from '~/lib/makeswift/utils/heading-accent-color';
 import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
+
+import { timelineSectionLayoutCss } from './archive-styles';
 
 export const DIABETES_CARE_TIMELINE_SECTION_ID =
   'shopify-section-template--26520397447459__timeline_nyTDKQ';
 export const DIABETES_CARE_TIMELINE_resolvedSliderId = 'Slider-template--26520397447459__timeline_nyTDKQ';
-
-/**
- * Section-scoped CSS: export vars, desktop two-column grid for each slide, horizontal strip with
- * scroll-snap (center). Snap uses `scroll-behavior: auto` so corrections are instant — `smooth` on
- * the scroller fights mandatory snap + trackpad deltas and reads as a laggy “snap back then forward”.
- * @param {number} blockCount - `--section-blocks-count` for `.timeline-dots`.
- * @returns {string} Inline `<style>` payload.
- */
-function timelineSectionCss(sectionDomId: string, blockCount: number): string {
-  const id = `#${sectionDomId}`;
-  /** Instant snap; arrows/dots still use `scrollIntoView({ behavior: 'smooth' })`. */
-  const strip = `${id} .timeline-react-strip{display:flex;flex-flow:row nowrap;gap:clamp(16px,2.5vw,40px);overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-behavior:auto;-webkit-overflow-scrolling:touch;padding-block:var(--sp-2,8px);scrollbar-width:none;-ms-overflow-style:none}`;
-  const stripScrollbar = `${id} .timeline-react-strip::-webkit-scrollbar{display:none;width:0;height:0}`;
-
-  const mobileDots = `@media screen and (max-width:1023px){${id} .timeline-dots--desktop{display:none}${id} .timeline-dots-mobile{display:block}${id} .scroll-area{overflow:visible;scroll-snap-type:none}${id} .scroll-area .scroll-area__inner{overflow:visible}${id} .slider.slider--tablet{overflow:visible;padding-inline:0;margin-inline:0;padding-block-end:0;scroll-snap-type:none}${id} .timeline-react-strip{overflow-x:auto!important;overflow-y:hidden;touch-action:pan-x pinch-zoom;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;scroll-padding-inline:1rem;overscroll-behavior-x:contain}}`;
-
-  return `${id}{--section-padding-top:72px;--section-padding-bottom:72px;--section-blocks-count:${String(blockCount)}}@media screen and (min-width:768px){${id} .timeline__item>.timeline-slide-layout.flex{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}}${strip}${stripScrollbar}${id} .timeline-react-strip .timeline__item{flex:0 0 min(92%,1120px);max-width:100%;width:auto;scroll-snap-align:center;transition:opacity .28s ease}${id} .timeline-react-strip .timeline__item:not(.selected){opacity:.48}${id} .timeline-react-strip .timeline__item.selected{opacity:1}@media (prefers-reduced-motion:reduce){${id} .timeline-react-strip .timeline__item{transition:none}}${mobileDots}`;
-}
 
 function timelineStepLabel(section: DiabetesCareTimelineSection, index: number): string {
   const category = timelineCategoryLabel(section);
@@ -61,12 +48,64 @@ function timelineStepLabel(section: DiabetesCareTimelineSection, index: number):
   return `Step ${index + 1}`;
 }
 
+/** Archive timeline dots: split multi-word labels across two lines. */
+function formatTimelineStepLabelLines(text: string): ReactNode {
+  const trimmed = text.trim();
+  const words = trimmed.split(/\s+/).filter(Boolean);
+
+  if (words.length <= 1) {
+    return trimmed;
+  }
+
+  const firstLineCount = Math.ceil(words.length / 2);
+
+  return (
+    <>
+      {words.slice(0, firstLineCount).join(' ')}
+      <br />
+      {words.slice(firstLineCount).join(' ')}
+    </>
+  );
+}
+
 export type TimelineTypographyProps = {
   textColor?: string;
   textColorHex?: string;
   fontSize?: number;
   fontSizeMobile?: number;
 };
+
+export type TimelineStepNavigationProps = {
+  activeTextColor?: string;
+  activeTextColorHex?: string;
+};
+
+const TIMELINE_STEP_INACTIVE_OPACITY = 0.25;
+
+function resolveTimelineStepNavigationStyle(
+  stepNavigation?: TimelineStepNavigationProps | null,
+): CSSProperties | undefined {
+  const active = resolvePlainTextColor({
+    textColor: stepNavigation?.activeTextColor,
+    textColorHex: stepNavigation?.activeTextColorHex,
+  });
+
+  if (active == null) {
+    return undefined;
+  }
+
+  const muted =
+    cssColorWithOpacity(active, TIMELINE_STEP_INACTIVE_OPACITY) ??
+    `color-mix(in srgb, ${active} ${TIMELINE_STEP_INACTIVE_OPACITY * 100}%, transparent)`;
+  const activeChannels = toArchiveRgbChannels(active);
+
+  return {
+    '--timeline-step-active-color': active,
+    '--timeline-step-inactive-color': muted,
+    '--timeline-step-connector-color': muted,
+    ...(activeChannels != null ? { '--timeline-step-active-channels': activeChannels } : {}),
+  } as CSSProperties;
+}
 
 export type TimelineTextBlockProps = TimelineTypographyProps & {
   text?: string;
@@ -122,12 +161,12 @@ function timelineCategoryLabel(section: DiabetesCareTimelineSection): string {
   return section.slideContent?.categoryLabel?.text?.trim() ?? '';
 }
 
-/** Per-slide heading: font size + optional custom swash via `--color-highlight`. */
+/** Per-slide heading: font size + swash scoped to this `h2` via `--color-highlight`. */
 function timelineSectionHeadingStyle(
   heading?: TimelineSectionHeadingProps | null,
 ): CSSProperties | undefined {
   const typography = timelineTypographyStyle(heading);
-  const { highlightChannels } = resolveAccentColors(heading);
+  const highlightChannels = resolveSectionHighlightChannels(heading);
 
   if (typography == null && highlightChannels == null) {
     return undefined;
@@ -139,6 +178,106 @@ function timelineSectionHeadingStyle(
   };
 }
 
+function timelineMainHeadingStyle(
+  heading?: TimelineMainHeadingProps | null,
+): CSSProperties | undefined {
+  const highlightChannels = resolveSectionHighlightChannels(heading);
+
+  return highlightChannels != null
+    ? ({ '--color-highlight': highlightChannels } as CSSProperties)
+    : undefined;
+}
+
+export type TimelineMainHeadingProps = HeadingWithHighlightProps & {
+  before?: string;
+  emphasis?: string;
+  after?: string;
+};
+
+const DEFAULT_TIMELINE_HEADING_LEAD = 'Your Care Journey,';
+const DEFAULT_TIMELINE_HEADING_EMPHASIS = 'Simp(liivv)fied';
+
+function resolveTimelineMainHeading(props: {
+  heading?: TimelineMainHeadingProps;
+  /** @deprecated Use `heading` (before / emphasis / after). */
+  primaryHeading?: HeadingTypographyProps;
+  /** @deprecated Use `heading.emphasis`. */
+  secondaryHeading?: HeadingWithHighlightProps;
+}): {
+  lead: string;
+  emphasis: string;
+  trail: string;
+  accentColors: HeadingWithHighlightProps | undefined;
+  leadColor?: string;
+  leadFontSize?: string;
+  emphasisFontSize?: string;
+} {
+  const { heading, primaryHeading, secondaryHeading } = props;
+
+  if (heading != null) {
+    const leadResolved = resolveHeadingTypography({
+      text: heading.before,
+      textColor: heading.textColor,
+      textColorHex: heading.textColorHex,
+      fontSize: heading.fontSize,
+      fontSizeMobile: heading.fontSizeMobile,
+    });
+    const emphasisResolved = resolveHeadingTypography({
+      text: heading.emphasis,
+      textColor: heading.textColor,
+      textColorHex: heading.textColorHex,
+      fontSize: heading.fontSize,
+      fontSizeMobile: heading.fontSizeMobile,
+    });
+    const trailResolved = resolveHeadingTypography({
+      text: heading.after,
+      textColor: heading.textColor,
+      textColorHex: heading.textColorHex,
+      fontSize: heading.fontSize,
+      fontSizeMobile: heading.fontSizeMobile,
+    });
+
+    return {
+      lead: leadResolved.text,
+      emphasis: emphasisResolved.text,
+      trail: trailResolved.text,
+      accentColors: heading,
+      leadColor: leadResolved.color,
+      leadFontSize: leadResolved.fontSize,
+      emphasisFontSize: emphasisResolved.fontSize,
+    };
+  }
+
+  if (primaryHeading != null || secondaryHeading != null) {
+    const leadResolved = resolveHeadingTypography(primaryHeading);
+    const emphasisResolved = resolveHeadingTypography(secondaryHeading);
+
+    return {
+      lead:
+        leadResolved.text.length > 0 ? leadResolved.text : DEFAULT_TIMELINE_HEADING_LEAD,
+      emphasis:
+        emphasisResolved.text.length > 0
+          ? emphasisResolved.text
+          : DEFAULT_TIMELINE_HEADING_EMPHASIS,
+      trail: '',
+      accentColors: secondaryHeading,
+      leadColor: leadResolved.color,
+      leadFontSize: leadResolved.fontSize,
+      emphasisFontSize: emphasisResolved.fontSize,
+    };
+  }
+
+  return {
+    lead: DEFAULT_TIMELINE_HEADING_LEAD,
+    emphasis: DEFAULT_TIMELINE_HEADING_EMPHASIS,
+    trail: '',
+    accentColors: undefined,
+    leadColor: undefined,
+    leadFontSize: undefined,
+    emphasisFontSize: undefined,
+  };
+}
+
 export type DiabetesCareTimelineProps = {
   className?: string;
   /** Override Shopify section id when multiple timelines share a page. */
@@ -146,10 +285,16 @@ export type DiabetesCareTimelineProps = {
   /** Override slider `id` / `aria-controls` target. Defaults from section id when omitted. */
   sliderDomId?: string;
   background?: SectionBackgroundProps;
+  heading?: TimelineMainHeadingProps;
+  /** @deprecated Use `heading.before`. */
   primaryHeading?: HeadingTypographyProps;
+  /** @deprecated Use `heading.emphasis`. */
   secondaryHeading?: HeadingWithHighlightProps;
   sections?: DiabetesCareTimelineSection[];
   roundedTop?: boolean;
+  /** When true, all slides show image left and copy right at md+ (omits `grid-row-reverse`). */
+  layoutReverse?: boolean;
+  stepNavigation?: TimelineStepNavigationProps;
 };
 
 function IconChevronLeft() {
@@ -205,10 +350,17 @@ interface TimelineSlideProps {
   section: DiabetesCareTimelineSection;
   index: number;
   isSelected: boolean;
+  layoutReverse: boolean;
   setSlideEl: (el: HTMLDivElement | null, i: number) => void;
 }
 
-function TimelineSlide({ section, index, isSelected, setSlideEl }: TimelineSlideProps) {
+function TimelineSlide({
+  section,
+  index,
+  isSelected,
+  layoutReverse,
+  setSlideEl,
+}: TimelineSlideProps) {
   const content = section.slideContent;
   const categoryLabel = content?.categoryLabel?.text?.trim() ?? '';
   const sectionHeadingBlock = content?.sectionHeading;
@@ -217,7 +369,7 @@ function TimelineSlide({ section, index, isSelected, setSlideEl }: TimelineSlide
   const sectionBodyHtml = content?.sectionBody?.html?.trim() ?? '';
   const buttonHref = section.button?.buttonLink?.href ?? '#';
   const buttonLabel = section.button?.buttonText?.trim() || 'Get Started';
-
+  const imageSrc = resolveMakeswiftImageSrc(section.image?.imageSrc);
   return (
     <div
       className={clsx('timeline__item card relative', isSelected && 'selected')}
@@ -225,14 +377,20 @@ function TimelineSlide({ section, index, isSelected, setSlideEl }: TimelineSlide
         setSlideEl(el, index);
       }}
     >
-      <div className="timeline-slide-layout md:grid-row-reverse flex flex-col overflow-hidden">
+      <div
+        className={clsx(
+          'timeline-slide-layout flex flex-col overflow-hidden',
+          !layoutReverse && 'md:grid-row-reverse',
+        )}
+      >
         <picture className="media media--portrait mobile:media--wide relative block overflow-hidden">
-          {section.image?.imageSrc ? (
+          {imageSrc.length > 0 ? (
             // eslint-disable-next-line @next/next/no-img-element -- Makeswift image URL
             <img
-              alt={section.image.imageAlt ?? ''}
+              alt={section.image?.imageAlt ?? ''}
+              className="block h-full w-full object-cover"
               loading={index === 0 ? 'eager' : 'lazy'}
-              src={section.image.imageSrc}
+              src={imageSrc}
             />
           ) : null}
         </picture>
@@ -294,10 +452,13 @@ export function DiabetesCareTimeline({
   sectionDomId,
   sliderDomId,
   background,
+  heading,
   primaryHeading,
   secondaryHeading,
   sections,
   roundedTop = true,
+  layoutReverse = false,
+  stepNavigation,
 }: DiabetesCareTimelineProps) {
   const resolvedSectionId =
     sectionDomId?.trim().length ? sectionDomId.trim() : DIABETES_CARE_TIMELINE_SECTION_ID;
@@ -305,8 +466,11 @@ export function DiabetesCareTimeline({
     sliderDomId?.trim().length
       ? sliderDomId.trim()
       : resolvedSectionId.replace(/^shopify-section-/, 'Slider-');
-  const primaryResolved = resolveHeadingTypography(primaryHeading);
-  const secondaryResolved = resolveHeadingTypography(secondaryHeading);
+  const mainHeading = resolveTimelineMainHeading({
+    heading,
+    primaryHeading,
+    secondaryHeading,
+  });
   const list = useMemo(() => sections ?? [], [sections]);
   const count = list.length;
   const [activeIndex, setActiveIndex] = useState(0);
@@ -416,41 +580,39 @@ export function DiabetesCareTimeline({
     scrollSlideIntoView(next);
   }, [count, safeIndex, scrollSlideIntoView]);
 
-  const primaryText =
-    primaryResolved.text.length > 0 ? primaryResolved.text : 'Your Care Journey,';
-  const secondaryText =
-    secondaryResolved.text.length > 0 ? secondaryResolved.text : 'Simp(liivv)fied';
   const prevDisabled = count === 0 || safeIndex === 0;
   const nextDisabled = count === 0 || safeIndex >= count - 1;
   const activeStepLabel =
     count > 0 ? timelineStepLabel(list[safeIndex] ?? {}, safeIndex) : '';
-  const activeStepStyle =
-    count > 0
-      ? timelineTypographyStyle(list[safeIndex]?.slideContent?.categoryLabel)
-      : undefined;
+  const stepNavigationStyle = resolveTimelineStepNavigationStyle(stepNavigation);
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: resolvedSectionId,
-    sectionCss: timelineSectionCss(resolvedSectionId, count),
+    sectionCss: timelineSectionLayoutCss(resolvedSectionId, count),
     background,
-    highlight: secondaryHeading,
   });
+  const mainHeadingStyle = timelineMainHeadingStyle(mainHeading.accentColors);
 
   return (
     <div className={clsx('diabetes-care-timeline', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}>
-      <div className="shopify-section" id={resolvedSectionId} style={sectionStyle}>
+      <div
+        className="shopify-section"
+        id={resolvedSectionId}
+        style={{ ...sectionStyle, ...stepNavigationStyle }}
+      >
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className={clsx('section section--padding', roundedTop && 'section--rounded')}>
           <div className="page-width relative px-4 sm:px-5 md:px-0">
             <div className="title-wrapper z-1 relative flex flex-row flex-wrap items-end justify-between gap-4 text-left leading-none lg:gap-8">
               <div className="grid min-w-0 flex-1 gap-4">
-                <h2 className="heading title-md">
+                <h2 className="heading title-md" style={mainHeadingStyle}>
                   <AccentSplitWordsHeading
-                    accentColors={secondaryHeading}
-                    emphasis={secondaryText}
-                    emphasisFontSize={secondaryResolved.fontSize}
-                    lead={primaryText}
-                    leadColor={primaryResolved.color}
-                    leadFontSize={primaryResolved.fontSize}
+                    accentColors={mainHeading.accentColors}
+                    emphasis={mainHeading.emphasis}
+                    emphasisFontSize={mainHeading.emphasisFontSize}
+                    lead={mainHeading.lead}
+                    leadColor={mainHeading.leadColor}
+                    leadFontSize={mainHeading.leadFontSize}
+                    trail={mainHeading.trail}
                   />
                 </h2>
               </div>
@@ -524,6 +686,7 @@ export function DiabetesCareTimeline({
                         index={index}
                         isSelected={index === safeIndex}
                         key={`slide-${index}`}
+                        layoutReverse={layoutReverse}
                         section={section}
                         setSlideEl={setSlideEl}
                       />
@@ -532,16 +695,13 @@ export function DiabetesCareTimeline({
                 </div>
 
                 <div className="scroll-area">
-                  <div className="scroll-area__inner">
                     <div
                       aria-live="polite"
                       className="timeline-dots-mobile mb-4 min-w-0 lg:hidden"
+                      style={stepNavigationStyle}
                     >
-                      <p
-                        className="heading text-left text-lg font-bold leading-snug tracking-tight"
-                        style={activeStepStyle}
-                      >
-                        {activeStepLabel}
+                      <p className="timeline-dots-mobile__label heading text-left text-lg font-bold leading-snug tracking-tight">
+                        {formatTimelineStepLabelLines(activeStepLabel)}
                       </p>
                       <p className="text-opacity mt-1 text-sm tabular-nums">
                         {safeIndex + 1} of {count}
@@ -551,8 +711,14 @@ export function DiabetesCareTimeline({
 
                     <div
                       aria-label="Journey timeline"
-                      className="timeline-dots timeline-dots--desktop hidden gap-2d5 lg:grid"
+                      className="timeline-dots timeline-dots--desktop gap-2d5 max-lg:hidden"
                       role="tablist"
+                      style={
+                        {
+                          gridTemplateColumns: `repeat(${String(count)}, minmax(0, 1fr))`,
+                          ...stepNavigationStyle,
+                        } as CSSProperties
+                      }
                     >
                       {list.map((section, index) => {
                         const label = timelineStepLabel(section, index);
@@ -562,7 +728,7 @@ export function DiabetesCareTimeline({
                           <button
                             aria-controls={resolvedSliderId}
                             aria-current={isActive ? 'true' : 'false'}
-                            className="heading gap-2d5 flex items-center text-left text-lg"
+                            className="heading flex items-center gap-2d5 text-left text-lg"
                             data-index={index + 1}
                             key={`dot-${index}`}
                             onClick={() => {
@@ -571,12 +737,13 @@ export function DiabetesCareTimeline({
                             }}
                             type="button"
                           >
-                            {label}
+                            <span className="timeline-dots__label">
+                              {formatTimelineStepLabelLines(label)}
+                            </span>
                           </button>
                         );
                       })}
                     </div>
-                  </div>
                 </div>
                 </ScrollReveal>
               </>

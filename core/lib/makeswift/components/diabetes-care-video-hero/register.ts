@@ -3,6 +3,7 @@ import { Checkbox, Group, Image, Style, TextArea, TextInput } from '@makeswift/r
 import {
   fontSizeFields,
   headingPopoverControls,
+  roundedTopControl,
   sectionBackgroundControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
@@ -20,6 +21,7 @@ runtime.registerComponent(DiabetesCareVideoHero, {
   props: {
     className: Style(),
     ...sectionBackgroundControls(),
+    ...roundedTopControl(),
     video: Group({
       label: 'Video',
       preferredLayout: Group.Layout.Popover,

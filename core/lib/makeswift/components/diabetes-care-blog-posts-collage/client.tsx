@@ -120,6 +120,7 @@ function resolvePostLink(post: DiabetesCareBlogPostsCollagePost) {
 export type DiabetesCareBlogPostsCollageProps = {
   className?: string;
   background?: SectionBackgroundProps;
+  roundedTop?: boolean;
   heading?: BlogPostsCollageHeadingProps;
   posts?: DiabetesCareBlogPostsCollagePost[];
   /** @deprecated Merged into `posts` (first item). */
@@ -300,6 +301,7 @@ function renderArticleCard(
 export function DiabetesCareBlogPostsCollage({
   className,
   background,
+  roundedTop = true,
   heading,
   posts,
   feature,
@@ -341,7 +343,9 @@ export function DiabetesCareBlogPostsCollage({
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <style dangerouslySetInnerHTML={{ __html: BLOG_POSTS_COLLAGE_ARCHIVE_CSS }} />
         <style dangerouslySetInnerHTML={{ __html: BLOG_POSTS_COLLAGE_IMAGE_FILL_CSS }} />
-        <div className="section section--padding section--rounded relative">
+        <div
+          className={clsx('section section--padding relative', roundedTop && 'section--rounded')}
+        >
           <div className="page-width relative px-4 sm:px-5 md:px-0">
             <div className="title-wrapper relative z-1 flex flex-col gap-4 text-left leading-none lg:gap-8 md:flex-row md:items-end md:justify-between">
               <div className="grid gap-4">

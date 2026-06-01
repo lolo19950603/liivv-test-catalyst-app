@@ -87,6 +87,7 @@ function secondaryUsesHighlightSwash(heading?: CustomBandSecondaryHeadingProps):
 
 export interface DiabetesCareCustomBandContentProps {
   className?: string;
+  roundedTop?: boolean;
   background?: CustomBandBackgroundProps;
   logo?: CustomBandLogoProps;
   primaryHeading?: CustomBandHeadingGroupProps;
@@ -97,6 +98,7 @@ export type DiabetesCareCustomBandProps = DiabetesCareCustomBandContentProps;
 
 export function DiabetesCareCustomBand({
   className,
+  roundedTop = true,
   background,
   logo,
   primaryHeading,
@@ -147,7 +149,7 @@ export function DiabetesCareCustomBand({
         style={sectionCssVars}
       >
         <style dangerouslySetInnerHTML={{ __html: sectionStyle }} />
-        <div className="section section--padding">
+        <div className={clsx('section section--padding', roundedTop && 'section--rounded')}>
           <div className="page-width page-width--page relative grid h-full px-4 sm:px-5 md:px-0">
             <div
               className="section-content media--auto mobile:media--auto spacing-style flex min-w-0 flex-col flex-nowrap items-center justify-center gap-4 md:flex-row md:items-center md:justify-center md:gap-0"

@@ -1,6 +1,9 @@
 import { Color, Group, Image, Link, Number, Style, TextInput } from '@makeswift/runtime/controls';
 
-import { highlightSwashFields } from '~/lib/makeswift/controls/diabetes-care-section-controls';
+import {
+  highlightSwashFields,
+  roundedTopControl,
+} from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 import {
@@ -22,6 +25,7 @@ runtime.registerComponent(DiabetesCareCustomBand, {
   icon: 'layout',
   props: {
     className: Style(),
+    ...roundedTopControl(),
     background: Group({
       label: 'Background',
       preferredLayout: Group.Layout.Popover,

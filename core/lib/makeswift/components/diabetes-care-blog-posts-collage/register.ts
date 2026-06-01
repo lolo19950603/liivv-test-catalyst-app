@@ -3,6 +3,7 @@ import { Group, Image, Link, List, Style, TextArea, TextInput } from '@makeswift
 import {
   fontSizeFields,
   highlightSwashFields,
+  roundedTopControl,
   sectionBackgroundControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
@@ -64,6 +65,7 @@ runtime.registerComponent(DiabetesCareBlogPostsCollage, {
   props: {
     className: Style(),
     ...sectionBackgroundControls(ARCHIVE_BLOG_COLLAGE_BACKGROUND_HSL),
+    ...roundedTopControl(),
     heading: Group({
       label: 'Heading',
       preferredLayout: Group.Layout.Popover,

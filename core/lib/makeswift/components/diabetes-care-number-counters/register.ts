@@ -12,6 +12,7 @@ import {
 import {
   FONT_SIZE_DESCRIPTION,
   HEX_OVERRIDE_DESCRIPTION,
+  roundedTopControl,
   sectionBackgroundControls,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
@@ -81,6 +82,7 @@ runtime.registerComponent(DiabetesCareNumberCounters, {
   props: {
     className: Style(),
     ...sectionBackgroundControls(),
+    ...roundedTopControl(),
     counters: List({
       label: 'Counters (order = left to right on desktop)',
       description: 'Maximum of 4 counters. Additional items are ignored on the live site.',

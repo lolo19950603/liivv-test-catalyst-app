@@ -3,6 +3,7 @@ import { Combobox, Group, List, Style, TextArea, TextInput } from '@makeswift/ru
 import {
   fontSizeFields,
   headingPopoverControls,
+  roundedTopControl,
   sectionBackgroundControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
@@ -23,6 +24,7 @@ runtime.registerComponent(DiabetesCareFeaturedCollections, {
   props: {
     className: Style(),
     ...sectionBackgroundControls(ARCHIVE_SAGE_BACKGROUND_HSL),
+    ...roundedTopControl(),
     eyebrow: Group({
       label: 'Eyebrow',
       preferredLayout: Group.Layout.Popover,

@@ -8,8 +8,6 @@ import { RICH_TEXT_LOWER_SECTION_ID } from '~/lib/makeswift/components/diabetes-
 import { MULTICOLUMN_SECTION_ID } from '~/lib/makeswift/components/diabetes-care-multicolumn/client';
 import { VIDEO_HERO_SECTION_ID } from '~/lib/makeswift/components/diabetes-care-video-hero/client';
 
-const TIMELINE_SECTION_ID = 'shopify-section-template--26520397447459__timeline_nyTDKQ';
-
 /** Phone + small tablet — matches archive `mobile:` utilities (767px). */
 const MOBILE = '@media screen and (max-width: 767px)';
 
@@ -67,9 +65,12 @@ export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
   `${MOBILE_TABLET}{.dc-carousel-host.slider--tablet,.slider--tablet.dc-carousel-host{overflow:visible!important;padding-inline:0!important;margin-inline:0!important;padding-block-end:0!important}}`,
   `${MOBILE_TABLET}{.dc-carousel-host .dc-mobile-carousel{--card-grid-template:unset!important;--slider-grid:unset!important}}`,
 
-  /* 01 — Video hero */
-  `${MOBILE}{#${VIDEO_HERO_SECTION_ID} .dc-video-hero-media{aspect-ratio:16/9!important}}`,
+  /* 01 — Video hero (archive `media--650px` + `mobile:media--auto`) */
+  `${MOBILE}{.diabetes-care-video-hero .video-hero{height:auto!important}}`,
+  `${MOBILE}{.diabetes-care-video-hero .dc-video-hero-media{aspect-ratio:16/9!important;height:auto!important;min-height:200px}}`,
   `${MOBILE}{#${VIDEO_HERO_SECTION_ID} .video-hero [class*="p-"]{padding:1rem!important}}`,
+  `@media screen and (min-width:768px){.diabetes-care-video-hero .video-hero{height:552.5px}}`,
+  `@media screen and (min-width:1536px){.diabetes-care-video-hero .video-hero{height:650px}}`,
 
   /* 02 — Custom band */
   mobileSectionPadding('shopify-section-template--26520397447459__custom_section_WpXaJg', '24px', '24px'),
@@ -79,17 +80,18 @@ export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
   mobileSectionPadding('shopify-section-template--26520397447459__number_counter_dTAx7w', '28px', '32px'),
   `${MOBILE_TABLET}{#shopify-section-template--26520397447459__number_counter_dTAx7w .page-width{overflow:visible}}`,
 
-  /* 04 — Timeline */
-  mobileSectionPadding(TIMELINE_SECTION_ID),
-  `${MOBILE_TABLET}{#${TIMELINE_SECTION_ID} .timeline-react-strip .timeline__item{flex:0 0 min(92vw,24rem)!important}}`,
-  `${MOBILE_TABLET}{#${TIMELINE_SECTION_ID} .slider--tablet{overflow:visible;padding-inline:0;margin-inline:0}}`,
-  `${MOBILE_TABLET}{#${TIMELINE_SECTION_ID} .scroll-area{overflow:visible;scroll-snap-type:none}}`,
-  `${MOBILE_TABLET}{#${TIMELINE_SECTION_ID} .timeline-dots-mobile{margin-block-start:var(--sp-6)}}`,
-  `${MOBILE_TABLET}{#${TIMELINE_SECTION_ID} .timeline-react-strip{touch-action:pan-x pinch-zoom}}`,
+  /* 04 — Timeline (any page — `.diabetes-care-timeline`, not only diabetes-care section id) */
+  `${MOBILE}{.diabetes-care-timeline .section{--section-padding-top:48px;--section-padding-bottom:48px}}`,
+  `${MOBILE_TABLET}{.diabetes-care-timeline .timeline-react-strip .timeline__item{flex:0 0 min(92vw,24rem)!important}}`,
+  `${MOBILE_TABLET}{.diabetes-care-timeline .slider--tablet{overflow:visible;padding-inline:0;margin-inline:0}}`,
+  `${MOBILE_TABLET}{.diabetes-care-timeline .scroll-area{overflow:visible;scroll-snap-type:none}}`,
+  `${MOBILE_TABLET}{.diabetes-care-timeline .timeline-dots-mobile{margin-block-start:var(--sp-6)}}`,
+  `${MOBILE_TABLET}{.diabetes-care-timeline .timeline-react-strip{touch-action:pan-x pinch-zoom}}`,
 
   /* 05 — Multicolumn */
   mobileSectionPadding(MULTICOLUMN_SECTION_ID),
   `${MOBILE}{#${MULTICOLUMN_SECTION_ID} .multicolumn .media img{aspect-ratio:16/9!important;height:auto!important;object-fit:cover}}`,
+  `${MOBILE}{#${MULTICOLUMN_SECTION_ID} .multicolumn-card__info .heading .highlighted-text[data-style=half_text]{display:inline-block;max-width:100%;box-decoration-break:clone;-webkit-box-decoration-break:clone}}`,
 
   /* 06 — Reveal + story (scroll-driven headline; shorter runway than desktop 120vh) */
   `${MOBILE_TABLET}{[id^="dcrift-"] .splitting-banner .reveal-banner__scroller{position:sticky!important;top:0!important;height:100lvh!important;max-height:100dvh!important;overflow:hidden!important;padding-inline:0!important;margin-inline:0!important}}`,

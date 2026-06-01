@@ -56,6 +56,7 @@ export type FeaturedCollectionsBodyProps = BodyTextProps & {
 export type DiabetesCareFeaturedCollectionsProps = {
   className?: string;
   background?: SectionBackgroundProps;
+  roundedTop?: boolean;
   eyebrow?: {
     text?: string;
     textColor?: string;
@@ -346,6 +347,7 @@ function productHasContent(p: DiabetesCareFeaturedCollectionProduct): boolean {
 export function DiabetesCareFeaturedCollections({
   className,
   background,
+  roundedTop = true,
   eyebrow,
   heading,
   body,
@@ -527,7 +529,9 @@ export function DiabetesCareFeaturedCollections({
         style={sectionStyle}
       >
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <div className="section section--padding section--rounded relative">
+        <div
+          className={clsx('section section--padding relative', roundedTop && 'section--rounded')}
+        >
           <div className="page-width relative min-w-0 max-w-full px-4 sm:px-5 md:px-0">
             <div className="title-wrapper z-1 relative flex flex-col gap-4 text-left leading-none md:flex-row md:items-end md:justify-between lg:gap-8">
               <div className="grid gap-4">

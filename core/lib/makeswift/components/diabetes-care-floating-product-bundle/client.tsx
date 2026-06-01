@@ -52,6 +52,7 @@ export type FloatingProductBundleBodyProps = BodyTextProps & {
 export interface DiabetesCareFloatingProductBundleProps {
   className?: string;
   background?: SectionBackgroundProps;
+  roundedTop?: boolean;
   imageSrc?: unknown;
   /** @deprecated Use root `imageSrc`. */
   banner?: {
@@ -165,6 +166,7 @@ function resolveBundleButtonColors(
 export function DiabetesCareFloatingProductBundle({
   className,
   background,
+  roundedTop = true,
   imageSrc,
   banner,
   heading,
@@ -250,7 +252,7 @@ export function DiabetesCareFloatingProductBundle({
         style={sectionStyle}
       >
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <div className="section section--padding">
+        <div className={clsx('section section--padding', roundedTop && 'section--rounded')}>
           <div className="relative">
             <div
               className={clsx(

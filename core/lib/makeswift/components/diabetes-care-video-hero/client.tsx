@@ -150,11 +150,12 @@ export function DiabetesCareVideoHero({
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
       ) : null}
       <div className="relative w-full [--section-padding-bottom:0px] [--section-padding-top:0px]">
-        <div className="video-hero relative mx-auto w-full max-w-full">
+        <div className="video-hero banner media--650px mobile:media--auto relative mx-auto w-full max-w-full max-md:h-auto md:h-[552.5px] 2xl:h-[650px]">
           <div
             ref={mediaRef as RefObject<HTMLDivElement>}
             className={clsx(
-              'dc-video-hero-media relative mx-auto w-full max-w-full overflow-hidden bg-black [aspect-ratio:16/9] md:[aspect-ratio:1.775/1]',
+              'dc-video-hero-media banner__media media media--height relative mx-auto h-full w-full max-w-full overflow-hidden bg-black',
+              'max-md:min-h-[200px] max-md:[aspect-ratio:16/9]',
               mediaAnimated && 'dc-animated',
             )}
             {...(clientReady ? { 'data-animate': 'zoom-out' as const } : {})}

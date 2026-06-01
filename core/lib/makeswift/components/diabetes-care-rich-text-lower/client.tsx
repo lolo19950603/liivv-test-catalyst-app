@@ -100,6 +100,7 @@ export type RichTextLowerButtonProps = ButtonColorProps & {
 export type DiabetesCareRichTextLowerProps = {
   className?: string;
   background?: SectionBackgroundProps;
+  roundedTop?: boolean;
   headingLine1?: HeadingTypographyProps;
   headingLine2?: RichTextLowerLine2HeadingProps;
   /** @deprecated Use `headingLine1` + `headingLine2`. */
@@ -239,6 +240,7 @@ function headingLineStyle(
 export function DiabetesCareRichTextLower({
   className,
   background,
+  roundedTop = true,
   headingLine1,
   headingLine2,
   heading,
@@ -277,7 +279,7 @@ export function DiabetesCareRichTextLower({
     <div className={clsx('diabetes-care-rich-text-lower', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}>
       <div className="shopify-section" id={RICH_TEXT_LOWER_SECTION_ID} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <div className="section section--padding">
+        <div className={clsx('section section--padding', roundedTop && 'section--rounded')}>
           <div className="page-width page-width--narrow relative px-4 sm:px-5 md:px-0">
             <div className="rich-text z-1 relative text-left md:text-left">
               {showSupportIcon ? (

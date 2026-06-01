@@ -47,6 +47,7 @@ export interface DiabetesCareLogoListLogo {
 export type DiabetesCareLogoListProps = {
   className?: string;
   background?: SectionBackgroundProps;
+  roundedTop?: boolean;
   heading?: HeadingWithHighlightProps;
   marquee?: {
     cycleDurationSeconds?: number;
@@ -100,6 +101,7 @@ function logosResolved(logos?: DiabetesCareLogoListLogo[]) {
 export function DiabetesCareLogoList({
   className,
   background,
+  roundedTop = true,
   heading,
   marquee,
   logos,
@@ -479,7 +481,12 @@ export function DiabetesCareLogoList({
     <div className={clsx('diabetes-care-logo-list', DC_SECTION_ROOT_CLASS, className)}>
       <div className="shopify-section" id={sectionDomId} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <div className="section section--divider section--rounded section--padding relative">
+        <div
+          className={clsx(
+            'section section--divider section--padding relative',
+            roundedTop && 'section--rounded',
+          )}
+        >
           <div className="page-width relative px-4 sm:px-5 md:px-0">
             <div className="title-wrapper relative z-1 flex flex-col gap-4 text-center leading-none lg:gap-8 md:items-center md:justify-between">
               <div className="grid gap-4">

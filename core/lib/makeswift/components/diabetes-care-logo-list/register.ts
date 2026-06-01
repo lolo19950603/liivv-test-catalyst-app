@@ -2,6 +2,7 @@ import { Group, Image, List, Number, Style, TextInput } from '@makeswift/runtime
 
 import {
   headingPopoverControls,
+  roundedTopControl,
   sectionBackgroundControls,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
@@ -20,6 +21,7 @@ runtime.registerComponent(DiabetesCareLogoList, {
   props: {
     className: Style(),
     ...sectionBackgroundControls(),
+    ...roundedTopControl(),
     ...headingPopoverControls({
       label: 'Heading',
       textDefault: 'Trusted by leading organizations',

@@ -67,6 +67,7 @@ export type ImageTextOverlayBodyProps = BodyTextProps & {
 export type DiabetesCareImageTextOverlayProps = {
   className?: string;
   background?: SectionBackgroundProps;
+  roundedTop?: boolean;
   imageSrc?: unknown;
   /** @deprecated Use root `imageSrc`. */
   banner?: {
@@ -232,6 +233,7 @@ function resolveBannerImageSrc(props: {
 export function DiabetesCareImageTextOverlay({
   className,
   background,
+  roundedTop = true,
   banner,
   imageSrc,
   heading,
@@ -273,7 +275,9 @@ export function DiabetesCareImageTextOverlay({
     >
       <div className="shopify-section" id={IMAGE_TEXT_OVERLAY_SECTION_ID} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <div className="section section--padding section--rounded relative">
+        <div
+          className={clsx('section section--padding relative', roundedTop && 'section--rounded')}
+        >
           <div className="relative">
             <div className="banner media--450px dciw-banner relative">
               <div className="banner__media block h-full w-full overflow-hidden">

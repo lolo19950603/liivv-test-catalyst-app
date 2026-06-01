@@ -25,6 +25,7 @@ import { FAQ_SECOND_ARCHIVE_STYLE, FAQ_SECOND_SECTION_ID } from './archive-style
 export interface DiabetesCareFaqSecondProps {
   className?: string;
   background?: SectionBackgroundProps;
+  roundedTop?: boolean;
   heading?: HeadingWithHighlightProps;
   items?: FaqRow[];
 }
@@ -32,6 +33,7 @@ export interface DiabetesCareFaqSecondProps {
 export function DiabetesCareFaqSecond({
   className,
   background,
+  roundedTop = true,
   heading,
   items,
 }: DiabetesCareFaqSecondProps) {
@@ -75,7 +77,12 @@ export function DiabetesCareFaqSecond({
     <div className={clsx('diabetes-care-faq-second', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}>
       <div className="shopify-section" id={FAQ_SECOND_SECTION_ID} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <div className="section section--padding section--plain">
+        <div
+          className={clsx(
+            'section section--padding section--plain',
+            roundedTop && 'section--rounded',
+          )}
+        >
           <div className="page-width relative px-4 sm:px-5 md:px-0">
             <div className="faqs with-background z-1 relative flex flex-col lg:flex-row">
               <div className="grid grow gap-8 md:gap-12">

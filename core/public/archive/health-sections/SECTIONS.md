@@ -3,11 +3,11 @@
 Source: [`../liivv-health-page.html`](../liivv-health-page.html)  
 Shopify template prefix: `template--26491503870243__`
 
-## Page content order (9 instances → 6 unique types)
+## Page content order (9 instances → 5 Health page types + Specialized page video hero)
 
 | # | Shopify suffix | Type | Makeswift component |
 |---|----------------|------|---------------------|
-| 0 | `video_with_text_overlay_BRd8Y9` | Video with text overlay | **Reuse** `health-video-hero` (same as `diabetes-care-video-hero`) |
+| 0 | `video_with_text_overlay_BRd8Y9` | Video with text overlay | **Reuse** `diabetes-care-video-hero` (`Specialized page` group) |
 | 1 | `highlight_text_rxEJiC` | Highlight text (logo) | **New** `health-highlight-text` |
 | 2 | `scrolling_text_4nanNc` | Scrolling text marquee | **New** `health-scrolling-text` |
 | 3 | `images_with_text_dnY6gg` | Images with text | **New** `health-images-with-text` |
@@ -26,7 +26,7 @@ Shopify template prefix: `template--26491503870243__`
 
 | Health section | Closest existing component | Notes |
 |----------------|---------------------------|--------|
-| Video hero | `diabetes-care-video-hero` | Identical `video-hero` pattern |
+| Video hero | `diabetes-care-video-hero` | Use Specialized page component (no `health-video-hero`) |
 | Timeline | `diabetes-care-timeline` | Identical slider + dots |
 | Highlight text | `diabetes-care-custom-band` | Different markup (`highlight-text` vs logo band) |
 | Scrolling text | `diabetes-care-logo-list` | Logo marquee only; no text+icon strip |

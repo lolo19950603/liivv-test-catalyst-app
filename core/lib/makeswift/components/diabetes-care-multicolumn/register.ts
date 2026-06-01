@@ -4,6 +4,7 @@ import {
   buttonColorFields,
   fontSizeFields,
   highlightSwashFields,
+  roundedTopControl,
   sectionBackgroundControls,
   splitHeadingPopoverControls,
   textColorFields,
@@ -61,6 +62,7 @@ runtime.registerComponent(DiabetesCareMulticolumn, {
   props: {
     className: Style(),
     ...sectionBackgroundControls(ARCHIVE_SAGE_BACKGROUND_HSL),
+    ...roundedTopControl(),
     ...splitHeadingPopoverControls({
       primaryLabel: 'Primary heading',
       secondaryLabel: 'Secondary heading (swash)',

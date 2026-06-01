@@ -1,11 +1,19 @@
 'use client';
 
 import { clsx } from 'clsx';
-import type { CSSProperties } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type RefObject,
+} from 'react';
 
+import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
 import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
-import { SplitWordsHeading } from '~/lib/makeswift/diabetes-care-scroll-animate';
 import { resolveHealthSectionDomId } from '~/lib/makeswift/health-page-section-id';
+import type { ButtonColorProps } from '~/lib/makeswift/utils/diabetes-care-button-theme';
 import { ARCHIVE_CREAM_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import {
   buildSectionTheme,
@@ -20,9 +28,89 @@ import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-
 
 import {
   HEALTH_SCROLLING_BANNER_SECTION_ID,
-  HEALTH_SCROLLING_BANNER_VARS,
+  HEALTH_SCROLLING_BANNER_SEGMENT_PX,
   healthScrollingBannerLayoutCss,
+  healthScrollingBannerSectionVars,
 } from './archive-styles';
+import {
+  computeScrollBannerProgress,
+  isScrollBannerContentRevealed,
+  resolveScrollBannerMotion,
+  SCROLL_BANNER_SSR_STICKY_INSET_PX,
+  SCROLL_BANNER_SSR_VIEWPORT_HEIGHT,
+  scrollBannerContentLayerStyle,
+  scrollBannerImageLayerStyle,
+  scrollBannerTrackHeightPx,
+} from './scroll-banner-motion';
+import { useStickyHeaderInset } from './use-sticky-header-inset';
+
+function IconArrowRight() {
+  return (
+    <svg
+      className="icon icon-arrow-right icon-sm transform"
+      fill="none"
+      role="presentation"
+      stroke="currentColor"
+      viewBox="0 0 21 20"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M3 10H18M18 10L12.1667 4.16675M18 10L12.1667 15.8334"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function useScrollingBannerProgress(
+  trackRef: RefObject<HTMLElement | null>,
+  stickyInsetPx: number,
+): number {
+  const [progress, setProgress] = useState(0);
+  const frameRef = useRef<number | null>(null);
+
+  const update = useCallback(() => {
+    frameRef.current = null;
+    const track = trackRef.current;
+
+    if (track == null || typeof window === 'undefined') {
+      return;
+    }
+
+    setProgress(computeScrollBannerProgress(track, stickyInsetPx));
+  }, [stickyInsetPx, trackRef]);
+
+  const schedule = useCallback(() => {
+    if (frameRef.current != null) {
+      return;
+    }
+
+    frameRef.current = window.requestAnimationFrame(update);
+  }, [update]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    schedule();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+
+    return () => {
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+
+      if (frameRef.current != null) {
+        window.cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+    };
+  }, [schedule]);
+
+  return progress;
+}
 
 export type HealthScrollingBannerPanel = {
   image?: unknown;
@@ -32,6 +120,11 @@ export type HealthScrollingBannerPanel = {
     html?: string;
     fontSize?: number;
     fontSizeMobile?: number;
+  };
+  button?: {
+    label?: string;
+    link?: { href?: string; target?: string };
+    colors?: ButtonColorProps;
   };
 };
 
@@ -44,19 +137,27 @@ export type HealthScrollingBannerProps = {
   roundedTop?: boolean;
 };
 
-function BannerPanel({
+function resolvePanelButton(panel: HealthScrollingBannerPanel) {
+  const label = panel.button?.label?.trim() ?? '';
+  const href = panel.button?.link?.href?.trim() ?? '';
+
+  return { label, href, colors: panel.button?.colors };
+}
+
+function PanelCopy({
   panel,
-  index,
+  headingClassName,
 }: {
   panel: HealthScrollingBannerPanel;
-  index: number;
+  headingClassName?: string;
 }) {
-  const imageSrc = resolveMakeswiftImageSrc(panel.image);
   const headingResolved = resolveHeadingTypography(panel.heading);
   const headingText = headingResolved.text.trim();
   const bodyHtml = panel.body?.html?.trim() ?? '';
   const bodyColor = resolveBodyTextColor(panel.body);
   const bodyFontSize = resolveHeadingFontSizeCss(panel.body?.fontSize, panel.body?.fontSizeMobile);
+  const { label: buttonLabel, href: buttonHref, colors: buttonColors } = resolvePanelButton(panel);
+
   const headingStyle: CSSProperties | undefined =
     headingResolved.color != null || headingResolved.fontSize != null
       ? {
@@ -73,42 +174,76 @@ function BannerPanel({
       : undefined;
 
   return (
-    <div
-      className="health-scroll-banner-panel image-with-text with-scrolling flex flex-col overflow-hidden lg:flex-row lg:gap-2"
-      style={{ zIndex: index + 1 }}
-    >
-      <div className="image-with-text__item image-with-text__media relative min-h-[240px] flex-1">
-        {imageSrc.length > 0 ? (
-          <picture className="media media--height relative block h-full min-h-[240px] w-full overflow-hidden">
-            <img
-              alt={panel.imageAlt?.trim() ?? ''}
-              className="absolute inset-0 block h-full w-full object-cover"
-              decoding="async"
-              loading={index === 0 ? 'eager' : 'lazy'}
-              src={imageSrc}
-            />
-          </picture>
-        ) : null}
+    <div className="rich-text relative z-[1] text-left lg:text-left">
+      {headingText.length > 0 ? (
+        <h2
+          className={clsx(
+            'heading leading-none title-lg tracking-heading',
+            headingClassName,
+          )}
+          style={headingStyle}
+        >
+          {headingText}
+        </h2>
+      ) : null}
+      {bodyHtml.length > 0 ? (
+        <div
+          className="rte leading-normal subtext-lg"
+          dangerouslySetInnerHTML={{ __html: bodyHtml }}
+          style={bodyStyle}
+        />
+      ) : null}
+      {buttonLabel.length > 0 && buttonHref.length > 0 ? (
+        <ArchiveShopifyButton
+          className="button--primary button--md icon-with-text"
+          colors={buttonColors}
+          href={buttonHref}
+          rel={panel.button?.link?.target === '_blank' ? 'noopener noreferrer' : undefined}
+          target={panel.button?.link?.target}
+        >
+          {buttonLabel}
+          <IconArrowRight />
+        </ArchiveShopifyButton>
+      ) : null}
+    </div>
+  );
+}
+
+function PanelImage({
+  panel,
+  index,
+  eager,
+}: {
+  panel: HealthScrollingBannerPanel;
+  index: number;
+  eager?: boolean;
+}) {
+  const imageSrc = resolveMakeswiftImageSrc(panel.image);
+
+  if (imageSrc.length === 0) {
+    return null;
+  }
+
+  return (
+    <picture className="media media--height block h-full w-full overflow-hidden">
+      <img
+        alt={panel.imageAlt?.trim() ?? ''}
+        className="block h-full w-full object-cover"
+        decoding="async"
+        loading={eager ? 'eager' : 'lazy'}
+        src={imageSrc}
+      />
+    </picture>
+  );
+}
+
+function MobilePanel({ panel, index }: { panel: HealthScrollingBannerPanel; index: number }) {
+  return (
+    <div className="flex flex-col gap-6 overflow-hidden">
+      <div className="image-with-text__image block media--650px mobile:media--auto relative overflow-hidden">
+        <PanelImage eager={index === 0} index={index} panel={panel} />
       </div>
-      <div className="image-with-text__item image-with-text__content relative z-[1] flex flex-1 flex-col justify-center p-6 lg:p-10">
-        <div className="rich-text relative z-[1] text-left">
-          {headingText.length > 0 ? (
-            <h2
-              className="heading title-lg mb-4 leading-none tracking-heading"
-              style={headingStyle}
-            >
-              <SplitWordsHeading text={headingText} />
-            </h2>
-          ) : null}
-          {bodyHtml.length > 0 ? (
-            <div
-              className="rte body leading-normal"
-              dangerouslySetInnerHTML={{ __html: bodyHtml }}
-              style={bodyStyle}
-            />
-          ) : null}
-        </div>
-      </div>
+      <PanelCopy panel={panel} />
     </div>
   );
 }
@@ -126,10 +261,55 @@ export function HealthScrollingBanner({
     instanceSuffix,
   );
   const list = panels ?? [];
-  const stackHeightPx = Math.max(2400, list.length * 1100);
+  const stickyInsetPx = useStickyHeaderInset(SCROLL_BANNER_SSR_STICKY_INSET_PX);
+  const panelCount = list.length;
+  const [viewportHeight, setViewportHeight] = useState(SCROLL_BANNER_SSR_VIEWPORT_HEIGHT);
+
+  useEffect(() => {
+    const updateViewport = () => {
+      setViewportHeight(window.innerHeight || document.documentElement.clientHeight);
+    };
+
+    updateViewport();
+    window.addEventListener('resize', updateViewport);
+
+    return () => {
+      window.removeEventListener('resize', updateViewport);
+    };
+  }, []);
+
+  const stackHeightPx =
+    panelCount > 0
+      ? scrollBannerTrackHeightPx(
+          panelCount,
+          HEALTH_SCROLLING_BANNER_SEGMENT_PX,
+          viewportHeight,
+          stickyInsetPx,
+        )
+      : HEALTH_SCROLLING_BANNER_SEGMENT_PX * 2;
+
+  const scrollTrackRef = useRef<HTMLDivElement>(null);
+  const scrollProgress = useScrollingBannerProgress(scrollTrackRef, stickyInsetPx);
+  const { segmentIndex, segmentProgress } = resolveScrollBannerMotion(panelCount, scrollProgress);
+  const [contentEnterKey, setContentEnterKey] = useState(0);
+  const prevSegmentIndexRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (prevSegmentIndexRef.current === null) {
+      prevSegmentIndexRef.current = segmentIndex;
+
+      return;
+    }
+
+    if (prevSegmentIndexRef.current !== segmentIndex) {
+      prevSegmentIndexRef.current = segmentIndex;
+      setContentEnterKey((key) => key + 1);
+    }
+  }, [segmentIndex]);
+
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: resolvedSectionId,
-    sectionCss: `${HEALTH_SCROLLING_BANNER_VARS}${healthScrollingBannerLayoutCss(resolvedSectionId)}`,
+    sectionCss: `${healthScrollingBannerSectionVars(resolvedSectionId)}${healthScrollingBannerLayoutCss(resolvedSectionId)}`,
     background,
     defaultBackgroundChannels: ARCHIVE_CREAM_BACKGROUND_CHANNELS,
   });
@@ -138,23 +318,108 @@ export function HealthScrollingBanner({
     <div className={clsx('health-scrolling-banner', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}>
       <div className="shopify-section" id={resolvedSectionId} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <div
-          className={clsx('section section--padding', roundedTop && 'section--rounded')}
-        >
-          <div className="page-width page-width--full">
+        <div className={clsx('section section--padding relative', roundedTop && 'section--rounded')}>
+          <div className="page-width page-width--full relative">
+            {list.length > 0 ? (
+              <div className="health-scroll-banner-mobile grid gap-10 lg:hidden">
+                {list.map((panel, index) => (
+                  <MobilePanel index={index} key={`mobile-panel-${index}`} panel={panel} />
+                ))}
+              </div>
+            ) : null}
+
             <div
-              className="scrolling-banner block lg:block"
+              className="scrolling-banner hidden lg:block"
+              ref={scrollTrackRef}
               style={{ '--scrolling-height': `${String(stackHeightPx)}px` } as CSSProperties}
             >
               <div
-                className="health-scroll-banner-stack top-0 lg:sticky"
+                className="scrolling-banner__track"
                 style={{ minHeight: `${String(stackHeightPx)}px` }}
               >
-                {list.map((panel, index) => (
-                  <BannerPanel index={index} key={`panel-${index}`} panel={panel} />
-                ))}
+                <div
+                  className="image-with-text with-scrolling flex flex-col overflow-hidden lg:sticky lg:flex-row"
+                  style={
+                    {
+                      '--scroll-banner-inset': `${String(stickyInsetPx)}px`,
+                    } as CSSProperties
+                  }
+                >
+                  <div className="image-with-text__item relative shrink-0 grow lg:grow-0">
+                    <div className="image-with-text__media h-full">
+                      <div className="image-with-text__image media--650px mobile:media--auto relative block overflow-hidden">
+                        {list.map((panel, index) => (
+                          <div
+                            aria-hidden={
+                              index !== segmentIndex &&
+                              index !== segmentIndex + 1 &&
+                              panelCount > 1
+                            }
+                            className="image-with-text__image-layer absolute inset-0"
+                            key={`image-layer-${index}`}
+                            style={scrollBannerImageLayerStyle(
+                              index,
+                              panelCount,
+                              segmentIndex,
+                              segmentProgress,
+                            )}
+                          >
+                            <PanelImage eager={index === 0} index={index} panel={panel} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="image-with-text__item image-with-text__content-col relative shrink-0 grow">
+                    {list.map((panel, index) => {
+                      const contentRevealed = isScrollBannerContentRevealed(
+                        index,
+                        panelCount,
+                        segmentIndex,
+                      );
+
+                      return (
+                      <div
+                        aria-hidden={
+                          panelCount > 1 &&
+                          index !== segmentIndex &&
+                          index !== segmentIndex + 1
+                        }
+                        className={clsx(
+                          'image-with-text__content image-with-text__content-layer absolute inset-0 flex h-full w-full items-center',
+                          contentRevealed && 'image-with-text__content-layer--revealed',
+                        )}
+                        key={`content-layer-${index}`}
+                        style={scrollBannerContentLayerStyle(
+                          index,
+                          panelCount,
+                          segmentIndex,
+                          segmentProgress,
+                        )}
+                      >
+                        {contentRevealed ? (
+                          <div
+                            className={clsx(
+                              'health-scroll-banner-content-enter flex h-full w-full items-center',
+                              contentEnterKey > 0 && 'health-scroll-banner-content-enter--animate',
+                            )}
+                            key={`scroll-banner-enter-${String(index)}-${String(contentEnterKey)}`}
+                          >
+                            <PanelCopy panel={panel} />
+                          </div>
+                        ) : null}
+                      </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
+
+            {list.length === 0 ? (
+              <p className="text-center opacity-60">Add sticky panels in the editor.</p>
+            ) : null}
           </div>
         </div>
       </div>

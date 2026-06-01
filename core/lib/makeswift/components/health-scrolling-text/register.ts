@@ -1,9 +1,6 @@
 import { Group, Image, List, Number, Select, Style, TextInput } from '@makeswift/runtime/controls';
 
-import {
-  roundedTopControl,
-  sectionBackgroundControls,
-} from '~/lib/makeswift/controls/diabetes-care-section-controls';
+import { sectionBackgroundControls } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { healthPageComponentLabel } from '~/lib/makeswift/health-page-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 
@@ -30,7 +27,7 @@ const itemGroup = Group({
 
 runtime.registerComponent(HealthScrollingText, {
   type: COMPONENT_TYPE,
-  label: healthPageComponentLabel(2, 'Scrolling text marquee'),
+  label: healthPageComponentLabel(1, 'Scrolling text marquee'),
   icon: 'carousel',
   props: {
     className: Style(),
@@ -39,7 +36,6 @@ runtime.registerComponent(HealthScrollingText, {
       defaultValue: '',
     }),
     ...sectionBackgroundControls(),
-    ...roundedTopControl(),
     direction: Select({
       label: 'Scroll direction',
       options: [
@@ -53,7 +49,9 @@ runtime.registerComponent(HealthScrollingText, {
       defaultValue: 26,
       suffix: 's',
     }),
-    iconImage: Image({ label: 'Repeating icon between labels (optional)' }),
+    iconImage: Image({
+      label: 'Liivv logo between label groups (every 5 labels)',
+    }),
     iconHeightPx: Number({
       label: 'Icon height',
       defaultValue: 80,

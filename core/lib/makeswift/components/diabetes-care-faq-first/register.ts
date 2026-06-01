@@ -3,6 +3,7 @@ import { Group, List, Style, TextArea, TextInput } from '@makeswift/runtime/cont
 import {
   fontSizeFields,
   headingPopoverControls,
+  roundedTopControl,
   sectionBackgroundControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
@@ -20,6 +21,7 @@ runtime.registerComponent(DiabetesCareFaqFirst, {
   props: {
     className: Style(),
     ...sectionBackgroundControls(),
+    ...roundedTopControl(),
     ...headingPopoverControls({
       label: 'Heading',
       textDefault: 'Support, Wherever You Are',
