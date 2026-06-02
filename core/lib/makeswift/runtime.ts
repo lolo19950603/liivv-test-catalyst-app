@@ -3,7 +3,7 @@ import { registerDividerComponent } from '@makeswift/runtime/react/builtins/divi
 import { registerEmbedComponent } from '@makeswift/runtime/react/builtins/embed';
 import { registerImageComponent } from '@makeswift/runtime/react/builtins/image';
 import { registerRootComponent } from '@makeswift/runtime/react/builtins/root';
-import { registerSlotComponent } from '@makeswift/runtime/react/builtins/slot';
+import { registerSlotComponent } from '~/lib/makeswift/register-slot-component';
 import { registerSocialLinksComponent } from '@makeswift/runtime/react/builtins/social-links';
 import { registerTextComponent } from '@makeswift/runtime/react/builtins/text';
 import { registerVideoComponent } from '@makeswift/runtime/react/builtins/video';

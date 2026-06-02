@@ -14,6 +14,7 @@ import { ReviewForm, SubmitReviewAction } from '@/vibes/soul/sections/reviews/re
 
 import {
   BackorderDisplayData,
+  ProductDetailBuyRowVariant,
   ProductDetailForm,
   ProductDetailFormAction,
   StockDisplayData,
@@ -76,6 +77,7 @@ export interface ProductDetailProps<F extends Field> {
   user: Streamable<{ email: string; name: string }>;
   loadMoreImagesAction?: ProductGalleryLoadMoreAction;
   recaptchaSiteKey?: string;
+  buyRowVariant?: ProductDetailBuyRowVariant;
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -119,6 +121,7 @@ export function ProductDetail<F extends Field>({
   user,
   loadMoreImagesAction,
   recaptchaSiteKey,
+  buyRowVariant = 'default',
 }: ProductDetailProps<F>) {
   return (
     <section className="@container">
@@ -251,6 +254,7 @@ export function ProductDetail<F extends Field>({
                           action={action}
                           additionalActions={additionalActions}
                           backorderDisplayData={backorderDisplayData ?? undefined}
+                          buyRowVariant={buyRowVariant}
                           ctaDisabled={ctaDisabled ?? undefined}
                           ctaLabel={ctaLabel ?? undefined}
                           decrementLabel={decrementLabel}

@@ -1,0 +1,101 @@
+.liivv-product-page-feel {
+  --product-detail-primary-text: #312f2f;
+  --product-detail-secondary-text: #66605c;
+  --product-detail-border: rgba(49, 47, 47, 0.18);
+  --product-detail-title-font-family: var(--font-family-heading);
+  --product-detail-subtitle-font-family: var(--font-family-mono);
+}
+
+.liivv-product-page-feel .group\/product-detail {
+  margin-top: 0.5rem;
+  border-radius: var(--rounded-block, 1rem);
+  background: rgb(245 242 237);
+}
+
+@media (min-width: 1280px) {
+  .liivv-product-page-feel .group\/product-detail {
+    padding-top: 4.5rem;
+    padding-bottom: 4.5rem;
+  }
+}
+
+/* Archive product-singular buy row (quantity pill + primary CTA) */
+.liivv-product-page-feel .buy-buttons {
+  align-items: stretch;
+  width: 100%;
+}
+
+.liivv-product-page-feel .buy-buttons .product-form__submit.grow {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Quantity + buy row — from product-singular-page.html (not in diabetes-care-sections.css) */
+.liivv-product-page-feel .quantity {
+  min-height: var(--input-height);
+  border: 1px solid rgb(var(--color-border));
+  border-radius: var(--buttons-radius);
+  background-color: rgb(var(--color-background));
+}
+
+.liivv-product-page-feel .quantity__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: rgb(var(--color-foreground));
+}
+
+.liivv-product-page-feel .quantity__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.liivv-product-page-feel .quantity__input::-webkit-outer-spin-button,
+.liivv-product-page-feel .quantity__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.liivv-product-page-feel .quantity__input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.liivv-product-page-feel .quantity .quantity__input {
+  max-width: var(--sp-11);
+  background-color: transparent;
+}
+
+.liivv-product-page-feel .quantity .quantity__button {
+  padding-inline: var(--sp-3);
+}
+
+.liivv-product-page-feel .quantity .quantity__button .icon {
+  width: var(--sp-4d5);
+  height: var(--sp-4d5);
+}
+
+@media screen and (min-width: 640px) {
+  .liivv-product-page-feel .product-form__submit {
+    min-height: 3.75rem;
+  }
+
+  .liivv-product-page-feel .quantity .quantity__input {
+    max-width: var(--sp-12);
+  }
+
+  .liivv-product-page-feel .quantity .quantity__button {
+    padding-inline: var(--sp-4d5);
+  }
+
+  .liivv-product-page-feel .quantity .quantity__button:first-of-type {
+    padding-inline-end: var(--sp-2);
+  }
+
+  .liivv-product-page-feel .quantity .quantity__button:last-of-type {
+    padding-inline-start: var(--sp-2);
+  }
+}

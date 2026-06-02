@@ -13,8 +13,12 @@ import { productOptionsTransformer } from '~/data-transformers/product-options-t
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { ProductDetail } from '~/lib/makeswift/components/product-detail';
+import { Slot } from '~/lib/makeswift/slot';
 import { getRecaptchaSiteKey } from '~/lib/recaptcha';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
+
+import './product-page-feel.css';
+import './product-related-products.css';
 
 import { addToCart } from './_actions/add-to-cart';
 import { getMoreProductImages } from './_actions/get-more-images';
@@ -551,54 +555,64 @@ export default async function Product({ params, searchParams }: Props) {
 
   return (
     <>
-      <ProductAnalyticsProvider data={streamableAnalyticsData}>
-        <ProductDetail
-          action={addToCart}
-          additionalActions={
-            <WishlistButton
-              formId={detachedWishlistFormId}
-              productId={productId}
-              productSku={streamableProductSku}
-            />
-          }
-          additionalInformationTitle={t('ProductDetails.additionalInformation')}
-          ctaDisabled={streameableCtaDisabled}
-          ctaLabel={streameableCtaLabel}
-          decrementLabel={t('ProductDetails.decreaseQuantity')}
-          emptySelectPlaceholder={t('ProductDetails.emptySelectPlaceholder')}
-          fields={productOptionsTransformer(baseProduct.productOptions)}
-          incrementLabel={t('ProductDetails.increaseQuantity')}
-          loadMoreImagesAction={getMoreProductImages}
-          prefetch={true}
-          product={{
-            id: baseProduct.entityId.toString(),
-            title: baseProduct.name,
-            description: <div dangerouslySetInnerHTML={{ __html: baseProduct.description }} />,
-            href: baseProduct.path,
-            images: streamableImages,
-            price: streamablePrices,
-            reviewsEnabled,
-            showRating,
-            numberOfReviews: baseProduct.reviewSummary.numberOfReviews,
-            subtitle: baseProduct.brand?.name,
-            rating: baseProduct.reviewSummary.averageRating,
-            accordions: streameableAccordions,
-            minQuantity: streamableMinQuantity,
-            maxQuantity: streamableMaxQuantity,
-            stockDisplayData: streamableStockDisplayData,
-            backorderDisplayData: streamableBackorderDisplayData,
-          }}
-          productId={baseProduct.entityId}
-          quantityLabel={t('ProductDetails.quantity')}
-          recaptchaSiteKey={recaptchaSiteKey}
-          reviewFormAction={submitReview}
-          thumbnailLabel={t('ProductDetails.thumbnail')}
-          user={streamableUser}
-        />
-      </ProductAnalyticsProvider>
+      <Slot label="Product (all products) — top" snapshotId="product-page-top-content" />
+
+      <div className="liivv-product-page-feel">
+        <ProductAnalyticsProvider data={streamableAnalyticsData}>
+          <ProductDetail
+            buyRowVariant="archive"
+            action={addToCart}
+            additionalActions={
+              <WishlistButton
+                formId={detachedWishlistFormId}
+                productId={productId}
+                productSku={streamableProductSku}
+              />
+            }
+            additionalInformationTitle={t('ProductDetails.additionalInformation')}
+            ctaDisabled={streameableCtaDisabled}
+            ctaLabel={streameableCtaLabel}
+            decrementLabel={t('ProductDetails.decreaseQuantity')}
+            emptySelectPlaceholder={t('ProductDetails.emptySelectPlaceholder')}
+            fields={productOptionsTransformer(baseProduct.productOptions)}
+            incrementLabel={t('ProductDetails.increaseQuantity')}
+            loadMoreImagesAction={getMoreProductImages}
+            prefetch={true}
+            product={{
+              id: baseProduct.entityId.toString(),
+              title: baseProduct.name,
+              description: <div dangerouslySetInnerHTML={{ __html: baseProduct.description }} />,
+              href: baseProduct.path,
+              images: streamableImages,
+              price: streamablePrices,
+              reviewsEnabled,
+              showRating,
+              numberOfReviews: baseProduct.reviewSummary.numberOfReviews,
+              subtitle: baseProduct.brand?.name,
+              rating: baseProduct.reviewSummary.averageRating,
+              accordions: streameableAccordions,
+              minQuantity: streamableMinQuantity,
+              maxQuantity: streamableMaxQuantity,
+              stockDisplayData: streamableStockDisplayData,
+              backorderDisplayData: streamableBackorderDisplayData,
+            }}
+            productId={baseProduct.entityId}
+            quantityLabel={t('ProductDetails.quantity')}
+            recaptchaSiteKey={recaptchaSiteKey}
+            reviewFormAction={submitReview}
+            thumbnailLabel={t('ProductDetails.thumbnail')}
+            user={streamableUser}
+          />
+        </ProductAnalyticsProvider>
+      </div>
+
+      <Slot
+        label="Product (all products) — between detail and related"
+        snapshotId="product-page-mid-content"
+      />
 
       <FeaturedProductCarousel
-        cta={{ label: t('RelatedProducts.cta'), href: '/shop-all' }}
+        appearance="liivv-archive"
         emptyStateSubtitle={t('RelatedProducts.browseCatalog')}
         emptyStateTitle={t('RelatedProducts.noRelatedProducts')}
         nextLabel={t('RelatedProducts.nextProducts')}
@@ -619,6 +633,8 @@ export default async function Product({ params, searchParams }: Props) {
           />
         </div>
       )}
+
+      <Slot label="Product (all products) — bottom" snapshotId="product-page-bottom-content" />
 
       <Stream
         fallback={null}

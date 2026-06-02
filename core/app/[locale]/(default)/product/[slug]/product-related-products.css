@@ -1,0 +1,31 @@
+/* From product-singular-recommendations / product-singular-page.html */
+.liivv-product-related-products {
+  --color-background: 245 242 237;
+}
+
+#liivv-product-related-products-section {
+  --section-padding-top: 52px;
+  --section-padding-bottom: 36px;
+  --color-background: 245 242 237;
+}
+
+.liivv-product-related-products .title-wrapper {
+  margin-block-end: clamp(var(--sp-8, 2rem), 2.526vw, var(--sp-12, 3rem));
+}
+
+.liivv-product-related-products .title-md {
+  font-size: var(--title-md);
+}
+
+.liivv-product-related-products .highlighted-text[data-style='half_text'] {
+  display: inline;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  background-size: 100% 28%;
+}
+
+.liivv-product-related-products .section--padding {
+  padding-top: var(--section-padding-top, 52px);
+  padding-bottom: var(--section-padding-bottom, 36px);
+  background-color: rgb(var(--color-background, 245 242 237));
+}

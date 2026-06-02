@@ -33,8 +33,11 @@ import { toast } from '@/vibes/soul/primitives/toaster';
 import { useEvents } from '~/components/analytics/events';
 import { usePathname, useRouter } from '~/i18n/routing';
 
+import { ArchiveQuantityInput, ArchiveSubmitButton } from './archive-buy-row';
 import { revalidateCart } from './actions/revalidate-cart';
 import { Field, schema, SchemaRawShape } from './schema';
+
+export type ProductDetailBuyRowVariant = 'default' | 'archive';
 
 type Action<S, P> = (state: Awaited<S>, payload: P) => S | Promise<S>;
 
@@ -75,6 +78,7 @@ export interface ProductDetailFormProps<F extends Field> {
   maxQuantity?: number;
   stockDisplayData?: StockDisplayData;
   backorderDisplayData?: BackorderDisplayData;
+  buyRowVariant?: ProductDetailBuyRowVariant;
 }
 
 export function ProductDetailForm<F extends Field>({
@@ -93,6 +97,7 @@ export function ProductDetailForm<F extends Field>({
   maxQuantity,
   stockDisplayData,
   backorderDisplayData,
+  buyRowVariant = 'default',
 }: ProductDetailFormProps<F>) {
   const router = useRouter();
   const pathname = usePathname();
@@ -299,23 +304,37 @@ export function ProductDetailForm<F extends Field>({
             )}
           </div>
 
-          <div className="flex gap-x-3">
-            <NumberInput
-              aria-label={quantityLabel}
-              decrementLabel={decrementLabel}
-              incrementLabel={incrementLabel}
-              max={maxQuantity}
-              min={minQuantity ?? 1}
-              name={formFields.quantity.name}
-              onBlur={quantityControl.blur}
-              onChange={(e) => quantityControl.change(e.currentTarget.value)}
-              onFocus={quantityControl.focus}
-              required
-              value={quantityControl.value}
-            />
-            <SubmitButton disabled={ctaDisabled}>{ctaLabel}</SubmitButton>
-            {additionalActions}
-          </div>
+          {buyRowVariant === 'archive' ? (
+            <div className="buy-buttons back-in-stock flex w-full flex-wrap items-center gap-4">
+              <ArchiveQuantityInput
+                decrementLabel={decrementLabel}
+                formField={formFields.quantity}
+                incrementLabel={incrementLabel}
+                max={maxQuantity ?? undefined}
+                min={minQuantity ?? 1}
+              />
+              <ArchiveSubmitButton disabled={ctaDisabled}>{ctaLabel}</ArchiveSubmitButton>
+              {additionalActions}
+            </div>
+          ) : (
+            <div className="flex gap-x-3">
+              <NumberInput
+                aria-label={quantityLabel}
+                decrementLabel={decrementLabel}
+                incrementLabel={incrementLabel}
+                max={maxQuantity}
+                min={minQuantity ?? 1}
+                name={formFields.quantity.name}
+                onBlur={quantityControl.blur}
+                onChange={(e) => quantityControl.change(e.currentTarget.value)}
+                onFocus={quantityControl.focus}
+                required
+                value={quantityControl.value}
+              />
+              <SubmitButton disabled={ctaDisabled}>{ctaLabel}</SubmitButton>
+              {additionalActions}
+            </div>
+          )}
         </div>
       </form>
     </FormProvider>

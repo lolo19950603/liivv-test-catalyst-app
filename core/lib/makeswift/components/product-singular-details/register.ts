@@ -1,10 +1,8 @@
 import { Checkbox, Group, List, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
 import {
-  fontSizeFields,
   roundedTopControl,
   sectionBackgroundControls,
-  textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { productSingularPageComponentLabel } from '~/lib/makeswift/product-singular-page-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
@@ -15,7 +13,7 @@ export const COMPONENT_TYPE = 'product-singular-details';
 
 runtime.registerComponent(ProductSingularDetails, {
   type: COMPONENT_TYPE,
-  label: productSingularPageComponentLabel(1, 'Product description & accordions'),
+  label: productSingularPageComponentLabel(1, 'Product accordions'),
   icon: 'layout',
   props: {
     className: Style(),
@@ -25,25 +23,8 @@ runtime.registerComponent(ProductSingularDetails, {
     }),
     ...sectionBackgroundControls(),
     ...roundedTopControl(),
-    descriptionLabel: TextInput({
-      label: 'Description column label',
-      defaultValue: 'Product description',
-    }),
-    descriptionHtml: TextArea({
-      label: 'Description (HTML)',
-      defaultValue: '',
-      description: 'Leave empty to use default archive copy.',
-    }),
-    descriptionBody: Group({
-      label: 'Description colors',
-      preferredLayout: Group.Layout.Popover,
-      props: {
-        ...textColorFields(),
-        ...fontSizeFields(),
-      },
-    }),
     accordions: List({
-      label: 'Specification accordions',
+      label: 'Accordions',
       type: Group({
         label: 'Accordion',
         props: {
