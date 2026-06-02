@@ -82,11 +82,11 @@ export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
 
   /* 04 — Timeline (any page — `.diabetes-care-timeline`, not only diabetes-care section id) */
   `${MOBILE}{.diabetes-care-timeline .section{--section-padding-top:48px;--section-padding-bottom:48px}}`,
-  `${MOBILE_TABLET}{.diabetes-care-timeline .timeline-react-strip .timeline__item{flex:0 0 min(92vw,24rem)!important}}`,
-  `${MOBILE_TABLET}{.diabetes-care-timeline .slider--tablet{overflow:visible;padding-inline:0;margin-inline:0}}`,
-  `${MOBILE_TABLET}{.diabetes-care-timeline .scroll-area{overflow:visible;scroll-snap-type:none}}`,
-  `${MOBILE_TABLET}{.diabetes-care-timeline .timeline-dots-mobile{margin-block-start:var(--sp-6)}}`,
-  `${MOBILE_TABLET}{.diabetes-care-timeline .timeline-react-strip{touch-action:pan-x pinch-zoom}}`,
+  `${MOBILE}{.diabetes-care-timeline .timeline-react-strip .timeline__item{flex:0 0 min(92vw,24rem)!important}}`,
+  `${MOBILE}{.diabetes-care-timeline .slider--tablet{overflow:visible;padding-inline:0;margin-inline:0}}`,
+  `${MOBILE}{.diabetes-care-timeline .scroll-area{overflow:visible;scroll-snap-type:none}}`,
+  `${MOBILE}{.diabetes-care-timeline .timeline-dots-mobile{margin-block-start:var(--sp-6)}}`,
+  `${MOBILE}{.diabetes-care-timeline .timeline-react-strip{touch-action:pan-x pinch-zoom}}`,
 
   /* 05 — Multicolumn */
   mobileSectionPadding(MULTICOLUMN_SECTION_ID),

@@ -137,7 +137,9 @@ export type HealthScrollingBannerProps = {
 };
 
 function resolvePanelButton(panel: HealthScrollingBannerPanel) {
-  return resolveArchiveButton(panel.button);
+  // Sticky banner panels: show the CTA whenever button text is set.
+  // Links are optional for visibility; missing href falls back to `#`.
+  return resolveArchiveButton(panel.button, { requireHref: false });
 }
 
 function PanelCopy({
