@@ -43,7 +43,7 @@ export function SiteFooterRevealShell({
         }}
       />
       {children}
-      <div className="site-footer-reveal-footer block w-full" style={footerGroupStyle}>
+      <div className="site-footer-reveal-footer footer-group block w-full" style={footerGroupStyle}>
         <div className="site-footer-reveal-features">{featuredColumns}</div>
         <div className="site-footer-reveal-main relative">
           <div aria-hidden className="footer-overlay hidden md:block" />

@@ -276,12 +276,15 @@ export function SiteFeaturedColumnsFooter({
         'site-featured-columns-footer',
         DC_SECTION_ROOT_CLASS,
         'max-w-full',
-        roundedBottom && 'site-featured-columns-footer__shell',
+        roundedBottom && 'site-featured-columns-footer__shell site-featured-columns-footer__shell--rounded',
         className,
       )}
     >
       <div
-        className="shopify-section"
+        className={clsx(
+          'shopify-section',
+          roundedBottom && 'site-featured-columns-footer--rounded',
+        )}
         id={SITE_FEATURED_COLUMNS_FOOTER_SECTION_ID}
         style={sectionStyle}
       >

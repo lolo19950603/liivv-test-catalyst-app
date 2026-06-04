@@ -5,6 +5,19 @@ import { resolveBodyTextColor } from '~/lib/makeswift/utils/diabetes-care-sectio
 import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
 import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
 
+/** Props for archive `<details is="accordion-details">` (SSR + client must match for hydration). */
+export function archiveAccordionDetailsProps(defaultOpen?: boolean) {
+  const isOpen = defaultOpen === true;
+
+  return {
+    className: 'details' as const,
+    ...(isOpen ? { open: true as const } : {}),
+    'aria-expanded': isOpen ? ('true' as const) : ('false' as const),
+    is: 'accordion-details',
+    suppressHydrationWarning: true as const,
+  };
+}
+
 export function IconPlusAccordion() {
   return (
     <svg

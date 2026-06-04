@@ -12,6 +12,7 @@ import { Input } from '@/vibes/soul/form/input';
 import { RatingRadioGroup } from '@/vibes/soul/form/rating-radio-group';
 import { Textarea } from '@/vibes/soul/form/textarea';
 import { Stream, Streamable, useStreamable } from '@/vibes/soul/lib/streamable';
+import { ArchiveButton } from '@/vibes/soul/primitives/archive-button';
 import { Button } from '@/vibes/soul/primitives/button';
 import { Modal } from '@/vibes/soul/primitives/modal';
 import { toast } from '@/vibes/soul/primitives/toaster';
@@ -19,6 +20,8 @@ import { Image } from '~/components/image';
 import { parseWithZodTranslatedErrors } from '~/i18n/utils';
 
 import { reviewFormErrorTranslations, schema } from './schema';
+
+type ReviewsAppearance = 'default' | 'liivv-archive';
 
 type Action<S, P> = (state: Awaited<S>, payload: P) => S | Promise<S>;
 
@@ -46,6 +49,7 @@ interface Props {
   streamableProduct: Streamable<{ name: string }>;
   streamableUser: Streamable<{ email: string; name: string }>;
   recaptchaSiteKey?: string;
+  appearance?: ReviewsAppearance;
 }
 
 export const ReviewForm = ({
@@ -64,6 +68,7 @@ export const ReviewForm = ({
   streamableImages,
   streamableUser,
   recaptchaSiteKey,
+  appearance = 'default',
 }: Props) => {
   const t = useTranslations('Product.Reviews.Form');
   const errorTranslations = reviewFormErrorTranslations(t);
@@ -229,10 +234,26 @@ export const ReviewForm = ({
               </div>
             ) : null}
             <div className="mt-auto flex justify-end gap-3">
-              <Button onClick={() => setIsOpen(false)} size="small" type="button" variant="ghost">
-                {formCancelLabel}
-              </Button>
-              <SubmitButton>{formSubmitLabel}</SubmitButton>
+              {appearance === 'liivv-archive' ? (
+                <>
+                  <ArchiveButton
+                    onClick={() => setIsOpen(false)}
+                    size="sm"
+                    type="button"
+                    variant="secondary"
+                  >
+                    {formCancelLabel}
+                  </ArchiveButton>
+                  <SubmitButton appearance={appearance}>{formSubmitLabel}</SubmitButton>
+                </>
+              ) : (
+                <>
+                  <Button onClick={() => setIsOpen(false)} size="small" type="button" variant="ghost">
+                    {formCancelLabel}
+                  </Button>
+                  <SubmitButton appearance={appearance}>{formSubmitLabel}</SubmitButton>
+                </>
+              )}
             </div>
           </form>
         </div>
@@ -241,11 +262,25 @@ export const ReviewForm = ({
   );
 };
 
-function SubmitButton({ children }: { children: React.ReactNode }) {
+function SubmitButton({
+  children,
+  appearance = 'default',
+}: {
+  children: React.ReactNode;
+  appearance?: ReviewsAppearance;
+}) {
   const { pending } = useFormStatus();
 
+  if (appearance === 'liivv-archive') {
+    return (
+      <ArchiveButton disabled={pending} size="sm" type="submit" variant="primary">
+        {children}
+      </ArchiveButton>
+    );
+  }
+
   return (
-    <Button loading={pending} size="small" type="submit" variant="secondary">
+    <Button loading={pending} size="small" type="submit" variant="primary">
       {children}
     </Button>
   );

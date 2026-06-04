@@ -5,6 +5,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { type ReactNode } from 'react';
 import { useFormStatus } from 'react-dom';
 
+import { ArchiveButton } from '@/vibes/soul/primitives/archive-button';
+
 interface ArchiveQuantityInputProps {
   formField: FieldMetadata<number | undefined>;
   decrementLabel: string;
@@ -91,16 +93,15 @@ export function ArchiveSubmitButton({
   const { pending } = useFormStatus();
 
   return (
-    <button
-      className="product-form__submit button button--primary button--fixed grow"
+    <ArchiveButton
+      className="product-form__submit grow"
       disabled={disabled || pending}
+      size="fixed"
       type="submit"
+      variant="primary"
       {...{ is: 'hover-button' }}
     >
-      <span className="btn-fill" data-fill="" />
-      <span className="btn-text">
-        <span>{children}</span>
-      </span>
-    </button>
+      {children}
+    </ArchiveButton>
   );
 }

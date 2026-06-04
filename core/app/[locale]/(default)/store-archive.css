@@ -1,0 +1,72 @@
+/* Store-wide archive feel for Catalyst commerce pages (category, cart, blog, account, etc.) */
+
+.liivv-store {
+  --store-primary-text: #312f2f;
+  --store-secondary-text: #66605c;
+  --store-border: rgba(49, 47, 47, 0.18);
+  --store-surface: 245 242 237;
+}
+
+.liivv-store .group\/products-list-section h1,
+.liivv-store .group\/blog-section h1,
+.liivv-store .group\/cart h1,
+.liivv-store .group\/compare-section h1 {
+  color: var(--store-primary-text);
+  font-family: var(--font-family-heading, inherit);
+}
+
+.liivv-store .group\/products-list-section h1 .text-contrast-300,
+.liivv-store .group\/blog-section .text-contrast-300 {
+  color: var(--store-secondary-text) !important;
+}
+
+.liivv-store .group\/products-list-section,
+.liivv-store .group\/product-list,
+.liivv-store .group\/blog-section,
+.liivv-store .group\/cart,
+.liivv-store .group\/sign-in-section,
+.liivv-store .group\/forgot-password-section,
+.liivv-store .group\/reset-password-section,
+.liivv-store .group\/gift-certificate-balance-section,
+.liivv-store .group\/compare-section,
+.liivv-store .group\/not-found,
+.liivv-store .group\/address-list-section,
+.liivv-store .group\/account-settings-section {
+  color: var(--store-primary-text);
+}
+
+.liivv-store .liivv-catalog-product-grid {
+  --color-base-background: 252 248 244;
+}
+
+/* Archive pagination on catalog / blog list pages */
+.liivv-store .indicators .button.button--secondary:not(:disabled) .btn-text {
+  position: relative;
+  z-index: 1;
+}
+
+@media screen and (pointer: fine) {
+  .liivv-store .indicators .button.button--secondary:not(:disabled) .btn-text,
+  .liivv-store .indicators .button.button--secondary:not(:disabled) svg {
+    transition:
+      color var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1)),
+      stroke var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1));
+    transition-delay: 0.1s;
+  }
+}
+
+.liivv-store .indicators .button.button--secondary:not(:disabled) {
+  --border-opacity: 1;
+  color: rgb(var(--color-button-background, 49 47 47));
+}
+
+.liivv-store .indicators .button.button--secondary:not(:disabled) svg {
+  stroke: currentColor;
+}
+
+.liivv-store .indicators .button.button--secondary:disabled,
+.liivv-store .indicators .button.button--secondary[aria-hidden] {
+  --border-opacity: 0.25;
+  color: rgb(var(--color-button-background, 49 47 47) / 0.25) !important;
+  opacity: 1 !important;
+}

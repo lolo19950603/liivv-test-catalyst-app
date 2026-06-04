@@ -1,5 +1,6 @@
 import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
 import { Metadata } from 'next';
+import type { CSSProperties } from 'react';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
 import { SearchParams } from 'nuqs/server';
@@ -19,6 +20,7 @@ import { getMetadataAlternates } from '~/lib/seo/canonical';
 
 import './product-page-feel.css';
 import './product-related-products.css';
+import './product-reviews.css';
 
 import { addToCart } from './_actions/add-to-cart';
 import { getMoreProductImages } from './_actions/get-more-images';
@@ -623,14 +625,30 @@ export default async function Product({ params, searchParams }: Props) {
       />
 
       {showRating && (
-        <div id="reviews">
-          <Reviews
-            productId={productId}
-            recaptchaSiteKey={recaptchaSiteKey}
-            searchParams={searchParams}
-            streamableImages={streamableImages}
-            streamableProduct={streamableProduct}
-          />
+        <div className="liivv-product-reviews dc-section-root max-w-full" id="reviews">
+          <div
+            className="shopify-section"
+            id="liivv-product-reviews-section"
+            style={
+              {
+                '--color-background': '245 242 237',
+                '--section-padding-top': '52px',
+                '--section-padding-bottom': '52px',
+              } as CSSProperties
+            }
+          >
+            <div className="section section--padding section--rounded relative">
+              <div className="page-width relative">
+                <Reviews
+                  productId={productId}
+                  recaptchaSiteKey={recaptchaSiteKey}
+                  searchParams={searchParams}
+                  streamableImages={streamableImages}
+                  streamableProduct={streamableProduct}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

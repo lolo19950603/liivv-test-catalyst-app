@@ -43,6 +43,8 @@ interface Props {
   removeLabel?: Streamable<string>;
   maxItems?: number;
   maxCompareLimitMessage?: Streamable<string>;
+  cardVariant?: 'default' | 'archive';
+  paginationVariant?: 'default' | 'archive';
 }
 
 export function ProductsListSection({
@@ -73,6 +75,8 @@ export function ProductsListSection({
   removeLabel,
   maxItems,
   maxCompareLimitMessage,
+  cardVariant = 'archive',
+  paginationVariant = 'archive',
 }: Props) {
   return (
     <div className="group/products-list-section @container">
@@ -162,6 +166,7 @@ export function ProductsListSection({
 
           <div className="group-has-data-pending/products-list-section:animate-pulse flex-1">
             <ProductList
+              cardVariant={cardVariant}
               compareHref={compareHref}
               compareLabel={compareLabel}
               compareParamName={compareParamName}
@@ -177,7 +182,9 @@ export function ProductsListSection({
               showRating={showRating}
             />
 
-            {paginationInfo && <CursorPagination info={paginationInfo} />}
+            {paginationInfo && (
+              <CursorPagination info={paginationInfo} variant={paginationVariant} />
+            )}
           </div>
         </div>
       </div>

@@ -71,7 +71,7 @@ export function FeaturedProductCarousel({
 }: FeaturedProductCarouselProps) {
   if (appearance === 'liivv-archive') {
     return (
-      <div className="liivv-product-related-products product-singular-recommendations recommendations-section dc-section-root max-w-full">
+      <div className="liivv-product-related-products recommendations-section dc-section-root max-w-full">
         <div
           className="shopify-section"
           id={LIIVV_RELATED_PRODUCTS_SECTION_ID}
@@ -85,20 +85,20 @@ export function FeaturedProductCarousel({
         >
           <div className="related-products block">
             <div className="section section--padding section--rounded relative">
-              <div className="page-width relative overflow-hidden md:overflow-visible">
-                <div className="title-wrapper relative z-[1] mb-8 flex flex-col gap-4 text-left md:flex-row md:items-end md:justify-between lg:gap-8">
-                  <div className="grid gap-4">
-                    <h2 className="heading title-md">
-                      <HighlightedHeading text={title} />
-                    </h2>
-                  </div>
-                </div>
+              <div className="page-width relative">
                 <div className="group/product-carousel">
                   <ProductCarousel
                     aspectRatio="1:1"
-                    colorScheme="dark"
+                    buttonsPlacement="header"
+                    cardVariant="archive"
+                    colorScheme="light"
                     emptyStateSubtitle={emptyStateSubtitle}
                     emptyStateTitle={emptyStateTitle}
+                    header={
+                      <h2 className="heading title-md">
+                        <HighlightedHeading text={title} />
+                      </h2>
+                    }
                     hideOverflow={false}
                     nextLabel={nextLabel}
                     placeholderCount={placeholderCount}

@@ -1,8 +1,9 @@
 import { ReactNode } from 'react';
 
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
-import { Accordion, AccordionItem } from '@/vibes/soul/primitives/accordion';
+import { Accordion, AccordionHydrationGate, AccordionItem } from '@/vibes/soul/primitives/accordion';
 import { AnimatedUnderline } from '@/vibes/soul/primitives/animated-underline';
+import { ArchiveButton } from '@/vibes/soul/primitives/archive-button';
 import { Price, PriceLabel } from '@/vibes/soul/primitives/price-label';
 import * as Skeleton from '@/vibes/soul/primitives/skeleton';
 import { type Breadcrumb, Breadcrumbs } from '@/vibes/soul/sections/breadcrumbs';
@@ -15,7 +16,7 @@ import { ReviewForm, SubmitReviewAction } from '@/vibes/soul/sections/reviews/re
 import {
   BackorderDisplayData,
   ProductDetailBuyRowVariant,
-  ProductDetailForm,
+  ProductDetailFormHydrationGate,
   ProductDetailFormAction,
   StockDisplayData,
 } from './product-detail-form';
@@ -161,6 +162,7 @@ export function ProductDetail<F extends Field>({
                     <div className="group/product-rating">
                       <ReviewForm
                         action={reviewFormAction}
+                        appearance={buyRowVariant === 'archive' ? 'liivv-archive' : 'default'}
                         formEmailLabel={reviewFormEmailLabel}
                         formModalTitle={reviewFormModalTitle}
                         formNameLabel={reviewFormNameLabel}
@@ -174,9 +176,15 @@ export function ProductDetail<F extends Field>({
                         streamableProduct={{ name: product.title }}
                         streamableUser={user}
                         trigger={
-                          <AnimatedUnderline className="cursor-pointer">
-                            Write a review
-                          </AnimatedUnderline>
+                          buyRowVariant === 'archive' ? (
+                            <ArchiveButton className="w-fit" size="md" type="button" variant="primary">
+                              Write a review
+                            </ArchiveButton>
+                          ) : (
+                            <AnimatedUnderline className="cursor-pointer">
+                              Write a review
+                            </AnimatedUnderline>
+                          )
                         }
                       />
                     </div>
@@ -250,7 +258,7 @@ export function ProductDetail<F extends Field>({
                         stockDisplayData,
                         backorderDisplayData,
                       ]) => (
-                        <ProductDetailForm
+                        <ProductDetailFormHydrationGate
                           action={action}
                           additionalActions={additionalActions}
                           backorderDisplayData={backorderDisplayData ?? undefined}
@@ -266,6 +274,7 @@ export function ProductDetail<F extends Field>({
                           prefetch={prefetch}
                           productId={product.id}
                           quantityLabel={quantityLabel}
+                          skeleton={<ProductDetailFormSkeleton />}
                           stockDisplayData={stockDisplayData ?? undefined}
                         />
                       )}
@@ -287,20 +296,22 @@ export function ProductDetail<F extends Field>({
                     <Stream fallback={<ProductAccordionsSkeleton />} value={product.accordions}>
                       {(accordions) =>
                         accordions && (
-                          <Accordion
-                            className="border-t border-[var(--product-detail-border,hsl(var(--contrast-100)))] pt-4"
-                            type="multiple"
-                          >
-                            {accordions.map((accordion, index) => (
-                              <AccordionItem
-                                key={index}
-                                title={accordion.title}
-                                value={index.toString()}
-                              >
-                                {accordion.content}
-                              </AccordionItem>
-                            ))}
-                          </Accordion>
+                          <AccordionHydrationGate fallback={<ProductAccordionsSkeleton />}>
+                            <Accordion
+                              className="border-t border-[var(--product-detail-border,hsl(var(--contrast-100)))] pt-4"
+                              type="multiple"
+                            >
+                              {accordions.map((accordion, index) => (
+                                <AccordionItem
+                                  key={index}
+                                  title={accordion.title}
+                                  value={index.toString()}
+                                >
+                                  {accordion.content}
+                                </AccordionItem>
+                              ))}
+                            </Accordion>
+                          </AccordionHydrationGate>
                         )
                       }
                     </Stream>

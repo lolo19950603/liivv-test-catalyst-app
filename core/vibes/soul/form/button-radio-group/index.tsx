@@ -60,18 +60,20 @@ export const ButtonRadioGroup = React.forwardRef<
     },
     ref,
   ) => {
-    const id = React.useId();
+    const generatedId = React.useId();
+    const labelId =
+      rest.name != null && rest.name !== '' ? `${rest.name}-label` : generatedId;
 
     return (
       <div className={clsx('button-radio-group space-y-2', className)}>
         {label !== undefined && label !== '' && (
-          <Label colorScheme={colorScheme} id={id} required={required}>
+          <Label colorScheme={colorScheme} id={labelId} required={required}>
             {label}
           </Label>
         )}
         <RadioGroupPrimitive.Root
           {...rest}
-          aria-labelledby={id}
+          aria-labelledby={labelId}
           className="flex flex-wrap gap-2"
           ref={ref}
           required={required}

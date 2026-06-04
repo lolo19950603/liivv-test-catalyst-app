@@ -13,7 +13,15 @@ import { getZodConstraint, parseWithZod } from '@conform-to/zod';
 import { clsx } from 'clsx';
 import { useTranslations } from 'next-intl';
 import { createSerializer, parseAsString, useQueryStates } from 'nuqs';
-import { ReactNode, startTransition, useActionState, useCallback, useEffect, useMemo } from 'react';
+import {
+  ReactNode,
+  startTransition,
+  useActionState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useFormStatus } from 'react-dom';
 import { z } from 'zod';
 
@@ -79,6 +87,31 @@ export interface ProductDetailFormProps<F extends Field> {
   stockDisplayData?: StockDisplayData;
   backorderDisplayData?: BackorderDisplayData;
   buyRowVariant?: ProductDetailBuyRowVariant;
+}
+
+export type ProductDetailFormHydrationGateProps<F extends Field> = ProductDetailFormProps<F> & {
+  skeleton: ReactNode;
+};
+
+/**
+ * Defers Radix/Conform form markup until after mount so auto-generated ids match
+ * (avoids useId drift when upstream client trees differ between SSR and hydration).
+ */
+export function ProductDetailFormHydrationGate<F extends Field>({
+  skeleton,
+  ...props
+}: ProductDetailFormHydrationGateProps<F>) {
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  if (!isHydrated) {
+    return skeleton;
+  }
+
+  return <ProductDetailForm {...props} />;
 }
 
 export function ProductDetailForm<F extends Field>({
@@ -173,6 +206,7 @@ export function ProductDetailForm<F extends Field>({
   }, [lastResult, successMessage, router]);
 
   const [form, formFields] = useForm({
+    id: `product-detail-form-${productId}`,
     lastResult,
     constraint: getZodConstraint(schema(fields, minQuantity, maxQuantity)),
     onValidate({ formData }) {

@@ -14,6 +14,7 @@ import {
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
 
 import {
+  archiveAccordionDetailsProps,
   buildFaqPageJsonLd,
   type FaqRow,
   faqRowsResolvedStyled,
@@ -103,7 +104,7 @@ export function DiabetesCareFaqSecond({
                     <div className="faq">
                       {rows.map((row, index) => (
                         <div className="accordion" key={`faq2-${String(index)}`}>
-                          <details className="details" {...{ is: 'accordion-details' }}>
+                          <details {...archiveAccordionDetailsProps()}>
                             <summary className="details__summary flex cursor-pointer items-center justify-between gap-2">
                               <span
                                 className="text-base font-medium leading-tight lg:text-lg xl:text-xl"

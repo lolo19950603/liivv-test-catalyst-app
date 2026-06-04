@@ -10,6 +10,8 @@ import { Rating } from '../rating';
 
 import { Compare } from './compare';
 
+export { ArchiveCatalogProductCard } from './archive-catalog-product-card';
+
 export interface Product {
   id: string;
   title: string;

@@ -2,7 +2,7 @@
 
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import { clsx } from 'clsx';
-import { ComponentPropsWithoutRef, useEffect, useState } from 'react';
+import { ComponentPropsWithoutRef, type ReactNode, useEffect, useState } from 'react';
 
 export interface AccordionProps extends ComponentPropsWithoutRef<typeof AccordionPrimitive.Item> {
   colorScheme?: 'light' | 'dark';
@@ -145,4 +145,25 @@ function AnimatedChevron({
 
 const Accordion = AccordionPrimitive.Root;
 
-export { Accordion, AccordionItem };
+/** Defers Radix accordion until after mount to avoid useId hydration mismatches. */
+function AccordionHydrationGate({
+  children,
+  fallback,
+}: {
+  children: ReactNode;
+  fallback: ReactNode;
+}) {
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  if (!isHydrated) {
+    return fallback;
+  }
+
+  return children;
+}
+
+export { Accordion, AccordionHydrationGate, AccordionItem };

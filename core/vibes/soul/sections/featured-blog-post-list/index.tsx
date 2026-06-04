@@ -30,7 +30,7 @@ export function FeaturedBlogPostList({
     <SectionLayout>
       {breadcrumbs && <Breadcrumbs breadcrumbs={breadcrumbs} />}
 
-      <div className="pt-6">
+      <div className="group/blog-section pt-6">
         <h1 className="mb-3 font-heading text-4xl font-medium leading-none text-foreground @xl:text-5xl @4xl:text-6xl">
           {title}
         </h1>

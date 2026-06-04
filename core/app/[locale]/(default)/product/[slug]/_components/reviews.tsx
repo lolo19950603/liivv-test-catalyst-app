@@ -176,6 +176,8 @@ export const Reviews = async ({
   return (
     <>
       <ReviewsSection
+        appearance="liivv-archive"
+        className="liivv-product-reviews__layout"
         action={submitReview}
         averageRating={streamableAvergeRating}
         emptyStateMessage={t('empty')}

@@ -1,0 +1,109 @@
+/* PDP reviews (archive product-singular layout) */
+.liivv-product-reviews {
+  --product-detail-primary-text: #312f2f;
+  --product-detail-secondary-text: #66605c;
+  --product-detail-border: rgba(49, 47, 47, 0.18);
+  --color-background: 245 242 237;
+  --color-base-background: 252 248 244;
+  --animated-underline-text: var(--product-detail-primary-text);
+  --animated-underline-hover: var(--product-detail-primary-text);
+}
+
+#liivv-product-reviews-section {
+  --section-padding-top: 52px;
+  --section-padding-bottom: 52px;
+  --color-background: 245 242 237;
+  --color-base-background: 252 248 244;
+}
+
+.liivv-product-reviews .section--padding {
+  padding-top: var(--section-padding-top, 52px);
+  padding-bottom: var(--section-padding-bottom, 52px);
+  background-color: rgb(var(--color-background, 245 242 237));
+}
+
+.liivv-product-reviews .liivv-product-reviews__layout > div {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.liivv-product-reviews .liivv-product-reviews__layout h2 {
+  color: var(--product-detail-primary-text);
+}
+
+.liivv-product-reviews .liivv-product-reviews__layout h2 span {
+  color: var(--product-detail-secondary-text) !important;
+}
+
+.liivv-product-reviews .liivv-product-reviews__layout .font-heading.text-5xl,
+.liivv-product-reviews .liivv-product-reviews__layout .font-heading.text-6xl {
+  color: var(--product-detail-primary-text);
+}
+
+.liivv-product-reviews .liivv-product-reviews__layout .border-contrast-100 {
+  border-color: var(--product-detail-border) !important;
+}
+
+.liivv-product-reviews .liivv-product-reviews__layout .text-foreground {
+  color: var(--product-detail-primary-text);
+}
+
+.liivv-product-reviews .liivv-product-reviews__layout .text-contrast-500 {
+  color: var(--product-detail-secondary-text) !important;
+}
+
+.liivv-product-reviews .liivv-product-reviews__layout svg.text-foreground {
+  color: var(--product-detail-secondary-text);
+}
+
+.liivv-product-reviews .liivv-product-reviews__empty > p {
+  color: var(--product-detail-primary-text);
+}
+
+.liivv-product-reviews .liivv-product-reviews__layout .indicators .button.button--secondary:not(:disabled) .btn-text,
+.liivv-product-reviews .liivv-product-reviews__empty .button.button--primary .btn-text {
+  position: relative;
+  z-index: 1;
+}
+
+@media screen and (pointer: fine) {
+  .liivv-product-reviews .liivv-product-reviews__layout .indicators .button.button--secondary:not(:disabled) {
+    transition:
+      color var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1)),
+      border-color var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1));
+  }
+
+  .liivv-product-reviews .liivv-product-reviews__layout .indicators .button.button--secondary:not(:disabled) .btn-text,
+  .liivv-product-reviews .liivv-product-reviews__layout .indicators .button.button--secondary:not(:disabled) svg {
+    transition:
+      color var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1)),
+      stroke var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1));
+    transition-delay: 0.1s;
+  }
+
+  .liivv-product-reviews .liivv-product-reviews__layout .indicators .button.button--secondary:not(:disabled) .btn-fill {
+    transition: background-color var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1));
+  }
+}
+
+.liivv-product-reviews .liivv-product-reviews__layout .indicators .button.button--secondary:not(:disabled) {
+  --border-opacity: 1;
+  color: rgb(var(--color-button-background, 49 47 47));
+}
+
+.liivv-product-reviews .liivv-product-reviews__layout .indicators .button.button--secondary:not(:disabled) svg {
+  stroke: currentColor;
+}
+
+.liivv-product-reviews .liivv-product-reviews__layout .indicators .button.button--secondary:disabled,
+.liivv-product-reviews .liivv-product-reviews__layout .indicators .button.button--secondary[aria-hidden] {
+  --border-opacity: 0.25;
+  --color-button-border: var(--color-button-background, 49 47 47);
+  color: rgb(var(--color-button-background, 49 47 47) / 0.25) !important;
+  opacity: 1 !important;
+}
+
+.liivv-product-reviews .liivv-product-reviews__layout .indicators .button.button--secondary:disabled svg,
+.liivv-product-reviews .liivv-product-reviews__layout .indicators .button.button--secondary[aria-hidden] svg {
+  stroke: currentColor;
+}

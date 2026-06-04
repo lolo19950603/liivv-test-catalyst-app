@@ -1,10 +1,35 @@
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
+import { ArchiveButton } from '@/vibes/soul/primitives/archive-button';
 import { Button } from '@/vibes/soul/primitives/button';
 import { CursorPagination, CursorPaginationInfo } from '@/vibes/soul/primitives/cursor-pagination';
 import { Rating } from '@/vibes/soul/primitives/rating';
 import { StickySidebarLayout } from '@/vibes/soul/sections/sticky-sidebar-layout';
 
 import { ReviewForm, SubmitReviewAction } from './review-form';
+
+export type ReviewsAppearance = 'default' | 'liivv-archive';
+
+function WriteReviewTrigger({
+  label,
+  appearance = 'default',
+}: {
+  label: string;
+  appearance?: ReviewsAppearance;
+}) {
+  if (appearance === 'liivv-archive') {
+    return (
+      <ArchiveButton className="mx-auto mt-8 w-fit" size="md" type="button" variant="primary">
+        {label}
+      </ArchiveButton>
+    );
+  }
+
+  return (
+    <Button className="mx-auto mt-8" size="small" variant="tertiary">
+      {label}
+    </Button>
+  );
+}
 
 interface Review {
   id: string;
@@ -41,6 +66,8 @@ interface Props {
   streamableProduct: Streamable<{ name: string }>;
   streamableUser: Streamable<{ email: string; name: string }>;
   recaptchaSiteKey?: string;
+  className?: string;
+  appearance?: ReviewsAppearance;
 }
 
 export function Reviews({
@@ -67,14 +94,21 @@ export function Reviews({
   streamableImages,
   streamableUser,
   recaptchaSiteKey,
+  className,
+  appearance = 'default',
 }: Readonly<Props>) {
   return (
-    <Stream fallback={<ReviewsSkeleton reviewsLabel={reviewsLabel} />} value={streamableReviews}>
+    <Stream
+      fallback={<ReviewsSkeleton appearance={appearance} className={className} reviewsLabel={reviewsLabel} />}
+      value={streamableReviews}
+    >
       {(reviews) => {
         if (reviews.length === 0)
           return (
             <ReviewsEmptyState
               action={action}
+              appearance={appearance}
+              className={className}
               formButtonLabel={formButtonLabel}
               formCancelLabel={formCancelLabel}
               formEmailLabel={formEmailLabel}
@@ -96,6 +130,7 @@ export function Reviews({
 
         return (
           <StickySidebarLayout
+            className={className}
             sidebar={
               <>
                 <Stream
@@ -134,6 +169,7 @@ export function Reviews({
                 </Stream>
                 <ReviewForm
                   action={action}
+                  appearance={appearance}
                   formEmailLabel={formEmailLabel}
                   formModalTitle={formModalTitle}
                   formNameLabel={formNameLabel}
@@ -146,11 +182,7 @@ export function Reviews({
                   streamableImages={streamableImages}
                   streamableProduct={streamableProduct}
                   streamableUser={streamableUser}
-                  trigger={
-                    <Button className="mx-auto mt-8" size="small" variant="tertiary">
-                      {formButtonLabel}
-                    </Button>
-                  }
+                  trigger={<WriteReviewTrigger appearance={appearance} label={formButtonLabel} />}
                 />
               </>
             }
@@ -176,6 +208,7 @@ export function Reviews({
                       nextLabel={nextLabel}
                       previousLabel={previousLabel}
                       scroll={false}
+                      variant={appearance === 'liivv-archive' ? 'archive' : 'default'}
                     />
                   )
                 }
@@ -206,9 +239,13 @@ export function ReviewsEmptyState({
   streamableImages,
   streamableUser,
   recaptchaSiteKey,
+  className,
+  appearance = 'default',
 }: {
   message?: string;
   reviewsLabel?: string;
+  className?: string;
+  appearance?: ReviewsAppearance;
   productId: number;
   action: SubmitReviewAction;
   formButtonLabel?: string;
@@ -230,6 +267,7 @@ export function ReviewsEmptyState({
 }) {
   return (
     <StickySidebarLayout
+      className={className}
       sidebar={
         <>
           <h2 className="mb-4 mt-0 text-xl font-medium @xl:my-5 @xl:text-2xl">
@@ -243,10 +281,11 @@ export function ReviewsEmptyState({
       }
       sidebarSize="medium"
     >
-      <div className="flex flex-1 flex-col border-t border-contrast-100 py-12">
+      <div className="liivv-product-reviews__empty flex flex-1 flex-col border-t border-contrast-100 py-12">
         <p className="text-center">{message}</p>
         <ReviewForm
           action={action}
+          appearance={appearance}
           formCancelLabel={formCancelLabel}
           formEmailLabel={formEmailLabel}
           formModalTitle={formModalTitle}
@@ -260,20 +299,24 @@ export function ReviewsEmptyState({
           streamableImages={streamableImages}
           streamableProduct={streamableProduct}
           streamableUser={streamableUser}
-          trigger={
-            <Button className="mx-auto mt-8" size="small" variant="tertiary">
-              {formButtonLabel}
-            </Button>
-          }
+          trigger={<WriteReviewTrigger appearance={appearance} label={formButtonLabel} />}
         />
       </div>
     </StickySidebarLayout>
   );
 }
 
-export function ReviewsSkeleton({ reviewsLabel = 'Reviews' }: { reviewsLabel?: string }) {
+export function ReviewsSkeleton({
+  reviewsLabel = 'Reviews',
+  className,
+}: {
+  reviewsLabel?: string;
+  className?: string;
+  appearance?: ReviewsAppearance;
+}) {
   return (
     <StickySidebarLayout
+      className={className}
       sidebar={
         <div className="animate-pulse">
           <h2 className="mb-4 mt-0 text-xl font-medium @xl:my-5 @xl:text-2xl">{reviewsLabel}</h2>

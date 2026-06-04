@@ -37,5 +37,7 @@ export function MSProductsList({
     return <ProductListSkeleton className={className} />;
   }
 
-  return <ProductList {...props} className={className} products={products} />;
+  return (
+    <ProductList {...props} cardVariant="archive" className={className} products={products} />
+  );
 }

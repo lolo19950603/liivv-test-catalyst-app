@@ -29,6 +29,7 @@ runtime.registerComponent(ProductSingularFaq, {
     ...headingPopoverControls({
       label: 'Heading',
       textDefault: 'FAQs',
+      textColorDefault: '0 0% 100%',
     }),
     introBody: Group({
       label: 'Intro',

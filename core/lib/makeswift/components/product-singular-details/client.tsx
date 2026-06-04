@@ -1,8 +1,12 @@
 'use client';
 
 import { clsx } from 'clsx';
+import { useEffect, useRef, useState } from 'react';
+
+import { initAccordionDetails } from '~/lib/archived-pages/accordion-details-element';
 
 import {
+  archiveAccordionDetailsProps,
   IconPlusAccordion,
   answerHtmlForRte,
 } from '~/lib/makeswift/components/diabetes-care-faq/shared';
@@ -83,9 +87,26 @@ export function ProductSingularDetails({
       ? (accordions ?? [])
       : PRODUCT_SINGULAR_DETAILS_DEFAULT_ACCORDIONS;
 
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [accordionReady, setAccordionReady] = useState(false);
+
+  useEffect(() => {
+    setAccordionReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!accordionReady || sectionRef.current == null) {
+      return;
+    }
+
+    return initAccordionDetails(sectionRef.current);
+  }, [accordionReady]);
+
   return (
     <div
       className={clsx('product-singular-details', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}
+      data-accordion-hydration-pending={accordionReady ? undefined : ''}
+      ref={sectionRef}
     >
       <div className="shopify-section" id={resolvedSectionId} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
@@ -99,11 +120,7 @@ export function ProductSingularDetails({
 
                   return (
                     <div className="accordion" key={`product-details-acc-${String(index)}`}>
-                      <details
-                        className="details"
-                        open={row.defaultOpen === true}
-                        {...{ is: 'accordion-details' }}
-                      >
+                      <details {...archiveAccordionDetailsProps(row.defaultOpen)}>
                         <summary className="details__summary flex cursor-pointer items-center justify-between gap-2">
                           <span className="heading flex items-center gap-2d5 text-base-xl font-medium leading-none md:gap-3">
                             {title}

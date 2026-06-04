@@ -44,6 +44,7 @@ export function MSProductsCarousel({
   return (
     <ProductCarousel
       {...props}
+      cardVariant="archive"
       className={className}
       hideOverflow={hideOverflow}
       products={products}

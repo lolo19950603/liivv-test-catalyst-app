@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import { useMemo, type CSSProperties, type FormEvent } from 'react';
 
 import {
+  archiveAccordionDetailsProps,
   buildFaqPageJsonLd,
   faqRowsResolvedStyled,
   IconPlusAccordion,
@@ -22,7 +23,11 @@ import {
   type SectionBackgroundProps,
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
 
-import { PRODUCT_SINGULAR_FAQ_SECTION_ID, PRODUCT_SINGULAR_FAQ_VARS } from './archive-styles';
+import {
+  productSingularFaqScopedCss,
+  PRODUCT_SINGULAR_FAQ_SECTION_ID,
+  PRODUCT_SINGULAR_FAQ_VARS,
+} from './archive-styles';
 
 export const PRODUCT_SINGULAR_FAQ_DEFAULT_ITEMS: FaqRow[] = [
   {
@@ -95,12 +100,13 @@ export function ProductSingularFaq({
   );
   const headingResolved = resolveHeadingTypography(heading);
   const contactHeadingResolved = resolveHeadingTypography(contactHeading);
-  const { sectionCss, sectionStyle } = buildSectionTheme({
+  const { sectionCss: themeCss, sectionStyle } = buildSectionTheme({
     sectionId: resolvedSectionId,
     sectionCss: PRODUCT_SINGULAR_FAQ_VARS,
     background,
     defaultBackgroundChannels: ARCHIVE_CREAM_BACKGROUND_CHANNELS,
   });
+  const sectionCss = `${themeCss}${productSingularFaqScopedCss(resolvedSectionId)}`;
   const introHtml = introBody?.bodyHtml?.trim() ?? '';
   const introColor = resolveBodyTextColor(introBody);
   const contactBodyHtml = contactBody?.bodyHtml?.trim() ?? '';
@@ -115,12 +121,7 @@ export function ProductSingularFaq({
       : "Didn't find your answer?";
 
   const headingStyle =
-    headingResolved.color != null || headingResolved.fontSize != null
-      ? ({
-          ...(headingResolved.color != null ? { color: headingResolved.color } : {}),
-          ...(headingResolved.fontSize != null ? { fontSize: headingResolved.fontSize } : {}),
-        } satisfies CSSProperties)
-      : undefined;
+    headingResolved.fontSize != null ? { fontSize: headingResolved.fontSize } : undefined;
 
   const jsonLd = useMemo(() => {
     if (rows.length === 0) {
@@ -153,11 +154,11 @@ export function ProductSingularFaq({
             roundedTop && 'section--rounded',
           )}
         >
-          <div className="page-width relative">
+          <div className="page-width relative px-4 sm:px-5 md:px-0">
             <div className="faqs with-background relative z-[1] flex flex-col lg:flex-row">
               <div className="grid grow gap-8 md:gap-12">
-                <div className="grid gap-4 text-left md:flex-row md:items-end">
-                  <div className="title-wrapper grid gap-4 text-left leading-none md:flex-row md:items-end">
+                <div className="grid gap-4 text-left">
+                  <div className="title-wrapper grid gap-4 text-left leading-none">
                     <h2 className="heading title-lg tracking-heading" style={headingStyle}>
                       <SplitWordsHeading text={headingText} />
                     </h2>
@@ -174,7 +175,7 @@ export function ProductSingularFaq({
                 <div className="faq">
                   {rows.map((row, index) => (
                     <div className="accordion" key={`product-faq-${String(index)}`}>
-                      <details className="details" {...{ is: 'accordion-details' }}>
+                      <details {...archiveAccordionDetailsProps()}>
                         <summary className="details__summary flex cursor-pointer items-center justify-between gap-2">
                           <span
                             className="text-base font-medium leading-tight lg:text-lg xl:text-xl"
@@ -196,15 +197,15 @@ export function ProductSingularFaq({
               </div>
 
               <form
-                className="grow-0"
+                className="w-full min-w-0 grow-0 lg:w-auto"
                 method="post"
                 action="/contact"
                 onSubmit={onSubmit}
               >
-                <div className="contact__sidebar sticky top-0 grid gap-7d5 md:gap-10 lg:sticky">
+                <div className="contact__sidebar relative grid w-full min-w-0 gap-7d5 md:gap-10 lg:sticky lg:top-0">
                   <div className="flex justify-between gap-6">
                     <div className="grid gap-2d5">
-                      <p className="heading text-2xl leading-none tracking-tight lg:text-3xl">
+                      <p className="heading text-2xl leading-none tracking-tight text-[rgb(var(--color-foreground))] lg:text-3xl">
                         {contactHeadingText}
                       </p>
                       {contactBodyHtml.length > 0 ? (
@@ -220,10 +221,10 @@ export function ProductSingularFaq({
                   </div>
 
                   <div className="grid gap-4d5 md:gap-6">
-                    <div className="field">
+                    <div className="field w-full min-w-0">
                       <input
                         autoComplete="name"
-                        className="input is-floating"
+                        className="input is-floating w-full"
                         id={`${resolvedSectionId}-contact-name`}
                         name="contact[Name]"
                         placeholder="Name"
@@ -236,10 +237,10 @@ export function ProductSingularFaq({
                         Name
                       </label>
                     </div>
-                    <div className="field">
+                    <div className="field w-full min-w-0">
                       <input
                         autoComplete="email"
-                        className="input is-floating"
+                        className="input is-floating w-full"
                         id={`${resolvedSectionId}-contact-email`}
                         name="contact[email]"
                         placeholder="Email"
@@ -254,9 +255,9 @@ export function ProductSingularFaq({
                         Email
                       </label>
                     </div>
-                    <div className="field">
+                    <div className="field w-full min-w-0">
                       <textarea
-                        className="textarea is-floating"
+                        className="textarea is-floating w-full max-w-full"
                         id={`${resolvedSectionId}-contact-message`}
                         name="contact[Message]"
                         placeholder=" "
@@ -269,9 +270,9 @@ export function ProductSingularFaq({
                         Message
                       </label>
                     </div>
-                    <div className="field">
+                    <div className="field w-full min-w-0">
                       <button
-                        className="button button--primary button--fixed"
+                        className="button button--primary button--fixed w-fit"
                         type="submit"
                         {...{ is: 'hover-button' }}
                       >

@@ -1,12 +1,104 @@
-/* From product-singular-recommendations / product-singular-page.html */
+/* PDP related products carousel (archive product-singular layout) */
 .liivv-product-related-products {
   --color-background: 245 242 237;
+  --color-base-background: 252 248 244;
 }
 
 #liivv-product-related-products-section {
   --section-padding-top: 52px;
   --section-padding-bottom: 36px;
   --color-background: 245 242 237;
+  --color-base-background: 252 248 244;
+}
+
+.liivv-product-related-products .liivv-archive-product-card__media :is(img) {
+  object-fit: cover;
+  object-position: center;
+}
+
+.liivv-product-related-products .liivv-archive-product-card {
+  color: rgb(var(--color-base-text, 40 40 40));
+}
+
+.liivv-product-related-products .liivv-archive-product-card__content,
+.liivv-product-related-products .liivv-archive-product-card__details {
+  text-align: center;
+}
+
+.liivv-product-related-products .liivv-archive-product-card__title .reversed-link {
+  --reversed-link-gap: 100%;
+  --transform-origin-start: left;
+  --transform-origin-end: right;
+  display: inline;
+  max-width: 100%;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  text-decoration: none;
+  background: linear-gradient(to var(--transform-origin-end), currentColor, currentColor) 0
+    var(--reversed-link-gap) / 0 1px no-repeat;
+  background-position-x: var(--transform-origin-end);
+  transition: background-size var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1));
+}
+
+.liivv-product-related-products .liivv-archive-product-card__details .price {
+  justify-content: center;
+  width: 100%;
+}
+
+@media screen and (pointer: fine) {
+  .liivv-product-related-products .liivv-archive-product-card__title .reversed-link:hover {
+    background-position-x: var(--transform-origin-start);
+    background-size: 100% 1px;
+  }
+}
+
+.liivv-product-related-products .title-wrapper .indicators .button.button--secondary:not(:disabled) .btn-text {
+  position: relative;
+  z-index: 1;
+}
+
+@media screen and (pointer: fine) {
+  .liivv-product-related-products .title-wrapper .indicators .button.button--secondary:not(:disabled) {
+    transition:
+      color var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1)),
+      border-color var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1));
+  }
+
+  .liivv-product-related-products .title-wrapper .indicators .button.button--secondary:not(:disabled):after {
+    transition: border var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1));
+  }
+
+  .liivv-product-related-products .title-wrapper .indicators .button.button--secondary:not(:disabled) .btn-text,
+  .liivv-product-related-products .title-wrapper .indicators .button.button--secondary:not(:disabled) svg {
+    transition:
+      color var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1)),
+      stroke var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1));
+    transition-delay: 0.1s;
+  }
+
+  .liivv-product-related-products .title-wrapper .indicators .button.button--secondary:not(:disabled) .btn-fill {
+    transition: background-color var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1));
+  }
+}
+
+.liivv-product-related-products .title-wrapper .indicators .button.button--secondary:not(:disabled) {
+  --border-opacity: 1;
+  color: rgb(var(--color-button-background, 49 47 47));
+}
+
+.liivv-product-related-products .title-wrapper .indicators .button.button--secondary:not(:disabled) svg {
+  stroke: currentColor;
+}
+
+.liivv-product-related-products .title-wrapper .indicators .button.button--secondary:disabled {
+  --border-opacity: 0.25;
+  --color-button-border: var(--color-button-background, 49 47 47);
+  color: rgb(var(--color-button-background, 49 47 47) / 0.25) !important;
+  opacity: 1 !important;
+}
+
+.liivv-product-related-products .title-wrapper .indicators .button.button--secondary:disabled svg {
+  stroke: currentColor;
 }
 
 .liivv-product-related-products .title-wrapper {

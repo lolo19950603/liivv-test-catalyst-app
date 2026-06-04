@@ -1,48 +1,30 @@
+'use client';
+
 import { clsx } from 'clsx';
 import { Loader2 } from 'lucide-react';
 import { ComponentPropsWithoutRef } from 'react';
+
+import {
+  mapSoulSizeToArchive,
+  mapSoulVariantToArchive,
+  resolveButtonAppearance,
+  shouldUseSoulButton,
+  type StoreButtonAppearance,
+} from '~/lib/store-theme/archive-button-maps';
+import { useStoreTheme } from '~/lib/store-theme/store-theme';
+
+import { ArchiveButton } from '@/vibes/soul/primitives/archive-button';
 
 export interface ButtonProps extends ComponentPropsWithoutRef<'button'> {
   variant?: 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'danger';
   size?: 'large' | 'medium' | 'small' | 'x-small';
   shape?: 'pill' | 'rounded' | 'square' | 'circle';
   loading?: boolean;
+  /** `inherit` uses the store layout theme (archive on the main storefront). */
+  appearance?: StoreButtonAppearance | 'inherit';
 }
 
-// eslint-disable-next-line valid-jsdoc
-/**
- * This component supports various CSS variables for theming. Here's a comprehensive list, along
- * with their default values:
- *
- * ```css
- * :root {
- *   --button-focus: hsl(var(--primary));
- *   --button-font-family: var(--font-family-body);
- *   --button-primary-background: hsl(var(--primary));
- *   --button-primary-background-hover: color-mix(in oklab, hsl(var(--primary)), white 75%);
- *   --button-primary-text: hsl(var(--foreground));
- *   --button-primary-border: hsl(var(--primary));
- *   --button-secondary-background: hsl(var(--foreground));
- *   --button-secondary-background-hover: hsl(var(--background));
- *   --button-secondary-text: hsl(var(--background));
- *   --button-secondary-border: hsl(var(--foreground));
- *   --button-tertiary-background: hsl(var(--background));
- *   --button-tertiary-background-hover: hsl(var(--contrast-100));
- *   --button-tertiary-text: hsl(var(--foreground));
- *   --button-tertiary-border: hsl(var(--contrast-200));
- *   --button-ghost-background: transparent;
- *   --button-ghost-background-hover: hsl(var(--foreground) / 5%);
- *   --button-ghost-text: hsl(var(--foreground));
- *   --button-ghost-border: transparent;
- *   --button-loader-icon: hsl(var(--foreground));
- *   --button-danger-background: color-mix(in oklab, hsl(var(--error)), white 30%);
- *   --button-danger-background-hover: color-mix(in oklab, hsl(var(--error)), white 75%);
- *   --button-danger-text: hsl(var(--foreground));
- *   --button-danger-border: color-mix(in oklab, hsl(var(--error)), white 30%);
- * }
- * ```
- */
-export function Button({
+function SoulButton({
   variant = 'primary',
   size = 'large',
   shape = 'pill',
@@ -127,5 +109,52 @@ export function Button({
         />
       </span>
     </button>
+  );
+}
+
+export function Button({
+  appearance = 'inherit',
+  variant = 'primary',
+  size = 'large',
+  shape = 'pill',
+  loading = false,
+  className,
+  children,
+  ...props
+}: ButtonProps) {
+  const storeTheme = useStoreTheme();
+  const resolvedAppearance = resolveButtonAppearance(appearance, storeTheme.buttonAppearance);
+
+  if (
+    shouldUseSoulButton({
+      variant,
+      shape,
+      appearance: resolvedAppearance,
+    })
+  ) {
+    return (
+      <SoulButton
+        className={className}
+        loading={loading}
+        shape={shape}
+        size={size}
+        variant={variant}
+        {...props}
+      >
+        {children}
+      </SoulButton>
+    );
+  }
+
+  return (
+    <ArchiveButton
+      className={className}
+      loading={loading}
+      size={mapSoulSizeToArchive(size)}
+      variant={mapSoulVariantToArchive(variant)}
+      {...props}
+    >
+      {children}
+    </ArchiveButton>
   );
 }

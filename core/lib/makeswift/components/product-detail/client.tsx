@@ -9,9 +9,10 @@ import React, {
   type Ref,
   useCallback,
   useContext,
+  useMemo,
 } from 'react';
 
-import { Stream, type Streamable } from '@/vibes/soul/lib/streamable';
+import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { ProductDetail, ProductDetailSkeleton } from '@/vibes/soul/sections/product-detail';
 import { mergeSections } from '~/lib/makeswift/utils/merge-sections';
 
@@ -82,25 +83,31 @@ const ProductDetailImpl = ({
     [accordions],
   );
 
+  const streamableProductDetail = useMemo(
+    () =>
+      Streamable.from(async () => {
+        const product = await Promise.resolve(streamableProduct);
+        const productAccordions =
+          product.accordions != null ? await Promise.resolve(product.accordions) : undefined;
+
+        return {
+          ...product,
+          summary: summaryText,
+          description: getProductDescription(product),
+          accordions: getProductAccordions(productAccordions),
+        };
+      }),
+    [
+      streamableProduct,
+      summaryText,
+      getProductDescription,
+      getProductAccordions,
+    ],
+  );
+
   return (
-    <Stream fallback={<ProductDetailSkeleton />} value={streamableProduct}>
-      {(product) => (
-        <Stream fallback={<ProductDetailSkeleton />} value={product.accordions}>
-          {(productAccordions) => (
-            <ProductDetail
-              {...{
-                ...props,
-                product: {
-                  ...product,
-                  summary: summaryText,
-                  description: getProductDescription(product),
-                  accordions: getProductAccordions(productAccordions),
-                },
-              }}
-            />
-          )}
-        </Stream>
-      )}
+    <Stream fallback={<ProductDetailSkeleton />} value={streamableProductDetail}>
+      {(product) => <ProductDetail {...props} product={product} />}
     </Stream>
   );
 };

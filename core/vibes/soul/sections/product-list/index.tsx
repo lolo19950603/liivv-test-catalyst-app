@@ -3,6 +3,7 @@ import { clsx } from 'clsx';
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { CompareDrawer, CompareDrawerProvider } from '@/vibes/soul/primitives/compare-drawer';
 import {
+  ArchiveCatalogProductCard,
   type Product,
   ProductCard,
   ProductCardSkeleton,
@@ -26,6 +27,7 @@ interface ProductListProps {
   removeLabel?: Streamable<string>;
   maxItems?: number;
   maxCompareLimitMessage?: Streamable<string>;
+  cardVariant?: 'default' | 'archive';
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -61,6 +63,7 @@ export function ProductList({
   removeLabel: streamableRemoveLabel,
   maxItems,
   maxCompareLimitMessage: streamableMaxCompareLimitMessage,
+  cardVariant = 'default',
 }: ProductListProps) {
   return (
     <Stream
@@ -99,20 +102,33 @@ export function ProductList({
             maxItems={maxItems}
           >
             <div className={clsx('w-full @container', className)}>
-              <div className="mx-auto grid grid-cols-1 gap-x-4 gap-y-6 @sm:grid-cols-2 @2xl:grid-cols-3 @2xl:gap-x-5 @2xl:gap-y-8 @5xl:grid-cols-4 @7xl:grid-cols-5">
-                {products.map((product) => (
-                  <ProductCard
-                    aspectRatio={aspectRatio}
-                    colorScheme={colorScheme}
-                    compareLabel={compareLabel}
-                    compareParamName={compareParamName}
-                    imageSizes="(min-width: 80rem) 20vw, (min-width: 64rem) 25vw, (min-width: 42rem) 33vw, (min-width: 24rem) 50vw, 100vw"
-                    key={product.id}
-                    product={product}
-                    showCompare={showCompare}
-                    showRating={showRating}
-                  />
-                ))}
+              <div
+                className={clsx(
+                  'mx-auto grid grid-cols-1 gap-x-4 gap-y-6 @sm:grid-cols-2 @2xl:grid-cols-3 @2xl:gap-x-5 @2xl:gap-y-8 @5xl:grid-cols-4 @7xl:grid-cols-5',
+                  cardVariant === 'archive' && 'liivv-catalog-product-grid',
+                )}
+              >
+                {products.map((product) =>
+                  cardVariant === 'archive' ? (
+                    <ArchiveCatalogProductCard
+                      imageSizes="(min-width: 80rem) 20vw, (min-width: 64rem) 25vw, (min-width: 42rem) 33vw, (min-width: 24rem) 50vw, 100vw"
+                      key={product.id}
+                      product={product}
+                    />
+                  ) : (
+                    <ProductCard
+                      aspectRatio={aspectRatio}
+                      colorScheme={colorScheme}
+                      compareLabel={compareLabel}
+                      compareParamName={compareParamName}
+                      imageSizes="(min-width: 80rem) 20vw, (min-width: 64rem) 25vw, (min-width: 42rem) 33vw, (min-width: 24rem) 50vw, 100vw"
+                      key={product.id}
+                      product={product}
+                      showCompare={showCompare}
+                      showRating={showRating}
+                    />
+                  ),
+                )}
               </div>
             </div>
             {showCompare && compareProducts.length > 0 && (

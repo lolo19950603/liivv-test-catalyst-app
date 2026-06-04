@@ -4,8 +4,14 @@
 import { clsx } from 'clsx';
 import useEmblaCarousel, { type UseEmblaCarouselType } from 'embla-carousel-react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import * as React from 'react';
+
+import { scanShopifyButtonFillHover } from '~/lib/archived-pages/init-shopify-button-fill-hover';
+import {
+  IconChevronLeft,
+  IconChevronRight,
+} from '~/lib/makeswift/diabetes-care-carousel-controls';
 
 type CarouselApi = UseEmblaCarouselType[1];
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
@@ -160,13 +166,73 @@ function CarouselButtons({
   colorScheme = 'light',
   previousLabel = 'Previous',
   nextLabel = 'Next',
+  variant = 'default',
   ...rest
 }: React.HTMLAttributes<HTMLDivElement> & {
   colorScheme?: 'light' | 'dark';
   previousLabel?: string;
   nextLabel?: string;
+  variant?: 'default' | 'archive';
 }) {
   const { scrollPrev, scrollNext, canScrollPrev, canScrollNext } = useCarousel();
+  const indicatorsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (variant !== 'archive') {
+      return;
+    }
+
+    const frameId = requestAnimationFrame(() => {
+      if (indicatorsRef.current != null) {
+        scanShopifyButtonFillHover(indicatorsRef.current);
+      }
+    });
+
+    return () => {
+      cancelAnimationFrame(frameId);
+    };
+  }, [variant, canScrollPrev, canScrollNext]);
+
+  if (variant === 'archive') {
+    return (
+      <div {...rest} className={clsx('indicators flex shrink-0 gap-2.5', className)} ref={indicatorsRef}>
+        <button
+          aria-label={previousLabel}
+          className="button button--secondary"
+          disabled={!canScrollPrev}
+          onClick={scrollPrev}
+          type="button"
+        >
+          <span className="btn-fill" data-fill />
+          <span className="btn-text">
+            <IconChevronLeft />
+          </span>
+          <span className="btn-loader">
+            <span />
+            <span />
+            <span />
+          </span>
+        </button>
+        <button
+          aria-label={nextLabel}
+          className="button button--secondary"
+          disabled={!canScrollNext}
+          onClick={scrollNext}
+          type="button"
+        >
+          <span className="btn-fill" data-fill />
+          <span className="btn-text">
+            <IconChevronRight />
+          </span>
+          <span className="btn-loader">
+            <span />
+            <span />
+            <span />
+          </span>
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div

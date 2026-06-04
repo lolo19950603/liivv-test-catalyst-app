@@ -1,5 +1,6 @@
 import { clsx } from 'clsx';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import {
@@ -11,6 +12,7 @@ import {
 } from '@/vibes/soul/primitives/carousel';
 import {
   type Product,
+  ArchiveCatalogProductCard,
   ProductCard,
   ProductCardSkeleton,
 } from '@/vibes/soul/primitives/product-card';
@@ -32,6 +34,11 @@ export interface ProductCarouselProps {
   showButtons?: boolean;
   showScrollbar?: boolean;
   hideOverflow?: boolean;
+  /** Archive Liivv catalog card (cream surface, centered text when no image). */
+  cardVariant?: 'default' | 'archive';
+  /** Render prev/next controls in the header row instead of below the carousel. */
+  buttonsPlacement?: 'bottom' | 'header';
+  header?: ReactNode;
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -64,7 +71,12 @@ export function ProductCarousel({
   showButtons = true,
   showScrollbar = true,
   hideOverflow = true,
+  cardVariant = 'default',
+  buttonsPlacement = 'bottom',
+  header,
 }: ProductCarouselProps) {
+  const buttonsInHeader = buttonsPlacement === 'header';
+  const buttonVariant = cardVariant === 'archive' ? 'archive' : 'default';
   return (
     <Stream
       fallback={
@@ -92,36 +104,64 @@ export function ProductCarousel({
 
         return (
           <Carousel className={className} hideOverflow={hideOverflow}>
-            <CarouselContent className="-ml-4 mb-10 @2xl:-ml-5">
+            {buttonsInHeader && (header != null || showButtons) ? (
+              <div className="title-wrapper relative z-[1] mb-8 flex flex-col gap-4 text-left md:flex-row md:items-end md:justify-between lg:gap-8">
+                {header != null ? <div className="grid gap-4">{header}</div> : null}
+                {showButtons ? (
+                  <CarouselButtons
+                    nextLabel={nextLabel}
+                    previousLabel={previousLabel}
+                    variant={buttonVariant}
+                  />
+                ) : null}
+              </div>
+            ) : null}
+            <CarouselContent className={clsx('-ml-4 @2xl:-ml-5', !buttonsInHeader && 'mb-10')}>
               {products.map(({ id, ...product }) => (
                 <CarouselItem
-                  className="basis-full pl-4 @md:basis-1/2 @lg:basis-1/3 @2xl:basis-1/4 @2xl:pl-5"
+                  className="min-w-0 max-w-full basis-full pl-4 @md:basis-1/2 @lg:basis-1/3 @2xl:basis-1/4 @2xl:pl-5"
                   key={id}
                 >
-                  <ProductCard
-                    aspectRatio={aspectRatio}
-                    colorScheme={colorScheme}
-                    imageSizes="(min-width: 42rem) 25vw, (min-width: 32rem) 33vw, (min-width: 28rem) 50vw, 100vw"
-                    product={{ id, ...product }}
-                  />
+                  {cardVariant === 'archive' ? (
+                    <ArchiveCatalogProductCard
+                      imageSizes="(min-width: 42rem) 25vw, (min-width: 32rem) 33vw, (min-width: 28rem) 50vw, 100vw"
+                      product={{ id, ...product }}
+                    />
+                  ) : (
+                    <ProductCard
+                      aspectRatio={aspectRatio}
+                      colorScheme={colorScheme}
+                      imageSizes="(min-width: 42rem) 25vw, (min-width: 32rem) 33vw, (min-width: 28rem) 50vw, 100vw"
+                      product={{ id, ...product }}
+                    />
+                  )}
                 </CarouselItem>
               ))}
             </CarouselContent>
-            {(showButtons || showScrollbar) && (
-              <div className="mt-10 flex w-full items-center justify-between gap-8">
+            {(!buttonsInHeader && (showButtons || showScrollbar)) ||
+            (buttonsInHeader && showScrollbar) ? (
+              <div
+                className={clsx(
+                  'flex w-full items-center justify-between gap-8',
+                  !buttonsInHeader && 'mt-10',
+                )}
+              >
                 <CarouselScrollbar
                   className={clsx(!showScrollbar && 'pointer-events-none invisible')}
                   colorScheme={colorScheme}
                   label={scrollbarLabel}
                 />
-                <CarouselButtons
-                  className={clsx(!showButtons && 'pointer-events-none invisible')}
-                  colorScheme={colorScheme}
-                  nextLabel={nextLabel}
-                  previousLabel={previousLabel}
-                />
+                {!buttonsInHeader ? (
+                  <CarouselButtons
+                    className={clsx(!showButtons && 'pointer-events-none invisible')}
+                    colorScheme={colorScheme}
+                    nextLabel={nextLabel}
+                    previousLabel={previousLabel}
+                    variant={buttonVariant}
+                  />
+                ) : null}
               </div>
-            )}
+            ) : null}
           </Carousel>
         );
       }}

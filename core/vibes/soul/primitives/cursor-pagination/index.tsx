@@ -7,6 +7,8 @@ import { createSerializer, parseAsString } from 'nuqs';
 import { Suspense } from 'react';
 
 import { Streamable, useStreamable } from '@/vibes/soul/lib/streamable';
+import { resolveButtonAppearance } from '~/lib/store-theme/archive-button-maps';
+import { useStoreTheme } from '~/lib/store-theme/store-theme';
 import { Link } from '~/components/link';
 
 export interface CursorPaginationInfo {
@@ -22,6 +24,7 @@ interface Props {
   previousLabel?: Streamable<string | null>;
   nextLabel?: Streamable<string | null>;
   scroll?: boolean;
+  variant?: 'default' | 'archive' | 'inherit';
 }
 
 export function CursorPagination(props: Props) {
@@ -38,7 +41,13 @@ function CursorPaginationResolved({
   previousLabel: streamablePreviousLabel,
   nextLabel: streamableNextLabel,
   scroll,
+  variant = 'inherit',
 }: Props) {
+  const storeTheme = useStoreTheme();
+  const resolvedVariant = resolveButtonAppearance(
+    variant === 'inherit' ? undefined : variant,
+    storeTheme.paginationVariant,
+  );
   const label = useStreamable(streamableLabel) ?? 'pagination';
   const {
     startCursorParamName = 'before',
@@ -53,6 +62,51 @@ function CursorPaginationResolved({
   });
   const previousLabel = useStreamable(streamablePreviousLabel) ?? 'Go to previous page';
   const nextLabel = useStreamable(streamableNextLabel) ?? 'Go to next page';
+
+  if (resolvedVariant === 'archive') {
+    return (
+      <nav aria-label={label} className="py-10" role="navigation">
+        <ul className="indicators flex items-center justify-center gap-2.5">
+          <li>
+            {startCursor != null ? (
+              <ArchivePaginationLink
+                aria-label={previousLabel}
+                href={serialize(searchParams, {
+                  [startCursorParamName]: startCursor,
+                  [endCursorParamName]: null,
+                })}
+                scroll={scroll}
+              >
+                <ArrowLeft className="icon icon-chevron-left icon-sm stroke-2" size={16} strokeWidth={2} />
+              </ArchivePaginationLink>
+            ) : (
+              <ArchiveSkeletonLink>
+                <ArrowLeft className="icon icon-chevron-left icon-sm stroke-2" size={16} strokeWidth={2} />
+              </ArchiveSkeletonLink>
+            )}
+          </li>
+          <li>
+            {endCursor != null ? (
+              <ArchivePaginationLink
+                aria-label={nextLabel}
+                href={serialize(searchParams, {
+                  [endCursorParamName]: endCursor,
+                  [startCursorParamName]: null,
+                })}
+                scroll={scroll}
+              >
+                <ArrowRight className="icon icon-chevron-right icon-sm stroke-2" size={16} strokeWidth={2} />
+              </ArchivePaginationLink>
+            ) : (
+              <ArchiveSkeletonLink>
+                <ArrowRight className="icon icon-chevron-right icon-sm stroke-2" size={16} strokeWidth={2} />
+              </ArchiveSkeletonLink>
+            )}
+          </li>
+        </ul>
+      </nav>
+    );
+  }
 
   return (
     <nav aria-label={label} className="py-10" role="navigation">
@@ -128,6 +182,43 @@ function SkeletonLink({ children }: { children: React.ReactNode }) {
     <div className="flex h-12 w-12 cursor-not-allowed items-center justify-center rounded-full border border-contrast-100 text-foreground opacity-50 duration-300">
       {children}
     </div>
+  );
+}
+
+function ArchivePaginationLink({
+  href,
+  children,
+  scroll,
+  'aria-label': ariaLabel,
+}: {
+  href: string;
+  children: React.ReactNode;
+  scroll?: boolean;
+  ['aria-label']?: string;
+}) {
+  return (
+    <Link
+      aria-label={ariaLabel}
+      className="button button--secondary"
+      href={href}
+      scroll={scroll}
+    >
+      <span className="btn-fill" data-fill="" />
+      <span className="btn-text">{children}</span>
+    </Link>
+  );
+}
+
+function ArchiveSkeletonLink({ children }: { children: React.ReactNode }) {
+  return (
+    <span
+      aria-hidden
+      className="button button--secondary pointer-events-none opacity-50"
+      tabIndex={-1}
+    >
+      <span className="btn-fill" data-fill="" />
+      <span className="btn-text">{children}</span>
+    </span>
   );
 }
 

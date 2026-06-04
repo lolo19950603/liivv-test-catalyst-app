@@ -1,43 +1,27 @@
+'use client';
+
 import { clsx } from 'clsx';
 import { ComponentPropsWithoutRef } from 'react';
 
+import {
+  mapSoulLinkVariantToArchive,
+  mapSoulSizeToArchive,
+  resolveButtonAppearance,
+  type StoreButtonAppearance,
+} from '~/lib/store-theme/archive-button-maps';
+import { useStoreTheme } from '~/lib/store-theme/store-theme';
+
+import { ArchiveButtonLink } from '@/vibes/soul/primitives/archive-button';
 import { Link } from '~/components/link';
 
 export interface ButtonLinkProps extends ComponentPropsWithoutRef<typeof Link> {
   variant?: 'primary' | 'secondary' | 'tertiary' | 'ghost';
   size?: 'large' | 'medium' | 'small' | 'x-small';
   shape?: 'pill' | 'rounded' | 'square' | 'circle';
+  appearance?: StoreButtonAppearance | 'inherit';
 }
 
-// eslint-disable-next-line valid-jsdoc
-/**
- * This component supports various CSS variables for theming. Here's a comprehensive list, along
- * with their default values:
- *
- * ```css
- * :root {
- *   --button-focus: hsl(var(--primary));
- *   --button-font-family: var(--font-family-body);
- *   --button-primary-background: hsl(var(--primary));
- *   --button-primary-background-hover: color-mix(in oklab, hsl(var(--primary)), white 75%);
- *   --button-primary-text: hsl(var(--foreground));
- *   --button-primary-border: hsl(var(--primary));
- *   --button-secondary-background: hsl(var(--foreground));
- *   --button-secondary-background-hover: hsl(var(--background));
- *   --button-secondary-text: hsl(var(--background));
- *   --button-secondary-border: hsl(var(--foreground));
- *   --button-tertiary-background: hsl(var(--background));
- *   --button-tertiary-background-hover: hsl(var(--contrast-100));
- *   --button-tertiary-text: hsl(var(--foreground));
- *   --button-tertiary-border: hsl(var(--contrast-200));
- *   --button-ghost-background: transparent;
- *   --button-ghost-background-hover: hsl(var(--foreground) / 5%);
- *   --button-ghost-text: hsl(var(--foreground));
- *   --button-ghost-border: transparent;
- * }
- * ```
- */
-export function ButtonLink({
+function SoulButtonLink({
   variant = 'primary',
   size = 'large',
   shape = 'pill',
@@ -84,5 +68,43 @@ export function ButtonLink({
     >
       <span className={clsx(variant === 'secondary' && 'mix-blend-difference')}>{children}</span>
     </Link>
+  );
+}
+
+export function ButtonLink({
+  appearance = 'inherit',
+  variant = 'primary',
+  size = 'large',
+  shape = 'pill',
+  className,
+  children,
+  ...props
+}: ButtonLinkProps) {
+  const storeTheme = useStoreTheme();
+  const resolvedAppearance = resolveButtonAppearance(appearance, storeTheme.buttonAppearance);
+
+  if (resolvedAppearance !== 'archive' || variant === 'ghost' || shape === 'circle') {
+    return (
+      <SoulButtonLink
+        className={className}
+        shape={shape}
+        size={size}
+        variant={variant}
+        {...props}
+      >
+        {children}
+      </SoulButtonLink>
+    );
+  }
+
+  return (
+    <ArchiveButtonLink
+      className={className}
+      size={mapSoulSizeToArchive(size)}
+      variant={mapSoulLinkVariantToArchive(variant)}
+      {...props}
+    >
+      {children}
+    </ArchiveButtonLink>
   );
 }

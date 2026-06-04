@@ -144,6 +144,8 @@ export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
   `${MOBILE}{#${IMAGE_TEXT_OVERLAY_SECTION_ID} .banner__box{padding-bottom:1.5rem}}`,
 
   /* 16 — Footer rounded panels: beat `.dc-section-root .section { overflow: visible }` at all widths */
+  `.site-featured-columns-footer .site-featured-columns-footer__shell--rounded{overflow:hidden!important}`,
+  `.site-featured-columns-footer .site-featured-columns-footer__shell--rounded>.shopify-section{overflow:hidden!important}`,
   `.site-featured-columns-footer .site-featured-columns-footer__panel--rounded{overflow:hidden!important}`,
   `.site-footer-makeswift footer.site-footer-makeswift__panel--rounded{overflow:hidden!important}`,
   `.site-footer-bottom-bar__shell .site-footer-bottom-bar--rounded-bottom{overflow:hidden!important}`,

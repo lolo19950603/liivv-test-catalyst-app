@@ -3,5 +3,4 @@
  * Picker group: {@link PRODUCT_SINGULAR_PAGE_COMPONENT_GROUP} via {@link productSingularPageComponentLabel}.
  */
 import './components/product-singular-details/register';
-import './components/product-singular-recommendations/register';
 import './components/product-singular-faq/register';

@@ -17,6 +17,7 @@ import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-si
 
 import {
   answerHtmlForRte,
+  archiveAccordionDetailsProps,
   buildFaqPageJsonLd,
   type FaqRow,
   faqRowsResolvedStyled,
@@ -152,7 +153,7 @@ export function DiabetesCareFaqFirst({
                   <div className="faq">
                     {rows.map((row, index) => (
                         <div className="accordion" key={`faq1-${String(index)}`}>
-                          <details className="details" {...{ is: 'accordion-details' }}>
+                          <details {...archiveAccordionDetailsProps()}>
                             <summary className="details__summary flex cursor-pointer items-center justify-between gap-2">
                               <span
                                 className="text-base font-medium leading-tight lg:text-lg xl:text-xl"
