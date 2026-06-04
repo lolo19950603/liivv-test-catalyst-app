@@ -4,6 +4,7 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   --animation-primary: 0.5s cubic-bezier(0.3, 1, 0.3, 1);
   --mega-menu-drawer-duration: 0.45s;
   --mega-menu-drawer-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --mega-menu-feature-radius: 0.625rem;
 }
 /* Top-level nav (Liivv Your Life / Liivv Health) — archive with-block hover slide */
 .liivv-archive-header .header__menu > ul.with-block > li {
@@ -115,19 +116,19 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   min-height: 280px;
   border-inline-start: 1px solid rgb(var(--color-foreground) / 0.08);
   overflow: hidden;
-  border-radius: var(--border-radius, 1rem);
+  border-radius: var(--mega-menu-feature-radius);
 }
 .liivv-archive-header .header-mega-menu__feature-panel,
 .liivv-archive-header .header-mega-menu__feature-placeholder,
 .liivv-archive-header .header-mega-menu__feature-image {
-  border-radius: var(--border-radius, 1rem);
+  border-radius: var(--mega-menu-feature-radius);
 }
 .liivv-archive-header .header-mega-menu__feature-panel,
 .liivv-archive-header .header-mega-menu__feature-placeholder {
   overflow: hidden;
 }
 .liivv-archive-header .header-mega-menu__feature-scrim {
-  border-radius: var(--border-radius, 1rem);
+  border-radius: var(--mega-menu-feature-radius);
 }
 .liivv-archive-header .header-mega-menu__link--active {
   font-weight: 600;
