@@ -13,8 +13,6 @@ export type MakeswiftAdditionalSubLinkInput = {
 export type MakeswiftAdditionalLinkInput = {
   label: string;
   link: { href?: string };
-  featuredImage?: string;
-  featuredImageAlt?: string;
   exploreAllLabel?: string;
   subLinks?: MakeswiftAdditionalSubLinkInput[];
 };
@@ -46,11 +44,6 @@ export function mapMakeswiftAdditionalLinks(
     .filter((item) => item.label.trim().length > 0)
     .map((item) => {
       const href = resolveMakeswiftHref(item.link.href, '/');
-      const featuredImage = mapMakeswiftNavImage(
-        item.featuredImage,
-        item.featuredImageAlt,
-        item.label,
-      );
 
       const subLinks = (item.subLinks ?? [])
         .filter((sub) => sub.label.trim().length > 0)
@@ -66,7 +59,6 @@ export function mapMakeswiftAdditionalLinks(
       return {
         label: item.label,
         href,
-        featuredImage,
         columns,
         exploreAll:
           columns != null && columns.length > 0

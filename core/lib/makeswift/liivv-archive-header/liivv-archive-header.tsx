@@ -163,7 +163,6 @@ function NavMenuTrigger({
       aria-label={label}
       className="menu__item text-sm-lg relative z-2 flex cursor-pointer items-center font-medium"
       href={href}
-      onClick={hasMegaMenu ? (e) => e.preventDefault() : undefined}
     >
       <span className="btn-text" data-text={label}>
         {label}
@@ -884,9 +883,17 @@ export function LiivvArchiveHeader({
                     className="border-b border-[rgb(var(--color-foreground)/0.06)] last:border-b-0"
                     key={`${item.label}-m-${index}`}
                   >
-                    <p className="px-4 pt-3 text-xs font-semibold uppercase tracking-wide text-[rgb(var(--color-foreground)/0.55)]">
+                    <Link
+                      className={clsx(
+                        'flex min-h-11 items-center px-4 pt-3 font-[family-name:var(--font-navigation-family,var(--font-sans))]',
+                        'text-xs font-semibold uppercase tracking-wide text-[rgb(var(--color-foreground)/0.55)] no-underline',
+                        'rounded-md active:bg-[rgb(var(--color-foreground)/0.06)]',
+                      )}
+                      href={item.href}
+                      onClick={closeMobileNav}
+                    >
                       {item.label}
-                    </p>
+                    </Link>
                     <ul className="list-none pb-2" role="list">
                       {columns.flatMap((column) =>
                         column.links.map((link, linkIndex) => (

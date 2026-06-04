@@ -13,7 +13,10 @@ import {
 
 import { usePathname } from '~/i18n/routing';
 import { LiivvArchiveHeader } from '~/lib/makeswift/liivv-archive-header/liivv-archive-header';
-import type { LiivvArchiveNavLink } from '~/lib/makeswift/liivv-archive-header/types';
+import type {
+  LiivvArchiveHeaderLogo,
+  LiivvArchiveNavLink,
+} from '~/lib/makeswift/liivv-archive-header/types';
 import type { StoreCategoryNode } from '~/lib/makeswift/site-header/build-store-nav-from-categories';
 import { resolveStoreNavLinks } from '~/lib/makeswift/site-header/resolve-store-nav-links';
 import { resolveStoreLogo, type StoreLogo } from '~/lib/makeswift/site-header/resolve-store-logo';
@@ -78,8 +81,6 @@ interface Props {
   links: Array<{
     label: string;
     link: { href?: string };
-    featuredImage?: string;
-    featuredImageAlt?: string;
     exploreAllLabel?: string;
     subLinks?: Array<{
       label: string;
@@ -92,16 +93,55 @@ interface Props {
   pageOverrides?: PageOverride[];
 }
 
+function resolvePageOverrideLogo(
+  showLogo: boolean,
+  logoImage: string | undefined,
+  logoAlt: string,
+  logoLink: PageOverride['logoLink'],
+  storeLogo: StoreLogo,
+  storeLogoLabel: string,
+): LiivvArchiveHeaderLogo | null {
+  if (!showLogo) {
+    return null;
+  }
+
+  const href = logoLink?.href;
+
+  if (logoImage != null && logoImage.trim().length > 0) {
+    return {
+      src: logoImage,
+      alt: logoAlt,
+      href,
+    };
+  }
+
+  const store = resolveStoreLogo(storeLogo, storeLogoLabel);
+
+  if (store == null) {
+    return null;
+  }
+
+  return {
+    ...store,
+    alt: logoAlt || store.alt,
+    href: href ?? store.href,
+  };
+}
+
 function PageOverrideHeader({
   background,
   override,
   cartCount,
   defaultSearchPlaceholder,
+  storeLogo,
+  storeLogoLabel,
 }: {
   background?: SectionBackgroundProps;
   override: PageOverride;
   cartCount: number | null;
   defaultSearchPlaceholder: string;
+  storeLogo: StoreLogo;
+  storeLogoLabel: string;
 }) {
   const {
     showLogo = true,
@@ -118,25 +158,26 @@ function PageOverrideHeader({
     href: resolveMakeswiftHref(item.link.href, '/'),
   }));
 
+  const logo = resolvePageOverrideLogo(
+    showLogo,
+    logoImage,
+    logoAlt,
+    logoLink,
+    storeLogo,
+    storeLogoLabel,
+  );
+
   return (
     <LiivvArchiveHeader
       background={background}
       className="liivv-site-header liivv-site-header--override"
       initialCartCount={cartCount}
-      logo={
-        showLogo && logoImage
-          ? {
-              src: logoImage,
-              alt: logoAlt,
-              href: logoLink?.href,
-            }
-          : null
-      }
+      logo={logo}
       navAriaLabel="Specialized page"
       navLinks={links}
       searchPlaceholder={searchPlaceholder}
       sectionId={ARCHIVE_HEADER_SECTION_ID}
-      showLogo={showLogo}
+      showLogo={Boolean(logo?.src || logo?.text)}
       showUtilityIcons={showUtilityIcons}
       sticky
       withPinSpacer={false}
@@ -168,6 +209,8 @@ export const MakeswiftHeader = forwardRef(
           cartCount={cartCount}
           defaultSearchPlaceholder={searchPlaceholder}
           override={override}
+          storeLogo={storeLogo}
+          storeLogoLabel={storeLogoLabel}
         />
       );
     }

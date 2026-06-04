@@ -57,8 +57,6 @@ const additionalNavLinks = List({
     props: {
       label: TextInput({ label: 'Text', defaultValue: 'Text' }),
       link: Link({ label: 'URL' }),
-      featuredImage: Image({ label: 'Default preview image (optional)' }),
-      featuredImageAlt: TextInput({ label: 'Default image alt text', defaultValue: '' }),
       exploreAllLabel: TextInput({ label: 'Explore all label', defaultValue: 'Explore All' }),
       subLinks: List({
         label: 'Sub links (mega menu)',
