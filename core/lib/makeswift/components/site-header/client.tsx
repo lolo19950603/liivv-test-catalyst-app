@@ -78,6 +78,15 @@ interface Props {
   links: Array<{
     label: string;
     link: { href?: string };
+    featuredImage?: string;
+    featuredImageAlt?: string;
+    exploreAllLabel?: string;
+    subLinks?: Array<{
+      label: string;
+      link: { href?: string };
+      previewImage?: string;
+      previewImageAlt?: string;
+    }>;
   }>;
   linksPosition: 'center' | 'left' | 'right';
   pageOverrides?: PageOverride[];

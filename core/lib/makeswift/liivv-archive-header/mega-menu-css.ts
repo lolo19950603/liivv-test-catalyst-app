@@ -96,11 +96,36 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
 .liivv-archive-header .header-mega-menu-wrap.is-open .header-mega-menu {
   transform: translateY(0);
 }
+.liivv-archive-header .header-mega-menu__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 36%);
+  gap: clamp(1.25rem, 2.5vw, 2.5rem);
+  padding-block: clamp(1.75rem, 3vw, 2.5rem);
+  padding-inline: 0;
+}
+.liivv-archive-header .header-mega-menu__links {
+  min-width: 0;
+}
 .liivv-archive-header .header-mega-menu__grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: clamp(1.5rem, 3vw, 3rem);
-  padding-block: clamp(1.75rem, 3vw, 2.5rem);
+}
+.liivv-archive-header .header-mega-menu__feature {
+  min-height: 280px;
+  border-inline-start: 1px solid rgb(var(--color-foreground) / 0.08);
+  overflow: hidden;
+}
+.liivv-archive-header .header-mega-menu__link--active {
+  font-weight: 600;
+}
+@media screen and (max-width: 1023px) {
+  .liivv-archive-header .header-mega-menu__body {
+    grid-template-columns: 1fr;
+  }
+  .liivv-archive-header .header-mega-menu__feature {
+    display: none;
+  }
 }
 .liivv-archive-header .header-mega-menu__column {
   list-style: none;

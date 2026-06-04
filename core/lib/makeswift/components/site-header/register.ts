@@ -40,6 +40,36 @@ const sectionNavLinks = List({
   getItemLabel: (item) => item?.label ?? 'Link',
 });
 
+const additionalNavSubLink = Group({
+  label: 'Sub link',
+  props: {
+    label: TextInput({ label: 'Text', defaultValue: 'Subcategory' }),
+    link: Link({ label: 'URL' }),
+    previewImage: Image({ label: 'Hover preview image' }),
+    previewImageAlt: TextInput({ label: 'Image alt text', defaultValue: '' }),
+  },
+});
+
+const additionalNavLinks = List({
+  label: 'Additional links',
+  type: Group({
+    label: 'Link',
+    props: {
+      label: TextInput({ label: 'Text', defaultValue: 'Text' }),
+      link: Link({ label: 'URL' }),
+      featuredImage: Image({ label: 'Default preview image (optional)' }),
+      featuredImageAlt: TextInput({ label: 'Default image alt text', defaultValue: '' }),
+      exploreAllLabel: TextInput({ label: 'Explore all label', defaultValue: 'Explore All' }),
+      subLinks: List({
+        label: 'Sub links (mega menu)',
+        type: additionalNavSubLink,
+        getItemLabel: (item) => item?.label ?? 'Sub link',
+      }),
+    },
+  }),
+  getItemLabel: (item) => item?.label ?? 'Text',
+});
+
 runtime.registerComponent(MakeswiftHeader, {
   type: COMPONENT_TYPE,
   label: 'Site Header',
@@ -47,17 +77,7 @@ runtime.registerComponent(MakeswiftHeader, {
   props: {
     ...sectionBackgroundControls('0 0% 100%'),
     banner,
-    links: List({
-      label: 'Additional links',
-      type: Group({
-        label: 'Link',
-        props: {
-          label: TextInput({ label: 'Text', defaultValue: 'Text' }),
-          link: Link({ label: 'URL' }),
-        },
-      }),
-      getItemLabel: (item) => item?.label ?? 'Link',
-    }),
+    links: additionalNavLinks,
     linksPosition: Select({
       label: 'Links position',
       options: [

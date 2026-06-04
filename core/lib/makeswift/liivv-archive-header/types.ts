@@ -1,6 +1,10 @@
 export interface LiivvArchiveNavSubLink {
   label: string;
   href: string;
+  image?: {
+    src: string;
+    alt: string;
+  } | null;
 }
 
 export interface LiivvArchiveNavColumn {
@@ -10,6 +14,10 @@ export interface LiivvArchiveNavColumn {
 export interface LiivvArchiveNavLink {
   label: string;
   href: string;
+  featuredImage?: {
+    src: string;
+    alt: string;
+  } | null;
   columns?: LiivvArchiveNavColumn[];
   exploreAll?: {
     label: string;

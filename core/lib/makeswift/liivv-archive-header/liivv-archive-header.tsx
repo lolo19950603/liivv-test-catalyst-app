@@ -8,6 +8,7 @@ import {
   useCallback,
   useEffect,
   useId,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -28,6 +29,7 @@ import type {
   LiivvArchiveHeaderLogo,
   LiivvArchiveLinksPosition,
   LiivvArchiveNavLink,
+  LiivvArchiveNavSubLink,
 } from './types';
 
 const SEARCH_RESULTS_PATH = '/search';
@@ -173,6 +175,75 @@ function NavMenuTrigger({
   );
 }
 
+function pickDefaultMegaMenuPreview(
+  item: LiivvArchiveNavLink,
+  links: LiivvArchiveNavSubLink[],
+): LiivvArchiveNavSubLink | null {
+  const linkWithImage = links.find((link) => Boolean(link.image?.src));
+
+  if (linkWithImage) {
+    return linkWithImage;
+  }
+
+  if (links[0]) {
+    return links[0];
+  }
+
+  if (item.featuredImage?.src) {
+    return {
+      label: item.label,
+      href: item.href,
+      image: item.featuredImage,
+    };
+  }
+
+  return null;
+}
+
+function MegaMenuCategoryPreview({ preview }: { preview: LiivvArchiveNavSubLink | null }) {
+  if (preview == null) {
+    return (
+      <div
+        aria-hidden
+        className="header-mega-menu__feature-placeholder flex h-full min-h-[280px] items-center justify-center bg-[rgb(var(--color-foreground)/0.04)] p-6 text-center text-sm text-[rgb(var(--color-foreground)/0.45)]"
+      >
+        Hover a category to preview
+      </div>
+    );
+  }
+
+  const imageSrc = preview.image?.src;
+  const imageAlt = preview.image?.alt || preview.label;
+
+  return (
+    <div className="header-mega-menu__feature-panel relative flex h-full min-h-[280px] flex-col overflow-hidden">
+      {imageSrc ? (
+        <img
+          alt={imageAlt}
+          className="header-mega-menu__feature-image absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ease-out"
+          key={imageSrc}
+          src={imageSrc}
+        />
+      ) : (
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-[rgb(var(--color-foreground)/0.06)]"
+        />
+      )}
+      <div className="header-mega-menu__feature-scrim pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgb(33_33_33/0.72)] via-[rgb(33_33_33/0.12)] to-transparent" />
+      <div className="relative mt-auto p-5 text-white">
+        <p className="text-lg font-semibold leading-tight">{preview.label}</p>
+        <Link
+          className="mt-2 inline-block text-sm font-medium underline underline-offset-2"
+          href={preview.href}
+        >
+          Shop {preview.label}
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 function HeaderMegaMenuPanel({
   item,
   menuId,
@@ -185,6 +256,18 @@ function HeaderMegaMenuPanel({
   onHover: () => void;
 }) {
   const columns = item.columns ?? [];
+  const flatLinks = useMemo(() => columns.flatMap((column) => column.links), [columns]);
+  const defaultPreview = useMemo(
+    () => pickDefaultMegaMenuPreview(item, flatLinks),
+    [item, flatLinks],
+  );
+  const [previewLink, setPreviewLink] = useState<LiivvArchiveNavSubLink | null>(defaultPreview);
+
+  useEffect(() => {
+    if (open) {
+      setPreviewLink(defaultPreview);
+    }
+  }, [open, defaultPreview]);
 
   if (columns.length === 0) {
     return null;
@@ -200,18 +283,38 @@ function HeaderMegaMenuPanel({
       aria-hidden={!open}
     >
       <div className="header-mega-menu page-width page-width--full">
-        <div className="header-mega-menu__grid">
-          {columns.map((column, columnIndex) => (
-            <ul className="header-mega-menu__column" key={`col-${columnIndex}`} role="list">
-              {column.links.map((link, linkIndex) => (
-                <li key={`${link.label}-${linkIndex}`}>
-                  <Link className="header-mega-menu__link" href={link.href}>
-                    {link.label}
-                  </Link>
-                </li>
+        <div className="header-mega-menu__body">
+          <div className="header-mega-menu__links">
+            <div className="header-mega-menu__grid">
+              {columns.map((column, columnIndex) => (
+                <ul className="header-mega-menu__column" key={`col-${columnIndex}`} role="list">
+                  {column.links.map((link, linkIndex) => {
+                    const isActive =
+                      previewLink?.href === link.href && previewLink.label === link.label;
+
+                    return (
+                      <li key={`${link.label}-${linkIndex}`}>
+                        <Link
+                          className={clsx(
+                            'header-mega-menu__link',
+                            isActive && 'header-mega-menu__link--active',
+                          )}
+                          href={link.href}
+                          onFocus={() => setPreviewLink(link)}
+                          onMouseEnter={() => setPreviewLink(link)}
+                        >
+                          {link.label}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
               ))}
-            </ul>
-          ))}
+            </div>
+          </div>
+          <aside aria-label="Category preview" className="header-mega-menu__feature">
+            <MegaMenuCategoryPreview preview={previewLink} />
+          </aside>
         </div>
         {item.exploreAll ? (
           <Link className="header-mega-menu__footer" href={item.exploreAll.href}>

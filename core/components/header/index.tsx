@@ -12,6 +12,7 @@ import { logoTransformer } from '~/data-transformers/logo-transformer';
 import { getCartId } from '~/lib/cart';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { SiteHeader } from '~/lib/makeswift/components/site-header';
+import { mapCategoryTreeFromStore } from '~/lib/makeswift/site-header/map-category-tree';
 
 import { CurrencyCode, HeaderFragment, HeaderLinksFragment } from './fragment';
 
@@ -77,7 +78,9 @@ export const Header = async () => {
       getPreferredCurrencyCode(),
     ]);
 
-    return (await getHeaderLinks(customerAccessToken, currencyCode)).categoryTree;
+    const { categoryTree } = await getHeaderLinks(customerAccessToken, currencyCode);
+
+    return mapCategoryTreeFromStore(categoryTree);
   });
 
   const streamableCartCount = Streamable.from(async () => {
