@@ -1,5 +1,3 @@
-import { getSiteVersion } from '@makeswift/runtime/next/server';
-
 import { getComponentSnapshot } from './client';
 import { SlotClient } from './slot-client';
 
@@ -12,16 +10,13 @@ export async function Slot({
   label: string;
   fallback?: React.ReactNode;
 }) {
-  const [snapshot, siteVersion] = await Promise.all([
-    getComponentSnapshot(snapshotId),
-    getSiteVersion(),
-  ]);
+  const snapshot = await getComponentSnapshot(snapshotId);
 
   return (
     <SlotClient
       fallback={fallback}
       label={label}
-      showWhenEmpty={siteVersion != null}
+      showWhenEmpty={false}
       snapshot={snapshot}
     />
   );

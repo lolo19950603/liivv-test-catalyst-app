@@ -10,7 +10,7 @@ type Props = {
   snapshot: MakeswiftComponentSnapshot;
   label: string;
   fallback?: ReactNode;
-  /** Draft/preview (siteVersion set); show empty slot chrome for editing. */
+  /** When true, empty snapshot slots render Makeswift chrome (builder only; keep false). */
   showWhenEmpty: boolean;
 };
 

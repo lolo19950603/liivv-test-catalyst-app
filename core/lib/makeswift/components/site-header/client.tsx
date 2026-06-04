@@ -1,6 +1,7 @@
 'use client';
 
 import { Banner } from '@/vibes/soul/primitives/banner';
+import { useIsInBuilder } from '@makeswift/runtime/react';
 import {
   createContext,
   forwardRef,
@@ -18,6 +19,10 @@ import type {
   LiivvArchiveNavLink,
 } from '~/lib/makeswift/liivv-archive-header/types';
 import type { StoreCategoryNode } from '~/lib/makeswift/site-header/build-store-nav-from-categories';
+import {
+  isEmptyMakeswiftPlaceholder,
+  MakeswiftVisibleSlotContent,
+} from '~/lib/makeswift/makeswift-visible-slot-content';
 import { resolveStoreNavLinks } from '~/lib/makeswift/site-header/resolve-store-nav-links';
 import { resolveStoreLogo, type StoreLogo } from '~/lib/makeswift/site-header/resolve-store-logo';
 import { findMatchingPathConfig } from '~/lib/makeswift/site-header/should-hide-store-header';
@@ -215,12 +220,19 @@ export const MakeswiftHeader = forwardRef(
       );
     }
 
-    const combinedBanner = banner.show
+    const isInBuilder = useIsInBuilder();
+    const bannerChildren = banner.children ?? passedBanner?.children;
+    const showBanner =
+      banner.show &&
+      (isInBuilder || !isEmptyMakeswiftPlaceholder(bannerChildren));
+    const combinedBanner = showBanner
       ? {
           ...passedBanner,
           id: banner.id,
           hideDismiss: !banner.allowClose,
-          children: banner.children ?? passedBanner?.children,
+          children: (
+            <MakeswiftVisibleSlotContent>{bannerChildren}</MakeswiftVisibleSlotContent>
+          ),
         }
       : undefined;
 

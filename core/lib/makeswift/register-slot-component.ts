@@ -11,8 +11,8 @@ import type { ReactRuntimeCore } from '@makeswift/runtime/react/core';
 export function registerSlotComponent(runtime: ReactRuntimeCore) {
   return runtime.registerComponent(
     lazy(() =>
-      import('@makeswift/runtime/react/builtins/slot').then((mod) => ({
-        default: mod.Slot,
+      import('./catalyst-builtin-slot').then((mod) => ({
+        default: mod.CatalystBuiltinSlot,
       })),
     ),
     {

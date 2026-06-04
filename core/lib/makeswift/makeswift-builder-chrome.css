@@ -1,0 +1,9 @@
+/* Hide empty Makeswift drop zones on preview/live; keep containers that have child components. */
+html:not([data-makeswift-builder])
+  [data-makeswift-empty-element='true']:not(:has([data-makeswift-component-type])) {
+  display: none !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}

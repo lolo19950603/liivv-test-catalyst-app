@@ -1,3 +1,5 @@
+@import './lib/makeswift/makeswift-builder-chrome.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
