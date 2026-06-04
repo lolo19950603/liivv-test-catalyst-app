@@ -1,9 +1,11 @@
 import { clsx } from 'clsx';
 
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
-import { ButtonLink } from '@/vibes/soul/primitives/button-link';
 import { Breadcrumb, Breadcrumbs, BreadcrumbsSkeleton } from '@/vibes/soul/sections/breadcrumbs';
 import { Image } from '~/components/image';
+import { Link } from '~/components/link';
+
+import './blog-post-content.css';
 
 interface Tag {
   label: string;
@@ -39,7 +41,7 @@ export function BlogPostContent({
   breadcrumbs,
 }: Props) {
   return (
-    <section className={clsx('@container', className)}>
+    <section className={clsx('group/blog-post liivv-blog-post @container', className)}>
       <div className="mx-auto max-w-screen-2xl px-4 py-10 @xl:px-6 @xl:py-14 @4xl:px-8 @4xl:py-20">
         <Stream fallback={<BlogPostContentSkeleton />} value={streamableBlogPost}>
           {(blogPost) => {
@@ -47,13 +49,13 @@ export function BlogPostContent({
 
             return (
               <>
-                <header className="mx-auto w-full max-w-4xl pb-8 @2xl:pb-12 @4xl:pb-16">
+                <header className="liivv-blog-post__header mx-auto w-full max-w-4xl pb-8 @2xl:pb-12 @4xl:pb-16">
                   {breadcrumbs && <Breadcrumbs breadcrumbs={breadcrumbs} />}
 
-                  <h1 className="mb-4 mt-8 font-heading text-4xl font-medium leading-none @xl:text-5xl @4xl:text-6xl">
+                  <h1 className="liivv-blog-post__title heading mb-4 mt-8 text-4xl font-medium leading-none @xl:text-5xl @4xl:text-6xl">
                     {title}
                   </h1>
-                  <p>
+                  <p className="liivv-blog-post__meta">
                     {date}{' '}
                     {Boolean(author) && (
                       <>
@@ -63,16 +65,11 @@ export function BlogPostContent({
                   </p>
 
                   {(tags?.length ?? 0) > 0 && (
-                    <div className="-ml-1 mt-4 flex flex-wrap gap-1.5 @xl:mt-6">
+                    <div className="liivv-blog-post__tags -ml-1 mt-4 flex flex-wrap gap-1.5 @xl:mt-6">
                       {tags?.map((tag, index) => (
-                        <ButtonLink
-                          href={tag.link.href}
-                          key={index}
-                          size="small"
-                          variant="tertiary"
-                        >
+                        <Link className="badge" href={tag.link.href} key={index}>
                           {tag.label}
-                        </ButtonLink>
+                        </Link>
                       ))}
                     </div>
                   )}
@@ -89,7 +86,7 @@ export function BlogPostContent({
                 )}
 
                 <article
-                  className="@-xl:[&_h2]:text-4xl prose mx-auto w-full max-w-4xl space-y-4 [&_h2]:font-heading [&_h2]:text-3xl [&_h2]:font-normal [&_h2]:leading-none [&_img]:mx-auto [&_img]:max-h-[600px] [&_img]:w-fit [&_img]:rounded-2xl [&_img]:object-cover"
+                  className="liivv-blog-post__body rte body subtext-md mx-auto w-full max-w-4xl leading-normal"
                   dangerouslySetInnerHTML={{ __html: content }}
                 />
               </>

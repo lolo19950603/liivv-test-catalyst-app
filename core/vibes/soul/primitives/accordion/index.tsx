@@ -6,6 +6,7 @@ import { ComponentPropsWithoutRef, type ReactNode, useEffect, useState } from 'r
 
 export interface AccordionProps extends ComponentPropsWithoutRef<typeof AccordionPrimitive.Item> {
   colorScheme?: 'light' | 'dark';
+  variant?: 'default' | 'archive';
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -37,6 +38,7 @@ function AccordionItem({
   title,
   children,
   colorScheme = 'light',
+  variant = 'default',
   className,
   ...props
 }: AccordionProps) {
@@ -59,26 +61,40 @@ function AccordionItem({
       )}
     >
       <AccordionPrimitive.Header>
-        <AccordionPrimitive.Trigger className="group flex w-full cursor-pointer items-start gap-8 border-none py-3 text-start focus:outline-none @md:py-4">
+        <AccordionPrimitive.Trigger
+          className={clsx(
+            'group flex w-full cursor-pointer items-center gap-3 border-none text-start focus:outline-none',
+            variant === 'archive' ? 'py-3' : 'items-start gap-8 py-3 @md:py-4',
+          )}
+        >
           <div
             className={clsx(
-              'flex-1 select-none font-[family-name:var(--accordion-title-font-family,var(--font-family-mono))] text-sm font-normal uppercase transition-colors duration-300 ease-out',
-              {
-                light:
-                  'text-[var(--accordion-light-title-text,hsl(var(--contrast-400)))] group-hover:text-[var(--accordion-light-title-text-hover,hsl(var(--foreground)))]',
-                dark: 'text-[var(--accordion-dark-title-text,hsl(var(--contrast-200)))] group-hover:text-[var(--accordion-dark-title-text-hover,hsl(var(--background)))]',
-              }[colorScheme],
+              'flex-1 select-none transition-colors duration-300 ease-out',
+              variant === 'archive'
+                ? clsx(
+                    'font-[family-name:var(--font-family-body)] text-base font-semibold leading-tight text-foreground',
+                  )
+                : clsx(
+                    'font-[family-name:var(--accordion-title-font-family,var(--font-family-mono))] text-sm font-normal uppercase',
+                    {
+                      light:
+                        'text-[var(--accordion-light-title-text,hsl(var(--contrast-400)))] group-hover:text-[var(--accordion-light-title-text-hover,hsl(var(--foreground)))]',
+                      dark: 'text-[var(--accordion-dark-title-text,hsl(var(--contrast-200)))] group-hover:text-[var(--accordion-dark-title-text-hover,hsl(var(--background)))]',
+                    }[colorScheme],
+                  ),
             )}
           >
             {title}
           </div>
           <AnimatedChevron
             className={clsx(
-              {
-                light:
-                  'stroke-[var(--accordion-light-title-icon,hsl(var(--contrast-500)))] group-hover:stroke-[var(--accordion-light-title-icon-hover,hsl(var(--foreground)))]',
-                dark: 'stroke-[var(--accordion-dark-title-icon,hsl(var(--contrast-200)))] group-hover:stroke-[var(--accordion-dark-title-icon-hover,hsl(var(--background)))]',
-              }[colorScheme],
+              variant === 'archive' ? 'mt-0 stroke-foreground' : 'mt-1',
+              variant !== 'archive' &&
+                {
+                  light:
+                    'stroke-[var(--accordion-light-title-icon,hsl(var(--contrast-500)))] group-hover:stroke-[var(--accordion-light-title-icon-hover,hsl(var(--foreground)))]',
+                  dark: 'stroke-[var(--accordion-dark-title-icon,hsl(var(--contrast-200)))] group-hover:stroke-[var(--accordion-dark-title-icon-hover,hsl(var(--background)))]',
+                }[colorScheme],
             )}
           />
         </AccordionPrimitive.Trigger>
@@ -93,11 +109,13 @@ function AccordionItem({
       >
         <div
           className={clsx(
-            'py-3 font-[family-name:var(--accordion-content-font-family,var(--font-family-body))] text-base font-light leading-normal',
-            {
+            'font-[family-name:var(--accordion-content-font-family,var(--font-family-body))] leading-normal',
+            variant === 'archive' ? 'pb-1 pt-0 text-sm' : 'py-3 text-base font-light',
+            variant !== 'archive' && {
               light: 'text-[var(--accordion-light-content-text,hsl(var(--foreground)))]',
               dark: 'text-[var(--accordion-dark-content-text,hsl(var(--background)))]',
             }[colorScheme],
+            variant === 'archive' && 'text-foreground',
           )}
         >
           {children}

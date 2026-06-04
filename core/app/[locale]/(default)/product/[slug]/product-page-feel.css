@@ -2,7 +2,7 @@
   --product-detail-primary-text: #312f2f;
   --product-detail-secondary-text: #66605c;
   --product-detail-border: rgba(49, 47, 47, 0.18);
-  --product-detail-title-font-family: var(--font-family-heading);
+  --product-detail-title-font-family: var(--font-product-family, var(--font-body-family));
   --product-detail-subtitle-font-family: var(--font-family-mono);
 }
 
@@ -17,6 +17,11 @@
     padding-top: 4.5rem;
     padding-bottom: 4.5rem;
   }
+}
+
+/* Product description — body text color for links, not Catalyst primary green */
+.liivv-product-page-feel .group\/product-description .prose :where(a, a:link, a:visited) {
+  color: var(--product-detail-primary-text, #312f2f) !important;
 }
 
 /* Archive product-singular buy row (quantity pill + primary CTA) */

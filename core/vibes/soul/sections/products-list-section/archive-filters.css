@@ -1,0 +1,24 @@
+.liivv-archive-filters {
+  --checkbox-light-unchecked-border: var(--foreground);
+  --checkbox-light-unchecked-border-hover: var(--foreground);
+  --checkbox-light-checked-border: var(--foreground);
+  --checkbox-light-checked-background: var(--foreground);
+  --checkbox-light-checked-icon: 30 29% 96%;
+  --checkbox-light-unchecked-background: 30 29% 96%;
+
+  background-color: #f7f3f0;
+  border-radius: 0.25rem;
+  padding: 1rem 1.125rem;
+}
+
+.liivv-archive-filters .liivv-archive-filter-option [role='checkbox'] {
+  border-radius: 0.25rem;
+  height: 1.125rem;
+  margin-top: 0.125rem;
+  width: 1.125rem;
+}
+
+.liivv-archive-filters .liivv-archive-filter-option [role='checkbox'] svg {
+  height: 0.875rem;
+  width: 0.875rem;
+}

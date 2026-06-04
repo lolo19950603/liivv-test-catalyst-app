@@ -137,6 +137,7 @@ export function ProductsListSection({
                     {(filtersPanelTitle) => (
                       <SidePanel.Content title={filtersPanelTitle}>
                         <FiltersPanel
+                          appearance={cardVariant === 'archive' ? 'archive' : 'default'}
                           filters={filters}
                           paginationInfo={paginationInfo}
                           rangeFilterApplyLabel={rangeFilterApplyLabel}
@@ -151,11 +152,12 @@ export function ProductsListSection({
           </div>
         </div>
         <div className="flex items-stretch gap-8 @4xl:gap-10">
-          <aside className="hidden w-52 @3xl:block @4xl:w-60">
+          <aside className="hidden w-60 shrink-0 @3xl:block @4xl:w-72">
             <Stream value={streamableFiltersPanelTitle}>
               {(filtersPanelTitle) => <h2 className="sr-only">{filtersPanelTitle}</h2>}
             </Stream>
             <FiltersPanel
+              appearance={cardVariant === 'archive' ? 'archive' : 'default'}
               className="sticky top-4"
               filters={filters}
               paginationInfo={paginationInfo}

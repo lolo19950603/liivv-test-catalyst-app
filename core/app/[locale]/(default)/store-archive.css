@@ -5,10 +5,13 @@
   --store-secondary-text: #66605c;
   --store-border: rgba(49, 47, 47, 0.18);
   --store-surface: 245 242 237;
+  /* Breadcrumb hover underline matches text, not Catalyst primary green */
+  --breadcrumbs-hover: hsl(var(--foreground));
 }
 
 .liivv-store .group\/products-list-section h1,
 .liivv-store .group\/blog-section h1,
+.liivv-store .group\/blog-post h1,
 .liivv-store .group\/cart h1,
 .liivv-store .group\/compare-section h1 {
   color: var(--store-primary-text);
@@ -23,6 +26,7 @@
 .liivv-store .group\/products-list-section,
 .liivv-store .group\/product-list,
 .liivv-store .group\/blog-section,
+.liivv-store .group\/blog-post,
 .liivv-store .group\/cart,
 .liivv-store .group\/sign-in-section,
 .liivv-store .group\/forgot-password-section,
@@ -37,6 +41,23 @@
 
 .liivv-store .liivv-catalog-product-grid {
   --color-base-background: 252 248 244;
+}
+
+/* Archive RTE links (blog, Makeswift sections) — not Catalyst prose */
+.liivv-store .rte a:not(:is(.button, .reversed-link, [class*='button--'], [class*='Button'])) {
+  color: inherit !important;
+  text-decoration: none !important;
+  background: linear-gradient(currentColor, currentColor) 0 min(100%, 1.35em) / 100% 1px no-repeat;
+  background-position-x: var(--transform-origin-start, left);
+  transition:
+    background-size var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1)),
+    color 0.3s var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1));
+}
+
+@media screen and (pointer: fine) {
+  .liivv-store .rte a:not(:is(.button, .reversed-link, [class*='button--'], [class*='Button'])):hover {
+    background-size: 100% 1px;
+  }
 }
 
 /* Archive pagination on catalog / blog list pages */

@@ -478,7 +478,7 @@ export function ArchiveSlideshow({
                   className="pointer-events-none absolute bottom-6 left-0 right-0 z-10 px-10 md:bottom-10 md:px-14"
                   role="group"
                 >
-                  <div className="pointer-events-auto flex items-center justify-between gap-4 border-t border-white/80 py-3 md:py-4">
+                  <div className="pointer-events-auto mx-auto flex w-[96%] items-center justify-between gap-4 border-t border-white/30 py-3 md:w-[94%] md:py-4">
                     {showArrows ? (
                       <button
                         aria-controls={ARCHIVE_SLIDESHOW_SECTION_ID}

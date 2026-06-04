@@ -1,0 +1,48 @@
+/* Single blog post — archive RTE typography (diabetes-care-sections.css) */
+
+.liivv-blog-post {
+  --color-foreground: 49 47 47;
+  --color-base-text: 49 47 47;
+
+  background-color: #f7f3f0;
+  color: #312f2f;
+}
+
+.liivv-blog-post__header {
+  color: #312f2f;
+}
+
+.liivv-blog-post__title {
+  color: #312f2f;
+  font-family: var(--font-family-heading, inherit);
+  font-weight: var(--font-heading-weight, 500);
+}
+
+.liivv-blog-post__meta {
+  color: #66605c;
+  font-size: clamp(var(--text-base, 1rem), 1.052vw, var(--text-xl, 1.25rem));
+}
+
+.liivv-blog-post__body.rte img {
+  border-radius: var(--card-radius, 1rem);
+  margin-inline: auto;
+  max-height: 600px;
+  object-fit: cover;
+  width: fit-content;
+}
+
+.liivv-blog-post__tags .badge {
+  border: 1px solid rgba(49, 47, 47, 0.35);
+  border-radius: var(--rounded-full, 9999px);
+  color: #312f2f;
+  font-size: var(--text-sm, 0.875rem);
+  padding: 0.35rem 0.85rem;
+  text-decoration: none;
+  transition: border-color var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1));
+}
+
+@media screen and (pointer: fine) {
+  .liivv-blog-post__tags .badge:hover {
+    border-color: #312f2f;
+  }
+}

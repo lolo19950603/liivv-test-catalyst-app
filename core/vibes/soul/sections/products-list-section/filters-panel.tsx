@@ -11,6 +11,8 @@ import { useOptimistic, useState, useTransition } from 'react';
 import { Checkbox } from '@/vibes/soul/form/checkbox';
 import { RangeInput } from '@/vibes/soul/form/range-input';
 import { ToggleGroup } from '@/vibes/soul/form/toggle-group';
+import './archive-filters.css';
+import { FilterCheckboxList } from '@/vibes/soul/sections/products-list-section/filter-checkbox-list';
 import { Stream, Streamable, useStreamable } from '@/vibes/soul/lib/streamable';
 import { Accordion, AccordionItem } from '@/vibes/soul/primitives/accordion';
 import { Button } from '@/vibes/soul/primitives/button';
@@ -30,7 +32,13 @@ export interface ToggleGroupFilter {
   type: 'toggle-group';
   paramName: string;
   label: string;
-  options: Array<{ label: string; value: string; disabled?: boolean }>;
+  defaultCollapsed?: boolean;
+  options: Array<{
+    label: string;
+    value: string;
+    disabled?: boolean;
+    productCount?: number;
+  }>;
 }
 
 export interface RatingFilter {
@@ -38,11 +46,13 @@ export interface RatingFilter {
   paramName: string;
   label: string;
   disabled?: boolean;
+  defaultCollapsed?: boolean;
 }
 
 export interface RangeFilter {
   type: 'range';
   label: string;
+  defaultCollapsed?: boolean;
   minParamName: string;
   maxParamName: string;
   min?: number;
@@ -58,7 +68,10 @@ export interface RangeFilter {
 
 export type Filter = ToggleGroupFilter | RangeFilter | RatingFilter | LinkGroupFilter;
 
+type FilterAppearance = 'default' | 'archive';
+
 interface Props {
+  appearance?: FilterAppearance;
   className?: string;
   filters: Streamable<Filter[]>;
   resetFiltersLabel?: Streamable<string>;
@@ -66,7 +79,7 @@ interface Props {
   rangeFilterApplyLabel?: Streamable<string>;
 }
 
-type InnerProps = Props & { filters: Filter[] };
+type InnerProps = Omit<Props, 'filters'> & { filters: Filter[] };
 
 function getParamCountLabel(params: Record<string, string | null | string[]>, key: string) {
   const value = params[key];
@@ -77,15 +90,17 @@ function getParamCountLabel(params: Record<string, string | null | string[]>, ke
 }
 
 export function FiltersPanel({
+  appearance = 'archive',
   className,
   filters: streamableFilters,
   resetFiltersLabel,
   rangeFilterApplyLabel,
 }: Props) {
   return (
-    <Stream fallback={<FiltersSkeleton />} value={streamableFilters}>
+    <Stream fallback={<FiltersSkeleton appearance={appearance} />} value={streamableFilters}>
       {(filters) => (
         <FiltersPanelInner
+          appearance={appearance}
           className={className}
           filters={filters}
           rangeFilterApplyLabel={rangeFilterApplyLabel}
@@ -96,7 +111,29 @@ export function FiltersPanel({
   );
 }
 
+function getInitialExpandedFilters(filters: Filter[], appearance: FilterAppearance) {
+  const initial = new Set<string>();
+  const accordionFilters = filters.filter((filter) => filter.type !== 'link-group');
+
+  if (appearance === 'archive') {
+    accordionFilters.forEach((filter) => {
+      if (!filter.defaultCollapsed) {
+        initial.add(filter.label.toLowerCase());
+      }
+    });
+
+    return initial;
+  }
+
+  accordionFilters.slice(0, 3).forEach((filter) => {
+    initial.add(filter.label.toLowerCase());
+  });
+
+  return initial;
+}
+
 export function FiltersPanelInner({
+  appearance = 'archive',
   className,
   filters,
   resetFiltersLabel: streamableResetFiltersLabel,
@@ -121,18 +158,11 @@ export function FiltersPanelInner({
   );
   const [isPending, startTransition] = useTransition();
   const [optimisticParams, setOptimisticParams] = useOptimistic(params);
-  const [expandedItems, setExpandedItems] = useState(() => {
-    const initial = new Set<string>();
-
-    filters
-      .filter((filter) => filter.type !== 'link-group')
-      .slice(0, 3)
-      .forEach((filter) => {
-        initial.add(filter.label.toLowerCase());
-      });
-
-    return initial;
-  });
+  const [expandedItems, setExpandedItems] = useState(() =>
+    getInitialExpandedFilters(filters, appearance),
+  );
+  const isArchive = appearance === 'archive';
+  const accordionVariant = isArchive ? 'archive' : 'default';
 
   const accordionItems = filters
     .filter((filter) => filter.type !== 'link-group')
@@ -152,7 +182,10 @@ export function FiltersPanelInner({
   );
 
   return (
-    <div className={clsx('space-y-5', className)} data-pending={isPending ? true : null}>
+    <div
+      className={clsx(isArchive && 'liivv-archive-filters', !isArchive && 'space-y-5', className)}
+      data-pending={isPending ? true : null}
+    >
       {linkGroupFilters.map((linkGroup, index) => (
         <div key={index.toString()}>
           <h3 className="py-4 font-mono text-sm uppercase text-contrast-400">{linkGroup.label}</h3>
@@ -185,28 +218,54 @@ export function FiltersPanelInner({
               return (
                 <AccordionItem
                   key={key}
-                  title={`${filter.label}${getParamCountLabel(optimisticParams, filter.paramName)}`}
+                  title={
+                    isArchive
+                      ? filter.label
+                      : `${filter.label}${getParamCountLabel(optimisticParams, filter.paramName)}`
+                  }
                   value={value}
+                  variant={accordionVariant}
                 >
-                  <ToggleGroup
-                    onValueChange={(toggleGroupValues) => {
-                      startTransition(async () => {
-                        const nextParams = {
-                          ...optimisticParams,
-                          [startCursorParamName]: null,
-                          [endCursorParamName]: null,
-                          [filter.paramName]:
-                            toggleGroupValues.length === 0 ? null : toggleGroupValues,
-                        };
+                  {isArchive ? (
+                    <FilterCheckboxList
+                      onValueChange={(toggleGroupValues) => {
+                        startTransition(async () => {
+                          const nextParams = {
+                            ...optimisticParams,
+                            [startCursorParamName]: null,
+                            [endCursorParamName]: null,
+                            [filter.paramName]:
+                              toggleGroupValues.length === 0 ? null : toggleGroupValues,
+                          };
 
-                        setOptimisticParams(nextParams);
-                        await setParams(nextParams);
-                      });
-                    }}
-                    options={filter.options}
-                    type="multiple"
-                    value={optimisticParams[filter.paramName] ?? []}
-                  />
+                          setOptimisticParams(nextParams);
+                          await setParams(nextParams);
+                        });
+                      }}
+                      options={filter.options}
+                      value={optimisticParams[filter.paramName] ?? []}
+                    />
+                  ) : (
+                    <ToggleGroup
+                      onValueChange={(toggleGroupValues) => {
+                        startTransition(async () => {
+                          const nextParams = {
+                            ...optimisticParams,
+                            [startCursorParamName]: null,
+                            [endCursorParamName]: null,
+                            [filter.paramName]:
+                              toggleGroupValues.length === 0 ? null : toggleGroupValues,
+                          };
+
+                          setOptimisticParams(nextParams);
+                          await setParams(nextParams);
+                        });
+                      }}
+                      options={filter.options}
+                      type="multiple"
+                      value={optimisticParams[filter.paramName] ?? []}
+                    />
+                  )}
                 </AccordionItem>
               );
 
@@ -250,8 +309,8 @@ export function FiltersPanelInner({
 
             case 'rating':
               return (
-                <AccordionItem key={key} title={filter.label} value={value}>
-                  <div className="space-y-3">
+                <AccordionItem key={key} title={filter.label} value={value} variant={accordionVariant}>
+                  <div className={clsx(isArchive ? 'space-y-1.5' : 'space-y-3')}>
                     {[5, 4, 3, 2, 1].map((rating) => (
                       <Checkbox
                         checked={
@@ -291,6 +350,7 @@ export function FiltersPanelInner({
       </Accordion>
 
       <Button
+        className={clsx(isArchive && 'mt-4 w-full')}
         onClick={() => {
           startTransition(async () => {
             const nextParams = {
@@ -312,33 +372,77 @@ export function FiltersPanelInner({
   );
 }
 
-export function FiltersSkeleton() {
+export function FiltersSkeleton({ appearance = 'archive' }: { appearance?: FilterAppearance }) {
+  const isArchive = appearance === 'archive';
+
   return (
-    <div className="space-y-5">
-      <AccordionSkeleton>
-        <ToggleGroupSkeleton options={4} seed={2} />
+    <div className={clsx(isArchive && 'liivv-archive-filters', !isArchive && 'space-y-5')}>
+      <AccordionSkeleton variant={appearance}>
+        {isArchive ? <CheckboxListSkeleton options={6} /> : <ToggleGroupSkeleton options={4} seed={2} />}
       </AccordionSkeleton>
-      <AccordionSkeleton>
-        <ToggleGroupSkeleton options={3} seed={1} />
-      </AccordionSkeleton>
-      <AccordionSkeleton>
-        <RangeSkeleton />
-      </AccordionSkeleton>
-      {/* Reset Filters Button */}
-      <div className="h-10 w-[10ch] animate-pulse rounded-full bg-contrast-100" />
+      {!isArchive && (
+        <>
+          <AccordionSkeleton>
+            <ToggleGroupSkeleton options={3} seed={1} />
+          </AccordionSkeleton>
+          <AccordionSkeleton>
+            <RangeSkeleton />
+          </AccordionSkeleton>
+        </>
+      )}
+      <div
+        className={clsx(
+          'animate-pulse rounded-full bg-contrast-100',
+          isArchive ? 'mt-4 h-10 w-full' : 'h-10 w-[10ch]',
+        )}
+      />
     </div>
   );
 }
 
-function AccordionSkeleton({ children }: { children: React.ReactNode }) {
+function AccordionSkeleton({
+  children,
+  variant = 'archive',
+}: {
+  children: React.ReactNode;
+  variant?: FilterAppearance;
+}) {
+  const isArchive = variant === 'archive';
+
   return (
     <div>
-      <div className="items-start py-3 font-mono text-sm uppercase last:flex @md:py-4">
+      <div
+        className={clsx(
+          'flex items-center justify-between py-3',
+          !isArchive && 'items-start font-mono text-sm uppercase @md:py-4',
+        )}
+      >
         <div className="inline-flex h-[1lh] items-center">
-          <div className="h-2 w-[10ch] flex-1 animate-pulse rounded-sm bg-contrast-100" />
+          <div
+            className={clsx(
+              'animate-pulse rounded-sm bg-contrast-100',
+              isArchive ? 'h-4 w-[8ch]' : 'h-2 w-[10ch] flex-1',
+            )}
+          />
         </div>
       </div>
-      <div className="pb-5">{children}</div>
+      <div className={isArchive ? 'pb-1' : 'pb-5'}>{children}</div>
+    </div>
+  );
+}
+
+function CheckboxListSkeleton({ options }: { options: number }) {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: options }, (_, i) => (
+        <div className="flex items-center gap-3" key={i}>
+          <div className="h-[18px] w-[18px] shrink-0 animate-pulse rounded-sm bg-contrast-100" />
+          <div
+            className="h-3.5 animate-pulse rounded-sm bg-contrast-100"
+            style={{ width: `${String(14 + ((i * 5) % 12))}ch` }}
+          />
+        </div>
+      ))}
     </div>
   );
 }

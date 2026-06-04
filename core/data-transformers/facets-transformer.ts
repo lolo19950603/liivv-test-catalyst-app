@@ -36,22 +36,19 @@ export const facetsTransformer = async ({
         type: 'toggle-group' as const,
         paramName: 'categoryIn',
         label: facet.displayName,
-        defaultCollapsed: facet.isCollapsedByDefault,
+        defaultCollapsed: facet.isCollapsedByDefault ?? false,
         options: facet.categories.map((category) => {
           const refinedCategory = refinedCategorySearchFilter?.categories.find(
             (c) => c.entityId === category.entityId,
           );
           const isSelected = filters.categoryEntityIds?.includes(category.entityId) === true;
           const disabled = refinedCategory == null && !isSelected;
-          const productCountLabel = disabled ? '' : ` (${category.productCount})`;
-          const label = facet.displayProductCount
-            ? `${category.name}${productCountLabel}`
-            : category.name;
-
           return {
-            label,
+            label: category.name,
             value: category.entityId.toString(),
             disabled,
+            productCount:
+              facet.displayProductCount && !disabled ? category.productCount : undefined,
           };
         }),
       };
@@ -65,22 +62,18 @@ export const facetsTransformer = async ({
         type: 'toggle-group' as const,
         paramName: 'brand',
         label: facet.displayName,
-        defaultCollapsed: facet.isCollapsedByDefault,
+        defaultCollapsed: facet.isCollapsedByDefault ?? false,
         options: facet.brands.map((brand) => {
           const refinedBrand = refinedBrandSearchFilter?.brands.find(
             (b) => b.entityId === brand.entityId,
           );
           const isSelected = filters.brandEntityIds?.includes(brand.entityId) === true;
           const disabled = refinedBrand == null && !isSelected;
-          const productCountLabel = disabled ? '' : ` (${brand.productCount})`;
-          const label = facet.displayProductCount
-            ? `${brand.name}${productCountLabel}`
-            : brand.name;
-
           return {
-            label,
+            label: brand.name,
             value: brand.entityId.toString(),
             disabled,
+            productCount: facet.displayProductCount && !disabled ? brand.productCount : undefined,
           };
         }),
       };
@@ -94,7 +87,7 @@ export const facetsTransformer = async ({
         type: 'toggle-group' as const,
         paramName: `attr_${facet.filterKey}`,
         label: facet.displayName,
-        defaultCollapsed: facet.isCollapsedByDefault,
+        defaultCollapsed: facet.isCollapsedByDefault ?? false,
         options: facet.attributes.map((attribute) => {
           const refinedAttribute = refinedProductAttributeSearchFilter?.attributes.find(
             (a) => a.value === attribute.value,
@@ -105,15 +98,12 @@ export const facetsTransformer = async ({
             true;
 
           const disabled = refinedAttribute == null && !isSelected;
-          const productCountLabel = disabled ? '' : ` (${attribute.productCount})`;
-          const label = facet.displayProductCount
-            ? `${attribute.value}${productCountLabel}`
-            : attribute.value;
-
           return {
-            label,
+            label: attribute.value,
             value: attribute.value,
             disabled,
+            productCount:
+              facet.displayProductCount && !disabled ? attribute.productCount : undefined,
           };
         }),
       };

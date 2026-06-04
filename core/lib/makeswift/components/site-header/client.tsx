@@ -196,6 +196,7 @@ export const MakeswiftHeader = forwardRef(
     ref: Ref<HTMLDivElement>,
   ) => {
     const pathname = usePathname() ?? '/';
+    const isInBuilder = useIsInBuilder();
     const {
       categoryTree,
       storeLogo,
@@ -219,8 +220,6 @@ export const MakeswiftHeader = forwardRef(
         />
       );
     }
-
-    const isInBuilder = useIsInBuilder();
     const bannerChildren = banner.children ?? passedBanner?.children;
     const showBanner =
       banner.show &&
