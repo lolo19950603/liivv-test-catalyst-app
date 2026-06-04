@@ -2,6 +2,8 @@
 export const LIIVV_HEADER_MEGA_MENU_CSS = `
 .liivv-archive-header {
   --animation-primary: 0.5s cubic-bezier(0.3, 1, 0.3, 1);
+  --mega-menu-fade-duration: 0.4s;
+  --mega-menu-fade-ease: cubic-bezier(0.3, 1, 0.3, 1);
 }
 /* Top-level nav (Liivv Your Life / Liivv Health) — archive with-block hover slide */
 .liivv-archive-header .header__menu > ul.with-block > li {
@@ -71,9 +73,19 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   top: 100%;
   z-index: 4;
   pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--mega-menu-fade-duration) var(--mega-menu-fade-ease),
+    visibility 0s linear var(--mega-menu-fade-duration);
 }
 .liivv-archive-header .header-mega-menu-wrap.is-open {
   pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity var(--mega-menu-fade-duration) var(--mega-menu-fade-ease),
+    visibility 0s;
 }
 .liivv-archive-header .header-mega-menu {
   background: rgb(var(--color-background));
@@ -82,14 +94,10 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   border-end-end-radius: var(--border-radius, 1rem);
   box-shadow: 0 12px 40px rgb(33 33 33 / 0.08);
   overflow: hidden;
-  opacity: 0;
-  transform: translateY(-4px);
-  transition:
-    opacity var(--animation-nav, 0.25s) ease,
-    transform var(--animation-nav, 0.25s) ease;
+  transform: translateY(-0.5rem);
+  transition: transform var(--mega-menu-fade-duration) var(--mega-menu-fade-ease);
 }
 .liivv-archive-header .header-mega-menu-wrap.is-open .header-mega-menu {
-  opacity: 1;
   transform: translateY(0);
 }
 .liivv-archive-header .header-mega-menu__grid {
@@ -147,8 +155,16 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   color: rgb(var(--color-foreground));
 }
 @media (prefers-reduced-motion: reduce) {
+  .liivv-archive-header .header-mega-menu-wrap,
   .liivv-archive-header .header-mega-menu {
     transition: none;
+  }
+  .liivv-archive-header .header-mega-menu-wrap.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+  .liivv-archive-header .header-mega-menu-wrap.is-open .header-mega-menu {
+    transform: none;
   }
   .liivv-archive-header .header__menu > ul.with-block > li:hover .menu__item .btn-duplicate,
   .liivv-archive-header .header__menu > ul.with-block > li[aria-expanded='true'] .menu__item .btn-duplicate {

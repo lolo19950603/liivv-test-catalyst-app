@@ -731,6 +731,7 @@ export function LiivvArchiveHeader({
               item={item}
               key={menuId}
               menuId={menuId}
+              onHover={() => openMegaMenu(index)}
               open={activeMegaIndex === index}
             />
           );
