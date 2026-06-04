@@ -14,6 +14,7 @@ import {
 import { usePathname } from '~/i18n/routing';
 import { LiivvArchiveHeader } from '~/lib/makeswift/liivv-archive-header/liivv-archive-header';
 import type { LiivvArchiveNavLink } from '~/lib/makeswift/liivv-archive-header/types';
+import { mapMakeswiftNavLinks } from '~/lib/makeswift/site-header/map-makeswift-nav-links';
 import { findMatchingPathConfig } from '~/lib/makeswift/site-header/should-hide-store-header';
 import type { SectionBackgroundProps } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { resolveMakeswiftHref } from '~/lib/makeswift/utils/resolve-makeswift-href';
@@ -88,13 +89,15 @@ interface Props {
   };
   links: Array<{
     label: string;
-    link: { href: string };
-    groups: Array<{
-      label: string;
-      link: { href: string };
-      links: Array<{
+    link: { href?: string };
+    exploreAllLabel?: string;
+    exploreAllLink?: { href?: string };
+    groups?: Array<{
+      label?: string;
+      link?: { href?: string };
+      links?: Array<{
         label: string;
-        link: { href: string };
+        link: { href?: string };
       }>;
     }>;
   }>;
@@ -107,18 +110,8 @@ interface Props {
   pageOverrides?: PageOverride[];
 }
 
-function combineNavLinks(
-  categoryLinks: SiteHeaderCategoryLink[],
-  additionalLinks: Props['links'],
-): LiivvArchiveNavLink[] {
-  const fromTree = categoryLinks.map(({ label, href }) => ({ label, href }));
-
-  const fromMakeswift = additionalLinks.map(({ label, link }) => ({
-    label,
-    href: link.href,
-  }));
-
-  return [...fromTree, ...fromMakeswift];
+function resolveStoreNavLinks(additionalLinks: Props['links']): LiivvArchiveNavLink[] {
+  return mapMakeswiftNavLinks(additionalLinks);
 }
 
 function normalizeFallbackLogo(
@@ -248,7 +241,7 @@ export const MakeswiftHeader = forwardRef(
     const bannerNode = combinedBanner ? <Banner {...combinedBanner} /> : null;
 
     const desktopLogo = resolveLogo(logo, fallbackLogo, fallbackLogoLabel, false);
-    const navLinks = combineNavLinks(categoryLinks, links);
+    const navLinks = resolveStoreNavLinks(links);
 
     return (
       <LiivvArchiveHeader

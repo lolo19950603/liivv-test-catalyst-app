@@ -39,6 +39,8 @@ export interface ProductCarouselProps {
   /** Render prev/next controls in the header row instead of below the carousel. */
   buttonsPlacement?: 'bottom' | 'header';
   header?: ReactNode;
+  /** Trackpad / mouse wheel horizontal scrolling. */
+  wheelGestures?: boolean;
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -74,6 +76,7 @@ export function ProductCarousel({
   cardVariant = 'default',
   buttonsPlacement = 'bottom',
   header,
+  wheelGestures = true,
 }: ProductCarouselProps) {
   const buttonsInHeader = buttonsPlacement === 'header';
   const buttonVariant = cardVariant === 'archive' ? 'archive' : 'default';
@@ -103,7 +106,12 @@ export function ProductCarousel({
         }
 
         return (
-          <Carousel className={className} hideOverflow={hideOverflow}>
+          <Carousel
+            className={className}
+            hideOverflow={hideOverflow}
+            opts={{ align: 'start', slidesToScroll: 1 }}
+            wheelGestures={wheelGestures}
+          >
             {buttonsInHeader && (header != null || showButtons) ? (
               <div className="title-wrapper relative z-[1] mb-8 flex flex-col gap-4 text-left md:flex-row md:items-end md:justify-between lg:gap-8">
                 {header != null ? <div className="grid gap-4">{header}</div> : null}

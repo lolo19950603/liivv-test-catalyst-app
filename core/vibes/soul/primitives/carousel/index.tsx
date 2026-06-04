@@ -3,8 +3,11 @@
 
 import { clsx } from 'clsx';
 import useEmblaCarousel, { type UseEmblaCarouselType } from 'embla-carousel-react';
+import WheelGesturesPlugin, {
+  type WheelGesturesPluginOptions,
+} from 'embla-carousel-wheel-gestures';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as React from 'react';
 
 import { scanShopifyButtonFillHover } from '~/lib/archived-pages/init-shopify-button-fill-hover';
@@ -24,6 +27,27 @@ interface CarouselProps extends React.ComponentPropsWithoutRef<'div'> {
   setApi?: (api: CarouselApi) => void;
   carouselScrollbarLabel?: string;
   hideOverflow?: boolean;
+  /** Enable trackpad / mouse wheel scrolling (horizontal axis by default). */
+  wheelGestures?: boolean | WheelGesturesPluginOptions;
+}
+
+function resolvePlugins(
+  plugins: CarouselPlugin | undefined,
+  wheelGestures: boolean | WheelGesturesPluginOptions | undefined,
+): CarouselPlugin | undefined {
+  if (!wheelGestures) {
+    return plugins;
+  }
+
+  const wheelOptions: WheelGesturesPluginOptions =
+    wheelGestures === true ? { forceWheelAxis: 'x' } : wheelGestures;
+  const wheelPlugin = WheelGesturesPlugin(wheelOptions);
+
+  if (!plugins) {
+    return [wheelPlugin];
+  }
+
+  return Array.isArray(plugins) ? [...plugins, wheelPlugin] : [plugins, wheelPlugin];
 }
 
 type CarouselContextProps = {
@@ -54,9 +78,14 @@ function Carousel({
   className,
   children,
   hideOverflow = true,
+  wheelGestures,
   ...rest
 }: CarouselProps) {
-  const [carouselRef, api] = useEmblaCarousel(opts, plugins);
+  const resolvedPlugins = useMemo(
+    () => resolvePlugins(plugins, wheelGestures),
+    [plugins, wheelGestures],
+  );
+  const [carouselRef, api] = useEmblaCarousel(opts, resolvedPlugins);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
 

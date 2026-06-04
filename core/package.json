@@ -58,6 +58,7 @@
     "embla-carousel-autoplay": "9.0.0-rc02",
     "embla-carousel-fade": "9.0.0-rc02",
     "embla-carousel-react": "9.0.0-rc02",
+    "embla-carousel-wheel-gestures": "9.0.0-rc01",
     "gql.tada": "^1.8.10",
     "graphql": "^16.11.0",
     "html-react-parser": "5.2.5",

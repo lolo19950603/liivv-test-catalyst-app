@@ -55,29 +55,27 @@ const logo = Group({
   },
 });
 
-const links = List({
-  label: 'Links',
+const columnLinks = List({
+  label: 'Category links',
   type: Group({
-    label: 'Link',
+    label: 'Category',
     props: {
-      label: TextInput({ label: 'Text', defaultValue: 'Text' }),
+      label: TextInput({ label: 'Label', defaultValue: 'Category' }),
       link: Link({ label: 'URL' }),
     },
   }),
-  getItemLabel: (item) => item?.label ?? 'Text',
+  getItemLabel: (item) => item?.label ?? 'Category',
 });
 
-const groups = List({
-  label: 'Groups',
+const megaMenuColumns = List({
+  label: 'Mega menu columns',
   type: Group({
-    label: 'Link group',
+    label: 'Column',
     props: {
-      label: TextInput({ label: 'Text', defaultValue: 'Text' }),
-      link: Link({ label: 'URL' }),
-      links,
+      links: columnLinks,
     },
   }),
-  getItemLabel: (item) => item?.label ?? 'Text',
+  getItemLabel: () => 'Column',
 });
 
 const sectionNavLinks = List({
@@ -101,16 +99,21 @@ runtime.registerComponent(MakeswiftHeader, {
     banner,
     logo,
     links: List({
-      label: 'Additional links',
+      label: 'Navigation items',
       type: Group({
-        label: 'Link',
+        label: 'Nav item',
         props: {
-          label: TextInput({ label: 'Text', defaultValue: 'Text' }),
+          label: TextInput({ label: 'Label', defaultValue: 'Liivv Your Life' }),
           link: Link({ label: 'URL' }),
-          groups,
+          groups: megaMenuColumns,
+          exploreAllLabel: TextInput({
+            label: 'Explore all label',
+            defaultValue: 'Explore All',
+          }),
+          exploreAllLink: Link({ label: 'Explore all URL' }),
         },
       }),
-      getItemLabel: (item) => item?.label ?? 'Text',
+      getItemLabel: (item) => item?.label ?? 'Nav item',
     }),
     linksPosition: Select({
       label: 'Links position',

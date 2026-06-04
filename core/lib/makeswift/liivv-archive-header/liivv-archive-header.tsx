@@ -23,6 +23,7 @@ import { useHeaderStickyScrolled } from '~/lib/makeswift/site-header/use-header-
 import { resolveMakeswiftHref } from '~/lib/makeswift/utils/resolve-makeswift-href';
 
 import { ARCHIVE_HEADER_CSS } from './archive-header-css';
+import { LIIVV_HEADER_MEGA_MENU_CSS } from './mega-menu-css';
 import type {
   LiivvArchiveHeaderLogo,
   LiivvArchiveLinksPosition,
@@ -123,20 +124,105 @@ function HeaderCorner({ className }: { className?: string }) {
   );
 }
 
-function NavMenuItem({ href, label }: { href: string; label: string }) {
+function IconArrowRight({ className }: { className?: string }) {
   return (
-    <li>
-      <Link
-        aria-label={label}
-        className="menu__item text-sm-lg relative z-2 flex cursor-pointer items-center font-medium"
-        href={href}
-      >
-        <span className="btn-text" data-text={label}>
-          {label}
-        </span>
-        <span className="btn-text btn-duplicate">{label}</span>
-      </Link>
-    </li>
+    <svg
+      aria-hidden
+      className={className}
+      fill="none"
+      height="20"
+      role="presentation"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      viewBox="0 0 24 24"
+      width="20"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function NavMenuTrigger({
+  href,
+  label,
+  hasMegaMenu,
+  isExpanded,
+}: {
+  href: string;
+  label: string;
+  hasMegaMenu: boolean;
+  isExpanded: boolean;
+}) {
+  return (
+    <Link
+      aria-expanded={hasMegaMenu ? isExpanded : undefined}
+      aria-haspopup={hasMegaMenu ? 'true' : undefined}
+      aria-label={label}
+      className="menu__item text-sm-lg relative z-2 flex cursor-pointer items-center font-medium"
+      href={href}
+      onClick={hasMegaMenu ? (e) => e.preventDefault() : undefined}
+    >
+      <span className="btn-text" data-text={label}>
+        {label}
+      </span>
+      <span aria-hidden className="btn-text btn-duplicate">
+        {label}
+      </span>
+    </Link>
+  );
+}
+
+function HeaderMegaMenuPanel({
+  item,
+  menuId,
+  open,
+  onHover,
+}: {
+  item: LiivvArchiveNavLink;
+  menuId: string;
+  open: boolean;
+  onHover: () => void;
+}) {
+  const columns = item.columns ?? [];
+
+  if (columns.length === 0) {
+    return null;
+  }
+
+  return (
+    <div
+      className={clsx('header-mega-menu-wrap', open && 'is-open')}
+      id={menuId}
+      onMouseEnter={onHover}
+      role="region"
+      aria-label={`${item.label} categories`}
+      aria-hidden={!open}
+    >
+      <div className="header-mega-menu page-width page-width--full">
+        <div className="header-mega-menu__grid">
+          {columns.map((column, columnIndex) => (
+            <ul className="header-mega-menu__column" key={`col-${columnIndex}`} role="list">
+              {column.links.map((link, linkIndex) => (
+                <li key={`${link.label}-${linkIndex}`}>
+                  <Link className="header-mega-menu__link" href={link.href}>
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ))}
+        </div>
+        {item.exploreAll ? (
+          <Link className="header-mega-menu__footer" href={item.exploreAll.href}>
+            <span className="header-mega-menu__explore-label">{item.exploreAll.label}</span>
+            <span className="header-mega-menu__arrow" aria-hidden>
+              <IconArrowRight />
+            </span>
+          </Link>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
@@ -228,6 +314,8 @@ export function LiivvArchiveHeader({
   const [cartLineCount, setCartLineCount] = useState<number | null>(initialCartCount);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [activeMegaIndex, setActiveMegaIndex] = useState<number | null>(null);
+  const megaCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const links = navLinks;
   const logoVisible = Boolean(showLogo && logo?.src);
@@ -235,6 +323,28 @@ export function LiivvArchiveHeader({
 
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
   const closeSearch = useCallback(() => setSearchOpen(false), []);
+  const closeMegaMenu = useCallback(() => setActiveMegaIndex(null), []);
+
+  const openMegaMenu = useCallback((index: number) => {
+    if (megaCloseTimerRef.current != null) {
+      clearTimeout(megaCloseTimerRef.current);
+      megaCloseTimerRef.current = null;
+    }
+
+    setActiveMegaIndex(index);
+    setSearchOpen(false);
+  }, []);
+
+  const scheduleCloseMegaMenu = useCallback(() => {
+    if (megaCloseTimerRef.current != null) {
+      clearTimeout(megaCloseTimerRef.current);
+    }
+
+    megaCloseTimerRef.current = setTimeout(() => {
+      setActiveMegaIndex(null);
+      megaCloseTimerRef.current = null;
+    }, 120);
+  }, []);
 
   const toggleSearch = useCallback(() => {
     setSearchOpen((open) => {
@@ -291,7 +401,17 @@ export function LiivvArchiveHeader({
   useEffect(() => {
     closeMobileNav();
     closeSearch();
-  }, [pathname, closeMobileNav, closeSearch]);
+    closeMegaMenu();
+  }, [pathname, closeMobileNav, closeSearch, closeMegaMenu]);
+
+  useEffect(
+    () => () => {
+      if (megaCloseTimerRef.current != null) {
+        clearTimeout(megaCloseTimerRef.current);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!mobileNavOpen && !searchOpen) {
@@ -302,13 +422,14 @@ export function LiivvArchiveHeader({
       if (e.key === 'Escape') {
         closeMobileNav();
         closeSearch();
+        closeMegaMenu();
       }
     };
 
     document.addEventListener('keydown', onKeyDown);
 
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [mobileNavOpen, searchOpen, closeMobileNav, closeSearch]);
+  }, [mobileNavOpen, searchOpen, closeMobileNav, closeSearch, closeMegaMenu]);
 
   useEffect(() => {
     if (!searchOpen) {
@@ -381,7 +502,7 @@ export function LiivvArchiveHeader({
   const section = (
     <div
       className={clsx(
-        'liivv-archive-header diabetes-care-section-header liivv-header-skin shopify-section shopify-section-group-header-group header-section header-opaque w-full min-w-0',
+        'liivv-archive-header diabetes-care-section-header liivv-header-skin shopify-section shopify-section-group-header-group header-section header-opaque relative w-full min-w-0',
         hasNav && 'diabetes-care-has-nav',
         sticky && 'header-sticky',
         className,
@@ -392,6 +513,7 @@ export function LiivvArchiveHeader({
     >
       <style dangerouslySetInnerHTML={{ __html: LIIVV_ARCHIVE_HEADER_SECTION_VARS }} />
       <style dangerouslySetInnerHTML={{ __html: ARCHIVE_HEADER_CSS }} />
+      <style dangerouslySetInnerHTML={{ __html: LIIVV_HEADER_MEGA_MENU_CSS }} />
       {sticky ? (
         <style dangerouslySetInnerHTML={{ __html: LIIVV_HEADER_STICKY_SCROLLED_CSS }} />
       ) : null}
@@ -407,7 +529,12 @@ export function LiivvArchiveHeader({
           }}
         />
       ) : null}
-      <div className="relative z-[2]">
+      <div
+        className="liivv-header-chrome relative z-[2]"
+        onMouseLeave={() => {
+          scheduleCloseMegaMenu();
+        }}
+      >
         <header
           className="header header--left mobile:header--left page-width page-width--full section section--rounded section--padding relative z-20 grid w-full max-w-full items-center section--next-rounded"
           data-section-id="sections--26374736970019__header"
@@ -483,9 +610,33 @@ export function LiivvArchiveHeader({
             >
               <nav aria-label={navAriaLabel} className="header__menu hidden lg:flex" role="navigation">
                 <ul className="list-menu with-block flex flex-wrap" role="list">
-                  {links.map((item, index) => (
-                    <NavMenuItem href={item.href} key={`${item.label}-${index}`} label={item.label} />
-                  ))}
+                  {links.map((item, index) => {
+                    const hasMegaMenu = (item.columns?.length ?? 0) > 0;
+                    const menuId = `${mobileNavId}-mega-${index}`;
+                    const isExpanded = activeMegaIndex === index;
+
+                    return (
+                      <li
+                        aria-controls={hasMegaMenu ? menuId : undefined}
+                        aria-expanded={hasMegaMenu ? isExpanded : undefined}
+                        key={`${item.label}-${index}`}
+                        onMouseEnter={() => {
+                          if (hasMegaMenu) {
+                            openMegaMenu(index);
+                          } else {
+                            closeMegaMenu();
+                          }
+                        }}
+                      >
+                        <NavMenuTrigger
+                          hasMegaMenu={hasMegaMenu}
+                          href={item.href}
+                          isExpanded={isExpanded}
+                          label={item.label}
+                        />
+                      </li>
+                    );
+                  })}
                 </ul>
               </nav>
             </div>
@@ -567,6 +718,24 @@ export function LiivvArchiveHeader({
           </div>
         ) : null}
 
+        {links.map((item, index) => {
+          const hasMegaMenu = (item.columns?.length ?? 0) > 0;
+          const menuId = `${mobileNavId}-mega-${index}`;
+
+          if (!hasMegaMenu) {
+            return null;
+          }
+
+          return (
+            <HeaderMegaMenuPanel
+              item={item}
+              key={menuId}
+              menuId={menuId}
+              open={activeMegaIndex === index}
+            />
+          );
+        })}
+
         {mobileNavOpen && hasNav ? (
           <nav
             aria-label={navAriaLabel}
@@ -578,24 +747,69 @@ export function LiivvArchiveHeader({
             role="navigation"
           >
             <ul className="flex list-none flex-col gap-0 p-2" role="list">
-              {links.map((item, index) => (
-                <li
-                  className="border-b border-[rgb(var(--color-foreground)/0.06)] last:border-b-0"
-                  key={`${item.label}-m-${index}`}
-                >
-                  <Link
-                    className={clsx(
-                      'flex min-h-12 items-center px-4 py-3 font-[family-name:var(--font-navigation-family,var(--font-sans))]',
-                      'text-base font-medium text-[rgb(var(--color-foreground))] no-underline',
-                      'rounded-md active:bg-[rgb(var(--color-foreground)/0.06)]',
-                    )}
-                    href={item.href}
-                    onClick={closeMobileNav}
+              {links.map((item, index) => {
+                const columns = item.columns ?? [];
+
+                if (columns.length === 0) {
+                  return (
+                    <li
+                      className="border-b border-[rgb(var(--color-foreground)/0.06)] last:border-b-0"
+                      key={`${item.label}-m-${index}`}
+                    >
+                      <Link
+                        className={clsx(
+                          'flex min-h-12 items-center px-4 py-3 font-[family-name:var(--font-navigation-family,var(--font-sans))]',
+                          'text-base font-medium text-[rgb(var(--color-foreground))] no-underline',
+                          'rounded-md active:bg-[rgb(var(--color-foreground)/0.06)]',
+                        )}
+                        href={item.href}
+                        onClick={closeMobileNav}
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                }
+
+                return (
+                  <li
+                    className="border-b border-[rgb(var(--color-foreground)/0.06)] last:border-b-0"
+                    key={`${item.label}-m-${index}`}
                   >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
+                    <p className="px-4 pt-3 text-xs font-semibold uppercase tracking-wide text-[rgb(var(--color-foreground)/0.55)]">
+                      {item.label}
+                    </p>
+                    <ul className="list-none pb-2" role="list">
+                      {columns.flatMap((column) =>
+                        column.links.map((link, linkIndex) => (
+                          <li key={`${item.label}-m-${link.label}-${linkIndex}`}>
+                            <Link
+                              className={clsx(
+                                'flex min-h-11 items-center px-4 py-2.5 pl-6 font-[family-name:var(--font-navigation-family,var(--font-sans))]',
+                                'text-sm font-medium text-[rgb(var(--color-foreground))] no-underline',
+                                'rounded-md active:bg-[rgb(var(--color-foreground)/0.06)]',
+                              )}
+                              href={link.href}
+                              onClick={closeMobileNav}
+                            >
+                              {link.label}
+                            </Link>
+                          </li>
+                        )),
+                      )}
+                    </ul>
+                    {item.exploreAll ? (
+                      <Link
+                        className="mx-4 mb-3 inline-flex min-h-11 items-center text-sm font-medium text-[rgb(var(--color-foreground))] underline"
+                        href={item.exploreAll.href}
+                        onClick={closeMobileNav}
+                      >
+                        {item.exploreAll.label}
+                      </Link>
+                    ) : null}
+                  </li>
+                );
+              })}
             </ul>
           </nav>
         ) : null}

@@ -9,6 +9,10 @@
   --section-padding-bottom: 36px;
   --color-background: 245 242 237;
   --color-base-background: 252 248 244;
+  --color-button-background: 49 47 47;
+  --color-button-border: 49 47 47;
+  --color-button-text: 49 47 47;
+  --related-products-arrow-hover-color: rgb(255 255 255);
 }
 
 .liivv-product-related-products .liivv-archive-product-card__media :is(img) {
@@ -55,6 +59,7 @@
 .liivv-product-related-products .title-wrapper .indicators .button.button--secondary:not(:disabled) .btn-text {
   position: relative;
   z-index: 1;
+  color: inherit;
 }
 
 @media screen and (pointer: fine) {
@@ -77,7 +82,13 @@
   }
 
   .liivv-product-related-products .title-wrapper .indicators .button.button--secondary:not(:disabled) .btn-fill {
+    background-color: rgb(var(--color-button-text, 49 47 47));
     transition: background-color var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1));
+  }
+
+  .liivv-product-related-products .title-wrapper .indicators .button.button--secondary:not(:disabled):hover
+    .btn-fill {
+    background-color: rgb(var(--color-button-text, 49 47 47)) !important;
   }
 }
 
@@ -87,6 +98,49 @@
 }
 
 .liivv-product-related-products .title-wrapper .indicators .button.button--secondary:not(:disabled) svg {
+  stroke: currentColor;
+}
+
+/* `js` is on <html>; `data-button-hover` is on <body> — must use descendant selector (not `.js[data-button-hover]`). */
+html.js
+  body[data-button-hover='standard']
+  .liivv-product-related-products
+  .title-wrapper
+  .indicators
+  .button.button--secondary:not(:disabled, .self-button):hover,
+.liivv-product-related-products
+  .title-wrapper
+  .indicators
+  .button.button--secondary:not(:disabled):hover {
+  --border-opacity: 1;
+  color: var(--related-products-arrow-hover-color, rgb(255 255 255)) !important;
+}
+
+html.js
+  body[data-button-hover='standard']
+  .liivv-product-related-products
+  .title-wrapper
+  .indicators
+  .button.button--secondary:not(:disabled, .self-button):hover
+  .btn-text,
+html.js
+  body[data-button-hover='standard']
+  .liivv-product-related-products
+  .title-wrapper
+  .indicators
+  .button.button--secondary:not(:disabled, .self-button):hover
+  svg,
+.liivv-product-related-products
+  .title-wrapper
+  .indicators
+  .button.button--secondary:not(:disabled):hover
+  .btn-text,
+.liivv-product-related-products
+  .title-wrapper
+  .indicators
+  .button.button--secondary:not(:disabled):hover
+  svg {
+  color: inherit;
   stroke: currentColor;
 }
 
