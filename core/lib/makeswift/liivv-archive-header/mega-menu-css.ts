@@ -4,7 +4,7 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   --animation-primary: 0.5s cubic-bezier(0.3, 1, 0.3, 1);
   --mega-menu-drawer-duration: 0.45s;
   --mega-menu-drawer-ease: cubic-bezier(0.32, 0.72, 0, 1);
-  --mega-menu-feature-radius: 0.625rem;
+  --mega-menu-feature-radius: 1.5rem;
 }
 /* Top-level nav (Liivv Your Life / Liivv Health) — archive with-block hover slide */
 .liivv-archive-header .header__menu > ul.with-block > li {
