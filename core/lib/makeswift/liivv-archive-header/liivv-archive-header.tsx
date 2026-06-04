@@ -28,6 +28,7 @@ import { LIIVV_HEADER_MEGA_MENU_CSS } from './mega-menu-css';
 import type {
   LiivvArchiveHeaderLogo,
   LiivvArchiveLinksPosition,
+  LiivvArchiveNavColumn,
   LiivvArchiveNavLink,
   LiivvArchiveNavSubLink,
 } from './types';
@@ -174,18 +175,36 @@ function NavMenuTrigger({
   );
 }
 
+function megaMenuLinksInDisplayOrder(columns: LiivvArchiveNavColumn[]): LiivvArchiveNavSubLink[] {
+  const maxRows = Math.max(0, ...columns.map((column) => column.links.length));
+  const ordered: LiivvArchiveNavSubLink[] = [];
+
+  for (let row = 0; row < maxRows; row++) {
+    for (const column of columns) {
+      const link = column.links[row];
+
+      if (link) {
+        ordered.push(link);
+      }
+    }
+  }
+
+  return ordered;
+}
+
 function pickDefaultMegaMenuPreview(
   item: LiivvArchiveNavLink,
-  links: LiivvArchiveNavSubLink[],
+  columns: LiivvArchiveNavColumn[],
 ): LiivvArchiveNavSubLink | null {
-  const linkWithImage = links.find((link) => Boolean(link.image?.src));
+  const ordered = megaMenuLinksInDisplayOrder(columns);
+  const linkWithImage = ordered.find((link) => Boolean(link.image?.src));
 
   if (linkWithImage) {
     return linkWithImage;
   }
 
-  if (links[0]) {
-    return links[0];
+  if (ordered[0]) {
+    return ordered[0];
   }
 
   if (item.featuredImage?.src) {
@@ -199,7 +218,13 @@ function pickDefaultMegaMenuPreview(
   return null;
 }
 
-function MegaMenuCategoryPreview({ preview }: { preview: LiivvArchiveNavSubLink | null }) {
+function MegaMenuCategoryPreview({
+  preview,
+  decorative,
+}: {
+  preview: LiivvArchiveNavSubLink | null;
+  decorative: boolean;
+}) {
   if (preview == null) {
     return (
       <div
@@ -213,13 +238,14 @@ function MegaMenuCategoryPreview({ preview }: { preview: LiivvArchiveNavSubLink 
 
   const imageSrc = preview.image?.src;
   const imageAlt = preview.image?.alt || preview.label;
+  const showCaption = !decorative && Boolean(imageSrc);
 
   return (
     <div className="header-mega-menu__feature-panel relative flex h-full min-h-[280px] flex-col overflow-hidden">
       {imageSrc ? (
         <img
           alt={imageAlt}
-          className="header-mega-menu__feature-image absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ease-out"
+          className="header-mega-menu__feature-image pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ease-out"
           key={imageSrc}
           src={imageSrc}
         />
@@ -229,16 +255,20 @@ function MegaMenuCategoryPreview({ preview }: { preview: LiivvArchiveNavSubLink 
           className="absolute inset-0 bg-[rgb(var(--color-foreground)/0.06)]"
         />
       )}
-      <div className="header-mega-menu__feature-scrim pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgb(33_33_33/0.72)] via-[rgb(33_33_33/0.12)] to-transparent" />
-      <div className="relative mt-auto p-5 text-white">
-        <p className="text-lg font-semibold leading-tight">{preview.label}</p>
-        <Link
-          className="mt-2 inline-block text-sm font-medium underline underline-offset-2"
-          href={preview.href}
-        >
-          Shop {preview.label}
-        </Link>
-      </div>
+      {showCaption ? (
+        <>
+          <div className="header-mega-menu__feature-scrim pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgb(33_33_33/0.72)] via-[rgb(33_33_33/0.12)] to-transparent" />
+          <div className="pointer-events-none relative mt-auto p-5 text-white">
+            <p className="text-lg font-semibold leading-tight">{preview.label}</p>
+            <Link
+              className="pointer-events-auto mt-2 inline-block text-sm font-medium underline underline-offset-2"
+              href={preview.href}
+            >
+              Shop {preview.label}
+            </Link>
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }
@@ -255,11 +285,11 @@ function HeaderMegaMenuPanel({
   onHover: () => void;
 }) {
   const columns = item.columns ?? [];
-  const flatLinks = useMemo(() => columns.flatMap((column) => column.links), [columns]);
   const defaultPreview = useMemo(
-    () => pickDefaultMegaMenuPreview(item, flatLinks),
-    [item, flatLinks],
+    () => pickDefaultMegaMenuPreview(item, columns),
+    [item, columns],
   );
+  const previewDecorative = item.megaMenuPreviewDecorative === true;
   const [previewLink, setPreviewLink] = useState<LiivvArchiveNavSubLink | null>(defaultPreview);
 
   useEffect(() => {
@@ -283,7 +313,10 @@ function HeaderMegaMenuPanel({
     >
       <div className="header-mega-menu page-width page-width--full">
         <div className="header-mega-menu__body">
-          <div className="header-mega-menu__links">
+          <div
+            className="header-mega-menu__links"
+            onMouseLeave={() => setPreviewLink(defaultPreview)}
+          >
             <div className="header-mega-menu__grid">
               {columns.map((column, columnIndex) => (
                 <ul className="header-mega-menu__column" key={`col-${columnIndex}`} role="list">
@@ -311,8 +344,12 @@ function HeaderMegaMenuPanel({
               ))}
             </div>
           </div>
-          <aside aria-label="Category preview" className="header-mega-menu__feature">
-            <MegaMenuCategoryPreview preview={previewLink} />
+          <aside
+            aria-label="Category preview"
+            className="header-mega-menu__feature"
+            onMouseEnter={() => setPreviewLink(defaultPreview)}
+          >
+            <MegaMenuCategoryPreview decorative={previewDecorative} preview={previewLink} />
           </aside>
         </div>
         {item.exploreAll ? (

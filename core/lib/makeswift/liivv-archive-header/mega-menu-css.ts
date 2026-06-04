@@ -115,6 +115,19 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   min-height: 280px;
   border-inline-start: 1px solid rgb(var(--color-foreground) / 0.08);
   overflow: hidden;
+  border-radius: var(--border-radius, 1rem);
+}
+.liivv-archive-header .header-mega-menu__feature-panel,
+.liivv-archive-header .header-mega-menu__feature-placeholder,
+.liivv-archive-header .header-mega-menu__feature-image {
+  border-radius: var(--border-radius, 1rem);
+}
+.liivv-archive-header .header-mega-menu__feature-panel,
+.liivv-archive-header .header-mega-menu__feature-placeholder {
+  overflow: hidden;
+}
+.liivv-archive-header .header-mega-menu__feature-scrim {
+  border-radius: var(--border-radius, 1rem);
 }
 .liivv-archive-header .header-mega-menu__link--active {
   font-weight: 600;

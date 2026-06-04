@@ -60,6 +60,7 @@ export function mapMakeswiftAdditionalLinks(
         label: item.label,
         href,
         columns,
+        megaMenuPreviewDecorative: columns != null && columns.length > 0,
         exploreAll:
           columns != null && columns.length > 0
             ? {

@@ -19,6 +19,8 @@ export interface LiivvArchiveNavLink {
     alt: string;
   } | null;
   columns?: LiivvArchiveNavColumn[];
+  /** Image-only preview panel; sub links on the left are the only navigation targets. */
+  megaMenuPreviewDecorative?: boolean;
   exploreAll?: {
     label: string;
     href: string;
