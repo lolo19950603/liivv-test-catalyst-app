@@ -29,6 +29,7 @@ import type {
   LiivvArchiveHeaderLogo,
   LiivvArchiveLinksPosition,
   LiivvArchiveNavColumn,
+  LiivvArchiveNavColumnHeading,
   LiivvArchiveNavLink,
   LiivvArchiveNavSubLink,
 } from './types';
@@ -175,18 +176,23 @@ function NavMenuTrigger({
   );
 }
 
+function columnHeadingAsPreview(heading: LiivvArchiveNavColumnHeading): LiivvArchiveNavSubLink {
+  return {
+    label: heading.label,
+    href: heading.href,
+    image: heading.image ?? null,
+  };
+}
+
 function megaMenuLinksInDisplayOrder(columns: LiivvArchiveNavColumn[]): LiivvArchiveNavSubLink[] {
-  const maxRows = Math.max(0, ...columns.map((column) => column.links.length));
   const ordered: LiivvArchiveNavSubLink[] = [];
 
-  for (let row = 0; row < maxRows; row++) {
-    for (const column of columns) {
-      const link = column.links[row];
-
-      if (link) {
-        ordered.push(link);
-      }
+  for (const column of columns) {
+    if (column.heading) {
+      ordered.push(columnHeadingAsPreview(column.heading));
     }
+
+    ordered.push(...column.links);
   }
 
   return ordered;
@@ -218,13 +224,7 @@ function pickDefaultMegaMenuPreview(
   return null;
 }
 
-function MegaMenuCategoryPreview({
-  preview,
-  decorative,
-}: {
-  preview: LiivvArchiveNavSubLink | null;
-  decorative: boolean;
-}) {
+function MegaMenuCategoryPreview({ preview }: { preview: LiivvArchiveNavSubLink | null }) {
   if (preview == null) {
     return (
       <div
@@ -238,7 +238,6 @@ function MegaMenuCategoryPreview({
 
   const imageSrc = preview.image?.src;
   const imageAlt = preview.image?.alt || preview.label;
-  const showCaption = !decorative && Boolean(imageSrc);
 
   return (
     <div className="header-mega-menu__feature-panel relative flex h-full min-h-[280px] flex-col overflow-hidden">
@@ -255,20 +254,6 @@ function MegaMenuCategoryPreview({
           className="absolute inset-0 bg-[rgb(var(--color-foreground)/0.06)]"
         />
       )}
-      {showCaption ? (
-        <>
-          <div className="header-mega-menu__feature-scrim pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgb(33_33_33/0.72)] via-[rgb(33_33_33/0.12)] to-transparent" />
-          <div className="pointer-events-none relative mt-auto p-5 text-white">
-            <p className="text-lg font-semibold leading-tight">{preview.label}</p>
-            <Link
-              className="pointer-events-auto mt-2 inline-block text-sm font-medium underline underline-offset-2"
-              href={preview.href}
-            >
-              Shop {preview.label}
-            </Link>
-          </div>
-        </>
-      ) : null}
     </div>
   );
 }
@@ -289,7 +274,6 @@ function HeaderMegaMenuPanel({
     () => pickDefaultMegaMenuPreview(item, columns),
     [item, columns],
   );
-  const previewDecorative = item.megaMenuPreviewDecorative === true;
   const [previewLink, setPreviewLink] = useState<LiivvArchiveNavSubLink | null>(defaultPreview);
 
   useEffect(() => {
@@ -317,31 +301,61 @@ function HeaderMegaMenuPanel({
             className="header-mega-menu__links"
             onMouseLeave={() => setPreviewLink(defaultPreview)}
           >
-            <div className="header-mega-menu__grid">
-              {columns.map((column, columnIndex) => (
-                <ul className="header-mega-menu__column" key={`col-${columnIndex}`} role="list">
-                  {column.links.map((link, linkIndex) => {
-                    const isActive =
-                      previewLink?.href === link.href && previewLink.label === link.label;
+            <div
+              className="header-mega-menu__grid"
+              style={
+                {
+                  '--mega-menu-column-count': String(Math.min(columns.length, 5)),
+                } as CSSProperties
+              }
+            >
+              {columns.map((column, columnIndex) => {
+                const headingPreview = column.heading
+                  ? columnHeadingAsPreview(column.heading)
+                  : null;
 
-                    return (
-                      <li key={`${link.label}-${linkIndex}`}>
+                return (
+                  <ul className="header-mega-menu__column" key={`col-${columnIndex}`} role="list">
+                    {column.heading ? (
+                      <li className="header-mega-menu__column-heading">
                         <Link
                           className={clsx(
-                            'header-mega-menu__link',
-                            isActive && 'header-mega-menu__link--active',
+                            'header-mega-menu__heading-link',
+                            previewLink?.href === column.heading.href &&
+                              previewLink.label === column.heading.label &&
+                              'header-mega-menu__link--active',
                           )}
-                          href={link.href}
-                          onFocus={() => setPreviewLink(link)}
-                          onMouseEnter={() => setPreviewLink(link)}
+                          href={column.heading.href}
+                          onFocus={() => setPreviewLink(headingPreview)}
+                          onMouseEnter={() => setPreviewLink(headingPreview)}
                         >
-                          {link.label}
+                          {column.heading.label}
                         </Link>
                       </li>
-                    );
-                  })}
-                </ul>
-              ))}
+                    ) : null}
+                    {column.links.map((link, linkIndex) => {
+                      const isActive =
+                        previewLink?.href === link.href && previewLink.label === link.label;
+
+                      return (
+                        <li key={`${link.label}-${linkIndex}`}>
+                          <Link
+                            className={clsx(
+                              'header-mega-menu__link',
+                              isActive && 'header-mega-menu__link--active',
+                            )}
+                            href={link.href}
+                            onFocus={() => setPreviewLink(link)}
+                            onMouseEnter={() => setPreviewLink(link)}
+                          >
+                            {link.label}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                );
+              })}
             </div>
           </div>
           <aside
@@ -349,7 +363,7 @@ function HeaderMegaMenuPanel({
             className="header-mega-menu__feature"
             onMouseEnter={() => setPreviewLink(defaultPreview)}
           >
-            <MegaMenuCategoryPreview decorative={previewDecorative} preview={previewLink} />
+            <MegaMenuCategoryPreview preview={previewLink} />
           </aside>
         </div>
         {item.exploreAll ? (
@@ -932,23 +946,40 @@ export function LiivvArchiveHeader({
                       {item.label}
                     </Link>
                     <ul className="list-none pb-2" role="list">
-                      {columns.flatMap((column) =>
-                        column.links.map((link, linkIndex) => (
-                          <li key={`${item.label}-m-${link.label}-${linkIndex}`}>
+                      {columns.map((column, columnIndex) => (
+                        <li key={`${item.label}-m-col-${columnIndex}`}>
+                          {column.heading ? (
                             <Link
                               className={clsx(
                                 'flex min-h-11 items-center px-4 py-2.5 pl-6 font-[family-name:var(--font-navigation-family,var(--font-sans))]',
-                                'text-sm font-medium text-[rgb(var(--color-foreground))] no-underline',
+                                'text-xs font-semibold uppercase tracking-wide text-[rgb(var(--color-foreground)/0.7)] no-underline',
                                 'rounded-md active:bg-[rgb(var(--color-foreground)/0.06)]',
                               )}
-                              href={link.href}
+                              href={column.heading.href}
                               onClick={closeMobileNav}
                             >
-                              {link.label}
+                              {column.heading.label}
                             </Link>
-                          </li>
-                        )),
-                      )}
+                          ) : null}
+                          <ul className="list-none" role="list">
+                            {column.links.map((link, linkIndex) => (
+                              <li key={`${item.label}-m-${link.label}-${linkIndex}`}>
+                                <Link
+                                  className={clsx(
+                                    'flex min-h-11 items-center px-4 py-2.5 pl-9 font-[family-name:var(--font-navigation-family,var(--font-sans))]',
+                                    'text-sm font-medium text-[rgb(var(--color-foreground))] no-underline',
+                                    'rounded-md active:bg-[rgb(var(--color-foreground)/0.06)]',
+                                  )}
+                                  href={link.href}
+                                  onClick={closeMobileNav}
+                                >
+                                  {link.label}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </li>
+                      ))}
                     </ul>
                     {item.exploreAll ? (
                       <Link

@@ -7,7 +7,18 @@ export interface LiivvArchiveNavSubLink {
   } | null;
 }
 
+export interface LiivvArchiveNavColumnHeading {
+  label: string;
+  href: string;
+  image?: {
+    src: string;
+    alt: string;
+  } | null;
+}
+
 export interface LiivvArchiveNavColumn {
+  /** Pillar category label (direct child of the top-level nav item). */
+  heading?: LiivvArchiveNavColumnHeading;
   links: LiivvArchiveNavSubLink[];
 }
 
@@ -19,8 +30,6 @@ export interface LiivvArchiveNavLink {
     alt: string;
   } | null;
   columns?: LiivvArchiveNavColumn[];
-  /** Image-only preview panel; sub links on the left are the only navigation targets. */
-  megaMenuPreviewDecorative?: boolean;
   exploreAll?: {
     label: string;
     href: string;
