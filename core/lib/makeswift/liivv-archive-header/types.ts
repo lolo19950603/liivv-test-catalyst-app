@@ -18,7 +18,10 @@ export interface LiivvArchiveNavLink {
 }
 
 export interface LiivvArchiveHeaderLogo {
-  src: string;
+  /** Image URL (BC CDN, `{:size}` already resolved). */
+  src?: string;
+  /** Store text logo when no image is configured in BC. */
+  text?: string;
   alt: string;
   href?: string;
   maxWidth?: number;

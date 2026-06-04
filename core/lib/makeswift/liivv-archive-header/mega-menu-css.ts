@@ -2,8 +2,8 @@
 export const LIIVV_HEADER_MEGA_MENU_CSS = `
 .liivv-archive-header {
   --animation-primary: 0.5s cubic-bezier(0.3, 1, 0.3, 1);
-  --mega-menu-fade-duration: 0.4s;
-  --mega-menu-fade-ease: cubic-bezier(0.3, 1, 0.3, 1);
+  --mega-menu-drawer-duration: 0.45s;
+  --mega-menu-drawer-ease: cubic-bezier(0.32, 0.72, 0, 1);
 }
 /* Top-level nav (Liivv Your Life / Liivv Health) — archive with-block hover slide */
 .liivv-archive-header .header__menu > ul.with-block > li {
@@ -72,20 +72,15 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   right: 0;
   top: 100%;
   z-index: 4;
+  overflow: hidden;
   pointer-events: none;
-  opacity: 0;
   visibility: hidden;
-  transition:
-    opacity var(--mega-menu-fade-duration) var(--mega-menu-fade-ease),
-    visibility 0s linear var(--mega-menu-fade-duration);
+  transition: visibility 0s linear var(--mega-menu-drawer-duration);
 }
 .liivv-archive-header .header-mega-menu-wrap.is-open {
   pointer-events: auto;
-  opacity: 1;
   visibility: visible;
-  transition:
-    opacity var(--mega-menu-fade-duration) var(--mega-menu-fade-ease),
-    visibility 0s;
+  transition: visibility 0s;
 }
 .liivv-archive-header .header-mega-menu {
   background: rgb(var(--color-background));
@@ -94,8 +89,9 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   border-end-end-radius: var(--border-radius, 1rem);
   box-shadow: 0 12px 40px rgb(33 33 33 / 0.08);
   overflow: hidden;
-  transform: translateY(-0.5rem);
-  transition: transform var(--mega-menu-fade-duration) var(--mega-menu-fade-ease);
+  transform: translateY(-100%);
+  transition: transform var(--mega-menu-drawer-duration) var(--mega-menu-drawer-ease);
+  will-change: transform;
 }
 .liivv-archive-header .header-mega-menu-wrap.is-open .header-mega-menu {
   transform: translateY(0);
@@ -160,7 +156,6 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
     transition: none;
   }
   .liivv-archive-header .header-mega-menu-wrap.is-open {
-    opacity: 1;
     visibility: visible;
   }
   .liivv-archive-header .header-mega-menu-wrap.is-open .header-mega-menu {

@@ -318,7 +318,7 @@ export function LiivvArchiveHeader({
   const megaCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const links = navLinks;
-  const logoVisible = Boolean(showLogo && logo?.src);
+  const logoVisible = Boolean(showLogo && (logo?.src || logo?.text));
   const hasNav = links.length > 0;
 
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
@@ -546,12 +546,16 @@ export function LiivvArchiveHeader({
                 href={logoHref}
               >
                 <span className="sr-only">{logoAlt}</span>
-                <img
-                  alt={logoAlt}
-                  className="logo block h-auto max-h-9 w-auto max-w-[min(100%,7.5rem)] object-contain sm:max-h-11 sm:max-w-[8.5rem] md:max-h-[140px] md:max-w-[140px]"
-                  src={logo!.src}
-                  style={logoStyle}
-                />
+                {logo?.src ? (
+                  <img
+                    alt={logoAlt}
+                    className="logo block h-auto max-h-9 w-auto max-w-[min(100%,7.5rem)] object-contain sm:max-h-11 sm:max-w-[8.5rem] md:max-h-[140px] md:max-w-[140px]"
+                    src={logo.src}
+                    style={logoStyle}
+                  />
+                ) : (
+                  <span className="logo text-lg font-semibold sm:text-xl md:text-2xl">{logo?.text}</span>
+                )}
               </Link>
               {hasNav ? (
                 <div className="diabetes-care-mobile-nav-slot">

@@ -14,7 +14,9 @@ import {
 import { usePathname } from '~/i18n/routing';
 import { LiivvArchiveHeader } from '~/lib/makeswift/liivv-archive-header/liivv-archive-header';
 import type { LiivvArchiveNavLink } from '~/lib/makeswift/liivv-archive-header/types';
-import { mapMakeswiftNavLinks } from '~/lib/makeswift/site-header/map-makeswift-nav-links';
+import type { StoreCategoryNode } from '~/lib/makeswift/site-header/build-store-nav-from-categories';
+import { resolveStoreNavLinks } from '~/lib/makeswift/site-header/resolve-store-nav-links';
+import { resolveStoreLogo, type StoreLogo } from '~/lib/makeswift/site-header/resolve-store-logo';
 import { findMatchingPathConfig } from '~/lib/makeswift/site-header/should-hide-store-header';
 import type { SectionBackgroundProps } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { resolveMakeswiftHref } from '~/lib/makeswift/utils/resolve-makeswift-href';
@@ -23,28 +25,21 @@ import { ARCHIVE_HEADER_SECTION_ID } from './archive-styles';
 
 export const LIIVV_SITE_HEADER_SECTION_ID = 'liivv-site-header';
 
-export type SiteHeaderCategoryLink = {
-  label: string;
-  href: string;
-};
-
 type BannerProps = ComponentPropsWithoutRef<typeof Banner>;
 
-export type SiteHeaderFallbackLogo = string | { src: string; alt: string };
-
 export type SiteHeaderContextValue = {
-  categoryLinks: SiteHeaderCategoryLink[];
-  fallbackLogo: SiteHeaderFallbackLogo;
-  fallbackLogoLabel: string;
+  categoryTree: StoreCategoryNode[];
+  storeLogo: StoreLogo;
+  storeLogoLabel: string;
   cartCount: number | null;
   searchPlaceholder: string;
   banner?: BannerProps;
 };
 
 const PropsContext = createContext<SiteHeaderContextValue>({
-  categoryLinks: [],
-  fallbackLogo: '',
-  fallbackLogoLabel: 'Home',
+  categoryTree: [],
+  storeLogo: '',
+  storeLogoLabel: 'Home',
   cartCount: null,
   searchPlaceholder: 'Search products',
 });
@@ -55,13 +50,6 @@ export const PropsContextProvider = ({
 }: PropsWithChildren<{ value: SiteHeaderContextValue }>) => (
   <PropsContext.Provider value={value}>{children}</PropsContext.Provider>
 );
-
-interface ImageProps {
-  src?: string;
-  alt: string;
-  width: number;
-  height: number;
-}
 
 interface SectionNavLink {
   label: string;
@@ -90,63 +78,9 @@ interface Props {
   links: Array<{
     label: string;
     link: { href?: string };
-    exploreAllLabel?: string;
-    exploreAllLink?: { href?: string };
-    groups?: Array<{
-      label?: string;
-      link?: { href?: string };
-      links?: Array<{
-        label: string;
-        link: { href?: string };
-      }>;
-    }>;
   }>;
-  logo: {
-    desktop: ImageProps;
-    mobile: ImageProps;
-    link?: { href: string };
-  };
   linksPosition: 'center' | 'left' | 'right';
   pageOverrides?: PageOverride[];
-}
-
-function resolveStoreNavLinks(additionalLinks: Props['links']): LiivvArchiveNavLink[] {
-  return mapMakeswiftNavLinks(additionalLinks);
-}
-
-function normalizeFallbackLogo(
-  fallbackLogo: SiteHeaderFallbackLogo,
-  fallbackLogoLabel: string,
-): { src: string; alt: string } | null {
-  if (typeof fallbackLogo === 'string') {
-    return fallbackLogo ? { src: fallbackLogo, alt: fallbackLogoLabel } : null;
-  }
-
-  return fallbackLogo.src ? { src: fallbackLogo.src, alt: fallbackLogo.alt || fallbackLogoLabel } : null;
-}
-
-function resolveLogo(
-  makeswiftLogo: Props['logo'],
-  fallbackLogo: SiteHeaderFallbackLogo,
-  fallbackLogoLabel: string,
-  useMobile: boolean,
-) {
-  const source = useMobile ? makeswiftLogo.mobile : makeswiftLogo.desktop;
-  const fallback = normalizeFallbackLogo(fallbackLogo, fallbackLogoLabel);
-  const src = source.src || fallback?.src;
-  const alt = source.alt || fallback?.alt || fallbackLogoLabel;
-
-  if (!src) {
-    return null;
-  }
-
-  return {
-    src,
-    alt,
-    href: makeswiftLogo.link?.href,
-    maxWidth: source.width,
-    maxHeight: source.height,
-  };
 }
 
 function PageOverrideHeader({
@@ -203,14 +137,14 @@ function PageOverrideHeader({
 
 export const MakeswiftHeader = forwardRef(
   (
-    { background, banner, links, logo, linksPosition, pageOverrides }: Props,
+    { background, banner, links, linksPosition, pageOverrides }: Props,
     ref: Ref<HTMLDivElement>,
   ) => {
     const pathname = usePathname() ?? '/';
     const {
-      categoryLinks,
-      fallbackLogo,
-      fallbackLogoLabel,
+      categoryTree,
+      storeLogo,
+      storeLogoLabel,
       cartCount,
       searchPlaceholder,
       banner: passedBanner,
@@ -240,8 +174,8 @@ export const MakeswiftHeader = forwardRef(
 
     const bannerNode = combinedBanner ? <Banner {...combinedBanner} /> : null;
 
-    const desktopLogo = resolveLogo(logo, fallbackLogo, fallbackLogoLabel, false);
-    const navLinks = resolveStoreNavLinks(links);
+    const desktopLogo = resolveStoreLogo(storeLogo, storeLogoLabel);
+    const navLinks = resolveStoreNavLinks(links, categoryTree);
 
     return (
       <LiivvArchiveHeader
@@ -255,7 +189,7 @@ export const MakeswiftHeader = forwardRef(
         navLinks={navLinks}
         searchPlaceholder={searchPlaceholder}
         sectionId={LIIVV_SITE_HEADER_SECTION_ID}
-        showLogo={Boolean(desktopLogo?.src)}
+        showLogo={Boolean(desktopLogo?.src || desktopLogo?.text)}
         sticky
         withPinSpacer={false}
       />

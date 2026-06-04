@@ -71,18 +71,13 @@ export const Header = async () => {
   const data = await getHeaderData();
   const logo = data.settings ? logoTransformer(data.settings) : '';
 
-  const streamableCategoryLinks = Streamable.from(async () => {
+  const streamableCategoryTree = Streamable.from(async () => {
     const [customerAccessToken, currencyCode] = await Promise.all([
       getSessionCustomerAccessToken(),
       getPreferredCurrencyCode(),
     ]);
-    const categoryTree = (await getHeaderLinks(customerAccessToken, currencyCode)).categoryTree;
-    const slicedTree = categoryTree.slice(0, 6);
 
-    return slicedTree.map(({ name, path }) => ({
-      label: name,
-      href: path,
-    }));
+    return (await getHeaderLinks(customerAccessToken, currencyCode)).categoryTree;
   });
 
   const streamableCartCount = Streamable.from(async () => {
@@ -99,9 +94,9 @@ export const Header = async () => {
   return (
     <SiteHeader
       cartCount={streamableCartCount}
-      categoryLinks={streamableCategoryLinks}
-      fallbackLogo={logo}
-      fallbackLogoLabel={t('home')}
+      categoryTree={streamableCategoryTree}
+      storeLogo={logo}
+      storeLogoLabel={t('home')}
       searchPlaceholder={t('Search.inputPlaceholder')}
     />
   );

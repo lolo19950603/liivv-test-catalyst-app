@@ -28,56 +28,6 @@ const banner = Group({
   },
 });
 
-const logoGroup = (
-  label: string,
-  defaults: {
-    width: number;
-    height: number;
-  },
-) =>
-  Group({
-    label,
-    props: {
-      src: Image({ label: 'Logo' }),
-      alt: TextInput({ label: 'Alt text', defaultValue: 'Logo alt' }),
-      width: Number({ label: 'Max width', suffix: 'px', defaultValue: defaults.width }),
-      height: Number({ label: 'Max height', suffix: 'px', defaultValue: defaults.height }),
-    },
-  });
-
-const logo = Group({
-  label: 'Logo',
-  preferredLayout: Group.Layout.Popover,
-  props: {
-    desktop: logoGroup('Desktop', { width: 140, height: 140 }),
-    mobile: logoGroup('Mobile', { width: 140, height: 140 }),
-    link: Link({ label: 'Logo link' }),
-  },
-});
-
-const columnLinks = List({
-  label: 'Category links',
-  type: Group({
-    label: 'Category',
-    props: {
-      label: TextInput({ label: 'Label', defaultValue: 'Category' }),
-      link: Link({ label: 'URL' }),
-    },
-  }),
-  getItemLabel: (item) => item?.label ?? 'Category',
-});
-
-const megaMenuColumns = List({
-  label: 'Mega menu columns',
-  type: Group({
-    label: 'Column',
-    props: {
-      links: columnLinks,
-    },
-  }),
-  getItemLabel: () => 'Column',
-});
-
 const sectionNavLinks = List({
   label: 'Navigation links',
   type: Group({
@@ -97,23 +47,16 @@ runtime.registerComponent(MakeswiftHeader, {
   props: {
     ...sectionBackgroundControls('0 0% 100%'),
     banner,
-    logo,
     links: List({
-      label: 'Navigation items',
+      label: 'Additional links',
       type: Group({
-        label: 'Nav item',
+        label: 'Link',
         props: {
-          label: TextInput({ label: 'Label', defaultValue: 'Liivv Your Life' }),
+          label: TextInput({ label: 'Text', defaultValue: 'Text' }),
           link: Link({ label: 'URL' }),
-          groups: megaMenuColumns,
-          exploreAllLabel: TextInput({
-            label: 'Explore all label',
-            defaultValue: 'Explore All',
-          }),
-          exploreAllLink: Link({ label: 'Explore all URL' }),
         },
       }),
-      getItemLabel: (item) => item?.label ?? 'Nav item',
+      getItemLabel: (item) => item?.label ?? 'Link',
     }),
     linksPosition: Select({
       label: 'Links position',
