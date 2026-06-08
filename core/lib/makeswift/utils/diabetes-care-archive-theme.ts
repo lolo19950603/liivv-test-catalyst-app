@@ -10,6 +10,12 @@ export const ARCHIVE_SAGE_BACKGROUND_CHANNELS = '142 165 141';
 /** Picker default matching {@link ARCHIVE_SAGE_BACKGROUND_CHANNELS}. */
 export const ARCHIVE_SAGE_BACKGROUND_HSL = '117 12% 60%';
 
+/** `#8ea78b` — secondary outline hover fill on white sections. */
+export const ARCHIVE_SAGE_BUTTON_HOVER_CHANNELS = '142 167 139';
+
+/** Picker default matching {@link ARCHIVE_SAGE_BUTTON_HOVER_CHANNELS}. */
+export const ARCHIVE_SAGE_BUTTON_HOVER_HSL = '114 14% 60%';
+
 /** `--color-background: 168 156 148` (blog posts collage). */
 export const ARCHIVE_BLOG_COLLAGE_BACKGROUND_CHANNELS = '168 156 148';
 

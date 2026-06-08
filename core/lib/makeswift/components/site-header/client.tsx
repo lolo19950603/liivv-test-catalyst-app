@@ -49,7 +49,7 @@ const PropsContext = createContext<SiteHeaderContextValue>({
   storeLogo: '',
   storeLogoLabel: 'Home',
   cartCount: null,
-  searchPlaceholder: 'Search products',
+  searchPlaceholder: 'search all products, categories, brands....',
 });
 
 export const PropsContextProvider = ({

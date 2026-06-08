@@ -94,7 +94,9 @@ export function buttonColorFields(defaults?: ButtonColorFieldDefaults) {
   return {
     outlineColor: Color({
       label: 'Button outline color',
-      defaultValue: hsl(defaults?.outlineHsl ?? defaults?.backgroundHsl ?? restingBg),
+      defaultValue: hsl(
+        defaults?.outlineHsl ?? defaults?.textHsl ?? defaults?.backgroundHsl ?? restingBg,
+      ),
     }),
     outlineColorHex: TextInput({
       label: 'Button outline color (hex override)',
