@@ -696,7 +696,9 @@
         "noSearchResultsSubtitle": "Please try another search.",
         "somethingWentWrong": "Something went wrong. Please try again.",
         "inputPlaceholder": "search all products, categories, brands....",
-        "submitLabel": "Search"
+        "submitLabel": "Search",
+        "clearLabel": "Clear search",
+        "loadingLabel": "Searching"
       }
     },
     "Footer": {

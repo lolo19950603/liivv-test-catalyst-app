@@ -24,6 +24,7 @@ import { useHeaderStickyScrolled } from '~/lib/makeswift/site-header/use-header-
 import { resolveMakeswiftHref } from '~/lib/makeswift/utils/resolve-makeswift-href';
 
 import { ARCHIVE_HEADER_CSS } from './archive-header-css';
+import { LiivvArchiveSearchPanel } from './liivv-archive-search-panel';
 import { LIIVV_HEADER_MEGA_MENU_CSS } from './mega-menu-css';
 import type {
   LiivvArchiveHeaderLogo,
@@ -34,7 +35,6 @@ import type {
   LiivvArchiveNavSubLink,
 } from './types';
 
-const SEARCH_RESULTS_PATH = '/search';
 const ACCOUNT_PATH = '/login';
 const CART_PATH = '/cart';
 const SEARCH_ARIA_LABEL = 'Search';
@@ -379,45 +379,6 @@ function HeaderMegaMenuPanel({
   );
 }
 
-function buildSearchPanelStyle(searchPanelId: string) {
-  return `
-#${searchPanelId} .liivv-archive-search-form {
-  display: flex;
-  align-items: stretch;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-}
-#${searchPanelId} .liivv-archive-search-input {
-  flex: 1;
-  min-width: 0;
-  border: 1px solid rgb(var(--color-foreground) / 0.12);
-  border-radius: var(--rounded-full, 9999px);
-  background: rgb(var(--color-background));
-  color: rgb(var(--color-foreground));
-  font: inherit;
-  font-size: var(--text-base, 1rem);
-  line-height: 1.5;
-  padding: 0.625rem 1rem;
-}
-#${searchPanelId} .liivv-archive-search-input:focus {
-  outline: 2px solid rgb(var(--color-keyboard-focus, var(--color-foreground)));
-  outline-offset: 2px;
-}
-#${searchPanelId} .liivv-archive-search-submit {
-  flex-shrink: 0;
-  border: 0;
-  border-radius: var(--rounded-full, 9999px);
-  background: rgb(var(--color-button-background, var(--color-foreground)));
-  color: rgb(var(--color-button-text, var(--color-background)));
-  cursor: pointer;
-  font: inherit;
-  font-size: var(--text-sm, 0.875rem);
-  font-weight: var(--font-medium, 500);
-  padding: 0.625rem 1.25rem;
-}
-`;
-}
-
 function navigationJustifyClass(position: LiivvArchiveLinksPosition) {
   switch (position) {
     case 'center':
@@ -670,7 +631,6 @@ export function LiivvArchiveHeader({
       {sticky ? (
         <style dangerouslySetInnerHTML={{ __html: LIIVV_HEADER_STICKY_SCROLLED_CSS }} />
       ) : null}
-      <style dangerouslySetInnerHTML={{ __html: buildSearchPanelStyle(searchPanelId) }} />
       {banner}
       {(mobileNavOpen || searchOpen) && (hasNav || searchOpen) ? (
         <div
@@ -853,25 +813,13 @@ export function LiivvArchiveHeader({
               'border-t border-[rgb(var(--color-foreground)/0.08)] bg-[rgb(var(--color-background))] shadow-lg',
             )}
             id={searchPanelId}
-            role="search"
           >
-            <form action={SEARCH_RESULTS_PATH} className="liivv-archive-search-form" method="get">
-              <label className="sr-only" htmlFor={`${searchPanelId}-input`}>
-                {searchPlaceholder}
-              </label>
-              <input
-                autoComplete="off"
-                className="liivv-archive-search-input"
-                id={`${searchPanelId}-input`}
-                name="term"
-                placeholder={searchPlaceholder}
-                ref={searchInputRef}
-                type="search"
-              />
-              <button className="liivv-archive-search-submit" type="submit">
-                {SEARCH_ARIA_LABEL}
-              </button>
-            </form>
+            <LiivvArchiveSearchPanel
+              inputRef={searchInputRef}
+              open={searchOpen}
+              searchPanelId={searchPanelId}
+              searchPlaceholder={searchPlaceholder}
+            />
           </div>
         ) : null}
 

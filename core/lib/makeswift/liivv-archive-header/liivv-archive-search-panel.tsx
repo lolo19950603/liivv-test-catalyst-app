@@ -3,6 +3,7 @@
 import { useForm } from '@conform-to/react';
 import { clsx } from 'clsx';
 import debounce from 'lodash.debounce';
+import { Loader2, XIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import {
   type RefObject,
@@ -21,7 +22,7 @@ import { search } from '~/components/header/_actions/search';
 
 const SEARCH_RESULTS_PATH = '/search';
 const SEARCH_PARAM_NAME = 'term';
-const MIN_QUERY_LENGTH = 3;
+const MIN_QUERY_LENGTH = 1;
 
 function buildSearchPanelStyle(searchPanelId: string) {
   return `
@@ -31,9 +32,13 @@ function buildSearchPanelStyle(searchPanelId: string) {
   gap: 0.5rem;
   padding: 0.75rem 1rem;
 }
-#${searchPanelId} .liivv-archive-search-input {
+#${searchPanelId} .liivv-archive-search-input-wrap {
   flex: 1;
   min-width: 0;
+  position: relative;
+}
+#${searchPanelId} .liivv-archive-search-input {
+  width: 100%;
   border: 1px solid rgb(var(--color-foreground) / 0.12);
   border-radius: var(--rounded-full, 9999px);
   background: rgb(var(--color-background));
@@ -41,7 +46,37 @@ function buildSearchPanelStyle(searchPanelId: string) {
   font: inherit;
   font-size: var(--text-base, 1rem);
   line-height: 1.5;
-  padding: 0.625rem 1rem;
+  padding: 0.625rem 2.5rem 0.625rem 1rem;
+}
+#${searchPanelId} .liivv-archive-search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+#${searchPanelId} .liivv-archive-search-input-action {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: rgb(var(--color-foreground) / 0.45);
+  cursor: pointer;
+  display: flex;
+  height: 1.25rem;
+  justify-content: center;
+  padding: 0;
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.25rem;
+}
+#${searchPanelId} .liivv-archive-search-input-action:hover,
+#${searchPanelId} .liivv-archive-search-input-action:focus-visible {
+  color: rgb(var(--color-foreground));
+  outline: none;
+}
+#${searchPanelId} .liivv-archive-search-input-action--loading {
+  cursor: default;
+  pointer-events: none;
 }
 #${searchPanelId} .liivv-archive-search-input:focus {
   outline: 2px solid rgb(var(--color-keyboard-focus, var(--color-foreground)));
@@ -308,6 +343,8 @@ export function LiivvArchiveSearchPanel({
 }) {
   const t = useTranslations('Components.Header.Search');
   const submitLabel = t('submitLabel');
+  const clearLabel = t('clearLabel');
+  const loadingLabel = t('loadingLabel');
   const [query, setQuery] = useState('');
   const [isSearching, startSearching] = useTransition();
   const [{ searchResults, lastResult, emptyStateTitle, emptyStateSubtitle }, formAction] =
@@ -319,37 +356,50 @@ export function LiivvArchiveSearchPanel({
     });
   const [isDebouncing, setIsDebouncing] = useState(false);
   const isPending = isSearching || isDebouncing;
-  const debouncedOnChange = useMemo(() => {
-    const debounced = debounce((value: string) => {
-      setIsDebouncing(false);
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setIsDebouncing(false);
 
-      if (value.length < MIN_QUERY_LENGTH) {
-        return;
-      }
+        if (value.length < MIN_QUERY_LENGTH) {
+          return;
+        }
 
-      const formData = new FormData();
+        const formData = new FormData();
 
-      formData.append(SEARCH_PARAM_NAME, value);
+        formData.append(SEARCH_PARAM_NAME, value);
 
-      startSearching(() => {
-        formAction(formData);
-      });
-    }, 300);
+        startSearching(() => {
+          formAction(formData);
+        });
+      }, 300),
+    [formAction],
+  );
 
-    return (value: string) => {
+  const debouncedOnChange = useMemo(
+    () => (value: string) => {
       setIsDebouncing(true);
-      debounced(value);
-    };
-  }, [formAction]);
+      debouncedSearch(value);
+    },
+    [debouncedSearch],
+  );
+
+  const clearQuery = () => {
+    debouncedSearch.cancel();
+    setIsDebouncing(false);
+    setQuery('');
+    inputRef.current?.focus();
+  };
 
   const [form] = useForm({ lastResult });
 
   useEffect(() => {
     if (!open) {
+      debouncedSearch.cancel();
       setQuery('');
       setIsDebouncing(false);
     }
-  }, [open]);
+  }, [debouncedSearch, open]);
 
   return (
     <>
@@ -363,26 +413,46 @@ export function LiivvArchiveSearchPanel({
         <label className="sr-only" htmlFor={`${searchPanelId}-input`}>
           {searchPlaceholder}
         </label>
-        <input
-          aria-autocomplete="list"
-          aria-controls={`${searchPanelId}-results`}
-          aria-expanded={query.length >= MIN_QUERY_LENGTH}
-          autoComplete="off"
-          className="liivv-archive-search-input"
-          id={`${searchPanelId}-input`}
-          name={SEARCH_PARAM_NAME}
-          onChange={(event) => {
-            const value = event.currentTarget.value;
+        <div className="liivv-archive-search-input-wrap">
+          <input
+            aria-autocomplete="list"
+            aria-controls={`${searchPanelId}-results`}
+            aria-expanded={query.length >= MIN_QUERY_LENGTH}
+            autoComplete="off"
+            className="liivv-archive-search-input"
+            id={`${searchPanelId}-input`}
+            name={SEARCH_PARAM_NAME}
+            onChange={(event) => {
+              const value = event.currentTarget.value;
 
-            setQuery(value);
-            debouncedOnChange(value);
-          }}
-          placeholder={searchPlaceholder}
-          ref={inputRef}
-          role="combobox"
-          type="search"
-          value={query}
-        />
+              setQuery(value);
+              debouncedOnChange(value);
+            }}
+            placeholder={searchPlaceholder}
+            ref={inputRef}
+            role="combobox"
+            type="search"
+            value={query}
+          />
+          {isPending ? (
+            <span
+              aria-label={loadingLabel}
+              className="liivv-archive-search-input-action liivv-archive-search-input-action--loading"
+              role="status"
+            >
+              <Loader2 aria-hidden className="size-4 animate-spin" strokeWidth={2} />
+            </span>
+          ) : query.length > 0 ? (
+            <button
+              aria-label={clearLabel}
+              className="liivv-archive-search-input-action"
+              onClick={clearQuery}
+              type="button"
+            >
+              <XIcon aria-hidden size={16} strokeWidth={2} />
+            </button>
+          ) : null}
+        </div>
         <button className="liivv-archive-search-submit" type="submit">
           {submitLabel}
         </button>

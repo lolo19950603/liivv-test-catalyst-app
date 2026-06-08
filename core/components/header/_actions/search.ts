@@ -70,7 +70,7 @@ export async function search(
     };
   }
 
-  if (submission.value.term.length < 3) {
+  if (submission.value.term.length < 1) {
     return {
       lastResult: submission.reply(),
       searchResults: null,
