@@ -11,6 +11,7 @@ import { COMPONENT_TYPE } from './register';
 type Props = {
   snapshotId?: string;
   label?: string;
+  accountHref: string;
   categoryTree: Streamable<StoreCategoryNode[]>;
   storeLogo: SiteHeaderContextValue['storeLogo'];
   storeLogoLabel: string;
@@ -22,6 +23,7 @@ type Props = {
 export const SiteHeader = async ({
   snapshotId = 'site-header',
   label = 'Site Header',
+  accountHref,
   categoryTree,
   storeLogo,
   storeLogoLabel,
@@ -32,6 +34,7 @@ export const SiteHeader = async ({
   const snapshot = await getComponentSnapshot(snapshotId);
 
   const contextValue: SiteHeaderContextValue = {
+    accountHref,
     categoryTree: await categoryTree,
     storeLogo,
     storeLogoLabel,

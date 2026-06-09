@@ -3,8 +3,10 @@
 import { clsx } from 'clsx';
 import {
   type CSSProperties,
+  type MouseEvent,
   type ReactNode,
   type RefObject,
+  type TransitionEvent,
   useCallback,
   useEffect,
   useId,
@@ -35,9 +37,12 @@ import type {
   LiivvArchiveNavSubLink,
 } from './types';
 
-const ACCOUNT_PATH = '/login';
+import { ACCOUNT_LOGIN_PATH } from '~/lib/makeswift/site-header/resolve-account-href';
+
 const CART_PATH = '/cart';
 const SEARCH_ARIA_LABEL = 'Search';
+/** Keep in sync with --mega-menu-drawer-duration in mega-menu-css.ts */
+const SEARCH_DRAWER_DURATION_MS = 450;
 const ACCOUNT_ARIA_LABEL = 'Account';
 const CART_ARIA_LABEL = 'Shopping cart';
 
@@ -68,6 +73,7 @@ export interface LiivvArchiveHeaderProps {
   showLogo?: boolean;
   navLinks?: LiivvArchiveNavLink[];
   showUtilityIcons?: boolean;
+  accountHref?: string;
   searchPlaceholder?: string;
   linksPosition?: LiivvArchiveLinksPosition;
   initialCartCount?: number | null;
@@ -152,11 +158,15 @@ function NavMenuTrigger({
   label,
   hasMegaMenu,
   isExpanded,
+  onMouseEnter,
+  onMouseLeave,
 }: {
   href: string;
   label: string;
   hasMegaMenu: boolean;
   isExpanded: boolean;
+  onMouseEnter?: () => void;
+  onMouseLeave?: (event: MouseEvent<HTMLAnchorElement>) => void;
 }) {
   return (
     <Link
@@ -165,6 +175,8 @@ function NavMenuTrigger({
       aria-label={label}
       className="menu__item text-sm-lg relative z-2 flex cursor-pointer items-center font-medium"
       href={href}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <span className="btn-text" data-text={label}>
         {label}
@@ -224,7 +236,268 @@ function pickDefaultMegaMenuPreview(
   return null;
 }
 
-function MegaMenuCategoryPreview({ preview }: { preview: LiivvArchiveNavSubLink | null }) {
+function megaMenuPreviewKey(
+  link: LiivvArchiveNavSubLink | null,
+  fallbackLogo?: LiivvArchiveHeaderLogo | null,
+): string {
+  if (link == null) {
+    return '';
+  }
+
+  const visualKey =
+    link.image?.src ??
+    (fallbackLogo?.src != null
+      ? `logo:${fallbackLogo.src}`
+      : fallbackLogo?.text != null
+        ? `logo-text:${fallbackLogo.text}`
+        : '');
+
+  return `${link.href}|${link.label}|${visualKey}`;
+}
+
+/** Keep in sync with --mega-menu-feature-fade-duration in mega-menu-css.ts */
+const MEGA_MENU_FEATURE_FADE_MS = 150;
+
+type MegaMenuPreviewContent =
+  | {
+      kind: 'image';
+      src: string;
+      alt: string;
+      isLogo: boolean;
+    }
+  | {
+      kind: 'logo-text';
+      text: string;
+    }
+  | {
+      kind: 'placeholder';
+    };
+
+function megaMenuPreviewVisualKey(
+  content: MegaMenuPreviewContent,
+): string {
+  if (content.kind === 'image') {
+    return content.isLogo ? `logo:${content.src}` : content.src;
+  }
+
+  if (content.kind === 'logo-text') {
+    return `logo-text:${content.text}`;
+  }
+
+  return 'placeholder';
+}
+
+async function preloadPreviewImage(src: string): Promise<void> {
+  const image = new window.Image();
+
+  await new Promise<void>((resolve, reject) => {
+    image.onload = () => resolve();
+    image.onerror = () => reject(new Error('Failed to load preview image'));
+    image.src = src;
+  });
+
+  if (typeof image.decode === 'function') {
+    await image.decode().catch(() => undefined);
+  }
+}
+
+function buildPreviewContent(
+  preview: LiivvArchiveNavSubLink,
+  fallbackLogo?: LiivvArchiveHeaderLogo | null,
+): MegaMenuPreviewContent {
+  if (preview.image?.src != null) {
+    return {
+      kind: 'image',
+      src: preview.image.src,
+      alt: preview.image.alt || preview.label,
+      isLogo: false,
+    };
+  }
+
+  if (fallbackLogo?.src != null) {
+    return {
+      kind: 'image',
+      src: fallbackLogo.src,
+      alt: fallbackLogo.alt,
+      isLogo: true,
+    };
+  }
+
+  if (fallbackLogo?.text != null) {
+    return {
+      kind: 'logo-text',
+      text: fallbackLogo.text,
+    };
+  }
+
+  return {
+    kind: 'placeholder',
+  };
+}
+
+function renderMegaMenuPreviewContent(
+  content: MegaMenuPreviewContent,
+  layerClass: string,
+  zIndex: number,
+  key: string,
+  onTransitionEnd?: (event: TransitionEvent) => void,
+) {
+  if (content.kind === 'image') {
+    return (
+      <img
+        alt={content.alt}
+        className={clsx(
+          'header-mega-menu__feature-image',
+          content.isLogo && 'header-mega-menu__feature-image--logo',
+          layerClass,
+        )}
+        decoding="sync"
+        key={key}
+        onTransitionEnd={onTransitionEnd}
+        src={content.src}
+        style={{ zIndex }}
+      />
+    );
+  }
+
+  if (content.kind === 'logo-text') {
+    return (
+      <div
+        aria-hidden
+        className={clsx('header-mega-menu__feature-logo-text', layerClass)}
+        key={key}
+        onTransitionEnd={onTransitionEnd}
+        style={{ zIndex }}
+      >
+        {content.text}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      aria-hidden
+      className={clsx('header-mega-menu__feature-placeholder-layer', layerClass)}
+      key={key}
+      onTransitionEnd={onTransitionEnd}
+      style={{ zIndex }}
+    />
+  );
+}
+
+function MegaMenuCategoryPreview({
+  preview,
+  fallbackLogo,
+}: {
+  preview: LiivvArchiveNavSubLink | null;
+  fallbackLogo?: LiivvArchiveHeaderLogo | null;
+}) {
+  const [baseContent, setBaseContent] = useState<MegaMenuPreviewContent | null>(() =>
+    preview == null ? null : buildPreviewContent(preview, fallbackLogo),
+  );
+  const lastPreviewKeyRef = useRef(
+    preview == null ? '' : megaMenuPreviewKey(preview, fallbackLogo),
+  );
+  const lastVisualKeyRef = useRef(
+    baseContent == null ? '' : megaMenuPreviewVisualKey(baseContent),
+  );
+  const baseContentRef = useRef<MegaMenuPreviewContent | null>(baseContent);
+  const [incomingContent, setIncomingContent] = useState<MegaMenuPreviewContent | null>(
+    null,
+  );
+  const [incomingVisible, setIncomingVisible] = useState(false);
+
+  baseContentRef.current = baseContent;
+
+  useEffect(() => {
+    if (preview == null) {
+      lastPreviewKeyRef.current = '';
+      lastVisualKeyRef.current = '';
+      setBaseContent(null);
+      setIncomingContent(null);
+      setIncomingVisible(false);
+
+      return;
+    }
+
+    const nextContent = buildPreviewContent(preview, fallbackLogo);
+    const previewKey = megaMenuPreviewKey(preview, fallbackLogo);
+
+    if (previewKey === lastPreviewKeyRef.current) {
+      return;
+    }
+
+    lastPreviewKeyRef.current = previewKey;
+
+    const visualKey = megaMenuPreviewVisualKey(nextContent);
+
+    if (visualKey === lastVisualKeyRef.current && baseContentRef.current != null) {
+      setBaseContent(nextContent);
+
+      return;
+    }
+
+    lastVisualKeyRef.current = visualKey;
+
+    let cancelled = false;
+    let fadeInRaf = 0;
+    let commitTimer = 0;
+
+    const commitIncoming = () => {
+      setBaseContent(nextContent);
+      setIncomingContent(null);
+      setIncomingVisible(false);
+    };
+
+    const beginFadeIn = () => {
+      if (cancelled) {
+        return;
+      }
+
+      if (baseContentRef.current == null) {
+        setBaseContent(nextContent);
+
+        return;
+      }
+
+      setIncomingContent(nextContent);
+      setIncomingVisible(false);
+
+      fadeInRaf = window.requestAnimationFrame(() => {
+        fadeInRaf = window.requestAnimationFrame(() => {
+          if (cancelled) {
+            return;
+          }
+
+          setIncomingVisible(true);
+          commitTimer = window.setTimeout(() => {
+            if (!cancelled) {
+              commitIncoming();
+            }
+          }, MEGA_MENU_FEATURE_FADE_MS);
+        });
+      });
+    };
+
+    if (nextContent.kind === 'image') {
+      void preloadPreviewImage(nextContent.src)
+        .catch(() => undefined)
+        .then(() => {
+          if (!cancelled) {
+            beginFadeIn();
+          }
+        });
+    } else {
+      beginFadeIn();
+    }
+
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(fadeInRaf);
+      window.clearTimeout(commitTimer);
+    };
+  }, [fallbackLogo, preview]);
+
   if (preview == null) {
     return (
       <div
@@ -236,24 +509,27 @@ function MegaMenuCategoryPreview({ preview }: { preview: LiivvArchiveNavSubLink 
     );
   }
 
-  const imageSrc = preview.image?.src;
-  const imageAlt = preview.image?.alt || preview.label;
+  const incomingLayerClass = clsx(
+    'header-mega-menu__feature-layer--incoming',
+    incomingVisible && 'is-entered',
+  );
 
   return (
     <div className="header-mega-menu__feature-panel relative flex h-full min-h-[280px] flex-col overflow-hidden">
-      {imageSrc ? (
-        <img
-          alt={imageAlt}
-          className="header-mega-menu__feature-image pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ease-out"
-          key={imageSrc}
-          src={imageSrc}
-        />
-      ) : (
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-[rgb(var(--color-foreground)/0.06)]"
-        />
-      )}
+      {baseContent != null &&
+        renderMegaMenuPreviewContent(
+          baseContent,
+          'header-mega-menu__feature-layer--base',
+          1,
+          'base',
+        )}
+      {incomingContent != null &&
+        renderMegaMenuPreviewContent(
+          incomingContent,
+          incomingLayerClass,
+          2,
+          'incoming',
+        )}
     </div>
   );
 }
@@ -263,11 +539,15 @@ function HeaderMegaMenuPanel({
   menuId,
   open,
   onHover,
+  onLeave,
+  fallbackLogo,
 }: {
   item: LiivvArchiveNavLink;
   menuId: string;
   open: boolean;
   onHover: () => void;
+  onLeave: () => void;
+  fallbackLogo?: LiivvArchiveHeaderLogo | null;
 }) {
   const columns = item.columns ?? [];
   const defaultPreview = useMemo(
@@ -291,16 +571,26 @@ function HeaderMegaMenuPanel({
       className={clsx('header-mega-menu-wrap', open && 'is-open')}
       id={menuId}
       onMouseEnter={onHover}
+      onMouseLeave={(event) => {
+        const related = event.relatedTarget;
+
+        if (related instanceof Node) {
+          const trigger = document.querySelector(`[aria-controls="${menuId}"]`);
+
+          if (trigger?.contains(related)) {
+            return;
+          }
+        }
+
+        onLeave();
+      }}
       role="region"
       aria-label={`${item.label} categories`}
       aria-hidden={!open}
     >
       <div className="header-mega-menu page-width page-width--full">
         <div className="header-mega-menu__body">
-          <div
-            className="header-mega-menu__links"
-            onMouseLeave={() => setPreviewLink(defaultPreview)}
-          >
+          <div className="header-mega-menu__links">
             <div
               className="header-mega-menu__grid"
               style={
@@ -358,12 +648,8 @@ function HeaderMegaMenuPanel({
               })}
             </div>
           </div>
-          <aside
-            aria-label="Category preview"
-            className="header-mega-menu__feature"
-            onMouseEnter={() => setPreviewLink(defaultPreview)}
-          >
-            <MegaMenuCategoryPreview preview={previewLink} />
+          <aside aria-label="Category preview" className="header-mega-menu__feature">
+            <MegaMenuCategoryPreview fallbackLogo={fallbackLogo} preview={previewLink} />
           </aside>
         </div>
         {item.exploreAll ? (
@@ -401,6 +687,7 @@ export function LiivvArchiveHeader({
   showLogo = true,
   navLinks = [],
   showUtilityIcons = true,
+  accountHref = ACCOUNT_LOGIN_PATH,
   searchPlaceholder = 'Search products',
   linksPosition = 'left',
   initialCartCount = null,
@@ -428,12 +715,15 @@ export function LiivvArchiveHeader({
   const [cartLineCount, setCartLineCount] = useState<number | null>(initialCartCount);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchDrawerMounted, setSearchDrawerMounted] = useState(false);
   const [activeMegaIndex, setActiveMegaIndex] = useState<number | null>(null);
   const megaCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const links = navLinks;
   const logoVisible = Boolean(showLogo && (logo?.src || logo?.text));
   const hasNav = links.length > 0;
+  const megaMenuOpen = activeMegaIndex !== null;
+  const searchDrawerOpen = searchOpen && !megaMenuOpen;
 
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
   const closeSearch = useCallback(() => setSearchOpen(false), []);
@@ -446,7 +736,6 @@ export function LiivvArchiveHeader({
     }
 
     setActiveMegaIndex(index);
-    setSearchOpen(false);
   }, []);
 
   const scheduleCloseMegaMenu = useCallback(() => {
@@ -461,14 +750,19 @@ export function LiivvArchiveHeader({
   }, []);
 
   const toggleSearch = useCallback(() => {
-    setSearchOpen((open) => {
-      if (!open) {
-        setMobileNavOpen(false);
-      }
+    if (searchOpen) {
+      setSearchOpen(false);
 
-      return !open;
+      return;
+    }
+
+    setMobileNavOpen(false);
+    setSearchDrawerMounted(true);
+
+    window.requestAnimationFrame(() => {
+      setSearchOpen(true);
     });
-  }, []);
+  }, [searchOpen]);
 
   const refreshCartCount = useCallback(async () => {
     try {
@@ -546,7 +840,19 @@ export function LiivvArchiveHeader({
   }, [mobileNavOpen, searchOpen, closeMobileNav, closeSearch, closeMegaMenu]);
 
   useEffect(() => {
-    if (!searchOpen) {
+    if (searchOpen || !searchDrawerMounted) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setSearchDrawerMounted(false);
+    }, SEARCH_DRAWER_DURATION_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [searchDrawerMounted, searchOpen]);
+
+  useEffect(() => {
+    if (!searchDrawerOpen) {
       return;
     }
 
@@ -555,7 +861,7 @@ export function LiivvArchiveHeader({
     });
 
     return () => window.cancelAnimationFrame(id);
-  }, [searchOpen]);
+  }, [searchDrawerOpen]);
 
   useEffect(() => {
     if (!mobileNavOpen) {
@@ -632,7 +938,7 @@ export function LiivvArchiveHeader({
         <style dangerouslySetInnerHTML={{ __html: LIIVV_HEADER_STICKY_SCROLLED_CSS }} />
       ) : null}
       {banner}
-      {(mobileNavOpen || searchOpen) && (hasNav || searchOpen) ? (
+      {(mobileNavOpen || searchDrawerMounted) && (hasNav || searchDrawerMounted) ? (
         <div
           aria-hidden
           className="diabetes-care-mobile-backdrop fixed inset-0 z-[1] bg-[rgb(33_33_33/0.4)]"
@@ -653,7 +959,10 @@ export function LiivvArchiveHeader({
           data-section-id="sections--26374736970019__header"
         >
           {logoVisible ? (
-            <div className="header__logo z-2 flex min-w-0 items-center justify-center gap-3 lg:justify-center">
+            <div
+              className="header__logo z-2 flex min-w-0 items-center justify-center gap-3 lg:justify-center"
+              onMouseEnter={closeMegaMenu}
+            >
               <Link
                 className="header__logo-link has-white-logo relative flex min-w-0 max-w-full items-center"
                 href={logoHref}
@@ -737,19 +1046,33 @@ export function LiivvArchiveHeader({
                         aria-controls={hasMegaMenu ? menuId : undefined}
                         aria-expanded={hasMegaMenu ? isExpanded : undefined}
                         key={`${item.label}-${index}`}
-                        onMouseEnter={() => {
-                          if (hasMegaMenu) {
-                            openMegaMenu(index);
-                          } else {
-                            closeMegaMenu();
-                          }
-                        }}
                       >
                         <NavMenuTrigger
                           hasMegaMenu={hasMegaMenu}
                           href={item.href}
                           isExpanded={isExpanded}
                           label={item.label}
+                          onMouseEnter={() => {
+                            if (hasMegaMenu) {
+                              openMegaMenu(index);
+                            } else {
+                              closeMegaMenu();
+                            }
+                          }}
+                          onMouseLeave={(event) => {
+                            if (!hasMegaMenu) {
+                              return;
+                            }
+
+                            const related = event.relatedTarget;
+                            const panel = document.getElementById(menuId);
+
+                            if (related instanceof Node && panel?.contains(related)) {
+                              return;
+                            }
+
+                            scheduleCloseMegaMenu();
+                          }}
                         />
                       </li>
                     );
@@ -760,7 +1083,10 @@ export function LiivvArchiveHeader({
           ) : null}
 
           {showUtilityIcons ? (
-            <div className="header__icons header__icons--end z-2 flex min-w-0 shrink-0 justify-end">
+            <div
+              className="header__icons header__icons--end z-2 flex min-w-0 shrink-0 justify-end"
+              onMouseEnter={closeMegaMenu}
+            >
               <div className="header__buttons gap-1d5 flex items-center">
                 <button
                   aria-controls={searchPanelId}
@@ -776,7 +1102,7 @@ export function LiivvArchiveHeader({
                 <Link
                   aria-label={ACCOUNT_ARIA_LABEL}
                   className="flex items-center justify-center"
-                  href={ACCOUNT_PATH}
+                  href={accountHref}
                 >
                   <span className="sr-only">{ACCOUNT_ARIA_LABEL}</span>
                   <LiivvIconAccount className="icon icon-account icon-md" />
@@ -806,20 +1132,21 @@ export function LiivvArchiveHeader({
           </span>
         </header>
 
-        {searchOpen ? (
+        {searchDrawerMounted ? (
           <div
-            className={clsx(
-              'liivv-archive-search-panel absolute left-0 right-0 top-full z-[3]',
-              'border-t border-[rgb(var(--color-foreground)/0.08)] bg-[rgb(var(--color-background))] shadow-lg',
-            )}
+            aria-hidden={!searchDrawerOpen}
+            className={clsx('header-search-wrap', searchDrawerOpen && 'is-open')}
             id={searchPanelId}
           >
-            <LiivvArchiveSearchPanel
-              inputRef={searchInputRef}
-              open={searchOpen}
-              searchPanelId={searchPanelId}
-              searchPlaceholder={searchPlaceholder}
-            />
+            <div className="header-search-drawer liivv-archive-search-panel">
+              <LiivvArchiveSearchPanel
+                fallbackLogo={logo}
+                inputRef={searchInputRef}
+                open={searchOpen}
+                searchPanelId={searchPanelId}
+                searchPlaceholder={searchPlaceholder}
+              />
+            </div>
           </div>
         ) : null}
 
@@ -833,10 +1160,12 @@ export function LiivvArchiveHeader({
 
           return (
             <HeaderMegaMenuPanel
+              fallbackLogo={logo}
               item={item}
               key={menuId}
               menuId={menuId}
               onHover={() => openMegaMenu(index)}
+              onLeave={scheduleCloseMegaMenu}
               open={activeMegaIndex === index}
             />
           );

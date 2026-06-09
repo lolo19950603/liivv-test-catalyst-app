@@ -8,6 +8,7 @@ import { pricesTransformer } from './prices-transformer';
 
 export async function searchResultsTransformer(
   searchProducts: Array<ResultOf<typeof SearchProductFragment>>,
+  options?: { productsOnly?: boolean },
 ): Promise<SearchResult[]> {
   const format = await getFormatter();
   const t = await getTranslations('Components.Header.Search');
@@ -67,6 +68,10 @@ export async function searchResultsTransformer(
           })
         : [],
   };
+
+  if (options?.productsOnly) {
+    return productResults.products.length > 0 ? [productResults] : [];
+  }
 
   const results = [];
 

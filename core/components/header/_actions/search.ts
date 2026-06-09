@@ -55,7 +55,23 @@ export async function search(
   emptyStateSubtitle: string;
 }> {
   const t = await getTranslations('Components.Header.Search');
-  const submission = parseWithZod(formData, { schema: z.object({ term: z.string() }) });
+  const submission = parseWithZod(formData, {
+    schema: z.object({
+      term: z.string(),
+      categoryEntityId: z
+        .string()
+        .optional()
+        .transform((value) => {
+          if (value == null || value === '') {
+            return undefined;
+          }
+
+          const parsed = Number(value);
+
+          return Number.isFinite(parsed) ? parsed : undefined;
+        }),
+    }),
+  });
   const emptyStateTitle = t('noSearchResultsTitle', {
     term: submission.status === 'success' ? submission.value.term : '',
   });
@@ -84,9 +100,17 @@ export async function search(
   const currencyCode = await getPreferredCurrencyCode();
 
   try {
+    const categoryEntityId = submission.value.categoryEntityId;
+
     const response = await client.fetch({
       document: GetQuickSearchResultsQuery,
-      variables: { filters: { searchTerm: submission.value.term }, currencyCode },
+      variables: {
+        filters: {
+          searchTerm: submission.value.term,
+          ...(categoryEntityId != null ? { categoryEntityId } : {}),
+        },
+        currencyCode,
+      },
       customerAccessToken,
       fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate } },
     });
@@ -95,7 +119,9 @@ export async function search(
 
     return {
       lastResult: submission.reply(),
-      searchResults: await searchResultsTransformer(removeEdgesAndNodes(products)),
+      searchResults: await searchResultsTransformer(removeEdgesAndNodes(products), {
+        productsOnly: categoryEntityId != null,
+      }),
       emptyStateTitle,
       emptyStateSubtitle,
     };

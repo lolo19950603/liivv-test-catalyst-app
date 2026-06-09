@@ -19,6 +19,7 @@ import { type SearchResult } from '@/vibes/soul/primitives/navigation';
 import { PriceLabel } from '@/vibes/soul/primitives/price-label';
 import { Link } from '~/components/link';
 import { search } from '~/components/header/_actions/search';
+import type { LiivvArchiveHeaderLogo } from '~/lib/makeswift/liivv-archive-header/types';
 
 const SEARCH_RESULTS_PATH = '/search';
 const SEARCH_PARAM_NAME = 'term';
@@ -39,7 +40,7 @@ function buildSearchPanelStyle(searchPanelId: string) {
 }
 #${searchPanelId} .liivv-archive-search-input {
   width: 100%;
-  border: 1px solid rgb(var(--color-foreground) / 0.12);
+  border: 2px solid rgb(var(--color-foreground) / 0.12);
   border-radius: var(--rounded-full, 9999px);
   background: rgb(var(--color-background));
   color: rgb(var(--color-foreground));
@@ -78,9 +79,10 @@ function buildSearchPanelStyle(searchPanelId: string) {
   cursor: default;
   pointer-events: none;
 }
-#${searchPanelId} .liivv-archive-search-input:focus {
-  outline: 2px solid rgb(var(--color-keyboard-focus, var(--color-foreground)));
-  outline-offset: 2px;
+#${searchPanelId} .liivv-archive-search-input:focus,
+#${searchPanelId} .liivv-archive-search-input:focus-visible {
+  border-color: #8da58e;
+  outline: none;
 }
 #${searchPanelId} .liivv-archive-search-submit {
   flex-shrink: 0;
@@ -171,6 +173,25 @@ function buildSearchPanelStyle(searchPanelId: string) {
   object-fit: cover;
   width: 3rem;
 }
+#${searchPanelId} .liivv-archive-search-product-image--logo {
+  background: rgb(var(--color-background));
+  object-fit: contain;
+  padding: 0.25rem;
+}
+#${searchPanelId} .liivv-archive-search-product-image--text {
+  align-items: center;
+  background: rgb(var(--color-background));
+  color: rgb(var(--color-foreground) / 0.7);
+  display: flex;
+  font-size: 0.5rem;
+  font-weight: var(--font-semibold, 600);
+  justify-content: center;
+  line-height: 1.1;
+  overflow: hidden;
+  padding: 0.25rem;
+  text-align: center;
+  text-transform: uppercase;
+}
 #${searchPanelId} .liivv-archive-search-product-title {
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-medium, 500);
@@ -212,9 +233,65 @@ function SearchLinksSection({ result }: { result: Extract<SearchResult, { type: 
   );
 }
 
+function SearchProductThumbnail({
+  fallbackLogo,
+  productImage,
+  productTitle,
+}: {
+  fallbackLogo?: LiivvArchiveHeaderLogo | null;
+  productImage?: { src: string; alt: string };
+  productTitle: string;
+}) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const productSrc = productImage?.src;
+
+  if (productSrc && !imageFailed) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        alt={productImage.alt || productTitle}
+        className="liivv-archive-search-product-image"
+        onError={() => setImageFailed(true)}
+        src={productSrc}
+      />
+    );
+  }
+
+  if (fallbackLogo?.src) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        alt={fallbackLogo.alt}
+        className="liivv-archive-search-product-image liivv-archive-search-product-image--logo"
+        src={fallbackLogo.src}
+      />
+    );
+  }
+
+  if (fallbackLogo?.text) {
+    return (
+      <span
+        aria-hidden
+        className="liivv-archive-search-product-image liivv-archive-search-product-image--text"
+      >
+        {fallbackLogo.text}
+      </span>
+    );
+  }
+
+  return (
+    <span
+      aria-hidden
+      className="liivv-archive-search-product-image liivv-archive-search-product-image--logo"
+    />
+  );
+}
+
 function SearchProductsSection({
+  fallbackLogo,
   result,
 }: {
+  fallbackLogo?: LiivvArchiveHeaderLogo | null;
   result: Extract<SearchResult, { type: 'products' }>;
 }) {
   if (result.products.length === 0) {
@@ -232,14 +309,11 @@ function SearchProductsSection({
         {result.products.map((product) => (
           <li key={product.id}>
             <Link className="liivv-archive-search-product" href={product.href} role="option">
-              {product.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  alt={product.image.alt}
-                  className="liivv-archive-search-product-image"
-                  src={product.image.src}
-                />
-              ) : null}
+              <SearchProductThumbnail
+                fallbackLogo={fallbackLogo}
+                productImage={product.image}
+                productTitle={product.title}
+              />
               <span>
                 <span className="liivv-archive-search-product-title">{product.title}</span>
                 {product.price != null ? (
@@ -257,6 +331,7 @@ function SearchProductsSection({
 }
 
 function SearchResultsPanel({
+  fallbackLogo,
   query,
   searchResults,
   stale,
@@ -264,6 +339,7 @@ function SearchResultsPanel({
   emptySearchSubtitle,
   errors,
 }: {
+  fallbackLogo?: LiivvArchiveHeaderLogo | null;
   query: string;
   searchResults: SearchResult[] | null;
   stale: boolean;
@@ -319,7 +395,13 @@ function SearchResultsPanel({
               return <SearchLinksSection key={`result-${index}`} result={result} />;
 
             case 'products':
-              return <SearchProductsSection key={`result-${index}`} result={result} />;
+              return (
+                <SearchProductsSection
+                  fallbackLogo={fallbackLogo}
+                  key={`result-${index}`}
+                  result={result}
+                />
+              );
 
             default:
               return null;
@@ -330,16 +412,26 @@ function SearchResultsPanel({
   );
 }
 
+const CATEGORY_ENTITY_ID_FIELD = 'categoryEntityId';
+
 export function LiivvArchiveSearchPanel({
+  categoryEntityId,
+  fallbackLogo,
   searchPanelId,
   searchPlaceholder,
   inputRef,
   open,
+  submitPath = SEARCH_RESULTS_PATH,
+  variant = 'drawer',
 }: {
+  categoryEntityId?: number;
+  fallbackLogo?: LiivvArchiveHeaderLogo | null;
   searchPanelId: string;
   searchPlaceholder: string;
-  inputRef: RefObject<HTMLInputElement | null>;
-  open: boolean;
+  inputRef?: RefObject<HTMLInputElement | null>;
+  open?: boolean;
+  submitPath?: string;
+  variant?: 'drawer' | 'inline';
 }) {
   const t = useTranslations('Components.Header.Search');
   const submitLabel = t('submitLabel');
@@ -369,11 +461,15 @@ export function LiivvArchiveSearchPanel({
 
         formData.append(SEARCH_PARAM_NAME, value);
 
+        if (categoryEntityId != null) {
+          formData.append(CATEGORY_ENTITY_ID_FIELD, String(categoryEntityId));
+        }
+
         startSearching(() => {
           formAction(formData);
         });
       }, 300),
-    [formAction],
+    [categoryEntityId, formAction],
   );
 
   const debouncedOnChange = useMemo(
@@ -388,24 +484,33 @@ export function LiivvArchiveSearchPanel({
     debouncedSearch.cancel();
     setIsDebouncing(false);
     setQuery('');
-    inputRef.current?.focus();
+    inputRef?.current?.focus();
   };
 
   const [form] = useForm({ lastResult });
+  const isDrawer = variant === 'drawer';
+  const panelOpen = open ?? true;
+  const panelRootId = `${searchPanelId}-inner`;
 
   useEffect(() => {
-    if (!open) {
+    if (isDrawer && !panelOpen) {
       debouncedSearch.cancel();
       setQuery('');
       setIsDebouncing(false);
     }
-  }, [debouncedSearch, open]);
+  }, [debouncedSearch, isDrawer, panelOpen]);
 
   return (
-    <>
-      <style>{buildSearchPanelStyle(searchPanelId)}</style>
+    <div
+      className={clsx(
+        variant === 'inline' &&
+          'liivv-archive-search-panel--inline mb-6 rounded-2xl border border-[rgb(var(--color-foreground)/0.08)] bg-[rgb(var(--color-background))] shadow-[0_12px_40px_rgb(33_33_33/0.06)]',
+      )}
+      id={panelRootId}
+    >
+      <style>{buildSearchPanelStyle(panelRootId)}</style>
       <form
-        action={SEARCH_RESULTS_PATH}
+        action={submitPath}
         className="liivv-archive-search-form"
         method="get"
         role="search"
@@ -462,11 +567,12 @@ export function LiivvArchiveSearchPanel({
           emptySearchSubtitle={emptyStateSubtitle ?? t('noSearchResultsSubtitle')}
           emptySearchTitle={emptyStateTitle ?? t('noSearchResultsTitle', { term: query })}
           errors={form.errors}
+          fallbackLogo={fallbackLogo}
           query={query}
           searchResults={searchResults}
           stale={isPending}
         />
       </div>
-    </>
+    </div>
   );
 }

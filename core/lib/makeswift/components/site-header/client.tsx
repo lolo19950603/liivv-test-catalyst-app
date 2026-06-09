@@ -14,20 +14,21 @@ import {
 
 import { usePathname } from '~/i18n/routing';
 import { LiivvArchiveHeader } from '~/lib/makeswift/liivv-archive-header/liivv-archive-header';
-import type {
-  LiivvArchiveHeaderLogo,
-  LiivvArchiveNavLink,
-} from '~/lib/makeswift/liivv-archive-header/types';
+import type { LiivvArchiveHeaderLogo } from '~/lib/makeswift/liivv-archive-header/types';
 import type { StoreCategoryNode } from '~/lib/makeswift/site-header/build-store-nav-from-categories';
 import {
   isEmptyMakeswiftPlaceholder,
   MakeswiftVisibleSlotContent,
 } from '~/lib/makeswift/makeswift-visible-slot-content';
+import { ACCOUNT_LOGIN_PATH } from '~/lib/makeswift/site-header/resolve-account-href';
+import {
+  mapMakeswiftAdditionalLinks,
+  type MakeswiftAdditionalLinkInput,
+} from '~/lib/makeswift/site-header/map-makeswift-nav-links';
 import { resolveStoreNavLinks } from '~/lib/makeswift/site-header/resolve-store-nav-links';
 import { resolveStoreLogo, type StoreLogo } from '~/lib/makeswift/site-header/resolve-store-logo';
 import { findMatchingPathConfig } from '~/lib/makeswift/site-header/should-hide-store-header';
 import type { SectionBackgroundProps } from '~/lib/makeswift/utils/diabetes-care-section-style';
-import { resolveMakeswiftHref } from '~/lib/makeswift/utils/resolve-makeswift-href';
 
 import { ARCHIVE_HEADER_SECTION_ID } from './archive-styles';
 
@@ -36,6 +37,7 @@ export const LIIVV_SITE_HEADER_SECTION_ID = 'liivv-site-header';
 type BannerProps = ComponentPropsWithoutRef<typeof Banner>;
 
 export type SiteHeaderContextValue = {
+  accountHref: string;
   categoryTree: StoreCategoryNode[];
   storeLogo: StoreLogo;
   storeLogoLabel: string;
@@ -45,6 +47,7 @@ export type SiteHeaderContextValue = {
 };
 
 const PropsContext = createContext<SiteHeaderContextValue>({
+  accountHref: ACCOUNT_LOGIN_PATH,
   categoryTree: [],
   storeLogo: '',
   storeLogoLabel: 'Home',
@@ -59,10 +62,7 @@ export const PropsContextProvider = ({
   <PropsContext.Provider value={value}>{children}</PropsContext.Provider>
 );
 
-interface SectionNavLink {
-  label: string;
-  link: { href: string };
-}
+type SectionNavLink = MakeswiftAdditionalLinkInput;
 
 interface PageOverride {
   paths?: ReadonlyArray<string | undefined>;
@@ -158,10 +158,7 @@ function PageOverrideHeader({
     searchPlaceholder = defaultSearchPlaceholder,
   } = override;
 
-  const links = navLinks.map((item) => ({
-    label: item.label,
-    href: resolveMakeswiftHref(item.link.href, '/'),
-  }));
+  const links = mapMakeswiftAdditionalLinks(navLinks);
 
   const logo = resolvePageOverrideLogo(
     showLogo,
@@ -172,8 +169,11 @@ function PageOverrideHeader({
     storeLogoLabel,
   );
 
+  const { accountHref } = useContext(PropsContext);
+
   return (
     <LiivvArchiveHeader
+      accountHref={accountHref}
       background={background}
       className="liivv-site-header liivv-site-header--override"
       initialCartCount={cartCount}
@@ -198,6 +198,7 @@ export const MakeswiftHeader = forwardRef(
     const pathname = usePathname() ?? '/';
     const isInBuilder = useIsInBuilder();
     const {
+      accountHref,
       categoryTree,
       storeLogo,
       storeLogoLabel,
@@ -242,6 +243,7 @@ export const MakeswiftHeader = forwardRef(
 
     return (
       <LiivvArchiveHeader
+        accountHref={accountHref}
         background={background}
         banner={bannerNode}
         className="liivv-site-header"

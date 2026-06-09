@@ -4,6 +4,7 @@ import { client } from '~/client';
 import { graphql } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
 import { BreadcrumbsCategoryFragment } from '~/components/breadcrumbs/fragment';
+import { StoreLogoFragment } from '~/components/store-logo/fragment';
 
 const CategoryPageQuery = graphql(
   `
@@ -36,6 +37,7 @@ const CategoryPageQuery = graphql(
           }
         }
         settings {
+          ...StoreLogoFragment
           inventory {
             defaultOutOfStockMessage
             showOutOfStockMessage
@@ -56,7 +58,7 @@ const CategoryPageQuery = graphql(
       }
     }
   `,
-  [BreadcrumbsCategoryFragment],
+  [BreadcrumbsCategoryFragment, StoreLogoFragment],
 );
 
 export const getCategoryPageData = cache(async (entityId: number, customerAccessToken?: string) => {

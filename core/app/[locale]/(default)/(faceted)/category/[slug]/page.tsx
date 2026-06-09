@@ -11,10 +11,12 @@ import { ProductsListSection } from '@/vibes/soul/sections/products-list-section
 import { getFilterParsers } from '@/vibes/soul/sections/products-list-section/filter-parsers';
 import { getSessionCustomerAccessToken } from '~/auth';
 import { facetsTransformer } from '~/data-transformers/facets-transformer';
+import { logoTransformer } from '~/data-transformers/logo-transformer';
 import { pageInfoTransformer } from '~/data-transformers/page-info-transformer';
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
+import { resolveStoreLogo } from '~/lib/makeswift/site-header/resolve-store-logo';
 import { Slot } from '~/lib/makeswift/slot';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
 
@@ -22,6 +24,7 @@ import { MAX_COMPARE_LIMIT } from '../../../compare/page-data';
 import { getCompareProducts } from '../../fetch-compare-products';
 import { fetchFacetedSearch } from '../../fetch-faceted-search';
 
+import { CategorySearchPanel } from './_components/category-search-panel';
 import { CategoryViewed } from './_components/category-viewed';
 import { getCategoryPageData } from './page-data';
 
@@ -108,7 +111,10 @@ export default async function Category(props: Props) {
 
   setRequestLocale(locale);
 
-  const t = await getTranslations('Faceted');
+  const [t, tHeader] = await Promise.all([
+    getTranslations('Faceted'),
+    getTranslations('Components.Header'),
+  ]);
 
   const categoryId = Number(slug);
 
@@ -130,6 +136,9 @@ export default async function Category(props: Props) {
 
   const productComparisonsEnabled =
     settings?.storefront.catalog?.productComparisonsEnabled ?? false;
+
+  const storeLogo = settings ? logoTransformer(settings) : '';
+  const fallbackLogo = resolveStoreLogo(storeLogo, tHeader('home'));
 
   const streamableFacetedSearch = Streamable.from(async () => {
     const searchParams = await props.searchParams;
@@ -261,6 +270,7 @@ export default async function Category(props: Props) {
       <ProductsListSection
         breadcrumbs={breadcrumbs}
         compareLabel={t('Compare.compare')}
+        fallbackLogo={fallbackLogo}
         compareProducts={streamableCompareProducts}
         emptyStateSubtitle={t('Category.Empty.subtitle')}
         emptyStateTitle={t('Category.Empty.title')}
@@ -290,6 +300,14 @@ export default async function Category(props: Props) {
           { value: 'relevance', label: t('SortBy.relevance') },
         ]}
         sortParamName="sort"
+        searchPanel={
+          <CategorySearchPanel
+            categoryEntityId={categoryId}
+            categoryPath={category.path}
+            fallbackLogo={fallbackLogo}
+            searchPlaceholder={t('Category.searchPlaceholder', { categoryName: category.name })}
+          />
+        }
         title={category.name}
         totalCount={streamableTotalCount}
       />

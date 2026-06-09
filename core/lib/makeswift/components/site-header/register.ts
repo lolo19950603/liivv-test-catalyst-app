@@ -28,18 +28,6 @@ const banner = Group({
   },
 });
 
-const sectionNavLinks = List({
-  label: 'Navigation links',
-  type: Group({
-    label: 'Link',
-    props: {
-      label: TextInput({ label: 'Label', defaultValue: 'Diabetes Essentials' }),
-      link: Link({ label: 'URL' }),
-    },
-  }),
-  getItemLabel: (item) => item?.label ?? 'Link',
-});
-
 const additionalNavSubLink = Group({
   label: 'Sub link',
   props: {
@@ -50,6 +38,28 @@ const additionalNavSubLink = Group({
   },
 });
 
+const navLinkMegaMenuFields = {
+  exploreAllLabel: TextInput({ label: 'Explore all label', defaultValue: 'Explore All' }),
+  subLinks: List({
+    label: 'Sub links (mega menu)',
+    type: additionalNavSubLink,
+    getItemLabel: (item) => item?.label ?? 'Sub link',
+  }),
+};
+
+const sectionNavLinks = List({
+  label: 'Navigation links',
+  type: Group({
+    label: 'Link',
+    props: {
+      label: TextInput({ label: 'Label', defaultValue: 'Diabetes Essentials' }),
+      link: Link({ label: 'URL' }),
+      ...navLinkMegaMenuFields,
+    },
+  }),
+  getItemLabel: (item) => item?.label ?? 'Link',
+});
+
 const additionalNavLinks = List({
   label: 'Additional links',
   type: Group({
@@ -57,12 +67,7 @@ const additionalNavLinks = List({
     props: {
       label: TextInput({ label: 'Text', defaultValue: 'Text' }),
       link: Link({ label: 'URL' }),
-      exploreAllLabel: TextInput({ label: 'Explore all label', defaultValue: 'Explore All' }),
-      subLinks: List({
-        label: 'Sub links (mega menu)',
-        type: additionalNavSubLink,
-        getItemLabel: (item) => item?.label ?? 'Sub link',
-      }),
+      ...navLinkMegaMenuFields,
     },
   }),
   getItemLabel: (item) => item?.label ?? 'Text',

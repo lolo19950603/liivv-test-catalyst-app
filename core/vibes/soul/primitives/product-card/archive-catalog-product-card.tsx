@@ -1,12 +1,16 @@
+'use client';
+
 import { clsx } from 'clsx';
+import { useState } from 'react';
 
 import type { Price } from '@/vibes/soul/primitives/price-label';
 import { Image } from '~/components/image';
 import { Link } from '~/components/link';
 
-import type { Product, ProductCardProps } from './index';
+import type { Product, ProductCardProps, ProductImageFallbackLogo } from './index';
 
 type ArchiveCatalogProductCardProps = Pick<ProductCardProps, 'className' | 'imageSizes' | 'imagePriority'> & {
+  fallbackLogo?: ProductImageFallbackLogo | null;
   product: Product;
 };
 
@@ -42,15 +46,82 @@ function ArchiveCatalogProductCardPrice({ price }: { price: Price }) {
   }
 }
 
+function ArchiveCatalogProductCardMedia({
+  fallbackLogo,
+  image,
+  imagePriority,
+  imageSizes,
+  productTitle,
+  safeHref,
+}: {
+  fallbackLogo?: ProductImageFallbackLogo | null;
+  image?: { src: string; alt: string };
+  imagePriority: boolean;
+  imageSizes: string;
+  productTitle: string;
+  safeHref: string;
+}) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const imgSrc = image?.src.trim() ?? '';
+  const hasProductImage = imgSrc.length > 0 && !imageFailed;
+  const hasLogoImage = fallbackLogo?.src != null && fallbackLogo.src.length > 0;
+  const hasLogoText = fallbackLogo?.text != null && fallbackLogo.text.length > 0;
+
+  if (!hasProductImage && !hasLogoImage && !hasLogoText) {
+    return null;
+  }
+
+  return (
+    <div className="liivv-archive-product-card__media relative w-full shrink-0">
+      <Link
+        aria-hidden
+        className="relative block aspect-square size-full max-w-full overflow-hidden bg-[rgb(var(--color-base-background,252_248_244))]"
+        href={safeHref}
+        tabIndex={-1}
+      >
+        {hasProductImage && image != null ? (
+          <Image
+            alt={image.alt}
+            className="object-cover object-center"
+            fill
+            onError={() => setImageFailed(true)}
+            preload={imagePriority}
+            sizes={imageSizes}
+            src={imgSrc}
+          />
+        ) : hasLogoImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            alt={fallbackLogo?.alt ?? productTitle}
+            className="absolute inset-0 size-full object-contain object-center p-6"
+            src={fallbackLogo.src}
+          />
+        ) : (
+          <span
+            aria-hidden
+            className="absolute inset-0 flex items-center justify-center p-6 text-center text-sm font-semibold uppercase leading-tight text-[rgb(var(--color-base-text,40_40_40)/0.7)]"
+          >
+            {fallbackLogo?.text}
+          </span>
+        )}
+      </Link>
+    </div>
+  );
+}
+
 export function ArchiveCatalogProductCard({
   product,
   className,
+  fallbackLogo,
   imagePriority = false,
   imageSizes = '(min-width: 42rem) 25vw, (min-width: 32rem) 33vw, (min-width: 28rem) 50vw, 100vw',
 }: ArchiveCatalogProductCardProps) {
   const { title, subtitle, price, image, href } = product;
   const imgSrc = image?.src.trim() ?? '';
   const hasImage = imgSrc.length > 0;
+  const hasLogoFallback =
+    fallbackLogo?.src != null || (fallbackLogo?.text != null && fallbackLogo.text.length > 0);
+  const hasMedia = hasImage || hasLogoFallback;
   const safeHref = href.trim().length > 0 && href !== '#' ? href : '/';
   const vendor = subtitle?.trim() ?? '';
   const productTitle = title.trim() || 'Product';
@@ -59,34 +130,25 @@ export function ArchiveCatalogProductCard({
     <div
       className={clsx(
         'liivv-archive-product-card fc-product-card relative flex h-full w-full max-w-full min-w-0 flex-col overflow-hidden rounded-[var(--card-radius,1.25rem)] bg-[rgb(var(--color-base-background,252_248_244))] leading-none',
-        !hasImage && 'aspect-square',
+        !hasMedia && 'aspect-square',
         className,
       )}
     >
-      {hasImage && image != null ? (
-        <div className="liivv-archive-product-card__media relative w-full shrink-0">
-          <Link
-            aria-hidden
-            className="relative block aspect-square size-full max-w-full overflow-hidden bg-[rgb(var(--color-base-background,252_248_244))]"
-            href={safeHref}
-            tabIndex={-1}
-          >
-            <Image
-              alt={image.alt}
-              className="object-cover object-center"
-              fill
-              preload={imagePriority}
-              sizes={imageSizes}
-              src={imgSrc}
-            />
-          </Link>
-        </div>
+      {hasMedia ? (
+        <ArchiveCatalogProductCardMedia
+          fallbackLogo={fallbackLogo}
+          image={image}
+          imagePriority={imagePriority}
+          imageSizes={imageSizes}
+          productTitle={productTitle}
+          safeHref={safeHref}
+        />
       ) : null}
 
       <div
         className={clsx(
           'liivv-archive-product-card__content flex w-full min-w-0 max-w-full flex-col bg-[rgb(var(--color-base-background,252_248_244))]',
-          hasImage ? 'grow justify-start gap-2 p-4 pt-3' : 'h-full flex-1 items-center justify-center gap-3 p-5',
+          hasMedia ? 'grow justify-start gap-2 p-4 pt-3' : 'h-full flex-1 items-center justify-center gap-3 p-5',
         )}
       >
         {vendor.length > 0 ? (

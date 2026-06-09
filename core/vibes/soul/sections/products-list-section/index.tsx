@@ -1,5 +1,5 @@
 import { Sliders } from 'lucide-react';
-import { Suspense } from 'react';
+import { type ReactNode, Suspense } from 'react';
 
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { Button } from '@/vibes/soul/primitives/button';
@@ -7,6 +7,7 @@ import { CursorPagination, CursorPaginationInfo } from '@/vibes/soul/primitives/
 import { Product } from '@/vibes/soul/primitives/product-card';
 import * as SidePanel from '@/vibes/soul/primitives/side-panel';
 import { Breadcrumb, Breadcrumbs, BreadcrumbsSkeleton } from '@/vibes/soul/sections/breadcrumbs';
+import { type ProductImageFallbackLogo } from '@/vibes/soul/primitives/product-card';
 import { ProductList } from '@/vibes/soul/sections/product-list';
 import { Filter, FiltersPanel } from '@/vibes/soul/sections/products-list-section/filters-panel';
 import {
@@ -45,6 +46,8 @@ interface Props {
   maxCompareLimitMessage?: Streamable<string>;
   cardVariant?: 'default' | 'archive';
   paginationVariant?: 'default' | 'archive';
+  searchPanel?: ReactNode;
+  fallbackLogo?: ProductImageFallbackLogo | null;
 }
 
 export function ProductsListSection({
@@ -77,6 +80,8 @@ export function ProductsListSection({
   maxCompareLimitMessage,
   cardVariant = 'archive',
   paginationVariant = 'archive',
+  searchPanel,
+  fallbackLogo,
 }: Props) {
   return (
     <div className="group/products-list-section @container">
@@ -167,9 +172,11 @@ export function ProductsListSection({
           </aside>
 
           <div className="group-has-data-pending/products-list-section:animate-pulse flex-1">
+            {searchPanel}
             <ProductList
               cardVariant={cardVariant}
               compareHref={compareHref}
+              fallbackLogo={fallbackLogo}
               compareLabel={compareLabel}
               compareParamName={compareParamName}
               compareProducts={compareProducts}

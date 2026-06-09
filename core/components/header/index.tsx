@@ -3,7 +3,7 @@ import { cache } from 'react';
 
 import { Streamable } from '@/vibes/soul/lib/streamable';
 import { GetLinksAndSectionsQuery, LayoutQuery } from '~/app/[locale]/(default)/page-data';
-import { getSessionCustomerAccessToken } from '~/auth';
+import { getSessionCustomerAccessToken, isLoggedIn } from '~/auth';
 import { client } from '~/client';
 import { graphql, readFragment } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
@@ -12,6 +12,7 @@ import { logoTransformer } from '~/data-transformers/logo-transformer';
 import { getCartId } from '~/lib/cart';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { SiteHeader } from '~/lib/makeswift/components/site-header';
+import { resolveAccountHref } from '~/lib/makeswift/site-header/resolve-account-href';
 import { mapCategoryTreeFromStore } from '~/lib/makeswift/site-header/map-category-tree';
 
 import { CurrencyCode, HeaderFragment, HeaderLinksFragment } from './fragment';
@@ -94,8 +95,11 @@ export const Header = async () => {
     return getCartCount(cartId, customerAccessToken);
   });
 
+  const accountHref = resolveAccountHref(await isLoggedIn());
+
   return (
     <SiteHeader
+      accountHref={accountHref}
       cartCount={streamableCartCount}
       categoryTree={streamableCategoryTree}
       storeLogo={logo}

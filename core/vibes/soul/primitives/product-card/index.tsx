@@ -12,6 +12,12 @@ import { Compare } from './compare';
 
 export { ArchiveCatalogProductCard } from './archive-catalog-product-card';
 
+export interface ProductImageFallbackLogo {
+  src?: string;
+  alt?: string;
+  text?: string;
+}
+
 export interface Product {
   id: string;
   title: string;

@@ -8,7 +8,16 @@ type ShopifyThemeStyle = CSSProperties & Record<string, string | number | undefi
 const CUSTOM_SECTION_STYLE = `#shopify-section-template--26520397447459__custom_section_WpXaJg{--section-padding-top:32px;--section-padding-bottom:32px;--color-background:245 242 237}@media screen and (max-width: 767px){#shopify-section-template--26520397447459__custom_section_WpXaJg{--section-padding-top:24px;--section-padding-bottom:24px}}`;
 
 /** Matches inline `<style>` from `diabetes-care.html` for this section id. */
-const NUMBER_COUNTER_STYLE = `#shopify-section-template--26520397447459__number_counter_dTAx7w{--section-padding-top:40px;--section-padding-bottom:40px;--section-blocks-count:4}@media screen and (min-width:1024px){#shopify-section-template--26520397447459__number_counter_dTAx7w .multicolumn{--card-grid-gap:clamp(40px,3.5vw,60px)}}@media screen and (max-width: 767px){#shopify-section-template--26520397447459__number_counter_dTAx7w{--section-padding-top:28px;--section-padding-bottom:32px}}`;
+const NUMBER_COUNTER_SECTION_ID = 'shopify-section-template--26520397447459__number_counter_dTAx7w';
+
+const NUMBER_COUNTER_STYLE =
+  `#${NUMBER_COUNTER_SECTION_ID}{--section-padding-top:40px;--section-padding-bottom:40px;--section-blocks-count:4}` +
+  `@media screen and (min-width:1024px){#${NUMBER_COUNTER_SECTION_ID} .multicolumn{--card-grid-gap:clamp(40px,3.5vw,60px)}}` +
+  `@media screen and (max-width: 767px){#${NUMBER_COUNTER_SECTION_ID}{--section-padding-top:28px;--section-padding-bottom:32px}}` +
+  `#${NUMBER_COUNTER_SECTION_ID} .multicolumn.card-grid{align-items:start;grid-template-rows:auto 1fr}` +
+  `#${NUMBER_COUNTER_SECTION_ID} .counter-card{display:grid;grid-row:span 2;grid-template-rows:subgrid;row-gap:var(--sp-3);align-content:start;min-height:0}` +
+  `@media screen and (min-width:640px){#${NUMBER_COUNTER_SECTION_ID} .counter-card{row-gap:var(--sp-4)}}` +
+  `@media screen and (min-width:1024px){#${NUMBER_COUNTER_SECTION_ID} .counter-card{row-gap:var(--sp-6)}}`;
 
 const sectionContentGapStyle: ShopifyThemeStyle = {
   '--gap': '15px',
@@ -167,19 +176,17 @@ export function StatsBand({
         <div className="section section--padding section--rounded relative">
           <div className="page-width page-width--full relative px-4 sm:px-5 md:px-0">
             <slider-element className="slider slider--tablet grid" selector=".card-grid>.card">
-              <div className="multicolumn with-4 card-grid card-grid--4 mobile:card-grid--1 z-1 relative grid">
+              <div className="multicolumn with-4 card-grid card-grid--4 mobile:card-grid--1 z-1 relative grid items-start">
                 {rows.map((row, index) => (
                   <div
-                    className="counter-card card flex w-full min-w-0 flex-col items-center gap-4 px-1 text-center sm:gap-5 sm:px-0 md:items-start md:text-center xl:flex-row"
+                    className="counter-card card w-full min-w-0 px-1 text-center sm:px-0"
                     key={`${row.value}-${index}`}
                   >
-                    <div className="grid w-full min-w-0 gap-3 sm:gap-4 lg:gap-6">
-                      <div className="counter-heading heading title-lg font-bold leading-none tracking-tight sm:whitespace-nowrap">
-                        <span>{row.value}</span>%
-                      </div>
-                      <div className="heading text-xl leading-snug tracking-tight sm:text-2xl sm:leading-none lg:text-3xl">
-                        {row.description}
-                      </div>
+                    <div className="counter-heading heading title-lg font-bold leading-none tracking-tight sm:whitespace-nowrap">
+                      <span>{row.value}</span>%
+                    </div>
+                    <div className="heading text-xl leading-snug tracking-tight sm:text-2xl sm:leading-none lg:text-3xl">
+                      {row.description}
                     </div>
                   </div>
                 ))}

@@ -5,6 +5,7 @@ import { CompareDrawer, CompareDrawerProvider } from '@/vibes/soul/primitives/co
 import {
   ArchiveCatalogProductCard,
   type Product,
+  type ProductImageFallbackLogo,
   ProductCard,
   ProductCardSkeleton,
 } from '@/vibes/soul/primitives/product-card';
@@ -28,6 +29,7 @@ interface ProductListProps {
   maxItems?: number;
   maxCompareLimitMessage?: Streamable<string>;
   cardVariant?: 'default' | 'archive';
+  fallbackLogo?: ProductImageFallbackLogo | null;
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -64,6 +66,7 @@ export function ProductList({
   maxItems,
   maxCompareLimitMessage: streamableMaxCompareLimitMessage,
   cardVariant = 'default',
+  fallbackLogo,
 }: ProductListProps) {
   return (
     <Stream
@@ -111,6 +114,7 @@ export function ProductList({
                 {products.map((product) =>
                   cardVariant === 'archive' ? (
                     <ArchiveCatalogProductCard
+                      fallbackLogo={fallbackLogo}
                       imageSizes="(min-width: 80rem) 20vw, (min-width: 64rem) 25vw, (min-width: 42rem) 33vw, (min-width: 24rem) 50vw, 100vw"
                       key={product.id}
                       product={product}

@@ -28,9 +28,16 @@ const MAX_COUNTERS = 4;
 /** Matches inline `<style>` from `diabetes-care.html` for this section id. */
 const NUMBER_COUNTER_STYLE_BASE = `#${NUMBER_COUNTER_SECTION_ID}{--section-padding-top:40px;--section-padding-bottom:40px}@media screen and (min-width:1024px){#${NUMBER_COUNTER_SECTION_ID} .multicolumn{--card-grid-gap:clamp(40px,3.5vw,60px)}}@media screen and (max-width: 767px){#${NUMBER_COUNTER_SECTION_ID}{--section-padding-top:28px;--section-padding-bottom:32px}}`;
 
+/** Keep stat numbers on one horizontal line when supporting text wraps to different heights. */
+const NUMBER_COUNTER_ALIGNMENT_STYLE =
+  `#${NUMBER_COUNTER_SECTION_ID} .multicolumn.card-grid{align-items:start;grid-template-rows:auto 1fr}` +
+  `#${NUMBER_COUNTER_SECTION_ID} .counter-card{display:grid;grid-row:span 2;grid-template-rows:subgrid;row-gap:var(--sp-3);align-content:start;min-height:0}` +
+  `@media screen and (min-width:640px){#${NUMBER_COUNTER_SECTION_ID} .counter-card{row-gap:var(--sp-4)}}` +
+  `@media screen and (min-width:1024px){#${NUMBER_COUNTER_SECTION_ID} .counter-card{row-gap:var(--sp-6)}}`;
+
 function numberCounterSectionStyle(blockCount: number): string {
   const id = `#${NUMBER_COUNTER_SECTION_ID}`;
-  let style = `${NUMBER_COUNTER_STYLE_BASE}${id}{--section-blocks-count:${String(blockCount)}}`;
+  let style = `${NUMBER_COUNTER_STYLE_BASE}${NUMBER_COUNTER_ALIGNMENT_STYLE}${id}{--section-blocks-count:${String(blockCount)}}`;
 
   if (blockCount === 4) {
     style += `@media screen and (min-width:768px){${id} .multicolumn.with-4.card-grid.card-grid--4{--card-grid-per-row:4}}`;
@@ -212,7 +219,7 @@ export function DiabetesCareNumberCounters({
     >
       <div
         className={clsx(
-          'multicolumn card-grid mobile:card-grid--1 z-1 relative grid',
+          'multicolumn card-grid mobile:card-grid--1 z-1 relative grid items-start',
           multicolumnCardGridModifierClass(rows.length),
           !useThemeColumnsOnly && [
             rows.length === 1 ? 'md:grid-cols-1' : 'md:grid-cols-2',
@@ -227,25 +234,23 @@ export function DiabetesCareNumberCounters({
 
           return (
             <div
-              className="counter-card card flex w-full min-w-0 flex-col items-center gap-4 px-1 text-center sm:gap-5 sm:px-0 md:items-start md:text-center xl:flex-row"
+              className="counter-card card w-full min-w-0 px-1 text-center sm:px-0"
               key={`counter-${index}`}
             >
-              <div className="grid w-full min-w-0 gap-3 sm:gap-4 lg:gap-6">
-                <p
-                  className="counter-heading heading title-lg font-bold leading-none tracking-tight sm:whitespace-nowrap"
-                  style={valueStyle}
-                >
-                  <AnimatedNumberCounter
-                    value={counterAnimatedValue(numberValue, showPercentSuffix)}
-                  />
-                  {showPercentSuffix ? '%' : null}
-                </p>
-                <div
-                  className="heading text-xl leading-snug tracking-tight sm:text-2xl sm:leading-none lg:text-3xl"
-                  style={descriptionStyle}
-                >
-                  {row.textBelow?.description ?? ''}
-                </div>
+              <p
+                className="counter-heading heading title-lg font-bold leading-none tracking-tight sm:whitespace-nowrap"
+                style={valueStyle}
+              >
+                <AnimatedNumberCounter
+                  value={counterAnimatedValue(numberValue, showPercentSuffix)}
+                />
+                {showPercentSuffix ? '%' : null}
+              </p>
+              <div
+                className="heading text-xl leading-snug tracking-tight sm:text-2xl sm:leading-none lg:text-3xl"
+                style={descriptionStyle}
+              >
+                {row.textBelow?.description ?? ''}
               </div>
             </div>
           );
