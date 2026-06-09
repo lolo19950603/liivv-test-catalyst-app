@@ -159,6 +159,14 @@
         "inStockLabel": "In stock"
       }
     },
+    "PageSize": {
+      "show": "Show:",
+      "perPage": "{count} per page"
+    },
+    "Pagination": {
+      "label": "Pagination",
+      "next": "Next"
+    },
     "SortBy": {
       "sortBy": "Sort by:",
       "featuredItems": "Featured items",

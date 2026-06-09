@@ -2,7 +2,10 @@ import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
 import { cache } from 'react';
 import { z } from 'zod';
 
+import { DEFAULT_FACETED_PAGE_SIZE } from '@/vibes/soul/sections/products-list-section/constants';
+
 import { client } from '~/client';
+import { defaultPageInfo } from '~/data-transformers/page-info-transformer';
 import { PaginationFragment } from '~/client/fragments/pagination';
 import { graphql, VariablesOf } from '~/client/graphql';
 import { CurrencyCode } from '~/components/header/fragment';
@@ -170,8 +173,11 @@ type Variables = VariablesOf<typeof GetProductSearchResultsQuery>;
 type SearchProductsSortInput = Variables['sort'];
 type SearchProductsFiltersInput = Variables['filters'];
 
+const SEARCH_CHUNK_SIZE = 50;
+
 interface ProductSearch {
   limit?: number | null;
+  page?: number | null;
   before?: string | null;
   after?: string | null;
   sort?: SearchProductsSortInput | null;
@@ -180,64 +186,128 @@ interface ProductSearch {
 
 const getProductSearchResults = cache(
   async (
-    { limit = 9, after, before, sort, filters }: ProductSearch,
+    { limit = DEFAULT_FACETED_PAGE_SIZE, page, after, before, sort, filters }: ProductSearch,
     currencyCode?: CurrencyCode,
     customerAccessToken?: string,
   ) => {
     const filterArgs = { filters, sort };
-    const paginationArgs = before ? { last: limit, before } : { first: limit, after };
+    const resolvedLimit = limit ?? DEFAULT_FACETED_PAGE_SIZE;
+    const resolvedPage = Math.max(1, Math.floor(page ?? 1));
 
-    const response = await client.fetch({
-      document: GetProductSearchResultsQuery,
-      variables: { ...filterArgs, ...paginationArgs, currencyCode },
-      customerAccessToken,
-      fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate: 300 } },
-    });
+    const fetchSearchChunk = async (paginationArgs: {
+      first?: number;
+      last?: number;
+      after?: string | null;
+      before?: string | null;
+    }) => {
+      const response = await client.fetch({
+        document: GetProductSearchResultsQuery,
+        variables: { ...filterArgs, ...paginationArgs, currencyCode },
+        customerAccessToken,
+        fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate: 300 } },
+      });
 
-    const { site } = response.data;
+      const searchResults = response.data.site.search.searchProducts;
 
-    const searchResults = site.search.searchProducts;
+      return {
+        facets: {
+          items: removeEdgesAndNodes(searchResults.filters).map((node) => {
+            switch (node.__typename) {
+              case 'BrandSearchFilter':
+                return {
+                  ...node,
+                  brands: removeEdgesAndNodes(node.brands),
+                };
 
-    const items = removeEdgesAndNodes(searchResults.products).map((product) => ({
-      ...product,
-    }));
+              case 'CategorySearchFilter':
+                return {
+                  ...node,
+                  categories: removeEdgesAndNodes(node.categories),
+                };
 
-    return {
-      facets: {
-        items: removeEdgesAndNodes(searchResults.filters).map((node) => {
-          switch (node.__typename) {
-            case 'BrandSearchFilter':
-              return {
-                ...node,
-                brands: removeEdgesAndNodes(node.brands),
-              };
+              case 'ProductAttributeSearchFilter':
+                return {
+                  ...node,
+                  attributes: removeEdgesAndNodes(node.attributes),
+                };
 
-            case 'CategorySearchFilter':
-              return {
-                ...node,
-                categories: removeEdgesAndNodes(node.categories),
-              };
+              case 'RatingSearchFilter':
+                return {
+                  ...node,
+                  ratings: removeEdgesAndNodes(node.ratings),
+                };
 
-            case 'ProductAttributeSearchFilter':
-              return {
-                ...node,
-                attributes: removeEdgesAndNodes(node.attributes),
-              };
-
-            case 'RatingSearchFilter':
-              return {
-                ...node,
-                ratings: removeEdgesAndNodes(node.ratings),
-              };
-
-            default:
-              return node;
-          }
-        }),
-      },
-      products: {
+              default:
+                return node;
+            }
+          }),
+        },
+        items: removeEdgesAndNodes(searchResults.products).map((product) => ({
+          ...product,
+        })),
         collectionInfo: searchResults.products.collectionInfo,
         pageInfo: searchResults.products.pageInfo,
+      };
+    };
+
+    if (after || before) {
+      const paginationArgs = before
+        ? { last: resolvedLimit, before }
+        : { first: resolvedLimit, after };
+
+      const chunk = await fetchSearchChunk(paginationArgs);
+
+      return {
+        facets: chunk.facets,
+        products: {
+          collectionInfo: chunk.collectionInfo,
+          pageInfo: chunk.pageInfo,
+          items: chunk.items,
+        },
+      };
+    }
+
+    const targetStart = (resolvedPage - 1) * resolvedLimit;
+    const targetEnd = targetStart + resolvedLimit;
+    let collectedItems: Awaited<ReturnType<typeof fetchSearchChunk>>['items'] = [];
+    let afterCursor: string | undefined;
+    let facets: Awaited<ReturnType<typeof fetchSearchChunk>>['facets'] | null = null;
+    let collectionInfo: Awaited<ReturnType<typeof fetchSearchChunk>>['collectionInfo'] | null =
+      null;
+    let pageInfo: Awaited<ReturnType<typeof fetchSearchChunk>>['pageInfo'] = defaultPageInfo;
+
+    while (collectedItems.length < targetEnd) {
+      const remaining = targetEnd - collectedItems.length;
+      const first = Math.min(SEARCH_CHUNK_SIZE, remaining);
+      const chunk = await fetchSearchChunk({ first, after: afterCursor });
+
+      if (!facets) {
+        facets = chunk.facets;
+      }
+
+      collectionInfo = chunk.collectionInfo;
+      pageInfo = chunk.pageInfo;
+      collectedItems = collectedItems.concat(chunk.items);
+
+      if (!chunk.pageInfo.hasNextPage || chunk.items.length === 0) {
+        break;
+      }
+
+      afterCursor = chunk.pageInfo.endCursor ?? undefined;
+    }
+
+    const items = collectedItems.slice(targetStart, targetEnd);
+
+    return {
+      facets: facets ?? { items: [] },
+      products: {
+        collectionInfo,
+        pageInfo: pageInfo ?? {
+          hasNextPage: false,
+          hasPreviousPage: resolvedPage > 1,
+          startCursor: null,
+          endCursor: null,
+        },
         items,
       },
     };
@@ -307,6 +377,7 @@ const PrivateSearchParamsSchema = z.object({
   after: z.string().nullish(),
   before: z.string().nullish(),
   limit: z.number().nullish(),
+  page: z.number().nullish(),
   sort: PrivateSortParam.nullish(),
   filters: SearchProductsFiltersInputSchema,
 });
@@ -333,6 +404,7 @@ export const PublicSearchParamsSchema = z.object({
     value?.filter((stock) => z.enum(['free_shipping']).safeParse(stock).success),
   ),
   term: z.string().nullish(),
+  page: z.coerce.number().nullish(),
 });
 
 const AttributeKey = z.custom<`attr_${string}`>((val) => {
@@ -341,7 +413,7 @@ const AttributeKey = z.custom<`attr_${string}`>((val) => {
 
 export const PublicToPrivateParams = PublicSearchParamsSchema.catchall(SearchParamToArray.nullish())
   .transform((publicParams) => {
-    const { after, before, limit, sort, ...filters } = publicParams;
+    const { after, before, limit, page, sort, ...filters } = publicParams;
 
     const {
       brand,
@@ -374,6 +446,7 @@ export const PublicToPrivateParams = PublicSearchParamsSchema.catchall(SearchPar
       after,
       before,
       limit,
+      page,
       sort,
       filters: {
         brandEntityIds: brand,
@@ -410,13 +483,15 @@ export const fetchFacetedSearch = cache(
     currencyCode?: CurrencyCode,
     customerAccessToken?: string,
   ) => {
-    const { after, before, limit = 9, sort, filters } = PublicToPrivateParams.parse(params);
+    const { after, before, limit = DEFAULT_FACETED_PAGE_SIZE, page, sort, filters } =
+      PublicToPrivateParams.parse(params);
 
     return getProductSearchResults(
       {
         after,
         before,
         limit,
+        page,
         sort,
         filters,
       },

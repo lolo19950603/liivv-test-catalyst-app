@@ -3,13 +3,19 @@ import { type ReactNode, Suspense } from 'react';
 
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { Button } from '@/vibes/soul/primitives/button';
-import { CursorPagination, CursorPaginationInfo } from '@/vibes/soul/primitives/cursor-pagination';
+import {
+  NumberedPagination,
+  NumberedPaginationInfo,
+} from '@/vibes/soul/primitives/numbered-pagination';
 import { Product } from '@/vibes/soul/primitives/product-card';
 import * as SidePanel from '@/vibes/soul/primitives/side-panel';
 import { Breadcrumb, Breadcrumbs, BreadcrumbsSkeleton } from '@/vibes/soul/sections/breadcrumbs';
 import { type ProductImageFallbackLogo } from '@/vibes/soul/primitives/product-card';
 import { ProductList } from '@/vibes/soul/sections/product-list';
 import { Filter, FiltersPanel } from '@/vibes/soul/sections/products-list-section/filters-panel';
+import './catalog-toolbar.css';
+import { DEFAULT_FACETED_PAGE_SIZE } from '@/vibes/soul/sections/products-list-section/constants';
+import { PageSize, PageSizeSkeleton } from '@/vibes/soul/sections/products-list-section/page-size';
 import {
   Sorting,
   SortingSkeleton,
@@ -24,7 +30,9 @@ interface Props {
   filters: Streamable<Filter[]>;
   sortOptions: Streamable<SortOption[]>;
   compareProducts?: Streamable<Product[]>;
-  paginationInfo?: Streamable<CursorPaginationInfo>;
+  paginationInfo?: Streamable<NumberedPaginationInfo>;
+  paginationLabel?: Streamable<string | null>;
+  paginationNextLabel?: Streamable<string | null>;
   compareHref?: string;
   compareLabel?: Streamable<string>;
   showCompare?: Streamable<boolean>;
@@ -37,6 +45,10 @@ interface Props {
   sortPlaceholder?: Streamable<string | null>;
   sortParamName?: string;
   sortDefaultValue?: string;
+  pageSizeLabel?: Streamable<string | null>;
+  pageSizeOptions?: Streamable<SortOption[]>;
+  pageSizeDefaultValue?: number;
+  pageSizeParamName?: string;
   compareParamName?: string;
   emptyStateSubtitle?: Streamable<string>;
   emptyStateTitle?: Streamable<string>;
@@ -64,6 +76,8 @@ export function ProductsListSection({
   compareLabel,
   showCompare,
   paginationInfo,
+  paginationLabel,
+  paginationNextLabel,
   filterLabel = 'Filters',
   filtersPanelTitle: streamableFiltersPanelTitle = 'Filters',
   resetFiltersLabel,
@@ -71,6 +85,10 @@ export function ProductsListSection({
   sortLabel: streamableSortLabel,
   sortPlaceholder: streamableSortPlaceholder,
   sortParamName,
+  pageSizeLabel: streamablePageSizeLabel,
+  pageSizeOptions: streamablePageSizeOptions,
+  pageSizeDefaultValue = DEFAULT_FACETED_PAGE_SIZE,
+  pageSizeParamName = 'limit',
   compareParamName,
   emptyStateSubtitle,
   emptyStateTitle,
@@ -109,25 +127,42 @@ export function ProductsListSection({
                 <span className="text-contrast-300">{totalCount}</span>
               </Suspense>
             </h1>
-            <div className="flex gap-2">
-              <Stream
-                fallback={<SortingSkeleton />}
-                value={Streamable.all([
-                  streamableSortLabel,
-                  streamableSortOptions,
-                  streamableSortPlaceholder,
-                ])}
-              >
-                {([label, options, placeholder]) => (
-                  <Sorting
-                    defaultValue={sortDefaultValue}
-                    label={label}
-                    options={options}
-                    paramName={sortParamName}
-                    placeholder={placeholder}
-                  />
+            <div className="liivv-catalog-toolbar">
+              <div className="liivv-catalog-toolbar__controls">
+                {streamablePageSizeOptions && (
+                  <Stream
+                    fallback={<PageSizeSkeleton />}
+                    value={Streamable.all([streamablePageSizeLabel, streamablePageSizeOptions])}
+                  >
+                    {([label, options]) => (
+                      <PageSize
+                        defaultValue={pageSizeDefaultValue}
+                        label={label}
+                        options={options}
+                        paramName={pageSizeParamName}
+                      />
+                    )}
+                  </Stream>
                 )}
-              </Stream>
+                <Stream
+                  fallback={<SortingSkeleton />}
+                  value={Streamable.all([
+                    streamableSortLabel,
+                    streamableSortOptions,
+                    streamableSortPlaceholder,
+                  ])}
+                >
+                  {([label, options, placeholder]) => (
+                    <Sorting
+                      defaultValue={sortDefaultValue}
+                      label={label}
+                      options={options}
+                      paramName={sortParamName}
+                      placeholder={placeholder}
+                    />
+                  )}
+                </Stream>
+              </div>
               <div className="block @3xl:hidden">
                 <SidePanel.Root>
                   <SidePanel.Trigger asChild>
@@ -192,7 +227,11 @@ export function ProductsListSection({
             />
 
             {paginationInfo && (
-              <CursorPagination info={paginationInfo} variant={paginationVariant} />
+              <NumberedPagination
+                info={paginationInfo}
+                label={paginationLabel}
+                nextLabel={paginationNextLabel}
+              />
             )}
           </div>
         </div>

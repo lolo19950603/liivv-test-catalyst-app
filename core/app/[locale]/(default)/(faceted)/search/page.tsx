@@ -9,13 +9,14 @@ import { ProductsListSection } from '@/vibes/soul/sections/products-list-section
 import { getFilterParsers } from '@/vibes/soul/sections/products-list-section/filter-parsers';
 import { getSessionCustomerAccessToken } from '~/auth';
 import { facetsTransformer } from '~/data-transformers/facets-transformer';
-import { pageInfoTransformer } from '~/data-transformers/page-info-transformer';
+import { numberedPaginationTransformer } from '~/data-transformers/numbered-pagination-transformer';
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 
 import { MAX_COMPARE_LIMIT } from '../../compare/page-data';
 import { getCompareProducts as getCompareProductsData } from '../fetch-compare-products';
+import { DEFAULT_FACETED_PAGE_SIZE, getFacetedPageSizeOptions } from '../faceted-page-size';
 import { fetchFacetedSearch } from '../fetch-faceted-search';
 
 import { getSearchPageData } from './page-data';
@@ -166,17 +167,15 @@ export default async function Search(props: Props) {
     const searchTerm = typeof searchParams.term === 'string' ? searchParams.term : '';
 
     if (!searchTerm) {
-      return {
-        startCursorParamName: 'before',
-        endCursorParamName: 'after',
-        endCursor: null,
-        startCursor: null,
-      };
+      return numberedPaginationTransformer(0, DEFAULT_FACETED_PAGE_SIZE, 1);
     }
 
     const search = await streamableFacetedSearch;
+    const limit = Number(searchParams.limit) || DEFAULT_FACETED_PAGE_SIZE;
+    const page = Number(searchParams.page) || 1;
+    const totalItems = search.products.collectionInfo?.totalItems ?? 0;
 
-    return pageInfoTransformer(search.products.pageInfo);
+    return numberedPaginationTransformer(totalItems, limit, page);
   });
 
   const streamableFilters = Streamable.from(async () => {
@@ -251,7 +250,14 @@ export default async function Search(props: Props) {
       filtersPanelTitle={t('FacetedSearch.filters')}
       maxCompareLimitMessage={t('Compare.maxCompareLimit')}
       maxItems={MAX_COMPARE_LIMIT}
+      pageSizeDefaultValue={DEFAULT_FACETED_PAGE_SIZE}
+      pageSizeLabel={t('PageSize.show')}
+      pageSizeOptions={getFacetedPageSizeOptions((count) =>
+        t('PageSize.perPage', { count: String(count) }),
+      )}
       paginationInfo={streamablePagination}
+      paginationLabel={t('Pagination.label')}
+      paginationNextLabel={t('Pagination.next')}
       products={streamableProducts}
       rangeFilterApplyLabel={t('FacetedSearch.Range.apply')}
       removeLabel={t('Compare.remove')}

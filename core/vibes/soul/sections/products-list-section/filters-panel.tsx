@@ -5,7 +5,7 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { parseAsString, useQueryStates } from 'nuqs';
+import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
 import { useOptimistic, useState, useTransition } from 'react';
 
 import { Checkbox } from '@/vibes/soul/form/checkbox';
@@ -16,7 +16,7 @@ import { FilterCheckboxList } from '@/vibes/soul/sections/products-list-section/
 import { Stream, Streamable, useStreamable } from '@/vibes/soul/lib/streamable';
 import { Accordion, AccordionItem } from '@/vibes/soul/primitives/accordion';
 import { Button } from '@/vibes/soul/primitives/button';
-import { CursorPaginationInfo } from '@/vibes/soul/primitives/cursor-pagination';
+import { NumberedPaginationInfo } from '@/vibes/soul/primitives/numbered-pagination';
 import { Rating } from '@/vibes/soul/primitives/rating';
 import { Link } from '~/components/link';
 
@@ -75,7 +75,7 @@ interface Props {
   className?: string;
   filters: Streamable<Filter[]>;
   resetFiltersLabel?: Streamable<string>;
-  paginationInfo?: Streamable<CursorPaginationInfo>;
+  paginationInfo?: Streamable<NumberedPaginationInfo>;
   rangeFilterApplyLabel?: Streamable<string>;
 }
 
@@ -93,6 +93,7 @@ export function FiltersPanel({
   appearance = 'archive',
   className,
   filters: streamableFilters,
+  paginationInfo,
   resetFiltersLabel,
   rangeFilterApplyLabel,
 }: Props) {
@@ -103,6 +104,7 @@ export function FiltersPanel({
           appearance={appearance}
           className={className}
           filters={filters}
+          paginationInfo={paginationInfo}
           rangeFilterApplyLabel={rangeFilterApplyLabel}
           resetFiltersLabel={resetFiltersLabel}
         />
@@ -143,13 +145,13 @@ export function FiltersPanelInner({
   const resetFiltersLabel = useStreamable(streamableResetFiltersLabel) ?? 'Reset filters';
   const rangeFilterApplyLabel = useStreamable(streamableRangeFilterApplyLabel);
   const paginationInfo = useStreamable(streamablePaginationInfo);
-  const startCursorParamName = paginationInfo?.startCursorParamName ?? 'before';
-  const endCursorParamName = paginationInfo?.endCursorParamName ?? 'after';
+  const pageParamName = paginationInfo?.pageParamName ?? 'page';
   const [params, setParams] = useQueryStates(
     {
       ...getFilterParsers(filters),
-      [startCursorParamName]: parseAsString,
-      [endCursorParamName]: parseAsString,
+      [pageParamName]: parseAsInteger,
+      before: parseAsString,
+      after: parseAsString,
     },
     {
       shallow: false,
@@ -232,8 +234,9 @@ export function FiltersPanelInner({
                         startTransition(async () => {
                           const nextParams = {
                             ...optimisticParams,
-                            [startCursorParamName]: null,
-                            [endCursorParamName]: null,
+                            [pageParamName]: null,
+                            before: null,
+                            after: null,
                             [filter.paramName]:
                               toggleGroupValues.length === 0 ? null : toggleGroupValues,
                           };
@@ -251,8 +254,9 @@ export function FiltersPanelInner({
                         startTransition(async () => {
                           const nextParams = {
                             ...optimisticParams,
-                            [startCursorParamName]: null,
-                            [endCursorParamName]: null,
+                            [pageParamName]: null,
+                            before: null,
+                            after: null,
                             [filter.paramName]:
                               toggleGroupValues.length === 0 ? null : toggleGroupValues,
                           };
@@ -291,8 +295,9 @@ export function FiltersPanelInner({
                           ...optimisticParams,
                           [filter.minParamName]: min,
                           [filter.maxParamName]: max,
-                          [startCursorParamName]: null,
-                          [endCursorParamName]: null,
+                          [pageParamName]: null,
+                          before: null,
+                          after: null,
                         };
 
                         setOptimisticParams(nextParams);
@@ -329,8 +334,9 @@ export function FiltersPanelInner({
                             const nextParams = {
                               ...optimisticParams,
                               [filter.paramName]: Array.from(ratings),
-                              [startCursorParamName]: null,
-                              [endCursorParamName]: null,
+                              [pageParamName]: null,
+                              before: null,
+                              after: null,
                             };
 
                             setOptimisticParams(nextParams);
@@ -355,8 +361,9 @@ export function FiltersPanelInner({
           startTransition(async () => {
             const nextParams = {
               ...Object.fromEntries(Object.entries(optimisticParams).map(([key]) => [key, null])),
-              [startCursorParamName]: optimisticParams[startCursorParamName],
-              [endCursorParamName]: optimisticParams[endCursorParamName],
+              [pageParamName]: null,
+              before: null,
+              after: null,
             };
 
             setOptimisticParams(nextParams);

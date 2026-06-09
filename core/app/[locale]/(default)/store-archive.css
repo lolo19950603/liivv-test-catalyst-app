@@ -1,5 +1,10 @@
 /* Store-wide archive feel for Catalyst commerce pages (category, cart, blog, account, etc.) */
 
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
 .liivv-store {
   --store-primary-text: #312f2f;
   --store-secondary-text: #66605c;
