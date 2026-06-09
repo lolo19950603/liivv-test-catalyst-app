@@ -707,6 +707,7 @@
         "inputPlaceholder": "search all products, categories, brands....",
         "submitLabel": "Search",
         "clearLabel": "Clear search",
+        "closeLabel": "Close search",
         "loadingLabel": "Searching"
       }
     },

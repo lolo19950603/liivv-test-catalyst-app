@@ -1142,6 +1142,7 @@ export function LiivvArchiveHeader({
               <LiivvArchiveSearchPanel
                 fallbackLogo={logo}
                 inputRef={searchInputRef}
+                onClose={closeSearch}
                 open={searchOpen}
                 searchPanelId={searchPanelId}
                 searchPlaceholder={searchPlaceholder}

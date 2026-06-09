@@ -3,7 +3,7 @@
 import { useForm } from '@conform-to/react';
 import { clsx } from 'clsx';
 import debounce from 'lodash.debounce';
-import { Loader2, XIcon } from 'lucide-react';
+import { ChevronUp, Loader2, XIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import {
   type RefObject,
@@ -95,6 +95,25 @@ function buildSearchPanelStyle(searchPanelId: string) {
   font-size: var(--text-sm, 0.875rem);
   font-weight: var(--font-medium, 500);
   padding: 0.625rem 1.25rem;
+}
+#${searchPanelId} .liivv-archive-search-close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid rgb(var(--color-foreground) / 0.12);
+  border-radius: 50%;
+  background: rgb(var(--color-background));
+  color: rgb(var(--color-foreground));
+  cursor: pointer;
+  padding: 0;
+}
+#${searchPanelId} .liivv-archive-search-close:hover,
+#${searchPanelId} .liivv-archive-search-close:focus-visible {
+  border-color: rgb(var(--color-foreground) / 0.25);
+  outline: none;
 }
 #${searchPanelId} .liivv-archive-search-results {
   border-top: 1px solid rgb(var(--color-foreground) / 0.08);
@@ -421,6 +440,7 @@ export function LiivvArchiveSearchPanel({
   searchPlaceholder,
   inputRef,
   open,
+  onClose,
   submitPath = SEARCH_RESULTS_PATH,
   variant = 'drawer',
 }: {
@@ -430,12 +450,14 @@ export function LiivvArchiveSearchPanel({
   searchPlaceholder: string;
   inputRef?: RefObject<HTMLInputElement | null>;
   open?: boolean;
+  onClose?: () => void;
   submitPath?: string;
   variant?: 'drawer' | 'inline';
 }) {
   const t = useTranslations('Components.Header.Search');
   const submitLabel = t('submitLabel');
   const clearLabel = t('clearLabel');
+  const closeLabel = t('closeLabel');
   const loadingLabel = t('loadingLabel');
   const [query, setQuery] = useState('');
   const [isSearching, startSearching] = useTransition();
@@ -561,6 +583,16 @@ export function LiivvArchiveSearchPanel({
         <button className="liivv-archive-search-submit" type="submit">
           {submitLabel}
         </button>
+        {isDrawer && onClose ? (
+          <button
+            aria-label={closeLabel}
+            className="liivv-archive-search-close"
+            onClick={onClose}
+            type="button"
+          >
+            <ChevronUp aria-hidden size={18} strokeWidth={2} />
+          </button>
+        ) : null}
       </form>
       <div id={`${searchPanelId}-results`}>
         <SearchResultsPanel
