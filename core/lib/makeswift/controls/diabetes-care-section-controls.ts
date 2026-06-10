@@ -1,4 +1,13 @@
-import { Checkbox, Color, Group, Link, Number, TextArea, TextInput } from '@makeswift/runtime/controls';
+import {
+  Checkbox,
+  Color,
+  Group,
+  Link,
+  Number,
+  Select,
+  TextArea,
+  TextInput,
+} from '@makeswift/runtime/controls';
 
 import {
   ARCHIVE_CREAM_BACKGROUND_HSL,
@@ -10,6 +19,46 @@ export const HEX_OVERRIDE_DESCRIPTION =
   'Optional. Overrides the picker when valid (e.g. `#4C7662`).';
 
 export const FONT_SIZE_DESCRIPTION = '0 = theme default (title-lg).';
+
+export type TextAlign = 'left' | 'center' | 'right';
+
+const TEXT_ALIGN_CONTROL_OPTIONS = [
+  { value: 'left', label: 'Left' },
+  { value: 'center', label: 'Center' },
+  { value: 'right', label: 'Right' },
+] as const;
+
+export function textAlignField(defaultValue: TextAlign = 'center') {
+  return {
+    textAlign: Select({
+      label: 'Alignment',
+      options: [...TEXT_ALIGN_CONTROL_OPTIONS],
+      defaultValue,
+    }),
+  };
+}
+
+export function resolveTextAlign(...values: (string | undefined | null)[]): TextAlign {
+  for (const value of values) {
+    if (value === 'left' || value === 'center' || value === 'right') {
+      return value;
+    }
+  }
+
+  return 'center';
+}
+
+export function textAlignClass(align: TextAlign): string {
+  if (align === 'left') {
+    return 'text-left';
+  }
+
+  if (align === 'right') {
+    return 'text-right';
+  }
+
+  return 'text-center';
+}
 
 export function roundedTopControl() {
   return {
@@ -323,6 +372,8 @@ export type SplitHeadingPopoverOptions = {
    * Swash color picker defaults to transparent when override is on.
    */
   secondarySwashTransparentByDefault?: boolean;
+  /** Adds left / center / right alignment to primary and secondary heading popovers. */
+  includeTextAlign?: boolean;
 };
 
 export type SplitRichTextLowerHeadingOptions = {
@@ -533,6 +584,7 @@ export function splitHeadingPopoverControls(options?: SplitHeadingPopoverOptions
         }),
         ...textColorFields(options?.primaryTextColorDefault),
         ...fontSizeFields(),
+        ...(options?.includeTextAlign ? textAlignField('center') : {}),
       },
     }),
     secondaryHeading: Group({
@@ -545,6 +597,7 @@ export function splitHeadingPopoverControls(options?: SplitHeadingPopoverOptions
         }),
         ...textColorFields(options?.secondaryTextColorDefault ?? '0 2% 19%'),
         ...fontSizeFields(),
+        ...(options?.includeTextAlign ? textAlignField('center') : {}),
         ...highlightSwashFields(
           options?.highlightDefault,
           options?.secondarySwashTransparentByDefault

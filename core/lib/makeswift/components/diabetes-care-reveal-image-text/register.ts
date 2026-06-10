@@ -2,7 +2,6 @@ import { Group, Image, Number, Style, TextArea, TextInput } from '@makeswift/run
 
 import {
   archiveButtonGroup,
-  FONT_SIZE_DESCRIPTION,
   fontSizeFields,
   roundedTopControl,
   sectionBackgroundControls,
@@ -42,7 +41,7 @@ runtime.registerComponent(DiabetesCareRevealImageWithText, {
           label: 'Font size',
           suffix: 'px',
           defaultValue: 0,
-          description: FONT_SIZE_DESCRIPTION,
+          description: '0 = 90px on desktop (compact on mobile).',
         }),
         fontSizeMobile: Number({
           label: 'Font size (mobile)',

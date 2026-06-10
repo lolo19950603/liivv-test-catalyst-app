@@ -12,6 +12,11 @@ import {
   type ArchiveButtonProps,
 } from '~/lib/makeswift/utils/archive-button';
 import { ArchiveHighlightedText } from '~/lib/makeswift/components/diabetes-care-faq/archive-highlighted-text';
+import {
+  resolveTextAlign,
+  textAlignClass,
+  type TextAlign,
+} from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { ARCHIVE_SAGE_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import {
   buildSectionTheme,
@@ -37,27 +42,53 @@ export const MULTICOLUMN_SECTION_ID = 'shopify-section-template--26520397447459_
 
 const MULTICOLUMN_SLIDER_ID = 'Slider-template--26520397447459__multicolumn_JtTdUn';
 
-const MAX_COLUMNS = 4;
+/** Desktop grid: four columns per row; additional columns wrap to the next row. */
+const DESKTOP_COLUMNS_PER_ROW = 4;
 
 /** Matches archived `--color-background` on `multicolumn_JtTdUn`. */
 const DEFAULT_BACKGROUND_CHANNELS = ARCHIVE_SAGE_BACKGROUND_CHANNELS;
 
 /**
  * Inline `<style>` from `diabetes-care.html` for this section id (theme color tokens + grid gap).
- * Appends `--section-blocks-count` and optional four-column media rule.
+ * Appends `--section-blocks-count` and a four-column-per-row media rule when needed.
  */
 /** Matches archive `card-grid` gap (home `multicolumn_xg87qF` uses ~`var(--sp-6)` at desktop, not 40–60px). */
 const MULTICOLUMN_CARD_GRID_GAP = 'clamp(var(--sp-4),1.263vw,var(--sp-6))';
 
+function multicolumnMobileTitleAlignCss(align: TextAlign): string {
+  const justify =
+    align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center';
+
+  return (
+    `#${MULTICOLUMN_SECTION_ID} .title-wrapper.mc-title-align-${align} h2.title-lg .split-words{` +
+    `display:flex;width:100%;justify-content:${justify};text-wrap:balance}`
+  );
+}
+
 /** Uniform section title on mobile — overrides Makeswift inline sizes on split-word segments. */
-const MULTICOLUMN_MOBILE_TITLE_CSS =
-  `@media screen and (max-width:767px){#${MULTICOLUMN_SECTION_ID}{--title-xl:clamp(1.5rem,5.5vw,1.875rem)}` +
-  `#${MULTICOLUMN_SECTION_ID} .title-wrapper h2.title-xl,` +
-  `#${MULTICOLUMN_SECTION_ID} .title-wrapper h2.title-xl .split-words,` +
-  `#${MULTICOLUMN_SECTION_ID} .title-wrapper h2.title-xl .split-words :is(.word,[data-dc-animate-child],.highlighted-text){` +
-  `font-size:clamp(1.5rem,5.5vw,1.875rem)!important;line-height:1.08!important;letter-spacing:-0.02em}` +
-  `#${MULTICOLUMN_SECTION_ID} .title-wrapper.text-center h2.title-xl .split-words{` +
-  `display:flex;width:100%;justify-content:center;text-wrap:balance}}`;
+function multicolumnMobileTitleCss(titleAlign: TextAlign): string {
+  return (
+    `@media screen and (max-width:767px){#${MULTICOLUMN_SECTION_ID}{--title-lg:clamp(1.25rem,4.5vw,1.5rem)}` +
+    `#${MULTICOLUMN_SECTION_ID} .title-wrapper h2.title-lg,` +
+    `#${MULTICOLUMN_SECTION_ID} .title-wrapper h2.title-lg .split-words,` +
+    `#${MULTICOLUMN_SECTION_ID} .title-wrapper h2.title-lg .split-words :is(.word,[data-dc-animate-child],.highlighted-text){` +
+    `font-size:clamp(1.25rem,4.5vw,1.5rem)!important;line-height:1.1!important;letter-spacing:-0.02em}` +
+    `${multicolumnMobileTitleAlignCss(titleAlign)}}`
+  );
+}
+
+/** Archive `.title-wrapper.text-center .description` centers the max-width block; we use `mc-intro-align-*` instead. */
+function multicolumnIntroAlignCss(introAlign: TextAlign): string {
+  const id = `#${MULTICOLUMN_SECTION_ID}`;
+  const selector = `${id} .title-wrapper .description.mc-intro-align-${introAlign}`;
+  const justifySelf =
+    introAlign === 'left' ? 'start' : introAlign === 'right' ? 'end' : 'center';
+
+  return (
+    `${selector},${selector} p{text-align:${introAlign}}` +
+    `@media screen and (min-width:768px){${selector}{justify-self:${justifySelf}}}`
+  );
+}
 
 const MULTICOLUMN_ARCHIVE_STYLE =
   `#${MULTICOLUMN_SECTION_ID}{--section-padding-top:72px;--section-padding-bottom:72px;--color-background:${DEFAULT_BACKGROUND_CHANNELS};--color-foreground:49 47 47;--color-border:var(--color-foreground)/0.1;--color-border-dark:var(--color-foreground)/0.4;--color-border-light:var(--color-foreground)/0.06;--color-highlight:243 199 190;--color-button-background:255 255 255;--color-button-border:255 255 255;--color-button-text:49 47 47}` +
@@ -65,12 +96,17 @@ const MULTICOLUMN_ARCHIVE_STYLE =
   `@media screen and (min-width:768px){#${MULTICOLUMN_SECTION_ID} .multicolumn{--card-grid-gap:${MULTICOLUMN_CARD_GRID_GAP}}}` +
   `@media screen and (min-width:1024px){#${MULTICOLUMN_SECTION_ID} .slider.slider--tablet{overflow:visible;padding-inline:0;margin-inline:0;padding-block-end:0}}`;
 
-function multicolumnSectionStyle(blockCount: number): string {
+function multicolumnSectionStyle(
+  blockCount: number,
+  titleAlign: TextAlign,
+  introAlign: TextAlign,
+): string {
   const id = `#${MULTICOLUMN_SECTION_ID}`;
-  let style = `${MULTICOLUMN_ARCHIVE_STYLE}${MULTICOLUMN_MOBILE_TITLE_CSS}${id}{--section-blocks-count:${String(blockCount)}}`;
+  let style =
+    `${MULTICOLUMN_ARCHIVE_STYLE}${multicolumnMobileTitleCss(titleAlign)}${multicolumnIntroAlignCss(introAlign)}${id}{--section-blocks-count:${String(blockCount)}}`;
 
-  if (blockCount === 4) {
-    style += `@media screen and (min-width:768px){${id} .multicolumn.with-4.card-grid.card-grid--4{--card-grid-per-row:4}}`;
+  if (blockCount >= DESKTOP_COLUMNS_PER_ROW) {
+    style += `@media screen and (min-width:768px){${id} .multicolumn.with-4.card-grid.card-grid--4{--card-grid-per-row:${String(DESKTOP_COLUMNS_PER_ROW)}}}`;
   }
 
   if (blockCount === 3) {
@@ -83,9 +119,9 @@ function multicolumnSectionStyle(blockCount: number): string {
 }
 
 function multicolumnCardGridModifierClass(count: number): string | undefined {
-  const n = Math.min(Math.max(count, 1), MAX_COLUMNS);
+  const n = Math.max(count, 1);
 
-  if (n === 4) {
+  if (n >= DESKTOP_COLUMNS_PER_ROW) {
     return 'with-4 card-grid--4';
   }
 
@@ -102,19 +138,6 @@ function multicolumnCardGridModifierClass(count: number): string | undefined {
   }
 
   return undefined;
-}
-
-const LARGE_SCREEN_GRID_CLASS: Record<number, string> = {
-  1: 'lg:grid-cols-1',
-  2: 'lg:grid-cols-2',
-  3: 'lg:grid-cols-3',
-  4: 'lg:grid-cols-4',
-};
-
-function largeScreenGridClass(count: number): string {
-  const columns = Math.min(Math.max(count, 1), MAX_COLUMNS);
-
-  return LARGE_SCREEN_GRID_CLASS[columns] ?? 'lg:grid-cols-4';
 }
 
 function IconArrowRight() {
@@ -188,12 +211,21 @@ export type IntroBodyTypographyProps = BodyTextProps & {
   body?: string;
   fontSize?: number;
   fontSizeMobile?: number;
+  textAlign?: TextAlign;
+};
+
+export type TopHeadingTypographyProps = BodyTextProps & {
+  text?: string;
+  fontSize?: number;
+  fontSizeMobile?: number;
+  textAlign?: TextAlign;
 };
 
 export type DiabetesCareMulticolumnProps = {
   className?: string;
   background?: SectionBackgroundProps;
   roundedTop?: boolean;
+  topHeading?: TopHeadingTypographyProps;
   primaryHeading?: HeadingTypographyProps;
   secondaryHeading?: HeadingWithHighlightProps;
   intro?: IntroBodyTypographyProps;
@@ -202,9 +234,6 @@ export type DiabetesCareMulticolumnProps = {
 
 const DEFAULT_PRIMARY_HEADING = 'Diabetes is a';
 const DEFAULT_SECONDARY_HEADING = 'journey.';
-const DEFAULT_INTRO_BODY =
-  'Add a short supporting paragraph here. Line breaks become separate paragraphs.';
-
 const DEFAULT_COLUMNS: DiabetesCareMulticolumnColumn[] = [
   {
     heading: { text: 'Support when you need it' },
@@ -218,7 +247,7 @@ const DEFAULT_COLUMNS: DiabetesCareMulticolumnColumn[] = [
     heading: { text: 'Built for everyday care' },
     secondaryHeading: { text: 'Navigating the Real World.' },
     body: {
-      text: 'Up to four columns use the same multicolumn grid styling as the archived page.',
+      text: 'Columns render in a four-across grid on desktop; extra columns wrap to the next row.',
     },
     image: { imageAlt: '' },
   },
@@ -309,6 +338,23 @@ function bodyParagraphs(body: string): string[] {
     .split(/\n+/)
     .map((p) => p.trim())
     .filter((p) => p.length > 0);
+}
+
+function topHeadingStyle(topHeading?: TopHeadingTypographyProps | null): CSSProperties | undefined {
+  const color = resolvePlainTextColor({
+    textColor: topHeading?.textColor,
+    textColorHex: topHeading?.textColorHex,
+  });
+  const fontSize = resolveHeadingFontSizeCss(topHeading?.fontSize, topHeading?.fontSizeMobile);
+
+  if (color == null && fontSize == null) {
+    return undefined;
+  }
+
+  return {
+    ...(color != null ? { color } : {}),
+    ...(fontSize != null ? { fontSize } : {}),
+  };
 }
 
 function introBodyStyle(intro?: IntroBodyTypographyProps | null): CSSProperties | undefined {
@@ -414,6 +460,7 @@ export function DiabetesCareMulticolumn({
   className,
   background,
   roundedTop = true,
+  topHeading,
   primaryHeading,
   secondaryHeading,
   intro,
@@ -430,18 +477,24 @@ export function DiabetesCareMulticolumn({
   const fromProps = columns !== undefined && columns.length > 0 ? columns : DEFAULT_COLUMNS;
   const nonEmpty = fromProps.filter(columnHasContent);
   const raw = nonEmpty.length > 0 ? nonEmpty : DEFAULT_COLUMNS;
-  const rows = raw.slice(0, MAX_COLUMNS);
+  const rows = raw;
   const sectionVars: ShopifyThemeStyle = {
     '--section-blocks-count': rows.length,
   };
-  const useThemeColumnsOnly = rows.length === 3 || rows.length === 4;
+  const useThemeColumnsOnly = rows.length >= 3;
+  const topHeadingText = topHeading?.text?.trim() ?? '';
+  const topHeadingAlign = resolveTextAlign(topHeading?.textAlign);
+  const titleAlign = resolveTextAlign(
+    primaryHeading?.textAlign,
+    secondaryHeading?.textAlign,
+  );
+  const introAlign = resolveTextAlign(intro?.textAlign, titleAlign);
 
-  const introCopyRaw = intro?.body?.trim() ?? '';
-  const introCopy = introCopyRaw.length > 0 ? introCopyRaw : DEFAULT_INTRO_BODY;
+  const introCopy = intro?.body?.trim() ?? '';
 
   const { sectionCss, sectionStyle: themeStyle } = buildSectionTheme({
     sectionId: MULTICOLUMN_SECTION_ID,
-    sectionCss: multicolumnSectionStyle(rows.length),
+    sectionCss: multicolumnSectionStyle(rows.length, titleAlign, introAlign),
     background,
     // Swash color is scoped to the section title only (see `sectionTitleStyle` below), not
     // every `.highlighted-text` in the column cards.
@@ -477,10 +530,29 @@ export function DiabetesCareMulticolumn({
           className={clsx('section section--padding relative', roundedTop && 'section--rounded')}
         >
           <div className="page-width relative">
-            <div className="title-wrapper relative z-1 mb-10 flex flex-col gap-4 text-center leading-none md:mb-12 md:items-center md:justify-between lg:gap-8">
-              <div className="grid gap-4">
+            <div
+              className={clsx(
+                'title-wrapper relative z-1 mb-10 flex flex-col gap-4 leading-none md:mb-12 md:justify-between lg:gap-8',
+                `mc-title-align-${titleAlign}`,
+              )}
+            >
+              <div className="grid w-full gap-4">
+                {topHeadingText.length > 0 ? (
+                  <p
+                    className={clsx(
+                      'heading subtext-lg font-medium normal-case leading-normal tracking-none',
+                      textAlignClass(topHeadingAlign),
+                    )}
+                    style={topHeadingStyle(topHeading)}
+                  >
+                    {topHeadingText}
+                  </p>
+                ) : null}
                 <h2
-                  className="heading title-xl tracking-heading text-center"
+                  className={clsx(
+                    'heading title-lg tracking-heading',
+                    textAlignClass(titleAlign),
+                  )}
                   style={sectionTitleStyle}
                 >
                   <AccentSplitWordsHeading
@@ -494,18 +566,24 @@ export function DiabetesCareMulticolumn({
                     leadFontSize={primaryResolved.fontSize}
                   />
                 </h2>
-                <div
-                  className="description rte subtext-lg leading-normal"
-                  style={introBodyStyle(intro)}
-                >
-                  {introCopy
-                    .split(/\n+/)
-                    .map((p) => p.trim())
-                    .filter((p) => p.length > 0)
-                    .map((p, i) => (
-                      <p key={`intro-${i}`}>{p}</p>
-                    ))}
-                </div>
+                {introCopy.length > 0 ? (
+                  <div
+                    className={clsx(
+                      'description rte subtext-lg leading-normal',
+                      textAlignClass(introAlign),
+                      `mc-intro-align-${introAlign}`,
+                    )}
+                    style={introBodyStyle(intro)}
+                  >
+                    {introCopy
+                      .split(/\n+/)
+                      .map((p) => p.trim())
+                      .filter((p) => p.length > 0)
+                      .map((p, i) => (
+                        <p key={`intro-${i}`}>{p}</p>
+                      ))}
+                  </div>
+                ) : null}
               </div>
             </div>
 
@@ -518,10 +596,8 @@ export function DiabetesCareMulticolumn({
                   className={clsx(
                     'multicolumn card-grid mobile:card-grid--1 relative z-1 grid items-stretch',
                     multicolumnCardGridModifierClass(rows.length),
-                    !useThemeColumnsOnly && [
-                      rows.length === 1 ? 'md:grid-cols-1' : 'md:grid-cols-2',
-                      largeScreenGridClass(rows.length),
-                    ],
+                    !useThemeColumnsOnly &&
+                      (rows.length === 1 ? 'md:grid-cols-1' : 'md:grid-cols-2 lg:grid-cols-2'),
                   )}
                 >
                   {rows.map((row, index) => {

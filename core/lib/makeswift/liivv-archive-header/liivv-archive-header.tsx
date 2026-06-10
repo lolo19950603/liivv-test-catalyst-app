@@ -43,6 +43,51 @@ const CART_PATH = '/cart';
 const SEARCH_ARIA_LABEL = 'Search';
 /** Keep in sync with --mega-menu-drawer-duration in mega-menu-css.ts */
 const SEARCH_DRAWER_DURATION_MS = 450;
+/** Keep in sync with --mega-menu-close-delay in mega-menu-css.ts */
+const MEGA_MENU_CLOSE_DELAY_MS = 200;
+
+function megaMenuPanelId(mobileNavId: string, index: number): string {
+  return `${mobileNavId}-mega-${index}`;
+}
+
+/** True when the pointer is moving onto a nav trigger, open panel, or bridge between them. */
+function isMegaMenuInteractionTarget(
+  related: EventTarget | null,
+  mobileNavId: string,
+  megaMenuIndices: readonly number[],
+): boolean {
+  if (!(related instanceof Node)) {
+    return false;
+  }
+
+  if (
+    related instanceof Element &&
+    related.closest('.liivv-archive-header .header-mega-menu-wrap.is-open') != null
+  ) {
+    return true;
+  }
+
+  for (const index of megaMenuIndices) {
+    const menuId = megaMenuPanelId(mobileNavId, index);
+    const panel = document.getElementById(menuId);
+
+    if (panel?.contains(related)) {
+      return true;
+    }
+
+    const trigger = document.querySelector(`[aria-controls="${menuId}"]`);
+
+    if (trigger?.contains(related)) {
+      return true;
+    }
+  }
+
+  if (related instanceof Element && related.closest('.liivv-archive-header .header__menu') != null) {
+    return true;
+  }
+
+  return false;
+}
 const ACCOUNT_ARIA_LABEL = 'Account';
 const CART_ARIA_LABEL = 'Shopping cart';
 
@@ -537,6 +582,8 @@ function MegaMenuCategoryPreview({
 function HeaderMegaMenuPanel({
   item,
   menuId,
+  mobileNavId,
+  megaMenuIndices,
   open,
   onHover,
   onLeave,
@@ -544,6 +591,8 @@ function HeaderMegaMenuPanel({
 }: {
   item: LiivvArchiveNavLink;
   menuId: string;
+  mobileNavId: string;
+  megaMenuIndices: readonly number[];
   open: boolean;
   onHover: () => void;
   onLeave: () => void;
@@ -572,14 +621,8 @@ function HeaderMegaMenuPanel({
       id={menuId}
       onMouseEnter={onHover}
       onMouseLeave={(event) => {
-        const related = event.relatedTarget;
-
-        if (related instanceof Node) {
-          const trigger = document.querySelector(`[aria-controls="${menuId}"]`);
-
-          if (trigger?.contains(related)) {
-            return;
-          }
+        if (isMegaMenuInteractionTarget(event.relatedTarget, mobileNavId, megaMenuIndices)) {
+          return;
         }
 
         onLeave();
@@ -720,6 +763,9 @@ export function LiivvArchiveHeader({
   const megaCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const links = navLinks;
+  const megaMenuIndices = links.flatMap((item, index) =>
+    (item.columns?.length ?? 0) > 0 ? [index] : [],
+  );
   const logoVisible = Boolean(showLogo && (logo?.src || logo?.text));
   const hasNav = links.length > 0;
   const megaMenuOpen = activeMegaIndex !== null;
@@ -746,7 +792,7 @@ export function LiivvArchiveHeader({
     megaCloseTimerRef.current = setTimeout(() => {
       setActiveMegaIndex(null);
       megaCloseTimerRef.current = null;
-    }, 120);
+    }, MEGA_MENU_CLOSE_DELAY_MS);
   }, []);
 
   const toggleSearch = useCallback(() => {
@@ -950,7 +996,11 @@ export function LiivvArchiveHeader({
       ) : null}
       <div
         className="liivv-header-chrome relative z-[2]"
-        onMouseLeave={() => {
+        onMouseLeave={(event) => {
+          if (isMegaMenuInteractionTarget(event.relatedTarget, mobileNavId, megaMenuIndices)) {
+            return;
+          }
+
           scheduleCloseMegaMenu();
         }}
       >
@@ -1064,10 +1114,13 @@ export function LiivvArchiveHeader({
                               return;
                             }
 
-                            const related = event.relatedTarget;
-                            const panel = document.getElementById(menuId);
-
-                            if (related instanceof Node && panel?.contains(related)) {
+                            if (
+                              isMegaMenuInteractionTarget(
+                                event.relatedTarget,
+                                mobileNavId,
+                                megaMenuIndices,
+                              )
+                            ) {
                               return;
                             }
 
@@ -1164,7 +1217,9 @@ export function LiivvArchiveHeader({
               fallbackLogo={logo}
               item={item}
               key={menuId}
+              megaMenuIndices={megaMenuIndices}
               menuId={menuId}
+              mobileNavId={mobileNavId}
               onHover={() => openMegaMenu(index)}
               onLeave={scheduleCloseMegaMenu}
               open={activeMegaIndex === index}

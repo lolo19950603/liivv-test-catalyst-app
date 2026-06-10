@@ -4,6 +4,8 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   --animation-primary: 0.5s cubic-bezier(0.3, 1, 0.3, 1);
   --mega-menu-drawer-duration: 0.45s;
   --mega-menu-drawer-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --mega-menu-close-delay: 0.2s;
+  --mega-menu-hover-bridge: 5rem;
   --mega-menu-feature-radius: 1.5rem;
   --mega-menu-feature-fade-duration: 0.15s;
   --mega-menu-feature-fade-ease: ease-out;
@@ -74,16 +76,29 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   left: 0;
   right: 0;
   top: 100%;
-  z-index: 4;
-  overflow: hidden;
+  z-index: 1;
+  overflow: visible;
   pointer-events: none;
   visibility: hidden;
   transition: visibility 0s linear var(--mega-menu-drawer-duration);
 }
 .liivv-archive-header .header-mega-menu-wrap.is-open {
+  z-index: 5;
   pointer-events: auto;
   visibility: visible;
   transition: visibility 0s;
+  /* Overlap the header bottom so the pointer can reach the panel from a nav pill. */
+  margin-top: calc(-1 * var(--mega-menu-hover-bridge));
+  padding-top: var(--mega-menu-hover-bridge);
+}
+/* Invisible bridge — padding box above the visible drawer (inside the header gap). */
+.liivv-archive-header .header-mega-menu-wrap.is-open::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: var(--mega-menu-hover-bridge);
 }
 .liivv-archive-header .header-mega-menu {
   background: rgb(var(--color-background));

@@ -6,6 +6,7 @@ import { Header } from '~/components/header';
 import './store-archive.css';
 
 import { DiabetesCareArchiveTheme } from '~/lib/archived-pages/diabetes-care-archive-theme';
+import { getStoreLogoFallback } from '~/lib/store-theme/get-store-logo-fallback';
 import { StoreThemeProvider } from '~/lib/store-theme/store-theme';
 import { SiteFeaturedColumnsFooter } from '~/lib/makeswift/components/site-featured-columns-footer';
 import { SiteHeaderSlideshow } from '~/lib/makeswift/components/site-header-slideshow';
@@ -20,12 +21,14 @@ export default async function DefaultLayout({ params, children }: Props) {
 
   setRequestLocale(locale);
 
+  const productImageFallbackLogo = await getStoreLogoFallback();
+
   return (
     <>
       {/* Archived Shopify section theme (scoped ids; utility collisions stripped in build). */}
       <link href="/archive/diabetes-care-sections.css" rel="stylesheet" />
       <DiabetesCareArchiveTheme>
-        <StoreThemeProvider>
+        <StoreThemeProvider theme={{ productImageFallbackLogo }}>
           <SiteHeaderSlideshow />
           <Header />
 

@@ -16,7 +16,9 @@ interface ParsedCounterValue {
 }
 
 function parseCounterValue(raw: string): ParsedCounterValue | null {
-  const normalized = raw.trim().replace(/,/g, '');
+  const normalized = String(raw ?? '')
+    .trim()
+    .replace(/,/g, '');
 
   if (normalized.length === 0) {
     return null;
@@ -81,35 +83,40 @@ export function AnimatedNumberCounter({
   value,
   durationSec = DEFAULT_DURATION_SEC,
 }: AnimatedNumberCounterProps) {
-  const parsed = useMemo(() => parseCounterValue(value), [value]);
-  const ref = useRef<HTMLSpanElement>(null);
+  const normalizedValue = String(value ?? '');
+  const parsed = useMemo(() => parseCounterValue(normalizedValue), [normalizedValue]);
+  const targetDisplay = useMemo(() => {
+    if (parsed == null) {
+      return normalizedValue;
+    }
+
+    return formatCounterValue(parsed.target, parsed.decimals);
+  }, [normalizedValue, parsed]);
+
+  const elementRef = useRef<HTMLSpanElement | null>(null);
   const hasStarted = useRef(false);
-  const [display, setDisplay] = useState(() =>
-    parsed != null ? formatCounterValue(0, parsed.decimals) : value,
-  );
+  const [display, setDisplay] = useState(targetDisplay);
+
+  // Makeswift often hydrates list item props after the first paint — keep the visible value in sync.
+  useEffect(() => {
+    hasStarted.current = false;
+    setDisplay(targetDisplay);
+  }, [targetDisplay]);
 
   useEffect(() => {
     if (parsed == null) {
-      setDisplay(value);
-
       return;
     }
 
-    const element = ref.current;
+    const element = elementRef.current;
 
     if (element == null) {
       return;
     }
 
-    const showFinal = (): void => {
-      setDisplay(formatCounterValue(parsed.target, parsed.decimals));
-    };
-
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (reducedMotion) {
-      showFinal();
-
       return;
     }
 
@@ -145,14 +152,14 @@ export function AnimatedNumberCounter({
       observer.disconnect();
       cancelCountUp?.();
     };
-  }, [durationSec, parsed, value]);
+  }, [durationSec, parsed, targetDisplay]);
 
   if (parsed == null) {
-    return <span>{value}</span>;
+    return <span>{normalizedValue}</span>;
   }
 
   return (
-    <span data-duration={String(durationSec)} ref={ref}>
+    <span data-duration={String(durationSec)} ref={elementRef}>
       {display}
     </span>
   );

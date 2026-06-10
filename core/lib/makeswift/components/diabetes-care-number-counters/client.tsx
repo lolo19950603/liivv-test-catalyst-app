@@ -88,18 +88,44 @@ export type CounterDescriptionStyleProps = {
 
 export type CounterNumberProps = CounterNumberStyleProps & {
   value?: string;
+  /** @deprecated Use `suffix`. */
   showPercentSuffix?: boolean;
+  suffix?: string;
 };
 
-/** Strip a trailing % so count-up animation still works when the suffix is shown separately. */
-function counterAnimatedValue(value: string, showPercentSuffix: boolean): string {
+function readCounterNumberValue(number?: CounterNumberProps | null): string {
+  const raw = number?.value;
+
+  if (raw == null) {
+    return '';
+  }
+
+  return String(raw).trim();
+}
+
+function resolveCounterSuffix(number?: CounterNumberProps | null): string {
+  if (number?.suffix != null) {
+    return String(number.suffix);
+  }
+
+  if (number?.showPercentSuffix === false) {
+    return '';
+  }
+
+  return '%';
+}
+
+/** Strip a trailing suffix so count-up animation still works when it is shown separately. */
+function counterAnimatedValue(value: string, suffix: string): string {
   const trimmed = value.trim();
 
-  if (!showPercentSuffix) {
+  if (suffix.length === 0) {
     return trimmed;
   }
 
-  return trimmed.replace(/%+\s*$/u, '');
+  const escaped = suffix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  return trimmed.replace(new RegExp(`${escaped}\\s*$`, 'u'), '').trim();
 }
 
 export type CounterTextBelowProps = CounterDescriptionStyleProps & {
@@ -120,21 +146,21 @@ export interface DiabetesCareNumberCountersProps {
 
 const DEFAULT_COUNTERS: DiabetesCareNumberCounterRow[] = [
   {
-    number: { value: '9.7', showPercentSuffix: true },
+    number: { value: '9.7', suffix: '%' },
     textBelow: { description: 'of Canadians live with diagnosed diabetes' },
   },
   {
-    number: { value: '6.3', showPercentSuffix: true },
+    number: { value: '6.3', suffix: '%' },
     textBelow: { description: 'of adults aged 20 to 79 years had prediabetes' },
   },
   {
-    number: { value: '60', showPercentSuffix: true },
+    number: { value: '60', suffix: '%' },
     textBelow: {
       description: 'of Canadians believe diabetes is caused only by lifestyle choices',
     },
   },
   {
-    number: { value: '40', showPercentSuffix: true },
+    number: { value: '40', suffix: '%' },
     textBelow: { description: 'of adults with Type 1 diabetes are initially misdiagnosed' },
   },
 ];
@@ -229,8 +255,8 @@ export function DiabetesCareNumberCounters({
       >
         {rows.map((row, index) => {
           const { valueStyle, descriptionStyle } = counterRowTypography(row);
-          const showPercentSuffix = row.number?.showPercentSuffix ?? true;
-          const numberValue = row.number?.value ?? '';
+          const suffix = resolveCounterSuffix(row.number);
+          const numberValue = readCounterNumberValue(row.number);
 
           return (
             <div
@@ -241,10 +267,8 @@ export function DiabetesCareNumberCounters({
                 className="counter-heading heading title-lg font-bold leading-none tracking-tight sm:whitespace-nowrap"
                 style={valueStyle}
               >
-                <AnimatedNumberCounter
-                  value={counterAnimatedValue(numberValue, showPercentSuffix)}
-                />
-                {showPercentSuffix ? '%' : null}
+                <AnimatedNumberCounter value={counterAnimatedValue(numberValue, suffix)} />
+                {suffix.length > 0 ? suffix : null}
               </p>
               <div
                 className="heading text-xl leading-snug tracking-tight sm:text-2xl sm:leading-none lg:text-3xl"

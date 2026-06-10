@@ -7,9 +7,12 @@ import { AccentSplitWordsHeading, ScrollReveal } from '~/lib/makeswift/diabetes-
 import {
   buildSectionTheme,
   resolveHeadingTypography,
+  type BodyTextProps,
   type HeadingWithHighlightProps,
   type SectionBackgroundProps,
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
+import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
+import { resolvePlainTextColor } from '~/lib/makeswift/utils/heading-accent-color';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 
 import { DIABETES_CARE_ARCHIVE_DEFAULT_LOGOS } from './archive-default-logos';
@@ -44,11 +47,18 @@ export interface DiabetesCareLogoListLogo {
   imageAlt?: string;
 }
 
+export type LogoListBodyProps = BodyTextProps & {
+  text?: string;
+  fontSize?: number;
+  fontSizeMobile?: number;
+};
+
 export type DiabetesCareLogoListProps = {
   className?: string;
   background?: SectionBackgroundProps;
   roundedTop?: boolean;
   heading?: HeadingWithHighlightProps;
+  body?: LogoListBodyProps;
   marquee?: {
     cycleDurationSeconds?: number;
     logoMaxHeightPx?: number;
@@ -98,11 +108,29 @@ function logosResolved(logos?: DiabetesCareLogoListLogo[]) {
   return expandLogosToMinimum(base, MIN_LOGOS_PER_STRIP);
 }
 
+function bodyStyle(body?: LogoListBodyProps | null): CSSProperties | undefined {
+  const color = resolvePlainTextColor({
+    textColor: body?.textColor,
+    textColorHex: body?.textColorHex,
+  });
+  const fontSize = resolveHeadingFontSizeCss(body?.fontSize, body?.fontSizeMobile);
+
+  if (color == null && fontSize == null) {
+    return undefined;
+  }
+
+  return {
+    ...(color != null ? { color } : {}),
+    ...(fontSize != null ? { fontSize } : {}),
+  };
+}
+
 export function DiabetesCareLogoList({
   className,
   background,
   roundedTop = true,
   heading,
+  body,
   marquee,
   logos,
 }: DiabetesCareLogoListProps) {
@@ -119,6 +147,7 @@ export function DiabetesCareLogoList({
     headingResolved.text.length > 0
       ? headingResolved.text
       : 'Trusted Brands, Made for Everyday Life';
+  const bodyCopy = body?.text?.trim() ?? '';
   const items = logosResolved(logos);
   const duration = Math.min(120, Math.max(2, marquee?.cycleDurationSeconds ?? 30));
 
@@ -497,6 +526,20 @@ export function DiabetesCareLogoList({
                     text={title}
                   />
                 </h2>
+                {bodyCopy.length > 0 ? (
+                  <div
+                    className="description rte subtext-md mx-auto max-w-3xl text-balance leading-normal"
+                    style={bodyStyle(body)}
+                  >
+                    {bodyCopy
+                      .split(/\n+/)
+                      .map((p) => p.trim())
+                      .filter((p) => p.length > 0)
+                      .map((p, i) => (
+                        <p key={`body-${i}`}>{p}</p>
+                      ))}
+                  </div>
+                ) : null}
               </div>
             </div>
 

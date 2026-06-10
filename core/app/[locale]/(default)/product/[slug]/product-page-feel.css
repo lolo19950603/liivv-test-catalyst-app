@@ -24,6 +24,14 @@
   color: var(--product-detail-primary-text, #312f2f) !important;
 }
 
+/* Catalog description subsection titles (e.g. "Product Details and Features") — Poppins, not theme serif */
+.liivv-product-page-feel .group\/product-description .prose :where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(
+    --product-detail-title-font-family,
+    var(--font-product-family, var(--font-body-family, Poppins, sans-serif))
+  );
+}
+
 /* Archive product-singular buy row (quantity pill + primary CTA) */
 .liivv-product-page-feel .buy-buttons {
   align-items: stretch;

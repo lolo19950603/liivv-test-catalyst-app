@@ -1,7 +1,7 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { useId, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useId, useRef, useState, type CSSProperties } from 'react';
 
 import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
 import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
@@ -54,6 +54,17 @@ function IconArrowRight() {
 
 const DEFAULT_BODY_HTML =
   '<p><em>"I got diagnosed in March of 2020 at age 20.</em></p><p><em>The first sign that something was wrong was in February where I was doing sprints on a treadmill to get ready for a soccer season and after finishing I felt sick and dizzy to where I might need to go to the hospital.</em></p><p><em>I thought maybe I just went "too hard" and I was upset because it meant that I was way out of shape for the upcoming soccer season. Then I was getting very thirsty and seeing my weight drop despite working out and bulking..."</em></p><p><strong>Sometimes the best resource is a conversation. Connect with community partners who have walked the path before you.</strong></p>';
+
+/** Headline + hero image share this cap; headline also syncs to rendered image width after load. */
+const REVEAL_COLUMN_MAX_WIDTH = 'min(70rem, 96vw)';
+const REVEAL_IMAGE_MAX_HEIGHT = 'min(95vh, 80rem)';
+
+/** Portrait default avoids landscape letterboxing before `img` onLoad (common for this section). */
+const DEFAULT_HERO_WIDTH = 900;
+const DEFAULT_HERO_HEIGHT = 1200;
+
+/** Banner headline when Makeswift font size is 0 (desktop only; mobile uses compact clamp). */
+const DEFAULT_BANNER_HEADING_FONT_SIZE_DESKTOP = 90;
 
 export type DiabetesCareRevealBannerImageProps = {
   heroImageSrc?: string;
@@ -142,22 +153,30 @@ export function DiabetesCareRevealImageWithText({
 
   /** Theme vars on the component root so reveal banner + image and rich text share background. */
   /** Shorter scroll runway on phone/tablet; portrait uses intrinsic ratio (no 16:9 crop). */
-  const revealMobileCss =
+  const revealSectionCss =
     `#${revealSectionId} .reveal-banner__scroller{z-index:1}` +
     `#${revealSectionId} [data-dc-scroll-reveal].section--padding{position:relative;z-index:2;background-color:rgb(var(--color-background))}` +
+    `#${revealSectionId} .reveal-banner .banner__box{min-width:0!important;width:100%;max-width:${REVEAL_COLUMN_MAX_WIDTH};margin-inline:auto}` +
+    `#${revealSectionId} .reveal-banner .splitting-wrapper,#${revealSectionId} .reveal-banner .splitting-wrapper h2,#${revealSectionId} .reveal-banner .split-words.words{max-width:100%}` +
+    `#${revealSectionId} .reveal-banner .split-words.words{display:inline-flex;flex-wrap:wrap;justify-content:center;text-wrap:balance}` +
+    `#${revealSectionId} .dcrift-reveal-media-wrap{display:flex;justify-content:center;width:100%}` +
+    `@media screen and (min-width:1024px){#${revealSectionId} .reveal-banner .splitting-wrapper h2.dcrift-banner-heading--default{font-size:${String(DEFAULT_BANNER_HEADING_FONT_SIZE_DESKTOP)}px;line-height:1.05;letter-spacing:-0.02em;text-wrap:balance}}` +
+    `@media screen and (max-width:1023px){#${revealSectionId} .reveal-banner .splitting-wrapper h2.dcrift-banner-heading--default{font-size:clamp(2rem,5.5vw,3.25rem);line-height:1.05;letter-spacing:-0.02em;text-wrap:balance}}` +
+    `@media screen and (min-width:1024px){#${revealSectionId} .dcrift-reveal-media.media--adapt{height:auto!important;width:fit-content!important;max-width:${REVEAL_COLUMN_MAX_WIDTH};margin-inline:auto;padding-block-end:0!important}` +
+    `#${revealSectionId} .dcrift-reveal-media.media--adapt>img{position:static!important;display:block;width:auto!important;height:auto!important;max-width:${REVEAL_COLUMN_MAX_WIDTH};max-height:${REVEAL_IMAGE_MAX_HEIGHT};margin-inline:auto;object-fit:contain!important;object-position:center center}}` +
     `@media screen and (max-width:1023px){#${revealSectionId} .splitting-banner .reveal-banner__scroller{position:sticky!important;top:0!important;height:100lvh!important;max-height:100dvh!important;overflow:hidden!important}` +
     `#${revealSectionId} .reveal-banner__tracker{inset-block-start:12%!important;height:72lvh!important}@supports (height:100lvh){#${revealSectionId} .reveal-banner__tracker{height:72lvh!important}}` +
     `#${revealSectionId} .reveal-banner .banner{height:100%!important;min-height:100%!important}}` +
     `@media screen and (max-width:500px){#${revealSectionId} .reveal-banner .banner__content .page-width--narrow{max-width:100%}` +
     `#${revealSectionId} .reveal-banner .banner__box{max-width:100%;margin-inline:auto}` +
-    `#${revealSectionId} .reveal-banner .splitting-wrapper h2.title-xl{font-size:clamp(1.625rem,6.5vw,2rem)!important;line-height:1.05!important;letter-spacing:-0.02em;text-wrap:balance}}` +
-    `#${revealSectionId} .dcrift-reveal-media.media--adapt{height:0;width:100%;padding-block-end:var(--ratio-percent,125%)}` +
+    `#${revealSectionId} .reveal-banner .splitting-wrapper h2.dcrift-banner-heading--default{font-size:clamp(1.5rem,6vw,2.125rem)!important;line-height:1.05!important;letter-spacing:-0.02em;text-wrap:balance}}` +
+    `#${revealSectionId} .dcrift-reveal-media.media--adapt{height:0;width:100%;padding-block-end:var(--ratio-percent,133.333%)}` +
     `#${revealSectionId} .dcrift-reveal-media.media--adapt>img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain!important;object-position:center center}` +
     `@media screen and (max-width:1023px){#${revealSectionId} .dcrift-reveal-media.mobile\\:media--wide>img,#${revealSectionId} .dcrift-reveal-media>img{aspect-ratio:unset!important}}`;
 
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: rootId,
-    sectionCss: `#${richSectionId}{--section-padding-top:72px;--section-padding-bottom:100px;--color-button-background:142 165 141;--color-button-border:142 165 141}${revealMobileCss}`,
+    sectionCss: `#${richSectionId}{--section-padding-top:72px;--section-padding-bottom:100px;--color-button-background:142 165 141;--color-button-border:142 165 141}${revealSectionCss}`,
     background,
     highlight: useStoryAccentSwash ? secondaryHeading : null,
     defaultBackgroundChannels: ARCHIVE_CREAM_BACKGROUND_CHANNELS,
@@ -169,14 +188,50 @@ export function DiabetesCareRevealImageWithText({
     bannerHeadline.text.length > 0 ? bannerHeadline.text : 'Meet Armaan...';
   const imageSrc = (bannerImage?.heroImageSrc ?? banner?.heroImageSrc)?.trim() ?? '';
   const imageAlt = (bannerImage?.heroImageAlt ?? banner?.heroImageAlt)?.trim() ?? '';
-  const imageWidth = 1200;
-  const imageHeight = 900;
+  const revealImageRef = useRef<HTMLImageElement>(null);
   const [imageRatioPercent, setImageRatioPercent] = useState(
-    `${String((imageHeight / imageWidth) * 100)}%`,
+    `${String((DEFAULT_HERO_HEIGHT / DEFAULT_HERO_WIDTH) * 100)}%`,
   );
+  const [revealColumnWidth, setRevealColumnWidth] = useState<number | null>(null);
   const revealMediaStyle = {
     '--ratio-percent': imageRatioPercent,
   } as CSSProperties;
+
+  const syncRevealColumnWidth = useCallback((img: HTMLImageElement) => {
+    if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+      setImageRatioPercent(`${String((img.naturalHeight / img.naturalWidth) * 100)}%`);
+    }
+
+    const width = Math.round(img.getBoundingClientRect().width);
+
+    if (width > 0) {
+      setRevealColumnWidth(width);
+    }
+  }, []);
+
+  useEffect(() => {
+    const img = revealImageRef.current;
+
+    if (img == null || imageSrc.length === 0) {
+      return;
+    }
+
+    if (img.complete && img.naturalWidth > 0) {
+      syncRevealColumnWidth(img);
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      if (revealImageRef.current != null) {
+        syncRevealColumnWidth(revealImageRef.current);
+      }
+    });
+
+    resizeObserver.observe(img);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [imageSrc, syncRevealColumnWidth]);
   const lead = storyLead.text.length > 0 ? storyLead.text : 'You Are';
   const headingEmphasis = storyAccent.text.length > 0 ? storyAccent.text : 'Not Alone...';
   const bodyHtml =
@@ -222,6 +277,8 @@ export function DiabetesCareRevealImageWithText({
           ...(bannerHeadingFontSize != null ? { fontSize: bannerHeadingFontSize } : {}),
         }
       : undefined;
+  const revealHeadlineBoxStyle: CSSProperties | undefined =
+    revealColumnWidth != null ? { maxWidth: revealColumnWidth } : undefined;
 
   return (
     <div
@@ -239,10 +296,16 @@ export function DiabetesCareRevealImageWithText({
                 <div className="banner relative h-full min-h-[100dvh] w-full md:h-screen">
                   <div className="banner__content left-0 h-full w-full overflow-hidden">
                     <div className="page-width page-width--narrow flex h-full w-full items-center justify-center px-4 sm:px-5 md:px-0">
-                      <div className="banner__box banner__box--large text-center">
+                      <div
+                        className="banner__box banner__box--large text-center"
+                        style={revealHeadlineBoxStyle}
+                      >
                         <div className="splitting-wrapper relative">
                           <h2
-                            className="heading title-xl tracking-heading splitting words chars leading-none"
+                            className={clsx(
+                              'heading title-lg tracking-heading splitting words chars leading-none',
+                              !hasBannerDesktopFont && 'dcrift-banner-heading--default',
+                            )}
                             style={bannerHeadingStyle}
                           >
                             <SplitWordsHeading text={title} />
@@ -255,28 +318,23 @@ export function DiabetesCareRevealImageWithText({
               </div>
               <ScrollReveal className="section--padding relative w-full" delayMs={80}>
                 {imageSrc.length > 0 ? (
-                  <div className="page-width page-width--narrow relative mx-auto w-full px-4 sm:px-5 md:px-0">
+                  <div className="dcrift-reveal-media-wrap page-width page-width--narrow relative mx-auto w-full px-4 sm:px-5 md:px-0">
                     <picture
-                      className="dcrift-reveal-media reveal-banner__cover-media media media--adapt media--transparent relative block w-full overflow-hidden rounded-3xl"
+                      className="dcrift-reveal-media reveal-banner__cover-media media media--adapt media--transparent relative mx-auto block max-w-full overflow-hidden rounded-3xl"
                       style={revealMediaStyle}
                     >
                       <img
                         alt={imageAlt}
-                        className="h-full w-full"
-                        height={imageHeight}
+                        className="mx-auto block h-auto max-w-full"
+                        height={DEFAULT_HERO_HEIGHT}
                         loading="lazy"
                         onLoad={(event) => {
-                          const img = event.currentTarget;
-
-                          if (img.naturalWidth > 0 && img.naturalHeight > 0) {
-                            setImageRatioPercent(
-                              `${String((img.naturalHeight / img.naturalWidth) * 100)}%`,
-                            );
-                          }
+                          syncRevealColumnWidth(event.currentTarget);
                         }}
-                        sizes="(max-width: 768px) 100vw, min(720px, 90vw)"
+                        ref={revealImageRef}
+                        sizes="(max-width: 768px) 100vw, min(70rem, 96vw)"
                         src={imageSrc}
-                        width={imageWidth}
+                        width={DEFAULT_HERO_WIDTH}
                       />
                     </picture>
                   </div>

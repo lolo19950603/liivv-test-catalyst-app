@@ -19,7 +19,14 @@ type ShopifyThemeStyle = CSSProperties & Record<string, string | number | undefi
 const CUSTOM_SECTION_ID = 'shopify-section-template--26520397447459__custom_section_WpXaJg';
 
 function buildCustomSectionStyle(backgroundChannels: string): string {
-  return `#${CUSTOM_SECTION_ID}{--section-padding-top:32px;--section-padding-bottom:32px;--color-background:${backgroundChannels}}@media screen and (max-width: 767px){#${CUSTOM_SECTION_ID}{--section-padding-top:24px;--section-padding-bottom:24px}}`;
+  const root = `#${CUSTOM_SECTION_ID}`;
+
+  return (
+    `${root}{--section-padding-top:32px;--section-padding-bottom:32px;--color-background:${backgroundChannels}}` +
+    `${root} .highlighted-text[data-style=text]{font-weight:inherit}` +
+    `${root} .highlighted-text[data-style=text] strong{font-weight:inherit}` +
+    `@media screen and (max-width: 767px){${root}{--section-padding-top:24px;--section-padding-bottom:24px}}`
+  );
 }
 
 const sectionContentGapStyle: ShopifyThemeStyle = {

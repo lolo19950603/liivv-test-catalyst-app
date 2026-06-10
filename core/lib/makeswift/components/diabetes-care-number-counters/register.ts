@@ -1,5 +1,4 @@
 import {
-  Checkbox,
   Color,
   Group,
   List,
@@ -96,11 +95,12 @@ runtime.registerComponent(DiabetesCareNumberCounters, {
               value: TextInput({
                 label: 'Number',
                 defaultValue: '9.7',
-                description: 'Numeric value only; use the checkbox below to append %.',
+                description: 'Numeric value for the count-up. Add symbols in “Suffix after number”.',
               }),
-              showPercentSuffix: Checkbox({
-                label: 'Show % after number',
-                defaultValue: true,
+              suffix: TextInput({
+                label: 'Suffix after number',
+                defaultValue: '%',
+                description: 'Optional text after the number (e.g. %, +, x). Leave empty for none.',
               }),
               ...counterNumberStyleFields(),
             },

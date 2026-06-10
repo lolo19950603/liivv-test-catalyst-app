@@ -608,11 +608,6 @@ export default async function Product({ params, searchParams }: Props) {
         </ProductAnalyticsProvider>
       </div>
 
-      <Slot
-        label="Product (all products) — between detail and related"
-        snapshotId="product-page-mid-content"
-      />
-
       <FeaturedProductCarousel
         appearance="liivv-archive"
         emptyStateSubtitle={t('RelatedProducts.browseCatalog')}
@@ -622,6 +617,11 @@ export default async function Product({ params, searchParams }: Props) {
         products={streameableRelatedProducts}
         scrollbarLabel={t('RelatedProducts.scrollbar')}
         title={t('RelatedProducts.title')}
+      />
+
+      <Slot
+        label="Product (all products) — between related and reviews"
+        snapshotId="product-page-mid-content"
       />
 
       {showRating && (

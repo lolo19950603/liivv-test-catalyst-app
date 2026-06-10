@@ -146,7 +146,8 @@ export function HealthImagesWithText({
             <div
               className={clsx(
                 'image-with-text flex flex-col gap-8 overflow-hidden lg:gap-10',
-                layoutReverse && 'image-with-text--reverse',
+                layoutReverse && showImages && 'image-with-text--reverse',
+                !showImages && 'image-with-text--no-media',
               )}
             >
               {showImages ? (
@@ -175,7 +176,7 @@ export function HealthImagesWithText({
                 </div>
               ) : null}
               <div className="image-with-text__item image-with-text__content image-with-text__content-col relative z-[1] flex shrink-0 flex-col justify-center">
-                <div className="rich-text relative z-[1] text-left lg:text-left">
+                <div className="rich-text relative z-[1] text-left">
                   {subheadingText.length > 0 ? (
                     <p
                       className="banner__subheading banner__text--colored subtitle-md heading mb-3 uppercase leading-none tracking-widest"

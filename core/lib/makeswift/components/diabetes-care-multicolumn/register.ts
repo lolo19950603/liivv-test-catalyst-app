@@ -7,6 +7,7 @@ import {
   roundedTopControl,
   sectionBackgroundControls,
   splitHeadingPopoverControls,
+  textAlignField,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
@@ -63,30 +64,44 @@ runtime.registerComponent(DiabetesCareMulticolumn, {
     className: Style(),
     ...sectionBackgroundControls(ARCHIVE_SAGE_BACKGROUND_HSL),
     ...roundedTopControl(),
+    topHeading: Group({
+      label: 'Top heading',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        text: TextInput({
+          label: 'Text (optional line above heading)',
+          defaultValue: '',
+        }),
+        ...textColorFields(),
+        ...fontSizeFields(),
+        ...textAlignField('center'),
+      },
+    }),
     ...splitHeadingPopoverControls({
       primaryLabel: 'Primary heading',
       secondaryLabel: 'Secondary heading (swash)',
       primaryDefault: 'Diabetes is a',
       secondaryDefault: 'journey.',
       secondarySwashTransparentByDefault: true,
+      includeTextAlign: true,
     }),
     intro: Group({
       label: 'Intro body',
       preferredLayout: Group.Layout.Popover,
       props: {
         body: TextArea({
-          label: 'Text',
-          defaultValue:
-            'Add a short supporting paragraph here. Line breaks become separate paragraphs.',
+          label: 'Text (optional, below heading)',
+          defaultValue: '',
         }),
         ...textColorFields(),
         ...fontSizeFields(),
+        ...textAlignField('center'),
       },
     }),
     columns: List({
-      label: 'Columns (max 4; order = left to right on desktop)',
+      label: 'Columns (4 per row on desktop; order = left to right)',
       description:
-        'Add up to 4 columns. The builder may allow more, but only the first four render on the site.',
+        'Add as many columns as needed. On desktop they display four per row; additional columns wrap to the next row.',
       type: Group({
         label: 'Column',
         props: {

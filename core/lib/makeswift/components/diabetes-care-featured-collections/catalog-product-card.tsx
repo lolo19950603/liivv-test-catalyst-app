@@ -1,12 +1,13 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import useSWR from 'swr';
 import { z } from 'zod';
 
-import type { Product } from '@/vibes/soul/primitives/product-card';
+import type { Product, ProductImageFallbackLogo } from '@/vibes/soul/primitives/product-card';
 import { Image } from '~/components/image';
+import { useStoreLogoFallback } from '~/lib/makeswift/utils/use-store-logo-fallback';
 import bcCdnImageLoader from '~/lib/cdn-image-loader';
 import {
   BcProductSchema,
@@ -27,7 +28,7 @@ function formatProductPrice(price: Product['price']): string {
 
   switch (price.type) {
     case 'range': {
-      return `${price.minValue} – ${price.maxValue}`;
+      return `${price.minValue} - ${price.maxValue}`;
     }
 
     case 'sale': {
@@ -56,6 +57,94 @@ export function resolveBcProductImageUrl(url: string, width = 640): string {
 
 export { comboboxEntityIdFromMakeswift };
 
+function CatalogProductCardMedia({
+  altText,
+  fallbackLogo,
+  fallbackLogoLoading,
+  imgRaw,
+  mediaOverlay,
+  safeHref,
+  title,
+}: {
+  altText: string;
+  fallbackLogo: ProductImageFallbackLogo | null;
+  fallbackLogoLoading: boolean;
+  imgRaw: string;
+  mediaOverlay?: ReactNode;
+  safeHref: string;
+  title: string;
+}) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const hasProductImage = imgRaw.length > 0 && !imageFailed;
+  const hasLogoImage = fallbackLogo?.src != null && fallbackLogo.src.length > 0;
+  const hasLogoText = fallbackLogo?.text != null && fallbackLogo.text.length > 0;
+  const showMedia =
+    hasProductImage || hasLogoImage || hasLogoText || fallbackLogoLoading || mediaOverlay != null;
+
+  if (!showMedia) {
+    return null;
+  }
+
+  const mediaClassName =
+    'media media--square fc-product-card-media relative block aspect-square size-full max-w-full overflow-hidden bg-[rgb(var(--color-base-background))]';
+
+  const overlay =
+    mediaOverlay != null ? (
+      <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-between px-3">
+        {mediaOverlay}
+      </div>
+    ) : null;
+
+  const mediaContent = hasProductImage ? (
+    <Image
+      alt={altText}
+      className="object-cover object-center"
+      fill
+      onError={() => {
+        setImageFailed(true);
+      }}
+      sizes="(max-width: 768px) 100vw, (max-width: 1023px) 100vw, 288px"
+      src={imgRaw}
+    />
+  ) : hasLogoImage ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      alt={fallbackLogo?.alt ?? title}
+      className="fc-product-card-logo absolute inset-0 size-full object-contain object-center p-6"
+      src={fallbackLogo.src}
+    />
+  ) : hasLogoText ? (
+    <span
+      aria-hidden
+      className="absolute inset-0 flex items-center justify-center p-6 text-center text-lg font-semibold leading-none sm:text-xl"
+    >
+      {fallbackLogo?.text}
+    </span>
+  ) : fallbackLogoLoading ? (
+    <span aria-hidden className="absolute inset-0 animate-pulse bg-zinc-200/60" />
+  ) : null;
+
+  if (safeHref.length > 0) {
+    return (
+      <div className="product-card__media relative w-full">
+        <a aria-hidden className={mediaClassName} href={safeHref} tabIndex={-1}>
+          {overlay}
+          {mediaContent}
+        </a>
+      </div>
+    );
+  }
+
+  return (
+    <div className="product-card__media relative w-full">
+      <div className={mediaClassName}>
+        {overlay}
+        {mediaContent}
+      </div>
+    </div>
+  );
+}
+
 export function DiabetesCareCatalogProductCard({
   entityId,
   mediaOverlay,
@@ -67,6 +156,7 @@ export function DiabetesCareCatalogProductCard({
   const id = comboboxEntityIdFromMakeswift(entityId);
   const locale = useLocale();
   const bcToVibes = useBcProductToVibesProduct();
+  const { fallbackLogo, isLoading: fallbackLogoLoading } = useStoreLogoFallback();
 
   const { data, error, isLoading } = useSWR<BcProductData, Error>(
     id.length > 0 ? `/api/products/${id}?locale=${locale}` : null,
@@ -84,7 +174,7 @@ export function DiabetesCareCatalogProductCard({
   );
 
   const cardShell = (children: ReactNode) => (
-    <div className="card product-card product-card--card fc-product-card relative flex flex-col leading-none opacity-100 [--motion-translateY:0px] [visibility:visible]">
+    <div className="card product-card product-card--card fc-product-card relative flex h-full flex-col leading-none opacity-100 [--motion-translateY:0px] [visibility:visible]">
       {children}
     </div>
   );
@@ -128,41 +218,19 @@ export function DiabetesCareCatalogProductCard({
 
   return cardShell(
     <>
-      <div className="product-card__media relative w-full">
-        {imgRaw.length > 0 ? (
-          <a
-            aria-hidden
-            className="media media--square fc-product-card-media relative block aspect-square size-full max-w-full overflow-hidden bg-[rgb(var(--color-base-background))]"
-            href={safeHref}
-            tabIndex={-1}
-          >
-            {mediaOverlay != null ? (
-              <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-between px-3">
-                {mediaOverlay}
-              </div>
-            ) : null}
-            <Image
-              alt={altText}
-              className="object-cover object-center"
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1023px) 100vw, 288px"
-              src={imgRaw}
-            />
-          </a>
-        ) : (
-          mediaOverlay != null ? (
-            <div className="media media--square fc-product-card-media relative block aspect-square size-full max-w-full overflow-hidden bg-[rgb(var(--color-base-background))]">
-              <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-between px-3">
-                {mediaOverlay}
-              </div>
-            </div>
-          ) : null
-        )}
-      </div>
-      <div className="product-card__content flex w-full grow flex-col justify-start text-center">
-        {vendor.length > 0 ? (
-          <div className="product-card__top w-full">
-            {vendorHrefRaw.length > 0 ? (
+      <CatalogProductCardMedia
+        altText={altText}
+        fallbackLogo={fallbackLogo}
+        fallbackLogoLoading={fallbackLogoLoading}
+        imgRaw={imgRaw}
+        mediaOverlay={mediaOverlay}
+        safeHref={safeHref}
+        title={title}
+      />
+      <div className="product-card__content flex w-full grow flex-col justify-start gap-2 p-4 pt-3 text-center">
+        <div className="product-card__top w-full min-h-[1.25rem]">
+          {vendor.length > 0 ? (
+            vendorHrefRaw.length > 0 ? (
               <a
                 className="caption reversed-link uppercase leading-none tracking-widest"
                 href={vendorHrefRaw}
@@ -176,9 +244,13 @@ export function DiabetesCareCatalogProductCard({
                 <span className="sr-only">Vendor:</span>
                 {vendor}
               </span>
-            )}
-          </div>
-        ) : null}
+            )
+          ) : (
+            <span aria-hidden className="caption block uppercase leading-none tracking-widest opacity-0">
+              &nbsp;
+            </span>
+          )}
+        </div>
         <div className="product-card__details flex w-full min-w-0 flex-col items-baseline gap-2 lg:flex-row">
           <p className="min-w-0 grow">
             <a

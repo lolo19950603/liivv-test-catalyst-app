@@ -13,6 +13,8 @@ import './components/customer-group-slot/register';
 import './components/product-card/register';
 import './components/product-detail/register';
 import './components/products-carousel/register';
+import './components/category-grid/register';
+import './components/category-products-list/register';
 import './components/products-list/register';
 import './components/section/register';
 import './components/site-featured-columns-footer/register';

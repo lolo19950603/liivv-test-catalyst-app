@@ -1,9 +1,11 @@
-import { Group, Image, List, Number, Style, TextInput } from '@makeswift/runtime/controls';
+import { Group, Image, List, Number, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
 import {
+  fontSizeFields,
   headingPopoverControls,
   roundedTopControl,
   sectionBackgroundControls,
+  textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
@@ -27,6 +29,18 @@ runtime.registerComponent(DiabetesCareLogoList, {
       textDefault: 'Trusted by leading organizations',
       includeHighlightSwash: true,
       highlightDefault: ARCHIVE_HIGHLIGHT_SWASH_HSL,
+    }),
+    body: Group({
+      label: 'Body',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        text: TextArea({
+          label: 'Text (optional, below heading)',
+          defaultValue: '',
+        }),
+        ...textColorFields(),
+        ...fontSizeFields(),
+      },
     }),
     marquee: Group({
       label: 'Marquee',

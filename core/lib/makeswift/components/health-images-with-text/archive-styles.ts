@@ -26,7 +26,9 @@ export function healthImagesWithTextSectionCss(sectionId: string): string {
     `${root} .image-with-text__media:not(.with-2nd-image) .image-with-text__image-first{width:100%}` +
     `${root} .image-with-text__item.image-with-text__media-col{flex:0 0 50%;width:50%;max-width:50%}` +
     `${root} .image-with-text__item.image-with-text__content-col{flex:0 0 50%;width:50%;max-width:50%}` +
-    `@media screen and (max-width:1023px){${root} .image-with-text__item .rich-text{padding-block-start:var(--sp-10,2.5rem)}${root} .image-with-text__item.image-with-text__media-col{width:100%;max-width:100%;margin-inline:auto}${root} .image-with-text__item.image-with-text__content-col{width:100%;max-width:100%;flex-basis:100%}}` +
+    `${root} .image-with-text--no-media{justify-content:center}` +
+    `${root} .image-with-text--no-media .image-with-text__content-col{flex:0 0 100%;width:100%;max-width:42rem;margin-inline:auto}` +
+    `@media screen and (max-width:1023px){${root} .image-with-text__item .rich-text{padding-block-start:var(--sp-10,2.5rem)}${root} .image-with-text--no-media .image-with-text__item .rich-text{padding-block-start:0}${root} .image-with-text__item.image-with-text__media-col{width:100%;max-width:100%;margin-inline:auto}${root} .image-with-text__item.image-with-text__content-col{width:100%;max-width:100%;flex-basis:100%}}` +
     `@media screen and (min-width:1024px){${root} .image-with-text{flex-direction:row;gap:0}${root} .image-with-text.image-with-text--reverse{flex-direction:row-reverse}${root} .image-with-text .rich-text>*+*:not(.spacing-section){margin-block-start:var(--sp-10,2.5rem)}${root} .image-with-text__item+.image-with-text__item .rich-text{padding-inline-start:var(--grid-gap,3rem)}${root} .image-with-text.image-with-text--reverse .image-with-text__item+.image-with-text__item .rich-text{padding-inline-start:0;padding-inline-end:var(--grid-gap,3rem)}${root} .image-with-text__media.with-2nd-image{padding-inline:calc(var(--grid-gap,3rem)/2)}${root} .image-with-text__image-second{width:40%}}`
   );
 }

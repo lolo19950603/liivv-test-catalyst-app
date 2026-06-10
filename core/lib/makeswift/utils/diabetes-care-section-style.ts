@@ -23,6 +23,7 @@ export type HeadingTypographyProps = {
   textColorHex?: string;
   fontSize?: number;
   fontSizeMobile?: number;
+  textAlign?: 'left' | 'center' | 'right';
 };
 
 export type BodyTextProps = {
