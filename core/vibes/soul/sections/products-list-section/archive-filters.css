@@ -5,10 +5,25 @@
   --checkbox-light-checked-background: var(--foreground);
   --checkbox-light-checked-icon: 30 29% 96%;
   --checkbox-light-unchecked-background: 30 29% 96%;
+  --font-family-body: var(--liivv-archive-sans-font, var(--font-product-family, var(--font-body-family, Poppins, sans-serif)));
+  --accordion-title-font-family: var(--liivv-archive-sans-font, var(--font-product-family, var(--font-body-family, Poppins, sans-serif)));
+  --accordion-content-font-family: var(--liivv-archive-sans-font, var(--font-product-family, var(--font-body-family, Poppins, sans-serif)));
+  --button-font-family: var(--liivv-archive-sans-font, var(--font-product-family, var(--font-body-family, Poppins, sans-serif)));
+  --checkbox-font-family: var(--liivv-archive-sans-font, var(--font-product-family, var(--font-body-family, Poppins, sans-serif)));
 
   background-color: #f7f3f0;
   border-radius: 0.25rem;
+  font-family: var(--liivv-archive-sans-font, var(--font-product-family, var(--font-body-family, Poppins, sans-serif)));
   padding: 1rem 1.125rem;
+}
+
+.liivv-archive-filters__group-heading {
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
 }
 
 .liivv-archive-filters .liivv-archive-filter-option [role='checkbox'] {

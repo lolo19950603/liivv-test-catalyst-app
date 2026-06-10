@@ -190,7 +190,16 @@ export function FiltersPanelInner({
     >
       {linkGroupFilters.map((linkGroup, index) => (
         <div key={index.toString()}>
-          <h3 className="py-4 font-mono text-sm uppercase text-contrast-400">{linkGroup.label}</h3>
+          <h3
+            className={clsx(
+              'py-4 text-contrast-400',
+              isArchive
+                ? 'liivv-archive-filters__group-heading'
+                : 'font-mono text-sm uppercase',
+            )}
+          >
+            {linkGroup.label}
+          </h3>
           <ul>
             {linkGroup.links.map((link, linkIndex) => (
               <li className="py-2" key={linkIndex.toString()}>
@@ -275,7 +284,7 @@ export function FiltersPanelInner({
 
             case 'range':
               return (
-                <AccordionItem key={key} title={filter.label} value={value}>
+                <AccordionItem key={key} title={filter.label} value={value} variant={accordionVariant}>
                   <RangeInput
                     applyLabel={rangeFilterApplyLabel}
                     disabled={filter.disabled}

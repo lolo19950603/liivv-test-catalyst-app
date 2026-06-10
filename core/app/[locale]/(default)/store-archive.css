@@ -10,11 +10,20 @@ html {
   --store-secondary-text: #66605c;
   --store-border: rgba(49, 47, 47, 0.18);
   --store-surface: 245 242 237;
+  --liivv-archive-sans-font: var(--font-product-family, var(--font-body-family, Poppins, sans-serif));
   /* Breadcrumb hover underline matches text, not Catalyst primary green */
   --breadcrumbs-hover: hsl(var(--foreground));
 }
 
-.liivv-store .group\/products-list-section h1,
+.liivv-store .group\/products-list-section h1 {
+  color: var(--store-primary-text);
+  font-family: var(--liivv-archive-sans-font);
+}
+
+.liivv-store .liivv-catalog-toolbar {
+  font-family: var(--liivv-archive-sans-font);
+}
+
 .liivv-store .group\/blog-section h1,
 .liivv-store .group\/blog-post h1,
 .liivv-store .group\/cart h1,
@@ -26,6 +35,10 @@ html {
 .liivv-store .group\/products-list-section h1 .text-contrast-300,
 .liivv-store .group\/blog-section .text-contrast-300 {
   color: var(--store-secondary-text) !important;
+}
+
+.liivv-store .group\/products-list-section {
+  --breadcrumbs-font-family: var(--liivv-archive-sans-font);
 }
 
 .liivv-store .group\/products-list-section,
