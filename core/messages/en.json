@@ -191,6 +191,7 @@
       "dashboard": "Dashboard",
       "logout": "Logout",
       "orders": "Orders",
+      "subscriptions": "Subscriptions",
       "settings": "Account",
       "wishlists": "Wish lists"
     },
@@ -250,6 +251,43 @@
             "description": "Track and review your health metrics in one place."
           }
         }
+      }
+    },
+    "Subscriptions": {
+      "title": "Subscriptions",
+      "manage": "Manage billing",
+      "browsePlans": "Browse plans",
+      "customPricing": "Custom pricing",
+      "renewsOn": "Renews on {date}",
+      "cancelAtPeriodEnd": "Cancels at period end",
+      "empty": {
+        "title": "You don't have any subscriptions",
+        "description": "Subscribe to a plan to get started with recurring deliveries and billing."
+      },
+      "intervals": {
+        "day": "per day",
+        "week": "per week",
+        "month": "per month",
+        "year": "per year",
+        "dayPlural": "every {count} days",
+        "weekPlural": "every {count} weeks",
+        "monthPlural": "every {count} months",
+        "yearPlural": "every {count} years"
+      },
+      "status": {
+        "active": "Active",
+        "trialing": "Trialing",
+        "past_due": "Past due",
+        "canceled": "Canceled",
+        "unpaid": "Unpaid",
+        "incomplete": "Incomplete",
+        "incomplete_expired": "Expired",
+        "paused": "Paused"
+      },
+      "errors": {
+        "notConfigured": "Subscriptions are not configured yet.",
+        "customerNotFound": "We could not find your account.",
+        "noStripeCustomer": "No billing profile found. Subscribe to a plan first."
       }
     },
     "Orders": {
@@ -572,6 +610,39 @@
     "missingCart": "Cart not found. Please try again later.",
     "unknownError": "Unknown error. Please try again later."
   },
+  "Subscribe": {
+    "title": "Subscribe",
+    "description": "Choose a subscription plan for recurring billing and deliveries.",
+    "subscribe": "Subscribe",
+    "loginToSubscribe": "Log in to subscribe",
+    "customPricing": "Custom pricing",
+    "empty": {
+      "title": "No subscription plans available",
+      "description": "Create recurring prices in your Stripe Dashboard to show plans here."
+    },
+    "intervals": {
+      "day": "per day",
+      "week": "per week",
+      "month": "per month",
+      "year": "per year",
+      "dayPlural": "every {count} days",
+      "weekPlural": "every {count} weeks",
+      "monthPlural": "every {count} months",
+      "yearPlural": "every {count} years"
+    },
+    "errors": {
+      "notConfigured": "Subscriptions are not configured yet.",
+      "invalidPlan": "Please select a valid subscription plan.",
+      "unavailablePrice": "This product does not have a valid price for subscription.",
+      "customerNotFound": "We could not find your account."
+    },
+    "Success": {
+      "title": "Subscription started",
+      "description": "Thank you! Your subscription is being set up. You can manage billing anytime from your account.",
+      "viewSubscriptions": "View subscriptions",
+      "continueShopping": "Continue shopping"
+    }
+  },
   "Product": {
     "ProductDetails": {
       "quantity": "Quantity",
@@ -590,6 +661,14 @@
       "backorderQuantity": "{quantity, number} will be on backorder",
       "loadingMoreImages": "Loading more images",
       "imagesLoaded": "{count, plural, =1 {1 more image loaded} other {# more images loaded}}",
+      "subscribe": "Subscribe",
+      "loginToSubscribe": "Log in to subscribe",
+      "subscriptionPanelTitle": "Subscribe",
+      "subscriptionPanelDescription": "Recurring delivery on your schedule. Cancel anytime.",
+      "subscriptionInterval": "Billing",
+      "subscriptionIntervalHint": "Choose how often you are billed.",
+      "subscriptionStartDate": "Starts",
+      "subscriptionStartDateHint": "Leave as today to start immediately, or pick a future date.",
       "Submit": {
         "addToCart": "Add to cart",
         "outOfStock": "Out of stock",
@@ -642,6 +721,11 @@
           "ratingTooLarge": "Rating must be at most 5"
         }
       }
+    },
+    "errors": {
+      "notConfigured": "Subscriptions are not configured yet.",
+      "invalidPlan": "This product is not available for subscription.",
+      "customerNotFound": "We could not find your account."
     }
   },
   "WebPages": {

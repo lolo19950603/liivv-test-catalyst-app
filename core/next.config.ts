@@ -1,7 +1,12 @@
+import { loadEnvConfig } from '@next/env';
 import createWithMakeswift from '@makeswift/runtime/next/plugin';
 import bundleAnalyzer from '@next/bundle-analyzer';
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
+import path from 'path';
+
+loadEnvConfig(path.join(process.cwd(), '..'));
+loadEnvConfig(process.cwd());
 
 import { writeBuildConfig } from './build-config/writer';
 import { client } from './client';

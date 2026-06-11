@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "npm run generate && next dev",
-    "generate": "dotenv -e .env.local -- node ./scripts/generate.cjs && node ./scripts/extract-diabetes-care-head-css.cjs && node ./scripts/extract-diabetes-care-header-css.cjs && node ./scripts/build-diabetes-care-sections-css.cjs",
+    "generate": "dotenv -e ../.env.local -e .env.local -- node ./scripts/generate.cjs && node ./scripts/extract-diabetes-care-head-css.cjs && node ./scripts/extract-diabetes-care-header-css.cjs && node ./scripts/build-diabetes-care-sections-css.cjs",
     "extract:diabetes-care-head-css": "node ./scripts/extract-diabetes-care-head-css.cjs",
     "extract:diabetes-care-header-css": "node ./scripts/extract-diabetes-care-header-css.cjs",
     "build:diabetes-care-sections-css": "node ./scripts/build-diabetes-care-sections-css.cjs",
@@ -81,6 +81,7 @@
     "set-cookie-parser": "^2.7.1",
     "sharp": "^0.33.5",
     "sonner": "^1.7.4",
+    "stripe": "^22.2.0",
     "swr": "^2.2.5",
     "tailwindcss-radix": "^3.0.5",
     "uuid": "^11.1.0",

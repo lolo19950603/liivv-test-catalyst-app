@@ -23,6 +23,7 @@ export default async function Layout({ children, params }: Props) {
           links={[
             { href: '/account/dashboard/', label: t('dashboard') },
             { href: '/account/orders/', label: t('orders') },
+            { href: '/account/subscriptions/', label: t('subscriptions') },
             { href: '/account/addresses/', label: t('addresses') },
             { href: '/account/settings/', label: t('settings') },
             { href: '/account/wishlists/', label: t('wishlists') },

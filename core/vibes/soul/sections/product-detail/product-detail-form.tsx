@@ -16,6 +16,7 @@ import { createSerializer, parseAsString, useQueryStates } from 'nuqs';
 import {
   ReactNode,
   startTransition,
+  Suspense,
   useActionState,
   useCallback,
   useEffect,
@@ -41,8 +42,9 @@ import { toast } from '@/vibes/soul/primitives/toaster';
 import { useEvents } from '~/components/analytics/events';
 import { usePathname, useRouter } from '~/i18n/routing';
 
-import { ArchiveQuantityInput, ArchiveSubmitButton } from './archive-buy-row';
 import { revalidateCart } from './actions/revalidate-cart';
+import { ArchiveQuantityInput, ArchiveSubmitButton } from './archive-buy-row';
+import { ProductSubscribeAction, ProductSubscribeButton } from './product-subscribe-button';
 import { Field, schema, SchemaRawShape } from './schema';
 
 export type ProductDetailBuyRowVariant = 'default' | 'archive';
@@ -87,6 +89,21 @@ export interface ProductDetailFormProps<F extends Field> {
   stockDisplayData?: StockDisplayData;
   backorderDisplayData?: BackorderDisplayData;
   buyRowVariant?: ProductDetailBuyRowVariant;
+  showSubscribe?: boolean;
+  productPath?: string;
+  subscribeLabel?: string;
+  subscribeLoginLabel?: string;
+  subscribeLoginHref?: string;
+  isLoggedIn?: boolean;
+  subscribeAction?: ProductSubscribeAction;
+  subscriptionIntervalLabel?: string;
+  subscriptionIntervalHint?: string;
+  subscriptionIntervalOptions?: Array<{ value: string; label: string }>;
+  subscriptionStartDateLabel?: string;
+  subscriptionStartDateHint?: string;
+  subscriptionStartDateMin?: string;
+  subscriptionStartDateMax?: string;
+  subscriptionStartDateDefault?: string;
 }
 
 export type ProductDetailFormHydrationGateProps<F extends Field> = ProductDetailFormProps<F> & {
@@ -131,6 +148,21 @@ export function ProductDetailForm<F extends Field>({
   stockDisplayData,
   backorderDisplayData,
   buyRowVariant = 'default',
+  showSubscribe = false,
+  productPath,
+  subscribeLabel,
+  subscribeLoginLabel,
+  subscribeLoginHref,
+  isLoggedIn = false,
+  subscribeAction,
+  subscriptionIntervalLabel,
+  subscriptionIntervalHint,
+  subscriptionIntervalOptions,
+  subscriptionStartDateLabel,
+  subscriptionStartDateHint,
+  subscriptionStartDateMin,
+  subscriptionStartDateMax,
+  subscriptionStartDateDefault,
 }: ProductDetailFormProps<F>) {
   const router = useRouter();
   const pathname = usePathname();
@@ -339,39 +371,159 @@ export function ProductDetailForm<F extends Field>({
           </div>
 
           {buyRowVariant === 'archive' ? (
-            <div className="buy-buttons back-in-stock flex w-full flex-wrap items-center gap-4">
-              <ArchiveQuantityInput
-                decrementLabel={decrementLabel}
-                formField={formFields.quantity}
-                incrementLabel={incrementLabel}
-                max={maxQuantity ?? undefined}
-                min={minQuantity ?? 1}
+            <div className="flex w-full flex-col gap-4">
+              <div className="buy-buttons back-in-stock flex w-full flex-wrap items-center gap-4">
+                <ArchiveQuantityInput
+                  decrementLabel={decrementLabel}
+                  formField={formFields.quantity}
+                  incrementLabel={incrementLabel}
+                  max={maxQuantity ?? undefined}
+                  min={minQuantity ?? 1}
+                />
+                <ArchiveSubmitButton disabled={ctaDisabled}>{ctaLabel}</ArchiveSubmitButton>
+                {additionalActions}
+              </div>
+              <ProductSubscribeSlot
+                buyRowVariant={buyRowVariant}
+                isLoggedIn={isLoggedIn}
+                productEntityId={Number(productId)}
+                productPath={productPath}
+                showSubscribe={showSubscribe}
+                subscribeAction={subscribeAction}
+                subscribeLabel={subscribeLabel}
+                subscribeLoginHref={subscribeLoginHref}
+                subscribeLoginLabel={subscribeLoginLabel}
+                subscriptionIntervalHint={subscriptionIntervalHint}
+                subscriptionIntervalLabel={subscriptionIntervalLabel}
+                subscriptionIntervalOptions={subscriptionIntervalOptions}
+                subscriptionStartDateDefault={subscriptionStartDateDefault}
+                subscriptionStartDateHint={subscriptionStartDateHint}
+                subscriptionStartDateLabel={subscriptionStartDateLabel}
+                subscriptionStartDateMax={subscriptionStartDateMax}
+                subscriptionStartDateMin={subscriptionStartDateMin}
               />
-              <ArchiveSubmitButton disabled={ctaDisabled}>{ctaLabel}</ArchiveSubmitButton>
-              {additionalActions}
             </div>
           ) : (
-            <div className="flex gap-x-3">
-              <NumberInput
-                aria-label={quantityLabel}
-                decrementLabel={decrementLabel}
-                incrementLabel={incrementLabel}
-                max={maxQuantity}
-                min={minQuantity ?? 1}
-                name={formFields.quantity.name}
-                onBlur={quantityControl.blur}
-                onChange={(e) => quantityControl.change(e.currentTarget.value)}
-                onFocus={quantityControl.focus}
-                required
-                value={quantityControl.value}
+            <div className="flex w-full flex-col gap-4">
+              <div className="flex flex-wrap gap-x-3 gap-y-3">
+                <NumberInput
+                  aria-label={quantityLabel}
+                  decrementLabel={decrementLabel}
+                  incrementLabel={incrementLabel}
+                  max={maxQuantity}
+                  min={minQuantity ?? 1}
+                  name={formFields.quantity.name}
+                  onBlur={quantityControl.blur}
+                  onChange={(e) => quantityControl.change(e.currentTarget.value)}
+                  onFocus={quantityControl.focus}
+                  required
+                  value={quantityControl.value}
+                />
+                <SubmitButton disabled={ctaDisabled}>{ctaLabel}</SubmitButton>
+                {additionalActions}
+              </div>
+              <ProductSubscribeSlot
+                buyRowVariant={buyRowVariant}
+                isLoggedIn={isLoggedIn}
+                productEntityId={Number(productId)}
+                productPath={productPath}
+                showSubscribe={showSubscribe}
+                subscribeAction={subscribeAction}
+                subscribeLabel={subscribeLabel}
+                subscribeLoginHref={subscribeLoginHref}
+                subscribeLoginLabel={subscribeLoginLabel}
+                subscriptionIntervalHint={subscriptionIntervalHint}
+                subscriptionIntervalLabel={subscriptionIntervalLabel}
+                subscriptionIntervalOptions={subscriptionIntervalOptions}
+                subscriptionStartDateDefault={subscriptionStartDateDefault}
+                subscriptionStartDateHint={subscriptionStartDateHint}
+                subscriptionStartDateLabel={subscriptionStartDateLabel}
+                subscriptionStartDateMax={subscriptionStartDateMax}
+                subscriptionStartDateMin={subscriptionStartDateMin}
               />
-              <SubmitButton disabled={ctaDisabled}>{ctaLabel}</SubmitButton>
-              {additionalActions}
             </div>
           )}
         </div>
       </form>
     </FormProvider>
+  );
+}
+
+function ProductSubscribeSlot({
+  showSubscribe,
+  productEntityId,
+  productPath,
+  subscribeLabel,
+  subscribeLoginLabel,
+  subscribeLoginHref,
+  isLoggedIn,
+  subscribeAction,
+  buyRowVariant,
+  subscriptionIntervalLabel,
+  subscriptionIntervalHint,
+  subscriptionIntervalOptions,
+  subscriptionStartDateLabel,
+  subscriptionStartDateHint,
+  subscriptionStartDateMin,
+  subscriptionStartDateMax,
+  subscriptionStartDateDefault,
+}: {
+  showSubscribe?: boolean;
+  productEntityId: number;
+  productPath?: string;
+  subscribeLabel?: string;
+  subscribeLoginLabel?: string;
+  subscribeLoginHref?: string;
+  isLoggedIn?: boolean;
+  subscribeAction?: ProductSubscribeAction;
+  buyRowVariant: ProductDetailBuyRowVariant;
+  subscriptionIntervalLabel?: string;
+  subscriptionIntervalHint?: string;
+  subscriptionIntervalOptions?: Array<{ value: string; label: string }>;
+  subscriptionStartDateLabel?: string;
+  subscriptionStartDateHint?: string;
+  subscriptionStartDateMin?: string;
+  subscriptionStartDateMax?: string;
+  subscriptionStartDateDefault?: string;
+}) {
+  if (
+    !showSubscribe ||
+    !Number.isFinite(productEntityId) ||
+    !subscribeAction ||
+    !subscribeLabel ||
+    !subscribeLoginLabel ||
+    !subscribeLoginHref ||
+    !productPath ||
+    !subscriptionIntervalLabel ||
+    !subscriptionIntervalOptions?.length ||
+    !subscriptionStartDateLabel ||
+    !subscriptionStartDateMin ||
+    !subscriptionStartDateMax ||
+    !subscriptionStartDateDefault
+  ) {
+    return null;
+  }
+
+  return (
+    <Suspense fallback={null}>
+      <ProductSubscribeButton
+        action={subscribeAction}
+        buyRowVariant={buyRowVariant}
+        defaultInterval={subscriptionIntervalOptions[0].value}
+        defaultStartDate={subscriptionStartDateDefault}
+        intervalLabel={subscriptionIntervalLabel}
+        intervalOptions={subscriptionIntervalOptions}
+        isLoggedIn={isLoggedIn ?? false}
+        loginHref={subscribeLoginHref}
+        loginLabel={subscribeLoginLabel}
+        productEntityId={productEntityId}
+        productPath={productPath}
+        startDateLabel={subscriptionStartDateLabel}
+        startDateMax={subscriptionStartDateMax}
+        startDateMin={subscriptionStartDateMin}
+        subscribeLabel={subscribeLabel}
+      />
+    </Suspense>
   );
 }
 

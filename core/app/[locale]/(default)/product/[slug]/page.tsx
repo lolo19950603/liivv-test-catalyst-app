@@ -1,13 +1,13 @@
 import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
 import { Metadata } from 'next';
-import type { CSSProperties } from 'react';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
 import { SearchParams } from 'nuqs/server';
+import type { CSSProperties } from 'react';
 
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { FeaturedProductCarousel } from '@/vibes/soul/sections/featured-product-carousel';
-import { auth, getSessionCustomerAccessToken } from '~/auth';
+import { auth, getSessionCustomerAccessToken, isLoggedIn } from '~/auth';
 import { pricesTransformer } from '~/data-transformers/prices-transformer';
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { productOptionsTransformer } from '~/data-transformers/product-options-transformer';
@@ -17,6 +17,17 @@ import { ProductDetail } from '~/lib/makeswift/components/product-detail';
 import { Slot } from '~/lib/makeswift/slot';
 import { getRecaptchaSiteKey } from '~/lib/recaptcha';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
+import { isStripeConfigured } from '~/lib/stripe';
+import {
+  formatSubscriptionIntervalKey,
+  getSubscriptionBillingIntervals,
+  type SubscriptionBillingInterval,
+} from '~/lib/stripe/subscription-interval';
+import {
+  getDefaultSubscriptionStartDateValue,
+  getMaxSubscriptionStartDateValue,
+  getMinSubscriptionStartDateValue,
+} from '~/lib/stripe/subscription-start-date';
 
 import './product-page-feel.css';
 import './product-related-products.css';
@@ -25,6 +36,7 @@ import './product-reviews.css';
 import { addToCart } from './_actions/add-to-cart';
 import { getMoreProductImages } from './_actions/get-more-images';
 import { submitReview } from './_actions/submit-review';
+import { subscribeFromProduct } from './_actions/subscribe';
 import { ProductAnalyticsProvider } from './_components/product-analytics-provider';
 import { ProductSchema } from './_components/product-schema';
 import { ProductViewed } from './_components/product-viewed';
@@ -44,6 +56,23 @@ import {
 interface Props {
   params: Promise<{ slug: string; locale: string }>;
   searchParams: Promise<SearchParams>;
+}
+
+function formatSubscriptionIntervalOption(
+  interval: SubscriptionBillingInterval,
+  t: Awaited<ReturnType<typeof getTranslations<'Subscribe'>>>,
+) {
+  const label =
+    interval.intervalCount === 1
+      ? t(`intervals.${interval.interval}` as 'intervals.month')
+      : t(`intervals.${interval.interval}Plural` as 'intervals.monthPlural', {
+          count: interval.intervalCount,
+        });
+
+  return {
+    value: formatSubscriptionIntervalKey(interval),
+    label,
+  };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -540,6 +569,15 @@ export default async function Product({ params, searchParams }: Props) {
     };
   });
 
+  const loggedIn = await isLoggedIn();
+  const showSubscribe = isStripeConfigured();
+  const subscribeLoginHref = `/login?redirectTo=${encodeURIComponent(baseProduct.path)}`;
+  const subscribeT = await getTranslations('Subscribe');
+  const subscriptionBillingIntervals = getSubscriptionBillingIntervals();
+  const subscriptionIntervalOptions = subscriptionBillingIntervals.map((interval) =>
+    formatSubscriptionIntervalOption(interval, subscribeT),
+  );
+
   const streamableUser = Streamable.from(async () => {
     const session = await auth();
     const firstName = session?.user?.firstName ?? '';
@@ -562,7 +600,6 @@ export default async function Product({ params, searchParams }: Props) {
       <div className="liivv-product-page-feel">
         <ProductAnalyticsProvider data={streamableAnalyticsData}>
           <ProductDetail
-            buyRowVariant="archive"
             action={addToCart}
             additionalActions={
               <WishlistButton
@@ -572,12 +609,14 @@ export default async function Product({ params, searchParams }: Props) {
               />
             }
             additionalInformationTitle={t('ProductDetails.additionalInformation')}
+            buyRowVariant="archive"
             ctaDisabled={streameableCtaDisabled}
             ctaLabel={streameableCtaLabel}
             decrementLabel={t('ProductDetails.decreaseQuantity')}
             emptySelectPlaceholder={t('ProductDetails.emptySelectPlaceholder')}
             fields={productOptionsTransformer(baseProduct.productOptions)}
             incrementLabel={t('ProductDetails.increaseQuantity')}
+            isLoggedIn={loggedIn}
             loadMoreImagesAction={getMoreProductImages}
             prefetch={true}
             product={{
@@ -599,9 +638,23 @@ export default async function Product({ params, searchParams }: Props) {
               backorderDisplayData: streamableBackorderDisplayData,
             }}
             productId={baseProduct.entityId}
+            productPath={baseProduct.path}
             quantityLabel={t('ProductDetails.quantity')}
             recaptchaSiteKey={recaptchaSiteKey}
             reviewFormAction={submitReview}
+            showSubscribe={showSubscribe}
+            subscribeAction={subscribeFromProduct}
+            subscribeLabel={t('ProductDetails.subscribe')}
+            subscribeLoginHref={subscribeLoginHref}
+            subscribeLoginLabel={t('ProductDetails.loginToSubscribe')}
+            subscriptionIntervalHint={t('ProductDetails.subscriptionIntervalHint')}
+            subscriptionIntervalLabel={t('ProductDetails.subscriptionInterval')}
+            subscriptionIntervalOptions={subscriptionIntervalOptions}
+            subscriptionStartDateDefault={getDefaultSubscriptionStartDateValue()}
+            subscriptionStartDateHint={t('ProductDetails.subscriptionStartDateHint')}
+            subscriptionStartDateLabel={t('ProductDetails.subscriptionStartDate')}
+            subscriptionStartDateMax={getMaxSubscriptionStartDateValue()}
+            subscriptionStartDateMin={getMinSubscriptionStartDateValue()}
             thumbnailLabel={t('ProductDetails.thumbnail')}
             user={streamableUser}
           />

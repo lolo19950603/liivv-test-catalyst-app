@@ -1,7 +1,11 @@
 import { ReactNode } from 'react';
 
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
-import { Accordion, AccordionHydrationGate, AccordionItem } from '@/vibes/soul/primitives/accordion';
+import {
+  Accordion,
+  AccordionHydrationGate,
+  AccordionItem,
+} from '@/vibes/soul/primitives/accordion';
 import { AnimatedUnderline } from '@/vibes/soul/primitives/animated-underline';
 import { ArchiveButton } from '@/vibes/soul/primitives/archive-button';
 import { Price, PriceLabel } from '@/vibes/soul/primitives/price-label';
@@ -16,10 +20,11 @@ import { ReviewForm, SubmitReviewAction } from '@/vibes/soul/sections/reviews/re
 import {
   BackorderDisplayData,
   ProductDetailBuyRowVariant,
-  ProductDetailFormHydrationGate,
   ProductDetailFormAction,
+  ProductDetailFormHydrationGate,
   StockDisplayData,
 } from './product-detail-form';
+import { type ProductSubscribeAction } from './product-subscribe-button';
 import { RatingLink } from './rating-link';
 import { Field } from './schema';
 
@@ -79,6 +84,21 @@ export interface ProductDetailProps<F extends Field> {
   loadMoreImagesAction?: ProductGalleryLoadMoreAction;
   recaptchaSiteKey?: string;
   buyRowVariant?: ProductDetailBuyRowVariant;
+  showSubscribe?: boolean;
+  productPath?: string;
+  subscribeLabel?: string;
+  subscribeLoginLabel?: string;
+  subscribeLoginHref?: string;
+  isLoggedIn?: boolean;
+  subscribeAction?: ProductSubscribeAction;
+  subscriptionIntervalLabel?: string;
+  subscriptionIntervalHint?: string;
+  subscriptionIntervalOptions?: Array<{ value: string; label: string }>;
+  subscriptionStartDateLabel?: string;
+  subscriptionStartDateHint?: string;
+  subscriptionStartDateMin?: string;
+  subscriptionStartDateMax?: string;
+  subscriptionStartDateDefault?: string;
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -123,6 +143,21 @@ export function ProductDetail<F extends Field>({
   loadMoreImagesAction,
   recaptchaSiteKey,
   buyRowVariant = 'default',
+  showSubscribe = false,
+  productPath,
+  subscribeLabel,
+  subscribeLoginLabel,
+  subscribeLoginHref,
+  isLoggedIn = false,
+  subscribeAction,
+  subscriptionIntervalLabel,
+  subscriptionIntervalHint,
+  subscriptionIntervalOptions,
+  subscriptionStartDateLabel,
+  subscriptionStartDateHint,
+  subscriptionStartDateMin,
+  subscriptionStartDateMax,
+  subscriptionStartDateDefault,
 }: ProductDetailProps<F>) {
   return (
     <section className="@container">
@@ -177,7 +212,12 @@ export function ProductDetail<F extends Field>({
                         streamableUser={user}
                         trigger={
                           buyRowVariant === 'archive' ? (
-                            <ArchiveButton className="w-fit" size="md" type="button" variant="primary">
+                            <ArchiveButton
+                              className="w-fit"
+                              size="md"
+                              type="button"
+                              variant="primary"
+                            >
                               Write a review
                             </ArchiveButton>
                           ) : (
@@ -269,13 +309,28 @@ export function ProductDetail<F extends Field>({
                           emptySelectPlaceholder={emptySelectPlaceholder}
                           fields={fields}
                           incrementLabel={incrementLabel}
+                          isLoggedIn={isLoggedIn}
                           maxQuantity={maxQuantity ?? undefined}
                           minQuantity={minQuantity ?? undefined}
                           prefetch={prefetch}
                           productId={product.id}
+                          productPath={productPath}
                           quantityLabel={quantityLabel}
+                          showSubscribe={showSubscribe}
                           skeleton={<ProductDetailFormSkeleton />}
                           stockDisplayData={stockDisplayData ?? undefined}
+                          subscribeAction={subscribeAction}
+                          subscribeLabel={subscribeLabel}
+                          subscribeLoginHref={subscribeLoginHref}
+                          subscribeLoginLabel={subscribeLoginLabel}
+                          subscriptionIntervalHint={subscriptionIntervalHint}
+                          subscriptionIntervalLabel={subscriptionIntervalLabel}
+                          subscriptionIntervalOptions={subscriptionIntervalOptions}
+                          subscriptionStartDateDefault={subscriptionStartDateDefault}
+                          subscriptionStartDateHint={subscriptionStartDateHint}
+                          subscriptionStartDateLabel={subscriptionStartDateLabel}
+                          subscriptionStartDateMax={subscriptionStartDateMax}
+                          subscriptionStartDateMin={subscriptionStartDateMin}
                         />
                       )}
                     </Stream>
