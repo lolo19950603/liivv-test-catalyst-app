@@ -119,7 +119,11 @@ function multicolumnSectionStyle(
 }
 
 function multicolumnCardGridModifierClass(count: number): string | undefined {
-  const n = Math.max(count, 1);
+  if (count <= 0) {
+    return undefined;
+  }
+
+  const n = count;
 
   if (n >= DESKTOP_COLUMNS_PER_ROW) {
     return 'with-4 card-grid--4';
@@ -231,27 +235,6 @@ export type DiabetesCareMulticolumnProps = {
   intro?: IntroBodyTypographyProps;
   columns?: DiabetesCareMulticolumnColumn[];
 };
-
-const DEFAULT_PRIMARY_HEADING = 'Diabetes is a';
-const DEFAULT_SECONDARY_HEADING = 'journey.';
-const DEFAULT_COLUMNS: DiabetesCareMulticolumnColumn[] = [
-  {
-    heading: { text: 'Support when you need it' },
-    secondaryHeading: { text: 'The Gear. No Guesswork.' },
-    body: {
-      text: 'Replace this text in Makeswift. Add an image or button per column.',
-    },
-    image: { imageAlt: '' },
-  },
-  {
-    heading: { text: 'Built for everyday care' },
-    secondaryHeading: { text: 'Navigating the Real World.' },
-    body: {
-      text: 'Columns render in a four-across grid on desktop; extra columns wrap to the next row.',
-    },
-    image: { imageAlt: '' },
-  },
-];
 
 function readColumnHeading(row: DiabetesCareMulticolumnColumn): MulticolumnSwashTextBlockProps | undefined {
   if (row.heading != null) {
@@ -469,15 +452,11 @@ export function DiabetesCareMulticolumn({
   const primaryResolved = resolveHeadingTypography(primaryHeading);
   const secondaryResolved = resolveHeadingTypography(secondaryHeading);
 
-  const primaryText =
-    primaryResolved.text.length > 0 ? primaryResolved.text : DEFAULT_PRIMARY_HEADING;
-  const secondaryText =
-    secondaryResolved.text.length > 0 ? secondaryResolved.text : DEFAULT_SECONDARY_HEADING;
+  const primaryText = primaryResolved.text;
+  const secondaryText = secondaryResolved.text;
+  const hasSectionHeading = primaryText.length > 0 || secondaryText.length > 0;
 
-  const fromProps = columns !== undefined && columns.length > 0 ? columns : DEFAULT_COLUMNS;
-  const nonEmpty = fromProps.filter(columnHasContent);
-  const raw = nonEmpty.length > 0 ? nonEmpty : DEFAULT_COLUMNS;
-  const rows = raw;
+  const rows = (columns ?? []).filter(columnHasContent);
   const sectionVars: ShopifyThemeStyle = {
     '--section-blocks-count': rows.length,
   };
@@ -491,6 +470,8 @@ export function DiabetesCareMulticolumn({
   const introAlign = resolveTextAlign(intro?.textAlign, titleAlign);
 
   const introCopy = intro?.body?.trim() ?? '';
+  const hasTitleBlock =
+    topHeadingText.length > 0 || hasSectionHeading || introCopy.length > 0;
 
   const { sectionCss, sectionStyle: themeStyle } = buildSectionTheme({
     sectionId: MULTICOLUMN_SECTION_ID,
@@ -530,62 +511,66 @@ export function DiabetesCareMulticolumn({
           className={clsx('section section--padding relative', roundedTop && 'section--rounded')}
         >
           <div className="page-width relative">
-            <div
-              className={clsx(
-                'title-wrapper relative z-1 mb-10 flex flex-col gap-4 leading-none md:mb-12 md:justify-between lg:gap-8',
-                `mc-title-align-${titleAlign}`,
-              )}
-            >
-              <div className="grid w-full gap-4">
-                {topHeadingText.length > 0 ? (
-                  <p
-                    className={clsx(
-                      'heading subtext-lg font-medium normal-case leading-normal tracking-none',
-                      textAlignClass(topHeadingAlign),
-                    )}
-                    style={topHeadingStyle(topHeading)}
-                  >
-                    {topHeadingText}
-                  </p>
-                ) : null}
-                <h2
-                  className={clsx(
-                    'heading title-lg tracking-heading',
-                    textAlignClass(titleAlign),
-                  )}
-                  style={sectionTitleStyle}
-                >
-                  <AccentSplitWordsHeading
-                    accentColors={useSecondaryTitleSwash ? secondaryHeading : undefined}
-                    emphasis={secondaryText}
-                    emphasisColor={secondaryResolved.emphasisColor}
-                    emphasisFontSize={secondaryResolved.fontSize}
-                    highlightStyle={useSecondaryTitleSwash ? 'half_text' : 'text'}
-                    lead={primaryText}
-                    leadColor={primaryResolved.color}
-                    leadFontSize={primaryResolved.fontSize}
-                  />
-                </h2>
-                {introCopy.length > 0 ? (
-                  <div
-                    className={clsx(
-                      'description rte subtext-lg leading-normal',
-                      textAlignClass(introAlign),
-                      `mc-intro-align-${introAlign}`,
-                    )}
-                    style={introBodyStyle(intro)}
-                  >
-                    {introCopy
-                      .split(/\n+/)
-                      .map((p) => p.trim())
-                      .filter((p) => p.length > 0)
-                      .map((p, i) => (
-                        <p key={`intro-${i}`}>{p}</p>
-                      ))}
-                  </div>
-                ) : null}
+            {hasTitleBlock ? (
+              <div
+                className={clsx(
+                  'title-wrapper relative z-1 mb-10 flex flex-col gap-4 leading-none md:mb-12 md:justify-between lg:gap-8',
+                  `mc-title-align-${titleAlign}`,
+                )}
+              >
+                <div className="grid w-full gap-4">
+                  {topHeadingText.length > 0 ? (
+                    <p
+                      className={clsx(
+                        'heading subtext-lg font-medium normal-case leading-normal tracking-none',
+                        textAlignClass(topHeadingAlign),
+                      )}
+                      style={topHeadingStyle(topHeading)}
+                    >
+                      {topHeadingText}
+                    </p>
+                  ) : null}
+                  {hasSectionHeading ? (
+                    <h2
+                      className={clsx(
+                        'heading title-lg tracking-heading',
+                        textAlignClass(titleAlign),
+                      )}
+                      style={sectionTitleStyle}
+                    >
+                      <AccentSplitWordsHeading
+                        accentColors={useSecondaryTitleSwash ? secondaryHeading : undefined}
+                        emphasis={secondaryText}
+                        emphasisColor={secondaryResolved.emphasisColor}
+                        emphasisFontSize={secondaryResolved.fontSize}
+                        highlightStyle={useSecondaryTitleSwash ? 'half_text' : 'text'}
+                        lead={primaryText}
+                        leadColor={primaryResolved.color}
+                        leadFontSize={primaryResolved.fontSize}
+                      />
+                    </h2>
+                  ) : null}
+                  {introCopy.length > 0 ? (
+                    <div
+                      className={clsx(
+                        'description rte subtext-lg leading-normal',
+                        textAlignClass(introAlign),
+                        `mc-intro-align-${introAlign}`,
+                      )}
+                      style={introBodyStyle(intro)}
+                    >
+                      {introCopy
+                        .split(/\n+/)
+                        .map((p) => p.trim())
+                        .filter((p) => p.length > 0)
+                        .map((p, i) => (
+                          <p key={`intro-${i}`}>{p}</p>
+                        ))}
+                    </div>
+                  ) : null}
+                </div>
               </div>
-            </div>
+            ) : null}
 
             <ScrollReveal delayMs={100}>
               <div

@@ -1,4 +1,4 @@
-import { Checkbox, Color, Group, Image, Link, List, Number, Select, Style, TextInput } from '@makeswift/runtime/controls';
+import { Color, Group, Image, Link, List, Number, Select, Style, TextInput } from '@makeswift/runtime/controls';
 
 import { archiveComponentLabel } from '~/lib/makeswift/archive-component-label';
 import {
@@ -13,7 +13,7 @@ import { runtime } from '~/lib/makeswift/runtime';
 import { hsl } from '~/lib/makeswift/utils/color';
 import {
   ARCHIVE_BUTTON_PRIMARY_DARK,
-  ARCHIVE_BUTTON_SECONDARY_ON_WHITE,
+  ARCHIVE_BUTTON_COLLAGE_SECONDARY_CTA,
 } from '~/lib/makeswift/utils/archive-button-presets';
 
 import { ArchiveCollageGrid } from './client';
@@ -123,8 +123,9 @@ const ctaButton = (groupLabel: string, defaults = ARCHIVE_BUTTON_PRIMARY_DARK, t
       ...archiveButtonControls(defaults, { textDefault: textDefault ?? groupLabel }),
       widthPct: Number({
         label: 'Desktop width (%)',
-        description: 'Leave blank for auto width.',
+        description: 'Share of the CTA row on desktop (e.g. 60 / 40).',
         suffix: '%',
+        defaultValue: groupLabel.includes('Primary') ? 60 : 40,
       }),
     },
   });
@@ -135,7 +136,7 @@ runtime.registerComponent(ArchiveCollageGrid, {
   icon: 'gallery',
   props: {
     className: Style(),
-    ...sectionBackgroundControls('0 2% 65%'),
+    ...sectionBackgroundControls('23 11% 62%'),
     items: List({
       label: 'Collage items',
       type: collageItem,
@@ -191,11 +192,10 @@ runtime.registerComponent(ArchiveCollageGrid, {
       label: 'CTA row (below collage)',
       preferredLayout: Group.Layout.Popover,
       props: {
-        enabled: Checkbox({ label: 'Show CTA row', defaultValue: false }),
         paddingTop: Number({ label: 'Padding top', defaultValue: 12, suffix: 'px' }),
         paddingBottom: Number({ label: 'Padding bottom', defaultValue: 32, suffix: 'px' }),
         primary: ctaButton('Primary CTA', ARCHIVE_BUTTON_PRIMARY_DARK),
-        secondary: ctaButton('Secondary CTA', ARCHIVE_BUTTON_SECONDARY_ON_WHITE),
+        secondary: ctaButton('Secondary CTA', ARCHIVE_BUTTON_COLLAGE_SECONDARY_CTA),
       },
     }),
   },

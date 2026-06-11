@@ -85,12 +85,12 @@ export function resolveButtonTheme(
   let scopeCss = '';
 
   if (hoverText != null) {
-    scopeCss += `${selector}${variantClass}:hover:not([disabled]){color:rgb(var(--dc-btn-hover-text))!important;}`;
+    scopeCss += `${selector}${variantClass}:hover:not([disabled]) .btn-text{color:rgb(var(--dc-btn-hover-text))!important;}`;
     style['--dc-btn-hover-text'] = hoverText;
   }
 
   if (hoverBg != null) {
-    scopeCss += `${selector}${variantClass} .btn-fill{background-color:rgb(var(--dc-btn-hover-fill))!important;}`;
+    scopeCss += `${selector}${variantClass}:hover:not([disabled]) .btn-fill{background-color:rgb(var(--dc-btn-hover-fill))!important;}`;
     style['--dc-btn-hover-fill'] = hoverBg;
   }
 

@@ -49,7 +49,19 @@ export const ARCHIVE_BUTTON_PRIMARY_SAGE: ButtonColorFieldDefaults = {
 };
 
 /**
- * `.button--secondary` on white (reveal story, collage).
+ * Collage grid secondary CTA — same `.button--primary` mechanics as the primary CTA.
+ * Light resting fill; hover inverts to dark fill with light label.
+ */
+export const ARCHIVE_BUTTON_COLLAGE_SECONDARY_CTA: ButtonColorFieldDefaults = {
+  outlineHsl: '0 2% 19%',
+  backgroundHsl: '30 12% 95%',
+  textHsl: '0 2% 19%',
+  hoverBackgroundHsl: '0 2% 19%',
+  hoverTextHsl: '0 0% 100%',
+};
+
+/**
+ * `.button--secondary` on white (reveal story).
  * Resting outline + label are sage (`#8ea78b`); hover fill is sage with white label.
  */
 export const ARCHIVE_BUTTON_SECONDARY_ON_WHITE: ButtonColorFieldDefaults = {

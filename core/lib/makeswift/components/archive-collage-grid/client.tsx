@@ -8,6 +8,7 @@ import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-clas
 import {
   resolveArchiveButton,
   type ArchiveButtonProps,
+  type ResolvedArchiveButton,
 } from '~/lib/makeswift/utils/archive-button';
 import {
   buildSectionTheme,
@@ -86,7 +87,6 @@ export type ArchiveCollageCtaButtonProps = ArchiveButtonProps & {
 };
 
 export type ArchiveCollageCtaRowProps = {
-  enabled?: boolean;
   paddingTop?: number;
   paddingBottom?: number;
   primary?: ArchiveCollageCtaButtonProps;
@@ -137,6 +137,35 @@ function clampPct(value: number | undefined, fallback: number): number {
   }
 
   return Math.min(100, Math.max(0, Math.round(value)));
+}
+
+function IconArrowRight() {
+  return (
+    <svg
+      aria-hidden
+      className="icon icon-arrow-right icon-sm transform"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 21 20"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M3 10H18M18 10L12.1667 4.16675M18 10L12.1667 15.8334"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/** Matches archive `custom_section` CTA row (`size-style` buttons at 60% / 40%). */
+function ctaButtonSizeStyle(widthPct: number): CSSProperties {
+  return {
+    '--size-style-width': `${String(widthPct)}%`,
+    '--size-style-height': 'auto',
+    '--size-style-width-mobile': '100%',
+    '--size-style-width-mobile-min': '5rem',
+  } as CSSProperties;
 }
 
 function resolveTitleColorValue(
@@ -424,17 +453,51 @@ function CollageItemFrame({
   );
 }
 
+function ctaRowHasVisibleButtons(cta: ArchiveCollageCtaRowProps | undefined): boolean {
+  if (cta == null) {
+    return false;
+  }
+
+  const primary = resolveArchiveButton(cta.primary, { requireHref: false });
+  const secondary = resolveArchiveButton(cta.secondary, { requireHref: false });
+
+  return primary.visible || secondary.visible;
+}
+
+function CollageCtaButton({
+  button,
+  showArrow = false,
+  widthPct,
+}: {
+  button: ResolvedArchiveButton;
+  showArrow?: boolean;
+  widthPct: number;
+}) {
+  return (
+    <ArchiveShopifyButton
+      className={clsx(
+        'button--primary button--sm size-style',
+        showArrow && 'icon-with-text',
+      )}
+      colors={button.colors}
+      href={button.href}
+      rel={button.rel}
+      style={ctaButtonSizeStyle(widthPct)}
+      target={button.target}
+    >
+      {button.text}
+      {showArrow ? <IconArrowRight /> : null}
+    </ArchiveShopifyButton>
+  );
+}
+
 function CtaRow({ cta }: { cta: ArchiveCollageCtaRowProps | undefined }) {
-  if (cta?.enabled !== true) {
+  if (cta == null || !ctaRowHasVisibleButtons(cta)) {
     return null;
   }
 
-  const primary = resolveArchiveButton(cta.primary);
-  const secondary = resolveArchiveButton(cta.secondary);
-
-  if (!primary.visible && !secondary.visible) {
-    return null;
-  }
+  const primary = resolveArchiveButton(cta.primary, { requireHref: false });
+  const secondary = resolveArchiveButton(cta.secondary, { requireHref: false });
 
   const paddingTop = clampPx(cta.paddingTop, 12);
   const paddingBottom = clampPx(cta.paddingBottom, 32);
@@ -443,31 +506,14 @@ function CtaRow({ cta }: { cta: ArchiveCollageCtaRowProps | undefined }) {
 
   return (
     <div
-      className="section-content media--auto mobile:media--auto flex flex-col items-center justify-center md:flex-row md:items-center md:justify-center"
-      style={{ paddingTop, paddingBottom, gap: 10 }}
+      className="section-content media--auto mobile:media--auto spacing-style flex w-full flex-col flex-nowrap items-center justify-center md:flex-row md:items-center md:justify-center"
+      style={{ paddingTop, paddingBottom, gap: 10, '--gap': '10px' } as CSSProperties}
     >
       {primary.visible ? (
-        <ArchiveShopifyButton
-          className="button--primary button--sm icon-with-text size-style"
-          colors={primary.colors}
-          href={primary.href}
-          rel={primary.rel}
-          target={primary.target}
-        >
-          {primary.text}
-        </ArchiveShopifyButton>
+        <CollageCtaButton button={primary} showArrow widthPct={primaryWidth} />
       ) : null}
       {secondary.visible ? (
-        <ArchiveShopifyButton
-          className="button--secondary button--sm size-style"
-          colors={secondary.colors}
-          href={secondary.href}
-          rel={secondary.rel}
-          target={secondary.target}
-          variant="secondary"
-        >
-          {secondary.text}
-        </ArchiveShopifyButton>
+        <CollageCtaButton button={secondary} widthPct={secondaryWidth} />
       ) : null}
     </div>
   );
@@ -490,10 +536,10 @@ export function ArchiveCollageGrid({
     sectionCss: ARCHIVE_COLLAGE_GRID_VARS,
     background,
     highlight: null,
-    defaultBackgroundChannels: '0 2% 65%',
+    defaultBackgroundChannels: '169 156 148',
   });
 
-  if (resolvedItems.length === 0 && cta?.enabled !== true) {
+  if (resolvedItems.length === 0 && !ctaRowHasVisibleButtons(cta)) {
     return null;
   }
 

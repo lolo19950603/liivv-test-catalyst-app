@@ -14,6 +14,7 @@ type ArchiveShopifyButtonBaseProps = {
   className?: string;
   variant?: ArchiveButtonVariant;
   colors?: ButtonColorProps | null;
+  style?: CSSProperties;
   children: ReactNode;
 };
 
@@ -37,6 +38,7 @@ function ArchiveShopifyButtonInner({
   className,
   variant = 'primary',
   colors,
+  style,
   children,
   scopeId,
   ...rest
@@ -45,10 +47,12 @@ function ArchiveShopifyButtonInner({
     | ({ as: 'button' } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className' | 'style' | 'children'>)
   )) {
   const theme = resolveButtonTheme(colors, { scopeId, variant });
+  const mergedStyle =
+    theme.style != null || style != null ? { ...theme.style, ...style } : undefined;
   const shared = {
     className: clsx('button', className),
     'data-dc-btn': theme.dataDcBtn,
-    style: theme.style as CSSProperties | undefined,
+    style: mergedStyle,
   };
 
   return (

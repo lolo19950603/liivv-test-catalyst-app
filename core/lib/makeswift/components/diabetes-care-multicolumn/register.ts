@@ -80,8 +80,8 @@ runtime.registerComponent(DiabetesCareMulticolumn, {
     ...splitHeadingPopoverControls({
       primaryLabel: 'Primary heading',
       secondaryLabel: 'Secondary heading (swash)',
-      primaryDefault: 'Diabetes is a',
-      secondaryDefault: 'journey.',
+      primaryDefault: '',
+      secondaryDefault: '',
       secondarySwashTransparentByDefault: true,
       includeTextAlign: true,
     }),
@@ -105,16 +105,9 @@ runtime.registerComponent(DiabetesCareMulticolumn, {
       type: Group({
         label: 'Column',
         props: {
-          heading: multicolumnHeadingPopover('Heading', 'Column heading'),
-          secondaryHeading: multicolumnPlainTextPopover(
-            'Secondary heading',
-            'The Gear. No Guesswork.',
-          ),
-          body: multicolumnPlainTextPopover(
-            'Body',
-            'Supporting copy for this column.\nSecond paragraph example.',
-            true,
-          ),
+          heading: multicolumnHeadingPopover('Heading', ''),
+          secondaryHeading: multicolumnPlainTextPopover('Secondary heading', ''),
+          body: multicolumnPlainTextPopover('Body', '', true),
           image: Group({
             label: 'Image',
             preferredLayout: Group.Layout.Popover,
