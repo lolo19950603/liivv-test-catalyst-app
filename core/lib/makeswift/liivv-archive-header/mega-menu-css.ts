@@ -4,7 +4,7 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   --animation-primary: 0.5s cubic-bezier(0.3, 1, 0.3, 1);
   --mega-menu-drawer-duration: 0.45s;
   --mega-menu-drawer-ease: cubic-bezier(0.32, 0.72, 0, 1);
-  --mega-menu-close-delay: 0.2s;
+  --mega-menu-close-delay: 0.3s;
   --mega-menu-hover-bridge: 5rem;
   --mega-menu-feature-radius: 1.5rem;
   --mega-menu-feature-fade-duration: 0.15s;
@@ -69,7 +69,8 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   overflow: visible;
 }
 .liivv-archive-header .header__navigation {
-  position: static;
+  position: relative;
+  z-index: 30;
 }
 .liivv-archive-header .header-mega-menu-wrap {
   position: absolute;
@@ -83,8 +84,9 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   transition: visibility 0s linear var(--mega-menu-drawer-duration);
 }
 .liivv-archive-header .header-mega-menu-wrap.is-open {
-  z-index: 5;
-  pointer-events: auto;
+  z-index: 25;
+  /* Pass pointer events through the bridge/overlap zone so top-level nav pills stay hoverable. */
+  pointer-events: none;
   visibility: visible;
   transition: visibility 0s;
   /* Overlap the header bottom so the pointer can reach the panel from a nav pill. */
@@ -99,6 +101,7 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   right: 0;
   top: 0;
   height: var(--mega-menu-hover-bridge);
+  pointer-events: none;
 }
 .liivv-archive-header .header-mega-menu {
   background: rgb(var(--color-background));
@@ -107,11 +110,16 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   border-end-end-radius: var(--border-radius, 1rem);
   box-shadow: 0 12px 40px rgb(33 33 33 / 0.08);
   overflow: hidden;
-  transform: translateY(-100%);
-  transition: transform var(--mega-menu-drawer-duration) var(--mega-menu-drawer-ease);
-  will-change: transform;
+  opacity: 0;
+  transform: translateY(-0.75rem);
+  transition:
+    transform var(--mega-menu-drawer-duration) var(--mega-menu-drawer-ease),
+    opacity var(--mega-menu-drawer-duration) var(--mega-menu-drawer-ease);
+  will-change: transform, opacity;
 }
 .liivv-archive-header .header-mega-menu-wrap.is-open .header-mega-menu {
+  opacity: 1;
+  pointer-events: auto;
   transform: translateY(0);
 }
 .liivv-archive-header .header-search-wrap {
@@ -316,6 +324,7 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
     visibility: visible;
   }
   .liivv-archive-header .header-mega-menu-wrap.is-open .header-mega-menu {
+    opacity: 1;
     transform: none;
   }
   .liivv-archive-header .header__menu > ul.with-block .menu__item:hover .btn-duplicate,

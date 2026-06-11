@@ -44,7 +44,7 @@ const SEARCH_ARIA_LABEL = 'Search';
 /** Keep in sync with --mega-menu-drawer-duration in mega-menu-css.ts */
 const SEARCH_DRAWER_DURATION_MS = 450;
 /** Keep in sync with --mega-menu-close-delay in mega-menu-css.ts */
-const MEGA_MENU_CLOSE_DELAY_MS = 200;
+const MEGA_MENU_CLOSE_DELAY_MS = 300;
 
 function megaMenuPanelId(mobileNavId: string, index: number): string {
   return `${mobileNavId}-mega-${index}`;
@@ -62,7 +62,14 @@ function isMegaMenuInteractionTarget(
 
   if (
     related instanceof Element &&
-    related.closest('.liivv-archive-header .header-mega-menu-wrap.is-open') != null
+    related.closest('.liivv-archive-header .header-mega-menu-wrap') != null
+  ) {
+    return true;
+  }
+
+  if (
+    related instanceof Element &&
+    related.closest('.liivv-archive-header .header__navigation') != null
   ) {
     return true;
   }
@@ -1108,23 +1115,6 @@ export function LiivvArchiveHeader({
                             } else {
                               closeMegaMenu();
                             }
-                          }}
-                          onMouseLeave={(event) => {
-                            if (!hasMegaMenu) {
-                              return;
-                            }
-
-                            if (
-                              isMegaMenuInteractionTarget(
-                                event.relatedTarget,
-                                mobileNavId,
-                                megaMenuIndices,
-                              )
-                            ) {
-                              return;
-                            }
-
-                            scheduleCloseMegaMenu();
                           }}
                         />
                       </li>
