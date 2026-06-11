@@ -1,4 +1,4 @@
-import { Checkbox, Group, Image, List, Number, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
+import { Group, Image, List, Number, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
 import { archiveComponentLabel } from '~/lib/makeswift/archive-component-label';
 import {
@@ -63,11 +63,6 @@ runtime.registerComponent(ArchiveRevealTestimonials, {
 
         return author != null && author.length > 0 ? author : fallback;
       },
-    }),
-    disableParallax: Checkbox({
-      label: 'Disable parallax',
-      description: 'Useful for users on slow devices or with motion sensitivity.',
-      defaultValue: false,
     }),
   },
 });

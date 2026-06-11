@@ -41,7 +41,6 @@ export interface ArchiveRevealTestimonialsProps {
   primaryHeading?: HeadingWithHighlightProps;
   secondaryHeading?: HeadingWithHighlightProps;
   items?: ArchiveTestimonialItemProps[];
-  disableParallax?: boolean;
   roundedTop?: boolean;
   /** @deprecated Legacy single heading; split into line 1 + line 2 when set. */
   heading?: HeadingWithHighlightProps;
@@ -198,18 +197,12 @@ function TestimonialsSplitTitle({
   );
 }
 
-function TestimonialCard({
-  item,
-  disableParallax,
-}: {
-  item: ArchiveTestimonialItemProps;
-  disableParallax: boolean;
-}) {
+function TestimonialCard({ item }: { item: ArchiveTestimonialItemProps }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const progress = useScrollProgress(ref);
   const start = item.parallaxStartPx ?? 0;
   const stop = item.parallaxStopPx ?? 0;
-  const translateY = disableParallax ? 0 : lerp(start, stop, progress);
+  const translateY = lerp(start, stop, progress);
   const avatarSrc = resolveMakeswiftImageSrc(item.avatar);
   const quote = item.quote?.trim() ?? '';
   const author = item.author?.trim() ?? '';
@@ -221,7 +214,7 @@ function TestimonialCard({
 
   const cardStyle: CSSProperties = {
     transform: `translate3d(0, ${translateY.toFixed(2)}px, 0)`,
-    willChange: disableParallax ? undefined : 'transform',
+    willChange: 'transform',
   };
 
   return (
@@ -259,7 +252,6 @@ export function ArchiveRevealTestimonials({
   secondaryHeading,
   heading,
   items,
-  disableParallax = false,
   roundedTop = true,
 }: ArchiveRevealTestimonialsProps) {
   const resolvedItems = useMemo(() => {
@@ -322,11 +314,7 @@ export function ArchiveRevealTestimonials({
             <div className="flex justify-center">
               <div className="reveal-testimonials relative z-1 grid gap-4 md:gap-10 rte">
                 {resolvedItems.map((item, index) => (
-                  <TestimonialCard
-                    disableParallax={disableParallax}
-                    item={item}
-                    key={`testimonial-${String(index)}`}
-                  />
+                  <TestimonialCard item={item} key={`testimonial-${String(index)}`} />
                 ))}
               </div>
             </div>

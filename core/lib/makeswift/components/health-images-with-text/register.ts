@@ -9,7 +9,7 @@ import {
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { healthPageComponentLabel } from '~/lib/makeswift/health-page-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
-import { ARCHIVE_BUTTON_PRIMARY_DARK } from '~/lib/makeswift/utils/archive-button-presets';
+import { ARCHIVE_BUTTON_PRIMARY_WHITE_ON_TINT } from '~/lib/makeswift/utils/archive-button-presets';
 
 import { HealthImagesWithText } from './client';
 import { HEALTH_IMAGES_WITH_TEXT_BACKGROUND_HSL } from './archive-styles';
@@ -80,9 +80,8 @@ runtime.registerComponent(HealthImagesWithText, {
     button: Group({
       label: 'Button (optional)',
       preferredLayout: Group.Layout.Popover,
-      props: archiveButtonControls(ARCHIVE_BUTTON_PRIMARY_DARK, {
+      props: archiveButtonControls(ARCHIVE_BUTTON_PRIMARY_WHITE_ON_TINT, {
         textDefault: 'Explore CarePack',
-        showButton: true,
       }),
     }),
   },

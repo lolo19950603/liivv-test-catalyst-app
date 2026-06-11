@@ -90,7 +90,9 @@ export function resolveButtonTheme(
   }
 
   if (hoverBg != null) {
-    scopeCss += `${selector}${variantClass}:hover:not([disabled]) .btn-fill{background-color:rgb(var(--dc-btn-hover-fill))!important;}`;
+    // Sweep uses `.btn-fill` on hover; set fill to hover bg always so the animation
+    // does not flash the resting text color while `background-color` transitions.
+    scopeCss += `${selector}${variantClass} .btn-fill{background-color:rgb(var(--dc-btn-hover-fill))!important;}`;
     style['--dc-btn-hover-fill'] = hoverBg;
   }
 

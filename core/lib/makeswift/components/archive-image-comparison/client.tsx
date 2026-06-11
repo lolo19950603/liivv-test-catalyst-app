@@ -37,6 +37,7 @@ import {
   type ImageAlignX,
   type ImageAlignY,
 } from '~/lib/makeswift/utils/image-object-position';
+import { useIsInBuilderAfterMount } from '~/lib/makeswift/utils/use-is-in-builder-after-mount';
 import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
 
 import {
@@ -158,6 +159,25 @@ function comparisonImageObjectPosition(image?: ComparisonImageProps): string {
   return toImageObjectPosition(image?.imageAlignX, image?.imageAlignY);
 }
 
+function ComparisonImagePlaceholder({
+  label,
+  side,
+}: {
+  label: string;
+  side: 'before' | 'after';
+}) {
+  return (
+    <div aria-hidden className="image-comparison__placeholder pointer-events-none absolute inset-0">
+      <span
+        className="image-comparison__placeholder-label absolute top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap px-2 text-center text-sm font-medium"
+        style={{ left: side === 'before' ? '25%' : '75%' }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+}
+
 export function ArchiveImageComparison({
   className,
   background,
@@ -171,6 +191,7 @@ export function ArchiveImageComparison({
   desktopRatioPercent,
   mobileRatioPercent,
 }: ArchiveImageComparisonProps) {
+  const isInBuilder = useIsInBuilderAfterMount();
   const targetPosition = clampPercent(initialPosition, DEFAULT_POSITION);
   const [position, setPosition] = useState(0);
   const [isEntranceAnimating, setIsEntranceAnimating] = useState(false);
@@ -400,7 +421,8 @@ export function ArchiveImageComparison({
     [isEntranceAnimating],
   );
 
-  const hasImages = beforeSrc.length > 0 && afterSrc.length > 0;
+  const hasBeforeImage = beforeSrc.length > 0;
+  const hasAfterImage = afterSrc.length > 0;
   const headingText =
     heading?.text != null ? heading.text.trim() : DEFAULT_SECTION_HEADING;
   const accentPhrase =
@@ -416,7 +438,7 @@ export function ArchiveImageComparison({
   };
   const headingParts = splitHeadingAroundAccent(headingText, accentPhrase);
 
-  if (!hasImages) {
+  if ((!hasBeforeImage || !hasAfterImage) && !isInBuilder) {
     return null;
   }
 
@@ -484,34 +506,48 @@ export function ArchiveImageComparison({
                 }
               >
               {/* Before (base) image */}
-              <picture className="absolute inset-0 block h-full w-full">
-                <img
-                  alt={beforeImage?.imageAlt?.trim() ?? ''}
-                  className="block h-full w-full object-cover"
-                  decoding="async"
-                  draggable={false}
-                  loading="lazy"
-                  src={beforeSrc}
-                  style={{ objectPosition: beforeObjectPosition }}
-                />
-              </picture>
+              {hasBeforeImage ? (
+                <picture className="absolute inset-0 block h-full w-full">
+                  <img
+                    alt={beforeImage?.imageAlt?.trim() ?? ''}
+                    className="block h-full w-full object-cover"
+                    decoding="async"
+                    draggable={false}
+                    loading="lazy"
+                    src={beforeSrc}
+                    style={{ objectPosition: beforeObjectPosition }}
+                  />
+                </picture>
+              ) : (
+                <ComparisonImagePlaceholder label="Before" side="before" />
+              )}
 
               {/* After image, clipped from the left to expose the before image. */}
-              <picture
-                aria-hidden="true"
-                className="absolute inset-0 block h-full w-full"
-                style={afterClipStyle}
-              >
-                <img
-                  alt={afterImage?.imageAlt?.trim() ?? ''}
-                  className="block h-full w-full object-cover"
-                  decoding="async"
-                  draggable={false}
-                  loading="lazy"
-                  src={afterSrc}
-                  style={{ objectPosition: afterObjectPosition }}
-                />
-              </picture>
+              {hasAfterImage ? (
+                <picture
+                  aria-hidden="true"
+                  className="absolute inset-0 block h-full w-full"
+                  style={afterClipStyle}
+                >
+                  <img
+                    alt={afterImage?.imageAlt?.trim() ?? ''}
+                    className="block h-full w-full object-cover"
+                    decoding="async"
+                    draggable={false}
+                    loading="lazy"
+                    src={afterSrc}
+                    style={{ objectPosition: afterObjectPosition }}
+                  />
+                </picture>
+              ) : (
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 block h-full w-full"
+                  style={afterClipStyle}
+                >
+                  <ComparisonImagePlaceholder label="After" side="after" />
+                </div>
+              )}
 
               <span
                 aria-hidden="true"

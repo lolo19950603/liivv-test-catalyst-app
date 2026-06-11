@@ -76,6 +76,8 @@ export function resolveArchiveButton(
     defaultText?: string;
     defaultHref?: string;
     requireHref?: boolean;
+    /** When true, visibility depends on button text (and href rules) only. */
+    ignoreShowButton?: boolean;
   },
 ): ResolvedArchiveButton {
   const text = (
@@ -86,13 +88,12 @@ export function resolveArchiveButton(
   ).trim();
   const link = button?.buttonLink ?? button?.link;
   const href = (link?.href ?? options?.defaultHref ?? '#').trim();
-  const showButton = button?.showButton !== false;
+  const showButton =
+    options?.ignoreShowButton === true ? true : button?.showButton !== false;
   const hasText = text.length > 0;
   const hasHref = href.length > 0 && href !== '#';
   const visible =
-    showButton &&
-    hasText &&
-    (options?.requireHref === false || hasHref);
+    showButton && hasText && (options?.requireHref === false || hasHref);
 
   return {
     text,

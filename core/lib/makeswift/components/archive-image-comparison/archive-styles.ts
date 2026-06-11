@@ -30,6 +30,10 @@ export const ARCHIVE_IMAGE_COMPARISON_VARS =
   `--ratio-percent:40%}` +
   `#${ARCHIVE_IMAGE_COMPARISON_SECTION_ID} [data-dc-scroll-reveal]{overflow:hidden}` +
   `#${ARCHIVE_IMAGE_COMPARISON_SECTION_ID} .image-comparison{border-radius:1rem}` +
+  `#${ARCHIVE_IMAGE_COMPARISON_SECTION_ID} .image-comparison__placeholder{` +
+  `background:rgb(var(--color-foreground)/0.06);border:2px dashed rgb(var(--color-foreground)/0.15)}` +
+  `#${ARCHIVE_IMAGE_COMPARISON_SECTION_ID} .image-comparison__placeholder-label{` +
+  `color:rgb(var(--color-foreground)/0.45)}` +
   `@media (prefers-reduced-motion:no-preference){` +
   `#${ARCHIVE_IMAGE_COMPARISON_SECTION_ID} .image-comparison.image-comparison--entrance .image-comparison__divider,` +
   `#${ARCHIVE_IMAGE_COMPARISON_SECTION_ID} .image-comparison.image-comparison--entrance .image-comparison__handle{` +

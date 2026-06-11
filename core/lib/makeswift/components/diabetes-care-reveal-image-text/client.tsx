@@ -26,6 +26,7 @@ import {
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
 import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
+import { useIsInBuilderAfterMount } from '~/lib/makeswift/utils/use-is-in-builder-after-mount';
 
 function storyAccentUsesHighlightSwash(heading?: HeadingWithHighlightProps | null): boolean {
   const value = heading?.useCustomHighlightColor;
@@ -130,6 +131,7 @@ export function DiabetesCareRevealImageWithText({
   secondaryButton,
   buttons,
 }: DiabetesCareRevealImageTextProps) {
+  const isInBuilder = useIsInBuilderAfterMount();
   const bannerHeadline = resolveHeadingTypography(
     resolveBannerHeadingProps({ bannerHeading, banner }),
   );
@@ -172,6 +174,11 @@ export function DiabetesCareRevealImageWithText({
     `#${revealSectionId} .reveal-banner .splitting-wrapper h2.dcrift-banner-heading--default{font-size:clamp(1.5rem,6vw,2.125rem)!important;line-height:1.05!important;letter-spacing:-0.02em;text-wrap:balance}}` +
     `#${revealSectionId} .dcrift-reveal-media.media--adapt{height:0;width:100%;padding-block-end:var(--ratio-percent,133.333%)}` +
     `#${revealSectionId} .dcrift-reveal-media.media--adapt>img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain!important;object-position:center center}` +
+    `#${revealSectionId} .dcrift-reveal-media--placeholder{display:flex;align-items:center;justify-content:center;` +
+    `background:rgb(var(--color-foreground)/0.06);border:2px dashed rgb(var(--color-foreground)/0.15);` +
+    `color:rgb(var(--color-foreground)/0.45)}` +
+    `#${revealSectionId} .dcrift-reveal-media--placeholder>span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;` +
+    `padding:1rem;text-align:center;font-size:0.875rem;font-weight:500;line-height:1.25;white-space:nowrap}` +
     `@media screen and (max-width:1023px){#${revealSectionId} .dcrift-reveal-media.mobile\\:media--wide>img,#${revealSectionId} .dcrift-reveal-media>img{aspect-ratio:unset!important}}`;
 
   const { sectionCss, sectionStyle } = buildSectionTheme({
@@ -337,6 +344,16 @@ export function DiabetesCareRevealImageWithText({
                         width={DEFAULT_HERO_WIDTH}
                       />
                     </picture>
+                  </div>
+                ) : isInBuilder ? (
+                  <div className="dcrift-reveal-media-wrap page-width page-width--narrow relative mx-auto w-full px-4 sm:px-5 md:px-0">
+                    <div
+                      aria-hidden
+                      className="dcrift-reveal-media dcrift-reveal-media--placeholder reveal-banner__cover-media media media--adapt relative mx-auto block max-w-full overflow-hidden rounded-3xl"
+                      style={revealMediaStyle}
+                    >
+                      <span>Banner image</span>
+                    </div>
                   </div>
                 ) : null}
               </ScrollReveal>

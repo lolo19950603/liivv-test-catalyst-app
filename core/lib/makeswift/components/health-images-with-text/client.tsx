@@ -106,7 +106,10 @@ export function HealthImagesWithText({
   const bodyHtml = body?.html?.trim() ?? '';
   const subheadingText = subheadingResolved.text.trim();
   const headingText = headingResolved.text.trim();
-  const resolvedButton = resolveArchiveButton(button, { requireHref: false });
+  const resolvedButton = resolveArchiveButton(button, {
+    requireHref: false,
+    ignoreShowButton: true,
+  });
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: resolvedSectionId,
     sectionCss: healthImagesWithTextSectionCss(resolvedSectionId),
