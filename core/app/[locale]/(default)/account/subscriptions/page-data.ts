@@ -7,11 +7,13 @@ import { client } from '~/client';
 import { graphql } from '~/client/graphql';
 import { TAGS } from '~/client/tags';
 import {
+  findStripeCustomerIdByEmail,
   getCustomerSubscriptions,
   isStripeConfigured,
   resolveStripeCustomerId,
   type CustomerSubscription,
 } from '~/lib/stripe';
+import { storeStripeCustomerId } from '~/lib/stripe/storage';
 
 const SubscriptionsCustomerQuery = graphql(`
   query SubscriptionsCustomerQuery {
@@ -51,11 +53,26 @@ export const getAccountSubscriptions = cache(async (): Promise<CustomerSubscript
     return [];
   }
 
-  const stripeCustomerId = await resolveStripeCustomerId(customer.entityId);
+  let stripeCustomerId = await resolveStripeCustomerId(customer.entityId);
 
-  if (!stripeCustomerId) {
+  try {
+    if (!stripeCustomerId) {
+      stripeCustomerId = await findStripeCustomerIdByEmail(customer.email);
+
+      if (stripeCustomerId) {
+        await storeStripeCustomerId(customer.entityId, stripeCustomerId);
+      }
+    }
+
+    if (!stripeCustomerId) {
+      return [];
+    }
+
+    return await getCustomerSubscriptions(stripeCustomerId);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to load Stripe subscriptions:', error);
+
     return [];
   }
-
-  return getCustomerSubscriptions(stripeCustomerId);
 });

@@ -1,6 +1,10 @@
 export { getStripe, isStripeConfigured } from './client';
 export { buildAppPath, buildAppUrl, getAppUrl, getStripeWebhookSecret } from './config';
-export { getOrCreateStripeCustomer, resolveStripeCustomerId } from './customers';
+export {
+  findStripeCustomerIdByEmail,
+  getOrCreateStripeCustomer,
+  resolveStripeCustomerId,
+} from './customers';
 export { getSubscriptionPlans, type SubscriptionPlan } from './plans';
 export {
   getStripePriceIdFromCustomFields,

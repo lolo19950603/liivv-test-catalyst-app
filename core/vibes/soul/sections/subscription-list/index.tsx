@@ -52,7 +52,6 @@ export function SubscriptionList({
                     {title}
                   </h1>
                 </header>
-                return (
                 <div className="rounded-2xl border border-[var(--contrast-100,hsl(var(--contrast-100)))] p-8 text-center">
                   <h2 className="text-xl font-medium text-[var(--foreground,hsl(var(--foreground)))]">
                     {emptyTitle}

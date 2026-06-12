@@ -17,15 +17,21 @@ export interface CustomerSubscription {
   cancelAtPeriodEnd: boolean;
 }
 
-function toCustomerSubscription(subscription: Stripe.Subscription): CustomerSubscription | null {
+function toCustomerSubscription(
+  subscription: Stripe.Subscription,
+  productNamesById: Map<string, string>,
+): CustomerSubscription | null {
   const item = subscription.items.data[0];
 
   if (!item?.price.recurring) {
     return null;
   }
 
-  const productName = getSubscriptionProductName(item.price.product);
-  const currentPeriodEnd = item.current_period_end;
+  const productName = getSubscriptionProductName(item.price, productNamesById);
+  const currentPeriodEnd =
+    item.current_period_end ??
+    subscription.billing_cycle_anchor ??
+    subscription.created;
 
   return {
     id: subscription.id,
@@ -40,9 +46,18 @@ function toCustomerSubscription(subscription: Stripe.Subscription): CustomerSubs
   };
 }
 
-function getSubscriptionProductName(product: Stripe.Price['product']): string {
+function getSubscriptionProductName(
+  price: Stripe.Price,
+  productNamesById: Map<string, string>,
+): string {
+  if (price.nickname) {
+    return price.nickname;
+  }
+
+  const product = price.product;
+
   if (typeof product === 'string') {
-    return 'Subscription';
+    return productNamesById.get(product) ?? 'Subscription';
   }
 
   if (product.deleted) {
@@ -52,6 +67,27 @@ function getSubscriptionProductName(product: Stripe.Price['product']): string {
   return product.name;
 }
 
+async function getProductNamesById(productIds: string[]): Promise<Map<string, string>> {
+  const stripe = getStripe();
+  const names = new Map<string, string>();
+
+  await Promise.all(
+    productIds.map(async (productId) => {
+      try {
+        const product = await stripe.products.retrieve(productId);
+
+        if (!product.deleted) {
+          names.set(productId, product.name);
+        }
+      } catch {
+        // Ignore missing products and fall back to a generic label.
+      }
+    }),
+  );
+
+  return names;
+}
+
 export async function getCustomerSubscriptions(
   stripeCustomerId: string,
 ): Promise<CustomerSubscription[]> {
@@ -59,12 +95,22 @@ export async function getCustomerSubscriptions(
   const subscriptions = await stripe.subscriptions.list({
     customer: stripeCustomerId,
     status: 'all',
-    expand: ['data.items.data.price.product'],
+    expand: ['data.items.data.price'],
     limit: 100,
   });
 
+  const productIds = [
+    ...new Set(
+      subscriptions.data
+        .map((subscription) => subscription.items.data[0]?.price.product)
+        .filter((product): product is string => typeof product === 'string'),
+    ),
+  ];
+
+  const productNamesById = await getProductNamesById(productIds);
+
   return subscriptions.data
-    .map(toCustomerSubscription)
+    .map((subscription) => toCustomerSubscription(subscription, productNamesById))
     .filter((subscription): subscription is CustomerSubscription => subscription !== null);
 }
 

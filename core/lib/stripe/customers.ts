@@ -63,6 +63,16 @@ export async function getOrCreateStripeCustomer({
   return customer.id;
 }
 
+export async function findStripeCustomerIdByEmail(email: string): Promise<string | null> {
+  const stripe = getStripe();
+  const customers = await stripe.customers.list({
+    email,
+    limit: 1,
+  });
+
+  return customers.data[0]?.id ?? null;
+}
+
 export async function resolveStripeCustomerId(
   bigcommerceCustomerId: number,
 ): Promise<string | null> {
