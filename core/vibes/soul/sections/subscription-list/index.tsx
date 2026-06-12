@@ -98,9 +98,11 @@ export function SubscriptionList({
                           <h2 className="text-xl font-medium text-[var(--foreground,hsl(var(--foreground)))]">
                             {subscription.productName}
                           </h2>
-                          <Badge>{subscription.statusLabel}</Badge>
+                          <Badge variant={subscription.cancelAtPeriodEnd ? 'warning' : 'primary'}>
+                            {subscription.statusLabel}
+                          </Badge>
                           {subscription.cancelAtPeriodEnd ? (
-                            <Badge variant="warning">{cancelAtPeriodEndLabel}</Badge>
+                            <Badge variant="info">{cancelAtPeriodEndLabel}</Badge>
                           ) : null}
                         </div>
                         <p className="mt-2 text-[var(--contrast-500,hsl(var(--contrast-500)))]">

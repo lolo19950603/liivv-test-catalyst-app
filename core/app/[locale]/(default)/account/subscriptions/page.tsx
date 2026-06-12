@@ -58,12 +58,20 @@ export default async function SubscriptionsPage({ params }: Props) {
         subscription.intervalCount,
         t,
       ),
-      statusLabel: t(`status.${subscription.status}` as 'status.active'),
-      renewalLabel: t('renewsOn', {
-        date: format.dateTime(new Date(subscription.currentPeriodEnd * 1000), {
-          dateStyle: 'medium',
-        }),
-      }),
+      statusLabel: subscription.cancelAtPeriodEnd
+        ? t('status.cancelling')
+        : t(`status.${subscription.status}` as 'status.active'),
+      renewalLabel: subscription.cancelAtPeriodEnd
+        ? t('endsOn', {
+            date: format.dateTime(new Date(subscription.currentPeriodEnd * 1000), {
+              dateStyle: 'medium',
+            }),
+          })
+        : t('renewsOn', {
+            date: format.dateTime(new Date(subscription.currentPeriodEnd * 1000), {
+              dateStyle: 'medium',
+            }),
+          }),
       cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
     }));
   });

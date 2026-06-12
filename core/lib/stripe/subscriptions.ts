@@ -17,6 +17,20 @@ export interface CustomerSubscription {
   cancelAtPeriodEnd: boolean;
 }
 
+function isSubscriptionCancelScheduled(subscription: Stripe.Subscription): boolean {
+  const now = Math.floor(Date.now() / 1000);
+
+  if (subscription.cancel_at_period_end) {
+    return true;
+  }
+
+  return (
+    subscription.cancel_at != null &&
+    subscription.cancel_at > now &&
+    (subscription.status === 'active' || subscription.status === 'trialing')
+  );
+}
+
 function toCustomerSubscription(
   subscription: Stripe.Subscription,
   productNamesById: Map<string, string>,
@@ -28,7 +42,9 @@ function toCustomerSubscription(
   }
 
   const productName = getSubscriptionProductName(item.price, productNamesById);
+  const cancelAtPeriodEnd = isSubscriptionCancelScheduled(subscription);
   const currentPeriodEnd =
+    (cancelAtPeriodEnd ? subscription.cancel_at : null) ??
     item.current_period_end ??
     subscription.billing_cycle_anchor ??
     subscription.created;
@@ -42,7 +58,7 @@ function toCustomerSubscription(
     interval: item.price.recurring.interval,
     intervalCount: item.price.recurring.interval_count,
     currentPeriodEnd,
-    cancelAtPeriodEnd: subscription.cancel_at_period_end,
+    cancelAtPeriodEnd,
   };
 }
 

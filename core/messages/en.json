@@ -259,6 +259,7 @@
       "browsePlans": "Browse plans",
       "customPricing": "Custom pricing",
       "renewsOn": "Renews on {date}",
+      "endsOn": "Ends on {date}",
       "cancelAtPeriodEnd": "Cancels at period end",
       "empty": {
         "title": "You don't have any subscriptions",
@@ -276,6 +277,7 @@
       },
       "status": {
         "active": "Active",
+        "cancelling": "Cancelling",
         "trialing": "Trialing",
         "past_due": "Past due",
         "canceled": "Canceled",
