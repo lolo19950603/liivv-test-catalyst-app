@@ -615,6 +615,8 @@
     "description": "Choose a subscription plan for recurring billing and deliveries.",
     "subscribe": "Subscribe",
     "loginToSubscribe": "Log in to subscribe",
+    "startDate": "Starts",
+    "startDateHint": "Leave as today to start immediately, or pick a future date.",
     "customPricing": "Custom pricing",
     "empty": {
       "title": "No subscription plans available",
