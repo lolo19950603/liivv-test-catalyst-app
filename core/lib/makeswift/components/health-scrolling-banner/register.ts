@@ -14,7 +14,9 @@ import { HealthScrollingBanner } from './client';
 
 export const COMPONENT_TYPE = 'health-scrolling-banner';
 
+/** Taupe `#a99c93` — outline matches fill on resting state. */
 const TAUPE_BUTTON_DEFAULTS = {
+  outlineHsl: '23 11% 62%',
   backgroundHsl: '23 11% 62%',
   textHsl: '0 0% 100%',
   hoverBackgroundHsl: '0 0% 100%',

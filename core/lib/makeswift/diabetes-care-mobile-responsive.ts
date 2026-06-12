@@ -41,6 +41,16 @@ export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
   `${MOBILE_TABLET}{.dc-section-root{overflow-x:clip;overflow-y:visible}}`,
   `@media screen and (min-width:1024px){.dc-section-root{overflow-x:clip;overflow-y:visible}}`,
   `${MOBILE_TABLET}{.dc-section-root .section--rounded,.dc-section-root .section{overflow:visible}}`,
+  /* Rounded top: pull section up so corner cutouts reveal the previous section (not page bg). */
+  `.dc-section-root:has(> .shopify-section > .section.section--rounded),` +
+  `.dc-section-root:has(> .shopify-section.section.section--rounded),` +
+  `.dc-section-root.shopify-section.section--rounded{` +
+  `margin-block-start:calc(-1 * var(--border-radius,1.5rem));` +
+  `position:relative;` +
+  `z-index:1}` +
+  `.dc-section-root:has(> .shopify-section > .section.section--rounded) > .shopify-section,` +
+  `.dc-section-root.shopify-section.section--rounded{` +
+  `background-color:transparent!important}`,
   `${MOBILE_TABLET}{.dc-section-root .page-width{padding-inline:max(1rem,env(safe-area-inset-left,0px)) max(1rem,env(safe-area-inset-right,0px))}}`,
 
   /* Archive `mobile:media--auto` (missing from sections.css) */
@@ -81,7 +91,8 @@ export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
   `${MOBILE_TABLET}{#shopify-section-template--26520397447459__number_counter_dTAx7w .page-width{overflow:visible}}`,
 
   /* 04 — Timeline (any page — `.diabetes-care-timeline`, not only diabetes-care section id) */
-  `${MOBILE}{.diabetes-care-timeline .section{--section-padding-top:48px;--section-padding-bottom:48px}}`,
+  `${MOBILE}{.diabetes-care-timeline .section{--section-padding-top:48px;--section-padding-bottom:48px}}` +
+  `${MOBILE_TABLET}{.diabetes-care-timeline .shopify-section .section.section--rounded{overflow:hidden!important}}`,
   `${MOBILE}{.diabetes-care-timeline .timeline-react-strip .timeline__item{flex:0 0 min(92vw,24rem)!important}}`,
   `${MOBILE}{.diabetes-care-timeline .slider--tablet{overflow:visible;padding-inline:0;margin-inline:0}}`,
   `${MOBILE}{.diabetes-care-timeline .scroll-area{overflow:visible;scroll-snap-type:none}}`,

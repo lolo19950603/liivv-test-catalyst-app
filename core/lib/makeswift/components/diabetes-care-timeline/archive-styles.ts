@@ -1,3 +1,23 @@
+const ROUNDED_RADIUS = 'var(--border-radius,1.5rem)';
+
+/**
+ * Class-scoped rounded top (any timeline instance id). Beats
+ * `.dc-section-root .section--rounded { overflow: visible }` and keeps archive
+ * `.section:before` height for the curved overlap.
+ */
+export const TIMELINE_ROUNDED_TOP_CSS =
+  `.diabetes-care-timeline{--border-radius:1.5rem}` +
+  `.diabetes-care-timeline .shopify-section:has(> .section.section--rounded){background-color:transparent!important}` +
+  `.diabetes-care-timeline .shopify-section .section:not(.section--rounded){background-color:rgb(var(--color-background))}` +
+  `.diabetes-care-timeline .shopify-section .section.section--rounded{` +
+  `position:relative;z-index:1;overflow:hidden!important;` +
+  `background-color:rgb(var(--color-background))!important;` +
+  `border-start-end-radius:${ROUNDED_RADIUS}!important;` +
+  `border-start-start-radius:${ROUNDED_RADIUS}!important}` +
+  `.js .diabetes-care-timeline .shopify-section .section.section--rounded:before{` +
+  `height:calc(100% + var(--border-radius,1.5rem));` +
+  `border-start-end-radius:${ROUNDED_RADIUS};` +
+  `border-start-start-radius:${ROUNDED_RADIUS}}`;
 /** Archive `.timeline-dots` rules from `diabetes-care-sections.css`, scoped per section. */
 export function timelineDotsCss(sectionDomId: string): string {
   const root = `#${sectionDomId}`;

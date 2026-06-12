@@ -23,15 +23,16 @@ import {
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
 import { cssColorWithOpacity, toArchiveRgbChannels } from '~/lib/makeswift/utils/archive-color';
+import { ARCHIVE_CREAM_BACKGROUND_CHANNELS } from '~/lib/makeswift/utils/diabetes-care-archive-theme';
 import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
 import {
-  resolveAccentColors,
+  isHighlightOverrideEnabled,
   resolvePlainTextColor,
   resolveSectionHighlightChannels,
 } from '~/lib/makeswift/utils/heading-accent-color';
 import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
 
-import { timelineSectionLayoutCss } from './archive-styles';
+import { TIMELINE_ROUNDED_TOP_CSS, timelineSectionLayoutCss } from './archive-styles';
 
 export const DIABETES_CARE_TIMELINE_SECTION_ID =
   'shopify-section-template--26520397447459__timeline_nyTDKQ';
@@ -219,11 +220,17 @@ function timelineCategoryLabel(section: DiabetesCareTimelineSection): string {
 }
 
 /** Per-slide heading: font size + swash scoped to this `h2` via `--color-highlight`. */
+function timelineSectionHeadingUsesSwash(heading?: TimelineSectionHeadingProps | null): boolean {
+  return isHighlightOverrideEnabled(heading?.useCustomHighlightColor);
+}
+
 function timelineSectionHeadingStyle(
   heading?: TimelineSectionHeadingProps | null,
 ): CSSProperties | undefined {
   const typography = timelineTypographyStyle(heading);
-  const highlightChannels = resolveSectionHighlightChannels(heading);
+  const highlightChannels = timelineSectionHeadingUsesSwash(heading)
+    ? resolveSectionHighlightChannels(heading)
+    : null;
 
   if (typography == null && highlightChannels == null) {
     return undefined;
@@ -423,7 +430,7 @@ function TimelineSlide({
   const categoryLabel = content?.categoryLabel?.text?.trim() ?? '';
   const sectionHeadingBlock = content?.sectionHeading;
   const sectionHeading = sectionHeadingBlock?.text?.trim() ?? '';
-  const sectionHeadingAccent = resolveAccentColors(sectionHeadingBlock);
+  const sectionHeadingUsesSwash = timelineSectionHeadingUsesSwash(sectionHeadingBlock);
   const sectionBodyHtml = content?.sectionBody?.html?.trim() ?? '';
   const slideButton = resolveArchiveButton(section.button, {
     defaultText: 'Get Started',
@@ -475,12 +482,16 @@ function TimelineSlide({
               className="heading text-2xl leading-none tracking-tight lg:text-3xl"
               style={timelineSectionHeadingStyle(sectionHeadingBlock)}
             >
-              <ArchiveHighlightedText
-                color={resolvePlainTextColor(sectionHeadingBlock)}
-                highlightStyle={sectionHeadingAccent.highlightStyle}
-              >
-                {sectionHeading}
-              </ArchiveHighlightedText>
+              {sectionHeadingUsesSwash ? (
+                <ArchiveHighlightedText
+                  color={resolvePlainTextColor(sectionHeadingBlock)}
+                  highlightStyle="half_text"
+                >
+                  {sectionHeading}
+                </ArchiveHighlightedText>
+              ) : (
+                sectionHeading
+              )}
             </h2>
           ) : null}
 
@@ -684,7 +695,15 @@ export function DiabetesCareTimeline({
     sectionId: resolvedSectionId,
     sectionCss: timelineSectionLayoutCss(resolvedSectionId, count),
     background,
+    defaultBackgroundChannels: ARCHIVE_CREAM_BACKGROUND_CHANNELS,
   });
+  const sectionBackgroundStyle: CSSProperties | undefined =
+    sectionStyle['--color-background'] != null
+      ? ({
+          '--color-background': sectionStyle['--color-background'],
+          backgroundColor: `rgb(${String(sectionStyle['--color-background'])})`,
+        } as CSSProperties)
+      : undefined;
   const mainHeadingStyle = timelineMainHeadingStyle(mainHeading.accentColors);
 
   return (
@@ -694,8 +713,17 @@ export function DiabetesCareTimeline({
         id={resolvedSectionId}
         style={{ ...sectionStyle, ...stepNavigationStyle }}
       >
+        {roundedTop ? (
+          <style dangerouslySetInnerHTML={{ __html: TIMELINE_ROUNDED_TOP_CSS }} />
+        ) : null}
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
-        <div className={clsx('section section--padding', roundedTop && 'section--rounded')}>
+        <div
+          className={clsx(
+            'section section--padding relative',
+            roundedTop && 'section--rounded overflow-hidden',
+          )}
+          style={roundedTop ? sectionBackgroundStyle : undefined}
+        >
           <div className="page-width relative px-4 sm:px-5 md:px-0">
             <div className="title-wrapper z-1 relative flex flex-row flex-wrap items-end justify-between gap-4 text-left leading-none lg:gap-8">
               <div className="grid min-w-0 flex-1 gap-4">

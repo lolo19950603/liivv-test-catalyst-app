@@ -13,7 +13,7 @@ import {
 import {
   archiveButtonControls,
   fontSizeFields,
-  highlightSwashColorFields,
+  highlightSwashFields,
   roundedTopControl,
   sectionBackgroundControls,
   HEX_OVERRIDE_DESCRIPTION,
@@ -65,7 +65,7 @@ function timelineSectionHeadingPopover(label: string, textDefault: string) {
       }),
       ...textColorFields(TIMELINE_TEXT_COLOR_HSL),
       ...fontSizeFields(),
-      ...highlightSwashColorFields(ARCHIVE_HIGHLIGHT_SWASH_HSL),
+      ...highlightSwashFields(ARCHIVE_HIGHLIGHT_SWASH_HSL),
     },
   });
 }

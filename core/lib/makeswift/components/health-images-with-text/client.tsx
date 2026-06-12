@@ -28,6 +28,25 @@ import {
   healthImagesWithTextSectionCss,
 } from './archive-styles';
 
+function IconArrowRight() {
+  return (
+    <svg
+      aria-hidden
+      className="icon icon-arrow-right icon-sm transform"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 21 20"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M3 10H18M18 10L12.1667 4.16675M18 10L12.1667 15.8334"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export type HealthImagesWithTextProps = {
   className?: string;
   instanceSuffix?: string;
@@ -213,6 +232,7 @@ export function HealthImagesWithText({
                         target={resolvedButton.target}
                       >
                         {resolvedButton.text}
+                        <IconArrowRight />
                       </ArchiveShopifyButton>
                     </p>
                   ) : null}
