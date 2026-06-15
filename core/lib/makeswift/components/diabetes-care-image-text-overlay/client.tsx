@@ -264,7 +264,7 @@ export function DiabetesCareImageTextOverlay({
   const line1Text = line1.text.length > 0 ? line1.text : "We're Here if";
   const line2Text = line2.text.length > 0 ? line2.text : 'You Need Us';
   const html = bodyResolved.html;
-  const resolvedButton = resolveArchiveButton(button);
+  const resolvedButton = resolveArchiveButton(button, { requireHref: false });
   const showLine2 = line2Text.length > 0;
 
   return (

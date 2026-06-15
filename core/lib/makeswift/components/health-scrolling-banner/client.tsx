@@ -193,11 +193,12 @@ function PanelCopy({
       ) : null}
       {panelButton.visible ? (
         <ArchiveShopifyButton
-          className="button--primary button--md icon-with-text"
+          className="button--md icon-with-text"
           colors={panelButton.colors}
           href={panelButton.href}
           rel={panelButton.rel}
           target={panelButton.target}
+          variant="secondary"
         >
           {panelButton.text}
           <IconArrowRight />

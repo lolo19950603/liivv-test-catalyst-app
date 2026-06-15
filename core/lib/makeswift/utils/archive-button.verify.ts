@@ -33,8 +33,9 @@ const primary = resolveButtonTheme(
 );
 assert(
   primary.style?.['--color-button-background'] === '49 47 47' &&
-    primary.style?.['--color-button-text'] === '255 255 255',
-  'primary resting colors map to archive vars',
+    primary.style?.['--color-button-text'] === '255 255 255' &&
+    primary.style?.['--color-button-gradient'] === 'none',
+  'primary resting colors map to archive vars and clear inherited gradient',
 );
 
 // Secondary swaps user-facing text/background to archive vars

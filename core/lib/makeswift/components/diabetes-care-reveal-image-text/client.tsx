@@ -67,6 +67,30 @@ const DEFAULT_HERO_HEIGHT = 1200;
 /** Banner headline when Makeswift font size is 0 (desktop only; mobile uses compact clamp). */
 const DEFAULT_BANNER_HEADING_FONT_SIZE_DESKTOP = 90;
 
+const ROUNDED_RADIUS = 'var(--border-radius,1.5rem)';
+
+/** Reveal uses `section inline` + `shopify-section contents`; scoped rules restore archive rounded-top. */
+function revealRoundedTopCss(revealSectionId: string, rootId: string, enabled: boolean): string {
+  if (!enabled) {
+    return '';
+  }
+
+  return (
+    `#${rootId}{--border-radius:1.5rem}` +
+    `#${revealSectionId} .section.section--rounded{` +
+    `position:relative;z-index:1;display:block!important;width:100%;` +
+    `margin-block-start:calc(-1 * ${ROUNDED_RADIUS});` +
+    `overflow:hidden!important;` +
+    `background-color:rgb(var(--color-background))!important;` +
+    `border-start-end-radius:${ROUNDED_RADIUS}!important;` +
+    `border-start-start-radius:${ROUNDED_RADIUS}!important}` +
+    `.js #${revealSectionId} .section.section--rounded:before{` +
+    `height:calc(100% + ${ROUNDED_RADIUS});` +
+    `border-start-end-radius:${ROUNDED_RADIUS};` +
+    `border-start-start-radius:${ROUNDED_RADIUS}}`
+  );
+}
+
 export type DiabetesCareRevealBannerImageProps = {
   heroImageSrc?: string;
   heroImageAlt?: string;
@@ -183,13 +207,22 @@ export function DiabetesCareRevealImageWithText({
 
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: rootId,
-    sectionCss: `#${richSectionId}{--section-padding-top:72px;--section-padding-bottom:100px;--color-button-background:142 165 141;--color-button-border:142 165 141}${revealSectionCss}`,
+    sectionCss:
+      revealRoundedTopCss(revealSectionId, rootId, roundedTop) +
+      `#${richSectionId}{--section-padding-top:72px;--section-padding-bottom:100px;--color-button-background:142 165 141;--color-button-border:142 165 141}${revealSectionCss}`,
     background,
     highlight: useStoryAccentSwash ? secondaryHeading : null,
     defaultBackgroundChannels: ARCHIVE_CREAM_BACKGROUND_CHANNELS,
   });
 
   const rootThemeStyle = sectionStyle as CSSProperties & Record<string, string | number>;
+  const roundedSectionStyle: CSSProperties | undefined =
+    roundedTop && rootThemeStyle['--color-background'] != null
+      ? ({
+          '--color-background': rootThemeStyle['--color-background'],
+          backgroundColor: `rgb(${String(rootThemeStyle['--color-background'])})`,
+        } as CSSProperties)
+      : undefined;
 
   const title =
     bannerHeadline.text.length > 0 ? bannerHeadline.text : 'Meet Armaan...';
@@ -295,7 +328,13 @@ export function DiabetesCareRevealImageWithText({
     >
       <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
       <div className="shopify-section contents" id={revealSectionId}>
-        <div className={clsx('section inline', roundedTop && 'section--rounded')}>
+        <div
+          className={clsx(
+            'section relative w-full',
+            roundedTop ? 'section--rounded overflow-hidden' : 'inline',
+          )}
+          style={roundedSectionStyle}
+        >
           <div className="relative contents">
             <SplittingBanner className="splitting-banner reveal-banner relative inline">
               <span className="reveal-banner__tracker absolute top-0 h-full" />

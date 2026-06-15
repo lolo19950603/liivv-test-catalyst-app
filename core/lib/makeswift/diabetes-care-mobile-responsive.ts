@@ -105,6 +105,7 @@ export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
   `${MOBILE}{#${MULTICOLUMN_SECTION_ID} .multicolumn-card__info .heading .highlighted-text[data-style=half_text]{display:inline-block;max-width:100%;box-decoration-break:clone;-webkit-box-decoration-break:clone}}`,
 
   /* 06 — Reveal + story (scroll-driven headline; shorter runway than desktop 120vh) */
+  `${MOBILE_TABLET}{[id^="dcrift-reveal"] .section.section--rounded{overflow:hidden!important}}` +
   `${MOBILE_TABLET}{[id^="dcrift-"] .splitting-banner .reveal-banner__scroller{position:sticky!important;top:0!important;height:100lvh!important;max-height:100dvh!important;overflow:hidden!important;padding-inline:0!important;margin-inline:0!important}}`,
   `${MOBILE_TABLET}{[id^="dcrift-"] .reveal-banner__tracker{inset-block-start:12%!important;height:72lvh!important}}`,
   `${MOBILE_TABLET}{[id^="dcrift-"] .reveal-banner .banner{height:100%!important;min-height:100%!important}}`,

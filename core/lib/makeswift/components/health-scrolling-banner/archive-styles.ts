@@ -6,7 +6,7 @@ export const HEALTH_SCROLLING_BANNER_SECTION_ID =
 export const HEALTH_SCROLLING_BANNER_SEGMENT_PX = 650;
 
 export function healthScrollingBannerSectionVars(sectionDomId: string): string {
-  return `#${sectionDomId}{--section-padding-top:72px;--section-padding-bottom:72px;--color-button-background:168 156 148;--color-button-border:168 156 148;--color-button-text:255 255 255;--scroll-banner-top-gap:${String(SCROLL_BANNER_TOP_GAP_PX)}px;--scroll-banner-grid-gap:clamp(40px,5vw,60px)}`;
+  return `#${sectionDomId}{--section-padding-top:72px;--section-padding-bottom:72px;--scroll-banner-top-gap:${String(SCROLL_BANNER_TOP_GAP_PX)}px;--scroll-banner-grid-gap:clamp(40px,5vw,60px)}`;
 }
 
 export function healthScrollingBannerLayoutCss(sectionDomId: string): string {

@@ -128,6 +128,7 @@ function resolveRichTextLowerButton(props: {
       (legacyText != null && legacyText.length > 0
         ? { buttonText: legacyText, buttonLink: legacyLink }
         : undefined),
+    { requireHref: false },
   );
 }
 

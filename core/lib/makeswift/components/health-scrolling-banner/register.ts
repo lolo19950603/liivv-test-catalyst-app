@@ -9,19 +9,11 @@ import {
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { healthPageComponentLabel } from '~/lib/makeswift/health-page-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
+import { ARCHIVE_BUTTON_SECONDARY_ON_BANNER } from '~/lib/makeswift/utils/archive-button-presets';
 
 import { HealthScrollingBanner } from './client';
 
 export const COMPONENT_TYPE = 'health-scrolling-banner';
-
-/** Taupe `#a99c93` — outline matches fill on resting state. */
-const TAUPE_BUTTON_DEFAULTS = {
-  outlineHsl: '23 11% 62%',
-  backgroundHsl: '23 11% 62%',
-  textHsl: '0 0% 100%',
-  hoverBackgroundHsl: '0 0% 100%',
-  hoverTextHsl: '23 11% 62%',
-} as const;
 
 const panelGroup = Group({
   label: 'Panel',
@@ -53,7 +45,7 @@ const panelGroup = Group({
     button: Group({
       label: 'Button',
       preferredLayout: Group.Layout.Popover,
-      props: archiveButtonControls(TAUPE_BUTTON_DEFAULTS, { textDefault: 'Get Started' }),
+      props: archiveButtonControls(ARCHIVE_BUTTON_SECONDARY_ON_BANNER, { textDefault: 'Get Started' }),
     }),
   },
 });

@@ -64,6 +64,12 @@ export function resolveButtonTheme(
 
   if (labelChannels != null) {
     style['--color-button-background'] = labelChannels;
+
+    if (!isSecondary) {
+      // Archive `.button` sets `background: var(--color-button-gradient)`; inherited
+      // gradients from the section theme otherwise mask a custom resting fill.
+      style['--color-button-gradient'] = 'none';
+    }
   }
 
   if (fillChannels != null) {
