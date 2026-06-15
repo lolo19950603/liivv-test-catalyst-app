@@ -23,14 +23,16 @@ export function healthScrollingBannerLayoutCss(sectionDomId: string): string {
     `${root} .with-scrolling .image-with-text__image{border-radius:var(--rounded-block,1rem);overflow:hidden;position:relative}` +
     `${root} .with-scrolling .image-with-text__image .media img{display:block;width:100%;height:100%;object-fit:cover}` +
     `${root} .with-scrolling .image-with-text__image-layer{will-change:clip-path}` +
-    `${root} .with-scrolling .image-with-text__content-col{position:relative;min-height:inherit}` +
+    `${root} .with-scrolling .image-with-text__content-col{position:relative;display:flex;flex-direction:column;min-height:0;overflow:hidden}` +
     `${root} .with-scrolling .image-with-text__content-col .rich-text{padding-inline-start:var(--scroll-banner-grid-gap,clamp(40px,5vw,60px))}` +
+    `${root} .with-scrolling .image-with-text__content-layer{display:flex;flex-direction:column;min-height:0}` +
     `${root} .with-scrolling .image-with-text__content-layer{opacity:0;visibility:hidden;pointer-events:none}` +
     `${root} .with-scrolling .image-with-text__content-layer--revealed{opacity:1;visibility:visible}` +
-    `${root} .with-scrolling .health-scroll-banner-content-enter{width:100%}` +
+    `${root} .with-scrolling .health-scroll-banner-content-enter{width:100%;min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;padding-block:var(--sp-8,2rem);-webkit-overflow-scrolling:touch}` +
     `${root} .with-scrolling .health-scroll-banner-content-enter--animate{animation:health-scroll-banner-content-in .35s cubic-bezier(.3,1,.3,1) both}` +
     `${root} .with-scrolling .rich-text>*+*:not(.spacing-section){margin-block-start:var(--sp-6,1.5rem)}` +
     `${root} .with-scrolling .rich-text .button{margin-block-start:var(--sp-6,1.5rem)}` +
+    `${root} .with-scrolling .rich-text{padding-block-end:var(--sp-2,0.5rem)}` +
     `@media screen and (min-width:1024px){${root} .with-scrolling .image-with-text__image{height:650px;max-height:min(650px,calc(100vh - var(--scroll-banner-inset,160px) - var(--scroll-banner-top-gap,40px)))}${root} .with-scrolling .image-with-text__content-col{min-height:650px;max-height:min(650px,calc(100vh - var(--scroll-banner-inset,160px) - var(--scroll-banner-top-gap,40px)))}}` +
     `@media screen and (min-width:1536px){${root} .with-scrolling .image-with-text__content-col .rich-text{padding-inline-start:15%}}` +
     `@media screen and (max-width:1023px){${root} .health-scroll-banner-mobile .image-with-text__image{aspect-ratio:16/10}${root} .health-scroll-banner-mobile .image-with-text__image .media img{height:100%}}` +

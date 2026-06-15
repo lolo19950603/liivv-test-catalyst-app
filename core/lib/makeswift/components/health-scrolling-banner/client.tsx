@@ -385,7 +385,7 @@ export function HealthScrollingBanner({
                           index !== segmentIndex + 1
                         }
                         className={clsx(
-                          'image-with-text__content image-with-text__content-layer absolute inset-0 flex h-full w-full items-center',
+                          'image-with-text__content image-with-text__content-layer absolute inset-0 flex h-full min-h-0 w-full flex-col',
                           contentRevealed && 'image-with-text__content-layer--revealed',
                         )}
                         key={`content-layer-${index}`}
@@ -399,7 +399,7 @@ export function HealthScrollingBanner({
                         {contentRevealed ? (
                           <div
                             className={clsx(
-                              'health-scroll-banner-content-enter flex h-full w-full items-center',
+                              'health-scroll-banner-content-enter min-h-0 w-full flex-1 overflow-y-auto',
                               contentEnterKey > 0 && 'health-scroll-banner-content-enter--animate',
                             )}
                             key={`scroll-banner-enter-${String(index)}-${String(contentEnterKey)}`}
