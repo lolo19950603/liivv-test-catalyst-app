@@ -350,6 +350,7 @@ export type DiabetesCareTimelineProps = {
   sliderDomId?: string;
   background?: SectionBackgroundProps;
   heading?: TimelineMainHeadingProps;
+  smallHeading?: TimelineTextBlockProps;
   /** @deprecated Use `heading.before`. */
   primaryHeading?: HeadingTypographyProps;
   /** @deprecated Use `heading.emphasis`. */
@@ -543,6 +544,7 @@ export function DiabetesCareTimeline({
   sliderDomId,
   background,
   heading,
+  smallHeading,
   primaryHeading,
   secondaryHeading,
   sections,
@@ -562,6 +564,7 @@ export function DiabetesCareTimeline({
     primaryHeading,
     secondaryHeading,
   });
+  const smallHeadingText = smallHeading?.text?.trim() ?? '';
   const list = useMemo(() => sections ?? [], [sections]);
   const count = list.length;
   const [activeIndex, setActiveIndex] = useState(0);
@@ -727,6 +730,14 @@ export function DiabetesCareTimeline({
           <div className="page-width relative px-4 sm:px-5 md:px-0">
             <div className="title-wrapper z-1 relative flex flex-row flex-wrap items-end justify-between gap-4 text-left leading-none lg:gap-8">
               <div className="grid min-w-0 flex-1 gap-4">
+                {smallHeadingText.length > 0 ? (
+                  <p
+                    className="heading subtext-lg font-medium normal-case leading-none tracking-none"
+                    style={timelineTypographyStyle(smallHeading)}
+                  >
+                    {smallHeadingText}
+                  </p>
+                ) : null}
                 <h2 className="heading title-md" style={mainHeadingStyle}>
                   <AccentSplitWordsHeading
                     accentColors={mainHeading.accentColors}

@@ -1,13 +1,11 @@
 'use server';
 
-import { startProductSubscriptionCheckout } from '~/lib/stripe/product-checkout';
+import { addSubscriptionProductToCart } from '~/lib/stripe/add-subscription-to-cart';
 
 export async function subscribeFromProduct(formData: FormData) {
   const productPath = String(formData.get('productPath') ?? '/');
 
-  await startProductSubscriptionCheckout(formData, {
+  await addSubscriptionProductToCart(formData, {
     loginRedirectTo: productPath,
-    successPath: '/subscribe/success/',
-    cancelPath: productPath,
   });
 }

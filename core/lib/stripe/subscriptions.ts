@@ -2,6 +2,12 @@ import 'server-only';
 
 import type Stripe from 'stripe';
 
+import {
+  BIGCOMMERCE_PRODUCT_OPTIONS_METADATA_KEY,
+  type ProductOptionSelection,
+  serializeProductOptionSelections,
+} from '~/lib/bigcommerce/product-options';
+
 import { getStripe } from './client';
 import { toStripeRecurring, type SubscriptionBillingInterval } from './subscription-interval';
 
@@ -134,9 +140,31 @@ export interface ProductSubscriptionLineItem {
   productEntityId: number;
   productName: string;
   sku: string;
+  productOptions?: ProductOptionSelection[];
   unitAmount: number;
   currency: string;
   billingInterval: SubscriptionBillingInterval;
+}
+
+function buildProductSubscriptionMetadata({
+  bigcommerceCustomerId,
+  lineItem,
+}: {
+  bigcommerceCustomerId: number;
+  lineItem: ProductSubscriptionLineItem;
+}): Stripe.MetadataParam {
+  const serializedOptions = serializeProductOptionSelections(lineItem.productOptions ?? []);
+
+  return {
+    bigcommerce_customer_id: String(bigcommerceCustomerId),
+    bigcommerce_product_id: String(lineItem.productEntityId),
+    bigcommerce_sku: lineItem.sku,
+    subscription_interval: lineItem.billingInterval.interval,
+    subscription_interval_count: String(lineItem.billingInterval.intervalCount),
+    ...(serializedOptions
+      ? { [BIGCOMMERCE_PRODUCT_OPTIONS_METADATA_KEY]: serializedOptions }
+      : {}),
+  };
 }
 
 export async function createProductSubscriptionCheckoutSession({
@@ -156,6 +184,10 @@ export async function createProductSubscriptionCheckoutSession({
 }): Promise<string> {
   const stripe = getStripe();
   const recurring = toStripeRecurring(lineItem.billingInterval);
+  const subscriptionMetadata = buildProductSubscriptionMetadata({
+    bigcommerceCustomerId,
+    lineItem,
+  });
 
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
@@ -180,21 +212,9 @@ export async function createProductSubscriptionCheckoutSession({
     success_url: successUrl,
     cancel_url: cancelUrl,
     allow_promotion_codes: true,
-    metadata: {
-      bigcommerce_customer_id: String(bigcommerceCustomerId),
-      bigcommerce_product_id: String(lineItem.productEntityId),
-      bigcommerce_sku: lineItem.sku,
-      subscription_interval: lineItem.billingInterval.interval,
-      subscription_interval_count: String(lineItem.billingInterval.intervalCount),
-    },
+    metadata: subscriptionMetadata,
     subscription_data: {
-      metadata: {
-        bigcommerce_customer_id: String(bigcommerceCustomerId),
-        bigcommerce_product_id: String(lineItem.productEntityId),
-        bigcommerce_sku: lineItem.sku,
-        subscription_interval: lineItem.billingInterval.interval,
-        subscription_interval_count: String(lineItem.billingInterval.intervalCount),
-      },
+      metadata: subscriptionMetadata,
       ...(billingCycleAnchor
         ? {
             billing_cycle_anchor: billingCycleAnchor,

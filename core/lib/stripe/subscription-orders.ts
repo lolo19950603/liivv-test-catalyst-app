@@ -2,6 +2,10 @@ import 'server-only';
 
 import type Stripe from 'stripe';
 
+import {
+  BIGCOMMERCE_PRODUCT_OPTIONS_METADATA_KEY,
+  parseProductOptionSelectionsFromMetadata,
+} from '~/lib/bigcommerce/product-options';
 import { createBigCommerceSubscriptionOrder } from '~/lib/bigcommerce/subscription-order';
 import { isBigCommerceAdminConfigured } from '~/lib/bigcommerce/rest';
 
@@ -36,6 +40,12 @@ function getProductSku(metadata: Stripe.Metadata | null | undefined): string | u
   const sku = metadata?.bigcommerce_sku;
 
   return sku?.trim() || undefined;
+}
+
+function getProductOptions(metadata: Stripe.Metadata | null | undefined) {
+  return parseProductOptionSelectionsFromMetadata(
+    metadata?.[BIGCOMMERCE_PRODUCT_OPTIONS_METADATA_KEY],
+  );
 }
 
 function getInvoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
@@ -119,6 +129,7 @@ async function createOrderFromSubscription({
       productEntityId: getBigCommerceProductId(subscription.metadata),
       productName,
       productSku: getProductSku(subscription.metadata),
+      productOptions: getProductOptions(subscription.metadata),
       unitAmount,
       currencyCode,
       stripeSubscriptionId: subscription.id,

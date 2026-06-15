@@ -523,6 +523,44 @@
       "print": "Print"
     }
   },
+  "Checkout": {
+    "title": "Checkout",
+    "subscriptionBadge": "Subscription",
+    "shippingRequired": "Select a shipping method on your cart before completing checkout.",
+    "shippingRequiredCta": "Back to cart",
+    "billing": {
+      "title": "Billing details",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "company": "Company",
+      "address1": "Address",
+      "address2": "Apartment, suite, etc.",
+      "city": "City",
+      "stateOrProvince": "State / Province",
+      "countryCode": "Country code",
+      "postalCode": "Postal code",
+      "phone": "Phone"
+    },
+    "payment": {
+      "title": "Payment",
+      "continue": "Continue to payment",
+      "submit": "Place order"
+    },
+    "summary": {
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "tax": "Tax",
+      "total": "Total"
+    },
+    "Success": {
+      "title": "Order placed",
+      "description": "Thank you! Your payment was received and your order is being processed.",
+      "viewOrders": "View orders",
+      "viewSubscriptions": "View subscriptions",
+      "continueShopping": "Continue shopping"
+    }
+  },
   "Cart": {
     "title": "Cart",
     "heading": "Your cart",

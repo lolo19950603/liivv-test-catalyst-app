@@ -6,25 +6,20 @@ import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
 import { PricingFragment } from '~/client/fragments/pricing';
 import { graphql } from '~/client/graphql';
-import { redirect } from '~/i18n/routing';
-import { getPreferredCurrencyCode } from '~/lib/currency';
-
 import { parseProductOptionSelectionsFromFormData } from '~/lib/bigcommerce/product-options';
+import {
+  addSubscriptionLineToCart,
+  buildSubscriptionLineMeta,
+} from '~/lib/checkout/subscription-lines';
+import { addToOrCreateCart, getCartId } from '~/lib/cart';
+import { getPreferredCurrencyCode } from '~/lib/currency';
+import { redirect as appRedirect } from '~/i18n/routing';
 
 import { isStripeConfigured } from './client';
-import { buildAppUrl } from './config';
-import { getOrCreateStripeCustomer } from './customers';
-import { getCheckoutCustomer } from './start-checkout';
-import {
-  getSubscriptionBillingIntervals,
-  resolveSelectedSubscriptionBillingInterval,
-} from './subscription-interval';
-import { parseSubscriptionStartDateInput } from './subscription-start-date';
-import { createProductSubscriptionCheckoutSession } from './subscriptions';
 
-const ProductSubscriptionCheckoutQuery = graphql(
+const ProductSubscriptionCartQuery = graphql(
   `
-    query ProductSubscriptionCheckoutQuery(
+    query ProductSubscriptionCartQuery(
       $entityId: Int!
       $optionValueIds: [OptionValueId!]
       $useDefaultOptionSelections: Boolean
@@ -47,26 +42,10 @@ const ProductSubscriptionCheckoutQuery = graphql(
   [PricingFragment],
 );
 
-function getSubscriptionUnitAmount(priceValue: number): number | null {
-  if (!Number.isFinite(priceValue) || priceValue <= 0) {
-    return null;
-  }
-
-  return Math.round(priceValue * 100);
-}
-
-export async function startProductSubscriptionCheckout(
+export async function addSubscriptionProductToCart(
   formData: FormData,
-  {
-    loginRedirectTo,
-    successPath,
-    cancelPath,
-  }: {
-    loginRedirectTo: string;
-    successPath: string;
-    cancelPath: string;
-  },
-) {
+  { loginRedirectTo }: { loginRedirectTo: string },
+): Promise<void> {
   const locale = await getLocale();
   const t = await getTranslations('Subscribe');
 
@@ -77,7 +56,7 @@ export async function startProductSubscriptionCheckout(
   const customerAccessToken = await getSessionCustomerAccessToken();
 
   if (!customerAccessToken) {
-    redirect({ href: `/login?redirectTo=${encodeURIComponent(loginRedirectTo)}`, locale });
+    appRedirect({ href: `/login?redirectTo=${encodeURIComponent(loginRedirectTo)}`, locale });
   }
 
   const productEntityId = Number(formData.get('productEntityId'));
@@ -94,7 +73,7 @@ export async function startProductSubscriptionCheckout(
   const currencyCode = await getPreferredCurrencyCode();
 
   const { data } = await client.fetch({
-    document: ProductSubscriptionCheckoutQuery,
+    document: ProductSubscriptionCartQuery,
     variables: {
       entityId: productEntityId,
       optionValueIds: optionValueIds.length > 0 ? optionValueIds : undefined,
@@ -113,50 +92,63 @@ export async function startProductSubscriptionCheckout(
 
   const priceValue = product.prices?.salePrice?.value ?? product.prices?.price.value;
   const currency = product.prices?.price.currencyCode ?? currencyCode;
-  const unitAmount = getSubscriptionUnitAmount(priceValue ?? 0);
+  const unitAmount = Math.round((priceValue ?? 0) * 100);
 
   if (!unitAmount) {
     throw new Error(t('errors.unavailablePrice'));
   }
 
-  const customer = await getCheckoutCustomer();
+  const { getSubscriptionBillingIntervals, resolveSelectedSubscriptionBillingInterval } =
+    await import('./subscription-interval');
+  const { parseSubscriptionStartDateInput } = await import('./subscription-start-date');
 
-  if (!customer) {
-    throw new Error(t('errors.customerNotFound'));
-  }
-
-  const stripeCustomerId = await getOrCreateStripeCustomer({
-    bigcommerceCustomerId: customer.entityId,
-    email: customer.email,
-    name: [customer.firstName, customer.lastName].filter(Boolean).join(' '),
-  });
-
-  const allowedIntervals = getSubscriptionBillingIntervals();
   const billingInterval = resolveSelectedSubscriptionBillingInterval(
     formData.get('subscriptionInterval'),
-    allowedIntervals,
+    getSubscriptionBillingIntervals(),
   );
 
   const billingCycleAnchor = parseSubscriptionStartDateInput(
     formData.get('subscriptionStartDate'),
   );
 
-  const checkoutUrl = await createProductSubscriptionCheckoutSession({
-    stripeCustomerId,
-    lineItem: {
-      productEntityId: product.entityId,
-      productName: product.name,
-      sku: product.sku,
-      productOptions,
-      unitAmount,
-      currency,
-      billingInterval,
-    },
-    bigcommerceCustomerId: customer.entityId,
-    successUrl: `${buildAppUrl(successPath, locale)}?session_id={CHECKOUT_SESSION_ID}`,
-    cancelUrl: buildAppUrl(cancelPath, locale),
-    billingCycleAnchor,
+  await addToOrCreateCart({
+    lineItems: [
+      {
+        productEntityId,
+        quantity: 1,
+        ...(optionValueIds.length > 0
+          ? {
+              selectedOptions: {
+                multipleChoices: optionValueIds.map((option) => ({
+                  optionEntityId: option.optionEntityId,
+                  optionValueEntityId: option.valueEntityId,
+                })),
+              },
+            }
+          : {}),
+      },
+    ],
   });
 
-  redirect({ href: checkoutUrl, locale });
+  const cartId = await getCartId();
+
+  if (!cartId) {
+    throw new Error(t('errors.invalidPlan'));
+  }
+
+  await addSubscriptionLineToCart(
+    cartId,
+    buildSubscriptionLineMeta({
+      productEntityId: product.entityId,
+      sku: product.sku ?? '',
+      productName: product.name,
+      productOptions,
+      billingInterval,
+      billingCycleAnchor,
+      unitAmount,
+      currency,
+    }),
+  );
+
+  appRedirect({ href: '/cart/', locale });
 }

@@ -85,6 +85,18 @@ runtime.registerComponent(DiabetesCareTimeline, {
       accentTextColorDefault: TIMELINE_TEXT_COLOR_HSL,
       swashColorOnly: true,
     }),
+    smallHeading: Group({
+      label: 'Small heading',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        text: TextInput({
+          label: 'Text (optional line above heading)',
+          defaultValue: '',
+        }),
+        ...textColorFields(),
+        ...fontSizeFields(),
+      },
+    }),
     layoutReverse: Checkbox({
       label: 'Reverse layout on desktop (image left, text right)',
       defaultValue: false,

@@ -1,5 +1,9 @@
 import 'server-only';
 
+import {
+  type ProductOptionSelection,
+  toBigCommerceOrderProductOptions,
+} from './product-options';
 import { bigCommerceAdminFetch } from './rest';
 
 interface BigCommerceAddress {
@@ -42,6 +46,7 @@ export interface CreateSubscriptionOrderInput {
   productEntityId?: number;
   productName: string;
   productSku?: string;
+  productOptions?: ProductOptionSelection[];
   quantity?: number;
   unitAmount: number;
   currencyCode: string;
@@ -114,6 +119,14 @@ function formatStaffNotes(input: CreateSubscriptionOrderInput): string {
     lines.push(`SKU: ${input.productSku}`);
   }
 
+  if (input.productOptions?.length) {
+    lines.push(
+      `Options: ${input.productOptions
+        .map((option) => `${option.optionEntityId}=${option.valueEntityId}`)
+        .join(', ')}`,
+    );
+  }
+
   return lines.join('\n');
 }
 
@@ -124,8 +137,16 @@ export async function createBigCommerceSubscriptionOrder(
   const price = (input.unitAmount / 100).toFixed(2);
   const quantity = input.quantity ?? 1;
 
+  const productOptions = toBigCommerceOrderProductOptions(input.productOptions ?? []);
+
   const products = input.productEntityId
-    ? [{ product_id: input.productEntityId, quantity }]
+    ? [
+        {
+          product_id: input.productEntityId,
+          quantity,
+          ...(productOptions.length > 0 ? { product_options: productOptions } : {}),
+        },
+      ]
     : [
         {
           name: input.productName,
