@@ -105,15 +105,15 @@ export function scrollBannerTrackHeightPx(
   segmentPx: number,
   viewportHeight: number,
   stickyInsetPx: number,
+  panelHeightPx?: number,
 ): number {
+  const viewportSlot = viewportHeight - stickyInsetPx - SCROLL_BANNER_TOP_GAP_PX;
+
   if (panelCount <= 1) {
-    return Math.max(segmentPx, viewportHeight - stickyInsetPx - SCROLL_BANNER_TOP_GAP_PX);
+    return Math.max(segmentPx, panelHeightPx ?? 0, viewportSlot);
   }
 
-  const visibleHeight = Math.max(
-    viewportHeight - stickyInsetPx - SCROLL_BANNER_TOP_GAP_PX,
-    segmentPx,
-  );
+  const visibleHeight = Math.max(panelHeightPx ?? 0, viewportSlot, segmentPx);
 
   return (panelCount - 1) * segmentPx + visibleHeight;
 }
@@ -123,8 +123,11 @@ export function computeScrollBannerProgress(
   stickyInsetPx: number,
 ): number {
   const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-  const scrollable =
-    trackEl.offsetHeight - (viewportHeight - stickyInsetPx - SCROLL_BANNER_TOP_GAP_PX);
+  const stickyPanel = trackEl.querySelector<HTMLElement>('.with-scrolling');
+  const panelHeight = stickyPanel?.offsetHeight ?? 0;
+  const viewportSlot = viewportHeight - stickyInsetPx - SCROLL_BANNER_TOP_GAP_PX;
+  const visibleHeight = Math.max(panelHeight, viewportSlot);
+  const scrollable = trackEl.offsetHeight - visibleHeight;
 
   if (scrollable <= 0) {
     return 0;

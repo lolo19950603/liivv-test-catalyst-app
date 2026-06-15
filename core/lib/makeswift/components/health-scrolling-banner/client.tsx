@@ -276,6 +276,12 @@ export function HealthScrollingBanner({
     };
   }, []);
 
+  const scrollTrackRef = useRef<HTMLDivElement>(null);
+  const stickyPanelRef = useRef<HTMLDivElement>(null);
+  const [panelHeightPx, setPanelHeightPx] = useState(HEALTH_SCROLLING_BANNER_SEGMENT_PX);
+  const scrollProgress = useScrollingBannerProgress(scrollTrackRef, stickyInsetPx);
+  const { segmentIndex, segmentProgress } = resolveScrollBannerMotion(panelCount, scrollProgress);
+
   const stackHeightPx =
     panelCount > 0
       ? scrollBannerTrackHeightPx(
@@ -283,12 +289,31 @@ export function HealthScrollingBanner({
           HEALTH_SCROLLING_BANNER_SEGMENT_PX,
           viewportHeight,
           stickyInsetPx,
+          panelHeightPx,
         )
       : HEALTH_SCROLLING_BANNER_SEGMENT_PX * 2;
 
-  const scrollTrackRef = useRef<HTMLDivElement>(null);
-  const scrollProgress = useScrollingBannerProgress(scrollTrackRef, stickyInsetPx);
-  const { segmentIndex, segmentProgress } = resolveScrollBannerMotion(panelCount, scrollProgress);
+  useEffect(() => {
+    const stickyPanel = stickyPanelRef.current;
+
+    if (stickyPanel == null || typeof window === 'undefined') {
+      return;
+    }
+
+    const updatePanelHeight = () => {
+      setPanelHeightPx(stickyPanel.offsetHeight);
+    };
+
+    updatePanelHeight();
+
+    const observer = new ResizeObserver(updatePanelHeight);
+    observer.observe(stickyPanel);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [list, segmentIndex]);
+
   const [contentEnterKey, setContentEnterKey] = useState(0);
   const prevSegmentIndexRef = useRef<number | null>(null);
 
@@ -336,7 +361,8 @@ export function HealthScrollingBanner({
                 style={{ minHeight: `${String(stackHeightPx)}px` }}
               >
                 <div
-                  className="image-with-text with-scrolling flex flex-col overflow-hidden lg:sticky lg:flex-row"
+                  className="image-with-text with-scrolling flex flex-col lg:sticky lg:flex-row"
+                  ref={stickyPanelRef}
                   style={
                     {
                       '--scroll-banner-inset': `${String(stickyInsetPx)}px`,
@@ -369,7 +395,7 @@ export function HealthScrollingBanner({
                     </div>
                   </div>
 
-                  <div className="image-with-text__item image-with-text__content-col relative shrink-0 grow">
+                  <div className="image-with-text__item image-with-text__content-col relative grid shrink-0 grow">
                     {list.map((panel, index) => {
                       const contentRevealed = isScrollBannerContentRevealed(
                         index,
@@ -385,7 +411,7 @@ export function HealthScrollingBanner({
                           index !== segmentIndex + 1
                         }
                         className={clsx(
-                          'image-with-text__content image-with-text__content-layer absolute inset-0 flex h-full min-h-0 w-full flex-col',
+                          'image-with-text__content image-with-text__content-layer flex w-full items-center',
                           contentRevealed && 'image-with-text__content-layer--revealed',
                         )}
                         key={`content-layer-${index}`}
@@ -399,14 +425,18 @@ export function HealthScrollingBanner({
                         {contentRevealed ? (
                           <div
                             className={clsx(
-                              'health-scroll-banner-content-enter min-h-0 w-full flex-1 overflow-y-auto',
+                              'health-scroll-banner-content-enter w-full',
                               contentEnterKey > 0 && 'health-scroll-banner-content-enter--animate',
                             )}
                             key={`scroll-banner-enter-${String(index)}-${String(contentEnterKey)}`}
                           >
                             <PanelCopy panel={panel} />
                           </div>
-                        ) : null}
+                        ) : (
+                          <div aria-hidden className="health-scroll-banner-content-enter w-full">
+                            <PanelCopy panel={panel} />
+                          </div>
+                        )}
                       </div>
                       );
                     })}
