@@ -258,7 +258,9 @@
       "manage": "Manage billing",
       "browsePlans": "Shop products",
       "customPricing": "Custom pricing",
+      "includingTax": "incl. tax",
       "renewsOn": "Renews on {date}",
+      "firstChargeOn": "First charge on {date}",
       "endsOn": "Ends on {date}",
       "cancelAtPeriodEnd": "Cancels at period end",
       "empty": {
@@ -278,7 +280,8 @@
       "status": {
         "active": "Active",
         "cancelling": "Cancelling",
-        "trialing": "Trialing",
+        "scheduled": "Scheduled",
+        "trialing": "Scheduled",
         "past_due": "Past due",
         "canceled": "Canceled",
         "unpaid": "Unpaid",

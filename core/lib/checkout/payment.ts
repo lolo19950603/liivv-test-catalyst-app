@@ -12,6 +12,10 @@ import { kv } from '~/lib/kv';
 import { getStripe } from '~/lib/stripe/client';
 import { getOrCreateStripeCustomer } from '~/lib/stripe/customers';
 import { createStripeProductForCheckoutLine } from '~/lib/stripe/subscription-products';
+import {
+  getStripeSubscriptionBillingSchedule,
+  getSubscriptionUnitAmountIncTax,
+} from '~/lib/stripe/subscription-pricing';
 import { toStripeRecurring } from '~/lib/stripe/subscription-interval';
 import { claimSubscriptionOrderCreation, getCheckoutFulfillmentOrderId, hasCheckoutStripeSubscriptions, isCheckoutFulfillmentComplete, markCheckoutFulfillmentComplete, markCheckoutStripeSubscriptionsCreated, markSubscriptionOrderCreated, releaseSubscriptionOrderCreation } from '~/lib/stripe/storage';
 
@@ -21,44 +25,10 @@ import {
   getCheckoutSnapshot,
   storeCheckoutSnapshot,
 } from './snapshot';
-import {
-  isDeferredSubscriptionLine,
-} from './subscription-charge-timing';
 import type {
   CheckoutAddressSnapshot,
-  CheckoutLineItemSnapshot,
   CheckoutSnapshot,
 } from './types';
-
-function getStripeSubscriptionTrialEnd(line: CheckoutLineItemSnapshot): number | 'now' {
-  if (line.billingCycleAnchor) {
-    return line.billingCycleAnchor;
-  }
-
-  if (!line.billingInterval) {
-    return 'now';
-  }
-
-  const date = new Date();
-  const { interval, intervalCount } = line.billingInterval;
-
-  switch (interval) {
-    case 'day':
-      date.setUTCDate(date.getUTCDate() + intervalCount);
-      break;
-    case 'week':
-      date.setUTCDate(date.getUTCDate() + 7 * intervalCount);
-      break;
-    case 'month':
-      date.setUTCMonth(date.getUTCMonth() + intervalCount);
-      break;
-    case 'year':
-      date.setUTCFullYear(date.getUTCFullYear() + intervalCount);
-      break;
-  }
-
-  return Math.floor(date.getTime() / 1000);
-}
 
 const REUSABLE_PAYMENT_INTENT_STATUSES = new Set<Stripe.PaymentIntent.Status>([
   'requires_payment_method',
@@ -679,7 +649,8 @@ async function createStripeSubscriptionsForCheckout({
       }
 
       const metadata = buildSubscriptionMetadataFromLine(snapshot, line);
-      const trialEnd = getStripeSubscriptionTrialEnd(line);
+      const billingSchedule = getStripeSubscriptionBillingSchedule(line);
+      const unitAmountIncTax = getSubscriptionUnitAmountIncTax(line, snapshot);
       const productId = await createStripeProductForCheckoutLine(stripe, line);
 
       await stripe.subscriptions.create({
@@ -690,14 +661,14 @@ async function createStripeSubscriptionsForCheckout({
             quantity: line.quantity,
             price_data: {
               currency: line.currency.toLowerCase(),
-              unit_amount: line.unitAmount,
+              unit_amount: unitAmountIncTax,
               recurring: toStripeRecurring(line.billingInterval),
               product: productId,
             },
           },
         ],
         metadata,
-        trial_end: trialEnd,
+        ...billingSchedule,
         proration_behavior: 'none',
       });
     }),

@@ -14,6 +14,8 @@ export interface CustomerSubscription {
   intervalCount: number;
   currentPeriodEnd: number;
   cancelAtPeriodEnd: boolean;
+  trialEnd: number | null;
+  billingCycleAnchor: number | null;
 }
 
 function isSubscriptionCancelScheduled(subscription: Stripe.Subscription): boolean {
@@ -58,6 +60,8 @@ function toCustomerSubscription(
     intervalCount: item.price.recurring.interval_count,
     currentPeriodEnd,
     cancelAtPeriodEnd,
+    trialEnd: subscription.trial_end,
+    billingCycleAnchor: subscription.billing_cycle_anchor,
   };
 }
 

@@ -90,14 +90,16 @@ async function createOrderFromSubscription({
   subscription,
   stripeReferenceId,
   orderType,
-  unitAmount,
+  unitAmountExTax,
+  unitAmountIncTax,
   currencyCode,
   productName,
 }: {
   subscription: Stripe.Subscription;
   stripeReferenceId: string;
   orderType: 'initial' | 'renewal';
-  unitAmount: number;
+  unitAmountExTax: number;
+  unitAmountIncTax: number;
   currencyCode: string;
   productName: string;
 }): Promise<number | null> {
@@ -124,13 +126,17 @@ async function createOrderFromSubscription({
   }
 
   try {
+    const quantity = subscription.items.data[0]?.quantity ?? 1;
+
     const orderId = await createBigCommerceSubscriptionOrder({
       customerId,
       productEntityId: getBigCommerceProductId(subscription.metadata),
       productName,
       productSku: getProductSku(subscription.metadata),
       productOptions: getProductOptions(subscription.metadata),
-      unitAmount,
+      quantity,
+      unitAmountExTax,
+      unitAmountIncTax,
       currencyCode,
       stripeSubscriptionId: subscription.id,
       stripeReferenceId,
@@ -159,16 +165,18 @@ function getSubscriptionProductName(subscription: Stripe.Subscription): string {
   return product.name;
 }
 
-function getSubscriptionUnitAmount(subscription: Stripe.Subscription): number {
+function getSubscriptionLineTotals(subscription: Stripe.Subscription): {
+  quantity: number;
+  unitAmountExTax: number;
+} {
   const item = subscription.items.data[0];
+  const quantity = item?.quantity ?? 1;
+  const unitAmount = item?.price.unit_amount ?? 0;
 
-  return item?.price.unit_amount ?? 0;
-}
-
-function getSubscriptionCurrency(subscription: Stripe.Subscription): string {
-  const item = subscription.items.data[0];
-
-  return item?.price.currency?.toUpperCase() ?? 'USD';
+  return {
+    quantity,
+    unitAmountExTax: unitAmount * quantity,
+  };
 }
 
 export async function createBigCommerceOrderFromCheckoutSession(
@@ -186,14 +194,16 @@ export async function createBigCommerceOrderFromCheckoutSession(
   }
 
   const subscription = await getSubscription(subscriptionId);
-  const unitAmount = session.amount_total ?? getSubscriptionUnitAmount(subscription);
+  const { unitAmountExTax } = getSubscriptionLineTotals(subscription);
+  const unitAmountIncTax = session.amount_total ?? unitAmountExTax;
   const currencyCode = (session.currency ?? subscription.currency ?? 'usd').toUpperCase();
 
   return createOrderFromSubscription({
     subscription,
     stripeReferenceId: `session:${session.id}`,
     orderType: 'initial',
-    unitAmount,
+    unitAmountExTax,
+    unitAmountIncTax,
     currencyCode,
     productName: getSubscriptionProductName(subscription),
   });
@@ -223,7 +233,8 @@ export async function createBigCommerceOrderFromInvoice(
   }
 
   const subscription = await getSubscription(subscriptionId);
-  const unitAmount = invoice.amount_paid ?? getSubscriptionUnitAmount(subscription);
+  const { unitAmountExTax } = getSubscriptionLineTotals(subscription);
+  const unitAmountIncTax = invoice.amount_paid ?? unitAmountExTax;
   const currencyCode = (invoice.currency ?? subscription.currency ?? 'usd').toUpperCase();
   const orderType = invoice.billing_reason === 'subscription_cycle' ? 'renewal' : 'initial';
 
@@ -231,7 +242,8 @@ export async function createBigCommerceOrderFromInvoice(
     subscription,
     stripeReferenceId: `invoice:${invoice.id}`,
     orderType,
-    unitAmount,
+    unitAmountExTax,
+    unitAmountIncTax,
     currencyCode,
     productName: getSubscriptionProductName(subscription),
   });

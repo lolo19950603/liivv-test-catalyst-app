@@ -5,6 +5,11 @@ import {
   toBigCommerceOrderProductOptions,
 } from './product-options';
 import { toBigCommerceOrderAddress } from './order-address';
+import {
+  buildImmediateOrderLineTaxes,
+  buildImmediateOrderTaxTotals,
+  buildLinePricesWithTax,
+} from './order-tax';
 import { bigCommerceAdminFetch } from './rest';
 import type { CheckoutSnapshot } from '../checkout/types';
 import { isDeferredSubscriptionLine } from '../checkout/subscription-charge-timing';
@@ -27,18 +32,18 @@ export async function createBigCommerceOrderFromCheckoutSnapshot(
 ): Promise<number> {
   const billing = snapshot.billingAddress;
   const shipping = snapshot.shippingAddress ?? snapshot.billingAddress;
+  const immediateLines = snapshot.lineItems.filter((line) => !isDeferredSubscriptionLine(line));
+  const lineTaxes = buildImmediateOrderLineTaxes(snapshot);
 
-  const products = snapshot.lineItems
-    .filter((line) => !isDeferredSubscriptionLine(line))
-    .map((line) => {
+  const products = immediateLines.map((line, index) => {
     const productOptions = toBigCommerceOrderProductOptions(line.productOptions);
-    const price = (line.unitAmount / 100).toFixed(2);
+    const { priceExTax, priceIncTax } = buildLinePricesWithTax(line, lineTaxes[index] ?? 0);
 
     return {
       product_id: line.productEntityId,
       quantity: line.quantity,
-      price_inc_tax: Number(price),
-      price_ex_tax: Number(price),
+      price_ex_tax: priceExTax,
+      price_inc_tax: priceIncTax,
       ...(productOptions.length > 0 ? { product_options: productOptions } : {}),
     };
   });
@@ -50,10 +55,14 @@ export async function createBigCommerceOrderFromCheckoutSnapshot(
   const staffNotes = [
     `Stripe payment: ${stripeReferenceId}`,
     `Checkout snapshot: ${snapshot.id}`,
+    `Stripe charged: ${snapshot.amounts.immediateGrandTotal.toFixed(2)} ${snapshot.currency}`,
+    `Tax charged: ${snapshot.amounts.immediateTax.toFixed(2)} ${snapshot.currency}`,
     ...snapshot.lineItems
       .filter((line) => line.isSubscription)
       .map((line) => `Subscription line: ${line.name} (${line.sku ?? line.productEntityId})`),
   ].join('\n');
+
+  const orderTaxTotals = buildImmediateOrderTaxTotals(snapshot);
 
   const order = await bigCommerceAdminFetch<{ id: number }>('/v2/orders', {
     method: 'POST',
@@ -65,8 +74,7 @@ export async function createBigCommerceOrderFromCheckoutSnapshot(
       payment_provider_id: stripeReferenceId,
       staff_notes: staffNotes,
       customer_message: 'Custom checkout order',
-      shipping_cost_inc_tax: snapshot.shipping,
-      shipping_cost_ex_tax: snapshot.shipping,
+      ...orderTaxTotals,
       billing_address: toBigCommerceOrderAddress(billing),
       shipping_addresses: [
         toBigCommerceOrderAddress({
@@ -99,6 +107,7 @@ export function buildSubscriptionMetadataFromLine(
     bigcommerce_customer_id: String(snapshot.bigcommerceCustomerId),
     bigcommerce_product_id: String(line.productEntityId),
     bigcommerce_sku: line.sku ?? '',
+    subscription_price_includes_tax: 'true',
     ...(serializedOptions ? { bigcommerce_product_options: serializedOptions } : {}),
     ...(line.billingInterval
       ? {

@@ -11,12 +11,17 @@ import {
   addCheckoutShippingConsignments,
   updateCheckoutShippingConsignment,
 } from '~/app/[locale]/(default)/cart/_actions/add-shipping-info';
-import { buildCheckoutShippingSections } from '~/lib/checkout/checkout-section-shipping';
+import {
+  aggregatePhysicalLineItems,
+  buildCheckoutShippingSections,
+} from '~/lib/checkout/checkout-section-shipping';
 import { expandCartLineItemForProduct } from '~/lib/checkout/expand-cart-line-items';
 import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
+import { getLineSubtotal, isDeferredSubscriptionLine } from '~/lib/checkout/subscription-charge-timing';
 import { getSubscriptionLinesForCart, findSubscriptionLineByKey } from '~/lib/checkout/subscription-lines';
 import {
   getSectionShippingState,
+  SECTION_SHIPPING_QUOTE_VERSION,
   type SectionShippingEntry,
   type SectionShippingOption,
   updateSectionShippingEntry,
@@ -36,13 +41,58 @@ function mapShippingOptions(
     entityId: string;
     description: string;
     cost: { value: number };
-  }>,
+    isRecommended?: boolean | null;
+  }> | null | undefined,
 ): SectionShippingOption[] {
-  return options.map((option) => ({
+  return (options ?? []).map((option) => ({
     entityId: option.entityId,
     description: option.description,
     cost: option.cost.value,
+    isRecommended: option.isRecommended ?? undefined,
   }));
+}
+
+function prorateShippingOptions(
+  options: SectionShippingOption[],
+  sectionSubtotal: number,
+  totalSubtotal: number,
+): SectionShippingOption[] {
+  if (totalSubtotal <= 0 || sectionSubtotal <= 0) {
+    return options;
+  }
+
+  const ratio = sectionSubtotal / totalSubtotal;
+
+  return options.map((option) => ({
+    ...option,
+    cost:
+      option.cost === 0
+        ? 0
+        : Math.round(option.cost * ratio * 100) / 100,
+  }));
+}
+
+function pickDefaultShippingOption(
+  options: SectionShippingOption[],
+  existingOptionId?: string,
+): SectionShippingOption | undefined {
+  if (options.length === 0) {
+    return undefined;
+  }
+
+  if (existingOptionId) {
+    const existing = options.find((option) => option.entityId === existingOptionId);
+
+    if (existing) {
+      return existing;
+    }
+  }
+
+  return (
+    options.find((option) => option.cost === 0) ??
+    options.find((option) => option.isRecommended) ??
+    options[0]
+  );
 }
 
 async function getCheckoutLineSnapshots(cartId: string): Promise<CheckoutLineItemSnapshot[]> {
@@ -55,46 +105,44 @@ async function getCheckoutLineSnapshots(cartId: string): Promise<CheckoutLineIte
 
   const subscriptionLines = await getSubscriptionLinesForCart(cartId);
 
-  return [
-    ...cart.lineItems.physicalItems
-      .filter((item) => !item.parentEntityId)
-      .flatMap((item) => {
-        const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
-        const unitPrice = item.salePrice?.value ?? item.listPrice.value;
+  return cart.lineItems.physicalItems
+    .filter((item) => !item.parentEntityId)
+    .flatMap((item) => {
+      const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
+      const unitPrice = item.salePrice?.value ?? item.listPrice.value;
 
-        return expandCartLineItemForProduct({
-          item: {
-            id: item.entityId,
-            quantity: item.quantity,
-          },
-          subscriptionLines,
+      return expandCartLineItemForProduct({
+        item: {
+          id: item.entityId,
+          quantity: item.quantity,
+        },
+        subscriptionLines,
+        productEntityId: item.productEntityId,
+        productOptions,
+        applySubscription: () => ({}),
+      }).map((line) => {
+        const subscription =
+          line.purchaseType === 'subscription' && line.subscriptionLineKey
+            ? findSubscriptionLineByKey(subscriptionLines, line.subscriptionLineKey)
+            : undefined;
+
+        return {
+          lineItemEntityId: item.entityId,
           productEntityId: item.productEntityId,
+          variantEntityId: item.variantEntityId ?? undefined,
+          sku: item.sku ?? undefined,
+          name: item.name,
+          quantity: line.quantity,
+          unitAmount: Math.round(unitPrice * 100),
+          currency: item.listPrice.currencyCode,
           productOptions,
-          applySubscription: () => ({}),
-        }).map((line) => {
-          const subscription =
-            line.purchaseType === 'subscription' && line.subscriptionLineKey
-              ? findSubscriptionLineByKey(subscriptionLines, line.subscriptionLineKey)
-              : undefined;
-
-          return {
-            lineItemEntityId: item.entityId,
-            productEntityId: item.productEntityId,
-            variantEntityId: item.variantEntityId ?? undefined,
-            sku: item.sku ?? undefined,
-            name: item.name,
-            quantity: line.quantity,
-            unitAmount: Math.round(unitPrice * 100),
-            currency: item.listPrice.currencyCode,
-            productOptions,
-            isPhysical: true,
-            isSubscription: line.purchaseType === 'subscription',
-            billingInterval: subscription?.billingInterval,
-            billingCycleAnchor: subscription?.billingCycleAnchor,
-          } satisfies CheckoutLineItemSnapshot;
-        });
-      }),
-  ];
+          isPhysical: true,
+          isSubscription: line.purchaseType === 'subscription',
+          billingInterval: subscription?.billingInterval,
+          billingCycleAnchor: subscription?.billingCycleAnchor,
+        } satisfies CheckoutLineItemSnapshot;
+      });
+    });
 }
 
 async function ensureShippingConsignment({
@@ -108,6 +156,10 @@ async function ensureShippingConsignment({
   lineItems: Array<{ lineItemEntityId: string; quantity: number }>;
   consignmentEntityId?: string;
 }) {
+  if (lineItems.length === 0) {
+    return null;
+  }
+
   if (consignmentEntityId) {
     return updateCheckoutShippingConsignment({
       checkoutEntityId,
@@ -124,18 +176,66 @@ async function ensureShippingConsignment({
   });
 }
 
-export async function quoteAllCheckoutSectionShipping(): Promise<void> {
+function getSectionLineSnapshots(
+  sectionId: string,
+  lineSnapshots: CheckoutLineItemSnapshot[],
+): CheckoutLineItemSnapshot[] {
+  if (sectionId === 'due-today') {
+    return lineSnapshots.filter((line) => line.isPhysical && !isDeferredSubscriptionLine(line));
+  }
+
+  const anchor = Number(sectionId.replace('deferred-', ''));
+
+  return lineSnapshots.filter(
+    (line) =>
+      line.isPhysical &&
+      isDeferredSubscriptionLine(line) &&
+      line.billingCycleAnchor === anchor,
+  );
+}
+
+async function fetchShippingOptionsForLineItems({
+  checkoutEntityId,
+  consignmentEntityId,
+  address,
+  lineItems,
+}: {
+  checkoutEntityId: string;
+  consignmentEntityId?: string;
+  address: ShippingAddress;
+  lineItems: Array<{ lineItemEntityId: string; quantity: number }>;
+}): Promise<{ options: SectionShippingOption[]; consignmentEntityId?: string }> {
+  const checkout = await ensureShippingConsignment({
+    checkoutEntityId,
+    consignmentEntityId,
+    address,
+    lineItems,
+  });
+
+  if (!checkout) {
+    return { options: [], consignmentEntityId };
+  }
+
+  const consignment = checkout.shippingConsignments?.[0];
+
+  return {
+    options: mapShippingOptions(consignment?.availableShippingOptions),
+    consignmentEntityId: consignment?.entityId ?? consignmentEntityId,
+  };
+}
+
+export async function quoteAllCheckoutSectionShipping(): Promise<{ hasOptions: boolean }> {
   const cartId = await getCartId();
 
   if (!cartId) {
-    return;
+    return { hasOptions: false };
   }
 
   const data = await getCart({ cartId });
   const checkout = data.site.checkout;
 
   if (!checkout?.entityId) {
-    return;
+    return { hasOptions: false };
   }
 
   const shippingConsignment =
@@ -145,7 +245,7 @@ export async function quoteAllCheckoutSectionShipping(): Promise<void> {
   const address = shippingConsignment?.address;
 
   if (!address?.countryCode) {
-    return;
+    return { hasOptions: false };
   }
 
   const lineSnapshots = await getCheckoutLineSnapshots(cartId);
@@ -154,7 +254,7 @@ export async function quoteAllCheckoutSectionShipping(): Promise<void> {
   );
 
   if (sections.length === 0) {
-    return;
+    return { hasOptions: false };
   }
 
   const shippingAddress: ShippingAddress = {
@@ -164,38 +264,90 @@ export async function quoteAllCheckoutSectionShipping(): Promise<void> {
     postalCode: address.postalCode ?? undefined,
   };
 
+  const allPhysicalLineItems = aggregatePhysicalLineItems(lineSnapshots);
+  const totalPhysicalSubtotal = lineSnapshots
+    .filter((line) => line.isPhysical)
+    .reduce((sum, line) => sum + getLineSubtotal(line), 0);
+
   let consignmentEntityId = shippingConsignment?.entityId;
+  let hasOptions = false;
 
-  for (const section of sections) {
-    await ensureShippingConsignment({
-      checkoutEntityId: checkout.entityId,
-      consignmentEntityId,
-      address: shippingAddress,
-      lineItems: section.physicalLineItems,
-    });
+  // Quote the full cart so BigCommerce order-level rules (e.g. free shipping over $200) apply.
+  const fullQuote = await fetchShippingOptionsForLineItems({
+    checkoutEntityId: checkout.entityId,
+    consignmentEntityId,
+    address: shippingAddress,
+    lineItems: allPhysicalLineItems,
+  });
 
-    const refreshedCart = await getCart({ cartId });
-    consignmentEntityId = refreshedCart.site.checkout?.shippingConsignments?.[0]?.entityId;
+  consignmentEntityId = fullQuote.consignmentEntityId ?? consignmentEntityId;
+  const fullCartOptions = fullQuote.options;
 
-    const options = mapShippingOptions(
-      refreshedCart.site.checkout?.shippingConsignments?.[0]?.availableShippingOptions ?? [],
-    );
-    const existing = (await getSectionShippingState(cartId))[section.id];
-    const selectedOption = existing?.selectedOptionId
-      ? options.find((option) => option.entityId === existing.selectedOptionId)
-      : undefined;
-
-    await updateSectionShippingEntry(cartId, section.id, {
-      options,
-      selectedOptionId: selectedOption?.entityId,
-      selectedCost: selectedOption?.cost,
-      selectedDescription: selectedOption?.description,
-    });
+  if (fullCartOptions.length > 0) {
+    hasOptions = true;
   }
 
-  await syncImmediateCheckoutConsignment();
+  for (const section of sections) {
+    const sectionSubtotal = getSectionLineSnapshots(section.id, lineSnapshots).reduce(
+      (sum, line) => sum + getLineSubtotal(line),
+      0,
+    );
+
+    try {
+      let options: SectionShippingOption[];
+
+      if (section.id === 'due-today') {
+        // Full-cart quote so order-level rules (e.g. free shipping over $200) apply to today's charge.
+        options = fullCartOptions;
+      } else {
+        // Deferred sections are quoted on their own line items so BC thresholds match that shipment.
+        const sectionQuote = await fetchShippingOptionsForLineItems({
+          checkoutEntityId: checkout.entityId,
+          consignmentEntityId,
+          address: shippingAddress,
+          lineItems: section.physicalLineItems,
+        });
+
+        options = sectionQuote.options;
+
+        if (options.length === 0) {
+          const paidOptions = fullCartOptions.filter((option) => option.cost > 0);
+
+          options = prorateShippingOptions(paidOptions, sectionSubtotal, totalPhysicalSubtotal);
+        }
+
+        if (options.length > 0) {
+          hasOptions = true;
+        }
+      }
+
+      const existing = (await getSectionShippingState(cartId))[section.id];
+      const selectedOption = pickDefaultShippingOption(options, existing?.selectedOptionId);
+
+      await updateSectionShippingEntry(cartId, section.id, {
+        options,
+        selectedOptionId: selectedOption?.entityId,
+        selectedCost: selectedOption?.cost,
+        selectedDescription: selectedOption?.description,
+        quoteVersion: SECTION_SHIPPING_QUOTE_VERSION,
+      });
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(`Failed to quote shipping for section ${section.id}:`, error);
+    }
+  }
+
+  try {
+    await syncImmediateCheckoutConsignment();
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to sync immediate checkout consignment:', error);
+  }
+
   revalidateTag(TAGS.checkout, { expire: 0 });
   revalidateTag(TAGS.cart, { expire: 0 });
+
+  return { hasOptions };
 }
 
 export async function syncImmediateCheckoutConsignment(): Promise<void> {
@@ -230,8 +382,9 @@ export async function syncImmediateCheckoutConsignment(): Promise<void> {
 
   const state = await getSectionShippingState(cartId);
   const immediateEntry = state['due-today'];
+  const allPhysicalLineItems = aggregatePhysicalLineItems(lineSnapshots);
 
-  await ensureShippingConsignment({
+  const { consignmentEntityId } = await fetchShippingOptionsForLineItems({
     checkoutEntityId: checkout.entityId,
     consignmentEntityId: shippingConsignment?.entityId,
     address: {
@@ -240,11 +393,8 @@ export async function syncImmediateCheckoutConsignment(): Promise<void> {
       stateOrProvince: address.stateOrProvince ?? undefined,
       postalCode: address.postalCode ?? undefined,
     },
-    lineItems: immediateSection.physicalLineItems,
+    lineItems: allPhysicalLineItems,
   });
-
-  const refreshedCart = await getCart({ cartId });
-  const consignmentEntityId = refreshedCart.site.checkout?.shippingConsignments?.[0]?.entityId;
 
   if (!consignmentEntityId || !immediateEntry?.selectedOptionId) {
     return;

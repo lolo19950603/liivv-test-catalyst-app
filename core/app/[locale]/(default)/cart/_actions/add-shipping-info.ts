@@ -21,6 +21,7 @@ const AddCheckoutShippingConsignmentsMutation = graphql(`
               }
               description
               entityId
+              isRecommended
             }
           }
         }
@@ -88,6 +89,7 @@ const UpdateCheckoutShippingConsignmentMutation = graphql(`
               }
               description
               entityId
+              isRecommended
             }
           }
         }

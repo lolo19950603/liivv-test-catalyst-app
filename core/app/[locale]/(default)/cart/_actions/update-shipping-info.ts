@@ -8,6 +8,7 @@ import { revalidateTag } from 'next/cache';
 import { shippingActionFormDataSchema } from '@/vibes/soul/sections/cart/schema';
 import { ShippingFormState } from '@/vibes/soul/sections/cart/shipping-form';
 import { TAGS } from '~/client/tags';
+import { quoteAllCheckoutSectionShipping } from '~/app/[locale]/(default)/checkout/_actions/section-shipping';
 import { getCartId } from '~/lib/cart';
 import { clearSectionShippingState } from '~/lib/checkout/section-shipping-storage';
 
@@ -228,6 +229,10 @@ export const updateShippingInfo = async (
 
       revalidateTag(TAGS.cart, { expire: 0 });
       revalidateTag(TAGS.checkout, { expire: 0 });
+
+      if (cartId) {
+        await quoteAllCheckoutSectionShipping();
+      }
 
       const currencyCode = checkout.cart?.currencyCode;
 

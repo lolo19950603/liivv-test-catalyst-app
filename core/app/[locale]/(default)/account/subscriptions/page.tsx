@@ -43,37 +43,46 @@ export default async function SubscriptionsPage({ params }: Props) {
   const streamableSubscriptions = Streamable.from(async () => {
     const subscriptions = await getAccountSubscriptions();
 
-    return subscriptions.map((subscription) => ({
-      id: subscription.id,
-      productName: subscription.productName,
-      priceLabel:
-        subscription.unitAmount != null
-          ? format.number(subscription.unitAmount / 100, {
-              style: 'currency',
-              currency: subscription.currency.toUpperCase(),
-            })
-          : t('customPricing'),
-      intervalLabel: formatIntervalLabel(
-        subscription.interval,
-        subscription.intervalCount,
-        t,
-      ),
-      statusLabel: subscription.cancelAtPeriodEnd
-        ? t('status.cancelling')
-        : t(`status.${subscription.status}` as 'status.active'),
-      renewalLabel: subscription.cancelAtPeriodEnd
-        ? t('endsOn', {
-            date: format.dateTime(new Date(subscription.currentPeriodEnd * 1000), {
-              dateStyle: 'medium',
-            }),
-          })
-        : t('renewsOn', {
-            date: format.dateTime(new Date(subscription.currentPeriodEnd * 1000), {
-              dateStyle: 'medium',
-            }),
-          }),
-      cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
-    }));
+    return subscriptions.map((subscription) => {
+      const scheduledChargeAt =
+        subscription.status === 'trialing'
+          ? subscription.trialEnd ?? subscription.billingCycleAnchor
+          : null;
+      const nextDate = format.dateTime(
+        new Date(
+          (scheduledChargeAt ?? subscription.currentPeriodEnd) * 1000,
+        ),
+        { dateStyle: 'medium' },
+      );
+
+      return {
+        id: subscription.id,
+        productName: subscription.productName,
+        priceLabel:
+          subscription.unitAmount != null
+            ? `${format.number(subscription.unitAmount / 100, {
+                style: 'currency',
+                currency: subscription.currency.toUpperCase(),
+              })} ${t('includingTax')}`
+            : t('customPricing'),
+        intervalLabel: formatIntervalLabel(
+          subscription.interval,
+          subscription.intervalCount,
+          t,
+        ),
+        statusLabel: subscription.cancelAtPeriodEnd
+          ? t('status.cancelling')
+          : scheduledChargeAt
+            ? t('status.scheduled')
+            : t(`status.${subscription.status}` as 'status.active'),
+        renewalLabel: subscription.cancelAtPeriodEnd
+          ? t('endsOn', { date: nextDate })
+          : scheduledChargeAt
+            ? t('firstChargeOn', { date: nextDate })
+            : t('renewsOn', { date: nextDate }),
+        cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+      };
+    });
   });
 
   return (

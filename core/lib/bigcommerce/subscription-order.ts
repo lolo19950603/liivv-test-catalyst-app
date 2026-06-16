@@ -4,6 +4,10 @@ import {
   type ProductOptionSelection,
   toBigCommerceOrderProductOptions,
 } from './product-options';
+import {
+  buildLinePricesFromTotals,
+  formatOrderAmountString,
+} from './order-tax';
 import { bigCommerceAdminFetch } from './rest';
 
 interface BigCommerceAddress {
@@ -48,7 +52,10 @@ export interface CreateSubscriptionOrderInput {
   productSku?: string;
   productOptions?: ProductOptionSelection[];
   quantity?: number;
-  unitAmount: number;
+  /** Pre-tax line total in cents (catalog/subscription price × quantity). */
+  unitAmountExTax: number;
+  /** Tax-inclusive line total in cents (amount Stripe charged for this line). */
+  unitAmountIncTax: number;
   currencyCode: string;
   stripeSubscriptionId: string;
   stripeReferenceId: string;
@@ -109,10 +116,13 @@ async function getCustomerBillingAddress(customerId: number): Promise<BigCommerc
 }
 
 function formatStaffNotes(input: CreateSubscriptionOrderInput): string {
+  const taxAmount = (input.unitAmountIncTax - input.unitAmountExTax) / 100;
   const lines = [
     `Stripe subscription: ${input.stripeSubscriptionId}`,
     `Stripe reference: ${input.stripeReferenceId}`,
     `Order type: ${input.orderType}`,
+    `Stripe charged: ${(input.unitAmountIncTax / 100).toFixed(2)} ${input.currencyCode}`,
+    `Tax charged: ${taxAmount.toFixed(2)} ${input.currencyCode}`,
   ];
 
   if (input.productSku) {
@@ -134,8 +144,10 @@ export async function createBigCommerceSubscriptionOrder(
   input: CreateSubscriptionOrderInput,
 ): Promise<number> {
   const billingAddress = await getCustomerBillingAddress(input.customerId);
-  const price = (input.unitAmount / 100).toFixed(2);
   const quantity = input.quantity ?? 1;
+  const exTaxTotal = input.unitAmountExTax / 100;
+  const incTaxTotal = input.unitAmountIncTax / 100;
+  const { priceExTax, priceIncTax } = buildLinePricesFromTotals(quantity, exTaxTotal, incTaxTotal);
 
   const productOptions = toBigCommerceOrderProductOptions(input.productOptions ?? []);
 
@@ -144,6 +156,8 @@ export async function createBigCommerceSubscriptionOrder(
         {
           product_id: input.productEntityId,
           quantity,
+          price_ex_tax: priceExTax,
+          price_inc_tax: priceIncTax,
           ...(productOptions.length > 0 ? { product_options: productOptions } : {}),
         },
       ]
@@ -151,8 +165,8 @@ export async function createBigCommerceSubscriptionOrder(
         {
           name: input.productName,
           quantity,
-          price_inc_tax: Number(price),
-          price_ex_tax: Number(price),
+          price_ex_tax: priceExTax,
+          price_inc_tax: priceIncTax,
         },
       ];
 
@@ -166,6 +180,10 @@ export async function createBigCommerceSubscriptionOrder(
       payment_provider_id: input.stripeSubscriptionId,
       staff_notes: formatStaffNotes(input),
       customer_message: 'Subscription order',
+      subtotal_ex_tax: formatOrderAmountString(exTaxTotal),
+      subtotal_inc_tax: formatOrderAmountString(incTaxTotal),
+      total_ex_tax: formatOrderAmountString(exTaxTotal),
+      total_inc_tax: formatOrderAmountString(incTaxTotal),
       billing_address: billingAddress,
       shipping_addresses: [billingAddress],
       products,

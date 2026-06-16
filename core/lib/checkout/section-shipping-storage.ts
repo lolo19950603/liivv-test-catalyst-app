@@ -6,6 +6,7 @@ export interface SectionShippingOption {
   entityId: string;
   description: string;
   cost: number;
+  isRecommended?: boolean;
 }
 
 export interface SectionShippingEntry {
@@ -13,7 +14,11 @@ export interface SectionShippingEntry {
   selectedOptionId?: string;
   selectedCost?: number;
   selectedDescription?: string;
+  quoteVersion?: number;
 }
+
+/** Bump when shipping quote logic changes so checkout re-fetches BC rates. */
+export const SECTION_SHIPPING_QUOTE_VERSION = 3;
 
 export type SectionShippingState = Record<string, SectionShippingEntry>;
 

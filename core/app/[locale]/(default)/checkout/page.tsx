@@ -3,6 +3,7 @@ import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/serve
 
 import { CustomCheckout } from '@/vibes/soul/sections/custom-checkout';
 import { CheckoutFulfillmentSection } from '~/components/checkout/checkout-fulfillment-section';
+import { CheckoutSectionShippingQuoter } from '~/components/checkout/checkout-section-shipping-quoter';
 import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
 import { graphql } from '~/client/graphql';
@@ -32,12 +33,12 @@ import {
   getSectionShippingCosts,
   getSectionShippingState,
   isSectionShippingReady,
+  SECTION_SHIPPING_QUOTE_VERSION,
 } from '~/lib/checkout/section-shipping-storage';
 
 import { initializePayment, prepareOrderConfirmation } from './_actions/initialize-payment';
 import {
   formatSectionShippingOptions,
-  quoteAllCheckoutSectionShipping,
 } from './_actions/section-shipping';
 
 interface Props {
@@ -214,20 +215,31 @@ export default async function CheckoutPage({ params }: Props) {
 
   const snapshotLines = checkoutLines.map((line) => line.snapshot);
   const shippingSections = buildCheckoutShippingSections(snapshotLines);
-  let sectionShippingState = await getSectionShippingState(cartId);
+  const sectionShippingState = await getSectionShippingState(cartId);
   const hasShippingAddress = Boolean(shippingConsignment?.address?.countryCode);
+  const needsSectionShippingQuote =
+    hasShippingAddress &&
+    shippingSections.some((section) => {
+      if (!section.requiresShipping) {
+        return false;
+      }
 
-  if (hasShippingAddress && shippingSections.some((section) => section.requiresShipping)) {
-    const needsQuote = shippingSections.some(
-      (section) =>
-        section.requiresShipping && !(sectionShippingState[section.id]?.options?.length ?? 0),
-    );
+      const entry = sectionShippingState[section.id];
 
-    if (needsQuote) {
-      await quoteAllCheckoutSectionShipping();
-      sectionShippingState = await getSectionShippingState(cartId);
-    }
-  }
+      return (
+        !(entry?.options?.length ?? 0) ||
+        entry.quoteVersion !== SECTION_SHIPPING_QUOTE_VERSION
+      );
+    });
+  const shippingQuoteKey = shippingConsignment?.address?.countryCode
+    ? [
+        shippingConsignment.address.countryCode,
+        shippingConsignment.address.city ?? '',
+        shippingConsignment.address.postalCode ?? '',
+        shippingConsignment.address.stateOrProvince ?? '',
+        String(checkout?.subtotal?.value ?? 0),
+      ].join('|')
+    : undefined;
 
   const sectionShippingCosts = getSectionShippingCosts(sectionShippingState);
   const requiresShipping = shippingSections.some((section) => section.requiresShipping);
@@ -245,6 +257,10 @@ export default async function CheckoutPage({ params }: Props) {
   > = {};
 
   for (const section of shippingSections) {
+    if (!section.requiresShipping) {
+      continue;
+    }
+
     const entry = sectionShippingState[section.id];
     const shippingOptions = entry
       ? await formatSectionShippingOptions(entry.options, currencyCode)
@@ -365,7 +381,12 @@ export default async function CheckoutPage({ params }: Props) {
         shippingUpdating: t('shippingMethod.updating'),
       }}
       fulfillmentSection={
-        <CheckoutFulfillmentSection
+        <>
+          <CheckoutSectionShippingQuoter
+            needsQuote={needsSectionShippingQuote}
+            quoteKey={shippingQuoteKey}
+          />
+          <CheckoutFulfillmentSection
           action={updateShippingInfo}
           address={
             shippingConsignment?.address
@@ -434,6 +455,7 @@ export default async function CheckoutPage({ params }: Props) {
           }
           submitLabel={t('payment.submit')}
         />
+        </>
       }
       summarySections={summarySections}
     />
