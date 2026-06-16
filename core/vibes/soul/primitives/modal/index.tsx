@@ -28,6 +28,8 @@ export interface ModalProps extends React.PropsWithChildren {
   required?: boolean;
   /** Hides the header / top of the modal. */
   hideHeader?: boolean;
+  /** When false, the modal sizes to its content instead of scrolling. Defaults to `true`. */
+  scrollable?: boolean;
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -51,6 +53,7 @@ export const Modal = ({
   children,
   required = false,
   hideHeader = false,
+  scrollable = true,
 }: ModalProps) => {
   const isClient = useIsClient();
 
@@ -62,8 +65,12 @@ export const Modal = ({
           <Dialog.Overlay className="fixed inset-0 z-30 flex items-center justify-center bg-[var(--modal-overlay-background,hsl(var(--foreground)/50%))] @container">
             <Dialog.Content
               className={clsx(
-                'mx-3 my-10 max-h-[90%] max-w-3xl overflow-y-auto rounded-2xl bg-[var(--modal-background,hsl(var(--background)))]',
+                'mx-3 rounded-2xl bg-[var(--modal-background,hsl(var(--background)))]',
+                scrollable
+                  ? 'my-10 max-h-[90%] overflow-y-auto'
+                  : 'my-6 max-h-none overflow-visible',
                 'transition ease-out',
+                scrollable ? 'max-w-3xl' : 'max-w-md',
                 'data-[state=closed]:duration-200 data-[state=open]:duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out',
                 'focus:outline-none data-[state=closed]:slide-out-to-bottom-16 data-[state=open]:slide-in-from-bottom-16',
                 className,

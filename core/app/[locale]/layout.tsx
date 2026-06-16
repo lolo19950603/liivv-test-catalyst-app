@@ -3,7 +3,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
-import { setRequestLocale } from 'next-intl/server';
+import { getMessages, setRequestLocale } from 'next-intl/server';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { cache, PropsWithChildren } from 'react';
 
@@ -130,6 +130,8 @@ export default async function RootLayout({ params, children }: Props) {
   // https://next-intl-docs.vercel.app/docs/getting-started/app-router#add-setRequestLocale-to-all-layouts-and-pages
   setRequestLocale(locale);
 
+  const messages = await getMessages();
+
   const scripts = scriptsTransformer(rootData.data.site.content.scripts);
   const isCookieConsentEnabled =
     rootData.data.site.settings?.privacy?.cookieConsentEnabled ?? false;
@@ -137,7 +139,7 @@ export default async function RootLayout({ params, children }: Props) {
 
   return (
     <>
-      <NextIntlClientProvider>
+      <NextIntlClientProvider locale={locale} messages={messages}>
         <ConsentManager
           isCookieConsentEnabled={isCookieConsentEnabled}
           privacyPolicyUrl={privacyPolicyUrl}

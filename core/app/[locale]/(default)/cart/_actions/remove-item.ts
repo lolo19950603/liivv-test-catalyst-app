@@ -7,7 +7,11 @@ import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
 import { graphql, VariablesOf } from '~/client/graphql';
 import { TAGS } from '~/client/tags';
+import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
+import { removeSubscriptionLineFromCart } from '~/lib/checkout/subscription-lines';
 import { clearCartId, getCartId } from '~/lib/cart';
+
+import { getCart } from '../page-data';
 
 const DeleteCartLineItemMutation = graphql(`
   mutation DeleteCartLineItemMutation($input: DeleteCartLineItemInput!) {
@@ -23,6 +27,32 @@ const DeleteCartLineItemMutation = graphql(`
 
 type Variables = VariablesOf<typeof DeleteCartLineItemMutation>;
 type DeleteCartLineItemInput = Variables['input'];
+
+async function clearSubscriptionMetadataForLineItem(lineItemEntityId: string): Promise<void> {
+  const cartId = await getCartId();
+
+  if (!cartId) {
+    return;
+  }
+
+  const data = await getCart({ cartId });
+  const cart = data.site.cart;
+
+  if (!cart) {
+    return;
+  }
+
+  const items = [...cart.lineItems.physicalItems, ...cart.lineItems.digitalItems];
+  const lineItem = items.find((item) => item.entityId === lineItemEntityId);
+
+  if (!lineItem) {
+    return;
+  }
+
+  const productOptions = mapCartSelectedOptionsToProductOptions(lineItem.selectedOptions);
+
+  await removeSubscriptionLineFromCart(cartId, lineItem.productEntityId, productOptions);
+}
 
 export async function removeItem({
   lineItemEntityId,
@@ -40,6 +70,8 @@ export async function removeItem({
   if (!lineItemEntityId) {
     throw new Error(t('lineItemNotFound'));
   }
+
+  await clearSubscriptionMetadataForLineItem(lineItemEntityId);
 
   const response = await client.fetch({
     document: DeleteCartLineItemMutation,

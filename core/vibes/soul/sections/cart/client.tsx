@@ -17,19 +17,21 @@ import { useFormStatus } from 'react-dom';
 
 import { Button } from '@/vibes/soul/primitives/button';
 import * as Skeleton from '@/vibes/soul/primitives/skeleton';
+import { SubscriptionLineSummary } from '@/vibes/soul/primitives/subscription-line-summary';
 import { toast } from '@/vibes/soul/primitives/toaster';
 import {
   GiftCertificateCodeForm,
   GiftCertificateCodeFormState,
 } from '@/vibes/soul/sections/cart/gift-certificate-code-form';
-import { StickySidebarLayout } from '@/vibes/soul/sections/sticky-sidebar-layout';
 import { useEvents } from '~/components/analytics/events';
 import { Image } from '~/components/image';
+import { useRouter } from '~/i18n/routing';
 
 import { CouponCodeForm, CouponCodeFormState } from './coupon-code-form';
 import { cartLineItemActionFormDataSchema } from './schema';
-import { ShippingForm, ShippingFormState } from './shipping-form';
+import type { ShippingFormState } from './shipping-form';
 
+import { CartShippingEstimate } from '~/components/cart/cart-shipping-estimate';
 import { CartEmptyState } from '.';
 
 type Action<State, Payload> = (state: Awaited<State>, payload: Payload) => State | Promise<State>;
@@ -53,6 +55,11 @@ export interface CartLineItem {
   salePrice?: string;
   href?: string;
   inventoryMessages?: CartLineIteminventoryMessages;
+  subscriptionBadge?: string;
+  subscriptionDetails?: string[];
+  lineItemEntityId?: string;
+  purchaseType?: 'subscription' | 'one-time';
+  subscriptionLineKey?: string;
 }
 
 export interface CartGiftCertificateLineItem extends CartLineItem {
@@ -125,34 +132,26 @@ interface States {
 
 interface Address {
   country: string;
-  city?: string;
   state?: string;
   postalCode?: string;
 }
 
 interface Shipping {
   action: Action<ShippingFormState, FormData>;
-  countries?: Country[];
-  states?: States[];
+  countries: Country[];
+  states: States[];
   address?: Address;
-  shippingOptions?: ShippingOption[];
   shippingOption?: ShippingOption;
-  shippingLabel?: string;
-  addLabel?: string;
-  changeLabel?: string;
-  countryLabel?: string;
-  cityLabel?: string;
-  stateLabel?: string;
-  postalCodeLabel?: string;
-  updateShippingOptionsLabel?: string;
-  viewShippingOptionsLabel?: string;
-  cancelLabel?: string;
-  editAddressLabel?: string;
-  shippingOptionsLabel?: string;
-  updateShippingLabel?: string;
-  addShippingLabel?: string;
-  showShippingForm?: boolean;
-  noShippingOptionsLabel?: string;
+  labels: {
+    shipping: string;
+    change: string;
+    estimate: string;
+    country: string;
+    state: string;
+    postalCode: string;
+    cancel: string;
+    noShippingOptions: string;
+  };
 }
 
 export interface CartProps<LineItem extends CartLineItem> {
@@ -220,6 +219,7 @@ export function CartClient<LineItem extends CartLineItem>({
   shipping,
 }: CartProps<LineItem>) {
   const events = useEvents();
+  const router = useRouter();
   const [state, formAction, isLineItemActionPending] = useActionState(lineItemAction, {
     lineItems: cart.lineItems,
     lastResult: null,
@@ -360,87 +360,91 @@ export function CartClient<LineItem extends CartLineItem>({
     return <CartEmptyState {...emptyState} />;
   }
 
-  return (
-    <StickySidebarLayout
-      className="font-[family-name:var(--cart-font-family,var(--font-family-body))] text-[var(--cart-text,hsl(var(--foreground)))]"
-      sidebar={
-        <div>
-          <h2 className="mb-10 font-[family-name:var(--cart-title-font-family,var(--font-family-heading))] text-4xl font-medium leading-none @xl:text-5xl">
-            {summaryTitle}
-          </h2>
-          <dl aria-label="Receipt Summary" className="w-full">
-            <div className="divide-y divide-[var(--cart-border,hsl(var(--contrast-100)))]">
-              {cart.summaryItems.map((summaryItem, index) => (
-                <div className="flex justify-between py-4" key={index}>
-                  <dt>{summaryItem.label}</dt>
-                  {isLineItemActionPending ? (
-                    <Skeleton.Text characterCount={8} className="animate-pulse rounded-md" />
-                  ) : (
-                    <dd>{summaryItem.value}</dd>
-                  )}
-                </div>
-              ))}
-
-              {shipping && <ShippingForm {...shipping} />}
-            </div>
-            {couponCode && (
-              <CouponCodeForm
-                action={couponCode.action}
-                couponCodes={couponCode.couponCodes}
-                ctaLabel={couponCode.ctaLabel}
-                disabled={couponCode.disabled}
-                label={couponCode.label}
-                placeholder={couponCode.placeholder}
-                removeLabel={couponCode.removeLabel}
-              />
-            )}
-            {giftCertificate && (
-              <GiftCertificateCodeForm
-                action={giftCertificate.action}
-                ctaLabel={giftCertificate.ctaLabel}
-                disabled={giftCertificate.disabled}
-                giftCertificateCodes={giftCertificate.giftCertificateCodes}
-                label={giftCertificate.label}
-                placeholder={giftCertificate.placeholder}
-                removeLabel={giftCertificate.removeLabel}
-              />
-            )}
-            <div className="flex justify-between border-t border-[var(--cart-border,hsl(var(--contrast-100)))] py-6 text-xl font-bold">
-              <dt>{cart.totalLabel ?? 'Total'}</dt>
+  const summary = (
+    <div>
+      <h2 className="mb-10 font-[family-name:var(--cart-title-font-family,var(--font-family-heading))] text-4xl font-medium leading-none @xl:text-5xl">
+        {summaryTitle}
+      </h2>
+      <dl aria-label="Receipt Summary" className="w-full">
+        <div className="divide-y divide-[var(--cart-border,hsl(var(--contrast-100)))]">
+          {cart.summaryItems.map((summaryItem, index) => (
+            <div className="flex justify-between py-4" key={index}>
+              <dt>{summaryItem.label}</dt>
               {isLineItemActionPending ? (
                 <Skeleton.Text characterCount={8} className="animate-pulse rounded-md" />
               ) : (
-                <dd>{cart.total}</dd>
+                <dd>{summaryItem.value}</dd>
               )}
             </div>
-          </dl>
-          <CheckoutButton
-            action={checkoutAction}
-            className="mt-4 w-full"
-            isCartUpdatePending={isLineItemActionPending}
-          >
-            {checkoutLabel}
-            <ArrowRight size={20} strokeWidth={1} />
-          </CheckoutButton>
+          ))}
+
+          {shipping && <CartShippingEstimate {...shipping} />}
         </div>
-      }
-      sidebarPosition="after"
-      sidebarSize="1/3"
+        {couponCode && (
+          <CouponCodeForm
+            action={couponCode.action}
+            couponCodes={couponCode.couponCodes}
+            ctaLabel={couponCode.ctaLabel}
+            disabled={couponCode.disabled}
+            label={couponCode.label}
+            placeholder={couponCode.placeholder}
+            removeLabel={couponCode.removeLabel}
+          />
+        )}
+        {giftCertificate && (
+          <GiftCertificateCodeForm
+            action={giftCertificate.action}
+            ctaLabel={giftCertificate.ctaLabel}
+            disabled={giftCertificate.disabled}
+            giftCertificateCodes={giftCertificate.giftCertificateCodes}
+            label={giftCertificate.label}
+            placeholder={giftCertificate.placeholder}
+            removeLabel={giftCertificate.removeLabel}
+          />
+        )}
+        <div className="flex justify-between border-t border-[var(--cart-border,hsl(var(--contrast-100)))] py-6 text-xl font-bold">
+          <dt>{cart.totalLabel ?? 'Total'}</dt>
+          {isLineItemActionPending ? (
+            <Skeleton.Text characterCount={8} className="animate-pulse rounded-md" />
+          ) : (
+            <dd>{cart.total}</dd>
+          )}
+        </div>
+      </dl>
+      <CheckoutButton
+        action={checkoutAction}
+        className="mt-4 w-fit"
+        isCartUpdatePending={isLineItemActionPending}
+      >
+        <span className="inline-flex items-center gap-2">
+          {checkoutLabel}
+          <ArrowRight size={20} strokeWidth={1} />
+        </span>
+      </CheckoutButton>
+    </div>
+  );
+
+  return (
+    <section
+      className={clsx(
+        'group/cart w-full font-[family-name:var(--cart-font-family,var(--font-family-body))] text-[var(--cart-text,hsl(var(--foreground)))]',
+      )}
     >
-      <div className="w-full">
-        <h1 className="mb-10 font-[family-name:var(--cart-title-font-family,var(--font-family-heading))] text-4xl font-medium leading-none @xl:text-5xl">
-          {title}
-          <span className="ml-4 text-[var(--cart-subtext-text,hsl(var(--contrast-300)))] contrast-more:text-[var(--cart-subtitle-text,hsl(var(--contrast-500)))]">
-            {optimisticQuantity}
-          </span>
-        </h1>
-        {/* Cart Items */}
-        <ul className="flex flex-col gap-5">
-          {optimisticLineItems.map((lineItem) => (
-            <li
-              className="flex flex-col items-start gap-x-5 gap-y-4 @container @sm:flex-row"
-              key={lineItem.id}
-            >
+      <div className="mx-auto w-full max-w-screen-2xl px-4 py-10 @xl:px-8 @xl:py-14">
+        <div className="grid w-full items-start gap-10 @lg:grid-cols-[minmax(0,1fr)_minmax(280px,380px)] @lg:gap-16">
+          <div className="min-w-0">
+            <h1 className="mb-10 font-[family-name:var(--cart-title-font-family,var(--font-family-heading))] text-4xl font-medium leading-none @xl:text-5xl">
+              {title}
+              <span className="ml-4 text-[var(--cart-subtext-text,hsl(var(--contrast-300)))] contrast-more:text-[var(--cart-subtitle-text,hsl(var(--contrast-500)))]">
+                {optimisticQuantity}
+              </span>
+            </h1>
+            <ul className="flex flex-col gap-5">
+              {optimisticLineItems.map((lineItem) => (
+                <li
+                  className="flex flex-col items-start gap-x-5 gap-y-4 @container @sm:flex-row"
+                  key={lineItem.id}
+                >
               <div className="relative aspect-square w-full max-w-24 overflow-hidden rounded-xl bg-[var(--cart-image-background,hsl(var(--contrast-100)))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cart-focus,hsl(var(--primary)))] focus-visible:ring-offset-4">
                 {lineItem.typename === 'CartGiftCertificate' ? (
                   <div className="flex h-full w-full flex-col items-center justify-center p-4 text-center">
@@ -458,13 +462,21 @@ export function CartClient<LineItem extends CartLineItem>({
                   )
                 )}
               </div>
-              <div className="flex grow flex-col flex-wrap justify-between gap-y-2 @xl:flex-row">
-                <div className="flex w-full flex-1 flex-col @xl:w-1/2 @xl:pr-4">
+              <div className="flex min-w-0 grow flex-col gap-y-3 @xl:flex-row @xl:items-start @xl:justify-between">
+                <div className="flex min-w-0 flex-1 flex-col @xl:pr-6">
                   <span className="font-medium">{lineItem.title}</span>
                   <span className="text-[var(--cart-subtext-text,hsl(var(--contrast-400)))] contrast-more:text-[var(--cart-subtitle-text,hsl(var(--contrast-500)))]">
                     {lineItem.subtitle}
                   </span>
+                  {lineItem.subscriptionBadge ? (
+                    <SubscriptionLineSummary
+                      badge={lineItem.subscriptionBadge}
+                      className="mt-2"
+                      details={lineItem.subscriptionDetails}
+                    />
+                  ) : null}
                 </div>
+                <div className="w-full shrink-0 @xl:w-[min(100%,16rem)]">
                 <CounterForm
                   action={formAction}
                   decrementLabel={decrementLineItemLabel}
@@ -475,6 +487,7 @@ export function CartClient<LineItem extends CartLineItem>({
                     startTransition(() => {
                       formAction(formData);
                       setOptimisticLineItems(formData);
+                      router.refresh();
 
                       const intent = formData.get('intent');
 
@@ -498,12 +511,16 @@ export function CartClient<LineItem extends CartLineItem>({
                     });
                   }}
                 />
+                </div>
               </div>
             </li>
           ))}
-        </ul>
+            </ul>
+          </div>
+          <aside className="min-w-0 @lg:sticky @lg:top-10">{summary}</aside>
+        </div>
       </div>
-    </StickySidebarLayout>
+    </section>
   );
 }
 
@@ -542,16 +559,16 @@ function CounterForm({
     return (
       <form {...getFormProps(form)} action={action}>
         <input {...getInputProps(fields.id, { type: 'hidden' })} key={fields.id.id} />
-        <div className="flex w-full flex-wrap items-center gap-x-5 gap-y-2">
-          <span className="font-medium @xl:ml-auto">{lineItem.price}</span>
+        <div className={cartLineItemControlsGridClassName}>
+          <span className="justify-self-end font-medium tabular-nums">{lineItem.price}</span>
 
-          <span className="flex flex-1 select-none justify-center px-14 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cart-focus,hsl(var(--primary)))]">
+          <span className="flex w-[7.25rem] select-none justify-center rounded-lg border border-[var(--cart-counter-border,hsl(var(--contrast-100)))] px-3 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cart-focus,hsl(var(--primary)))]">
             {lineItem.quantity}
           </span>
 
           <button
             aria-label={deleteLabel}
-            className="group -ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors duration-300 hover:bg-[var(--cart-button-background,hsl(var(--contrast-100)))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cart-focus,hsl(var(--primary)))] focus-visible:ring-offset-4"
+            className="group flex h-8 w-8 shrink-0 items-center justify-center justify-self-end rounded-full transition-colors duration-300 hover:bg-[var(--cart-button-background,hsl(var(--contrast-100)))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cart-focus,hsl(var(--primary)))] focus-visible:ring-offset-4"
             name="intent"
             type="submit"
             value="delete"
@@ -570,114 +587,146 @@ function CounterForm({
   return (
     <form {...getFormProps(form)} action={action}>
       <input {...getInputProps(fields.id, { type: 'hidden' })} key={fields.id.id} />
-      <div className="flex w-full flex-wrap items-center gap-x-5 gap-y-2">
-        {lineItem.salePrice && lineItem.salePrice !== lineItem.price ? (
-          <span className="mt-3 self-start font-medium @xl:ml-auto">
-            <span className="sr-only">{t('originalPrice', { price: lineItem.price })}</span>
-            <span aria-hidden="true" className="line-through">
-              {lineItem.price}
-            </span>{' '}
-            <span className="sr-only">{t('currentPrice', { price: lineItem.salePrice })}</span>
-            <span aria-hidden="true">{lineItem.salePrice}</span>
-          </span>
-        ) : (
-          <span className="mt-3 self-start font-medium @xl:ml-auto">{lineItem.price}</span>
-        )}
-        <div className="flex size-min flex-col gap-y-0">
-          <div className="mb-1 mt-1 flex items-center gap-x-5">
-            {/* Counter */}
-            <div
-              className={clsx(
-                'flex items-center rounded-lg border border-[var(--cart-counter-border,hsl(var(--contrast-100)))]',
-                (lineItem.inventoryMessages?.outOfStockMessage != null ||
-                  lineItem.inventoryMessages?.quantityOutOfStockMessage != null) &&
-                  'border-red-500',
-              )}
-            >
-              <button
-                aria-label={decrementLabel}
-                className={clsx(
-                  'group rounded-l-lg bg-[var(--cart-counter-background,hsl(var(--background)))] p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cart-focus,hsl(var(--primary)))] disabled:cursor-not-allowed',
-                  lineItem.quantity === 1
-                    ? 'opacity-50'
-                    : 'hover:bg-[var(--cart-counter-background-hover,hsl(var(--contrast-100)/50%))]',
-                )}
-                disabled={lineItem.quantity === 1}
-                name="intent"
-                type="submit"
-                value="decrement"
-              >
-                <Minus
-                  className={clsx(
-                    'text-[var(--cart-counter-icon,hsl(var(--contrast-300)))] transition-colors duration-300',
-                    lineItem.quantity !== 1 &&
-                      'group-hover:text-[var(--cart-counter-icon-hover,hsl(var(--foreground)))]',
-                  )}
-                  size={18}
-                  strokeWidth={1.5}
-                />
-              </button>
-              <span className="flex w-8 select-none justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cart-focus,hsl(var(--primary)))]">
-                {lineItem.quantity}
-              </span>
-              <button
-                aria-label={incrementLabel}
-                className={clsx(
-                  'group rounded-r-lg bg-[var(--cart-counter-background,hsl(var(--background)))] p-3 transition-colors duration-300 hover:bg-[var(--cart-counter-background-hover,hsl(var(--contrast-100)/50%))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cart-focus,hsl(var(--primary)))] disabled:cursor-not-allowed',
-                )}
-                name="intent"
-                type="submit"
-                value="increment"
-              >
-                <Plus
-                  className="text-[var(--cart-counter-icon,hsl(var(--contrast-300)))] transition-colors duration-300 group-hover:text-[var(--cart-counter-icon-hover,hsl(var(--foreground)))]"
-                  size={18}
-                  strokeWidth={1.5}
-                />
-              </button>
-            </div>
-            <button
-              aria-label={deleteLabel}
-              className="group -ml-1 mt-1.5 flex h-8 w-8 shrink-0 items-center justify-center self-start rounded-full transition-colors duration-300 hover:bg-[var(--cart-button-background,hsl(var(--contrast-100)))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cart-focus,hsl(var(--primary)))] focus-visible:ring-offset-4"
-              name="intent"
-              type="submit"
-              value="delete"
-            >
-              <Trash2
-                className="text-[var(--cart-icon,hsl(var(--contrast-300)))] group-hover:text-[var(--cart-icon-hover,hsl(var(--foreground)))]"
-                size={20}
-                strokeWidth={1}
-              />
-            </button>
-          </div>
-          {lineItem.inventoryMessages?.outOfStockMessage != null && (
-            <span className="text-xs/5 font-light text-red-500">
-              {lineItem.inventoryMessages.outOfStockMessage}
+      <div className="flex w-full flex-col gap-y-2">
+        <div className={cartLineItemControlsGridClassName}>
+          {lineItem.salePrice && lineItem.salePrice !== lineItem.price ? (
+            <span className="justify-self-end text-right font-medium tabular-nums">
+              <span className="sr-only">{t('originalPrice', { price: lineItem.price })}</span>
+              <span aria-hidden="true" className="line-through">
+                {lineItem.price}
+              </span>{' '}
+              <span className="sr-only">{t('currentPrice', { price: lineItem.salePrice })}</span>
+              <span aria-hidden="true">{lineItem.salePrice}</span>
             </span>
+          ) : (
+            <span className="justify-self-end font-medium tabular-nums">{lineItem.price}</span>
           )}
-          {lineItem.inventoryMessages?.quantityOutOfStockMessage != null && (
-            <span className="mb-3 text-xs/5 font-light text-red-500">
-              {lineItem.inventoryMessages.quantityOutOfStockMessage}
-            </span>
-          )}
-          {lineItem.inventoryMessages?.quantityReadyToShipMessage != null && (
-            <span className="text-xs/5 font-light">
-              {lineItem.inventoryMessages.quantityReadyToShipMessage}
-            </span>
-          )}
-          {lineItem.inventoryMessages?.quantityBackorderedMessage != null && (
-            <span className="text-xs/5 font-light">
-              {lineItem.inventoryMessages.quantityBackorderedMessage}
-            </span>
-          )}
-          {lineItem.inventoryMessages?.backorderMessage != null && (
-            <span className="text-xs/5 font-light">
-              {lineItem.inventoryMessages.backorderMessage}
-            </span>
-          )}
+          <CartLineItemCounter
+            decrementLabel={decrementLabel}
+            incrementLabel={incrementLabel}
+            lineItem={lineItem}
+          />
+          <button
+            aria-label={deleteLabel}
+            className="group flex h-8 w-8 shrink-0 items-center justify-center justify-self-end rounded-full transition-colors duration-300 hover:bg-[var(--cart-button-background,hsl(var(--contrast-100)))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cart-focus,hsl(var(--primary)))] focus-visible:ring-offset-4"
+            name="intent"
+            type="submit"
+            value="delete"
+          >
+            <Trash2
+              className="text-[var(--cart-icon,hsl(var(--contrast-300)))] group-hover:text-[var(--cart-icon-hover,hsl(var(--foreground)))]"
+              size={20}
+              strokeWidth={1}
+            />
+          </button>
         </div>
+        <CartLineItemInventoryMessages lineItem={lineItem} />
       </div>
     </form>
+  );
+}
+
+const cartLineItemControlsGridClassName =
+  'grid w-full grid-cols-[minmax(0,1fr)_7.25rem_2rem] items-center gap-x-4';
+
+function CartLineItemCounter({
+  lineItem,
+  decrementLabel,
+  incrementLabel,
+}: {
+  lineItem: CartLineItem;
+  decrementLabel: string;
+  incrementLabel: string;
+}) {
+  return (
+    <div
+      className={clsx(
+        'flex w-[7.25rem] items-center rounded-lg border border-[var(--cart-counter-border,hsl(var(--contrast-100)))]',
+        (lineItem.inventoryMessages?.outOfStockMessage != null ||
+          lineItem.inventoryMessages?.quantityOutOfStockMessage != null) &&
+          'border-red-500',
+      )}
+    >
+      <button
+        aria-label={decrementLabel}
+        className={clsx(
+          'group rounded-l-lg bg-[var(--cart-counter-background,hsl(var(--background)))] p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cart-focus,hsl(var(--primary)))] disabled:cursor-not-allowed',
+          lineItem.quantity === 1
+            ? 'opacity-50'
+            : 'hover:bg-[var(--cart-counter-background-hover,hsl(var(--contrast-100)/50%))]',
+        )}
+        disabled={lineItem.quantity === 1}
+        name="intent"
+        type="submit"
+        value="decrement"
+      >
+        <Minus
+          className={clsx(
+            'text-[var(--cart-counter-icon,hsl(var(--contrast-300)))] transition-colors duration-300',
+            lineItem.quantity !== 1 &&
+              'group-hover:text-[var(--cart-counter-icon-hover,hsl(var(--foreground)))]',
+          )}
+          size={18}
+          strokeWidth={1.5}
+        />
+      </button>
+      <span className="flex w-8 flex-1 select-none justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cart-focus,hsl(var(--primary)))]">
+        {lineItem.quantity}
+      </span>
+      <button
+        aria-label={incrementLabel}
+        className="group rounded-r-lg bg-[var(--cart-counter-background,hsl(var(--background)))] p-3 transition-colors duration-300 hover:bg-[var(--cart-counter-background-hover,hsl(var(--contrast-100)/50%))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cart-focus,hsl(var(--primary)))] disabled:cursor-not-allowed"
+        name="intent"
+        type="submit"
+        value="increment"
+      >
+        <Plus
+          className="text-[var(--cart-counter-icon,hsl(var(--contrast-300)))] transition-colors duration-300 group-hover:text-[var(--cart-counter-icon-hover,hsl(var(--foreground)))]"
+          size={18}
+          strokeWidth={1.5}
+        />
+      </button>
+    </div>
+  );
+}
+
+function CartLineItemInventoryMessages({ lineItem }: { lineItem: CartLineItem }) {
+  if (
+    lineItem.inventoryMessages?.outOfStockMessage == null &&
+    lineItem.inventoryMessages?.quantityOutOfStockMessage == null &&
+    lineItem.inventoryMessages?.quantityReadyToShipMessage == null &&
+    lineItem.inventoryMessages?.quantityBackorderedMessage == null &&
+    lineItem.inventoryMessages?.backorderMessage == null
+  ) {
+    return null;
+  }
+
+  return (
+    <div className="flex flex-col gap-y-1">
+      {lineItem.inventoryMessages?.outOfStockMessage != null && (
+        <span className="text-xs/5 font-light text-red-500">
+          {lineItem.inventoryMessages.outOfStockMessage}
+        </span>
+      )}
+      {lineItem.inventoryMessages?.quantityOutOfStockMessage != null && (
+        <span className="text-xs/5 font-light text-red-500">
+          {lineItem.inventoryMessages.quantityOutOfStockMessage}
+        </span>
+      )}
+      {lineItem.inventoryMessages?.quantityReadyToShipMessage != null && (
+        <span className="text-xs/5 font-light">
+          {lineItem.inventoryMessages.quantityReadyToShipMessage}
+        </span>
+      )}
+      {lineItem.inventoryMessages?.quantityBackorderedMessage != null && (
+        <span className="text-xs/5 font-light">
+          {lineItem.inventoryMessages.quantityBackorderedMessage}
+        </span>
+      )}
+      {lineItem.inventoryMessages?.backorderMessage != null && (
+        <span className="text-xs/5 font-light">{lineItem.inventoryMessages.backorderMessage}</span>
+      )}
+    </div>
   );
 }
 

@@ -166,7 +166,6 @@ export async function createBigCommerceSubscriptionOrder(
       payment_provider_id: input.stripeSubscriptionId,
       staff_notes: formatStaffNotes(input),
       customer_message: 'Subscription order',
-      currency_code: input.currencyCode.toUpperCase(),
       billing_address: billingAddress,
       shipping_addresses: [billingAddress],
       products,

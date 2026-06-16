@@ -1,3 +1,5 @@
+import { buildBcCdnImageUrl } from '~/lib/bc-cdn-image-url';
+
 /**
  * BigCommerce `urlTemplate(lossy: true)` URLs contain `{:size}`.
  * Next `<Image>` resolves it via `bcCdnImageLoader`; plain `<img>` needs this helper.
@@ -9,9 +11,5 @@ export function resolveBcCdnImageUrl(url: string, width = 320): string {
     return '';
   }
 
-  if (trimmed.includes('{:size}')) {
-    return trimmed.replace('{:size}', `${width}w`);
-  }
-
-  return trimmed;
+  return buildBcCdnImageUrl(trimmed, width);
 }

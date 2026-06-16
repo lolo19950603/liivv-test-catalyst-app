@@ -2,7 +2,6 @@ import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { ButtonLink } from '@/vibes/soul/primitives/button-link';
 import * as Skeleton from '@/vibes/soul/primitives/skeleton';
 import { SectionLayout } from '@/vibes/soul/sections/section-layout';
-import { StickySidebarLayout } from '@/vibes/soul/sections/sticky-sidebar-layout';
 
 import { CartClient, Cart as CartData, CartLineItem, CartProps } from './client';
 
@@ -42,80 +41,66 @@ export function CartSkeleton({
   summaryPlaceholderCount = 3,
 }: CartSkeletonProps) {
   return (
-    <StickySidebarLayout
-      className="group/cart text-[var(--cart-text,hsl(var(--foreground)))]"
-      sidebar={
-        <div>
-          <h2 className="mb-10 font-[family-name:var(--cart-title-font-family,var(--font-family-heading))] text-4xl font-medium leading-none @xl:text-5xl">
-            {summaryTitle}
-          </h2>
-          <div className="group-has-[[data-pending]]/cart:animate-pulse">
-            <div className="w-full" data-pending>
-              <div className="divide-y divide-[var(--skeleton,hsl(var(--contrast-300)/15%))]">
-                {Array.from({ length: summaryPlaceholderCount }).map((_, index) => (
-                  <div className="py-4" key={index}>
-                    <div className="flex items-center justify-between">
-                      <Skeleton.Text characterCount={10} className="rounded-md" />
-                      <Skeleton.Text characterCount={8} className="rounded-md" />
+    <section className="group/cart w-full text-[var(--cart-text,hsl(var(--foreground)))]">
+      <div className="mx-auto w-full max-w-screen-2xl px-4 py-10 @xl:px-8 @xl:py-14">
+        <div className="grid w-full items-start gap-10 @lg:grid-cols-[minmax(0,1fr)_minmax(280px,380px)] @lg:gap-16">
+          <div className="min-w-0">
+            <h1 className="mb-10 font-[family-name:var(--cart-title-font-family,var(--font-family-heading))] text-4xl font-medium leading-none @xl:text-5xl">
+              {title}
+            </h1>
+            <div className="group-has-[[data-pending]]/cart:animate-pulse">
+              <ul className="flex flex-col gap-5" data-pending>
+                {Array.from({ length: placeholderCount }).map((_, index) => (
+                  <li
+                    className="flex flex-col items-start gap-x-5 gap-y-4 @container @sm:flex-row"
+                    key={index}
+                  >
+                    <Skeleton.Box className="aspect-square w-full max-w-24 rounded-xl" />
+                    <div className="flex grow flex-col flex-wrap justify-between gap-y-2 @xl:flex-row">
+                      <div className="flex w-full flex-1 flex-col @xl:w-1/2 @xl:pr-4">
+                        <Skeleton.Text characterCount={15} className="rounded-md" />
+                        <Skeleton.Text characterCount={10} className="rounded-md" />
+                      </div>
+                      <div>
+                        <div className="flex w-full flex-wrap items-center gap-x-5 gap-y-2">
+                          <Skeleton.Text characterCount={5} className="rounded-md" />
+                          <Skeleton.Box className="h-[44px] w-[118px] rounded-lg" />
+                          <Skeleton.Box className="-ml-1 h-8 w-8 rounded-full" />
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  </li>
                 ))}
-              </div>
-              <div className="flex justify-between border-t border-[var(--skeleton,hsl(var(--contrast-300)/15%))] py-6 text-xl font-bold">
-                <div className="flex items-center justify-between">
-                  <Skeleton.Text characterCount={8} className="rounded-md" />
+              </ul>
+            </div>
+          </div>
+          <aside className="min-w-0">
+            <h2 className="mb-10 font-[family-name:var(--cart-title-font-family,var(--font-family-heading))] text-4xl font-medium leading-none @xl:text-5xl">
+              {summaryTitle}
+            </h2>
+            <div className="group-has-[[data-pending]]/cart:animate-pulse">
+              <div className="w-full" data-pending>
+                <div className="divide-y divide-[var(--skeleton,hsl(var(--contrast-300)/15%))]">
+                  {Array.from({ length: summaryPlaceholderCount }).map((_, index) => (
+                    <div className="py-4" key={index}>
+                      <div className="flex items-center justify-between">
+                        <Skeleton.Text characterCount={10} className="rounded-md" />
+                        <Skeleton.Text characterCount={8} className="rounded-md" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex justify-between border-t border-[var(--skeleton,hsl(var(--contrast-300)/15%))] py-6 text-xl font-bold">
+                  <Skeleton.Text characterCount={8} className="rounded-md" />
                   <Skeleton.Text characterCount={8} className="rounded-md" />
                 </div>
               </div>
             </div>
-          </div>
-          <Skeleton.Box className="mt-4 h-[58px] w-full rounded-full" />
-        </div>
-      }
-      sidebarPosition="after"
-      sidebarSize="1/3"
-    >
-      <div>
-        <h1 className="mb-10 font-[family-name:var(--cart-title-font-family,var(--font-family-heading))] text-4xl font-medium leading-none @xl:text-5xl">
-          {title}
-        </h1>
-        {/* Cart Line Items */}
-        <div className="group-has-[[data-pending]]/cart:animate-pulse">
-          <ul className="flex flex-col gap-5" data-pending>
-            {Array.from({ length: placeholderCount }).map((_, index) => (
-              <li
-                className="flex flex-col items-start gap-x-5 gap-y-4 @container @sm:flex-row"
-                key={index}
-              >
-                {/* Image */}
-                <Skeleton.Box className="aspect-square w-full max-w-24 rounded-xl" />
-                <div className="flex grow flex-col flex-wrap justify-between gap-y-2 @xl:flex-row">
-                  <div className="flex w-full flex-1 flex-col @xl:w-1/2 @xl:pr-4">
-                    {/* Line Item Title */}
-                    <Skeleton.Text characterCount={15} className="rounded-md" />
-                    {/* Subtitle */}
-                    <Skeleton.Text characterCount={10} className="rounded-md" />
-                  </div>
-                  {/* Counter */}
-                  <div>
-                    <div className="flex w-full flex-wrap items-center gap-x-5 gap-y-2">
-                      {/* Price */}
-                      <Skeleton.Text characterCount={5} className="rounded-md" />
-                      {/* Counter */}
-                      <Skeleton.Box className="h-[44px] w-[118px] rounded-lg" />
-                      {/* DeleteLineItemButton */}
-                      <Skeleton.Box className="-ml-1 h-8 w-8 rounded-full" />
-                    </div>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
+            <Skeleton.Box className="mt-4 h-[58px] w-full rounded-full" />
+          </aside>
         </div>
       </div>
-    </StickySidebarLayout>
+    </section>
   );
 }
 

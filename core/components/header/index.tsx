@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server';
+import { headers } from 'next/headers';
 import { cache } from 'react';
 
 import { Streamable } from '@/vibes/soul/lib/streamable';
@@ -14,6 +15,7 @@ import { getPreferredCurrencyCode } from '~/lib/currency';
 import { SiteHeader } from '~/lib/makeswift/components/site-header';
 import { resolveAccountHref } from '~/lib/makeswift/site-header/resolve-account-href';
 import { mapCategoryTreeFromStore } from '~/lib/makeswift/site-header/map-category-tree';
+import { stripLocaleFromPathname } from '~/lib/makeswift/site-header/should-hide-store-header';
 
 import { CurrencyCode, HeaderFragment, HeaderLinksFragment } from './fragment';
 
@@ -96,12 +98,14 @@ export const Header = async () => {
   });
 
   const accountHref = resolveAccountHref(await isLoggedIn());
+  const requestPathname = stripLocaleFromPathname((await headers()).get('x-pathname') ?? '/');
 
   return (
     <SiteHeader
       accountHref={accountHref}
       cartCount={streamableCartCount}
       categoryTree={streamableCategoryTree}
+      initialPathname={requestPathname}
       storeLogo={logo}
       storeLogoLabel={t('home')}
       searchPlaceholder={t('Search.inputPlaceholder')}

@@ -25,7 +25,9 @@ class KV<Adapter extends KvAdapter> implements KvAdapter {
   async mget<Data>(...keys: string[]) {
     const kv = await this.getKv();
 
-    const memoryValues = (await this.memoryKv.mget<Data>(...keys)).filter(Boolean);
+    const memoryValues = (await this.memoryKv.mget<Data>(...keys)).filter(
+      (value) => value !== undefined && value !== null,
+    );
 
     if (memoryValues.length === keys.length) {
       this.logger(

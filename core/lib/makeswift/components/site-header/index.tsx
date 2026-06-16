@@ -13,6 +13,7 @@ type Props = {
   label?: string;
   accountHref: string;
   categoryTree: Streamable<StoreCategoryNode[]>;
+  initialPathname: string;
   storeLogo: SiteHeaderContextValue['storeLogo'];
   storeLogoLabel: string;
   cartCount: Streamable<number | null>;
@@ -25,6 +26,7 @@ export const SiteHeader = async ({
   label = 'Site Header',
   accountHref,
   categoryTree,
+  initialPathname,
   storeLogo,
   storeLogoLabel,
   cartCount,
@@ -36,6 +38,7 @@ export const SiteHeader = async ({
   const contextValue: SiteHeaderContextValue = {
     accountHref,
     categoryTree: await categoryTree,
+    initialPathname,
     storeLogo,
     storeLogoLabel,
     cartCount: await cartCount,

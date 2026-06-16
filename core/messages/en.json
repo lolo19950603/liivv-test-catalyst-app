@@ -256,14 +256,14 @@
     "Subscriptions": {
       "title": "Subscriptions",
       "manage": "Manage billing",
-      "browsePlans": "Browse plans",
+      "browsePlans": "Shop products",
       "customPricing": "Custom pricing",
       "renewsOn": "Renews on {date}",
       "endsOn": "Ends on {date}",
       "cancelAtPeriodEnd": "Cancels at period end",
       "empty": {
         "title": "You don't have any subscriptions",
-        "description": "Subscribe to a plan to get started with recurring deliveries and billing."
+        "description": "Add subscription products from the shop to your cart and check out like any other order."
       },
       "intervals": {
         "day": "per day",
@@ -289,7 +289,7 @@
       "errors": {
         "notConfigured": "Subscriptions are not configured yet.",
         "customerNotFound": "We could not find your account.",
-        "noStripeCustomer": "No billing profile found. Subscribe to a plan first."
+        "noStripeCustomer": "No billing profile found. Complete a subscription checkout first."
       }
     },
     "Orders": {
@@ -526,10 +526,51 @@
   "Checkout": {
     "title": "Checkout",
     "subscriptionBadge": "Subscription",
+    "subscriptionBilling": "Billing",
+    "subscriptionStarts": "Starts",
+    "subscriptionStartsToday": "Starts today",
+    "lineItemQuantity": "Qty {quantity}",
+    "intervals": {
+      "day": "per day",
+      "week": "per week",
+      "month": "per month",
+      "year": "per year",
+      "dayPlural": "every {count} days",
+      "weekPlural": "every {count} weeks",
+      "monthPlural": "every {count} months",
+      "yearPlural": "every {count} years"
+    },
     "shippingRequired": "Select a shipping method on your cart before completing checkout.",
     "shippingRequiredCta": "Back to cart",
+    "shipTo": {
+      "title": "Ship to",
+      "description": "Where should we deliver your order?"
+    },
+    "shippingMethod": {
+      "title": "Shipping",
+      "description": "Rates are calculated from your shipping address.",
+      "empty": "Enter your shipping address above to see available options.",
+      "select": "Select a shipping method",
+      "noOptions": "No shipping options are available for this address.",
+      "updating": "Updating order totals…"
+    },
+    "calculateShipping": "Calculate shipping",
+    "address": {
+      "useDifferent": "Use a different address",
+      "add": "Add address",
+      "default": "Default",
+      "modalTitle": "Add address",
+      "cancel": "Cancel",
+      "save": "Save address",
+      "notLoggedIn": "You must be logged in to save an address.",
+      "invalid": "Please check the address fields and try again.",
+      "saveFailed": "Unable to save address. Please try again."
+    },
     "billing": {
-      "title": "Billing details",
+      "title": "Billing",
+      "addressTitle": "Billing address",
+      "sameAsShipping": "Same as shipping address",
+      "differentBilling": "Use a different billing address",
       "firstName": "First name",
       "lastName": "Last name",
       "email": "Email",
@@ -538,20 +579,28 @@
       "address2": "Apartment, suite, etc.",
       "city": "City",
       "stateOrProvince": "State / Province",
+      "country": "Country",
       "countryCode": "Country code",
       "postalCode": "Postal code",
       "phone": "Phone"
     },
     "payment": {
       "title": "Payment",
+      "secure": "All transactions are secure and encrypted.",
       "continue": "Continue to payment",
-      "submit": "Place order"
+      "submit": "Complete order",
+      "shippingRequired": "Select a shipping method for each order section before continuing to payment."
     },
     "summary": {
       "subtotal": "Subtotal",
       "shipping": "Shipping",
       "tax": "Tax",
-      "total": "Total"
+      "total": "Total",
+      "dueToday": "Due today",
+      "dueTodayTotal": "Due today",
+      "billedOn": "Billed on {date}",
+      "billedLaterTotal": "Billed later",
+      "billedLaterNote": "Your saved payment method will be charged on this date and a new order will be created."
     },
     "Success": {
       "title": "Order placed",
@@ -564,6 +613,22 @@
   "Cart": {
     "title": "Cart",
     "heading": "Your cart",
+    "subscription": {
+      "badge": "Subscription",
+      "billing": "Billing",
+      "starts": "Starts",
+      "startsToday": "Starts today",
+      "intervals": {
+        "day": "per day",
+        "week": "per week",
+        "month": "per month",
+        "year": "per year",
+        "dayPlural": "every {count} days",
+        "weekPlural": "every {count} weeks",
+        "monthPlural": "every {count} months",
+        "yearPlural": "every {count} years"
+      }
+    },
     "proceedToCheckout": "Proceed to checkout",
     "increment": "Increase quantity",
     "decrement": "Decrease quantity",
@@ -593,6 +658,7 @@
         "shipping": "Shipping",
         "add": "Add",
         "change": "Change",
+        "estimate": "Estimate shipping",
         "cancel": "Cancel",
         "country": "Country",
         "city": "City",
@@ -707,6 +773,7 @@
       "loginToSubscribe": "Log in to subscribe",
       "subscriptionPanelTitle": "Subscribe",
       "subscriptionPanelDescription": "Recurring delivery on your schedule. Cancel anytime.",
+      "quantitySharedHint": "Quantity applies to one-time purchase and subscription.",
       "subscriptionInterval": "Billing",
       "subscriptionIntervalHint": "Choose how often you are billed.",
       "subscriptionStartDate": "Starts",

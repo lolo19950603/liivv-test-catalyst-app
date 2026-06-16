@@ -5,6 +5,10 @@ import { revalidateTag } from 'next/cache';
 import { auth, getAnonymousSession, updateAnonymousSession, updateSession } from '~/auth';
 import { TAGS } from '~/client/tags';
 import { addCartLineItem, AddCartLineItemsInput } from '~/lib/cart/add-cart-line-item';
+import {
+  type AddToOrCreateCartResult,
+  collectCartMutationLineItems,
+} from '~/lib/cart/cart-mutation-line-items';
 import { createCart, CreateCartInput } from '~/lib/cart/create-cart';
 import { validateCartId } from '~/lib/cart/validate-cart';
 
@@ -48,29 +52,39 @@ export async function clearCartId(): Promise<void> {
 
 export async function addToOrCreateCart(
   data: CreateCartInput | AddCartLineItemsInput['data'],
-): Promise<void> {
+): Promise<AddToOrCreateCartResult> {
   const cartId = await getCartId();
   const cart = await validateCartId(cartId);
 
   if (cart) {
     const response = await addCartLineItem(cart.entityId, data);
+    const resultCart = response.data.cart.addCartLineItems?.cart;
 
-    if (!response.data.cart.addCartLineItems?.cart?.entityId) {
+    if (!resultCart?.entityId) {
       throw new MissingCartError();
     }
 
     revalidateTag(TAGS.cart, { expire: 0 });
 
-    return;
+    return {
+      cartId: resultCart.entityId,
+      lineItems: collectCartMutationLineItems(resultCart.lineItems),
+    };
   }
 
   const createResponse = await createCart(data);
+  const resultCart = createResponse.data.cart.createCart?.cart;
 
-  if (!createResponse.data.cart.createCart?.cart?.entityId) {
+  if (!resultCart?.entityId) {
     throw new MissingCartError();
   }
 
-  await setCartId(createResponse.data.cart.createCart.cart.entityId);
+  await setCartId(resultCart.entityId);
 
   revalidateTag(TAGS.cart, { expire: 0 });
+
+  return {
+    cartId: resultCart.entityId,
+    lineItems: collectCartMutationLineItems(resultCart.lineItems),
+  };
 }

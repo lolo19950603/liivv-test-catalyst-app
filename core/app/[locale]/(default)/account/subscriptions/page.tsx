@@ -78,7 +78,7 @@ export default async function SubscriptionsPage({ params }: Props) {
 
   return (
     <SubscriptionList
-      browsePlansHref="/subscribe/"
+      browsePlansHref="/"
       browsePlansLabel={t('browsePlans')}
       cancelAtPeriodEndLabel={t('cancelAtPeriodEnd')}
       emptyDescription={t('empty.description')}

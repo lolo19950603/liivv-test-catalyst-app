@@ -1,18 +1,25 @@
 import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
 import { graphql, VariablesOf } from '~/client/graphql';
+import { CartMutationLineItemsFragment } from '~/lib/cart/cart-mutation-line-items';
 
-const AddCartLineItemMutation = graphql(`
-  mutation AddCartLineItemMutation($input: AddCartLineItemsInput!) {
-    cart {
-      addCartLineItems(input: $input) {
-        cart {
-          entityId
+const AddCartLineItemMutation = graphql(
+  `
+    mutation AddCartLineItemMutation($input: AddCartLineItemsInput!) {
+      cart {
+        addCartLineItems(input: $input) {
+          cart {
+            entityId
+            lineItems {
+              ...CartMutationLineItemsFragment
+            }
+          }
         }
       }
     }
-  }
-`);
+  `,
+  [CartMutationLineItemsFragment],
+);
 
 type Variables = VariablesOf<typeof AddCartLineItemMutation>;
 export type AddCartLineItemsInput = Variables['input'];

@@ -33,7 +33,7 @@ export function ArchiveQuantityInput({
   };
 
   return (
-    <div className="quantity relative inline-flex shrink-0">
+    <div className="quantity relative inline-flex w-fit shrink-0">
       <button
         aria-label={decrementLabel}
         className="quantity__button"

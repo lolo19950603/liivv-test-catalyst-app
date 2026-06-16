@@ -4,8 +4,10 @@ import {
   serializeProductOptionSelections,
   toBigCommerceOrderProductOptions,
 } from './product-options';
+import { toBigCommerceOrderAddress } from './order-address';
 import { bigCommerceAdminFetch } from './rest';
 import type { CheckoutSnapshot } from '../checkout/types';
+import { isDeferredSubscriptionLine } from '../checkout/subscription-charge-timing';
 
 function getOrderStatusId(): number {
   const configured = Number(process.env.STRIPE_BC_ORDER_STATUS_ID ?? '11');
@@ -26,7 +28,9 @@ export async function createBigCommerceOrderFromCheckoutSnapshot(
   const billing = snapshot.billingAddress;
   const shipping = snapshot.shippingAddress ?? snapshot.billingAddress;
 
-  const products = snapshot.lineItems.map((line) => {
+  const products = snapshot.lineItems
+    .filter((line) => !isDeferredSubscriptionLine(line))
+    .map((line) => {
     const productOptions = toBigCommerceOrderProductOptions(line.productOptions);
     const price = (line.unitAmount / 100).toFixed(2);
 
@@ -38,6 +42,10 @@ export async function createBigCommerceOrderFromCheckoutSnapshot(
       ...(productOptions.length > 0 ? { product_options: productOptions } : {}),
     };
   });
+
+  if (products.length === 0) {
+    throw new Error('Checkout order has no immediate line items to fulfill');
+  }
 
   const staffNotes = [
     `Stripe payment: ${stripeReferenceId}`,
@@ -57,39 +65,18 @@ export async function createBigCommerceOrderFromCheckoutSnapshot(
       payment_provider_id: stripeReferenceId,
       staff_notes: staffNotes,
       customer_message: 'Custom checkout order',
-      currency_code: snapshot.currency.toUpperCase(),
       shipping_cost_inc_tax: snapshot.shipping,
       shipping_cost_ex_tax: snapshot.shipping,
-      total_tax: snapshot.tax,
-      billing_address: {
-        first_name: billing.firstName,
-        last_name: billing.lastName,
-        company: billing.company,
-        street_1: billing.address1,
-        street_2: billing.address2,
-        city: billing.city,
-        state: billing.stateOrProvince,
-        zip: billing.postalCode,
-        country: billing.countryCode,
-        country_iso2: billing.countryCode,
-        phone: billing.phone,
-        email: billing.email,
-      },
+      billing_address: toBigCommerceOrderAddress(billing),
       shipping_addresses: [
-        {
-          first_name: shipping.firstName,
-          last_name: shipping.lastName,
-          company: shipping.company,
-          street_1: shipping.address1 || billing.address1,
-          street_2: shipping.address2,
+        toBigCommerceOrderAddress({
+          ...shipping,
+          address1: shipping.address1 || billing.address1,
           city: shipping.city || billing.city,
-          state: shipping.stateOrProvince,
-          zip: shipping.postalCode || billing.postalCode,
-          country: shipping.countryCode,
-          country_iso2: shipping.countryCode,
-          phone: shipping.phone,
-          email: shipping.email,
-        },
+          postalCode: shipping.postalCode || billing.postalCode,
+          phone: shipping.phone ?? billing.phone,
+          email: shipping.email || billing.email,
+        }),
       ],
       products,
     }),

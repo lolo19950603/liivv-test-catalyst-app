@@ -59,7 +59,11 @@ export async function addCheckoutBillingAddress({
             address2: address.address2,
             city: address.city,
             stateOrProvince: address.stateOrProvince,
-            stateOrProvinceCode: address.stateOrProvinceCode ?? address.stateOrProvince,
+            stateOrProvinceCode:
+              address.stateOrProvinceCode ??
+              (address.stateOrProvince && address.stateOrProvince.length <= 3
+                ? address.stateOrProvince
+                : undefined),
             countryCode: address.countryCode,
             postalCode: address.postalCode,
             phone: address.phone,

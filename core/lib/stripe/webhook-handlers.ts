@@ -2,7 +2,7 @@ import 'server-only';
 
 import type Stripe from 'stripe';
 
-import { fulfillCheckoutPayment } from '~/lib/checkout/payment';
+import { fulfillCheckoutStripeSession } from '~/lib/checkout/payment';
 
 import {
   createBigCommerceOrderFromCheckoutSession,
@@ -48,7 +48,17 @@ export async function handleStripeWebhookEvent(event: Stripe.Event): Promise<voi
       const paymentIntent = event.data.object;
 
       if (paymentIntent.metadata.checkout_snapshot_id) {
-        await fulfillCheckoutPayment(paymentIntent.id);
+        await fulfillCheckoutStripeSession(paymentIntent.id);
+      }
+
+      break;
+    }
+
+    case 'setup_intent.succeeded': {
+      const setupIntent = event.data.object;
+
+      if (setupIntent.metadata.checkout_snapshot_id) {
+        await fulfillCheckoutStripeSession(setupIntent.id);
       }
 
       break;

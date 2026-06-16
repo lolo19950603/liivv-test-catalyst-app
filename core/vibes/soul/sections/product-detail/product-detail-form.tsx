@@ -16,7 +16,6 @@ import { createSerializer, parseAsString, useQueryStates } from 'nuqs';
 import {
   ReactNode,
   startTransition,
-  Suspense,
   useActionState,
   useCallback,
   useEffect,
@@ -371,8 +370,14 @@ export function ProductDetailForm<F extends Field>({
           </div>
 
           {buyRowVariant === 'archive' ? (
-            <div className="flex w-full flex-col gap-4">
-              <div className="buy-buttons back-in-stock flex w-full flex-wrap items-center gap-4">
+            <div
+              className={clsx(
+                'product-purchase flex w-full flex-col gap-4',
+                showSubscribe && 'product-purchase--with-subscribe',
+              )}
+            >
+              <div className="product-purchase__quantity">
+                <span className="product-purchase__quantity-label">{quantityLabel}</span>
                 <ArchiveQuantityInput
                   decrementLabel={decrementLabel}
                   formField={formFields.quantity}
@@ -380,12 +385,23 @@ export function ProductDetailForm<F extends Field>({
                   max={maxQuantity ?? undefined}
                   min={minQuantity ?? 1}
                 />
+                {showSubscribe ? (
+                  <p className="product-purchase__quantity-note">{t('quantitySharedHint')}</p>
+                ) : null}
+              </div>
+              <div className="buy-buttons back-in-stock flex w-full flex-wrap items-center gap-4">
                 <ArchiveSubmitButton disabled={ctaDisabled}>{ctaLabel}</ArchiveSubmitButton>
                 {additionalActions}
               </div>
+              {showSubscribe ? <hr className="product-purchase__divider" /> : null}
               <ProductSubscribeSlot
                 buyRowVariant={buyRowVariant}
+                embedded={showSubscribe}
+                fields={fields}
+                formId={`product-detail-form-${productId}`}
                 isLoggedIn={isLoggedIn}
+                maxQuantity={maxQuantity}
+                minQuantity={minQuantity}
                 productEntityId={Number(productId)}
                 productPath={productPath}
                 showSubscribe={showSubscribe}
@@ -404,10 +420,20 @@ export function ProductDetailForm<F extends Field>({
               />
             </div>
           ) : (
-            <div className="flex w-full flex-col gap-4">
-              <div className="flex flex-wrap gap-x-3 gap-y-3">
+            <div
+              className={clsx(
+                'product-purchase flex w-full flex-col gap-4',
+                showSubscribe &&
+                  'product-purchase--with-subscribe rounded-2xl border border-[var(--product-detail-border,hsl(var(--contrast-200)))] bg-[var(--product-detail-background,hsl(var(--background)))] p-5',
+              )}
+            >
+              <div className="product-purchase__quantity flex flex-col items-start gap-2">
+                <span className="product-purchase__quantity-label text-xs font-medium uppercase tracking-wide text-[var(--product-detail-secondary-text,hsl(var(--contrast-500)))]">
+                  {quantityLabel}
+                </span>
                 <NumberInput
                   aria-label={quantityLabel}
+                  className="w-fit"
                   decrementLabel={decrementLabel}
                   incrementLabel={incrementLabel}
                   max={maxQuantity}
@@ -419,12 +445,25 @@ export function ProductDetailForm<F extends Field>({
                   required
                   value={quantityControl.value}
                 />
+                {showSubscribe ? (
+                  <p className="product-purchase__quantity-note text-sm text-[var(--product-detail-secondary-text,hsl(var(--contrast-500)))]">
+                    {t('quantitySharedHint')}
+                  </p>
+                ) : null}
+              </div>
+              <div className="product-purchase__one-time flex flex-wrap items-center gap-3">
                 <SubmitButton disabled={ctaDisabled}>{ctaLabel}</SubmitButton>
                 {additionalActions}
               </div>
+              {showSubscribe ? <hr className="product-purchase__divider" /> : null}
               <ProductSubscribeSlot
                 buyRowVariant={buyRowVariant}
+                embedded={showSubscribe}
+                fields={fields}
+                formId={`product-detail-form-${productId}`}
                 isLoggedIn={isLoggedIn}
+                maxQuantity={maxQuantity}
+                minQuantity={minQuantity}
                 productEntityId={Number(productId)}
                 productPath={productPath}
                 showSubscribe={showSubscribe}
@@ -459,6 +498,7 @@ function ProductSubscribeSlot({
   isLoggedIn,
   subscribeAction,
   buyRowVariant,
+  embedded,
   subscriptionIntervalLabel,
   subscriptionIntervalHint,
   subscriptionIntervalOptions,
@@ -467,6 +507,10 @@ function ProductSubscribeSlot({
   subscriptionStartDateMin,
   subscriptionStartDateMax,
   subscriptionStartDateDefault,
+  formId,
+  fields,
+  minQuantity,
+  maxQuantity,
 }: {
   showSubscribe?: boolean;
   productEntityId: number;
@@ -477,6 +521,7 @@ function ProductSubscribeSlot({
   isLoggedIn?: boolean;
   subscribeAction?: ProductSubscribeAction;
   buyRowVariant: ProductDetailBuyRowVariant;
+  embedded?: boolean;
   subscriptionIntervalLabel?: string;
   subscriptionIntervalHint?: string;
   subscriptionIntervalOptions?: Array<{ value: string; label: string }>;
@@ -485,6 +530,10 @@ function ProductSubscribeSlot({
   subscriptionStartDateMin?: string;
   subscriptionStartDateMax?: string;
   subscriptionStartDateDefault?: string;
+  formId: string;
+  fields: Field[];
+  minQuantity?: number;
+  maxQuantity?: number;
 }) {
   if (
     !showSubscribe ||
@@ -505,25 +554,28 @@ function ProductSubscribeSlot({
   }
 
   return (
-    <Suspense fallback={null}>
-      <ProductSubscribeButton
-        action={subscribeAction}
-        buyRowVariant={buyRowVariant}
-        defaultInterval={subscriptionIntervalOptions[0].value}
-        defaultStartDate={subscriptionStartDateDefault}
-        intervalLabel={subscriptionIntervalLabel}
-        intervalOptions={subscriptionIntervalOptions}
-        isLoggedIn={isLoggedIn ?? false}
-        loginHref={subscribeLoginHref}
-        loginLabel={subscribeLoginLabel}
-        productEntityId={productEntityId}
-        productPath={productPath}
-        startDateLabel={subscriptionStartDateLabel}
-        startDateMax={subscriptionStartDateMax}
-        startDateMin={subscriptionStartDateMin}
-        subscribeLabel={subscribeLabel}
-      />
-    </Suspense>
+    <ProductSubscribeButton
+      action={subscribeAction}
+      buyRowVariant={buyRowVariant}
+      defaultInterval={subscriptionIntervalOptions[0].value}
+      defaultStartDate={subscriptionStartDateDefault}
+      embedded={embedded}
+      fields={fields}
+      formId={formId}
+      intervalLabel={subscriptionIntervalLabel}
+      intervalOptions={subscriptionIntervalOptions}
+      isLoggedIn={isLoggedIn ?? false}
+      loginHref={subscribeLoginHref}
+      loginLabel={subscribeLoginLabel}
+      maxQuantity={maxQuantity}
+      minQuantity={minQuantity}
+      productEntityId={productEntityId}
+      productPath={productPath}
+      startDateLabel={subscriptionStartDateLabel}
+      startDateMax={subscriptionStartDateMax}
+      startDateMin={subscriptionStartDateMin}
+      subscribeLabel={subscribeLabel}
+    />
   );
 }
 

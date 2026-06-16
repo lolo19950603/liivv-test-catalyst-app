@@ -6,8 +6,80 @@ import { getCart } from '~/app/[locale]/(default)/cart/page-data';
 import { kv } from '~/lib/kv';
 
 import { mapCartSelectedOptionsToProductOptions } from './map-cart-options';
-import { getSubscriptionLinesForCart, matchSubscriptionLine } from './subscription-lines';
+import { calculateCheckoutAmounts } from './subscription-charge-timing';
+import { buildCheckoutShippingSections } from './checkout-section-shipping';
+import {
+  getSectionShippingCosts,
+  getSectionShippingState,
+  isSectionShippingReady,
+} from './section-shipping-storage';
+import { getSubscriptionLinesForCartLine } from './subscription-line-key';
+import { getSubscriptionLinesForCart } from './subscription-lines';
 import type { CheckoutAddressSnapshot, CheckoutLineItemSnapshot, CheckoutSnapshot } from './types';
+import type { SubscriptionLineMeta } from './types';
+
+function buildCheckoutLineItemSnapshots(
+  item: {
+    entityId: string;
+    productEntityId: number;
+    variantEntityId?: number | null;
+    sku?: string | null;
+    name: string;
+    quantity: number;
+    salePrice?: { value: number } | null;
+    listPrice: { value: number; currencyCode: string };
+    selectedOptions: Array<{ entityId: number; valueEntityId?: number | null }>;
+  },
+  isPhysical: boolean,
+  subscriptionLines: SubscriptionLineMeta[],
+): CheckoutLineItemSnapshot[] {
+  const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
+  const subscriptionEntries = getSubscriptionLinesForCartLine(
+    subscriptionLines,
+    item.productEntityId,
+    productOptions,
+    item.entityId,
+  );
+  const subscriptionQuantity = subscriptionEntries.reduce((sum, entry) => sum + entry.quantity, 0);
+  const oneTimeQuantity = item.quantity - subscriptionQuantity;
+  const unitPrice = item.salePrice?.value ?? item.listPrice.value;
+  const baseLine = {
+    lineItemEntityId: item.entityId,
+    productEntityId: item.productEntityId,
+    variantEntityId: item.variantEntityId ?? undefined,
+    sku: item.sku ?? undefined,
+    name: item.name,
+    unitAmount: Math.round(unitPrice * 100),
+    currency: item.listPrice.currencyCode,
+    productOptions,
+    isPhysical,
+  };
+  const snapshots: CheckoutLineItemSnapshot[] = subscriptionEntries.map((subscription) => ({
+    ...baseLine,
+    quantity: subscription.quantity,
+    isSubscription: true,
+    billingInterval: subscription.billingInterval,
+    billingCycleAnchor: subscription.billingCycleAnchor,
+  }));
+
+  if (oneTimeQuantity > 0) {
+    snapshots.push({
+      ...baseLine,
+      quantity: oneTimeQuantity,
+      isSubscription: false,
+    });
+  }
+
+  if (snapshots.length === 0) {
+    snapshots.push({
+      ...baseLine,
+      quantity: item.quantity,
+      isSubscription: false,
+    });
+  }
+
+  return snapshots;
+}
 
 function snapshotKey(snapshotId: string): string {
   return `checkout:snapshot:${snapshotId}`;
@@ -44,40 +116,49 @@ export async function buildCheckoutSnapshot({
   const physicalItems = cart.lineItems.physicalItems;
   const digitalItems = cart.lineItems.digitalItems;
 
-  const lineItems: CheckoutLineItemSnapshot[] = [...physicalItems, ...digitalItems].map((item) => {
-    const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
-    const subscription = matchSubscriptionLine(
-      subscriptionLines,
-      item.productEntityId,
-      productOptions,
-    );
-    const unitPrice = item.salePrice?.value ?? item.listPrice.value;
+  const lineItems: CheckoutLineItemSnapshot[] = [
+    ...physicalItems
+      .filter((item) => !item.parentEntityId)
+      .flatMap((item) => buildCheckoutLineItemSnapshots(item, true, subscriptionLines)),
+    ...digitalItems
+      .filter((item) => !item.parentEntityId)
+      .flatMap((item) => buildCheckoutLineItemSnapshots(item, false, subscriptionLines)),
+  ];
 
-    return {
-      lineItemEntityId: item.entityId,
-      productEntityId: item.productEntityId,
-      variantEntityId: item.variantEntityId ?? undefined,
-      sku: item.sku ?? undefined,
-      name: item.name,
-      quantity: item.quantity,
-      unitAmount: Math.round(unitPrice * 100),
-      currency: item.listPrice.currencyCode,
-      productOptions,
-      isSubscription: Boolean(subscription),
-      billingInterval: subscription?.billingInterval,
-      billingCycleAnchor: subscription?.billingCycleAnchor,
-    };
-  });
+  const requiresShipping = lineItems.some((line) => line.isPhysical);
+  const shippingSections = buildCheckoutShippingSections(lineItems);
+  const sectionShippingState = await getSectionShippingState(cartId);
+  const sectionShippingCosts = getSectionShippingCosts(sectionShippingState);
+
+  if (requiresShipping && !isSectionShippingReady(shippingSections, sectionShippingState)) {
+    throw new Error('A shipping method must be selected for each delivery section before checkout');
+  }
 
   const shippingConsignment = checkout.shippingConsignments?.find(
     (consignment) => consignment.selectedShippingOption,
   );
 
-  if (!shippingConsignment?.selectedShippingOption) {
-    throw new Error('A shipping method must be selected before checkout');
-  }
+  const immediateShipping = sectionShippingCosts['due-today'] ?? 0;
+  const shippingAddress = checkout.shippingConsignments?.[0]?.address;
+  const amounts = calculateCheckoutAmounts({
+    lineItems,
+    cartSubtotal: checkout.subtotal?.value ?? 0,
+    cartTax: checkout.taxTotal?.value ?? 0,
+    sectionShippingCosts,
+  });
 
-  const shippingAddress = shippingConsignment.address;
+  const sectionShipping = Object.fromEntries(
+    Object.entries(sectionShippingState)
+      .filter(([, entry]) => entry.selectedOptionId && entry.selectedCost != null)
+      .map(([sectionId, entry]) => [
+        sectionId,
+        {
+          cost: entry.selectedCost as number,
+          description: entry.selectedDescription ?? '',
+          optionEntityId: entry.selectedOptionId as string,
+        },
+      ]),
+  );
 
   return {
     id: uuid(),
@@ -86,9 +167,11 @@ export async function buildCheckoutSnapshot({
     currency: checkout.grandTotal.currencyCode,
     subtotal: checkout.subtotal?.value ?? 0,
     tax: checkout.taxTotal?.value ?? 0,
-    shipping: shippingConsignment.selectedShippingOption.cost.value,
+    shipping: immediateShipping,
     grandTotal: checkout.grandTotal.value,
+    amounts,
     lineItems,
+    sectionShipping,
     billingAddress,
     shippingAddress: shippingAddress
       ? {
@@ -102,6 +185,6 @@ export async function buildCheckoutSnapshot({
           postalCode: shippingAddress.postalCode ?? '',
         }
       : undefined,
-    shippingMethodDescription: shippingConsignment.selectedShippingOption.description,
+    shippingMethodDescription: shippingConsignment?.selectedShippingOption?.description,
   };
 }

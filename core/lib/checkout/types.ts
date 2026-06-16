@@ -10,6 +10,8 @@ export interface SubscriptionLineMeta {
   billingCycleAnchor?: number;
   unitAmount: number;
   currency: string;
+  quantity: number;
+  cartLineItemEntityId?: string;
 }
 
 export interface CheckoutAddressSnapshot {
@@ -37,9 +39,20 @@ export interface CheckoutLineItemSnapshot {
   unitAmount: number;
   currency: string;
   productOptions: ProductOptionSelection[];
+  isPhysical: boolean;
   isSubscription: boolean;
   billingInterval?: SubscriptionBillingInterval;
   billingCycleAnchor?: number;
+}
+
+export interface CheckoutAmountsSnapshot {
+  immediateSubtotal: number;
+  immediateShipping: number;
+  immediateTax: number;
+  immediateGrandTotal: number;
+  deferredSubtotal: number;
+  hasDeferredSubscriptions: boolean;
+  hasImmediateCharges: boolean;
 }
 
 export interface CheckoutSnapshot {
@@ -51,7 +64,16 @@ export interface CheckoutSnapshot {
   tax: number;
   shipping: number;
   grandTotal: number;
+  amounts: CheckoutAmountsSnapshot;
   lineItems: CheckoutLineItemSnapshot[];
+  sectionShipping?: Record<
+    string,
+    {
+      cost: number;
+      description: string;
+      optionEntityId: string;
+    }
+  >;
   billingAddress: CheckoutAddressSnapshot;
   shippingAddress?: CheckoutAddressSnapshot;
   shippingMethodDescription?: string;

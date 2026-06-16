@@ -8,10 +8,22 @@ interface CacheEntry {
   expiresAt: number;
 }
 
+const globalForKv = globalThis as typeof globalThis & {
+  __catalystMemoryKv?: LRUCache<string, CacheEntry>;
+};
+
+function getSharedMemoryKvStore(): LRUCache<string, CacheEntry> {
+  if (!globalForKv.__catalystMemoryKv) {
+    globalForKv.__catalystMemoryKv = new LRUCache<string, CacheEntry>({
+      max: 500,
+    });
+  }
+
+  return globalForKv.__catalystMemoryKv;
+}
+
 export class MemoryKvAdapter implements KvAdapter {
-  private kv = new LRUCache<string, CacheEntry>({
-    max: 500,
-  });
+  private kv = getSharedMemoryKvStore();
 
   async mget<Data>(...keys: string[]) {
     const entries = keys.map((key) => this.kv.get(key)?.value);

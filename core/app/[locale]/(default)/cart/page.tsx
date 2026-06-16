@@ -6,6 +6,16 @@ import { Cart as CartComponent, CartEmptyState } from '@/vibes/soul/sections/car
 import { CartAnalyticsProvider } from '~/app/[locale]/(default)/cart/_components/cart-analytics-provider';
 import { getCartId } from '~/lib/cart';
 import { getPreferredCurrencyCode } from '~/lib/currency';
+import {
+  expandCartLineItemForProduct,
+} from '~/lib/checkout/expand-cart-line-items';
+import { getSubscriptionLineDetails } from '~/lib/checkout/format-subscription-line';
+import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
+import {
+  findSubscriptionLineByKey,
+  getSubscriptionLinesForCart,
+} from '~/lib/checkout/subscription-lines';
+import type { SubscriptionBillingInterval } from '~/lib/stripe/subscription-interval';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { Slot } from '~/lib/makeswift/slot';
 import { exists } from '~/lib/utils';
@@ -96,6 +106,16 @@ export default async function Cart({ params }: Props) {
   const cart = data.site.cart;
   const checkout = data.site.checkout;
   const giftCertificatesEnabled = data.site.settings?.giftCertificates?.isEnabled ?? false;
+  const subscriptionLines = await getSubscriptionLinesForCart(cartId);
+  const formatInterval = ({ interval, intervalCount }: SubscriptionBillingInterval) => {
+    if (intervalCount === 1) {
+      return t(`subscription.intervals.${interval}` as 'subscription.intervals.month');
+    }
+
+    return t(`subscription.intervals.${interval}Plural` as 'subscription.intervals.monthPlural', {
+      count: intervalCount,
+    });
+  };
 
   if (!cart) {
     return emptyState;
@@ -107,9 +127,10 @@ export default async function Cart({ params }: Props) {
     ...cart.lineItems.digitalItems,
   ].filter((item) => !('parentEntityId' in item) || !item.parentEntityId);
 
-  const formattedLineItems = lineItems.map((item) => {
+  const formattedLineItems = lineItems.flatMap((item) => {
     if (item.__typename === 'CartGiftCertificate') {
-      return {
+      return [
+        {
         typename: item.__typename,
         id: item.entityId,
         title: item.name,
@@ -126,7 +147,9 @@ export default async function Cart({ params }: Props) {
         selectedOptions: [],
         productEntityId: 0,
         variantEntityId: 0,
-      };
+        lineItemEntityId: item.entityId,
+      },
+      ];
     }
 
     let inventoryMessages;
@@ -170,7 +193,9 @@ export default async function Cart({ params }: Props) {
       }
     }
 
-    return {
+    const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
+
+    const baseItem = {
       typename: item.__typename,
       id: item.entityId,
       quantity: item.quantity,
@@ -212,6 +237,38 @@ export default async function Cart({ params }: Props) {
       variantEntityId: item.variantEntityId,
       inventoryMessages,
     };
+
+    return expandCartLineItemForProduct({
+      item: baseItem,
+      subscriptionLines,
+      productEntityId: item.productEntityId,
+      productOptions,
+      applySubscription: () => ({}),
+    }).map((line) => {
+      const subscription =
+        line.purchaseType === 'subscription' && line.subscriptionLineKey
+          ? findSubscriptionLineByKey(subscriptionLines, line.subscriptionLineKey)
+          : undefined;
+      const isSubscriptionRow = line.purchaseType === 'subscription';
+
+      const subscriptionDetails = subscription
+        ? getSubscriptionLineDetails(subscription, {
+            billingLabel: t('subscription.billing'),
+            startsLabel: t('subscription.starts'),
+            startsTodayLabel: t('subscription.startsToday'),
+            formatInterval,
+            formatStartsDate: (timestamp) =>
+              format.dateTime(new Date(timestamp * 1000), { dateStyle: 'medium' }),
+          })
+        : undefined;
+
+      return {
+        ...line,
+        subscriptionBadge: isSubscriptionRow && subscription ? t('subscription.badge') : undefined,
+        subscriptionDetails:
+          isSubscriptionRow && subscription ? subscriptionDetails : undefined,
+      };
+    });
   });
 
   const totalCouponDiscount =
@@ -231,7 +288,9 @@ export default async function Cart({ params }: Props) {
     checkout?.shippingConsignments?.find((consignment) => consignment.selectedShippingOption) ||
     checkout?.shippingConsignments?.[0];
 
-  const shippingCountries = await getShippingCountries();
+  const requiresShipping = cart.lineItems.physicalItems.length > 0;
+
+  const shippingCountries = requiresShipping ? await getShippingCountries() : [];
 
   const countries = shippingCountries.map((country) => ({
     value: country.code,
@@ -256,9 +315,6 @@ export default async function Cart({ params }: Props) {
         label: state.name,
       })),
   }));
-
-  const showShippingForm =
-    shippingConsignment?.address && !shippingConsignment.selectedShippingOption;
 
   const checkoutUrl = data.site.settings?.url.checkoutUrl;
 
@@ -349,64 +405,48 @@ export default async function Cart({ params }: Props) {
           key={`${cart.entityId}-${cart.version}`}
           lineItemAction={updateLineItem}
           lineItemActionPendingLabel={t('cartUpdateInProgress')}
-          shipping={{
-            action: updateShippingInfo,
-            countries,
-            states: statesOrProvinces,
-            address: shippingConsignment?.address
+          shipping={
+            requiresShipping
               ? {
-                  country: shippingConsignment.address.countryCode,
-                  city:
-                    shippingConsignment.address.city !== ''
-                      ? (shippingConsignment.address.city ?? undefined)
-                      : undefined,
-                  state:
-                    shippingConsignment.address.stateOrProvince !== ''
-                      ? (shippingConsignment.address.stateOrProvince ?? undefined)
-                      : undefined,
-                  postalCode:
-                    shippingConsignment.address.postalCode !== ''
-                      ? (shippingConsignment.address.postalCode ?? undefined)
-                      : undefined,
+                  action: updateShippingInfo,
+                  countries,
+                  states: statesOrProvinces,
+                  address: shippingConsignment?.address
+                    ? {
+                        country: shippingConsignment.address.countryCode,
+                        state:
+                          shippingConsignment.address.stateOrProvince !== ''
+                            ? (shippingConsignment.address.stateOrProvince ?? undefined)
+                            : undefined,
+                        postalCode:
+                          shippingConsignment.address.postalCode !== ''
+                            ? (shippingConsignment.address.postalCode ?? undefined)
+                            : undefined,
+                      }
+                    : undefined,
+                  shippingOption: shippingConsignment?.selectedShippingOption
+                    ? {
+                        value: shippingConsignment.selectedShippingOption.entityId,
+                        label: shippingConsignment.selectedShippingOption.description,
+                        price: format.number(shippingConsignment.selectedShippingOption.cost.value, {
+                          style: 'currency',
+                          currency: checkout?.cart?.currencyCode,
+                        }),
+                      }
+                    : undefined,
+                  labels: {
+                    shipping: t('CheckoutSummary.Shipping.shipping'),
+                    change: t('CheckoutSummary.Shipping.change'),
+                    estimate: t('CheckoutSummary.Shipping.estimate'),
+                    country: t('CheckoutSummary.Shipping.country'),
+                    state: t('CheckoutSummary.Shipping.state'),
+                    postalCode: t('CheckoutSummary.Shipping.postalCode'),
+                    cancel: t('CheckoutSummary.Shipping.cancel'),
+                    noShippingOptions: t('CheckoutSummary.Shipping.noShippingOptions'),
+                  },
                 }
-              : undefined,
-            shippingOptions: shippingConsignment?.availableShippingOptions
-              ? shippingConsignment.availableShippingOptions.map((option) => ({
-                  label: option.description,
-                  value: option.entityId,
-                  price: format.number(option.cost.value, {
-                    style: 'currency',
-                    currency: checkout?.cart?.currencyCode,
-                  }),
-                }))
-              : undefined,
-            shippingOption: shippingConsignment?.selectedShippingOption
-              ? {
-                  value: shippingConsignment.selectedShippingOption.entityId,
-                  label: shippingConsignment.selectedShippingOption.description,
-                  price: format.number(shippingConsignment.selectedShippingOption.cost.value, {
-                    style: 'currency',
-                    currency: checkout?.cart?.currencyCode,
-                  }),
-                }
-              : undefined,
-            showShippingForm,
-            shippingLabel: t('CheckoutSummary.Shipping.shipping'),
-            addLabel: t('CheckoutSummary.Shipping.add'),
-            changeLabel: t('CheckoutSummary.Shipping.change'),
-            countryLabel: t('CheckoutSummary.Shipping.country'),
-            cityLabel: t('CheckoutSummary.Shipping.city'),
-            stateLabel: t('CheckoutSummary.Shipping.state'),
-            postalCodeLabel: t('CheckoutSummary.Shipping.postalCode'),
-            updateShippingOptionsLabel: t('CheckoutSummary.Shipping.updatedShippingOptions'),
-            viewShippingOptionsLabel: t('CheckoutSummary.Shipping.viewShippingOptions'),
-            cancelLabel: t('CheckoutSummary.Shipping.cancel'),
-            editAddressLabel: t('CheckoutSummary.Shipping.editAddress'),
-            shippingOptionsLabel: t('CheckoutSummary.Shipping.shippingOptions'),
-            updateShippingLabel: t('CheckoutSummary.Shipping.updateShipping'),
-            addShippingLabel: t('CheckoutSummary.Shipping.addShipping'),
-            noShippingOptionsLabel: t('CheckoutSummary.Shipping.noShippingOptions'),
-          }}
+              : undefined
+          }
           summaryTitle={t('CheckoutSummary.title')}
           title={t('title')}
         />

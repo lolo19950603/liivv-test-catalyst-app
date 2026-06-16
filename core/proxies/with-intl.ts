@@ -24,6 +24,7 @@ export const withIntl: ProxyFactory = (next) => {
     const locale = intlResponse.headers.get('x-middleware-request-x-next-intl-locale') ?? '';
 
     request.headers.set('x-bc-locale', locale);
+    request.headers.set('x-pathname', request.nextUrl.pathname);
 
     // Continue the proxy chain
     const response = await next(request, event);

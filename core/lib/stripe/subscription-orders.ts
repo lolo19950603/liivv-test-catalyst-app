@@ -202,7 +202,17 @@ export async function createBigCommerceOrderFromCheckoutSession(
 export async function createBigCommerceOrderFromInvoice(
   invoice: Stripe.Invoice,
 ): Promise<number | null> {
-  if (invoice.billing_reason !== 'subscription_cycle') {
+  if ((invoice.amount_paid ?? 0) <= 0) {
+    return null;
+  }
+
+  const billableReasons = new Set<Stripe.Invoice.BillingReason | null>([
+    'subscription_cycle',
+    'subscription_create',
+    'subscription_update',
+  ]);
+
+  if (!billableReasons.has(invoice.billing_reason)) {
     return null;
   }
 
@@ -215,11 +225,12 @@ export async function createBigCommerceOrderFromInvoice(
   const subscription = await getSubscription(subscriptionId);
   const unitAmount = invoice.amount_paid ?? getSubscriptionUnitAmount(subscription);
   const currencyCode = (invoice.currency ?? subscription.currency ?? 'usd').toUpperCase();
+  const orderType = invoice.billing_reason === 'subscription_cycle' ? 'renewal' : 'initial';
 
   return createOrderFromSubscription({
     subscription,
     stripeReferenceId: `invoice:${invoice.id}`,
-    orderType: 'renewal',
+    orderType,
     unitAmount,
     currencyCode,
     productName: getSubscriptionProductName(subscription),

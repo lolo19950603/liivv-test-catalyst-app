@@ -1,8 +1,10 @@
 'use client';
 
 import { ComponentPropsWithRef, ComponentRef, forwardRef, useReducer } from 'react';
+// eslint-disable-next-line @typescript-eslint/no-restricted-imports
+import { useRouter as useNextRouter } from 'next/navigation';
 
-import { Link as NavLink, useRouter } from '../../i18n/routing';
+import { Link as NavLink } from '../../i18n/routing';
 
 type NextLinkProps = Omit<ComponentPropsWithRef<typeof NavLink>, 'prefetch'>;
 
@@ -25,7 +27,7 @@ type Props = NextLinkProps & PrefetchOptions;
  */
 export const Link = forwardRef<ComponentRef<'a'>, Props>(
   ({ href, prefetch = 'hover', prefetchKind = 'auto', children, className, ...rest }, ref) => {
-    const router = useRouter();
+    const router = useNextRouter();
     const [prefetched, setPrefetched] = useReducer(() => true, false);
     const computedPrefetch = computePrefetchProp({ prefetch, prefetchKind });
 

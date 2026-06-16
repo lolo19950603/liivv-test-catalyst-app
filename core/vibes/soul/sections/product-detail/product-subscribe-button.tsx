@@ -1,19 +1,26 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { useFormMetadata } from '@conform-to/react';
+import { parseWithZod } from '@conform-to/zod';
+import { clsx } from 'clsx';
 import { type ReactNode, useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 
 import { ArchiveButton, ArchiveButtonLink } from '@/vibes/soul/primitives/archive-button';
 import { Button } from '@/vibes/soul/primitives/button';
 import { ButtonLink } from '@/vibes/soul/primitives/button-link';
+import { toast } from '@/vibes/soul/primitives/toaster';
 import {
   SubscriptionIntervalField,
   type SubscriptionIntervalOption,
 } from '@/vibes/soul/primitives/subscription-interval-field';
 import { SubscriptionStartDateField } from '@/vibes/soul/primitives/subscription-start-date-field';
+import { Link } from '~/components/link';
+
+import { revalidateCart } from './actions/revalidate-cart';
 
 import { type ProductDetailBuyRowVariant } from './product-detail-form';
+import { type Field, schema } from './schema';
 
 export type ProductSubscribeAction = (formData: FormData) => Promise<void>;
 
@@ -26,6 +33,7 @@ interface ProductSubscribeButtonProps {
   isLoggedIn: boolean;
   action: ProductSubscribeAction;
   buyRowVariant?: ProductDetailBuyRowVariant;
+  embedded?: boolean;
   intervalLabel: string;
   intervalOptions: SubscriptionIntervalOption[];
   defaultInterval: string;
@@ -33,6 +41,10 @@ interface ProductSubscribeButtonProps {
   startDateMin: string;
   startDateMax: string;
   defaultStartDate: string;
+  formId: string;
+  fields: Field[];
+  minQuantity?: number;
+  maxQuantity?: number;
 }
 
 function SubscribeActionButton({
@@ -85,6 +97,7 @@ export function ProductSubscribeButton({
   isLoggedIn,
   action,
   buyRowVariant = 'default',
+  embedded = false,
   intervalLabel,
   intervalOptions,
   defaultInterval,
@@ -92,16 +105,22 @@ export function ProductSubscribeButton({
   startDateMin,
   startDateMax,
   defaultStartDate,
+  formId,
+  fields,
+  minQuantity,
+  maxQuantity,
 }: ProductSubscribeButtonProps) {
   const t = useTranslations('Product.ProductDetails');
-  const searchParams = useSearchParams();
+  const form = useFormMetadata(formId);
   const [isPending, startTransition] = useTransition();
   const [subscriptionInterval, setSubscriptionInterval] = useState(defaultInterval);
   const [subscriptionStartDate, setSubscriptionStartDate] = useState(defaultStartDate);
-  const selectedOptions = [...searchParams.entries()].filter(([key]) => /^\d+$/.test(key));
 
   const panel = (content: ReactNode) => (
-    <section aria-label={t('subscriptionPanelTitle')} className="subscribe-form">
+    <section
+      aria-label={t('subscriptionPanelTitle')}
+      className={clsx('subscribe-form', embedded && 'subscribe-form--embedded')}
+    >
       <div className="subscribe-form__panel">
         <header className="subscribe-form__header">
           <h3 className="subscribe-form__title">{t('subscriptionPanelTitle')}</h3>
@@ -134,19 +153,64 @@ export function ProductSubscribeButton({
   }
 
   const handleSubscribe = () => {
+    const formElement = document.getElementById(formId);
+
+    if (!(formElement instanceof HTMLFormElement)) {
+      return;
+    }
+
+    const productFormData = new FormData(formElement);
+    const validation = parseWithZod(productFormData, {
+      schema: schema(fields, minQuantity, maxQuantity),
+    });
+
+    if (validation.status !== 'success') {
+      form.validate();
+
+      return;
+    }
+
     const formData = new FormData();
 
     formData.set('productEntityId', String(productEntityId));
     formData.set('productPath', productPath);
+    formData.set('quantity', String(validation.value.quantity));
     formData.set('subscriptionInterval', subscriptionInterval);
     formData.set('subscriptionStartDate', subscriptionStartDate);
 
-    selectedOptions.forEach(([optionEntityId, valueEntityId]) => {
-      formData.set(optionEntityId, valueEntityId);
+    fields.forEach((field) => {
+      if (!/^\d+$/.test(field.name)) {
+        return;
+      }
+
+      const value = productFormData.get(field.name);
+
+      if (typeof value === 'string' && value.length > 0) {
+        formData.set(field.name, value);
+      }
     });
 
-    startTransition(() => {
-      void action(formData);
+    startTransition(async () => {
+      const subscribeQuantity = validation.value.quantity;
+
+      try {
+        await action(formData);
+
+        toast.success(
+          t.rich('successMessage', {
+            cartItems: subscribeQuantity,
+            cartLink: (chunks) => (
+              <Link className="underline" href="/cart" prefetch="viewport" prefetchKind="full">
+                {chunks}
+              </Link>
+            ),
+          }),
+        );
+
+        await revalidateCart();
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : t('unknownError'));
+      }
     });
   };
 

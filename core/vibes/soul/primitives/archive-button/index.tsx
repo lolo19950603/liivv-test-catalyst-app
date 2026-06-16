@@ -46,7 +46,11 @@ export const ArchiveButton = forwardRef<HTMLButtonElement, ArchiveButtonProps>(f
     >
       <span className="btn-fill" data-fill="" />
       <span className="btn-text">
-        {loading ? <Loader2 className="size-5 animate-spin" strokeWidth={1.5} /> : <span>{children}</span>}
+        {loading ? (
+          <Loader2 className="size-5 animate-spin" strokeWidth={1.5} />
+        ) : (
+          <span className="inline-flex items-center justify-center gap-2">{children}</span>
+        )}
       </span>
     </button>
   );

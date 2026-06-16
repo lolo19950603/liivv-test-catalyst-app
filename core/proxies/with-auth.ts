@@ -8,7 +8,11 @@ import { type ProxyFactory } from './compose-proxies';
 const protectedPathPattern = new URLPattern({ pathname: `{/:locale}?/(account)/*` });
 
 function redirectToLogin(url: string) {
-  return NextResponse.redirect(new URL('/login', url), { status: 302 });
+  const loginUrl = new URL('/login', url);
+
+  loginUrl.searchParams.set('redirectTo', '/account/orders');
+
+  return NextResponse.redirect(loginUrl, { status: 302 });
 }
 
 export const withAuth: ProxyFactory = (next) => {

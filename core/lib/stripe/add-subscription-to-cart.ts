@@ -1,17 +1,21 @@
 import 'server-only';
 
+import { revalidateTag } from 'next/cache';
 import { getLocale, getTranslations } from 'next-intl/server';
 
 import { getSessionCustomerAccessToken } from '~/auth';
+import { TAGS } from '~/client/tags';
 import { client } from '~/client';
 import { PricingFragment } from '~/client/fragments/pricing';
 import { graphql } from '~/client/graphql';
 import { parseProductOptionSelectionsFromFormData } from '~/lib/bigcommerce/product-options';
+import { findMatchingCartLineItem } from '~/lib/checkout/find-cart-line-item';
+import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
 import {
   addSubscriptionLineToCart,
   buildSubscriptionLineMeta,
 } from '~/lib/checkout/subscription-lines';
-import { addToOrCreateCart, getCartId } from '~/lib/cart';
+import { addToOrCreateCart } from '~/lib/cart';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { redirect as appRedirect } from '~/i18n/routing';
 
@@ -111,11 +115,15 @@ export async function addSubscriptionProductToCart(
     formData.get('subscriptionStartDate'),
   );
 
-  await addToOrCreateCart({
+  const rawQuantity = Number(formData.get('quantity'));
+  const quantity =
+    Number.isFinite(rawQuantity) && rawQuantity > 0 ? Math.floor(rawQuantity) : 1;
+
+  const { cartId, lineItems: cartItems } = await addToOrCreateCart({
     lineItems: [
       {
         productEntityId,
-        quantity: 1,
+        quantity,
         ...(optionValueIds.length > 0
           ? {
               selectedOptions: {
@@ -130,11 +138,10 @@ export async function addSubscriptionProductToCart(
     ],
   });
 
-  const cartId = await getCartId();
-
-  if (!cartId) {
-    throw new Error(t('errors.invalidPlan'));
-  }
+  const matchedLine = findMatchingCartLineItem(cartItems, product.entityId, productOptions);
+  const resolvedProductOptions = matchedLine
+    ? mapCartSelectedOptionsToProductOptions(matchedLine.selectedOptions)
+    : productOptions;
 
   await addSubscriptionLineToCart(
     cartId,
@@ -142,13 +149,16 @@ export async function addSubscriptionProductToCart(
       productEntityId: product.entityId,
       sku: product.sku ?? '',
       productName: product.name,
-      productOptions,
+      productOptions:
+        resolvedProductOptions.length > 0 ? resolvedProductOptions : productOptions,
       billingInterval,
       billingCycleAnchor,
       unitAmount,
       currency,
+      cartLineItemEntityId: matchedLine?.entityId,
+      quantity,
     }),
   );
 
-  appRedirect({ href: '/cart/', locale });
+  revalidateTag(TAGS.cart, { expire: 0 });
 }

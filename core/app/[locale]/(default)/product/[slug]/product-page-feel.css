@@ -33,6 +33,60 @@
 }
 
 /* Archive product-singular buy row (quantity pill + primary CTA) */
+.liivv-product-page-feel .product-purchase {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.liivv-product-page-feel .product-purchase--with-subscribe {
+  padding: 1.25rem;
+  border: 1px solid var(--product-detail-border, rgba(49, 47, 47, 0.18));
+  border-radius: var(--rounded-block, 1rem);
+  background: rgb(var(--color-background));
+}
+
+.liivv-product-page-feel .product-purchase__quantity {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.liivv-product-page-feel .product-purchase__quantity-label {
+  font-family: var(--product-detail-subtitle-font-family, var(--font-family-mono));
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--product-detail-secondary-text, #66605c);
+}
+
+.liivv-product-page-feel .product-purchase__quantity-note {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--product-detail-secondary-text, #66605c);
+}
+
+.liivv-product-page-feel .product-purchase__divider {
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--product-detail-border, rgba(49, 47, 47, 0.18));
+}
+
+.liivv-product-page-feel .product-purchase .subscribe-form {
+  margin-top: 0;
+}
+
+.liivv-product-page-feel .product-purchase .subscribe-form--embedded .subscribe-form__panel {
+  gap: 1rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
 .liivv-product-page-feel .buy-buttons {
   align-items: stretch;
   width: 100%;
@@ -135,6 +189,7 @@
 
 /* Quantity + buy row — from product-singular-page.html (not in diabetes-care-sections.css) */
 .liivv-product-page-feel .quantity {
+  width: fit-content;
   min-height: var(--input-height);
   border: 1px solid rgb(var(--color-border));
   border-radius: var(--buttons-radius);

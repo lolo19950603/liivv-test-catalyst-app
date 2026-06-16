@@ -61,6 +61,12 @@ export const shippingActionFormDataSchema = ({
       postalCode: z.string().optional(),
     }),
     z.object({
+      intent: z.literal('estimate-shipping'),
+      country: z.string({ required_error }),
+      state: z.string().optional(),
+      postalCode: z.string().optional(),
+    }),
+    z.object({
       intent: z.literal('add-shipping'),
       shippingOption: z.string(),
     }),

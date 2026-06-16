@@ -57,6 +57,18 @@ html {
   color: var(--store-primary-text);
 }
 
+.liivv-store .checkout-summary img {
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.liivv-store .group\/order-list img {
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
 .liivv-store .liivv-catalog-product-grid {
   --color-base-background: 252 248 244;
 }

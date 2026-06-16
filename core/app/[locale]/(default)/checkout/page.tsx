@@ -2,21 +2,43 @@ import { Metadata } from 'next';
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { CustomCheckout } from '@/vibes/soul/sections/custom-checkout';
-import { BillingAddressForm } from '~/components/checkout/billing-address-form';
-import { CheckoutPaymentSection } from '~/components/checkout/checkout-payment-section';
+import { CheckoutFulfillmentSection } from '~/components/checkout/checkout-fulfillment-section';
 import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
 import { graphql } from '~/client/graphql';
 import { redirect } from '~/i18n/routing';
-import { getCart } from '~/app/[locale]/(default)/cart/page-data';
+import { getCart, getShippingCountries } from '~/app/[locale]/(default)/cart/page-data';
+import { getCustomerAddresses } from '~/app/[locale]/(default)/account/addresses/page-data';
+import { updateShippingInfo } from '~/app/[locale]/(default)/cart/_actions/update-shipping-info';
 import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
-import { matchSubscriptionLine, getSubscriptionLinesForCart } from '~/lib/checkout/subscription-lines';
+import {
+  expandCartLineItemForProduct,
+} from '~/lib/checkout/expand-cart-line-items';
+import {
+  getSubscriptionLineDetails,
+} from '~/lib/checkout/format-subscription-line';
+import type { SubscriptionBillingInterval } from '~/lib/stripe/subscription-interval';
+import {
+  findSubscriptionLineByKey,
+  getSubscriptionLinesForCart,
+} from '~/lib/checkout/subscription-lines';
 import { buildAppUrl } from '~/lib/stripe/config';
 import { isStripeConfigured } from '~/lib/stripe/client';
 import { getCartId } from '~/lib/cart';
-import { exists } from '~/lib/utils';
+import { buildCheckoutSummarySections } from '~/lib/checkout/build-checkout-summary';
+import type { CheckoutDisplayLineInput } from '~/lib/checkout/build-checkout-summary';
+import { buildCheckoutShippingSections } from '~/lib/checkout/checkout-section-shipping';
+import {
+  getSectionShippingCosts,
+  getSectionShippingState,
+  isSectionShippingReady,
+} from '~/lib/checkout/section-shipping-storage';
 
-import { initializePayment } from './_actions/initialize-payment';
+import { initializePayment, prepareOrderConfirmation } from './_actions/initialize-payment';
+import {
+  formatSectionShippingOptions,
+  quoteAllCheckoutSectionShipping,
+} from './_actions/section-shipping';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -83,123 +105,337 @@ export default async function CheckoutPage({ params }: Props) {
   const customer = customerResponse.data.customer;
   const format = await getFormatter();
   const subscriptionLines = await getSubscriptionLinesForCart(cartId);
+  const formatInterval = ({ interval, intervalCount }: SubscriptionBillingInterval) => {
+    if (intervalCount === 1) {
+      return t(`intervals.${interval}` as 'intervals.month');
+    }
 
-  const physicalAndDigital = [...cart.lineItems.physicalItems, ...cart.lineItems.digitalItems];
+    return t(`intervals.${interval}Plural` as 'intervals.monthPlural', { count: intervalCount });
+  };
 
-  const lineItems = physicalAndDigital.map((item) => {
+  const physicalAndDigital = [
+    ...cart.lineItems.physicalItems
+      .filter((item) => !item.parentEntityId)
+      .map((item) => ({ item, isPhysical: true as const })),
+    ...cart.lineItems.digitalItems
+      .filter((item) => !item.parentEntityId)
+      .map((item) => ({ item, isPhysical: false as const })),
+  ];
+
+  const checkoutLines: CheckoutDisplayLineInput[] = physicalAndDigital.flatMap(({ item, isPhysical }) => {
     const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
-    const subscription = matchSubscriptionLine(
-      subscriptionLines,
-      item.productEntityId,
-      productOptions,
-    );
     const unitPrice = item.salePrice?.value ?? item.listPrice.value;
 
-    return {
+    const baseItem = {
       id: item.entityId,
+      quantity: item.quantity,
       title: item.name,
       subtitle: item.sku ?? undefined,
-      price: format.number(unitPrice * item.quantity, {
-        style: 'currency',
-        currency: item.listPrice.currencyCode,
-      }),
-      badge: subscription ? t('subscriptionBadge') : undefined,
+      imageUrl: item.image?.url,
+      unitPrice,
+      currencyCode: item.listPrice.currencyCode,
     };
+
+    return expandCartLineItemForProduct({
+      item: baseItem,
+      subscriptionLines,
+      productEntityId: item.productEntityId,
+      productOptions,
+      applySubscription: () => ({}),
+    }).map((line) => {
+      const subscription =
+        line.purchaseType === 'subscription' && line.subscriptionLineKey
+          ? findSubscriptionLineByKey(subscriptionLines, line.subscriptionLineKey)
+          : undefined;
+
+      const subscriptionDetails = subscription
+        ? getSubscriptionLineDetails(subscription, {
+            billingLabel: t('subscriptionBilling'),
+            startsLabel: t('subscriptionStarts'),
+            startsTodayLabel: t('subscriptionStartsToday'),
+            formatInterval,
+            formatStartsDate: (timestamp) =>
+              format.dateTime(new Date(timestamp * 1000), { dateStyle: 'medium' }),
+          })
+        : undefined;
+
+      const unitAmount = Math.round(line.unitPrice * 100);
+      const billingCycleAnchor = subscription?.billingCycleAnchor;
+      const isSubscription = line.purchaseType === 'subscription';
+
+      return {
+        id: line.id,
+        title: line.title,
+        subtitle: line.subtitle,
+        imageUrl: baseItem.imageUrl,
+        quantity: line.quantity,
+        unitPrice: line.unitPrice,
+        currencyCode: line.currencyCode,
+        isPhysical,
+        isSubscription,
+        billingCycleAnchor,
+        badge: isSubscription ? t('subscriptionBadge') : undefined,
+        subscriptionDetails: isSubscription ? subscriptionDetails : undefined,
+        snapshot: {
+          lineItemEntityId: item.entityId,
+          productEntityId: item.productEntityId,
+          variantEntityId: item.variantEntityId ?? undefined,
+          sku: item.sku ?? undefined,
+          name: line.title,
+          quantity: line.quantity,
+          unitAmount,
+          currency: line.currencyCode,
+          productOptions,
+          isPhysical,
+          isSubscription,
+          billingInterval: subscription?.billingInterval,
+          billingCycleAnchor,
+        },
+        display: {
+          id: line.id,
+          title: line.title,
+          subtitle: line.subtitle,
+          imageUrl: baseItem.imageUrl,
+          quantity: line.quantity,
+          price: format.number(line.unitPrice * line.quantity, {
+            style: 'currency',
+            currency: line.currencyCode,
+          }),
+          badge: isSubscription ? t('subscriptionBadge') : undefined,
+          subscriptionDetails: isSubscription ? subscriptionDetails : undefined,
+        },
+      } satisfies CheckoutDisplayLineInput;
+    });
   });
 
-  const shippingConsignment = checkout?.shippingConsignments?.find(
-    (consignment) => consignment.selectedShippingOption,
-  );
+  const shippingConsignment =
+    checkout?.shippingConsignments?.find((consignment) => consignment.selectedShippingOption) ||
+    checkout?.shippingConsignments?.[0];
 
-  const shippingReady = Boolean(shippingConsignment?.selectedShippingOption);
+  const snapshotLines = checkoutLines.map((line) => line.snapshot);
+  const shippingSections = buildCheckoutShippingSections(snapshotLines);
+  let sectionShippingState = await getSectionShippingState(cartId);
+  const hasShippingAddress = Boolean(shippingConsignment?.address?.countryCode);
 
-  const summaryItems = [
-    checkout?.subtotal
-      ? {
-          label: t('summary.subtotal'),
-          value: format.number(checkout.subtotal.value, {
-            style: 'currency',
-            currency: checkout.subtotal.currencyCode,
-          }),
-        }
-      : null,
-    checkout?.shippingCostTotal
-      ? {
-          label: t('summary.shipping'),
-          value: format.number(checkout.shippingCostTotal.value, {
-            style: 'currency',
-            currency: checkout.shippingCostTotal.currencyCode,
-          }),
-        }
-      : null,
-    checkout?.taxTotal
-      ? {
-          label: t('summary.tax'),
-          value: format.number(checkout.taxTotal.value, {
-            style: 'currency',
-            currency: checkout.taxTotal.currencyCode,
-          }),
-        }
-      : null,
-  ].filter(exists);
+  if (hasShippingAddress && shippingSections.some((section) => section.requiresShipping)) {
+    const needsQuote = shippingSections.some(
+      (section) =>
+        section.requiresShipping && !(sectionShippingState[section.id]?.options?.length ?? 0),
+    );
+
+    if (needsQuote) {
+      await quoteAllCheckoutSectionShipping();
+      sectionShippingState = await getSectionShippingState(cartId);
+    }
+  }
+
+  const sectionShippingCosts = getSectionShippingCosts(sectionShippingState);
+  const requiresShipping = shippingSections.some((section) => section.requiresShipping);
+  const shippingReady =
+    !requiresShipping || isSectionShippingReady(shippingSections, sectionShippingState);
+  const currencyCode = checkout?.grandTotal?.currencyCode ?? 'USD';
+
+  const sectionShippingUi: Record<
+    string,
+    {
+      requiresShipping: boolean;
+      shippingOptions: Array<{ value: string; label: string; price: string }>;
+      selectedShippingOption?: { value: string; label: string; price: string };
+    }
+  > = {};
+
+  for (const section of shippingSections) {
+    const entry = sectionShippingState[section.id];
+    const shippingOptions = entry
+      ? await formatSectionShippingOptions(entry.options, currencyCode)
+      : [];
+    const selectedOption = entry?.options.find(
+      (option) => option.entityId === entry.selectedOptionId,
+    );
+
+    sectionShippingUi[section.id] = {
+      requiresShipping: section.requiresShipping,
+      shippingOptions,
+      selectedShippingOption:
+        selectedOption && entry?.selectedOptionId
+          ? {
+              value: entry.selectedOptionId,
+              label: selectedOption.description,
+              price: format.number(selectedOption.cost, {
+                style: 'currency',
+                currency: currencyCode,
+              }),
+            }
+          : undefined,
+    };
+  }
+
+  const shippingCountries = await getShippingCountries();
+
+  const countries = shippingCountries.map((country) => ({
+    value: country.code,
+    label: country.name,
+  }));
+
+  const blacklistedUSStates = new Set([
+    'Armed Forces Africa',
+    'Armed Forces Canada',
+    'Armed Forces Middle East',
+  ]);
+
+  const statesOrProvinces = shippingCountries.map((country) => ({
+    country: country.code,
+    states: country.statesOrProvinces
+      .filter((state) => country.code !== 'US' || !blacklistedUSStates.has(state.name))
+      .map((state) => ({
+        value: state.abbreviation,
+        label: state.name,
+      })),
+  }));
+
+  const addressData = await getCustomerAddresses({ limit: 50 });
+  const savedAddresses = (addressData?.addresses ?? []).map((entry, index) => ({
+    id: entry.entityId.toString(),
+    firstName: entry.firstName,
+    lastName: entry.lastName,
+    company: entry.company ?? undefined,
+    address1: entry.address1,
+    address2: entry.address2 ?? undefined,
+    city: entry.city,
+    stateOrProvince: entry.stateOrProvince ?? undefined,
+    countryCode: entry.countryCode,
+    postalCode: entry.postalCode ?? undefined,
+    phone: entry.phone ?? undefined,
+    isDefault: index === 0,
+  }));
+
+  const defaultSavedAddress = savedAddresses[0];
+
+  const billingDefaults = {
+    firstName: customer?.firstName ?? defaultSavedAddress?.firstName ?? '',
+    lastName: customer?.lastName ?? defaultSavedAddress?.lastName ?? '',
+    email: customer?.email ?? '',
+    company: defaultSavedAddress?.company,
+    address1: defaultSavedAddress?.address1 ?? '',
+    address2: defaultSavedAddress?.address2,
+    city: defaultSavedAddress?.city ?? shippingConsignment?.address?.city ?? '',
+    countryCode:
+      defaultSavedAddress?.countryCode ?? shippingConsignment?.address?.countryCode ?? 'CA',
+    postalCode: defaultSavedAddress?.postalCode ?? shippingConsignment?.address?.postalCode ?? '',
+    stateOrProvince:
+      defaultSavedAddress?.stateOrProvince ??
+      shippingConsignment?.address?.stateOrProvince ??
+      undefined,
+    phone: defaultSavedAddress?.phone,
+  };
+
+  const summarySections = buildCheckoutSummarySections({
+    lines: checkoutLines,
+    cartSubtotal: checkout?.subtotal?.value ?? 0,
+    cartTax: checkout?.taxTotal?.value ?? 0,
+    sectionShippingCosts,
+    sectionShippingUi,
+    formatMoney: (value) =>
+      format.number(value, {
+        style: 'currency',
+        currency: currencyCode,
+      }),
+    labels: {
+      dueTodayTitle: t('summary.dueToday'),
+      formatBilledOnTitle: (date) => t('summary.billedOn', { date }),
+      subtotal: t('summary.subtotal'),
+      shipping: t('summary.shipping'),
+      tax: t('summary.tax'),
+      dueTodayTotal: t('summary.dueTodayTotal'),
+      billedLaterTotal: t('summary.billedLaterTotal'),
+      billedLaterNote: t('summary.billedLaterNote'),
+    },
+    formatDeferredDate: (timestamp) =>
+      format.dateTime(new Date(timestamp * 1000), { dateStyle: 'medium' }),
+  });
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-10">
-      <CustomCheckout
-        billingForm={
-          <BillingAddressForm
-            defaultValues={{
-              firstName: customer?.firstName ?? '',
-              lastName: customer?.lastName ?? '',
-              email: customer?.email ?? '',
-              address1: '',
-              city: '',
-              countryCode: shippingConsignment?.address?.countryCode ?? 'CA',
-              postalCode: shippingConsignment?.address?.postalCode ?? '',
-              stateOrProvince: shippingConsignment?.address?.stateOrProvince ?? undefined,
-            }}
-            id={BILLING_FORM_ID}
-            labels={{
-              firstName: t('billing.firstName'),
-              lastName: t('billing.lastName'),
-              email: t('billing.email'),
-              company: t('billing.company'),
-              address1: t('billing.address1'),
-              address2: t('billing.address2'),
-              city: t('billing.city'),
-              stateOrProvince: t('billing.stateOrProvince'),
-              countryCode: t('billing.countryCode'),
-              postalCode: t('billing.postalCode'),
-              phone: t('billing.phone'),
-            }}
-          />
-        }
-        billingTitle={t('billing.title')}
-        lineItems={lineItems}
-        paymentSection={
-          <CheckoutPaymentSection
-            billingFormId={BILLING_FORM_ID}
-            continueLabel={t('payment.continue')}
-            initializePaymentAction={initializePayment}
-            returnUrl={buildAppUrl('/checkout/success/', locale)}
-            submitLabel={t('payment.submit')}
-          />
-        }
-        paymentTitle={t('payment.title')}
-        shippingWarning={shippingReady ? undefined : t('shippingRequired')}
-        shippingWarningCta={shippingReady ? undefined : t('shippingRequiredCta')}
-        summaryItems={summaryItems}
-        title={t('title')}
-        total={
-          checkout?.grandTotal
-            ? format.number(checkout.grandTotal.value, {
-                style: 'currency',
-                currency: checkout.grandTotal.currencyCode,
-              })
-            : '—'
-        }
-        totalLabel={t('summary.total')}
-      />
-    </div>
+    <CustomCheckout
+      currencyCode={currencyCode}
+      summaryLabels={{
+        shippingTitle: t('shippingMethod.title'),
+        shippingEmpty: t('shippingMethod.empty'),
+        shippingSelect: t('shippingMethod.select'),
+        shippingNoOptions: t('shippingMethod.noOptions'),
+        shippingUpdating: t('shippingMethod.updating'),
+      }}
+      fulfillmentSection={
+        <CheckoutFulfillmentSection
+          action={updateShippingInfo}
+          address={
+            shippingConsignment?.address
+              ? {
+                  country: shippingConsignment.address.countryCode,
+                  city:
+                    shippingConsignment.address.city !== ''
+                      ? (shippingConsignment.address.city ?? undefined)
+                      : undefined,
+                  state:
+                    shippingConsignment.address.stateOrProvince !== ''
+                      ? (shippingConsignment.address.stateOrProvince ?? undefined)
+                      : undefined,
+                  postalCode:
+                    shippingConsignment.address.postalCode !== ''
+                      ? (shippingConsignment.address.postalCode ?? undefined)
+                      : undefined,
+                }
+              : undefined
+          }
+          billingDefaults={billingDefaults}
+          billingFormId={BILLING_FORM_ID}
+          countries={countries}
+          customerEmail={customer?.email ?? ''}
+          initializePaymentAction={initializePayment}
+          prepareOrderConfirmationAction={prepareOrderConfirmation}
+          labels={{
+            shipToTitle: t('shipTo.title'),
+            shippingMethodTitle: t('shippingMethod.title'),
+            shippingMethodEmpty: t('shippingMethod.empty'),
+            shippingMethodSelect: t('shippingMethod.select'),
+            shippingMethodNoOptions: t('shippingMethod.noOptions'),
+            shippingMethodUpdating: t('shippingMethod.updating'),
+            billingAddressTitle: t('billing.addressTitle'),
+            sameAsShipping: t('billing.sameAsShipping'),
+            differentBilling: t('billing.differentBilling'),
+            useDifferentAddress: t('address.useDifferent'),
+            addAddress: t('address.add'),
+            defaultBadge: t('address.default'),
+            paymentSecure: t('payment.secure'),
+            firstName: t('billing.firstName'),
+            lastName: t('billing.lastName'),
+            email: t('billing.email'),
+            company: t('billing.company'),
+            address1: t('billing.address1'),
+            address2: t('billing.address2'),
+            city: t('billing.city'),
+            stateOrProvince: t('billing.stateOrProvince'),
+            country: t('billing.country'),
+            postalCode: t('billing.postalCode'),
+            phone: t('billing.phone'),
+            addressModalTitle: t('address.modalTitle'),
+            addressModalCancel: t('address.cancel'),
+            addressModalSave: t('address.save'),
+          }}
+          paymentTitle={t('payment.title')}
+          requiresShipping={requiresShipping}
+          returnUrl={buildAppUrl('/checkout/success/', locale)}
+          savedAddresses={savedAddresses}
+          states={statesOrProvinces}
+          shippingReady={shippingReady}
+          shippingRequiredMessage={
+            requiresShipping && !shippingReady
+              ? t('payment.shippingRequired')
+              : undefined
+          }
+          submitLabel={t('payment.submit')}
+        />
+      }
+      summarySections={summarySections}
+    />
   );
 }

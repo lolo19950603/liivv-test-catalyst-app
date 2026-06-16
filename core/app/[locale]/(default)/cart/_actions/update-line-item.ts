@@ -11,8 +11,7 @@ import { cartLineItemActionFormDataSchema } from '@/vibes/soul/sections/cart/sch
 
 import { DigitalItemFragment, PhysicalItemFragment } from '../page-data';
 
-import { removeItem } from './remove-item';
-import { CartSelectedOptionsInput, updateQuantity } from './update-quantity';
+import { updateCartLinePurchaseQuantity } from './update-line-item-purchase';
 
 type LineItem = {
   selectedOptions:
@@ -20,6 +19,8 @@ type LineItem = {
     | FragmentOf<typeof DigitalItemFragment>['selectedOptions'];
   productEntityId: number;
   variantEntityId: number | null;
+  purchaseType?: 'subscription' | 'one-time';
+  lineItemEntityId?: string;
 } & CartLineItem;
 
 export const updateLineItem = async (
@@ -52,348 +53,60 @@ export const updateLineItem = async (
     };
   }
 
+  try {
+    await updateCartLinePurchaseQuantity({
+      lineItems: prevState.lineItems,
+      cartLineItem,
+      intent: submission.value.intent,
+    });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+
+    if (error instanceof BigCommerceGQLError) {
+      return {
+        ...prevState,
+        lastResult: submission.reply({
+          formErrors: error.errors.map(({ message }) => message),
+        }),
+      };
+    }
+
+    if (error instanceof Error) {
+      return { ...prevState, lastResult: submission.reply({ formErrors: [error.message] }) };
+    }
+
+    return { ...prevState, lastResult: submission.reply({ formErrors: [String(error)] }) };
+  }
+
   switch (submission.value.intent) {
-    case 'increment': {
-      const parsedSelectedOptions = cartLineItem.selectedOptions.reduce<CartSelectedOptionsInput>(
-        (accum, option) => {
-          let multipleChoicesOptionInput;
-          let checkboxOptionInput;
-          let numberFieldOptionInput;
-          let textFieldOptionInput;
-          let multiLineTextFieldOptionInput;
-          let dateFieldOptionInput;
-
-          switch (option.__typename) {
-            case 'CartSelectedMultipleChoiceOption':
-              multipleChoicesOptionInput = {
-                optionEntityId: option.entityId,
-                optionValueEntityId: option.valueEntityId,
-              };
-
-              if (accum.multipleChoices) {
-                return {
-                  ...accum,
-                  multipleChoices: [...accum.multipleChoices, multipleChoicesOptionInput],
-                };
-              }
-
-              return {
-                ...accum,
-                multipleChoices: [multipleChoicesOptionInput],
-              };
-
-            case 'CartSelectedCheckboxOption':
-              checkboxOptionInput = {
-                optionEntityId: option.entityId,
-                optionValueEntityId: option.valueEntityId,
-              };
-
-              if (accum.checkboxes) {
-                return {
-                  ...accum,
-                  checkboxes: [...accum.checkboxes, checkboxOptionInput],
-                };
-              }
-
-              return { ...accum, checkboxes: [checkboxOptionInput] };
-
-            case 'CartSelectedNumberFieldOption':
-              numberFieldOptionInput = {
-                optionEntityId: option.entityId,
-                number: option.number,
-              };
-
-              if (accum.numberFields) {
-                return {
-                  ...accum,
-                  numberFields: [...accum.numberFields, numberFieldOptionInput],
-                };
-              }
-
-              return { ...accum, numberFields: [numberFieldOptionInput] };
-
-            case 'CartSelectedTextFieldOption':
-              textFieldOptionInput = {
-                optionEntityId: option.entityId,
-                text: option.text,
-              };
-
-              if (accum.textFields) {
-                return {
-                  ...accum,
-                  textFields: [...accum.textFields, textFieldOptionInput],
-                };
-              }
-
-              return { ...accum, textFields: [textFieldOptionInput] };
-
-            case 'CartSelectedMultiLineTextFieldOption':
-              multiLineTextFieldOptionInput = {
-                optionEntityId: option.entityId,
-                text: option.text,
-              };
-
-              if (accum.multiLineTextFields) {
-                return {
-                  ...accum,
-                  multiLineTextFields: [
-                    ...accum.multiLineTextFields,
-                    multiLineTextFieldOptionInput,
-                  ],
-                };
-              }
-
-              return {
-                ...accum,
-                multiLineTextFields: [multiLineTextFieldOptionInput],
-              };
-
-            case 'CartSelectedDateFieldOption':
-              dateFieldOptionInput = {
-                optionEntityId: option.entityId,
-                date: new Date(String(option.date.utc)).toISOString(),
-              };
-
-              if (accum.dateFields) {
-                return {
-                  ...accum,
-                  dateFields: [...accum.dateFields, dateFieldOptionInput],
-                };
-              }
-
-              return { ...accum, dateFields: [dateFieldOptionInput] };
-          }
-
-          return accum;
-        },
-        {},
-      );
-
-      try {
-        await updateQuantity({
-          lineItemEntityId: cartLineItem.id,
-          productEntityId: cartLineItem.productEntityId,
-          variantEntityId: cartLineItem.variantEntityId,
-          selectedOptions: parsedSelectedOptions,
-          quantity: cartLineItem.quantity + 1,
-        });
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error(error);
-
-        if (error instanceof BigCommerceGQLError) {
-          return {
-            ...prevState,
-            lastResult: submission.reply({
-              formErrors: error.errors.map(({ message }) => message),
-            }),
-          };
-        }
-
-        if (error instanceof Error) {
-          return { ...prevState, lastResult: submission.reply({ formErrors: [error.message] }) };
-        }
-
-        return { ...prevState, lastResult: submission.reply({ formErrors: [String(error)] }) };
-      }
-
-      const item = submission.value;
-
+    case 'increment':
       return {
         lineItems: prevState.lineItems.map((lineItem) =>
-          lineItem.id === item.id ? { ...lineItem, quantity: lineItem.quantity + 1 } : lineItem,
+          lineItem.id === submission.value.id
+            ? { ...lineItem, quantity: lineItem.quantity + 1 }
+            : lineItem,
         ),
         lastResult: submission.reply({ resetForm: true }),
       };
-    }
 
-    case 'decrement': {
-      const parsedSelectedOptions = cartLineItem.selectedOptions.reduce<CartSelectedOptionsInput>(
-        (accum, option) => {
-          let multipleChoicesOptionInput;
-          let checkboxOptionInput;
-          let numberFieldOptionInput;
-          let textFieldOptionInput;
-          let multiLineTextFieldOptionInput;
-          let dateFieldOptionInput;
-
-          switch (option.__typename) {
-            case 'CartSelectedMultipleChoiceOption':
-              multipleChoicesOptionInput = {
-                optionEntityId: option.entityId,
-                optionValueEntityId: option.valueEntityId,
-              };
-
-              if (accum.multipleChoices) {
-                return {
-                  ...accum,
-                  multipleChoices: [...accum.multipleChoices, multipleChoicesOptionInput],
-                };
-              }
-
-              return {
-                ...accum,
-                multipleChoices: [multipleChoicesOptionInput],
-              };
-
-            case 'CartSelectedCheckboxOption':
-              checkboxOptionInput = {
-                optionEntityId: option.entityId,
-                optionValueEntityId: option.valueEntityId,
-              };
-
-              if (accum.checkboxes) {
-                return {
-                  ...accum,
-                  checkboxes: [...accum.checkboxes, checkboxOptionInput],
-                };
-              }
-
-              return { ...accum, checkboxes: [checkboxOptionInput] };
-
-            case 'CartSelectedNumberFieldOption':
-              numberFieldOptionInput = {
-                optionEntityId: option.entityId,
-                number: option.number,
-              };
-
-              if (accum.numberFields) {
-                return {
-                  ...accum,
-                  numberFields: [...accum.numberFields, numberFieldOptionInput],
-                };
-              }
-
-              return { ...accum, numberFields: [numberFieldOptionInput] };
-
-            case 'CartSelectedTextFieldOption':
-              textFieldOptionInput = {
-                optionEntityId: option.entityId,
-                text: option.text,
-              };
-
-              if (accum.textFields) {
-                return {
-                  ...accum,
-                  textFields: [...accum.textFields, textFieldOptionInput],
-                };
-              }
-
-              return { ...accum, textFields: [textFieldOptionInput] };
-
-            case 'CartSelectedMultiLineTextFieldOption':
-              multiLineTextFieldOptionInput = {
-                optionEntityId: option.entityId,
-                text: option.text,
-              };
-
-              if (accum.multiLineTextFields) {
-                return {
-                  ...accum,
-                  multiLineTextFields: [
-                    ...accum.multiLineTextFields,
-                    multiLineTextFieldOptionInput,
-                  ],
-                };
-              }
-
-              return {
-                ...accum,
-                multiLineTextFields: [multiLineTextFieldOptionInput],
-              };
-
-            case 'CartSelectedDateFieldOption':
-              dateFieldOptionInput = {
-                optionEntityId: option.entityId,
-                date: new Date(String(option.date.utc)).toISOString(),
-              };
-
-              if (accum.dateFields) {
-                return {
-                  ...accum,
-                  dateFields: [...accum.dateFields, dateFieldOptionInput],
-                };
-              }
-
-              return { ...accum, dateFields: [dateFieldOptionInput] };
-          }
-
-          return accum;
-        },
-        {},
-      );
-
-      try {
-        await updateQuantity({
-          lineItemEntityId: cartLineItem.id,
-          productEntityId: cartLineItem.productEntityId,
-          variantEntityId: cartLineItem.variantEntityId,
-          selectedOptions: parsedSelectedOptions,
-          quantity: cartLineItem.quantity - 1,
-        });
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error(error);
-
-        if (error instanceof BigCommerceGQLError) {
-          return {
-            ...prevState,
-            lastResult: submission.reply({
-              formErrors: error.errors.map(({ message }) => message),
-            }),
-          };
-        }
-
-        if (error instanceof Error) {
-          return { ...prevState, lastResult: submission.reply({ formErrors: [error.message] }) };
-        }
-
-        return { ...prevState, lastResult: submission.reply({ formErrors: [String(error)] }) };
-      }
-
-      const item = submission.value;
-
+    case 'decrement':
       return {
         lineItems: prevState.lineItems.map((lineItem) =>
-          lineItem.id === item.id ? { ...lineItem, quantity: lineItem.quantity - 1 } : lineItem,
+          lineItem.id === submission.value.id
+            ? { ...lineItem, quantity: lineItem.quantity - 1 }
+            : lineItem,
         ),
         lastResult: submission.reply({ resetForm: true }),
       };
-    }
 
-    case 'delete': {
-      try {
-        await removeItem({ lineItemEntityId: submission.value.id });
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error(error);
-
-        if (error instanceof BigCommerceGQLError) {
-          return {
-            ...prevState,
-            lastResult: submission.reply({
-              formErrors: error.errors.map(({ message }) => message),
-            }),
-          };
-        }
-
-        if (error instanceof Error) {
-          return { ...prevState, lastResult: submission.reply({ formErrors: [error.message] }) };
-        }
-
-        return { ...prevState, lastResult: submission.reply({ formErrors: [String(error)] }) };
-      }
-
-      const deletedItem = submission.value;
-
+    case 'delete':
       return {
-        lineItems: prevState.lineItems.filter((item) => item.id !== deletedItem.id),
+        lineItems: prevState.lineItems.filter((item) => item.id !== submission.value.id),
         lastResult: submission.reply({ resetForm: true }),
       };
-    }
 
-    default: {
+    default:
       return prevState;
-    }
   }
 };

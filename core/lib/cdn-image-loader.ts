@@ -2,8 +2,8 @@
 
 import { ImageLoaderProps } from 'next/image';
 
-export default function bcCdnImageLoader({ src, width }: ImageLoaderProps): string {
-  const url = src.replace('{:size}', `${width}w`);
+import { buildBcCdnImageUrl } from '~/lib/bc-cdn-image-url';
 
-  return url;
+export default function bcCdnImageLoader({ src, width }: ImageLoaderProps): string {
+  return buildBcCdnImageUrl(src, width);
 }

@@ -10,6 +10,8 @@ import {
   type ReactNode,
   type Ref,
   useContext,
+  useEffect,
+  useState,
 } from 'react';
 
 import { usePathname } from '~/i18n/routing';
@@ -39,6 +41,7 @@ type BannerProps = ComponentPropsWithoutRef<typeof Banner>;
 export type SiteHeaderContextValue = {
   accountHref: string;
   categoryTree: StoreCategoryNode[];
+  initialPathname: string;
   storeLogo: StoreLogo;
   storeLogoLabel: string;
   cartCount: number | null;
@@ -49,6 +52,7 @@ export type SiteHeaderContextValue = {
 const PropsContext = createContext<SiteHeaderContextValue>({
   accountHref: ACCOUNT_LOGIN_PATH,
   categoryTree: [],
+  initialPathname: '/',
   storeLogo: '',
   storeLogoLabel: 'Home',
   cartCount: null,
@@ -190,12 +194,24 @@ function PageOverrideHeader({
   );
 }
 
+function useStablePathname(): string {
+  const { initialPathname } = useContext(PropsContext);
+  const clientPathname = usePathname() ?? '/';
+  const [pathname, setPathname] = useState(initialPathname);
+
+  useEffect(() => {
+    setPathname(clientPathname);
+  }, [clientPathname]);
+
+  return pathname;
+}
+
 export const MakeswiftHeader = forwardRef(
   (
     { background, banner, links, linksPosition, pageOverrides }: Props,
     ref: Ref<HTMLDivElement>,
   ) => {
-    const pathname = usePathname() ?? '/';
+    const pathname = useStablePathname();
     const isInBuilder = useIsInBuilder();
     const {
       accountHref,

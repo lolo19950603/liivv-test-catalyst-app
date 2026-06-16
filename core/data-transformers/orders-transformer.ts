@@ -27,6 +27,7 @@ export const ordersTransformer = (
             href: lineItem.baseCatalogProduct?.path ?? '#',
             title: lineItem.name,
             subtitle: lineItem.brand ?? undefined,
+            quantity: lineItem.quantity,
             price,
             totalPrice: format.number(lineItem.subTotalListPrice.value, {
               style: 'currency',
@@ -60,6 +61,7 @@ export const ordersTransformer = (
       id: order.entityId.toString(),
       href: `/account/orders/${order.entityId}`,
       status: order.status.label,
+      orderedAt: format.dateTime(new Date(order.orderedAt.utc), { dateStyle: 'medium' }),
       totalPrice: format.number(order.totalIncTax.value, {
         style: 'currency',
         currency: order.totalIncTax.currencyCode,

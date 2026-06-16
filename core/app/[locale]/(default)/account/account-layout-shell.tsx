@@ -1,9 +1,9 @@
 'use client';
 
-import { usePathname } from '~/i18n/routing';
 import { type ReactNode } from 'react';
 
 import { StickySidebarLayout } from '@/vibes/soul/sections/sticky-sidebar-layout';
+import { usePathname } from '~/i18n/routing';
 
 interface Props {
   children: ReactNode;

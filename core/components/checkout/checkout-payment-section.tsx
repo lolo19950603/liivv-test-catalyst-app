@@ -16,6 +16,8 @@ interface CheckoutPaymentSectionProps {
   continueLabel: string;
   submitLabel: string;
   returnUrl: string;
+  disabled?: boolean;
+  disabledMessage?: string;
 }
 
 export function CheckoutPaymentSection({
@@ -24,6 +26,8 @@ export function CheckoutPaymentSection({
   continueLabel,
   submitLabel,
   returnUrl,
+  disabled = false,
+  disabledMessage,
 }: CheckoutPaymentSectionProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -53,10 +57,20 @@ export function CheckoutPaymentSection({
   if (!clientSecret) {
     return (
       <div className="space-y-4">
+        {disabled && disabledMessage ? (
+          <p className="text-sm text-[var(--contrast-500,hsl(var(--contrast-500)))]">{disabledMessage}</p>
+        ) : null}
         {errorMessage ? (
           <p className="text-sm text-[var(--error,hsl(var(--error)))]">{errorMessage}</p>
         ) : null}
-        <Button className="w-full" loading={isPending} onClick={handleContinue} size="medium" type="button">
+        <Button
+          className="w-full"
+          disabled={disabled}
+          loading={isPending}
+          onClick={handleContinue}
+          size="medium"
+          type="button"
+        >
           {continueLabel}
         </Button>
       </div>
@@ -72,7 +86,7 @@ export function CheckoutPaymentSection({
 
   return (
     <Elements options={options} stripe={stripePromise}>
-      <CheckoutPaymentForm returnUrl={returnUrl} submitLabel={submitLabel} />
+      <CheckoutPaymentForm billingFormId={billingFormId} returnUrl={returnUrl} submitLabel={submitLabel} />
     </Elements>
   );
 }

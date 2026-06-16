@@ -1015,27 +1015,29 @@ export function LiivvArchiveHeader({
           className="header header--left mobile:header--left page-width page-width--full section section--rounded section--padding relative z-20 grid w-full max-w-full items-center section--next-rounded"
           data-section-id="sections--26374736970019__header"
         >
-          {logoVisible ? (
+          {logoVisible || hasNav ? (
             <div
               className="header__logo z-2 flex min-w-0 items-center justify-center gap-3 lg:justify-center"
               onMouseEnter={closeMegaMenu}
             >
-              <Link
-                className="header__logo-link has-white-logo relative flex min-w-0 max-w-full items-center"
-                href={logoHref}
-              >
-                <span className="sr-only">{logoAlt}</span>
-                {logo?.src ? (
-                  <img
-                    alt={logoAlt}
-                    className="logo block h-auto max-h-9 w-auto max-w-[min(100%,7.5rem)] object-contain sm:max-h-11 sm:max-w-[8.5rem] md:max-h-[140px] md:max-w-[140px]"
-                    src={logo.src}
-                    style={logoStyle}
-                  />
-                ) : (
-                  <span className="logo text-lg font-semibold sm:text-xl md:text-2xl">{logo?.text}</span>
-                )}
-              </Link>
+              {logoVisible ? (
+                <Link
+                  className="header__logo-link has-white-logo relative flex min-w-0 max-w-full items-center"
+                  href={logoHref}
+                >
+                  <span className="sr-only">{logoAlt}</span>
+                  {logo?.src ? (
+                    <img
+                      alt={logoAlt}
+                      className="logo block h-auto max-h-9 w-auto max-w-[min(100%,7.5rem)] object-contain sm:max-h-11 sm:max-w-[8.5rem] md:max-h-[140px] md:max-w-[140px]"
+                      src={logo.src}
+                      style={logoStyle}
+                    />
+                  ) : (
+                    <span className="logo text-lg font-semibold sm:text-xl md:text-2xl">{logo?.text}</span>
+                  )}
+                </Link>
+              ) : null}
               {hasNav ? (
                 <div className="diabetes-care-mobile-nav-slot">
                   <button
@@ -1058,29 +1060,6 @@ export function LiivvArchiveHeader({
                   </button>
                 </div>
               ) : null}
-            </div>
-          ) : hasNav ? (
-            <div className="header__logo z-2 flex min-w-0 justify-center lg:justify-center">
-              <div className="diabetes-care-mobile-nav-slot">
-                <button
-                  aria-controls={mobileNavId}
-                  aria-expanded={mobileNavOpen}
-                  className={clsx(
-                    'diabetes-care-mobile-nav-trigger menu-drawer-button',
-                    'border-0 bg-transparent p-0 text-inherit outline-none',
-                    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--color-keyboard-focus))]',
-                  )}
-                  id={`${mobileNavId}-trigger`}
-                  type="button"
-                  onClick={() => {
-                    closeSearch();
-                    setMobileNavOpen((o) => !o);
-                  }}
-                >
-                  <span className="sr-only">{mobileNavOpen ? 'Close menu' : 'Open menu'}</span>
-                  <IconMenu className="icon shrink-0" />
-                </button>
-              </div>
             </div>
           ) : null}
 

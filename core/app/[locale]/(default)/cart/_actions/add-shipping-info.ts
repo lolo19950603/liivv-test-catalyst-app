@@ -14,6 +14,7 @@ const AddCheckoutShippingConsignmentsMutation = graphql(`
         checkout {
           entityId
           shippingConsignments {
+            entityId
             availableShippingOptions {
               cost {
                 value
@@ -80,6 +81,7 @@ const UpdateCheckoutShippingConsignmentMutation = graphql(`
         checkout {
           entityId
           shippingConsignments {
+            entityId
             availableShippingOptions {
               cost {
                 value

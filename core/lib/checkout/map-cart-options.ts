@@ -13,7 +13,10 @@ export function mapCartSelectedOptionsToProductOptions(
       return option.valueEntityId != null && !Number.isNaN(Number(option.valueEntityId));
     })
     .map((option) => ({
-      optionEntityId: option.entityId,
+      optionEntityId: Number(option.entityId),
       valueEntityId: Number(option.valueEntityId),
-    }));
+    }))
+    .filter(
+      (option) => !Number.isNaN(option.optionEntityId) && !Number.isNaN(option.valueEntityId),
+    );
 }

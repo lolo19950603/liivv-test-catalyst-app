@@ -25,7 +25,9 @@ export async function GET(_: Request, { params }: { params: Promise<{ token: str
 
     // sign in with token which will check validity against BigCommerce API
     // and redirect to redirectTo
-    await signIn('jwt', { jwt: token, cartId, redirectTo });
+    await signIn('jwt', { jwt: token, cartId, redirect: false });
+
+    redirect(redirectTo);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);

@@ -29,7 +29,7 @@ export const ArchiveButtonLink = forwardRef<HTMLAnchorElement, ArchiveButtonLink
       >
         <span className="btn-fill" data-fill="" />
         <span className="btn-text">
-          <span>{children}</span>
+          <span className="inline-flex items-center justify-center gap-2">{children}</span>
         </span>
       </Link>
     );
