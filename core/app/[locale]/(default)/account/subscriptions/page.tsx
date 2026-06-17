@@ -60,10 +60,10 @@ export default async function SubscriptionsPage({ params }: Props) {
         productName: subscription.productName,
         priceLabel:
           subscription.unitAmount != null
-            ? `${format.number(subscription.unitAmount / 100, {
+            ? format.number(subscription.unitAmount / 100, {
                 style: 'currency',
                 currency: subscription.currency.toUpperCase(),
-              })} ${t('includingTax')}`
+              })
             : t('customPricing'),
         intervalLabel: formatIntervalLabel(
           subscription.interval,

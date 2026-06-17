@@ -1,34 +1,5 @@
-import { getLineSubtotal, isDeferredSubscriptionLine } from '../checkout/subscription-charge-timing';
-import type { CheckoutLineItemSnapshot, CheckoutSnapshot } from '../checkout/types';
-
-function getLineTaxCents(
-  line: CheckoutLineItemSnapshot,
-  snapshot: CheckoutSnapshot,
-): number {
-  const ratioBase =
-    snapshot.lineItems.reduce((sum, entry) => sum + getLineSubtotal(entry), 0) || snapshot.subtotal;
-
-  if (ratioBase <= 0 || snapshot.tax <= 0) {
-    return 0;
-  }
-
-  const lineSubtotal = getLineSubtotal(line);
-  const lineTaxDollars = (snapshot.tax * lineSubtotal) / ratioBase;
-
-  return Math.round(lineTaxDollars * 100);
-}
-
-/** Stripe recurring unit amount in cents, including this line's share of checkout tax. */
-export function getSubscriptionUnitAmountIncTax(
-  line: CheckoutLineItemSnapshot,
-  snapshot: CheckoutSnapshot,
-): number {
-  const lineTaxCents = getLineTaxCents(line, snapshot);
-  const taxPerUnitCents =
-    line.quantity > 0 ? Math.round(lineTaxCents / line.quantity) : 0;
-
-  return line.unitAmount + taxPerUnitCents;
-}
+import { isDeferredSubscriptionLine } from '../checkout/subscription-charge-timing';
+import type { CheckoutLineItemSnapshot } from '../checkout/types';
 
 function getFirstBillingPeriodEnd(line: CheckoutLineItemSnapshot): number {
   if (!line.billingInterval) {

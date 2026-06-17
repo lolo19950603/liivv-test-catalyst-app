@@ -15,6 +15,7 @@ import {
   aggregatePhysicalLineItems,
   buildCheckoutShippingSections,
 } from '~/lib/checkout/checkout-section-shipping';
+import { filterShippingOptionsBySubtotal } from '~/lib/checkout/shipping-rules';
 import { expandCartLineItemForProduct } from '~/lib/checkout/expand-cart-line-items';
 import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
 import { getLineSubtotal, isDeferredSubscriptionLine } from '~/lib/checkout/subscription-charge-timing';
@@ -308,7 +309,8 @@ export async function quoteAllCheckoutSectionShipping(): Promise<{ hasOptions: b
           lineItems: section.physicalLineItems,
         });
 
-        options = sectionQuote.options;
+        consignmentEntityId = sectionQuote.consignmentEntityId ?? consignmentEntityId;
+        options = filterShippingOptionsBySubtotal(sectionQuote.options, sectionSubtotal);
 
         if (options.length === 0) {
           const paidOptions = fullCartOptions.filter((option) => option.cost > 0);
@@ -430,6 +432,7 @@ export async function selectCheckoutSectionShipping(
     selectedOptionId: selectedOption.entityId,
     selectedCost: selectedOption.cost,
     selectedDescription: selectedOption.description,
+    quoteVersion: entry?.quoteVersion,
   };
 
   await updateSectionShippingEntry(cartId, sectionId, nextEntry);

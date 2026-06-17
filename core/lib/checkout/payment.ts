@@ -12,10 +12,7 @@ import { kv } from '~/lib/kv';
 import { getStripe } from '~/lib/stripe/client';
 import { getOrCreateStripeCustomer } from '~/lib/stripe/customers';
 import { createStripeProductForCheckoutLine } from '~/lib/stripe/subscription-products';
-import {
-  getStripeSubscriptionBillingSchedule,
-  getSubscriptionUnitAmountIncTax,
-} from '~/lib/stripe/subscription-pricing';
+import { getStripeSubscriptionBillingSchedule } from '~/lib/stripe/subscription-pricing';
 import { toStripeRecurring } from '~/lib/stripe/subscription-interval';
 import { claimSubscriptionOrderCreation, getCheckoutFulfillmentOrderId, hasCheckoutStripeSubscriptions, isCheckoutFulfillmentComplete, markCheckoutFulfillmentComplete, markCheckoutStripeSubscriptionsCreated, markSubscriptionOrderCreated, releaseSubscriptionOrderCreation } from '~/lib/stripe/storage';
 
@@ -25,6 +22,7 @@ import {
   getCheckoutSnapshot,
   storeCheckoutSnapshot,
 } from './snapshot';
+import { isDeferredSubscriptionLine } from './subscription-charge-timing';
 import type {
   CheckoutAddressSnapshot,
   CheckoutSnapshot,
@@ -650,7 +648,6 @@ async function createStripeSubscriptionsForCheckout({
 
       const metadata = buildSubscriptionMetadataFromLine(snapshot, line);
       const billingSchedule = getStripeSubscriptionBillingSchedule(line);
-      const unitAmountIncTax = getSubscriptionUnitAmountIncTax(line, snapshot);
       const productId = await createStripeProductForCheckoutLine(stripe, line);
 
       await stripe.subscriptions.create({
@@ -661,7 +658,7 @@ async function createStripeSubscriptionsForCheckout({
             quantity: line.quantity,
             price_data: {
               currency: line.currency.toLowerCase(),
-              unit_amount: unitAmountIncTax,
+              unit_amount: line.unitAmount,
               recurring: toStripeRecurring(line.billingInterval),
               product: productId,
             },

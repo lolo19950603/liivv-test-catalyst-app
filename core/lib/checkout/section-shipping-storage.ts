@@ -18,7 +18,7 @@ export interface SectionShippingEntry {
 }
 
 /** Bump when shipping quote logic changes so checkout re-fetches BC rates. */
-export const SECTION_SHIPPING_QUOTE_VERSION = 3;
+export const SECTION_SHIPPING_QUOTE_VERSION = 6;
 
 export type SectionShippingState = Record<string, SectionShippingEntry>;
 

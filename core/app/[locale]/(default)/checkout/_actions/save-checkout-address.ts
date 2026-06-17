@@ -9,6 +9,7 @@ import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
 import { graphql } from '~/client/graphql';
 import { TAGS } from '~/client/tags';
+import { resolveShippingStateOrProvince } from '~/lib/checkout/resolve-shipping-state';
 
 const AddCustomerAddressMutation = graphql(`
   mutation CheckoutSaveAddressMutation($input: AddCustomerAddressInput!) {
@@ -94,6 +95,11 @@ export async function saveCheckoutAddress(
   }
 
   try {
+    const stateOrProvince = await resolveShippingStateOrProvince(
+      parsed.data.countryCode,
+      parsed.data.stateOrProvince,
+    );
+
     const response = await client.fetch({
       document: AddCustomerAddressMutation,
       customerAccessToken,
@@ -101,6 +107,7 @@ export async function saveCheckoutAddress(
       variables: {
         input: {
           ...parsed.data,
+          stateOrProvince,
           formFields: {
             checkboxes: [],
             multipleChoices: [],

@@ -3,6 +3,31 @@ interface StateOption {
   label: string;
 }
 
+export function buildStatesByCountry(
+  shippingCountries: Array<{
+    code: string;
+    statesOrProvinces: Array<{ abbreviation: string; name: string }>;
+  }>,
+): Array<{ country: string; states: StateOption[] }> {
+  return shippingCountries.map((country) => ({
+    country: country.code,
+    states: country.statesOrProvinces.map((state) => ({
+      value: state.abbreviation,
+      label: state.name,
+    })),
+  }));
+}
+
+export function resolveBigCommerceStateOrProvince(
+  countryCode: string,
+  stateOrProvince: string | undefined,
+  statesByCountry: Array<{ country: string; states: StateOption[] }>,
+): string | undefined {
+  const resolved = resolveStateOrProvinceCode(countryCode, stateOrProvince, statesByCountry);
+
+  return resolved.stateOrProvince ?? stateOrProvince;
+}
+
 export function resolveStateOrProvinceCode(
   countryCode: string,
   stateOrProvince: string | undefined,

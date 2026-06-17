@@ -11,6 +11,7 @@ import { TAGS } from '~/client/tags';
 import { quoteAllCheckoutSectionShipping } from '~/app/[locale]/(default)/checkout/_actions/section-shipping';
 import { getCartId } from '~/lib/cart';
 import { clearSectionShippingState } from '~/lib/checkout/section-shipping-storage';
+import { resolveShippingStateOrProvince } from '~/lib/checkout/resolve-shipping-state';
 
 import { getCart } from '../page-data';
 
@@ -71,6 +72,23 @@ export const updateShippingInfo = async (
 
   const shippingId = shippingConsignment?.entityId;
 
+  const resolveConsignmentAddress = async ({
+    countryCode,
+    city,
+    stateOrProvince,
+    postalCode,
+  }: {
+    countryCode: string;
+    city?: string;
+    stateOrProvince?: string;
+    postalCode?: string;
+  }) => ({
+    countryCode,
+    city,
+    postalCode,
+    stateOrProvince: await resolveShippingStateOrProvince(countryCode, stateOrProvince),
+  });
+
   switch (submission.value.intent) {
     case 'estimate-shipping': {
       let updatedShippingConsignment:
@@ -80,26 +98,23 @@ export const updateShippingInfo = async (
         | undefined;
 
       try {
+        const consignmentAddress = await resolveConsignmentAddress({
+          countryCode: submission.value.country,
+          city: '',
+          stateOrProvince: submission.value.state,
+          postalCode: submission.value.postalCode,
+        });
+
         const result = shippingId
           ? await updateCheckoutShippingConsignment({
               checkoutEntityId,
-              address: {
-                countryCode: submission.value.country,
-                city: '',
-                stateOrProvince: submission.value.state,
-                postalCode: submission.value.postalCode,
-              },
+              address: consignmentAddress,
               lineItems,
               shippingId,
             })
           : await addCheckoutShippingConsignments({
               checkoutEntityId,
-              address: {
-                countryCode: submission.value.country,
-                city: '',
-                stateOrProvince: submission.value.state,
-                postalCode: submission.value.postalCode,
-              },
+              address: consignmentAddress,
               lineItems,
             });
 
@@ -176,26 +191,23 @@ export const updateShippingInfo = async (
         | undefined;
 
       try {
+        const consignmentAddress = await resolveConsignmentAddress({
+          countryCode: submission.value.country,
+          city: submission.value.city,
+          stateOrProvince: submission.value.state,
+          postalCode: submission.value.postalCode,
+        });
+
         const result = shippingId
           ? await updateCheckoutShippingConsignment({
               checkoutEntityId,
-              address: {
-                countryCode: submission.value.country,
-                city: submission.value.city,
-                stateOrProvince: submission.value.state,
-                postalCode: submission.value.postalCode,
-              },
+              address: consignmentAddress,
               lineItems,
               shippingId,
             })
           : await addCheckoutShippingConsignments({
               checkoutEntityId,
-              address: {
-                countryCode: submission.value.country,
-                city: submission.value.city,
-                stateOrProvince: submission.value.state,
-                postalCode: submission.value.postalCode,
-              },
+              address: consignmentAddress,
               lineItems,
             });
 

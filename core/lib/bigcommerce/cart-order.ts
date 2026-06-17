@@ -107,7 +107,6 @@ export function buildSubscriptionMetadataFromLine(
     bigcommerce_customer_id: String(snapshot.bigcommerceCustomerId),
     bigcommerce_product_id: String(line.productEntityId),
     bigcommerce_sku: line.sku ?? '',
-    subscription_price_includes_tax: 'true',
     ...(serializedOptions ? { bigcommerce_product_options: serializedOptions } : {}),
     ...(line.billingInterval
       ? {
