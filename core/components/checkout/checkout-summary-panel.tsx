@@ -10,7 +10,6 @@ import {
 } from '@/vibes/soul/sections/custom-checkout';
 import { selectCheckoutSectionShipping } from '~/app/[locale]/(default)/checkout/_actions/section-shipping';
 import { Image } from '~/components/image';
-import { SubscriptionLineSummary } from '@/vibes/soul/primitives/subscription-line-summary';
 
 interface CheckoutSummaryPanelLabels {
   shippingTitle: string;
@@ -71,11 +70,9 @@ function CheckoutLineItemRow({ item }: { item: CustomCheckoutLineItem }) {
             ) : null}
 
             {item.badge ? (
-              <SubscriptionLineSummary
-                badge={item.badge}
-                className="mt-1"
-                details={item.subscriptionDetails}
-              />
+              <p className="mt-1 text-xs font-medium uppercase tracking-wide text-[var(--contrast-500,hsl(var(--contrast-500)))]">
+                {item.badge}
+              </p>
             ) : null}
           </div>
 

@@ -17,7 +17,6 @@ import { useFormStatus } from 'react-dom';
 
 import { Button } from '@/vibes/soul/primitives/button';
 import * as Skeleton from '@/vibes/soul/primitives/skeleton';
-import { SubscriptionLineSummary } from '@/vibes/soul/primitives/subscription-line-summary';
 import { toast } from '@/vibes/soul/primitives/toaster';
 import {
   GiftCertificateCodeForm,
@@ -55,11 +54,6 @@ export interface CartLineItem {
   salePrice?: string;
   href?: string;
   inventoryMessages?: CartLineIteminventoryMessages;
-  subscriptionBadge?: string;
-  subscriptionDetails?: string[];
-  lineItemEntityId?: string;
-  purchaseType?: 'subscription' | 'one-time';
-  subscriptionLineKey?: string;
 }
 
 export interface CartGiftCertificateLineItem extends CartLineItem {
@@ -468,13 +462,6 @@ export function CartClient<LineItem extends CartLineItem>({
                   <span className="text-[var(--cart-subtext-text,hsl(var(--contrast-400)))] contrast-more:text-[var(--cart-subtitle-text,hsl(var(--contrast-500)))]">
                     {lineItem.subtitle}
                   </span>
-                  {lineItem.subscriptionBadge ? (
-                    <SubscriptionLineSummary
-                      badge={lineItem.subscriptionBadge}
-                      className="mt-2"
-                      details={lineItem.subscriptionDetails}
-                    />
-                  ) : null}
                 </div>
                 <div className="w-full shrink-0 @xl:w-[min(100%,16rem)]">
                 <CounterForm

@@ -1,8 +1,4 @@
 import type { CheckoutLineItemSnapshot } from './types';
-import {
-  groupDeferredSubscriptionLines,
-  isDeferredSubscriptionLine,
-} from './subscription-charge-timing';
 
 export interface CheckoutPhysicalLineItem {
   lineItemEntityId: string;
@@ -40,30 +36,19 @@ export function aggregatePhysicalLineItems(
 export function buildCheckoutShippingSections(
   lines: CheckoutLineItemSnapshot[],
 ): CheckoutShippingSection[] {
-  const sections: CheckoutShippingSection[] = [];
-  const immediateLines = lines.filter((line) => !isDeferredSubscriptionLine(line));
+  const physicalLineItems = aggregatePhysicalLineItems(lines);
 
-  if (immediateLines.length > 0) {
-    const physicalLineItems = aggregatePhysicalLineItems(immediateLines);
+  if (lines.length === 0) {
+    return [];
+  }
 
-    sections.push({
+  return [
+    {
       id: 'due-today',
       requiresShipping: physicalLineItems.length > 0,
       physicalLineItems,
-    });
-  }
-
-  for (const group of groupDeferredSubscriptionLines(lines)) {
-    const physicalLineItems = aggregatePhysicalLineItems(group.lines);
-
-    sections.push({
-      id: `deferred-${group.billingCycleAnchor}`,
-      requiresShipping: physicalLineItems.length > 0,
-      physicalLineItems,
-    });
-  }
-
-  return sections;
+    },
+  ];
 }
 
 export function getSectionShippingCost(

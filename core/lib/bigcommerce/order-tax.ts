@@ -1,4 +1,6 @@
-import { getLineSubtotal, isDeferredSubscriptionLine } from '../checkout/subscription-charge-timing';
+import 'server-only';
+
+import { getLineSubtotal } from '../checkout/checkout-amounts';
 import type { CheckoutLineItemSnapshot, CheckoutSnapshot } from '../checkout/types';
 
 export function formatOrderAmount(amount: number): number {
@@ -68,23 +70,21 @@ export function buildLinePricesFromTotals(
   };
 }
 
-export function buildImmediateOrderLineTaxes(snapshot: CheckoutSnapshot): number[] {
-  const lines = snapshot.lineItems.filter((line) => !isDeferredSubscriptionLine(line));
-  const lineSubtotals = lines.map((line) => getLineSubtotal(line));
+export function buildOrderLineTaxes(snapshot: CheckoutSnapshot): number[] {
+  const lineSubtotals = snapshot.lineItems.map((line) => getLineSubtotal(line));
 
-  return allocateAmountBySubtotal(lineSubtotals, snapshot.amounts.immediateTax);
+  return allocateAmountBySubtotal(lineSubtotals, snapshot.amounts.tax);
 }
 
-export function buildImmediateOrderTaxTotals(snapshot: CheckoutSnapshot) {
-  const { immediateSubtotal, immediateShipping, immediateTax, immediateGrandTotal } =
-    snapshot.amounts;
+export function buildOrderTaxTotals(snapshot: CheckoutSnapshot) {
+  const { subtotal, shipping, tax, grandTotal } = snapshot.amounts;
 
   return {
-    subtotal_ex_tax: formatOrderAmountString(immediateSubtotal),
-    subtotal_inc_tax: formatOrderAmountString(immediateSubtotal + immediateTax),
-    shipping_cost_ex_tax: formatOrderAmount(immediateShipping),
-    shipping_cost_inc_tax: formatOrderAmount(immediateShipping),
-    total_ex_tax: formatOrderAmountString(immediateSubtotal + immediateShipping),
-    total_inc_tax: formatOrderAmountString(immediateGrandTotal),
+    subtotal_ex_tax: formatOrderAmountString(subtotal),
+    subtotal_inc_tax: formatOrderAmountString(subtotal + tax),
+    shipping_cost_ex_tax: formatOrderAmount(shipping),
+    shipping_cost_inc_tax: formatOrderAmount(shipping),
+    total_ex_tax: formatOrderAmountString(subtotal + shipping),
+    total_inc_tax: formatOrderAmountString(grandTotal),
   };
 }

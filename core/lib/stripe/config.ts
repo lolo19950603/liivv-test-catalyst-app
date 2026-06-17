@@ -33,9 +33,3 @@ export function buildAppUrl(path: string, locale: string): string {
 export function getStripeWebhookSecret(): string | undefined {
   return process.env.STRIPE_WEBHOOK_SECRET?.trim() || undefined;
 }
-
-import { getDefaultSubscriptionBillingInterval } from './subscription-interval';
-
-export function getSubscriptionBillingConfig() {
-  return getDefaultSubscriptionBillingInterval();
-}

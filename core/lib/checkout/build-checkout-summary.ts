@@ -4,15 +4,8 @@ import type {
   CustomCheckoutSummarySection,
 } from '@/vibes/soul/sections/custom-checkout';
 
-import { checkoutSnapshotKey } from './subscription-line-key';
+import { calculateCheckoutAmounts } from './checkout-amounts';
 import type { CheckoutLineItemSnapshot } from './types';
-import {
-  calculateCheckoutAmounts,
-  getLineSubtotal,
-  groupDeferredSubscriptionLines,
-  isDeferredSubscriptionLine,
-} from './subscription-charge-timing';
-import { getSectionShippingCost } from './checkout-section-shipping';
 
 export interface CheckoutDisplayLineInput {
   id: string;
@@ -23,10 +16,6 @@ export interface CheckoutDisplayLineInput {
   unitPrice: number;
   currencyCode: string;
   isPhysical: boolean;
-  isSubscription: boolean;
-  billingCycleAnchor?: number;
-  badge?: string;
-  subscriptionDetails?: string[];
   snapshot: CheckoutLineItemSnapshot;
   display: CustomCheckoutLineItem;
 }
@@ -82,7 +71,6 @@ export function buildCheckoutSummarySections({
   sectionShippingUi,
   formatMoney,
   labels,
-  formatDeferredDate,
 }: {
   lines: CheckoutDisplayLineInput[];
   cartSubtotal: number;
@@ -98,101 +86,44 @@ export function buildCheckoutSummarySections({
   >;
   formatMoney: (value: number) => string;
   labels: {
-    dueTodayTitle: string;
-    formatBilledOnTitle: (date: string) => string;
+    sectionTitle: string;
     subtotal: string;
     shipping: string;
     tax: string;
-    dueTodayTotal: string;
-    billedLaterTotal: string;
-    billedLaterNote: string;
+    total: string;
   };
-  formatDeferredDate: (timestamp: number) => string;
 }): CustomCheckoutSummarySection[] {
   const snapshotLines = lines.map((line) => line.snapshot);
+  const shipping = sectionShippingCosts['due-today'] ?? 0;
   const amounts = calculateCheckoutAmounts({
     lineItems: snapshotLines,
     cartSubtotal,
     cartTax,
-    sectionShippingCosts,
+    shipping,
   });
 
-  const displayBySnapshotKey = new Map(
-    lines.map((line) => [checkoutSnapshotKey(line.snapshot), line.display]),
-  );
+  const sectionId = 'due-today';
+  const shippingUi = sectionShippingUi?.[sectionId];
+  const displayLines = lines.map((line) => line.display);
 
-  const getDisplayLines = (snapshotGroup: CheckoutLineItemSnapshot[]) => {
-    const seen = new Set<string>();
-
-    return snapshotGroup.reduce<CustomCheckoutLineItem[]>((items, line) => {
-      const key = checkoutSnapshotKey(line);
-      const display = displayBySnapshotKey.get(key);
-
-      if (!display || seen.has(key)) {
-        return items;
-      }
-
-      seen.add(key);
-      items.push(display);
-
-      return items;
-    }, []);
-  };
-
-  const immediateSnapshotLines = snapshotLines.filter((line) => !isDeferredSubscriptionLine(line));
-  const sections: CustomCheckoutSummarySection[] = [];
-
-  if (immediateSnapshotLines.length > 0) {
-    const sectionId = 'due-today';
-    const shippingUi = sectionShippingUi?.[sectionId];
-
-    sections.push({
+  return [
+    {
       id: sectionId,
-      title: labels.dueTodayTitle,
-      lineItems: getDisplayLines(immediateSnapshotLines),
+      title: labels.sectionTitle,
+      lineItems: displayLines,
       summaryItems: toSummaryItems({
-        subtotal: amounts.immediateSubtotal,
-        shipping: amounts.immediateShipping,
-        tax: amounts.immediateTax,
+        subtotal: amounts.subtotal,
+        shipping: amounts.shipping,
+        tax: amounts.tax,
         labels,
         formatMoney,
         includeShipping: shippingUi?.requiresShipping ?? false,
       }),
-      total: formatMoney(amounts.immediateGrandTotal),
-      totalLabel: labels.dueTodayTotal,
+      total: formatMoney(amounts.grandTotal),
+      totalLabel: labels.total,
       requiresShipping: shippingUi?.requiresShipping,
       shippingOptions: shippingUi?.shippingOptions,
       selectedShippingOption: shippingUi?.selectedShippingOption,
-    });
-  }
-
-  for (const group of groupDeferredSubscriptionLines(snapshotLines)) {
-    const sectionId = `deferred-${group.billingCycleAnchor}`;
-    const groupSubtotal = group.lines.reduce((sum, line) => sum + getLineSubtotal(line), 0);
-    const sectionShipping = getSectionShippingCost(sectionShippingCosts, sectionId);
-    const formattedDate = formatDeferredDate(group.billingCycleAnchor);
-    const shippingUi = sectionShippingUi?.[sectionId];
-
-    sections.push({
-      id: sectionId,
-      title: labels.formatBilledOnTitle(formattedDate),
-      description: labels.billedLaterNote,
-      lineItems: getDisplayLines(group.lines),
-      summaryItems: toSummaryItems({
-        subtotal: groupSubtotal,
-        shipping: sectionShipping,
-        tax: 0,
-        labels,
-        formatMoney,
-        includeShipping: shippingUi?.requiresShipping ?? false,
-      }),
-      total: formatMoney(groupSubtotal + sectionShipping),
-      totalLabel: labels.billedLaterTotal,
-      requiresShipping: shippingUi?.requiresShipping,
-      shippingOptions: shippingUi?.shippingOptions,
-      selectedShippingOption: shippingUi?.selectedShippingOption,
-    });
-  }
-
-  return sections;
+    },
+  ];
 }

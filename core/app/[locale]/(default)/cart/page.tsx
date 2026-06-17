@@ -6,16 +6,6 @@ import { Cart as CartComponent, CartEmptyState } from '@/vibes/soul/sections/car
 import { CartAnalyticsProvider } from '~/app/[locale]/(default)/cart/_components/cart-analytics-provider';
 import { getCartId } from '~/lib/cart';
 import { getPreferredCurrencyCode } from '~/lib/currency';
-import {
-  expandCartLineItemForProduct,
-} from '~/lib/checkout/expand-cart-line-items';
-import { getSubscriptionLineDetails } from '~/lib/checkout/format-subscription-line';
-import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
-import {
-  findSubscriptionLineByKey,
-  getSubscriptionLinesForCart,
-} from '~/lib/checkout/subscription-lines';
-import type { SubscriptionBillingInterval } from '~/lib/stripe/subscription-interval';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { Slot } from '~/lib/makeswift/slot';
 import { exists } from '~/lib/utils';
@@ -106,16 +96,6 @@ export default async function Cart({ params }: Props) {
   const cart = data.site.cart;
   const checkout = data.site.checkout;
   const giftCertificatesEnabled = data.site.settings?.giftCertificates?.isEnabled ?? false;
-  const subscriptionLines = await getSubscriptionLinesForCart(cartId);
-  const formatInterval = ({ interval, intervalCount }: SubscriptionBillingInterval) => {
-    if (intervalCount === 1) {
-      return t(`subscription.intervals.${interval}` as 'subscription.intervals.month');
-    }
-
-    return t(`subscription.intervals.${interval}Plural` as 'subscription.intervals.monthPlural', {
-      count: intervalCount,
-    });
-  };
 
   if (!cart) {
     return emptyState;
@@ -127,10 +107,9 @@ export default async function Cart({ params }: Props) {
     ...cart.lineItems.digitalItems,
   ].filter((item) => !('parentEntityId' in item) || !item.parentEntityId);
 
-  const formattedLineItems = lineItems.flatMap((item) => {
+  const formattedLineItems = lineItems.map((item) => {
     if (item.__typename === 'CartGiftCertificate') {
-      return [
-        {
+      return {
         typename: item.__typename,
         id: item.entityId,
         title: item.name,
@@ -147,9 +126,7 @@ export default async function Cart({ params }: Props) {
         selectedOptions: [],
         productEntityId: 0,
         variantEntityId: 0,
-        lineItemEntityId: item.entityId,
-      },
-      ];
+      };
     }
 
     let inventoryMessages;
@@ -193,9 +170,7 @@ export default async function Cart({ params }: Props) {
       }
     }
 
-    const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
-
-    const baseItem = {
+    return {
       typename: item.__typename,
       id: item.entityId,
       quantity: item.quantity,
@@ -237,38 +212,6 @@ export default async function Cart({ params }: Props) {
       variantEntityId: item.variantEntityId,
       inventoryMessages,
     };
-
-    return expandCartLineItemForProduct({
-      item: baseItem,
-      subscriptionLines,
-      productEntityId: item.productEntityId,
-      productOptions,
-      applySubscription: () => ({}),
-    }).map((line) => {
-      const subscription =
-        line.purchaseType === 'subscription' && line.subscriptionLineKey
-          ? findSubscriptionLineByKey(subscriptionLines, line.subscriptionLineKey)
-          : undefined;
-      const isSubscriptionRow = line.purchaseType === 'subscription';
-
-      const subscriptionDetails = subscription
-        ? getSubscriptionLineDetails(subscription, {
-            billingLabel: t('subscription.billing'),
-            startsLabel: t('subscription.starts'),
-            startsTodayLabel: t('subscription.startsToday'),
-            formatInterval,
-            formatStartsDate: (timestamp) =>
-              format.dateTime(new Date(timestamp * 1000), { dateStyle: 'medium' }),
-          })
-        : undefined;
-
-      return {
-        ...line,
-        subscriptionBadge: isSubscriptionRow && subscription ? t('subscription.badge') : undefined,
-        subscriptionDetails:
-          isSubscriptionRow && subscription ? subscriptionDetails : undefined,
-      };
-    });
   });
 
   const totalCouponDiscount =
