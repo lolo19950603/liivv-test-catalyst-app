@@ -2,10 +2,27 @@ import { Metadata } from 'next';
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { Streamable } from '@/vibes/soul/lib/streamable';
-import { Cart as CartComponent, CartEmptyState } from '@/vibes/soul/sections/cart';
+import {
+  Cart as CartComponent,
+  CartEmptyState,
+} from '@/vibes/soul/sections/cart';
+import type {
+  CartGiftCertificateLineItem,
+  CartLineItem,
+} from '@/vibes/soul/sections/cart/client';
 import { CartAnalyticsProvider } from '~/app/[locale]/(default)/cart/_components/cart-analytics-provider';
 import { getCartId } from '~/lib/cart';
 import { getPreferredCurrencyCode } from '~/lib/currency';
+import {
+  expandCartLineItemForProduct,
+} from '~/lib/checkout/expand-cart-line-items';
+import { getSubscriptionLineDetails } from '~/lib/checkout/format-subscription-line';
+import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
+import {
+  findSubscriptionLineByKey,
+  getSubscriptionLinesForCart,
+} from '~/lib/checkout/subscription-lines';
+import type { SubscriptionBillingInterval } from '~/lib/stripe/subscription-interval';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { Slot } from '~/lib/makeswift/slot';
 import { exists } from '~/lib/utils';
@@ -96,6 +113,16 @@ export default async function Cart({ params }: Props) {
   const cart = data.site.cart;
   const checkout = data.site.checkout;
   const giftCertificatesEnabled = data.site.settings?.giftCertificates?.isEnabled ?? false;
+  const subscriptionLines = await getSubscriptionLinesForCart(cartId);
+  const formatInterval = ({ interval, intervalCount }: SubscriptionBillingInterval) => {
+    if (intervalCount === 1) {
+      return t(`subscription.intervals.${interval}` as 'subscription.intervals.month');
+    }
+
+    return t(`subscription.intervals.${interval}Plural` as 'subscription.intervals.monthPlural', {
+      count: String(intervalCount),
+    });
+  };
 
   if (!cart) {
     return emptyState;
@@ -107,28 +134,31 @@ export default async function Cart({ params }: Props) {
     ...cart.lineItems.digitalItems,
   ].filter((item) => !('parentEntityId' in item) || !item.parentEntityId);
 
-  const formattedLineItems = lineItems.map((item) => {
-    if (item.__typename === 'CartGiftCertificate') {
-      return {
-        typename: item.__typename,
-        id: item.entityId,
-        title: item.name,
-        subtitle: `${t('GiftCertificate.to')}: ${item.recipient.name} (${item.recipient.email})${item.message ? `, ${t('GiftCertificate.message')}: ${item.message}` : ''}`,
-        quantity: 1,
-        price: format.number(item.amount.value, {
-          style: 'currency',
-          currency: item.amount.currencyCode,
-        }),
-        sender: item.sender,
-        recipient: item.recipient,
-        message: item.message,
-        href: undefined,
-        selectedOptions: [],
-        productEntityId: 0,
-        variantEntityId: 0,
-      };
-    }
+  const productLineItems = lineItems.filter((item) => item.__typename !== 'CartGiftCertificate');
 
+  const formattedGiftCertificates: CartGiftCertificateLineItem[] = lineItems
+    .filter((item) => item.__typename === 'CartGiftCertificate')
+    .map((item) => ({
+      typename: item.__typename,
+      id: item.entityId,
+      title: item.name,
+      subtitle: `${t('GiftCertificate.to')}: ${item.recipient.name} (${item.recipient.email})${item.message ? `, ${t('GiftCertificate.message')}: ${item.message}` : ''}`,
+      quantity: 1,
+      price: format.number(item.amount.value, {
+        style: 'currency',
+        currency: item.amount.currencyCode,
+      }),
+      sender: item.sender,
+      recipient: item.recipient,
+      message: item.message ?? undefined,
+      href: undefined,
+      selectedOptions: [],
+      productEntityId: 0,
+      variantEntityId: 0,
+      lineItemEntityId: item.entityId,
+    }));
+
+  const formattedProducts: CartLineItem[] = productLineItems.flatMap((item) => {
     let inventoryMessages;
 
     if (item.__typename === 'CartPhysicalItem') {
@@ -170,7 +200,9 @@ export default async function Cart({ params }: Props) {
       }
     }
 
-    return {
+    const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
+
+    const baseItem = {
       typename: item.__typename,
       id: item.entityId,
       quantity: item.quantity,
@@ -212,7 +244,44 @@ export default async function Cart({ params }: Props) {
       variantEntityId: item.variantEntityId,
       inventoryMessages,
     };
+
+    return expandCartLineItemForProduct({
+      item: baseItem,
+      subscriptionLines,
+      productEntityId: item.productEntityId,
+      productOptions,
+      applySubscription: () => ({}),
+    }).map((line) => {
+      const subscription =
+        line.purchaseType === 'subscription' && line.subscriptionLineKey
+          ? findSubscriptionLineByKey(subscriptionLines, line.subscriptionLineKey)
+          : undefined;
+      const isSubscriptionRow = line.purchaseType === 'subscription';
+
+      const subscriptionDetails = subscription
+        ? getSubscriptionLineDetails(subscription, {
+            billingLabel: t('subscription.billing'),
+            startsLabel: t('subscription.starts'),
+            startsTodayLabel: t('subscription.startsToday'),
+            formatInterval,
+            formatStartsDate: (timestamp) =>
+              format.dateTime(new Date(timestamp * 1000), { dateStyle: 'medium' }),
+          })
+        : undefined;
+
+      return {
+        ...line,
+        subscriptionBadge: isSubscriptionRow && subscription ? t('subscription.badge') : undefined,
+        subscriptionDetails:
+          isSubscriptionRow && subscription ? subscriptionDetails : undefined,
+      };
+    });
   });
+
+  const formattedLineItems: Array<CartLineItem | CartGiftCertificateLineItem> = [
+    ...formattedGiftCertificates,
+    ...formattedProducts,
+  ];
 
   const totalCouponDiscount =
     checkout?.coupons.reduce((sum, coupon) => sum + coupon.discountedAmount.value, 0) ?? 0;
@@ -268,7 +337,9 @@ export default async function Cart({ params }: Props) {
         {checkoutUrl ? <CheckoutPreconnect url={checkoutUrl} /> : null}
         <CartComponent
           cart={{
-            lineItems: formattedLineItems,
+            lineItems: formattedLineItems as Awaited<
+              Parameters<typeof updateLineItem>[0]
+            >['lineItems'],
             total: format.number(checkout?.grandTotal?.value || 0, {
               style: 'currency',
               currency: cart.currencyCode,

@@ -17,6 +17,17 @@ import { ProductDetail } from '~/lib/makeswift/components/product-detail';
 import { Slot } from '~/lib/makeswift/slot';
 import { getRecaptchaSiteKey } from '~/lib/recaptcha';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
+import { isStripeConfigured } from '~/lib/stripe';
+import {
+  formatSubscriptionIntervalKey,
+  getSubscriptionBillingIntervals,
+  type SubscriptionBillingInterval,
+} from '~/lib/stripe/subscription-interval';
+import {
+  getDefaultSubscriptionStartDateValue,
+  getMaxSubscriptionStartDateValue,
+  getMinSubscriptionStartDateValue,
+} from '~/lib/stripe/subscription-start-date';
 
 import './product-page-feel.css';
 import './product-related-products.css';
@@ -44,6 +55,23 @@ import {
 interface Props {
   params: Promise<{ slug: string; locale: string }>;
   searchParams: Promise<SearchParams>;
+}
+
+function formatSubscriptionIntervalOption(
+  interval: SubscriptionBillingInterval,
+  t: Awaited<ReturnType<typeof getTranslations<'Subscribe'>>>,
+) {
+  const label =
+    interval.intervalCount === 1
+      ? t(`intervals.${interval.interval}` as 'intervals.month')
+      : t(`intervals.${interval.interval}Plural` as 'intervals.monthPlural', {
+          count: interval.intervalCount,
+        });
+
+  return {
+    value: formatSubscriptionIntervalKey(interval),
+    label,
+  };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -555,6 +583,37 @@ export default async function Product({ params, searchParams }: Props) {
     return { email: session?.user?.email ?? '', name: obfuscatedName };
   });
 
+  const showPurchaseOptions = isStripeConfigured();
+  const subscribeT = await getTranslations('Subscribe');
+  const subscriptionBillingIntervals = getSubscriptionBillingIntervals();
+  const subscriptionIntervalOptions = subscriptionBillingIntervals.map((interval) =>
+    formatSubscriptionIntervalOption(interval, subscribeT),
+  );
+  const pricingProduct = await streamableProductPricingAndRelatedProducts;
+  const purchasePriceValue =
+    pricingProduct?.prices?.salePrice?.value ?? pricingProduct?.prices?.price.value ?? 0;
+  const purchaseCurrencyCode = pricingProduct?.prices?.price.currencyCode ?? 'USD';
+  const purchaseOptions = showPurchaseOptions
+    ? {
+        title: t('ProductDetails.purchaseOptions.title'),
+        oneTimeLabel: t('ProductDetails.purchaseOptions.oneTime'),
+        subscribeLabel: t('ProductDetails.purchaseOptions.subscribeAndSave'),
+        formattedPrice: format.number(purchasePriceValue, {
+          style: 'currency',
+          currency: purchaseCurrencyCode,
+        }),
+        deliverEveryLabel: t('ProductDetails.purchaseOptions.deliverEvery'),
+        startDateLabel: t('ProductDetails.subscriptionStartDate'),
+        startDateHint: t('ProductDetails.subscriptionStartDateHint'),
+        intervalOptions: subscriptionIntervalOptions,
+        startDateMin: getMinSubscriptionStartDateValue(),
+        startDateMax: getMaxSubscriptionStartDateValue(),
+        startDateDefault: getDefaultSubscriptionStartDateValue(),
+        defaultInterval: formatSubscriptionIntervalKey(subscriptionBillingIntervals[0]!),
+        productPath: baseProduct.path,
+      }
+    : undefined;
+
   return (
     <>
       <Slot label="Product (all products) — top" snapshotId="product-page-top-content" />
@@ -599,9 +658,11 @@ export default async function Product({ params, searchParams }: Props) {
               backorderDisplayData: streamableBackorderDisplayData,
             }}
             productId={baseProduct.entityId}
+            purchaseOptions={purchaseOptions}
             quantityLabel={t('ProductDetails.quantity')}
             recaptchaSiteKey={recaptchaSiteKey}
             reviewFormAction={submitReview}
+            showPurchaseOptions={showPurchaseOptions}
             thumbnailLabel={t('ProductDetails.thumbnail')}
             user={streamableUser}
           />

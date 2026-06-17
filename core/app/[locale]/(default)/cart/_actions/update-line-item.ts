@@ -11,7 +11,7 @@ import { cartLineItemActionFormDataSchema } from '@/vibes/soul/sections/cart/sch
 
 import { DigitalItemFragment, PhysicalItemFragment } from '../page-data';
 
-import { CartSelectedOptionsInput, updateQuantity } from './update-quantity';
+import { updateCartLinePurchaseQuantity } from './update-line-item-purchase';
 
 type LineItem = {
   selectedOptions:
@@ -19,127 +19,9 @@ type LineItem = {
     | FragmentOf<typeof DigitalItemFragment>['selectedOptions'];
   productEntityId: number;
   variantEntityId: number | null;
+  purchaseType?: 'subscription' | 'one-time';
+  lineItemEntityId?: string;
 } & CartLineItem;
-
-function parseCartSelectedOptionsInput(
-  selectedOptions: LineItem['selectedOptions'],
-): CartSelectedOptionsInput {
-  return selectedOptions.reduce<CartSelectedOptionsInput>((accum, option) => {
-    let multipleChoicesOptionInput;
-    let checkboxOptionInput;
-    let numberFieldOptionInput;
-    let textFieldOptionInput;
-    let multiLineTextFieldOptionInput;
-    let dateFieldOptionInput;
-
-    switch (option.__typename) {
-      case 'CartSelectedMultipleChoiceOption':
-        multipleChoicesOptionInput = {
-          optionEntityId: option.entityId,
-          optionValueEntityId: option.valueEntityId ?? 0,
-        };
-
-        if (accum.multipleChoices) {
-          return {
-            ...accum,
-            multipleChoices: [...accum.multipleChoices, multipleChoicesOptionInput],
-          };
-        }
-
-        return {
-          ...accum,
-          multipleChoices: [multipleChoicesOptionInput],
-        };
-
-      case 'CartSelectedCheckboxOption':
-        checkboxOptionInput = {
-          optionEntityId: option.entityId,
-          optionValueEntityId: option.valueEntityId ?? 0,
-        };
-
-        if (accum.checkboxes) {
-          return {
-            ...accum,
-            checkboxes: [...accum.checkboxes, checkboxOptionInput],
-          };
-        }
-
-        return { ...accum, checkboxes: [checkboxOptionInput] };
-
-      case 'CartSelectedNumberFieldOption':
-        numberFieldOptionInput = {
-          optionEntityId: option.entityId,
-          number: 'number' in option ? Number(option.number) : 0,
-        };
-
-        if (accum.numberFields) {
-          return {
-            ...accum,
-            numberFields: [...accum.numberFields, numberFieldOptionInput],
-          };
-        }
-
-        return { ...accum, numberFields: [numberFieldOptionInput] };
-
-      case 'CartSelectedTextFieldOption':
-        textFieldOptionInput = {
-          optionEntityId: option.entityId,
-          text: 'text' in option ? String(option.text) : '',
-        };
-
-        if (accum.textFields) {
-          return {
-            ...accum,
-            textFields: [...accum.textFields, textFieldOptionInput],
-          };
-        }
-
-        return { ...accum, textFields: [textFieldOptionInput] };
-
-      case 'CartSelectedMultiLineTextFieldOption':
-        multiLineTextFieldOptionInput = {
-          optionEntityId: option.entityId,
-          text: 'text' in option ? String(option.text) : '',
-        };
-
-        if (accum.multiLineTextFields) {
-          return {
-            ...accum,
-            multiLineTextFields: [
-              ...accum.multiLineTextFields,
-              multiLineTextFieldOptionInput,
-            ],
-          };
-        }
-
-        return {
-          ...accum,
-          multiLineTextFields: [multiLineTextFieldOptionInput],
-        };
-
-      case 'CartSelectedDateFieldOption':
-        dateFieldOptionInput = {
-          optionEntityId: option.entityId,
-          date:
-            'date' in option && option.date?.utc
-              ? new Date(String(option.date.utc)).toISOString()
-              : new Date().toISOString(),
-        };
-
-        if (accum.dateFields) {
-          return {
-            ...accum,
-            dateFields: [...accum.dateFields, dateFieldOptionInput],
-          };
-        }
-
-        return { ...accum, dateFields: [dateFieldOptionInput] };
-
-      default:
-        return accum;
-    }
-  }, {});
-}
 
 export const updateLineItem = async (
   prevState: Awaited<{
@@ -171,21 +53,11 @@ export const updateLineItem = async (
     };
   }
 
-  const selectedOptions = parseCartSelectedOptionsInput(cartLineItem.selectedOptions);
-  const nextQuantity =
-    submission.value.intent === 'increment'
-      ? cartLineItem.quantity + 1
-      : submission.value.intent === 'decrement'
-        ? cartLineItem.quantity - 1
-        : 0;
-
   try {
-    await updateQuantity({
-      lineItemEntityId: cartLineItem.id,
-      productEntityId: cartLineItem.productEntityId,
-      variantEntityId: cartLineItem.variantEntityId,
-      selectedOptions,
-      quantity: nextQuantity,
+    await updateCartLinePurchaseQuantity({
+      lineItems: prevState.lineItems,
+      cartLineItem,
+      intent: submission.value.intent,
     });
   } catch (error) {
     // eslint-disable-next-line no-console

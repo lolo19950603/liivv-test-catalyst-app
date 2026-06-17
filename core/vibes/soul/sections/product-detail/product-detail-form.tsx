@@ -43,9 +43,29 @@ import { usePathname, useRouter } from '~/i18n/routing';
 
 import { revalidateCart } from './actions/revalidate-cart';
 import { ArchiveQuantityInput, ArchiveSubmitButton } from './archive-buy-row';
+import {
+  ProductPurchaseOptions,
+  type ProductPurchaseIntervalOption,
+} from './product-purchase-options';
 import { Field, schema, SchemaRawShape } from './schema';
 
 export type ProductDetailBuyRowVariant = 'default' | 'archive';
+
+export interface ProductPurchaseOptionsConfig {
+  title: string;
+  oneTimeLabel: string;
+  subscribeLabel: string;
+  formattedPrice: string;
+  deliverEveryLabel: string;
+  startDateLabel: string;
+  startDateHint?: string;
+  intervalOptions: ProductPurchaseIntervalOption[];
+  startDateMin: string;
+  startDateMax: string;
+  startDateDefault: string;
+  defaultInterval: string;
+  productPath: string;
+}
 
 type Action<S, P> = (state: Awaited<S>, payload: P) => S | Promise<S>;
 
@@ -87,6 +107,8 @@ export interface ProductDetailFormProps<F extends Field> {
   stockDisplayData?: StockDisplayData;
   backorderDisplayData?: BackorderDisplayData;
   buyRowVariant?: ProductDetailBuyRowVariant;
+  showPurchaseOptions?: boolean;
+  purchaseOptions?: ProductPurchaseOptionsConfig;
 }
 
 export type ProductDetailFormHydrationGateProps<F extends Field> = ProductDetailFormProps<F> & {
@@ -131,6 +153,8 @@ export function ProductDetailForm<F extends Field>({
   stockDisplayData,
   backorderDisplayData,
   buyRowVariant = 'default',
+  showPurchaseOptions = false,
+  purchaseOptions,
 }: ProductDetailFormProps<F>) {
   const router = useRouter();
   const pathname = usePathname();
@@ -339,9 +363,33 @@ export function ProductDetailForm<F extends Field>({
           </div>
 
           {buyRowVariant === 'archive' ? (
-            <div className="product-purchase flex w-full flex-col gap-4">
-              <div className="product-purchase__quantity">
-                <span className="product-purchase__quantity-label">{quantityLabel}</span>
+            <div
+              className={clsx(
+                'product-purchase flex w-full flex-col gap-4',
+                showPurchaseOptions && purchaseOptions && 'product-purchase--with-subscribe',
+              )}
+            >
+              {showPurchaseOptions && purchaseOptions ? (
+                <>
+                  <input name="productEntityId" type="hidden" value={productId} />
+                  <input name="productPath" type="hidden" value={purchaseOptions.productPath} />
+                  <ProductPurchaseOptions
+                    defaultInterval={purchaseOptions.defaultInterval}
+                    deliverEveryLabel={purchaseOptions.deliverEveryLabel}
+                    formattedPrice={purchaseOptions.formattedPrice}
+                    intervalOptions={purchaseOptions.intervalOptions}
+                    oneTimeLabel={purchaseOptions.oneTimeLabel}
+                    startDateDefault={purchaseOptions.startDateDefault}
+                    startDateHint={purchaseOptions.startDateHint}
+                    startDateLabel={purchaseOptions.startDateLabel}
+                    startDateMax={purchaseOptions.startDateMax}
+                    startDateMin={purchaseOptions.startDateMin}
+                    subscribeLabel={purchaseOptions.subscribeLabel}
+                    title={purchaseOptions.title}
+                  />
+                </>
+              ) : null}
+              <div className="product-purchase__actions flex w-full flex-wrap items-center gap-4">
                 <ArchiveQuantityInput
                   decrementLabel={decrementLabel}
                   formField={formFields.quantity}
@@ -349,34 +397,69 @@ export function ProductDetailForm<F extends Field>({
                   max={maxQuantity ?? undefined}
                   min={minQuantity ?? 1}
                 />
-              </div>
-              <div className="buy-buttons back-in-stock flex w-full flex-wrap items-center gap-4">
                 <ArchiveSubmitButton disabled={ctaDisabled}>{ctaLabel}</ArchiveSubmitButton>
                 {additionalActions}
               </div>
             </div>
           ) : (
-            <div className="product-purchase flex w-full flex-col gap-4">
-              <div className="product-purchase__quantity flex flex-col items-start gap-2">
-                <span className="product-purchase__quantity-label text-xs font-medium uppercase tracking-wide text-[var(--product-detail-secondary-text,hsl(var(--contrast-500)))]">
-                  {quantityLabel}
-                </span>
-                <NumberInput
-                  aria-label={quantityLabel}
-                  className="w-fit"
-                  decrementLabel={decrementLabel}
-                  incrementLabel={incrementLabel}
-                  max={maxQuantity}
-                  min={minQuantity ?? 1}
-                  name={formFields.quantity.name}
-                  onBlur={quantityControl.blur}
-                  onChange={(e) => quantityControl.change(e.currentTarget.value)}
-                  onFocus={quantityControl.focus}
-                  required
-                  value={quantityControl.value}
-                />
-              </div>
-              <div className="product-purchase__one-time flex flex-wrap items-center gap-3">
+            <div
+              className={clsx(
+                'product-purchase flex w-full flex-col gap-4',
+                showPurchaseOptions &&
+                  purchaseOptions &&
+                  'product-purchase--with-subscribe rounded-2xl border border-[var(--product-detail-border,hsl(var(--contrast-200)))] bg-[var(--product-detail-background,hsl(var(--background)))] p-5',
+              )}
+            >
+              {showPurchaseOptions && purchaseOptions ? (
+                <>
+                  <input name="productEntityId" type="hidden" value={productId} />
+                  <input name="productPath" type="hidden" value={purchaseOptions.productPath} />
+                  <ProductPurchaseOptions
+                    defaultInterval={purchaseOptions.defaultInterval}
+                    deliverEveryLabel={purchaseOptions.deliverEveryLabel}
+                    formattedPrice={purchaseOptions.formattedPrice}
+                    intervalOptions={purchaseOptions.intervalOptions}
+                    oneTimeLabel={purchaseOptions.oneTimeLabel}
+                    startDateDefault={purchaseOptions.startDateDefault}
+                    startDateHint={purchaseOptions.startDateHint}
+                    startDateLabel={purchaseOptions.startDateLabel}
+                    startDateMax={purchaseOptions.startDateMax}
+                    startDateMin={purchaseOptions.startDateMin}
+                    subscribeLabel={purchaseOptions.subscribeLabel}
+                    title={purchaseOptions.title}
+                  />
+                </>
+              ) : (
+                <div className="product-purchase__quantity flex flex-col items-start gap-2">
+                  <span className="product-purchase__quantity-label text-xs font-medium uppercase tracking-wide text-[var(--product-detail-secondary-text,hsl(var(--contrast-500)))]">
+                    {quantityLabel}
+                  </span>
+                  <NumberInput
+                    aria-label={quantityLabel}
+                    className="w-fit"
+                    decrementLabel={decrementLabel}
+                    incrementLabel={incrementLabel}
+                    max={maxQuantity}
+                    min={minQuantity ?? 1}
+                    name={formFields.quantity.name}
+                    onBlur={quantityControl.blur}
+                    onChange={(e) => quantityControl.change(e.currentTarget.value)}
+                    onFocus={quantityControl.focus}
+                    required
+                    value={quantityControl.value}
+                  />
+                </div>
+              )}
+              <div className="product-purchase__actions flex flex-wrap items-center gap-3">
+                {showPurchaseOptions && purchaseOptions ? (
+                  <ArchiveQuantityInput
+                    decrementLabel={decrementLabel}
+                    formField={formFields.quantity}
+                    incrementLabel={incrementLabel}
+                    max={maxQuantity ?? undefined}
+                    min={minQuantity ?? 1}
+                  />
+                ) : null}
                 <SubmitButton disabled={ctaDisabled}>{ctaLabel}</SubmitButton>
                 {additionalActions}
               </div>

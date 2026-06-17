@@ -4,6 +4,7 @@ import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
 import { graphql } from '~/client/graphql';
 import { getCheckoutSnapshot } from '~/lib/checkout/snapshot';
+import { clearSubscriptionLinesForCart } from '~/lib/checkout/subscription-lines';
 import { getStripe } from '~/lib/stripe/client';
 
 import { clearCartId } from './index';
@@ -42,9 +43,22 @@ async function emptyBigCommerceCart(cartId: string, lineItemEntityIds: string[])
   }
 }
 
-async function getSucceededCheckoutSnapshotId(paymentIntentId: string): Promise<string | null> {
+async function getSucceededCheckoutSnapshotId(
+  stripeSessionId: string,
+): Promise<string | null> {
   const stripe = getStripe();
-  const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+  if (stripeSessionId.startsWith('seti_')) {
+    const setupIntent = await stripe.setupIntents.retrieve(stripeSessionId);
+
+    if (setupIntent.status !== 'succeeded') {
+      return null;
+    }
+
+    return setupIntent.metadata.checkout_snapshot_id ?? null;
+  }
+
+  const paymentIntent = await stripe.paymentIntents.retrieve(stripeSessionId);
 
   if (paymentIntent.status !== 'succeeded') {
     return null;
@@ -53,8 +67,8 @@ async function getSucceededCheckoutSnapshotId(paymentIntentId: string): Promise<
   return paymentIntent.metadata.checkout_snapshot_id ?? null;
 }
 
-export async function clearCheckoutCartAfterStripeSession(paymentIntentId: string): Promise<void> {
-  const snapshotId = await getSucceededCheckoutSnapshotId(paymentIntentId);
+export async function clearCheckoutCartAfterStripeSession(stripeSessionId: string): Promise<void> {
+  const snapshotId = await getSucceededCheckoutSnapshotId(stripeSessionId);
 
   if (!snapshotId) {
     return;
@@ -66,9 +80,7 @@ export async function clearCheckoutCartAfterStripeSession(paymentIntentId: strin
     return;
   }
 
-  const lineItemEntityIds = [
-    ...new Set(snapshot.lineItems.map((line) => line.lineItemEntityId)),
-  ];
+  const lineItemEntityIds = snapshot.lineItems.map((line) => line.lineItemEntityId);
 
   try {
     await emptyBigCommerceCart(snapshot.cartId, lineItemEntityIds);
@@ -77,6 +89,7 @@ export async function clearCheckoutCartAfterStripeSession(paymentIntentId: strin
     console.error('Failed to empty BigCommerce cart after checkout:', error);
   }
 
+  await clearSubscriptionLinesForCart(snapshot.cartId);
   await clearCartId();
 }
 

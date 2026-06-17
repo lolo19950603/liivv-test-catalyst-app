@@ -43,6 +43,9 @@ export default async function CheckoutSuccessPage({ params, searchParams }: Prop
           <ButtonLink href="/account/orders/" size="medium" variant="primary">
             {t('viewOrders')}
           </ButtonLink>
+          <ButtonLink href="/account/subscriptions/" size="medium" variant="secondary">
+            {t('viewSubscriptions')}
+          </ButtonLink>
           <ButtonLink href="/" size="medium" variant="secondary">
             {t('continueShopping')}
           </ButtonLink>

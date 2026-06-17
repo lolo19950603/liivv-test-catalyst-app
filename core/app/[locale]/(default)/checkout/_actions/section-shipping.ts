@@ -15,8 +15,11 @@ import {
   aggregatePhysicalLineItems,
   buildCheckoutShippingSections,
 } from '~/lib/checkout/checkout-section-shipping';
-import { getLineSubtotal } from '~/lib/checkout/checkout-amounts';
+import { filterShippingOptionsBySubtotal } from '~/lib/checkout/shipping-rules';
+import { expandCartLineItemForProduct } from '~/lib/checkout/expand-cart-line-items';
 import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
+import { getLineSubtotal, isDeferredSubscriptionLine } from '~/lib/checkout/subscription-charge-timing';
+import { getSubscriptionLinesForCart, findSubscriptionLineByKey } from '~/lib/checkout/subscription-lines';
 import {
   getSectionShippingState,
   SECTION_SHIPPING_QUOTE_VERSION,
@@ -101,24 +104,45 @@ async function getCheckoutLineSnapshots(cartId: string): Promise<CheckoutLineIte
     return [];
   }
 
+  const subscriptionLines = await getSubscriptionLinesForCart(cartId);
+
   return cart.lineItems.physicalItems
     .filter((item) => !item.parentEntityId)
-    .map((item) => {
+    .flatMap((item) => {
       const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
       const unitPrice = item.salePrice?.value ?? item.listPrice.value;
 
-      return {
-        lineItemEntityId: item.entityId,
+      return expandCartLineItemForProduct({
+        item: {
+          id: item.entityId,
+          quantity: item.quantity,
+        },
+        subscriptionLines,
         productEntityId: item.productEntityId,
-        variantEntityId: item.variantEntityId ?? undefined,
-        sku: item.sku ?? undefined,
-        name: item.name,
-        quantity: item.quantity,
-        unitAmount: Math.round(unitPrice * 100),
-        currency: item.listPrice.currencyCode,
         productOptions,
-        isPhysical: true,
-      } satisfies CheckoutLineItemSnapshot;
+        applySubscription: () => ({}),
+      }).map((line) => {
+        const subscription =
+          line.purchaseType === 'subscription' && line.subscriptionLineKey
+            ? findSubscriptionLineByKey(subscriptionLines, line.subscriptionLineKey)
+            : undefined;
+
+        return {
+          lineItemEntityId: item.entityId,
+          productEntityId: item.productEntityId,
+          variantEntityId: item.variantEntityId ?? undefined,
+          sku: item.sku ?? undefined,
+          name: item.name,
+          quantity: line.quantity,
+          unitAmount: Math.round(unitPrice * 100),
+          currency: item.listPrice.currencyCode,
+          productOptions,
+          isPhysical: true,
+          isSubscription: line.purchaseType === 'subscription',
+          billingInterval: subscription?.billingInterval,
+          billingCycleAnchor: subscription?.billingCycleAnchor,
+        } satisfies CheckoutLineItemSnapshot;
+      });
     });
 }
 
@@ -158,10 +182,17 @@ function getSectionLineSnapshots(
   lineSnapshots: CheckoutLineItemSnapshot[],
 ): CheckoutLineItemSnapshot[] {
   if (sectionId === 'due-today') {
-    return lineSnapshots.filter((line) => line.isPhysical);
+    return lineSnapshots.filter((line) => line.isPhysical && !isDeferredSubscriptionLine(line));
   }
 
-  return [];
+  const anchor = Number(sectionId.replace('deferred-', ''));
+
+  return lineSnapshots.filter(
+    (line) =>
+      line.isPhysical &&
+      isDeferredSubscriptionLine(line) &&
+      line.billingCycleAnchor === anchor,
+  );
 }
 
 async function fetchShippingOptionsForLineItems({
@@ -267,9 +298,29 @@ export async function quoteAllCheckoutSectionShipping(): Promise<{ hasOptions: b
       let options: SectionShippingOption[];
 
       if (section.id === 'due-today') {
+        // Full-cart quote so order-level rules (e.g. free shipping over $200) apply to today's charge.
         options = fullCartOptions;
       } else {
-        options = [];
+        // Deferred sections are quoted on their own line items so BC thresholds match that shipment.
+        const sectionQuote = await fetchShippingOptionsForLineItems({
+          checkoutEntityId: checkout.entityId,
+          consignmentEntityId,
+          address: shippingAddress,
+          lineItems: section.physicalLineItems,
+        });
+
+        consignmentEntityId = sectionQuote.consignmentEntityId ?? consignmentEntityId;
+        options = filterShippingOptionsBySubtotal(sectionQuote.options, sectionSubtotal);
+
+        if (options.length === 0) {
+          const paidOptions = fullCartOptions.filter((option) => option.cost > 0);
+
+          options = prorateShippingOptions(paidOptions, sectionSubtotal, totalPhysicalSubtotal);
+        }
+
+        if (options.length > 0) {
+          hasOptions = true;
+        }
       }
 
       const existing = (await getSectionShippingState(cartId))[section.id];

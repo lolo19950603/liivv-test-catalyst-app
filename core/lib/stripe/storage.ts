@@ -19,12 +19,12 @@ export async function storeStripeCustomerId(
   await kv.set(stripeCustomerKey(bigcommerceCustomerId), stripeCustomerId);
 }
 
-function checkoutFulfillmentKey(referenceId: string): string {
-  return `checkout:fulfillment:${referenceId}`;
+function subscriptionOrderKey(referenceId: string): string {
+  return `stripe:bc-order:${referenceId}`;
 }
 
-export async function releaseCheckoutFulfillment(referenceId: string): Promise<void> {
-  const key = checkoutFulfillmentKey(referenceId);
+export async function releaseSubscriptionOrderCreation(referenceId: string): Promise<void> {
+  const key = subscriptionOrderKey(referenceId);
   const existing = await kv.get<string>(key);
 
   if (existing === 'pending') {
@@ -32,8 +32,8 @@ export async function releaseCheckoutFulfillment(referenceId: string): Promise<v
   }
 }
 
-export async function claimCheckoutFulfillment(referenceId: string): Promise<boolean> {
-  const key = checkoutFulfillmentKey(referenceId);
+export async function claimSubscriptionOrderCreation(referenceId: string): Promise<boolean> {
+  const key = subscriptionOrderKey(referenceId);
   const existing = await kv.get<string>(key);
 
   if (existing) {
@@ -45,15 +45,15 @@ export async function claimCheckoutFulfillment(referenceId: string): Promise<boo
   return true;
 }
 
-export async function markCheckoutOrderCreated(
+export async function markSubscriptionOrderCreated(
   referenceId: string,
   orderId: number,
 ): Promise<void> {
-  await kv.set(checkoutFulfillmentKey(referenceId), String(orderId));
+  await kv.set(subscriptionOrderKey(referenceId), String(orderId));
 }
 
 export async function markCheckoutFulfillmentComplete(referenceId: string): Promise<void> {
-  const key = checkoutFulfillmentKey(referenceId);
+  const key = subscriptionOrderKey(referenceId);
   const existing = await kv.get<string>(key);
 
   if (existing && existing !== 'pending') {
@@ -66,7 +66,7 @@ export async function markCheckoutFulfillmentComplete(referenceId: string): Prom
 export async function getCheckoutFulfillmentOrderId(
   referenceId: string,
 ): Promise<number | null> {
-  const existing = await kv.get<string>(checkoutFulfillmentKey(referenceId));
+  const existing = await kv.get<string>(subscriptionOrderKey(referenceId));
 
   if (!existing || existing === 'pending' || existing === 'complete') {
     return null;
@@ -78,16 +78,23 @@ export async function getCheckoutFulfillmentOrderId(
 }
 
 export async function isCheckoutFulfillmentComplete(referenceId: string): Promise<boolean> {
-  const existing = await kv.get<string>(checkoutFulfillmentKey(referenceId));
+  const existing = await kv.get<string>(subscriptionOrderKey(referenceId));
 
   return Boolean(existing && existing !== 'pending');
 }
 
-/** @deprecated Use claimCheckoutFulfillment */
-export const claimSubscriptionOrderCreation = claimCheckoutFulfillment;
+function checkoutStripeSubscriptionsKey(paymentIntentId: string): string {
+  return `checkout:stripe-subs:${paymentIntentId}`;
+}
 
-/** @deprecated Use releaseCheckoutFulfillment */
-export const releaseSubscriptionOrderCreation = releaseCheckoutFulfillment;
+export async function hasCheckoutStripeSubscriptions(
+  paymentIntentId: string,
+): Promise<boolean> {
+  return Boolean(await kv.get<string>(checkoutStripeSubscriptionsKey(paymentIntentId)));
+}
 
-/** @deprecated Use markCheckoutOrderCreated */
-export const markSubscriptionOrderCreated = markCheckoutOrderCreated;
+export async function markCheckoutStripeSubscriptionsCreated(
+  paymentIntentId: string,
+): Promise<void> {
+  await kv.set(checkoutStripeSubscriptionsKey(paymentIntentId), 'created');
+}

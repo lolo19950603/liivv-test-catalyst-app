@@ -11,6 +11,7 @@ import { graphql } from '~/client/graphql';
 import { Link } from '~/components/link';
 import { addToOrCreateCart } from '~/lib/cart';
 import { MissingCartError } from '~/lib/cart/error';
+import { addSubscriptionProductToCart } from '~/lib/stripe/add-subscription-to-cart';
 
 type CartSelectedOptionsInput = ReturnType<typeof graphql.scalar<'CartSelectedOptionsInput'>>;
 
@@ -34,6 +35,55 @@ export const addToCart = async (
 
   if (submission.status !== 'success') {
     return { lastResult: submission.reply(), fields: prevState.fields };
+  }
+
+  const purchaseType = payload.get('purchaseType');
+
+  if (purchaseType === 'subscription') {
+    payload.set('productEntityId', String(submission.value.id));
+
+    if (!payload.get('productPath')) {
+      payload.set('productPath', '/');
+    }
+
+    try {
+      await addSubscriptionProductToCart(payload, {
+        loginRedirectTo: String(payload.get('productPath')),
+      });
+
+      const quantity = Number(submission.value.quantity);
+
+      return {
+        lastResult: submission.reply(),
+        fields: prevState.fields,
+        successMessage: t.rich('successMessage', {
+          cartItems: quantity,
+          cartLink: (chunks) => (
+            <Link className="underline" href="/cart" prefetch="viewport" prefetchKind="full">
+              {chunks}
+            </Link>
+          ),
+        }),
+      };
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+
+      if (error instanceof BigCommerceGQLError) {
+        return {
+          lastResult: submission.reply({
+            formErrors: error.errors.map(({ message }) => message),
+          }),
+          fields: prevState.fields,
+        };
+      }
+
+      if (error instanceof Error) {
+        return { ...prevState, lastResult: submission.reply({ formErrors: [error.message] }) };
+      }
+
+      return { ...prevState, lastResult: submission.reply({ formErrors: [String(error)] }) };
+    }
   }
 
   const productEntityId = Number(submission.value.id);

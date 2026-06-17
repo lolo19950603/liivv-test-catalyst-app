@@ -781,6 +781,12 @@
       "subscriptionIntervalHint": "Choose how often you are billed.",
       "subscriptionStartDate": "Starts",
       "subscriptionStartDateHint": "Leave as today to start immediately, or pick a future date.",
+      "purchaseOptions": {
+        "title": "Purchase options",
+        "oneTime": "One-time purchase",
+        "subscribeAndSave": "Subscribe & save",
+        "deliverEvery": "Deliver every"
+      },
       "Submit": {
         "addToCart": "Add to cart",
         "outOfStock": "Out of stock",

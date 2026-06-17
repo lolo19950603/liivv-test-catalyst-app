@@ -5,3 +5,8 @@ export {
   getOrCreateStripeCustomer,
   resolveStripeCustomerId,
 } from './customers';
+export {
+  createBillingPortalSession,
+  getCustomerSubscriptions,
+  type CustomerSubscription,
+} from './subscriptions';

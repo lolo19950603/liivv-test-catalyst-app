@@ -22,6 +22,7 @@ import {
   ProductDetailBuyRowVariant,
   ProductDetailFormAction,
   ProductDetailFormHydrationGate,
+  ProductPurchaseOptionsConfig,
   StockDisplayData,
 } from './product-detail-form';
 import { RatingLink } from './rating-link';
@@ -83,6 +84,8 @@ export interface ProductDetailProps<F extends Field> {
   loadMoreImagesAction?: ProductGalleryLoadMoreAction;
   recaptchaSiteKey?: string;
   buyRowVariant?: ProductDetailBuyRowVariant;
+  showPurchaseOptions?: boolean;
+  purchaseOptions?: ProductPurchaseOptionsConfig;
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -127,6 +130,8 @@ export function ProductDetail<F extends Field>({
   loadMoreImagesAction,
   recaptchaSiteKey,
   buyRowVariant = 'default',
+  showPurchaseOptions = false,
+  purchaseOptions,
 }: ProductDetailProps<F>) {
   return (
     <section className="@container">
@@ -282,7 +287,9 @@ export function ProductDetail<F extends Field>({
                           minQuantity={minQuantity ?? undefined}
                           prefetch={prefetch}
                           productId={product.id}
+                          purchaseOptions={purchaseOptions}
                           quantityLabel={quantityLabel}
+                          showPurchaseOptions={showPurchaseOptions}
                           skeleton={<ProductDetailFormSkeleton />}
                           stockDisplayData={stockDisplayData ?? undefined}
                         />
