@@ -67,7 +67,7 @@ function SubscribeActionButton({
         onClick={onClick}
         size="fixed"
         type="button"
-        variant="secondary"
+        variant="primary"
       >
         {children}
       </ArchiveButton>
@@ -81,7 +81,7 @@ function SubscribeActionButton({
       onClick={onClick}
       size="medium"
       type="button"
-      variant="secondary"
+      variant="primary"
     >
       {children}
     </Button>
@@ -138,7 +138,7 @@ export function ProductSubscribeButton({
           className="product-form__submit subscribe-form__submit grow"
           href={loginHref}
           size="fixed"
-          variant="secondary"
+          variant="primary"
         >
           {loginLabel}
         </ArchiveButtonLink>,
@@ -146,7 +146,7 @@ export function ProductSubscribeButton({
     }
 
     return panel(
-      <ButtonLink className="subscribe-form__submit w-full" href={loginHref} size="medium" variant="secondary">
+      <ButtonLink className="subscribe-form__submit w-full" href={loginHref} size="medium" variant="primary">
         {loginLabel}
       </ButtonLink>,
     );
