@@ -8,6 +8,7 @@ import { kv } from '~/lib/kv';
 import { mapCartSelectedOptionsToProductOptions } from './map-cart-options';
 import { calculateCheckoutAmounts } from './subscription-charge-timing';
 import { buildCheckoutShippingSections } from './checkout-section-shipping';
+import { ensureDueTodayShippingSyncedToCheckout } from '~/app/[locale]/(default)/checkout/_actions/section-shipping';
 import {
   getSectionShippingCosts,
   getSectionShippingState,
@@ -104,9 +105,11 @@ export async function buildCheckoutSnapshot({
   bigcommerceCustomerId: number;
   billingAddress: CheckoutAddressSnapshot;
 }): Promise<CheckoutSnapshot> {
+  await ensureDueTodayShippingSyncedToCheckout();
+
   const data = await getCart({ cartId });
   const cart = data.site.cart;
-  const checkout = data.site.checkout;
+  let checkout = data.site.checkout;
 
   if (!cart || !checkout?.grandTotal) {
     throw new Error('Cart checkout is not ready');

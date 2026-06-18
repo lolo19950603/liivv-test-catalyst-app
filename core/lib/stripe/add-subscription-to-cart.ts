@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { revalidateTag } from 'next/cache';
-import { getLocale, getTranslations } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 
 import { getSessionCustomerAccessToken } from '~/auth';
 import { TAGS } from '~/client/tags';
@@ -17,7 +17,6 @@ import {
 } from '~/lib/checkout/subscription-lines';
 import { addToOrCreateCart } from '~/lib/cart';
 import { getPreferredCurrencyCode } from '~/lib/currency';
-import { redirect as appRedirect } from '~/i18n/routing';
 
 import { isStripeConfigured } from './client';
 
@@ -46,11 +45,7 @@ const ProductSubscriptionCartQuery = graphql(
   [PricingFragment],
 );
 
-export async function addSubscriptionProductToCart(
-  formData: FormData,
-  { loginRedirectTo }: { loginRedirectTo: string },
-): Promise<void> {
-  const locale = await getLocale();
+export async function addSubscriptionProductToCart(formData: FormData): Promise<void> {
   const t = await getTranslations('Subscribe');
 
   if (!isStripeConfigured()) {
@@ -58,10 +53,6 @@ export async function addSubscriptionProductToCart(
   }
 
   const customerAccessToken = await getSessionCustomerAccessToken();
-
-  if (!customerAccessToken) {
-    appRedirect({ href: `/login?redirectTo=${encodeURIComponent(loginRedirectTo)}`, locale });
-  }
 
   const productEntityId = Number(formData.get('productEntityId'));
 

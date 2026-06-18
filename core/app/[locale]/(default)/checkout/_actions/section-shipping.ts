@@ -14,6 +14,8 @@ import {
 import {
   aggregatePhysicalLineItems,
   buildCheckoutShippingSections,
+  getSectionLineSnapshots,
+  getSectionShippingQuoteSubtotal,
 } from '~/lib/checkout/checkout-section-shipping';
 import { filterShippingOptionsBySubtotal } from '~/lib/checkout/shipping-rules';
 import { expandCartLineItemForProduct } from '~/lib/checkout/expand-cart-line-items';
@@ -177,24 +179,6 @@ async function ensureShippingConsignment({
   });
 }
 
-function getSectionLineSnapshots(
-  sectionId: string,
-  lineSnapshots: CheckoutLineItemSnapshot[],
-): CheckoutLineItemSnapshot[] {
-  if (sectionId === 'due-today') {
-    return lineSnapshots.filter((line) => line.isPhysical && !isDeferredSubscriptionLine(line));
-  }
-
-  const anchor = Number(sectionId.replace('deferred-', ''));
-
-  return lineSnapshots.filter(
-    (line) =>
-      line.isPhysical &&
-      isDeferredSubscriptionLine(line) &&
-      line.billingCycleAnchor === anchor,
-  );
-}
-
 async function fetchShippingOptionsForLineItems({
   checkoutEntityId,
   consignmentEntityId,
@@ -258,6 +242,7 @@ export async function quoteAllCheckoutSectionShipping(): Promise<{ hasOptions: b
     return { hasOptions: false };
   }
 
+  const cartSubtotal = checkout.subtotal?.value ?? 0;
   const shippingAddress: ShippingAddress = {
     countryCode: address.countryCode,
     city: address.city ?? undefined,
@@ -288,7 +273,10 @@ export async function quoteAllCheckoutSectionShipping(): Promise<{ hasOptions: b
     hasOptions = true;
   }
 
-  for (const section of sections) {
+  for (const section of [
+    ...sections.filter((candidate) => candidate.id !== 'due-today'),
+    ...sections.filter((candidate) => candidate.id === 'due-today'),
+  ]) {
     const sectionSubtotal = getSectionLineSnapshots(section.id, lineSnapshots).reduce(
       (sum, line) => sum + getLineSubtotal(line),
       0,
@@ -298,8 +286,8 @@ export async function quoteAllCheckoutSectionShipping(): Promise<{ hasOptions: b
       let options: SectionShippingOption[];
 
       if (section.id === 'due-today') {
-        // Full-cart quote so order-level rules (e.g. free shipping over $200) apply to today's charge.
-        options = fullCartOptions;
+        // Full-cart quote for BC rates; eligibility uses due-today lines only (not deferred).
+        options = filterShippingOptionsBySubtotal(fullCartOptions, sectionSubtotal);
       } else {
         // Deferred sections are quoted on their own line items so BC thresholds match that shipment.
         const sectionQuote = await fetchShippingOptionsForLineItems({
@@ -323,6 +311,7 @@ export async function quoteAllCheckoutSectionShipping(): Promise<{ hasOptions: b
         }
       }
 
+      const quotedSubtotal = getSectionShippingQuoteSubtotal(section.id, lineSnapshots);
       const existing = (await getSectionShippingState(cartId))[section.id];
       const selectedOption = pickDefaultShippingOption(options, existing?.selectedOptionId);
 
@@ -332,7 +321,17 @@ export async function quoteAllCheckoutSectionShipping(): Promise<{ hasOptions: b
         selectedCost: selectedOption?.cost,
         selectedDescription: selectedOption?.description,
         quoteVersion: SECTION_SHIPPING_QUOTE_VERSION,
+        quotedSubtotal,
       });
+
+      if (section.id === 'due-today') {
+        try {
+          await syncImmediateCheckoutConsignment();
+        } catch (syncError) {
+          // eslint-disable-next-line no-console
+          console.error('Failed to sync due-today shipping after quote:', syncError);
+        }
+      }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(`Failed to quote shipping for section ${section.id}:`, error);
@@ -409,6 +408,35 @@ export async function syncImmediateCheckoutConsignment(): Promise<void> {
   });
 }
 
+/** Apply KV due-today shipping to BigCommerce when consignment selection is out of sync (fixes stale tax). */
+export async function ensureDueTodayShippingSyncedToCheckout(): Promise<boolean> {
+  const cartId = await getCartId();
+
+  if (!cartId) {
+    return false;
+  }
+
+  const state = await getSectionShippingState(cartId);
+  const dueToday = state['due-today'];
+
+  if (!dueToday?.selectedOptionId) {
+    return false;
+  }
+
+  const data = await getCart({ cartId });
+  const checkout = data.site.checkout;
+  const consignment = checkout?.shippingConsignments?.[0];
+  const bcSelectedOptionId = consignment?.selectedShippingOption?.entityId;
+
+  if (bcSelectedOptionId === dueToday.selectedOptionId) {
+    return false;
+  }
+
+  await syncImmediateCheckoutConsignment();
+
+  return true;
+}
+
 export async function selectCheckoutSectionShipping(
   sectionId: string,
   shippingOptionEntityId: string,
@@ -433,6 +461,7 @@ export async function selectCheckoutSectionShipping(
     selectedCost: selectedOption.cost,
     selectedDescription: selectedOption.description,
     quoteVersion: entry?.quoteVersion,
+    quotedSubtotal: entry?.quotedSubtotal,
   };
 
   await updateSectionShippingEntry(cartId, sectionId, nextEntry);

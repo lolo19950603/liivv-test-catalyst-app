@@ -4,10 +4,10 @@ import type {
   CustomCheckoutSummarySection,
 } from '@/vibes/soul/sections/custom-checkout';
 
-import { checkoutSnapshotKey } from './subscription-line-key';
 import type { CheckoutLineItemSnapshot } from './types';
 import {
   calculateCheckoutAmounts,
+  getDeferredSectionAmounts,
   getLineSubtotal,
   groupDeferredSubscriptionLines,
   isDeferredSubscriptionLine,
@@ -117,39 +117,17 @@ export function buildCheckoutSummarySections({
     sectionShippingCosts,
   });
 
-  const displayBySnapshotKey = new Map(
-    lines.map((line) => [checkoutSnapshotKey(line.snapshot), line.display]),
-  );
-
-  const getDisplayLines = (snapshotGroup: CheckoutLineItemSnapshot[]) => {
-    const seen = new Set<string>();
-
-    return snapshotGroup.reduce<CustomCheckoutLineItem[]>((items, line) => {
-      const key = checkoutSnapshotKey(line);
-      const display = displayBySnapshotKey.get(key);
-
-      if (!display || seen.has(key)) {
-        return items;
-      }
-
-      seen.add(key);
-      items.push(display);
-
-      return items;
-    }, []);
-  };
-
-  const immediateSnapshotLines = snapshotLines.filter((line) => !isDeferredSubscriptionLine(line));
+  const immediateLines = lines.filter((line) => !isDeferredSubscriptionLine(line.snapshot));
   const sections: CustomCheckoutSummarySection[] = [];
 
-  if (immediateSnapshotLines.length > 0) {
+  if (immediateLines.length > 0) {
     const sectionId = 'due-today';
     const shippingUi = sectionShippingUi?.[sectionId];
 
     sections.push({
       id: sectionId,
       title: labels.dueTodayTitle,
-      lineItems: getDisplayLines(immediateSnapshotLines),
+      lineItems: immediateLines.map((line) => line.display),
       summaryItems: toSummaryItems({
         subtotal: amounts.immediateSubtotal,
         shipping: amounts.immediateShipping,
@@ -168,8 +146,20 @@ export function buildCheckoutSummarySections({
 
   for (const group of groupDeferredSubscriptionLines(snapshotLines)) {
     const sectionId = `deferred-${group.billingCycleAnchor}`;
-    const groupSubtotal = group.lines.reduce((sum, line) => sum + getLineSubtotal(line), 0);
-    const sectionShipping = getSectionShippingCost(sectionShippingCosts, sectionId);
+    const sectionLines = lines.filter(
+      (line) =>
+        isDeferredSubscriptionLine(line.snapshot) &&
+        line.snapshot.billingCycleAnchor === group.billingCycleAnchor,
+    );
+    const sectionAmounts = getDeferredSectionAmounts(amounts, group.billingCycleAnchor);
+    const groupSubtotal = sectionAmounts?.subtotal ?? group.lines.reduce(
+      (sum, line) => sum + getLineSubtotal(line),
+      0,
+    );
+    const sectionShipping = sectionAmounts?.shipping ?? getSectionShippingCost(sectionShippingCosts, sectionId);
+    const sectionTax = sectionAmounts?.tax ?? 0;
+    const sectionTotal =
+      sectionAmounts?.grandTotal ?? groupSubtotal + sectionShipping + sectionTax;
     const formattedDate = formatDeferredDate(group.billingCycleAnchor);
     const shippingUi = sectionShippingUi?.[sectionId];
 
@@ -177,16 +167,16 @@ export function buildCheckoutSummarySections({
       id: sectionId,
       title: labels.formatBilledOnTitle(formattedDate),
       description: labels.billedLaterNote,
-      lineItems: getDisplayLines(group.lines),
+      lineItems: sectionLines.map((line) => line.display),
       summaryItems: toSummaryItems({
         subtotal: groupSubtotal,
         shipping: sectionShipping,
-        tax: 0,
+        tax: sectionTax,
         labels,
         formatMoney,
         includeShipping: shippingUi?.requiresShipping ?? false,
       }),
-      total: formatMoney(groupSubtotal + sectionShipping),
+      total: formatMoney(sectionTotal),
       totalLabel: labels.billedLaterTotal,
       requiresShipping: shippingUi?.requiresShipping,
       shippingOptions: shippingUi?.shippingOptions,

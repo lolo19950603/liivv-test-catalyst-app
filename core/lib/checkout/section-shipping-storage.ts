@@ -15,10 +15,31 @@ export interface SectionShippingEntry {
   selectedCost?: number;
   selectedDescription?: string;
   quoteVersion?: number;
+  /** Cart/section subtotal when this quote was fetched (drives free-shipping eligibility). */
+  quotedSubtotal?: number;
+}
+
+export function isSectionShippingQuoteStale(
+  entry: SectionShippingEntry | undefined,
+  expectedSubtotal: number,
+): boolean {
+  if (!entry?.options?.length) {
+    return true;
+  }
+
+  if (entry.quoteVersion !== SECTION_SHIPPING_QUOTE_VERSION) {
+    return true;
+  }
+
+  if (entry.quotedSubtotal == null || entry.quotedSubtotal !== expectedSubtotal) {
+    return true;
+  }
+
+  return false;
 }
 
 /** Bump when shipping quote logic changes so checkout re-fetches BC rates. */
-export const SECTION_SHIPPING_QUOTE_VERSION = 6;
+export const SECTION_SHIPPING_QUOTE_VERSION = 7;
 
 export type SectionShippingState = Record<string, SectionShippingEntry>;
 

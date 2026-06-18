@@ -11,6 +11,7 @@ import {
 } from '~/lib/cart/cart-mutation-line-items';
 import { createCart, CreateCartInput } from '~/lib/cart/create-cart';
 import { validateCartId } from '~/lib/cart/validate-cart';
+import { clearSectionShippingState } from '~/lib/checkout/section-shipping-storage';
 
 import { MissingCartError } from './error';
 
@@ -63,6 +64,8 @@ export async function addToOrCreateCart(
     if (!resultCart?.entityId) {
       throw new MissingCartError();
     }
+
+    await clearSectionShippingState(cart.entityId);
 
     revalidateTag(TAGS.cart, { expire: 0 });
 

@@ -9,6 +9,7 @@ import { graphql, VariablesOf } from '~/client/graphql';
 import { TAGS } from '~/client/tags';
 import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
 import { removeSubscriptionLineFromCart } from '~/lib/checkout/subscription-lines';
+import { clearSectionShippingState } from '~/lib/checkout/section-shipping-storage';
 import { clearCartId, getCartId } from '~/lib/cart';
 
 import { getCart } from '../page-data';
@@ -92,6 +93,8 @@ export async function removeItem({
   // TODO: We need to figure out if it actually failed.
   if (!cart) {
     await clearCartId();
+  } else {
+    await clearSectionShippingState(cartId);
   }
 
   revalidateTag(TAGS.cart, { expire: 0 });

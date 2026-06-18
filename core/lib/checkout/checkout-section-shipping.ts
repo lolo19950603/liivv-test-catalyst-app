@@ -1,8 +1,38 @@
 import type { CheckoutLineItemSnapshot } from './types';
 import {
+  getLineSubtotal,
   groupDeferredSubscriptionLines,
   isDeferredSubscriptionLine,
 } from './subscription-charge-timing';
+
+export function getSectionLineSnapshots(
+  sectionId: string,
+  lineSnapshots: CheckoutLineItemSnapshot[],
+): CheckoutLineItemSnapshot[] {
+  if (sectionId === 'due-today') {
+    return lineSnapshots.filter((line) => line.isPhysical && !isDeferredSubscriptionLine(line));
+  }
+
+  const anchor = Number(sectionId.replace('deferred-', ''));
+
+  return lineSnapshots.filter(
+    (line) =>
+      line.isPhysical &&
+      isDeferredSubscriptionLine(line) &&
+      line.billingCycleAnchor === anchor,
+  );
+}
+
+/** Subtotal used for free-shipping eligibility on this checkout section. */
+export function getSectionShippingQuoteSubtotal(
+  sectionId: string,
+  lineSnapshots: CheckoutLineItemSnapshot[],
+): number {
+  return getSectionLineSnapshots(sectionId, lineSnapshots).reduce(
+    (sum, line) => sum + getLineSubtotal(line),
+    0,
+  );
+}
 
 export interface CheckoutPhysicalLineItem {
   lineItemEntityId: string;

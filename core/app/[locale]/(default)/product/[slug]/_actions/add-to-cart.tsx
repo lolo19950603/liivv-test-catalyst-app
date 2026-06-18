@@ -3,7 +3,6 @@
 import { BigCommerceGQLError } from '@bigcommerce/catalyst-client';
 import { SubmissionResult } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
-import { isRedirectError } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { ReactNode } from 'react';
 
@@ -48,9 +47,7 @@ export const addToCart = async (
     }
 
     try {
-      await addSubscriptionProductToCart(payload, {
-        loginRedirectTo: String(payload.get('productPath')),
-      });
+      await addSubscriptionProductToCart(payload);
 
       const quantity = Number(submission.value.quantity);
 
@@ -67,10 +64,6 @@ export const addToCart = async (
         }),
       };
     } catch (error) {
-      if (isRedirectError(error)) {
-        throw error;
-      }
-
       // eslint-disable-next-line no-console
       console.error(error);
 

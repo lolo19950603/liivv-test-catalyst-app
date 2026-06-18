@@ -32,24 +32,35 @@ export function subscriptionLineIdentityKey(line: SubscriptionLineIdentity): str
 }
 
 export function checkoutSnapshotKey(snapshot: CheckoutLineItemSnapshot): string {
-  if (!snapshot.isSubscription || !snapshot.billingInterval) {
+  if (snapshot.isSubscription) {
+    if (snapshot.billingInterval) {
+      return [
+        snapshot.lineItemEntityId,
+        subscriptionLineIdentityKey({
+          productEntityId: snapshot.productEntityId,
+          productOptions: snapshot.productOptions,
+          billingInterval: snapshot.billingInterval,
+          billingCycleAnchor: snapshot.billingCycleAnchor,
+        }),
+        String(snapshot.quantity),
+      ].join(':');
+    }
+
     return [
       snapshot.lineItemEntityId,
-      'one-time',
+      'subscription',
       String(snapshot.productEntityId),
       productOptionsKey(snapshot.productOptions) || 'default',
+      String(snapshot.billingCycleAnchor ?? 'today'),
       String(snapshot.quantity),
     ].join(':');
   }
 
   return [
     snapshot.lineItemEntityId,
-    subscriptionLineIdentityKey({
-      productEntityId: snapshot.productEntityId,
-      productOptions: snapshot.productOptions,
-      billingInterval: snapshot.billingInterval,
-      billingCycleAnchor: snapshot.billingCycleAnchor,
-    }),
+    'one-time',
+    String(snapshot.productEntityId),
+    productOptionsKey(snapshot.productOptions) || 'default',
     String(snapshot.quantity),
   ].join(':');
 }

@@ -1,3 +1,4 @@
+import { allocateAmountBySubtotal } from '../checkout/tax-allocation';
 import { getLineSubtotal, isDeferredSubscriptionLine } from '../checkout/subscription-charge-timing';
 import type { CheckoutLineItemSnapshot, CheckoutSnapshot } from '../checkout/types';
 
@@ -9,33 +10,7 @@ export function formatOrderAmountString(amount: number): string {
   return amount.toFixed(2);
 }
 
-/** Split a dollar amount across lines proportionally; last line absorbs rounding remainder. */
-export function allocateAmountBySubtotal(lineSubtotals: number[], totalAmount: number): number[] {
-  if (lineSubtotals.length === 0 || totalAmount <= 0) {
-    return lineSubtotals.map(() => 0);
-  }
-
-  const subtotalSum = lineSubtotals.reduce((sum, value) => sum + value, 0);
-
-  if (subtotalSum <= 0) {
-    return lineSubtotals.map(() => 0);
-  }
-
-  const totalCents = Math.round(totalAmount * 100);
-  let allocatedCents = 0;
-
-  return lineSubtotals.map((lineSubtotal, index) => {
-    if (index === lineSubtotals.length - 1) {
-      return (totalCents - allocatedCents) / 100;
-    }
-
-    const shareCents = Math.round((lineSubtotal / subtotalSum) * totalCents);
-
-    allocatedCents += shareCents;
-
-    return shareCents / 100;
-  });
-}
+export { allocateAmountBySubtotal } from '../checkout/tax-allocation';
 
 export interface OrderLinePrices {
   priceExTax: number;
@@ -68,22 +43,46 @@ export function buildLinePricesFromTotals(
   };
 }
 
+export function splitImmediateTaxByTaxableBase({
+  immediateTax,
+  immediateSubtotal,
+  immediateShipping,
+}: {
+  immediateTax: number;
+  immediateSubtotal: number;
+  immediateShipping: number;
+}): { productTax: number; shippingTax: number } {
+  const taxableBase = immediateSubtotal + immediateShipping;
+
+  if (immediateTax <= 0 || taxableBase <= 0) {
+    return { productTax: 0, shippingTax: 0 };
+  }
+
+  const [productTax, shippingTax] = allocateAmountBySubtotal(
+    [immediateSubtotal, immediateShipping],
+    immediateTax,
+  );
+
+  return { productTax, shippingTax };
+}
+
 export function buildImmediateOrderLineTaxes(snapshot: CheckoutSnapshot): number[] {
   const lines = snapshot.lineItems.filter((line) => !isDeferredSubscriptionLine(line));
   const lineSubtotals = lines.map((line) => getLineSubtotal(line));
+  const { productTax } = splitImmediateTaxByTaxableBase(snapshot.amounts);
 
-  return allocateAmountBySubtotal(lineSubtotals, snapshot.amounts.immediateTax);
+  return allocateAmountBySubtotal(lineSubtotals, productTax);
 }
 
 export function buildImmediateOrderTaxTotals(snapshot: CheckoutSnapshot) {
-  const { immediateSubtotal, immediateShipping, immediateTax, immediateGrandTotal } =
-    snapshot.amounts;
+  const { immediateSubtotal, immediateShipping, immediateGrandTotal } = snapshot.amounts;
+  const { productTax, shippingTax } = splitImmediateTaxByTaxableBase(snapshot.amounts);
 
   return {
     subtotal_ex_tax: formatOrderAmountString(immediateSubtotal),
-    subtotal_inc_tax: formatOrderAmountString(immediateSubtotal + immediateTax),
+    subtotal_inc_tax: formatOrderAmountString(immediateSubtotal + productTax),
     shipping_cost_ex_tax: formatOrderAmount(immediateShipping),
-    shipping_cost_inc_tax: formatOrderAmount(immediateShipping),
+    shipping_cost_inc_tax: formatOrderAmount(immediateShipping + shippingTax),
     total_ex_tax: formatOrderAmountString(immediateSubtotal + immediateShipping),
     total_inc_tax: formatOrderAmountString(immediateGrandTotal),
   };

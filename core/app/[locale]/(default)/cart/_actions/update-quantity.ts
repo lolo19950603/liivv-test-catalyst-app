@@ -7,6 +7,7 @@ import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
 import { graphql, VariablesOf } from '~/client/graphql';
 import { getCartId } from '~/lib/cart';
+import { clearSectionShippingState } from '~/lib/checkout/section-shipping-storage';
 
 import { removeItem } from './remove-item';
 
@@ -86,6 +87,8 @@ export const updateQuantity = async ({
   if (!cart) {
     throw new Error(t('failedToUpdateQuantity'));
   }
+
+  await clearSectionShippingState(cartId);
 
   revalidatePath('/cart');
 

@@ -28,16 +28,18 @@ import { isStripeConfigured } from '~/lib/stripe/client';
 import { getCartId } from '~/lib/cart';
 import { buildCheckoutSummarySections } from '~/lib/checkout/build-checkout-summary';
 import type { CheckoutDisplayLineInput } from '~/lib/checkout/build-checkout-summary';
-import { buildCheckoutShippingSections } from '~/lib/checkout/checkout-section-shipping';
+import { buildCheckoutShippingSections, getSectionShippingQuoteSubtotal } from '~/lib/checkout/checkout-section-shipping';
+import { filterShippingOptionsBySubtotal } from '~/lib/checkout/shipping-rules';
 import {
   getSectionShippingCosts,
   getSectionShippingState,
+  isSectionShippingQuoteStale,
   isSectionShippingReady,
-  SECTION_SHIPPING_QUOTE_VERSION,
 } from '~/lib/checkout/section-shipping-storage';
 
 import { initializePayment, prepareOrderConfirmation } from './_actions/initialize-payment';
 import {
+  ensureDueTodayShippingSyncedToCheckout,
   formatSectionShippingOptions,
 } from './_actions/section-shipping';
 
@@ -91,7 +93,7 @@ export default async function CheckoutPage({ params }: Props) {
 
   const data = await getCart({ cartId });
   const cart = data.site.cart;
-  const checkout = data.site.checkout;
+  let checkout = data.site.checkout;
 
   if (!cart || cart.lineItems.totalQuantity === 0) {
     redirect({ href: '/cart/', locale });
@@ -209,37 +211,48 @@ export default async function CheckoutPage({ params }: Props) {
     });
   });
 
+  const snapshotLines = checkoutLines.map((line) => line.snapshot);
+  const shippingSections = buildCheckoutShippingSections(snapshotLines);
+  const sectionShippingState = await getSectionShippingState(cartId);
+
+  if (await ensureDueTodayShippingSyncedToCheckout()) {
+    const refreshed = await getCart({ cartId });
+    checkout = refreshed.site.checkout;
+  }
+
   const shippingConsignment =
     checkout?.shippingConsignments?.find((consignment) => consignment.selectedShippingOption) ||
     checkout?.shippingConsignments?.[0];
 
-  const snapshotLines = checkoutLines.map((line) => line.snapshot);
-  const shippingSections = buildCheckoutShippingSections(snapshotLines);
-  const sectionShippingState = await getSectionShippingState(cartId);
+  const cartSubtotal = checkout?.subtotal?.value ?? 0;
   const hasShippingAddress = Boolean(shippingConsignment?.address?.countryCode);
+  const requiresSectionShippingQuote =
+    hasShippingAddress && shippingSections.some((section) => section.requiresShipping);
+  const shippingQuoteKey =
+    requiresSectionShippingQuote && shippingConsignment?.address?.countryCode
+      ? [
+          shippingConsignment.address.countryCode,
+          shippingConsignment.address.city ?? '',
+          shippingConsignment.address.postalCode ?? '',
+          shippingConsignment.address.stateOrProvince ?? '',
+          ...shippingSections.map(
+            (section) =>
+              `${section.id}:${getSectionShippingQuoteSubtotal(section.id, snapshotLines)}`,
+          ),
+        ].join('|')
+      : undefined;
   const needsSectionShippingQuote =
-    hasShippingAddress &&
+    requiresSectionShippingQuote &&
     shippingSections.some((section) => {
       if (!section.requiresShipping) {
         return false;
       }
 
       const entry = sectionShippingState[section.id];
+      const expectedSubtotal = getSectionShippingQuoteSubtotal(section.id, snapshotLines);
 
-      return (
-        !(entry?.options?.length ?? 0) ||
-        entry.quoteVersion !== SECTION_SHIPPING_QUOTE_VERSION
-      );
+      return isSectionShippingQuoteStale(entry, expectedSubtotal);
     });
-  const shippingQuoteKey = shippingConsignment?.address?.countryCode
-    ? [
-        shippingConsignment.address.countryCode,
-        shippingConsignment.address.city ?? '',
-        shippingConsignment.address.postalCode ?? '',
-        shippingConsignment.address.stateOrProvince ?? '',
-        String(checkout?.subtotal?.value ?? 0),
-      ].join('|')
-    : undefined;
 
   const sectionShippingCosts = getSectionShippingCosts(sectionShippingState);
   const requiresShipping = shippingSections.some((section) => section.requiresShipping);
@@ -262,12 +275,20 @@ export default async function CheckoutPage({ params }: Props) {
     }
 
     const entry = sectionShippingState[section.id];
-    const shippingOptions = entry
-      ? await formatSectionShippingOptions(entry.options, currencyCode)
-      : [];
-    const selectedOption = entry?.options.find(
-      (option) => option.entityId === entry.selectedOptionId,
-    );
+    const expectedSubtotal = getSectionShippingQuoteSubtotal(section.id, snapshotLines);
+    const quoteIsCurrent = entry && !isSectionShippingQuoteStale(entry, expectedSubtotal);
+    const filteredOptions =
+      quoteIsCurrent && entry
+        ? filterShippingOptionsBySubtotal(entry.options, expectedSubtotal)
+        : [];
+    const shippingOptions =
+      filteredOptions.length > 0
+        ? await formatSectionShippingOptions(filteredOptions, currencyCode)
+        : [];
+    const selectedOption =
+      quoteIsCurrent && entry
+        ? filteredOptions.find((option) => option.entityId === entry.selectedOptionId)
+        : undefined;
 
     sectionShippingUi[section.id] = {
       requiresShipping: section.requiresShipping,

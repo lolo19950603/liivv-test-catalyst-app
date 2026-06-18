@@ -45,12 +45,23 @@ export interface CheckoutLineItemSnapshot {
   billingCycleAnchor?: number;
 }
 
+export interface CheckoutSectionAmounts {
+  sectionId: string;
+  billingCycleAnchor?: number;
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  grandTotal: number;
+}
+
 export interface CheckoutAmountsSnapshot {
   immediateSubtotal: number;
   immediateShipping: number;
   immediateTax: number;
   immediateGrandTotal: number;
   deferredSubtotal: number;
+  deferredTax: number;
+  deferredSections: CheckoutSectionAmounts[];
   hasDeferredSubscriptions: boolean;
   hasImmediateCharges: boolean;
 }
