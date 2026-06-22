@@ -11,6 +11,10 @@ import { isBigCommerceAdminConfigured } from '~/lib/bigcommerce/rest';
 
 import { getStripe } from './client';
 import {
+  queuePaidInvoiceForSubscriptionOrderBatch,
+  type QueuedSubscriptionInvoiceBatch,
+} from './subscription-order-batch';
+import {
   claimSubscriptionOrderCreation,
   markSubscriptionOrderCreated,
   releaseSubscriptionOrderCreation,
@@ -264,7 +268,7 @@ export async function createBigCommerceOrderFromCheckoutSession(
 
 export async function createBigCommerceOrderFromInvoice(
   invoice: Stripe.Invoice,
-): Promise<number | null> {
+): Promise<QueuedSubscriptionInvoiceBatch | null> {
   if ((invoice.amount_paid ?? 0) <= 0) {
     return null;
   }
@@ -297,22 +301,12 @@ export async function createBigCommerceOrderFromInvoice(
 
   const subscription = await getSubscription(subscriptionId);
   const subscriptionMetadata = mergeSubscriptionMetadata(subscription, invoice);
-  const { unitAmountExTax } = getSubscriptionLineTotals({
-    ...subscription,
-    metadata: subscriptionMetadata,
-  });
-  const unitAmountIncTax = invoice.amount_paid ?? unitAmountExTax;
-  const currencyCode = (invoice.currency ?? subscription.currency ?? 'usd').toUpperCase();
   const orderType = invoice.billing_reason === 'subscription_cycle' ? 'renewal' : 'initial';
 
-  return createOrderFromSubscription({
+  return queuePaidInvoiceForSubscriptionOrderBatch({
+    invoice,
     subscription,
     subscriptionMetadata,
-    stripeReferenceId: `invoice:${invoice.id}`,
     orderType,
-    unitAmountExTax,
-    unitAmountIncTax,
-    currencyCode,
-    productName: getSubscriptionProductName(subscription),
   });
 }

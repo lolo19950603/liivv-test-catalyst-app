@@ -1,14 +1,15 @@
 import 'server-only';
 
+import { after } from 'next/server';
 import type Stripe from 'stripe';
 
 import { fulfillCheckoutStripeSession } from '~/lib/checkout/payment';
 
 import {
-  createBigCommerceOrderFromCheckoutSession,
   createBigCommerceOrderFromInvoice,
   getInvoiceSubscriptionId,
 } from './subscription-orders';
+import { scheduleSubscriptionOrderBatchFlush } from './subscription-order-batch';
 import { getStripe } from './client';
 import {
   applySubscriptionInvoiceTax,
@@ -44,8 +45,6 @@ export async function handleStripeWebhookEvent(event: Stripe.Event): Promise<voi
       if (bigcommerceCustomerId && stripeCustomerId) {
         await storeStripeCustomerId(bigcommerceCustomerId, stripeCustomerId);
       }
-
-      await createBigCommerceOrderFromCheckoutSession(session);
 
       break;
     }
@@ -100,7 +99,13 @@ export async function handleStripeWebhookEvent(event: Stripe.Event): Promise<voi
       const stripe = getStripe();
       const invoice = await stripe.invoices.retrieve(invoiceEvent.id);
 
-      await createBigCommerceOrderFromInvoice(invoice);
+      const queued = await createBigCommerceOrderFromInvoice(invoice);
+
+      if (queued) {
+        after(async () => {
+          await scheduleSubscriptionOrderBatchFlush(queued);
+        });
+      }
 
       break;
     }

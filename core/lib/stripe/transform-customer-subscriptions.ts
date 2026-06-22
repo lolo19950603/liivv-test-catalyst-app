@@ -1,4 +1,7 @@
 import type { CustomerSubscription } from './subscriptions';
+import { getShipmentCalendarDayKey } from './subscription-shipment-grouping';
+
+export { getShipmentCalendarDayKey } from './subscription-shipment-grouping';
 
 export interface SubscriptionListItem {
   id: string;
@@ -153,17 +156,6 @@ export function getNextShipmentTimestamp(subscription: CustomerSubscription): nu
   }
 
   return subscription.currentPeriodEnd;
-}
-
-/** UTC calendar day for shipment grouping (matches subscription start-date storage). */
-export function getShipmentCalendarDayKey(timestamp: number): string {
-  const date = new Date(timestamp * 1000);
-
-  return [
-    date.getUTCFullYear(),
-    String(date.getUTCMonth() + 1).padStart(2, '0'),
-    String(date.getUTCDate()).padStart(2, '0'),
-  ].join('-');
 }
 
 export function transformCustomerSubscription(
