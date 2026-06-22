@@ -128,13 +128,21 @@ export async function buildCheckoutSnapshot({
       .flatMap((item) => buildCheckoutLineItemSnapshots(item, false, subscriptionLines)),
   ];
 
-  const requiresShipping = lineItems.some((line) => line.isPhysical);
+  const requiresShippingAddress = lineItems.some((line) => line.isPhysical);
   const shippingSections = buildCheckoutShippingSections(lineItems);
   const sectionShippingState = await getSectionShippingState(cartId);
   const sectionShippingCosts = getSectionShippingCosts(sectionShippingState);
+  const requiresShippingMethod = shippingSections.some((section) => section.requiresShippingMethod);
+  const shippingConsignmentWithAddress = checkout.shippingConsignments?.find(
+    (consignment) => consignment.address?.countryCode,
+  );
 
-  if (requiresShipping && !isSectionShippingReady(shippingSections, sectionShippingState)) {
+  if (requiresShippingMethod && !isSectionShippingReady(shippingSections, sectionShippingState)) {
     throw new Error('A shipping method must be selected for each delivery section before checkout');
+  }
+
+  if (requiresShippingAddress && !shippingConsignmentWithAddress?.address?.countryCode) {
+    throw new Error('A shipping address is required before checkout');
   }
 
   const shippingConsignment = checkout.shippingConsignments?.find(
@@ -142,7 +150,7 @@ export async function buildCheckoutSnapshot({
   );
 
   const immediateShipping = sectionShippingCosts['due-today'] ?? 0;
-  const shippingAddress = checkout.shippingConsignments?.[0]?.address;
+  const shippingAddress = shippingConsignmentWithAddress?.address ?? checkout.shippingConsignments?.[0]?.address;
   const amounts = calculateCheckoutAmounts({
     lineItems,
     cartSubtotal: checkout.subtotal?.value ?? 0,
@@ -181,7 +189,12 @@ export async function buildCheckoutSnapshot({
           firstName: billingAddress.firstName,
           lastName: billingAddress.lastName,
           email: billingAddress.email,
-          address1: '',
+          address1: shippingAddress.address1?.trim()
+            ? shippingAddress.address1
+            : billingAddress.address1,
+          address2: shippingAddress.address2?.trim()
+            ? shippingAddress.address2
+            : billingAddress.address2,
           city: shippingAddress.city ?? '',
           stateOrProvince: shippingAddress.stateOrProvince ?? undefined,
           countryCode: shippingAddress.countryCode,

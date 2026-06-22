@@ -10,9 +10,13 @@ export interface CustomCheckoutLineItem {
   subtitle?: string;
   imageUrl?: string;
   quantity?: number;
-  price: string;
+  price?: string;
   badge?: string;
   subscriptionDetails?: string[];
+  chargeTiming?: 'due-today' | 'billed-later';
+  chargeLabel?: string;
+  chargeNote?: string;
+  hidePrice?: boolean;
 }
 
 export interface CustomCheckoutSummaryItem {
@@ -29,6 +33,8 @@ export interface CustomCheckoutSummarySection {
   total: string;
   totalLabel: string;
   requiresShipping?: boolean;
+  /** KV section id used when persisting shipping selection (e.g. `due-today`). */
+  shippingSectionId?: string;
   shippingOptions?: Array<{ value: string; label: string; price: string }>;
   selectedShippingOption?: { value: string; label: string; price: string };
 }

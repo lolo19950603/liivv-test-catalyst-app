@@ -60,6 +60,10 @@ export async function addSubscriptionProductToCart(formData: FormData): Promise<
     throw new Error(t('errors.invalidPlan'));
   }
 
+  if (formData.get('subscriptionPriceConsent') !== '1') {
+    throw new Error(t('errors.priceConsentRequired'));
+  }
+
   const productOptions = parseProductOptionSelectionsFromFormData(formData);
   const optionValueIds = productOptions.map((option) => ({
     optionEntityId: option.optionEntityId,
@@ -85,13 +89,7 @@ export async function addSubscriptionProductToCart(formData: FormData): Promise<
     throw new Error(t('errors.invalidPlan'));
   }
 
-  const priceValue = product.prices?.salePrice?.value ?? product.prices?.price.value;
   const currency = product.prices?.price.currencyCode ?? currencyCode ?? 'USD';
-  const unitAmount = Math.round((priceValue ?? 0) * 100);
-
-  if (!unitAmount) {
-    throw new Error(t('errors.unavailablePrice'));
-  }
 
   const { getSubscriptionBillingIntervals, resolveSelectedSubscriptionBillingInterval } =
     await import('./subscription-interval');
@@ -144,7 +142,7 @@ export async function addSubscriptionProductToCart(formData: FormData): Promise<
         resolvedProductOptions.length > 0 ? resolvedProductOptions : productOptions,
       billingInterval,
       billingCycleAnchor,
-      unitAmount,
+      unitAmount: 0,
       currency,
       cartLineItemEntityId: matchedLine?.entityId,
       quantity,

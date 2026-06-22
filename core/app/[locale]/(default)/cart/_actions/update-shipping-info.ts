@@ -11,6 +11,11 @@ import { TAGS } from '~/client/tags';
 import { quoteAllCheckoutSectionShipping } from '~/app/[locale]/(default)/checkout/_actions/section-shipping';
 import { getCartId } from '~/lib/cart';
 import { clearSectionShippingState } from '~/lib/checkout/section-shipping-storage';
+import {
+  filterCustomerVisibleShippingOptions,
+  isSubscriptionOnlyShippingOption,
+  pickCustomerDefaultShippingOption,
+} from '~/lib/checkout/shipping-option-filters';
 import { resolveShippingStateOrProvince } from '~/lib/checkout/resolve-shipping-state';
 
 import { getCart } from '../page-data';
@@ -120,7 +125,17 @@ export const updateShippingInfo = async (
 
         updatedShippingConsignment = result ? result.shippingConsignments?.[0] : undefined;
 
-        const firstOption = updatedShippingConsignment?.availableShippingOptions?.[0];
+        const customerOptions = filterCustomerVisibleShippingOptions(
+          updatedShippingConsignment?.availableShippingOptions ?? [],
+        );
+        const firstOption = pickCustomerDefaultShippingOption(
+          customerOptions.map((option) => ({
+            entityId: option.entityId,
+            description: option.description,
+            cost: option.cost.value,
+            isRecommended: option.isRecommended ?? undefined,
+          })),
+        );
 
         if (!updatedShippingConsignment?.entityId || !firstOption) {
           return {
@@ -256,7 +271,9 @@ export const updateShippingInfo = async (
           postalCode: submission.value.postalCode,
         },
         shippingOptions:
-          updatedShippingConsignment?.availableShippingOptions?.map((option) => ({
+          filterCustomerVisibleShippingOptions(
+            updatedShippingConsignment?.availableShippingOptions ?? [],
+          ).map((option) => ({
             label: option.description,
             value: option.entityId,
             price: format.number(option.cost.value, {
@@ -279,10 +296,21 @@ export const updateShippingInfo = async (
           };
         }
 
+        const selectedOption = shippingConsignment.availableShippingOptions?.find(
+          (option) => option.entityId === submission.value.shippingOption,
+        );
+
+        if (!selectedOption || isSubscriptionOnlyShippingOption(selectedOption.description)) {
+          return {
+            ...prevState,
+            lastResult: submission.reply({ formErrors: [t('noShippingOptions')] }),
+          };
+        }
+
         await addShippingCost({
           checkoutEntityId,
           consignmentEntityId: shippingConsignment.entityId,
-          shippingOptionEntityId: submission.value.shippingOption,
+          shippingOptionEntityId: selectedOption.entityId,
         });
       } catch (error) {
         // eslint-disable-next-line no-console
@@ -307,22 +335,16 @@ export const updateShippingInfo = async (
       revalidateTag(TAGS.cart, { expire: 0 });
       revalidateTag(TAGS.checkout, { expire: 0 });
 
-      const selectedOption = shippingConsignment.availableShippingOptions?.find(
-        (option) => option.entityId === submission.value.shippingOption,
-      );
-
       return {
         ...prevState,
-        shippingOption: selectedOption
-          ? {
-              value: selectedOption.entityId,
-              label: selectedOption.description,
-              price: format.number(selectedOption.cost.value, {
-                style: 'currency',
-                currency: checkout.cart?.currencyCode,
-              }),
-            }
-          : prevState.shippingOption,
+        shippingOption: {
+          value: selectedOption.entityId,
+          label: selectedOption.description,
+          price: format.number(selectedOption.cost.value, {
+            style: 'currency',
+            currency: checkout.cart?.currencyCode,
+          }),
+        },
         form: 'shipping' as const,
         lastResult: submission.reply({ resetForm: true }),
       };

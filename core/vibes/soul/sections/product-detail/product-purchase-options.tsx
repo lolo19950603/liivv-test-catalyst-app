@@ -25,6 +25,8 @@ export interface ProductPurchaseOptionsProps {
   startDateDefault: string;
   defaultInterval: string;
   defaultPurchaseType?: PurchaseType;
+  priceConsentLabel: string;
+  priceConsentRequiredError?: string;
 }
 
 export function ProductPurchaseOptions({
@@ -41,6 +43,7 @@ export function ProductPurchaseOptions({
   startDateDefault,
   defaultInterval,
   defaultPurchaseType = 'one-time',
+  priceConsentLabel,
 }: ProductPurchaseOptionsProps) {
   const groupId = useId();
   const [purchaseType, setPurchaseType] = useState<PurchaseType>(defaultPurchaseType);
@@ -134,6 +137,17 @@ export function ProductPurchaseOptions({
                   <span className="product-purchase-options__field-hint">{startDateHint}</span>
                 ) : null}
               </span>
+
+              <label className="product-purchase-options__consent">
+                <input
+                  className="product-purchase-options__consent-checkbox"
+                  name="subscriptionPriceConsent"
+                  required
+                  type="checkbox"
+                  value="1"
+                />
+                <span className="product-purchase-options__consent-label">{priceConsentLabel}</span>
+              </label>
             </span>
           ) : null}
         </label>

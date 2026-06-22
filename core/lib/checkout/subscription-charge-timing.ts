@@ -86,13 +86,11 @@ function buildCheckoutAmountSections({
   }
 
   for (const group of groupDeferredSubscriptionLines(lineItems)) {
-    const sectionId = `deferred-${group.billingCycleAnchor}`;
-
     sections.push({
-      sectionId,
+      sectionId: `deferred-${group.billingCycleAnchor}`,
       billingCycleAnchor: group.billingCycleAnchor,
       subtotal: group.lines.reduce((sum, line) => sum + getLineSubtotal(line), 0),
-      shipping: sectionShippingCosts[sectionId] ?? 0,
+      shipping: 0,
     });
   }
 

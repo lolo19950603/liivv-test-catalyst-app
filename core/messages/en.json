@@ -256,16 +256,43 @@
     "Subscriptions": {
       "title": "Subscriptions",
       "manage": "Manage billing",
+      "manageItem": "Edit",
+      "shipmentOn": "Shipping on {date}",
+      "endedOn": "Ended on {date}",
+      "sections": {
+        "deliveries": "Deliveries",
+        "active": "Active",
+        "canceled": "Canceled"
+      },
       "browsePlans": "Shop products",
       "customPricing": "Custom pricing",
       "includingTax": "incl. tax",
       "renewsOn": "Renews on {date}",
+      "nextShipmentOn": "Next shipment {date}",
       "firstChargeOn": "First charge on {date}",
+      "priceAtBilling": "Price confirmed at billing",
+      "delivery": {
+        "shipTo": "Ship to",
+        "shipment": "Shipment {number}",
+        "option": "Delivery",
+        "freeShipping": "Free shipping",
+        "shippingConfirmedAtBilling": "Confirmed at billing",
+        "subtotal": "Subtotal",
+        "tax": "Tax",
+        "total": "Total",
+        "totalsPending": "Totals confirmed at billing",
+        "quantity": "Quantity",
+        "payment": "Payment",
+        "frequency": "Frequency"
+      },
       "endsOn": "Ends on {date}",
       "cancelAtPeriodEnd": "Cancels at period end",
       "empty": {
         "title": "You don't have any subscriptions",
-        "description": "Add subscription products from the shop to your cart and check out like any other order."
+        "description": "Add subscription products from the shop to your cart and check out like any other order.",
+        "active": "You don't have any active subscriptions.",
+        "canceled": "You don't have any canceled subscriptions.",
+        "deliveries": "You don't have any upcoming deliveries."
       },
       "intervals": {
         "day": "per day",
@@ -532,6 +559,7 @@
     "subscriptionBilling": "Billing",
     "subscriptionStarts": "Starts",
     "subscriptionStartsToday": "Starts today",
+    "subscriptionBilledOn": "Billed on",
     "lineItemQuantity": "Qty {quantity}",
     "intervals": {
       "day": "per day",
@@ -547,7 +575,8 @@
     "shippingRequiredCta": "Back to cart",
     "shipTo": {
       "title": "Ship to",
-      "description": "Where should we deliver your order?"
+      "description": "Where should we deliver your order?",
+      "required": "Select a shipping address before continuing."
     },
     "shippingMethod": {
       "title": "Shipping",
@@ -595,6 +624,11 @@
       "shippingRequired": "Select a shipping method for each order section before continuing to payment."
     },
     "summary": {
+      "orderSummary": "Order summary",
+      "chargeDueToday": "Due today",
+      "chargeBilledOn": "Billing and shipping on {date}",
+      "notInTotal": "Not in total below",
+      "priceAtBilling": "Price confirmed at billing",
       "subtotal": "Subtotal",
       "shipping": "Shipping",
       "tax": "Tax",
@@ -621,6 +655,7 @@
       "billing": "Billing",
       "starts": "Starts",
       "startsToday": "Starts today",
+      "billedOn": "Billed on",
       "intervals": {
         "day": "per day",
         "week": "per week",
@@ -745,6 +780,7 @@
       "notConfigured": "Subscriptions are not configured yet.",
       "invalidPlan": "Please select a valid subscription plan.",
       "unavailablePrice": "This product does not have a valid price for subscription.",
+      "priceConsentRequired": "Please confirm you understand subscription prices may change before continuing.",
       "customerNotFound": "We could not find your account."
     },
     "Success": {
@@ -785,6 +821,7 @@
         "title": "Purchase options",
         "oneTime": "One-time purchase",
         "subscribeAndSave": "Subscribe & save",
+        "priceConsent": "I understand subscription prices may change before each billing date based on current product pricing and availability.",
         "deliverEvery": "Deliver every"
       },
       "Submit": {

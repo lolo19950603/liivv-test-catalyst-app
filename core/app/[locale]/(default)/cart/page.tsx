@@ -261,8 +261,8 @@ export default async function Cart({ params }: Props) {
       const subscriptionDetails = subscription
         ? getSubscriptionLineDetails(subscription, {
             billingLabel: t('subscription.billing'),
-            startsLabel: t('subscription.starts'),
             startsTodayLabel: t('subscription.startsToday'),
+            billedOnLabel: t('subscription.billedOn'),
             formatInterval,
             formatStartsDate: (timestamp) =>
               format.dateTime(new Date(timestamp * 1000), { dateStyle: 'medium' }),

@@ -2,10 +2,12 @@ import { Metadata } from 'next';
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { SubscriptionList } from '@/vibes/soul/sections/subscription-list';
-import { transformCustomerSubscriptions } from '~/lib/stripe/transform-customer-subscriptions';
+import { groupSubscriptionsForPortal } from '~/lib/stripe/transform-customer-subscriptions';
 
 import { openBillingPortal } from './_actions/open-billing-portal';
+import { openSubscriptionPortal } from './_actions/open-subscription-portal';
 import { getSubscriptionsPageData } from './page-data';
+import { getStoreLogoFallback } from '~/lib/store-theme/get-store-logo-fallback';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -27,7 +29,10 @@ export default async function SubscriptionsPage({ params }: Props) {
 
   const t = await getTranslations('Account.Subscriptions');
   const format = await getFormatter();
-  const data = await getSubscriptionsPageData();
+  const [data, storeLogoFallback] = await Promise.all([
+    getSubscriptionsPageData(),
+    getStoreLogoFallback(),
+  ]);
 
   if (data.kind === 'not-configured') {
     return (
@@ -58,17 +63,35 @@ export default async function SubscriptionsPage({ params }: Props) {
     );
   }
 
-  const subscriptions = transformCustomerSubscriptions(data.subscriptions, t, format);
+  const portalSections = groupSubscriptionsForPortal(data.subscriptions, t, format);
 
   return (
     <SubscriptionList
+      activeSectionTitle={t('sections.active')}
+      canceledSectionTitle={t('sections.canceled')}
+      deliveriesSectionTitle={t('sections.deliveries')}
+      emptyActiveTitle={t('empty.active')}
+      emptyCanceledTitle={t('empty.canceled')}
+      emptyDeliveriesTitle={t('empty.deliveries')}
       emptyStateActionHref="/"
       emptyStateActionLabel={t('browsePlans')}
       emptyStateDescription={t('empty.description')}
       emptyStateTitle={t('empty.title')}
       manageBillingAction={openBillingPortal}
       manageBillingLabel={t('manage')}
-      subscriptions={subscriptions}
+      manageItemAction={openSubscriptionPortal}
+      manageItemLabel={t('manageItem')}
+      portalSections={portalSections}
+      shipToLabel={t('delivery.shipTo')}
+      storeLogoFallback={storeLogoFallback}
+      deliveryOptionLabel={t('delivery.option')}
+      subtotalLabel={t('delivery.subtotal')}
+      taxLabel={t('delivery.tax')}
+      totalLabel={t('delivery.total')}
+      totalsPendingLabel={t('delivery.totalsPending')}
+      quantityLabel={t('delivery.quantity')}
+      paymentLabel={t('delivery.payment')}
+      frequencyLabel={t('delivery.frequency')}
       title={t('title')}
     />
   );

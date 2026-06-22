@@ -398,6 +398,24 @@
   color: var(--product-detail-secondary-text, #66605c);
 }
 
+.liivv-product-page-feel .product-purchase-options__consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  margin-top: 0.25rem;
+}
+
+.liivv-product-page-feel .product-purchase-options__consent-checkbox {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.liivv-product-page-feel .product-purchase-options__consent-label {
+  color: var(--product-detail-secondary-text, #66605c);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
 .liivv-product-page-feel .product-purchase__actions {
   align-items: stretch;
   width: 100%;

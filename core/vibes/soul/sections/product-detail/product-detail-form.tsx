@@ -65,6 +65,7 @@ export interface ProductPurchaseOptionsConfig {
   startDateDefault: string;
   defaultInterval: string;
   productPath: string;
+  priceConsentLabel: string;
 }
 
 type Action<S, P> = (state: Awaited<S>, payload: P) => S | Promise<S>;
@@ -386,6 +387,7 @@ export function ProductDetailForm<F extends Field>({
                     startDateMin={purchaseOptions.startDateMin}
                     subscribeLabel={purchaseOptions.subscribeLabel}
                     title={purchaseOptions.title}
+                    priceConsentLabel={purchaseOptions.priceConsentLabel}
                   />
                 </>
               ) : null}
@@ -427,6 +429,7 @@ export function ProductDetailForm<F extends Field>({
                     startDateMin={purchaseOptions.startDateMin}
                     subscribeLabel={purchaseOptions.subscribeLabel}
                     title={purchaseOptions.title}
+                    priceConsentLabel={purchaseOptions.priceConsentLabel}
                   />
                 </>
               ) : (

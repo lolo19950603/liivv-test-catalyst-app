@@ -1,7 +1,10 @@
 import 'server-only';
 
+import { revalidateTag } from 'next/cache';
+
 import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
+import { TAGS } from '~/client/tags';
 import { graphql } from '~/client/graphql';
 import { getCheckoutSnapshot } from '~/lib/checkout/snapshot';
 import { clearSubscriptionLinesForCart } from '~/lib/checkout/subscription-lines';
@@ -91,6 +94,7 @@ export async function clearCheckoutCartAfterStripeSession(stripeSessionId: strin
 
   await clearSubscriptionLinesForCart(snapshot.cartId);
   await clearCartId();
+  revalidateTag(TAGS.cart, { expire: 0 });
 }
 
 /** @deprecated Use clearCheckoutCartAfterStripeSession */

@@ -5,6 +5,7 @@ import { revalidateTag } from 'next/cache';
 import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
 import { graphql } from '~/client/graphql';
+import type { CheckoutConsignmentAddressInput } from '~/lib/checkout/types';
 import { TAGS } from '~/client/tags';
 
 const AddCheckoutShippingConsignmentsMutation = graphql(`
@@ -32,19 +33,16 @@ const AddCheckoutShippingConsignmentsMutation = graphql(`
 
 interface AddProps {
   checkoutEntityId: string;
-  address: {
-    countryCode: string;
-    city?: string;
-    stateOrProvince?: string;
-    postalCode?: string;
-  };
+  address: CheckoutConsignmentAddressInput;
   lineItems: Array<{ quantity: number; lineItemEntityId: string }>;
+  skipCacheRevalidation?: boolean;
 }
 
 export const addCheckoutShippingConsignments = async ({
   checkoutEntityId,
   address,
   lineItems,
+  skipCacheRevalidation = false,
 }: AddProps) => {
   const customerAccessToken = await getSessionCustomerAccessToken();
 
@@ -70,7 +68,9 @@ export const addCheckoutShippingConsignments = async ({
     fetchOptions: { cache: 'no-store' },
   });
 
-  revalidateTag(TAGS.checkout, { expire: 0 });
+  if (!skipCacheRevalidation) {
+    revalidateTag(TAGS.checkout, { expire: 0 });
+  }
 
   return response.data.checkout.addCheckoutShippingConsignments?.checkout;
 };
@@ -101,12 +101,7 @@ const UpdateCheckoutShippingConsignmentMutation = graphql(`
 interface UpdateProps {
   checkoutEntityId: string;
   shippingId: string;
-  address: {
-    countryCode: string;
-    city?: string;
-    stateOrProvince?: string;
-    postalCode?: string;
-  };
+  address: CheckoutConsignmentAddressInput;
   lineItems: Array<{ quantity: number; lineItemEntityId: string }>;
 }
 

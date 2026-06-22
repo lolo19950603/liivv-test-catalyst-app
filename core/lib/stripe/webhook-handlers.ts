@@ -7,7 +7,13 @@ import { fulfillCheckoutStripeSession } from '~/lib/checkout/payment';
 import {
   createBigCommerceOrderFromCheckoutSession,
   createBigCommerceOrderFromInvoice,
+  getInvoiceSubscriptionId,
 } from './subscription-orders';
+import { getStripe } from './client';
+import {
+  applySubscriptionInvoiceTax,
+  prepareSubscriptionForBillingById,
+} from './prepare-subscription-invoice';
 import { storeStripeCustomerId } from './storage';
 
 function getBigCommerceCustomerId(metadata: Stripe.Metadata | null | undefined): number | null {
@@ -64,8 +70,35 @@ export async function handleStripeWebhookEvent(event: Stripe.Event): Promise<voi
       break;
     }
 
-    case 'invoice.paid': {
+    case 'invoice.upcoming': {
       const invoice = event.data.object;
+      const subscriptionId = getInvoiceSubscriptionId(invoice);
+
+      if (subscriptionId) {
+        await prepareSubscriptionForBillingById(subscriptionId);
+      }
+
+      break;
+    }
+
+    case 'invoice.created': {
+      const invoice = event.data.object;
+      const subscriptionId = getInvoiceSubscriptionId(invoice);
+
+      if (subscriptionId) {
+        const stripe = getStripe();
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+        await applySubscriptionInvoiceTax(invoice, subscription);
+      }
+
+      break;
+    }
+
+    case 'invoice.paid': {
+      const invoiceEvent = event.data.object;
+      const stripe = getStripe();
+      const invoice = await stripe.invoices.retrieve(invoiceEvent.id);
 
       await createBigCommerceOrderFromInvoice(invoice);
 

@@ -10,7 +10,11 @@ import { createBigCommerceSubscriptionOrder } from '~/lib/bigcommerce/subscripti
 import { isBigCommerceAdminConfigured } from '~/lib/bigcommerce/rest';
 
 import { getStripe } from './client';
-import { claimSubscriptionOrderCreation, markSubscriptionOrderCreated } from './storage';
+import {
+  claimSubscriptionOrderCreation,
+  markSubscriptionOrderCreated,
+  releaseSubscriptionOrderCreation,
+} from './storage';
 
 function getBigCommerceCustomerId(metadata: Stripe.Metadata | null | undefined): number | null {
   const value = metadata?.bigcommerce_customer_id;
@@ -48,15 +52,33 @@ function getProductOptions(metadata: Stripe.Metadata | null | undefined) {
   );
 }
 
-function getInvoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
-  const parentSubscription = invoice.parent?.subscription_details?.subscription;
+export function getInvoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
+  if (invoice.parent?.type === 'subscription_details') {
+    const parentSubscription = invoice.parent.subscription_details?.subscription;
 
-  if (typeof parentSubscription === 'string') {
-    return parentSubscription;
+    if (typeof parentSubscription === 'string') {
+      return parentSubscription;
+    }
+
+    if (parentSubscription?.id) {
+      return parentSubscription.id;
+    }
   }
 
-  if (parentSubscription?.id) {
-    return parentSubscription.id;
+  for (const line of invoice.lines?.data ?? []) {
+    if (line.parent?.type !== 'subscription_item_details') {
+      continue;
+    }
+
+    const lineSubscription = line.parent.subscription_item_details?.subscription;
+
+    if (typeof lineSubscription === 'string') {
+      return lineSubscription;
+    }
+
+    if (lineSubscription?.id) {
+      return lineSubscription.id;
+    }
   }
 
   const legacySubscription = (
@@ -76,6 +98,21 @@ function getInvoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
   return null;
 }
 
+function mergeSubscriptionMetadata(
+  subscription: Stripe.Subscription,
+  invoice: Stripe.Invoice,
+): Stripe.Metadata {
+  const invoiceMetadata =
+    invoice.parent?.type === 'subscription_details'
+      ? invoice.parent.subscription_details?.metadata
+      : undefined;
+
+  return {
+    ...subscription.metadata,
+    ...(invoiceMetadata ?? {}),
+  };
+}
+
 async function getSubscription(
   subscriptionId: string,
 ): Promise<Stripe.Subscription> {
@@ -88,6 +125,7 @@ async function getSubscription(
 
 async function createOrderFromSubscription({
   subscription,
+  subscriptionMetadata,
   stripeReferenceId,
   orderType,
   unitAmountExTax,
@@ -96,6 +134,7 @@ async function createOrderFromSubscription({
   productName,
 }: {
   subscription: Stripe.Subscription;
+  subscriptionMetadata?: Stripe.Metadata;
   stripeReferenceId: string;
   orderType: 'initial' | 'renewal';
   unitAmountExTax: number;
@@ -110,11 +149,14 @@ async function createOrderFromSubscription({
     return null;
   }
 
-  const customerId = getBigCommerceCustomerId(subscription.metadata);
+  const metadata = subscriptionMetadata ?? subscription.metadata;
+  const customerId = getBigCommerceCustomerId(metadata);
 
   if (!customerId) {
     // eslint-disable-next-line no-console
-    console.warn('Skipping BigCommerce subscription order: missing bigcommerce_customer_id');
+    console.warn(
+      `Skipping BigCommerce subscription order ${stripeReferenceId}: missing bigcommerce_customer_id`,
+    );
 
     return null;
   }
@@ -122,6 +164,9 @@ async function createOrderFromSubscription({
   const claimed = await claimSubscriptionOrderCreation(stripeReferenceId);
 
   if (!claimed) {
+    // eslint-disable-next-line no-console
+    console.info(`BigCommerce subscription order already handled for ${stripeReferenceId}`);
+
     return null;
   }
 
@@ -130,10 +175,10 @@ async function createOrderFromSubscription({
 
     const orderId = await createBigCommerceSubscriptionOrder({
       customerId,
-      productEntityId: getBigCommerceProductId(subscription.metadata),
+      productEntityId: getBigCommerceProductId(metadata),
       productName,
-      productSku: getProductSku(subscription.metadata),
-      productOptions: getProductOptions(subscription.metadata),
+      productSku: getProductSku(metadata),
+      productOptions: getProductOptions(metadata),
       quantity,
       unitAmountExTax,
       unitAmountIncTax,
@@ -145,10 +190,14 @@ async function createOrderFromSubscription({
 
     await markSubscriptionOrderCreated(stripeReferenceId, orderId);
 
+    // eslint-disable-next-line no-console
+    console.info(`Created BigCommerce subscription order ${orderId} for ${stripeReferenceId}`);
+
     return orderId;
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Failed to create BigCommerce subscription order:', error);
+    await releaseSubscriptionOrderCreation(stripeReferenceId);
 
     return null;
   }
@@ -171,11 +220,15 @@ function getSubscriptionLineTotals(subscription: Stripe.Subscription): {
 } {
   const item = subscription.items.data[0];
   const quantity = item?.quantity ?? 1;
-  const unitAmount = item?.price.unit_amount ?? 0;
+  const billedSubtotal = Number(subscription.metadata.billed_subtotal_cents ?? '');
+  const unitAmount =
+    Number.isFinite(billedSubtotal) && billedSubtotal > 0
+      ? billedSubtotal
+      : (item?.price.unit_amount ?? 0) * quantity;
 
   return {
     quantity,
-    unitAmountExTax: unitAmount * quantity,
+    unitAmountExTax: unitAmount,
   };
 }
 
@@ -223,23 +276,38 @@ export async function createBigCommerceOrderFromInvoice(
   ]);
 
   if (!billableReasons.has(invoice.billing_reason)) {
+    // eslint-disable-next-line no-console
+    console.info(
+      `Skipping BigCommerce subscription order for invoice ${invoice.id}: billing_reason=${invoice.billing_reason ?? 'null'}`,
+    );
+
     return null;
   }
 
   const subscriptionId = getInvoiceSubscriptionId(invoice);
 
   if (!subscriptionId) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `Skipping BigCommerce subscription order for invoice ${invoice.id}: missing subscription id`,
+    );
+
     return null;
   }
 
   const subscription = await getSubscription(subscriptionId);
-  const { unitAmountExTax } = getSubscriptionLineTotals(subscription);
+  const subscriptionMetadata = mergeSubscriptionMetadata(subscription, invoice);
+  const { unitAmountExTax } = getSubscriptionLineTotals({
+    ...subscription,
+    metadata: subscriptionMetadata,
+  });
   const unitAmountIncTax = invoice.amount_paid ?? unitAmountExTax;
   const currencyCode = (invoice.currency ?? subscription.currency ?? 'usd').toUpperCase();
   const orderType = invoice.billing_reason === 'subscription_cycle' ? 'renewal' : 'initial';
 
   return createOrderFromSubscription({
     subscription,
+    subscriptionMetadata,
     stripeReferenceId: `invoice:${invoice.id}`,
     orderType,
     unitAmountExTax,

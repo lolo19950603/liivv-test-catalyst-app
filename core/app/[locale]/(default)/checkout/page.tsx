@@ -30,6 +30,7 @@ import { buildCheckoutSummarySections } from '~/lib/checkout/build-checkout-summ
 import type { CheckoutDisplayLineInput } from '~/lib/checkout/build-checkout-summary';
 import { buildCheckoutShippingSections, getSectionShippingQuoteSubtotal } from '~/lib/checkout/checkout-section-shipping';
 import { filterShippingOptionsBySubtotal } from '~/lib/checkout/shipping-rules';
+import { filterCustomerVisibleShippingOptions } from '~/lib/checkout/shipping-option-filters';
 import {
   getSectionShippingCosts,
   getSectionShippingState,
@@ -154,8 +155,8 @@ export default async function CheckoutPage({ params }: Props) {
       const subscriptionDetails = subscription
         ? getSubscriptionLineDetails(subscription, {
             billingLabel: t('subscriptionBilling'),
-            startsLabel: t('subscriptionStarts'),
             startsTodayLabel: t('subscriptionStartsToday'),
+            billedOnLabel: t('subscriptionBilledOn'),
             formatInterval,
             formatStartsDate: (timestamp) =>
               format.dateTime(new Date(timestamp * 1000), { dateStyle: 'medium' }),
@@ -227,7 +228,7 @@ export default async function CheckoutPage({ params }: Props) {
   const cartSubtotal = checkout?.subtotal?.value ?? 0;
   const hasShippingAddress = Boolean(shippingConsignment?.address?.countryCode);
   const requiresSectionShippingQuote =
-    hasShippingAddress && shippingSections.some((section) => section.requiresShipping);
+    hasShippingAddress && shippingSections.some((section) => section.requiresShippingMethod);
   const shippingQuoteKey =
     requiresSectionShippingQuote && shippingConsignment?.address?.countryCode
       ? [
@@ -244,7 +245,7 @@ export default async function CheckoutPage({ params }: Props) {
   const needsSectionShippingQuote =
     requiresSectionShippingQuote &&
     shippingSections.some((section) => {
-      if (!section.requiresShipping) {
+      if (!section.requiresShippingMethod) {
         return false;
       }
 
@@ -255,9 +256,14 @@ export default async function CheckoutPage({ params }: Props) {
     });
 
   const sectionShippingCosts = getSectionShippingCosts(sectionShippingState);
-  const requiresShipping = shippingSections.some((section) => section.requiresShipping);
-  const shippingReady =
-    !requiresShipping || isSectionShippingReady(shippingSections, sectionShippingState);
+  const requiresShippingAddress = shippingSections.some(
+    (section) => section.requiresShippingAddress,
+  );
+  const requiresShippingMethod = shippingSections.some((section) => section.requiresShippingMethod);
+  const shippingMethodReady =
+    !requiresShippingMethod || isSectionShippingReady(shippingSections, sectionShippingState);
+  const shippingAddressReady = !requiresShippingAddress || hasShippingAddress;
+  const shippingReady = shippingMethodReady && shippingAddressReady;
   const currencyCode = checkout?.grandTotal?.currencyCode ?? 'USD';
 
   const sectionShippingUi: Record<
@@ -270,7 +276,7 @@ export default async function CheckoutPage({ params }: Props) {
   > = {};
 
   for (const section of shippingSections) {
-    if (!section.requiresShipping) {
+    if (!section.requiresShippingMethod) {
       continue;
     }
 
@@ -279,7 +285,10 @@ export default async function CheckoutPage({ params }: Props) {
     const quoteIsCurrent = entry && !isSectionShippingQuoteStale(entry, expectedSubtotal);
     const filteredOptions =
       quoteIsCurrent && entry
-        ? filterShippingOptionsBySubtotal(entry.options, expectedSubtotal)
+        ? filterShippingOptionsBySubtotal(
+            filterCustomerVisibleShippingOptions(entry.options),
+            expectedSubtotal,
+          )
         : [];
     const shippingOptions =
       filteredOptions.length > 0
@@ -291,7 +300,7 @@ export default async function CheckoutPage({ params }: Props) {
         : undefined;
 
     sectionShippingUi[section.id] = {
-      requiresShipping: section.requiresShipping,
+      requiresShipping: section.requiresShippingMethod,
       shippingOptions,
       selectedShippingOption:
         selectedOption && entry?.selectedOptionId
@@ -378,14 +387,15 @@ export default async function CheckoutPage({ params }: Props) {
         currency: currencyCode,
       }),
     labels: {
-      dueTodayTitle: t('summary.dueToday'),
-      formatBilledOnTitle: (date) => t('summary.billedOn', { date }),
+      orderSummaryTitle: t('summary.orderSummary'),
+      formatBilledOnLineLabel: (date) => t('summary.chargeBilledOn', { date }),
+      notInTotalNote: t('summary.notInTotal'),
+      billedOnDetailPrefix: `${t('subscriptionBilledOn')}:`,
+      priceAtBillingNote: t('summary.priceAtBilling'),
       subtotal: t('summary.subtotal'),
       shipping: t('summary.shipping'),
       tax: t('summary.tax'),
       dueTodayTotal: t('summary.dueTodayTotal'),
-      billedLaterTotal: t('summary.billedLaterTotal'),
-      billedLaterNote: t('summary.billedLaterNote'),
     },
     formatDeferredDate: (timestamp) =>
       format.dateTime(new Date(timestamp * 1000), { dateStyle: 'medium' }),
@@ -464,14 +474,16 @@ export default async function CheckoutPage({ params }: Props) {
             addressModalSave: t('address.save'),
           }}
           paymentTitle={t('payment.title')}
-          requiresShipping={requiresShipping}
+          requiresShipping={requiresShippingAddress}
           returnUrl={buildAppUrl('/checkout/success/', locale)}
           savedAddresses={savedAddresses}
           states={statesOrProvinces}
           shippingReady={shippingReady}
           shippingRequiredMessage={
-            requiresShipping && !shippingReady
-              ? t('payment.shippingRequired')
+            !shippingReady
+              ? !shippingAddressReady
+                ? t('shipTo.required')
+                : t('payment.shippingRequired')
               : undefined
           }
           submitLabel={t('payment.submit')}

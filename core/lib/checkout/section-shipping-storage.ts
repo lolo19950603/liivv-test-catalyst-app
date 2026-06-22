@@ -86,11 +86,11 @@ export function getSectionShippingCosts(
 }
 
 export function isSectionShippingReady(
-  sections: Array<{ id: string; requiresShipping: boolean }>,
+  sections: Array<{ id: string; requiresShippingMethod: boolean }>,
   state: SectionShippingState,
 ): boolean {
   return sections.every((section) => {
-    if (!section.requiresShipping) {
+    if (!section.requiresShippingMethod) {
       return true;
     }
 

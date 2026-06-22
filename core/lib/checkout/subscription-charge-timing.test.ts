@@ -59,7 +59,7 @@ describe('calculateCheckoutAmounts', () => {
     expect(amounts.deferredTax).toBe(0);
   });
 
-  it('estimates deferred shipping tax separately from the BC tax pool', () => {
+  it('does not include shipping on deferred subscription sections', () => {
     const anchor = 1_900_000_000;
     const lineItems = [
       line({ unitAmount: 10_000, quantity: 1 }),
@@ -84,14 +84,14 @@ describe('calculateCheckoutAmounts', () => {
     const deferred = amounts.deferredSections[0];
 
     expect(deferred?.subtotal).toBe(100);
-    expect(deferred?.shipping).toBe(8);
-    expect(deferred?.tax).toBe(14.04);
-    expect(deferred?.grandTotal).toBe(122.04);
+    expect(deferred?.shipping).toBe(0);
+    expect(deferred?.tax).toBe(13);
+    expect(deferred?.grandTotal).toBe(113);
     expect(amounts.immediateTax).toBe(15.6);
-    expect(amounts.immediateTax + amounts.deferredTax).toBe(29.64);
+    expect(amounts.immediateTax + amounts.deferredTax).toBe(28.6);
   });
 
-  it('does not inflate deferred tax when deferred shipping is selected', () => {
+  it('calculates deferred totals from product subtotal and tax only', () => {
     const anchor = 1_900_000_000;
     const lineItems = [
       line({
@@ -113,7 +113,8 @@ describe('calculateCheckoutAmounts', () => {
 
     const deferred = amounts.deferredSections[0];
 
-    expect(deferred?.tax).toBeCloseTo(30.31, 2);
-    expect(deferred?.grandTotal).toBeCloseTo(271.31, 2);
+    expect(deferred?.shipping).toBe(0);
+    expect(deferred?.tax).toBeCloseTo(28.3, 2);
+    expect(deferred?.grandTotal).toBeCloseTo(253.3, 2);
   });
 });

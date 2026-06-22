@@ -11,7 +11,28 @@ import {
   buildLinePricesWithTax,
 } from './order-tax';
 import { bigCommerceAdminFetch } from './rest';
-import type { CheckoutSnapshot } from '../checkout/types';
+import {
+  buildSubscriptionShippingMetadata,
+} from '../checkout/subscription-shipping-metadata';
+import type { CheckoutAddressSnapshot, CheckoutSnapshot } from '../checkout/types';
+
+function resolveShippingAddressForMetadata(
+  snapshot: CheckoutSnapshot,
+): CheckoutAddressSnapshot {
+  const shipping = snapshot.shippingAddress;
+  const billing = snapshot.billingAddress;
+
+  if (!shipping?.countryCode) {
+    return billing;
+  }
+
+  return {
+    ...billing,
+    ...shipping,
+    address1: shipping.address1?.trim() ? shipping.address1 : billing.address1,
+    address2: shipping.address2?.trim() ? shipping.address2 : billing.address2,
+  };
+}
 import { isDeferredSubscriptionLine } from '../checkout/subscription-charge-timing';
 
 function getOrderStatusId(): number {
@@ -102,6 +123,7 @@ export function buildSubscriptionMetadataFromLine(
   line: CheckoutSnapshot['lineItems'][number],
 ): Record<string, string> {
   const serializedOptions = serializeProductOptionSelections(line.productOptions);
+  const shippingAddress = resolveShippingAddressForMetadata(snapshot);
 
   return {
     bigcommerce_customer_id: String(snapshot.bigcommerceCustomerId),
@@ -114,5 +136,9 @@ export function buildSubscriptionMetadataFromLine(
           subscription_interval_count: String(line.billingInterval.intervalCount),
         }
       : {}),
+    ...buildSubscriptionShippingMetadata(
+      shippingAddress,
+      snapshot.shippingMethodDescription,
+    ),
   };
 }

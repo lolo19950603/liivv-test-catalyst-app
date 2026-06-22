@@ -7,12 +7,8 @@ import type {
 import type { CheckoutLineItemSnapshot } from './types';
 import {
   calculateCheckoutAmounts,
-  getDeferredSectionAmounts,
-  getLineSubtotal,
-  groupDeferredSubscriptionLines,
   isDeferredSubscriptionLine,
 } from './subscription-charge-timing';
-import { getSectionShippingCost } from './checkout-section-shipping';
 
 export interface CheckoutDisplayLineInput {
   id: string;
@@ -74,6 +70,54 @@ function toSummaryItems({
   return items;
 }
 
+function enrichCheckoutLineDisplay(
+  line: CheckoutDisplayLineInput,
+  {
+    formatBilledOnLineLabel,
+    notInTotalNote,
+    billedOnDetailPrefix,
+    priceAtBillingNote,
+  }: {
+    formatBilledOnLineLabel: (date: string) => string;
+    notInTotalNote: string;
+    billedOnDetailPrefix: string;
+    priceAtBillingNote: string;
+  },
+  formatDeferredDate: (timestamp: number) => string,
+): CustomCheckoutLineItem {
+  if (
+    line.snapshot.isSubscription &&
+    isDeferredSubscriptionLine(line.snapshot) &&
+    line.snapshot.billingCycleAnchor
+  ) {
+    const billedOnDate = formatDeferredDate(line.snapshot.billingCycleAnchor);
+    const subscriptionDetails = line.display.subscriptionDetails?.filter(
+      (detail) => !detail.startsWith(billedOnDetailPrefix),
+    );
+
+    return {
+      ...line.display,
+      hidePrice: true,
+      subscriptionDetails,
+      chargeTiming: 'billed-later',
+      chargeLabel: formatBilledOnLineLabel(billedOnDate),
+      chargeNote: priceAtBillingNote,
+    };
+  }
+
+  if (line.snapshot.isSubscription) {
+    return {
+      ...line.display,
+      chargeTiming: 'due-today',
+    };
+  }
+
+  return {
+    ...line.display,
+    chargeTiming: 'due-today',
+  };
+}
+
 export function buildCheckoutSummarySections({
   lines,
   cartSubtotal,
@@ -98,14 +142,15 @@ export function buildCheckoutSummarySections({
   >;
   formatMoney: (value: number) => string;
   labels: {
-    dueTodayTitle: string;
-    formatBilledOnTitle: (date: string) => string;
+    orderSummaryTitle: string;
+    formatBilledOnLineLabel: (date: string) => string;
+    notInTotalNote: string;
+    billedOnDetailPrefix: string;
+    priceAtBillingNote: string;
     subtotal: string;
     shipping: string;
     tax: string;
     dueTodayTotal: string;
-    billedLaterTotal: string;
-    billedLaterNote: string;
   };
   formatDeferredDate: (timestamp: number) => string;
 }): CustomCheckoutSummarySection[] {
@@ -117,17 +162,29 @@ export function buildCheckoutSummarySections({
     sectionShippingCosts,
   });
 
-  const immediateLines = lines.filter((line) => !isDeferredSubscriptionLine(line.snapshot));
-  const sections: CustomCheckoutSummarySection[] = [];
+  const shippingUi = sectionShippingUi?.['due-today'];
+  const lineItems = lines
+    .map((line, index) => ({
+      index,
+      item: enrichCheckoutLineDisplay(line, labels, formatDeferredDate),
+    }))
+    .sort((left, right) => {
+      const leftIsDueToday = left.item.chargeTiming !== 'billed-later';
+      const rightIsDueToday = right.item.chargeTiming !== 'billed-later';
 
-  if (immediateLines.length > 0) {
-    const sectionId = 'due-today';
-    const shippingUi = sectionShippingUi?.[sectionId];
+      if (leftIsDueToday !== rightIsDueToday) {
+        return leftIsDueToday ? -1 : 1;
+      }
 
-    sections.push({
-      id: sectionId,
-      title: labels.dueTodayTitle,
-      lineItems: immediateLines.map((line) => line.display),
+      return left.index - right.index;
+    })
+    .map(({ item }) => item);
+
+  return [
+    {
+      id: 'checkout-summary',
+      title: labels.orderSummaryTitle,
+      lineItems,
       summaryItems: toSummaryItems({
         subtotal: amounts.immediateSubtotal,
         shipping: amounts.immediateShipping,
@@ -139,50 +196,9 @@ export function buildCheckoutSummarySections({
       total: formatMoney(amounts.immediateGrandTotal),
       totalLabel: labels.dueTodayTotal,
       requiresShipping: shippingUi?.requiresShipping,
+      shippingSectionId: 'due-today',
       shippingOptions: shippingUi?.shippingOptions,
       selectedShippingOption: shippingUi?.selectedShippingOption,
-    });
-  }
-
-  for (const group of groupDeferredSubscriptionLines(snapshotLines)) {
-    const sectionId = `deferred-${group.billingCycleAnchor}`;
-    const sectionLines = lines.filter(
-      (line) =>
-        isDeferredSubscriptionLine(line.snapshot) &&
-        line.snapshot.billingCycleAnchor === group.billingCycleAnchor,
-    );
-    const sectionAmounts = getDeferredSectionAmounts(amounts, group.billingCycleAnchor);
-    const groupSubtotal = sectionAmounts?.subtotal ?? group.lines.reduce(
-      (sum, line) => sum + getLineSubtotal(line),
-      0,
-    );
-    const sectionShipping = sectionAmounts?.shipping ?? getSectionShippingCost(sectionShippingCosts, sectionId);
-    const sectionTax = sectionAmounts?.tax ?? 0;
-    const sectionTotal =
-      sectionAmounts?.grandTotal ?? groupSubtotal + sectionShipping + sectionTax;
-    const formattedDate = formatDeferredDate(group.billingCycleAnchor);
-    const shippingUi = sectionShippingUi?.[sectionId];
-
-    sections.push({
-      id: sectionId,
-      title: labels.formatBilledOnTitle(formattedDate),
-      description: labels.billedLaterNote,
-      lineItems: sectionLines.map((line) => line.display),
-      summaryItems: toSummaryItems({
-        subtotal: groupSubtotal,
-        shipping: sectionShipping,
-        tax: sectionTax,
-        labels,
-        formatMoney,
-        includeShipping: shippingUi?.requiresShipping ?? false,
-      }),
-      total: formatMoney(sectionTotal),
-      totalLabel: labels.billedLaterTotal,
-      requiresShipping: shippingUi?.requiresShipping,
-      shippingOptions: shippingUi?.shippingOptions,
-      selectedShippingOption: shippingUi?.selectedShippingOption,
-    });
-  }
-
-  return sections;
+    },
+  ];
 }

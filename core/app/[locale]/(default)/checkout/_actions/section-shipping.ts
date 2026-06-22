@@ -17,6 +17,11 @@ import {
   getSectionLineSnapshots,
   getSectionShippingQuoteSubtotal,
 } from '~/lib/checkout/checkout-section-shipping';
+import {
+  filterCustomerVisibleShippingOptions,
+  isSubscriptionOnlyShippingOption,
+  pickCustomerDefaultShippingOption,
+} from '~/lib/checkout/shipping-option-filters';
 import { filterShippingOptionsBySubtotal } from '~/lib/checkout/shipping-rules';
 import { expandCartLineItemForProduct } from '~/lib/checkout/expand-cart-line-items';
 import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
@@ -47,12 +52,14 @@ function mapShippingOptions(
     isRecommended?: boolean | null;
   }> | null | undefined,
 ): SectionShippingOption[] {
-  return (options ?? []).map((option) => ({
-    entityId: option.entityId,
-    description: option.description,
-    cost: option.cost.value,
-    isRecommended: option.isRecommended ?? undefined,
-  }));
+  return filterCustomerVisibleShippingOptions(
+    (options ?? []).map((option) => ({
+      entityId: option.entityId,
+      description: option.description,
+      cost: option.cost.value,
+      isRecommended: option.isRecommended ?? undefined,
+    })),
+  );
 }
 
 function prorateShippingOptions(
@@ -73,29 +80,6 @@ function prorateShippingOptions(
         ? 0
         : Math.round(option.cost * ratio * 100) / 100,
   }));
-}
-
-function pickDefaultShippingOption(
-  options: SectionShippingOption[],
-  existingOptionId?: string,
-): SectionShippingOption | undefined {
-  if (options.length === 0) {
-    return undefined;
-  }
-
-  if (existingOptionId) {
-    const existing = options.find((option) => option.entityId === existingOptionId);
-
-    if (existing) {
-      return existing;
-    }
-  }
-
-  return (
-    options.find((option) => option.cost === 0) ??
-    options.find((option) => option.isRecommended) ??
-    options[0]
-  );
 }
 
 async function getCheckoutLineSnapshots(cartId: string): Promise<CheckoutLineItemSnapshot[]> {
@@ -235,7 +219,7 @@ export async function quoteAllCheckoutSectionShipping(): Promise<{ hasOptions: b
 
   const lineSnapshots = await getCheckoutLineSnapshots(cartId);
   const sections = buildCheckoutShippingSections(lineSnapshots).filter(
-    (section) => section.requiresShipping,
+    (section) => section.requiresShippingMethod,
   );
 
   if (sections.length === 0) {
@@ -313,7 +297,10 @@ export async function quoteAllCheckoutSectionShipping(): Promise<{ hasOptions: b
 
       const quotedSubtotal = getSectionShippingQuoteSubtotal(section.id, lineSnapshots);
       const existing = (await getSectionShippingState(cartId))[section.id];
-      const selectedOption = pickDefaultShippingOption(options, existing?.selectedOptionId);
+      const selectedOption = pickCustomerDefaultShippingOption(
+        options,
+        existing?.selectedOptionId,
+      );
 
       await updateSectionShippingEntry(cartId, section.id, {
         options,
@@ -377,7 +364,7 @@ export async function syncImmediateCheckoutConsignment(): Promise<void> {
     (section) => section.id === 'due-today',
   );
 
-  if (!immediateSection?.requiresShipping) {
+  if (!immediateSection?.requiresShippingMethod) {
     return;
   }
 
@@ -451,7 +438,7 @@ export async function selectCheckoutSectionShipping(
   const entry = state[sectionId];
   const selectedOption = entry?.options.find((option) => option.entityId === shippingOptionEntityId);
 
-  if (!selectedOption) {
+  if (!selectedOption || isSubscriptionOnlyShippingOption(selectedOption.description)) {
     return { success: false, error: 'Shipping option not found' };
   }
 

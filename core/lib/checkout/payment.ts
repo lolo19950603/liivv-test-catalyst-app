@@ -12,6 +12,9 @@ import { kv } from '~/lib/kv';
 import { getStripe } from '~/lib/stripe/client';
 import { getOrCreateStripeCustomer } from '~/lib/stripe/customers';
 import { createStripeProductForCheckoutLine } from '~/lib/stripe/subscription-products';
+import {
+  DYNAMIC_SUBSCRIPTION_PRICING_METADATA_KEY,
+} from '~/lib/stripe/prepare-subscription-invoice';
 import { getStripeSubscriptionBillingSchedule } from '~/lib/stripe/subscription-pricing';
 import { toStripeRecurring } from '~/lib/stripe/subscription-interval';
 import { claimSubscriptionOrderCreation, getCheckoutFulfillmentOrderId, hasCheckoutStripeSubscriptions, isCheckoutFulfillmentComplete, markCheckoutFulfillmentComplete, markCheckoutStripeSubscriptionsCreated, markSubscriptionOrderCreated, releaseSubscriptionOrderCreation } from '~/lib/stripe/storage';
@@ -27,6 +30,10 @@ import type {
   CheckoutAddressSnapshot,
   CheckoutSnapshot,
 } from './types';
+
+const SUBSCRIPTION_PLACEHOLDER_UNIT_AMOUNT = Number(
+  process.env.STRIPE_SUBSCRIPTION_PLACEHOLDER_UNIT_AMOUNT ?? '50',
+);
 
 const REUSABLE_PAYMENT_INTENT_STATUSES = new Set<Stripe.PaymentIntent.Status>([
   'requires_payment_method',
@@ -640,6 +647,8 @@ async function createStripeSubscriptionsForCheckout({
     return;
   }
 
+  await syncStripeCustomerShippingFromSnapshot(stripe, stripeCustomerId, snapshot);
+
   await Promise.all(
     subscriptionLines.map(async (line) => {
       if (!line.billingInterval) {
@@ -658,13 +667,17 @@ async function createStripeSubscriptionsForCheckout({
             quantity: line.quantity,
             price_data: {
               currency: line.currency.toLowerCase(),
-              unit_amount: line.unitAmount,
+              unit_amount: SUBSCRIPTION_PLACEHOLDER_UNIT_AMOUNT,
               recurring: toStripeRecurring(line.billingInterval),
               product: productId,
             },
           },
         ],
-        metadata,
+        metadata: {
+          ...metadata,
+          [DYNAMIC_SUBSCRIPTION_PRICING_METADATA_KEY]: 'true',
+          subscription_quantity: String(line.quantity),
+        },
         ...billingSchedule,
         proration_behavior: 'none',
       });
@@ -672,6 +685,36 @@ async function createStripeSubscriptionsForCheckout({
   );
 
   await markCheckoutStripeSubscriptionsCreated(stripeSessionId);
+}
+
+async function syncStripeCustomerShippingFromSnapshot(
+  stripe: Stripe,
+  stripeCustomerId: string,
+  snapshot: CheckoutSnapshot,
+): Promise<void> {
+  const shipping = snapshot.shippingAddress?.address1?.trim()
+    ? snapshot.shippingAddress
+    : snapshot.billingAddress.address1?.trim()
+      ? snapshot.billingAddress
+      : undefined;
+
+  if (!shipping?.address1 || !shipping.countryCode) {
+    return;
+  }
+
+  await stripe.customers.update(stripeCustomerId, {
+    shipping: {
+      name: `${shipping.firstName} ${shipping.lastName}`.trim() || undefined,
+      address: {
+        line1: shipping.address1,
+        line2: shipping.address2,
+        city: shipping.city,
+        state: shipping.stateOrProvince,
+        postal_code: shipping.postalCode,
+        country: shipping.countryCode,
+      },
+    },
+  });
 }
 
 function getPaymentMethodIdFromPaymentIntent(paymentIntent: Stripe.PaymentIntent): string {

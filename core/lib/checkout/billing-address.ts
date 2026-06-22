@@ -38,9 +38,11 @@ const AddCheckoutBillingAddressMutation = graphql(`
 export async function addCheckoutBillingAddress({
   checkoutEntityId,
   address,
+  skipCacheRevalidation = false,
 }: {
   checkoutEntityId: string;
   address: CheckoutAddressSnapshot;
+  skipCacheRevalidation?: boolean;
 }) {
   const customerAccessToken = await getSessionCustomerAccessToken();
 
@@ -76,7 +78,9 @@ export async function addCheckoutBillingAddress({
     fetchOptions: { cache: 'no-store' },
   });
 
-  revalidateTag(TAGS.checkout, { expire: 0 });
+  if (!skipCacheRevalidation) {
+    revalidateTag(TAGS.checkout, { expire: 0 });
+  }
 
   return response.data.checkout.addCheckoutBillingAddress?.checkout;
 }

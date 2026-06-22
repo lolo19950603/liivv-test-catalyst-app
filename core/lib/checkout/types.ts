@@ -29,6 +29,22 @@ export interface CheckoutAddressSnapshot {
   phone?: string;
 }
 
+export interface CheckoutConsignmentAddressInput {
+  countryCode: string;
+  city?: string;
+  stateOrProvince?: string;
+  stateOrProvinceCode?: string;
+  postalCode?: string;
+  address1?: string;
+  address2?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  shouldSaveAddress?: boolean;
+}
+
 export interface CheckoutLineItemSnapshot {
   lineItemEntityId: string;
   productEntityId: number;

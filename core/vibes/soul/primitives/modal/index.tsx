@@ -57,54 +57,56 @@ export const Modal = ({
 }: ModalProps) => {
   const isClient = useIsClient();
 
+  if (!isClient) {
+    return trigger != null ? <>{trigger}</> : null;
+  }
+
   return (
     <Dialog.Root onOpenChange={setOpen} open={isOpen}>
       {trigger != null && <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>}
-      {isClient ? (
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-30 flex items-center justify-center bg-[var(--modal-overlay-background,hsl(var(--foreground)/50%))] @container">
-            <Dialog.Content
-              className={clsx(
-                'mx-3 rounded-2xl bg-[var(--modal-background,hsl(var(--background)))]',
-                scrollable
-                  ? 'my-10 max-h-[90%] overflow-y-auto'
-                  : 'my-6 max-h-none overflow-visible',
-                'transition ease-out',
-                scrollable ? 'max-w-3xl' : 'max-w-md',
-                'data-[state=closed]:duration-200 data-[state=open]:duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out',
-                'focus:outline-none data-[state=closed]:slide-out-to-bottom-16 data-[state=open]:slide-in-from-bottom-16',
-                className,
-              )}
-              onEscapeKeyDown={required ? (event) => event.preventDefault() : undefined}
-              onInteractOutside={required ? (event) => event.preventDefault() : undefined}
-              onPointerDownOutside={required ? (event) => event.preventDefault() : undefined}
-            >
-              <div className="flex flex-col">
-                <div
-                  className={clsx(
-                    'flex min-h-10 flex-row items-center py-3 pl-5',
-                    hideHeader ? 'sr-only' : '',
-                  )}
-                >
-                  <Dialog.Title asChild>
-                    <h1 className="flex-1 pr-4 text-base font-semibold leading-none">{title}</h1>
-                  </Dialog.Title>
-                  {!(required || hideHeader) && (
-                    <div className="flex items-center justify-center pr-3">
-                      <Dialog.Close asChild>
-                        <Button shape="circle" size="x-small" variant="ghost">
-                          <XIcon size={20} />
-                        </Button>
-                      </Dialog.Close>
-                    </div>
-                  )}
-                </div>
-                <div className={clsx('mb-5 flex-1 px-5', hideHeader ? 'mt-5' : '')}>{children}</div>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-30 flex items-center justify-center bg-[var(--modal-overlay-background,hsl(var(--foreground)/50%))] @container">
+          <Dialog.Content
+            className={clsx(
+              'mx-3 rounded-2xl bg-[var(--modal-background,hsl(var(--background)))]',
+              scrollable
+                ? 'my-10 max-h-[90%] overflow-y-auto'
+                : 'my-6 max-h-none overflow-visible',
+              'transition ease-out',
+              scrollable ? 'max-w-3xl' : 'max-w-md',
+              'data-[state=closed]:duration-200 data-[state=open]:duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out',
+              'focus:outline-none data-[state=closed]:slide-out-to-bottom-16 data-[state=open]:slide-in-from-bottom-16',
+              className,
+            )}
+            onEscapeKeyDown={required ? (event) => event.preventDefault() : undefined}
+            onInteractOutside={required ? (event) => event.preventDefault() : undefined}
+            onPointerDownOutside={required ? (event) => event.preventDefault() : undefined}
+          >
+            <div className="flex flex-col">
+              <div
+                className={clsx(
+                  'flex min-h-10 flex-row items-center py-3 pl-5',
+                  hideHeader ? 'sr-only' : '',
+                )}
+              >
+                <Dialog.Title asChild>
+                  <h1 className="flex-1 pr-4 text-base font-semibold leading-none">{title}</h1>
+                </Dialog.Title>
+                {!(required || hideHeader) && (
+                  <div className="flex items-center justify-center pr-3">
+                    <Dialog.Close asChild>
+                      <Button shape="circle" size="x-small" variant="ghost">
+                        <XIcon size={20} />
+                      </Button>
+                    </Dialog.Close>
+                  </div>
+                )}
               </div>
-            </Dialog.Content>
-          </Dialog.Overlay>
-        </Dialog.Portal>
-      ) : null}
+              <div className={clsx('mb-5 flex-1 px-5', hideHeader ? 'mt-5' : '')}>{children}</div>
+            </div>
+          </Dialog.Content>
+        </Dialog.Overlay>
+      </Dialog.Portal>
     </Dialog.Root>
   );
 };

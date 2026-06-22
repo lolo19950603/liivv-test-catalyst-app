@@ -610,6 +610,7 @@ export default async function Product({ params, searchParams }: Props) {
         startDateMax: getMaxSubscriptionStartDateValue(),
         startDateDefault: getDefaultSubscriptionStartDateValue(),
         defaultInterval: formatSubscriptionIntervalKey(subscriptionBillingIntervals[0]!),
+        priceConsentLabel: t('ProductDetails.purchaseOptions.priceConsent'),
         productPath: baseProduct.path,
       }
     : undefined;

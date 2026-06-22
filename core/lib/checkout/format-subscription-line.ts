@@ -6,22 +6,27 @@ export function getSubscriptionLineDetails(
   subscription: SubscriptionLineMeta,
   {
     billingLabel,
-    startsLabel,
     startsTodayLabel,
+    billedOnLabel,
     formatInterval,
     formatStartsDate,
   }: {
     billingLabel: string;
-    startsLabel: string;
     startsTodayLabel: string;
+    billedOnLabel: string;
     formatInterval: (interval: SubscriptionBillingInterval) => string;
     formatStartsDate: (timestamp: number) => string;
   },
 ): string[] {
   const details = [`${billingLabel}: ${formatInterval(subscription.billingInterval)}`];
+  const now = Math.floor(Date.now() / 1000);
 
   if (subscription.billingCycleAnchor) {
-    details.push(`${startsLabel}: ${formatStartsDate(subscription.billingCycleAnchor)}`);
+    if (subscription.billingCycleAnchor > now) {
+      details.push(`${billedOnLabel}: ${formatStartsDate(subscription.billingCycleAnchor)}`);
+    } else {
+      details.push(startsTodayLabel);
+    }
   } else {
     details.push(startsTodayLabel);
   }

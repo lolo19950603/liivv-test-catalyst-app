@@ -41,7 +41,10 @@ export interface CheckoutPhysicalLineItem {
 
 export interface CheckoutShippingSection {
   id: string;
-  requiresShipping: boolean;
+  /** Physical items in this section need a ship-to address at checkout. */
+  requiresShippingAddress: boolean;
+  /** Customer must select a shipping rate for this section before paying. */
+  requiresShippingMethod: boolean;
   physicalLineItems: CheckoutPhysicalLineItem[];
 }
 
@@ -78,7 +81,8 @@ export function buildCheckoutShippingSections(
 
     sections.push({
       id: 'due-today',
-      requiresShipping: physicalLineItems.length > 0,
+      requiresShippingAddress: physicalLineItems.length > 0,
+      requiresShippingMethod: physicalLineItems.length > 0,
       physicalLineItems,
     });
   }
@@ -88,7 +92,8 @@ export function buildCheckoutShippingSections(
 
     sections.push({
       id: `deferred-${group.billingCycleAnchor}`,
-      requiresShipping: physicalLineItems.length > 0,
+      requiresShippingAddress: physicalLineItems.length > 0,
+      requiresShippingMethod: false,
       physicalLineItems,
     });
   }

@@ -23,12 +23,14 @@ interface Props {
   checkoutEntityId: string;
   consignmentEntityId: string;
   shippingOptionEntityId: string;
+  skipCacheRevalidation?: boolean;
 }
 
 export const addShippingCost = async ({
   checkoutEntityId,
   consignmentEntityId,
   shippingOptionEntityId,
+  skipCacheRevalidation = false,
 }: Props) => {
   const customerAccessToken = await getSessionCustomerAccessToken();
 
@@ -49,8 +51,10 @@ export const addShippingCost = async ({
 
   const result = response.data.checkout.selectCheckoutShippingOption?.checkout;
 
-  revalidateTag(TAGS.checkout, { expire: 0 });
-  revalidateTag(TAGS.cart, { expire: 0 });
+  if (!skipCacheRevalidation) {
+    revalidateTag(TAGS.checkout, { expire: 0 });
+    revalidateTag(TAGS.cart, { expire: 0 });
+  }
 
   return result;
 };
