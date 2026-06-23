@@ -7,7 +7,7 @@ import { Button } from '@/vibes/soul/primitives/button';
 import type { SaveCheckoutAddressInput } from '~/app/[locale]/(default)/checkout/_actions/save-checkout-address';
 
 const fieldClassName =
-  'w-full rounded-md border border-[var(--contrast-200,hsl(var(--contrast-200)))] bg-[var(--background,hsl(var(--background)))] px-3 py-2.5 text-sm text-[var(--foreground,hsl(var(--foreground)))] outline-none placeholder:text-[var(--contrast-400,hsl(var(--contrast-400)))] focus:border-[var(--primary,hsl(var(--primary)))] focus:ring-1 focus:ring-[var(--primary,hsl(var(--primary)))]';
+  'checkout-address-modal__input w-full rounded-md border border-[var(--contrast-200,hsl(var(--contrast-200)))] bg-[var(--background,hsl(var(--background)))] px-3 py-2.5 text-sm text-[var(--foreground,hsl(var(--foreground)))] outline-none placeholder:text-[var(--contrast-400,hsl(var(--contrast-400)))] focus:border-[var(--primary,hsl(var(--primary)))] focus:ring-1 focus:ring-[var(--primary,hsl(var(--primary)))]';
 
 interface CountryOption {
   label: string;
@@ -109,7 +109,7 @@ export function CheckoutAddressModal({
       setOpen={handleOpenChange}
       title={labels.title}
     >
-      <form className="flex flex-col gap-3" key={formKey} onSubmit={handleSubmit}>
+      <form className="checkout-address-modal flex flex-col gap-3" key={formKey} onSubmit={handleSubmit}>
         <select
           aria-label={labels.country}
           className={fieldClassName}

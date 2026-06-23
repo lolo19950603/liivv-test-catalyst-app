@@ -76,12 +76,12 @@ function enrichCheckoutLineDisplay(
     formatBilledOnLineLabel,
     notInTotalNote,
     billedOnDetailPrefix,
-    priceAtBillingNote,
+    subjectToChangeAtBillingNote,
   }: {
     formatBilledOnLineLabel: (date: string) => string;
     notInTotalNote: string;
     billedOnDetailPrefix: string;
-    priceAtBillingNote: string;
+    subjectToChangeAtBillingNote: string;
   },
   formatDeferredDate: (timestamp: number) => string,
 ): CustomCheckoutLineItem {
@@ -97,11 +97,10 @@ function enrichCheckoutLineDisplay(
 
     return {
       ...line.display,
-      hidePrice: true,
       subscriptionDetails,
       chargeTiming: 'billed-later',
       chargeLabel: formatBilledOnLineLabel(billedOnDate),
-      chargeNote: priceAtBillingNote,
+      chargeNote: subjectToChangeAtBillingNote,
     };
   }
 
@@ -146,7 +145,7 @@ export function buildCheckoutSummarySections({
     formatBilledOnLineLabel: (date: string) => string;
     notInTotalNote: string;
     billedOnDetailPrefix: string;
-    priceAtBillingNote: string;
+    subjectToChangeAtBillingNote: string;
     subtotal: string;
     shipping: string;
     tax: string;

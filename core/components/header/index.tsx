@@ -12,6 +12,7 @@ import { TAGS } from '~/client/tags';
 import { logoTransformer } from '~/data-transformers/logo-transformer';
 import { getCartId } from '~/lib/cart';
 import { getPreferredCurrencyCode } from '~/lib/currency';
+import { buildAccountMenuLinks } from '~/lib/account/account-menu-links';
 import { SiteHeader } from '~/lib/makeswift/components/site-header';
 import { resolveAccountHref } from '~/lib/makeswift/site-header/resolve-account-href';
 import { mapCategoryTreeFromStore } from '~/lib/makeswift/site-header/map-category-tree';
@@ -71,6 +72,7 @@ const getHeaderData = cache(async () => {
 
 export const Header = async () => {
   const t = await getTranslations('Components.Header');
+  const tAccount = await getTranslations('Account.Layout');
 
   const data = await getHeaderData();
   const logo = data.settings ? logoTransformer(data.settings) : '';
@@ -97,12 +99,15 @@ export const Header = async () => {
     return getCartCount(cartId, customerAccessToken);
   });
 
-  const accountHref = resolveAccountHref(await isLoggedIn());
+  const loggedIn = await isLoggedIn();
+  const accountHref = resolveAccountHref(loggedIn);
+  const accountMenuLinks = loggedIn ? buildAccountMenuLinks((key) => tAccount(key)) : undefined;
   const requestPathname = stripLocaleFromPathname((await headers()).get('x-pathname') ?? '/');
 
   return (
     <SiteHeader
       accountHref={accountHref}
+      accountMenuLinks={accountMenuLinks}
       cartCount={streamableCartCount}
       categoryTree={streamableCategoryTree}
       initialPathname={requestPathname}

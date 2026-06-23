@@ -391,7 +391,7 @@ export default async function CheckoutPage({ params }: Props) {
       formatBilledOnLineLabel: (date) => t('summary.chargeBilledOn', { date }),
       notInTotalNote: t('summary.notInTotal'),
       billedOnDetailPrefix: `${t('subscriptionBilledOn')}:`,
-      priceAtBillingNote: t('summary.priceAtBilling'),
+      subjectToChangeAtBillingNote: t('summary.subjectToChangeAtBilling'),
       subtotal: t('summary.subtotal'),
       shipping: t('summary.shipping'),
       tax: t('summary.tax'),

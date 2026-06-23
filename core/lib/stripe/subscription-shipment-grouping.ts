@@ -20,3 +20,22 @@ export function buildSubscriptionOrderBatchStorageKey({
 }): string {
   return `${customerId}:${dayKey}:${shippingAddressKey}`;
 }
+
+export function getNextShipmentTimestamp(
+  subscription: Pick<
+    import('./subscriptions').CustomerSubscription,
+    'trialEnd' | 'billingCycleAnchor' | 'currentPeriodEnd'
+  >,
+): number {
+  const now = Math.floor(Date.now() / 1000);
+
+  if (subscription.trialEnd && subscription.trialEnd > now) {
+    return subscription.trialEnd;
+  }
+
+  if (subscription.billingCycleAnchor && subscription.billingCycleAnchor > now) {
+    return subscription.billingCycleAnchor;
+  }
+
+  return subscription.currentPeriodEnd;
+}

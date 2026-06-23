@@ -1,0 +1,111 @@
+/**
+ * Account pages theme — palette from archived Liivv HTML (diabetes-care-sections.css,
+ * my-health-dashboard / account dashboard tokens).
+ *
+ * --color-base-background: 245 242 237
+ * --color-base-text: 49 47 47
+ * --mhd-border: 230 220 213
+ * --mhd-accent: 142 165 141
+ */
+
+.liivv-store .liivv-account-pages {
+  --account-page-text: #312f2f;
+  --account-page-muted: #66605c;
+  --account-page-muted-warm: #a89c94;
+  --account-page-border: rgba(49, 47, 47, 0.14);
+  --account-page-border-soft: rgb(230 220 213);
+  --account-page-surface: rgb(245 242 237);
+  --account-page-card: #ffffff;
+  --account-page-accent: #8ea58d;
+  --account-page-shadow: 0 1px 2px rgba(49, 47, 47, 0.04);
+
+  color: var(--account-page-text);
+  font-family: var(--liivv-archive-sans-font);
+
+  /* Soul section tokens */
+  --order-list-title: var(--account-page-text);
+  --order-list-info: var(--account-page-text);
+  --order-list-label: var(--account-page-muted);
+  --order-list-border: var(--account-page-border);
+  --order-list-empty-state-title: var(--account-page-text);
+
+  --order-details-section-border: var(--account-page-border-soft);
+  --order-details-text-primary: var(--account-page-text);
+  --order-details-section-line-item-subtitle: var(--account-page-muted);
+  --order-details-section-line-item: var(--account-page-muted-warm);
+
+  --account-settings-section-title: var(--account-page-text);
+  --account-settings-section-text: var(--account-page-text);
+  --account-settings-section-border: var(--account-page-border-soft);
+
+  --address-list-section-title: var(--account-page-text);
+  --address-list-section-border: var(--account-page-border-soft);
+  --address-list-section-info: var(--account-page-muted);
+  --address-list-section-name: var(--account-page-text);
+
+  --wishlists-section-title: var(--account-page-text);
+  --wishlists-section-border: var(--account-page-border-soft);
+}
+
+/* Headings */
+.liivv-store .liivv-account-pages h1,
+.liivv-store .liivv-account-pages h2,
+.liivv-store .liivv-account-pages h3 {
+  color: var(--account-page-text);
+  font-family: var(--liivv-archive-sans-font);
+}
+
+/* Order cards */
+.liivv-store .liivv-account-pages .group\/order-list > ul > li {
+  background-color: var(--account-page-card) !important;
+  border-color: var(--account-page-border) !important;
+  box-shadow: var(--account-page-shadow);
+}
+
+.liivv-store .liivv-account-pages .group\/order-list .rounded-full {
+  background-color: var(--account-page-surface) !important;
+  color: var(--account-page-muted) !important;
+}
+
+/* Subscription portal page header + empty/message cards */
+.liivv-store .liivv-account-pages section.w-full > .rounded-2xl.border {
+  background-color: var(--account-page-card) !important;
+  border-color: var(--account-page-border) !important;
+  box-shadow: var(--account-page-shadow);
+}
+
+.liivv-store .liivv-account-pages .subscription-date-heading {
+  color: var(--account-page-text);
+  border-color: var(--account-page-border-soft) !important;
+}
+
+/* Address & settings section dividers */
+.liivv-store .liivv-account-pages section.w-full header,
+.liivv-store .liivv-account-pages section.w-full [class*='border-t'],
+.liivv-store .liivv-account-pages section.w-full [class*='border-b'] {
+  border-color: var(--account-page-border-soft) !important;
+}
+
+/* Wishlist rows */
+.liivv-store .liivv-account-pages .border-b-contrast-100,
+.liivv-store .liivv-account-pages .border-b-transparent {
+  border-color: var(--account-page-border-soft) !important;
+}
+
+/* Form fields on account pages */
+.liivv-store .liivv-account-pages input:not([type='radio']):not([type='checkbox']):not([type='hidden']),
+.liivv-store .liivv-account-pages select,
+.liivv-store .liivv-account-pages textarea {
+  border: 1px solid var(--store-border) !important;
+  background-color: #fff !important;
+  color: var(--account-page-text) !important;
+  border-radius: 0.5rem;
+}
+
+.liivv-store .liivv-account-pages input:focus,
+.liivv-store .liivv-account-pages select:focus,
+.liivv-store .liivv-account-pages textarea:focus {
+  border-color: var(--account-page-text) !important;
+  outline: 2px solid rgba(49, 47, 47, 0.2);
+  outline-offset: 1px;
+}

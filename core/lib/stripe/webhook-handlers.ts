@@ -15,7 +15,8 @@ import {
   applySubscriptionInvoiceTax,
   prepareSubscriptionForBillingById,
 } from './prepare-subscription-invoice';
-import { storeStripeCustomerId } from './storage';
+import { getStoredStripeCustomerId, storeStripeCustomerId } from './storage';
+import { getCustomerSubscriptions } from './subscriptions';
 
 function getBigCommerceCustomerId(metadata: Stripe.Metadata | null | undefined): number | null {
   const value = metadata?.bigcommerce_customer_id;
@@ -103,7 +104,19 @@ export async function handleStripeWebhookEvent(event: Stripe.Event): Promise<voi
 
       if (queued) {
         after(async () => {
-          await scheduleSubscriptionOrderBatchFlush(queued);
+          const stripeCustomerId = await getStoredStripeCustomerId(queued.customerId);
+
+          if (!stripeCustomerId) {
+            return;
+          }
+
+          const subscriptions = await getCustomerSubscriptions(stripeCustomerId);
+
+          await scheduleSubscriptionOrderBatchFlush({
+            ...queued,
+            stripeCustomerId,
+            subscriptions,
+          });
         });
       }
 

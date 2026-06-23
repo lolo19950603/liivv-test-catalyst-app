@@ -26,7 +26,154 @@ import {
 import { CheckoutPaymentProvider, useCheckoutPayment } from './checkout-payment-provider';
 
 const inputClassName =
-  'w-full rounded-lg border border-[var(--contrast-200,hsl(var(--contrast-200)))] bg-[var(--background,hsl(var(--background)))] px-3 py-2.5 text-sm';
+  'checkout-field__input w-full rounded-lg border border-[var(--contrast-200,hsl(var(--contrast-200)))] bg-[var(--background,hsl(var(--background)))] px-3 py-2.5 text-sm';
+
+function CheckoutBillingAddressFields({
+  billingDefaults,
+  customerEmail,
+  countries,
+  labels,
+}: {
+  billingDefaults: CheckoutFulfillmentSectionProps['billingDefaults'];
+  customerEmail: string;
+  countries: CountryOption[];
+  labels: CheckoutFulfillmentLabels;
+}) {
+  return (
+    <>
+      <input name="email" type="hidden" value={customerEmail} />
+      <div className="checkout-field text-sm">
+        <span className="checkout-field__label">{labels.firstName}</span>
+        <input
+          className={inputClassName}
+          defaultValue={billingDefaults.firstName}
+          name="firstName"
+          required
+        />
+      </div>
+      <div className="checkout-field text-sm">
+        <span className="checkout-field__label">{labels.lastName}</span>
+        <input
+          className={inputClassName}
+          defaultValue={billingDefaults.lastName}
+          name="lastName"
+          required
+        />
+      </div>
+      <div className="checkout-field text-sm @md:col-span-2">
+        <span className="checkout-field__label">{labels.company}</span>
+        <input className={inputClassName} defaultValue={billingDefaults.company} name="company" />
+      </div>
+      <div className="checkout-field text-sm @md:col-span-2">
+        <span className="checkout-field__label">{labels.address1}</span>
+        <input
+          className={inputClassName}
+          defaultValue={billingDefaults.address1}
+          name="address1"
+          required
+        />
+      </div>
+      <div className="checkout-field text-sm @md:col-span-2">
+        <span className="checkout-field__label">{labels.address2}</span>
+        <input className={inputClassName} defaultValue={billingDefaults.address2} name="address2" />
+      </div>
+      <div className="checkout-field text-sm">
+        <span className="checkout-field__label">{labels.city}</span>
+        <input className={inputClassName} defaultValue={billingDefaults.city} name="city" required />
+      </div>
+      <div className="checkout-field text-sm">
+        <span className="checkout-field__label">{labels.stateOrProvince}</span>
+        <input
+          className={inputClassName}
+          defaultValue={billingDefaults.stateOrProvince}
+          name="stateOrProvince"
+        />
+      </div>
+      <div className="checkout-field text-sm">
+        <span className="checkout-field__label">{labels.country}</span>
+        <select
+          className={inputClassName}
+          defaultValue={billingDefaults.countryCode}
+          name="countryCode"
+          required
+        >
+          {countries.map((country) => (
+            <option key={country.value} value={country.value}>
+              {country.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="checkout-field text-sm">
+        <span className="checkout-field__label">{labels.postalCode}</span>
+        <input
+          className={inputClassName}
+          defaultValue={billingDefaults.postalCode}
+          name="postalCode"
+          required
+        />
+      </div>
+      <div className="checkout-field text-sm @md:col-span-2">
+        <span className="checkout-field__label">{labels.phone}</span>
+        <input
+          className={inputClassName}
+          defaultValue={billingDefaults.phone}
+          name="phone"
+          type="tel"
+        />
+      </div>
+    </>
+  );
+}
+
+function BillingModeOptions({
+  billingMode,
+  labels,
+  onChange,
+  requiresShipping,
+}: {
+  billingMode: 'different' | 'same';
+  labels: { differentBilling: string; sameAsShipping: string };
+  onChange: (mode: 'different' | 'same') => void;
+  requiresShipping: boolean;
+}) {
+  if (!requiresShipping) {
+    return null;
+  }
+
+  return (
+    <div className="checkout-billing-mode overflow-hidden rounded-lg border border-[var(--contrast-200,hsl(var(--contrast-200)))]">
+      <label
+        className={clsx(
+          'checkout-billing-mode__option flex cursor-pointer items-center gap-3 border-b border-[var(--contrast-200,hsl(var(--contrast-200)))] px-4 py-3 text-sm',
+          billingMode === 'same' && 'checkout-billing-mode__option--selected',
+        )}
+      >
+        <input
+          checked={billingMode === 'same'}
+          name="billing-mode"
+          onChange={() => onChange('same')}
+          type="radio"
+        />
+        <span>{labels.sameAsShipping}</span>
+      </label>
+      <label
+        className={clsx(
+          'checkout-billing-mode__option flex cursor-pointer items-center gap-3 px-4 py-3 text-sm',
+          billingMode === 'different' && 'checkout-billing-mode__option--selected',
+        )}
+      >
+        <input
+          checked={billingMode === 'different'}
+          name="billing-mode"
+          onChange={() => onChange('different')}
+          type="radio"
+        />
+        <span>{labels.differentBilling}</span>
+      </label>
+    </div>
+  );
+}
 
 const fieldButtonClassName =
   'flex w-full items-center justify-between gap-4 rounded-lg border border-[var(--contrast-200,hsl(var(--contrast-200)))] px-4 py-3 text-left text-sm transition-colors hover:bg-[var(--contrast-50,hsl(var(--contrast-50)))]';
@@ -602,153 +749,32 @@ function CheckoutFulfillmentContent({
 
           <section className="space-y-3">
             <h2 className="text-base font-semibold">{labels.billingAddressTitle}</h2>
-            <div className="overflow-hidden rounded-lg border border-[var(--contrast-200,hsl(var(--contrast-200)))]">
-              {requiresShipping ? (
-                <>
-                  <label
-                    className={clsx(
-                      'flex cursor-pointer items-center gap-3 border-b px-4 py-3 text-sm',
-                      billingMode === 'same' && 'bg-[var(--primary,hsl(var(--primary)))]/5',
-                    )}
-                  >
-                    <input
-                      checked={billingMode === 'same'}
-                      name="billing-mode"
-                      onChange={() => setBillingMode('same')}
-                      type="radio"
-                    />
-                    <span>{labels.sameAsShipping}</span>
-                  </label>
-                  <label
-                    className={clsx(
-                      'flex cursor-pointer items-center gap-3 px-4 py-3 text-sm',
-                      billingMode === 'different' && 'bg-[var(--primary,hsl(var(--primary)))]/5',
-                    )}
-                  >
-                    <input
-                      checked={billingMode === 'different'}
-                      name="billing-mode"
-                      onChange={() => setBillingMode('different')}
-                      type="radio"
-                    />
-                    <span>{labels.differentBilling}</span>
-                  </label>
-                </>
-              ) : null}
-            </div>
+            <BillingModeOptions
+              billingMode={billingMode}
+              labels={labels}
+              onChange={setBillingMode}
+              requiresShipping={requiresShipping}
+            />
 
-            <form
+            <div
               className={clsx(
-                'grid gap-3 @md:grid-cols-2',
+                'checkout-billing-form-panel rounded-lg border border-[var(--contrast-200,hsl(var(--contrast-200)))] p-4',
                 billingMode === 'same' && requiresShipping && 'hidden',
               )}
-              id={billingFormId}
-              ref={billingRef}
             >
-              <label className="grid gap-1.5 text-sm">
-                <span>{labels.firstName}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.firstName}
-                  name="firstName"
-                  required
+              <form
+                className="checkout-billing-form grid items-start gap-3 @md:grid-cols-2"
+                id={billingFormId}
+                ref={billingRef}
+              >
+                <CheckoutBillingAddressFields
+                  billingDefaults={billingDefaults}
+                  countries={countries}
+                  customerEmail={customerEmail}
+                  labels={labels}
                 />
-              </label>
-              <label className="grid gap-1.5 text-sm">
-                <span>{labels.lastName}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.lastName}
-                  name="lastName"
-                  required
-                />
-              </label>
-              <label className="grid gap-1.5 text-sm @md:col-span-2">
-                <span>{labels.email}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.email}
-                  name="email"
-                  required
-                  type="email"
-                />
-              </label>
-              <label className="grid gap-1.5 text-sm @md:col-span-2">
-                <span>{labels.company}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.company}
-                  name="company"
-                />
-              </label>
-              <label className="grid gap-1.5 text-sm @md:col-span-2">
-                <span>{labels.address1}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.address1}
-                  name="address1"
-                  required
-                />
-              </label>
-              <label className="grid gap-1.5 text-sm @md:col-span-2">
-                <span>{labels.address2}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.address2}
-                  name="address2"
-                />
-              </label>
-              <label className="grid gap-1.5 text-sm">
-                <span>{labels.city}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.city}
-                  name="city"
-                  required
-                />
-              </label>
-              <label className="grid gap-1.5 text-sm">
-                <span>{labels.stateOrProvince}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.stateOrProvince}
-                  name="stateOrProvince"
-                />
-              </label>
-              <label className="grid gap-1.5 text-sm">
-                <span>{labels.country}</span>
-                <select
-                  className={inputClassName}
-                  defaultValue={billingDefaults.countryCode}
-                  name="countryCode"
-                  required
-                >
-                  {countries.map((country) => (
-                    <option key={country.value} value={country.value}>
-                      {country.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="grid gap-1.5 text-sm">
-                <span>{labels.postalCode}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.postalCode}
-                  name="postalCode"
-                  required
-                />
-              </label>
-              <label className="grid gap-1.5 text-sm @md:col-span-2">
-                <span>{labels.phone}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.phone}
-                  name="phone"
-                  type="tel"
-                />
-              </label>
-            </form>
+              </form>
+            </div>
 
             <CheckoutCompleteOrderButton
               disabled={!shippingReady}
@@ -785,153 +811,32 @@ function CheckoutFulfillmentContent({
 
           <section className="space-y-3">
             <h2 className="text-base font-semibold">{labels.billingAddressTitle}</h2>
-            <div className="overflow-hidden rounded-lg border border-[var(--contrast-200,hsl(var(--contrast-200)))]">
-              {requiresShipping ? (
-                <>
-                  <label
-                    className={clsx(
-                      'flex cursor-pointer items-center gap-3 border-b px-4 py-3 text-sm',
-                      billingMode === 'same' && 'bg-[var(--primary,hsl(var(--primary)))]/5',
-                    )}
-                  >
-                    <input
-                      checked={billingMode === 'same'}
-                      name="billing-mode"
-                      onChange={() => setBillingMode('same')}
-                      type="radio"
-                    />
-                    <span>{labels.sameAsShipping}</span>
-                  </label>
-                  <label
-                    className={clsx(
-                      'flex cursor-pointer items-center gap-3 px-4 py-3 text-sm',
-                      billingMode === 'different' && 'bg-[var(--primary,hsl(var(--primary)))]/5',
-                    )}
-                  >
-                    <input
-                      checked={billingMode === 'different'}
-                      name="billing-mode"
-                      onChange={() => setBillingMode('different')}
-                      type="radio"
-                    />
-                    <span>{labels.differentBilling}</span>
-                  </label>
-                </>
-              ) : null}
-            </div>
+            <BillingModeOptions
+              billingMode={billingMode}
+              labels={labels}
+              onChange={setBillingMode}
+              requiresShipping={requiresShipping}
+            />
 
-            <form
+            <div
               className={clsx(
-                'grid gap-3 @md:grid-cols-2',
+                'checkout-billing-form-panel rounded-lg border border-[var(--contrast-200,hsl(var(--contrast-200)))] p-4',
                 billingMode === 'same' && requiresShipping && 'hidden',
               )}
-              id={billingFormId}
-              ref={billingRef}
             >
-              <label className="grid gap-1.5 text-sm">
-                <span>{labels.firstName}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.firstName}
-                  name="firstName"
-                  required
+              <form
+                className="checkout-billing-form grid items-start gap-3 @md:grid-cols-2"
+                id={billingFormId}
+                ref={billingRef}
+              >
+                <CheckoutBillingAddressFields
+                  billingDefaults={billingDefaults}
+                  countries={countries}
+                  customerEmail={customerEmail}
+                  labels={labels}
                 />
-              </label>
-              <label className="grid gap-1.5 text-sm">
-                <span>{labels.lastName}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.lastName}
-                  name="lastName"
-                  required
-                />
-              </label>
-              <label className="grid gap-1.5 text-sm @md:col-span-2">
-                <span>{labels.email}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.email}
-                  name="email"
-                  required
-                  type="email"
-                />
-              </label>
-              <label className="grid gap-1.5 text-sm @md:col-span-2">
-                <span>{labels.company}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.company}
-                  name="company"
-                />
-              </label>
-              <label className="grid gap-1.5 text-sm @md:col-span-2">
-                <span>{labels.address1}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.address1}
-                  name="address1"
-                  required
-                />
-              </label>
-              <label className="grid gap-1.5 text-sm @md:col-span-2">
-                <span>{labels.address2}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.address2}
-                  name="address2"
-                />
-              </label>
-              <label className="grid gap-1.5 text-sm">
-                <span>{labels.city}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.city}
-                  name="city"
-                  required
-                />
-              </label>
-              <label className="grid gap-1.5 text-sm">
-                <span>{labels.stateOrProvince}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.stateOrProvince}
-                  name="stateOrProvince"
-                />
-              </label>
-              <label className="grid gap-1.5 text-sm">
-                <span>{labels.country}</span>
-                <select
-                  className={inputClassName}
-                  defaultValue={billingDefaults.countryCode}
-                  name="countryCode"
-                  required
-                >
-                  {countries.map((country) => (
-                    <option key={country.value} value={country.value}>
-                      {country.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="grid gap-1.5 text-sm">
-                <span>{labels.postalCode}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.postalCode}
-                  name="postalCode"
-                  required
-                />
-              </label>
-              <label className="grid gap-1.5 text-sm @md:col-span-2">
-                <span>{labels.phone}</span>
-                <input
-                  className={inputClassName}
-                  defaultValue={billingDefaults.phone}
-                  name="phone"
-                  type="tel"
-                />
-              </label>
-            </form>
+              </form>
+            </div>
 
             <CheckoutCompleteOrderButtonPlaceholder
               disabledMessage={shippingRequiredMessage}

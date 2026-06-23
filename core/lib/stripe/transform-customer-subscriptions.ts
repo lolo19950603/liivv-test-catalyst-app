@@ -1,5 +1,11 @@
 import type { CustomerSubscription } from './subscriptions';
-import { getShipmentCalendarDayKey } from './subscription-shipment-grouping';
+import { isSubscriptionPaymentFailed } from './subscription-delivery-payment';
+import type { FinalizedShipmentRecord } from './subscription-shipment-records';
+import { buildShipmentStorageKey } from './subscription-shipment-records';
+import {
+  getNextShipmentTimestamp,
+  getShipmentCalendarDayKey,
+} from './subscription-shipment-grouping';
 
 export { getShipmentCalendarDayKey } from './subscription-shipment-grouping';
 
@@ -15,6 +21,8 @@ export interface SubscriptionListItem {
   statusLabel: string;
   statusKey: string;
   scheduleDetail?: string;
+  paymentFailed?: boolean;
+  skippedReasonLabel?: string;
 }
 
 export interface SubscriptionDeliveryGroup {
@@ -26,6 +34,12 @@ export interface SubscriptionDeliveryGroup {
   tax?: string;
   totalIncTax?: string;
   totalsPending?: boolean;
+  shipmentPaused?: boolean;
+  isPast?: boolean;
+  bigcommerceOrderId?: number;
+  bigcommerceOrderHref?: string;
+  bigcommerceOrderLabel?: string;
+  outcomeNote?: string;
   items: SubscriptionListItem[];
 }
 
@@ -43,7 +57,8 @@ export interface SubscriptionShipmentGroup {
 }
 
 export interface SubscriptionPortalSections {
-  deliveries: SubscriptionDateGroup[];
+  upcomingShipments: SubscriptionDateGroup[];
+  pastShipments: SubscriptionDateGroup[];
   active: SubscriptionListItem[];
   canceled: SubscriptionListItem[];
 }
@@ -144,19 +159,7 @@ function getScheduleDetail(
   return undefined;
 }
 
-export function getNextShipmentTimestamp(subscription: CustomerSubscription): number {
-  const now = Math.floor(Date.now() / 1000);
-
-  if (subscription.trialEnd && subscription.trialEnd > now) {
-    return subscription.trialEnd;
-  }
-
-  if (subscription.billingCycleAnchor && subscription.billingCycleAnchor > now) {
-    return subscription.billingCycleAnchor;
-  }
-
-  return subscription.currentPeriodEnd;
-}
+export { getNextShipmentTimestamp } from './subscription-shipment-grouping';
 
 export function transformCustomerSubscription(
   subscription: CustomerSubscription,
@@ -196,6 +199,7 @@ export function transformCustomerSubscription(
     statusLabel: t(`status.${statusKey}`),
     statusKey,
     scheduleDetail: getScheduleDetail(subscription, t, format),
+    paymentFailed: isSubscriptionPaymentFailed(subscription.status),
   };
 }
 
@@ -226,23 +230,34 @@ function buildDeliveryTotals(
   t: SubscriptionsT,
   format: Format,
 ): Pick<SubscriptionDeliveryGroup, 'subtotalExTax' | 'tax' | 'totalIncTax' | 'totalsPending'> {
-  const hasPendingPricing = subscriptions.some((subscription) => subscription.priceConfirmedAtBilling);
+  const billableSubscriptions = subscriptions.filter(
+    (subscription) => !isSubscriptionPaymentFailed(subscription.status),
+  );
+
+  if (billableSubscriptions.length === 0) {
+    return { totalsPending: true };
+  }
+
+  const hasPendingPricing = billableSubscriptions.some(
+    (subscription) => subscription.priceConfirmedAtBilling,
+  );
 
   if (hasPendingPricing) {
     return { totalsPending: true };
   }
 
-  const currency = subscriptions[0]?.currency ?? 'usd';
-  const subtotalExTaxCents = subscriptions.reduce(
+  const currency = billableSubscriptions[0]?.currency ?? 'usd';
+  const subtotalExTaxCents = billableSubscriptions.reduce(
     (sum, subscription) => sum + (subscription.subtotalExTaxCents ?? 0),
     0,
   );
-  const taxCents = subscriptions.reduce(
+  const taxCents = billableSubscriptions.reduce(
     (sum, subscription) => sum + (subscription.taxCents ?? 0),
     0,
   );
-  const totalIncTaxCents = subscriptions.reduce(
-    (sum, subscription) => sum + (subscription.totalIncTaxCents ?? subscription.subtotalExTaxCents ?? 0),
+  const totalIncTaxCents = billableSubscriptions.reduce(
+    (sum, subscription) =>
+      sum + (subscription.totalIncTaxCents ?? subscription.subtotalExTaxCents ?? 0),
     0,
   );
 
@@ -287,6 +302,9 @@ function groupSubscriptionsIntoDeliveries(
 
   return Array.from(deliveries.entries()).map(([addressKey, delivery]) => {
     const totals = buildDeliveryTotals(delivery.subscriptions, t, format);
+    const deliveryPaused = delivery.subscriptions.some((subscription) =>
+      isSubscriptionPaymentFailed(subscription.status),
+    );
 
     return {
       id: `${idPrefix}-${addressKey}`,
@@ -295,8 +313,130 @@ function groupSubscriptionsIntoDeliveries(
       items: delivery.subscriptions.map((subscription) =>
         transformCustomerSubscription(subscription, t, format),
       ),
+      shipmentPaused: deliveryPaused,
       ...totals,
     };
+  });
+}
+
+function formatPastShipmentSkipReasonLabel(
+  reason: FinalizedShipmentRecord['skippedItems'][number]['reason'],
+  t: SubscriptionsT,
+): string {
+  if (reason === 'customer_skip') {
+    return t('pastShipment.skipReason.customer_skip');
+  }
+
+  return t('pastShipment.skipReason.missedDeadline');
+}
+
+function buildPastShipmentDeliveryGroups(
+  records: FinalizedShipmentRecord[],
+  t: SubscriptionsT,
+): SubscriptionDeliveryGroup[] {
+  return records.map((record) => {
+    const chargedItems: SubscriptionListItem[] = record.chargedItems.map((item) => ({
+      id: item.subscriptionId,
+      productName: item.productName,
+      quantity: item.quantity,
+      intervalLabel: '',
+      paymentMethodLabel: '',
+      statusLabel: t('pastShipment.statusCharged'),
+      statusKey: 'active',
+    }));
+
+    const skippedItems: SubscriptionListItem[] = record.skippedItems.map((item) => ({
+      id: item.subscriptionId,
+      productName: item.productName,
+      quantity: item.quantity,
+      intervalLabel: '',
+      paymentMethodLabel: '',
+      statusLabel: t('pastShipment.statusSkipped'),
+      statusKey: 'skipped',
+      skippedReasonLabel: formatPastShipmentSkipReasonLabel(item.reason, t),
+    }));
+
+    const outcomeNote =
+      record.outcome === 'partial_skipped'
+        ? t('pastShipment.outcomePartialNote')
+        : record.outcome === 'all_failed'
+          ? t('pastShipment.outcomeAllFailed')
+          : undefined;
+
+    return {
+      id: `past-${record.storageKey}`,
+      shippingAddressLabel: record.shippingAddressLabel,
+      shippingMethodLabel: record.shippingMethodLabel ?? t('delivery.freeShipping'),
+      isPast: true,
+      bigcommerceOrderId: record.bigcommerceOrderId,
+      bigcommerceOrderHref: record.bigcommerceOrderId
+        ? `/account/orders/${record.bigcommerceOrderId}/`
+        : undefined,
+      bigcommerceOrderLabel: record.bigcommerceOrderId
+        ? t('pastShipment.orderLink', { orderId: record.bigcommerceOrderId })
+        : undefined,
+      outcomeNote,
+      totalsPending: record.outcome === 'all_failed',
+      items: [...chargedItems, ...skippedItems],
+    };
+  });
+}
+
+function buildPastShipmentGroups(
+  records: FinalizedShipmentRecord[],
+  t: SubscriptionsT,
+  format: Format,
+): SubscriptionDateGroup[] {
+  const groups = new Map<string, FinalizedShipmentRecord[]>();
+
+  for (const record of records) {
+    const existing = groups.get(record.dayKey);
+
+    if (existing) {
+      existing.push(record);
+      continue;
+    }
+
+    groups.set(record.dayKey, [record]);
+  }
+
+  return Array.from(groups.entries())
+    .sort(([leftDay], [rightDay]) => rightDay.localeCompare(leftDay))
+    .map(([dayKey, dayRecords]) => {
+      const [year, month, day] = dayKey.split('-').map(Number);
+      const sortTimestamp = Math.floor(Date.UTC(year ?? 2026, (month ?? 1) - 1, day ?? 1) / 1000);
+      const deliveries = buildPastShipmentDeliveryGroups(dayRecords, t);
+
+      return {
+        id: `past-shipment-${dayKey}`,
+        title: t('shipmentOn', {
+          date: format.dateTime(new Date(sortTimestamp * 1000), { dateStyle: 'medium' }),
+        }),
+        deliveries:
+          deliveries.length > 1
+            ? deliveries.map((delivery, index) => ({
+                ...delivery,
+                shipmentHeading: t('delivery.shipment', { number: index + 1 }),
+              }))
+            : deliveries,
+      };
+    });
+}
+
+function filterSubscriptionsForUpcomingShipments(
+  subscriptions: CustomerSubscription[],
+  customerId: number,
+  finalizedStorageKeys: Set<string>,
+): CustomerSubscription[] {
+  return subscriptions.filter((subscription) => {
+    const dayKey = getShipmentCalendarDayKey(getNextShipmentTimestamp(subscription));
+    const storageKey = buildShipmentStorageKey({
+      customerId,
+      dayKey,
+      shippingAddressKey: subscription.shippingAddressKey,
+    });
+
+    return !finalizedStorageKeys.has(storageKey);
   });
 }
 
@@ -373,12 +513,25 @@ export function groupSubscriptionsForPortal(
   subscriptions: CustomerSubscription[],
   t: SubscriptionsT,
   format: Format,
+  options: {
+    customerId: number;
+    finalizedShipments?: FinalizedShipmentRecord[];
+  },
 ): SubscriptionPortalSections {
   const activeSubscriptions = subscriptions.filter((subscription) => !isCanceledSubscription(subscription));
   const canceledSubscriptions = subscriptions.filter(isCanceledSubscription);
+  const finalizedStorageKeys = new Set(
+    (options.finalizedShipments ?? []).map((record) => record.storageKey),
+  );
+  const upcomingSubscriptions = filterSubscriptionsForUpcomingShipments(
+    activeSubscriptions,
+    options.customerId,
+    finalizedStorageKeys,
+  );
 
   return {
-    deliveries: groupSubscriptionsByShipmentDate(activeSubscriptions, t, format),
+    upcomingShipments: groupSubscriptionsByShipmentDate(upcomingSubscriptions, t, format),
+    pastShipments: buildPastShipmentGroups(options.finalizedShipments ?? [], t, format),
     active: transformCustomerSubscriptions(activeSubscriptions, t, format),
     canceled: transformCustomerSubscriptions(canceledSubscriptions, t, format, {
       hidePricing: true,

@@ -8,6 +8,7 @@ import { Button } from '@/vibes/soul/primitives/button';
 import { ButtonLink } from '@/vibes/soul/primitives/button-link';
 import type { ProductImageFallbackLogo } from '@/vibes/soul/primitives/product-card';
 import { Image } from '~/components/image';
+import { Link } from '~/components/link';
 
 export interface SubscriptionListItem {
   id: string;
@@ -21,6 +22,8 @@ export interface SubscriptionListItem {
   statusLabel: string;
   statusKey?: string;
   scheduleDetail?: string;
+  paymentFailed?: boolean;
+  skippedReasonLabel?: string;
 }
 
 export interface SubscriptionDeliveryGroup {
@@ -32,6 +35,12 @@ export interface SubscriptionDeliveryGroup {
   tax?: string;
   totalIncTax?: string;
   totalsPending?: boolean;
+  shipmentPaused?: boolean;
+  isPast?: boolean;
+  bigcommerceOrderId?: number;
+  bigcommerceOrderHref?: string;
+  bigcommerceOrderLabel?: string;
+  outcomeNote?: string;
   items: SubscriptionListItem[];
 }
 
@@ -42,7 +51,8 @@ export interface SubscriptionDateGroup {
 }
 
 export interface SubscriptionPortalSections {
-  deliveries: SubscriptionDateGroup[];
+  upcomingShipments: SubscriptionDateGroup[];
+  pastShipments: SubscriptionDateGroup[];
   active: SubscriptionListItem[];
   canceled: SubscriptionListItem[];
 }
@@ -65,6 +75,19 @@ export interface SubscriptionListProps {
   manageBillingAction?: () => Promise<void>;
   manageItemLabel?: string;
   manageItemAction?: (subscriptionId: string) => Promise<void>;
+  updatePaymentLabel?: string;
+  updatePaymentAction?: () => Promise<void>;
+  skipDeliveryItemLabel?: string;
+  skipDeliveryItemAction?: (subscriptionId: string) => Promise<void>;
+  retryPaymentLabel?: string;
+  retryPaymentAction?: (subscriptionId: string) => Promise<void>;
+  shipmentPausedMessage?: string;
+  paymentIssueLabel?: string;
+  fixPaymentLabel?: string;
+  upcomingShipmentsTitle?: string;
+  pastShipmentsTitle?: string;
+  emptyUpcomingShipmentsTitle?: string;
+  emptyPastShipmentsTitle?: string;
   shipToLabel?: string;
   deliveryOptionLabel?: string;
   subtotalLabel?: string;
@@ -124,6 +147,45 @@ function SubscriptionSectionToggle({
   );
 }
 
+function SubscriptionShipmentsViewToggle({
+  upcomingLabel,
+  pastLabel,
+  selected,
+  onSelect,
+}: {
+  upcomingLabel: string;
+  pastLabel: string;
+  selected: 'upcoming' | 'past';
+  onSelect: (value: 'upcoming' | 'past') => void;
+}) {
+  const tabs: Array<{ value: 'upcoming' | 'past'; label: string }> = [
+    { value: 'upcoming', label: upcomingLabel },
+    { value: 'past', label: pastLabel },
+  ];
+
+  return (
+    <div className="subscription-portal-toggle" role="tablist">
+      {tabs.map(({ value, label }) => {
+        const isSelected = selected === value;
+
+        return (
+          <button
+            aria-selected={isSelected}
+            className="subscription-portal-toggle__option"
+            data-selected={isSelected ? 'true' : 'false'}
+            key={value}
+            onClick={() => onSelect(value)}
+            role="tab"
+            type="button"
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 function SubscriptionTabEmptyState({ title }: { title: string }) {
   return (
     <div className="rounded-2xl border border-[hsl(var(--contrast-100))] bg-[hsl(var(--background))] p-8 text-center">
@@ -140,13 +202,86 @@ function SubscriptionStatusBadge({ status }: { status: string }) {
   );
 }
 
-function SubscriptionPortalSubmitButton({ label }: { label: string }) {
+function SubscriptionPortalSubmitButton({
+  label,
+  variant = 'secondary',
+  size = 'medium',
+  className,
+}: {
+  label: string;
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'danger';
+  size?: 'large' | 'medium' | 'small' | 'x-small';
+  className?: string;
+}) {
   const { pending } = useFormStatus();
 
   return (
-    <Button disabled={pending} loading={pending} size="medium" type="submit" variant="secondary">
+    <Button
+      className={clsx('subscription-portal-action-button', className)}
+      disabled={pending}
+      loading={pending}
+      size={size}
+      type="submit"
+      variant={variant}
+    >
       {label}
     </Button>
+  );
+}
+
+function SubscriptionShipmentPausedBanner({ message }: { message: string }) {
+  return (
+    <div className="border-b border-amber-200/80 bg-amber-50 px-5 py-4 @md:px-6">
+      <p className="text-sm leading-relaxed text-amber-950">{message}</p>
+    </div>
+  );
+}
+
+function SubscriptionPortalTextSubmit({
+  label,
+  className,
+}: {
+  label: string;
+  className?: string;
+}) {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      className={clsx(
+        'text-sm font-medium text-[var(--foreground,hsl(var(--foreground)))] underline-offset-4 transition hover:underline disabled:cursor-not-allowed disabled:opacity-40',
+        className,
+      )}
+      disabled={pending}
+      type="submit"
+    >
+      {pending ? '…' : label}
+    </button>
+  );
+}
+
+function SubscriptionEditLinkAction({
+  subscriptionId,
+  manageItemAction,
+  manageItemLabel,
+  className,
+}: {
+  subscriptionId: string;
+  manageItemAction?: (subscriptionId: string) => Promise<void>;
+  manageItemLabel?: string;
+  className?: string;
+}) {
+  if (!manageItemAction || !manageItemLabel) {
+    return null;
+  }
+
+  return (
+    <form
+      action={manageItemAction.bind(null, subscriptionId)}
+      className={clsx('subscription-edit-link inline', className)}
+    >
+      <SubscriptionPortalTextSubmit label={manageItemLabel} />
+    </form>
   );
 }
 
@@ -166,9 +301,80 @@ function SubscriptionEditAction({
   }
 
   return (
-    <form action={manageItemAction.bind(null, subscriptionId)} className={className}>
-      <SubscriptionPortalSubmitButton label={manageItemLabel} />
+    <form
+      action={manageItemAction.bind(null, subscriptionId)}
+      className={clsx('subscription-edit-action flex w-full min-w-0 justify-center', className)}
+    >
+      <SubscriptionPortalSubmitButton
+        className="w-full"
+        label={manageItemLabel}
+        size="small"
+        variant="tertiary"
+      />
     </form>
+  );
+}
+
+function SubscriptionPaymentRecoveryStrip({
+  subscriptionId,
+  retryPaymentAction,
+  retryPaymentLabel,
+  updatePaymentAction,
+  updatePaymentLabel,
+  skipDeliveryItemAction,
+  skipDeliveryItemLabel,
+  paymentIssueLabel = 'Payment issue',
+  fixPaymentLabel = 'Fix payment',
+}: {
+  subscriptionId: string;
+  retryPaymentAction?: (subscriptionId: string) => Promise<void>;
+  retryPaymentLabel?: string;
+  updatePaymentAction?: () => Promise<void>;
+  updatePaymentLabel?: string;
+  skipDeliveryItemAction?: (subscriptionId: string) => Promise<void>;
+  skipDeliveryItemLabel?: string;
+  paymentIssueLabel?: string;
+  fixPaymentLabel?: string;
+}) {
+  const hasActions =
+    (retryPaymentAction && retryPaymentLabel) ||
+    (updatePaymentAction && updatePaymentLabel) ||
+    (skipDeliveryItemAction && skipDeliveryItemLabel);
+
+  if (!hasActions) {
+    return null;
+  }
+
+  return (
+    <div className="subscription-payment-strip mt-3 rounded-lg border border-amber-200/70 bg-amber-50/60 px-3 py-3 @sm:flex @sm:items-center @sm:justify-between @sm:gap-4">
+      <div className="min-w-0">
+        <p className="text-xs font-semibold text-amber-950">{fixPaymentLabel}</p>
+        <p className="mt-0.5 text-xs leading-relaxed text-amber-900/85">{paymentIssueLabel}</p>
+      </div>
+      <div className="subscription-payment-strip__actions mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 @sm:mt-0 @sm:shrink-0">
+        {retryPaymentAction && retryPaymentLabel ? (
+          <form action={retryPaymentAction.bind(null, subscriptionId)} className="inline">
+            <SubscriptionPortalTextSubmit
+              className="text-xs font-semibold text-amber-950"
+              label={retryPaymentLabel}
+            />
+          </form>
+        ) : null}
+        {updatePaymentAction && updatePaymentLabel ? (
+          <form action={updatePaymentAction} className="inline">
+            <SubscriptionPortalTextSubmit className="text-xs text-amber-950/90" label={updatePaymentLabel} />
+          </form>
+        ) : null}
+        {skipDeliveryItemAction && skipDeliveryItemLabel ? (
+          <form action={skipDeliveryItemAction.bind(null, subscriptionId)} className="inline">
+            <SubscriptionPortalTextSubmit
+              className="text-xs text-[var(--contrast-500,hsl(var(--contrast-500)))]"
+              label={skipDeliveryItemLabel}
+            />
+          </form>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
@@ -177,11 +383,13 @@ function SubscriptionProductImage({
   quantityLabel,
   size = 'large',
   fallbackLogo,
+  showQuantityBadge = true,
 }: {
   subscription: SubscriptionListItem;
   quantityLabel: string;
   size?: 'large' | 'medium' | 'compact';
   fallbackLogo?: ProductImageFallbackLogo | null;
+  showQuantityBadge?: boolean;
 }) {
   const dimension = size === 'large' ? 96 : size === 'medium' ? 80 : 56;
   const hasLogoImage = Boolean(fallbackLogo?.src?.trim());
@@ -224,7 +432,7 @@ function SubscriptionProductImage({
         )}
       </div>
 
-      {subscription.quantity >= 1 ? (
+      {showQuantityBadge && subscription.quantity >= 1 ? (
         <span
           aria-label={`${quantityLabel} ${subscription.quantity}`}
           className="absolute right-0 top-0 z-10 flex h-5 min-w-5 translate-x-1/4 -translate-y-1/4 items-center justify-center rounded bg-[#2b2b2b] px-1 text-[11px] font-medium leading-none text-white"
@@ -268,6 +476,9 @@ function SubscriptionProductDetails({
           <p className="mt-1 text-xs text-[var(--contrast-600,hsl(var(--contrast-600)))]">
             {subscription.scheduleDetail}
           </p>
+        ) : null}
+        {subscription.skippedReasonLabel ? (
+          <p className="mt-1 text-xs text-amber-900">{subscription.skippedReasonLabel}</p>
         ) : null}
       </div>
     </>
@@ -329,7 +540,7 @@ function SubscriptionProductCard({
 }) {
   if (variant === 'embedded') {
     return (
-      <li className="subscription-product-card subscription-delivery-product flex h-full w-[13.5rem] shrink-0 flex-col rounded-xl border border-[var(--contrast-100,hsl(var(--contrast-100)))]/60 bg-[var(--background,hsl(var(--background)))] p-3">
+      <li className="subscription-product-card subscription-delivery-product flex h-full w-full min-w-0 flex-col overflow-hidden rounded-xl border border-[var(--contrast-100,hsl(var(--contrast-100)))]/60 bg-[var(--background,hsl(var(--background)))] p-3">
         <SubscriptionProductImage
           fallbackLogo={fallbackLogo}
           quantityLabel={quantityLabel}
@@ -351,7 +562,7 @@ function SubscriptionProductCard({
         </div>
 
         <SubscriptionEditAction
-          className="mt-4 flex w-full shrink-0 justify-center"
+          className="mt-4 shrink-0"
           manageItemAction={manageItemAction}
           manageItemLabel={manageItemLabel}
           subscriptionId={subscription.id}
@@ -387,7 +598,7 @@ function SubscriptionProductCard({
       </div>
 
       <SubscriptionEditAction
-        className="mt-4 flex w-full shrink-0 justify-center"
+        className="mt-4 shrink-0"
         manageItemAction={manageItemAction}
         manageItemLabel={manageItemLabel}
         subscriptionId={subscription.id}
@@ -403,6 +614,15 @@ function SubscriptionLineItemRow({
   frequencyLabel,
   manageItemAction,
   manageItemLabel,
+  updatePaymentAction,
+  updatePaymentLabel,
+  retryPaymentAction,
+  retryPaymentLabel,
+  skipDeliveryItemAction,
+  skipDeliveryItemLabel,
+  paymentIssueLabel,
+  fixPaymentLabel,
+  readOnly = false,
   fallbackLogo,
 }: {
   subscription: SubscriptionListItem;
@@ -411,19 +631,131 @@ function SubscriptionLineItemRow({
   frequencyLabel: string;
   manageItemAction?: (subscriptionId: string) => Promise<void>;
   manageItemLabel?: string;
+  updatePaymentAction?: () => Promise<void>;
+  updatePaymentLabel?: string;
+  retryPaymentAction?: (subscriptionId: string) => Promise<void>;
+  retryPaymentLabel?: string;
+  skipDeliveryItemAction?: (subscriptionId: string) => Promise<void>;
+  skipDeliveryItemLabel?: string;
+  paymentIssueLabel?: string;
+  fixPaymentLabel?: string;
+  readOnly?: boolean;
   fallbackLogo?: ProductImageFallbackLogo | null;
 }) {
+  const metaParts = [
+    `${quantityLabel} ${subscription.quantity}`,
+    subscription.intervalLabel,
+    subscription.paymentMethodLabel,
+    subscription.scheduleDetail,
+  ].filter(Boolean);
+
+  const showStatus =
+    readOnly || subscription.paymentFailed || subscription.statusKey === 'skipped';
+
+  const isPaymentFailed = subscription.paymentFailed && !readOnly;
+
   return (
-    <SubscriptionProductCard
-      fallbackLogo={fallbackLogo}
-      frequencyLabel={frequencyLabel}
-      manageItemAction={manageItemAction}
-      manageItemLabel={manageItemLabel}
-      paymentLabel={paymentLabel}
-      quantityLabel={quantityLabel}
-      subscription={subscription}
-      variant="embedded"
-    />
+    <li
+      className={clsx(
+        'subscription-delivery-line px-5 py-4 @md:px-6',
+        isPaymentFailed && 'subscription-delivery-line--payment-failed',
+      )}
+    >
+      <div className="flex gap-3 @md:gap-4">
+        <div
+          className={clsx(
+            'subscription-delivery-line__media shrink-0',
+            isPaymentFailed && 'opacity-60',
+          )}
+        >
+          <SubscriptionProductImage
+            fallbackLogo={fallbackLogo}
+            quantityLabel={quantityLabel}
+            showQuantityBadge={false}
+            size="compact"
+            subscription={subscription}
+          />
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <p
+                  className={clsx(
+                    'text-sm font-medium leading-snug',
+                    isPaymentFailed
+                      ? 'text-[var(--contrast-500,hsl(var(--contrast-500)))]'
+                      : 'text-[var(--foreground,hsl(var(--foreground)))]',
+                  )}
+                >
+                  {subscription.productName}
+                </p>
+                {showStatus ? <SubscriptionStatusBadge status={subscription.statusLabel} /> : null}
+              </div>
+
+              <p
+                className={clsx(
+                  'mt-1 text-xs leading-relaxed',
+                  isPaymentFailed
+                    ? 'text-[var(--contrast-400,hsl(var(--contrast-400)))]'
+                    : 'text-[var(--contrast-500,hsl(var(--contrast-500)))]',
+                )}
+              >
+                {metaParts.join(' · ')}
+              </p>
+
+              {subscription.skippedReasonLabel ? (
+                <p className="mt-1.5 text-xs leading-relaxed text-amber-900">
+                  {subscription.skippedReasonLabel}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="flex shrink-0 flex-col items-end gap-1.5 text-right">
+              {subscription.price ? (
+                <p
+                  className={clsx(
+                    'text-sm font-semibold tabular-nums',
+                    isPaymentFailed
+                      ? 'text-[var(--contrast-500,hsl(var(--contrast-500)))]'
+                      : 'text-[var(--foreground,hsl(var(--foreground)))]',
+                  )}
+                >
+                  {subscription.price}
+                </p>
+              ) : subscription.priceNote ? (
+                <p className="max-w-[8rem] text-xs leading-tight text-[var(--contrast-500,hsl(var(--contrast-500)))]">
+                  {subscription.priceNote}
+                </p>
+              ) : null}
+
+              {!readOnly ? (
+                <SubscriptionEditLinkAction
+                  manageItemAction={manageItemAction}
+                  manageItemLabel={manageItemLabel}
+                  subscriptionId={subscription.id}
+                />
+              ) : null}
+            </div>
+          </div>
+
+          {isPaymentFailed ? (
+            <SubscriptionPaymentRecoveryStrip
+              fixPaymentLabel={fixPaymentLabel}
+              paymentIssueLabel={paymentIssueLabel}
+              retryPaymentAction={retryPaymentAction}
+              retryPaymentLabel={retryPaymentLabel}
+              skipDeliveryItemAction={skipDeliveryItemAction}
+              skipDeliveryItemLabel={skipDeliveryItemLabel}
+              subscriptionId={subscription.id}
+              updatePaymentAction={updatePaymentAction}
+              updatePaymentLabel={updatePaymentLabel}
+            />
+          ) : null}
+        </div>
+      </div>
+    </li>
   );
 }
 
@@ -431,12 +763,30 @@ function SubscriptionDeliveryCard({
   delivery,
   manageItemAction,
   manageItemLabel,
+  updatePaymentAction,
+  updatePaymentLabel,
+  retryPaymentAction,
+  retryPaymentLabel,
+  skipDeliveryItemAction,
+  skipDeliveryItemLabel,
+  paymentIssueLabel,
+  fixPaymentLabel,
+  shipmentPausedMessage,
   labels,
   fallbackLogo,
 }: {
   delivery: SubscriptionDeliveryGroup;
   manageItemAction?: (subscriptionId: string) => Promise<void>;
   manageItemLabel?: string;
+  updatePaymentAction?: () => Promise<void>;
+  updatePaymentLabel?: string;
+  retryPaymentAction?: (subscriptionId: string) => Promise<void>;
+  retryPaymentLabel?: string;
+  skipDeliveryItemAction?: (subscriptionId: string) => Promise<void>;
+  skipDeliveryItemLabel?: string;
+  paymentIssueLabel?: string;
+  fixPaymentLabel?: string;
+  shipmentPausedMessage?: string;
   fallbackLogo?: ProductImageFallbackLogo | null;
   labels: {
     shipToLabel: string;
@@ -451,13 +801,46 @@ function SubscriptionDeliveryCard({
   };
 }) {
   return (
-    <li className="subscription-delivery-card flex w-full min-w-0 flex-col overflow-hidden rounded-2xl bg-[var(--contrast-50,hsl(var(--contrast-50)))]">
-      {delivery.shipmentHeading ? (
+    <li className="subscription-delivery-card flex w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--contrast-100,hsl(var(--contrast-100)))] bg-[var(--background,hsl(var(--background)))] shadow-[0_1px_2px_rgba(49,47,47,0.04)]">
+      {delivery.shipmentHeading ||
+      (delivery.isPast && delivery.bigcommerceOrderHref) ||
+      (delivery.isPast && delivery.outcomeNote) ? (
         <div className="border-b border-[var(--contrast-100,hsl(var(--contrast-100)))]/60 px-5 py-3 @md:px-6">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground,hsl(var(--foreground)))]">
-            {delivery.shipmentHeading}
-          </p>
+          {delivery.shipmentHeading || (delivery.isPast && delivery.bigcommerceOrderHref) ? (
+            <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+              {delivery.shipmentHeading ? (
+                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--foreground,hsl(var(--foreground)))]">
+                  {delivery.shipmentHeading}
+                </p>
+              ) : (
+                <span />
+              )}
+              {delivery.isPast && delivery.bigcommerceOrderHref && delivery.bigcommerceOrderLabel ? (
+                <Link
+                  className="subscription-order-link shrink-0 text-sm font-medium text-[var(--foreground,hsl(var(--foreground)))] underline-offset-4 hover:underline"
+                  href={delivery.bigcommerceOrderHref}
+                >
+                  {delivery.bigcommerceOrderLabel}
+                </Link>
+              ) : null}
+            </div>
+          ) : null}
+          {delivery.isPast && delivery.outcomeNote ? (
+            <p
+              className={clsx(
+                'text-xs leading-relaxed text-[var(--contrast-600,hsl(var(--contrast-600)))]',
+                (delivery.shipmentHeading ||
+                  (delivery.isPast && delivery.bigcommerceOrderHref && delivery.bigcommerceOrderLabel)) &&
+                  'mt-1.5',
+              )}
+            >
+              {delivery.outcomeNote}
+            </p>
+          ) : null}
         </div>
+      ) : null}
+      {delivery.shipmentPaused && shipmentPausedMessage ? (
+        <SubscriptionShipmentPausedBanner message={shipmentPausedMessage} />
       ) : null}
       <div className="px-5 py-4 @md:px-6">
         <div className="flex flex-wrap items-start gap-x-8 gap-y-3">
@@ -481,27 +864,36 @@ function SubscriptionDeliveryCard({
         </div>
       </div>
 
-      <ul className="subscription-delivery-products flex items-stretch gap-3 overflow-x-auto border-t border-[var(--contrast-100,hsl(var(--contrast-100)))]/60 px-5 py-4 @md:px-6">
+      <ul className="subscription-delivery-lines divide-y divide-[var(--contrast-100,hsl(var(--contrast-100)))]/60 border-t border-[var(--contrast-100,hsl(var(--contrast-100)))]/60">
         {delivery.items.map((subscription) => (
           <SubscriptionLineItemRow
             fallbackLogo={fallbackLogo}
+            fixPaymentLabel={fixPaymentLabel}
             frequencyLabel={labels.frequencyLabel}
             key={subscription.id}
             manageItemAction={manageItemAction}
             manageItemLabel={manageItemLabel}
+            paymentIssueLabel={paymentIssueLabel}
             paymentLabel={labels.paymentLabel}
             quantityLabel={labels.quantityLabel}
+            readOnly={delivery.isPast}
+            retryPaymentAction={retryPaymentAction}
+            retryPaymentLabel={retryPaymentLabel}
+            skipDeliveryItemAction={skipDeliveryItemAction}
+            skipDeliveryItemLabel={skipDeliveryItemLabel}
             subscription={subscription}
+            updatePaymentAction={updatePaymentAction}
+            updatePaymentLabel={updatePaymentLabel}
           />
         ))}
       </ul>
 
       <div className="mt-auto border-t border-[var(--contrast-100,hsl(var(--contrast-100)))]/60 px-5 py-4 @md:px-6">
-        {delivery.totalsPending ? (
+        {delivery.totalsPending && !delivery.isPast ? (
           <p className="text-sm text-[var(--contrast-500,hsl(var(--contrast-500)))]">
             {labels.totalsPendingLabel}
           </p>
-        ) : (
+        ) : !delivery.totalsPending && delivery.subtotalExTax ? (
           <dl className="space-y-1.5 text-sm">
             <div className="flex items-baseline justify-between gap-4">
               <dt className="text-[var(--contrast-500,hsl(var(--contrast-500)))]">
@@ -526,7 +918,7 @@ function SubscriptionDeliveryCard({
               </dd>
             </div>
           </dl>
-        )}
+        ) : null}
       </div>
     </li>
   );
@@ -602,12 +994,30 @@ function SubscriptionDateSections({
   groups,
   manageItemAction,
   manageItemLabel,
+  updatePaymentAction,
+  updatePaymentLabel,
+  retryPaymentAction,
+  retryPaymentLabel,
+  skipDeliveryItemAction,
+  skipDeliveryItemLabel,
+  paymentIssueLabel,
+  fixPaymentLabel,
+  shipmentPausedMessage,
   labels,
   fallbackLogo,
 }: {
   groups: SubscriptionDateGroup[];
   manageItemAction?: (subscriptionId: string) => Promise<void>;
   manageItemLabel?: string;
+  updatePaymentAction?: () => Promise<void>;
+  updatePaymentLabel?: string;
+  retryPaymentAction?: (subscriptionId: string) => Promise<void>;
+  retryPaymentLabel?: string;
+  skipDeliveryItemAction?: (subscriptionId: string) => Promise<void>;
+  skipDeliveryItemLabel?: string;
+  paymentIssueLabel?: string;
+  fixPaymentLabel?: string;
+  shipmentPausedMessage?: string;
   fallbackLogo?: ProductImageFallbackLogo | null;
   labels: {
     shipToLabel: string;
@@ -622,16 +1032,16 @@ function SubscriptionDateSections({
   };
 }) {
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-10">
       {groups.map((group) => (
         <section key={group.id}>
           {group.title ? (
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-[var(--contrast-500,hsl(var(--contrast-500)))]">
+            <h3 className="subscription-date-heading mb-4 border-b border-[var(--contrast-100,hsl(var(--contrast-100)))]/80 pb-3 text-base font-semibold leading-snug text-[var(--foreground,hsl(var(--foreground)))] @md:mb-5 @md:text-lg">
               {group.title}
             </h3>
           ) : null}
 
-          <ul className="subscription-delivery-grid flex flex-col gap-4">
+          <ul className="subscription-delivery-grid flex flex-col gap-5">
             {group.deliveries.map((delivery) => (
               <SubscriptionDeliveryCard
                 delivery={delivery}
@@ -650,11 +1060,124 @@ function SubscriptionDateSections({
                 }}
                 manageItemAction={manageItemAction}
                 manageItemLabel={manageItemLabel}
+                fixPaymentLabel={fixPaymentLabel}
+                paymentIssueLabel={paymentIssueLabel}
+                retryPaymentAction={retryPaymentAction}
+                retryPaymentLabel={retryPaymentLabel}
+                shipmentPausedMessage={shipmentPausedMessage}
+                skipDeliveryItemAction={skipDeliveryItemAction}
+                skipDeliveryItemLabel={skipDeliveryItemLabel}
+                updatePaymentAction={updatePaymentAction}
+                updatePaymentLabel={updatePaymentLabel}
               />
             ))}
           </ul>
         </section>
       ))}
+    </div>
+  );
+}
+
+function SubscriptionShipmentsTabContent({
+  upcomingGroups,
+  pastGroups,
+  upcomingTitle,
+  pastTitle,
+  emptyUpcomingTitle,
+  emptyPastTitle,
+  shipmentPausedMessage,
+  manageItemAction,
+  manageItemLabel,
+  updatePaymentAction,
+  updatePaymentLabel,
+  retryPaymentAction,
+  retryPaymentLabel,
+  skipDeliveryItemAction,
+  skipDeliveryItemLabel,
+  paymentIssueLabel,
+  fixPaymentLabel,
+  labels,
+  fallbackLogo,
+}: {
+  upcomingGroups: SubscriptionDateGroup[];
+  pastGroups: SubscriptionDateGroup[];
+  upcomingTitle: string;
+  pastTitle: string;
+  emptyUpcomingTitle: string;
+  emptyPastTitle: string;
+  shipmentPausedMessage?: string;
+  manageItemAction?: (subscriptionId: string) => Promise<void>;
+  manageItemLabel?: string;
+  updatePaymentAction?: () => Promise<void>;
+  updatePaymentLabel?: string;
+  retryPaymentAction?: (subscriptionId: string) => Promise<void>;
+  retryPaymentLabel?: string;
+  skipDeliveryItemAction?: (subscriptionId: string) => Promise<void>;
+  skipDeliveryItemLabel?: string;
+  paymentIssueLabel?: string;
+  fixPaymentLabel?: string;
+  fallbackLogo?: ProductImageFallbackLogo | null;
+  labels: {
+    shipToLabel: string;
+    deliveryOptionLabel: string;
+    subtotalLabel: string;
+    taxLabel: string;
+    totalLabel: string;
+    totalsPendingLabel: string;
+    quantityLabel: string;
+    paymentLabel: string;
+    frequencyLabel: string;
+  };
+}) {
+  const hasUpcoming = upcomingGroups.some((group) => group.deliveries.some((delivery) => delivery.items.length > 0));
+  const hasPast = pastGroups.some((group) => group.deliveries.some((delivery) => delivery.items.length > 0));
+  const [selectedView, setSelectedView] = useState<'upcoming' | 'past'>(() => {
+    if (hasUpcoming) {
+      return 'upcoming';
+    }
+
+    if (hasPast) {
+      return 'past';
+    }
+
+    return 'upcoming';
+  });
+  const sectionProps = {
+    manageItemAction,
+    manageItemLabel,
+    updatePaymentAction,
+    updatePaymentLabel,
+    retryPaymentAction,
+    retryPaymentLabel,
+    skipDeliveryItemAction,
+    skipDeliveryItemLabel,
+    paymentIssueLabel,
+    fixPaymentLabel,
+    shipmentPausedMessage,
+    labels,
+    fallbackLogo,
+  };
+
+  return (
+    <div className="flex flex-col gap-6">
+      <SubscriptionShipmentsViewToggle
+        onSelect={setSelectedView}
+        pastLabel={pastTitle}
+        selected={selectedView}
+        upcomingLabel={upcomingTitle}
+      />
+
+      {selectedView === 'upcoming' ? (
+        hasUpcoming ? (
+          <SubscriptionDateSections groups={upcomingGroups} {...sectionProps} />
+        ) : (
+          <SubscriptionTabEmptyState title={emptyUpcomingTitle} />
+        )
+      ) : hasPast ? (
+        <SubscriptionDateSections groups={pastGroups} {...sectionProps} />
+      ) : (
+        <SubscriptionTabEmptyState title={emptyPastTitle} />
+      )}
     </div>
   );
 }
@@ -675,6 +1198,19 @@ export function SubscriptionList({
   manageBillingAction,
   manageItemLabel = 'Edit',
   manageItemAction,
+  updatePaymentLabel = 'Update payment card and retry',
+  updatePaymentAction,
+  retryPaymentLabel = 'Retry',
+  retryPaymentAction,
+  skipDeliveryItemLabel = 'Skip',
+  skipDeliveryItemAction,
+  shipmentPausedMessage = 'Shipment paused due to unsuccessful payment on one or more items in this shipment.',
+  paymentIssueLabel = 'Payment issue',
+  fixPaymentLabel = 'Fix payment',
+  upcomingShipmentsTitle = 'Upcoming shipments',
+  pastShipmentsTitle = 'Past shipments',
+  emptyUpcomingShipmentsTitle = 'You do not have any upcoming shipments.',
+  emptyPastShipmentsTitle = 'You do not have any past shipments.',
   shipToLabel = 'Ship to',
   deliveryOptionLabel = 'Delivery',
   subtotalLabel = 'Subtotal',
@@ -709,18 +1245,27 @@ export function SubscriptionList({
             },
           ]
         : [];
-  const deliveryGroups = portalSections?.deliveries ?? legacyGroups;
+  const upcomingGroups = portalSections?.upcomingShipments ?? legacyGroups;
+  const pastGroups = portalSections?.pastShipments ?? [];
   const activeItems = portalSections?.active ?? [];
   const canceledItems = portalSections?.canceled ?? [];
-  const hasDeliveryGroups = deliveryGroups.some((group) =>
+  const hasUpcomingShipments = upcomingGroups.some((group) =>
     group.deliveries.some((delivery) => delivery.items.length > 0),
   );
+  const hasPastShipments = pastGroups.some((group) =>
+    group.deliveries.some((delivery) => delivery.items.length > 0),
+  );
+  const hasDeliveryGroups = hasUpcomingShipments || hasPastShipments;
   const hasActiveItems = activeItems.length > 0;
   const hasCanceledItems = canceledItems.length > 0;
   const hasSubscriptions = hasDeliveryGroups || hasActiveItems || hasCanceledItems;
   const showSectionToggle = Boolean(portalSections);
   const [selectedSection, setSelectedSection] = useState<SubscriptionPortalTab>(() => {
-    if (hasDeliveryGroups) {
+    if (hasUpcomingShipments) {
+      return 'deliveries';
+    }
+
+    if (hasPastShipments) {
       return 'deliveries';
     }
 
@@ -801,9 +1346,10 @@ export function SubscriptionList({
           {visibleSectionEmpty ? (
             <SubscriptionTabEmptyState title={visibleEmptyTitle} />
           ) : selectedSection === 'deliveries' ? (
-            <SubscriptionDateSections
+            <SubscriptionShipmentsTabContent
+              emptyPastTitle={emptyPastShipmentsTitle}
+              emptyUpcomingTitle={emptyUpcomingShipmentsTitle}
               fallbackLogo={storeLogoFallback}
-              groups={deliveryGroups}
               labels={{
                 shipToLabel,
                 deliveryOptionLabel,
@@ -817,6 +1363,19 @@ export function SubscriptionList({
               }}
               manageItemAction={manageItemAction}
               manageItemLabel={manageItemLabel}
+              pastGroups={pastGroups}
+              pastTitle={pastShipmentsTitle}
+              fixPaymentLabel={fixPaymentLabel}
+              paymentIssueLabel={paymentIssueLabel}
+              retryPaymentAction={retryPaymentAction}
+              retryPaymentLabel={retryPaymentLabel}
+              shipmentPausedMessage={shipmentPausedMessage}
+              skipDeliveryItemAction={skipDeliveryItemAction}
+              skipDeliveryItemLabel={skipDeliveryItemLabel}
+              upcomingGroups={upcomingGroups}
+              upcomingTitle={upcomingShipmentsTitle}
+              updatePaymentAction={updatePaymentAction}
+              updatePaymentLabel={updatePaymentLabel}
             />
           ) : (
             <SubscriptionFlatItemsSection

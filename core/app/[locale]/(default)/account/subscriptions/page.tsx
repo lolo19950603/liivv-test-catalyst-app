@@ -6,6 +6,8 @@ import { groupSubscriptionsForPortal } from '~/lib/stripe/transform-customer-sub
 
 import { openBillingPortal } from './_actions/open-billing-portal';
 import { openSubscriptionPortal } from './_actions/open-subscription-portal';
+import { retrySubscriptionPaymentItem } from './_actions/retry-subscription-payment';
+import { skipSubscriptionDeliveryItem } from './_actions/skip-subscription-delivery';
 import { getSubscriptionsPageData } from './page-data';
 import { getStoreLogoFallback } from '~/lib/store-theme/get-store-logo-fallback';
 
@@ -63,7 +65,10 @@ export default async function SubscriptionsPage({ params }: Props) {
     );
   }
 
-  const portalSections = groupSubscriptionsForPortal(data.subscriptions, t, format);
+  const portalSections = groupSubscriptionsForPortal(data.subscriptions, t, format, {
+    customerId: data.bigcommerceCustomerId,
+    finalizedShipments: data.finalizedShipments,
+  });
 
   return (
     <SubscriptionList
@@ -72,6 +77,8 @@ export default async function SubscriptionsPage({ params }: Props) {
       deliveriesSectionTitle={t('sections.deliveries')}
       emptyActiveTitle={t('empty.active')}
       emptyCanceledTitle={t('empty.canceled')}
+      emptyPastShipmentsTitle={t('empty.pastShipments')}
+      emptyUpcomingShipmentsTitle={t('empty.upcomingShipments')}
       emptyDeliveriesTitle={t('empty.deliveries')}
       emptyStateActionHref="/"
       emptyStateActionLabel={t('browsePlans')}
@@ -85,6 +92,11 @@ export default async function SubscriptionsPage({ params }: Props) {
       shipToLabel={t('delivery.shipTo')}
       storeLogoFallback={storeLogoFallback}
       deliveryOptionLabel={t('delivery.option')}
+      pastShipmentsTitle={t('sections.pastShipments')}
+      paymentIssueLabel={t('delivery.paymentIssue')}
+      fixPaymentLabel={t('delivery.fixPayment')}
+      shipmentPausedMessage={t('delivery.paused')}
+      upcomingShipmentsTitle={t('sections.upcomingShipments')}
       subtotalLabel={t('delivery.subtotal')}
       taxLabel={t('delivery.tax')}
       totalLabel={t('delivery.total')}
@@ -92,7 +104,13 @@ export default async function SubscriptionsPage({ params }: Props) {
       quantityLabel={t('delivery.quantity')}
       paymentLabel={t('delivery.payment')}
       frequencyLabel={t('delivery.frequency')}
+      retryPaymentAction={retrySubscriptionPaymentItem}
+      retryPaymentLabel={t('delivery.retry')}
+      skipDeliveryItemAction={skipSubscriptionDeliveryItem}
+      skipDeliveryItemLabel={t('delivery.skipItem')}
       title={t('title')}
+      updatePaymentAction={openBillingPortal}
+      updatePaymentLabel={t('delivery.updatePayment')}
     />
   );
 }

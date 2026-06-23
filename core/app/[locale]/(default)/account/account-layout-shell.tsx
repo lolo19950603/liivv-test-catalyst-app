@@ -1,17 +1,16 @@
 'use client';
 
+import { clsx } from 'clsx';
 import { type ReactNode } from 'react';
 
-import { StickySidebarLayout } from '@/vibes/soul/sections/sticky-sidebar-layout';
 import { usePathname } from '~/i18n/routing';
 
 interface Props {
   children: ReactNode;
-  sidebar: ReactNode;
 }
 
-/** Full-screen dashboard skips the classic account sidebar shell. */
-export function AccountLayoutShell({ children, sidebar }: Props) {
+/** Full-screen dashboard skips the classic account page shell padding. */
+export function AccountLayoutShell({ children }: Props) {
   const pathname = usePathname() ?? '';
   const isDashboard = pathname.includes('/account/dashboard');
 
@@ -20,8 +19,10 @@ export function AccountLayoutShell({ children, sidebar }: Props) {
   }
 
   return (
-    <StickySidebarLayout sidebar={sidebar} sidebarSize="small">
-      {children}
-    </StickySidebarLayout>
+    <section className={clsx('liivv-account-pages group/pending @container')}>
+      <div className="mx-auto flex w-full max-w-[var(--section-max-width-2xl,1536px)] flex-col px-4 py-10 @xl:px-6 @xl:py-14 @4xl:px-8 @4xl:py-20">
+        {children}
+      </div>
+    </section>
   );
 }

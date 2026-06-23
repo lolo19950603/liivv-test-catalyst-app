@@ -5,6 +5,8 @@ import { getComponentSnapshot } from '~/lib/makeswift/client';
 
 import type { StoreCategoryNode } from '~/lib/makeswift/site-header/build-store-nav-from-categories';
 
+import type { AccountMenuLink } from '~/lib/account/account-menu-links';
+
 import { PropsContextProvider, type SiteHeaderContextValue } from './client';
 import { COMPONENT_TYPE } from './register';
 
@@ -12,6 +14,7 @@ type Props = {
   snapshotId?: string;
   label?: string;
   accountHref: string;
+  accountMenuLinks?: AccountMenuLink[];
   categoryTree: Streamable<StoreCategoryNode[]>;
   initialPathname: string;
   storeLogo: SiteHeaderContextValue['storeLogo'];
@@ -25,6 +28,7 @@ export const SiteHeader = async ({
   snapshotId = 'site-header',
   label = 'Site Header',
   accountHref,
+  accountMenuLinks,
   categoryTree,
   initialPathname,
   storeLogo,
@@ -37,6 +41,7 @@ export const SiteHeader = async ({
 
   const contextValue: SiteHeaderContextValue = {
     accountHref,
+    accountMenuLinks,
     categoryTree: await categoryTree,
     initialPathname,
     storeLogo,

@@ -328,6 +328,25 @@ export async function queuePaidInvoiceForSubscriptionOrderBatch({
   }
 }
 
+export async function getSubscriptionOrderBatch(
+  storageKey: string,
+): Promise<SubscriptionOrderBatch | null> {
+  return readBatch(storageKey);
+}
+
+export async function getSubscriptionOrderBatchIndex(customerId: number): Promise<string[]> {
+  const indexValue = await kv.get<string[] | ''>(batchIndexKvKey(customerId));
+
+  return typeof indexValue === 'string' || !indexValue ? [] : indexValue;
+}
+
+export async function removeSubscriptionOrderBatch(
+  storageKey: string,
+  customerId: number,
+): Promise<void> {
+  await deleteBatch(storageKey, customerId);
+}
+
 async function flushSubscriptionOrderBatch(storageKey: string): Promise<number | null> {
   const batch = await readBatch(storageKey);
 
@@ -401,8 +420,22 @@ export async function flushQuietSubscriptionOrderBatchesForCustomer(
 export async function scheduleSubscriptionOrderBatchFlush({
   customerId,
   batchStorageKey,
-}: QueuedSubscriptionInvoiceBatch): Promise<void> {
+  stripeCustomerId,
+  subscriptions,
+}: QueuedSubscriptionInvoiceBatch & {
+  stripeCustomerId: string;
+  subscriptions: import('./subscriptions').CustomerSubscription[];
+}): Promise<void> {
   await delay(getBatchQuietPeriodMs());
-  await flushSubscriptionOrderBatchIfReady(batchStorageKey);
-  await flushQuietSubscriptionOrderBatchesForCustomer(customerId);
+
+  const { tryFinalizeSubscriptionShipmentByStorageKey } = await import(
+    './finalize-subscription-shipment'
+  );
+
+  await tryFinalizeSubscriptionShipmentByStorageKey({
+    customerId,
+    batchStorageKey,
+    stripeCustomerId,
+    subscriptions,
+  });
 }

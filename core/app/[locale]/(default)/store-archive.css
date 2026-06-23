@@ -1,5 +1,7 @@
 /* Store-wide archive feel for Catalyst commerce pages (category, cart, blog, account, etc.) */
 
+@import './account-pages-theme.css';
+
 html {
   overflow-y: scroll;
   scrollbar-gutter: stable;
@@ -53,7 +55,8 @@ html {
 .liivv-store .group\/compare-section,
 .liivv-store .group\/not-found,
 .liivv-store .group\/address-list-section,
-.liivv-store .group\/account-settings-section {
+.liivv-store .group\/account-settings-section,
+.liivv-store .liivv-account-pages {
   color: var(--store-primary-text);
 }
 
@@ -127,9 +130,9 @@ html {
   display: inline-flex;
   width: fit-content;
   gap: 0.25rem;
-  border: 1px solid rgba(49, 47, 47, 0.18);
+  border: 1px solid rgba(49, 47, 47, 0.14);
   border-radius: 9999px;
-  background: rgb(245 242 237);
+  background: #fff;
   padding: 0.25rem;
 }
 
@@ -163,8 +166,14 @@ html {
 }
 
 .liivv-store .subscription-delivery-card {
-  border: 0 !important;
+  border: 1px solid rgba(49, 47, 47, 0.14) !important;
+  background-color: #fff !important;
   outline: none !important;
+  box-shadow: 0 1px 2px rgba(49, 47, 47, 0.04);
+}
+
+.liivv-store .subscription-delivery-card .subscription-delivery-product {
+  background-color: #fff !important;
 }
 
 .liivv-store .subscription-delivery-card img {
@@ -180,13 +189,68 @@ html {
   width: 100%;
 }
 
-.liivv-store .subscription-delivery-products {
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
+.liivv-store .subscription-delivery-lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.liivv-store .subscription-delivery-product {
-  border-color: rgba(49, 47, 47, 0.12) !important;
+.liivv-store .subscription-delivery-line {
+  background: transparent;
+}
+
+.liivv-store .subscription-delivery-line img {
+  border: 0 !important;
+  outline: none !important;
+}
+
+.liivv-store .subscription-order-link {
+  background: transparent !important;
+  border: 0 !important;
+  min-height: auto !important;
+  padding: 0 !important;
+}
+
+.liivv-store .subscription-date-heading {
+  letter-spacing: -0.01em;
+}
+
+.liivv-store .subscription-delivery-line--payment-failed {
+  background: rgba(49, 47, 47, 0.02);
+}
+
+.liivv-store .subscription-delivery-line--payment-failed .subscription-delivery-line__media img,
+.liivv-store .subscription-delivery-line--payment-failed .subscription-delivery-line__media span {
+  filter: grayscale(1);
+}
+
+.liivv-store .subscription-payment-strip button[type='submit'] {
+  background: transparent !important;
+  border: 0 !important;
+  min-height: auto !important;
+  padding: 0 !important;
+}
+
+.liivv-store .subscription-edit-link button {
+  background: transparent !important;
+  border: 0 !important;
+  min-height: auto !important;
+  padding: 0 !important;
+}
+
+.liivv-store .subscription-product-card .subscription-portal-action-button {
+  max-width: 100%;
+}
+
+.liivv-store .subscription-edit-action .subscription-portal-action-button {
+  height: auto;
+  min-height: 2.5rem;
+  width: 100%;
+  max-width: 100%;
+  padding-inline: 1rem;
+  padding-block: 0.5rem;
+  white-space: normal;
+  line-height: 1.35;
 }
 
 .liivv-store .subscription-flat-item,
@@ -224,4 +288,90 @@ html {
   background: rgba(102, 96, 92, 0.12);
   color: #66605c;
   border-bottom: 1px dashed rgba(102, 96, 92, 0.2);
+}
+
+/* Checkout billing form — reset archive theme label/input floating-field styles */
+.liivv-store .checkout-fulfillment .checkout-billing-mode,
+.liivv-store .checkout-fulfillment .checkout-billing-form-panel {
+  background: transparent;
+}
+
+.liivv-store .checkout-fulfillment .checkout-billing-mode__option {
+  position: static !important;
+  transform: none !important;
+  border-inline: 0 !important;
+  background: transparent !important;
+  color: #66605c;
+  font-weight: 500;
+  min-height: auto !important;
+}
+
+.liivv-store .checkout-fulfillment .checkout-billing-mode__option--selected {
+  color: #312f2f;
+  font-weight: 600;
+  background-color: rgba(49, 47, 47, 0.04) !important;
+}
+
+.liivv-store .checkout-fulfillment .checkout-billing-mode__option input[type='radio'] {
+  accent-color: #312f2f;
+}
+
+.liivv-store .checkout-fulfillment .checkout-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  align-self: start;
+  width: 100%;
+}
+
+.liivv-store .checkout-fulfillment .checkout-field__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25;
+  transform: none !important;
+}
+
+.liivv-store .checkout-fulfillment .checkout-field__input {
+  display: block;
+  width: 100%;
+  min-height: 2.5rem;
+  transform: none !important;
+  appearance: auto;
+  -webkit-appearance: auto;
+  border: 1px solid var(--store-border) !important;
+  border-radius: 0.5rem !important;
+  background-color: #fff !important;
+  padding: 0.625rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25 !important;
+  color: var(--store-primary-text) !important;
+}
+
+.liivv-store .checkout-fulfillment .checkout-field__input:focus {
+  outline: 2px solid rgb(var(--color-keyboard-focus, 49 47 47) / 0.35);
+  outline-offset: 1px;
+  border-color: var(--store-primary-text) !important;
+}
+
+/* Portaled checkout address modal — outside .liivv-store */
+.checkout-address-modal .checkout-address-modal__input {
+  display: block;
+  width: 100%;
+  min-height: 2.5rem;
+  transform: none !important;
+  appearance: auto;
+  -webkit-appearance: auto;
+  border: 1px solid rgba(49, 47, 47, 0.18) !important;
+  border-radius: 0.5rem !important;
+  background-color: #fff !important;
+  padding: 0.625rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25 !important;
+  color: #312f2f !important;
+}
+
+.checkout-address-modal .checkout-address-modal__input:focus {
+  outline: 2px solid rgba(49, 47, 47, 0.35);
+  outline-offset: 1px;
+  border-color: #312f2f !important;
 }

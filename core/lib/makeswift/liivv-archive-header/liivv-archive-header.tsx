@@ -25,6 +25,9 @@ import {
 import { useHeaderStickyScrolled } from '~/lib/makeswift/site-header/use-header-sticky-scrolled';
 import { resolveMakeswiftHref } from '~/lib/makeswift/utils/resolve-makeswift-href';
 
+import type { AccountMenuLink } from '~/lib/account/account-menu-links';
+
+import { LIIVV_HEADER_ACCOUNT_MENU_CSS } from './account-menu-css';
 import { ARCHIVE_HEADER_CSS } from './archive-header-css';
 import { LiivvArchiveSearchPanel } from './liivv-archive-search-panel';
 import { LIIVV_HEADER_MEGA_MENU_CSS } from './mega-menu-css';
@@ -97,6 +100,7 @@ function isMegaMenuInteractionTarget(
 }
 const ACCOUNT_ARIA_LABEL = 'Account';
 const CART_ARIA_LABEL = 'Shopping cart';
+const ACCOUNT_MENU_CLOSE_DELAY_MS = 200;
 
 /** Archive header palette — scoped to each header root so vars are not inherited from page `:root`. */
 export const LIIVV_ARCHIVE_HEADER_SECTION_VARS = `#shopify-section-sections--26374736970019__header,#liivv-site-header,.liivv-archive-header{--section-padding-top:0px;--section-padding-bottom:0px;--color-background:255 255 255;--color-foreground:49 47 47;--color-transparent:168 156 148;--color-localization:255 255 255}`;
@@ -126,6 +130,7 @@ export interface LiivvArchiveHeaderProps {
   navLinks?: LiivvArchiveNavLink[];
   showUtilityIcons?: boolean;
   accountHref?: string;
+  accountMenuLinks?: AccountMenuLink[];
   searchPlaceholder?: string;
   linksPosition?: LiivvArchiveLinksPosition;
   initialCartCount?: number | null;
@@ -715,6 +720,118 @@ function HeaderMegaMenuPanel({
   );
 }
 
+function HeaderAccountMenu({
+  accountHref,
+  links,
+  panelId,
+}: {
+  accountHref: string;
+  links: AccountMenuLink[];
+  panelId: string;
+}) {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const openMenu = useCallback(() => {
+    if (closeTimerRef.current != null) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+
+    setOpen(true);
+  }, []);
+
+  const scheduleCloseMenu = useCallback(() => {
+    if (closeTimerRef.current != null) {
+      clearTimeout(closeTimerRef.current);
+    }
+
+    closeTimerRef.current = setTimeout(() => {
+      setOpen(false);
+      closeTimerRef.current = null;
+    }, ACCOUNT_MENU_CLOSE_DELAY_MS);
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (closeTimerRef.current != null) {
+        clearTimeout(closeTimerRef.current);
+      }
+    },
+    [],
+  );
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  if (links.length === 0) {
+    return (
+      <Link
+        aria-label={ACCOUNT_ARIA_LABEL}
+        className="flex items-center justify-center"
+        href={accountHref}
+      >
+        <span className="sr-only">{ACCOUNT_ARIA_LABEL}</span>
+        <LiivvIconAccount className="icon icon-account icon-md" />
+      </Link>
+    );
+  }
+
+  return (
+    <div
+      className={clsx('header-account-menu', open && 'is-open')}
+      onMouseEnter={openMenu}
+      onMouseLeave={scheduleCloseMenu}
+    >
+      <Link
+        aria-controls={panelId}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        aria-label={ACCOUNT_ARIA_LABEL}
+        className="header-account-menu__trigger"
+        href={accountHref}
+        onClick={(event) => {
+          if (typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches) {
+            event.preventDefault();
+            setOpen((current) => !current);
+          }
+        }}
+      >
+        <span className="sr-only">{ACCOUNT_ARIA_LABEL}</span>
+        <LiivvIconAccount className="icon icon-account icon-md" />
+      </Link>
+      <div
+        className="header-account-menu__panel"
+        id={panelId}
+        onMouseEnter={openMenu}
+        onMouseLeave={scheduleCloseMenu}
+        role="menu"
+      >
+        {links.map((link) => {
+          const isActive = pathname.includes(link.href);
+
+          return (
+            <Link
+              className={clsx(
+                'header-account-menu__link',
+                isActive && 'header-account-menu__link--active',
+              )}
+              href={link.href}
+              key={link.href}
+              prefetch={link.prefetch}
+              role="menuitem"
+            >
+              {link.label}
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function navigationJustifyClass(position: LiivvArchiveLinksPosition) {
   switch (position) {
     case 'center':
@@ -738,6 +855,7 @@ export function LiivvArchiveHeader({
   navLinks = [],
   showUtilityIcons = true,
   accountHref = ACCOUNT_LOGIN_PATH,
+  accountMenuLinks = [],
   searchPlaceholder = 'Search products',
   linksPosition = 'left',
   initialCartCount = null,
@@ -752,6 +870,7 @@ export function LiivvArchiveHeader({
   const safeId = reactId.replace(/:/g, '');
   const mobileNavId = `liivv-archive-header-mobile-nav-${safeId}`;
   const searchPanelId = `liivv-archive-header-search-${safeId}`;
+  const accountMenuPanelId = `liivv-archive-header-account-${safeId}`;
 
   const pathname = usePathname();
   const internalSectionRef = useRef<HTMLDivElement>(null);
@@ -987,6 +1106,9 @@ export function LiivvArchiveHeader({
       <style dangerouslySetInnerHTML={{ __html: LIIVV_ARCHIVE_HEADER_SECTION_VARS }} />
       <style dangerouslySetInnerHTML={{ __html: ARCHIVE_HEADER_CSS }} />
       <style dangerouslySetInnerHTML={{ __html: LIIVV_HEADER_MEGA_MENU_CSS }} />
+      {accountMenuLinks.length > 0 ? (
+        <style dangerouslySetInnerHTML={{ __html: LIIVV_HEADER_ACCOUNT_MENU_CSS }} />
+      ) : null}
       {sticky ? (
         <style dangerouslySetInnerHTML={{ __html: LIIVV_HEADER_STICKY_SCROLLED_CSS }} />
       ) : null}
@@ -1121,14 +1243,11 @@ export function LiivvArchiveHeader({
                   <span className="sr-only">{SEARCH_ARIA_LABEL}</span>
                   <LiivvIconSearch className="icon icon-search icon-md" />
                 </button>
-                <Link
-                  aria-label={ACCOUNT_ARIA_LABEL}
-                  className="flex items-center justify-center"
-                  href={accountHref}
-                >
-                  <span className="sr-only">{ACCOUNT_ARIA_LABEL}</span>
-                  <LiivvIconAccount className="icon icon-account icon-md" />
-                </Link>
+                <HeaderAccountMenu
+                  accountHref={accountHref}
+                  links={accountMenuLinks}
+                  panelId={accountMenuPanelId}
+                />
                 <Link
                   aria-label={cartCountLabel}
                   className="cart-drawer-button relative flex shrink-0 items-center justify-center"

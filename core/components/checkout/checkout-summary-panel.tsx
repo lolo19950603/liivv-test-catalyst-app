@@ -76,7 +76,7 @@ function CheckoutLineItemRow({ item }: { item: CustomCheckoutLineItem }) {
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-[15px] leading-snug text-[var(--foreground,hsl(var(--foreground)))]">
                 {item.title}
               </p>
@@ -85,14 +85,6 @@ function CheckoutLineItemRow({ item }: { item: CustomCheckoutLineItem }) {
                 <p className="mt-0.5 text-[13px] leading-snug text-[var(--contrast-500,hsl(var(--contrast-500)))]">
                   {item.subtitle}
                 </p>
-              ) : null}
-
-              {item.badge ? (
-                <SubscriptionLineSummary
-                  badge={item.badge}
-                  className="mt-1"
-                  details={item.subscriptionDetails}
-                />
               ) : null}
 
               {item.chargeNote ? (
@@ -108,6 +100,14 @@ function CheckoutLineItemRow({ item }: { item: CustomCheckoutLineItem }) {
               </p>
             ) : null}
           </div>
+
+          {item.badge ? (
+            <SubscriptionLineSummary
+              badge={item.badge}
+              className="mt-1"
+              details={item.subscriptionDetails}
+            />
+          ) : null}
         </div>
       </li>
     );
@@ -153,7 +153,7 @@ function CheckoutLineItemRow({ item }: { item: CustomCheckoutLineItem }) {
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-[15px] font-medium leading-snug text-[hsl(var(--foreground))]">
                 {item.title}
               </p>
@@ -163,29 +163,29 @@ function CheckoutLineItemRow({ item }: { item: CustomCheckoutLineItem }) {
                   {item.subtitle}
                 </p>
               ) : null}
-
-              {item.badge ? (
-                <SubscriptionLineSummary
-                  badge={item.badge}
-                  className="mt-2"
-                  details={item.subscriptionDetails}
-                />
-              ) : null}
             </div>
 
             <div className="shrink-0 text-right">
-              {!item.hidePrice && item.price ? (
-                <p className="text-[15px] font-medium leading-snug text-[hsl(var(--contrast-500))]">
+              {item.price ? (
+                <p className="text-[15px] font-medium leading-snug text-[hsl(var(--foreground))]">
                   {item.price}
                 </p>
               ) : null}
               {item.chargeNote ? (
-                <p className="mt-1 max-w-[7rem] text-[11px] leading-tight text-[hsl(var(--contrast-500))]">
+                <p className="mt-1 max-w-[9rem] text-[11px] leading-tight text-[hsl(var(--contrast-500))]">
                   {item.chargeNote}
                 </p>
               ) : null}
             </div>
           </div>
+
+          {item.badge ? (
+            <SubscriptionLineSummary
+              badge={item.badge}
+              className="mt-2"
+              details={item.subscriptionDetails}
+            />
+          ) : null}
         </div>
       </div>
     </li>

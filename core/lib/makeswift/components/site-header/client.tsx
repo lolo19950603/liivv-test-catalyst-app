@@ -23,6 +23,7 @@ import {
   MakeswiftVisibleSlotContent,
 } from '~/lib/makeswift/makeswift-visible-slot-content';
 import { ACCOUNT_LOGIN_PATH } from '~/lib/makeswift/site-header/resolve-account-href';
+import type { AccountMenuLink } from '~/lib/account/account-menu-links';
 import {
   mapMakeswiftAdditionalLinks,
   type MakeswiftAdditionalLinkInput,
@@ -40,6 +41,7 @@ type BannerProps = ComponentPropsWithoutRef<typeof Banner>;
 
 export type SiteHeaderContextValue = {
   accountHref: string;
+  accountMenuLinks?: AccountMenuLink[];
   categoryTree: StoreCategoryNode[];
   initialPathname: string;
   storeLogo: StoreLogo;
@@ -173,11 +175,12 @@ function PageOverrideHeader({
     storeLogoLabel,
   );
 
-  const { accountHref } = useContext(PropsContext);
+  const { accountHref, accountMenuLinks } = useContext(PropsContext);
 
   return (
     <LiivvArchiveHeader
       accountHref={accountHref}
+      accountMenuLinks={accountMenuLinks}
       background={background}
       className="liivv-site-header liivv-site-header--override"
       initialCartCount={cartCount}
@@ -215,6 +218,7 @@ export const MakeswiftHeader = forwardRef(
     const isInBuilder = useIsInBuilder();
     const {
       accountHref,
+      accountMenuLinks,
       categoryTree,
       storeLogo,
       storeLogoLabel,
@@ -260,6 +264,7 @@ export const MakeswiftHeader = forwardRef(
     return (
       <LiivvArchiveHeader
         accountHref={accountHref}
+        accountMenuLinks={accountMenuLinks}
         background={background}
         banner={bannerNode}
         className="liivv-site-header"

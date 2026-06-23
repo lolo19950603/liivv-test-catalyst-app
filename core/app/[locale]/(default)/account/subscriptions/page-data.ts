@@ -15,6 +15,9 @@ import {
 } from '~/lib/stripe/customers';
 import { enrichSubscriptionsForPortal } from '~/lib/stripe/enrich-subscriptions-for-portal';
 import { quoteLivePricesForPortal } from '~/lib/stripe/quote-subscriptions-for-portal';
+import { finalizeDueShipmentsForCustomer } from '~/lib/stripe/finalize-subscription-shipment';
+import { getFinalizedShipmentsForCustomer } from '~/lib/stripe/subscription-shipment-records';
+import type { FinalizedShipmentRecord } from '~/lib/stripe/subscription-shipment-records';
 import {
   getCustomerSubscriptions,
   getStripeCustomerShippingAddress,
@@ -32,8 +35,10 @@ const SubscriptionsCustomerQuery = graphql(`
 export type SubscriptionsPageResult =
   | {
       kind: 'ready';
+      bigcommerceCustomerId: number;
       stripeCustomerId: string;
       subscriptions: Awaited<ReturnType<typeof getCustomerSubscriptions>>;
+      finalizedShipments: FinalizedShipmentRecord[];
     }
   | { kind: 'not-configured' }
   | { kind: 'customer-not-found' }
@@ -76,9 +81,17 @@ export const getSubscriptionsPageData = cache(async (): Promise<SubscriptionsPag
   }
 
   const subscriptions = await getCustomerSubscriptions(stripeCustomerId);
+
+  await finalizeDueShipmentsForCustomer({
+    customerId: customer.entityId,
+    stripeCustomerId,
+    subscriptions,
+  });
+
+  const refreshedSubscriptions = await getCustomerSubscriptions(stripeCustomerId);
   const productEntityIds = [
     ...new Set(
-      subscriptions
+      refreshedSubscriptions
         .map((subscription) => subscription.productEntityId)
         .filter((productEntityId): productEntityId is number => productEntityId != null),
     ),
@@ -104,7 +117,7 @@ export const getSubscriptionsPageData = cache(async (): Promise<SubscriptionsPag
     }
   }
 
-  const enrichedSubscriptions = enrichSubscriptionsForPortal(subscriptions, {
+  const enrichedSubscriptions = enrichSubscriptionsForPortal(refreshedSubscriptions, {
     customerAddresses: addressData?.addresses ?? [],
     stripeCustomerShipping,
     productImagesByEntityId,
@@ -115,10 +128,14 @@ export const getSubscriptionsPageData = cache(async (): Promise<SubscriptionsPag
     customerAddresses: addressData?.addresses ?? [],
   });
 
+  const finalizedShipments = await getFinalizedShipmentsForCustomer(customer.entityId);
+
   return {
     kind: 'ready',
+    bigcommerceCustomerId: customer.entityId,
     stripeCustomerId,
     subscriptions: subscriptionsWithLivePrices,
+    finalizedShipments,
   };
 });
 
@@ -130,4 +147,37 @@ export async function resolveStripeCustomerIdForAccount(): Promise<string | null
   }
 
   return data.stripeCustomerId;
+}
+
+export async function syncSubscriptionShipmentsForAccount(): Promise<void> {
+  const customerAccessToken = await getSessionCustomerAccessToken();
+
+  if (!customerAccessToken || !isStripeConfigured()) {
+    return;
+  }
+
+  const response = await client.fetch({
+    document: SubscriptionsCustomerQuery,
+    customerAccessToken,
+    fetchOptions: { cache: 'no-store' },
+  });
+  const customer = response.data.customer;
+
+  if (!customer) {
+    return;
+  }
+
+  const stripeCustomerId = await resolveStripeCustomerId(customer.entityId);
+
+  if (!stripeCustomerId) {
+    return;
+  }
+
+  const subscriptions = await getCustomerSubscriptions(stripeCustomerId);
+
+  await finalizeDueShipmentsForCustomer({
+    customerId: customer.entityId,
+    stripeCustomerId,
+    subscriptions,
+  });
 }

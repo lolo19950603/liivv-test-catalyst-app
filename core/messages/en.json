@@ -261,6 +261,8 @@
       "endedOn": "Ended on {date}",
       "sections": {
         "deliveries": "Deliveries",
+        "upcomingShipments": "Upcoming shipments",
+        "pastShipments": "Past shipments",
         "active": "Active",
         "canceled": "Canceled"
       },
@@ -283,7 +285,24 @@
         "totalsPending": "Totals confirmed at billing",
         "quantity": "Quantity",
         "payment": "Payment",
-        "frequency": "Frequency"
+        "frequency": "Frequency",
+        "paused": "Shipment paused due to unsuccessful payment on one or more items in this shipment.",
+        "retry": "Retry",
+        "updatePayment": "Update payment card and retry",
+        "skipItem": "Skip",
+        "paymentIssue": "Payment failed for this item. Choose an option below.",
+        "fixPayment": "Fix payment"
+      },
+      "pastShipment": {
+        "orderLink": "Order #{orderId}",
+        "statusCharged": "Charged",
+        "statusSkipped": "Skipped",
+        "outcomePartialNote": "Some items were skipped from this shipment.",
+        "outcomeAllFailed": "No order was created. All items failed payment or were skipped.",
+        "skipReason": {
+          "customer_skip": "Skipped by customer for this shipment",
+          "missedDeadline": "Payment was not received before 1:00 PM and this item was not included in this shipment."
+        }
       },
       "endsOn": "Ends on {date}",
       "cancelAtPeriodEnd": "Cancels at period end",
@@ -292,7 +311,9 @@
         "description": "Add subscription products from the shop to your cart and check out like any other order.",
         "active": "You don't have any active subscriptions.",
         "canceled": "You don't have any canceled subscriptions.",
-        "deliveries": "You don't have any upcoming deliveries."
+        "deliveries": "You don't have any upcoming deliveries.",
+        "upcomingShipments": "You don't have any upcoming shipments.",
+        "pastShipments": "You don't have any past shipments."
       },
       "intervals": {
         "day": "per day",
@@ -628,7 +649,7 @@
       "chargeDueToday": "Due today",
       "chargeBilledOn": "Billing and shipping on {date}",
       "notInTotal": "Not in total below",
-      "priceAtBilling": "Price confirmed at billing",
+      "subjectToChangeAtBilling": "Subject to change at billing",
       "subtotal": "Subtotal",
       "shipping": "Shipping",
       "tax": "Tax",

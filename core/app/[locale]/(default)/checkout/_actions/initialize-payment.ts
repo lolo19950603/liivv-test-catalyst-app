@@ -84,14 +84,15 @@ async function initializeFromBillingAddress(billingAddress: CheckoutAddressSnaps
   });
 }
 
-async function parseBillingAddressFromFormData(formData: FormData) {
+async function parseBillingAddressFromFormData(formData: FormData, fallbackEmail?: string) {
   const statesByCountry = await buildStatesByCountry();
+  const email = String(formData.get('email') ?? '').trim() || fallbackEmail || '';
 
   return buildBillingAddressSnapshot(
     {
       firstName: String(formData.get('firstName') ?? ''),
       lastName: String(formData.get('lastName') ?? ''),
-      email: String(formData.get('email') ?? ''),
+      email,
       company: String(formData.get('company') ?? '') || undefined,
       address1: String(formData.get('address1') ?? ''),
       address2: String(formData.get('address2') ?? '') || undefined,
@@ -140,14 +141,15 @@ async function getCheckoutCustomerContext() {
 }
 
 export async function initializePayment(formData: FormData) {
-  const billingAddress = await parseBillingAddressFromFormData(formData);
+  const { customer } = await getCheckoutCustomerContext();
+  const billingAddress = await parseBillingAddressFromFormData(formData, customer.email);
 
   return initializeFromBillingAddress(billingAddress);
 }
 
 export async function prepareOrderConfirmation(formData: FormData, stripeSessionId: string) {
-  const billingAddress = await parseBillingAddressFromFormData(formData);
   const { cartId, customer } = await getCheckoutCustomerContext();
+  const billingAddress = await parseBillingAddressFromFormData(formData, customer.email);
 
   return syncCheckoutBillingForStripeSession({
     cartId,
