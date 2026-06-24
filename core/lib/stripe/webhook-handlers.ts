@@ -120,21 +120,18 @@ export async function handleStripeWebhookEvent(event: Stripe.Event): Promise<voi
         await storeStripeCustomerId(bigcommerceCustomerId, stripeCustomerId);
       }
 
-      const orderId = await createBigCommerceOrderFromInvoice(invoice);
+      const result = await createBigCommerceOrderFromInvoice(invoice);
 
-      if (orderId) {
+      if (result.status === 'created') {
         // eslint-disable-next-line no-console
         console.info(
-          `Created BigCommerce subscription order ${orderId} for invoice ${invoice.id}`,
-        );
-      } else if (process.env.STRIPE_SUBSCRIPTION_ORDER_BATCHING === 'true') {
-        // eslint-disable-next-line no-console
-        console.info(
-          `Queued subscription invoice ${invoice.id} for batched BigCommerce order creation`,
+          `Created BigCommerce subscription order ${result.orderId} for invoice ${invoice.id}`,
         );
       } else {
         // eslint-disable-next-line no-console
-        console.info(`No BigCommerce subscription order created for invoice ${invoice.id}`);
+        console.warn(
+          `No BigCommerce subscription order created for invoice ${invoice.id}: ${result.reason}`,
+        );
       }
 
       break;

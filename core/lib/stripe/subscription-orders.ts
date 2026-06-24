@@ -144,33 +144,22 @@ async function createOrderFromSubscription({
   unitAmountIncTax: number;
   currencyCode: string;
   productName: string;
-}): Promise<number | null> {
+}): Promise<{ orderId: number } | { reason: string }> {
   if (!isBigCommerceAdminConfigured()) {
-    // eslint-disable-next-line no-console
-    console.warn('Skipping BigCommerce subscription order: admin API not configured');
-
-    return null;
+    return { reason: 'BigCommerce admin API not configured on server' };
   }
 
   const metadata = subscriptionMetadata ?? subscription.metadata;
   const customerId = getBigCommerceCustomerId(metadata);
 
   if (!customerId) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `Skipping BigCommerce subscription order ${stripeReferenceId}: missing bigcommerce_customer_id`,
-    );
-
-    return null;
+    return { reason: 'missing bigcommerce_customer_id in subscription metadata' };
   }
 
   const claimed = await claimSubscriptionOrderCreation(stripeReferenceId);
 
   if (!claimed) {
-    // eslint-disable-next-line no-console
-    console.info(`BigCommerce subscription order already handled for ${stripeReferenceId}`);
-
-    return null;
+    return { reason: 'subscription order already handled for this Stripe reference' };
   }
 
   try {
@@ -196,13 +185,15 @@ async function createOrderFromSubscription({
     // eslint-disable-next-line no-console
     console.info(`Created BigCommerce subscription order ${orderId} for ${stripeReferenceId}`);
 
-    return orderId;
+    return { orderId };
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Failed to create BigCommerce subscription order:', error);
     await releaseSubscriptionOrderCreation(stripeReferenceId);
 
-    return null;
+    return {
+      reason: error instanceof Error ? error.message : 'BigCommerce order API failed',
+    };
   }
 }
 
@@ -217,11 +208,18 @@ function getSubscriptionProductName(subscription: Stripe.Subscription): string {
   return product.name;
 }
 
+export type CreateBigCommerceOrderFromInvoiceResult =
+  | { status: 'created'; orderId: number }
+  | { status: 'skipped'; reason: string };
+
 export async function createBigCommerceOrderFromInvoice(
   invoice: Stripe.Invoice,
-): Promise<number | null> {
+): Promise<CreateBigCommerceOrderFromInvoiceResult> {
   if ((invoice.amount_paid ?? 0) <= 0) {
-    return null;
+    return {
+      status: 'skipped',
+      reason: `amount_paid=${invoice.amount_paid ?? 0}`,
+    };
   }
 
   const billableReasons = new Set<Stripe.Invoice.BillingReason | null>([
@@ -231,23 +229,19 @@ export async function createBigCommerceOrderFromInvoice(
   ]);
 
   if (!billableReasons.has(invoice.billing_reason)) {
-    // eslint-disable-next-line no-console
-    console.info(
-      `Skipping BigCommerce subscription order for invoice ${invoice.id}: billing_reason=${invoice.billing_reason ?? 'null'}`,
-    );
-
-    return null;
+    return {
+      status: 'skipped',
+      reason: `billing_reason=${invoice.billing_reason ?? 'null'}`,
+    };
   }
 
   const subscriptionId = getInvoiceSubscriptionId(invoice);
 
   if (!subscriptionId) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `Skipping BigCommerce subscription order for invoice ${invoice.id}: missing subscription id`,
-    );
-
-    return null;
+    return {
+      status: 'skipped',
+      reason: 'missing subscription id',
+    };
   }
 
   const subscription = await getSubscription(subscriptionId);
@@ -258,17 +252,27 @@ export async function createBigCommerceOrderFromInvoice(
   const currencyCode = (invoice.currency ?? subscription.currency ?? 'usd').toUpperCase();
 
   if (isSubscriptionOrderBatchingEnabled()) {
-    await queuePaidInvoiceForSubscriptionOrderBatch({
+    const queued = await queuePaidInvoiceForSubscriptionOrderBatch({
       invoice,
       subscription,
       subscriptionMetadata,
       orderType,
     });
 
-    return null;
+    if (!queued) {
+      return {
+        status: 'skipped',
+        reason: 'failed to queue subscription order batch',
+      };
+    }
+
+    return {
+      status: 'skipped',
+      reason: 'queued for batched BigCommerce order creation',
+    };
   }
 
-  return createOrderFromSubscription({
+  const orderResult = await createOrderFromSubscription({
     subscription,
     subscriptionMetadata,
     stripeReferenceId: `invoice:${invoice.id}`,
@@ -278,6 +282,15 @@ export async function createBigCommerceOrderFromInvoice(
     currencyCode,
     productName: getSubscriptionProductName(subscription),
   });
+
+  if ('orderId' in orderResult) {
+    return { status: 'created', orderId: orderResult.orderId };
+  }
+
+  return {
+    status: 'skipped',
+    reason: orderResult.reason,
+  };
 }
 
 function isSubscriptionOrderBatchingEnabled(): boolean {
@@ -332,5 +345,5 @@ export async function createBigCommerceOrderFromCheckoutSession(
     unitAmountIncTax,
     currencyCode,
     productName: getSubscriptionProductName(subscription),
-  });
+  }).then((result) => ('orderId' in result ? result.orderId : null));
 }

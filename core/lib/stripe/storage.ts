@@ -36,7 +36,7 @@ export async function claimSubscriptionOrderCreation(referenceId: string): Promi
   const key = subscriptionOrderKey(referenceId);
   const existing = await kv.get<string>(key);
 
-  if (existing) {
+  if (existing && existing !== 'pending') {
     return false;
   }
 
