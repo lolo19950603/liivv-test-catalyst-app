@@ -1,6 +1,5 @@
 import 'server-only';
 
-import { after } from 'next/server';
 import type Stripe from 'stripe';
 
 import { fulfillCheckoutStripeSession } from '~/lib/checkout/payment';
@@ -9,14 +8,12 @@ import {
   createBigCommerceOrderFromInvoice,
   getInvoiceSubscriptionId,
 } from './subscription-orders';
-import { scheduleSubscriptionOrderBatchFlush } from './subscription-order-batch';
 import { getStripe } from './client';
 import {
   applySubscriptionInvoiceTax,
   prepareSubscriptionForBillingById,
 } from './prepare-subscription-invoice';
 import { getStoredStripeCustomerId, storeStripeCustomerId } from './storage';
-import { getCustomerSubscriptions } from './subscriptions';
 
 function getBigCommerceCustomerId(metadata: Stripe.Metadata | null | undefined): number | null {
   const value = metadata?.bigcommerce_customer_id;
@@ -28,6 +25,14 @@ function getBigCommerceCustomerId(metadata: Stripe.Metadata | null | undefined):
   const parsed = Number(value);
 
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+function getStripeCustomerIdFromInvoice(invoice: Stripe.Invoice): string | null {
+  if (typeof invoice.customer === 'string') {
+    return invoice.customer;
+  }
+
+  return invoice.customer?.id ?? null;
 }
 
 export async function handleStripeWebhookEvent(event: Stripe.Event): Promise<void> {
@@ -100,24 +105,36 @@ export async function handleStripeWebhookEvent(event: Stripe.Event): Promise<voi
       const stripe = getStripe();
       const invoice = await stripe.invoices.retrieve(invoiceEvent.id);
 
-      const queued = await createBigCommerceOrderFromInvoice(invoice);
+      let stripeCustomerId = getStripeCustomerIdFromInvoice(invoice);
+      const bigcommerceCustomerId = getBigCommerceCustomerId(
+        invoice.parent?.type === 'subscription_details'
+          ? invoice.parent.subscription_details?.metadata
+          : invoice.lines?.data[0]?.metadata,
+      );
 
-      if (queued) {
-        after(async () => {
-          const stripeCustomerId = await getStoredStripeCustomerId(queued.customerId);
+      if (!stripeCustomerId && bigcommerceCustomerId) {
+        stripeCustomerId = await getStoredStripeCustomerId(bigcommerceCustomerId);
+      }
 
-          if (!stripeCustomerId) {
-            return;
-          }
+      if (stripeCustomerId && bigcommerceCustomerId) {
+        await storeStripeCustomerId(bigcommerceCustomerId, stripeCustomerId);
+      }
 
-          const subscriptions = await getCustomerSubscriptions(stripeCustomerId);
+      const orderId = await createBigCommerceOrderFromInvoice(invoice);
 
-          await scheduleSubscriptionOrderBatchFlush({
-            ...queued,
-            stripeCustomerId,
-            subscriptions,
-          });
-        });
+      if (orderId) {
+        // eslint-disable-next-line no-console
+        console.info(
+          `Created BigCommerce subscription order ${orderId} for invoice ${invoice.id}`,
+        );
+      } else if (process.env.STRIPE_SUBSCRIPTION_ORDER_BATCHING === 'true') {
+        // eslint-disable-next-line no-console
+        console.info(
+          `Queued subscription invoice ${invoice.id} for batched BigCommerce order creation`,
+        );
+      } else {
+        // eslint-disable-next-line no-console
+        console.info(`No BigCommerce subscription order created for invoice ${invoice.id}`);
       }
 
       break;

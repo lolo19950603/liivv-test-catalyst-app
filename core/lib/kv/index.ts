@@ -84,17 +84,16 @@ class KV<Adapter extends KvAdapter> implements KvAdapter {
 }
 
 async function createKVAdapter() {
-  // Prioritize Runtime Cache for Vercel environments
-  if (process.env.VERCEL === '1') {
-    const { RuntimeCacheAdapter } = await import('./adapters/vercel-runtime-cache');
-
-    return new RuntimeCacheAdapter();
-  }
-
   if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
     const { UpstashKvAdapter } = await import('./adapters/upstash');
 
     return new UpstashKvAdapter();
+  }
+
+  if (process.env.VERCEL === '1') {
+    const { RuntimeCacheAdapter } = await import('./adapters/vercel-runtime-cache');
+
+    return new RuntimeCacheAdapter();
   }
 
   return new MemoryKvAdapter();

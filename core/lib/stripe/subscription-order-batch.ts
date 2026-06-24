@@ -13,8 +13,8 @@ import { kv } from '~/lib/kv';
 
 import {
   buildSubscriptionOrderBatchStorageKey,
-  getShipmentCalendarDayKey,
 } from './subscription-shipment-grouping';
+import { getSubscriptionBillingDayKey } from './subscription-schedule-time';
 import {
   claimSubscriptionOrderCreation,
   markSubscriptionOrderCreated,
@@ -76,6 +76,10 @@ function batchFlushKvKey(storageKey: string): string {
   return `stripe:subscription-batch-flush:${storageKey}`;
 }
 
+function globalBatchIndexKvKey(): string {
+  return 'stripe:subscription-batch-global-index';
+}
+
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
@@ -123,6 +127,8 @@ async function deleteBatch(storageKey: string, customerId: number): Promise<void
   } else {
     await kv.set(indexKey, '');
   }
+
+  await unregisterGlobalBatchIndex(storageKey);
 }
 
 async function registerBatchIndex(customerId: number, storageKey: string): Promise<void> {
@@ -130,11 +136,38 @@ async function registerBatchIndex(customerId: number, storageKey: string): Promi
   const existingIndex = (await kv.get<string[] | ''>(indexKey)) ?? [];
   const normalizedIndex = typeof existingIndex === 'string' ? [] : existingIndex;
 
-  if (normalizedIndex.includes(storageKey)) {
+  if (!normalizedIndex.includes(storageKey)) {
+    await kv.set(indexKey, [...normalizedIndex, storageKey]);
+  }
+
+  await registerGlobalBatchIndex(storageKey);
+}
+
+async function readGlobalBatchIndex(): Promise<string[]> {
+  const indexValue = await kv.get<string[] | ''>(globalBatchIndexKvKey());
+
+  return typeof indexValue === 'string' || !indexValue ? [] : indexValue;
+}
+
+async function registerGlobalBatchIndex(storageKey: string): Promise<void> {
+  const index = await readGlobalBatchIndex();
+
+  if (index.includes(storageKey)) {
     return;
   }
 
-  await kv.set(indexKey, [...normalizedIndex, storageKey]);
+  await kv.set(globalBatchIndexKvKey(), [...index, storageKey]);
+}
+
+async function unregisterGlobalBatchIndex(storageKey: string): Promise<void> {
+  const index = await readGlobalBatchIndex();
+  const nextIndex = index.filter((entry) => entry !== storageKey);
+
+  if (nextIndex.length > 0) {
+    await kv.set(globalBatchIndexKvKey(), nextIndex);
+  } else {
+    await kv.set(globalBatchIndexKvKey(), '');
+  }
 }
 
 async function claimBatchFlush(storageKey: string): Promise<boolean> {
@@ -254,6 +287,11 @@ export async function queuePaidInvoiceForSubscriptionOrderBatch({
   orderType: 'initial' | 'renewal';
 }): Promise<QueuedSubscriptionInvoiceBatch | null> {
   if (!isBigCommerceAdminConfigured()) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `Skipping BigCommerce subscription order for invoice ${invoice.id}: admin API not configured`,
+    );
+
     return null;
   }
 
@@ -270,7 +308,7 @@ export async function queuePaidInvoiceForSubscriptionOrderBatch({
     return null;
   }
 
-  const dayKey = getShipmentCalendarDayKey(getInvoiceChargeTimestamp(invoice));
+  const dayKey = getSubscriptionBillingDayKey(getInvoiceChargeTimestamp(invoice));
   const shippingAddressKey =
     subscriptionMetadata.shipping_address_key?.trim() || 'default-shipping-address';
   const batchStorageKey = buildSubscriptionOrderBatchStorageKey({
@@ -417,25 +455,103 @@ export async function flushQuietSubscriptionOrderBatchesForCustomer(
   }
 }
 
-export async function scheduleSubscriptionOrderBatchFlush({
-  customerId,
-  batchStorageKey,
-  stripeCustomerId,
-  subscriptions,
-}: QueuedSubscriptionInvoiceBatch & {
-  stripeCustomerId: string;
-  subscriptions: import('./subscriptions').CustomerSubscription[];
-}): Promise<void> {
-  await delay(getBatchQuietPeriodMs());
+/** Flush queued subscription batches once their quiet period has elapsed. */
+export async function flushReadySubscriptionOrderBatches(): Promise<{
+  processed: number;
+  orderIds: number[];
+}> {
+  const index = await readGlobalBatchIndex();
+  const orderIds: number[] = [];
+  let processed = 0;
+
+  for (const storageKey of index) {
+    const batch = await readBatch(storageKey);
+
+    if (!batch) {
+      await unregisterGlobalBatchIndex(storageKey);
+      continue;
+    }
+
+    if (Date.now() - batch.updatedAt < getBatchQuietPeriodMs()) {
+      continue;
+    }
+
+    processed += 1;
+
+    try {
+      const { getStoredStripeCustomerId } = await import('./storage');
+      const { getCustomerSubscriptions } = await import('./subscriptions');
+      const { tryFinalizeSubscriptionShipmentByStorageKey } = await import(
+        './finalize-subscription-shipment'
+      );
+
+      const stripeCustomerId = await getStoredStripeCustomerId(batch.customerId);
+
+      if (!stripeCustomerId) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `Skipping subscription batch ${storageKey}: missing Stripe customer mapping for BigCommerce customer ${batch.customerId}`,
+        );
+        continue;
+      }
+
+      const subscriptions = await getCustomerSubscriptions(stripeCustomerId);
+      const record = await tryFinalizeSubscriptionShipmentByStorageKey({
+        customerId: batch.customerId,
+        batchStorageKey: storageKey,
+        stripeCustomerId,
+        subscriptions,
+      });
+
+      if (record?.bigcommerceOrderId) {
+        orderIds.push(record.bigcommerceOrderId);
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(`Failed to flush ready subscription order batch ${storageKey}:`, error);
+    }
+  }
+
+  return { processed, orderIds };
+}
+
+/** Wait for additional invoices in the same shipment group, then create the BigCommerce order. */
+export async function finalizeSubscriptionInvoiceBatch(
+  {
+    customerId,
+    batchStorageKey,
+    stripeCustomerId,
+    subscriptions,
+  }: QueuedSubscriptionInvoiceBatch & {
+    stripeCustomerId: string;
+    subscriptions: import('./subscriptions').CustomerSubscription[];
+  },
+  options?: { quietPeriodMs?: number },
+): Promise<void> {
+  const quietPeriodMs = options?.quietPeriodMs ?? getBatchQuietPeriodMs();
+
+  if (quietPeriodMs > 0) {
+    await delay(quietPeriodMs);
+  }
 
   const { tryFinalizeSubscriptionShipmentByStorageKey } = await import(
     './finalize-subscription-shipment'
   );
 
-  await tryFinalizeSubscriptionShipmentByStorageKey({
+  const record = await tryFinalizeSubscriptionShipmentByStorageKey({
     customerId,
     batchStorageKey,
     stripeCustomerId,
     subscriptions,
   });
+
+  if (!record?.bigcommerceOrderId) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `Subscription invoice batch ${batchStorageKey} finalized without a BigCommerce order (outcome=${record?.outcome ?? 'none'})`,
+    );
+  }
 }
+
+/** @deprecated Use finalizeSubscriptionInvoiceBatch */
+export const scheduleSubscriptionOrderBatchFlush = finalizeSubscriptionInvoiceBatch;

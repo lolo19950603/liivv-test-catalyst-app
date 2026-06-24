@@ -12,7 +12,6 @@ import { isBigCommerceAdminConfigured } from '~/lib/bigcommerce/rest';
 import { getStripe } from './client';
 import {
   queuePaidInvoiceForSubscriptionOrderBatch,
-  type QueuedSubscriptionInvoiceBatch,
 } from './subscription-order-batch';
 import {
   claimSubscriptionOrderCreation,
@@ -218,13 +217,83 @@ function getSubscriptionProductName(subscription: Stripe.Subscription): string {
   return product.name;
 }
 
-function getSubscriptionLineTotals(subscription: Stripe.Subscription): {
+export async function createBigCommerceOrderFromInvoice(
+  invoice: Stripe.Invoice,
+): Promise<number | null> {
+  if ((invoice.amount_paid ?? 0) <= 0) {
+    return null;
+  }
+
+  const billableReasons = new Set<Stripe.Invoice.BillingReason | null>([
+    'subscription_cycle',
+    'subscription_create',
+    'subscription_update',
+  ]);
+
+  if (!billableReasons.has(invoice.billing_reason)) {
+    // eslint-disable-next-line no-console
+    console.info(
+      `Skipping BigCommerce subscription order for invoice ${invoice.id}: billing_reason=${invoice.billing_reason ?? 'null'}`,
+    );
+
+    return null;
+  }
+
+  const subscriptionId = getInvoiceSubscriptionId(invoice);
+
+  if (!subscriptionId) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `Skipping BigCommerce subscription order for invoice ${invoice.id}: missing subscription id`,
+    );
+
+    return null;
+  }
+
+  const subscription = await getSubscription(subscriptionId);
+  const subscriptionMetadata = mergeSubscriptionMetadata(subscription, invoice);
+  const orderType = invoice.billing_reason === 'subscription_cycle' ? 'renewal' : 'initial';
+  const { unitAmountExTax } = getSubscriptionLineTotals(subscription, subscriptionMetadata);
+  const unitAmountIncTax = invoice.amount_paid ?? unitAmountExTax;
+  const currencyCode = (invoice.currency ?? subscription.currency ?? 'usd').toUpperCase();
+
+  if (isSubscriptionOrderBatchingEnabled()) {
+    await queuePaidInvoiceForSubscriptionOrderBatch({
+      invoice,
+      subscription,
+      subscriptionMetadata,
+      orderType,
+    });
+
+    return null;
+  }
+
+  return createOrderFromSubscription({
+    subscription,
+    subscriptionMetadata,
+    stripeReferenceId: `invoice:${invoice.id}`,
+    orderType,
+    unitAmountExTax,
+    unitAmountIncTax,
+    currencyCode,
+    productName: getSubscriptionProductName(subscription),
+  });
+}
+
+function isSubscriptionOrderBatchingEnabled(): boolean {
+  return process.env.STRIPE_SUBSCRIPTION_ORDER_BATCHING === 'true';
+}
+
+function getSubscriptionLineTotals(
+  subscription: Stripe.Subscription,
+  metadata: Stripe.Metadata = subscription.metadata,
+): {
   quantity: number;
   unitAmountExTax: number;
 } {
   const item = subscription.items.data[0];
   const quantity = item?.quantity ?? 1;
-  const billedSubtotal = Number(subscription.metadata.billed_subtotal_cents ?? '');
+  const billedSubtotal = Number(metadata.billed_subtotal_cents ?? '');
   const unitAmount =
     Number.isFinite(billedSubtotal) && billedSubtotal > 0
       ? billedSubtotal
@@ -263,50 +332,5 @@ export async function createBigCommerceOrderFromCheckoutSession(
     unitAmountIncTax,
     currencyCode,
     productName: getSubscriptionProductName(subscription),
-  });
-}
-
-export async function createBigCommerceOrderFromInvoice(
-  invoice: Stripe.Invoice,
-): Promise<QueuedSubscriptionInvoiceBatch | null> {
-  if ((invoice.amount_paid ?? 0) <= 0) {
-    return null;
-  }
-
-  const billableReasons = new Set<Stripe.Invoice.BillingReason | null>([
-    'subscription_cycle',
-    'subscription_create',
-    'subscription_update',
-  ]);
-
-  if (!billableReasons.has(invoice.billing_reason)) {
-    // eslint-disable-next-line no-console
-    console.info(
-      `Skipping BigCommerce subscription order for invoice ${invoice.id}: billing_reason=${invoice.billing_reason ?? 'null'}`,
-    );
-
-    return null;
-  }
-
-  const subscriptionId = getInvoiceSubscriptionId(invoice);
-
-  if (!subscriptionId) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      `Skipping BigCommerce subscription order for invoice ${invoice.id}: missing subscription id`,
-    );
-
-    return null;
-  }
-
-  const subscription = await getSubscription(subscriptionId);
-  const subscriptionMetadata = mergeSubscriptionMetadata(subscription, invoice);
-  const orderType = invoice.billing_reason === 'subscription_cycle' ? 'renewal' : 'initial';
-
-  return queuePaidInvoiceForSubscriptionOrderBatch({
-    invoice,
-    subscription,
-    subscriptionMetadata,
-    orderType,
   });
 }

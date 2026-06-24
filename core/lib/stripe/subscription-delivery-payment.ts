@@ -4,6 +4,7 @@ import type Stripe from 'stripe';
 
 import { getStripe } from './client';
 import { getShipmentCalendarDayKey } from './subscription-shipment-grouping';
+import { resolveSubscriptionBillingCycleAnchor } from './subscription-schedule-time';
 
 export function isSubscriptionPaymentFailed(
   status: Stripe.Subscription.Status,
@@ -103,7 +104,7 @@ export async function skipSubscriptionDelivery({
     intervalCount,
   );
   const now = Math.floor(Date.now() / 1000);
-  const billingCycleAnchor = Math.max(nextBillingAnchor, now + 60);
+  const billingCycleAnchor = resolveSubscriptionBillingCycleAnchor(nextBillingAnchor, now);
   const resolvedShipmentDayKey =
     shipmentDayKey ?? getShipmentCalendarDayKey(subscription.current_period_end);
 
@@ -162,7 +163,7 @@ export async function releaseSubscriptionFromFailedShipmentDeadline({
     intervalCount,
   );
   const now = Math.floor(Date.now() / 1000);
-  const billingCycleAnchor = Math.max(nextBillingAnchor, now + 60);
+  const billingCycleAnchor = resolveSubscriptionBillingCycleAnchor(nextBillingAnchor, now);
 
   await stripe.subscriptions.update(subscriptionId, {
     billing_cycle_anchor: billingCycleAnchor,

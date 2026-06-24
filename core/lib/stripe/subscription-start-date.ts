@@ -1,5 +1,10 @@
 import 'server-only';
 
+import {
+  getSubscriptionBillingAnchorForStartDate,
+  getSubscriptionBillingDayKey,
+} from './subscription-schedule-time';
+
 const MAX_START_DATE_DAYS = 365;
 
 export function parseSubscriptionStartDateInput(
@@ -9,33 +14,29 @@ export function parseSubscriptionStartDateInput(
     return undefined;
   }
 
-  const parsed = new Date(`${value.trim()}T12:00:00.000Z`);
+  const dayKey = value.trim();
 
-  if (Number.isNaN(parsed.getTime())) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dayKey)) {
     return undefined;
   }
 
-  const today = new Date();
+  const anchor = getSubscriptionBillingAnchorForStartDate(dayKey);
+  const todayKey = getSubscriptionBillingDayKey(Math.floor(Date.now() / 1000));
 
-  today.setUTCHours(0, 0, 0, 0);
-
-  const startDay = new Date(parsed);
-
-  startDay.setUTCHours(0, 0, 0, 0);
-
-  if (startDay <= today) {
+  if (dayKey <= todayKey) {
     return undefined;
   }
 
-  const maxDate = new Date(today);
+  const maxDate = new Date();
 
   maxDate.setUTCDate(maxDate.getUTCDate() + MAX_START_DATE_DAYS);
+  const maxDayKey = getSubscriptionBillingDayKey(Math.floor(maxDate.getTime() / 1000));
 
-  if (startDay > maxDate) {
+  if (dayKey > maxDayKey) {
     return undefined;
   }
 
-  return Math.floor(parsed.getTime() / 1000);
+  return anchor;
 }
 
 export function getMinSubscriptionStartDateValue(): string {

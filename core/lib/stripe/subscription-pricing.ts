@@ -1,6 +1,8 @@
 import { isDeferredSubscriptionLine } from '../checkout/subscription-charge-timing';
 import type { CheckoutLineItemSnapshot } from '../checkout/types';
 
+import { resolveSubscriptionBillingCycleAnchor } from './subscription-schedule-time';
+
 function getFirstBillingPeriodEnd(line: CheckoutLineItemSnapshot): number {
   if (!line.billingInterval) {
     return Math.floor(Date.now() / 1000);
@@ -36,7 +38,9 @@ export function getStripeSubscriptionBillingSchedule(
   now = Math.floor(Date.now() / 1000),
 ): { billing_cycle_anchor?: number } {
   if (line.billingCycleAnchor != null && line.billingCycleAnchor > now) {
-    return { billing_cycle_anchor: line.billingCycleAnchor };
+    return {
+      billing_cycle_anchor: resolveSubscriptionBillingCycleAnchor(line.billingCycleAnchor, now),
+    };
   }
 
   // Already paid on checkout — push Stripe's first invoice to the end of period one.
@@ -44,7 +48,9 @@ export function getStripeSubscriptionBillingSchedule(
     const periodEnd = getFirstBillingPeriodEnd(line);
 
     if (periodEnd > now) {
-      return { billing_cycle_anchor: periodEnd };
+      return {
+        billing_cycle_anchor: resolveSubscriptionBillingCycleAnchor(periodEnd, now),
+      };
     }
   }
 
