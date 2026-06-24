@@ -41,6 +41,16 @@ export class MemoryKvAdapter implements KvAdapter {
     return value;
   }
 
+  async setIfNotExists<Data>(key: string, value: Data): Promise<boolean> {
+    if (this.kv.has(key)) {
+      return false;
+    }
+
+    await this.set(key, value);
+
+    return true;
+  }
+
   private async get<Data>(key: string) {
     const entry = this.kv.get(key);
 

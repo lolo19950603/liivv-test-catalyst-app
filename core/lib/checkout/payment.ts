@@ -17,7 +17,7 @@ import {
 } from '~/lib/stripe/prepare-subscription-invoice';
 import { getStripeSubscriptionBillingSchedule } from '~/lib/stripe/subscription-pricing';
 import { toStripeRecurring } from '~/lib/stripe/subscription-interval';
-import { claimSubscriptionOrderCreation, getCheckoutFulfillmentOrderId, hasCheckoutStripeSubscriptions, isCheckoutFulfillmentComplete, markCheckoutFulfillmentComplete, markCheckoutStripeSubscriptionsCreated, markSubscriptionOrderCreated, releaseSubscriptionOrderCreation } from '~/lib/stripe/storage';
+import { claimSubscriptionOrderCreation, claimCheckoutStripeSubscriptionsCreation, getCheckoutFulfillmentOrderId, hasCheckoutStripeSubscriptions, isCheckoutFulfillmentComplete, markCheckoutFulfillmentComplete, markCheckoutStripeSubscriptionsCreated, markSubscriptionOrderCreated, releaseCheckoutStripeSubscriptionsCreation, releaseSubscriptionOrderCreation } from '~/lib/stripe/storage';
 
 import { addCheckoutBillingAddress } from './billing-address';
 import {
@@ -649,51 +649,65 @@ async function createStripeSubscriptionsForCheckout({
     return;
   }
 
+  const claimed = await claimCheckoutStripeSubscriptionsCreation(stripeSessionId);
+
+  if (!claimed) {
+    return;
+  }
+
   const stripe = getStripe();
   const subscriptionLines = snapshot.lineItems.filter((line) => line.isSubscription);
 
   if (subscriptionLines.length === 0) {
+    await releaseCheckoutStripeSubscriptionsCreation(stripeSessionId);
+
     return;
   }
 
-  await syncStripeCustomerShippingFromSnapshot(stripe, stripeCustomerId, snapshot);
+  try {
+    await syncStripeCustomerShippingFromSnapshot(stripe, stripeCustomerId, snapshot);
 
-  await Promise.all(
-    subscriptionLines.map(async (line) => {
-      if (!line.billingInterval) {
-        return;
-      }
+    await Promise.all(
+      subscriptionLines.map(async (line) => {
+        if (!line.billingInterval) {
+          return;
+        }
 
-      const metadata = buildSubscriptionMetadataFromLine(snapshot, line);
-      const billingSchedule = getStripeSubscriptionBillingSchedule(line);
-      const productId = await createStripeProductForCheckoutLine(stripe, line);
+        const metadata = buildSubscriptionMetadataFromLine(snapshot, line);
+        const billingSchedule = getStripeSubscriptionBillingSchedule(line);
+        const productId = await createStripeProductForCheckoutLine(stripe, line);
 
-      await stripe.subscriptions.create({
-        customer: stripeCustomerId,
-        default_payment_method: paymentMethodId,
-        items: [
-          {
-            quantity: line.quantity,
-            price_data: {
-              currency: line.currency.toLowerCase(),
-              unit_amount: SUBSCRIPTION_PLACEHOLDER_UNIT_AMOUNT,
-              recurring: toStripeRecurring(line.billingInterval),
-              product: productId,
+        await stripe.subscriptions.create({
+          customer: stripeCustomerId,
+          default_payment_method: paymentMethodId,
+          items: [
+            {
+              quantity: line.quantity,
+              price_data: {
+                currency: line.currency.toLowerCase(),
+                unit_amount: SUBSCRIPTION_PLACEHOLDER_UNIT_AMOUNT,
+                recurring: toStripeRecurring(line.billingInterval),
+                product: productId,
+              },
             },
+          ],
+          metadata: {
+            ...metadata,
+            [DYNAMIC_SUBSCRIPTION_PRICING_METADATA_KEY]: 'true',
+            subscription_quantity: String(line.quantity),
           },
-        ],
-        metadata: {
-          ...metadata,
-          [DYNAMIC_SUBSCRIPTION_PRICING_METADATA_KEY]: 'true',
-          subscription_quantity: String(line.quantity),
-        },
-        ...billingSchedule,
-        proration_behavior: 'none',
-      });
-    }),
-  );
+          ...billingSchedule,
+          proration_behavior: 'none',
+        });
+      }),
+    );
 
-  await markCheckoutStripeSubscriptionsCreated(stripeSessionId);
+    await markCheckoutStripeSubscriptionsCreated(stripeSessionId);
+  } catch (error) {
+    await releaseCheckoutStripeSubscriptionsCreation(stripeSessionId);
+
+    throw error;
+  }
 }
 
 async function syncStripeCustomerShippingFromSnapshot(

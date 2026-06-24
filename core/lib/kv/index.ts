@@ -67,6 +67,36 @@ class KV<Adapter extends KvAdapter> implements KvAdapter {
     return value;
   }
 
+  async setIfNotExists<Data>(key: string, value: Data): Promise<boolean> {
+    const kv = await this.getKv();
+
+    if (typeof kv.setIfNotExists === 'function') {
+      const claimed = await kv.setIfNotExists(key, value);
+
+      if (claimed) {
+        await this.memoryKv.setIfNotExists?.(key, value);
+      }
+
+      this.logger(
+        `SET NX - Key: ${key} - Value: ${JSON.stringify(value, null, 2)} - Claimed: ${claimed}`,
+      );
+
+      return claimed;
+    }
+
+    const existing = await this.get<Data>(key);
+
+    if (existing != null && existing !== '') {
+      return false;
+    }
+
+    await this.set(key, value);
+
+    const after = await this.get<Data>(key);
+
+    return after === value;
+  }
+
   private async getKv() {
     if (!this.kv) {
       this.kv = await this.createAdapter();

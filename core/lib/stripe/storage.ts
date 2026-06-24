@@ -90,7 +90,33 @@ function checkoutStripeSubscriptionsKey(paymentIntentId: string): string {
 export async function hasCheckoutStripeSubscriptions(
   paymentIntentId: string,
 ): Promise<boolean> {
-  return Boolean(await kv.get<string>(checkoutStripeSubscriptionsKey(paymentIntentId)));
+  const existing = await kv.get<string>(checkoutStripeSubscriptionsKey(paymentIntentId));
+
+  return existing === 'created';
+}
+
+export async function claimCheckoutStripeSubscriptionsCreation(
+  stripeSessionId: string,
+): Promise<boolean> {
+  const key = checkoutStripeSubscriptionsKey(stripeSessionId);
+  const existing = await kv.get<string>(key);
+
+  if (existing === 'created' || existing === 'pending') {
+    return false;
+  }
+
+  return kv.setIfNotExists(key, 'pending');
+}
+
+export async function releaseCheckoutStripeSubscriptionsCreation(
+  stripeSessionId: string,
+): Promise<void> {
+  const key = checkoutStripeSubscriptionsKey(stripeSessionId);
+  const existing = await kv.get<string>(key);
+
+  if (existing === 'pending') {
+    await kv.set(key, '');
+  }
 }
 
 export async function markCheckoutStripeSubscriptionsCreated(

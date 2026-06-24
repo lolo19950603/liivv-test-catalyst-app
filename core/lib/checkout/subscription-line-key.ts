@@ -131,7 +131,10 @@ export function getSubscriptionLinesForCartLine(
     (line) => !line.cartLineItemEntityId || line.cartLineItemEntityId === cartLineItemEntityId,
   );
 
-  const resolvedLines = scopedLines.length > 0 ? scopedLines : matchingLines;
+  const resolvedLines =
+    scopedLines.length > 0
+      ? scopedLines
+      : matchingLines.filter((line) => !line.cartLineItemEntityId);
 
   return resolvedLines.sort((left, right) =>
     subscriptionLineIdentityKey(left).localeCompare(subscriptionLineIdentityKey(right)),

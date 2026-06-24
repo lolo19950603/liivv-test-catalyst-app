@@ -18,4 +18,10 @@ export class UpstashKvAdapter implements KvAdapter {
 
     return response;
   }
+
+  async setIfNotExists<Data>(key: string, value: Data): Promise<boolean> {
+    const response = await this.upstashKv.set(key, value, { nx: true });
+
+    return response === 'OK';
+  }
 }
