@@ -5,8 +5,10 @@ import { withChannelId } from './proxies/with-channel-id';
 import { withIntl } from './proxies/with-intl';
 import { withMakeswift } from './proxies/with-makeswift';
 import { withRoutes } from './proxies/with-routes';
+import { withVercelInternals } from './proxies/with-vercel-internals';
 
 export const proxy = composeProxies(
+  withVercelInternals,
   withAuth,
   withMakeswift,
   withIntl,
@@ -23,13 +25,12 @@ export const config = {
      * - archive (static assets under public/archive, e.g. diabetes-care-sections.css)
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - _vercel (vercel internals, eg: web vitals)
      * - favicon.ico (favicon file)
      * - admin (admin panel)
      * - sitemap.xml (sitemap route)
      * - xmlsitemap.php (legacy sitemap route)
      * - robots.txt (robots route)
      */
-    '/((?!api|admin|archive|_next/static|_next/image|_vercel|favicon.ico|xmlsitemap.php|sitemap.xml|robots.txt).*)',
+    '/((?!api|admin|archive|_next/static|_next/image|favicon.ico|xmlsitemap.php|sitemap.xml|robots.txt).*)',
   ],
 };

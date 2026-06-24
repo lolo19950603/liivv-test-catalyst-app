@@ -3,7 +3,7 @@ import { getSiteVersion } from '@makeswift/runtime/next/server';
 import { strict } from 'assert';
 import { getLocale } from 'next-intl/server';
 
-import { defaultLocale } from '~/i18n/locales';
+import { defaultLocale, locales } from '~/i18n/locales';
 
 import { runtime } from './runtime';
 
@@ -14,11 +14,16 @@ export const client = new Makeswift(process.env.MAKESWIFT_SITE_API_KEY, {
   apiOrigin: process.env.NEXT_PUBLIC_MAKESWIFT_API_ORIGIN ?? process.env.MAKESWIFT_API_ORIGIN,
 });
 
-export const getPageSnapshot = async ({ path, locale }: { path: string; locale: string }) =>
-  await client.getPageSnapshot(path, {
+export const getPageSnapshot = async ({ path, locale }: { path: string; locale: string }) => {
+  if (!isValidLocale(locale)) {
+    return null;
+  }
+
+  return await client.getPageSnapshot(path, {
     siteVersion: await getSiteVersion(),
     locale: normalizeLocale(locale),
   });
+};
 
 export const getComponentSnapshot = async (snapshotId: string) => {
   const locale = await getLocale();
@@ -29,11 +34,23 @@ export const getComponentSnapshot = async (snapshotId: string) => {
   });
 };
 
+function isValidLocale(locale: string): boolean {
+  return locales.includes(locale);
+}
+
 function normalizeLocale(locale: string): string | undefined {
+  if (!isValidLocale(locale)) {
+    return undefined;
+  }
+
   return locale === defaultLocale ? undefined : locale;
 }
 
 export async function getMakeswiftPageMetadata({ path, locale }: { path: string; locale: string }) {
+  if (!isValidLocale(locale)) {
+    return null;
+  }
+
   const { data: pages } = await client.getPages({
     pathPrefix: path,
     locale: normalizeLocale(locale),
