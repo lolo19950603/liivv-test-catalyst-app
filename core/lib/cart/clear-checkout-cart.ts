@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { BigCommerceGQLError } from '@bigcommerce/catalyst-client';
 import { revalidateTag } from 'next/cache';
 
 import { getSessionCustomerAccessToken } from '~/auth';
@@ -23,6 +24,13 @@ const DeleteCartLineItemMutation = graphql(`
     }
   }
 `);
+
+function isCartNotFoundError(error: unknown): boolean {
+  return (
+    error instanceof BigCommerceGQLError &&
+    error.errors.some((entry) => entry.message.includes('Cart does not exist'))
+  );
+}
 
 async function emptyBigCommerceCart(cartId: string, lineItemEntityIds: string[]): Promise<void> {
   if (lineItemEntityIds.length === 0) {
@@ -70,7 +78,10 @@ async function getSucceededCheckoutSnapshotId(
   return paymentIntent.metadata.checkout_snapshot_id ?? null;
 }
 
-export async function clearCheckoutCartAfterStripeSession(stripeSessionId: string): Promise<void> {
+export async function clearCheckoutCartAfterStripeSession(
+  stripeSessionId: string,
+  options?: { clearSessionCart?: boolean },
+): Promise<void> {
   const snapshotId = await getSucceededCheckoutSnapshotId(stripeSessionId);
 
   if (!snapshotId) {
@@ -88,12 +99,18 @@ export async function clearCheckoutCartAfterStripeSession(stripeSessionId: strin
   try {
     await emptyBigCommerceCart(snapshot.cartId, lineItemEntityIds);
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Failed to empty BigCommerce cart after checkout:', error);
+    if (!isCartNotFoundError(error)) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to empty BigCommerce cart after checkout:', error);
+    }
   }
 
   await clearSubscriptionLinesForCart(snapshot.cartId);
-  await clearCartId();
+
+  if (options?.clearSessionCart !== false) {
+    await clearCartId();
+  }
+
   revalidateTag(TAGS.cart, { expire: 0 });
 }
 

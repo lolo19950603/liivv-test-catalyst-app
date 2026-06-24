@@ -59,7 +59,7 @@ export async function handleStripeWebhookEvent(event: Stripe.Event): Promise<voi
       const paymentIntent = event.data.object;
 
       if (paymentIntent.metadata.checkout_snapshot_id) {
-        await fulfillCheckoutStripeSession(paymentIntent.id);
+        await fulfillCheckoutStripeSession(paymentIntent.id, { clearSessionCart: false });
       }
 
       break;
@@ -69,7 +69,7 @@ export async function handleStripeWebhookEvent(event: Stripe.Event): Promise<voi
       const setupIntent = event.data.object;
 
       if (setupIntent.metadata.checkout_snapshot_id) {
-        await fulfillCheckoutStripeSession(setupIntent.id);
+        await fulfillCheckoutStripeSession(setupIntent.id, { clearSessionCart: false });
       }
 
       break;

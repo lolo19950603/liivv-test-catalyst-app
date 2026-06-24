@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { ButtonLink } from '@/vibes/soul/primitives/button-link';
-import { clearCheckoutCartAfterStripeSession } from '~/lib/cart/clear-checkout-cart';
 
 import { CheckoutSuccessFulfillment } from './checkout-success-fulfillment';
 
@@ -29,10 +28,6 @@ export default async function CheckoutSuccessPage({ params, searchParams }: Prop
       : typeof query.setup_intent === 'string'
         ? query.setup_intent
         : undefined;
-
-  if (stripeSessionId) {
-    await clearCheckoutCartAfterStripeSession(stripeSessionId);
-  }
 
   setRequestLocale(locale);
 

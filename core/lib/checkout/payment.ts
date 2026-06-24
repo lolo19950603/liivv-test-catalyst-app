@@ -422,15 +422,21 @@ export async function initializeCheckoutPayment({
   };
 }
 
-export async function fulfillCheckoutStripeSession(stripeSessionId: string): Promise<number | null> {
+export async function fulfillCheckoutStripeSession(
+  stripeSessionId: string,
+  options?: { clearSessionCart?: boolean },
+): Promise<number | null> {
   if (stripeSessionId.startsWith('seti_')) {
-    return fulfillCheckoutSetup(stripeSessionId);
+    return fulfillCheckoutSetup(stripeSessionId, options);
   }
 
-  return fulfillCheckoutPayment(stripeSessionId);
+  return fulfillCheckoutPayment(stripeSessionId, options);
 }
 
-export async function fulfillCheckoutSetup(setupIntentId: string): Promise<number | null> {
+export async function fulfillCheckoutSetup(
+  setupIntentId: string,
+  options?: { clearSessionCart?: boolean },
+): Promise<number | null> {
   if (!isBigCommerceAdminConfigured()) {
     // eslint-disable-next-line no-console
     console.warn('Skipping checkout fulfillment: BigCommerce admin API not configured');
@@ -506,7 +512,7 @@ export async function fulfillCheckoutSetup(setupIntentId: string): Promise<numbe
 
     await markCheckoutFulfillmentComplete(fulfillmentRef);
     await clearCheckoutActiveStripeSession(snapshot.cartId);
-    await clearCheckoutCartAfterStripeSession(setupIntentId);
+    await clearCheckoutCartAfterStripeSession(setupIntentId, options);
 
     return existingOrderId;
   } catch (error) {
@@ -521,7 +527,10 @@ export async function fulfillCheckoutSetup(setupIntentId: string): Promise<numbe
   }
 }
 
-export async function fulfillCheckoutPayment(paymentIntentId: string): Promise<number | null> {
+export async function fulfillCheckoutPayment(
+  paymentIntentId: string,
+  options?: { clearSessionCart?: boolean },
+): Promise<number | null> {
   if (!isBigCommerceAdminConfigured()) {
     // eslint-disable-next-line no-console
     console.warn('Skipping checkout fulfillment: BigCommerce admin API not configured');
@@ -610,7 +619,7 @@ export async function fulfillCheckoutPayment(paymentIntentId: string): Promise<n
     }
 
     await clearCheckoutActiveStripeSession(snapshot.cartId);
-    await clearCheckoutCartAfterStripeSession(paymentIntentId);
+    await clearCheckoutCartAfterStripeSession(paymentIntentId, options);
 
     return orderId;
   } catch (error) {
