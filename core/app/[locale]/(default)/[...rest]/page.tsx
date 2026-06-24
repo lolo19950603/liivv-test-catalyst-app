@@ -1,6 +1,9 @@
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { hasLocale } from 'next-intl';
 
 import { defaultLocale, locales } from '~/i18n/locales';
+import { routing } from '~/i18n/routing';
 import { client, getMakeswiftPageMetadata, Page } from '~/lib/makeswift';
 
 interface PageParams {
@@ -14,6 +17,11 @@ export async function generateMetadata({
   params: Promise<PageParams>;
 }): Promise<Metadata> {
   const { rest, locale } = await params;
+
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+
   const path = `/${rest.join('/')}`;
 
   const metadata = await getMakeswiftPageMetadata({ path, locale });
@@ -40,6 +48,11 @@ export async function generateStaticParams(): Promise<PageParams[]> {
 
 export default async function CatchAllPage({ params }: { params: Promise<PageParams> }) {
   const { rest, locale } = await params;
+
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+
   const path = `/${rest.join('/')}`;
 
   return <Page locale={locale} path={path} />;
