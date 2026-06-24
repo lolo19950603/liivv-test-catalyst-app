@@ -22,6 +22,7 @@ import type { SubscriptionBillingInterval } from '~/lib/stripe/subscription-inte
 import {
   findSubscriptionLineByKey,
   getSubscriptionLinesForCart,
+  reconcileSubscriptionLinesWithCart,
 } from '~/lib/checkout/subscription-lines';
 import { buildAppUrl } from '~/lib/stripe/config';
 import { isStripeConfigured } from '~/lib/stripe/client';
@@ -108,14 +109,6 @@ export default async function CheckoutPage({ params }: Props) {
 
   const customer = customerResponse.data.customer;
   const format = await getFormatter();
-  const subscriptionLines = await getSubscriptionLinesForCart(cartId);
-  const formatInterval = ({ interval, intervalCount }: SubscriptionBillingInterval) => {
-    if (intervalCount === 1) {
-      return t(`intervals.${interval}` as 'intervals.month');
-    }
-
-    return t(`intervals.${interval}Plural` as 'intervals.monthPlural', { count: intervalCount });
-  };
 
   const physicalAndDigital = [
     ...cart.lineItems.physicalItems
@@ -125,6 +118,18 @@ export default async function CheckoutPage({ params }: Props) {
       .filter((item) => !item.parentEntityId)
       .map((item) => ({ item, isPhysical: false as const })),
   ];
+
+  const subscriptionLines = await reconcileSubscriptionLinesWithCart(
+    cartId,
+    physicalAndDigital.map(({ item }) => item),
+  );
+  const formatInterval = ({ interval, intervalCount }: SubscriptionBillingInterval) => {
+    if (intervalCount === 1) {
+      return t(`intervals.${interval}` as 'intervals.month');
+    }
+
+    return t(`intervals.${interval}Plural` as 'intervals.monthPlural', { count: intervalCount });
+  };
 
   const checkoutLines: CheckoutDisplayLineInput[] = physicalAndDigital.flatMap(({ item, isPhysical }) => {
     const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);

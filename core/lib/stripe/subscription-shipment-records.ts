@@ -1,6 +1,12 @@
 import 'server-only';
 
 import { kv } from '~/lib/kv';
+import {
+  getFinalizedShipmentRecordFromSupabase,
+  getFinalizedShipmentsForCustomerFromSupabase,
+  saveFinalizedShipmentRecordInSupabase,
+} from '~/lib/supabase/shipment-records-store';
+import { isSupabaseConfigured } from '~/lib/supabase/client';
 
 import { buildSubscriptionOrderBatchStorageKey } from './subscription-shipment-grouping';
 
@@ -58,6 +64,10 @@ export function buildShipmentStorageKey({
 export async function getFinalizedShipmentRecord(
   storageKey: string,
 ): Promise<FinalizedShipmentRecord | null> {
+  if (isSupabaseConfigured()) {
+    return getFinalizedShipmentRecordFromSupabase(storageKey);
+  }
+
   const record = await kv.get<FinalizedShipmentRecord | ''>(shipmentRecordKvKey(storageKey));
 
   if (!record || typeof record === 'string') {
@@ -70,6 +80,10 @@ export async function getFinalizedShipmentRecord(
 export async function getFinalizedShipmentsForCustomer(
   customerId: number,
 ): Promise<FinalizedShipmentRecord[]> {
+  if (isSupabaseConfigured()) {
+    return (await getFinalizedShipmentsForCustomerFromSupabase(customerId)) ?? [];
+  }
+
   const indexValue = await kv.get<string[] | ''>(shipmentHistoryIndexKvKey(customerId));
   const index = typeof indexValue === 'string' || !indexValue ? [] : indexValue;
 
@@ -85,6 +99,12 @@ export async function isShipmentFinalized(storageKey: string): Promise<boolean> 
 }
 
 export async function saveFinalizedShipmentRecord(record: FinalizedShipmentRecord): Promise<void> {
+  if (isSupabaseConfigured()) {
+    await saveFinalizedShipmentRecordInSupabase(record);
+
+    return;
+  }
+
   await kv.set(shipmentRecordKvKey(record.storageKey), record);
 
   const indexKey = shipmentHistoryIndexKvKey(record.customerId);

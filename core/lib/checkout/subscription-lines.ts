@@ -1,7 +1,15 @@
 import 'server-only';
 
 import type { ProductOptionSelection } from '~/lib/bigcommerce/product-options';
+import { findMatchingCartLineItem } from '~/lib/checkout/find-cart-line-item';
+import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
 import { kv } from '~/lib/kv';
+import {
+  getCartSubscriptionLinesFromSupabase,
+  setCartSubscriptionLinesInSupabase,
+  deleteCartSubscriptionLinesFromSupabase,
+} from '~/lib/supabase/cart-subscription-lines-store';
+import { isSupabaseConfigured } from '~/lib/supabase/client';
 import type { SubscriptionBillingInterval } from '~/lib/stripe/subscription-interval';
 
 import {
@@ -15,11 +23,28 @@ function subscriptionLinesKey(cartId: string): string {
   return `checkout:subscription-lines:${cartId}`;
 }
 
-export async function getSubscriptionLinesForCart(
-  cartId: string,
-): Promise<SubscriptionLineMeta[]> {
-  const lines = (await kv.get<SubscriptionLineMeta[]>(subscriptionLinesKey(cartId))) ?? [];
+async function loadSubscriptionLines(cartId: string): Promise<SubscriptionLineMeta[]> {
+  if (isSupabaseConfigured()) {
+    return (await getCartSubscriptionLinesFromSupabase(cartId)) ?? [];
+  }
 
+  return (await kv.get<SubscriptionLineMeta[]>(subscriptionLinesKey(cartId))) ?? [];
+}
+
+async function persistSubscriptionLines(
+  cartId: string,
+  lines: SubscriptionLineMeta[],
+): Promise<void> {
+  if (isSupabaseConfigured()) {
+    await setCartSubscriptionLinesInSupabase(cartId, lines);
+
+    return;
+  }
+
+  await kv.set(subscriptionLinesKey(cartId), lines);
+}
+
+function normalizeSubscriptionLines(lines: SubscriptionLineMeta[]): SubscriptionLineMeta[] {
   return mergeSubscriptionLinesByIdentity(
     lines.map((line) => ({
       ...line,
@@ -29,6 +54,67 @@ export async function getSubscriptionLinesForCart(
         : undefined,
     })),
   );
+}
+
+export async function getSubscriptionLinesForCart(
+  cartId: string,
+): Promise<SubscriptionLineMeta[]> {
+  const lines = await loadSubscriptionLines(cartId);
+
+  return normalizeSubscriptionLines(lines);
+}
+
+interface CartLineItemForReconciliation {
+  entityId: string;
+  productEntityId: number;
+  selectedOptions: Parameters<typeof mapCartSelectedOptionsToProductOptions>[0];
+}
+
+export async function reconcileSubscriptionLinesWithCart(
+  cartId: string,
+  cartLineItems: CartLineItemForReconciliation[],
+): Promise<SubscriptionLineMeta[]> {
+  const lines = await getSubscriptionLinesForCart(cartId);
+
+  if (lines.length === 0) {
+    return lines;
+  }
+
+  let changed = false;
+  const reconciled = lines.map((line) => {
+    const matchedLine = findMatchingCartLineItem(
+      cartLineItems,
+      line.productEntityId,
+      line.productOptions,
+    );
+
+    if (!matchedLine) {
+      return line;
+    }
+
+    const nextCartLineItemEntityId = String(matchedLine.entityId);
+
+    if (line.cartLineItemEntityId === nextCartLineItemEntityId) {
+      return line;
+    }
+
+    changed = true;
+
+    return {
+      ...line,
+      cartLineItemEntityId: nextCartLineItemEntityId,
+    };
+  });
+
+  if (!changed) {
+    return lines;
+  }
+
+  const normalized = normalizeSubscriptionLines(reconciled);
+
+  await persistSubscriptionLines(cartId, normalized);
+
+  return normalized;
 }
 
 export async function addSubscriptionLineToCart(
@@ -56,12 +142,12 @@ export async function addSubscriptionLineToCart(
           : current.productOptions,
       quantity: current.quantity + line.quantity,
     };
-    await kv.set(subscriptionLinesKey(cartId), existing);
+    await persistSubscriptionLines(cartId, existing);
 
     return;
   }
 
-  await kv.set(subscriptionLinesKey(cartId), [...existing, line]);
+  await persistSubscriptionLines(cartId, [...existing, line]);
 }
 
 export async function adjustSubscriptionQuantity(
@@ -82,8 +168,8 @@ export async function adjustSubscriptionQuantity(
   const nextQuantity = entry.quantity + delta;
 
   if (nextQuantity <= 0) {
-    await kv.set(
-      subscriptionLinesKey(cartId),
+    await persistSubscriptionLines(
+      cartId,
       existing.filter((_, entryIndex) => entryIndex !== index),
     );
 
@@ -91,7 +177,7 @@ export async function adjustSubscriptionQuantity(
   }
 
   existing[index] = { ...entry, quantity: nextQuantity };
-  await kv.set(subscriptionLinesKey(cartId), existing);
+  await persistSubscriptionLines(cartId, existing);
 }
 
 export async function removeSubscriptionLineFromCart(
@@ -102,8 +188,8 @@ export async function removeSubscriptionLineFromCart(
 ): Promise<void> {
   const existing = await getSubscriptionLinesForCart(cartId);
 
-  await kv.set(
-    subscriptionLinesKey(cartId),
+  await persistSubscriptionLines(
+    cartId,
     existing.filter((entry) => {
       if (subscriptionLineKey) {
         return subscriptionLineIdentityKey(entry) !== subscriptionLineKey;
@@ -118,6 +204,12 @@ export async function removeSubscriptionLineFromCart(
 }
 
 export async function clearSubscriptionLinesForCart(cartId: string): Promise<void> {
+  if (isSupabaseConfigured()) {
+    await deleteCartSubscriptionLinesFromSupabase(cartId);
+
+    return;
+  }
+
   await kv.set(subscriptionLinesKey(cartId), []);
 }
 

@@ -21,6 +21,7 @@ import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-
 import {
   findSubscriptionLineByKey,
   getSubscriptionLinesForCart,
+  reconcileSubscriptionLinesWithCart,
 } from '~/lib/checkout/subscription-lines';
 import type { SubscriptionBillingInterval } from '~/lib/stripe/subscription-interval';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
@@ -113,7 +114,6 @@ export default async function Cart({ params }: Props) {
   const cart = data.site.cart;
   const checkout = data.site.checkout;
   const giftCertificatesEnabled = data.site.settings?.giftCertificates?.isEnabled ?? false;
-  const subscriptionLines = await getSubscriptionLinesForCart(cartId);
   const formatInterval = ({ interval, intervalCount }: SubscriptionBillingInterval) => {
     if (intervalCount === 1) {
       return t(`subscription.intervals.${interval}` as 'subscription.intervals.month');
@@ -135,6 +135,7 @@ export default async function Cart({ params }: Props) {
   ].filter((item) => !('parentEntityId' in item) || !item.parentEntityId);
 
   const productLineItems = lineItems.filter((item) => item.__typename !== 'CartGiftCertificate');
+  const subscriptionLines = await reconcileSubscriptionLinesWithCart(cartId, productLineItems);
 
   const formattedGiftCertificates: CartGiftCertificateLineItem[] = lineItems
     .filter((item) => item.__typename === 'CartGiftCertificate')
