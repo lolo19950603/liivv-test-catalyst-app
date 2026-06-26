@@ -9,10 +9,7 @@ import {
   getInvoiceSubscriptionId,
 } from './subscription-orders';
 import { getStripe } from './client';
-import {
-  applySubscriptionInvoiceTax,
-  prepareSubscriptionForBillingById,
-} from './prepare-subscription-invoice';
+import { applySubscriptionInvoiceTax } from './prepare-subscription-invoice';
 import { getStoredStripeCustomerId, storeStripeCustomerId } from './storage';
 
 function getBigCommerceCustomerId(metadata: Stripe.Metadata | null | undefined): number | null {
@@ -70,17 +67,6 @@ export async function handleStripeWebhookEvent(event: Stripe.Event): Promise<voi
 
       if (setupIntent.metadata.checkout_snapshot_id) {
         await fulfillCheckoutStripeSession(setupIntent.id, { clearSessionCart: false });
-      }
-
-      break;
-    }
-
-    case 'invoice.upcoming': {
-      const invoice = event.data.object;
-      const subscriptionId = getInvoiceSubscriptionId(invoice);
-
-      if (subscriptionId) {
-        await prepareSubscriptionForBillingById(subscriptionId);
       }
 
       break;

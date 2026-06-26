@@ -93,7 +93,7 @@ function resolveSubscriptionAmounts(
   const unitAmount = item.price.unit_amount ?? 0;
   const isPlaceholder = unitAmount > 0 && unitAmount <= PLACEHOLDER_UNIT_AMOUNT;
 
-  if (isPlaceholder || metadata.dynamic_pricing === 'true') {
+  if (isPlaceholder) {
     return {
       subtotalExTaxCents: null,
       taxCents: null,

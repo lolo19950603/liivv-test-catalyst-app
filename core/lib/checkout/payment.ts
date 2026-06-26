@@ -12,10 +12,8 @@ import { kv } from '~/lib/kv';
 import { getStripe } from '~/lib/stripe/client';
 import { getOrCreateStripeCustomer } from '~/lib/stripe/customers';
 import { createStripeProductForCheckoutLine } from '~/lib/stripe/subscription-products';
-import {
-  DYNAMIC_SUBSCRIPTION_PRICING_METADATA_KEY,
-} from '~/lib/stripe/prepare-subscription-invoice';
-import { getStripeSubscriptionBillingSchedule } from '~/lib/stripe/subscription-pricing';
+import { getStripeSubscriptionBillingSchedule, resolveSubscriptionLineBillingAmounts } from '~/lib/stripe/subscription-pricing';
+import { DYNAMIC_SUBSCRIPTION_PRICING_METADATA_KEY } from '~/lib/stripe/prepare-subscription-invoice';
 import { toStripeRecurring } from '~/lib/stripe/subscription-interval';
 import { claimSubscriptionOrderCreation, claimCheckoutStripeSubscriptionsCreation, getCheckoutFulfillmentOrderId, hasCheckoutStripeSubscriptions, isCheckoutFulfillmentComplete, markCheckoutFulfillmentComplete, markCheckoutStripeSubscriptionsCreated, markSubscriptionOrderCreated, releaseCheckoutStripeSubscriptionsCreation, releaseSubscriptionOrderCreation } from '~/lib/stripe/storage';
 
@@ -30,10 +28,6 @@ import type {
   CheckoutAddressSnapshot,
   CheckoutSnapshot,
 } from './types';
-
-const SUBSCRIPTION_PLACEHOLDER_UNIT_AMOUNT = Number(
-  process.env.STRIPE_SUBSCRIPTION_PLACEHOLDER_UNIT_AMOUNT ?? '50',
-);
 
 const REUSABLE_PAYMENT_INTENT_STATUSES = new Set<Stripe.PaymentIntent.Status>([
   'requires_payment_method',
@@ -675,6 +669,7 @@ async function createStripeSubscriptionsForCheckout({
 
         const metadata = buildSubscriptionMetadataFromLine(snapshot, line);
         const billingSchedule = getStripeSubscriptionBillingSchedule(line);
+        const billingAmounts = resolveSubscriptionLineBillingAmounts(snapshot, line);
         const productId = await createStripeProductForCheckoutLine(stripe, line);
 
         await stripe.subscriptions.create({
@@ -685,7 +680,7 @@ async function createStripeSubscriptionsForCheckout({
               quantity: line.quantity,
               price_data: {
                 currency: line.currency.toLowerCase(),
-                unit_amount: SUBSCRIPTION_PLACEHOLDER_UNIT_AMOUNT,
+                unit_amount: billingAmounts.unitAmountExTaxPerUnit,
                 recurring: toStripeRecurring(line.billingInterval),
                 product: productId,
               },
@@ -695,6 +690,9 @@ async function createStripeSubscriptionsForCheckout({
             ...metadata,
             [DYNAMIC_SUBSCRIPTION_PRICING_METADATA_KEY]: 'true',
             subscription_quantity: String(line.quantity),
+            billed_subtotal_cents: String(billingAmounts.unitAmountExTax),
+            billed_tax_cents: String(billingAmounts.taxAmount),
+            billed_total_cents: String(billingAmounts.unitAmountIncTax),
           },
           ...billingSchedule,
           proration_behavior: 'none',

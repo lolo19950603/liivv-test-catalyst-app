@@ -247,8 +247,25 @@ export async function createBigCommerceOrderFromInvoice(
   const subscription = await getSubscription(subscriptionId);
   const subscriptionMetadata = mergeSubscriptionMetadata(subscription, invoice);
   const orderType = invoice.billing_reason === 'subscription_cycle' ? 'renewal' : 'initial';
-  const { unitAmountExTax } = getSubscriptionLineTotals(subscription, subscriptionMetadata);
-  const unitAmountIncTax = invoice.amount_paid ?? unitAmountExTax;
+  const { unitAmountExTax: metadataExTax } = getSubscriptionLineTotals(
+    subscription,
+    subscriptionMetadata,
+  );
+  const metadataIncTax = invoice.amount_paid ?? metadataExTax;
+  const { unitAmountExTax, unitAmountIncTax, reconciled } = reconcileSubscriptionOrderAmounts({
+    invoice,
+    unitAmountExTax: metadataExTax,
+    unitAmountIncTax: metadataIncTax,
+    metadata: subscriptionMetadata,
+  });
+
+  if (reconciled) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `Reconciled subscription order amounts for invoice ${invoice.id}: metadata ex-tax=${metadataExTax}, paid=${metadataIncTax}; using ex-tax=${unitAmountExTax}, inc-tax=${unitAmountIncTax}`,
+    );
+  }
+
   const currencyCode = (invoice.currency ?? subscription.currency ?? 'usd').toUpperCase();
 
   if (isSubscriptionOrderBatchingEnabled()) {
@@ -315,6 +332,57 @@ function getSubscriptionLineTotals(
   return {
     quantity,
     unitAmountExTax: unitAmount,
+  };
+}
+
+function getInvoiceSubscriptionLineSubtotalCents(invoice: Stripe.Invoice): number {
+  return (invoice.lines?.data ?? []).reduce((sum, line) => {
+    if (line.description === 'Sales tax') {
+      return sum;
+    }
+
+    if (line.parent?.type === 'subscription_item_details') {
+      return sum + (line.amount ?? 0);
+    }
+
+    return sum;
+  }, 0);
+}
+
+/** Keep BigCommerce order totals aligned with what Stripe actually charged. */
+export function reconcileSubscriptionOrderAmounts({
+  invoice,
+  unitAmountExTax,
+  unitAmountIncTax,
+  metadata,
+}: {
+  invoice: Stripe.Invoice;
+  unitAmountExTax: number;
+  unitAmountIncTax: number;
+  metadata: Stripe.Metadata;
+}): { unitAmountExTax: number; unitAmountIncTax: number; reconciled: boolean } {
+  const amountPaid = invoice.amount_paid ?? unitAmountIncTax;
+  const incTax = amountPaid > 0 ? amountPaid : unitAmountIncTax;
+  const invoiceSubtotalExTax = getInvoiceSubscriptionLineSubtotalCents(invoice);
+
+  let exTax = unitAmountExTax;
+
+  if (invoiceSubtotalExTax > 0 && invoiceSubtotalExTax <= incTax) {
+    exTax = invoiceSubtotalExTax;
+  } else if (exTax > incTax) {
+    const billedTax = Number(metadata.billed_tax_cents ?? '');
+
+    if (Number.isFinite(billedTax) && billedTax >= 0 && incTax - billedTax >= 0) {
+      exTax = incTax - billedTax;
+    } else {
+      exTax = incTax;
+    }
+  }
+
+  return {
+    unitAmountExTax: exTax,
+    unitAmountIncTax: incTax,
+    reconciled: exTax !== unitAmountExTax || incTax !== unitAmountIncTax,
   };
 }
 
