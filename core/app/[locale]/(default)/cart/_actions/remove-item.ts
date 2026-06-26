@@ -52,7 +52,13 @@ async function clearSubscriptionMetadataForLineItem(lineItemEntityId: string): P
 
   const productOptions = mapCartSelectedOptionsToProductOptions(lineItem.selectedOptions);
 
-  await removeSubscriptionLineFromCart(cartId, lineItem.productEntityId, productOptions);
+  await removeSubscriptionLineFromCart(
+    cartId,
+    lineItem.productEntityId,
+    productOptions,
+    undefined,
+    lineItemEntityId,
+  );
 }
 
 export async function removeItem({

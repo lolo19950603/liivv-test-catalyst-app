@@ -9,12 +9,14 @@ import { client } from '~/client';
 import { PricingFragment } from '~/client/fragments/pricing';
 import { graphql } from '~/client/graphql';
 import { parseProductOptionSelectionsFromFormData } from '~/lib/bigcommerce/product-options';
-import { findMatchingCartLineItem } from '~/lib/checkout/find-cart-line-item';
+import { findCartLineForNewSubscription } from '~/lib/checkout/reconcile-subscription-cart-lines';
 import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
 import {
   addSubscriptionLineToCart,
   buildSubscriptionLineMeta,
+  getSubscriptionLinesForCart,
 } from '~/lib/checkout/subscription-lines';
+import { subscriptionLineIdentityKey } from '~/lib/checkout/subscription-line-key';
 import { addToOrCreateCart } from '~/lib/cart';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 
@@ -127,7 +129,25 @@ export async function addSubscriptionProductToCart(formData: FormData): Promise<
     ],
   });
 
-  const matchedLine = findMatchingCartLineItem(cartItems, product.entityId, productOptions);
+  const subscriptionLine = buildSubscriptionLineMeta({
+    productEntityId: product.entityId,
+    sku: product.sku ?? '',
+    productName: product.name,
+    productOptions,
+    billingInterval,
+    billingCycleAnchor,
+    unitAmount: 0,
+    currency,
+    quantity,
+  });
+  const existingSubscriptionLines = await getSubscriptionLinesForCart(cartId);
+  const matchedLine = findCartLineForNewSubscription({
+    cartLineItems: cartItems,
+    productEntityId: product.entityId,
+    productOptions,
+    subscriptionLines: existingSubscriptionLines,
+    subscriptionLineIdentity: subscriptionLineIdentityKey(subscriptionLine),
+  });
   const resolvedProductOptions = matchedLine
     ? mapCartSelectedOptionsToProductOptions(matchedLine.selectedOptions)
     : productOptions;

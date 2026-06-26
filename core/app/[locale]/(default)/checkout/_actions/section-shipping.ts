@@ -26,7 +26,10 @@ import { filterShippingOptionsBySubtotal } from '~/lib/checkout/shipping-rules';
 import { expandCartLineItemForProduct } from '~/lib/checkout/expand-cart-line-items';
 import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
 import { getLineSubtotal, isDeferredSubscriptionLine } from '~/lib/checkout/subscription-charge-timing';
-import { getSubscriptionLinesForCart, findSubscriptionLineByKey } from '~/lib/checkout/subscription-lines';
+import {
+  findSubscriptionLineByKey,
+  reconcileSubscriptionLinesWithCart,
+} from '~/lib/checkout/subscription-lines';
 import {
   getSectionShippingState,
   SECTION_SHIPPING_QUOTE_VERSION,
@@ -90,7 +93,10 @@ async function getCheckoutLineSnapshots(cartId: string): Promise<CheckoutLineIte
     return [];
   }
 
-  const subscriptionLines = await getSubscriptionLinesForCart(cartId);
+  const subscriptionLines = await reconcileSubscriptionLinesWithCart(cartId, [
+    ...cart.lineItems.physicalItems.filter((item) => !item.parentEntityId),
+    ...cart.lineItems.digitalItems.filter((item) => !item.parentEntityId),
+  ]);
 
   return cart.lineItems.physicalItems
     .filter((item) => !item.parentEntityId)

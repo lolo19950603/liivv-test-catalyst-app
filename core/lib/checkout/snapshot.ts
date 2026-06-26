@@ -16,7 +16,9 @@ import {
   isSectionShippingReady,
 } from './section-shipping-storage';
 import { getSubscriptionLinesForCartLine } from './subscription-line-key';
-import { getSubscriptionLinesForCart } from './subscription-lines';
+import {
+  reconcileSubscriptionLinesWithCart,
+} from './subscription-lines';
 import type { CheckoutAddressSnapshot, CheckoutLineItemSnapshot, CheckoutSnapshot } from './types';
 import type { SubscriptionLineMeta } from './types';
 
@@ -127,9 +129,12 @@ export async function buildCheckoutSnapshot({
     throw new Error('Cart checkout is not ready');
   }
 
-  const subscriptionLines = await getSubscriptionLinesForCart(cartId);
   const physicalItems = cart.lineItems.physicalItems;
   const digitalItems = cart.lineItems.digitalItems;
+  const subscriptionLines = await reconcileSubscriptionLinesWithCart(cartId, [
+    ...physicalItems.filter((item) => !item.parentEntityId),
+    ...digitalItems.filter((item) => !item.parentEntityId),
+  ]);
 
   const lineItems: CheckoutLineItemSnapshot[] = [
     ...physicalItems

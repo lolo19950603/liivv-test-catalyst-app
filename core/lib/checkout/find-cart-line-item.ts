@@ -9,29 +9,29 @@ interface CartLineItemLike {
   selectedOptions: Parameters<typeof mapCartSelectedOptionsToProductOptions>[0];
 }
 
-export function findMatchingCartLineItem(
+export function findMatchingCartLineItems(
   items: CartLineItemLike[],
   productEntityId: number,
   productOptions: ProductOptionSelection[],
-): CartLineItemLike | undefined {
+): CartLineItemLike[] {
   const targetKey = productOptionsKey(productOptions);
   const productLines = items.filter((item) => item.productEntityId === productEntityId);
 
   if (productLines.length === 0) {
-    return undefined;
+    return [];
   }
 
-  const exactMatch = productLines.find((item) => {
+  const exactMatches = productLines.filter((item) => {
     const cartOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
 
     return productOptionsKey(cartOptions) === targetKey;
   });
 
-  if (exactMatch) {
-    return exactMatch;
+  if (exactMatches.length > 0) {
+    return exactMatches;
   }
 
-  const compatibleMatch = productLines.find((item) => {
+  const compatibleMatches = productLines.filter((item) => {
     const cartOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
 
     return (
@@ -40,13 +40,27 @@ export function findMatchingCartLineItem(
     );
   });
 
-  if (compatibleMatch) {
-    return compatibleMatch;
+  if (compatibleMatches.length > 0) {
+    return compatibleMatches;
   }
 
-  if (productLines.length === 1) {
-    return productLines[0];
+  return productLines;
+}
+
+export function findMatchingCartLineItem(
+  items: CartLineItemLike[],
+  productEntityId: number,
+  productOptions: ProductOptionSelection[],
+): CartLineItemLike | undefined {
+  const matches = findMatchingCartLineItems(items, productEntityId, productOptions);
+
+  if (matches.length === 0) {
+    return undefined;
   }
 
-  return productLines.at(-1);
+  if (matches.length === 1) {
+    return matches[0];
+  }
+
+  return matches.at(-1);
 }

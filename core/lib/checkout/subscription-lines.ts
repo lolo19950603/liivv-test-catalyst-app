@@ -1,17 +1,17 @@
 import 'server-only';
 
 import type { ProductOptionSelection } from '~/lib/bigcommerce/product-options';
-import { findMatchingCartLineItem } from '~/lib/checkout/find-cart-line-item';
 import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
 import { kv } from '~/lib/kv';
 import {
-  getCartSubscriptionLinesFromSupabase,
-  setCartSubscriptionLinesInSupabase,
+  getCartSubscriptionLinesRecordFromSupabase,
+  setCartSubscriptionLinesOptimisticInSupabase,
   deleteCartSubscriptionLinesFromSupabase,
 } from '~/lib/supabase/cart-subscription-lines-store';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import type { SubscriptionBillingInterval } from '~/lib/stripe/subscription-interval';
 
+import { reconcileSubscriptionLinesToCartItems } from './reconcile-subscription-cart-lines';
 import {
   mergeSubscriptionLinesByIdentity,
   productOptionsMatch,
@@ -23,25 +23,109 @@ function subscriptionLinesKey(cartId: string): string {
   return `checkout:subscription-lines:${cartId}`;
 }
 
-async function loadSubscriptionLines(cartId: string): Promise<SubscriptionLineMeta[]> {
+const MAX_PERSIST_ATTEMPTS = 5;
+
+async function loadSubscriptionLinesRecord(cartId: string): Promise<{
+  lines: SubscriptionLineMeta[];
+  updatedAt: string | null;
+}> {
   if (isSupabaseConfigured()) {
-    return (await getCartSubscriptionLinesFromSupabase(cartId)) ?? [];
+    return getCartSubscriptionLinesRecordFromSupabase(cartId);
   }
 
-  return (await kv.get<SubscriptionLineMeta[]>(subscriptionLinesKey(cartId))) ?? [];
+  const lines = (await kv.get<SubscriptionLineMeta[]>(subscriptionLinesKey(cartId))) ?? [];
+
+  return { lines, updatedAt: null };
 }
 
-async function persistSubscriptionLines(
-  cartId: string,
-  lines: SubscriptionLineMeta[],
-): Promise<void> {
-  if (isSupabaseConfigured()) {
-    await setCartSubscriptionLinesInSupabase(cartId, lines);
+async function loadSubscriptionLines(cartId: string): Promise<SubscriptionLineMeta[]> {
+  const record = await loadSubscriptionLinesRecord(cartId);
 
-    return;
+  return record.lines;
+}
+
+function subscriptionCartMappingsChanged(
+  current: SubscriptionLineMeta[],
+  next: SubscriptionLineMeta[],
+): boolean {
+  if (current.length !== next.length) {
+    return true;
   }
 
-  await kv.set(subscriptionLinesKey(cartId), lines);
+  const nextByIdentity = new Map(
+    next.map((line) => [subscriptionLineIdentityKey(line), line]),
+  );
+
+  return current.some((line) => {
+    const reconciled = nextByIdentity.get(subscriptionLineIdentityKey(line));
+
+    return (
+      !reconciled || reconciled.cartLineItemEntityId !== line.cartLineItemEntityId
+    );
+  });
+}
+
+async function mutateSubscriptionLines(
+  cartId: string,
+  mutator: (lines: SubscriptionLineMeta[]) => SubscriptionLineMeta[],
+): Promise<SubscriptionLineMeta[]> {
+  for (let attempt = 0; attempt < MAX_PERSIST_ATTEMPTS; attempt += 1) {
+    const record = await loadSubscriptionLinesRecord(cartId);
+    const normalizedCurrent = normalizeSubscriptionLines(record.lines);
+    const nextLines = normalizeSubscriptionLines(mutator(record.lines));
+
+    if (subscriptionLinesContentEqual(normalizedCurrent, nextLines)) {
+      return nextLines;
+    }
+
+    if (isSupabaseConfigured()) {
+      const saved = await setCartSubscriptionLinesOptimisticInSupabase(
+        cartId,
+        nextLines,
+        record.updatedAt,
+      );
+
+      if (saved) {
+        return nextLines;
+      }
+
+      continue;
+    }
+
+    await kv.set(subscriptionLinesKey(cartId), nextLines);
+
+    return nextLines;
+  }
+
+  throw new Error('Failed to save cart subscription lines after concurrent updates');
+}
+
+function subscriptionLinesContentEqual(
+  left: SubscriptionLineMeta[],
+  right: SubscriptionLineMeta[],
+): boolean {
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  const rightByIdentity = new Map(
+    right.map((line) => [subscriptionLineIdentityKey(line), line]),
+  );
+
+  return left.every((line) => {
+    const other = rightByIdentity.get(subscriptionLineIdentityKey(line));
+
+    if (!other) {
+      return false;
+    }
+
+    return (
+      line.quantity === other.quantity &&
+      line.cartLineItemEntityId === other.cartLineItemEntityId &&
+      line.billingCycleAnchor === other.billingCycleAnchor &&
+      line.productEntityId === other.productEntityId
+    );
+  });
 }
 
 function normalizeSubscriptionLines(lines: SubscriptionLineMeta[]): SubscriptionLineMeta[] {
@@ -74,80 +158,55 @@ export async function reconcileSubscriptionLinesWithCart(
   cartId: string,
   cartLineItems: CartLineItemForReconciliation[],
 ): Promise<SubscriptionLineMeta[]> {
-  const lines = await getSubscriptionLinesForCart(cartId);
+  return mutateSubscriptionLines(cartId, (lines) => {
+    if (lines.length === 0) {
+      return lines;
+    }
 
-  if (lines.length === 0) {
-    return lines;
-  }
-
-  let changed = false;
-  const reconciled = lines.map((line) => {
-    const matchedLine = findMatchingCartLineItem(
-      cartLineItems,
-      line.productEntityId,
-      line.productOptions,
+    const reconciled = normalizeSubscriptionLines(
+      reconcileSubscriptionLinesToCartItems(lines, cartLineItems),
     );
 
-    if (!matchedLine) {
-      return line;
+    if (!subscriptionCartMappingsChanged(lines, reconciled)) {
+      return lines;
     }
 
-    const nextCartLineItemEntityId = String(matchedLine.entityId);
-
-    if (line.cartLineItemEntityId === nextCartLineItemEntityId) {
-      return line;
-    }
-
-    changed = true;
-
-    return {
-      ...line,
-      cartLineItemEntityId: nextCartLineItemEntityId,
-    };
+    return reconciled;
   });
-
-  if (!changed) {
-    return lines;
-  }
-
-  const normalized = normalizeSubscriptionLines(reconciled);
-
-  await persistSubscriptionLines(cartId, normalized);
-
-  return normalized;
 }
 
 export async function addSubscriptionLineToCart(
   cartId: string,
   line: SubscriptionLineMeta,
 ): Promise<void> {
-  const existing = await getSubscriptionLinesForCart(cartId);
-  const identityKey = subscriptionLineIdentityKey(line);
-  const existingIndex = existing.findIndex(
-    (entry) => subscriptionLineIdentityKey(entry) === identityKey,
-  );
+  await mutateSubscriptionLines(cartId, (existing) => {
+    const identityKey = subscriptionLineIdentityKey(line);
+    const existingIndex = existing.findIndex(
+      (entry) => subscriptionLineIdentityKey(entry) === identityKey,
+    );
 
-  if (existingIndex >= 0) {
-    const current = existing[existingIndex]!;
+    if (existingIndex >= 0) {
+      const current = existing[existingIndex]!;
+      const next = [...existing];
 
-    existing[existingIndex] = {
-      ...current,
-      ...line,
-      cartLineItemEntityId: (line.cartLineItemEntityId ?? current.cartLineItemEntityId)
-        ? String(line.cartLineItemEntityId ?? current.cartLineItemEntityId)
-        : undefined,
-      productOptions:
-        line.productOptions.length >= current.productOptions.length
-          ? line.productOptions
-          : current.productOptions,
-      quantity: current.quantity + line.quantity,
-    };
-    await persistSubscriptionLines(cartId, existing);
+      next[existingIndex] = {
+        ...current,
+        ...line,
+        cartLineItemEntityId: (line.cartLineItemEntityId ?? current.cartLineItemEntityId)
+          ? String(line.cartLineItemEntityId ?? current.cartLineItemEntityId)
+          : undefined,
+        productOptions:
+          line.productOptions.length >= current.productOptions.length
+            ? line.productOptions
+            : current.productOptions,
+        quantity: current.quantity + line.quantity,
+      };
 
-    return;
-  }
+      return next;
+    }
 
-  await persistSubscriptionLines(cartId, [...existing, line]);
+    return [...existing, line];
+  });
 }
 
 export async function adjustSubscriptionQuantity(
@@ -155,29 +214,28 @@ export async function adjustSubscriptionQuantity(
   subscriptionLineKey: string,
   delta: number,
 ): Promise<void> {
-  const existing = await getSubscriptionLinesForCart(cartId);
-  const index = existing.findIndex(
-    (entry) => subscriptionLineIdentityKey(entry) === subscriptionLineKey,
-  );
-
-  if (index < 0) {
-    return;
-  }
-
-  const entry = existing[index]!;
-  const nextQuantity = entry.quantity + delta;
-
-  if (nextQuantity <= 0) {
-    await persistSubscriptionLines(
-      cartId,
-      existing.filter((_, entryIndex) => entryIndex !== index),
+  await mutateSubscriptionLines(cartId, (existing) => {
+    const index = existing.findIndex(
+      (entry) => subscriptionLineIdentityKey(entry) === subscriptionLineKey,
     );
 
-    return;
-  }
+    if (index < 0) {
+      return existing;
+    }
 
-  existing[index] = { ...entry, quantity: nextQuantity };
-  await persistSubscriptionLines(cartId, existing);
+    const entry = existing[index]!;
+    const nextQuantity = entry.quantity + delta;
+
+    if (nextQuantity <= 0) {
+      return existing.filter((_, entryIndex) => entryIndex !== index);
+    }
+
+    const next = [...existing];
+
+    next[index] = { ...entry, quantity: nextQuantity };
+
+    return next;
+  });
 }
 
 export async function removeSubscriptionLineFromCart(
@@ -185,14 +243,16 @@ export async function removeSubscriptionLineFromCart(
   productEntityId: number,
   productOptions: ProductOptionSelection[],
   subscriptionLineKey?: string,
+  cartLineItemEntityId?: string,
 ): Promise<void> {
-  const existing = await getSubscriptionLinesForCart(cartId);
-
-  await persistSubscriptionLines(
-    cartId,
+  await mutateSubscriptionLines(cartId, (existing) =>
     existing.filter((entry) => {
       if (subscriptionLineKey) {
         return subscriptionLineIdentityKey(entry) !== subscriptionLineKey;
+      }
+
+      if (cartLineItemEntityId) {
+        return String(entry.cartLineItemEntityId ?? '') !== String(cartLineItemEntityId);
       }
 
       return !(
