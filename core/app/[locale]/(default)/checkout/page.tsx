@@ -12,6 +12,7 @@ import { getCart, getShippingCountries } from '~/app/[locale]/(default)/cart/pag
 import { getCustomerAddresses } from '~/app/[locale]/(default)/account/addresses/page-data';
 import { updateShippingInfo } from '~/app/[locale]/(default)/cart/_actions/update-shipping-info';
 import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
+import { formatCartSelectedOptionsSubtitle } from '~/lib/checkout/format-cart-selected-options-subtitle';
 import {
   expandCartLineItemForProduct,
 } from '~/lib/checkout/expand-cart-line-items';
@@ -134,12 +135,13 @@ export default async function CheckoutPage({ params }: Props) {
   const checkoutLines: CheckoutDisplayLineInput[] = physicalAndDigital.flatMap(({ item, isPhysical }) => {
     const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
     const unitPrice = item.salePrice?.value ?? item.listPrice.value;
+    const variantSubtitle = formatCartSelectedOptionsSubtitle(item.selectedOptions, item.sku);
 
     const baseItem = {
       id: item.entityId,
       quantity: item.quantity,
       title: item.name,
-      subtitle: item.sku ?? undefined,
+      subtitle: variantSubtitle,
       imageUrl: item.image?.url,
       unitPrice,
       currencyCode: item.listPrice.currencyCode,
@@ -199,6 +201,7 @@ export default async function CheckoutPage({ params }: Props) {
           isSubscription,
           billingInterval: subscription?.billingInterval,
           billingCycleAnchor,
+          ...(variantSubtitle ? { variantSubtitle } : {}),
         },
         display: {
           id: line.id,
