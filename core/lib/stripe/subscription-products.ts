@@ -13,6 +13,9 @@ export async function createStripeProductForCheckoutLine(
     metadata: {
       bigcommerce_product_id: String(line.productEntityId),
       bigcommerce_sku: line.sku ?? '',
+      ...(line.variantEntityId != null
+        ? { bigcommerce_variant_id: String(line.variantEntityId) }
+        : {}),
     },
   });
 

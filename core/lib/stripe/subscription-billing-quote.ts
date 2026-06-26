@@ -8,6 +8,7 @@ import { graphql } from '~/client/graphql';
 import { PricingFragment } from '~/client/fragments/pricing';
 import {
   parseProductOptionSelectionsFromMetadata,
+  parseVariantEntityIdFromMetadata,
   type ProductOptionSelection,
 } from '~/lib/bigcommerce/product-options';
 import { addShippingCost } from '~/app/[locale]/(default)/cart/_actions/add-shipping-cost';
@@ -597,12 +598,16 @@ export async function resolveSubscriptionBillingQuote({
   productOptions,
   quantity,
   billingAddress,
+  variantEntityId: variantEntityIdFromContext,
+  forPortalDisplay = false,
 }: {
   customerId: number;
   productEntityId: number;
   productOptions: ProductOptionSelection[];
   quantity: number;
   billingAddress?: CheckoutAddressSnapshot;
+  variantEntityId?: number;
+  forPortalDisplay?: boolean;
 }): Promise<SubscriptionBillingQuote | null> {
   const currencyCode = await getPreferredCurrencyCode();
   const optionValueIds = productOptions.map((option) => ({
@@ -612,7 +617,7 @@ export async function resolveSubscriptionBillingQuote({
 
   const catalogState = await fetchCatalogProductState({ productEntityId, productOptions });
 
-  if (catalogState && !catalogState.inStock) {
+  if (catalogState && !catalogState.inStock && !forPortalDisplay) {
     return {
       inStock: false,
       currency: currencyCode,
@@ -636,8 +641,13 @@ export async function resolveSubscriptionBillingQuote({
   });
 
   const product = data.site.product;
+  const inStock = product?.inventory.isInStock ?? catalogState?.inStock ?? false;
 
-  if (!product?.inventory.isInStock) {
+  if (!product) {
+    return null;
+  }
+
+  if (!inStock && !forPortalDisplay) {
     return {
       inStock: false,
       currency: currencyCode,
@@ -650,7 +660,9 @@ export async function resolveSubscriptionBillingQuote({
   }
 
   const quoteAddress = billingAddress ?? (await tryGetCustomerQuoteAddress(customerId));
-  const variantEntityId = product ? resolveVariantEntityIdFromQuotedProduct(product) : undefined;
+  const variantEntityId =
+    variantEntityIdFromContext ??
+    (product ? resolveVariantEntityIdFromQuotedProduct(product) : undefined);
   const checkoutTotals = quoteAddress
     ? await quoteCheckoutTaxTotals({
         productEntityId,
@@ -679,7 +691,7 @@ export async function resolveSubscriptionBillingQuote({
     }, 'info');
 
     return {
-      inStock: true,
+      inStock,
       currency: quoteCurrency,
       quantity,
       unitAmountExTax,
@@ -705,7 +717,7 @@ export async function resolveSubscriptionBillingQuote({
   });
 
   return {
-    inStock: true,
+    inStock,
     currency: quoteCurrency,
     quantity,
     unitAmountExTax,
@@ -720,6 +732,7 @@ export function parseSubscriptionBillingContext(metadata: Stripe.Metadata | null
   productEntityId: number;
   productOptions: ProductOptionSelection[];
   quantity: number;
+  variantEntityId?: number;
 } | null {
   const customerId = Number(metadata?.bigcommerce_customer_id);
   const productEntityId = Number(metadata?.bigcommerce_product_id);
@@ -736,5 +749,6 @@ export function parseSubscriptionBillingContext(metadata: Stripe.Metadata | null
       metadata?.bigcommerce_product_options,
     ),
     quantity: Number.isFinite(quantity) && quantity > 0 ? Math.floor(quantity) : 1,
+    variantEntityId: parseVariantEntityIdFromMetadata(metadata ?? undefined),
   };
 }

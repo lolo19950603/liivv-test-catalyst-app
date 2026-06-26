@@ -2,6 +2,8 @@ import 'server-only';
 
 import type Stripe from 'stripe';
 
+import { parseSubscriptionShippingAddressFromMetadata } from '~/lib/checkout/subscription-shipping-metadata';
+
 import { getStripe, isStripeConfigured } from './client';
 import { DYNAMIC_SUBSCRIPTION_PRICING_METADATA_KEY } from './prepare-subscription-invoice';
 import {
@@ -79,18 +81,32 @@ export async function syncSubscriptionPricingFromBigCommerce(
     return 'skipped';
   }
 
+  const stripe = getStripe();
+  const customerId =
+    typeof subscription.customer === 'string'
+      ? subscription.customer
+      : subscription.customer?.id;
+  const stripeCustomer =
+    customerId != null ? await stripe.customers.retrieve(customerId) : null;
+  const customerEmail =
+    stripeCustomer && !stripeCustomer.deleted ? stripeCustomer.email ?? undefined : undefined;
+  const quoteAddress =
+    customerEmail != null
+      ? parseSubscriptionShippingAddressFromMetadata(subscription.metadata, customerEmail)
+      : undefined;
+
   const quote = await resolveSubscriptionBillingQuote({
     customerId: billingContext.customerId,
     productEntityId: billingContext.productEntityId,
     productOptions: billingContext.productOptions,
     quantity: billingContext.quantity,
+    billingAddress: quoteAddress,
+    variantEntityId: billingContext.variantEntityId,
   });
 
   if (!quote) {
     return 'skipped';
   }
-
-  const stripe = getStripe();
 
   if (!quote.inStock || quote.unitAmountExTaxPerUnit <= 0) {
     if (subscription.pause_collection?.behavior !== 'void') {

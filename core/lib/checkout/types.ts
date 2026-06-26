@@ -59,6 +59,7 @@ export interface CheckoutLineItemSnapshot {
   isSubscription: boolean;
   billingInterval?: SubscriptionBillingInterval;
   billingCycleAnchor?: number;
+  variantSubtitle?: string;
 }
 
 export interface CheckoutSectionAmounts {

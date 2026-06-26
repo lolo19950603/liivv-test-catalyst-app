@@ -9,6 +9,12 @@ import {
 import type { CheckoutAddressSnapshot } from '~/lib/checkout/types';
 
 import type { CustomerSubscription } from './subscriptions';
+import type {
+  SubscriptionProductImage,
+  SubscriptionVariantDisplay,
+} from './resolve-subscription-variant-display';
+
+export type { SubscriptionProductImage } from './resolve-subscription-variant-display';
 
 export interface CustomerAddressRecord {
   firstName: string;
@@ -19,11 +25,6 @@ export interface CustomerAddressRecord {
   stateOrProvince?: string | null;
   countryCode: string;
   postalCode?: string | null;
-}
-
-export interface SubscriptionProductImage {
-  src: string;
-  alt: string;
 }
 
 function toCheckoutAddressSnapshot(address: CustomerAddressRecord): CheckoutAddressSnapshot {
@@ -102,10 +103,12 @@ export function enrichSubscriptionsForPortal(
     customerAddresses = [],
     stripeCustomerShipping,
     productImagesByEntityId = new Map<number, SubscriptionProductImage>(),
+    variantDisplaysBySubscriptionId = new Map<string, SubscriptionVariantDisplay>(),
   }: {
     customerAddresses?: CustomerAddressRecord[];
     stripeCustomerShipping?: Stripe.Address | null;
     productImagesByEntityId?: Map<number, SubscriptionProductImage>;
+    variantDisplaysBySubscriptionId?: Map<string, SubscriptionVariantDisplay>;
   },
 ): CustomerSubscription[] {
   const stripeShippingLabel = stripeCustomerShipping
@@ -124,15 +127,19 @@ export function enrichSubscriptionsForPortal(
       stripeShippingLabel ??
       subscription.shippingAddressLabel;
 
-    const image =
+    const variantDisplay = variantDisplaysBySubscriptionId.get(subscription.id);
+    const fallbackImage =
       subscription.productEntityId != null
         ? productImagesByEntityId.get(subscription.productEntityId)
         : undefined;
+    const image = variantDisplay?.image ?? fallbackImage;
+    const variantSubtitle = variantDisplay?.variantSubtitle ?? subscription.variantSubtitle;
 
     return {
       ...subscription,
       shippingAddressLabel,
-      image,
+      ...(image ? { image } : {}),
+      ...(variantSubtitle ? { variantSubtitle } : {}),
     };
   });
 }

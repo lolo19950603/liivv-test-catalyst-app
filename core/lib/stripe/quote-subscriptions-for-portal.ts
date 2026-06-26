@@ -102,6 +102,7 @@ function resolvePortalBillingContext(
         subscription.metadata?.bigcommerce_product_options,
       ),
       quantity: subscription.quantity,
+      variantEntityId: subscription.variantEntityId,
     };
   }
 
@@ -158,23 +159,19 @@ export async function quoteLivePricesForPortal(
           : undefined);
 
       try {
+        const hadPlaceholderPricing = subscription.priceConfirmedAtBilling;
         const quote = await resolveSubscriptionBillingQuote({
           ...billingContext,
           billingAddress: quoteAddress,
+          forPortalDisplay: true,
         });
 
         if (!quote) {
           return subscription;
         }
 
-        if (!quote.inStock) {
-          return {
-            ...subscription,
-            subtotalExTaxCents: null,
-            taxCents: null,
-            totalIncTaxCents: null,
-            priceConfirmedAtBilling: true,
-          };
+        if (!quote.inStock && quote.unitAmountExTax <= 0) {
+          return subscription;
         }
 
         const amounts = applyQuotedSubscriptionAmounts(subscription, quote);
@@ -184,7 +181,7 @@ export async function quoteLivePricesForPortal(
           ...subscription,
           currency,
           ...amounts,
-          priceConfirmedAtBilling: false,
+          priceConfirmedAtBilling: hadPlaceholderPricing,
         };
       } catch (error) {
         // eslint-disable-next-line no-console

@@ -13,6 +13,7 @@ import { Link } from '~/components/link';
 export interface SubscriptionListItem {
   id: string;
   productName: string;
+  variantSubtitle?: string;
   quantity: number;
   image?: { src: string; alt: string };
   price?: string;
@@ -35,6 +36,7 @@ export interface SubscriptionDeliveryGroup {
   tax?: string;
   totalIncTax?: string;
   totalsPending?: boolean;
+  totalsNote?: string;
   shipmentPaused?: boolean;
   isPast?: boolean;
   bigcommerceOrderId?: number;
@@ -465,6 +467,16 @@ function SubscriptionProductDetails({
       >
         {subscription.productName}
       </p>
+      {subscription.variantSubtitle ? (
+        <p
+          className={clsx(
+            'mt-1 text-xs leading-relaxed text-[var(--contrast-500,hsl(var(--contrast-500)))]',
+            align === 'center' && 'text-center',
+          )}
+        >
+          {subscription.variantSubtitle}
+        </p>
+      ) : null}
       <div className={clsx('mt-1', align === 'center' && 'text-center')}>
         <p className="text-xs text-[var(--contrast-500,hsl(var(--contrast-500)))]">
           {frequencyLabel}: {subscription.intervalLabel}
@@ -485,6 +497,45 @@ function SubscriptionProductDetails({
   );
 }
 
+function SubscriptionItemPrice({
+  subscription,
+  align = 'end',
+  priceClassName,
+}: {
+  subscription: SubscriptionListItem;
+  align?: 'center' | 'end';
+  priceClassName?: string;
+}) {
+  return (
+    <>
+      {subscription.price ? (
+        <p
+          className={clsx(
+            priceClassName ??
+              'text-sm font-semibold tabular-nums text-[var(--foreground,hsl(var(--foreground)))]',
+            align === 'center' && 'text-center',
+            align === 'end' && 'text-right',
+          )}
+        >
+          {subscription.price}
+        </p>
+      ) : null}
+      {subscription.priceNote ? (
+        <p
+          className={clsx(
+            'text-xs leading-tight text-[var(--contrast-500,hsl(var(--contrast-500)))]',
+            subscription.price && 'mt-1',
+            align === 'end' && 'max-w-[8rem] text-right',
+            align === 'center' && 'text-center',
+          )}
+        >
+          {subscription.priceNote}
+        </p>
+      ) : null}
+    </>
+  );
+}
+
 function SubscriptionProductPricing({
   subscription,
   align = 'center',
@@ -496,20 +547,11 @@ function SubscriptionProductPricing({
 }) {
   return (
     <div className={clsx(align === 'end' && 'shrink-0 text-right', align === 'center' && 'text-center')}>
-      {subscription.price ? (
-        <p className="text-sm font-medium text-[var(--foreground,hsl(var(--foreground)))]">
-          {subscription.price}
-        </p>
-      ) : subscription.priceNote ? (
-        <p
-          className={clsx(
-            'text-xs leading-tight text-[var(--contrast-500,hsl(var(--contrast-500)))]',
-            align === 'end' && 'max-w-[7rem]',
-          )}
-        >
-          {subscription.priceNote}
-        </p>
-      ) : null}
+      <SubscriptionItemPrice
+        align={align}
+        priceClassName="text-sm font-medium text-[var(--foreground,hsl(var(--foreground)))]"
+        subscription={subscription}
+      />
       {showStatus ? (
         <div className={clsx('mt-2 flex', align === 'end' ? 'justify-end' : 'justify-center')}>
           <SubscriptionStatusBadge status={subscription.statusLabel} />
@@ -643,7 +685,6 @@ function SubscriptionLineItemRow({
   fallbackLogo?: ProductImageFallbackLogo | null;
 }) {
   const metaParts = [
-    `${quantityLabel} ${subscription.quantity}`,
     subscription.intervalLabel,
     subscription.paymentMethodLabel,
     subscription.scheduleDetail,
@@ -671,7 +712,6 @@ function SubscriptionLineItemRow({
           <SubscriptionProductImage
             fallbackLogo={fallbackLogo}
             quantityLabel={quantityLabel}
-            showQuantityBadge={false}
             size="compact"
             subscription={subscription}
           />
@@ -694,6 +734,19 @@ function SubscriptionLineItemRow({
                 {showStatus ? <SubscriptionStatusBadge status={subscription.statusLabel} /> : null}
               </div>
 
+              {subscription.variantSubtitle ? (
+                <p
+                  className={clsx(
+                    'mt-1 text-xs leading-relaxed',
+                    isPaymentFailed
+                      ? 'text-[var(--contrast-400,hsl(var(--contrast-400)))]'
+                      : 'text-[var(--contrast-500,hsl(var(--contrast-500)))]',
+                  )}
+                >
+                  {subscription.variantSubtitle}
+                </p>
+              ) : null}
+
               <p
                 className={clsx(
                   'mt-1 text-xs leading-relaxed',
@@ -713,22 +766,15 @@ function SubscriptionLineItemRow({
             </div>
 
             <div className="flex shrink-0 flex-col items-end gap-1.5 text-right">
-              {subscription.price ? (
-                <p
-                  className={clsx(
-                    'text-sm font-semibold tabular-nums',
-                    isPaymentFailed
-                      ? 'text-[var(--contrast-500,hsl(var(--contrast-500)))]'
-                      : 'text-[var(--foreground,hsl(var(--foreground)))]',
-                  )}
-                >
-                  {subscription.price}
-                </p>
-              ) : subscription.priceNote ? (
-                <p className="max-w-[8rem] text-xs leading-tight text-[var(--contrast-500,hsl(var(--contrast-500)))]">
-                  {subscription.priceNote}
-                </p>
-              ) : null}
+              <SubscriptionItemPrice
+                priceClassName={clsx(
+                  'text-sm font-semibold tabular-nums',
+                  isPaymentFailed
+                    ? 'text-[var(--contrast-500,hsl(var(--contrast-500)))]'
+                    : 'text-[var(--foreground,hsl(var(--foreground)))]',
+                )}
+                subscription={subscription}
+              />
 
               {!readOnly ? (
                 <SubscriptionEditLinkAction
@@ -917,6 +963,11 @@ function SubscriptionDeliveryCard({
                 {delivery.totalIncTax}
               </dd>
             </div>
+            {delivery.totalsNote ? (
+              <p className="pt-1 text-right text-xs leading-tight text-[var(--contrast-500,hsl(var(--contrast-500)))]">
+                {delivery.totalsNote}
+              </p>
+            ) : null}
           </dl>
         ) : null}
       </div>

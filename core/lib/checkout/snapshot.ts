@@ -6,6 +6,7 @@ import { getCart } from '~/app/[locale]/(default)/cart/page-data';
 import { kv } from '~/lib/kv';
 
 import { mapCartSelectedOptionsToProductOptions } from './map-cart-options';
+import { formatCartSelectedOptionsSubtitle } from './format-cart-selected-options-subtitle';
 import { calculateCheckoutAmounts } from './subscription-charge-timing';
 import { buildCheckoutShippingSections } from './checkout-section-shipping';
 import { ensureDueTodayShippingSyncedToCheckout } from '~/app/[locale]/(default)/checkout/_actions/section-shipping';
@@ -29,12 +30,22 @@ function buildCheckoutLineItemSnapshots(
     quantity: number;
     salePrice?: { value: number } | null;
     listPrice: { value: number; currencyCode: string };
-    selectedOptions: Array<{ entityId: number; valueEntityId?: number | null }>;
+    selectedOptions: Array<{
+      __typename?: string;
+      entityId: number;
+      name?: string;
+      value?: string;
+      valueEntityId?: number | null;
+      number?: number;
+      text?: string;
+      date?: { utc: string };
+    }>;
   },
   isPhysical: boolean,
   subscriptionLines: SubscriptionLineMeta[],
 ): CheckoutLineItemSnapshot[] {
   const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
+  const variantSubtitle = formatCartSelectedOptionsSubtitle(item.selectedOptions, item.sku);
   const subscriptionEntries = getSubscriptionLinesForCartLine(
     subscriptionLines,
     item.productEntityId,
@@ -54,6 +65,7 @@ function buildCheckoutLineItemSnapshots(
     currency: item.listPrice.currencyCode,
     productOptions,
     isPhysical,
+    ...(variantSubtitle ? { variantSubtitle } : {}),
   };
   const snapshots: CheckoutLineItemSnapshot[] = subscriptionEntries.map((subscription) => ({
     ...baseLine,

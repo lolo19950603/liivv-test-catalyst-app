@@ -2,6 +2,8 @@ import 'server-only';
 
 import type Stripe from 'stripe';
 
+import { parseVariantEntityIdFromMetadata, parseVariantLabelFromMetadata } from '~/lib/bigcommerce/product-options';
+
 import { getStripe } from './client';
 
 const PLACEHOLDER_UNIT_AMOUNT = Number(process.env.STRIPE_SUBSCRIPTION_PLACEHOLDER_UNIT_AMOUNT ?? '50');
@@ -11,6 +13,8 @@ export interface CustomerSubscription {
   status: Stripe.Subscription.Status;
   productName: string;
   productEntityId?: number;
+  variantEntityId?: number;
+  variantSubtitle?: string;
   image?: { src: string; alt: string };
   quantity: number;
   unitAmount: number | null;
@@ -165,6 +169,8 @@ function toCustomerSubscription(
       item.price,
       stripeProductInfoById,
     ),
+    variantEntityId: parseVariantEntityIdFromMetadata(subscription.metadata),
+    variantSubtitle: parseVariantLabelFromMetadata(subscription.metadata),
     quantity: item.quantity ?? 1,
     unitAmount: item.price.unit_amount,
     currency: item.price.currency,

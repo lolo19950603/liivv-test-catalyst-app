@@ -20,6 +20,24 @@ export function parseProductOptionSelectionsFromFormData(
 }
 
 export const BIGCOMMERCE_PRODUCT_OPTIONS_METADATA_KEY = 'bigcommerce_product_options';
+export const BIGCOMMERCE_VARIANT_ID_METADATA_KEY = 'bigcommerce_variant_id';
+export const BIGCOMMERCE_VARIANT_LABEL_METADATA_KEY = 'bigcommerce_variant_label';
+
+export function parseVariantEntityIdFromMetadata(
+  metadata: Record<string, string | undefined> | null | undefined,
+): number | undefined {
+  const value = Number(metadata?.[BIGCOMMERCE_VARIANT_ID_METADATA_KEY]);
+
+  return Number.isFinite(value) && value > 0 ? value : undefined;
+}
+
+export function parseVariantLabelFromMetadata(
+  metadata: Record<string, string | undefined> | null | undefined,
+): string | undefined {
+  const label = metadata?.[BIGCOMMERCE_VARIANT_LABEL_METADATA_KEY]?.trim();
+
+  return label || undefined;
+}
 
 export function serializeProductOptionSelections(
   options: ProductOptionSelection[],

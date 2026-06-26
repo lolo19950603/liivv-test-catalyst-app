@@ -15,6 +15,7 @@ import {
 } from '~/lib/stripe/customers';
 import { enrichSubscriptionsForPortal } from '~/lib/stripe/enrich-subscriptions-for-portal';
 import { quoteLivePricesForPortal } from '~/lib/stripe/quote-subscriptions-for-portal';
+import { resolveSubscriptionVariantDisplays } from '~/lib/stripe/resolve-subscription-variant-display';
 import { finalizeDueShipmentsForCustomer } from '~/lib/stripe/finalize-subscription-shipment';
 import { getFinalizedShipmentsForCustomer } from '~/lib/stripe/subscription-shipment-records';
 import type { FinalizedShipmentRecord } from '~/lib/stripe/subscription-shipment-records';
@@ -96,11 +97,13 @@ export const getSubscriptionsPageData = cache(async (): Promise<SubscriptionsPag
         .filter((productEntityId): productEntityId is number => productEntityId != null),
     ),
   ];
-  const [productsResult, addressData, stripeCustomerShipping] = await Promise.all([
-    productEntityIds.length > 0 ? getProductsByIds({ entityIds: productEntityIds }) : null,
-    getCustomerAddresses({ limit: 50 }),
-    getStripeCustomerShippingAddress(stripeCustomerId),
-  ]);
+  const [productsResult, addressData, stripeCustomerShipping, variantDisplaysBySubscriptionId] =
+    await Promise.all([
+      productEntityIds.length > 0 ? getProductsByIds({ entityIds: productEntityIds }) : null,
+      getCustomerAddresses({ limit: 50 }),
+      getStripeCustomerShippingAddress(stripeCustomerId),
+      resolveSubscriptionVariantDisplays(refreshedSubscriptions),
+    ]);
   const productImagesByEntityId = new Map<
     number,
     { src: string; alt: string }
@@ -121,6 +124,7 @@ export const getSubscriptionsPageData = cache(async (): Promise<SubscriptionsPag
     customerAddresses: addressData?.addresses ?? [],
     stripeCustomerShipping,
     productImagesByEntityId,
+    variantDisplaysBySubscriptionId,
   });
   const subscriptionsWithLivePrices = await quoteLivePricesForPortal(enrichedSubscriptions, {
     bigcommerceCustomerId: customer.entityId,

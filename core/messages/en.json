@@ -273,6 +273,7 @@
       "nextShipmentOn": "Next shipment {date}",
       "firstChargeOn": "First charge on {date}",
       "priceAtBilling": "Price confirmed at billing",
+      "subjectToChangeAtBilling": "Subject to change at billing",
       "delivery": {
         "shipTo": "Ship to",
         "shipment": "Shipment {number}",

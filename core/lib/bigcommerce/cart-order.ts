@@ -1,6 +1,8 @@
 import 'server-only';
 
 import {
+  BIGCOMMERCE_VARIANT_ID_METADATA_KEY,
+  BIGCOMMERCE_VARIANT_LABEL_METADATA_KEY,
   serializeProductOptionSelections,
   toBigCommerceOrderProductOptions,
 } from './product-options';
@@ -129,6 +131,12 @@ export function buildSubscriptionMetadataFromLine(
     bigcommerce_customer_id: String(snapshot.bigcommerceCustomerId),
     bigcommerce_product_id: String(line.productEntityId),
     bigcommerce_sku: line.sku ?? '',
+    ...(line.variantEntityId != null
+      ? { [BIGCOMMERCE_VARIANT_ID_METADATA_KEY]: String(line.variantEntityId) }
+      : {}),
+    ...(line.variantSubtitle
+      ? { [BIGCOMMERCE_VARIANT_LABEL_METADATA_KEY]: line.variantSubtitle }
+      : {}),
     ...(serializedOptions ? { bigcommerce_product_options: serializedOptions } : {}),
     ...(line.billingInterval
       ? {

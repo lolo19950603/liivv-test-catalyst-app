@@ -13,6 +13,7 @@ import { getStripe } from '~/lib/stripe/client';
 import { getOrCreateStripeCustomer } from '~/lib/stripe/customers';
 import { createStripeProductForCheckoutLine } from '~/lib/stripe/subscription-products';
 import { getStripeSubscriptionBillingSchedule, resolveSubscriptionLineBillingAmounts } from '~/lib/stripe/subscription-pricing';
+import { resolveSubscriptionBillingQuote } from '~/lib/stripe/subscription-billing-quote';
 import { DYNAMIC_SUBSCRIPTION_PRICING_METADATA_KEY } from '~/lib/stripe/prepare-subscription-invoice';
 import { toStripeRecurring } from '~/lib/stripe/subscription-interval';
 import { claimSubscriptionOrderCreation, claimCheckoutStripeSubscriptionsCreation, getCheckoutFulfillmentOrderId, hasCheckoutStripeSubscriptions, isCheckoutFulfillmentComplete, markCheckoutFulfillmentComplete, markCheckoutStripeSubscriptionsCreated, markSubscriptionOrderCreated, releaseCheckoutStripeSubscriptionsCreation, releaseSubscriptionOrderCreation } from '~/lib/stripe/storage';
@@ -669,7 +670,35 @@ async function createStripeSubscriptionsForCheckout({
 
         const metadata = buildSubscriptionMetadataFromLine(snapshot, line);
         const billingSchedule = getStripeSubscriptionBillingSchedule(line);
-        const billingAmounts = resolveSubscriptionLineBillingAmounts(snapshot, line);
+        let billingAmounts = resolveSubscriptionLineBillingAmounts(snapshot, line);
+
+        if (billingAmounts.taxAmount <= 0) {
+          const quoteAddress =
+            snapshot.shippingAddress?.address1?.trim()
+              ? snapshot.shippingAddress
+              : snapshot.billingAddress.address1?.trim()
+                ? snapshot.billingAddress
+                : undefined;
+
+          if (quoteAddress) {
+            const quote = await resolveSubscriptionBillingQuote({
+              customerId: snapshot.bigcommerceCustomerId,
+              productEntityId: line.productEntityId,
+              productOptions: line.productOptions,
+              quantity: line.quantity,
+              billingAddress: quoteAddress,
+            });
+
+            if (quote && quote.taxAmount > 0) {
+              billingAmounts = {
+                ...billingAmounts,
+                taxAmount: quote.taxAmount,
+                unitAmountIncTax: billingAmounts.unitAmountExTax + quote.taxAmount,
+              };
+            }
+          }
+        }
+
         const productId = await createStripeProductForCheckoutLine(stripe, line);
 
         await stripe.subscriptions.create({

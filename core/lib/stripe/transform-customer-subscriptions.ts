@@ -12,6 +12,7 @@ export { getShipmentCalendarDayKey } from './subscription-shipment-grouping';
 export interface SubscriptionListItem {
   id: string;
   productName: string;
+  variantSubtitle?: string;
   quantity: number;
   image?: { src: string; alt: string };
   price?: string;
@@ -34,6 +35,7 @@ export interface SubscriptionDeliveryGroup {
   tax?: string;
   totalIncTax?: string;
   totalsPending?: boolean;
+  totalsNote?: string;
   shipmentPaused?: boolean;
   isPast?: boolean;
   bigcommerceOrderId?: number;
@@ -172,10 +174,14 @@ export function transformCustomerSubscription(
   let priceNote: string | undefined;
 
   if (!options.hidePricing) {
-    if (subscription.priceConfirmedAtBilling) {
-      priceNote = t('priceAtBilling');
-    } else if (subscription.subtotalExTaxCents != null) {
+    if (subscription.subtotalExTaxCents != null) {
       price = formatMoney(format, subscription.subtotalExTaxCents, subscription.currency);
+
+      if (subscription.priceConfirmedAtBilling) {
+        priceNote = t('subjectToChangeAtBilling');
+      }
+    } else if (subscription.priceConfirmedAtBilling) {
+      priceNote = t('priceAtBilling');
     } else if (subscription.unitAmount == null) {
       priceNote = t('customPricing');
     } else {
@@ -190,6 +196,7 @@ export function transformCustomerSubscription(
   return {
     id: subscription.id,
     productName: subscription.productName,
+    variantSubtitle: subscription.variantSubtitle,
     quantity: subscription.quantity,
     image: subscription.image,
     price,
@@ -229,7 +236,10 @@ function buildDeliveryTotals(
   subscriptions: CustomerSubscription[],
   t: SubscriptionsT,
   format: Format,
-): Pick<SubscriptionDeliveryGroup, 'subtotalExTax' | 'tax' | 'totalIncTax' | 'totalsPending'> {
+): Pick<
+  SubscriptionDeliveryGroup,
+  'subtotalExTax' | 'tax' | 'totalIncTax' | 'totalsPending' | 'totalsNote'
+> {
   const billableSubscriptions = subscriptions.filter(
     (subscription) => !isSubscriptionPaymentFailed(subscription.status),
   );
@@ -239,7 +249,8 @@ function buildDeliveryTotals(
   }
 
   const hasPendingPricing = billableSubscriptions.some(
-    (subscription) => subscription.priceConfirmedAtBilling,
+    (subscription) =>
+      subscription.priceConfirmedAtBilling && subscription.subtotalExTaxCents == null,
   );
 
   if (hasPendingPricing) {
@@ -261,11 +272,16 @@ function buildDeliveryTotals(
     0,
   );
 
+  const hasEstimatedPricing = billableSubscriptions.some(
+    (subscription) => subscription.priceConfirmedAtBilling,
+  );
+
   return {
     subtotalExTax: formatMoney(format, subtotalExTaxCents, currency),
     tax: formatMoney(format, taxCents, currency),
     totalIncTax: formatMoney(format, totalIncTaxCents, currency),
     totalsPending: false,
+    totalsNote: hasEstimatedPricing ? t('subjectToChangeAtBilling') : undefined,
   };
 }
 
