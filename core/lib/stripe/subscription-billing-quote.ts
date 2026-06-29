@@ -181,6 +181,24 @@ function findMatchingVariant(
   });
 }
 
+function findCatalogVariant(
+  product: AdminCatalogProduct,
+  productOptions: ProductOptionSelection[],
+  variantEntityId?: number,
+): AdminCatalogVariant | undefined {
+  const variants = product.variants ?? [];
+
+  if (variantEntityId != null) {
+    const byId = variants.find((variant) => variant.id === variantEntityId);
+
+    if (byId) {
+      return byId;
+    }
+  }
+
+  return findMatchingVariant(product, productOptions);
+}
+
 function isCatalogProductInStock(
   product: AdminCatalogProduct,
   variant: AdminCatalogVariant | undefined,
@@ -205,20 +223,22 @@ function isCatalogProductInStock(
 async function fetchCatalogProductState({
   productEntityId,
   productOptions,
+  variantEntityId,
 }: {
   productEntityId: number;
   productOptions: ProductOptionSelection[];
+  variantEntityId?: number;
 }): Promise<{ inStock: boolean; unitPrice: number; currency: string } | null> {
   if (!isBigCommerceAdminConfigured()) {
     return null;
   }
 
   try {
-    const product = await bigCommerceAdminFetch<AdminCatalogProduct>(
+    const response = await bigCommerceAdminFetch<{ data: AdminCatalogProduct }>(
       `/v3/catalog/products/${productEntityId}?include=variants`,
     );
-
-    const variant = findMatchingVariant(product, productOptions);
+    const product = response.data;
+    const variant = findCatalogVariant(product, productOptions, variantEntityId);
 
     if (!isCatalogProductInStock(product, variant, 1)) {
       return { inStock: false, unitPrice: 0, currency: 'CAD' };
@@ -615,7 +635,11 @@ export async function resolveSubscriptionBillingQuote({
     valueEntityId: option.valueEntityId,
   }));
 
-  const catalogState = await fetchCatalogProductState({ productEntityId, productOptions });
+  const catalogState = await fetchCatalogProductState({
+    productEntityId,
+    productOptions,
+    variantEntityId: variantEntityIdFromContext,
+  });
 
   if (catalogState && !catalogState.inStock && !forPortalDisplay) {
     return {
