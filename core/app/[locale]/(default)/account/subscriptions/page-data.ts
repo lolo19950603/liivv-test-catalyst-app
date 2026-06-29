@@ -14,7 +14,6 @@ import {
   resolveStripeCustomerId,
 } from '~/lib/stripe/customers';
 import { enrichSubscriptionsForPortal } from '~/lib/stripe/enrich-subscriptions-for-portal';
-import { quoteLivePricesForPortal } from '~/lib/stripe/quote-subscriptions-for-portal';
 import { resolveSubscriptionVariantDisplays } from '~/lib/stripe/resolve-subscription-variant-display';
 import { finalizeDueShipmentsForCustomer } from '~/lib/stripe/finalize-subscription-shipment';
 import { getFinalizedShipmentsForCustomer } from '~/lib/stripe/subscription-shipment-records';
@@ -126,11 +125,6 @@ export const getSubscriptionsPageData = cache(async (): Promise<SubscriptionsPag
     productImagesByEntityId,
     variantDisplaysBySubscriptionId,
   });
-  const subscriptionsWithLivePrices = await quoteLivePricesForPortal(enrichedSubscriptions, {
-    bigcommerceCustomerId: customer.entityId,
-    customerEmail: customer.email,
-    customerAddresses: addressData?.addresses ?? [],
-  });
 
   const finalizedShipments = await getFinalizedShipmentsForCustomer(customer.entityId);
 
@@ -138,7 +132,7 @@ export const getSubscriptionsPageData = cache(async (): Promise<SubscriptionsPag
     kind: 'ready',
     bigcommerceCustomerId: customer.entityId,
     stripeCustomerId,
-    subscriptions: subscriptionsWithLivePrices,
+    subscriptions: enrichedSubscriptions,
     finalizedShipments,
   };
 });
