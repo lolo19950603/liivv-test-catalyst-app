@@ -547,11 +547,13 @@ function SubscriptionProductPricing({
 }) {
   return (
     <div className={clsx(align === 'end' && 'shrink-0 text-right', align === 'center' && 'text-center')}>
-      <SubscriptionItemPrice
-        align={align}
-        priceClassName="text-sm font-medium text-[var(--foreground,hsl(var(--foreground)))]"
-        subscription={subscription}
-      />
+      <div className={clsx(showStatus && 'min-h-[2.75rem]')}>
+        <SubscriptionItemPrice
+          align={align}
+          priceClassName="text-sm font-medium text-[var(--foreground,hsl(var(--foreground)))]"
+          subscription={subscription}
+        />
+      </div>
       {showStatus ? (
         <div className={clsx('mt-2 flex', align === 'end' ? 'justify-end' : 'justify-center')}>
           <SubscriptionStatusBadge status={subscription.statusLabel} />
@@ -634,7 +636,7 @@ function SubscriptionProductCard({
           subscription={subscription}
         />
 
-        <div className="mt-3">
+        <div className="mt-auto pt-3">
           <SubscriptionProductPricing align="center" subscription={subscription} />
         </div>
       </div>
@@ -940,35 +942,33 @@ function SubscriptionDeliveryCard({
             {labels.totalsPendingLabel}
           </p>
         ) : !delivery.totalsPending && delivery.subtotalExTax ? (
-          <dl className="space-y-1.5 text-sm">
-            <div className="flex items-baseline justify-between gap-4">
-              <dt className="text-[var(--contrast-500,hsl(var(--contrast-500)))]">
-                {labels.subtotalLabel}
-              </dt>
-              <dd className="font-medium tabular-nums text-[var(--foreground,hsl(var(--foreground)))]">
-                {delivery.subtotalExTax}
-              </dd>
-            </div>
-            <div className="flex items-baseline justify-between gap-4">
-              <dt className="text-[var(--contrast-500,hsl(var(--contrast-500)))]">{labels.taxLabel}</dt>
-              <dd className="font-medium tabular-nums text-[var(--foreground,hsl(var(--foreground)))]">
-                {delivery.tax}
-              </dd>
-            </div>
-            <div className="flex items-baseline justify-between gap-4 pt-1.5">
-              <dt className="font-medium text-[var(--foreground,hsl(var(--foreground)))]">
-                {labels.totalLabel}
-              </dt>
-              <dd className="font-semibold tabular-nums text-[var(--foreground,hsl(var(--foreground)))]">
-                {delivery.totalIncTax}
-              </dd>
+          <>
+            <div className="flex justify-end">
+              <dl className="grid grid-cols-[auto_auto] gap-x-6 gap-y-1.5 text-sm">
+                <dt className="text-[var(--contrast-500,hsl(var(--contrast-500)))]">
+                  {labels.subtotalLabel}
+                </dt>
+                <dd className="text-right font-medium tabular-nums text-[var(--foreground,hsl(var(--foreground)))]">
+                  {delivery.subtotalExTax}
+                </dd>
+                <dt className="text-[var(--contrast-500,hsl(var(--contrast-500)))]">{labels.taxLabel}</dt>
+                <dd className="text-right font-medium tabular-nums text-[var(--foreground,hsl(var(--foreground)))]">
+                  {delivery.tax}
+                </dd>
+                <dt className="pt-1.5 font-medium text-[var(--foreground,hsl(var(--foreground)))]">
+                  {labels.totalLabel}
+                </dt>
+                <dd className="pt-1.5 text-right font-semibold tabular-nums text-[var(--foreground,hsl(var(--foreground)))]">
+                  {delivery.totalIncTax}
+                </dd>
+              </dl>
             </div>
             {delivery.totalsNote ? (
               <p className="pt-1 text-right text-xs leading-tight text-[var(--contrast-500,hsl(var(--contrast-500)))]">
                 {delivery.totalsNote}
               </p>
             ) : null}
-          </dl>
+          </>
         ) : null}
       </div>
     </li>

@@ -299,7 +299,7 @@ export async function getCustomerSubscriptions(
   const subscriptions = await stripe.subscriptions.list({
     customer: stripeCustomerId,
     status: 'all',
-    expand: ['data.items.data.price.product', 'data.default_payment_method'],
+    expand: ['data.items.data.price', 'data.default_payment_method'],
     limit: 100,
   });
 
