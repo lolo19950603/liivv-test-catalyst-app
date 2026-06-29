@@ -3,7 +3,11 @@ import 'server-only';
 import { syncStripeProductNamesForBigCommerceProduct } from '~/lib/stripe/sync-subscription-product-name';
 import { syncStripeSubscriptionsForProduct } from '~/lib/stripe/sync-subscription-pricing';
 
-const PRODUCT_SYNC_SCOPES = new Set(['store/product/updated', 'store/sku/updated']);
+const PRODUCT_SYNC_SCOPES = new Set([
+  'store/product/updated',
+  'store/sku/updated',
+  'store/sku/inventory/updated',
+]);
 
 interface BigCommerceWebhookPayload {
   scope: string;
@@ -15,6 +19,12 @@ interface BigCommerceWebhookPayload {
     sku?: {
       product_id: number;
       variant_id: number;
+    };
+    inventory?: {
+      product_id: number;
+      variant_id: number;
+      method?: string;
+      value?: number;
     };
   };
 }
@@ -44,6 +54,16 @@ function getProductEntityIdFromWebhookPayload(payload: BigCommerceWebhookPayload
 
   if (payload.scope === 'store/sku/updated') {
     const productEntityId = payload.data.sku?.product_id;
+
+    if (!Number.isFinite(productEntityId) || productEntityId <= 0) {
+      return null;
+    }
+
+    return productEntityId;
+  }
+
+  if (payload.scope === 'store/sku/inventory/updated') {
+    const productEntityId = payload.data.inventory?.product_id;
 
     if (!Number.isFinite(productEntityId) || productEntityId <= 0) {
       return null;
