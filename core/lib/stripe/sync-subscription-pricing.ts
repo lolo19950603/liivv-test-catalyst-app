@@ -171,7 +171,7 @@ export async function listStripeSubscriptionsForProduct(
       query: `metadata['bigcommerce_product_id']:'${productEntityId}'`,
       limit: 100,
       page,
-      expand: ['data.items.data.price.product'],
+      expand: ['data.items.data.price'],
     });
 
     subscriptions.push(...result.data);
