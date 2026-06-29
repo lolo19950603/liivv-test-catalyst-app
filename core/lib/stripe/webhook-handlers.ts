@@ -8,6 +8,8 @@ import {
   createBigCommerceOrderFromInvoice,
   getInvoiceSubscriptionId,
 } from './subscription-orders';
+import { tryFinalizeSubscriptionShipmentByStorageKey } from './finalize-subscription-shipment';
+import { getCustomerSubscriptions } from './subscriptions';
 import { getStripe } from './client';
 import { applySubscriptionInvoiceTax } from './prepare-subscription-invoice';
 import { getStoredStripeCustomerId, storeStripeCustomerId } from './storage';
@@ -113,6 +115,34 @@ export async function handleStripeWebhookEvent(event: Stripe.Event): Promise<voi
         console.info(
           `Created BigCommerce subscription order ${result.orderId} for invoice ${invoice.id}`,
         );
+      } else if (result.status === 'queued') {
+        if (!stripeCustomerId) {
+          // eslint-disable-next-line no-console
+          console.warn(
+            `Queued subscription order batch for invoice ${invoice.id} but Stripe customer id is missing`,
+          );
+          break;
+        }
+
+        const subscriptions = await getCustomerSubscriptions(stripeCustomerId);
+        const record = await tryFinalizeSubscriptionShipmentByStorageKey({
+          customerId: result.customerId,
+          batchStorageKey: result.batchStorageKey,
+          stripeCustomerId,
+          subscriptions,
+        });
+
+        if (record?.bigcommerceOrderId) {
+          // eslint-disable-next-line no-console
+          console.info(
+            `Created batched BigCommerce subscription order ${record.bigcommerceOrderId} for invoice ${invoice.id} (${record.chargedItems.length} items)`,
+          );
+        } else {
+          // eslint-disable-next-line no-console
+          console.info(
+            `Queued invoice ${invoice.id} for batched shipment ${result.batchStorageKey}; waiting for remaining subscription payments`,
+          );
+        }
       } else {
         // eslint-disable-next-line no-console
         console.warn(

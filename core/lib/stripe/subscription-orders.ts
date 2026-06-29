@@ -210,7 +210,12 @@ function getSubscriptionProductName(subscription: Stripe.Subscription): string {
 
 export type CreateBigCommerceOrderFromInvoiceResult =
   | { status: 'created'; orderId: number }
+  | { status: 'queued'; customerId: number; batchStorageKey: string }
   | { status: 'skipped'; reason: string };
+
+export function isSubscriptionOrderBatchingEnabled(): boolean {
+  return process.env.STRIPE_SUBSCRIPTION_ORDER_BATCHING !== 'false';
+}
 
 export async function createBigCommerceOrderFromInvoice(
   invoice: Stripe.Invoice,
@@ -284,8 +289,9 @@ export async function createBigCommerceOrderFromInvoice(
     }
 
     return {
-      status: 'skipped',
-      reason: 'queued for batched BigCommerce order creation',
+      status: 'queued',
+      customerId: queued.customerId,
+      batchStorageKey: queued.batchStorageKey,
     };
   }
 
@@ -308,10 +314,6 @@ export async function createBigCommerceOrderFromInvoice(
     status: 'skipped',
     reason: orderResult.reason,
   };
-}
-
-function isSubscriptionOrderBatchingEnabled(): boolean {
-  return process.env.STRIPE_SUBSCRIPTION_ORDER_BATCHING === 'true';
 }
 
 function getSubscriptionLineTotals(

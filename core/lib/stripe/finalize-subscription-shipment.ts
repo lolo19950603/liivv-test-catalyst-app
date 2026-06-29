@@ -7,6 +7,7 @@ import type { CustomerSubscription } from './subscriptions';
 import {
   getSubscriptionOrderBatch,
   removeSubscriptionOrderBatch,
+  type SubscriptionOrderBatch,
 } from './subscription-order-batch';
 import {
   isSubscriptionPaymentFailed,
@@ -38,6 +39,54 @@ export function getSubscriptionsInShipmentGroup(
       subscription.shippingAddressKey === shippingAddressKey &&
       getShipmentCalendarDayKey(getNextShipmentTimestamp(subscription)) === dayKey,
   );
+}
+
+export type ShipmentBatchReadiness = 'pending' | 'ready' | 'blocked_failed_payment';
+
+export function getShipmentBatchReadiness({
+  groupSubscriptions,
+  batch,
+  dayKey,
+  shippingAddressKey,
+  pastCutoff,
+}: {
+  groupSubscriptions: CustomerSubscription[];
+  batch: SubscriptionOrderBatch | null;
+  dayKey: string;
+  shippingAddressKey: string;
+  pastCutoff: boolean;
+}): ShipmentBatchReadiness {
+  if (!batch || batch.items.length === 0) {
+    return 'pending';
+  }
+
+  const paidSubscriptionIds = new Set(batch.items.map((item) => item.stripeSubscriptionId));
+
+  for (const subscription of groupSubscriptions) {
+    if (paidSubscriptionIds.has(subscription.id)) {
+      continue;
+    }
+
+    const skippedDay = subscription.metadata.skipped_shipment_day?.trim();
+    const addressKey =
+      subscription.metadata.shipping_address_key?.trim() || subscription.shippingAddressKey;
+
+    if (skippedDay === dayKey && addressKey === shippingAddressKey) {
+      continue;
+    }
+
+    if (isSubscriptionPaymentFailed(subscription.status)) {
+      if (!pastCutoff) {
+        return 'blocked_failed_payment';
+      }
+
+      continue;
+    }
+
+    return 'pending';
+  }
+
+  return 'ready';
 }
 
 function getCustomerSkippedItemsForShipment(
@@ -90,10 +139,23 @@ export async function tryFinalizeSubscriptionShipment({
     dayKey,
     shippingAddressKey,
   );
+  const pastCutoff = isPastShipmentCutoff(dayKey);
+  const batch = await getSubscriptionOrderBatch(storageKey);
+  const batchReadiness = getShipmentBatchReadiness({
+    groupSubscriptions,
+    batch,
+    dayKey,
+    shippingAddressKey,
+    pastCutoff,
+  });
+
+  if (batchReadiness !== 'ready') {
+    return null;
+  }
+
   const failedSubscriptions = groupSubscriptions.filter((subscription) =>
     isSubscriptionPaymentFailed(subscription.status),
   );
-  const pastCutoff = isPastShipmentCutoff(dayKey);
   const customerSkippedItems = getCustomerSkippedItemsForShipment(
     subscriptions,
     dayKey,
@@ -154,7 +216,6 @@ export async function tryFinalizeSubscriptionShipment({
     }
   }
 
-  const batch = await getSubscriptionOrderBatch(storageKey);
   const shippingAddressLabel =
     groupSubscriptions[0]?.shippingAddressLabel ??
     batch?.shippingMetadata.shipping_address_label ??

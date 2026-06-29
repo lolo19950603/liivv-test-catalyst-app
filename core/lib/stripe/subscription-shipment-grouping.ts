@@ -1,12 +1,10 @@
-/** UTC calendar day key (YYYY-MM-DD), aligned with subscription delivery grouping. */
-export function getShipmentCalendarDayKey(timestamp: number): string {
-  const date = new Date(timestamp * 1000);
+import type Stripe from 'stripe';
 
-  return [
-    date.getUTCFullYear(),
-    String(date.getUTCMonth() + 1).padStart(2, '0'),
-    String(date.getUTCDate()).padStart(2, '0'),
-  ].join('-');
+import { getShipmentDayKey } from './subscription-schedule-time';
+
+/** Calendar day key (YYYY-MM-DD) in SUBSCRIPTION_SHIPMENT_TIMEZONE for portal grouping and order batches. */
+export function getShipmentCalendarDayKey(timestamp: number): string {
+  return getShipmentDayKey(timestamp);
 }
 
 export function buildSubscriptionOrderBatchStorageKey({
@@ -38,4 +36,43 @@ export function getNextShipmentTimestamp(
   }
 
   return subscription.currentPeriodEnd;
+}
+
+/** Same shipment timestamp logic as the portal, using Stripe subscription fields. */
+export function getNextShipmentTimestampFromStripeSubscription(
+  subscription: Pick<
+    Stripe.Subscription,
+    'trial_end' | 'billing_cycle_anchor' | 'current_period_end'
+  >,
+): number {
+  const now = Math.floor(Date.now() / 1000);
+
+  if (subscription.trial_end && subscription.trial_end > now) {
+    return subscription.trial_end;
+  }
+
+  if (subscription.billing_cycle_anchor && subscription.billing_cycle_anchor > now) {
+    return subscription.billing_cycle_anchor;
+  }
+
+  return subscription.current_period_end;
+}
+
+/** Shipment timestamp for a paid invoice — aligns batch keys with portal shipment groups. */
+export function getSubscriptionInvoiceShipmentTimestamp(
+  invoice: Stripe.Invoice,
+  subscription: Pick<
+    Stripe.Subscription,
+    'trial_end' | 'billing_cycle_anchor' | 'current_period_end'
+  >,
+): number {
+  const subscriptionLine = (invoice.lines?.data ?? []).find(
+    (line) => line.parent?.type === 'subscription_item_details',
+  );
+
+  if (subscriptionLine?.period?.end) {
+    return subscriptionLine.period.end;
+  }
+
+  return getNextShipmentTimestampFromStripeSubscription(subscription);
 }

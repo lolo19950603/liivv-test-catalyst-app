@@ -1,8 +1,7 @@
 import 'server-only';
 
-/** Local calendar day key (YYYY-MM-DD) in the subscription billing timezone. */
-export function getSubscriptionBillingDayKey(timestamp: number): string {
-  const timeZone = getSubscriptionBillingTimezone();
+/** Local calendar day key (YYYY-MM-DD) in the given IANA timezone. */
+export function getCalendarDayKeyInTimezone(timestamp: number, timeZone: string): string {
   const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone,
     year: 'numeric',
@@ -19,6 +18,24 @@ export function getSubscriptionBillingDayKey(timestamp: number): string {
   }
 
   return `${year}-${month}-${day}`;
+}
+
+/** Local calendar day key (YYYY-MM-DD) in the subscription billing timezone. */
+export function getSubscriptionBillingDayKey(timestamp: number): string {
+  return getCalendarDayKeyInTimezone(timestamp, getSubscriptionBillingTimezone());
+}
+
+/** Local calendar day key (YYYY-MM-DD) in the subscription shipment timezone. */
+export function getShipmentDayKey(timestamp: number): string {
+  return getCalendarDayKeyInTimezone(timestamp, getShipmentTimezone());
+}
+
+export function getShipmentTimezone(): string {
+  return (
+    process.env.SUBSCRIPTION_SHIPMENT_TIMEZONE?.trim() ||
+    process.env.SUBSCRIPTION_BILLING_TIMEZONE?.trim() ||
+    'America/Toronto'
+  );
 }
 
 export function getSubscriptionBillingTimezone(): string {
