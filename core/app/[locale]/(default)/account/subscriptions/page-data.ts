@@ -107,9 +107,16 @@ export const getSubscriptionsPageData = cache(async (): Promise<SubscriptionsPag
     number,
     { src: string; alt: string }
   >();
+  const productNamesByEntityId = new Map<number, string>();
 
   if (productsResult?.status === 'success') {
     for (const product of productsResult.products) {
+      const catalogName = product.name?.trim();
+
+      if (catalogName) {
+        productNamesByEntityId.set(product.entityId, catalogName);
+      }
+
       if (product.defaultImage?.url) {
         productImagesByEntityId.set(product.entityId, {
           src: product.defaultImage.url,
@@ -123,6 +130,7 @@ export const getSubscriptionsPageData = cache(async (): Promise<SubscriptionsPag
     customerAddresses: addressData?.addresses ?? [],
     stripeCustomerShipping,
     productImagesByEntityId,
+    productNamesByEntityId,
     variantDisplaysBySubscriptionId,
   });
 

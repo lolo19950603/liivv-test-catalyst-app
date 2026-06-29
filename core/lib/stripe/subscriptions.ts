@@ -127,8 +127,7 @@ function getBigCommerceProductEntityId(
     return fromMetadata;
   }
 
-  const stripeProductId =
-    typeof price.product === 'string' ? price.product : price.product?.id;
+  const stripeProductId = getStripeProductIdFromPrice(price);
 
   if (!stripeProductId) {
     return undefined;
@@ -194,19 +193,46 @@ function toCustomerSubscription(
   };
 }
 
+function getStripeProductIdFromPrice(price: Stripe.Price | undefined): string | undefined {
+  if (!price) {
+    return undefined;
+  }
+
+  return typeof price.product === 'string' ? price.product : price.product?.id;
+}
+
+function getExpandedStripeProductName(price: Stripe.Price): string | undefined {
+  if (typeof price.product !== 'object' || !price.product || price.product.deleted) {
+    return undefined;
+  }
+
+  const name = price.product.name?.trim();
+
+  return name || undefined;
+}
+
 function getSubscriptionProductName(
   price: Stripe.Price,
   stripeProductInfoById: Map<string, StripeProductInfo>,
 ): string {
-  if (price.nickname) {
-    return price.nickname;
+  if (price.nickname?.trim()) {
+    return price.nickname.trim();
   }
 
-  const stripeProductId =
-    typeof price.product === 'string' ? price.product : price.product?.id;
+  const expandedName = getExpandedStripeProductName(price);
+
+  if (expandedName) {
+    return expandedName;
+  }
+
+  const stripeProductId = getStripeProductIdFromPrice(price);
 
   if (stripeProductId) {
-    return stripeProductInfoById.get(stripeProductId)?.name ?? 'Subscription';
+    const fetchedName = stripeProductInfoById.get(stripeProductId)?.name?.trim();
+
+    if (fetchedName) {
+      return fetchedName;
+    }
   }
 
   return 'Subscription';
@@ -273,15 +299,15 @@ export async function getCustomerSubscriptions(
   const subscriptions = await stripe.subscriptions.list({
     customer: stripeCustomerId,
     status: 'all',
-    expand: ['data.items.data.price', 'data.default_payment_method'],
+    expand: ['data.items.data.price.product', 'data.default_payment_method'],
     limit: 100,
   });
 
   const productIds = [
     ...new Set(
       subscriptions.data
-        .map((subscription) => subscription.items.data[0]?.price.product)
-        .filter((product): product is string => typeof product === 'string'),
+        .map((subscription) => getStripeProductIdFromPrice(subscription.items.data[0]?.price))
+        .filter((productId): productId is string => Boolean(productId)),
     ),
   ];
 

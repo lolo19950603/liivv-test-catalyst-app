@@ -103,11 +103,13 @@ export function enrichSubscriptionsForPortal(
     customerAddresses = [],
     stripeCustomerShipping,
     productImagesByEntityId = new Map<number, SubscriptionProductImage>(),
+    productNamesByEntityId = new Map<number, string>(),
     variantDisplaysBySubscriptionId = new Map<string, SubscriptionVariantDisplay>(),
   }: {
     customerAddresses?: CustomerAddressRecord[];
     stripeCustomerShipping?: Stripe.Address | null;
     productImagesByEntityId?: Map<number, SubscriptionProductImage>;
+    productNamesByEntityId?: Map<number, string>;
     variantDisplaysBySubscriptionId?: Map<string, SubscriptionVariantDisplay>;
   },
 ): CustomerSubscription[] {
@@ -134,9 +136,18 @@ export function enrichSubscriptionsForPortal(
         : undefined;
     const image = variantDisplay?.image ?? fallbackImage;
     const variantSubtitle = variantDisplay?.variantSubtitle ?? subscription.variantSubtitle;
+    const catalogProductName =
+      subscription.productEntityId != null
+        ? productNamesByEntityId.get(subscription.productEntityId)?.trim()
+        : undefined;
+    const productName =
+      subscription.productName !== 'Subscription'
+        ? subscription.productName
+        : (catalogProductName ?? subscription.productName);
 
     return {
       ...subscription,
+      productName,
       shippingAddressLabel,
       ...(image ? { image } : {}),
       ...(variantSubtitle ? { variantSubtitle } : {}),
