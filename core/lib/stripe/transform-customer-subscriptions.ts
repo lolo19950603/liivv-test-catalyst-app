@@ -525,58 +525,76 @@ function buildPastShipmentGroups(
     });
 }
 
-function isSubscriptionFinalizedForUpcomingPortal({
-  subscription,
-  customerId,
-  finalizedShipments,
-}: {
-  subscription: CustomerSubscription;
-  customerId: number;
-  finalizedShipments: FinalizedShipmentRecord[];
-}): boolean {
-  const portalDayKey = getShipmentCalendarDayKey(getPortalUpcomingShipmentTimestamp(subscription));
+function isSubscriptionPortalShipmentFinalized(
+  subscription: CustomerSubscription,
+  portalTimestamp: number,
+  finalizedShipments: FinalizedShipmentRecord[],
+): boolean {
+  const portalDayKey = getShipmentCalendarDayKey(portalTimestamp);
+  const chargeDayKey = getShipmentCalendarDayKey(getCurrentShipmentTimestamp(subscription));
   const addressKey = subscription.shippingAddressKey;
-  const portalStorageKey = buildShipmentStorageKey({
-    customerId,
-    dayKey: portalDayKey,
-    shippingAddressKey: addressKey,
-  });
-  const finalizedStorageKeys = new Set(finalizedShipments.map((record) => record.storageKey));
+  const periodStart = subscription.currentPeriodStart ?? 0;
 
-  if (finalizedStorageKeys.has(portalStorageKey)) {
-    return true;
+  return finalizedShipments.some((record) => {
+    if (record.shippingAddressKey !== addressKey) {
+      return false;
+    }
+
+    if (record.finalizedAt < periodStart) {
+      return false;
+    }
+
+    const dayMatches = record.dayKey === portalDayKey || record.dayKey === chargeDayKey;
+
+    if (!dayMatches) {
+      return false;
+    }
+
+    return [...record.chargedItems, ...record.skippedItems].some(
+      (item) => item.subscriptionId === subscription.id,
+    );
+  });
+}
+
+function getUpcomingPortalShipmentTimestamp(
+  subscription: CustomerSubscription,
+  finalizedShipments: FinalizedShipmentRecord[],
+): number {
+  const portalTimestamp = getPortalUpcomingShipmentTimestamp(subscription);
+  const periodStart = subscription.currentPeriodStart ?? 0;
+  const periodEnd = subscription.currentPeriodEnd ?? portalTimestamp;
+  const periodLength = periodEnd - periodStart;
+
+  if (periodLength <= 0) {
+    return portalTimestamp;
   }
 
-  return finalizedShipments.some(
-    (record) =>
-      record.dayKey === portalDayKey &&
-      record.shippingAddressKey === addressKey &&
-      [...record.chargedItems, ...record.skippedItems].some(
-        (item) => item.subscriptionId === subscription.id,
-      ),
-  );
+  if (!isSubscriptionPortalShipmentFinalized(subscription, portalTimestamp, finalizedShipments)) {
+    return portalTimestamp;
+  }
+
+  return periodEnd + periodLength;
 }
 
 function filterSubscriptionsForUpcomingShipments(
   subscriptions: CustomerSubscription[],
-  customerId: number,
   finalizedShipments: FinalizedShipmentRecord[],
 ): CustomerSubscription[] {
   const todayKey = getShipmentCalendarDayKey(Math.floor(Date.now() / 1000));
 
   return subscriptions.filter((subscription) => {
-    const shipmentTimestamp = getPortalUpcomingShipmentTimestamp(subscription);
+    const shipmentTimestamp = getUpcomingPortalShipmentTimestamp(subscription, finalizedShipments);
     const dayKey = getShipmentCalendarDayKey(shipmentTimestamp);
 
     if (dayKey < todayKey) {
       return false;
     }
 
-    return !isSubscriptionFinalizedForUpcomingPortal({
+    return !isSubscriptionPortalShipmentFinalized(
       subscription,
-      customerId,
+      shipmentTimestamp,
       finalizedShipments,
-    });
+    );
   });
 }
 
@@ -647,14 +665,22 @@ export function groupSubscriptionsByShipmentDate(
   subscriptions: CustomerSubscription[],
   t: SubscriptionsT,
   format: Format,
-  batchOptions?: {
+  options?: {
     customerId: number;
     batchesByStorageKey: Map<string, SubscriptionOrderBatch>;
+    finalizedShipments?: FinalizedShipmentRecord[];
   },
 ): SubscriptionDateGroup[] {
+  const finalizedShipments = options?.finalizedShipments ?? [];
+  const getTimestamp =
+    finalizedShipments.length > 0
+      ? (subscription: CustomerSubscription) =>
+          getUpcomingPortalShipmentTimestamp(subscription, finalizedShipments)
+      : getPortalUpcomingShipmentTimestamp;
+
   return groupSubscriptionsByDate(
     subscriptions,
-    getPortalUpcomingShipmentTimestamp,
+    getTimestamp,
     (timestamp) =>
       t('shipmentOn', {
         date: format.dateTime(new Date(timestamp * 1000), { dateStyle: 'medium' }),
@@ -662,7 +688,12 @@ export function groupSubscriptionsByShipmentDate(
     'shipment',
     t,
     format,
-    batchOptions,
+    options
+      ? {
+          customerId: options.customerId,
+          batchesByStorageKey: options.batchesByStorageKey,
+        }
+      : undefined,
   );
 }
 
@@ -681,7 +712,6 @@ export async function groupSubscriptionsForPortal(
   const batchesByStorageKey = await getSubscriptionOrderBatchesForCustomer(options.customerId);
   const upcomingSubscriptions = filterSubscriptionsForUpcomingShipments(
     activeSubscriptions,
-    options.customerId,
     finalizedShipments,
   );
 
@@ -689,6 +719,7 @@ export async function groupSubscriptionsForPortal(
     upcomingShipments: groupSubscriptionsByShipmentDate(upcomingSubscriptions, t, format, {
       customerId: options.customerId,
       batchesByStorageKey,
+      finalizedShipments,
     }),
     pastShipments: buildPastShipmentGroups(finalizedShipments, t, format),
     active: transformCustomerSubscriptions(activeSubscriptions, t, format),
