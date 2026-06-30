@@ -525,35 +525,48 @@ function buildPastShipmentGroups(
     });
 }
 
-function isSubscriptionPortalShipmentFinalized(
+function normalizeProductNameForMatch(name: string): string {
+  return name.trim().toLowerCase();
+}
+
+function recordIncludesSubscription(
+  record: FinalizedShipmentRecord,
   subscription: CustomerSubscription,
-  portalTimestamp: number,
-  finalizedShipments: FinalizedShipmentRecord[],
 ): boolean {
-  const portalDayKey = getShipmentCalendarDayKey(portalTimestamp);
-  const chargeDayKey = getShipmentCalendarDayKey(getCurrentShipmentTimestamp(subscription));
-  const addressKey = subscription.shippingAddressKey;
-  const periodStart = subscription.currentPeriodStart ?? 0;
+  const items = [...record.chargedItems, ...record.skippedItems];
 
-  return finalizedShipments.some((record) => {
-    if (record.shippingAddressKey !== addressKey) {
+  if (items.some((item) => item.subscriptionId === subscription.id)) {
+    return true;
+  }
+
+  const subscriptionName = normalizeProductNameForMatch(subscription.productName);
+
+  return items.some((item) => {
+    if (item.subscriptionId && item.subscriptionId !== subscription.id) {
       return false;
     }
 
-    if (record.finalizedAt < periodStart) {
-      return false;
-    }
+    const recordName = normalizeProductNameForMatch(item.productName);
 
-    const dayMatches = record.dayKey === portalDayKey || record.dayKey === chargeDayKey;
-
-    if (!dayMatches) {
-      return false;
-    }
-
-    return [...record.chargedItems, ...record.skippedItems].some(
-      (item) => item.subscriptionId === subscription.id,
+    return (
+      subscriptionName.startsWith(recordName) ||
+      recordName.startsWith(subscriptionName.slice(0, Math.max(recordName.length, 8)))
     );
   });
+}
+
+function isChargePeriodShipmentFinalized(
+  subscription: CustomerSubscription,
+  finalizedShipments: FinalizedShipmentRecord[],
+): boolean {
+  const chargeDayKey = getShipmentCalendarDayKey(getCurrentShipmentTimestamp(subscription));
+
+  return finalizedShipments.some(
+    (record) =>
+      record.shippingAddressKey === subscription.shippingAddressKey &&
+      record.dayKey === chargeDayKey &&
+      recordIncludesSubscription(record, subscription),
+  );
 }
 
 function getUpcomingPortalShipmentTimestamp(
@@ -569,7 +582,7 @@ function getUpcomingPortalShipmentTimestamp(
     return portalTimestamp;
   }
 
-  if (!isSubscriptionPortalShipmentFinalized(subscription, portalTimestamp, finalizedShipments)) {
+  if (!isChargePeriodShipmentFinalized(subscription, finalizedShipments)) {
     return portalTimestamp;
   }
 
@@ -586,15 +599,7 @@ function filterSubscriptionsForUpcomingShipments(
     const shipmentTimestamp = getUpcomingPortalShipmentTimestamp(subscription, finalizedShipments);
     const dayKey = getShipmentCalendarDayKey(shipmentTimestamp);
 
-    if (dayKey < todayKey) {
-      return false;
-    }
-
-    return !isSubscriptionPortalShipmentFinalized(
-      subscription,
-      shipmentTimestamp,
-      finalizedShipments,
-    );
+    return dayKey >= todayKey;
   });
 }
 
