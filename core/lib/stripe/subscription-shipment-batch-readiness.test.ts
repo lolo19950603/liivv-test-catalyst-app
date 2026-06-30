@@ -16,6 +16,7 @@ function buildSubscription(
     currency: 'usd',
     interval: 'month',
     intervalCount: 1,
+    currentPeriodStart: 0,
     currentPeriodEnd: 0,
     cancelAtPeriodEnd: false,
     trialEnd: null,

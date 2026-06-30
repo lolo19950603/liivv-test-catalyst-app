@@ -19,10 +19,14 @@ export function buildSubscriptionOrderBatchStorageKey({
   return `${customerId}:${dayKey}:${shippingAddressKey}`;
 }
 
+/**
+ * Shipment day for grouping — the calendar day the customer is charged and the order ships,
+ * not the end of the billing period (which varies by 14-day vs 30-day intervals).
+ */
 export function getNextShipmentTimestamp(
   subscription: Pick<
     import('./subscriptions').CustomerSubscription,
-    'trialEnd' | 'billingCycleAnchor' | 'currentPeriodEnd'
+    'trialEnd' | 'billingCycleAnchor' | 'currentPeriodStart' | 'currentPeriodEnd'
   >,
 ): number {
   const now = Math.floor(Date.now() / 1000);
@@ -35,14 +39,23 @@ export function getNextShipmentTimestamp(
     return subscription.billingCycleAnchor;
   }
 
-  return subscription.currentPeriodEnd;
+  return subscription.currentPeriodStart ?? subscription.currentPeriodEnd;
+}
+
+function getStripeSubscriptionPeriodStart(
+  subscription: Pick<
+    Stripe.Subscription,
+    'trial_end' | 'billing_cycle_anchor' | 'current_period_end' | 'items'
+  >,
+): number | undefined {
+  return subscription.items?.data[0]?.current_period_start;
 }
 
 /** Same shipment timestamp logic as the portal, using Stripe subscription fields. */
 export function getNextShipmentTimestampFromStripeSubscription(
   subscription: Pick<
     Stripe.Subscription,
-    'trial_end' | 'billing_cycle_anchor' | 'current_period_end'
+    'trial_end' | 'billing_cycle_anchor' | 'current_period_end' | 'items'
   >,
 ): number {
   const now = Math.floor(Date.now() / 1000);
@@ -55,23 +68,32 @@ export function getNextShipmentTimestampFromStripeSubscription(
     return subscription.billing_cycle_anchor;
   }
 
-  return subscription.current_period_end;
+  return getStripeSubscriptionPeriodStart(subscription) ?? subscription.current_period_end;
 }
 
-/** Shipment timestamp for a paid invoice — aligns batch keys with portal shipment groups. */
+/** Shipment timestamp for a paid invoice — uses period start (charge day), not period end. */
 export function getSubscriptionInvoiceShipmentTimestamp(
   invoice: Stripe.Invoice,
   subscription: Pick<
     Stripe.Subscription,
-    'trial_end' | 'billing_cycle_anchor' | 'current_period_end'
+    'trial_end' | 'billing_cycle_anchor' | 'current_period_end' | 'items'
   >,
 ): number {
   const subscriptionLine = (invoice.lines?.data ?? []).find(
     (line) => line.parent?.type === 'subscription_item_details',
   );
 
-  if (subscriptionLine?.period?.end) {
-    return subscriptionLine.period.end;
+  if (subscriptionLine?.period?.start) {
+    return subscriptionLine.period.start;
+  }
+
+  const paidAt =
+    invoice.status_transitions?.paid_at ??
+    invoice.effective_at ??
+    invoice.created;
+
+  if (paidAt) {
+    return paidAt;
   }
 
   return getNextShipmentTimestampFromStripeSubscription(subscription);

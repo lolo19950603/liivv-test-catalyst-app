@@ -21,6 +21,7 @@ export interface CustomerSubscription {
   currency: string;
   interval: Stripe.Price.Recurring.Interval;
   intervalCount: number;
+  currentPeriodStart: number;
   currentPeriodEnd: number;
   cancelAtPeriodEnd: boolean;
   trialEnd: number | null;
@@ -148,6 +149,10 @@ function toCustomerSubscription(
 
   const productName = getSubscriptionProductName(item.price, stripeProductInfoById);
   const cancelAtPeriodEnd = isSubscriptionCancelScheduled(subscription);
+  const currentPeriodStart =
+    item.current_period_start ??
+    subscription.billing_cycle_anchor ??
+    subscription.created;
   const currentPeriodEnd =
     (cancelAtPeriodEnd ? subscription.cancel_at : null) ??
     item.current_period_end ??
@@ -175,6 +180,7 @@ function toCustomerSubscription(
     currency: item.price.currency,
     interval: item.price.recurring.interval,
     intervalCount: item.price.recurring.interval_count,
+    currentPeriodStart,
     currentPeriodEnd,
     cancelAtPeriodEnd,
     trialEnd: subscription.trial_end,
