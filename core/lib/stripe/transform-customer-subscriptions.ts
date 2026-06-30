@@ -525,10 +525,53 @@ function buildPastShipmentGroups(
     });
 }
 
+function isSubscriptionFinalizedForUpcomingPortal({
+  subscription,
+  customerId,
+  finalizedShipments,
+}: {
+  subscription: CustomerSubscription;
+  customerId: number;
+  finalizedShipments: FinalizedShipmentRecord[];
+}): boolean {
+  const chargeDayKey = getShipmentCalendarDayKey(getCurrentShipmentTimestamp(subscription));
+  const portalDayKey = getShipmentCalendarDayKey(getPortalUpcomingShipmentTimestamp(subscription));
+  const addressKey = subscription.shippingAddressKey;
+  const chargeStorageKey = buildShipmentStorageKey({
+    customerId,
+    dayKey: chargeDayKey,
+    shippingAddressKey: addressKey,
+  });
+  const portalStorageKey = buildShipmentStorageKey({
+    customerId,
+    dayKey: portalDayKey,
+    shippingAddressKey: addressKey,
+  });
+  const finalizedStorageKeys = new Set(finalizedShipments.map((record) => record.storageKey));
+
+  if (finalizedStorageKeys.has(chargeStorageKey) || finalizedStorageKeys.has(portalStorageKey)) {
+    return true;
+  }
+
+  return finalizedShipments.some((record) => {
+    if (record.shippingAddressKey !== addressKey) {
+      return false;
+    }
+
+    if (record.dayKey !== chargeDayKey && record.dayKey !== portalDayKey) {
+      return false;
+    }
+
+    return [...record.chargedItems, ...record.skippedItems].some(
+      (item) => item.subscriptionId === subscription.id,
+    );
+  });
+}
+
 function filterSubscriptionsForUpcomingShipments(
   subscriptions: CustomerSubscription[],
   customerId: number,
-  finalizedStorageKeys: Set<string>,
+  finalizedShipments: FinalizedShipmentRecord[],
 ): CustomerSubscription[] {
   const todayKey = getShipmentCalendarDayKey(Math.floor(Date.now() / 1000));
 
@@ -540,13 +583,11 @@ function filterSubscriptionsForUpcomingShipments(
       return false;
     }
 
-    const storageKey = buildShipmentStorageKey({
+    return !isSubscriptionFinalizedForUpcomingPortal({
+      subscription,
       customerId,
-      dayKey,
-      shippingAddressKey: subscription.shippingAddressKey,
+      finalizedShipments,
     });
-
-    return !finalizedStorageKeys.has(storageKey);
   });
 }
 
@@ -647,14 +688,12 @@ export async function groupSubscriptionsForPortal(
 ): Promise<SubscriptionPortalSections> {
   const activeSubscriptions = subscriptions.filter((subscription) => !isCanceledSubscription(subscription));
   const canceledSubscriptions = subscriptions.filter(isCanceledSubscription);
-  const finalizedStorageKeys = new Set(
-    (options.finalizedShipments ?? []).map((record) => record.storageKey),
-  );
+  const finalizedShipments = options.finalizedShipments ?? [];
   const batchesByStorageKey = await getSubscriptionOrderBatchesForCustomer(options.customerId);
   const upcomingSubscriptions = filterSubscriptionsForUpcomingShipments(
     activeSubscriptions,
     options.customerId,
-    finalizedStorageKeys,
+    finalizedShipments,
   );
 
   return {
@@ -662,7 +701,7 @@ export async function groupSubscriptionsForPortal(
       customerId: options.customerId,
       batchesByStorageKey,
     }),
-    pastShipments: buildPastShipmentGroups(options.finalizedShipments ?? [], t, format),
+    pastShipments: buildPastShipmentGroups(finalizedShipments, t, format),
     active: transformCustomerSubscriptions(activeSubscriptions, t, format),
     canceled: transformCustomerSubscriptions(canceledSubscriptions, t, format, {
       hidePricing: true,
