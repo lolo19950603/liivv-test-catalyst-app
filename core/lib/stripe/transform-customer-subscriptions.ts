@@ -3,7 +3,8 @@ import { isSubscriptionPaymentFailed } from './subscription-delivery-payment';
 import type { FinalizedShipmentRecord } from './subscription-shipment-records';
 import { buildShipmentStorageKey } from './subscription-shipment-records';
 import {
-  getNextShipmentTimestamp,
+  getCurrentShipmentTimestamp,
+  getPortalUpcomingShipmentTimestamp,
   getShipmentCalendarDayKey,
 } from './subscription-shipment-grouping';
 
@@ -161,7 +162,7 @@ function getScheduleDetail(
   return undefined;
 }
 
-export { getNextShipmentTimestamp } from './subscription-shipment-grouping';
+export { getCurrentShipmentTimestamp, getPortalUpcomingShipmentTimestamp } from './subscription-shipment-grouping';
 
 export function transformCustomerSubscription(
   subscription: CustomerSubscription,
@@ -444,8 +445,16 @@ function filterSubscriptionsForUpcomingShipments(
   customerId: number,
   finalizedStorageKeys: Set<string>,
 ): CustomerSubscription[] {
+  const todayKey = getShipmentCalendarDayKey(Math.floor(Date.now() / 1000));
+
   return subscriptions.filter((subscription) => {
-    const dayKey = getShipmentCalendarDayKey(getNextShipmentTimestamp(subscription));
+    const shipmentTimestamp = getPortalUpcomingShipmentTimestamp(subscription);
+    const dayKey = getShipmentCalendarDayKey(shipmentTimestamp);
+
+    if (dayKey < todayKey) {
+      return false;
+    }
+
     const storageKey = buildShipmentStorageKey({
       customerId,
       dayKey,
@@ -514,7 +523,7 @@ export function groupSubscriptionsByShipmentDate(
 ): SubscriptionDateGroup[] {
   return groupSubscriptionsByDate(
     subscriptions,
-    getNextShipmentTimestamp,
+    getPortalUpcomingShipmentTimestamp,
     (timestamp) =>
       t('shipmentOn', {
         date: format.dateTime(new Date(timestamp * 1000), { dateStyle: 'medium' }),

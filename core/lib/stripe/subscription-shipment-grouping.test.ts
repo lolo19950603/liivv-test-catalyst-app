@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import type Stripe from 'stripe';
 
 import {
-  getNextShipmentTimestamp,
+  getCurrentShipmentTimestamp,
+  getPortalUpcomingShipmentTimestamp,
   getShipmentCalendarDayKey,
   getSubscriptionInvoiceShipmentTimestamp,
 } from './subscription-shipment-grouping';
@@ -60,13 +61,13 @@ describe('subscription shipment grouping', () => {
     const fourteenDayEnd = Math.floor(Date.parse('2026-07-14T10:00:00.000Z') / 1000);
     const thirtyDayEnd = Math.floor(Date.parse('2026-07-30T10:00:00.000Z') / 1000);
 
-    const fourteenDayShipment = getNextShipmentTimestamp({
+    const fourteenDayShipment = getCurrentShipmentTimestamp({
       trialEnd: null,
       billingCycleAnchor: null,
       currentPeriodStart: chargeDay,
       currentPeriodEnd: fourteenDayEnd,
     });
-    const thirtyDayShipment = getNextShipmentTimestamp({
+    const thirtyDayShipment = getCurrentShipmentTimestamp({
       trialEnd: null,
       billingCycleAnchor: null,
       currentPeriodStart: chargeDay,
@@ -89,5 +90,23 @@ describe('subscription shipment grouping', () => {
     const shipmentTimestamp = getSubscriptionInvoiceShipmentTimestamp(invoice, subscription);
 
     expect(getShipmentCalendarDayKey(shipmentTimestamp)).toBe('2026-06-30');
+  });
+
+  it('advances portal upcoming shipments to the next charge after the period start passes', () => {
+    const now = Math.floor(Date.parse('2026-06-30T16:00:00.000Z') / 1000);
+    const periodStart = Math.floor(Date.parse('2026-06-27T10:00:00.000Z') / 1000);
+    const periodEnd = Math.floor(Date.parse('2026-07-04T10:00:00.000Z') / 1000);
+
+    const upcoming = getPortalUpcomingShipmentTimestamp(
+      {
+        trialEnd: null,
+        billingCycleAnchor: null,
+        currentPeriodStart: periodStart,
+        currentPeriodEnd: periodEnd,
+      },
+      now,
+    );
+
+    expect(getShipmentCalendarDayKey(upcoming)).toBe('2026-07-04');
   });
 });

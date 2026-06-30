@@ -24,7 +24,8 @@ import {
   type ShipmentSkippedItem,
 } from './subscription-shipment-records';
 import {
-  getNextShipmentTimestamp,
+  getCurrentShipmentTimestamp,
+  getPortalUpcomingShipmentTimestamp,
   getShipmentCalendarDayKey,
 } from './subscription-shipment-grouping';
 import { markSubscriptionOrderCreated } from './storage';
@@ -37,7 +38,7 @@ export function getSubscriptionsInShipmentGroup(
   return subscriptions.filter(
     (subscription) =>
       subscription.shippingAddressKey === shippingAddressKey &&
-      getShipmentCalendarDayKey(getNextShipmentTimestamp(subscription)) === dayKey,
+      getShipmentCalendarDayKey(getCurrentShipmentTimestamp(subscription)) === dayKey,
   );
 }
 
@@ -293,7 +294,7 @@ export async function finalizeDueShipmentsForCustomer({
   const shipmentGroups = new Map<string, { dayKey: string; shippingAddressKey: string }>();
 
   for (const subscription of subscriptions) {
-    const dayKey = getShipmentCalendarDayKey(getNextShipmentTimestamp(subscription));
+    const dayKey = getShipmentCalendarDayKey(getCurrentShipmentTimestamp(subscription));
     const storageKey = buildShipmentStorageKey({
       customerId,
       dayKey,

@@ -19,18 +19,12 @@ export function buildSubscriptionOrderBatchStorageKey({
   return `${customerId}:${dayKey}:${shippingAddressKey}`;
 }
 
-/**
- * Shipment day for grouping — the calendar day the customer is charged and the order ships,
- * not the end of the billing period (which varies by 14-day vs 30-day intervals).
- */
-export function getNextShipmentTimestamp(
-  subscription: Pick<
-    import('./subscriptions').CustomerSubscription,
-    'trialEnd' | 'billingCycleAnchor' | 'currentPeriodStart' | 'currentPeriodEnd'
-  >,
-): number {
-  const now = Math.floor(Date.now() / 1000);
+type ShipmentSubscription = Pick<
+  import('./subscriptions').CustomerSubscription,
+  'trialEnd' | 'billingCycleAnchor' | 'currentPeriodStart' | 'currentPeriodEnd'
+>;
 
+function getDeferredShipmentTimestamp(subscription: ShipmentSubscription, now: number): number | null {
   if (subscription.trialEnd && subscription.trialEnd > now) {
     return subscription.trialEnd;
   }
@@ -39,7 +33,50 @@ export function getNextShipmentTimestamp(
     return subscription.billingCycleAnchor;
   }
 
+  return null;
+}
+
+/**
+ * Shipment day for the current billing period (charge day) — used for batching and finalize groups.
+ */
+export function getCurrentShipmentTimestamp(subscription: ShipmentSubscription): number {
+  const now = Math.floor(Date.now() / 1000);
+  const deferred = getDeferredShipmentTimestamp(subscription, now);
+
+  if (deferred != null) {
+    return deferred;
+  }
+
   return subscription.currentPeriodStart ?? subscription.currentPeriodEnd;
+}
+
+/**
+ * Next shipment shown in the portal — advances to the next charge once the current period
+ * charge day has passed.
+ */
+export function getPortalUpcomingShipmentTimestamp(
+  subscription: ShipmentSubscription,
+  now = Math.floor(Date.now() / 1000),
+): number {
+  const deferred = getDeferredShipmentTimestamp(subscription, now);
+
+  if (deferred != null) {
+    return deferred;
+  }
+
+  const periodStart = subscription.currentPeriodStart ?? subscription.currentPeriodEnd;
+  const todayKey = getShipmentCalendarDayKey(now);
+
+  if (getShipmentCalendarDayKey(periodStart) >= todayKey) {
+    return periodStart;
+  }
+
+  return subscription.currentPeriodEnd;
+}
+
+/** @deprecated Use getCurrentShipmentTimestamp or getPortalUpcomingShipmentTimestamp */
+export function getNextShipmentTimestamp(subscription: ShipmentSubscription): number {
+  return getCurrentShipmentTimestamp(subscription);
 }
 
 function getStripeSubscriptionPeriodStart(
