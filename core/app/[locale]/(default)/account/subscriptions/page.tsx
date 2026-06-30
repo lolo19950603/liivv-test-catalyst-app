@@ -65,7 +65,7 @@ export default async function SubscriptionsPage({ params }: Props) {
     );
   }
 
-  const portalSections = groupSubscriptionsForPortal(data.subscriptions, t, format, {
+  const portalSections = await groupSubscriptionsForPortal(data.subscriptions, t, format, {
     customerId: data.bigcommerceCustomerId,
     finalizedShipments: data.finalizedShipments,
   });

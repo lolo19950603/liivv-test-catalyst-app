@@ -98,6 +98,41 @@ export async function getSubscriptionOrderBatchFromSupabase(
   return rowToBatch(data as SubscriptionOrderBatchDbRow);
 }
 
+export async function getSubscriptionOrderBatchesForCustomerFromSupabase(
+  customerId: number,
+): Promise<Array<{ storageKey: string; batch: SubscriptionOrderBatchRowData }>> {
+  if (!isSupabaseConfigured()) {
+    return [];
+  }
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from('subscription_order_batches')
+    .select('*')
+    .eq('customer_id', customerId);
+
+  if (error) {
+    throw new Error(`Failed to load subscription order batches: ${error.message}`);
+  }
+
+  return (data ?? [])
+    .map((row) => {
+      const batch = rowToBatch(row as SubscriptionOrderBatchDbRow);
+
+      if (!batch) {
+        return null;
+      }
+
+      return {
+        storageKey: (row as SubscriptionOrderBatchDbRow).storage_key,
+        batch,
+      };
+    })
+    .filter((entry): entry is { storageKey: string; batch: SubscriptionOrderBatchRowData } =>
+      Boolean(entry),
+    );
+}
+
 export async function getSubscriptionOrderBatchIndexFromSupabase(
   customerId: number,
 ): Promise<string[] | null> {

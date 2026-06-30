@@ -1,7 +1,14 @@
 import type { CustomerSubscription } from './subscriptions';
 import { isSubscriptionPaymentFailed } from './subscription-delivery-payment';
+import {
+  getShipmentBatchReadiness,
+  getSubscriptionsInShipmentGroup,
+} from './finalize-subscription-shipment';
+import type { SubscriptionOrderBatch } from './subscription-order-batch';
+import { getSubscriptionOrderBatchesForCustomer } from './subscription-order-batch';
 import type { FinalizedShipmentRecord } from './subscription-shipment-records';
 import { buildShipmentStorageKey } from './subscription-shipment-records';
+import { isPastShipmentCutoff } from './subscription-shipment-cutoff';
 import {
   getCurrentShipmentTimestamp,
   getPortalUpcomingShipmentTimestamp,
@@ -38,6 +45,7 @@ export interface SubscriptionDeliveryGroup {
   totalsPending?: boolean;
   totalsNote?: string;
   shipmentPaused?: boolean;
+  fulfillmentNote?: string;
   isPast?: boolean;
   bigcommerceOrderId?: number;
   bigcommerceOrderHref?: string;
@@ -286,11 +294,82 @@ function buildDeliveryTotals(
   };
 }
 
+function applyBatchStatusToDelivery(
+  delivery: SubscriptionDeliveryGroup,
+  addressKey: string,
+  batchEnrichment: {
+    customerId: number;
+    dayKey: string;
+    allSubscriptionsInDateGroup: CustomerSubscription[];
+    batchesByStorageKey: Map<string, SubscriptionOrderBatch>;
+    t: SubscriptionsT;
+  },
+): SubscriptionDeliveryGroup {
+  const storageKey = buildShipmentStorageKey({
+    customerId: batchEnrichment.customerId,
+    dayKey: batchEnrichment.dayKey,
+    shippingAddressKey: addressKey,
+  });
+  const batch = batchEnrichment.batchesByStorageKey.get(storageKey) ?? null;
+
+  if (!batch || batch.items.length === 0) {
+    return delivery;
+  }
+
+  const paidSubscriptionIds = new Set(batch.items.map((item) => item.stripeSubscriptionId));
+  const groupSubscriptions = getSubscriptionsInShipmentGroup(
+    batchEnrichment.allSubscriptionsInDateGroup,
+    batchEnrichment.dayKey,
+    addressKey,
+  );
+  const items = delivery.items.map((item) => {
+    if (!paidSubscriptionIds.has(item.id)) {
+      return item;
+    }
+
+    return {
+      ...item,
+      statusKey: 'charged',
+      statusLabel: batchEnrichment.t('delivery.charged'),
+    };
+  });
+  const readiness = getShipmentBatchReadiness({
+    groupSubscriptions,
+    batch,
+    dayKey: batchEnrichment.dayKey,
+    shippingAddressKey: addressKey,
+    pastCutoff: isPastShipmentCutoff(batchEnrichment.dayKey),
+  });
+
+  let fulfillmentNote: string | undefined;
+
+  if (readiness === 'ready') {
+    fulfillmentNote = batchEnrichment.t('delivery.processingOrder');
+  } else if (readiness === 'pending') {
+    fulfillmentNote = batchEnrichment.t('delivery.waitingForPayments', {
+      paid: batch.items.length,
+      total: groupSubscriptions.length,
+    });
+  }
+
+  return {
+    ...delivery,
+    items,
+    fulfillmentNote,
+  };
+}
+
 function groupSubscriptionsIntoDeliveries(
   subscriptions: CustomerSubscription[],
   t: SubscriptionsT,
   format: Format,
   idPrefix: string,
+  batchEnrichment?: {
+    customerId: number;
+    dayKey: string;
+    allSubscriptionsInDateGroup: CustomerSubscription[];
+    batchesByStorageKey: Map<string, SubscriptionOrderBatch>;
+  },
 ): SubscriptionDeliveryGroup[] {
   const deliveries = new Map<
     string,
@@ -323,7 +402,7 @@ function groupSubscriptionsIntoDeliveries(
       isSubscriptionPaymentFailed(subscription.status),
     );
 
-    return {
+    const baseDelivery: SubscriptionDeliveryGroup = {
       id: `${idPrefix}-${addressKey}`,
       shippingAddressLabel: delivery.shippingAddressLabel,
       shippingMethodLabel: t('delivery.freeShipping'),
@@ -333,6 +412,12 @@ function groupSubscriptionsIntoDeliveries(
       shipmentPaused: deliveryPaused,
       ...totals,
     };
+
+    if (!batchEnrichment) {
+      return baseDelivery;
+    }
+
+    return applyBatchStatusToDelivery(baseDelivery, addressKey, { ...batchEnrichment, t });
   });
 }
 
@@ -472,6 +557,10 @@ function groupSubscriptionsByDate(
   idPrefix: string,
   t: SubscriptionsT,
   format: Format,
+  batchOptions?: {
+    customerId: number;
+    batchesByStorageKey: Map<string, SubscriptionOrderBatch>;
+  },
 ): SubscriptionDateGroup[] {
   const dateGroups = new Map<
     string,
@@ -500,6 +589,14 @@ function groupSubscriptionsByDate(
         t,
         format,
         `${idPrefix}-${dayKey}`,
+        batchOptions
+          ? {
+              customerId: batchOptions.customerId,
+              dayKey,
+              allSubscriptionsInDateGroup: groupSubscriptions,
+              batchesByStorageKey: batchOptions.batchesByStorageKey,
+            }
+          : undefined,
       );
 
       return {
@@ -520,6 +617,10 @@ export function groupSubscriptionsByShipmentDate(
   subscriptions: CustomerSubscription[],
   t: SubscriptionsT,
   format: Format,
+  batchOptions?: {
+    customerId: number;
+    batchesByStorageKey: Map<string, SubscriptionOrderBatch>;
+  },
 ): SubscriptionDateGroup[] {
   return groupSubscriptionsByDate(
     subscriptions,
@@ -531,10 +632,11 @@ export function groupSubscriptionsByShipmentDate(
     'shipment',
     t,
     format,
+    batchOptions,
   );
 }
 
-export function groupSubscriptionsForPortal(
+export async function groupSubscriptionsForPortal(
   subscriptions: CustomerSubscription[],
   t: SubscriptionsT,
   format: Format,
@@ -542,12 +644,13 @@ export function groupSubscriptionsForPortal(
     customerId: number;
     finalizedShipments?: FinalizedShipmentRecord[];
   },
-): SubscriptionPortalSections {
+): Promise<SubscriptionPortalSections> {
   const activeSubscriptions = subscriptions.filter((subscription) => !isCanceledSubscription(subscription));
   const canceledSubscriptions = subscriptions.filter(isCanceledSubscription);
   const finalizedStorageKeys = new Set(
     (options.finalizedShipments ?? []).map((record) => record.storageKey),
   );
+  const batchesByStorageKey = await getSubscriptionOrderBatchesForCustomer(options.customerId);
   const upcomingSubscriptions = filterSubscriptionsForUpcomingShipments(
     activeSubscriptions,
     options.customerId,
@@ -555,7 +658,10 @@ export function groupSubscriptionsForPortal(
   );
 
   return {
-    upcomingShipments: groupSubscriptionsByShipmentDate(upcomingSubscriptions, t, format),
+    upcomingShipments: groupSubscriptionsByShipmentDate(upcomingSubscriptions, t, format, {
+      customerId: options.customerId,
+      batchesByStorageKey,
+    }),
     pastShipments: buildPastShipmentGroups(options.finalizedShipments ?? [], t, format),
     active: transformCustomerSubscriptions(activeSubscriptions, t, format),
     canceled: transformCustomerSubscriptions(canceledSubscriptions, t, format, {

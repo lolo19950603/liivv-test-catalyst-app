@@ -14,6 +14,7 @@ import {
   deleteSubscriptionOrderBatchFromSupabase,
   getSubscriptionOrderBatchFromSupabase,
   getSubscriptionOrderBatchIndexFromSupabase,
+  getSubscriptionOrderBatchesForCustomerFromSupabase,
   saveSubscriptionOrderBatchInSupabase,
 } from '~/lib/supabase/subscription-order-batch-store';
 
@@ -333,6 +334,29 @@ export async function getSubscriptionOrderBatchIndex(customerId: number): Promis
   const indexValue = await kv.get<string[] | ''>(batchIndexKvKey(customerId));
 
   return typeof indexValue === 'string' || !indexValue ? [] : indexValue;
+}
+
+export async function getSubscriptionOrderBatchesForCustomer(
+  customerId: number,
+): Promise<Map<string, SubscriptionOrderBatch>> {
+  if (isSupabaseConfigured()) {
+    const rows = await getSubscriptionOrderBatchesForCustomerFromSupabase(customerId);
+
+    return new Map(rows.map((row) => [row.storageKey, row.batch]));
+  }
+
+  const keys = await getSubscriptionOrderBatchIndex(customerId);
+  const entries = await Promise.all(
+    keys.map(async (storageKey) => {
+      const batch = await readBatch(storageKey);
+
+      return batch ? ([storageKey, batch] as const) : null;
+    }),
+  );
+
+  return new Map(
+    entries.filter((entry): entry is readonly [string, SubscriptionOrderBatch] => Boolean(entry)),
+  );
 }
 
 export async function removeSubscriptionOrderBatch(

@@ -38,6 +38,7 @@ export interface SubscriptionDeliveryGroup {
   totalsPending?: boolean;
   totalsNote?: string;
   shipmentPaused?: boolean;
+  fulfillmentNote?: string;
   isPast?: boolean;
   bigcommerceOrderId?: number;
   bigcommerceOrderHref?: string;
@@ -235,6 +236,14 @@ function SubscriptionShipmentPausedBanner({ message }: { message: string }) {
   return (
     <div className="border-b border-amber-200/80 bg-amber-50 px-5 py-4 @md:px-6">
       <p className="text-sm leading-relaxed text-amber-950">{message}</p>
+    </div>
+  );
+}
+
+function SubscriptionFulfillmentBanner({ message }: { message: string }) {
+  return (
+    <div className="border-b border-sky-200/80 bg-sky-50 px-5 py-4 @md:px-6">
+      <p className="text-sm leading-relaxed text-sky-950">{message}</p>
     </div>
   );
 }
@@ -693,7 +702,10 @@ function SubscriptionLineItemRow({
   ].filter(Boolean);
 
   const showStatus =
-    readOnly || subscription.paymentFailed || subscription.statusKey === 'skipped';
+    readOnly ||
+    subscription.paymentFailed ||
+    subscription.statusKey === 'skipped' ||
+    subscription.statusKey === 'charged';
 
   const isPaymentFailed = subscription.paymentFailed && !readOnly;
 
@@ -889,6 +901,9 @@ function SubscriptionDeliveryCard({
       ) : null}
       {delivery.shipmentPaused && shipmentPausedMessage ? (
         <SubscriptionShipmentPausedBanner message={shipmentPausedMessage} />
+      ) : null}
+      {delivery.fulfillmentNote ? (
+        <SubscriptionFulfillmentBanner message={delivery.fulfillmentNote} />
       ) : null}
       <div className="px-5 py-4 @md:px-6">
         <div className="flex flex-wrap items-start gap-x-8 gap-y-3">
