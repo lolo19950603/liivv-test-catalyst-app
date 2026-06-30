@@ -9,6 +9,13 @@ import {
 } from '~/lib/bigcommerce/product-options';
 import { isBigCommerceAdminConfigured } from '~/lib/bigcommerce/rest';
 import { kv } from '~/lib/kv';
+import { isSupabaseConfigured } from '~/lib/supabase/client';
+import {
+  deleteSubscriptionOrderBatchFromSupabase,
+  getSubscriptionOrderBatchFromSupabase,
+  getSubscriptionOrderBatchIndexFromSupabase,
+  saveSubscriptionOrderBatchInSupabase,
+} from '~/lib/supabase/subscription-order-batch-store';
 
 import {
   buildSubscriptionOrderBatchStorageKey,
@@ -79,7 +86,22 @@ function pickShippingMetadata(metadata: Stripe.Metadata): Record<string, string>
   return picked;
 }
 
+function mergeBatchLines(
+  existingItems: BatchedSubscriptionOrderLine[],
+  line: BatchedSubscriptionOrderLine,
+): BatchedSubscriptionOrderLine[] {
+  const withoutDuplicate = existingItems.filter(
+    (item) => item.invoiceReferenceId !== line.invoiceReferenceId,
+  );
+
+  return [...withoutDuplicate, line];
+}
+
 async function readBatch(storageKey: string): Promise<SubscriptionOrderBatch | null> {
+  if (isSupabaseConfigured()) {
+    return getSubscriptionOrderBatchFromSupabase(storageKey);
+  }
+
   const batch = await kv.get<SubscriptionOrderBatch | ''>(batchKvKey(storageKey));
 
   if (!batch || typeof batch === 'string' || batch.items.length === 0) {
@@ -90,10 +112,22 @@ async function readBatch(storageKey: string): Promise<SubscriptionOrderBatch | n
 }
 
 async function writeBatch(storageKey: string, batch: SubscriptionOrderBatch): Promise<void> {
+  if (isSupabaseConfigured()) {
+    await saveSubscriptionOrderBatchInSupabase(storageKey, batch);
+
+    return;
+  }
+
   await kv.set(batchKvKey(storageKey), batch);
 }
 
 async function deleteBatch(storageKey: string, customerId: number): Promise<void> {
+  if (isSupabaseConfigured()) {
+    await deleteSubscriptionOrderBatchFromSupabase(storageKey);
+
+    return;
+  }
+
   await kv.set(batchKvKey(storageKey), '');
 
   const indexKey = batchIndexKvKey(customerId);
@@ -106,10 +140,13 @@ async function deleteBatch(storageKey: string, customerId: number): Promise<void
   } else {
     await kv.set(indexKey, '');
   }
-
 }
 
 async function registerBatchIndex(customerId: number, storageKey: string): Promise<void> {
+  if (isSupabaseConfigured()) {
+    return;
+  }
+
   const indexKey = batchIndexKvKey(customerId);
   const existingIndex = (await kv.get<string[] | ''>(indexKey)) ?? [];
   const normalizedIndex = typeof existingIndex === 'string' ? [] : existingIndex;
@@ -258,7 +295,7 @@ export async function queuePaidInvoiceForSubscriptionOrderBatch({
     const nextBatch: SubscriptionOrderBatch = existingBatch
       ? {
           ...existingBatch,
-          items: [...existingBatch.items, line],
+          items: mergeBatchLines(existingBatch.items, line),
           updatedAt: Date.now(),
         }
       : {
@@ -289,6 +326,10 @@ export async function getSubscriptionOrderBatch(
 }
 
 export async function getSubscriptionOrderBatchIndex(customerId: number): Promise<string[]> {
+  if (isSupabaseConfigured()) {
+    return (await getSubscriptionOrderBatchIndexFromSupabase(customerId)) ?? [];
+  }
+
   const indexValue = await kv.get<string[] | ''>(batchIndexKvKey(customerId));
 
   return typeof indexValue === 'string' || !indexValue ? [] : indexValue;
