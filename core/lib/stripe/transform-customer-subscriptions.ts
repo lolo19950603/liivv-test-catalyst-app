@@ -534,14 +534,8 @@ function isSubscriptionFinalizedForUpcomingPortal({
   customerId: number;
   finalizedShipments: FinalizedShipmentRecord[];
 }): boolean {
-  const chargeDayKey = getShipmentCalendarDayKey(getCurrentShipmentTimestamp(subscription));
   const portalDayKey = getShipmentCalendarDayKey(getPortalUpcomingShipmentTimestamp(subscription));
   const addressKey = subscription.shippingAddressKey;
-  const chargeStorageKey = buildShipmentStorageKey({
-    customerId,
-    dayKey: chargeDayKey,
-    shippingAddressKey: addressKey,
-  });
   const portalStorageKey = buildShipmentStorageKey({
     customerId,
     dayKey: portalDayKey,
@@ -549,23 +543,18 @@ function isSubscriptionFinalizedForUpcomingPortal({
   });
   const finalizedStorageKeys = new Set(finalizedShipments.map((record) => record.storageKey));
 
-  if (finalizedStorageKeys.has(chargeStorageKey) || finalizedStorageKeys.has(portalStorageKey)) {
+  if (finalizedStorageKeys.has(portalStorageKey)) {
     return true;
   }
 
-  return finalizedShipments.some((record) => {
-    if (record.shippingAddressKey !== addressKey) {
-      return false;
-    }
-
-    if (record.dayKey !== chargeDayKey && record.dayKey !== portalDayKey) {
-      return false;
-    }
-
-    return [...record.chargedItems, ...record.skippedItems].some(
-      (item) => item.subscriptionId === subscription.id,
-    );
-  });
+  return finalizedShipments.some(
+    (record) =>
+      record.dayKey === portalDayKey &&
+      record.shippingAddressKey === addressKey &&
+      [...record.chargedItems, ...record.skippedItems].some(
+        (item) => item.subscriptionId === subscription.id,
+      ),
+  );
 }
 
 function filterSubscriptionsForUpcomingShipments(
