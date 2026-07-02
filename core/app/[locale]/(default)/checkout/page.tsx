@@ -39,6 +39,7 @@ import {
   isSectionShippingQuoteStale,
   isSectionShippingReady,
 } from '~/lib/checkout/section-shipping-storage';
+import { isCheckoutSubscriptionMetadataReady } from '~/lib/checkout/subscription-metadata-readiness';
 
 import { initializePayment, prepareOrderConfirmation } from './_actions/initialize-payment';
 import {
@@ -399,6 +400,8 @@ export default async function CheckoutPage({ params }: Props) {
     phone: defaultSavedAddress?.phone,
   };
 
+  const summaryMetadataReady = await isCheckoutSubscriptionMetadataReady(cartId);
+
   const summarySections = buildCheckoutSummarySections({
     lines: checkoutLines,
     cartSubtotal: checkout?.subtotal?.value ?? 0,
@@ -428,6 +431,8 @@ export default async function CheckoutPage({ params }: Props) {
   return (
     <CustomCheckout
       currencyCode={currencyCode}
+      summaryLoadingLabel={t('summary.loadingSubscriptionDetails')}
+      summaryMetadataReady={summaryMetadataReady}
       summaryLabels={{
         shippingTitle: t('shippingMethod.title'),
         shippingEmpty: t('shippingMethod.empty'),

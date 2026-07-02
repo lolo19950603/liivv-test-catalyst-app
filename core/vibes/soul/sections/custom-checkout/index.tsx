@@ -2,7 +2,7 @@ import { clsx } from 'clsx';
 
 import { ReactNode } from 'react';
 
-import { CheckoutSummaryPanel } from '~/components/checkout/checkout-summary-panel';
+import { CheckoutSummaryGate } from '~/components/checkout/checkout-summary-gate';
 
 export interface CustomCheckoutLineItem {
   id: string;
@@ -44,6 +44,8 @@ export interface CustomCheckoutProps {
   fulfillmentSection: ReactNode;
   summarySections: CustomCheckoutSummarySection[];
   currencyCode?: string;
+  summaryMetadataReady?: boolean;
+  summaryLoadingLabel?: string;
   summaryLabels: {
     shippingTitle: string;
     shippingEmpty: string;
@@ -58,6 +60,8 @@ export function CustomCheckout({
   fulfillmentSection,
   summarySections,
   currencyCode,
+  summaryMetadataReady = true,
+  summaryLoadingLabel = 'Loading subscription details…',
   summaryLabels,
 }: CustomCheckoutProps) {
   return (
@@ -71,9 +75,11 @@ export function CustomCheckout({
 
         <aside className="bg-[var(--contrast-50,hsl(var(--contrast-50)))]">
           <div className="sticky top-0 mx-auto w-full max-w-md px-5 py-8 @md:px-10 @lg:py-12 @lg:pl-10 @lg:pr-12">
-            <CheckoutSummaryPanel
+            <CheckoutSummaryGate
               currencyCode={currencyCode}
+              initialReady={summaryMetadataReady}
               labels={summaryLabels}
+              loadingLabel={summaryLoadingLabel}
               summarySections={summarySections}
             />
           </div>

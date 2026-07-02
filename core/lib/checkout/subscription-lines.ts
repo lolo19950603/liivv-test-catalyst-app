@@ -9,6 +9,12 @@ import {
   deleteCartSubscriptionLinesFromSupabase,
 } from '~/lib/supabase/cart-subscription-lines-store';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
+
+import {
+  clearSubscriptionMetadataPending,
+  markSubscriptionMetadataPending,
+  unmarkSubscriptionMetadataPending,
+} from './subscription-metadata-pending';
 import type { SubscriptionBillingInterval } from '~/lib/stripe/subscription-interval';
 
 import { reconcileSubscriptionLinesToCartItems } from './reconcile-subscription-cart-lines';
@@ -69,12 +75,25 @@ async function mutateSubscriptionLines(
   cartId: string,
   mutator: (lines: SubscriptionLineMeta[]) => SubscriptionLineMeta[],
 ): Promise<SubscriptionLineMeta[]> {
+  await markSubscriptionMetadataPending(cartId);
+
+  try {
+    return await mutateSubscriptionLinesInner(cartId, mutator);
+  } finally {
+    await unmarkSubscriptionMetadataPending(cartId);
+  }
+}
+
+async function mutateSubscriptionLinesInner(
+  cartId: string,
+  mutator: (lines: SubscriptionLineMeta[]) => SubscriptionLineMeta[],
+): Promise<SubscriptionLineMeta[]> {
   for (let attempt = 0; attempt < MAX_PERSIST_ATTEMPTS; attempt += 1) {
     const record = await loadSubscriptionLinesRecord(cartId);
     const normalizedCurrent = normalizeSubscriptionLines(record.lines);
     const nextLines = normalizeSubscriptionLines(mutator(record.lines));
 
-    if (subscriptionLinesContentEqual(normalizedCurrent, nextLines)) {
+    if (subscriptionLinesAreEqual(normalizedCurrent, nextLines)) {
       return nextLines;
     }
 
@@ -100,7 +119,7 @@ async function mutateSubscriptionLines(
   throw new Error('Failed to save cart subscription lines after concurrent updates');
 }
 
-function subscriptionLinesContentEqual(
+export function subscriptionLinesAreEqual(
   left: SubscriptionLineMeta[],
   right: SubscriptionLineMeta[],
 ): boolean {
@@ -266,11 +285,11 @@ export async function removeSubscriptionLineFromCart(
 export async function clearSubscriptionLinesForCart(cartId: string): Promise<void> {
   if (isSupabaseConfigured()) {
     await deleteCartSubscriptionLinesFromSupabase(cartId);
-
-    return;
+  } else {
+    await kv.set(subscriptionLinesKey(cartId), []);
   }
 
-  await kv.set(subscriptionLinesKey(cartId), []);
+  await clearSubscriptionMetadataPending(cartId);
 }
 
 export function findSubscriptionLineByKey(

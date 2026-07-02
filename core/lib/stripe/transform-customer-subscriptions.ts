@@ -37,6 +37,8 @@ export interface SubscriptionListItem {
   scheduleDetail?: string;
   paymentFailed?: boolean;
   skippedReasonLabel?: string;
+  shippingAddressLabel?: string;
+  shippingAddressGroupNumber?: number;
 }
 
 export interface SubscriptionDeliveryGroup {
@@ -233,6 +235,89 @@ export function transformCustomerSubscriptions(
   return subscriptions.map((subscription) =>
     transformCustomerSubscription(subscription, t, format, options),
   );
+}
+
+function annotateSubscriptionsWithShippingAddressGroups(
+  subscriptions: CustomerSubscription[],
+  items: SubscriptionListItem[],
+): SubscriptionListItem[] {
+  const addressOrder: string[] = [];
+
+  for (const subscription of subscriptions) {
+    const key = subscription.shippingAddressKey;
+
+    if (!addressOrder.includes(key)) {
+      addressOrder.push(key);
+    }
+  }
+
+  if (addressOrder.length <= 1) {
+    return items;
+  }
+
+  const groupNumberByAddressKey = new Map(
+    addressOrder.map((key, index) => [key, index + 1]),
+  );
+  const addressLabelByKey = new Map(
+    subscriptions.map((subscription) => [
+      subscription.shippingAddressKey,
+      subscription.shippingAddressLabel,
+    ]),
+  );
+
+  return items.map((item, index) => {
+    const subscription = subscriptions[index];
+
+    if (!subscription) {
+      return item;
+    }
+
+    const groupNumber = groupNumberByAddressKey.get(subscription.shippingAddressKey);
+
+    if (!groupNumber) {
+      return item;
+    }
+
+    return {
+      ...item,
+      shippingAddressGroupNumber: groupNumber,
+      shippingAddressLabel: addressLabelByKey.get(subscription.shippingAddressKey),
+    };
+  });
+}
+
+export function transformCustomerSubscriptionsGroupedByShippingAddress(
+  subscriptions: CustomerSubscription[],
+  t: SubscriptionsT,
+  format: Format,
+  options: { hidePricing?: boolean } = {},
+): SubscriptionListItem[] {
+  const addressOrder: string[] = [];
+  const subscriptionsByAddress = new Map<string, CustomerSubscription[]>();
+
+  for (const subscription of subscriptions) {
+    const key = subscription.shippingAddressKey;
+    const existing = subscriptionsByAddress.get(key);
+
+    if (existing) {
+      existing.push(subscription);
+      continue;
+    }
+
+    addressOrder.push(key);
+    subscriptionsByAddress.set(key, [subscription]);
+  }
+
+  if (addressOrder.length <= 1) {
+    return transformCustomerSubscriptions(subscriptions, t, format, options);
+  }
+
+  const groupedSubscriptions = addressOrder.flatMap(
+    (key) => subscriptionsByAddress.get(key) ?? [],
+  );
+  const items = transformCustomerSubscriptions(groupedSubscriptions, t, format, options);
+
+  return annotateSubscriptionsWithShippingAddressGroups(groupedSubscriptions, items);
 }
 
 export function isCanceledSubscription(subscription: CustomerSubscription): boolean {
@@ -844,9 +929,18 @@ export async function groupSubscriptionsForPortal(
       pastShipmentImageLookup,
       options.productImagesByEntityId,
     ),
-    active: transformCustomerSubscriptions(activeSubscriptions, t, format),
-    canceled: transformCustomerSubscriptions(canceledSubscriptions, t, format, {
-      hidePricing: true,
-    }),
+    active: transformCustomerSubscriptionsGroupedByShippingAddress(
+      activeSubscriptions,
+      t,
+      format,
+    ),
+    canceled: transformCustomerSubscriptionsGroupedByShippingAddress(
+      canceledSubscriptions,
+      t,
+      format,
+      {
+        hidePricing: true,
+      },
+    ),
   };
 }

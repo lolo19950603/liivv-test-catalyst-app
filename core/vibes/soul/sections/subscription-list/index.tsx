@@ -25,6 +25,8 @@ export interface SubscriptionListItem {
   scheduleDetail?: string;
   paymentFailed?: boolean;
   skippedReasonLabel?: string;
+  shippingAddressLabel?: string;
+  shippingAddressGroupNumber?: number;
 }
 
 export interface SubscriptionDeliveryGroup {
@@ -395,12 +397,14 @@ function SubscriptionProductImage({
   size = 'large',
   fallbackLogo,
   showQuantityBadge = true,
+  shipToLabel = 'Ship to',
 }: {
   subscription: SubscriptionListItem;
   quantityLabel: string;
   size?: 'large' | 'medium' | 'compact';
   fallbackLogo?: ProductImageFallbackLogo | null;
   showQuantityBadge?: boolean;
+  shipToLabel?: string;
 }) {
   const dimension = size === 'large' ? 96 : size === 'medium' ? 80 : 56;
   const hasLogoImage = Boolean(fallbackLogo?.src?.trim());
@@ -443,7 +447,17 @@ function SubscriptionProductImage({
         )}
       </div>
 
-      {showQuantityBadge && subscription.quantity >= 1 ? (
+      {subscription.shippingAddressGroupNumber != null ? (
+        <span
+          aria-label={`${shipToLabel} ${subscription.shippingAddressGroupNumber}${
+            subscription.shippingAddressLabel ? `: ${subscription.shippingAddressLabel}` : ''
+          }`}
+          className="absolute right-0 top-0 z-10 flex h-5 min-w-5 translate-x-1/4 -translate-y-1/4 items-center justify-center rounded bg-[#2b2b2b] px-1 text-[11px] font-medium leading-none text-white"
+          title={subscription.shippingAddressLabel}
+        >
+          {subscription.shippingAddressGroupNumber}
+        </span>
+      ) : showQuantityBadge && subscription.quantity >= 1 ? (
         <span
           aria-label={`${quantityLabel} ${subscription.quantity}`}
           className="absolute right-0 top-0 z-10 flex h-5 min-w-5 translate-x-1/4 -translate-y-1/4 items-center justify-center rounded bg-[#2b2b2b] px-1 text-[11px] font-medium leading-none text-white"
@@ -581,6 +595,7 @@ function SubscriptionProductCard({
   manageItemLabel,
   variant = 'standalone',
   fallbackLogo,
+  shipToLabel,
 }: {
   subscription: SubscriptionListItem;
   quantityLabel: string;
@@ -590,6 +605,7 @@ function SubscriptionProductCard({
   manageItemLabel?: string;
   variant?: 'standalone' | 'embedded';
   fallbackLogo?: ProductImageFallbackLogo | null;
+  shipToLabel?: string;
 }) {
   if (variant === 'embedded') {
     return (
@@ -597,6 +613,7 @@ function SubscriptionProductCard({
         <SubscriptionProductImage
           fallbackLogo={fallbackLogo}
           quantityLabel={quantityLabel}
+          shipToLabel={shipToLabel}
           size="medium"
           subscription={subscription}
         />
@@ -634,6 +651,7 @@ function SubscriptionProductCard({
       <SubscriptionProductImage
         fallbackLogo={fallbackLogo}
         quantityLabel={quantityLabel}
+        shipToLabel={shipToLabel}
         subscription={subscription}
       />
 
@@ -998,6 +1016,7 @@ function SubscriptionFlatItemCard({
   manageItemAction,
   manageItemLabel,
   fallbackLogo,
+  shipToLabel,
 }: {
   subscription: SubscriptionListItem;
   quantityLabel: string;
@@ -1006,6 +1025,7 @@ function SubscriptionFlatItemCard({
   manageItemAction?: (subscriptionId: string) => Promise<void>;
   manageItemLabel?: string;
   fallbackLogo?: ProductImageFallbackLogo | null;
+  shipToLabel?: string;
 }) {
   return (
     <SubscriptionProductCard
@@ -1015,23 +1035,60 @@ function SubscriptionFlatItemCard({
       manageItemLabel={manageItemLabel}
       paymentLabel={paymentLabel}
       quantityLabel={quantityLabel}
+      shipToLabel={shipToLabel}
       subscription={subscription}
       variant="standalone"
     />
   );
 }
 
-function SubscriptionFlatItemsSection({
+function buildShippingAddressGroups(items: SubscriptionListItem[]) {
+  const groups = new Map<
+    number,
+    { shippingAddressLabel: string; items: SubscriptionListItem[] }
+  >();
+
+  for (const item of items) {
+    const groupNumber = item.shippingAddressGroupNumber;
+
+    if (!groupNumber) {
+      continue;
+    }
+
+    const existing = groups.get(groupNumber);
+
+    if (existing) {
+      existing.items.push(item);
+      continue;
+    }
+
+    groups.set(groupNumber, {
+      shippingAddressLabel: item.shippingAddressLabel ?? '',
+      items: [item],
+    });
+  }
+
+  return [...groups.entries()]
+    .sort(([left], [right]) => left - right)
+    .map(([groupNumber, group]) => ({
+      groupNumber,
+      ...group,
+    }));
+}
+
+function SubscriptionFlatItemsGrid({
   items,
   manageItemAction,
   manageItemLabel,
   labels,
   fallbackLogo,
+  shipToLabel,
 }: {
   items: SubscriptionListItem[];
   manageItemAction?: (subscriptionId: string) => Promise<void>;
   manageItemLabel?: string;
   fallbackLogo?: ProductImageFallbackLogo | null;
+  shipToLabel?: string;
   labels: {
     quantityLabel: string;
     paymentLabel: string;
@@ -1049,10 +1106,57 @@ function SubscriptionFlatItemsSection({
           manageItemLabel={manageItemLabel}
           paymentLabel={labels.paymentLabel}
           quantityLabel={labels.quantityLabel}
+          shipToLabel={shipToLabel}
           subscription={subscription}
         />
       ))}
     </ul>
+  );
+}
+
+function SubscriptionFlatItemsSection({
+  items,
+  manageItemAction,
+  manageItemLabel,
+  labels,
+  fallbackLogo,
+  shipToLabel = 'Ship to',
+}: {
+  items: SubscriptionListItem[];
+  manageItemAction?: (subscriptionId: string) => Promise<void>;
+  manageItemLabel?: string;
+  fallbackLogo?: ProductImageFallbackLogo | null;
+  shipToLabel?: string;
+  labels: {
+    quantityLabel: string;
+    paymentLabel: string;
+    frequencyLabel: string;
+  };
+}) {
+  const addressGroups = buildShippingAddressGroups(items);
+  const gridProps = {
+    fallbackLogo,
+    labels,
+    manageItemAction,
+    manageItemLabel,
+    shipToLabel,
+  };
+
+  if (addressGroups.length <= 1) {
+    return <SubscriptionFlatItemsGrid items={items} {...gridProps} />;
+  }
+
+  return (
+    <div className="flex flex-col gap-8">
+      {addressGroups.map((group) => (
+        <section key={group.groupNumber}>
+          <h3 className="subscription-date-heading mb-4 border-b border-[var(--contrast-100,hsl(var(--contrast-100)))]/80 pb-3 text-base font-semibold leading-snug text-[var(--foreground,hsl(var(--foreground)))] @md:mb-5 @md:text-lg">
+            {shipToLabel}: {group.shippingAddressLabel}
+          </h3>
+          <SubscriptionFlatItemsGrid items={group.items} {...gridProps} />
+        </section>
+      ))}
+    </div>
   );
 }
 
@@ -1450,6 +1554,7 @@ export function SubscriptionList({
               labels={itemLabels}
               manageItemAction={manageItemAction}
               manageItemLabel={manageItemLabel}
+              shipToLabel={shipToLabel}
             />
           )}
         </div>

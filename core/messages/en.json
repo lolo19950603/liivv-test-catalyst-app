@@ -660,6 +660,7 @@
       "total": "Total",
       "dueToday": "Due today",
       "dueTodayTotal": "Due today",
+      "loadingSubscriptionDetails": "Loading subscription details…",
       "billedOn": "Billed on {date}",
       "billedLaterTotal": "Billed later",
       "billedLaterNote": "Your saved payment method will be charged on this date and a new order will be created."
