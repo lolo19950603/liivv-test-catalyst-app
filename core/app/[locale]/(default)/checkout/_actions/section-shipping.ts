@@ -23,7 +23,7 @@ import {
   pickCustomerDefaultShippingOption,
 } from '~/lib/checkout/shipping-option-filters';
 import { filterShippingOptionsBySubtotal } from '~/lib/checkout/shipping-rules';
-import { expandCartLineItemForProduct } from '~/lib/checkout/expand-cart-line-items';
+import { expandGroupedCartLineItems } from '~/lib/checkout/expand-cart-line-items';
 import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
 import { getLineSubtotal, isDeferredSubscriptionLine } from '~/lib/checkout/subscription-charge-timing';
 import {
@@ -98,44 +98,50 @@ async function getCheckoutLineSnapshots(cartId: string): Promise<CheckoutLineIte
     ...cart.lineItems.digitalItems.filter((item) => !item.parentEntityId),
   ]);
 
-  return cart.lineItems.physicalItems
-    .filter((item) => !item.parentEntityId)
-    .flatMap((item) => {
-      const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
-      const unitPrice = item.salePrice?.value ?? item.listPrice.value;
+  const cartLineItems = [
+    ...cart.lineItems.physicalItems.filter((item) => !item.parentEntityId),
+    ...cart.lineItems.digitalItems.filter((item) => !item.parentEntityId),
+  ];
 
-      return expandCartLineItemForProduct({
-        item: {
-          id: item.entityId,
-          quantity: item.quantity,
-        },
-        subscriptionLines,
-        productEntityId: item.productEntityId,
-        productOptions,
-        applySubscription: () => ({}),
-      }).map((line) => {
-        const subscription =
-          line.purchaseType === 'subscription' && line.subscriptionLineKey
-            ? findSubscriptionLineByKey(subscriptionLines, line.subscriptionLineKey)
-            : undefined;
+  return expandGroupedCartLineItems({
+    cartLineItems,
+    subscriptionLines,
+    buildBaseItem: (item, totalQuantity, lineItemEntityId) => ({
+      id: lineItemEntityId,
+      quantity: totalQuantity,
+      entityId: lineItemEntityId,
+      productEntityId: item.productEntityId,
+      variantEntityId: item.variantEntityId,
+      sku: item.sku,
+      name: item.name,
+      unitPrice: item.salePrice?.value ?? item.listPrice.value,
+      currency: item.listPrice.currencyCode,
+      productOptions: mapCartSelectedOptionsToProductOptions(item.selectedOptions),
+      isPhysical: item.__typename === 'CartPhysicalItem',
+    }),
+    applySubscription: () => ({}),
+  }).map((line) => {
+    const subscription =
+      line.purchaseType === 'subscription' && line.subscriptionLineKey
+        ? findSubscriptionLineByKey(subscriptionLines, line.subscriptionLineKey)
+        : undefined;
 
-        return {
-          lineItemEntityId: item.entityId,
-          productEntityId: item.productEntityId,
-          variantEntityId: item.variantEntityId ?? undefined,
-          sku: item.sku ?? undefined,
-          name: item.name,
-          quantity: line.quantity,
-          unitAmount: Math.round(unitPrice * 100),
-          currency: item.listPrice.currencyCode,
-          productOptions,
-          isPhysical: true,
-          isSubscription: line.purchaseType === 'subscription',
-          billingInterval: subscription?.billingInterval,
-          billingCycleAnchor: subscription?.billingCycleAnchor,
-        } satisfies CheckoutLineItemSnapshot;
-      });
-    });
+    return {
+      lineItemEntityId: line.lineItemEntityId,
+      productEntityId: line.productEntityId,
+      variantEntityId: line.variantEntityId ?? undefined,
+      sku: line.sku ?? undefined,
+      name: line.name,
+      quantity: line.quantity,
+      unitAmount: Math.round(line.unitPrice * 100),
+      currency: line.currency,
+      productOptions: line.productOptions,
+      isPhysical: line.isPhysical,
+      isSubscription: line.purchaseType === 'subscription',
+      billingInterval: subscription?.billingInterval,
+      billingCycleAnchor: subscription?.billingCycleAnchor,
+    } satisfies CheckoutLineItemSnapshot;
+  });
 }
 
 async function ensureShippingConsignment({

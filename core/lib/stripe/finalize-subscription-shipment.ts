@@ -111,6 +111,9 @@ function getCustomerSkippedItemsForShipment(
         subscription.metadata.shipment_skip_reason === 'payment_deadline'
           ? 'payment_deadline'
           : 'customer_skip',
+      ...(subscription.productEntityId != null
+        ? { productEntityId: subscription.productEntityId }
+        : {}),
     }));
 }
 
@@ -188,6 +191,9 @@ export async function tryFinalizeSubscriptionShipment({
           productName: subscription.productName,
           quantity: subscription.quantity,
           reason: 'payment_deadline',
+          ...(subscription.productEntityId != null
+            ? { productEntityId: subscription.productEntityId }
+            : {}),
         });
         continue;
       }
@@ -198,6 +204,9 @@ export async function tryFinalizeSubscriptionShipment({
           productName: subscription.productName,
           quantity: subscription.quantity,
           reason: 'payment_deadline',
+          ...(subscription.productEntityId != null
+            ? { productEntityId: subscription.productEntityId }
+            : {}),
         });
         continue;
       }
@@ -213,6 +222,9 @@ export async function tryFinalizeSubscriptionShipment({
         productName: subscription.productName,
         quantity: subscription.quantity,
         reason: released.ok ? 'payment_deadline' : 'payment_failed',
+        ...(subscription.productEntityId != null
+          ? { productEntityId: subscription.productEntityId }
+          : {}),
       });
     }
   }
@@ -248,6 +260,7 @@ export async function tryFinalizeSubscriptionShipment({
     subscriptionId: item.stripeSubscriptionId,
     productName: item.productName,
     quantity: item.quantity,
+    ...(item.productEntityId != null ? { productEntityId: item.productEntityId } : {}),
   }));
   const hasSkipped = skippedItems.length > 0;
   const hasOrder = bigcommerceOrderId != null;

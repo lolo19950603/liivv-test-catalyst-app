@@ -108,17 +108,34 @@ export function subscriptionLineMatchesCartLine(
   return true;
 }
 
+/** All subscription rows for a product variant, regardless of BC cart line assignment. */
+export function getSubscriptionLinesForProductGroup(
+  lines: SubscriptionLineMeta[],
+  productEntityId: number,
+  productOptions: ProductOptionSelection[],
+): SubscriptionLineMeta[] {
+  return lines
+    .filter(
+      (line) =>
+        line.productEntityId === productEntityId &&
+        (line.quantity ?? 0) > 0 &&
+        productOptionsMatch(line.productOptions, productOptions),
+    )
+    .sort((left, right) =>
+      subscriptionLineIdentityKey(left).localeCompare(subscriptionLineIdentityKey(right)),
+    );
+}
+
 export function getSubscriptionLinesForCartLine(
   lines: SubscriptionLineMeta[],
   productEntityId: number,
   productOptions: ProductOptionSelection[],
   cartLineItemEntityId?: string,
 ): SubscriptionLineMeta[] {
-  const matchingLines = lines.filter(
-    (line) =>
-      line.productEntityId === productEntityId &&
-      (line.quantity ?? 0) > 0 &&
-      productOptionsMatch(line.productOptions, productOptions),
+  const matchingLines = getSubscriptionLinesForProductGroup(
+    lines,
+    productEntityId,
+    productOptions,
   );
 
   if (!cartLineItemEntityId || matchingLines.length === 0) {

@@ -14,7 +14,7 @@ import { updateShippingInfo } from '~/app/[locale]/(default)/cart/_actions/updat
 import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
 import { formatCartSelectedOptionsSubtitle } from '~/lib/checkout/format-cart-selected-options-subtitle';
 import {
-  expandCartLineItemForProduct,
+  expandGroupedCartLineItems,
 } from '~/lib/checkout/expand-cart-line-items';
 import {
   getSubscriptionLineDetails,
@@ -132,26 +132,32 @@ export default async function CheckoutPage({ params }: Props) {
     return t(`intervals.${interval}Plural` as 'intervals.monthPlural', { count: intervalCount });
   };
 
-  const checkoutLines: CheckoutDisplayLineInput[] = physicalAndDigital.flatMap(({ item, isPhysical }) => {
-    const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
-    const unitPrice = item.salePrice?.value ?? item.listPrice.value;
-    const variantSubtitle = formatCartSelectedOptionsSubtitle(item.selectedOptions, item.sku);
-
-    const baseItem = {
-      id: item.entityId,
-      quantity: item.quantity,
-      title: item.name,
-      subtitle: variantSubtitle,
-      imageUrl: item.image?.url,
-      unitPrice,
-      currencyCode: item.listPrice.currencyCode,
-    };
-
-    return expandCartLineItemForProduct({
-      item: baseItem,
+  const buildCheckoutLinesForItems = (
+    items: (typeof physicalAndDigital)[number]['item'][],
+    isPhysical: boolean,
+  ): CheckoutDisplayLineInput[] =>
+    expandGroupedCartLineItems({
+      cartLineItems: items,
       subscriptionLines,
-      productEntityId: item.productEntityId,
-      productOptions,
+      buildBaseItem: (item, totalQuantity, lineItemEntityId) => {
+        const variantSubtitle = formatCartSelectedOptionsSubtitle(item.selectedOptions, item.sku);
+        const unitPrice = item.salePrice?.value ?? item.listPrice.value;
+
+        return {
+          id: lineItemEntityId,
+          quantity: totalQuantity,
+          title: item.name,
+          subtitle: variantSubtitle,
+          imageUrl: item.image?.url,
+          unitPrice,
+          currencyCode: item.listPrice.currencyCode,
+          productEntityId: item.productEntityId,
+          variantEntityId: item.variantEntityId,
+          sku: item.sku,
+          productOptions: mapCartSelectedOptionsToProductOptions(item.selectedOptions),
+          variantSubtitle,
+        };
+      },
       applySubscription: () => ({}),
     }).map((line) => {
       const subscription =
@@ -178,7 +184,7 @@ export default async function CheckoutPage({ params }: Props) {
         id: line.id,
         title: line.title,
         subtitle: line.subtitle,
-        imageUrl: baseItem.imageUrl,
+        imageUrl: line.imageUrl,
         quantity: line.quantity,
         unitPrice: line.unitPrice,
         currencyCode: line.currencyCode,
@@ -188,26 +194,26 @@ export default async function CheckoutPage({ params }: Props) {
         badge: isSubscription ? t('subscriptionBadge') : undefined,
         subscriptionDetails: isSubscription ? subscriptionDetails : undefined,
         snapshot: {
-          lineItemEntityId: item.entityId,
-          productEntityId: item.productEntityId,
-          variantEntityId: item.variantEntityId ?? undefined,
-          sku: item.sku ?? undefined,
+          lineItemEntityId: line.lineItemEntityId,
+          productEntityId: line.productEntityId,
+          variantEntityId: line.variantEntityId ?? undefined,
+          sku: line.sku ?? undefined,
           name: line.title,
           quantity: line.quantity,
           unitAmount,
           currency: line.currencyCode,
-          productOptions,
+          productOptions: line.productOptions,
           isPhysical,
           isSubscription,
           billingInterval: subscription?.billingInterval,
           billingCycleAnchor,
-          ...(variantSubtitle ? { variantSubtitle } : {}),
+          ...(line.variantSubtitle ? { variantSubtitle: line.variantSubtitle } : {}),
         },
         display: {
           id: line.id,
           title: line.title,
           subtitle: line.subtitle,
-          imageUrl: baseItem.imageUrl,
+          imageUrl: line.imageUrl,
           quantity: line.quantity,
           price: format.number(line.unitPrice * line.quantity, {
             style: 'currency',
@@ -218,7 +224,17 @@ export default async function CheckoutPage({ params }: Props) {
         },
       } satisfies CheckoutDisplayLineInput;
     });
-  });
+
+  const checkoutLines: CheckoutDisplayLineInput[] = [
+    ...buildCheckoutLinesForItems(
+      cart.lineItems.physicalItems.filter((item) => !item.parentEntityId),
+      true,
+    ),
+    ...buildCheckoutLinesForItems(
+      cart.lineItems.digitalItems.filter((item) => !item.parentEntityId),
+      false,
+    ),
+  ];
 
   const snapshotLines = checkoutLines.map((line) => line.snapshot);
   const shippingSections = buildCheckoutShippingSections(snapshotLines);

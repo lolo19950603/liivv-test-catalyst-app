@@ -1,7 +1,10 @@
 import type { ProductOptionSelection } from '~/lib/bigcommerce/product-options';
 
+import { mapCartSelectedOptionsToProductOptions } from './map-cart-options';
+import { productOptionsKey } from './product-options-key';
 import {
   getSubscriptionLinesForCartLine,
+  getSubscriptionLinesForProductGroup,
   getTotalSubscriptionQuantityForCartLine,
   mergeSubscriptionLinesByIdentity,
   subscriptionLineIdentityKey,
@@ -12,6 +15,21 @@ export const SUBSCRIPTION_LINE_MARKER = ':sub:';
 export const ONE_TIME_LINE_SUFFIX = ':one-time';
 
 export type CartLinePurchaseType = 'subscription' | 'one-time';
+
+export interface CartLineItemForExpansion {
+  entityId: string;
+  productEntityId: number;
+  quantity: number;
+  selectedOptions: Parameters<typeof mapCartSelectedOptionsToProductOptions>[0];
+}
+
+export type ExpandedCartLineItem<T> = T & {
+  id: string;
+  quantity: number;
+  lineItemEntityId: string;
+  purchaseType?: CartLinePurchaseType;
+  subscriptionLineKey?: string;
+};
 
 export function buildSubscriptionLineId(
   lineItemEntityId: string,
@@ -54,6 +72,26 @@ export function getSubscriptionQuantityForProductOptions(
   return getTotalSubscriptionQuantityForCartLine(lines, productEntityId, productOptions);
 }
 
+export function groupCartLineItemsByProductKey<T extends CartLineItemForExpansion>(
+  items: T[],
+): Map<string, T[]> {
+  const groups = new Map<string, T[]>();
+
+  for (const item of items) {
+    const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
+    const groupKey = [
+      item.productEntityId,
+      productOptionsKey(productOptions) || 'default',
+    ].join('~');
+    const group = groups.get(groupKey) ?? [];
+
+    group.push(item);
+    groups.set(groupKey, group);
+  }
+
+  return groups;
+}
+
 export function expandCartLineItemsBySubscription<
   T extends {
     id: string;
@@ -67,15 +105,7 @@ export function expandCartLineItemsBySubscription<
   item: T;
   subscriptionEntries: SubscriptionLineMeta[];
   applySubscription: (item: T, entry: SubscriptionLineMeta) => Partial<T>;
-}): Array<
-  T & {
-    id: string;
-    quantity: number;
-    lineItemEntityId: string;
-    purchaseType?: CartLinePurchaseType;
-    subscriptionLineKey?: string;
-  }
-> {
+}): ExpandedCartLineItem<T>[] {
   const mergedSubscriptionEntries = mergeSubscriptionLinesByIdentity(subscriptionEntries);
   const totalSubscriptionQty = mergedSubscriptionEntries.reduce(
     (sum, entry) => sum + entry.quantity,
@@ -83,15 +113,7 @@ export function expandCartLineItemsBySubscription<
   );
   const oneTimeQty = Math.max(0, item.quantity - totalSubscriptionQty);
 
-  type ExpandedRow = T & {
-    id: string;
-    quantity: number;
-    lineItemEntityId: string;
-    purchaseType?: CartLinePurchaseType;
-    subscriptionLineKey?: string;
-  };
-
-  const rows: ExpandedRow[] = mergedSubscriptionEntries.map((entry) => {
+  const rows: ExpandedCartLineItem<T>[] = mergedSubscriptionEntries.map((entry) => {
     const identityKey = subscriptionLineIdentityKey(entry);
 
     return {
@@ -129,6 +151,62 @@ export function expandCartLineItemsBySubscription<
   return rows;
 }
 
+/**
+ * Expands cart rows once per product variant group so duplicate BigCommerce line
+ * items never duplicate or mis-scope subscription metadata at checkout.
+ */
+export function expandGroupedCartLineItems<
+  TItem extends CartLineItemForExpansion,
+  TBase extends {
+    id: string;
+    quantity: number;
+  },
+>({
+  cartLineItems,
+  subscriptionLines,
+  buildBaseItem,
+  applySubscription,
+}: {
+  cartLineItems: TItem[];
+  subscriptionLines: SubscriptionLineMeta[];
+  buildBaseItem: (
+    primaryItem: TItem,
+    totalQuantity: number,
+    lineItemEntityId: string,
+  ) => TBase;
+  applySubscription: (item: TBase, entry: SubscriptionLineMeta) => Partial<TBase>;
+}): ExpandedCartLineItem<TBase>[] {
+  const groups = groupCartLineItemsByProductKey(cartLineItems);
+  const expanded: ExpandedCartLineItem<TBase>[] = [];
+
+  for (const groupItems of groups.values()) {
+    const [primaryItem] = groupItems;
+
+    if (!primaryItem) {
+      continue;
+    }
+
+    const productOptions = mapCartSelectedOptionsToProductOptions(primaryItem.selectedOptions);
+    const totalQuantity = groupItems.reduce((sum, item) => sum + item.quantity, 0);
+    const lineItemEntityId = primaryItem.entityId;
+    const baseItem = buildBaseItem(primaryItem, totalQuantity, lineItemEntityId);
+
+    expanded.push(
+      ...expandCartLineItemsBySubscription({
+        item: { ...baseItem, id: lineItemEntityId, quantity: totalQuantity },
+        subscriptionEntries: getSubscriptionLinesForProductGroup(
+          subscriptionLines,
+          primaryItem.productEntityId,
+          productOptions,
+        ),
+        applySubscription,
+      }),
+    );
+  }
+
+  return expanded;
+}
+
 export function expandCartLineItemForProduct<
   T extends {
     id: string;
@@ -146,7 +224,7 @@ export function expandCartLineItemForProduct<
   productEntityId: number;
   productOptions: ProductOptionSelection[];
   applySubscription: (item: T, entry: SubscriptionLineMeta) => Partial<T>;
-}): ReturnType<typeof expandCartLineItemsBySubscription<T>> {
+}): ExpandedCartLineItem<T>[] {
   return expandCartLineItemsBySubscription({
     item,
     subscriptionEntries: getSubscriptionLinesForCartLine(

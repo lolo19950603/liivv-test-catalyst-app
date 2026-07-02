@@ -15,15 +15,16 @@ import {
   getSectionShippingState,
   isSectionShippingReady,
 } from './section-shipping-storage';
-import { getSubscriptionLinesForCartLine } from './subscription-line-key';
+import { expandGroupedCartLineItems } from './expand-cart-line-items';
 import {
+  findSubscriptionLineByKey,
   reconcileSubscriptionLinesWithCart,
 } from './subscription-lines';
 import type { CheckoutAddressSnapshot, CheckoutLineItemSnapshot, CheckoutSnapshot } from './types';
 import type { SubscriptionLineMeta } from './types';
 
 function buildCheckoutLineItemSnapshots(
-  item: {
+  items: Array<{
     entityId: string;
     productEntityId: number;
     variantEntityId?: number | null;
@@ -42,58 +43,56 @@ function buildCheckoutLineItemSnapshots(
       text?: string;
       date?: { utc: string };
     }>;
-  },
+  }>,
   isPhysical: boolean,
   subscriptionLines: SubscriptionLineMeta[],
 ): CheckoutLineItemSnapshot[] {
-  const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
-  const variantSubtitle = formatCartSelectedOptionsSubtitle(item.selectedOptions, item.sku);
-  const subscriptionEntries = getSubscriptionLinesForCartLine(
+  return expandGroupedCartLineItems({
+    cartLineItems: items,
     subscriptionLines,
-    item.productEntityId,
-    productOptions,
-    item.entityId,
-  );
-  const subscriptionQuantity = subscriptionEntries.reduce((sum, entry) => sum + entry.quantity, 0);
-  const oneTimeQuantity = item.quantity - subscriptionQuantity;
-  const unitPrice = item.salePrice?.value ?? item.listPrice.value;
-  const baseLine = {
-    lineItemEntityId: item.entityId,
-    productEntityId: item.productEntityId,
-    variantEntityId: item.variantEntityId ?? undefined,
-    sku: item.sku ?? undefined,
-    name: item.name,
-    unitAmount: Math.round(unitPrice * 100),
-    currency: item.listPrice.currencyCode,
-    productOptions,
-    isPhysical,
-    ...(variantSubtitle ? { variantSubtitle } : {}),
-  };
-  const snapshots: CheckoutLineItemSnapshot[] = subscriptionEntries.map((subscription) => ({
-    ...baseLine,
-    quantity: subscription.quantity,
-    isSubscription: true,
-    billingInterval: subscription.billingInterval,
-    billingCycleAnchor: subscription.billingCycleAnchor,
-  }));
+    buildBaseItem: (item, totalQuantity, lineItemEntityId) => {
+      const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
+      const variantSubtitle = formatCartSelectedOptionsSubtitle(item.selectedOptions, item.sku);
+      const unitPrice = item.salePrice?.value ?? item.listPrice.value;
 
-  if (oneTimeQuantity > 0) {
-    snapshots.push({
-      ...baseLine,
-      quantity: oneTimeQuantity,
-      isSubscription: false,
-    });
-  }
+      return {
+        id: lineItemEntityId,
+        quantity: totalQuantity,
+        lineItemEntityId,
+        productEntityId: item.productEntityId,
+        variantEntityId: item.variantEntityId,
+        sku: item.sku,
+        name: item.name,
+        unitPrice,
+        currency: item.listPrice.currencyCode,
+        productOptions,
+        ...(variantSubtitle ? { variantSubtitle } : {}),
+      };
+    },
+    applySubscription: () => ({}),
+  }).map((line) => {
+    const subscription =
+      line.purchaseType === 'subscription' && line.subscriptionLineKey
+        ? findSubscriptionLineByKey(subscriptionLines, line.subscriptionLineKey)
+        : undefined;
 
-  if (snapshots.length === 0) {
-    snapshots.push({
-      ...baseLine,
-      quantity: item.quantity,
-      isSubscription: false,
-    });
-  }
-
-  return snapshots;
+    return {
+      lineItemEntityId: line.lineItemEntityId,
+      productEntityId: line.productEntityId,
+      variantEntityId: line.variantEntityId ?? undefined,
+      sku: line.sku ?? undefined,
+      name: line.name,
+      quantity: line.quantity,
+      unitAmount: Math.round(line.unitPrice * 100),
+      currency: line.currency,
+      productOptions: line.productOptions,
+      isPhysical,
+      isSubscription: line.purchaseType === 'subscription',
+      billingInterval: subscription?.billingInterval,
+      billingCycleAnchor: subscription?.billingCycleAnchor,
+      ...(line.variantSubtitle ? { variantSubtitle: line.variantSubtitle } : {}),
+    };
+  });
 }
 
 function snapshotKey(snapshotId: string): string {
@@ -137,12 +136,16 @@ export async function buildCheckoutSnapshot({
   ]);
 
   const lineItems: CheckoutLineItemSnapshot[] = [
-    ...physicalItems
-      .filter((item) => !item.parentEntityId)
-      .flatMap((item) => buildCheckoutLineItemSnapshots(item, true, subscriptionLines)),
-    ...digitalItems
-      .filter((item) => !item.parentEntityId)
-      .flatMap((item) => buildCheckoutLineItemSnapshots(item, false, subscriptionLines)),
+    ...buildCheckoutLineItemSnapshots(
+      physicalItems.filter((item) => !item.parentEntityId),
+      true,
+      subscriptionLines,
+    ),
+    ...buildCheckoutLineItemSnapshots(
+      digitalItems.filter((item) => !item.parentEntityId),
+      false,
+      subscriptionLines,
+    ),
   ];
 
   const requiresShippingAddress = lineItems.some((line) => line.isPhysical);

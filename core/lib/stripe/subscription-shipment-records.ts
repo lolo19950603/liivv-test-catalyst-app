@@ -17,12 +17,14 @@ export interface ShipmentSkippedItem {
   productName: string;
   quantity: number;
   reason: ShipmentSkipReason;
+  productEntityId?: number;
 }
 
 export interface ShipmentChargedItem {
   subscriptionId: string;
   productName: string;
   quantity: number;
+  productEntityId?: number;
 }
 
 export type ShipmentOutcome = 'ordered' | 'partial_skipped' | 'all_failed';

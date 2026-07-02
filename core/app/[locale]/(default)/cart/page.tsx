@@ -14,10 +14,9 @@ import { CartAnalyticsProvider } from '~/app/[locale]/(default)/cart/_components
 import { getCartId } from '~/lib/cart';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import {
-  expandCartLineItemForProduct,
+  expandGroupedCartLineItems,
 } from '~/lib/checkout/expand-cart-line-items';
 import { getSubscriptionLineDetails } from '~/lib/checkout/format-subscription-line';
-import { mapCartSelectedOptionsToProductOptions } from '~/lib/checkout/map-cart-options';
 import {
   findSubscriptionLineByKey,
   getSubscriptionLinesForCart,
@@ -159,124 +158,119 @@ export default async function Cart({ params }: Props) {
       lineItemEntityId: item.entityId,
     }));
 
-  const formattedProducts: CartLineItem[] = productLineItems.flatMap((item) => {
-    let inventoryMessages;
+  const formattedProducts: CartLineItem[] = expandGroupedCartLineItems({
+    cartLineItems: productLineItems,
+    subscriptionLines,
+    buildBaseItem: (item, totalQuantity, lineItemEntityId) => {
+      let inventoryMessages;
 
-    if (item.__typename === 'CartPhysicalItem') {
-      if (item.stockPosition?.quantityOutOfStock === item.quantity) {
-        inventoryMessages = {
-          outOfStockMessage: data.site.settings?.inventory?.showOutOfStockMessage
-            ? data.site.settings.inventory.defaultOutOfStockMessage
-            : undefined,
-        };
-      } else {
-        inventoryMessages = {
-          quantityReadyToShipMessage:
-            data.site.settings?.inventory?.showQuantityOnHand &&
-            !!item.stockPosition?.quantityOnHand
-              ? t('quantityReadyToShip', {
-                  quantity: Number(item.stockPosition.quantityOnHand),
-                })
+      if (item.__typename === 'CartPhysicalItem') {
+        if (item.stockPosition?.quantityOutOfStock === item.quantity) {
+          inventoryMessages = {
+            outOfStockMessage: data.site.settings?.inventory?.showOutOfStockMessage
+              ? data.site.settings.inventory.defaultOutOfStockMessage
               : undefined,
-          quantityBackorderedMessage:
-            data.site.settings?.inventory?.showQuantityOnBackorder &&
-            !!item.stockPosition?.quantityBackordered
-              ? t('quantityOnBackorder', {
-                  quantity: Number(item.stockPosition.quantityBackordered),
-                })
-              : undefined,
-          quantityOutOfStockMessage:
-            data.site.settings?.inventory?.showOutOfStockMessage &&
-            !!item.stockPosition?.quantityOutOfStock
-              ? t('partiallyAvailable', {
-                  quantity: item.quantity - Number(item.stockPosition.quantityOutOfStock),
-                })
-              : undefined,
-          backorderMessage:
-            data.site.settings?.inventory?.showBackorderMessage &&
-            !!item.stockPosition?.quantityBackordered
-              ? (item.stockPosition.backorderMessage ?? undefined)
-              : undefined,
-        };
+          };
+        } else {
+          inventoryMessages = {
+            quantityReadyToShipMessage:
+              data.site.settings?.inventory?.showQuantityOnHand &&
+              !!item.stockPosition?.quantityOnHand
+                ? t('quantityReadyToShip', {
+                    quantity: Number(item.stockPosition.quantityOnHand),
+                  })
+                : undefined,
+            quantityBackorderedMessage:
+              data.site.settings?.inventory?.showQuantityOnBackorder &&
+              !!item.stockPosition?.quantityBackordered
+                ? t('quantityOnBackorder', {
+                    quantity: Number(item.stockPosition.quantityBackordered),
+                  })
+                : undefined,
+            quantityOutOfStockMessage:
+              data.site.settings?.inventory?.showOutOfStockMessage &&
+              !!item.stockPosition?.quantityOutOfStock
+                ? t('partiallyAvailable', {
+                    quantity: item.quantity - Number(item.stockPosition.quantityOutOfStock),
+                  })
+                : undefined,
+            backorderMessage:
+              data.site.settings?.inventory?.showBackorderMessage &&
+              !!item.stockPosition?.quantityBackordered
+                ? (item.stockPosition.backorderMessage ?? undefined)
+                : undefined,
+          };
+        }
       }
-    }
-
-    const productOptions = mapCartSelectedOptionsToProductOptions(item.selectedOptions);
-
-    const baseItem = {
-      typename: item.__typename,
-      id: item.entityId,
-      quantity: item.quantity,
-      price: format.number(item.listPrice.value, {
-        style: 'currency',
-        currency: item.listPrice.currencyCode,
-      }),
-      salePrice: format.number(item.salePrice.value, {
-        style: 'currency',
-        currency: item.salePrice.currencyCode,
-      }),
-      subtitle: item.selectedOptions
-        .map((option) => {
-          switch (option.__typename) {
-            case 'CartSelectedMultipleChoiceOption':
-            case 'CartSelectedCheckboxOption':
-              return `${option.name}: ${option.value}`;
-
-            case 'CartSelectedNumberFieldOption':
-              return `${option.name}: ${option.number}`;
-
-            case 'CartSelectedMultiLineTextFieldOption':
-            case 'CartSelectedTextFieldOption':
-              return `${option.name}: ${option.text}`;
-
-            case 'CartSelectedDateFieldOption':
-              return `${option.name}: ${format.dateTime(new Date(option.date.utc))}`;
-
-            default:
-              return '';
-          }
-        })
-        .join(', '),
-      title: item.name,
-      image: item.image?.url ? { src: item.image.url, alt: item.name } : undefined,
-      href: new URL(item.url).pathname,
-      selectedOptions: item.selectedOptions,
-      productEntityId: item.productEntityId,
-      variantEntityId: item.variantEntityId,
-      inventoryMessages,
-    };
-
-    return expandCartLineItemForProduct({
-      item: baseItem,
-      subscriptionLines,
-      productEntityId: item.productEntityId,
-      productOptions,
-      applySubscription: () => ({}),
-    }).map((line) => {
-      const subscription =
-        line.purchaseType === 'subscription' && line.subscriptionLineKey
-          ? findSubscriptionLineByKey(subscriptionLines, line.subscriptionLineKey)
-          : undefined;
-      const isSubscriptionRow = line.purchaseType === 'subscription';
-
-      const subscriptionDetails = subscription
-        ? getSubscriptionLineDetails(subscription, {
-            billingLabel: t('subscription.billing'),
-            startsTodayLabel: t('subscription.startsToday'),
-            billedOnLabel: t('subscription.billedOn'),
-            formatInterval,
-            formatStartsDate: (timestamp) =>
-              format.dateTime(new Date(timestamp * 1000), { dateStyle: 'medium' }),
-          })
-        : undefined;
 
       return {
-        ...line,
-        subscriptionBadge: isSubscriptionRow && subscription ? t('subscription.badge') : undefined,
-        subscriptionDetails:
-          isSubscriptionRow && subscription ? subscriptionDetails : undefined,
+        typename: item.__typename,
+        id: lineItemEntityId,
+        quantity: totalQuantity,
+        price: format.number(item.listPrice.value, {
+          style: 'currency',
+          currency: item.listPrice.currencyCode,
+        }),
+        salePrice: format.number(item.salePrice.value, {
+          style: 'currency',
+          currency: item.salePrice.currencyCode,
+        }),
+        subtitle: item.selectedOptions
+          .map((option) => {
+            switch (option.__typename) {
+              case 'CartSelectedMultipleChoiceOption':
+              case 'CartSelectedCheckboxOption':
+                return `${option.name}: ${option.value}`;
+
+              case 'CartSelectedNumberFieldOption':
+                return `${option.name}: ${option.number}`;
+
+              case 'CartSelectedMultiLineTextFieldOption':
+              case 'CartSelectedTextFieldOption':
+                return `${option.name}: ${option.text}`;
+
+              case 'CartSelectedDateFieldOption':
+                return `${option.name}: ${format.dateTime(new Date(option.date.utc))}`;
+
+              default:
+                return '';
+            }
+          })
+          .join(', '),
+        title: item.name,
+        image: item.image?.url ? { src: item.image.url, alt: item.name } : undefined,
+        href: new URL(item.url).pathname,
+        selectedOptions: item.selectedOptions,
+        productEntityId: item.productEntityId,
+        variantEntityId: item.variantEntityId,
+        inventoryMessages,
       };
-    });
+    },
+    applySubscription: () => ({}),
+  }).map((line) => {
+    const subscription =
+      line.purchaseType === 'subscription' && line.subscriptionLineKey
+        ? findSubscriptionLineByKey(subscriptionLines, line.subscriptionLineKey)
+        : undefined;
+    const isSubscriptionRow = line.purchaseType === 'subscription';
+
+    const subscriptionDetails = subscription
+      ? getSubscriptionLineDetails(subscription, {
+          billingLabel: t('subscription.billing'),
+          startsTodayLabel: t('subscription.startsToday'),
+          billedOnLabel: t('subscription.billedOn'),
+          formatInterval,
+          formatStartsDate: (timestamp) =>
+            format.dateTime(new Date(timestamp * 1000), { dateStyle: 'medium' }),
+        })
+      : undefined;
+
+    return {
+      ...line,
+      subscriptionBadge: isSubscriptionRow && subscription ? t('subscription.badge') : undefined,
+      subscriptionDetails:
+        isSubscriptionRow && subscription ? subscriptionDetails : undefined,
+    };
   });
 
   const formattedLineItems: Array<CartLineItem | CartGiftCertificateLineItem> = [

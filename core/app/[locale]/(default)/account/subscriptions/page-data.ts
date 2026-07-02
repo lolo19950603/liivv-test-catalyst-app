@@ -39,6 +39,7 @@ export type SubscriptionsPageResult =
       stripeCustomerId: string;
       subscriptions: Awaited<ReturnType<typeof getCustomerSubscriptions>>;
       finalizedShipments: FinalizedShipmentRecord[];
+      productImagesByEntityId: Map<number, { src: string; alt: string }>;
     }
   | { kind: 'not-configured' }
   | { kind: 'customer-not-found' }
@@ -135,6 +136,41 @@ export const getSubscriptionsPageData = cache(async (): Promise<SubscriptionsPag
   });
 
   const finalizedShipments = await getFinalizedShipmentsForCustomer(customer.entityId);
+  const pastShipmentProductEntityIds = [
+    ...new Set(
+      finalizedShipments.flatMap((record) =>
+        [...record.chargedItems, ...record.skippedItems]
+          .map((item) => item.productEntityId)
+          .filter((productEntityId): productEntityId is number => productEntityId != null),
+      ),
+    ),
+  ];
+  const missingPastShipmentProductEntityIds = pastShipmentProductEntityIds.filter(
+    (entityId) => !productImagesByEntityId.has(entityId),
+  );
+
+  if (missingPastShipmentProductEntityIds.length > 0) {
+    const pastShipmentProductsResult = await getProductsByIds({
+      entityIds: missingPastShipmentProductEntityIds,
+    });
+
+    if (pastShipmentProductsResult?.status === 'success') {
+      for (const product of pastShipmentProductsResult.products) {
+        const catalogName = product.name?.trim();
+
+        if (catalogName && !productNamesByEntityId.has(product.entityId)) {
+          productNamesByEntityId.set(product.entityId, catalogName);
+        }
+
+        if (product.defaultImage?.url && !productImagesByEntityId.has(product.entityId)) {
+          productImagesByEntityId.set(product.entityId, {
+            src: product.defaultImage.url,
+            alt: product.defaultImage.altText || product.name,
+          });
+        }
+      }
+    }
+  }
 
   return {
     kind: 'ready',
@@ -142,6 +178,7 @@ export const getSubscriptionsPageData = cache(async (): Promise<SubscriptionsPag
     stripeCustomerId,
     subscriptions: enrichedSubscriptions,
     finalizedShipments,
+    productImagesByEntityId,
   };
 });
 

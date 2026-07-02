@@ -6,7 +6,11 @@ import {
 } from './finalize-subscription-shipment';
 import type { SubscriptionOrderBatch } from './subscription-order-batch';
 import { getSubscriptionOrderBatchesForCustomer } from './subscription-order-batch';
-import type { FinalizedShipmentRecord } from './subscription-shipment-records';
+import type {
+  FinalizedShipmentRecord,
+  ShipmentChargedItem,
+  ShipmentSkippedItem,
+} from './subscription-shipment-records';
 import { buildShipmentStorageKey } from './subscription-shipment-records';
 import { isPastShipmentCutoff } from './subscription-shipment-cutoff';
 import {
@@ -432,31 +436,134 @@ function formatPastShipmentSkipReasonLabel(
   return t('pastShipment.skipReason.missedDeadline');
 }
 
+function normalizeProductNameForMatch(name: string): string {
+  return name.trim().toLowerCase();
+}
+
+type ShipmentItemImageSource = Pick<
+  ShipmentChargedItem,
+  'subscriptionId' | 'productName' | 'productEntityId'
+>;
+
+interface PastShipmentImageLookup {
+  bySubscriptionId: Map<string, { src: string; alt: string }>;
+  byProductName: Map<string, { src: string; alt: string }>;
+  byProductEntityId: Map<number, { src: string; alt: string }>;
+}
+
+function buildPastShipmentImageLookup(
+  subscriptions: CustomerSubscription[],
+): PastShipmentImageLookup {
+  const bySubscriptionId = new Map<string, { src: string; alt: string }>();
+  const byProductName = new Map<string, { src: string; alt: string }>();
+  const byProductEntityId = new Map<number, { src: string; alt: string }>();
+
+  for (const subscription of subscriptions) {
+    if (!subscription.image) {
+      continue;
+    }
+
+    bySubscriptionId.set(subscription.id, subscription.image);
+    byProductName.set(normalizeProductNameForMatch(subscription.productName), subscription.image);
+
+    if (subscription.productEntityId != null) {
+      byProductEntityId.set(subscription.productEntityId, subscription.image);
+    }
+  }
+
+  return { bySubscriptionId, byProductName, byProductEntityId };
+}
+
+function resolvePastShipmentItemImage(
+  item: ShipmentItemImageSource,
+  imageLookup: PastShipmentImageLookup,
+  productImagesByEntityId?: Map<number, { src: string; alt: string }>,
+): { src: string; alt: string } | undefined {
+  const fromSubscriptionId = imageLookup.bySubscriptionId.get(item.subscriptionId);
+
+  if (fromSubscriptionId) {
+    return fromSubscriptionId;
+  }
+
+  if (item.productEntityId != null) {
+    const fromCatalog = productImagesByEntityId?.get(item.productEntityId);
+    const fromSubscriptionCatalog = imageLookup.byProductEntityId.get(item.productEntityId);
+
+    if (fromCatalog) {
+      return fromCatalog;
+    }
+
+    if (fromSubscriptionCatalog) {
+      return fromSubscriptionCatalog;
+    }
+  }
+
+  return imageLookup.byProductName.get(normalizeProductNameForMatch(item.productName)) ?? findFuzzyProductNameImage(
+    item.productName,
+    imageLookup.byProductName,
+  );
+}
+
+function findFuzzyProductNameImage(
+  productName: string,
+  byProductName: Map<string, { src: string; alt: string }>,
+): { src: string; alt: string } | undefined {
+  const recordName = normalizeProductNameForMatch(productName);
+
+  for (const [subscriptionName, image] of byProductName) {
+    if (
+      subscriptionName.startsWith(recordName) ||
+      recordName.startsWith(subscriptionName.slice(0, Math.max(recordName.length, 8)))
+    ) {
+      return image;
+    }
+  }
+
+  return undefined;
+}
+
+function mapPastShipmentItemToListItem(
+  item: ShipmentChargedItem | ShipmentSkippedItem,
+  imageLookup: PastShipmentImageLookup,
+  productImagesByEntityId: Map<number, { src: string; alt: string }> | undefined,
+  base: Omit<SubscriptionListItem, 'id' | 'productName' | 'quantity' | 'image'>,
+): SubscriptionListItem {
+  const image = resolvePastShipmentItemImage(item, imageLookup, productImagesByEntityId);
+
+  return {
+    id: item.subscriptionId,
+    productName: item.productName,
+    quantity: item.quantity,
+    ...(image ? { image } : {}),
+    ...base,
+  };
+}
+
 function buildPastShipmentDeliveryGroups(
   records: FinalizedShipmentRecord[],
   t: SubscriptionsT,
+  imageLookup: PastShipmentImageLookup,
+  productImagesByEntityId?: Map<number, { src: string; alt: string }>,
 ): SubscriptionDeliveryGroup[] {
   return records.map((record) => {
-    const chargedItems: SubscriptionListItem[] = record.chargedItems.map((item) => ({
-      id: item.subscriptionId,
-      productName: item.productName,
-      quantity: item.quantity,
-      intervalLabel: '',
-      paymentMethodLabel: '',
-      statusLabel: t('pastShipment.statusCharged'),
-      statusKey: 'active',
-    }));
+    const chargedItems: SubscriptionListItem[] = record.chargedItems.map((item) =>
+      mapPastShipmentItemToListItem(item, imageLookup, productImagesByEntityId, {
+        intervalLabel: '',
+        paymentMethodLabel: '',
+        statusLabel: t('pastShipment.statusCharged'),
+        statusKey: 'active',
+      }),
+    );
 
-    const skippedItems: SubscriptionListItem[] = record.skippedItems.map((item) => ({
-      id: item.subscriptionId,
-      productName: item.productName,
-      quantity: item.quantity,
-      intervalLabel: '',
-      paymentMethodLabel: '',
-      statusLabel: t('pastShipment.statusSkipped'),
-      statusKey: 'skipped',
-      skippedReasonLabel: formatPastShipmentSkipReasonLabel(item.reason, t),
-    }));
+    const skippedItems: SubscriptionListItem[] = record.skippedItems.map((item) =>
+      mapPastShipmentItemToListItem(item, imageLookup, productImagesByEntityId, {
+        intervalLabel: '',
+        paymentMethodLabel: '',
+        statusLabel: t('pastShipment.statusSkipped'),
+        statusKey: 'skipped',
+        skippedReasonLabel: formatPastShipmentSkipReasonLabel(item.reason, t),
+      }),
+    );
 
     const outcomeNote =
       record.outcome === 'partial_skipped'
@@ -488,6 +595,8 @@ function buildPastShipmentGroups(
   records: FinalizedShipmentRecord[],
   t: SubscriptionsT,
   format: Format,
+  imageLookup: PastShipmentImageLookup,
+  productImagesByEntityId?: Map<number, { src: string; alt: string }>,
 ): SubscriptionDateGroup[] {
   const groups = new Map<string, FinalizedShipmentRecord[]>();
 
@@ -507,7 +616,12 @@ function buildPastShipmentGroups(
     .map(([dayKey, dayRecords]) => {
       const [year, month, day] = dayKey.split('-').map(Number);
       const sortTimestamp = Math.floor(Date.UTC(year ?? 2026, (month ?? 1) - 1, day ?? 1) / 1000);
-      const deliveries = buildPastShipmentDeliveryGroups(dayRecords, t);
+      const deliveries = buildPastShipmentDeliveryGroups(
+        dayRecords,
+        t,
+        imageLookup,
+        productImagesByEntityId,
+      );
 
       return {
         id: `past-shipment-${dayKey}`,
@@ -523,10 +637,6 @@ function buildPastShipmentGroups(
             : deliveries,
       };
     });
-}
-
-function normalizeProductNameForMatch(name: string): string {
-  return name.trim().toLowerCase();
 }
 
 function recordIncludesSubscription(
@@ -709,11 +819,13 @@ export async function groupSubscriptionsForPortal(
   options: {
     customerId: number;
     finalizedShipments?: FinalizedShipmentRecord[];
+    productImagesByEntityId?: Map<number, { src: string; alt: string }>;
   },
 ): Promise<SubscriptionPortalSections> {
   const activeSubscriptions = subscriptions.filter((subscription) => !isCanceledSubscription(subscription));
   const canceledSubscriptions = subscriptions.filter(isCanceledSubscription);
   const finalizedShipments = options.finalizedShipments ?? [];
+  const pastShipmentImageLookup = buildPastShipmentImageLookup(subscriptions);
   const batchesByStorageKey = await getSubscriptionOrderBatchesForCustomer(options.customerId);
   const upcomingSubscriptions = filterSubscriptionsForUpcomingShipments(
     activeSubscriptions,
@@ -726,7 +838,13 @@ export async function groupSubscriptionsForPortal(
       batchesByStorageKey,
       finalizedShipments,
     }),
-    pastShipments: buildPastShipmentGroups(finalizedShipments, t, format),
+    pastShipments: buildPastShipmentGroups(
+      finalizedShipments,
+      t,
+      format,
+      pastShipmentImageLookup,
+      options.productImagesByEntityId,
+    ),
     active: transformCustomerSubscriptions(activeSubscriptions, t, format),
     canceled: transformCustomerSubscriptions(canceledSubscriptions, t, format, {
       hidePricing: true,
