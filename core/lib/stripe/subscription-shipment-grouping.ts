@@ -50,8 +50,7 @@ export function getCurrentShipmentTimestamp(subscription: ShipmentSubscription):
   return subscription.currentPeriodStart ?? subscription.currentPeriodEnd;
 }
 
-/**
- * Next shipment shown in the portal — advances to the next charge once the current period
+/** Next shipment shown in the portal — advances to the next charge once the current period
  * charge day has passed.
  */
 export function getPortalUpcomingShipmentTimestamp(
@@ -72,6 +71,32 @@ export function getPortalUpcomingShipmentTimestamp(
   }
 
   return subscription.currentPeriodEnd;
+}
+
+/**
+ * After the current period's charge-day shipment is finalized, advance to the next charge
+ * (period end) without skipping an extra billing period.
+ */
+export function resolveUpcomingPortalShipmentTimestamp({
+  portalTimestamp,
+  periodEnd,
+  chargeDayTimestamp,
+  isCurrentChargePeriodFinalized,
+}: {
+  portalTimestamp: number;
+  periodEnd: number;
+  chargeDayTimestamp: number;
+  isCurrentChargePeriodFinalized: boolean;
+}): number {
+  if (!isCurrentChargePeriodFinalized) {
+    return portalTimestamp;
+  }
+
+  if (getShipmentCalendarDayKey(portalTimestamp) === getShipmentCalendarDayKey(chargeDayTimestamp)) {
+    return periodEnd;
+  }
+
+  return portalTimestamp;
 }
 
 /** @deprecated Use getCurrentShipmentTimestamp or getPortalUpcomingShipmentTimestamp */

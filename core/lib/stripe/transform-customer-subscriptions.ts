@@ -17,6 +17,7 @@ import {
   getCurrentShipmentTimestamp,
   getPortalUpcomingShipmentTimestamp,
   getShipmentCalendarDayKey,
+  resolveUpcomingPortalShipmentTimestamp,
 } from './subscription-shipment-grouping';
 
 export { getShipmentCalendarDayKey } from './subscription-shipment-grouping';
@@ -679,24 +680,22 @@ function isChargePeriodShipmentFinalized(
   );
 }
 
-function getUpcomingPortalShipmentTimestamp(
+export function getUpcomingPortalShipmentTimestamp(
   subscription: CustomerSubscription,
   finalizedShipments: FinalizedShipmentRecord[],
 ): number {
   const portalTimestamp = getPortalUpcomingShipmentTimestamp(subscription);
-  const periodStart = subscription.currentPeriodStart ?? 0;
   const periodEnd = subscription.currentPeriodEnd ?? portalTimestamp;
-  const periodLength = periodEnd - periodStart;
 
-  if (periodLength <= 0) {
-    return portalTimestamp;
-  }
-
-  if (!isChargePeriodShipmentFinalized(subscription, finalizedShipments)) {
-    return portalTimestamp;
-  }
-
-  return periodEnd + periodLength;
+  return resolveUpcomingPortalShipmentTimestamp({
+    portalTimestamp,
+    periodEnd,
+    chargeDayTimestamp: getCurrentShipmentTimestamp(subscription),
+    isCurrentChargePeriodFinalized: isChargePeriodShipmentFinalized(
+      subscription,
+      finalizedShipments,
+    ),
+  });
 }
 
 function filterSubscriptionsForUpcomingShipments(

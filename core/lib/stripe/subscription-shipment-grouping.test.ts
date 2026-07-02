@@ -6,6 +6,7 @@ import {
   getPortalUpcomingShipmentTimestamp,
   getShipmentCalendarDayKey,
   getSubscriptionInvoiceShipmentTimestamp,
+  resolveUpcomingPortalShipmentTimestamp,
 } from './subscription-shipment-grouping';
 
 function buildInvoice(period: { start: number; end: number }): Stripe.Invoice {
@@ -108,5 +109,51 @@ describe('subscription shipment grouping', () => {
     );
 
     expect(getShipmentCalendarDayKey(upcoming)).toBe('2026-07-04');
+  });
+
+  it('advances to the renewal date after finalize, not one extra billing period', () => {
+    const periodStart = Math.floor(Date.parse('2026-07-01T14:00:00.000Z') / 1000);
+    const periodEnd = Math.floor(Date.parse('2026-07-08T14:00:00.000Z') / 1000);
+    const portalTimestamp = getPortalUpcomingShipmentTimestamp(
+      {
+        trialEnd: null,
+        billingCycleAnchor: null,
+        currentPeriodStart: periodStart,
+        currentPeriodEnd: periodEnd,
+      },
+      Math.floor(Date.parse('2026-07-02T14:00:00.000Z') / 1000),
+    );
+
+    const upcoming = resolveUpcomingPortalShipmentTimestamp({
+      portalTimestamp,
+      periodEnd,
+      chargeDayTimestamp: periodStart,
+      isCurrentChargePeriodFinalized: true,
+    });
+
+    expect(getShipmentCalendarDayKey(upcoming)).toBe('2026-07-08');
+  });
+
+  it('keeps the next charge date when the renewal shipment is already finalized', () => {
+    const periodStart = Math.floor(Date.parse('2026-07-08T14:00:00.000Z') / 1000);
+    const periodEnd = Math.floor(Date.parse('2026-07-15T14:00:00.000Z') / 1000);
+    const portalTimestamp = getPortalUpcomingShipmentTimestamp(
+      {
+        trialEnd: null,
+        billingCycleAnchor: null,
+        currentPeriodStart: periodStart,
+        currentPeriodEnd: periodEnd,
+      },
+      Math.floor(Date.parse('2026-07-10T14:00:00.000Z') / 1000),
+    );
+
+    const upcoming = resolveUpcomingPortalShipmentTimestamp({
+      portalTimestamp,
+      periodEnd,
+      chargeDayTimestamp: periodStart,
+      isCurrentChargePeriodFinalized: true,
+    });
+
+    expect(getShipmentCalendarDayKey(upcoming)).toBe('2026-07-15');
   });
 });
