@@ -787,8 +787,14 @@ function HeaderAccountMenu({
 
   useEffect(() => {
     closeMenu();
-    suppressHoverOpenRef.current = true;
   }, [pathname, closeMenu]);
+
+  const handleMenuLinkClick = useCallback(() => {
+    // Keep the menu closed after a link click while the pointer is still over
+    // the trigger; clear on mouse leave via scheduleCloseMenu.
+    suppressHoverOpenRef.current = true;
+    closeMenu();
+  }, [closeMenu]);
 
   if (links.length === 0) {
     return (
@@ -845,7 +851,7 @@ function HeaderAccountMenu({
               )}
               href={link.href}
               key={link.href}
-              onClick={closeMenu}
+              onClick={handleMenuLinkClick}
               prefetch={link.prefetch}
               role="menuitem"
             >

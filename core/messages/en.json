@@ -276,6 +276,9 @@
         "goBack": "Go back",
         "defaultPayment": "Default",
         "cancelling": "Cancelling subscription…",
+        "updatingPayment": "Updating payment method…",
+        "savingPaymentMethod": "Saving payment method…",
+        "updatingAddress": "Updating shipping address…",
         "cancelForm": {
           "title": "Cancel your subscription",
           "reasonLabel": "Reason",

@@ -11,6 +11,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
 interface AddPaymentMethodFormInnerProps {
   onSuccess: (paymentMethodId: string) => void;
   onError: (message: string) => void;
+  onPendingChange?: (isPending: boolean) => void;
   saveLabel: string;
   secureNote?: string;
 }
@@ -18,6 +19,7 @@ interface AddPaymentMethodFormInnerProps {
 function AddPaymentMethodFormInner({
   onSuccess,
   onError,
+  onPendingChange,
   saveLabel,
   secureNote,
 }: AddPaymentMethodFormInnerProps) {
@@ -25,18 +27,24 @@ function AddPaymentMethodFormInner({
   const elements = useElements();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const finishWithError = (message: string) => {
+    onError(message);
+    setIsSubmitting(false);
+    onPendingChange?.(false);
+  };
+
   const handleSubmit = async () => {
-    if (!stripe || !elements) {
+    if (!stripe || !elements || isSubmitting) {
       return;
     }
 
     setIsSubmitting(true);
+    onPendingChange?.(true);
 
     const { error: submitError } = await elements.submit();
 
     if (submitError) {
-      onError(submitError.message ?? 'Please check your card details');
-      setIsSubmitting(false);
+      finishWithError(submitError.message ?? 'Please check your card details');
 
       return;
     }
@@ -47,8 +55,7 @@ function AddPaymentMethodFormInner({
     });
 
     if (error) {
-      onError(error.message ?? 'Unable to save payment method');
-      setIsSubmitting(false);
+      finishWithError(error.message ?? 'Unable to save payment method');
 
       return;
     }
@@ -61,12 +68,12 @@ function AddPaymentMethodFormInner({
 
       if (paymentMethodId) {
         onSuccess(paymentMethodId);
-      } else {
-        onError('Unable to save payment method');
+
+        return;
       }
     }
 
-    setIsSubmitting(false);
+    finishWithError('Unable to save payment method');
   };
 
   return (

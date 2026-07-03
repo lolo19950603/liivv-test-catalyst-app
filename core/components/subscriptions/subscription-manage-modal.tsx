@@ -67,6 +67,9 @@ export interface SubscriptionManageModalProps {
   addPaymentMethodLabel: string;
   goBackLabel: string;
   cancellingLabel: string;
+  updatingPaymentLabel: string;
+  savingPaymentMethodLabel: string;
+  updatingAddressLabel: string;
   defaultBadgeLabel: string;
   shipToLabel: string;
   paymentLabel: string;
@@ -266,6 +269,9 @@ export function SubscriptionManageModal({
   addPaymentMethodLabel,
   goBackLabel,
   cancellingLabel,
+  updatingPaymentLabel,
+  savingPaymentMethodLabel,
+  updatingAddressLabel,
   defaultBadgeLabel,
   shipToLabel,
   paymentLabel,
@@ -294,14 +300,17 @@ export function SubscriptionManageModal({
   const [isUpdating, startUpdate] = useTransition();
   const [isUpdatingAddress, startAddressUpdate] = useTransition();
   const [isCancelling, startCancel] = useTransition();
+  const [isSavingPayment, setIsSavingPayment] = useState(false);
   const subscriptionId = subscription?.id;
   const priceFrequency = formatPriceFrequency(subscription?.price, subscription?.intervalLabel);
+  const isBusy = isCancelling || isUpdating || isUpdatingAddress || isSavingPayment;
 
   useEffect(() => {
     if (!isOpen) {
       setStep('menu');
       setErrorMessage(null);
       setCancellationReason('');
+      setIsSavingPayment(false);
 
       return;
     }
@@ -352,7 +361,7 @@ export function SubscriptionManageModal({
   }, [step, createSetupIntentAction]);
 
   const handleClose = () => {
-    if (isCancelling) {
+    if (isBusy) {
       return;
     }
 
@@ -360,6 +369,7 @@ export function SubscriptionManageModal({
     setErrorMessage(null);
     setCancellationReason('');
     setSetupClientSecret(null);
+    setIsSavingPayment(false);
     onClose();
   };
 
@@ -369,6 +379,7 @@ export function SubscriptionManageModal({
     setErrorMessage(null);
     router.refresh();
     setStep('payment');
+    setIsSavingPayment(false);
   };
 
   const handleUpdatePayment = () => {
@@ -504,9 +515,16 @@ export function SubscriptionManageModal({
 
   if (step === 'address') {
     return (
-      <SubscriptionManageModalShell isOpen={isOpen} onClose={handleClose} title={modalTitle}>
+      <SubscriptionManageModalShell
+        blockingMessage={updatingAddressLabel}
+        isBlocking={isUpdatingAddress}
+        isOpen={isOpen}
+        onClose={handleClose}
+        title={modalTitle}
+      >
         <button
           className="subscription-manage-modal__back"
+          disabled={isUpdatingAddress}
           onClick={() => {
             setStep('menu');
             setErrorMessage(null);
@@ -537,6 +555,7 @@ export function SubscriptionManageModal({
                   <input
                     checked={isSelected}
                     className="subscription-manage-modal__payment-radio"
+                    disabled={isUpdatingAddress}
                     name="subscription-shipping-address"
                     onChange={() => setSelectedAddressId(address.id)}
                     type="radio"
@@ -558,7 +577,7 @@ export function SubscriptionManageModal({
           {savedShippingAddresses.length > 0 ? (
             <Button
               className="w-full justify-center"
-              disabled={!selectedAddressId}
+              disabled={!selectedAddressId || isUpdatingAddress}
               loading={isUpdatingAddress}
               onClick={handleUpdateAddress}
               size="medium"
@@ -571,6 +590,7 @@ export function SubscriptionManageModal({
           {saveAndApplyAddressAction ? (
             <button
               className="subscription-manage-modal__secondary-button w-full"
+              disabled={isUpdatingAddress}
               onClick={() => setStep('add-address')}
               type="button"
             >
@@ -584,9 +604,16 @@ export function SubscriptionManageModal({
 
   if (step === 'add-payment') {
     return (
-      <SubscriptionManageModalShell isOpen={isOpen} onClose={handleClose} title={modalTitle}>
+      <SubscriptionManageModalShell
+        blockingMessage={savingPaymentMethodLabel}
+        isBlocking={isSavingPayment}
+        isOpen={isOpen}
+        onClose={handleClose}
+        title={modalTitle}
+      >
         <button
           className="subscription-manage-modal__back"
+          disabled={isSavingPayment}
           onClick={() => {
             setStep(savedPaymentMethods.length > 0 ? 'payment' : 'menu');
             setErrorMessage(null);
@@ -609,6 +636,13 @@ export function SubscriptionManageModal({
           <AddPaymentMethodForm
             clientSecret={setupClientSecret}
             onError={setErrorMessage}
+            onPendingChange={(isPending) => {
+              setIsSavingPayment(isPending);
+
+              if (isPending) {
+                setErrorMessage(null);
+              }
+            }}
             onSuccess={handlePaymentMethodAdded}
             saveLabel={savePaymentMethodLabel}
             secureNote={addPaymentMethodSecureNote}
@@ -779,9 +813,16 @@ export function SubscriptionManageModal({
   }
 
   return (
-    <SubscriptionManageModalShell isOpen={isOpen} onClose={handleClose} title={modalTitle}>
+    <SubscriptionManageModalShell
+      blockingMessage={updatingPaymentLabel}
+      isBlocking={isUpdating}
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={modalTitle}
+    >
       <button
         className="subscription-manage-modal__back"
+        disabled={isUpdating}
         onClick={() => {
           setStep('menu');
           setErrorMessage(null);
@@ -812,6 +853,7 @@ export function SubscriptionManageModal({
                 <input
                   checked={isSelected}
                   className="subscription-manage-modal__payment-radio"
+                  disabled={isUpdating}
                   name="subscription-payment-method"
                   onChange={() => setSelectedPaymentMethodId(paymentMethod.id)}
                   type="radio"
@@ -839,7 +881,7 @@ export function SubscriptionManageModal({
         {savedPaymentMethods.length > 0 ? (
           <Button
             className="w-full justify-center"
-            disabled={!selectedPaymentMethodId}
+            disabled={!selectedPaymentMethodId || isUpdating}
             loading={isUpdating}
             onClick={handleUpdatePayment}
             size="medium"
@@ -852,6 +894,7 @@ export function SubscriptionManageModal({
         {createSetupIntentAction ? (
           <button
             className="subscription-manage-modal__secondary-button w-full"
+            disabled={isUpdating}
             onClick={() => setStep('add-payment')}
             type="button"
           >

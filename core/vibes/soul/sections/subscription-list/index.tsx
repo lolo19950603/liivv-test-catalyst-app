@@ -100,6 +100,9 @@ export interface SubscriptionListProps {
     addPaymentMethodLabel: string;
     goBackLabel: string;
     cancellingLabel: string;
+    updatingPaymentLabel: string;
+    savingPaymentMethodLabel: string;
+    updatingAddressLabel: string;
     defaultBadgeLabel: string;
     cancelAction: (
       subscriptionId: string,
@@ -1722,6 +1725,15 @@ export function SubscriptionList({
         cancellationReasons={manageItemOptions?.cancellationReasons ?? []}
         cancellingLabel={manageItemOptions?.cancellingLabel ?? 'Cancelling subscription…'}
         createSetupIntentAction={manageItemOptions?.createSetupIntentAction}
+        savingPaymentMethodLabel={
+          manageItemOptions?.savingPaymentMethodLabel ?? 'Saving payment method…'
+        }
+        updatingAddressLabel={
+          manageItemOptions?.updatingAddressLabel ?? 'Updating shipping address…'
+        }
+        updatingPaymentLabel={
+          manageItemOptions?.updatingPaymentLabel ?? 'Updating payment method…'
+        }
         defaultBadgeLabel={manageItemOptions?.defaultBadgeLabel ?? 'Default'}
         defaultCountryCode={manageItemOptions?.defaultCountryCode ?? 'US'}
         editAddressLabel={manageItemOptions?.editAddressLabel ?? 'Edit address'}
