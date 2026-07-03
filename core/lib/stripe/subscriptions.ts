@@ -3,8 +3,11 @@ import 'server-only';
 import type Stripe from 'stripe';
 
 import { parseVariantEntityIdFromMetadata, parseVariantLabelFromMetadata } from '~/lib/bigcommerce/product-options';
+import { buildSubscriptionShippingMetadata } from '~/lib/checkout/subscription-shipping-metadata';
+import type { CheckoutAddressSnapshot } from '~/lib/checkout/types';
 
 import { getStripe } from './client';
+import { syncSubscriptionPricingFromBigCommerce } from './sync-subscription-pricing';
 
 const PLACEHOLDER_UNIT_AMOUNT = Number(process.env.STRIPE_SUBSCRIPTION_PLACEHOLDER_UNIT_AMOUNT ?? '50');
 
@@ -470,4 +473,57 @@ export async function updateSubscriptionPaymentMethod({
       default_payment_method: paymentMethodId,
     },
   });
+}
+
+export async function updateSubscriptionShippingAddress({
+  stripeCustomerId,
+  subscriptionId,
+  shippingAddress,
+}: {
+  stripeCustomerId: string;
+  subscriptionId: string;
+  shippingAddress: CheckoutAddressSnapshot;
+}): Promise<void> {
+  const stripe = getStripe();
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  const customerId =
+    typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
+
+  if (customerId !== stripeCustomerId) {
+    throw new Error('Subscription not found');
+  }
+
+  if (!shippingAddress.address1?.trim() || !shippingAddress.countryCode?.trim()) {
+    throw new Error('Invalid shipping address');
+  }
+
+  const shippingMetadata = buildSubscriptionShippingMetadata(
+    shippingAddress,
+    subscription.metadata.shipping_method_label?.trim() || undefined,
+  );
+
+  await stripe.subscriptions.update(subscriptionId, {
+    metadata: {
+      ...subscription.metadata,
+      ...shippingMetadata,
+    },
+  });
+
+  await stripe.customers.update(stripeCustomerId, {
+    shipping: {
+      name: `${shippingAddress.firstName} ${shippingAddress.lastName}`.trim() || undefined,
+      address: {
+        line1: shippingAddress.address1,
+        line2: shippingAddress.address2,
+        city: shippingAddress.city,
+        state: shippingAddress.stateOrProvince,
+        postal_code: shippingAddress.postalCode,
+        country: shippingAddress.countryCode,
+      },
+    },
+  });
+
+  const updatedSubscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+  await syncSubscriptionPricingFromBigCommerce(updatedSubscription);
 }

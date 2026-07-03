@@ -8,6 +8,9 @@ import { getProductsByIds } from '~/client/queries/get-products';
 import { graphql } from '~/client/graphql';
 import { TAGS } from '~/client/tags';
 import { getCustomerAddresses } from '~/app/[locale]/(default)/account/addresses/page-data';
+import { getShippingCountries } from '~/app/[locale]/(default)/cart/page-data';
+import { mapCustomerAddressesToSaved } from '~/lib/account/saved-shipping-addresses';
+import type { SavedShippingAddress } from '~/lib/account/saved-shipping-addresses';
 import { isStripeConfigured } from '~/lib/stripe/client';
 import {
   findStripeCustomerIdByEmail,
@@ -43,6 +46,10 @@ export type SubscriptionsPageResult =
       finalizedShipments: FinalizedShipmentRecord[];
       productImagesByEntityId: Map<number, { src: string; alt: string }>;
       savedPaymentMethods: SavedPaymentMethod[];
+      savedShippingAddresses: SavedShippingAddress[];
+      addressFormCountries: Array<{ value: string; label: string }>;
+      addressFormStates: Array<{ country: string; states: Array<{ label: string; value: string }> }>;
+      defaultCountryCode: string;
     }
   | { kind: 'not-configured' }
   | { kind: 'customer-not-found' }
@@ -100,14 +107,35 @@ export const getSubscriptionsPageData = cache(async (): Promise<SubscriptionsPag
         .filter((productEntityId): productEntityId is number => productEntityId != null),
     ),
   ];
-  const [productsResult, addressData, stripeCustomerShipping, variantDisplaysBySubscriptionId, savedPaymentMethods] =
+  const [productsResult, addressData, stripeCustomerShipping, variantDisplaysBySubscriptionId, savedPaymentMethods, shippingCountries] =
     await Promise.all([
       productEntityIds.length > 0 ? getProductsByIds({ entityIds: productEntityIds }) : null,
       getCustomerAddresses({ limit: 50 }),
       getStripeCustomerShippingAddress(stripeCustomerId),
       resolveSubscriptionVariantDisplays(refreshedSubscriptions),
       getCustomerSavedPaymentMethods(stripeCustomerId),
+      getShippingCountries(),
     ]);
+  const savedShippingAddresses = mapCustomerAddressesToSaved(addressData?.addresses ?? []);
+  const blacklistedUSStates = new Set([
+    'Armed Forces Africa',
+    'Armed Forces Canada',
+    'Armed Forces Middle East',
+  ]);
+  const addressFormCountries = shippingCountries.map((country) => ({
+    value: country.code,
+    label: country.name,
+  }));
+  const addressFormStates = shippingCountries.map((country) => ({
+    country: country.code,
+    states: country.statesOrProvinces
+      .filter((state) => country.code !== 'US' || !blacklistedUSStates.has(state.name))
+      .map((state) => ({
+        value: state.abbreviation,
+        label: state.name,
+      })),
+  }));
+  const defaultCountryCode = addressFormCountries[0]?.value ?? 'US';
   const productImagesByEntityId = new Map<
     number,
     { src: string; alt: string }
@@ -184,6 +212,10 @@ export const getSubscriptionsPageData = cache(async (): Promise<SubscriptionsPag
     finalizedShipments,
     productImagesByEntityId,
     savedPaymentMethods,
+    savedShippingAddresses,
+    addressFormCountries,
+    addressFormStates,
+    defaultCountryCode,
   };
 });
 

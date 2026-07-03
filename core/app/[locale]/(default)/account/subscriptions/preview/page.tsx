@@ -478,6 +478,7 @@ export default async function SubscriptionsPreviewPage({ params }: Props) {
   setRequestLocale(locale);
 
   const t = await getTranslations('Account.Subscriptions');
+  const checkoutAddressT = await getTranslations('Checkout.billing');
 
   const cancellationReasons = [
     { value: 'too_expensive', label: t('manageModal.cancelForm.reasons.tooExpensive') },
@@ -543,12 +544,14 @@ export default async function SubscriptionsPreviewPage({ params }: Props) {
           paymentPickerDescription: t('manageModal.paymentPickerDescription'),
           updatePaymentLabel: t('manageModal.updatePayment'),
           addPaymentMethodLabel: t('manageModal.addPaymentMethod'),
+          addPaymentMethodSecureNote: t('manageModal.addPaymentMethodSecureNote'),
           goBackLabel: t('manageModal.goBack'),
           cancellingLabel: t('manageModal.cancelling'),
           defaultBadgeLabel: t('manageModal.defaultPayment'),
           cancelAction: previewNoopSubscriptionAction,
           updatePaymentMethodAction: async () => ({ success: true }),
-          addPaymentMethodAction: previewNoopAction,
+          createSetupIntentAction: async () => ({ error: 'Preview only' }),
+          savePaymentMethodLabel: t('manageModal.savePaymentMethod'),
           savedPaymentMethods: [
             {
               id: 'pm_preview_1',
@@ -561,6 +564,46 @@ export default async function SubscriptionsPreviewPage({ params }: Props) {
               isDefault: true,
             },
           ],
+          editAddressLabel: t('manageModal.editAddress'),
+          addressPickerTitle: t('manageModal.addressPickerTitle'),
+          addressPickerDescription: t('manageModal.addressPickerDescription'),
+          updateAddressLabel: t('manageModal.updateAddress'),
+          addAddressLabel: t('manageModal.addAddress'),
+          saveAddressLabel: t('manageModal.saveAddress'),
+          updateShippingAddressAction: async () => ({ success: true }),
+          saveAndApplyAddressAction: async () => ({ success: true, addressId: 'addr_preview_2' }),
+          savedShippingAddresses: [
+            {
+              id: 'addr_preview_1',
+              label: 'Alex Kim · 1200 Main St · Vancouver, British Columbia, V6A 2W9 · CA',
+              addressKey: 'preview-address-1',
+            },
+          ],
+          addressFormCountries: [{ value: 'CA', label: 'Canada' }, { value: 'US', label: 'United States' }],
+          addressFormStates: [
+            {
+              country: 'CA',
+              states: [{ value: 'BC', label: 'British Columbia' }],
+            },
+            {
+              country: 'US',
+              states: [{ value: 'CA', label: 'California' }],
+            },
+          ],
+          defaultCountryCode: 'CA',
+          addressFormLabels: {
+            firstName: checkoutAddressT('firstName'),
+            lastName: checkoutAddressT('lastName'),
+            company: checkoutAddressT('company'),
+            address1: checkoutAddressT('address1'),
+            address2: checkoutAddressT('address2'),
+            city: checkoutAddressT('city'),
+            stateOrProvince: checkoutAddressT('stateOrProvince'),
+            country: checkoutAddressT('country'),
+            postalCode: checkoutAddressT('postalCode'),
+            phone: checkoutAddressT('phone'),
+            saveLabel: t('manageModal.saveAddress'),
+          },
         }}
         pastShipmentsTitle={t('sections.pastShipments')}
         paymentLabel={t('delivery.payment')}

@@ -31,6 +31,21 @@ export function formatSavedPaymentMethodLabel(
   return `${formatCardBrand(paymentMethod.card.brand)} •••• ${paymentMethod.card.last4}`;
 }
 
+export async function createCustomerSetupIntent(stripeCustomerId: string): Promise<string> {
+  const stripe = getStripe();
+  const setupIntent = await stripe.setupIntents.create({
+    customer: stripeCustomerId,
+    payment_method_types: ['card'],
+    usage: 'off_session',
+  });
+
+  if (!setupIntent.client_secret) {
+    throw new Error('Stripe did not return a client secret');
+  }
+
+  return setupIntent.client_secret;
+}
+
 export async function getCustomerSavedPaymentMethods(
   stripeCustomerId: string,
 ): Promise<SavedPaymentMethod[]> {

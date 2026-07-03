@@ -13,12 +13,19 @@ import {
   useTransition,
   type ReactNode,
 } from 'react';
-import { useFormStatus } from 'react-dom';
 
 import { Badge } from '@/vibes/soul/primitives/badge';
 import { Button } from '@/vibes/soul/primitives/button';
 import { useRouter } from '~/i18n/routing';
+import type { SaveCheckoutAddressInput } from '~/app/[locale]/(default)/checkout/_actions/save-checkout-address';
+import type { SavedShippingAddress } from '~/lib/account/saved-shipping-addresses';
 import type { SavedPaymentMethod } from '~/lib/stripe/payment-methods';
+
+import { AddPaymentMethodForm } from './add-payment-method-form';
+import {
+  SubscriptionAddressForm,
+  type SubscriptionAddressFormLabels,
+} from './subscription-address-form';
 
 export interface SubscriptionManageDetails {
   id: string;
@@ -29,6 +36,7 @@ export interface SubscriptionManageDetails {
   paymentMethodLabel?: string;
   scheduleDetail?: string;
   shippingAddressLabel?: string;
+  shippingAddressKey?: string;
 }
 
 export interface CancellationReasonOption {
@@ -46,6 +54,12 @@ export interface SubscriptionManageModalProps {
   cancellationReasonLabel: string;
   cancellationReasonPlaceholder: string;
   cancellationReasons: CancellationReasonOption[];
+  editAddressLabel: string;
+  addressPickerTitle: string;
+  addressPickerDescription: string;
+  updateAddressLabel: string;
+  addAddressLabel: string;
+  saveAddressLabel: string;
   editPaymentLabel: string;
   paymentPickerTitle: string;
   paymentPickerDescription: string;
@@ -64,11 +78,26 @@ export interface SubscriptionManageModalProps {
     subscriptionId: string,
     paymentMethodId: string,
   ) => Promise<{ success: boolean; error?: string }>;
-  addPaymentMethodAction?: () => Promise<void>;
+  createSetupIntentAction?: () => Promise<{ clientSecret: string } | { error: string }>;
+  savePaymentMethodLabel: string;
+  addPaymentMethodSecureNote?: string;
   savedPaymentMethods?: SavedPaymentMethod[];
+  updateShippingAddressAction?: (
+    subscriptionId: string,
+    addressId: string,
+  ) => Promise<{ success: boolean; error?: string }>;
+  saveAndApplyAddressAction?: (
+    subscriptionId: string,
+    input: SaveCheckoutAddressInput,
+  ) => Promise<{ success: boolean; addressId?: string; error?: string }>;
+  savedShippingAddresses?: SavedShippingAddress[];
+  addressFormCountries?: Array<{ value: string; label: string }>;
+  addressFormStates?: Array<{ country: string; states: Array<{ label: string; value: string }> }>;
+  defaultCountryCode?: string;
+  addressFormLabels?: SubscriptionAddressFormLabels;
 }
 
-type ModalStep = 'menu' | 'payment' | 'cancel';
+type ModalStep = 'menu' | 'payment' | 'add-payment' | 'address' | 'add-address' | 'cancel';
 
 const MODAL_OPEN_BODY_CLASS = 'subscription-manage-modal-open';
 const MODAL_BLUR_TARGET_CLASS = 'subscription-manage-modal-blur-target';
@@ -97,28 +126,6 @@ function formatPriceFrequency(price?: string, intervalLabel?: string): string | 
   }
 
   return price ?? intervalLabel ?? null;
-}
-
-function AddPaymentMethodPortalButton({
-  label,
-  action,
-}: {
-  label: string;
-  action?: () => Promise<void>;
-}) {
-  const { pending } = useFormStatus();
-
-  if (!action) {
-    return null;
-  }
-
-  return (
-    <form action={action} className="w-full">
-      <button className="subscription-manage-modal__secondary-button" disabled={pending} type="submit">
-        {pending ? '…' : label}
-      </button>
-    </form>
-  );
 }
 
 function SubscriptionManageModalShell({
@@ -246,6 +253,12 @@ export function SubscriptionManageModal({
   cancellationReasonLabel,
   cancellationReasonPlaceholder,
   cancellationReasons,
+  editAddressLabel,
+  addressPickerTitle,
+  addressPickerDescription,
+  updateAddressLabel,
+  addAddressLabel,
+  saveAddressLabel,
   editPaymentLabel,
   paymentPickerTitle,
   paymentPickerDescription,
@@ -258,15 +271,28 @@ export function SubscriptionManageModal({
   paymentLabel,
   cancelAction,
   updatePaymentMethodAction,
-  addPaymentMethodAction,
+  createSetupIntentAction,
+  savePaymentMethodLabel,
+  addPaymentMethodSecureNote,
   savedPaymentMethods = [],
+  updateShippingAddressAction,
+  saveAndApplyAddressAction,
+  savedShippingAddresses = [],
+  addressFormCountries = [],
+  addressFormStates = [],
+  defaultCountryCode = 'US',
+  addressFormLabels,
 }: SubscriptionManageModalProps) {
   const router = useRouter();
   const [step, setStep] = useState<ModalStep>('menu');
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState('');
+  const [selectedAddressId, setSelectedAddressId] = useState('');
+  const [setupClientSecret, setSetupClientSecret] = useState<string | null>(null);
+  const [isLoadingSetupIntent, setIsLoadingSetupIntent] = useState(false);
   const [cancellationReason, setCancellationReason] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isUpdating, startUpdate] = useTransition();
+  const [isUpdatingAddress, startAddressUpdate] = useTransition();
   const [isCancelling, startCancel] = useTransition();
   const subscriptionId = subscription?.id;
   const priceFrequency = formatPriceFrequency(subscription?.price, subscription?.intervalLabel);
@@ -286,7 +312,44 @@ export function SubscriptionManageModal({
       '';
 
     setSelectedPaymentMethodId(defaultPaymentMethodId);
-  }, [isOpen, savedPaymentMethods]);
+
+    const subscriptionAddressKey = subscription?.shippingAddressKey?.trim();
+    const matchedAddress =
+      savedShippingAddresses.find((address) => address.addressKey === subscriptionAddressKey) ??
+      savedShippingAddresses[0];
+
+    setSelectedAddressId(matchedAddress?.id ?? '');
+  }, [isOpen, savedPaymentMethods, savedShippingAddresses, subscription?.shippingAddressKey]);
+
+  useEffect(() => {
+    if (step !== 'add-payment' || !createSetupIntentAction) {
+      return;
+    }
+
+    let cancelled = false;
+
+    setIsLoadingSetupIntent(true);
+    setSetupClientSecret(null);
+    setErrorMessage(null);
+
+    void createSetupIntentAction().then((result) => {
+      if (cancelled) {
+        return;
+      }
+
+      if ('error' in result) {
+        setErrorMessage(result.error);
+      } else {
+        setSetupClientSecret(result.clientSecret);
+      }
+
+      setIsLoadingSetupIntent(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [step, createSetupIntentAction]);
 
   const handleClose = () => {
     if (isCancelling) {
@@ -296,7 +359,16 @@ export function SubscriptionManageModal({
     setStep('menu');
     setErrorMessage(null);
     setCancellationReason('');
+    setSetupClientSecret(null);
     onClose();
+  };
+
+  const handlePaymentMethodAdded = (paymentMethodId: string) => {
+    setSelectedPaymentMethodId(paymentMethodId);
+    setSetupClientSecret(null);
+    setErrorMessage(null);
+    router.refresh();
+    setStep('payment');
   };
 
   const handleUpdatePayment = () => {
@@ -339,8 +411,214 @@ export function SubscriptionManageModal({
     });
   };
 
+  const openPaymentStep = () => {
+    setStep(
+      savedPaymentMethods.length > 0 || !createSetupIntentAction ? 'payment' : 'add-payment',
+    );
+  };
+
+  const handleUpdateAddress = () => {
+    if (!subscriptionId || !selectedAddressId || !updateShippingAddressAction) {
+      return;
+    }
+
+    startAddressUpdate(async () => {
+      setErrorMessage(null);
+      const result = await updateShippingAddressAction(subscriptionId, selectedAddressId);
+
+      if (!result.success) {
+        setErrorMessage(result.error ?? 'Unable to update shipping address');
+
+        return;
+      }
+
+      router.refresh();
+      handleClose();
+    });
+  };
+
+  const handleAddressSaved = (addressId: string) => {
+    setSelectedAddressId(addressId);
+    setErrorMessage(null);
+    router.refresh();
+    handleClose();
+  };
+
+  const openAddressStep = () => {
+    setStep(
+      savedShippingAddresses.length > 0 || !saveAndApplyAddressAction ? 'address' : 'add-address',
+    );
+  };
+
   const modalTitle =
-    step === 'payment' ? paymentPickerTitle : step === 'cancel' ? cancelFormTitle : title;
+    step === 'add-payment'
+      ? addPaymentMethodLabel
+      : step === 'add-address'
+        ? addAddressLabel
+        : step === 'address'
+          ? addressPickerTitle
+          : step === 'payment'
+            ? paymentPickerTitle
+            : step === 'cancel'
+              ? cancelFormTitle
+              : title;
+
+  if (step === 'add-address' && addressFormLabels && saveAndApplyAddressAction) {
+    return (
+      <SubscriptionManageModalShell isOpen={isOpen} onClose={handleClose} title={modalTitle}>
+        <button
+          className="subscription-manage-modal__back"
+          onClick={() => {
+            setStep(savedShippingAddresses.length > 0 ? 'address' : 'menu');
+            setErrorMessage(null);
+          }}
+          type="button"
+        >
+          {goBackLabel}
+        </button>
+
+        <SubscriptionAddressForm
+          countries={addressFormCountries}
+          defaultCountryCode={defaultCountryCode}
+          labels={{ ...addressFormLabels, saveLabel: saveAddressLabel }}
+          onSave={async (input) => {
+            if (!subscriptionId) {
+              return { success: false, error: 'Unable to update shipping address' };
+            }
+
+            const result = await saveAndApplyAddressAction(subscriptionId, input);
+
+            if (result.success && result.addressId) {
+              handleAddressSaved(result.addressId);
+            }
+
+            return result;
+          }}
+          states={addressFormStates}
+        />
+
+        {errorMessage ? <p className="subscription-manage-modal__error">{errorMessage}</p> : null}
+      </SubscriptionManageModalShell>
+    );
+  }
+
+  if (step === 'address') {
+    return (
+      <SubscriptionManageModalShell isOpen={isOpen} onClose={handleClose} title={modalTitle}>
+        <button
+          className="subscription-manage-modal__back"
+          onClick={() => {
+            setStep('menu');
+            setErrorMessage(null);
+          }}
+          type="button"
+        >
+          {goBackLabel}
+        </button>
+
+        <p className="subscription-manage-modal__payment-intro">
+          {addressPickerDescription}
+          {subscription?.productName ? ` ${subscription.productName}` : ''}
+        </p>
+
+        {savedShippingAddresses.length > 0 ? (
+          <div className="subscription-manage-modal__payment-list">
+            {savedShippingAddresses.map((address) => {
+              const isSelected = selectedAddressId === address.id;
+
+              return (
+                <label
+                  className={clsx(
+                    'subscription-manage-modal__payment-option',
+                    isSelected && 'subscription-manage-modal__payment-option--selected',
+                  )}
+                  key={address.id}
+                >
+                  <input
+                    checked={isSelected}
+                    className="subscription-manage-modal__payment-radio"
+                    name="subscription-shipping-address"
+                    onChange={() => setSelectedAddressId(address.id)}
+                    type="radio"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="subscription-manage-modal__payment-label">{address.label}</span>
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="subscription-manage-modal__payment-intro">{addAddressLabel}</p>
+        )}
+
+        {errorMessage ? <p className="subscription-manage-modal__error">{errorMessage}</p> : null}
+
+        <div className="subscription-manage-modal__payment-actions">
+          {savedShippingAddresses.length > 0 ? (
+            <Button
+              className="w-full justify-center"
+              disabled={!selectedAddressId}
+              loading={isUpdatingAddress}
+              onClick={handleUpdateAddress}
+              size="medium"
+              type="button"
+              variant="primary"
+            >
+              {updateAddressLabel}
+            </Button>
+          ) : null}
+          {saveAndApplyAddressAction ? (
+            <button
+              className="subscription-manage-modal__secondary-button w-full"
+              onClick={() => setStep('add-address')}
+              type="button"
+            >
+              {addAddressLabel}
+            </button>
+          ) : null}
+        </div>
+      </SubscriptionManageModalShell>
+    );
+  }
+
+  if (step === 'add-payment') {
+    return (
+      <SubscriptionManageModalShell isOpen={isOpen} onClose={handleClose} title={modalTitle}>
+        <button
+          className="subscription-manage-modal__back"
+          onClick={() => {
+            setStep(savedPaymentMethods.length > 0 ? 'payment' : 'menu');
+            setErrorMessage(null);
+            setSetupClientSecret(null);
+          }}
+          type="button"
+        >
+          {goBackLabel}
+        </button>
+
+        {isLoadingSetupIntent ? (
+          <div className="subscription-manage-modal__setup-loading" role="status">
+            <Loader2
+              aria-hidden
+              className="subscription-manage-modal__loading-spinner size-6"
+              strokeWidth={1.75}
+            />
+          </div>
+        ) : setupClientSecret ? (
+          <AddPaymentMethodForm
+            clientSecret={setupClientSecret}
+            onError={setErrorMessage}
+            onSuccess={handlePaymentMethodAdded}
+            saveLabel={savePaymentMethodLabel}
+            secureNote={addPaymentMethodSecureNote}
+          />
+        ) : null}
+
+        {errorMessage ? <p className="subscription-manage-modal__error">{errorMessage}</p> : null}
+      </SubscriptionManageModalShell>
+    );
+  }
 
   if (step === 'menu') {
     return (
@@ -380,10 +658,30 @@ export function SubscriptionManageModal({
                 <MapPin className="size-4" strokeWidth={1.75} />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="subscription-manage-modal__detail-label">{shipToLabel}</p>
+                <div className="flex items-start justify-between gap-3">
+                  <p className="subscription-manage-modal__detail-label">{shipToLabel}</p>
+                  {updateShippingAddressAction || saveAndApplyAddressAction ? (
+                    <button
+                      className="subscription-manage-modal__text-action"
+                      onClick={openAddressStep}
+                      type="button"
+                    >
+                      <Pencil className="size-3.5" strokeWidth={1.75} />
+                      <span>{editAddressLabel}</span>
+                    </button>
+                  ) : null}
+                </div>
                 <p className="subscription-manage-modal__detail-value">{subscription.shippingAddressLabel}</p>
               </div>
             </div>
+          ) : updateShippingAddressAction || saveAndApplyAddressAction ? (
+            <button
+              className="subscription-manage-modal__secondary-button w-full"
+              onClick={openAddressStep}
+              type="button"
+            >
+              {editAddressLabel}
+            </button>
           ) : null}
 
           {subscription?.paymentMethodLabel ? (
@@ -396,7 +694,7 @@ export function SubscriptionManageModal({
                   <p className="subscription-manage-modal__detail-label">{paymentLabel}</p>
                   <button
                     className="subscription-manage-modal__text-action"
-                    onClick={() => setStep('payment')}
+                    onClick={openPaymentStep}
                     type="button"
                   >
                     <Pencil className="size-3.5" strokeWidth={1.75} />
@@ -409,7 +707,7 @@ export function SubscriptionManageModal({
           ) : (
             <button
               className="subscription-manage-modal__secondary-button w-full"
-              onClick={() => setStep('payment')}
+              onClick={openPaymentStep}
               type="button"
             >
               {editPaymentLabel}
@@ -551,7 +849,15 @@ export function SubscriptionManageModal({
             {updatePaymentLabel}
           </Button>
         ) : null}
-        <AddPaymentMethodPortalButton action={addPaymentMethodAction} label={addPaymentMethodLabel} />
+        {createSetupIntentAction ? (
+          <button
+            className="subscription-manage-modal__secondary-button w-full"
+            onClick={() => setStep('add-payment')}
+            type="button"
+          >
+            {addPaymentMethodLabel}
+          </button>
+        ) : null}
       </div>
     </SubscriptionManageModalShell>
   );

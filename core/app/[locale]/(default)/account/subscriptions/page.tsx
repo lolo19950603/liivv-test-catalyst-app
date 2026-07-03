@@ -6,10 +6,10 @@ import { groupSubscriptionsForPortal } from '~/lib/stripe/transform-customer-sub
 
 import { openBillingPortal } from './_actions/open-billing-portal';
 import { cancelSubscriptionAction } from './_actions/cancel-subscription';
-import {
-  openAddPaymentMethodPortal,
-} from './_actions/open-subscription-manage-portal';
+import { createAddPaymentMethodSetupIntentAction } from './_actions/create-add-payment-method-setup-intent';
+import { saveAndApplySubscriptionAddressAction } from './_actions/save-and-apply-subscription-address';
 import { updateSubscriptionPaymentMethodAction } from './_actions/update-subscription-payment-method';
+import { updateSubscriptionShippingAddressAction } from './_actions/update-subscription-shipping-address';
 import { retrySubscriptionPaymentItem } from './_actions/retry-subscription-payment';
 import { skipSubscriptionDeliveryItem } from './_actions/skip-subscription-delivery';
 import { getSubscriptionsPageData } from './page-data';
@@ -34,6 +34,7 @@ export default async function SubscriptionsPage({ params }: Props) {
   setRequestLocale(locale);
 
   const t = await getTranslations('Account.Subscriptions');
+  const checkoutAddressT = await getTranslations('Checkout.billing');
   const format = await getFormatter();
   const [data, storeLogoFallback] = await Promise.all([
     getSubscriptionsPageData(),
@@ -111,13 +112,40 @@ export default async function SubscriptionsPage({ params }: Props) {
         paymentPickerDescription: t('manageModal.paymentPickerDescription'),
         updatePaymentLabel: t('manageModal.updatePayment'),
         addPaymentMethodLabel: t('manageModal.addPaymentMethod'),
+        addPaymentMethodSecureNote: t('manageModal.addPaymentMethodSecureNote'),
         goBackLabel: t('manageModal.goBack'),
         cancellingLabel: t('manageModal.cancelling'),
         defaultBadgeLabel: t('manageModal.defaultPayment'),
         cancelAction: cancelSubscriptionAction,
         updatePaymentMethodAction: updateSubscriptionPaymentMethodAction,
-        addPaymentMethodAction: openAddPaymentMethodPortal,
+        createSetupIntentAction: createAddPaymentMethodSetupIntentAction,
+        savePaymentMethodLabel: t('manageModal.savePaymentMethod'),
         savedPaymentMethods: data.savedPaymentMethods,
+        editAddressLabel: t('manageModal.editAddress'),
+        addressPickerTitle: t('manageModal.addressPickerTitle'),
+        addressPickerDescription: t('manageModal.addressPickerDescription'),
+        updateAddressLabel: t('manageModal.updateAddress'),
+        addAddressLabel: t('manageModal.addAddress'),
+        saveAddressLabel: t('manageModal.saveAddress'),
+        updateShippingAddressAction: updateSubscriptionShippingAddressAction,
+        saveAndApplyAddressAction: saveAndApplySubscriptionAddressAction,
+        savedShippingAddresses: data.savedShippingAddresses,
+        addressFormCountries: data.addressFormCountries,
+        addressFormStates: data.addressFormStates,
+        defaultCountryCode: data.defaultCountryCode,
+        addressFormLabels: {
+          firstName: checkoutAddressT('firstName'),
+          lastName: checkoutAddressT('lastName'),
+          company: checkoutAddressT('company'),
+          address1: checkoutAddressT('address1'),
+          address2: checkoutAddressT('address2'),
+          city: checkoutAddressT('city'),
+          stateOrProvince: checkoutAddressT('stateOrProvince'),
+          country: checkoutAddressT('country'),
+          postalCode: checkoutAddressT('postalCode'),
+          phone: checkoutAddressT('phone'),
+          saveLabel: t('manageModal.saveAddress'),
+        },
       }}
       portalSections={portalSections}
       shipToLabel={t('delivery.shipTo')}

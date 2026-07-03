@@ -39,6 +39,7 @@ export interface SubscriptionListItem {
   skippedReasonLabel?: string;
   shippingAddressLabel?: string;
   shippingAddressGroupNumber?: number;
+  shippingAddressKey?: string;
 }
 
 export interface SubscriptionDeliveryGroup {
@@ -223,6 +224,8 @@ export function transformCustomerSubscription(
     statusKey,
     scheduleDetail: getScheduleDetail(subscription, t, format),
     paymentFailed: isSubscriptionPaymentFailed(subscription.status),
+    shippingAddressLabel: subscription.shippingAddressLabel,
+    shippingAddressKey: subscription.shippingAddressKey,
   };
 }
 

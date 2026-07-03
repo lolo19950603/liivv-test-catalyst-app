@@ -11,6 +11,9 @@ import { SubscriptionManageModal, type SubscriptionManageDetails } from '~/compo
 import { Image } from '~/components/image';
 import { Link } from '~/components/link';
 import type { SavedPaymentMethod } from '~/lib/stripe/payment-methods';
+import type { SavedShippingAddress } from '~/lib/account/saved-shipping-addresses';
+import type { SaveCheckoutAddressInput } from '~/app/[locale]/(default)/checkout/_actions/save-checkout-address';
+import type { SubscriptionAddressFormLabels } from '~/components/subscriptions/subscription-address-form';
 
 export interface SubscriptionListItem {
   id: string;
@@ -29,6 +32,7 @@ export interface SubscriptionListItem {
   skippedReasonLabel?: string;
   shippingAddressLabel?: string;
   shippingAddressGroupNumber?: number;
+  shippingAddressKey?: string;
 }
 
 export interface SubscriptionDeliveryGroup {
@@ -105,8 +109,29 @@ export interface SubscriptionListProps {
       subscriptionId: string,
       paymentMethodId: string,
     ) => Promise<{ success: boolean; error?: string }>;
-    addPaymentMethodAction: () => Promise<void>;
+    createSetupIntentAction: () => Promise<{ clientSecret: string } | { error: string }>;
+    savePaymentMethodLabel: string;
+    addPaymentMethodSecureNote?: string;
     savedPaymentMethods: SavedPaymentMethod[];
+    editAddressLabel: string;
+    addressPickerTitle: string;
+    addressPickerDescription: string;
+    updateAddressLabel: string;
+    addAddressLabel: string;
+    saveAddressLabel: string;
+    updateShippingAddressAction: (
+      subscriptionId: string,
+      addressId: string,
+    ) => Promise<{ success: boolean; error?: string }>;
+    saveAndApplyAddressAction: (
+      subscriptionId: string,
+      input: SaveCheckoutAddressInput,
+    ) => Promise<{ success: boolean; addressId?: string; error?: string }>;
+    savedShippingAddresses: SavedShippingAddress[];
+    addressFormCountries: Array<{ value: string; label: string }>;
+    addressFormStates: Array<{ country: string; states: Array<{ label: string; value: string }> }>;
+    defaultCountryCode: string;
+    addressFormLabels: SubscriptionAddressFormLabels;
   };
   updatePaymentLabel?: string;
   updatePaymentAction?: () => Promise<void>;
@@ -1573,6 +1598,7 @@ export function SubscriptionList({
         paymentMethodLabel: item.paymentMethodLabel,
         scheduleDetail: item.scheduleDetail,
         shippingAddressLabel: item.shippingAddressLabel ?? shippingAddressFromDelivery,
+        shippingAddressKey: item.shippingAddressKey,
       });
     },
     [allManageableItems, pastGroups, upcomingGroups],
@@ -1676,8 +1702,16 @@ export function SubscriptionList({
       ) : null}
 
       <SubscriptionManageModal
-        addPaymentMethodAction={manageItemOptions?.addPaymentMethodAction}
+        addAddressLabel={manageItemOptions?.addAddressLabel ?? 'Add new address'}
         addPaymentMethodLabel={manageItemOptions?.addPaymentMethodLabel ?? 'Add payment method'}
+        addPaymentMethodSecureNote={manageItemOptions?.addPaymentMethodSecureNote}
+        addressFormCountries={manageItemOptions?.addressFormCountries ?? []}
+        addressFormLabels={manageItemOptions?.addressFormLabels}
+        addressFormStates={manageItemOptions?.addressFormStates ?? []}
+        addressPickerDescription={
+          manageItemOptions?.addressPickerDescription ?? 'Choose a shipping address for your'
+        }
+        addressPickerTitle={manageItemOptions?.addressPickerTitle ?? 'Select a shipping address'}
         cancelAction={manageItemOptions?.cancelAction}
         cancelFormTitle={manageItemOptions?.cancelFormTitle ?? 'Cancel your subscription'}
         cancelLabel={manageItemOptions?.cancelLabel ?? 'Cancel subscription'}
@@ -1687,7 +1721,10 @@ export function SubscriptionList({
         }
         cancellationReasons={manageItemOptions?.cancellationReasons ?? []}
         cancellingLabel={manageItemOptions?.cancellingLabel ?? 'Cancelling subscription…'}
+        createSetupIntentAction={manageItemOptions?.createSetupIntentAction}
         defaultBadgeLabel={manageItemOptions?.defaultBadgeLabel ?? 'Default'}
+        defaultCountryCode={manageItemOptions?.defaultCountryCode ?? 'US'}
+        editAddressLabel={manageItemOptions?.editAddressLabel ?? 'Edit address'}
         editPaymentLabel={manageItemOptions?.editPaymentLabel ?? 'Edit payment card'}
         goBackLabel={manageItemOptions?.goBackLabel ?? 'Go back'}
         isOpen={managedSubscription != null}
@@ -1697,12 +1734,18 @@ export function SubscriptionList({
           manageItemOptions?.paymentPickerDescription ?? 'Choose a saved card for your'
         }
         paymentPickerTitle={manageItemOptions?.paymentPickerTitle ?? 'Select a payment method'}
+        saveAddressLabel={manageItemOptions?.saveAddressLabel ?? 'Save address'}
+        saveAndApplyAddressAction={manageItemOptions?.saveAndApplyAddressAction}
+        savePaymentMethodLabel={manageItemOptions?.savePaymentMethodLabel ?? 'Save card'}
         savedPaymentMethods={manageItemOptions?.savedPaymentMethods ?? []}
+        savedShippingAddresses={manageItemOptions?.savedShippingAddresses ?? []}
         shipToLabel={shipToLabel}
         subscription={managedSubscription ?? undefined}
         title={manageItemOptions?.modalTitle ?? 'Manage subscription'}
+        updateAddressLabel={manageItemOptions?.updateAddressLabel ?? 'Update'}
         updatePaymentLabel={manageItemOptions?.updatePaymentLabel ?? 'Update'}
         updatePaymentMethodAction={manageItemOptions?.updatePaymentMethodAction}
+        updateShippingAddressAction={manageItemOptions?.updateShippingAddressAction}
       />
     </section>
     </SubscriptionManageClickContext.Provider>
