@@ -2,18 +2,24 @@ import { Metadata } from 'next';
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { SubscriptionList } from '@/vibes/soul/sections/subscription-list';
+import {
+  formatSubscriptionIntervalKey,
+  getSubscriptionBillingIntervals,
+} from '~/lib/stripe/subscription-interval';
 import { groupSubscriptionsForPortal } from '~/lib/stripe/transform-customer-subscriptions';
+import { getStoreLogoFallback } from '~/lib/store-theme/get-store-logo-fallback';
 
 import { openBillingPortal } from './_actions/open-billing-portal';
 import { cancelSubscriptionAction } from './_actions/cancel-subscription';
 import { createAddPaymentMethodSetupIntentAction } from './_actions/create-add-payment-method-setup-intent';
 import { saveAndApplySubscriptionAddressAction } from './_actions/save-and-apply-subscription-address';
+import { skipSubscriptionDeliveryManageAction } from './_actions/skip-subscription-delivery-manage';
+import { updateSubscriptionFrequencyAction } from './_actions/update-subscription-frequency';
 import { updateSubscriptionPaymentMethodAction } from './_actions/update-subscription-payment-method';
 import { updateSubscriptionShippingAddressAction } from './_actions/update-subscription-shipping-address';
 import { retrySubscriptionPaymentItem } from './_actions/retry-subscription-payment';
 import { skipSubscriptionDeliveryItem } from './_actions/skip-subscription-delivery';
 import { getSubscriptionsPageData } from './page-data';
-import { getStoreLogoFallback } from '~/lib/store-theme/get-store-logo-fallback';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -83,6 +89,16 @@ export default async function SubscriptionsPage({ params }: Props) {
     { value: 'other', label: t('manageModal.cancelForm.reasons.other') },
   ];
 
+  const frequencyOptions = getSubscriptionBillingIntervals().map((interval) => ({
+    value: formatSubscriptionIntervalKey(interval),
+    label:
+      interval.intervalCount === 1
+        ? t(`manageModal.frequencyOptions.${interval.interval}`)
+        : t(`manageModal.frequencyOptions.${interval.interval}Plural`, {
+            count: interval.intervalCount,
+          }),
+  }));
+
   return (
     <SubscriptionList
       activeSectionTitle={t('sections.active')}
@@ -149,6 +165,20 @@ export default async function SubscriptionsPage({ params }: Props) {
           phone: checkoutAddressT('phone'),
           saveLabel: t('manageModal.saveAddress'),
         },
+        frequencyLabel: t('manageModal.frequency'),
+        editFrequencyLabel: t('manageModal.editFrequency'),
+        frequencyPickerTitle: t('manageModal.frequencyPickerTitle'),
+        frequencyPickerDescription: t('manageModal.frequencyPickerDescription'),
+        updateFrequencyLabel: t('manageModal.updateFrequency'),
+        updatingFrequencyLabel: t('manageModal.updatingFrequency'),
+        frequencyOptions,
+        updateFrequencyAction: updateSubscriptionFrequencyAction,
+        skipDeliveryLabel: t('manageModal.skipDelivery'),
+        skipDeliveryTitle: t('manageModal.skipDeliveryTitle'),
+        skipDeliveryDescription: t('manageModal.skipDeliveryDescription'),
+        confirmSkipDeliveryLabel: t('manageModal.confirmSkipDelivery'),
+        skippingDeliveryLabel: t('manageModal.skippingDelivery'),
+        skipDeliveryAction: skipSubscriptionDeliveryManageAction,
       }}
       portalSections={portalSections}
       shipToLabel={t('delivery.shipTo')}

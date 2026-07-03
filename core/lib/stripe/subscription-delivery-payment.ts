@@ -83,7 +83,13 @@ export async function skipSubscriptionDelivery({
     return { ok: false, reason: 'not_found' };
   }
 
-  if (!isSubscriptionPaymentFailed(subscription.status)) {
+  const paymentFailed = isSubscriptionPaymentFailed(subscription.status);
+  const canSkip =
+    paymentFailed ||
+    subscription.status === 'active' ||
+    subscription.status === 'trialing';
+
+  if (!canSkip) {
     return { ok: false, reason: 'not_failed' };
   }
 
@@ -94,19 +100,22 @@ export async function skipSubscriptionDelivery({
     return { ok: false, reason: 'invalid' };
   }
 
-  await voidOpenSubscriptionInvoices(stripe, subscriptionId);
+  if (paymentFailed) {
+    await voidOpenSubscriptionInvoices(stripe, subscriptionId);
+  }
 
   const interval = recurring.interval;
   const intervalCount = recurring.interval_count ?? 1;
-  const nextBillingAnchor = addBillingInterval(
-    subscription.current_period_end,
-    interval,
-    intervalCount,
-  );
+  const periodEnd =
+    item.current_period_end ??
+    subscription.billing_cycle_anchor ??
+    subscription.current_period_end ??
+    Math.floor(Date.now() / 1000);
+  const nextBillingAnchor = addBillingInterval(periodEnd, interval, intervalCount);
   const now = Math.floor(Date.now() / 1000);
   const billingCycleAnchor = resolveSubscriptionBillingCycleAnchor(nextBillingAnchor, now);
   const resolvedShipmentDayKey =
-    shipmentDayKey ?? getShipmentCalendarDayKey(subscription.current_period_end);
+    shipmentDayKey ?? getShipmentCalendarDayKey(periodEnd);
 
   await stripe.subscriptions.update(subscriptionId, {
     billing_cycle_anchor: billingCycleAnchor,

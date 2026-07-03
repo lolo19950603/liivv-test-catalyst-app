@@ -4,7 +4,7 @@ import './subscription-manage-modal.css';
 
 import * as Dialog from '@radix-ui/react-dialog';
 import { clsx } from 'clsx';
-import { ChevronDown, CreditCard, Loader2, MapPin, Pencil, X } from 'lucide-react';
+import { CalendarClock, ChevronDown, CreditCard, Loader2, MapPin, Pencil, SkipForward, X } from 'lucide-react';
 import {
   useEffect,
   useLayoutEffect,
@@ -37,6 +37,14 @@ export interface SubscriptionManageDetails {
   scheduleDetail?: string;
   shippingAddressLabel?: string;
   shippingAddressKey?: string;
+  frequencyKey?: string;
+  canEditFrequency?: boolean;
+  canSkipDelivery?: boolean;
+}
+
+export interface FrequencyOption {
+  value: string;
+  label: string;
 }
 
 export interface CancellationReasonOption {
@@ -70,6 +78,18 @@ export interface SubscriptionManageModalProps {
   updatingPaymentLabel: string;
   savingPaymentMethodLabel: string;
   updatingAddressLabel: string;
+  frequencyLabel: string;
+  editFrequencyLabel: string;
+  frequencyPickerTitle: string;
+  frequencyPickerDescription: string;
+  updateFrequencyLabel: string;
+  updatingFrequencyLabel: string;
+  frequencyOptions?: FrequencyOption[];
+  skipDeliveryLabel: string;
+  skipDeliveryTitle: string;
+  skipDeliveryDescription: string;
+  confirmSkipDeliveryLabel: string;
+  skippingDeliveryLabel: string;
   defaultBadgeLabel: string;
   shipToLabel: string;
   paymentLabel: string;
@@ -93,6 +113,13 @@ export interface SubscriptionManageModalProps {
     subscriptionId: string,
     input: SaveCheckoutAddressInput,
   ) => Promise<{ success: boolean; addressId?: string; error?: string }>;
+  updateFrequencyAction?: (
+    subscriptionId: string,
+    intervalKey: string,
+  ) => Promise<{ success: boolean; error?: string }>;
+  skipDeliveryAction?: (
+    subscriptionId: string,
+  ) => Promise<{ success: boolean; error?: string }>;
   savedShippingAddresses?: SavedShippingAddress[];
   addressFormCountries?: Array<{ value: string; label: string }>;
   addressFormStates?: Array<{ country: string; states: Array<{ label: string; value: string }> }>;
@@ -100,7 +127,15 @@ export interface SubscriptionManageModalProps {
   addressFormLabels?: SubscriptionAddressFormLabels;
 }
 
-type ModalStep = 'menu' | 'payment' | 'add-payment' | 'address' | 'add-address' | 'cancel';
+type ModalStep =
+  | 'menu'
+  | 'payment'
+  | 'add-payment'
+  | 'address'
+  | 'add-address'
+  | 'frequency'
+  | 'skip'
+  | 'cancel';
 
 const MODAL_OPEN_BODY_CLASS = 'subscription-manage-modal-open';
 const MODAL_BLUR_TARGET_CLASS = 'subscription-manage-modal-blur-target';
@@ -272,6 +307,18 @@ export function SubscriptionManageModal({
   updatingPaymentLabel,
   savingPaymentMethodLabel,
   updatingAddressLabel,
+  frequencyLabel,
+  editFrequencyLabel,
+  frequencyPickerTitle,
+  frequencyPickerDescription,
+  updateFrequencyLabel,
+  updatingFrequencyLabel,
+  frequencyOptions = [],
+  skipDeliveryLabel,
+  skipDeliveryTitle,
+  skipDeliveryDescription,
+  confirmSkipDeliveryLabel,
+  skippingDeliveryLabel,
   defaultBadgeLabel,
   shipToLabel,
   paymentLabel,
@@ -283,6 +330,8 @@ export function SubscriptionManageModal({
   savedPaymentMethods = [],
   updateShippingAddressAction,
   saveAndApplyAddressAction,
+  updateFrequencyAction,
+  skipDeliveryAction,
   savedShippingAddresses = [],
   addressFormCountries = [],
   addressFormStates = [],
@@ -293,17 +342,29 @@ export function SubscriptionManageModal({
   const [step, setStep] = useState<ModalStep>('menu');
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState('');
   const [selectedAddressId, setSelectedAddressId] = useState('');
+  const [selectedFrequencyKey, setSelectedFrequencyKey] = useState('');
   const [setupClientSecret, setSetupClientSecret] = useState<string | null>(null);
   const [isLoadingSetupIntent, setIsLoadingSetupIntent] = useState(false);
   const [cancellationReason, setCancellationReason] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isUpdating, startUpdate] = useTransition();
   const [isUpdatingAddress, startAddressUpdate] = useTransition();
+  const [isUpdatingFrequency, startFrequencyUpdate] = useTransition();
+  const [isSkippingDelivery, startSkipDelivery] = useTransition();
   const [isCancelling, startCancel] = useTransition();
   const [isSavingPayment, setIsSavingPayment] = useState(false);
   const subscriptionId = subscription?.id;
   const priceFrequency = formatPriceFrequency(subscription?.price, subscription?.intervalLabel);
-  const isBusy = isCancelling || isUpdating || isUpdatingAddress || isSavingPayment;
+  const isBusy =
+    isCancelling ||
+    isUpdating ||
+    isUpdatingAddress ||
+    isUpdatingFrequency ||
+    isSkippingDelivery ||
+    isSavingPayment;
+  const canEditFrequency =
+    Boolean(subscription?.canEditFrequency && updateFrequencyAction && frequencyOptions.length > 0);
+  const canSkipDelivery = Boolean(subscription?.canSkipDelivery && skipDeliveryAction);
 
   useEffect(() => {
     if (!isOpen) {
@@ -328,7 +389,15 @@ export function SubscriptionManageModal({
       savedShippingAddresses[0];
 
     setSelectedAddressId(matchedAddress?.id ?? '');
-  }, [isOpen, savedPaymentMethods, savedShippingAddresses, subscription?.shippingAddressKey]);
+    setSelectedFrequencyKey(subscription?.frequencyKey ?? frequencyOptions[0]?.value ?? '');
+  }, [
+    isOpen,
+    savedPaymentMethods,
+    savedShippingAddresses,
+    subscription?.shippingAddressKey,
+    subscription?.frequencyKey,
+    frequencyOptions,
+  ]);
 
   useEffect(() => {
     if (step !== 'add-payment' || !createSetupIntentAction) {
@@ -461,6 +530,46 @@ export function SubscriptionManageModal({
     );
   };
 
+  const handleUpdateFrequency = () => {
+    if (!subscriptionId || !selectedFrequencyKey || !updateFrequencyAction) {
+      return;
+    }
+
+    startFrequencyUpdate(async () => {
+      setErrorMessage(null);
+      const result = await updateFrequencyAction(subscriptionId, selectedFrequencyKey);
+
+      if (!result.success) {
+        setErrorMessage(result.error ?? 'Unable to update frequency');
+
+        return;
+      }
+
+      router.refresh();
+      handleClose();
+    });
+  };
+
+  const handleSkipDelivery = () => {
+    if (!subscriptionId || !skipDeliveryAction) {
+      return;
+    }
+
+    startSkipDelivery(async () => {
+      setErrorMessage(null);
+      const result = await skipDeliveryAction(subscriptionId);
+
+      if (!result.success) {
+        setErrorMessage(result.error ?? 'Unable to skip delivery');
+
+        return;
+      }
+
+      router.refresh();
+      handleClose();
+    });
+  };
+
   const modalTitle =
     step === 'add-payment'
       ? addPaymentMethodLabel
@@ -468,11 +577,15 @@ export function SubscriptionManageModal({
         ? addAddressLabel
         : step === 'address'
           ? addressPickerTitle
-          : step === 'payment'
-            ? paymentPickerTitle
-            : step === 'cancel'
-              ? cancelFormTitle
-              : title;
+          : step === 'frequency'
+            ? frequencyPickerTitle
+            : step === 'skip'
+              ? skipDeliveryTitle
+              : step === 'payment'
+                ? paymentPickerTitle
+                : step === 'cancel'
+                  ? cancelFormTitle
+                  : title;
 
   if (step === 'add-address' && addressFormLabels && saveAndApplyAddressAction) {
     return (
@@ -654,17 +767,139 @@ export function SubscriptionManageModal({
     );
   }
 
+  if (step === 'frequency') {
+    return (
+      <SubscriptionManageModalShell
+        blockingMessage={updatingFrequencyLabel}
+        isBlocking={isUpdatingFrequency}
+        isOpen={isOpen}
+        onClose={handleClose}
+        title={modalTitle}
+      >
+        <button
+          className="subscription-manage-modal__back"
+          disabled={isUpdatingFrequency}
+          onClick={() => {
+            setStep('menu');
+            setErrorMessage(null);
+          }}
+          type="button"
+        >
+          {goBackLabel}
+        </button>
+
+        <p className="subscription-manage-modal__payment-intro">
+          {frequencyPickerDescription}
+          {subscription?.productName ? ` ${subscription.productName}` : ''}
+        </p>
+
+        <div className="subscription-manage-modal__payment-list">
+          {frequencyOptions.map((option) => {
+            const isSelected = selectedFrequencyKey === option.value;
+
+            return (
+              <label
+                className={clsx(
+                  'subscription-manage-modal__payment-option',
+                  isSelected && 'subscription-manage-modal__payment-option--selected',
+                )}
+                key={option.value}
+              >
+                <input
+                  checked={isSelected}
+                  className="subscription-manage-modal__payment-radio"
+                  disabled={isUpdatingFrequency}
+                  name="subscription-frequency"
+                  onChange={() => setSelectedFrequencyKey(option.value)}
+                  type="radio"
+                />
+                <span className="subscription-manage-modal__payment-label">{option.label}</span>
+              </label>
+            );
+          })}
+        </div>
+
+        {errorMessage ? <p className="subscription-manage-modal__error">{errorMessage}</p> : null}
+
+        <div className="subscription-manage-modal__payment-actions">
+          <Button
+            className="w-full justify-center"
+            disabled={!selectedFrequencyKey || isUpdatingFrequency}
+            loading={isUpdatingFrequency}
+            onClick={handleUpdateFrequency}
+            size="medium"
+            type="button"
+            variant="primary"
+          >
+            {updateFrequencyLabel}
+          </Button>
+        </div>
+      </SubscriptionManageModalShell>
+    );
+  }
+
+  if (step === 'skip') {
+    return (
+      <SubscriptionManageModalShell
+        blockingMessage={skippingDeliveryLabel}
+        contentClassName="subscription-manage-modal__content--cancel"
+        footer={
+          <div className="subscription-manage-modal__cancel-footer">
+            <button
+              className="subscription-manage-modal__footer-button"
+              disabled={isSkippingDelivery}
+              onClick={() => {
+                setStep('menu');
+                setErrorMessage(null);
+              }}
+              type="button"
+            >
+              {goBackLabel}
+            </button>
+            <button
+              className="subscription-manage-modal__footer-button"
+              disabled={isSkippingDelivery}
+              onClick={handleSkipDelivery}
+              type="button"
+            >
+              {confirmSkipDeliveryLabel}
+            </button>
+          </div>
+        }
+        isBlocking={isSkippingDelivery}
+        isOpen={isOpen}
+        onClose={handleClose}
+        title={modalTitle}
+      >
+        <p className="subscription-manage-modal__payment-intro">{skipDeliveryDescription}</p>
+        {errorMessage ? <p className="subscription-manage-modal__error">{errorMessage}</p> : null}
+      </SubscriptionManageModalShell>
+    );
+  }
+
   if (step === 'menu') {
     return (
       <SubscriptionManageModalShell
         footer={
-          <button
-            className="subscription-manage-modal__cancel-button"
-            onClick={() => setStep('cancel')}
-            type="button"
-          >
-            {cancelLabel}
-          </button>
+          <div className="subscription-manage-modal__menu-footer">
+            {canSkipDelivery ? (
+              <button
+                className="subscription-manage-modal__secondary-button w-full"
+                onClick={() => setStep('skip')}
+                type="button"
+              >
+                <SkipForward className="size-4" strokeWidth={1.75} />
+                <span>{skipDeliveryLabel}</span>
+              </button>
+            ) : null}
+            <button
+              className="subscription-manage-modal__cancel-button"
+              onClick={() => setStep('cancel')}
+              type="button"
+            >
+              {cancelLabel}
+            </button>
+          </div>
         }
         isOpen={isOpen}
         onClose={handleClose}
@@ -675,7 +910,11 @@ export function SubscriptionManageModal({
             <h3 className="subscription-manage-modal__product-name">{subscription.productName}</h3>
           ) : null}
           {subscription?.variantSubtitle ? (
-            <p className="subscription-manage-modal__product-meta">{subscription.variantSubtitle}</p>
+            <div className="subscription-manage-modal__product-meta">
+              {subscription.variantSubtitle.split(/\s*·\s*/).map((part, index) => (
+                <div key={`${part}-${index}`}>{part}</div>
+              ))}
+            </div>
           ) : null}
           {priceFrequency ? (
             <p className="subscription-manage-modal__price">{priceFrequency}</p>
@@ -686,6 +925,32 @@ export function SubscriptionManageModal({
         </div>
 
         <div className="subscription-manage-modal__details">
+          {subscription?.intervalLabel || canEditFrequency ? (
+            <div className="subscription-manage-modal__detail-row">
+              <span className="subscription-manage-modal__detail-icon" aria-hidden>
+                <CalendarClock className="size-4" strokeWidth={1.75} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="subscription-manage-modal__detail-label">{frequencyLabel}</p>
+                  {canEditFrequency ? (
+                    <button
+                      className="subscription-manage-modal__text-action"
+                      onClick={() => setStep('frequency')}
+                      type="button"
+                    >
+                      <Pencil className="size-3.5" strokeWidth={1.75} />
+                      <span>{editFrequencyLabel}</span>
+                    </button>
+                  ) : null}
+                </div>
+                {subscription?.intervalLabel ? (
+                  <p className="subscription-manage-modal__detail-value">{subscription.intervalLabel}</p>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
+
           {subscription?.shippingAddressLabel ? (
             <div className="subscription-manage-modal__detail-row">
               <span className="subscription-manage-modal__detail-icon" aria-hidden>

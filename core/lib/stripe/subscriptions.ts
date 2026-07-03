@@ -7,6 +7,13 @@ import { buildSubscriptionShippingMetadata } from '~/lib/checkout/subscription-s
 import type { CheckoutAddressSnapshot } from '~/lib/checkout/types';
 
 import { getStripe } from './client';
+import {
+  formatSubscriptionIntervalKey,
+  getSubscriptionBillingIntervals,
+  intervalsMatch,
+  parseSubscriptionIntervalKey,
+  type SubscriptionBillingInterval,
+} from './subscription-interval';
 import { syncSubscriptionPricingFromBigCommerce } from './sync-subscription-pricing';
 
 const PLACEHOLDER_UNIT_AMOUNT = Number(process.env.STRIPE_SUBSCRIPTION_PLACEHOLDER_UNIT_AMOUNT ?? '50');
@@ -526,4 +533,96 @@ export async function updateSubscriptionShippingAddress({
   const updatedSubscription = await stripe.subscriptions.retrieve(subscriptionId);
 
   await syncSubscriptionPricingFromBigCommerce(updatedSubscription);
+}
+
+function getSubscriptionItemProductId(item: Stripe.SubscriptionItem): string {
+  const product = item.price.product;
+
+  if (typeof product === 'string') {
+    return product;
+  }
+
+  if (!product || product.deleted) {
+    throw new Error('Subscription item is missing a Stripe product');
+  }
+
+  return product.id;
+}
+
+export async function updateSubscriptionFrequency({
+  stripeCustomerId,
+  subscriptionId,
+  intervalKey,
+}: {
+  stripeCustomerId: string;
+  subscriptionId: string;
+  intervalKey: string;
+}): Promise<void> {
+  const billingInterval = parseSubscriptionIntervalKey(intervalKey);
+  const allowedIntervals = getSubscriptionBillingIntervals();
+
+  if (
+    !billingInterval ||
+    !allowedIntervals.some((interval) => intervalsMatch(interval, billingInterval))
+  ) {
+    throw new Error('Invalid delivery frequency');
+  }
+
+  const stripe = getStripe();
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+    expand: ['items.data.price'],
+  });
+  const customerId =
+    typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
+
+  if (customerId !== stripeCustomerId) {
+    throw new Error('Subscription not found');
+  }
+
+  if (subscription.status !== 'active' && subscription.status !== 'trialing') {
+    throw new Error('Unable to update frequency for this subscription');
+  }
+
+  const item = subscription.items.data[0];
+  const recurring = item?.price.recurring;
+
+  if (!item || !recurring) {
+    throw new Error('Subscription item not found');
+  }
+
+  const currentInterval: SubscriptionBillingInterval = {
+    interval: recurring.interval,
+    intervalCount: recurring.interval_count ?? 1,
+  };
+
+  if (intervalsMatch(currentInterval, billingInterval)) {
+    return;
+  }
+
+  const unitAmount = item.price.unit_amount;
+
+  if (unitAmount == null) {
+    throw new Error('Subscription price is unavailable');
+  }
+
+  await stripe.subscriptionItems.update(item.id, {
+    price_data: {
+      currency: item.price.currency,
+      unit_amount: unitAmount,
+      recurring: {
+        interval: billingInterval.interval,
+        interval_count: billingInterval.intervalCount,
+      },
+      product: getSubscriptionItemProductId(item),
+    },
+    quantity: item.quantity ?? 1,
+    proration_behavior: 'none',
+  });
+
+  await stripe.subscriptions.update(subscriptionId, {
+    metadata: {
+      ...subscription.metadata,
+      billing_interval: formatSubscriptionIntervalKey(billingInterval),
+    },
+  });
 }

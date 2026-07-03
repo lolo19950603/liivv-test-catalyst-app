@@ -607,6 +607,25 @@ export default async function SubscriptionsPreviewPage({ params }: Props) {
             phone: checkoutAddressT('phone'),
             saveLabel: t('manageModal.saveAddress'),
           },
+          frequencyLabel: t('manageModal.frequency'),
+          editFrequencyLabel: t('manageModal.editFrequency'),
+          frequencyPickerTitle: t('manageModal.frequencyPickerTitle'),
+          frequencyPickerDescription: t('manageModal.frequencyPickerDescription'),
+          updateFrequencyLabel: t('manageModal.updateFrequency'),
+          updatingFrequencyLabel: t('manageModal.updatingFrequency'),
+          frequencyOptions: [
+            { value: 'week:1', label: t('manageModal.frequencyOptions.week') },
+            { value: 'month:1', label: t('manageModal.frequencyOptions.month') },
+            { value: 'day:14', label: t('manageModal.frequencyOptions.dayPlural', { count: 14 }) },
+            { value: 'day:30', label: t('manageModal.frequencyOptions.dayPlural', { count: 30 }) },
+          ],
+          updateFrequencyAction: async () => ({ success: true }),
+          skipDeliveryLabel: t('manageModal.skipDelivery'),
+          skipDeliveryTitle: t('manageModal.skipDeliveryTitle'),
+          skipDeliveryDescription: t('manageModal.skipDeliveryDescription'),
+          confirmSkipDeliveryLabel: t('manageModal.confirmSkipDelivery'),
+          skippingDeliveryLabel: t('manageModal.skippingDelivery'),
+          skipDeliveryAction: async () => ({ success: true }),
         }}
         pastShipmentsTitle={t('sections.pastShipments')}
         paymentLabel={t('delivery.payment')}

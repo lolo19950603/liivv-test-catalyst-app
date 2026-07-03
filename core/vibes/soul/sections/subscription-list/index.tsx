@@ -33,6 +33,9 @@ export interface SubscriptionListItem {
   shippingAddressLabel?: string;
   shippingAddressGroupNumber?: number;
   shippingAddressKey?: string;
+  frequencyKey?: string;
+  canEditFrequency?: boolean;
+  canSkipDelivery?: boolean;
 }
 
 export interface SubscriptionDeliveryGroup {
@@ -135,6 +138,25 @@ export interface SubscriptionListProps {
     addressFormStates: Array<{ country: string; states: Array<{ label: string; value: string }> }>;
     defaultCountryCode: string;
     addressFormLabels: SubscriptionAddressFormLabels;
+    frequencyLabel: string;
+    editFrequencyLabel: string;
+    frequencyPickerTitle: string;
+    frequencyPickerDescription: string;
+    updateFrequencyLabel: string;
+    updatingFrequencyLabel: string;
+    frequencyOptions: Array<{ value: string; label: string }>;
+    updateFrequencyAction: (
+      subscriptionId: string,
+      intervalKey: string,
+    ) => Promise<{ success: boolean; error?: string }>;
+    skipDeliveryLabel: string;
+    skipDeliveryTitle: string;
+    skipDeliveryDescription: string;
+    confirmSkipDeliveryLabel: string;
+    skippingDeliveryLabel: string;
+    skipDeliveryAction: (
+      subscriptionId: string,
+    ) => Promise<{ success: boolean; error?: string }>;
   };
   updatePaymentLabel?: string;
   updatePaymentAction?: () => Promise<void>;
@@ -1592,6 +1614,17 @@ export function SubscriptionList({
         return;
       }
 
+      const statusKey = item.statusKey;
+      const canEditFrequency =
+        item.canEditFrequency ??
+        (statusKey === 'active' || statusKey === 'scheduled');
+      const canSkipDelivery =
+        item.canSkipDelivery ??
+        (statusKey === 'active' ||
+          statusKey === 'scheduled' ||
+          statusKey === 'past_due' ||
+          statusKey === 'unpaid');
+
       setManagedSubscription({
         id: item.id,
         productName: item.productName,
@@ -1602,6 +1635,9 @@ export function SubscriptionList({
         scheduleDetail: item.scheduleDetail,
         shippingAddressLabel: item.shippingAddressLabel ?? shippingAddressFromDelivery,
         shippingAddressKey: item.shippingAddressKey,
+        frequencyKey: item.frequencyKey,
+        canEditFrequency,
+        canSkipDelivery,
       });
     },
     [allManageableItems, pastGroups, upcomingGroups],
@@ -1734,10 +1770,20 @@ export function SubscriptionList({
         updatingPaymentLabel={
           manageItemOptions?.updatingPaymentLabel ?? 'Updating payment method…'
         }
+        confirmSkipDeliveryLabel={manageItemOptions?.confirmSkipDeliveryLabel ?? 'Skip delivery'}
         defaultBadgeLabel={manageItemOptions?.defaultBadgeLabel ?? 'Default'}
         defaultCountryCode={manageItemOptions?.defaultCountryCode ?? 'US'}
         editAddressLabel={manageItemOptions?.editAddressLabel ?? 'Edit address'}
+        editFrequencyLabel={manageItemOptions?.editFrequencyLabel ?? 'Edit frequency'}
         editPaymentLabel={manageItemOptions?.editPaymentLabel ?? 'Edit payment card'}
+        frequencyLabel={manageItemOptions?.frequencyLabel ?? 'Frequency'}
+        frequencyOptions={manageItemOptions?.frequencyOptions ?? []}
+        frequencyPickerDescription={
+          manageItemOptions?.frequencyPickerDescription ?? 'Choose how often you receive'
+        }
+        frequencyPickerTitle={
+          manageItemOptions?.frequencyPickerTitle ?? 'Select a delivery frequency'
+        }
         goBackLabel={manageItemOptions?.goBackLabel ?? 'Go back'}
         isOpen={managedSubscription != null}
         onClose={() => setManagedSubscription(null)}
@@ -1752,12 +1798,25 @@ export function SubscriptionList({
         savedPaymentMethods={manageItemOptions?.savedPaymentMethods ?? []}
         savedShippingAddresses={manageItemOptions?.savedShippingAddresses ?? []}
         shipToLabel={shipToLabel}
+        skipDeliveryAction={manageItemOptions?.skipDeliveryAction}
+        skipDeliveryDescription={
+          manageItemOptions?.skipDeliveryDescription ??
+          "We'll skip your next shipment and resume on the following cycle."
+        }
+        skipDeliveryLabel={manageItemOptions?.skipDeliveryLabel ?? 'Skip next delivery'}
+        skipDeliveryTitle={manageItemOptions?.skipDeliveryTitle ?? 'Skip next delivery?'}
+        skippingDeliveryLabel={manageItemOptions?.skippingDeliveryLabel ?? 'Skipping delivery…'}
         subscription={managedSubscription ?? undefined}
         title={manageItemOptions?.modalTitle ?? 'Manage subscription'}
         updateAddressLabel={manageItemOptions?.updateAddressLabel ?? 'Update'}
+        updateFrequencyAction={manageItemOptions?.updateFrequencyAction}
+        updateFrequencyLabel={manageItemOptions?.updateFrequencyLabel ?? 'Update'}
         updatePaymentLabel={manageItemOptions?.updatePaymentLabel ?? 'Update'}
         updatePaymentMethodAction={manageItemOptions?.updatePaymentMethodAction}
         updateShippingAddressAction={manageItemOptions?.updateShippingAddressAction}
+        updatingFrequencyLabel={
+          manageItemOptions?.updatingFrequencyLabel ?? 'Updating frequency…'
+        }
       />
     </section>
     </SubscriptionManageClickContext.Provider>

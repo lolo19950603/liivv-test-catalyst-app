@@ -40,6 +40,9 @@ export interface SubscriptionListItem {
   shippingAddressLabel?: string;
   shippingAddressGroupNumber?: number;
   shippingAddressKey?: string;
+  frequencyKey?: string;
+  canEditFrequency?: boolean;
+  canSkipDelivery?: boolean;
 }
 
 export interface SubscriptionDeliveryGroup {
@@ -226,6 +229,13 @@ export function transformCustomerSubscription(
     paymentFailed: isSubscriptionPaymentFailed(subscription.status),
     shippingAddressLabel: subscription.shippingAddressLabel,
     shippingAddressKey: subscription.shippingAddressKey,
+    frequencyKey: `${subscription.interval}:${subscription.intervalCount}`,
+    canEditFrequency: statusKey === 'active' || statusKey === 'scheduled',
+    canSkipDelivery:
+      statusKey === 'active' ||
+      statusKey === 'scheduled' ||
+      statusKey === 'past_due' ||
+      statusKey === 'unpaid',
   };
 }
 
