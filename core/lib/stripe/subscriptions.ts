@@ -363,3 +363,111 @@ export async function createSubscriptionBillingPortalSession({
 
   return session.url;
 }
+
+export async function cancelCustomerSubscription({
+  stripeCustomerId,
+  subscriptionId,
+  cancellationReason,
+}: {
+  stripeCustomerId: string;
+  subscriptionId: string;
+  cancellationReason: string;
+}): Promise<void> {
+  const stripe = getStripe();
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  const customerId =
+    typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
+
+  if (customerId !== stripeCustomerId) {
+    throw new Error('Subscription not found');
+  }
+
+  await stripe.subscriptions.update(subscriptionId, {
+    metadata: {
+      ...subscription.metadata,
+      cancellation_reason: cancellationReason,
+      cancellation_reason_submitted_at: String(Math.floor(Date.now() / 1000)),
+    },
+  });
+
+  await stripe.subscriptions.cancel(subscriptionId);
+}
+
+export async function createSubscriptionCancelPortalSession({
+  stripeCustomerId,
+  subscriptionId,
+  returnUrl,
+}: {
+  stripeCustomerId: string;
+  subscriptionId: string;
+  returnUrl: string;
+}): Promise<string> {
+  const stripe = getStripe();
+  const session = await stripe.billingPortal.sessions.create({
+    customer: stripeCustomerId,
+    return_url: returnUrl,
+    flow_data: {
+      type: 'subscription_cancel',
+      subscription_cancel: {
+        subscription: subscriptionId,
+      },
+    },
+  });
+
+  return session.url;
+}
+
+export async function createSubscriptionPaymentPortalSession({
+  stripeCustomerId,
+  returnUrl,
+}: {
+  stripeCustomerId: string;
+  subscriptionId?: string;
+  returnUrl: string;
+}): Promise<string> {
+  const stripe = getStripe();
+  const session = await stripe.billingPortal.sessions.create({
+    customer: stripeCustomerId,
+    return_url: returnUrl,
+    flow_data: {
+      type: 'payment_method_update',
+    },
+  });
+
+  return session.url;
+}
+
+export async function updateSubscriptionPaymentMethod({
+  stripeCustomerId,
+  subscriptionId,
+  paymentMethodId,
+}: {
+  stripeCustomerId: string;
+  subscriptionId: string;
+  paymentMethodId: string;
+}): Promise<void> {
+  const stripe = getStripe();
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  const customerId =
+    typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
+
+  if (customerId !== stripeCustomerId) {
+    throw new Error('Subscription not found');
+  }
+
+  const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+
+  if (paymentMethod.customer !== stripeCustomerId) {
+    throw new Error('Payment method not found');
+  }
+
+  await stripe.subscriptions.update(subscriptionId, {
+    default_payment_method: paymentMethodId,
+  });
+
+  await stripe.customers.update(stripeCustomerId, {
+    invoice_settings: {
+      default_payment_method: paymentMethodId,
+    },
+  });
+}

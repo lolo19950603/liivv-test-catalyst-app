@@ -479,6 +479,13 @@ export default async function SubscriptionsPreviewPage({ params }: Props) {
 
   const t = await getTranslations('Account.Subscriptions');
 
+  const cancellationReasons = [
+    { value: 'too_expensive', label: t('manageModal.cancelForm.reasons.tooExpensive') },
+    { value: 'found_alternative', label: t('manageModal.cancelForm.reasons.foundAlternative') },
+    { value: 'no_longer_need', label: t('manageModal.cancelForm.reasons.noLongerNeed') },
+    { value: 'other', label: t('manageModal.cancelForm.reasons.other') },
+  ];
+
   return (
     <div className="flex flex-col gap-4">
       <div className="rounded-xl border border-dashed border-[hsl(var(--contrast-300))] bg-[hsl(var(--contrast-50))] px-4 py-3 text-sm text-[hsl(var(--contrast-600))]">
@@ -523,8 +530,38 @@ export default async function SubscriptionsPreviewPage({ params }: Props) {
         frequencyLabel={t('delivery.frequency')}
         manageBillingAction={previewNoopAction}
         manageBillingLabel={t('manage')}
-        manageItemAction={previewNoopSubscriptionAction}
         manageItemLabel={t('manageItem')}
+        manageItemOptions={{
+          modalTitle: t('manageModal.title'),
+          cancelLabel: t('manageModal.cancelSubscription'),
+          cancelFormTitle: t('manageModal.cancelForm.title'),
+          cancellationReasonLabel: t('manageModal.cancelForm.reasonLabel'),
+          cancellationReasonPlaceholder: t('manageModal.cancelForm.reasonPlaceholder'),
+          cancellationReasons,
+          editPaymentLabel: t('manageModal.editPaymentCard'),
+          paymentPickerTitle: t('manageModal.paymentPickerTitle'),
+          paymentPickerDescription: t('manageModal.paymentPickerDescription'),
+          updatePaymentLabel: t('manageModal.updatePayment'),
+          addPaymentMethodLabel: t('manageModal.addPaymentMethod'),
+          goBackLabel: t('manageModal.goBack'),
+          cancellingLabel: t('manageModal.cancelling'),
+          defaultBadgeLabel: t('manageModal.defaultPayment'),
+          cancelAction: previewNoopSubscriptionAction,
+          updatePaymentMethodAction: async () => ({ success: true }),
+          addPaymentMethodAction: previewNoopAction,
+          savedPaymentMethods: [
+            {
+              id: 'pm_preview_1',
+              brand: 'Visa',
+              last4: '4242',
+              expMonth: 4,
+              expYear: 2028,
+              label: 'Visa •••• 4242',
+              expiryLabel: 'Expires 04/2028',
+              isDefault: true,
+            },
+          ],
+        }}
         pastShipmentsTitle={t('sections.pastShipments')}
         paymentLabel={t('delivery.payment')}
         portalSections={mockPortalSections}

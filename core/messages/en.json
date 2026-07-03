@@ -257,6 +257,29 @@
       "title": "Subscriptions",
       "manage": "Manage billing",
       "manageItem": "Edit",
+      "manageModal": {
+        "title": "Manage subscription",
+        "cancelSubscription": "Cancel subscription",
+        "editPaymentCard": "Edit payment card",
+        "paymentPickerTitle": "Select a payment method",
+        "paymentPickerDescription": "Choose a saved card for your",
+        "updatePayment": "Update",
+        "addPaymentMethod": "Add payment method",
+        "goBack": "Go back",
+        "defaultPayment": "Default",
+        "cancelling": "Cancelling subscription…",
+        "cancelForm": {
+          "title": "Cancel your subscription",
+          "reasonLabel": "Reason",
+          "reasonPlaceholder": "Choose an option",
+          "reasons": {
+            "tooExpensive": "It's too expensive",
+            "foundAlternative": "I found an alternative",
+            "noLongerNeed": "I no longer need it",
+            "other": "Other reason"
+          }
+        }
+      },
       "shipmentOn": "Shipping on {date}",
       "endedOn": "Ended on {date}",
       "sections": {
@@ -646,7 +669,10 @@
       "secure": "All transactions are secure and encrypted.",
       "continue": "Continue to payment",
       "submit": "Complete order",
-      "shippingRequired": "Select a shipping method for each order section before continuing to payment."
+      "shippingRequired": "Select a shipping method for each order section before continuing to payment.",
+      "addPaymentMethod": "Add a new payment method",
+      "expires": "Expires {date}",
+      "default": "Default"
     },
     "summary": {
       "orderSummary": "Order summary",

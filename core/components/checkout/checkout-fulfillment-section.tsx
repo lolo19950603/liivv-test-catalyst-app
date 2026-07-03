@@ -18,12 +18,21 @@ import { formatAddressInline, formatAddressMultiline } from '~/lib/checkout/form
 import { useRouter } from '~/i18n/routing';
 
 import { CheckoutAddressModal } from './checkout-address-modal';
-import { CheckoutCompleteOrderButton, CheckoutCompleteOrderButtonPlaceholder } from './checkout-complete-order-button';
+import {
+  CheckoutCompleteOrderButton,
+  CheckoutCompleteOrderButtonPlaceholder,
+  CheckoutCompleteOrderWithSavedPaymentButton,
+} from './checkout-complete-order-button';
 import {
   CheckoutPaymentElement,
   CheckoutPaymentElements,
 } from './checkout-payment-element';
 import { CheckoutPaymentProvider, useCheckoutPayment } from './checkout-payment-provider';
+import {
+  CheckoutSavedPaymentMethods,
+  type CheckoutPaymentMode,
+} from './checkout-saved-payment-methods';
+import type { SavedPaymentMethod } from '~/lib/stripe/payment-methods';
 
 const inputClassName =
   'checkout-field__input w-full rounded-lg border border-[var(--contrast-200,hsl(var(--contrast-200)))] bg-[var(--background,hsl(var(--background)))] px-3 py-2.5 text-sm';
@@ -224,6 +233,7 @@ export interface CheckoutFulfillmentLabels {
   addAddress: string;
   defaultBadge: string;
   paymentSecure: string;
+  addPaymentMethod: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -275,6 +285,7 @@ interface CheckoutFulfillmentSectionProps {
   returnUrl: string;
   shippingReady: boolean;
   shippingRequiredMessage?: string;
+  savedPaymentMethods?: SavedPaymentMethod[];
 }
 
 function Chevron({ open }: { open: boolean }) {
@@ -371,10 +382,19 @@ export function CheckoutFulfillmentSection({
   returnUrl,
   shippingReady,
   shippingRequiredMessage,
+  savedPaymentMethods = [],
 }: CheckoutFulfillmentSectionProps) {
   const router = useRouter();
   const billingRef = useRef<HTMLFormElement>(null);
   const hasAutoApplied = useRef(false);
+  const defaultSavedPaymentMethod =
+    savedPaymentMethods.find((paymentMethod) => paymentMethod.isDefault) ?? savedPaymentMethods[0];
+  const [paymentMode, setPaymentMode] = useState<CheckoutPaymentMode>(
+    defaultSavedPaymentMethod ? 'saved' : 'new',
+  );
+  const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState(
+    defaultSavedPaymentMethod?.id ?? '',
+  );
   const [savedAddresses, setSavedAddresses] = useState(initialSavedAddresses);
   const [billingMode, setBillingMode] = useState<'same' | 'different'>('same');
   const [shipToOpen, setShipToOpen] = useState(false);
@@ -502,6 +522,22 @@ export function CheckoutFulfillmentSection({
     setSavedAddresses(initialSavedAddresses);
   }, [initialSavedAddresses]);
 
+  useEffect(() => {
+    const defaultPaymentMethodId =
+      savedPaymentMethods.find((paymentMethod) => paymentMethod.isDefault)?.id ??
+      savedPaymentMethods[0]?.id;
+
+    if (!defaultPaymentMethodId) {
+      setPaymentMode('new');
+      setSelectedPaymentMethodId('');
+
+      return;
+    }
+
+    setPaymentMode('saved');
+    setSelectedPaymentMethodId(defaultPaymentMethodId);
+  }, [savedPaymentMethods]);
+
   const handleSelectAddress = (shipAddress: CheckoutSavedAddress) => {
     setSelectedAddress(shipAddress);
     setShipToOpen(false);
@@ -562,6 +598,11 @@ export function CheckoutFulfillmentSection({
         paymentTitle={paymentTitle}
         requiresShipping={requiresShipping}
         savedAddresses={savedAddresses}
+        savedPaymentMethods={savedPaymentMethods}
+        paymentMode={paymentMode}
+        selectedPaymentMethodId={selectedPaymentMethodId}
+        setPaymentMode={setPaymentMode}
+        setSelectedPaymentMethodId={setSelectedPaymentMethodId}
         selectedAddress={selectedAddress}
         setAddressModalOpen={setAddressModalOpen}
         setBillingMode={setBillingMode}
@@ -597,6 +638,11 @@ function CheckoutFulfillmentContent({
   paymentTitle,
   requiresShipping,
   savedAddresses,
+  savedPaymentMethods,
+  paymentMode,
+  selectedPaymentMethodId,
+  setPaymentMode,
+  setSelectedPaymentMethodId,
   selectedAddress,
   setAddressModalOpen,
   setBillingMode,
@@ -629,6 +675,11 @@ function CheckoutFulfillmentContent({
   paymentTitle: string;
   requiresShipping: boolean;
   savedAddresses: CheckoutSavedAddress[];
+  savedPaymentMethods: SavedPaymentMethod[];
+  paymentMode: CheckoutPaymentMode;
+  selectedPaymentMethodId: string;
+  setPaymentMode: (mode: CheckoutPaymentMode) => void;
+  setSelectedPaymentMethodId: (paymentMethodId: string) => void;
   selectedAddress: CheckoutSavedAddress | null;
   setAddressModalOpen: (open: boolean) => void;
   setBillingMode: (mode: 'same' | 'different') => void;
@@ -743,7 +794,20 @@ function CheckoutFulfillmentContent({
               {errorMessage ? (
                 <p className="mb-3 text-sm text-[var(--error,hsl(var(--error)))]">{errorMessage}</p>
               ) : null}
-              <CheckoutPaymentElement />
+              <CheckoutSavedPaymentMethods
+                addPaymentMethodLabel={labels.addPaymentMethod}
+                defaultBadgeLabel={labels.defaultBadge}
+                onSelectPaymentMethod={setSelectedPaymentMethodId}
+                onSelectPaymentMode={setPaymentMode}
+                paymentMode={paymentMode}
+                savedPaymentMethods={savedPaymentMethods}
+                selectedPaymentMethodId={selectedPaymentMethodId}
+              />
+              {paymentMode === 'new' || savedPaymentMethods.length === 0 ? (
+                <div className={savedPaymentMethods.length > 0 ? 'mt-4 border-t border-[var(--contrast-200,hsl(var(--contrast-200)))] pt-4' : undefined}>
+                  <CheckoutPaymentElement />
+                </div>
+              ) : null}
             </div>
           </section>
 
@@ -776,12 +840,22 @@ function CheckoutFulfillmentContent({
               </form>
             </div>
 
-            <CheckoutCompleteOrderButton
-              disabled={!shippingReady}
-              disabledMessage={shippingRequiredMessage}
-              onBeforeConfirm={syncBillingFromShipping}
-              submitLabel={submitLabel}
-            />
+            {paymentMode === 'saved' && selectedPaymentMethodId ? (
+              <CheckoutCompleteOrderWithSavedPaymentButton
+                disabled={!shippingReady}
+                disabledMessage={shippingRequiredMessage}
+                onBeforeConfirm={syncBillingFromShipping}
+                paymentMethodId={selectedPaymentMethodId}
+                submitLabel={submitLabel}
+              />
+            ) : (
+              <CheckoutCompleteOrderButton
+                disabled={!shippingReady}
+                disabledMessage={shippingRequiredMessage}
+                onBeforeConfirm={syncBillingFromShipping}
+                submitLabel={submitLabel}
+              />
+            )}
           </section>
         </CheckoutPaymentElements>
       ) : (

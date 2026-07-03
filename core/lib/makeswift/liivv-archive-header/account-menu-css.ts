@@ -33,8 +33,7 @@ export const LIIVV_HEADER_ACCOUNT_MENU_CSS = `
     visibility 0.15s ease;
 }
 
-.liivv-archive-header .header-account-menu.is-open .header-account-menu__panel,
-.liivv-archive-header .header-account-menu:focus-within .header-account-menu__panel {
+.liivv-archive-header .header-account-menu.is-open .header-account-menu__panel {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;

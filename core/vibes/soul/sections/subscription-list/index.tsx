@@ -1,14 +1,16 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 
 import { Button } from '@/vibes/soul/primitives/button';
 import { ButtonLink } from '@/vibes/soul/primitives/button-link';
 import type { ProductImageFallbackLogo } from '@/vibes/soul/primitives/product-card';
+import { SubscriptionManageModal, type SubscriptionManageDetails } from '~/components/subscriptions/subscription-manage-modal';
 import { Image } from '~/components/image';
 import { Link } from '~/components/link';
+import type { SavedPaymentMethod } from '~/lib/stripe/payment-methods';
 
 export interface SubscriptionListItem {
   id: string;
@@ -80,6 +82,32 @@ export interface SubscriptionListProps {
   manageBillingAction?: () => Promise<void>;
   manageItemLabel?: string;
   manageItemAction?: (subscriptionId: string) => Promise<void>;
+  manageItemOptions?: {
+    modalTitle: string;
+    cancelLabel: string;
+    cancelFormTitle: string;
+    cancellationReasonLabel: string;
+    cancellationReasonPlaceholder: string;
+    cancellationReasons: Array<{ value: string; label: string }>;
+    editPaymentLabel: string;
+    paymentPickerTitle: string;
+    paymentPickerDescription: string;
+    updatePaymentLabel: string;
+    addPaymentMethodLabel: string;
+    goBackLabel: string;
+    cancellingLabel: string;
+    defaultBadgeLabel: string;
+    cancelAction: (
+      subscriptionId: string,
+      cancellationReason: string,
+    ) => Promise<{ success: boolean; error?: string }>;
+    updatePaymentMethodAction: (
+      subscriptionId: string,
+      paymentMethodId: string,
+    ) => Promise<{ success: boolean; error?: string }>;
+    addPaymentMethodAction: () => Promise<void>;
+    savedPaymentMethods: SavedPaymentMethod[];
+  };
   updatePaymentLabel?: string;
   updatePaymentAction?: () => Promise<void>;
   skipDeliveryItemLabel?: string;
@@ -108,6 +136,12 @@ export interface SubscriptionListProps {
   emptyStateActionHref?: string;
   message?: string;
   storeLogoFallback?: ProductImageFallbackLogo | null;
+}
+
+const SubscriptionManageClickContext = createContext<((subscriptionId: string) => void) | null>(null);
+
+function useSubscriptionManageClick() {
+  return useContext(SubscriptionManageClickContext);
 }
 
 function SubscriptionSectionToggle({
@@ -284,7 +318,28 @@ function SubscriptionEditLinkAction({
   manageItemLabel?: string;
   className?: string;
 }) {
-  if (!manageItemAction || !manageItemLabel) {
+  const onManageClick = useSubscriptionManageClick();
+
+  if (!manageItemLabel) {
+    return null;
+  }
+
+  if (onManageClick) {
+    return (
+      <button
+        className={clsx(
+          'text-sm font-medium text-[var(--foreground,hsl(var(--foreground)))] underline-offset-4 transition hover:underline',
+          className,
+        )}
+        onClick={() => onManageClick(subscriptionId)}
+        type="button"
+      >
+        {manageItemLabel}
+      </button>
+    );
+  }
+
+  if (!manageItemAction) {
     return null;
   }
 
@@ -309,7 +364,27 @@ function SubscriptionEditAction({
   manageItemLabel?: string;
   className?: string;
 }) {
-  if (!manageItemAction || !manageItemLabel) {
+  const onManageClick = useSubscriptionManageClick();
+
+  if (!manageItemLabel) {
+    return null;
+  }
+
+  if (onManageClick) {
+    return (
+      <Button
+        className={clsx('subscription-edit-action w-full', className)}
+        onClick={() => onManageClick(subscriptionId)}
+        size="small"
+        type="button"
+        variant="tertiary"
+      >
+        {manageItemLabel}
+      </Button>
+    );
+  }
+
+  if (!manageItemAction) {
     return null;
   }
 
@@ -1368,6 +1443,7 @@ export function SubscriptionList({
   manageBillingAction,
   manageItemLabel = 'Edit',
   manageItemAction,
+  manageItemOptions,
   updatePaymentLabel = 'Update payment card and retry',
   updatePaymentAction,
   retryPaymentLabel = 'Retry',
@@ -1464,8 +1540,47 @@ export function SubscriptionList({
     paymentLabel,
     frequencyLabel,
   };
+  const [managedSubscription, setManagedSubscription] = useState<SubscriptionManageDetails | null>(null);
+  const allManageableItems = useMemo(
+    () => [
+      ...activeItems,
+      ...canceledItems,
+      ...upcomingGroups.flatMap((group) => group.deliveries.flatMap((delivery) => delivery.items)),
+      ...pastGroups.flatMap((group) => group.deliveries.flatMap((delivery) => delivery.items)),
+    ],
+    [activeItems, canceledItems, pastGroups, upcomingGroups],
+  );
+  const openManageModal = useCallback(
+    (subscriptionId: string) => {
+      const item = allManageableItems.find((entry) => entry.id === subscriptionId);
+      const shippingAddressFromDelivery = [...upcomingGroups, ...pastGroups]
+        .flatMap((group) => group.deliveries)
+        .find((delivery) => delivery.items.some((entry) => entry.id === subscriptionId))
+        ?.shippingAddressLabel;
+
+      if (!item) {
+        setManagedSubscription({ id: subscriptionId, productName: '' });
+
+        return;
+      }
+
+      setManagedSubscription({
+        id: item.id,
+        productName: item.productName,
+        variantSubtitle: item.variantSubtitle,
+        price: item.price,
+        intervalLabel: item.intervalLabel,
+        paymentMethodLabel: item.paymentMethodLabel,
+        scheduleDetail: item.scheduleDetail,
+        shippingAddressLabel: item.shippingAddressLabel ?? shippingAddressFromDelivery,
+      });
+    },
+    [allManageableItems, pastGroups, upcomingGroups],
+  );
+  const manageClickValue = manageItemOptions ? openManageModal : null;
 
   return (
+    <SubscriptionManageClickContext.Provider value={manageClickValue}>
     <section className={clsx('w-full @container', className)}>
       <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <h1 className="font-[family-name:var(--font-family-heading)] text-4xl font-medium leading-none tracking-tight text-[var(--foreground,hsl(var(--foreground)))]">
@@ -1559,6 +1674,37 @@ export function SubscriptionList({
           )}
         </div>
       ) : null}
+
+      <SubscriptionManageModal
+        addPaymentMethodAction={manageItemOptions?.addPaymentMethodAction}
+        addPaymentMethodLabel={manageItemOptions?.addPaymentMethodLabel ?? 'Add payment method'}
+        cancelAction={manageItemOptions?.cancelAction}
+        cancelFormTitle={manageItemOptions?.cancelFormTitle ?? 'Cancel your subscription'}
+        cancelLabel={manageItemOptions?.cancelLabel ?? 'Cancel subscription'}
+        cancellationReasonLabel={manageItemOptions?.cancellationReasonLabel ?? 'Reason'}
+        cancellationReasonPlaceholder={
+          manageItemOptions?.cancellationReasonPlaceholder ?? 'Choose an option'
+        }
+        cancellationReasons={manageItemOptions?.cancellationReasons ?? []}
+        cancellingLabel={manageItemOptions?.cancellingLabel ?? 'Cancelling subscription…'}
+        defaultBadgeLabel={manageItemOptions?.defaultBadgeLabel ?? 'Default'}
+        editPaymentLabel={manageItemOptions?.editPaymentLabel ?? 'Edit payment card'}
+        goBackLabel={manageItemOptions?.goBackLabel ?? 'Go back'}
+        isOpen={managedSubscription != null}
+        onClose={() => setManagedSubscription(null)}
+        paymentLabel={paymentLabel}
+        paymentPickerDescription={
+          manageItemOptions?.paymentPickerDescription ?? 'Choose a saved card for your'
+        }
+        paymentPickerTitle={manageItemOptions?.paymentPickerTitle ?? 'Select a payment method'}
+        savedPaymentMethods={manageItemOptions?.savedPaymentMethods ?? []}
+        shipToLabel={shipToLabel}
+        subscription={managedSubscription ?? undefined}
+        title={manageItemOptions?.modalTitle ?? 'Manage subscription'}
+        updatePaymentLabel={manageItemOptions?.updatePaymentLabel ?? 'Update'}
+        updatePaymentMethodAction={manageItemOptions?.updatePaymentMethodAction}
+      />
     </section>
+    </SubscriptionManageClickContext.Provider>
   );
 }

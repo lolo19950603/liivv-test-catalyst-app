@@ -731,9 +731,30 @@ function HeaderAccountMenu({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const suppressHoverOpenRef = useRef(false);
+
+  const closeMenu = useCallback(() => {
+    if (closeTimerRef.current != null) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+
+    setOpen(false);
+
+    const activeElement = document.activeElement;
+
+    if (activeElement instanceof HTMLElement && menuRef.current?.contains(activeElement)) {
+      activeElement.blur();
+    }
+  }, []);
 
   const openMenu = useCallback(() => {
+    if (suppressHoverOpenRef.current) {
+      return;
+    }
+
     if (closeTimerRef.current != null) {
       clearTimeout(closeTimerRef.current);
       closeTimerRef.current = null;
@@ -743,6 +764,8 @@ function HeaderAccountMenu({
   }, []);
 
   const scheduleCloseMenu = useCallback(() => {
+    suppressHoverOpenRef.current = false;
+
     if (closeTimerRef.current != null) {
       clearTimeout(closeTimerRef.current);
     }
@@ -763,8 +786,9 @@ function HeaderAccountMenu({
   );
 
   useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+    closeMenu();
+    suppressHoverOpenRef.current = true;
+  }, [pathname, closeMenu]);
 
   if (links.length === 0) {
     return (
@@ -784,6 +808,7 @@ function HeaderAccountMenu({
       className={clsx('header-account-menu', open && 'is-open')}
       onMouseEnter={openMenu}
       onMouseLeave={scheduleCloseMenu}
+      ref={menuRef}
     >
       <Link
         aria-controls={panelId}
@@ -820,6 +845,7 @@ function HeaderAccountMenu({
               )}
               href={link.href}
               key={link.href}
+              onClick={closeMenu}
               prefetch={link.prefetch}
               role="menuitem"
             >

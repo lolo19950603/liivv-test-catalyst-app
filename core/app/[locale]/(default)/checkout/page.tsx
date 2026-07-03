@@ -27,6 +27,11 @@ import {
 } from '~/lib/checkout/subscription-lines';
 import { buildAppUrl } from '~/lib/stripe/config';
 import { isStripeConfigured } from '~/lib/stripe/client';
+import {
+  findStripeCustomerIdByEmail,
+  resolveStripeCustomerId,
+} from '~/lib/stripe/customers';
+import { getCustomerSavedPaymentMethods } from '~/lib/stripe/payment-methods';
 import { getCartId } from '~/lib/cart';
 import { buildCheckoutSummarySections } from '~/lib/checkout/build-checkout-summary';
 import type { CheckoutDisplayLineInput } from '~/lib/checkout/build-checkout-summary';
@@ -56,6 +61,7 @@ const BILLING_FORM_ID = 'custom-checkout-billing-form';
 const CheckoutPageCustomerQuery = graphql(`
   query CheckoutPageCustomerQuery {
     customer {
+      entityId
       firstName
       lastName
       email
@@ -365,6 +371,13 @@ export default async function CheckoutPage({ params }: Props) {
   }));
 
   const addressData = await getCustomerAddresses({ limit: 50 });
+  const stripeCustomerId = customer
+    ? (await resolveStripeCustomerId(customer.entityId)) ??
+      (customer.email ? await findStripeCustomerIdByEmail(customer.email) : null)
+    : null;
+  const savedPaymentMethods = stripeCustomerId
+    ? await getCustomerSavedPaymentMethods(stripeCustomerId)
+    : [];
   const savedAddresses = (addressData?.addresses ?? []).map((entry, index) => ({
     id: entry.entityId.toString(),
     firstName: entry.firstName,
@@ -487,6 +500,7 @@ export default async function CheckoutPage({ params }: Props) {
             addAddress: t('address.add'),
             defaultBadge: t('address.default'),
             paymentSecure: t('payment.secure'),
+            addPaymentMethod: t('payment.addPaymentMethod'),
             firstName: t('billing.firstName'),
             lastName: t('billing.lastName'),
             email: t('billing.email'),
@@ -506,6 +520,7 @@ export default async function CheckoutPage({ params }: Props) {
           requiresShipping={requiresShippingAddress}
           returnUrl={buildAppUrl('/checkout/success/', locale)}
           savedAddresses={savedAddresses}
+          savedPaymentMethods={savedPaymentMethods}
           states={statesOrProvinces}
           shippingReady={shippingReady}
           shippingRequiredMessage={

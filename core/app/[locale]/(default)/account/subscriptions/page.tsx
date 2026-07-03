@@ -5,7 +5,11 @@ import { SubscriptionList } from '@/vibes/soul/sections/subscription-list';
 import { groupSubscriptionsForPortal } from '~/lib/stripe/transform-customer-subscriptions';
 
 import { openBillingPortal } from './_actions/open-billing-portal';
-import { openSubscriptionPortal } from './_actions/open-subscription-portal';
+import { cancelSubscriptionAction } from './_actions/cancel-subscription';
+import {
+  openAddPaymentMethodPortal,
+} from './_actions/open-subscription-manage-portal';
+import { updateSubscriptionPaymentMethodAction } from './_actions/update-subscription-payment-method';
 import { retrySubscriptionPaymentItem } from './_actions/retry-subscription-payment';
 import { skipSubscriptionDeliveryItem } from './_actions/skip-subscription-delivery';
 import { getSubscriptionsPageData } from './page-data';
@@ -71,6 +75,13 @@ export default async function SubscriptionsPage({ params }: Props) {
     productImagesByEntityId: data.productImagesByEntityId,
   });
 
+  const cancellationReasons = [
+    { value: 'too_expensive', label: t('manageModal.cancelForm.reasons.tooExpensive') },
+    { value: 'found_alternative', label: t('manageModal.cancelForm.reasons.foundAlternative') },
+    { value: 'no_longer_need', label: t('manageModal.cancelForm.reasons.noLongerNeed') },
+    { value: 'other', label: t('manageModal.cancelForm.reasons.other') },
+  ];
+
   return (
     <SubscriptionList
       activeSectionTitle={t('sections.active')}
@@ -87,8 +98,27 @@ export default async function SubscriptionsPage({ params }: Props) {
       emptyStateTitle={t('empty.title')}
       manageBillingAction={openBillingPortal}
       manageBillingLabel={t('manage')}
-      manageItemAction={openSubscriptionPortal}
       manageItemLabel={t('manageItem')}
+      manageItemOptions={{
+        modalTitle: t('manageModal.title'),
+        cancelLabel: t('manageModal.cancelSubscription'),
+        cancelFormTitle: t('manageModal.cancelForm.title'),
+        cancellationReasonLabel: t('manageModal.cancelForm.reasonLabel'),
+        cancellationReasonPlaceholder: t('manageModal.cancelForm.reasonPlaceholder'),
+        cancellationReasons,
+        editPaymentLabel: t('manageModal.editPaymentCard'),
+        paymentPickerTitle: t('manageModal.paymentPickerTitle'),
+        paymentPickerDescription: t('manageModal.paymentPickerDescription'),
+        updatePaymentLabel: t('manageModal.updatePayment'),
+        addPaymentMethodLabel: t('manageModal.addPaymentMethod'),
+        goBackLabel: t('manageModal.goBack'),
+        cancellingLabel: t('manageModal.cancelling'),
+        defaultBadgeLabel: t('manageModal.defaultPayment'),
+        cancelAction: cancelSubscriptionAction,
+        updatePaymentMethodAction: updateSubscriptionPaymentMethodAction,
+        addPaymentMethodAction: openAddPaymentMethodPortal,
+        savedPaymentMethods: data.savedPaymentMethods,
+      }}
       portalSections={portalSections}
       shipToLabel={t('delivery.shipTo')}
       storeLogoFallback={storeLogoFallback}

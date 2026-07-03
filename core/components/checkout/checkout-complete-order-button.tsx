@@ -183,3 +183,89 @@ export function CheckoutCompleteOrderButton({
     />
   );
 }
+
+interface CheckoutCompleteOrderWithSavedPaymentButtonProps extends CheckoutCompleteOrderButtonProps {
+  paymentMethodId: string;
+}
+
+export function CheckoutCompleteOrderWithSavedPaymentButton({
+  submitLabel,
+  disabled = false,
+  disabledMessage,
+  onBeforeConfirm,
+  paymentMethodId,
+}: CheckoutCompleteOrderWithSavedPaymentButtonProps) {
+  const stripe = useStripe();
+  const {
+    clientSecret,
+    errorMessage,
+    isInitializing,
+    prepareOrderConfirmation,
+    refreshPaymentIntent,
+    returnUrl,
+    setConfirmError,
+  } = useCheckoutPayment();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleClick = async () => {
+    if (!stripe || !clientSecret || !paymentMethodId || disabled) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setConfirmError(null);
+
+    try {
+      onBeforeConfirm?.();
+      await prepareOrderConfirmation();
+
+      const checkoutMode = getCheckoutStripeModeFromClientSecret(clientSecret);
+      const confirmParams = {
+        payment_method: paymentMethodId,
+        return_url: returnUrl,
+      };
+
+      const result =
+        checkoutMode === 'setup'
+          ? await stripe.confirmSetup({
+              clientSecret,
+              confirmParams,
+            })
+          : await stripe.confirmPayment({
+              clientSecret,
+              confirmParams,
+            });
+
+      if (result.error) {
+        setConfirmError(result.error.message ?? 'Payment failed');
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to complete order';
+
+      if (message.toLowerCase().includes('payment session expired')) {
+        try {
+          await refreshPaymentIntent();
+        } catch {
+          // refreshPaymentIntent already sets a user-facing error message
+        }
+      }
+
+      setConfirmError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <CheckoutCompleteOrderButtonShell
+      disabled={disabled || !clientSecret || !stripe || !paymentMethodId}
+      disabledMessage={disabledMessage}
+      errorMessage={errorMessage}
+      isLoading={isSubmitting || isInitializing}
+      onClick={() => {
+        void handleClick();
+      }}
+      submitLabel={submitLabel}
+    />
+  );
+}

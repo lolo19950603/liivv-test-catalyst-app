@@ -22,6 +22,8 @@ import {
   getCustomerSubscriptions,
   getStripeCustomerShippingAddress,
 } from '~/lib/stripe/subscriptions';
+import { getCustomerSavedPaymentMethods } from '~/lib/stripe/payment-methods';
+import type { SavedPaymentMethod } from '~/lib/stripe/payment-methods';
 
 const SubscriptionsCustomerQuery = graphql(`
   query SubscriptionsCustomerQuery {
@@ -40,6 +42,7 @@ export type SubscriptionsPageResult =
       subscriptions: Awaited<ReturnType<typeof getCustomerSubscriptions>>;
       finalizedShipments: FinalizedShipmentRecord[];
       productImagesByEntityId: Map<number, { src: string; alt: string }>;
+      savedPaymentMethods: SavedPaymentMethod[];
     }
   | { kind: 'not-configured' }
   | { kind: 'customer-not-found' }
@@ -97,12 +100,13 @@ export const getSubscriptionsPageData = cache(async (): Promise<SubscriptionsPag
         .filter((productEntityId): productEntityId is number => productEntityId != null),
     ),
   ];
-  const [productsResult, addressData, stripeCustomerShipping, variantDisplaysBySubscriptionId] =
+  const [productsResult, addressData, stripeCustomerShipping, variantDisplaysBySubscriptionId, savedPaymentMethods] =
     await Promise.all([
       productEntityIds.length > 0 ? getProductsByIds({ entityIds: productEntityIds }) : null,
       getCustomerAddresses({ limit: 50 }),
       getStripeCustomerShippingAddress(stripeCustomerId),
       resolveSubscriptionVariantDisplays(refreshedSubscriptions),
+      getCustomerSavedPaymentMethods(stripeCustomerId),
     ]);
   const productImagesByEntityId = new Map<
     number,
@@ -179,6 +183,7 @@ export const getSubscriptionsPageData = cache(async (): Promise<SubscriptionsPag
     subscriptions: enrichedSubscriptions,
     finalizedShipments,
     productImagesByEntityId,
+    savedPaymentMethods,
   };
 });
 
