@@ -236,6 +236,7 @@ export function transformCustomerSubscription(
       statusKey === 'scheduled' ||
       statusKey === 'past_due' ||
       statusKey === 'unpaid',
+    isCanceled: statusKey === 'canceled',
   };
 }
 

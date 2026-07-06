@@ -200,56 +200,51 @@
       "signOut": "Sign out",
       "notifications": "Notifications",
       "cart": "Cart",
+      "search": "Search",
       "guestName": "Member",
       "myAccount": "My Account",
       "accountSettings": "Account settings",
-      "featuredNav": {
-        "prescriptions": "My Prescriptions",
-        "appointments": "My Appointments",
-        "metrics": "My Metric"
-      },
-      "megaNav": {
-        "healthDashboard": "My Health Dashboard",
-        "digitalPharmacy": "Digital Pharmacy",
-        "featuredServices": "Featured Services",
-        "bookHealthServices": "Book Health Services",
-        "healthResources": "Health Resources",
+      "sidebar": {
+        "home": "Home",
         "orders": "Orders",
-        "rewards": "Rewards"
+        "shop": "Shop",
+        "loyalty": "Loyalty",
+        "settings": "Account settings",
+        "help": "Help"
       },
-      "healthCenter": {
-        "greeting": {
-          "morning": "Good morning, {name}",
-          "afternoon": "Good afternoon, {name}",
-          "evening": "Good evening, {name}"
-        },
-        "welcomeLead": "Welcome to your Health Dashboard, where you can manage all your health needs.",
-        "prescriptions": {
-          "title": "My prescriptions",
-          "heading": "Save time, refill online.",
-          "description": "Refill or renew an existing prescription online when you set up your prescriptions. Plus, keep track of your medications in one place, view your prescription history, and more.",
-          "cta": "Set up my prescriptions"
-        },
-        "appointments": {
-          "title": "My appointments",
-          "heading": "How can we help?",
-          "description": "Book an appointment with your Pharmacist or get rehabilitation support from a trained healthcare provider.",
-          "cta": "Book Now"
-        },
-        "quickLinksTitle": "My health quick links",
-        "quickLinks": {
-          "prescriptions": {
-            "title": "My Prescriptions",
-            "description": "Refill, renew, and manage your prescriptions with ease."
+      "wellness": {
+        "greeting": "Hi {name},",
+        "welcomeLead": "Let's focus on your Liivv wellness journey.",
+        "hero": {
+          "basedOnSelection": "Based on your onboarding selection",
+          "title": "Ostomy Care",
+          "subtitle": "Products, treatment, or everyday wellness support.",
+          "dailyTips": {
+            "title": "Daily Ostomy Tips",
+            "description": "Practical guidance to help you feel confident and comfortable every day."
           },
-          "appointments": {
-            "title": "Appointments",
-            "description": "Book, view, and stay on top of all your health appointments."
+          "yourSupplies": {
+            "title": "Your Supplies",
+            "description": "Reorder essentials and keep your care routine on track."
           },
-          "metrics": {
-            "title": "Metrics",
-            "description": "Track and review your health metrics in one place."
+          "exploreMore": "Explore care resources",
+          "tabs": {
+            "diabetes": "Diabetes",
+            "sleepRest": "Sleep + Rest",
+            "changeSelection": "Change Your Selection"
           }
+        },
+        "actionCenter": {
+          "subscriptionTitle": "Your Next Subscription",
+          "subscriptionManage": "Manage Your Subscriptions",
+          "subscriptionEmpty": "No upcoming deliveries",
+          "orderHistory": "Order History"
+        },
+        "virtualCare": {
+          "title": "Virtual Care",
+          "consulting": "19+ Minor Ailment Consulting — Book Now",
+          "carePack": "CarePack — Never Forget Another Dose",
+          "pharmacy": "My Pharmacy — Manage my RXs"
         }
       }
     },
@@ -300,6 +295,8 @@
         "skipDeliveryDescription": "We'll skip your next shipment and resume on the following cycle. You won't be charged for the skipped delivery.",
         "confirmSkipDelivery": "Skip delivery",
         "skippingDelivery": "Skipping delivery…",
+        "reactivateSubscription": "Re-activate subscription",
+        "reactivatingSubscription": "Re-activating subscription…",
         "cancelForm": {
           "title": "Cancel your subscription",
           "reasonLabel": "Reason",

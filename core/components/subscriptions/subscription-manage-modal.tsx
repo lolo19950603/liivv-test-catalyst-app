@@ -40,6 +40,7 @@ export interface SubscriptionManageDetails {
   frequencyKey?: string;
   canEditFrequency?: boolean;
   canSkipDelivery?: boolean;
+  isCanceled?: boolean;
 }
 
 export interface FrequencyOption {
@@ -90,6 +91,8 @@ export interface SubscriptionManageModalProps {
   skipDeliveryDescription: string;
   confirmSkipDeliveryLabel: string;
   skippingDeliveryLabel: string;
+  reactivateLabel: string;
+  reactivatingLabel: string;
   defaultBadgeLabel: string;
   shipToLabel: string;
   paymentLabel: string;
@@ -118,6 +121,9 @@ export interface SubscriptionManageModalProps {
     intervalKey: string,
   ) => Promise<{ success: boolean; error?: string }>;
   skipDeliveryAction?: (
+    subscriptionId: string,
+  ) => Promise<{ success: boolean; error?: string }>;
+  reactivateAction?: (
     subscriptionId: string,
   ) => Promise<{ success: boolean; error?: string }>;
   savedShippingAddresses?: SavedShippingAddress[];
@@ -319,6 +325,8 @@ export function SubscriptionManageModal({
   skipDeliveryDescription,
   confirmSkipDeliveryLabel,
   skippingDeliveryLabel,
+  reactivateLabel,
+  reactivatingLabel,
   defaultBadgeLabel,
   shipToLabel,
   paymentLabel,
@@ -332,6 +340,7 @@ export function SubscriptionManageModal({
   saveAndApplyAddressAction,
   updateFrequencyAction,
   skipDeliveryAction,
+  reactivateAction,
   savedShippingAddresses = [],
   addressFormCountries = [],
   addressFormStates = [],
@@ -351,6 +360,7 @@ export function SubscriptionManageModal({
   const [isUpdatingAddress, startAddressUpdate] = useTransition();
   const [isUpdatingFrequency, startFrequencyUpdate] = useTransition();
   const [isSkippingDelivery, startSkipDelivery] = useTransition();
+  const [isReactivating, startReactivate] = useTransition();
   const [isCancelling, startCancel] = useTransition();
   const [isSavingPayment, setIsSavingPayment] = useState(false);
   const subscriptionId = subscription?.id;
@@ -361,10 +371,14 @@ export function SubscriptionManageModal({
     isUpdatingAddress ||
     isUpdatingFrequency ||
     isSkippingDelivery ||
+    isReactivating ||
     isSavingPayment;
+  const isCanceled = Boolean(subscription?.isCanceled);
   const canEditFrequency =
+    !isCanceled &&
     Boolean(subscription?.canEditFrequency && updateFrequencyAction && frequencyOptions.length > 0);
-  const canSkipDelivery = Boolean(subscription?.canSkipDelivery && skipDeliveryAction);
+  const canSkipDelivery = !isCanceled && Boolean(subscription?.canSkipDelivery && skipDeliveryAction);
+  const canReactivate = isCanceled && Boolean(reactivateAction);
 
   useEffect(() => {
     if (!isOpen) {
@@ -561,6 +575,26 @@ export function SubscriptionManageModal({
 
       if (!result.success) {
         setErrorMessage(result.error ?? 'Unable to skip delivery');
+
+        return;
+      }
+
+      router.refresh();
+      handleClose();
+    });
+  };
+
+  const handleReactivate = () => {
+    if (!subscriptionId || !reactivateAction) {
+      return;
+    }
+
+    startReactivate(async () => {
+      setErrorMessage(null);
+      const result = await reactivateAction(subscriptionId);
+
+      if (!result.success) {
+        setErrorMessage(result.error ?? 'Unable to reactivate subscription');
 
         return;
       }
@@ -880,6 +914,7 @@ export function SubscriptionManageModal({
   if (step === 'menu') {
     return (
       <SubscriptionManageModalShell
+        blockingMessage={reactivatingLabel}
         footer={
           <div className="subscription-manage-modal__menu-footer">
             {canSkipDelivery ? (
@@ -892,15 +927,27 @@ export function SubscriptionManageModal({
                 <span>{skipDeliveryLabel}</span>
               </button>
             ) : null}
-            <button
-              className="subscription-manage-modal__cancel-button"
-              onClick={() => setStep('cancel')}
-              type="button"
-            >
-              {cancelLabel}
-            </button>
+            {canReactivate ? (
+              <button
+                className="subscription-manage-modal__secondary-button w-full"
+                disabled={isReactivating}
+                onClick={handleReactivate}
+                type="button"
+              >
+                {reactivateLabel}
+              </button>
+            ) : (
+              <button
+                className="subscription-manage-modal__cancel-button"
+                onClick={() => setStep('cancel')}
+                type="button"
+              >
+                {cancelLabel}
+              </button>
+            )}
           </div>
         }
+        isBlocking={isReactivating}
         isOpen={isOpen}
         onClose={handleClose}
         title={modalTitle}
@@ -1013,6 +1060,8 @@ export function SubscriptionManageModal({
             </button>
           )}
         </div>
+
+        {errorMessage ? <p className="subscription-manage-modal__error">{errorMessage}</p> : null}
       </SubscriptionManageModalShell>
     );
   }

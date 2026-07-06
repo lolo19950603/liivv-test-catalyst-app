@@ -403,6 +403,124 @@ export async function cancelCustomerSubscription({
   await stripe.subscriptions.cancel(subscriptionId);
 }
 
+async function resolveSubscriptionPaymentMethodId(
+  stripe: ReturnType<typeof getStripe>,
+  stripeCustomerId: string,
+  subscription: Stripe.Subscription,
+): Promise<string> {
+  const subscriptionPaymentMethodId =
+    typeof subscription.default_payment_method === 'string'
+      ? subscription.default_payment_method
+      : subscription.default_payment_method?.id;
+
+  if (subscriptionPaymentMethodId) {
+    return subscriptionPaymentMethodId;
+  }
+
+  const customer = await stripe.customers.retrieve(stripeCustomerId);
+
+  if ('deleted' in customer && customer.deleted) {
+    throw new Error('Payment method not found');
+  }
+
+  const customerPaymentMethodId =
+    typeof customer.invoice_settings?.default_payment_method === 'string'
+      ? customer.invoice_settings.default_payment_method
+      : customer.invoice_settings?.default_payment_method?.id;
+
+  if (!customerPaymentMethodId) {
+    throw new Error('Payment method not found');
+  }
+
+  return customerPaymentMethodId;
+}
+
+export async function reactivateCustomerSubscription({
+  stripeCustomerId,
+  subscriptionId,
+}: {
+  stripeCustomerId: string;
+  subscriptionId: string;
+}): Promise<{ subscriptionId: string }> {
+  const stripe = getStripe();
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+    expand: ['items.data.price.product', 'default_payment_method'],
+  });
+  const customerId =
+    typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
+
+  if (customerId !== stripeCustomerId) {
+    throw new Error('Subscription not found');
+  }
+
+  if (
+    (subscription.status === 'active' || subscription.status === 'trialing') &&
+    (subscription.cancel_at_period_end || subscription.cancel_at)
+  ) {
+    await stripe.subscriptions.update(subscriptionId, {
+      cancel_at_period_end: false,
+      cancel_at: null,
+      metadata: {
+        ...subscription.metadata,
+        cancellation_reason: '',
+        cancellation_reason_submitted_at: '',
+      },
+    });
+
+    return { subscriptionId };
+  }
+
+  if (subscription.status !== 'canceled') {
+    throw new Error('Unable to reactivate this subscription');
+  }
+
+  const item = subscription.items.data[0];
+  const recurring = item?.price.recurring;
+
+  if (!item || !recurring) {
+    throw new Error('Subscription item not found');
+  }
+
+  const unitAmount = item.price.unit_amount;
+
+  if (unitAmount == null) {
+    throw new Error('Subscription price is unavailable');
+  }
+
+  const paymentMethodId = await resolveSubscriptionPaymentMethodId(
+    stripe,
+    stripeCustomerId,
+    subscription,
+  );
+  const metadata = { ...subscription.metadata };
+
+  delete metadata.cancellation_reason;
+  delete metadata.cancellation_reason_submitted_at;
+
+  const newSubscription = await stripe.subscriptions.create({
+    customer: stripeCustomerId,
+    default_payment_method: paymentMethodId,
+    items: [
+      {
+        quantity: item.quantity ?? 1,
+        price_data: {
+          currency: item.price.currency,
+          unit_amount: unitAmount,
+          recurring: {
+            interval: recurring.interval,
+            interval_count: recurring.interval_count ?? 1,
+          },
+          product: getSubscriptionItemProductId(item),
+        },
+      },
+    ],
+    metadata,
+    proration_behavior: 'none',
+  });
+
+  return { subscriptionId: newSubscription.id };
+}
+
 export async function createSubscriptionCancelPortalSession({
   stripeCustomerId,
   subscriptionId,

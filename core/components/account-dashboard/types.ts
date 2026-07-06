@@ -1,48 +1,51 @@
-export type DashboardPanelId =
-  | 'main'
-  | 'health-profile'
-  | 'pharmacy'
-  | 'insurance'
-  | 'rewards'
-  | 'orders'
-  | 'subscriptions';
-
 export interface AccountDashboardLabels {
   signOut: string;
   notifications: string;
   cart: string;
   myAccount: string;
   accountSettings: string;
-  featuredNav: {
-    prescriptions: string;
-    appointments: string;
-    metrics: string;
+  search: string;
+  sidebar: {
+    home: string;
+    orders: string;
+    shop: string;
+    loyalty: string;
+    settings: string;
+    help: string;
   };
-  megaNav: string[];
-  healthCenter: {
-    greeting: {
-      morning: string;
-      afternoon: string;
-      evening: string;
-    };
+  wellness: {
+    greeting: string;
     welcomeLead: string;
-    prescriptions: {
+    hero: {
+      basedOnSelection: string;
       title: string;
-      heading: string;
-      description: string;
-      cta: string;
+      subtitle: string;
+      dailyTips: {
+        title: string;
+        description: string;
+      };
+      yourSupplies: {
+        title: string;
+        description: string;
+      };
+      exploreMore: string;
+      tabs: {
+        diabetes: string;
+        sleepRest: string;
+        changeSelection: string;
+      };
     };
-    appointments: {
+    actionCenter: {
+      subscriptionTitle: string;
+      subscriptionManage: string;
+      subscriptionEmpty: string;
+      orderHistory: string;
+    };
+    virtualCare: {
       title: string;
-      heading: string;
-      description: string;
-      cta: string;
-    };
-    quickLinksTitle: string;
-    quickLinks: {
-      prescriptions: { title: string; description: string };
-      appointments: { title: string; description: string };
-      metrics: { title: string; description: string };
+      consulting: string;
+      carePack: string;
+      pharmacy: string;
     };
   };
 }
@@ -51,6 +54,12 @@ export interface AccountDashboardProps {
   customerName: string;
   cartHref: string;
   ordersHref: string;
+  subscriptionsHref: string;
+  shopHref: string;
+  loyaltyHref: string;
+  settingsHref: string;
+  contactHref: string;
   logoutHref: string;
+  nextSubscriptionDate: string | null;
   labels: AccountDashboardLabels;
 }

@@ -1,3 +1,176 @@
+export function IconSearch({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20l-3.5-3.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function IconHome({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function IconOrders({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M4 7h16l-1.2 10.2a1 1 0 0 1-1 .8H6.2a1 1 0 0 1-1-.8L4 7Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M9 11v4M15 11v4M8 7V5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" strokeLinecap="round" />
+      <circle cx="12" cy="4" fill="currentColor" r="1.25" stroke="none" />
+    </svg>
+  );
+}
+
+export function IconShop({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M3 5h2l2.2 11.4a1 1 0 0 0 1 .8h9.6a1 1 0 0 0 1-.8L20 9H7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="10" cy="20" r="1.25" />
+      <circle cx="17" cy="20" r="1.25" />
+    </svg>
+  );
+}
+
+export function IconLoyalty({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 4.5 13.8 9h4.7l-3.8 2.8 1.5 4.7L12 14.8 7.8 16.5l1.5-4.7L5.5 9h4.7L12 4.5Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function IconLock({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect height="10" rx="2" width="14" x="5" y="11" />
+      <path d="M8 11V8a4 4 0 1 1 8 0v3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function IconInfo({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 10v6M12 7h.01" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function IconCrown({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M4 18h16M6 18l1.2-8 4.8 4 4.8-4L18 18M6 10l2-5 4 3 4-3 2 5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function IconSupplies({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect height="12" rx="2" width="14" x="5" y="8" />
+      <path d="M9 8V6a3 3 0 0 1 6 0v2" strokeLinecap="round" />
+      <path d="M12 12v4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function IconBell({ className }: { className?: string }) {
   return (
     <svg

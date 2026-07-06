@@ -11,12 +11,16 @@ import {
 } from './dashboard-styles';
 import { HealthDashboardMain } from './health-dashboard-main';
 import {
-  IconAppointment,
   IconBell,
   IconCart,
   IconChevronDown,
-  IconMetric,
-  IconPrescription,
+  IconHome,
+  IconInfo,
+  IconLock,
+  IconLoyalty,
+  IconOrders,
+  IconSearch,
+  IconShop,
 } from './icons';
 import type { AccountDashboardProps } from './types';
 
@@ -36,8 +40,15 @@ function initialsFromName(name: string): string {
 export function AccountDashboardPortal({
   customerName,
   cartHref,
-  logoutHref,
+  contactHref,
   labels,
+  logoutHref,
+  loyaltyHref,
+  nextSubscriptionDate,
+  ordersHref,
+  settingsHref,
+  shopHref,
+  subscriptionsHref,
 }: AccountDashboardProps) {
   const [accountOpen, setAccountOpen] = useState(false);
   const accountRef = useRef<HTMLDivElement>(null);
@@ -57,7 +68,6 @@ export function AccountDashboardPortal({
     };
   }, []);
 
-  /** Sweep-fill hover (top → bottom on enter, exits bottom on leave) shared with rich-text-lower CTA. */
   useEffect(() => {
     if (rootRef.current == null) {
       return;
@@ -91,105 +101,144 @@ export function AccountDashboardPortal({
         id={ACCOUNT_DASHBOARD_ROOT_ID}
         ref={rootRef}
       >
-        <header className="mhd-header">
-          <div className="mhd-header__top">
-            <Link aria-label="Liivv" className="mhd-logo" href="/">
+        <div className="mhd-shell">
+          <aside aria-label="Account navigation" className="mhd-sidebar">
+            <Link aria-label="Liivv" className="mhd-sidebar__logo" href="/">
               <img
                 alt="Liivv"
-                className="mhd-logo__img"
-                height={40}
+                className="mhd-sidebar__logo-img"
+                height={32}
                 src="https://storage.googleapis.com/s.mkswft.com/RmlsZTo4NWQ4MGJiNi03MDZjLTQ4MWEtOGFmNi1kNDI2ZjBlNDYwOTQ=/Liivv_Favicon.png"
-                width={40}
+                width={32}
               />
+              <span className="mhd-sidebar__logo-text">Liivv</span>
             </Link>
 
-            <nav aria-label="Featured services" className="mhd-header__services">
-              <FeaturedServiceLink icon={<IconPrescription />} label={labels.featuredNav.prescriptions} />
-              <FeaturedServiceLink icon={<IconAppointment />} label={labels.featuredNav.appointments} />
-              <FeaturedServiceLink icon={<IconMetric />} label={labels.featuredNav.metrics} />
+            <nav aria-label="Primary" className="mhd-sidebar__nav">
+              <SidebarLink
+                active
+                href="/account/dashboard/"
+                icon={<IconHome />}
+                label={labels.sidebar.home}
+              />
+              <SidebarLink href={ordersHref} icon={<IconOrders />} label={labels.sidebar.orders} />
+              <SidebarLink href={shopHref} icon={<IconShop />} label={labels.sidebar.shop} />
+              <SidebarLink href={loyaltyHref} icon={<IconLoyalty />} label={labels.sidebar.loyalty} />
             </nav>
 
-            <div className="mhd-header__account">
-              <button
-                aria-expanded={false}
-                aria-label={labels.notifications}
-                className="mhd-icon-btn"
-                type="button"
-              >
-                <IconBell />
-                <span className="mhd-badge">3</span>
-              </button>
-              <Link aria-label={labels.cart} className="mhd-icon-btn" href={cartHref}>
-                <IconCart />
-              </Link>
+            <nav aria-label="Secondary" className="mhd-sidebar__footer">
+              <SidebarLink href={settingsHref} icon={<IconLock />} label={labels.sidebar.settings} />
+              <SidebarLink href={contactHref} icon={<IconInfo />} label={labels.sidebar.help} />
+            </nav>
+          </aside>
 
-              <div className="mhd-account-wrap" ref={accountRef}>
+          <div className="mhd-content">
+            <header className="mhd-content-header">
+              <div className="mhd-content-header__greeting">
+                <h1 className="mhd-greeting__title">{labels.wellness.greeting}</h1>
+                <p className="mhd-greeting__lead">{labels.wellness.welcomeLead}</p>
+              </div>
+
+              <div className="mhd-content-header__utilities">
+                <Link aria-label={labels.search} className="mhd-icon-btn" href={shopHref}>
+                  <IconSearch />
+                </Link>
                 <button
-                  aria-expanded={accountOpen}
-                  aria-haspopup="menu"
-                  className="mhd-account-btn"
-                  onClick={() => setAccountOpen((open) => !open)}
+                  aria-expanded={false}
+                  aria-label={labels.notifications}
+                  className="mhd-icon-btn"
                   type="button"
                 >
-                  <span aria-hidden className="mhd-avatar">
-                    {avatarInitials}
-                  </span>
-                  {labels.myAccount}
-                  <IconChevronDown className="mhd-chevron" />
+                  <IconBell />
+                  <span className="mhd-badge">3</span>
                 </button>
-                <ul className="mhd-account-menu" hidden={!accountOpen} role="menu">
-                  <li role="none">
-                    <Link href="/account/settings/" onClick={() => setAccountOpen(false)} role="menuitem">
-                      {labels.accountSettings}
-                    </Link>
-                  </li>
-                  <li role="none">
-                    <Link href={logoutHref} onClick={() => setAccountOpen(false)} prefetch="none" role="menuitem">
-                      {labels.signOut}
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
+                <Link aria-label={labels.cart} className="mhd-icon-btn" href={cartHref}>
+                  <IconCart />
+                </Link>
 
-          <nav aria-label="Main navigation" className="mhd-mega-nav">
-            <ul className="mhd-mega-nav__list" role="list">
-              {labels.megaNav.map((item) => (
-                <li className="mhd-mega-nav__item" key={item}>
-                  <button className="mhd-mega-nav__btn mhd-btn-fill" type="button">
-                    <span data-text>
-                      {item}
-                      <IconChevronDown />
+                <div className="mhd-account-wrap" ref={accountRef}>
+                  <button
+                    aria-expanded={accountOpen}
+                    aria-haspopup="menu"
+                    className="mhd-account-btn mhd-account-btn--avatar"
+                    onClick={() => setAccountOpen((open) => !open)}
+                    type="button"
+                  >
+                    <span aria-hidden className="mhd-avatar">
+                      {avatarInitials}
                     </span>
-                    <span aria-hidden className="mhd-btn-fill__dup">
-                      {item}
-                      <IconChevronDown />
-                    </span>
+                    <span className="mhd-account-btn__label">{labels.myAccount}</span>
+                    <IconChevronDown className="mhd-chevron" />
                   </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </header>
+                  <ul className="mhd-account-menu" hidden={!accountOpen} role="menu">
+                    <li role="none">
+                      <Link href={ordersHref} onClick={() => setAccountOpen(false)} role="menuitem">
+                        {labels.sidebar.orders}
+                      </Link>
+                    </li>
+                    <li role="none">
+                      <Link
+                        href={subscriptionsHref}
+                        onClick={() => setAccountOpen(false)}
+                        role="menuitem"
+                      >
+                        {labels.wellness.actionCenter.subscriptionManage}
+                      </Link>
+                    </li>
+                    <li role="none">
+                      <Link href={settingsHref} onClick={() => setAccountOpen(false)} role="menuitem">
+                        {labels.accountSettings}
+                      </Link>
+                    </li>
+                    <li role="none">
+                      <Link href={logoutHref} onClick={() => setAccountOpen(false)} prefetch="none" role="menuitem">
+                        {labels.signOut}
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </header>
 
-        <main className="mhd-main">
-          <div className="mhd-container">
-            <HealthDashboardMain customerName={customerName} labels={labels} />
+            <main className="mhd-main">
+              <div className="mhd-container">
+                <HealthDashboardMain
+                  contactHref={contactHref}
+                  labels={labels}
+                  nextSubscriptionDate={nextSubscriptionDate}
+                  ordersHref={ordersHref}
+                  shopHref={shopHref}
+                  subscriptionsHref={subscriptionsHref}
+                />
+              </div>
+            </main>
           </div>
-        </main>
+        </div>
       </div>
     </>
   );
 }
 
-function FeaturedServiceLink({ icon, label }: { icon: ReactNode; label: string }) {
+function SidebarLink({
+  href,
+  icon,
+  label,
+  active = false,
+}: {
+  href: string;
+  icon: ReactNode;
+  label: string;
+  active?: boolean;
+}) {
   return (
-    <button className="mhd-service-link" type="button">
-      <span aria-hidden className="mhd-service-link__icon">
-        {icon}
-      </span>
-      <span className="mhd-service-link__label">{label}</span>
-    </button>
+    <Link
+      aria-current={active ? 'page' : undefined}
+      aria-label={label}
+      className={active ? 'mhd-sidebar__link mhd-sidebar__link--active' : 'mhd-sidebar__link'}
+      href={href}
+      title={label}
+    >
+      <span className="mhd-sidebar__icon">{icon}</span>
+    </Link>
   );
 }

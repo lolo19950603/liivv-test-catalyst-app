@@ -626,6 +626,9 @@ export default async function SubscriptionsPreviewPage({ params }: Props) {
           confirmSkipDeliveryLabel: t('manageModal.confirmSkipDelivery'),
           skippingDeliveryLabel: t('manageModal.skippingDelivery'),
           skipDeliveryAction: async () => ({ success: true }),
+          reactivateLabel: t('manageModal.reactivateSubscription'),
+          reactivatingLabel: t('manageModal.reactivatingSubscription'),
+          reactivateAction: async () => ({ success: true }),
         }}
         pastShipmentsTitle={t('sections.pastShipments')}
         paymentLabel={t('delivery.payment')}

@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { AccountDashboardPortal } from '~/components/account-dashboard';
 import type { AccountDashboardLabels } from '~/components/account-dashboard/types';
 
-import { getDashboardCustomer } from './page-data';
+import { getDashboardCustomer, getDashboardNextSubscriptionDate } from './page-data';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -20,62 +20,57 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 function buildLabels(
-  t: Awaited<ReturnType<typeof getTranslations<'Account.Dashboard'>>>,
+  t: (key: string, values?: Record<string, string>) => string,
   customerFirstName: string,
 ): AccountDashboardLabels {
   return {
     signOut: t('signOut'),
     notifications: t('notifications'),
     cart: t('cart'),
+    search: t('search'),
     myAccount: t('myAccount'),
     accountSettings: t('accountSettings'),
-    featuredNav: {
-      prescriptions: t('featuredNav.prescriptions'),
-      appointments: t('featuredNav.appointments'),
-      metrics: t('featuredNav.metrics'),
+    sidebar: {
+      home: t('sidebar.home'),
+      orders: t('sidebar.orders'),
+      shop: t('sidebar.shop'),
+      loyalty: t('sidebar.loyalty'),
+      settings: t('sidebar.settings'),
+      help: t('sidebar.help'),
     },
-    megaNav: [
-      t('megaNav.healthDashboard'),
-      t('megaNav.digitalPharmacy'),
-      t('megaNav.featuredServices'),
-      t('megaNav.bookHealthServices'),
-      t('megaNav.healthResources'),
-      t('megaNav.orders'),
-      t('megaNav.rewards'),
-    ],
-    healthCenter: {
-      greeting: {
-        morning: t('healthCenter.greeting.morning', { name: customerFirstName }),
-        afternoon: t('healthCenter.greeting.afternoon', { name: customerFirstName }),
-        evening: t('healthCenter.greeting.evening', { name: customerFirstName }),
-      },
-      welcomeLead: t('healthCenter.welcomeLead'),
-      prescriptions: {
-        title: t('healthCenter.prescriptions.title'),
-        heading: t('healthCenter.prescriptions.heading'),
-        description: t('healthCenter.prescriptions.description'),
-        cta: t('healthCenter.prescriptions.cta'),
-      },
-      appointments: {
-        title: t('healthCenter.appointments.title'),
-        heading: t('healthCenter.appointments.heading'),
-        description: t('healthCenter.appointments.description'),
-        cta: t('healthCenter.appointments.cta'),
-      },
-      quickLinksTitle: t('healthCenter.quickLinksTitle'),
-      quickLinks: {
-        prescriptions: {
-          title: t('healthCenter.quickLinks.prescriptions.title'),
-          description: t('healthCenter.quickLinks.prescriptions.description'),
+    wellness: {
+      greeting: t('wellness.greeting', { name: customerFirstName }),
+      welcomeLead: t('wellness.welcomeLead'),
+      hero: {
+        basedOnSelection: t('wellness.hero.basedOnSelection'),
+        title: t('wellness.hero.title'),
+        subtitle: t('wellness.hero.subtitle'),
+        dailyTips: {
+          title: t('wellness.hero.dailyTips.title'),
+          description: t('wellness.hero.dailyTips.description'),
         },
-        appointments: {
-          title: t('healthCenter.quickLinks.appointments.title'),
-          description: t('healthCenter.quickLinks.appointments.description'),
+        yourSupplies: {
+          title: t('wellness.hero.yourSupplies.title'),
+          description: t('wellness.hero.yourSupplies.description'),
         },
-        metrics: {
-          title: t('healthCenter.quickLinks.metrics.title'),
-          description: t('healthCenter.quickLinks.metrics.description'),
+        exploreMore: t('wellness.hero.exploreMore'),
+        tabs: {
+          diabetes: t('wellness.hero.tabs.diabetes'),
+          sleepRest: t('wellness.hero.tabs.sleepRest'),
+          changeSelection: t('wellness.hero.tabs.changeSelection'),
         },
+      },
+      actionCenter: {
+        subscriptionTitle: t('wellness.actionCenter.subscriptionTitle'),
+        subscriptionManage: t('wellness.actionCenter.subscriptionManage'),
+        subscriptionEmpty: t('wellness.actionCenter.subscriptionEmpty'),
+        orderHistory: t('wellness.actionCenter.orderHistory'),
+      },
+      virtualCare: {
+        title: t('wellness.virtualCare.title'),
+        consulting: t('wellness.virtualCare.consulting'),
+        carePack: t('wellness.virtualCare.carePack'),
+        pharmacy: t('wellness.virtualCare.pharmacy'),
       },
     },
   };
@@ -88,6 +83,7 @@ export default async function AccountDashboardPage({ params }: Props) {
 
   const t = await getTranslations('Account.Dashboard');
   const customer = await getDashboardCustomer();
+  const nextSubscriptionDate = await getDashboardNextSubscriptionDate(locale);
 
   const firstName = customer?.firstName?.trim() ?? '';
   const lastName = customer?.lastName?.trim() ?? '';
@@ -98,10 +94,19 @@ export default async function AccountDashboardPage({ params }: Props) {
   return (
     <AccountDashboardPortal
       cartHref="/cart"
+      contactHref="/contact-us"
       customerName={customerName}
-      labels={buildLabels(t, firstNameForGreeting)}
+      labels={buildLabels(
+        t as (key: string, values?: Record<string, string>) => string,
+        firstNameForGreeting,
+      )}
       logoutHref="/logout"
+      loyaltyHref="/account/wishlists/"
+      nextSubscriptionDate={nextSubscriptionDate}
       ordersHref="/account/orders/"
+      settingsHref="/account/settings/"
+      shopHref="/shop-all"
+      subscriptionsHref="/account/subscriptions/"
     />
   );
 }

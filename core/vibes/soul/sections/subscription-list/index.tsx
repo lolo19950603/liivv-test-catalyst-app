@@ -36,6 +36,7 @@ export interface SubscriptionListItem {
   frequencyKey?: string;
   canEditFrequency?: boolean;
   canSkipDelivery?: boolean;
+  isCanceled?: boolean;
 }
 
 export interface SubscriptionDeliveryGroup {
@@ -155,6 +156,11 @@ export interface SubscriptionListProps {
     confirmSkipDeliveryLabel: string;
     skippingDeliveryLabel: string;
     skipDeliveryAction: (
+      subscriptionId: string,
+    ) => Promise<{ success: boolean; error?: string }>;
+    reactivateLabel: string;
+    reactivatingLabel: string;
+    reactivateAction: (
       subscriptionId: string,
     ) => Promise<{ success: boolean; error?: string }>;
   };
@@ -1624,6 +1630,7 @@ export function SubscriptionList({
           statusKey === 'scheduled' ||
           statusKey === 'past_due' ||
           statusKey === 'unpaid');
+      const isCanceled = item.isCanceled ?? statusKey === 'canceled';
 
       setManagedSubscription({
         id: item.id,
@@ -1638,6 +1645,7 @@ export function SubscriptionList({
         frequencyKey: item.frequencyKey,
         canEditFrequency,
         canSkipDelivery,
+        isCanceled,
       });
     },
     [allManageableItems, pastGroups, upcomingGroups],
@@ -1792,6 +1800,9 @@ export function SubscriptionList({
           manageItemOptions?.paymentPickerDescription ?? 'Choose a saved card for your'
         }
         paymentPickerTitle={manageItemOptions?.paymentPickerTitle ?? 'Select a payment method'}
+        reactivateAction={manageItemOptions?.reactivateAction}
+        reactivateLabel={manageItemOptions?.reactivateLabel ?? 'Re-activate subscription'}
+        reactivatingLabel={manageItemOptions?.reactivatingLabel ?? 'Re-activating subscription…'}
         saveAddressLabel={manageItemOptions?.saveAddressLabel ?? 'Save address'}
         saveAndApplyAddressAction={manageItemOptions?.saveAndApplyAddressAction}
         savePaymentMethodLabel={manageItemOptions?.savePaymentMethodLabel ?? 'Save card'}

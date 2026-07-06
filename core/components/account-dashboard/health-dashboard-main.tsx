@@ -1,157 +1,152 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { Link } from '~/components/link';
 
-import type { AccountDashboardLabels } from './types';
 import {
-  IconAppointment,
-  IconMetric,
+  IconChevronRight,
+  IconCrown,
+  IconOrders,
   IconPrescription,
+  IconSupplies,
 } from './icons';
-
-function greetingPrefix(hour: number): 'morning' | 'afternoon' | 'evening' {
-  if (hour < 12) {
-    return 'morning';
-  }
-
-  if (hour < 17) {
-    return 'afternoon';
-  }
-
-  return 'evening';
-}
+import type { AccountDashboardLabels } from './types';
 
 export function HealthDashboardMain({
   labels,
+  nextSubscriptionDate,
+  ordersHref,
+  subscriptionsHref,
+  shopHref,
+  contactHref,
 }: {
-  customerName: string;
   labels: AccountDashboardLabels;
+  nextSubscriptionDate: string | null;
+  ordersHref: string;
+  subscriptionsHref: string;
+  shopHref: string;
+  contactHref: string;
 }) {
-  const timeKey = greetingPrefix(new Date().getHours());
-  const greeting = labels.healthCenter.greeting[timeKey];
+  const { wellness } = labels;
 
   return (
-    <div className="mhd-grid">
-      <div className="mhd-greeting">
-        <div>
-          <h1 className="mhd-greeting__title">{greeting}</h1>
-          <p className="mhd-greeting__lead">{labels.healthCenter.welcomeLead}</p>
+    <div className="mhd-wellness">
+      <section aria-label={wellness.hero.title} className="mhd-hero">
+        <div className="mhd-hero__media">
+          <img
+            alt=""
+            className="mhd-hero__image"
+            height={480}
+            src="/archive/images/dashboard-prescriptions.png"
+            width={960}
+          />
+          <div className="mhd-hero__overlay" />
         </div>
-      </div>
 
-      <div className="mhd-cards">
-        <article className="mhd-service-card">
-          <div className="mhd-service-card__inner">
-            <div className="mhd-service-card__head">
-              <h2 className="mhd-service-card__title">{labels.healthCenter.prescriptions.title}</h2>
-            </div>
-            <div className="mhd-empty">
-              <div className="mhd-empty__body">
-                <div className="mhd-empty__art mhd-empty__art--photo">
-                  <img
-                    alt=""
-                    className="mhd-empty__photo"
-                    height={235}
-                    src="/archive/images/dashboard-prescriptions.png"
-                    width={470}
-                  />
-                </div>
-                <div className="mhd-empty__text">
-                  <p className="mhd-empty__heading">{labels.healthCenter.prescriptions.heading}</p>
-                  <p className="mhd-empty__desc">{labels.healthCenter.prescriptions.description}</p>
-                </div>
-              </div>
-              <div className="mhd-empty__actions">
-                <button className="mhd-btn-primary button" type="button">
-                  <span aria-hidden className="btn-fill" data-fill />
-                  <span className="btn-text">{labels.healthCenter.prescriptions.cta}</span>
-                </button>
-              </div>
-            </div>
+        <div className="mhd-hero__body">
+          <div className="mhd-hero__intro">
+            <p className="mhd-hero__eyebrow">{wellness.hero.basedOnSelection}</p>
+            <h2 className="mhd-hero__title">{wellness.hero.title}</h2>
+            <p className="mhd-hero__subtitle">{wellness.hero.subtitle}</p>
           </div>
-        </article>
 
-        <article className="mhd-service-card">
-          <div className="mhd-service-card__inner">
-            <div className="mhd-service-card__head">
-              <h2 className="mhd-service-card__title">{labels.healthCenter.appointments.title}</h2>
-            </div>
-            <div className="mhd-empty">
-              <div className="mhd-empty__body">
-                <div className="mhd-empty__art mhd-empty__art--photo">
-                  <img
-                    alt=""
-                    className="mhd-empty__photo"
-                    height={235}
-                    src="/archive/images/dashboard-appointments.png"
-                    width={465}
-                  />
-                </div>
-                <div className="mhd-empty__text">
-                  <p className="mhd-empty__heading">{labels.healthCenter.appointments.heading}</p>
-                  <p className="mhd-empty__desc">{labels.healthCenter.appointments.description}</p>
-                </div>
+          <div className="mhd-hero__cards">
+            <article className="mhd-glass-card">
+              <h3 className="mhd-glass-card__title">{wellness.hero.dailyTips.title}</h3>
+              <p className="mhd-glass-card__desc">{wellness.hero.dailyTips.description}</p>
+            </article>
+            <Link className="mhd-glass-card mhd-glass-card--link" href={shopHref}>
+              <div className="mhd-glass-card__icon">
+                <IconSupplies />
               </div>
-              <div className="mhd-empty__actions">
-                <button className="mhd-btn-primary mhd-btn-primary--block button" type="button">
-                  <span aria-hidden className="btn-fill" data-fill />
-                  <span className="btn-text">{labels.healthCenter.appointments.cta}</span>
-                </button>
+              <div>
+                <h3 className="mhd-glass-card__title">{wellness.hero.yourSupplies.title}</h3>
+                <p className="mhd-glass-card__desc">{wellness.hero.yourSupplies.description}</p>
               </div>
-            </div>
+            </Link>
+            <Link className="mhd-glass-card mhd-glass-card--link" href={contactHref}>
+              <div className="mhd-glass-card__icon">
+                <IconPrescription />
+              </div>
+              <div>
+                <h3 className="mhd-glass-card__title">{wellness.hero.exploreMore}</h3>
+              </div>
+            </Link>
           </div>
-        </article>
-      </div>
+        </div>
 
-      <section aria-label={labels.healthCenter.quickLinksTitle} className="mhd-quick-links">
-        <h2 className="mhd-quick-links__title">{labels.healthCenter.quickLinksTitle}</h2>
-        <div className="mhd-quick-links__grid">
-          <QuickLinkCard
-            description={labels.healthCenter.quickLinks.prescriptions.description}
-            icon={<IconPrescription />}
-            title={labels.healthCenter.quickLinks.prescriptions.title}
-          />
-          <QuickLinkCard
-            description={labels.healthCenter.quickLinks.appointments.description}
-            icon={<IconAppointment />}
-            title={labels.healthCenter.quickLinks.appointments.title}
-          />
-          <QuickLinkCard
-            description={labels.healthCenter.quickLinks.metrics.description}
-            icon={<IconMetric />}
-            title={labels.healthCenter.quickLinks.metrics.title}
-          />
+        <div aria-label="Wellness categories" className="mhd-hero__tabs" role="tablist">
+          <Link className="mhd-hero-tab" href="/shop-all" role="tab">
+            {wellness.hero.tabs.diabetes}
+          </Link>
+          <Link className="mhd-hero-tab" href="/shop-all" role="tab">
+            {wellness.hero.tabs.sleepRest}
+          </Link>
+          <Link className="mhd-hero-tab mhd-hero-tab--active" href="/account/settings/" role="tab">
+            {wellness.hero.tabs.changeSelection}
+          </Link>
         </div>
       </section>
+
+      <div className="mhd-bottom">
+        <section aria-label="Action center" className="mhd-action-center">
+          <Link className="mhd-action-card mhd-action-card--subscription" href={subscriptionsHref}>
+            <div className="mhd-action-card__icon">
+              <IconCrown />
+            </div>
+            <div className="mhd-action-card__content">
+              <p className="mhd-action-card__label">{wellness.actionCenter.subscriptionTitle}</p>
+              <p className="mhd-action-card__value">
+                {nextSubscriptionDate ?? wellness.actionCenter.subscriptionEmpty}
+              </p>
+              <span className="mhd-action-card__link">{wellness.actionCenter.subscriptionManage}</span>
+            </div>
+          </Link>
+
+          <Link className="mhd-action-card mhd-action-card--orders" href={ordersHref}>
+            <div className="mhd-action-card__icon">
+              <IconOrders />
+            </div>
+            <p className="mhd-action-card__label mhd-action-card__label--bottom">
+              {wellness.actionCenter.orderHistory}
+            </p>
+          </Link>
+        </section>
+
+        <section aria-label={wellness.virtualCare.title} className="mhd-virtual-care">
+          <h2 className="mhd-virtual-care__title">{wellness.virtualCare.title}</h2>
+          <div className="mhd-virtual-care__grid">
+            <VirtualCareLink href={contactHref} label={wellness.virtualCare.consulting} wide />
+            <VirtualCareLink href={shopHref} label={wellness.virtualCare.carePack} />
+            <VirtualCareLink href={subscriptionsHref} label={wellness.virtualCare.pharmacy} />
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
 
-function QuickLinkCard({
-  title,
-  description,
-  icon,
+function VirtualCareLink({
+  href,
+  label,
+  wide = false,
 }: {
-  title: string;
-  description: string;
-  icon: ReactNode;
+  href: string;
+  label: string;
+  wide?: boolean;
 }) {
   return (
-    <button className="mhd-quick-card" type="button">
-      <div className="mhd-quick-card__content">
-        <div className="mhd-quick-card__row">
-          <div className="mhd-quick-card__thumb">{icon}</div>
-          <div>
-            <p className="mhd-quick-card__title">{title}</p>
-            <p className="mhd-quick-card__desc">{description}</p>
-          </div>
-        </div>
-      </div>
-      <span aria-hidden className="mhd-quick-card__chevron">
-        <svg fill="currentColor" height="24" viewBox="0 0 24 24" width="24">
-          <path d="M9.29 6.71a1 1 0 0 1 1.41 0L14.59 12l-3.89 3.88a1 1 0 0 1-1.41-1.41L12.17 12 9.29 9.12a1 1 0 0 1 0-1.41Z" />
-        </svg>
+    <Link
+      className={
+        wide
+          ? 'mhd-virtual-card mhd-virtual-card--wide'
+          : 'mhd-virtual-card'
+      }
+      href={href}
+    >
+      <span className="mhd-virtual-card__label">{label}</span>
+      <span aria-hidden className="mhd-virtual-card__chevron">
+        <IconChevronRight />
       </span>
-    </button>
+    </Link>
   );
 }
