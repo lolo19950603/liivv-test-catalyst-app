@@ -55,6 +55,7 @@ export function AccountDashboardPortal({
   headerNotifications,
   notificationsUnreadCount,
   hasUnreadChatMessage,
+  heroImageSrc,
   ordersHref,
   settingsHref,
   shopHref,
@@ -121,7 +122,6 @@ export function AccountDashboardPortal({
                 src="https://storage.googleapis.com/s.mkswft.com/RmlsZTo4NWQ4MGJiNi03MDZjLTQ4MWEtOGFmNi1kNDI2ZjBlNDYwOTQ=/Liivv_Favicon.png"
                 width={32}
               />
-              <span className="mhd-sidebar__logo-text">Liivv</span>
             </Link>
 
             <nav aria-label="Primary" className="mhd-sidebar__nav">
@@ -225,6 +225,7 @@ export function AccountDashboardPortal({
                   consultingHref={virtualCareConsultingHref}
                   contactHref={contactHref}
                   hasUnreadChatMessage={hasUnreadChatMessage}
+                  heroImageSrc={heroImageSrc}
                   labels={labels}
                   nextSubscriptionDate={nextSubscriptionDate}
                   ordersHref={ordersHref}

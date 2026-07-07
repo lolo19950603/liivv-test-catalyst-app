@@ -11,57 +11,68 @@ export const LIIV_PRIMARY_HEALTH_CATEGORIES = [
   {
     id: 'diabetes_care_everyday',
     label: 'Diabetes Care and Everyday Living',
+    shortLabel: 'Diabetes Care',
     imageEmoji: '🩸',
   },
   {
     id: 'ostomy_care_everyday',
     label: 'Ostomy Care & Everyday Living',
+    shortLabel: 'Ostomy Care',
     imageEmoji: '🩹',
   },
   {
     id: 'womens_health_wellness',
     label: "Women's Health and Wellness",
+    shortLabel: "Women's Health",
     imageEmoji: '🌸',
   },
   {
     id: 'sleep_rest',
     label: 'Sleep and Rest',
+    shortLabel: 'Sleep + Rest',
     imageEmoji: '🌙',
   },
   {
     id: 'healing_advanced_wound',
     label: 'Healing & Advanced Wound Care',
+    shortLabel: 'Wound Care',
     imageEmoji: '🧴',
   },
   {
     id: 'minor_ailment_on',
     label: 'Minor Ailment (Ontario only)',
+    shortLabel: 'Minor Ailment',
     ontarioOnly: true,
     imageEmoji: '💊',
   },
   {
     id: 'personal_care_confidence',
     label: 'Personal Care & Confidence',
+    shortLabel: 'Personal Care',
     imageEmoji: '✨',
   },
   {
     id: 'breathing_lung_health',
     label: 'Breathing & Lung Health',
+    shortLabel: 'Lung Health',
     imageEmoji: '🫁',
   },
   {
     id: 'heart_blood_pressure',
     label: 'Heart & Blood Pressure',
+    shortLabel: 'Heart Health',
     imageEmoji: '❤️',
   },
   {
     id: 'skin_health_relief',
     label: 'Skin Health & Relief',
+    shortLabel: 'Skin Health',
     imageEmoji: '🧼',
   },
   {
     id: 'daily_nutrition_fuel',
     label: 'Daily Nutrition & Fuel',
+    shortLabel: 'Nutrition',
     imageEmoji: '🥗',
   },
 ] as const;
@@ -217,6 +228,7 @@ export function getPrimaryCategoryDisplay(id: LiivPrimaryCategoryId) {
     return {
       id,
       label: 'Wellness',
+      shortLabel: 'Wellness',
       subtitle: 'Products, treatment, or everyday wellness support.',
     };
   }
@@ -224,6 +236,7 @@ export function getPrimaryCategoryDisplay(id: LiivPrimaryCategoryId) {
   return {
     id: row.id,
     label: row.label,
+    shortLabel: row.shortLabel,
     subtitle: 'Products, treatment, or everyday wellness support.',
     emoji: row.imageEmoji,
   };

@@ -10,6 +10,7 @@ import { getFirstIncompleteOnboardingHref } from '~/lib/supabase/onboarding-redi
 import { appendSetupFlowQuery } from '~/lib/onboarding/onboarding-flow';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
 
+import { getCategoryHeroImage } from '~/lib/account-dashboard/hero-category-assets';
 import { getAccountDashboardNotifications } from '~/lib/account-notifications/get-header-notifications';
 
 import { getDashboardCustomer, getDashboardNextSubscriptionDate } from './page-data';
@@ -144,8 +145,9 @@ export default async function AccountDashboardPage({ params }: Props) {
   const customerName =
     [firstName, lastName].filter(Boolean).join(' ') || t('guestName');
   const firstNameForGreeting = firstName.length > 0 ? firstName : customerName;
-  const heroTitle = wellness.primaryCategory?.label;
+  const heroTitle = wellness.primaryCategory?.shortLabel ?? wellness.primaryCategory?.label;
   const heroSubtitle = wellness.primaryCategory?.subtitle;
+  const heroImageSrc = getCategoryHeroImage(wellness.primaryCategory?.id);
   const accountNotifications = await getAccountDashboardNotifications();
 
   return (
@@ -155,6 +157,7 @@ export default async function AccountDashboardPage({ params }: Props) {
       customerName={customerName}
       hasUnreadChatMessage={accountNotifications.hasUnreadChatMessage}
       headerNotifications={accountNotifications.headerNotifications}
+      heroImageSrc={heroImageSrc}
       labels={buildLabels(
         t as (key: string, values?: Record<string, string>) => string,
         firstNameForGreeting,

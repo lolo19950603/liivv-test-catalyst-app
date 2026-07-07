@@ -48,52 +48,38 @@ function OrderStatusBadge({ status }: { status: string }) {
   );
 }
 
-function OrderLineItemRow({ item }: { item: OrderLineItem }) {
+function OrderLineItemImage({ item }: { item: OrderLineItem }) {
   return (
-    <li className="flex items-center gap-3 px-5 py-3 @md:px-6">
-      <div className="relative size-14 shrink-0">
-        <div className="size-full overflow-hidden rounded-[10px] bg-[var(--contrast-100,hsl(var(--contrast-100)))]">
-          {item.image ? (
-            <Image
-              alt={item.image.alt}
-              className="size-full border-0 object-cover outline-none ring-0"
-              height={56}
-              sizes="56px"
-              src={item.image.src}
-              width={56}
-            />
-          ) : (
-            <span className="flex size-full items-center justify-center text-xs text-[var(--contrast-400,hsl(var(--contrast-400)))]">
-              —
+    <li className="shrink-0">
+      <Link aria-label={item.title} className="block" href={item.href}>
+        <div className="relative size-14">
+          <div className="size-full overflow-hidden rounded-[10px] bg-[var(--contrast-100,hsl(var(--contrast-100)))]">
+            {item.image ? (
+              <Image
+                alt={item.image.alt}
+                className="size-full border-0 object-cover outline-none ring-0"
+                height={56}
+                sizes="56px"
+                src={item.image.src}
+                width={56}
+              />
+            ) : (
+              <span className="flex size-full items-center justify-center text-xs text-[var(--contrast-400,hsl(var(--contrast-400)))]">
+                —
+              </span>
+            )}
+          </div>
+
+          {item.quantity != null && item.quantity >= 1 ? (
+            <span
+              aria-hidden
+              className="absolute right-0 top-0 z-10 flex h-5 min-w-5 translate-x-1/4 -translate-y-1/4 items-center justify-center rounded bg-[#2b2b2b] px-1 text-[11px] font-medium leading-none text-white"
+            >
+              {item.quantity}
             </span>
-          )}
+          ) : null}
         </div>
-
-        {item.quantity != null && item.quantity >= 1 ? (
-          <span
-            aria-hidden
-            className="absolute right-0 top-0 z-10 flex h-5 min-w-5 translate-x-1/4 -translate-y-1/4 items-center justify-center rounded bg-[#2b2b2b] px-1 text-[11px] font-medium leading-none text-white"
-          >
-            {item.quantity}
-          </span>
-        ) : null}
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <Link
-          className="line-clamp-2 text-sm font-medium leading-snug text-[var(--foreground,hsl(var(--foreground)))] hover:underline"
-          href={item.href}
-        >
-          {item.title}
-        </Link>
-        {item.subtitle ? (
-          <p className="mt-0.5 text-xs text-[var(--contrast-500,hsl(var(--contrast-500)))]">{item.subtitle}</p>
-        ) : null}
-      </div>
-
-      <p className="shrink-0 text-sm font-medium text-[var(--foreground,hsl(var(--foreground)))]">
-        {item.totalPrice || item.price}
-      </p>
+      </Link>
     </li>
   );
 }
@@ -181,9 +167,9 @@ export function OrderList({
                     </div>
 
                     {order.lineItems.length > 0 ? (
-                      <ul className="divide-y divide-[var(--order-list-border,hsl(var(--contrast-100)))]">
+                      <ul className="flex flex-wrap items-center gap-3 px-5 py-4 @md:px-6">
                         {order.lineItems.map((lineItem) => (
-                          <OrderLineItemRow item={lineItem} key={lineItem.id} />
+                          <OrderLineItemImage item={lineItem} key={lineItem.id} />
                         ))}
                       </ul>
                     ) : null}
@@ -233,13 +219,10 @@ function OrderListSkeleton({ title }: { title: string }) {
                 </div>
                 <Skeleton.Box className="h-10 w-32 rounded-lg" />
               </div>
-              <div className="flex items-center gap-3 px-5 py-3 @md:px-6">
-                <Skeleton.Box className="size-14 rounded-[10px]" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton.Text characterCount={18} className="rounded text-sm" />
-                  <Skeleton.Text characterCount={10} className="rounded text-xs" />
-                </div>
-                <Skeleton.Text characterCount={6} className="rounded text-sm" />
+              <div className="flex flex-wrap items-center gap-3 px-5 py-4 @md:px-6">
+                {Array.from({ length: 4 }).map((_, itemId) => (
+                  <Skeleton.Box className="size-14 rounded-[10px]" key={itemId} />
+                ))}
               </div>
             </li>
           ))}

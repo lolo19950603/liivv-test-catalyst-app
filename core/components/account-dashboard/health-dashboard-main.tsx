@@ -24,6 +24,7 @@ export function HealthDashboardMain({
   chatHref,
   hasUnreadChatMessage,
   wellnessSelectionHref,
+  heroImageSrc,
 }: {
   labels: AccountDashboardLabels;
   nextSubscriptionDate: string | null;
@@ -37,64 +38,70 @@ export function HealthDashboardMain({
   chatHref: string;
   hasUnreadChatMessage: boolean;
   wellnessSelectionHref: string;
+  heroImageSrc: string;
 }) {
   const { wellness } = labels;
 
   return (
     <div className="mhd-wellness">
       <section aria-label={wellness.hero.title} className="mhd-hero">
-        <div className="mhd-hero__media">
-          <img
-            alt=""
-            className="mhd-hero__image"
-            height={480}
-            src="/archive/images/dashboard-prescriptions.png"
-            width={960}
-          />
-          <div className="mhd-hero__overlay" />
+        <div aria-hidden className="mhd-hero__rail">
+          <span className="mhd-hero__rail-text">{wellness.hero.basedOnSelection}</span>
         </div>
 
-        <div className="mhd-hero__body">
-          <div className="mhd-hero__intro">
-            <p className="mhd-hero__eyebrow">{wellness.hero.basedOnSelection}</p>
-            <h2 className="mhd-hero__title">{wellness.hero.title}</h2>
-            <p className="mhd-hero__subtitle">{wellness.hero.subtitle}</p>
+        <div className="mhd-hero__main">
+          <div className="mhd-hero__body">
+            <p className="mhd-hero__eyebrow mhd-hero__eyebrow--mobile">
+              {wellness.hero.basedOnSelection}
+            </p>
+            <div className="mhd-hero__intro">
+              <h2 className="mhd-hero__title">{wellness.hero.title}</h2>
+              <p className="mhd-hero__subtitle">{wellness.hero.subtitle}</p>
+            </div>
+
+            <div className="mhd-hero__cards">
+              <article className="mhd-glass-card mhd-glass-card--tips">
+                <h3 className="mhd-glass-card__title">{wellness.hero.dailyTips.title}</h3>
+                <p className="mhd-glass-card__desc">{wellness.hero.dailyTips.description}</p>
+              </article>
+              <Link className="mhd-glass-card mhd-glass-card--link" href={shopHref}>
+                <div className="mhd-glass-card__icon">
+                  <IconSupplies />
+                </div>
+                <div>
+                  <h3 className="mhd-glass-card__title">{wellness.hero.yourSupplies.title}</h3>
+                  <p className="mhd-glass-card__desc">{wellness.hero.yourSupplies.description}</p>
+                </div>
+              </Link>
+              <Link className="mhd-glass-card mhd-glass-card--link" href={contactHref}>
+                <div className="mhd-glass-card__icon">
+                  <IconPrescription />
+                </div>
+                <div>
+                  <h3 className="mhd-glass-card__title">{wellness.hero.exploreMore}</h3>
+                </div>
+              </Link>
+            </div>
           </div>
 
-          <div className="mhd-hero__cards">
-            <article className="mhd-glass-card">
-              <h3 className="mhd-glass-card__title">{wellness.hero.dailyTips.title}</h3>
-              <p className="mhd-glass-card__desc">{wellness.hero.dailyTips.description}</p>
-            </article>
-            <Link className="mhd-glass-card mhd-glass-card--link" href={shopHref}>
-              <div className="mhd-glass-card__icon">
-                <IconSupplies />
-              </div>
-              <div>
-                <h3 className="mhd-glass-card__title">{wellness.hero.yourSupplies.title}</h3>
-                <p className="mhd-glass-card__desc">{wellness.hero.yourSupplies.description}</p>
-              </div>
-            </Link>
-            <Link className="mhd-glass-card mhd-glass-card--link" href={contactHref}>
-              <div className="mhd-glass-card__icon">
-                <IconPrescription />
-              </div>
-              <div>
-                <h3 className="mhd-glass-card__title">{wellness.hero.exploreMore}</h3>
-              </div>
-            </Link>
+          <div className="mhd-hero__media" aria-hidden>
+            <img alt="" className="mhd-hero__image" height={480} src={heroImageSrc} width={960} />
           </div>
         </div>
 
         <div aria-label="Wellness categories" className="mhd-hero__tabs" role="tablist">
           <Link className="mhd-hero-tab" href="/shop-all" role="tab">
-            {wellness.hero.tabs.diabetes}
+            <span className="mhd-hero-tab__label">{wellness.hero.tabs.diabetes}</span>
           </Link>
           <Link className="mhd-hero-tab" href="/shop-all" role="tab">
-            {wellness.hero.tabs.sleepRest}
+            <span className="mhd-hero-tab__label">{wellness.hero.tabs.sleepRest}</span>
           </Link>
-          <Link className="mhd-hero-tab mhd-hero-tab--active" href={wellnessSelectionHref} role="tab">
-            {wellness.hero.tabs.changeSelection}
+          <Link
+            className="mhd-hero-tab mhd-hero-tab--active"
+            href={wellnessSelectionHref}
+            role="tab"
+          >
+            <span className="mhd-hero-tab__label">{wellness.hero.tabs.changeSelection}</span>
           </Link>
         </div>
       </section>

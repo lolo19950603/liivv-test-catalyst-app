@@ -80,4 +80,5 @@ export interface AccountDashboardProps {
   notificationsUnreadCount: number;
   hasUnreadChatMessage: boolean;
   virtualCareChatHref: string;
+  heroImageSrc: string;
 }
