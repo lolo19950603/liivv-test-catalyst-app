@@ -13,8 +13,9 @@ interface Props {
 export function AccountLayoutShell({ children }: Props) {
   const pathname = usePathname() ?? '';
   const isDashboard = pathname.includes('/account/dashboard');
+  const isOnboarding = pathname.includes('/account/onboarding');
 
-  if (isDashboard) {
+  if (isDashboard || isOnboarding) {
     return <>{children}</>;
   }
 

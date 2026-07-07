@@ -1,6 +1,7 @@
 /* Store-wide archive feel for Catalyst commerce pages (category, cart, blog, account, etc.) */
 
 @import './account-pages-theme.css';
+@import './liivv-feature-buttons.css';
 
 html {
   overflow-y: scroll;

@@ -199,6 +199,9 @@
       "metaTitle": "My Health Dashboard",
       "signOut": "Sign out",
       "notifications": "Notifications",
+      "notificationsUnread": "Notifications, {count} unread",
+      "notificationsPanelTitle": "Notifications",
+      "notificationsEmpty": "No recent orders or subscriptions yet.",
       "cart": "Cart",
       "search": "Search",
       "guestName": "Member",
@@ -244,7 +247,11 @@
           "title": "Virtual Care",
           "consulting": "19+ Minor Ailment Consulting — Book Now",
           "carePack": "CarePack — Never Forget Another Dose",
-          "pharmacy": "My Pharmacy — Manage my RXs"
+          "pharmacy": "My Pharmacy — Manage my RXs",
+          "unreadMessages": "Unread messages",
+          "hasNewMessage": "You have a new message",
+          "noNewMessages": "No new messages",
+          "openInbox": "Open inbox"
         }
       }
     },

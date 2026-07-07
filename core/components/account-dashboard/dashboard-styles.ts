@@ -1226,4 +1226,105 @@ body.adc-portal-active main{
   text-align:center;
   z-index:2;
 }
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications{
+  position:relative;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications__panel{
+  position:absolute;
+  top:calc(100% + 0.5rem);
+  right:0;
+  z-index:60;
+  width:min(22rem,calc(100vw - 1.5rem));
+  max-width:calc(100vw - 2rem);
+  overflow:hidden;
+  border-radius:var(--mhd-radius-lg);
+  border:1px solid rgb(var(--mhd-border));
+  background:rgb(var(--mhd-white));
+  box-shadow:0 1rem 3rem rgb(var(--mhd-shadow)/0.35);
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications__title{
+  border-bottom:1px solid rgb(var(--mhd-border));
+  padding:0.75rem 1rem;
+  font-family:var(--mhd-font-body);
+  font-size:0.875rem;
+  font-weight:600;
+  color:rgb(var(--mhd-text));
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications__list{
+  max-height:24rem;
+  overflow-y:auto;
+  padding:0.75rem;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications__empty{
+  font-family:var(--mhd-font-body);
+  font-size:0.875rem;
+  color:rgb(var(--mhd-muted));
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications__items{
+  display:flex;
+  flex-direction:column;
+  gap:0.75rem;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications__item{
+  display:block;
+  border-radius:var(--mhd-radius-sm);
+  padding:0.5rem;
+  text-decoration:none;
+  transition:background-color 0.2s ease;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications__item:hover,#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications__item:focus-visible{
+  background:rgb(var(--mhd-surface));
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications__kind{
+  font-family:var(--mhd-font-body);
+  font-size:0.65rem;
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:rgb(var(--mhd-muted));
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications__item-title{
+  margin-top:0.125rem;
+  font-family:var(--mhd-font-body);
+  font-size:0.875rem;
+  font-weight:500;
+  color:rgb(var(--mhd-text));
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications__item-body{
+  margin-top:0.125rem;
+  font-family:var(--mhd-font-body);
+  font-size:0.75rem;
+  color:rgb(var(--mhd-muted));
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-unread-messages{
+  margin-top:1rem;
+  border-radius:var(--mhd-radius-lg);
+  border:1px solid rgb(var(--mhd-border));
+  background:rgb(var(--mhd-white));
+  padding:1rem 1.25rem;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-unread-messages__title{
+  font-family:var(--mhd-font-body);
+  font-size:0.75rem;
+  font-weight:600;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:rgb(var(--mhd-muted));
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-unread-messages__body{
+  margin-top:0.5rem;
+  font-family:var(--mhd-font-body);
+  font-size:0.875rem;
+  color:rgb(var(--mhd-text));
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-unread-messages__link{
+  display:inline-flex;
+  margin-top:0.75rem;
+  font-family:var(--mhd-font-body);
+  font-size:0.875rem;
+  font-weight:500;
+  color:rgb(var(--mhd-text));
+  text-decoration:underline;
+  text-underline-offset:0.2em;
+}
 `;

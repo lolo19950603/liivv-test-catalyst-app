@@ -1,6 +1,9 @@
 export interface AccountDashboardLabels {
   signOut: string;
   notifications: string;
+  notificationsUnread: string;
+  notificationsPanelTitle: string;
+  notificationsEmpty: string;
   cart: string;
   myAccount: string;
   accountSettings: string;
@@ -46,9 +49,15 @@ export interface AccountDashboardLabels {
       consulting: string;
       carePack: string;
       pharmacy: string;
+      unreadMessages: string;
+      hasNewMessage: string;
+      noNewMessages: string;
+      openInbox: string;
     };
   };
 }
+
+import type { AccountHeaderNotification } from '~/lib/account-notifications/types';
 
 export interface AccountDashboardProps {
   customerName: string;
@@ -61,5 +70,14 @@ export interface AccountDashboardProps {
   contactHref: string;
   logoutHref: string;
   nextSubscriptionDate: string | null;
+  onboardingBannerHref?: string | null;
+  wellnessSelectionHref: string;
+  virtualCarePharmacyHref: string;
+  virtualCareCarePackHref: string;
+  virtualCareConsultingHref: string;
   labels: AccountDashboardLabels;
+  headerNotifications: AccountHeaderNotification[];
+  notificationsUnreadCount: number;
+  hasUnreadChatMessage: boolean;
+  virtualCareChatHref: string;
 }

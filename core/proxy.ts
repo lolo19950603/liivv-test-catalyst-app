@@ -31,6 +31,6 @@ export const config = {
      * - xmlsitemap.php (legacy sitemap route)
      * - robots.txt (robots route)
      */
-    '/((?!api|admin|archive|_next/static|_next/image|favicon.ico|xmlsitemap.php|sitemap.xml|robots.txt).*)',
+    '/((?!api|admin|staff|archive|_next/static|_next/image|favicon.ico|xmlsitemap.php|sitemap.xml|robots.txt).*)',
   ],
 };

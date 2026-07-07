@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 import { Link } from '~/components/link';
+import { AccountNotificationsBell } from '~/components/account-notifications';
+import { OnboardingBanner } from '~/components/onboarding/onboarding-banner';
 import { initShopifyButtonFillHover } from '~/lib/archived-pages/init-shopify-button-fill-hover';
 
 import {
@@ -11,7 +13,6 @@ import {
 } from './dashboard-styles';
 import { HealthDashboardMain } from './health-dashboard-main';
 import {
-  IconBell,
   IconCart,
   IconChevronDown,
   IconHome,
@@ -45,6 +46,15 @@ export function AccountDashboardPortal({
   logoutHref,
   loyaltyHref,
   nextSubscriptionDate,
+  onboardingBannerHref,
+  virtualCareCarePackHref,
+  virtualCareConsultingHref,
+  virtualCarePharmacyHref,
+  wellnessSelectionHref,
+  virtualCareChatHref,
+  headerNotifications,
+  notificationsUnreadCount,
+  hasUnreadChatMessage,
   ordersHref,
   settingsHref,
   shopHref,
@@ -143,15 +153,16 @@ export function AccountDashboardPortal({
                 <Link aria-label={labels.search} className="mhd-icon-btn" href={shopHref}>
                   <IconSearch />
                 </Link>
-                <button
-                  aria-expanded={false}
-                  aria-label={labels.notifications}
-                  className="mhd-icon-btn"
-                  type="button"
-                >
-                  <IconBell />
-                  <span className="mhd-badge">3</span>
-                </button>
+                <AccountNotificationsBell
+                  labels={{
+                    ariaLabel: labels.notifications,
+                    empty: labels.notificationsEmpty,
+                    panelTitle: labels.notificationsPanelTitle,
+                    unreadAria: labels.notificationsUnread,
+                  }}
+                  notifications={headerNotifications}
+                  unreadCount={notificationsUnreadCount}
+                />
                 <Link aria-label={labels.cart} className="mhd-icon-btn" href={cartHref}>
                   <IconCart />
                 </Link>
@@ -202,13 +213,25 @@ export function AccountDashboardPortal({
 
             <main className="mhd-main">
               <div className="mhd-container">
+                {onboardingBannerHref ? (
+                  <OnboardingBanner
+                    href={onboardingBannerHref}
+                    message="Finish setting up your Liivv wellness profile to personalize your dashboard."
+                  />
+                ) : null}
                 <HealthDashboardMain
+                  carePackHref={virtualCareCarePackHref}
+                  chatHref={virtualCareChatHref}
+                  consultingHref={virtualCareConsultingHref}
                   contactHref={contactHref}
+                  hasUnreadChatMessage={hasUnreadChatMessage}
                   labels={labels}
                   nextSubscriptionDate={nextSubscriptionDate}
                   ordersHref={ordersHref}
+                  pharmacyHref={virtualCarePharmacyHref}
                   shopHref={shopHref}
                   subscriptionsHref={subscriptionsHref}
+                  wellnessSelectionHref={wellnessSelectionHref}
                 />
               </div>
             </main>

@@ -18,6 +18,12 @@ export function HealthDashboardMain({
   subscriptionsHref,
   shopHref,
   contactHref,
+  consultingHref,
+  carePackHref,
+  pharmacyHref,
+  chatHref,
+  hasUnreadChatMessage,
+  wellnessSelectionHref,
 }: {
   labels: AccountDashboardLabels;
   nextSubscriptionDate: string | null;
@@ -25,6 +31,12 @@ export function HealthDashboardMain({
   subscriptionsHref: string;
   shopHref: string;
   contactHref: string;
+  consultingHref: string;
+  carePackHref: string;
+  pharmacyHref: string;
+  chatHref: string;
+  hasUnreadChatMessage: boolean;
+  wellnessSelectionHref: string;
 }) {
   const { wellness } = labels;
 
@@ -81,7 +93,7 @@ export function HealthDashboardMain({
           <Link className="mhd-hero-tab" href="/shop-all" role="tab">
             {wellness.hero.tabs.sleepRest}
           </Link>
-          <Link className="mhd-hero-tab mhd-hero-tab--active" href="/account/settings/" role="tab">
+          <Link className="mhd-hero-tab mhd-hero-tab--active" href={wellnessSelectionHref} role="tab">
             {wellness.hero.tabs.changeSelection}
           </Link>
         </div>
@@ -115,10 +127,23 @@ export function HealthDashboardMain({
         <section aria-label={wellness.virtualCare.title} className="mhd-virtual-care">
           <h2 className="mhd-virtual-care__title">{wellness.virtualCare.title}</h2>
           <div className="mhd-virtual-care__grid">
-            <VirtualCareLink href={contactHref} label={wellness.virtualCare.consulting} wide />
-            <VirtualCareLink href={shopHref} label={wellness.virtualCare.carePack} />
-            <VirtualCareLink href={subscriptionsHref} label={wellness.virtualCare.pharmacy} />
+            <VirtualCareLink href={consultingHref} label={wellness.virtualCare.consulting} wide />
+            <VirtualCareLink href={carePackHref} label={wellness.virtualCare.carePack} />
+            <VirtualCareLink href={pharmacyHref} label={wellness.virtualCare.pharmacy} />
           </div>
+          <article className="mhd-unread-messages">
+            <div className="mhd-unread-messages__header">
+              <h3 className="mhd-unread-messages__title">{wellness.virtualCare.unreadMessages}</h3>
+            </div>
+            <p className="mhd-unread-messages__body">
+              {hasUnreadChatMessage
+                ? wellness.virtualCare.hasNewMessage
+                : wellness.virtualCare.noNewMessages}
+            </p>
+            <Link className="mhd-unread-messages__link" href={chatHref}>
+              {wellness.virtualCare.openInbox}
+            </Link>
+          </article>
         </section>
       </div>
     </div>
