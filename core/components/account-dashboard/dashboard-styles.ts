@@ -469,42 +469,31 @@ body.adc-portal-active main{
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero{
   position:relative;
-  display:grid;
-  grid-template-columns:1fr;
+  display:flex;
+  flex-direction:column;
   min-height:18rem;
   border-radius:var(--mhd-radius-lg);
   overflow:hidden;
   background:rgb(var(--mhd-white));
   border:1px solid rgb(var(--mhd-border));
 }
-@media screen and (min-width:900px){
-  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero{
-    grid-template-columns:2.75rem minmax(0,1fr) auto;
-    min-height:22rem;
-  }
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__rail{
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:1rem 0.35rem;
-  background:rgb(var(--mhd-accent));
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__header{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:0.75rem;
+  padding:1rem 1.25rem;
+  background:rgb(var(--mhd-white));
+  border-bottom:1px solid rgb(var(--mhd-border));
 }
 @media screen and (min-width:900px){
-  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__rail{
-    display:flex;
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__header{
+    flex-direction:row;
+    align-items:center;
+    justify-content:space-between;
+    gap:1rem;
+    padding:0.875rem 1.5rem;
   }
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__rail-text{
-  writing-mode:vertical-rl;
-  transform:rotate(180deg);
-  color:rgb(var(--mhd-white));
-  font-size:0.6875rem;
-  font-weight:600;
-  letter-spacing:0.12em;
-  line-height:1.35;
-  text-align:center;
-  text-transform:uppercase;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__main{
   display:grid;
@@ -566,22 +555,17 @@ body.adc-portal-active main{
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__eyebrow{
   display:inline-flex;
   align-items:center;
-  margin:0 0 0.75rem;
-  padding:0.5rem 0.75rem;
-  border-radius:var(--mhd-radius-sm);
-  background:rgb(var(--mhd-accent));
-  color:rgb(var(--mhd-white));
-  font-size:0.75rem;
-  font-weight:500;
+  margin:0;
+  padding:0.4rem 0.75rem;
+  border-radius:var(--mhd-radius-pill);
+  background:rgb(var(--mhd-accent) / 0.14);
+  color:rgb(var(--mhd-accent));
+  font-size:0.6875rem;
+  font-weight:600;
+  letter-spacing:0.06em;
   line-height:1.2;
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__eyebrow--mobile{
-  display:inline-flex;
-}
-@media screen and (min-width:900px){
-  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__eyebrow--mobile{
-    display:none;
-  }
+  text-transform:uppercase;
+  white-space:nowrap;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__title{
   margin:0;
@@ -666,64 +650,46 @@ body.adc-portal-active main{
   display:flex;
   flex-direction:row;
   flex-wrap:wrap;
-  gap:0.5rem;
-  padding:0.75rem;
-  background:rgb(var(--mhd-surface));
-  border-top:1px solid rgb(var(--mhd-border));
+  align-items:center;
+  gap:0.35rem;
+  width:100%;
 }
 @media screen and (min-width:900px){
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__tabs{
-    flex-direction:column;
     flex-wrap:nowrap;
-    gap:0.35rem;
-    padding:0.75rem 0.5rem;
-    align-self:stretch;
-    justify-content:center;
-    border-top:none;
-    border-left:1px solid rgb(var(--mhd-border));
-    background:rgb(var(--mhd-white));
+    justify-content:flex-end;
+    width:auto;
+    max-width:min(100%,36rem);
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__tabs::-webkit-scrollbar{
+    display:none;
   }
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-tab{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  min-height:2.75rem;
-  padding:0.65rem 0.85rem;
-  border-radius:var(--mhd-radius-lg);
-  background:rgb(var(--mhd-white));
+  min-height:2.25rem;
+  padding:0.45rem 0.9rem;
+  border-radius:var(--mhd-radius-pill);
+  background:rgb(var(--mhd-surface));
   color:rgb(var(--mhd-text));
   font-size:0.8125rem;
   font-weight:500;
+  line-height:1.2;
   text-decoration:none;
   text-align:center;
+  white-space:nowrap;
   border:1px solid rgb(var(--mhd-border));
   transition:background-color 0.2s ease,color 0.2s ease,border-color 0.2s ease;
-}
-@media screen and (min-width:900px){
-  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-tab{
-    min-width:3.25rem;
-    min-height:5.5rem;
-    padding:0.75rem 0.45rem;
-    background:rgb(var(--mhd-surface));
-    border-color:transparent;
-  }
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-tab__label{
-  display:block;
-}
-@media screen and (min-width:900px){
-  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-tab__label{
-    writing-mode:vertical-rl;
-    transform:rotate(180deg);
-    line-height:1.2;
-    letter-spacing:0.01em;
-  }
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-tab:hover,#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-tab:focus-visible{
   background:rgb(var(--mhd-white));
   color:rgb(var(--mhd-accent));
-  border-color:rgb(var(--mhd-border));
+  border-color:rgb(var(--mhd-accent));
   outline:none;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-tab--active{
@@ -1451,6 +1417,13 @@ body.adc-portal-active main{
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page{
   width:100%;
+  --order-list-title:rgb(var(--mhd-text));
+  --order-list-info:rgb(var(--mhd-text));
+  --order-list-label:rgb(var(--mhd-muted));
+  --order-list-border:rgb(var(--mhd-border));
+  --order-list-empty-state-title:rgb(var(--mhd-text));
+  --contrast-100:var(--mhd-border);
+  --background:var(--mhd-white);
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page > section{
   max-width:none;
@@ -1470,5 +1443,23 @@ body.adc-portal-active main{
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page .subscription-portal-toggle{
   margin-bottom:1.25rem;
+}
+/* Order cards — match subscription shipment card outlines */
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page .group\\/order-list > ul{
+  gap:1rem;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page .group\\/order-list > ul > li{
+  background-color:rgb(var(--mhd-white)) !important;
+  border:1px solid rgb(var(--mhd-border)) !important;
+  border-radius:1rem !important;
+  box-shadow:0 1px 2px rgba(49,47,47,0.04);
+  overflow:hidden;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page .group\\/order-list > ul > li > div:first-child{
+  border-bottom:1px solid rgb(var(--mhd-border)) !important;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page .group\\/order-list .rounded-full{
+  background-color:rgb(var(--mhd-surface)) !important;
+  color:rgb(var(--mhd-muted)) !important;
 }
 `;

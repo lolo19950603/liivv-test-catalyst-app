@@ -141,7 +141,7 @@ export function AccountDashboardPortal({
                 icon={<IconOrders />}
                 label={labels.sidebar.orders}
               />
-              <SidebarLink href={shopHref} icon={<IconShop />} label={labels.sidebar.shop} />
+              <SidebarLink href="/" icon={<IconShop />} label={labels.sidebar.shop} />
               <SidebarLink href={wishlistsHref} icon={<IconLoyalty />} label={labels.sidebar.wishlists} />
             </nav>
 

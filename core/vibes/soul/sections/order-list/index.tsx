@@ -128,7 +128,7 @@ export function OrderList({
               <ul className="flex flex-col gap-4">
                 {orders.map((order) => (
                   <li
-                    className="overflow-hidden rounded-2xl border border-[var(--order-list-border,hsl(var(--contrast-100)))] bg-[var(--background,hsl(var(--background)))]"
+                    className="overflow-hidden rounded-2xl border border-[var(--order-list-border,hsl(var(--contrast-100)))] bg-[var(--order-list-card,hsl(var(--background)))] shadow-[0_1px_2px_rgba(49,47,47,0.04)]"
                     key={order.id}
                   >
                     <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--order-list-border,hsl(var(--contrast-100)))] px-5 py-4 @md:px-6">

@@ -43,15 +43,24 @@ export function HealthDashboardMain({
   return (
     <div className="mhd-wellness">
       <section aria-label={wellness.hero.title} className="mhd-hero">
-        <div aria-hidden className="mhd-hero__rail">
-          <span className="mhd-hero__rail-text">{wellness.hero.basedOnSelection}</span>
+        <div className="mhd-hero__header">
+          <p className="mhd-hero__eyebrow">{wellness.hero.basedOnSelection}</p>
+          <nav aria-label={labels.aria.wellnessCategories} className="mhd-hero__tabs">
+            {heroTabs.map((tab) => (
+              <Link
+                aria-current={tab.active ? 'page' : undefined}
+                className={tab.active ? 'mhd-hero-tab mhd-hero-tab--active' : 'mhd-hero-tab'}
+                href={tab.href}
+                key={tab.id}
+              >
+                {tab.label}
+              </Link>
+            ))}
+          </nav>
         </div>
 
         <div className="mhd-hero__main">
           <div className="mhd-hero__body">
-            <p className="mhd-hero__eyebrow mhd-hero__eyebrow--mobile">
-              {wellness.hero.basedOnSelection}
-            </p>
             <div className="mhd-hero__intro">
               <h2 className="mhd-hero__title">{wellness.hero.title}</h2>
               <p className="mhd-hero__subtitle">{wellness.hero.subtitle}</p>
@@ -93,19 +102,6 @@ export function HealthDashboardMain({
             />
           </div>
         </div>
-
-        <nav aria-label={labels.aria.wellnessCategories} className="mhd-hero__tabs">
-          {heroTabs.map((tab) => (
-            <Link
-              aria-current={tab.active ? 'page' : undefined}
-              className={tab.active ? 'mhd-hero-tab mhd-hero-tab--active' : 'mhd-hero-tab'}
-              href={tab.href}
-              key={tab.id}
-            >
-              <span className="mhd-hero-tab__label">{tab.label}</span>
-            </Link>
-          ))}
-        </nav>
       </section>
 
       <div className="mhd-bottom">
