@@ -2,12 +2,13 @@ import 'server-only';
 
 import { cache } from 'react';
 
-import { getCustomerOrders } from '~/app/[locale]/(default)/account/orders/page-data';
-import { getDashboardCustomer } from '~/app/[locale]/(default)/account/dashboard/page-data';
-import { getSessionCustomerAccessToken } from '~/auth';
-import { findStripeCustomerIdByEmail, resolveStripeCustomerId } from '~/lib/stripe/customers';
-import { isStripeConfigured } from '~/lib/stripe/client';
-import { getCustomerSubscriptions } from '~/lib/stripe/subscriptions';
+import { getTranslations } from 'next-intl/server';
+
+import { getCustomerOrders } from '~/app/[locale]/(default)/account/(portal)/orders/page-data';
+import {
+  getDashboardCustomer,
+  getDashboardStripeSubscriptions,
+} from '~/app/[locale]/(default)/account/(portal)/dashboard/page-data';
 import { getConversationByProfileId, getLatestMessageForConversation } from '~/lib/supabase/chat-messages';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
@@ -18,7 +19,14 @@ import {
 } from './cookie';
 import type { AccountDashboardNotifications, AccountHeaderNotification } from './types';
 
-async function buildHeaderNotifications(): Promise<AccountHeaderNotification[]> {
+async function buildHeaderNotifications(
+  locale: string,
+): Promise<AccountHeaderNotification[]> {
+  const t = await getTranslations({ locale, namespace: 'Account.Dashboard' });
+  const translate = t as unknown as (
+    key: string,
+    values?: Record<string, string>,
+  ) => string;
   const notifications: AccountHeaderNotification[] = [];
 
   try {
@@ -26,13 +34,16 @@ async function buildHeaderNotifications(): Promise<AccountHeaderNotification[]> 
 
     for (const order of ordersData?.orders ?? []) {
       const createdAt = order.orderedAt?.utc ?? new Date().toISOString();
-      const statusLabel = order.status?.label ?? 'Order update';
+      const statusLabel = order.status?.label ?? translate('notificationOrderTitle');
 
       notifications.push({
         id: `order:${order.entityId}`,
         kind: 'order',
-        title: 'Order',
-        body: `Order #${order.entityId} · ${statusLabel}`,
+        title: translate('notificationOrderTitle'),
+        body: translate('notificationOrderBody', {
+          orderId: String(order.entityId),
+          status: statusLabel,
+        }),
         href: `/account/orders/${order.entityId}/`,
         createdAt,
       });
@@ -41,42 +52,26 @@ async function buildHeaderNotifications(): Promise<AccountHeaderNotification[]> 
     console.error('[account notifications] header order notifications', error);
   }
 
-  if (isStripeConfigured()) {
-    try {
-      const customerAccessToken = await getSessionCustomerAccessToken();
+  try {
+    const subscriptions = await getDashboardStripeSubscriptions();
 
-      if (customerAccessToken) {
-        const customer = await getDashboardCustomer();
+    for (const subscription of subscriptions.slice(0, 5)) {
+      const shortId = subscription.id.replace(/^sub_/, '').slice(0, 8);
 
-        if (customer) {
-          let stripeCustomerId = await resolveStripeCustomerId(customer.entityId);
-
-          if (!stripeCustomerId) {
-            stripeCustomerId = await findStripeCustomerIdByEmail(customer.email);
-          }
-
-          if (stripeCustomerId) {
-            const subscriptions = await getCustomerSubscriptions(stripeCustomerId);
-
-            for (const subscription of subscriptions.slice(0, 5)) {
-              const status = subscription.status.toUpperCase();
-              const shortId = subscription.id.replace(/^sub_/, '').slice(0, 8);
-
-              notifications.push({
-                id: `subscription:${subscription.id}`,
-                kind: 'subscription',
-                title: 'Subscription',
-                body: `Subscription ${shortId} · ${status}`,
-                href: '/account/subscriptions/',
-                createdAt: new Date(subscription.currentPeriodStart * 1000).toISOString(),
-              });
-            }
-          }
-        }
-      }
-    } catch (error) {
-      console.error('[account notifications] header subscription notifications', error);
+      notifications.push({
+        id: `subscription:${subscription.id}`,
+        kind: 'subscription',
+        title: translate('notificationSubscriptionTitle'),
+        body: translate('notificationSubscriptionBody', {
+          id: shortId,
+          status: subscription.status.toUpperCase(),
+        }),
+        href: '/account/subscriptions/',
+        createdAt: new Date(subscription.currentPeriodStart * 1000).toISOString(),
+      });
     }
+  } catch (error) {
+    console.error('[account notifications] header subscription notifications', error);
   }
 
   notifications.sort(
@@ -128,9 +123,9 @@ async function getHasUnreadChatMessage(lastSeen: Date | null): Promise<boolean> 
 }
 
 export const getAccountDashboardNotifications = cache(
-  async (): Promise<AccountDashboardNotifications> => {
+  async (locale: string): Promise<AccountDashboardNotifications> => {
     const lastSeen = await getAccountNotificationsLastSeen();
-    const headerNotifications = await buildHeaderNotifications();
+    const headerNotifications = await buildHeaderNotifications(locale);
     const unreadCount = headerNotifications.filter((notification) =>
       isAccountNotificationUnread(notification.createdAt, lastSeen),
     ).length;

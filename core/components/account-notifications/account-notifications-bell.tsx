@@ -2,14 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { useTranslations } from 'next-intl';
+
 import { Link } from '~/components/link';
 import type { AccountHeaderNotification } from '~/lib/account-notifications/types';
 
 import { IconBell } from '../account-dashboard/icons';
-
-function kindLabel(kind: AccountHeaderNotification['kind']) {
-  return kind;
-}
 
 export function AccountNotificationsBell({
   notifications,
@@ -20,11 +18,13 @@ export function AccountNotificationsBell({
   unreadCount: number;
   labels: {
     ariaLabel: string;
-    unreadAria: string;
     panelTitle: string;
     empty: string;
+    kindOrder: string;
+    kindSubscription: string;
   };
 }) {
+  const t = useTranslations('Account.Dashboard');
   const [open, setOpen] = useState(false);
   const [badgeCount, setBadgeCount] = useState(unreadCount);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -59,12 +59,19 @@ export function AccountNotificationsBell({
     };
   }, [open]);
 
-  const markRead = () => {
-    setBadgeCount(0);
-    void fetch('/api/account/notifications/mark-read', {
-      method: 'POST',
-      credentials: 'same-origin',
-    }).catch(() => {});
+  const markRead = async () => {
+    try {
+      const response = await fetch('/api/account/notifications/mark-read', {
+        method: 'POST',
+        credentials: 'same-origin',
+      });
+
+      if (response.ok) {
+        setBadgeCount(0);
+      }
+    } catch {
+      /* keep badge until next refresh */
+    }
   };
 
   const onToggle = () => {
@@ -73,9 +80,12 @@ export function AccountNotificationsBell({
     setOpen(next);
 
     if (next) {
-      markRead();
+      void markRead();
     }
   };
+
+  const kindLabel = (kind: AccountHeaderNotification['kind']) =>
+    kind === 'order' ? labels.kindOrder : labels.kindSubscription;
 
   return (
     <div className="mhd-notifications" ref={rootRef}>
@@ -84,7 +94,7 @@ export function AccountNotificationsBell({
         aria-haspopup="menu"
         aria-label={
           badgeCount > 0
-            ? labels.unreadAria.replace('{count}', String(badgeCount))
+            ? t('notificationsUnread', { count: badgeCount })
             : labels.ariaLabel
         }
         className="mhd-icon-btn"

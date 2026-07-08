@@ -5,13 +5,12 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link } from '~/components/link';
 import { AccountNotificationsBell } from '~/components/account-notifications';
 import { OnboardingBanner } from '~/components/onboarding/onboarding-banner';
-import { initShopifyButtonFillHover } from '~/lib/archived-pages/init-shopify-button-fill-hover';
+import { usePathname } from '~/i18n/routing';
 
 import {
   ACCOUNT_DASHBOARD_ROOT_ID,
   ACCOUNT_DASHBOARD_STYLE,
 } from './dashboard-styles';
-import { HealthDashboardMain } from './health-dashboard-main';
 import {
   IconCart,
   IconChevronDown,
@@ -23,7 +22,7 @@ import {
   IconSearch,
   IconShop,
 } from './icons';
-import type { AccountDashboardProps } from './types';
+import type { AccountDashboardShellProps } from './types';
 
 function initialsFromName(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -38,32 +37,45 @@ function initialsFromName(name: string): string {
     .join('');
 }
 
+function isAccountSubPage(pathname: string): boolean {
+  return (
+    pathname.includes('/account/orders') || pathname.includes('/account/subscriptions')
+  );
+}
+
+function isNavActive(pathname: string, href: string): boolean {
+  const normalizedPath = pathname.replace(/\/$/, '');
+  const normalizedHref = href.replace(/\/$/, '');
+
+  if (normalizedHref === '/account/dashboard') {
+    return normalizedPath === normalizedHref || normalizedPath.endsWith('/account/dashboard');
+  }
+
+  return normalizedPath === normalizedHref || normalizedPath.startsWith(`${normalizedHref}/`);
+}
+
 export function AccountDashboardPortal({
+  children,
   customerName,
   cartHref,
-  contactHref,
   labels,
   logoutHref,
-  loyaltyHref,
-  nextSubscriptionDate,
+  wishlistsHref,
   onboardingBannerHref,
-  virtualCareCarePackHref,
-  virtualCareConsultingHref,
-  virtualCarePharmacyHref,
-  wellnessSelectionHref,
-  virtualCareChatHref,
   headerNotifications,
   notificationsUnreadCount,
-  hasUnreadChatMessage,
-  heroImageSrc,
+  logoSrc,
+  logoAlt,
   ordersHref,
   settingsHref,
   shopHref,
   subscriptionsHref,
-}: AccountDashboardProps) {
+  contactHref,
+}: AccountDashboardShellProps) {
+  const pathname = usePathname() ?? '';
   const [accountOpen, setAccountOpen] = useState(false);
   const accountRef = useRef<HTMLDivElement>(null);
-  const rootRef = useRef<HTMLDivElement>(null);
+  const accountButtonRef = useRef<HTMLButtonElement>(null);
 
   const avatarInitials = useMemo(() => initialsFromName(customerName), [customerName]);
 
@@ -80,14 +92,6 @@ export function AccountDashboardPortal({
   }, []);
 
   useEffect(() => {
-    if (rootRef.current == null) {
-      return;
-    }
-
-    return initShopifyButtonFillHover(rootRef.current);
-  }, []);
-
-  useEffect(() => {
     if (!accountOpen) {
       return;
     }
@@ -98,46 +102,56 @@ export function AccountDashboardPortal({
       }
     };
 
-    document.addEventListener('mousedown', onPointerDown);
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setAccountOpen(false);
+        accountButtonRef.current?.focus();
+      }
+    };
 
-    return () => document.removeEventListener('mousedown', onPointerDown);
+    document.addEventListener('mousedown', onPointerDown);
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      window.removeEventListener('keydown', onKeyDown);
+    };
   }, [accountOpen]);
 
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: ACCOUNT_DASHBOARD_STYLE }} />
-      <div
-        className="liivv-account-dashboard-root"
-        data-button-hover="standard"
-        id={ACCOUNT_DASHBOARD_ROOT_ID}
-        ref={rootRef}
-      >
+      <div className="liivv-account-dashboard-root" id={ACCOUNT_DASHBOARD_ROOT_ID}>
         <div className="mhd-shell">
-          <aside aria-label="Account navigation" className="mhd-sidebar">
-            <Link aria-label="Liivv" className="mhd-sidebar__logo" href="/">
-              <img
-                alt="Liivv"
-                className="mhd-sidebar__logo-img"
-                height={32}
-                src="https://storage.googleapis.com/s.mkswft.com/RmlsZTo4NWQ4MGJiNi03MDZjLTQ4MWEtOGFmNi1kNDI2ZjBlNDYwOTQ=/Liivv_Favicon.png"
-                width={32}
-              />
+          <aside aria-label={labels.aria.accountNavigation} className="mhd-sidebar">
+            <Link aria-label={logoAlt} className="mhd-sidebar__logo" href="/">
+              <img alt={logoAlt} className="mhd-sidebar__logo-img" height={32} src={logoSrc} width={32} />
             </Link>
 
-            <nav aria-label="Primary" className="mhd-sidebar__nav">
+            <nav aria-label={labels.aria.primaryNavigation} className="mhd-sidebar__nav">
               <SidebarLink
-                active
+                active={isNavActive(pathname, '/account/dashboard/')}
                 href="/account/dashboard/"
                 icon={<IconHome />}
                 label={labels.sidebar.home}
               />
-              <SidebarLink href={ordersHref} icon={<IconOrders />} label={labels.sidebar.orders} />
+              <SidebarLink
+                active={isNavActive(pathname, ordersHref)}
+                href={ordersHref}
+                icon={<IconOrders />}
+                label={labels.sidebar.orders}
+              />
               <SidebarLink href={shopHref} icon={<IconShop />} label={labels.sidebar.shop} />
-              <SidebarLink href={loyaltyHref} icon={<IconLoyalty />} label={labels.sidebar.loyalty} />
+              <SidebarLink href={wishlistsHref} icon={<IconLoyalty />} label={labels.sidebar.wishlists} />
             </nav>
 
-            <nav aria-label="Secondary" className="mhd-sidebar__footer">
-              <SidebarLink href={settingsHref} icon={<IconLock />} label={labels.sidebar.settings} />
+            <nav aria-label={labels.aria.secondaryNavigation} className="mhd-sidebar__footer">
+              <SidebarLink
+                active={isNavActive(pathname, settingsHref)}
+                href={settingsHref}
+                icon={<IconLock />}
+                label={labels.sidebar.settings}
+              />
               <SidebarLink href={contactHref} icon={<IconInfo />} label={labels.sidebar.help} />
             </nav>
           </aside>
@@ -157,8 +171,9 @@ export function AccountDashboardPortal({
                   labels={{
                     ariaLabel: labels.notifications,
                     empty: labels.notificationsEmpty,
+                    kindOrder: labels.notificationKindOrder,
+                    kindSubscription: labels.notificationKindSubscription,
                     panelTitle: labels.notificationsPanelTitle,
-                    unreadAria: labels.notificationsUnread,
                   }}
                   notifications={headerNotifications}
                   unreadCount={notificationsUnreadCount}
@@ -173,6 +188,7 @@ export function AccountDashboardPortal({
                     aria-haspopup="menu"
                     className="mhd-account-btn mhd-account-btn--avatar"
                     onClick={() => setAccountOpen((open) => !open)}
+                    ref={accountButtonRef}
                     type="button"
                   >
                     <span aria-hidden className="mhd-avatar">
@@ -183,12 +199,18 @@ export function AccountDashboardPortal({
                   </button>
                   <ul className="mhd-account-menu" hidden={!accountOpen} role="menu">
                     <li role="none">
-                      <Link href={ordersHref} onClick={() => setAccountOpen(false)} role="menuitem">
+                      <Link
+                        aria-current={isNavActive(pathname, ordersHref) ? 'page' : undefined}
+                        href={ordersHref}
+                        onClick={() => setAccountOpen(false)}
+                        role="menuitem"
+                      >
                         {labels.sidebar.orders}
                       </Link>
                     </li>
                     <li role="none">
                       <Link
+                        aria-current={isNavActive(pathname, subscriptionsHref) ? 'page' : undefined}
                         href={subscriptionsHref}
                         onClick={() => setAccountOpen(false)}
                         role="menuitem"
@@ -197,7 +219,12 @@ export function AccountDashboardPortal({
                       </Link>
                     </li>
                     <li role="none">
-                      <Link href={settingsHref} onClick={() => setAccountOpen(false)} role="menuitem">
+                      <Link
+                        aria-current={isNavActive(pathname, settingsHref) ? 'page' : undefined}
+                        href={settingsHref}
+                        onClick={() => setAccountOpen(false)}
+                        role="menuitem"
+                      >
                         {labels.accountSettings}
                       </Link>
                     </li>
@@ -215,25 +242,16 @@ export function AccountDashboardPortal({
               <div className="mhd-container">
                 {onboardingBannerHref ? (
                   <OnboardingBanner
+                    ctaLabel={labels.onboardingBannerCta}
                     href={onboardingBannerHref}
-                    message="Finish setting up your Liivv wellness profile to personalize your dashboard."
+                    message={labels.onboardingBannerMessage}
                   />
                 ) : null}
-                <HealthDashboardMain
-                  carePackHref={virtualCareCarePackHref}
-                  chatHref={virtualCareChatHref}
-                  consultingHref={virtualCareConsultingHref}
-                  contactHref={contactHref}
-                  hasUnreadChatMessage={hasUnreadChatMessage}
-                  heroImageSrc={heroImageSrc}
-                  labels={labels}
-                  nextSubscriptionDate={nextSubscriptionDate}
-                  ordersHref={ordersHref}
-                  pharmacyHref={virtualCarePharmacyHref}
-                  shopHref={shopHref}
-                  subscriptionsHref={subscriptionsHref}
-                  wellnessSelectionHref={wellnessSelectionHref}
-                />
+                {isAccountSubPage(pathname) ? (
+                  <div className="mhd-account-page">{children}</div>
+                ) : (
+                  children
+                )}
               </div>
             </main>
           </div>

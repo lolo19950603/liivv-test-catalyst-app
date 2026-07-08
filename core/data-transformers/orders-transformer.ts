@@ -1,7 +1,7 @@
 import { getFormatter } from 'next-intl/server';
 
 import { Order } from '@/vibes/soul/sections/order-list';
-import { getCustomerOrders } from '~/app/[locale]/(default)/account/orders/page-data';
+import { getCustomerOrders } from '~/app/[locale]/(default)/account/(portal)/orders/page-data';
 import { ExistingResultType } from '~/client/util';
 
 export const ordersTransformer = (

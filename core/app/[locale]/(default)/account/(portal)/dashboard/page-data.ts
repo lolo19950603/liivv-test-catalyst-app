@@ -6,7 +6,10 @@ import { graphql } from '~/client/graphql';
 import { TAGS } from '~/client/tags';
 import { findStripeCustomerIdByEmail, resolveStripeCustomerId } from '~/lib/stripe/customers';
 import { isStripeConfigured } from '~/lib/stripe/client';
-import { getCustomerSubscriptions } from '~/lib/stripe/subscriptions';
+import {
+  getCustomerSubscriptions,
+  type CustomerSubscription,
+} from '~/lib/stripe/subscriptions';
 
 const DashboardCustomerQuery = graphql(`
   query DashboardCustomerQuery {
@@ -35,6 +38,33 @@ export const getDashboardCustomer = cache(async () => {
   return response.data.customer;
 });
 
+/** One Stripe subscriptions.list (+ product lookups) per dashboard request. */
+export const getDashboardStripeSubscriptions = cache(
+  async (): Promise<CustomerSubscription[]> => {
+    if (!isStripeConfigured()) {
+      return [];
+    }
+
+    const customer = await getDashboardCustomer();
+
+    if (!customer) {
+      return [];
+    }
+
+    let stripeCustomerId = await resolveStripeCustomerId(customer.entityId);
+
+    if (!stripeCustomerId) {
+      stripeCustomerId = await findStripeCustomerIdByEmail(customer.email);
+    }
+
+    if (!stripeCustomerId) {
+      return [];
+    }
+
+    return getCustomerSubscriptions(stripeCustomerId);
+  },
+);
+
 function formatSubscriptionDate(timestamp: number, locale: string): string {
   return new Intl.DateTimeFormat(locale, {
     month: 'long',
@@ -45,39 +75,7 @@ function formatSubscriptionDate(timestamp: number, locale: string): string {
 
 export const getDashboardNextSubscriptionDate = cache(
   async (locale: string): Promise<string | null> => {
-    if (!isStripeConfigured()) {
-      return null;
-    }
-
-    const customerAccessToken = await getSessionCustomerAccessToken();
-
-    if (!customerAccessToken) {
-      return null;
-    }
-
-    const response = await client.fetch({
-      document: DashboardCustomerQuery,
-      fetchOptions: { cache: 'no-store', next: { tags: [TAGS.customer] } },
-      customerAccessToken,
-    });
-
-    const customer = response.data.customer;
-
-    if (!customer) {
-      return null;
-    }
-
-    let stripeCustomerId = await resolveStripeCustomerId(customer.entityId);
-
-    if (!stripeCustomerId) {
-      stripeCustomerId = await findStripeCustomerIdByEmail(customer.email);
-    }
-
-    if (!stripeCustomerId) {
-      return null;
-    }
-
-    const subscriptions = await getCustomerSubscriptions(stripeCustomerId);
+    const subscriptions = await getDashboardStripeSubscriptions();
     const now = Math.floor(Date.now() / 1000);
     const upcoming = subscriptions
       .filter(

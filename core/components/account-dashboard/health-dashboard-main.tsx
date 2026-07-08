@@ -9,7 +9,7 @@ import {
   IconPrescription,
   IconSupplies,
 } from './icons';
-import type { AccountDashboardLabels } from './types';
+import type { AccountDashboardLabels, DashboardHeroTab } from './types';
 
 export function HealthDashboardMain({
   labels,
@@ -17,28 +17,26 @@ export function HealthDashboardMain({
   ordersHref,
   subscriptionsHref,
   shopHref,
-  contactHref,
   consultingHref,
   carePackHref,
   pharmacyHref,
   chatHref,
   hasUnreadChatMessage,
-  wellnessSelectionHref,
   heroImageSrc,
+  heroTabs,
 }: {
   labels: AccountDashboardLabels;
   nextSubscriptionDate: string | null;
   ordersHref: string;
   subscriptionsHref: string;
   shopHref: string;
-  contactHref: string;
   consultingHref: string;
   carePackHref: string;
   pharmacyHref: string;
   chatHref: string;
   hasUnreadChatMessage: boolean;
-  wellnessSelectionHref: string;
   heroImageSrc: string;
+  heroTabs: DashboardHeroTab[];
 }) {
   const { wellness } = labels;
 
@@ -73,7 +71,7 @@ export function HealthDashboardMain({
                   <p className="mhd-glass-card__desc">{wellness.hero.yourSupplies.description}</p>
                 </div>
               </Link>
-              <Link className="mhd-glass-card mhd-glass-card--link" href={contactHref}>
+              <Link className="mhd-glass-card mhd-glass-card--link" href={consultingHref}>
                 <div className="mhd-glass-card__icon">
                   <IconPrescription />
                 </div>
@@ -84,30 +82,34 @@ export function HealthDashboardMain({
             </div>
           </div>
 
-          <div className="mhd-hero__media" aria-hidden>
-            <img alt="" className="mhd-hero__image" height={480} src={heroImageSrc} width={960} />
+          <div className="mhd-hero__media">
+            <img
+              alt=""
+              className="mhd-hero__image"
+              height={480}
+              loading="lazy"
+              src={heroImageSrc}
+              width={960}
+            />
           </div>
         </div>
 
-        <div aria-label="Wellness categories" className="mhd-hero__tabs" role="tablist">
-          <Link className="mhd-hero-tab" href="/shop-all" role="tab">
-            <span className="mhd-hero-tab__label">{wellness.hero.tabs.diabetes}</span>
-          </Link>
-          <Link className="mhd-hero-tab" href="/shop-all" role="tab">
-            <span className="mhd-hero-tab__label">{wellness.hero.tabs.sleepRest}</span>
-          </Link>
-          <Link
-            className="mhd-hero-tab mhd-hero-tab--active"
-            href={wellnessSelectionHref}
-            role="tab"
-          >
-            <span className="mhd-hero-tab__label">{wellness.hero.tabs.changeSelection}</span>
-          </Link>
-        </div>
+        <nav aria-label={labels.aria.wellnessCategories} className="mhd-hero__tabs">
+          {heroTabs.map((tab) => (
+            <Link
+              aria-current={tab.active ? 'page' : undefined}
+              className={tab.active ? 'mhd-hero-tab mhd-hero-tab--active' : 'mhd-hero-tab'}
+              href={tab.href}
+              key={tab.id}
+            >
+              <span className="mhd-hero-tab__label">{tab.label}</span>
+            </Link>
+          ))}
+        </nav>
       </section>
 
       <div className="mhd-bottom">
-        <section aria-label="Action center" className="mhd-action-center">
+        <section aria-label={labels.aria.actionCenter} className="mhd-action-center">
           <Link className="mhd-action-card mhd-action-card--subscription" href={subscriptionsHref}>
             <div className="mhd-action-card__icon">
               <IconCrown />

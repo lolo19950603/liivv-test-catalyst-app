@@ -9,13 +9,16 @@ interface Props {
   children: ReactNode;
 }
 
-/** Full-screen dashboard skips the classic account page shell padding. */
+/** Full-screen portal routes skip the classic account page shell padding. */
 export function AccountLayoutShell({ children }: Props) {
   const pathname = usePathname() ?? '';
-  const isDashboard = pathname.includes('/account/dashboard');
+  const isPortalRoute =
+    pathname.includes('/account/dashboard') ||
+    pathname.includes('/account/orders') ||
+    pathname.includes('/account/subscriptions');
   const isOnboarding = pathname.includes('/account/onboarding');
 
-  if (isDashboard || isOnboarding) {
+  if (isPortalRoute || isOnboarding) {
     return <>{children}</>;
   }
 

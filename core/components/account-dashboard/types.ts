@@ -1,18 +1,39 @@
+import type { AccountHeaderNotification } from '~/lib/account-notifications/types';
+import type { ReactNode } from 'react';
+
+export type DashboardHeroTab = {
+  id: string;
+  label: string;
+  href: string;
+  active: boolean;
+};
+
 export interface AccountDashboardLabels {
   signOut: string;
   notifications: string;
-  notificationsUnread: string;
   notificationsPanelTitle: string;
   notificationsEmpty: string;
+  notificationKindOrder: string;
+  notificationKindSubscription: string;
   cart: string;
   myAccount: string;
   accountSettings: string;
   search: string;
+  brandName: string;
+  onboardingBannerMessage: string;
+  onboardingBannerCta: string;
+  aria: {
+    accountNavigation: string;
+    primaryNavigation: string;
+    secondaryNavigation: string;
+    wellnessCategories: string;
+    actionCenter: string;
+  };
   sidebar: {
     home: string;
     orders: string;
     shop: string;
-    loyalty: string;
+    wishlists: string;
     settings: string;
     help: string;
   };
@@ -32,11 +53,7 @@ export interface AccountDashboardLabels {
         description: string;
       };
       exploreMore: string;
-      tabs: {
-        diabetes: string;
-        sleepRest: string;
-        changeSelection: string;
-      };
+      changeSelection: string;
     };
     actionCenter: {
       subscriptionTitle: string;
@@ -57,28 +74,21 @@ export interface AccountDashboardLabels {
   };
 }
 
-import type { AccountHeaderNotification } from '~/lib/account-notifications/types';
-
-export interface AccountDashboardProps {
+export interface AccountDashboardShellProps {
   customerName: string;
   cartHref: string;
   ordersHref: string;
   subscriptionsHref: string;
   shopHref: string;
-  loyaltyHref: string;
+  wishlistsHref: string;
   settingsHref: string;
   contactHref: string;
   logoutHref: string;
-  nextSubscriptionDate: string | null;
   onboardingBannerHref?: string | null;
-  wellnessSelectionHref: string;
-  virtualCarePharmacyHref: string;
-  virtualCareCarePackHref: string;
-  virtualCareConsultingHref: string;
   labels: AccountDashboardLabels;
   headerNotifications: AccountHeaderNotification[];
   notificationsUnreadCount: number;
-  hasUnreadChatMessage: boolean;
-  virtualCareChatHref: string;
-  heroImageSrc: string;
+  logoSrc: string;
+  logoAlt: string;
+  children: ReactNode;
 }

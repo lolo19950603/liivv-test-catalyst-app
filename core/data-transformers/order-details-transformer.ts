@@ -4,7 +4,7 @@ import { getFormatter, getTranslations } from 'next-intl/server';
 import { Order } from '@/vibes/soul/sections/order-details-section';
 import { ExistingResultType } from '~/client/util';
 
-import { getCustomerOrderDetails } from '../app/[locale]/(default)/account/orders/[id]/page-data';
+import { getCustomerOrderDetails } from '../app/[locale]/(default)/account/(portal)/orders/[id]/page-data';
 
 function getStatusColor(
   status: ExistingResultType<typeof getCustomerOrderDetails>['status']['value'],

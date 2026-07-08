@@ -197,21 +197,40 @@
     },
     "Dashboard": {
       "metaTitle": "My Health Dashboard",
+      "loading": "Loading your dashboard…",
       "signOut": "Sign out",
       "notifications": "Notifications",
       "notificationsUnread": "Notifications, {count} unread",
       "notificationsPanelTitle": "Notifications",
       "notificationsEmpty": "No recent orders or subscriptions yet.",
+      "notificationKindOrder": "Order",
+      "notificationKindSubscription": "Subscription",
+      "notificationOrderTitle": "Order",
+      "notificationOrderBody": "Order #{orderId} · {status}",
+      "notificationSubscriptionTitle": "Subscription",
+      "notificationSubscriptionBody": "Subscription {id} · {status}",
       "cart": "Cart",
       "search": "Search",
       "guestName": "Member",
+      "brandName": "Liivv",
       "myAccount": "My Account",
       "accountSettings": "Account settings",
+      "onboardingBanner": {
+        "message": "Finish setting up your Liivv wellness profile to personalize your dashboard.",
+        "cta": "Continue setup"
+      },
+      "aria": {
+        "accountNavigation": "Account navigation",
+        "primaryNavigation": "Primary navigation",
+        "secondaryNavigation": "Secondary navigation",
+        "wellnessCategories": "Wellness categories",
+        "actionCenter": "Action center"
+      },
       "sidebar": {
         "home": "Home",
         "orders": "Orders",
         "shop": "Shop",
-        "loyalty": "Loyalty",
+        "wishlists": "Wish lists",
         "settings": "Account settings",
         "help": "Help"
       },
@@ -220,22 +239,38 @@
         "welcomeLead": "Let's focus on your Liivv wellness journey.",
         "hero": {
           "basedOnSelection": "Based on your onboarding selection",
-          "title": "Ostomy Care",
-          "subtitle": "Products, treatment, or everyday wellness support.",
+          "title": "Your wellness",
+          "subtitle": "Products, treatment, and everyday support tailored to you.",
           "dailyTips": {
-            "title": "Daily Ostomy Tips",
+            "title": "Daily wellness tips",
             "description": "Practical guidance to help you feel confident and comfortable every day."
+          },
+          "categories": {
+            "ostomy": {
+              "dailyTips": {
+                "title": "Daily ostomy tips",
+                "description": "Practical guidance to help you feel confident and comfortable every day."
+              }
+            },
+            "diabetes": {
+              "dailyTips": {
+                "title": "Daily diabetes tips",
+                "description": "Stay on track with supplies, routines, and everyday diabetes care."
+              }
+            },
+            "sleep": {
+              "dailyTips": {
+                "title": "Daily sleep tips",
+                "description": "Build better rest habits with simple, actionable guidance."
+              }
+            }
           },
           "yourSupplies": {
             "title": "Your Supplies",
             "description": "Reorder essentials and keep your care routine on track."
           },
-          "exploreMore": "Explore care resources",
-          "tabs": {
-            "diabetes": "Diabetes",
-            "sleepRest": "Sleep + Rest",
-            "changeSelection": "Change Your Selection"
-          }
+          "exploreMore": "Explore virtual care",
+          "changeSelection": "Change Your Selection"
         },
         "actionCenter": {
           "subscriptionTitle": "Your Next Subscription",

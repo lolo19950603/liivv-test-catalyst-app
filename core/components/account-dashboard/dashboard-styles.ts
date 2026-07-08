@@ -136,11 +136,18 @@ body.adc-portal-active main{
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header{
   display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
+  flex-direction:column;
+  align-items:stretch;
   gap:1rem;
   padding:1.5rem 1.25rem 1rem;
   background:rgb(var(--mhd-surface));
+}
+@media screen and (min-width:768px){
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header{
+    flex-direction:row;
+    align-items:flex-start;
+    justify-content:space-between;
+  }
 }
 @media screen and (min-width:900px){
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header{
@@ -150,6 +157,8 @@ body.adc-portal-active main{
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header__utilities{
   display:flex;
   align-items:center;
+  justify-content:flex-end;
+  flex-wrap:wrap;
   gap:0.5rem;
   flex-shrink:0;
 }
@@ -1408,5 +1417,58 @@ body.adc-portal-active main{
   color:rgb(var(--mhd-text));
   text-decoration:underline;
   text-underline-offset:0.2em;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-onboarding-banner{
+  margin-bottom:1.5rem;
+  border-radius:var(--mhd-radius-lg);
+  border:1px solid rgb(var(--mhd-border));
+  background:rgb(238 244 238 / 1);
+  padding:1rem 1.25rem;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-onboarding-banner__inner{
+  display:flex;
+  flex-direction:column;
+  gap:0.75rem;
+}
+@media screen and (min-width:640px){
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-onboarding-banner__inner{
+    flex-direction:row;
+    align-items:center;
+    justify-content:space-between;
+  }
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-onboarding-banner__message{
+  margin:0;
+  font-family:var(--mhd-font-body);
+  font-size:0.875rem;
+  line-height:1.5;
+  color:rgb(var(--mhd-text));
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-onboarding-banner__cta{
+  flex-shrink:0;
+  padding:0.5rem 1rem;
+  font-size:0.875rem;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page{
+  width:100%;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page > section{
+  max-width:none;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page h1{
+  font-family:var(--mhd-font-heading);
+  font-size:1.75rem;
+  font-weight:600;
+  line-height:1.2;
+  letter-spacing:-0.02em;
+  color:rgb(var(--mhd-text));
+}
+@media screen and (min-width:900px){
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page h1{
+    font-size:2rem;
+  }
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page .subscription-portal-toggle{
+  margin-bottom:1.25rem;
 }
 `;
