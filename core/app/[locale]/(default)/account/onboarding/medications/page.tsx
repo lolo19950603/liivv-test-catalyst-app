@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation';
+
 import { Link } from '~/components/link';
 import { OnboardingProgressBar } from '~/components/onboarding/onboarding-progress-bar';
 import { OnboardingSectionHeader } from '~/components/onboarding/onboarding-section-header';
@@ -7,8 +9,10 @@ import {
   appendSetupFlowQuery,
   SETUP_FLOW_VALUE,
 } from '~/lib/onboarding/onboarding-flow';
+import { getFirstIncompleteOnboardingHref } from '~/lib/supabase/onboarding-redirect';
 
 import { saveMedicationsStep } from '../_actions/onboarding-actions';
+import { getOnboardingCustomer } from '../page-data';
 
 interface Props {
   searchParams: Promise<{ setup?: string }>;
@@ -18,6 +22,16 @@ export default async function OnboardingMedicationsPage({ searchParams }: Props)
   const { setup } = await searchParams;
   const isSetupFlow = setup === '1';
 
+  if (isSetupFlow) {
+    const customer = await getOnboardingCustomer();
+
+    if (customer) {
+      const nextStep = await getFirstIncompleteOnboardingHref(customer);
+
+      redirect(nextStep ?? '/account/dashboard/');
+    }
+  }
+
   return (
     <div className="w-full">
       <section className="space-y-8">
@@ -26,7 +40,7 @@ export default async function OnboardingMedicationsPage({ searchParams }: Props)
         ) : null}
         <OnboardingSectionHeader
           centerOnMobile
-          description="Medication search and allergy tracking will be saved in a future update. Continue to insurance when ready."
+          description="Optional for now — medication and allergy tracking will be saved in a future update. Continue to insurance when ready."
           kicker="Onboarding"
           title={
             <>

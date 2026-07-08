@@ -32,6 +32,48 @@ export async function listInsuranceByProfileId(profileId: string): Promise<Insur
   return data as InsuranceInfoRow[];
 }
 
+export async function replaceInsuranceInfo(payload: {
+  profile_id: string;
+  provider_name: string | null;
+  policy_number: string | null;
+  group_number: string | null;
+  member_id: string | null;
+  primary_holder_name: string | null;
+  relationship: string | null;
+  card_image_url: string | null;
+  notes: string | null;
+}): Promise<{ ok: true; row: InsuranceInfoRow } | { ok: false; message: string }> {
+  const supabase = getSupabaseClient();
+  const { error: deleteError } = await supabase
+    .from('insurance_info')
+    .delete()
+    .eq('profile_id', payload.profile_id);
+
+  if (deleteError) {
+    return { ok: false, message: deleteError.message };
+  }
+
+  const now = new Date().toISOString();
+  const { data, error } = await supabase
+    .from('insurance_info')
+    .insert({
+      ...payload,
+      updated_at: now,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    return { ok: false, message: error.message };
+  }
+
+  if (!data) {
+    return { ok: false, message: 'No row returned from insurance_info insert.' };
+  }
+
+  return { ok: true, row: data as InsuranceInfoRow };
+}
+
 export async function insertInsuranceInfo(payload: {
   profile_id: string;
   provider_name: string | null;

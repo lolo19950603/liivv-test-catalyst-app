@@ -109,9 +109,6 @@ export function HealthProfileForm({
     });
   };
 
-  const totalHealthPages = 1 + selectedCategories.length;
-  const totalOnboardingUnits = 1 + totalHealthPages + 1 + 1;
-  const currentOnboardingUnit = 2 + microPageIdx;
   const currentCategory = microPageIdx > 0 ? selectedCategories[microPageIdx - 1] ?? null : null;
   const currentCategoryDef = currentCategory
     ? primaryCategoryOptions.find((option) => option.id === currentCategory) ?? null
@@ -747,9 +744,8 @@ export function HealthProfileForm({
         <div className="rounded-2xl border border-[#e8e2d8] bg-white p-8 shadow-sm">
           <h1 className="text-2xl font-semibold text-[#2c2a26]">Health profile</h1>
           <p className="mt-4 text-sm text-[#6b6560]">
-            Connect Supabase (`SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`) and run migrations in
-            `supabase/migrations/` (including `003_health_profiles_catalyst_columns.sql`) to enable
-            this step.
+            Connect Supabase (`SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`) and run
+            `core/lib/supabase/onboarding-schema.sql` to enable this step.
           </p>
         </div>
       </div>
@@ -790,11 +786,7 @@ export function HealthProfileForm({
         ) : null}
 
         {isSetupFlow ? (
-          <OnboardingProgressBar
-            current={currentOnboardingUnit}
-            total={totalOnboardingUnits}
-            label="Onboarding progress"
-          />
+          <OnboardingProgressBar current={2} label="Onboarding progress" total={3} />
         ) : null}
 
         {!isSetupFlow && healthProfileCompleted ? (
@@ -893,8 +885,8 @@ export function HealthProfileForm({
                 </p>
                 {!isOntario ? (
                   <p className="mt-2 text-xs text-[#8a8176]">
-                    Minor Ailment is available only for Ontario. Add an Ontario default address in your
-                    Shopify account to see that option.
+                    Minor Ailment is available only for Ontario. Add an Ontario mailing address in your
+                    account settings to see that option.
                   </p>
                 ) : null}
               </div>
@@ -965,9 +957,9 @@ export function HealthProfileForm({
             <div className="mb-4 space-y-1 text-xs text-[#8a8176]">
               {showSkipForNow ? (
                 <p>
-                  To continue to medications, complete any required fields above for your selections.{' '}
-                  <span className="font-medium text-[#5c564c]">Skip for now</span> moves on without saving your
-                  answers.
+                  To continue to insurance, complete any required fields above for your selections.{' '}
+                  <span className="font-medium text-[#5c564c]">Skip for now</span> continues setup and
+                  lets you personalize this later from your dashboard.
                 </p>
               ) : (
                 <p>Complete required fields, then save to return to your account.</p>

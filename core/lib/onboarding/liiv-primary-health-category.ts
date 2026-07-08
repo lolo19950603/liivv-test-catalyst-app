@@ -13,30 +13,40 @@ export const LIIV_PRIMARY_HEALTH_CATEGORIES = [
     label: 'Diabetes Care and Everyday Living',
     shortLabel: 'Diabetes Care',
     imageEmoji: '🩸',
+    pageLink: '',
+    image: '',
   },
   {
     id: 'ostomy_care_everyday',
     label: 'Ostomy Care & Everyday Living',
     shortLabel: 'Ostomy Care',
     imageEmoji: '🩹',
+    pageLink: '',
+    image: '',
   },
   {
     id: 'womens_health_wellness',
     label: "Women's Health and Wellness",
     shortLabel: "Women's Health",
     imageEmoji: '🌸',
+    pageLink: '',
+    image: '',
   },
   {
     id: 'sleep_rest',
     label: 'Sleep and Rest',
     shortLabel: 'Sleep + Rest',
     imageEmoji: '🌙',
+    pageLink: '',
+    image: '',
   },
   {
     id: 'healing_advanced_wound',
     label: 'Healing & Advanced Wound Care',
     shortLabel: 'Wound Care',
     imageEmoji: '🧴',
+    pageLink: '',
+    image: '',
   },
   {
     id: 'minor_ailment_on',
@@ -44,36 +54,48 @@ export const LIIV_PRIMARY_HEALTH_CATEGORIES = [
     shortLabel: 'Minor Ailment',
     ontarioOnly: true,
     imageEmoji: '💊',
+    pageLink: '',
+    image: '',
   },
   {
     id: 'personal_care_confidence',
     label: 'Personal Care & Confidence',
     shortLabel: 'Personal Care',
     imageEmoji: '✨',
+    pageLink: '',
+    image: '',
   },
   {
     id: 'breathing_lung_health',
     label: 'Breathing & Lung Health',
     shortLabel: 'Lung Health',
     imageEmoji: '🫁',
+    pageLink: '',
+    image: '',
   },
   {
     id: 'heart_blood_pressure',
     label: 'Heart & Blood Pressure',
     shortLabel: 'Heart Health',
     imageEmoji: '❤️',
+    pageLink: '',
+    image: '',
   },
   {
     id: 'skin_health_relief',
     label: 'Skin Health & Relief',
     shortLabel: 'Skin Health',
     imageEmoji: '🧼',
+    pageLink: '',
+    image: '',
   },
   {
     id: 'daily_nutrition_fuel',
     label: 'Daily Nutrition & Fuel',
     shortLabel: 'Nutrition',
     imageEmoji: '🥗',
+    pageLink: '',
+    image: '',
   },
 ] as const;
 
@@ -230,6 +252,8 @@ export function getPrimaryCategoryDisplay(id: LiivPrimaryCategoryId) {
       label: 'Wellness',
       shortLabel: 'Wellness',
       subtitle: 'Products, treatment, or everyday wellness support.',
+      pageLink: '',
+      image: '',
     };
   }
 
@@ -239,6 +263,17 @@ export function getPrimaryCategoryDisplay(id: LiivPrimaryCategoryId) {
     shortLabel: row.shortLabel,
     subtitle: 'Products, treatment, or everyday wellness support.',
     emoji: row.imageEmoji,
+    pageLink: row.pageLink,
+    image: row.image,
   };
+}
+
+export function getCategoryPageLink(
+  id: LiivPrimaryCategoryId,
+  fallback = '',
+): string {
+  const row = LIIV_PRIMARY_HEALTH_CATEGORIES.find((category) => category.id === id);
+  const link = row?.pageLink?.trim();
+  return link || fallback;
 }
 

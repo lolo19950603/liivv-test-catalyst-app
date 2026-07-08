@@ -499,11 +499,93 @@ body.adc-portal-active main{
   display:grid;
   grid-template-columns:1fr;
   min-height:18rem;
+  position:relative;
 }
 @media screen and (min-width:900px){
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__main{
     grid-template-columns:minmax(0,1.12fr) minmax(0,0.88fr);
     min-height:22rem;
+  }
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip{
+  perspective:1400px;
+  transform-style:preserve-3d;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip--active{
+  display:block;
+  min-height:18rem;
+}
+@media screen and (min-width:900px){
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip--active{
+    min-height:22rem;
+  }
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page{
+  display:grid;
+  grid-template-columns:1fr;
+  min-height:18rem;
+  width:100%;
+  backface-visibility:hidden;
+  will-change:transform,opacity;
+}
+@media screen and (min-width:900px){
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page{
+    grid-template-columns:minmax(0,1.12fr) minmax(0,0.88fr);
+    min-height:22rem;
+  }
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--static{
+  position:relative;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip--active .mhd-hero-flip__page{
+  position:absolute;
+  inset:0;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--out-forward{
+  z-index:2;
+  transform-origin:left center;
+  animation:mhd-hero-flip-out-forward 0.52s cubic-bezier(0.45,0.05,0.25,1) forwards;
+  box-shadow:-12px 0 28px rgb(0 0 0 / 0.18);
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--in-forward{
+  z-index:1;
+  transform-origin:right center;
+  animation:mhd-hero-flip-in-forward 0.52s cubic-bezier(0.45,0.05,0.25,1) forwards;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--out-backward{
+  z-index:2;
+  transform-origin:right center;
+  animation:mhd-hero-flip-out-backward 0.52s cubic-bezier(0.45,0.05,0.25,1) forwards;
+  box-shadow:12px 0 28px rgb(0 0 0 / 0.18);
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--in-backward{
+  z-index:1;
+  transform-origin:left center;
+  animation:mhd-hero-flip-in-backward 0.52s cubic-bezier(0.45,0.05,0.25,1) forwards;
+}
+@keyframes mhd-hero-flip-out-forward{
+  0%{transform:rotateY(0deg);opacity:1;}
+  100%{transform:rotateY(-78deg);opacity:0;}
+}
+@keyframes mhd-hero-flip-in-forward{
+  0%{transform:rotateY(78deg);opacity:0;}
+  100%{transform:rotateY(0deg);opacity:1;}
+}
+@keyframes mhd-hero-flip-out-backward{
+  0%{transform:rotateY(0deg);opacity:1;}
+  100%{transform:rotateY(78deg);opacity:0;}
+}
+@keyframes mhd-hero-flip-in-backward{
+  0%{transform:rotateY(-78deg);opacity:0;}
+  100%{transform:rotateY(0deg);opacity:1;}
+}
+@media (prefers-reduced-motion:reduce){
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--out-forward,
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--in-forward,
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--out-backward,
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--in-backward{
+    animation-duration:0.01ms;
+    box-shadow:none;
   }
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__media{
@@ -684,7 +766,13 @@ body.adc-portal-active main{
   text-align:center;
   white-space:nowrap;
   border:1px solid rgb(var(--mhd-border));
+  font-family:inherit;
+  cursor:pointer;
   transition:background-color 0.2s ease,color 0.2s ease,border-color 0.2s ease;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-tab:disabled{
+  cursor:wait;
+  opacity:0.85;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-tab:hover,#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-tab:focus-visible{
   background:rgb(var(--mhd-white));

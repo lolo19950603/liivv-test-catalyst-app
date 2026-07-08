@@ -28,14 +28,14 @@ export function InsuranceStepForm({ isSetupFlow }: { isSetupFlow: boolean }) {
       <OnboardingSubmitOverlay message="Saving insurance details..." visible={isPending} />
       <section className="space-y-8">
         {isSetupFlow ? (
-          <OnboardingProgressBar current={4} label="Onboarding progress" total={4} />
+          <OnboardingProgressBar current={3} label="Onboarding progress" total={3} />
         ) : null}
         <OnboardingSectionHeader
           centerOnMobile
           description="Add your coverage details or skip for now. You can update this later."
           kicker="Onboarding"
           titleAccent="information"
-          titleBefore="Step 4: Insurance "
+          titleBefore="Step 3: Insurance "
         />
 
         {state?.error ? (
@@ -92,7 +92,7 @@ export function InsuranceStepForm({ isSetupFlow }: { isSetupFlow: boolean }) {
               className="liivv-btn-secondary inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm"
               href={
                 isSetupFlow
-                  ? appendSetupFlowQuery('/account/onboarding/medications')
+                  ? appendSetupFlowQuery(ACCOUNT_ONBOARDING_HEALTH_PROFILE)
                   : ACCOUNT_ONBOARDING_HEALTH_PROFILE
               }
             >

@@ -1,6 +1,12 @@
 import { isSupabaseConfigured } from '~/lib/supabase/client';
+import {
+  ACCOUNT_ONBOARDING_HEALTH_PROFILE,
+  ACCOUNT_ONBOARDING_INSURANCE,
+  ACCOUNT_ONBOARDING_PROFILE,
+} from '~/lib/onboarding/onboarding-flow';
+import { enforceSetupFlowStep } from '~/lib/onboarding/enforce-setup-flow-step';
 
-import { getOnboardingProfileInitial } from '../page-data';
+import { getOnboardingCustomer, getOnboardingProfileInitial } from '../page-data';
 import { ProfileStepForm } from './profile-step-form';
 
 interface Props {
@@ -10,10 +16,15 @@ interface Props {
 export default async function OnboardingProfilePage({ searchParams }: Props) {
   const params = await searchParams;
   const isSetupFlow = params.setup === '1';
+  const customer = await getOnboardingCustomer();
   const initial = await getOnboardingProfileInitial();
 
-  if (!initial) {
+  if (!customer || !initial) {
     return null;
+  }
+
+  if (isSetupFlow) {
+    await enforceSetupFlowStep(ACCOUNT_ONBOARDING_PROFILE, customer);
   }
 
   if (!isSupabaseConfigured()) {

@@ -4,11 +4,10 @@ import { redirect } from 'next/navigation';
 
 import { HealthDashboardMain } from '~/components/account-dashboard/health-dashboard-main';
 import { getWellnessDashboardContext } from '~/app/[locale]/(default)/account/onboarding/page-data';
+import { buildDashboardHeroPanels } from '~/lib/account-dashboard/build-dashboard-hero-panels';
 import { buildDashboardHeroTabs } from '~/lib/account-dashboard/build-hero-tabs';
-import { getCategoryHeroImage } from '~/lib/account-dashboard/hero-category-assets';
 import { buildDashboardLabels } from '~/lib/account-dashboard/dashboard-labels';
 import { getAccountDashboardNotifications } from '~/lib/account-notifications/get-header-notifications';
-import { getDashboardPostLoginRedirect } from '~/lib/supabase/post-login-redirect';
 
 import { getDashboardCustomer, getDashboardNextSubscriptionDate } from './page-data';
 
@@ -43,23 +42,11 @@ export default async function AccountDashboardPage({ params }: Props) {
     getAccountDashboardNotifications(locale),
   ]);
 
-  const postLoginRedirect = await getDashboardPostLoginRedirect({
-    entityId: customer.entityId,
-    firstName: customer.firstName,
-    lastName: customer.lastName,
-    email: customer.email,
-  });
-
-  if (postLoginRedirect) {
-    redirect(postLoginRedirect);
-  }
-
   const firstName = customer.firstName.trim();
   const lastName = customer.lastName.trim();
   const customerName = [firstName, lastName].filter(Boolean).join(' ') || t('guestName');
   const firstNameForGreeting = firstName.length > 0 ? firstName : customerName;
   const primaryCategoryId = wellness.primaryCategory?.id;
-  const heroImageSrc = getCategoryHeroImage(primaryCategoryId);
   const shopHref = '/shop-all';
   const wellnessSelectionHref = '/account/onboarding/health-profile/';
 
@@ -71,10 +58,15 @@ export default async function AccountDashboardPage({ params }: Props) {
     },
   );
 
+  const heroPanels = buildDashboardHeroPanels({
+    careInterests: wellness.careInterests,
+    subtitle: labels.wellness.hero.subtitle,
+    t: t as (key: string, values?: Record<string, string>) => string,
+  });
+
   const heroTabs = buildDashboardHeroTabs({
     careInterests: wellness.careInterests,
     primaryCategoryId,
-    shopHref,
     changeSelectionHref: wellnessSelectionHref,
     changeSelectionLabel: labels.wellness.hero.changeSelection,
   });
@@ -85,8 +77,9 @@ export default async function AccountDashboardPage({ params }: Props) {
       chatHref="/account/virtual-care/chat"
       consultingHref="/account/virtual-care"
       hasUnreadChatMessage={accountNotifications.hasUnreadChatMessage}
-      heroImageSrc={heroImageSrc}
+      heroPanels={heroPanels}
       heroTabs={heroTabs}
+      initialPanelId={primaryCategoryId}
       labels={labels}
       nextSubscriptionDate={nextSubscriptionDate}
       ordersHref="/account/orders/"

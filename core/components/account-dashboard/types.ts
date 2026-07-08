@@ -4,8 +4,20 @@ import type { ReactNode } from 'react';
 export type DashboardHeroTab = {
   id: string;
   label: string;
-  href: string;
+  href?: string;
   active: boolean;
+  kind: 'category' | 'link';
+};
+
+export type DashboardHeroPanel = {
+  id: string;
+  title: string;
+  subtitle: string;
+  heroImageSrc: string;
+  dailyTips: {
+    title: string;
+    description: string;
+  };
 };
 
 export interface AccountDashboardLabels {

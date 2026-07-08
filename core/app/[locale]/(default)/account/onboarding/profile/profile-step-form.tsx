@@ -39,7 +39,7 @@ export function ProfileStepForm({
       <OnboardingSubmitOverlay message="Saving profile details..." visible={isPending} />
       <section className="space-y-8">
         {isSetupFlow ? (
-          <OnboardingProgressBar current={1} label="Onboarding progress" total={4} />
+          <OnboardingProgressBar current={1} label="Onboarding progress" total={3} />
         ) : null}
         <OnboardingSectionHeader
           centerOnMobile

@@ -8,7 +8,6 @@ import {
 export function buildDashboardHeroTabs(options: {
   careInterests: string[];
   primaryCategoryId?: string;
-  shopHref: string;
   changeSelectionHref: string;
   changeSelectionLabel: string;
 }): DashboardHeroTab[] {
@@ -16,8 +15,8 @@ export function buildDashboardHeroTabs(options: {
   const tabs: DashboardHeroTab[] = ranked.map(({ id }) => ({
     id,
     label: getPrimaryCategoryDisplay(id as LiivPrimaryCategoryId).shortLabel,
-    href: options.shopHref,
     active: id === options.primaryCategoryId,
+    kind: 'category',
   }));
 
   tabs.push({
@@ -25,6 +24,7 @@ export function buildDashboardHeroTabs(options: {
     label: options.changeSelectionLabel,
     href: options.changeSelectionHref,
     active: ranked.length === 0,
+    kind: 'link',
   });
 
   return tabs;

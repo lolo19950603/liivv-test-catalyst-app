@@ -6,16 +6,15 @@ import { revalidatePath } from 'next/cache';
 import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
 import { graphql } from '~/client/graphql';
-import { TAGS } from '~/client/tags';
 import { syncOnboardingProfileToBigCommerce } from '~/lib/onboarding/bigcommerce-profile-sync';
 import { validateHealthProfileComplete } from '~/lib/onboarding/health-profile-form-validation';
 import {
   ACCOUNT_ONBOARDING_HEALTH_PROFILE,
   ACCOUNT_ONBOARDING_INSURANCE,
-  ACCOUNT_ONBOARDING_MEDICATIONS,
   appendSetupFlowQuery,
   SETUP_FLOW_VALUE,
 } from '~/lib/onboarding/onboarding-flow';
+import { redirectAfterHealthProfileStep } from '~/lib/onboarding/redirect-after-health-step';
 import {
   encodeRankedCareInterest,
   isLiivPrimaryCategoryId,
@@ -30,7 +29,7 @@ import {
   getOnboardingStatus,
 } from '~/lib/supabase/onboarding';
 import { upsertHealthProfile, type UpsertHealthProfilePayload } from '~/lib/supabase/health-profile';
-import { insertInsuranceInfo } from '~/lib/supabase/insurance';
+import { replaceInsuranceInfo } from '~/lib/supabase/insurance';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import { getOnboardingCustomer } from '../page-data';
@@ -232,11 +231,15 @@ export async function saveHealthProfileStep(
   if (intent === 'skip') {
     const statusBefore = await getOnboardingStatus(String(customer.entityId));
 
-    if (statusBefore?.health_profile_completed_at) {
-      redirect('/account/dashboard/');
+    if (!statusBefore?.health_profile_completed_at) {
+      const stepOk = await completeOnboardingStep2(customer, []);
+
+      if (!stepOk) {
+        return { error: 'Could not save onboarding progress.' };
+      }
     }
 
-    redirect(appendSetupFlowQuery(ACCOUNT_ONBOARDING_MEDICATIONS));
+    await redirectAfterHealthProfileStep(customer, isSetupFlow);
   }
 
   const rawCategoryIds = formData.getAll('care_interests').flatMap((value) => {
@@ -280,25 +283,13 @@ export async function saveHealthProfileStep(
     return { error: up.message };
   }
 
-  const statusBeforeSave = await getOnboardingStatus(String(customer.entityId));
-  const wasHealthAlreadyComplete = Boolean(statusBeforeSave?.health_profile_completed_at);
   const stepOk = await completeOnboardingStep2(customer, normalizedCareWithRank);
 
   if (!stepOk) {
     return { error: 'Could not save onboarding progress.' };
   }
 
-  revalidatePath('/account/dashboard');
-
-  if (wasHealthAlreadyComplete) {
-    redirect('/account/dashboard/');
-  }
-
-  if (isSetupFlow) {
-    redirect(appendSetupFlowQuery(ACCOUNT_ONBOARDING_MEDICATIONS));
-  }
-
-  redirect('/account/dashboard/');
+  await redirectAfterHealthProfileStep(customer, isSetupFlow);
 }
 
 export async function updateOnboardingCustomerName(
@@ -346,22 +337,24 @@ export async function updateOnboardingCustomerName(
 }
 
 export async function saveMedicationsStep(formData: FormData): Promise<void> {
+  const customer = await getOnboardingCustomer();
+
+  if (!customer) {
+    redirect('/login?redirectTo=/account/onboarding/medications');
+  }
+
   const intent = str(formData, 'intent');
   const isSetupFlow = str(formData, 'setup') === SETUP_FLOW_VALUE;
 
-  if (intent === 'skip' || intent === 'continue') {
-    redirect(
-      isSetupFlow
-        ? appendSetupFlowQuery(ACCOUNT_ONBOARDING_INSURANCE)
-        : ACCOUNT_ONBOARDING_INSURANCE,
-    );
+  if (isSetupFlow) {
+    await redirectAfterHealthProfileStep(customer, true);
   }
 
-  redirect(
-    isSetupFlow
-      ? appendSetupFlowQuery(ACCOUNT_ONBOARDING_INSURANCE)
-      : ACCOUNT_ONBOARDING_INSURANCE,
-  );
+  if (intent === 'skip' || intent === 'continue') {
+    redirect(ACCOUNT_ONBOARDING_INSURANCE);
+  }
+
+  redirect(ACCOUNT_ONBOARDING_INSURANCE);
 }
 
 export async function saveInsuranceStep(
@@ -417,7 +410,7 @@ export async function saveInsuranceStep(
     };
   }
 
-  const inserted = await insertInsuranceInfo({
+  const inserted = await replaceInsuranceInfo({
     profile_id: ensured.profile.id,
     provider_name: providerName,
     policy_number: policyNumber,

@@ -9,6 +9,8 @@ import {
   getPrimaryCategoryDisplay,
   resolveInitialHealthCategoriesWithRank,
 } from '~/lib/onboarding/liiv-primary-health-category';
+import { ACCOUNT_ONBOARDING_PROFILE, appendSetupFlowQuery } from '~/lib/onboarding/onboarding-flow';
+import { getFirstIncompleteOnboardingHref } from '~/lib/supabase/onboarding-redirect';
 import { getHealthProfileByProfileId } from '~/lib/supabase/health-profile';
 import { getOnboardingStatus } from '~/lib/supabase/onboarding';
 import { ensureCustomerProfile, getCustomerProfileByBigCommerceId } from '~/lib/supabase/profile';
@@ -109,14 +111,19 @@ export const getWellnessDashboardContext = cache(async () => {
       status.insurance_info_completed_at,
   );
 
+  const onboardingHref = onboardingComplete
+    ? null
+    : (await getFirstIncompleteOnboardingHref(
+        customer,
+        ensured.status === 'ok' ? ensured : undefined,
+      )) ?? appendSetupFlowQuery(ACCOUNT_ONBOARDING_PROFILE);
+
   return {
     supabaseReady: ensured.status === 'ok' || profile != null,
     primaryCategory: primary,
     careInterests: profile?.care_interests ?? status?.care_interests ?? [],
     onboardingComplete,
-    onboardingHref: onboardingComplete
-      ? null
-      : `/account/onboarding/profile?setup=1`,
+    onboardingHref,
   };
 });
 
