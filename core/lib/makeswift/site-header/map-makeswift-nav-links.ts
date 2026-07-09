@@ -4,18 +4,22 @@ import { resolveMakeswiftHref } from '~/lib/makeswift/utils/resolve-makeswift-hr
 import { distributeIntoColumns } from './build-store-nav-from-categories';
 
 export type MakeswiftAdditionalSubLinkInput = {
-  label: string;
-  link: { href?: string };
+  label?: string;
+  link?: { href?: string };
   previewImage?: string;
   previewImageAlt?: string;
 };
 
 export type MakeswiftAdditionalLinkInput = {
-  label: string;
-  link: { href?: string };
+  label?: string;
+  link?: { href?: string };
   exploreAllLabel?: string;
   subLinks?: MakeswiftAdditionalSubLinkInput[];
 };
+
+function hasNavLabel(label: string | undefined): boolean {
+  return (label?.trim() ?? '').length > 0;
+}
 
 function mapMakeswiftNavImage(
   src: string | undefined,
@@ -41,23 +45,28 @@ export function mapMakeswiftAdditionalLinks(
   links: MakeswiftAdditionalLinkInput[],
 ): LiivvArchiveNavLink[] {
   return links
-    .filter((item) => item.label.trim().length > 0)
+    .filter((item) => hasNavLabel(item.label))
     .map((item) => {
-      const href = resolveMakeswiftHref(item.link.href, '/');
+      const label = item.label!.trim();
+      const href = resolveMakeswiftHref(item.link?.href, '/');
 
       const subLinks = (item.subLinks ?? [])
-        .filter((sub) => sub.label.trim().length > 0)
-        .map((sub) => ({
-          label: sub.label,
-          href: resolveMakeswiftHref(sub.link.href, '/'),
-          image: mapMakeswiftNavImage(sub.previewImage, sub.previewImageAlt, sub.label),
-        }));
+        .filter((sub) => hasNavLabel(sub.label))
+        .map((sub) => {
+          const subLabel = sub.label!.trim();
+
+          return {
+            label: subLabel,
+            href: resolveMakeswiftHref(sub.link?.href, '/'),
+            image: mapMakeswiftNavImage(sub.previewImage, sub.previewImageAlt, subLabel),
+          };
+        });
 
       const columns = subLinks.length > 0 ? distributeIntoColumns(subLinks) : undefined;
       const exploreAllLabel = item.exploreAllLabel?.trim();
 
       return {
-        label: item.label,
+        label,
         href,
         columns,
         exploreAll:

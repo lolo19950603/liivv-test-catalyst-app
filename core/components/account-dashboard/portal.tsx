@@ -66,6 +66,7 @@ export function AccountDashboardPortal({
   notificationsUnreadCount,
   logoSrc,
   logoAlt,
+  storeNav,
   ordersHref,
   settingsHref,
   shopHref,
@@ -158,82 +159,124 @@ export function AccountDashboardPortal({
 
           <div className="mhd-content">
             <header className="mhd-content-header">
-              <div className="mhd-content-header__greeting">
-                <h1 className="mhd-greeting__title">{labels.wellness.greeting}</h1>
-                <p className="mhd-greeting__lead">{labels.wellness.welcomeLead}</p>
+              <div className="mhd-store-nav">
+                <Link aria-label={storeNav.logo.alt} className="mhd-store-nav__logo" href={storeNav.logo.href}>
+                  {storeNav.logo.src ? (
+                    <img
+                      alt={storeNav.logo.alt}
+                      className="mhd-store-nav__logo-img"
+                      height={32}
+                      src={storeNav.logo.src}
+                      width={120}
+                    />
+                  ) : (
+                    <span className="mhd-store-nav__logo-text">{storeNav.logo.text ?? labels.brandName}</span>
+                  )}
+                </Link>
+                {storeNav.links.length > 0 ? (
+                  <nav aria-label="Store" className="mhd-store-nav__links">
+                    {storeNav.links.map((link) => (
+                      <Link className="mhd-store-nav__link" href={link.href} key={link.href}>
+                        {link.label}
+                      </Link>
+                    ))}
+                  </nav>
+                ) : null}
               </div>
 
-              <div className="mhd-content-header__utilities">
-                <Link aria-label={labels.search} className="mhd-icon-btn" href={shopHref}>
-                  <IconSearch />
-                </Link>
-                <AccountNotificationsBell
-                  labels={{
-                    ariaLabel: labels.notifications,
-                    empty: labels.notificationsEmpty,
-                    kindOrder: labels.notificationKindOrder,
-                    kindSubscription: labels.notificationKindSubscription,
-                    panelTitle: labels.notificationsPanelTitle,
-                  }}
-                  notifications={headerNotifications}
-                  unreadCount={notificationsUnreadCount}
-                />
-                <Link aria-label={labels.cart} className="mhd-icon-btn" href={cartHref}>
-                  <IconCart />
-                </Link>
+              <div className="mhd-content-header__body">
+                <div className="mhd-content-header__greeting">
+                  <h1 className="mhd-greeting__title">{labels.wellness.greeting}</h1>
+                  <p className="mhd-greeting__lead">{labels.wellness.welcomeLead}</p>
+                </div>
 
-                <div className="mhd-account-wrap" ref={accountRef}>
-                  <button
-                    aria-expanded={accountOpen}
-                    aria-haspopup="menu"
-                    className="mhd-account-btn mhd-account-btn--avatar"
-                    onClick={() => setAccountOpen((open) => !open)}
-                    ref={accountButtonRef}
-                    type="button"
-                  >
-                    <span aria-hidden className="mhd-avatar">
-                      {avatarInitials}
-                    </span>
-                    <span className="mhd-account-btn__label">{labels.myAccount}</span>
-                    <IconChevronDown className="mhd-chevron" />
-                  </button>
-                  <ul className="mhd-account-menu" hidden={!accountOpen} role="menu">
-                    <li role="none">
-                      <Link
-                        aria-current={isNavActive(pathname, ordersHref) ? 'page' : undefined}
-                        href={ordersHref}
-                        onClick={() => setAccountOpen(false)}
-                        role="menuitem"
-                      >
-                        {labels.sidebar.orders}
-                      </Link>
-                    </li>
-                    <li role="none">
-                      <Link
-                        aria-current={isNavActive(pathname, subscriptionsHref) ? 'page' : undefined}
-                        href={subscriptionsHref}
-                        onClick={() => setAccountOpen(false)}
-                        role="menuitem"
-                      >
-                        {labels.wellness.actionCenter.subscriptionManage}
-                      </Link>
-                    </li>
-                    <li role="none">
-                      <Link
-                        aria-current={isNavActive(pathname, settingsHref) ? 'page' : undefined}
-                        href={settingsHref}
-                        onClick={() => setAccountOpen(false)}
-                        role="menuitem"
-                      >
-                        {labels.accountSettings}
-                      </Link>
-                    </li>
-                    <li role="none">
-                      <Link href={logoutHref} onClick={() => setAccountOpen(false)} prefetch="none" role="menuitem">
-                        {labels.signOut}
-                      </Link>
-                    </li>
-                  </ul>
+                <div className="mhd-content-header__utilities">
+                  <Link aria-label={labels.search} className="mhd-icon-btn" href={shopHref}>
+                    <IconSearch />
+                  </Link>
+                  <AccountNotificationsBell
+                    labels={{
+                      ariaLabel: labels.notifications,
+                      empty: labels.notificationsEmpty,
+                      kindOrder: labels.notificationKindOrder,
+                      kindSubscription: labels.notificationKindSubscription,
+                      panelTitle: labels.notificationsPanelTitle,
+                    }}
+                    notifications={headerNotifications}
+                    unreadCount={notificationsUnreadCount}
+                  />
+                  <Link aria-label={labels.cart} className="mhd-icon-btn" href={cartHref}>
+                    <IconCart />
+                  </Link>
+
+                  <div className="mhd-account-wrap" ref={accountRef}>
+                    <button
+                      aria-expanded={accountOpen}
+                      aria-haspopup="menu"
+                      className="mhd-account-btn mhd-account-btn--avatar"
+                      onClick={() => setAccountOpen((open) => !open)}
+                      ref={accountButtonRef}
+                      type="button"
+                    >
+                      <span aria-hidden className="mhd-avatar">
+                        {avatarInitials}
+                      </span>
+                      <span className="mhd-account-btn__label">{labels.myAccount}</span>
+                      <IconChevronDown className="mhd-chevron" />
+                    </button>
+                    <ul className="mhd-account-menu" hidden={!accountOpen} role="menu">
+                      <li className="mhd-account-menu__notifications-item" role="none">
+                        <AccountNotificationsBell
+                          labels={{
+                            ariaLabel: labels.notifications,
+                            empty: labels.notificationsEmpty,
+                            kindOrder: labels.notificationKindOrder,
+                            kindSubscription: labels.notificationKindSubscription,
+                            panelTitle: labels.notificationsPanelTitle,
+                          }}
+                          notifications={headerNotifications}
+                          onOpen={() => setAccountOpen(false)}
+                          unreadCount={notificationsUnreadCount}
+                          variant="menu"
+                        />
+                      </li>
+                      <li role="none">
+                        <Link
+                          aria-current={isNavActive(pathname, ordersHref) ? 'page' : undefined}
+                          href={ordersHref}
+                          onClick={() => setAccountOpen(false)}
+                          role="menuitem"
+                        >
+                          {labels.sidebar.orders}
+                        </Link>
+                      </li>
+                      <li role="none">
+                        <Link
+                          aria-current={isNavActive(pathname, subscriptionsHref) ? 'page' : undefined}
+                          href={subscriptionsHref}
+                          onClick={() => setAccountOpen(false)}
+                          role="menuitem"
+                        >
+                          {labels.wellness.actionCenter.subscriptionManage}
+                        </Link>
+                      </li>
+                      <li role="none">
+                        <Link
+                          aria-current={isNavActive(pathname, settingsHref) ? 'page' : undefined}
+                          href={settingsHref}
+                          onClick={() => setAccountOpen(false)}
+                          role="menuitem"
+                        >
+                          {labels.accountSettings}
+                        </Link>
+                      </li>
+                      <li role="none">
+                        <Link href={logoutHref} onClick={() => setAccountOpen(false)} prefetch="none" role="menuitem">
+                          {labels.signOut}
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </header>

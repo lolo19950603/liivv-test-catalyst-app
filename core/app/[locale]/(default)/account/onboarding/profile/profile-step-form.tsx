@@ -150,7 +150,7 @@ export function ProfileStepForm({
             </label>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="flex flex-row flex-wrap items-center gap-3">
             <Link
               className="liivv-btn-secondary inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm"
               href="/account/dashboard/"

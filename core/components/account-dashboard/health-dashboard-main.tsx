@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { Link } from '~/components/link';
 
@@ -12,10 +12,6 @@ import {
   IconSupplies,
 } from './icons';
 import type { AccountDashboardLabels, DashboardHeroPanel, DashboardHeroTab } from './types';
-
-const FLIP_DURATION_MS = 520;
-
-type FlipDirection = 'forward' | 'backward';
 
 export function HealthDashboardMain({
   labels,
@@ -49,104 +45,19 @@ export function HealthDashboardMain({
   const { wellness } = labels;
   const defaultPanelId = initialPanelId ?? heroPanels[0]?.id ?? null;
   const [activePanelId, setActivePanelId] = useState(defaultPanelId);
-  const [exitingPanelId, setExitingPanelId] = useState<string | null>(null);
-  const [flipDirection, setFlipDirection] = useState<FlipDirection>('forward');
-  const [isFlipping, setIsFlipping] = useState(false);
-  const flipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const categoryTabIds = heroTabs.filter((tab) => tab.kind === 'category').map((tab) => tab.id);
-
-  const clearFlipTimer = useCallback(() => {
-    if (flipTimerRef.current) {
-      clearTimeout(flipTimerRef.current);
-      flipTimerRef.current = null;
-    }
-  }, []);
-
-  useEffect(() => clearFlipTimer, [clearFlipTimer]);
 
   const selectCategory = (tabId: string) => {
-    if (tabId === activePanelId || isFlipping || !heroPanels.some((panel) => panel.id === tabId)) {
+    if (tabId === activePanelId || !heroPanels.some((panel) => panel.id === tabId)) {
       return;
     }
 
-    const currentIndex = categoryTabIds.indexOf(activePanelId ?? '');
-    const nextIndex = categoryTabIds.indexOf(tabId);
-    setFlipDirection(nextIndex > currentIndex ? 'forward' : 'backward');
-    setExitingPanelId(activePanelId);
     setActivePanelId(tabId);
-    setIsFlipping(true);
-    clearFlipTimer();
-    flipTimerRef.current = setTimeout(() => {
-      setExitingPanelId(null);
-      setIsFlipping(false);
-      flipTimerRef.current = null;
-    }, FLIP_DURATION_MS);
   };
 
   const isTabActive = (tab: DashboardHeroTab) =>
     tab.kind === 'category' ? tab.id === activePanelId : tab.active;
 
-  const renderHeroPanel = (panel: DashboardHeroPanel, motionState: 'static' | 'exit' | 'enter') => (
-    <div
-      className={[
-        'mhd-hero-flip__page',
-        motionState === 'static' ? 'mhd-hero-flip__page--static' : '',
-        motionState === 'exit' ? `mhd-hero-flip__page--out-${flipDirection}` : '',
-        motionState === 'enter' ? `mhd-hero-flip__page--in-${flipDirection}` : '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      key={panel.id}
-    >
-      <div className="mhd-hero__body">
-        <div className="mhd-hero__intro">
-          <h2 className="mhd-hero__title">{panel.title}</h2>
-          <p className="mhd-hero__subtitle">{panel.subtitle}</p>
-        </div>
-
-        <div className="mhd-hero__cards">
-          <article className="mhd-glass-card mhd-glass-card--tips">
-            <h3 className="mhd-glass-card__title">{panel.dailyTips.title}</h3>
-            <p className="mhd-glass-card__desc">{panel.dailyTips.description}</p>
-          </article>
-          <Link className="mhd-glass-card mhd-glass-card--link" href={shopHref}>
-            <div className="mhd-glass-card__icon">
-              <IconSupplies />
-            </div>
-            <div>
-              <h3 className="mhd-glass-card__title">{wellness.hero.yourSupplies.title}</h3>
-              <p className="mhd-glass-card__desc">{wellness.hero.yourSupplies.description}</p>
-            </div>
-          </Link>
-          <Link className="mhd-glass-card mhd-glass-card--link" href={consultingHref}>
-            <div className="mhd-glass-card__icon">
-              <IconPrescription />
-            </div>
-            <div>
-              <h3 className="mhd-glass-card__title">{wellness.hero.exploreMore}</h3>
-            </div>
-          </Link>
-        </div>
-      </div>
-
-      <div className="mhd-hero__media">
-        <img
-          alt=""
-          className="mhd-hero__image"
-          height={480}
-          loading="lazy"
-          src={panel.heroImageSrc}
-          width={960}
-        />
-      </div>
-    </div>
-  );
-
   const activePanel = heroPanels.find((panel) => panel.id === activePanelId);
-  const exitingPanel = exitingPanelId
-    ? heroPanels.find((panel) => panel.id === exitingPanelId)
-    : null;
 
   return (
     <div className="mhd-wellness">
@@ -162,7 +73,6 @@ export function HealthDashboardMain({
                   <button
                     aria-pressed={active}
                     className={active ? 'mhd-hero-tab mhd-hero-tab--active' : 'mhd-hero-tab'}
-                    disabled={isFlipping}
                     key={tab.id}
                     onClick={() => selectCategory(tab.id)}
                     type="button"
@@ -186,11 +96,39 @@ export function HealthDashboardMain({
           </nav>
         </div>
 
-        <div className={`mhd-hero__main mhd-hero-flip${isFlipping ? ' mhd-hero-flip--active' : ''}`}>
-          {isFlipping && exitingPanel ? renderHeroPanel(exitingPanel, 'exit') : null}
-          {activePanel
-            ? renderHeroPanel(activePanel, isFlipping ? 'enter' : 'static')
-            : null}
+        <div className="mhd-hero__main">
+          {activePanel ? (
+            <div className="mhd-hero__body">
+              <div className="mhd-hero__intro">
+                <h2 className="mhd-hero__title">{activePanel.title}</h2>
+                <p className="mhd-hero__subtitle">{activePanel.subtitle}</p>
+              </div>
+
+              <div className="mhd-hero__cards">
+                <article className="mhd-glass-card mhd-glass-card--tips">
+                  <h3 className="mhd-glass-card__title">{activePanel.dailyTips.title}</h3>
+                  <p className="mhd-glass-card__desc">{activePanel.dailyTips.description}</p>
+                </article>
+                <Link className="mhd-glass-card mhd-glass-card--link" href={shopHref}>
+                  <div className="mhd-glass-card__icon">
+                    <IconSupplies />
+                  </div>
+                  <div>
+                    <h3 className="mhd-glass-card__title">{wellness.hero.yourSupplies.title}</h3>
+                    <p className="mhd-glass-card__desc">{wellness.hero.yourSupplies.description}</p>
+                  </div>
+                </Link>
+                <Link className="mhd-glass-card mhd-glass-card--link" href={consultingHref}>
+                  <div className="mhd-glass-card__icon">
+                    <IconPrescription />
+                  </div>
+                  <div>
+                    <h3 className="mhd-glass-card__title">{wellness.hero.exploreMore}</h3>
+                  </div>
+                </Link>
+              </div>
+            </div>
+          ) : null}
         </div>
       </section>
 

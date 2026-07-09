@@ -1,4 +1,5 @@
 import type { AccountHeaderNotification } from '~/lib/account-notifications/types';
+import type { DashboardStoreNav } from '~/lib/account-dashboard/get-dashboard-store-nav';
 import type { ReactNode } from 'react';
 
 export type DashboardHeroTab = {
@@ -13,7 +14,6 @@ export type DashboardHeroPanel = {
   id: string;
   title: string;
   subtitle: string;
-  heroImageSrc: string;
   dailyTips: {
     title: string;
     description: string;
@@ -102,5 +102,6 @@ export interface AccountDashboardShellProps {
   notificationsUnreadCount: number;
   logoSrc: string;
   logoAlt: string;
+  storeNav: DashboardStoreNav;
   children: ReactNode;
 }

@@ -140,18 +140,74 @@ body.adc-portal-active main{
   align-items:stretch;
   gap:1rem;
   padding:1.5rem 1.25rem 1rem;
-  background:rgb(var(--mhd-surface));
-}
-@media screen and (min-width:768px){
-  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header{
-    flex-direction:row;
-    align-items:flex-start;
-    justify-content:space-between;
-  }
+  background:rgb(var(--mhd-white));
+  border-bottom:1px solid rgb(var(--mhd-border));
 }
 @media screen and (min-width:900px){
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header{
-    padding:2rem 2rem 1.25rem;
+    padding:1rem 2rem;
+  }
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-store-nav{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:1rem 1.5rem;
+  width:100%;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-store-nav__logo{
+  display:inline-flex;
+  align-items:center;
+  flex-shrink:0;
+  text-decoration:none;
+  color:rgb(var(--mhd-text));
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-store-nav__logo-img{
+  display:block;
+  height:2rem;
+  width:auto;
+  max-width:8.5rem;
+  object-fit:contain;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-store-nav__logo-text{
+  font-family:var(--mhd-font-heading);
+  font-size:1.375rem;
+  font-weight:500;
+  letter-spacing:-0.03em;
+  line-height:1;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-store-nav__links{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:0.75rem 1.25rem;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-store-nav__link{
+  font-family:var(--mhd-font-body);
+  font-size:0.9375rem;
+  font-weight:500;
+  line-height:1.2;
+  color:rgb(var(--mhd-text));
+  text-decoration:none;
+  transition:color 0.2s ease;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-store-nav__link:hover,#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-store-nav__link:focus-visible{
+  color:rgb(var(--mhd-accent));
+  outline:none;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header__body{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:1rem;
+  width:100%;
+}
+@media screen and (min-width:768px){
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header__body{
+    flex-direction:row;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:1.5rem;
   }
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header__utilities{
@@ -349,6 +405,25 @@ body.adc-portal-active main{
   background:rgb(var(--mhd-surface));
   color:rgb(var(--mhd-accent));
 }
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-menu__notifications-item{
+  padding:0;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-menu__notifications{
+  position:relative;
+  justify-content:flex-start;
+  gap:0.625rem;
+  width:100%;
+  padding:0.5rem 0.75rem;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications--menu{
+  width:100%;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications--menu .mhd-notifications__panel{
+  left:0;
+  right:auto;
+  top:calc(100% + 0.25rem);
+  width:min(20rem,calc(100vw - 2rem));
+}
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-mega-nav{
   display:none;
   border-bottom:1px solid rgb(var(--mhd-border));
@@ -496,123 +571,8 @@ body.adc-portal-active main{
   }
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__main{
-  display:grid;
-  grid-template-columns:1fr;
-  min-height:18rem;
-  position:relative;
-}
-@media screen and (min-width:900px){
-  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__main{
-    grid-template-columns:minmax(0,1.12fr) minmax(0,0.88fr);
-    min-height:22rem;
-  }
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip{
-  perspective:1400px;
-  transform-style:preserve-3d;
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip--active{
   display:block;
-  min-height:18rem;
-}
-@media screen and (min-width:900px){
-  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip--active{
-    min-height:22rem;
-  }
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page{
-  display:grid;
-  grid-template-columns:1fr;
-  min-height:18rem;
-  width:100%;
-  backface-visibility:hidden;
-  will-change:transform,opacity;
-}
-@media screen and (min-width:900px){
-  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page{
-    grid-template-columns:minmax(0,1.12fr) minmax(0,0.88fr);
-    min-height:22rem;
-  }
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--static{
   position:relative;
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip--active .mhd-hero-flip__page{
-  position:absolute;
-  inset:0;
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--out-forward{
-  z-index:2;
-  transform-origin:left center;
-  animation:mhd-hero-flip-out-forward 0.52s cubic-bezier(0.45,0.05,0.25,1) forwards;
-  box-shadow:-12px 0 28px rgb(0 0 0 / 0.18);
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--in-forward{
-  z-index:1;
-  transform-origin:right center;
-  animation:mhd-hero-flip-in-forward 0.52s cubic-bezier(0.45,0.05,0.25,1) forwards;
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--out-backward{
-  z-index:2;
-  transform-origin:right center;
-  animation:mhd-hero-flip-out-backward 0.52s cubic-bezier(0.45,0.05,0.25,1) forwards;
-  box-shadow:12px 0 28px rgb(0 0 0 / 0.18);
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--in-backward{
-  z-index:1;
-  transform-origin:left center;
-  animation:mhd-hero-flip-in-backward 0.52s cubic-bezier(0.45,0.05,0.25,1) forwards;
-}
-@keyframes mhd-hero-flip-out-forward{
-  0%{transform:rotateY(0deg);opacity:1;}
-  100%{transform:rotateY(-78deg);opacity:0;}
-}
-@keyframes mhd-hero-flip-in-forward{
-  0%{transform:rotateY(78deg);opacity:0;}
-  100%{transform:rotateY(0deg);opacity:1;}
-}
-@keyframes mhd-hero-flip-out-backward{
-  0%{transform:rotateY(0deg);opacity:1;}
-  100%{transform:rotateY(78deg);opacity:0;}
-}
-@keyframes mhd-hero-flip-in-backward{
-  0%{transform:rotateY(-78deg);opacity:0;}
-  100%{transform:rotateY(0deg);opacity:1;}
-}
-@media (prefers-reduced-motion:reduce){
-  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--out-forward,
-  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--in-forward,
-  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--out-backward,
-  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero-flip__page--in-backward{
-    animation-duration:0.01ms;
-    box-shadow:none;
-  }
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__media{
-  position:relative;
-  min-height:12rem;
-  background:rgb(var(--mhd-surface));
-  order:2;
-}
-@media screen and (min-width:900px){
-  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__media{
-    order:2;
-    min-height:100%;
-  }
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__image{
-  display:block;
-  width:100%;
-  height:100%;
-  min-height:12rem;
-  object-fit:cover;
-  object-position:center top;
-}
-@media screen and (min-width:900px){
-  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__image{
-    min-height:22rem;
-    object-position:center center;
-  }
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__body{
   position:relative;
@@ -622,13 +582,12 @@ body.adc-portal-active main{
   justify-content:space-between;
   gap:1.25rem;
   padding:1.25rem;
-  order:1;
   background:linear-gradient(145deg,#4a5d4a 0%,#3f523f 42%,#354835 100%);
 }
 @media screen and (min-width:900px){
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__body{
     padding:1.75rem 1.5rem 1.5rem;
-    min-height:22rem;
+    min-height:18rem;
   }
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__intro{

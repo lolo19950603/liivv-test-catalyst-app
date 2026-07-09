@@ -13,6 +13,9 @@ import { getFirstIncompleteOnboardingHref } from '~/lib/supabase/onboarding-redi
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
 import { getStoreLogoFallback } from '~/lib/store-theme/get-store-logo-fallback';
 
+import { getDashboardStoreNav } from '~/lib/account-dashboard/get-dashboard-store-nav';
+import type { DashboardStoreNav } from '~/lib/account-dashboard/get-dashboard-store-nav';
+
 import type { AccountDashboardLabels } from '~/components/account-dashboard/types';
 import type { AccountHeaderNotification } from '~/lib/account-notifications/types';
 
@@ -32,6 +35,7 @@ export interface AccountDashboardShellData {
   settingsHref: string;
   contactHref: string;
   logoutHref: string;
+  storeNav: DashboardStoreNav;
 }
 
 export async function getAccountDashboardShellProps(
@@ -44,10 +48,11 @@ export async function getAccountDashboardShellProps(
   }
 
   const t = await getTranslations({ locale, namespace: 'Account.Dashboard' });
-  const [wellness, accountNotifications, storeLogo] = await Promise.all([
+  const [wellness, accountNotifications, storeLogo, storeNav] = await Promise.all([
     getWellnessDashboardContext(),
     getAccountDashboardNotifications(locale),
     getStoreLogoFallback(),
+    getDashboardStoreNav(),
   ]);
 
   const firstName = customer.firstName.trim();
@@ -108,5 +113,6 @@ export async function getAccountDashboardShellProps(
     settingsHref: '/account/settings/',
     contactHref: '/contact-us',
     logoutHref: '/logout',
+    storeNav,
   };
 }

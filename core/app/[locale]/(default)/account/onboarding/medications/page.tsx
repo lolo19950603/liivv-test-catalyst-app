@@ -66,7 +66,7 @@ export default async function OnboardingMedicationsPage({ searchParams }: Props)
             />
           </div>
 
-          <div className="flex flex-col gap-3 border-t border-[#e8e2d8] pt-6 sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="flex flex-row flex-wrap items-center gap-3 border-t border-[#e8e2d8] pt-6">
             <Link
               className="liivv-btn-secondary inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm"
               href={

@@ -1,4 +1,3 @@
-import { getCategoryHeroImage } from '~/lib/account-dashboard/hero-category-assets';
 import {
   getPrimaryCategoryDisplay,
   resolveInitialHealthCategoriesWithRank,
@@ -59,7 +58,6 @@ export function buildDashboardHeroPanels(options: {
       id,
       title: display.shortLabel ?? display.label,
       subtitle: options.subtitle,
-      heroImageSrc: getCategoryHeroImage(id),
       dailyTips: resolveDailyTips(options.t, id),
     };
   });

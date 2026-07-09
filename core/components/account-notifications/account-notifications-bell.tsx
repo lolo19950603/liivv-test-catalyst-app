@@ -13,6 +13,8 @@ export function AccountNotificationsBell({
   notifications,
   unreadCount,
   labels,
+  variant = 'icon',
+  onOpen,
 }: {
   notifications: AccountHeaderNotification[];
   unreadCount: number;
@@ -23,6 +25,8 @@ export function AccountNotificationsBell({
     kindOrder: string;
     kindSubscription: string;
   };
+  variant?: 'icon' | 'menu';
+  onOpen?: () => void;
 }) {
   const t = useTranslations('Account.Dashboard');
   const [open, setOpen] = useState(false);
@@ -80,6 +84,7 @@ export function AccountNotificationsBell({
     setOpen(next);
 
     if (next) {
+      onOpen?.();
       void markRead();
     }
   };
@@ -88,7 +93,12 @@ export function AccountNotificationsBell({
     kind === 'order' ? labels.kindOrder : labels.kindSubscription;
 
   return (
-    <div className="mhd-notifications" ref={rootRef}>
+    <div
+      className={
+        variant === 'menu' ? 'mhd-notifications mhd-notifications--menu' : 'mhd-notifications'
+      }
+      ref={rootRef}
+    >
       <button
         aria-expanded={open}
         aria-haspopup="menu"
@@ -97,11 +107,12 @@ export function AccountNotificationsBell({
             ? t('notificationsUnread', { count: badgeCount })
             : labels.ariaLabel
         }
-        className="mhd-icon-btn"
+        className={variant === 'menu' ? 'mhd-account-menu__notifications' : 'mhd-icon-btn'}
         onClick={onToggle}
         type="button"
       >
         <IconBell />
+        {variant === 'menu' ? <span>{labels.ariaLabel}</span> : null}
         {badgeCount > 0 ? (
           <span aria-hidden className="mhd-badge">
             {badgeCount > 9 ? '9+' : badgeCount}
