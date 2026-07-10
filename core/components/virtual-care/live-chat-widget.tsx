@@ -6,7 +6,6 @@ import {
   useEffectEvent,
   useRef,
   useState,
-  type FormEvent,
   type ReactNode,
 } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -151,7 +150,6 @@ function AuthenticatedPanel({
   onRefresh: () => void;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
   const [sendBurstTrigger, setSendBurstTrigger] = useState(0);
   const [sendState, sendAction, sendPending] = useActionState<
     VirtualCareChatActionState,
@@ -167,13 +165,15 @@ function AuthenticatedPanel({
   const escalatedToPharmacistAt = data?.escalatedToPharmacistAt ?? null;
   const assistantActive = botEnabled && !careTeamActive && !escalatedToPharmacistAt;
 
-  const { capturePendingSend, displayMessages, inputLocked, showTyping } = useChatOptimisticSend({
-    assistantActive,
-    conversationId,
-    messages,
-    sendPending,
-    sendState,
-  });
+  const { draft, displayMessages, handleSendSubmit, inputLocked, setDraft, showTyping } =
+    useChatOptimisticSend({
+      assistantActive,
+      conversationId,
+      messages,
+      sendAction,
+      sendPending,
+      sendState,
+    });
   const pollIntervalMs = conversationId ? CHAT_ACTIVE_POLL_MS : CHAT_IDLE_POLL_MS;
 
   useChatPollRefresh({
@@ -196,25 +196,11 @@ function AuthenticatedPanel({
   }, [displayMessages.length, showTyping]);
 
   useEffect(() => {
-    if (sendPending) {
-      formRef.current?.reset();
-    }
-  }, [sendPending]);
-
-  useEffect(() => {
     if (sendState?.ok) {
       setSendBurstTrigger((value) => value + 1);
       refresh();
     }
   }, [sendState?.ok]);
-
-  function handleSendSubmit(event: FormEvent<HTMLFormElement>) {
-    const body = String(new FormData(event.currentTarget).get('body') ?? '').trim();
-
-    if (body) {
-      capturePendingSend(body);
-    }
-  }
 
   if (!data || !supabaseReady) {
     return (
@@ -302,7 +288,6 @@ function AuthenticatedPanel({
           action={sendAction}
           className="flex gap-2"
           onSubmit={handleSendSubmit}
-          ref={formRef}
         >
           <input name="intent" type="hidden" value="send" />
           <input
@@ -310,6 +295,7 @@ function AuthenticatedPanel({
             disabled={inputLocked}
             maxLength={8000}
             name="body"
+            onChange={(event) => setDraft(event.target.value)}
             placeholder={
               careTeamActive
                 ? 'Message the care team…'
@@ -317,8 +303,8 @@ function AuthenticatedPanel({
                   ? 'Ask the store assistant…'
                   : 'Type your message'
             }
-            required
             type="text"
+            value={draft}
           />
           <button
             className="liivv-btn-primary shrink-0 rounded-xl px-4 py-3 text-sm disabled:opacity-60"

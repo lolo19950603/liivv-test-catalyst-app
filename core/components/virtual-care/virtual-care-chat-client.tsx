@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useRef, type FormEvent } from 'react';
+import { useActionState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 import {
@@ -58,7 +58,6 @@ export function VirtualCareChatClient({
 }) {
   const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
   const [sendState, sendAction, sendPending] = useActionState<
     VirtualCareChatActionState,
     FormData
@@ -66,13 +65,15 @@ export function VirtualCareChatClient({
 
   const assistantActive = botEnabled && !careTeamActive && !escalatedToPharmacistAt;
 
-  const { capturePendingSend, displayMessages, inputLocked, showTyping } = useChatOptimisticSend({
-    assistantActive,
-    conversationId,
-    messages,
-    sendPending,
-    sendState,
-  });
+  const { draft, displayMessages, handleSendSubmit, inputLocked, setDraft, showTyping } =
+    useChatOptimisticSend({
+      assistantActive,
+      conversationId,
+      messages,
+      sendAction,
+      sendPending,
+      sendState,
+    });
 
   useEffect(() => {
     if (!supabaseReady || !conversationId) {
@@ -97,24 +98,10 @@ export function VirtualCareChatClient({
   }, [displayMessages.length, showTyping]);
 
   useEffect(() => {
-    if (sendPending) {
-      formRef.current?.reset();
-    }
-  }, [sendPending]);
-
-  useEffect(() => {
     if (sendState?.ok) {
       router.refresh();
     }
   }, [router, sendState?.ok]);
-
-  function handleSendSubmit(event: FormEvent<HTMLFormElement>) {
-    const body = String(new FormData(event.currentTarget).get('body') ?? '').trim();
-
-    if (body) {
-      capturePendingSend(body);
-    }
-  }
 
   return (
     <section className="mx-auto w-full max-w-5xl space-y-6 pb-10">
@@ -205,7 +192,6 @@ export function VirtualCareChatClient({
             action={sendAction}
             className="flex flex-col gap-3 sm:flex-row sm:items-end"
             onSubmit={handleSendSubmit}
-            ref={formRef}
           >
             <input name="intent" type="hidden" value="send" />
             <textarea
@@ -213,6 +199,7 @@ export function VirtualCareChatClient({
               disabled={inputLocked || Boolean(loadError)}
               maxLength={8000}
               name="body"
+              onChange={(event) => setDraft(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' && !event.shiftKey) {
                   event.preventDefault();
@@ -226,8 +213,8 @@ export function VirtualCareChatClient({
                     ? 'Ask the store assistant…'
                     : 'Type your message…'
               }
-              required
               rows={3}
+              value={draft}
             />
             <button
               className="liivv-btn-primary px-5 py-2.5 text-sm disabled:opacity-60"

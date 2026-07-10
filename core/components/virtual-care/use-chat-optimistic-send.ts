@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import type { VirtualCareChatActionState } from '~/app/[locale]/(default)/account/(portal)/virtual-care/_actions/virtual-care-actions';
 import type { ChatMessageRow } from '~/lib/supabase/chat-messages';
@@ -25,15 +25,18 @@ export function useChatOptimisticSend({
   messages,
   conversationId,
   assistantActive,
+  sendAction,
   sendPending,
   sendState,
 }: {
   messages: ChatMessageRow[];
   conversationId: string | null;
   assistantActive: boolean;
+  sendAction: (formData: FormData) => void;
   sendPending: boolean;
   sendState: VirtualCareChatActionState;
 }) {
+  const [draft, setDraft] = useState('');
   const [pendingSend, setPendingSend] = useState<PendingSend | null>(null);
 
   const displayMessages = useMemo(() => {
@@ -94,10 +97,29 @@ export function useChatOptimisticSend({
     });
   }
 
+  function handleSendSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const body = draft.trim();
+
+    if (!body || pendingSend) {
+      return;
+    }
+
+    const formData = new FormData(event.currentTarget);
+
+    formData.set('body', body);
+    capturePendingSend(body);
+    setDraft('');
+    sendAction(formData);
+  }
+
   return {
-    capturePendingSend,
+    draft,
     displayMessages,
+    handleSendSubmit,
     inputLocked: Boolean(pendingSend),
+    setDraft,
     showTyping,
   };
 }
