@@ -92,6 +92,7 @@ export default async (): Promise<NextConfig> => {
               key: 'Content-Security-Policy',
               value: bcAppCspHeader.replace(/\n/g, ''),
             },
+            ...cdnLinks,
           ],
         },
         {
@@ -101,6 +102,7 @@ export default async (): Promise<NextConfig> => {
               key: 'Content-Security-Policy',
               value: bcAppCspHeader.replace(/\n/g, ''),
             },
+            ...cdnLinks,
           ],
         },
         {
@@ -131,7 +133,7 @@ export default async (): Promise<NextConfig> => {
           ],
         },
         {
-          source: '/(.*)',
+          source: '/((?!bc-app|api/bigcommerce/app).*)',
           headers: [
             {
               key: 'Content-Security-Policy',

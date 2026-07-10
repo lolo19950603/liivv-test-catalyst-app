@@ -11,8 +11,8 @@ export async function GET(request: Request) {
 
   const url = new URL(request.url);
   const signedPayload =
-    url.searchParams.get('signed_payload')?.trim() ??
     url.searchParams.get('signed_payload_jwt')?.trim() ??
+    url.searchParams.get('signed_payload')?.trim() ??
     '';
 
   if (!signedPayload) {
