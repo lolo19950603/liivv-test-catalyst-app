@@ -284,11 +284,7 @@ function AuthenticatedPanel({
       </div>
 
       <div className="border-t border-[#e8e2d8] bg-white p-3">
-        <form
-          action={sendAction}
-          className="flex gap-2"
-          onSubmit={handleSendSubmit}
-        >
+        <form className="flex gap-2" onSubmit={handleSendSubmit}>
           <input name="intent" type="hidden" value="send" />
           <input
             className="min-w-0 flex-1 rounded-xl border-0 bg-[#f0ebe3] px-3.5 py-3 text-sm text-[#2c2a26] outline-none placeholder:text-[#8a8176] focus:ring-2 focus:ring-[#8a9a7b]"
@@ -352,7 +348,11 @@ export function LiveChatWidget() {
     const session = await getLiveChatSessionAction();
 
     setIsLoggedIn(session.isLoggedIn);
-    setData(session.data);
+
+    if (session.data) {
+      setData(session.data);
+    }
+
     setSessionReady(true);
   });
 
@@ -391,7 +391,6 @@ export function LiveChatWidget() {
       return;
     }
 
-    setSessionReady(false);
     void refreshSession();
   }, [open]);
 

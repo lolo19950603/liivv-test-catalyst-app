@@ -189,7 +189,6 @@ export function VirtualCareChatClient({
           </div>
 
           <form
-            action={sendAction}
             className="flex flex-col gap-3 sm:flex-row sm:items-end"
             onSubmit={handleSendSubmit}
           >

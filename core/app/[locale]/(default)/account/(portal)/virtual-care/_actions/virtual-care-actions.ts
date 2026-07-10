@@ -185,7 +185,6 @@ export async function virtualCareChatAction(
     console.error('[virtual-care-bot]', botResult.message);
   }
 
-  revalidatePath('/', 'layout');
   return { ok: true };
 }
 

@@ -283,15 +283,15 @@ function SubscriptionShipmentsViewToggle({
 
 function SubscriptionTabEmptyState({ title }: { title: string }) {
   return (
-    <div className="rounded-2xl border border-[hsl(var(--contrast-100))] bg-[hsl(var(--background))] p-8 text-center">
-      <p className="text-sm text-[hsl(var(--contrast-500))]">{title}</p>
+    <div className="rounded-2xl border border-[var(--contrast-100,hsl(var(--contrast-100)))] bg-[var(--background,hsl(var(--background)))] p-8 text-center">
+      <p className="text-sm text-[var(--contrast-500,hsl(var(--contrast-500)))]">{title}</p>
     </div>
   );
 }
 
 function SubscriptionStatusBadge({ status }: { status: string }) {
   return (
-    <span className="inline-flex items-center rounded-full bg-[hsl(var(--contrast-100))] px-3 py-1 text-xs font-medium text-[hsl(var(--contrast-500))]">
+    <span className="inline-flex items-center rounded-full bg-[var(--contrast-100,hsl(var(--contrast-100)))] px-3 py-1 text-xs font-medium text-[var(--contrast-500,hsl(var(--contrast-500)))]">
       {status}
     </span>
   );
@@ -405,56 +405,6 @@ function SubscriptionEditLinkAction({
       className={clsx('subscription-edit-link inline', className)}
     >
       <SubscriptionPortalTextSubmit label={manageItemLabel} />
-    </form>
-  );
-}
-
-function SubscriptionEditAction({
-  subscriptionId,
-  manageItemAction,
-  manageItemLabel,
-  className,
-}: {
-  subscriptionId: string;
-  manageItemAction?: (subscriptionId: string) => Promise<void>;
-  manageItemLabel?: string;
-  className?: string;
-}) {
-  const onManageClick = useSubscriptionManageClick();
-
-  if (!manageItemLabel) {
-    return null;
-  }
-
-  if (onManageClick) {
-    return (
-      <Button
-        className={clsx('subscription-edit-action w-full', className)}
-        onClick={() => onManageClick(subscriptionId)}
-        size="small"
-        type="button"
-        variant="tertiary"
-      >
-        {manageItemLabel}
-      </Button>
-    );
-  }
-
-  if (!manageItemAction) {
-    return null;
-  }
-
-  return (
-    <form
-      action={manageItemAction.bind(null, subscriptionId)}
-      className={clsx('subscription-edit-action flex w-full min-w-0 justify-center', className)}
-    >
-      <SubscriptionPortalSubmitButton
-        className="w-full"
-        label={manageItemLabel}
-        size="small"
-        variant="tertiary"
-      />
     </form>
   );
 }
@@ -763,12 +713,13 @@ function SubscriptionProductCard({
           </div>
         </div>
 
-        <SubscriptionEditAction
-          className="mt-4 shrink-0"
-          manageItemAction={manageItemAction}
-          manageItemLabel={manageItemLabel}
-          subscriptionId={subscription.id}
-        />
+        <div className="mt-4 flex shrink-0 justify-center">
+          <SubscriptionEditLinkAction
+            manageItemAction={manageItemAction}
+            manageItemLabel={manageItemLabel}
+            subscriptionId={subscription.id}
+          />
+        </div>
       </li>
     );
   }
@@ -800,12 +751,13 @@ function SubscriptionProductCard({
         </div>
       </div>
 
-      <SubscriptionEditAction
-        className="mt-4 shrink-0"
-        manageItemAction={manageItemAction}
-        manageItemLabel={manageItemLabel}
-        subscriptionId={subscription.id}
-      />
+      <div className="mt-4 flex shrink-0 justify-center">
+        <SubscriptionEditLinkAction
+          manageItemAction={manageItemAction}
+          manageItemLabel={manageItemLabel}
+          subscriptionId={subscription.id}
+        />
+      </div>
     </li>
   );
 }

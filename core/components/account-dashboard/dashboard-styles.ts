@@ -1600,8 +1600,11 @@ body.adc-portal-active main{
   --order-list-label:rgb(var(--mhd-muted));
   --order-list-border:rgb(var(--mhd-border));
   --order-list-empty-state-title:rgb(var(--mhd-text));
-  --contrast-100:var(--mhd-border);
-  --background:var(--mhd-white);
+  --contrast-100:rgb(var(--mhd-border));
+  --contrast-400:rgb(var(--mhd-muted));
+  --contrast-500:rgb(var(--mhd-muted));
+  --contrast-600:rgb(var(--mhd-text));
+  --background:rgb(var(--mhd-white));
   --account-settings-section-title:rgb(var(--mhd-text));
   --account-settings-section-text:rgb(var(--mhd-text));
   --account-settings-section-border:rgb(var(--mhd-border));
@@ -1619,8 +1622,7 @@ body.adc-portal-active main{
   --input-light-focus:rgb(var(--mhd-accent));
   --input-light-placeholder:rgb(var(--mhd-muted));
   --label-light-text:rgb(var(--mhd-muted));
-  --foreground:var(--mhd-text);
-  --contrast-500:var(--mhd-muted);
+  --foreground:rgb(var(--mhd-text));
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-settings{
   max-width:42rem;
