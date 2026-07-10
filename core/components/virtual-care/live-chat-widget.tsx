@@ -4,7 +4,6 @@ import {
   useActionState,
   useEffect,
   useEffectEvent,
-  useMemo,
   useRef,
   useState,
   type FormEvent,
@@ -25,6 +24,7 @@ import type { ChatMessageRow } from '~/lib/supabase/chat-messages';
 import { ChatMessageBody } from '~/components/virtual-care/chat-message-body';
 import { ChatSystemMessage } from '~/components/virtual-care/chat-system-message';
 import { ChatTypingIndicator } from '~/components/virtual-care/chat-typing-indicator';
+import { useChatOptimisticSend } from '~/components/virtual-care/use-chat-optimistic-send';
 import {
   CHAT_ACTIVE_POLL_MS,
   CHAT_IDLE_POLL_MS,
@@ -153,7 +153,6 @@ function AuthenticatedPanel({
   const scrollRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const [sendBurstTrigger, setSendBurstTrigger] = useState(0);
-  const [optimisticBody, setOptimisticBody] = useState<string | null>(null);
   const [sendState, sendAction, sendPending] = useActionState<
     VirtualCareChatActionState,
     FormData
@@ -168,32 +167,13 @@ function AuthenticatedPanel({
   const escalatedToPharmacistAt = data?.escalatedToPharmacistAt ?? null;
   const assistantActive = botEnabled && !careTeamActive && !escalatedToPharmacistAt;
 
-  const displayMessages = useMemo(() => {
-    if (!optimisticBody) {
-      return messages;
-    }
-
-    const alreadyPersisted = messages.some(
-      (m) => m.sender_type === 'customer' && m.body === optimisticBody,
-    );
-
-    if (alreadyPersisted) {
-      return messages;
-    }
-
-    return [
-      ...messages,
-      {
-        id: 'optimistic-customer',
-        conversation_id: conversationId ?? 'pending',
-        sender_type: 'customer' as const,
-        body: optimisticBody,
-        created_at: new Date().toISOString(),
-      },
-    ];
-  }, [conversationId, messages, optimisticBody]);
-
-  const showTyping = Boolean(sendPending && optimisticBody && assistantActive);
+  const { capturePendingSend, displayMessages, inputLocked, showTyping } = useChatOptimisticSend({
+    assistantActive,
+    conversationId,
+    messages,
+    sendPending,
+    sendState,
+  });
   const pollIntervalMs = conversationId ? CHAT_ACTIVE_POLL_MS : CHAT_IDLE_POLL_MS;
 
   useChatPollRefresh({
@@ -222,26 +202,6 @@ function AuthenticatedPanel({
   }, [sendPending]);
 
   useEffect(() => {
-    if (!optimisticBody) {
-      return;
-    }
-
-    const persisted = messages.some(
-      (m) => m.sender_type === 'customer' && m.body === optimisticBody,
-    );
-
-    if (persisted && !sendPending) {
-      setOptimisticBody(null);
-    }
-  }, [messages, optimisticBody, sendPending]);
-
-  useEffect(() => {
-    if (sendState?.error) {
-      setOptimisticBody(null);
-    }
-  }, [sendState?.error]);
-
-  useEffect(() => {
     if (sendState?.ok) {
       setSendBurstTrigger((value) => value + 1);
       refresh();
@@ -252,7 +212,7 @@ function AuthenticatedPanel({
     const body = String(new FormData(event.currentTarget).get('body') ?? '').trim();
 
     if (body) {
-      setOptimisticBody(body);
+      capturePendingSend(body);
     }
   }
 
@@ -347,7 +307,7 @@ function AuthenticatedPanel({
           <input name="intent" type="hidden" value="send" />
           <input
             className="min-w-0 flex-1 rounded-xl border-0 bg-[#f0ebe3] px-3.5 py-3 text-sm text-[#2c2a26] outline-none placeholder:text-[#8a8176] focus:ring-2 focus:ring-[#8a9a7b]"
-            disabled={sendPending}
+            disabled={inputLocked}
             maxLength={8000}
             name="body"
             placeholder={
@@ -362,7 +322,7 @@ function AuthenticatedPanel({
           />
           <button
             className="liivv-btn-primary shrink-0 rounded-xl px-4 py-3 text-sm disabled:opacity-60"
-            disabled={sendPending}
+            disabled={inputLocked}
             type="submit"
           >
             Send

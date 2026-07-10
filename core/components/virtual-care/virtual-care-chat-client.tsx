@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { useActionState, useEffect, useRef, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 
 import {
@@ -12,6 +12,7 @@ import { OnboardingSectionHeader } from '~/components/onboarding/onboarding-sect
 import { ChatMessageBody } from '~/components/virtual-care/chat-message-body';
 import { ChatSystemMessage } from '~/components/virtual-care/chat-system-message';
 import { ChatTypingIndicator } from '~/components/virtual-care/chat-typing-indicator';
+import { useChatOptimisticSend } from '~/components/virtual-care/use-chat-optimistic-send';
 import type { ChatMessageRow } from '~/lib/supabase/chat-messages';
 
 function messageBubbleClass(senderType: ChatMessageRow['sender_type']): string {
@@ -58,7 +59,6 @@ export function VirtualCareChatClient({
   const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const [optimisticBody, setOptimisticBody] = useState<string | null>(null);
   const [sendState, sendAction, sendPending] = useActionState<
     VirtualCareChatActionState,
     FormData
@@ -66,32 +66,13 @@ export function VirtualCareChatClient({
 
   const assistantActive = botEnabled && !careTeamActive && !escalatedToPharmacistAt;
 
-  const displayMessages = useMemo(() => {
-    if (!optimisticBody) {
-      return messages;
-    }
-
-    const alreadyPersisted = messages.some(
-      (m) => m.sender_type === 'customer' && m.body === optimisticBody,
-    );
-
-    if (alreadyPersisted) {
-      return messages;
-    }
-
-    return [
-      ...messages,
-      {
-        id: 'optimistic-customer',
-        conversation_id: conversationId ?? 'pending',
-        sender_type: 'customer' as const,
-        body: optimisticBody,
-        created_at: new Date().toISOString(),
-      },
-    ];
-  }, [conversationId, messages, optimisticBody]);
-
-  const showTyping = Boolean(sendPending && optimisticBody && assistantActive);
+  const { capturePendingSend, displayMessages, inputLocked, showTyping } = useChatOptimisticSend({
+    assistantActive,
+    conversationId,
+    messages,
+    sendPending,
+    sendState,
+  });
 
   useEffect(() => {
     if (!supabaseReady || !conversationId) {
@@ -122,26 +103,6 @@ export function VirtualCareChatClient({
   }, [sendPending]);
 
   useEffect(() => {
-    if (!optimisticBody) {
-      return;
-    }
-
-    const persisted = messages.some(
-      (m) => m.sender_type === 'customer' && m.body === optimisticBody,
-    );
-
-    if (persisted && !sendPending) {
-      setOptimisticBody(null);
-    }
-  }, [messages, optimisticBody, sendPending]);
-
-  useEffect(() => {
-    if (sendState?.error) {
-      setOptimisticBody(null);
-    }
-  }, [sendState?.error]);
-
-  useEffect(() => {
     if (sendState?.ok) {
       router.refresh();
     }
@@ -151,7 +112,7 @@ export function VirtualCareChatClient({
     const body = String(new FormData(event.currentTarget).get('body') ?? '').trim();
 
     if (body) {
-      setOptimisticBody(body);
+      capturePendingSend(body);
     }
   }
 
@@ -249,7 +210,7 @@ export function VirtualCareChatClient({
             <input name="intent" type="hidden" value="send" />
             <textarea
               className="min-h-22 w-full resize-y rounded-xl border border-[#e0d9ce] px-3.5 py-2.5 text-sm"
-              disabled={sendPending || Boolean(loadError)}
+              disabled={inputLocked || Boolean(loadError)}
               maxLength={8000}
               name="body"
               onKeyDown={(event) => {
@@ -270,7 +231,7 @@ export function VirtualCareChatClient({
             />
             <button
               className="liivv-btn-primary px-5 py-2.5 text-sm disabled:opacity-60"
-              disabled={sendPending || Boolean(loadError)}
+              disabled={inputLocked || Boolean(loadError)}
               type="submit"
             >
               Send
