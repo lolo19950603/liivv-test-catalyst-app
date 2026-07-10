@@ -289,9 +289,37 @@ function SubscriptionTabEmptyState({ title }: { title: string }) {
   );
 }
 
-function SubscriptionStatusBadge({ status }: { status: string }) {
+function subscriptionStatusBadgeClass(statusKey?: string): string {
+  switch (statusKey) {
+    case 'past_due':
+    case 'unpaid':
+      return 'bg-amber-50 text-amber-950 ring-1 ring-inset ring-amber-200/80';
+    case 'canceled':
+    case 'skipped':
+      return 'bg-[#f4f2ef] text-[#6b6560] ring-1 ring-inset ring-[#e5dfd5]';
+    case 'charged':
+      return 'bg-[#e8efe6] text-[#2f4a2f] ring-1 ring-inset ring-[#c8d4bc]';
+    case 'active':
+    case 'scheduled':
+    default:
+      return 'bg-[#e8efe6] text-[#375a37] ring-1 ring-inset ring-[#c8d4bc]';
+  }
+}
+
+function SubscriptionStatusBadge({
+  status,
+  statusKey,
+}: {
+  status: string;
+  statusKey?: string;
+}) {
   return (
-    <span className="inline-flex items-center rounded-full bg-[var(--contrast-100,hsl(var(--contrast-100)))] px-3 py-1 text-xs font-medium text-[var(--contrast-500,hsl(var(--contrast-500)))]">
+    <span
+      className={clsx(
+        'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold',
+        subscriptionStatusBadgeClass(statusKey),
+      )}
+    >
       {status}
     </span>
   );
@@ -661,7 +689,7 @@ function SubscriptionProductPricing({
       </div>
       {showStatus ? (
         <div className={clsx('mt-2 flex', align === 'end' ? 'justify-end' : 'justify-center')}>
-          <SubscriptionStatusBadge status={subscription.statusLabel} />
+          <SubscriptionStatusBadge status={subscription.statusLabel} statusKey={subscription.statusKey} />
         </div>
       ) : null}
     </div>
@@ -847,7 +875,12 @@ function SubscriptionLineItemRow({
                 >
                   {subscription.productName}
                 </p>
-                {showStatus ? <SubscriptionStatusBadge status={subscription.statusLabel} /> : null}
+                {showStatus ? (
+                  <SubscriptionStatusBadge
+                    status={subscription.statusLabel}
+                    statusKey={subscription.statusKey}
+                  />
+                ) : null}
               </div>
 
               {subscription.variantSubtitle ? (

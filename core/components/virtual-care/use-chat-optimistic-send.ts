@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { startTransition, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import type { VirtualCareChatActionState } from '~/app/[locale]/(default)/account/(portal)/virtual-care/_actions/virtual-care-actions';
 import type { ChatMessageRow } from '~/lib/supabase/chat-messages';
@@ -111,7 +111,9 @@ export function useChatOptimisticSend({
     formData.set('body', body);
     capturePendingSend(body);
     setDraft('');
-    sendAction(formData);
+    startTransition(() => {
+      sendAction(formData);
+    });
   }
 
   return {
