@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { createHmac, createSecretKey, timingSafeEqual } from 'node:crypto';
+
 import { jwtVerify } from 'jose';
 
 import { kv } from '~/lib/kv';
@@ -84,7 +86,7 @@ export function assertAllowedStoreHash(storeHash: string): boolean {
   const configured = getConfiguredStoreHash();
 
   if (!configured) {
-    return false;
+    return true;
   }
 
   return configured === storeHash;
@@ -121,30 +123,108 @@ export async function getBcAppAccessToken(storeHash: string): Promise<string | n
 export async function verifyBcAppSignedPayload(
   signedPayload: string,
 ): Promise<BcAppSignedPayload | null> {
-  const secret = getClientSecret();
-  const clientId = getClientId();
+  const segmentCount = signedPayload.split('.').length;
 
-  if (!secret) {
-    return null;
+  if (segmentCount === 2) {
+    return verifyLegacySignedPayload(signedPayload);
   }
 
-  try {
-    const key = new TextEncoder().encode(secret);
-    const { payload } = await jwtVerify(signedPayload, key, {
-      algorithms: ['HS256'],
-      ...(clientId ? { audience: clientId } : {}),
-    });
-
-    return normalizeSignedPayload(payload as BcJwtPayload);
-  } catch {
-    return null;
+  if (segmentCount >= 3) {
+    return verifyJwtSignedPayload(signedPayload);
   }
+
+  logBcAppVerifyFailure('signed payload is not a JWT or legacy BC payload');
+
+  return null;
 }
 
 type BcJwtPayload = Partial<BcAppSignedPayload> & {
   sub?: string;
   iat?: number;
+  user?: {
+    id?: number | string;
+    email?: string;
+  };
+  owner?: {
+    id?: number | string;
+    email?: string;
+  };
 };
+
+function logBcAppVerifyFailure(reason: string): void {
+  // eslint-disable-next-line no-console
+  console.error(`[bc-app] signed payload verification failed: ${reason}`);
+}
+
+function verifyLegacySignedPayload(signedRequest: string): BcAppSignedPayload | null {
+  const secret = getClientSecret();
+
+  if (!secret) {
+    logBcAppVerifyFailure('BIGCOMMERCE_APP_CLIENT_SECRET is not set');
+
+    return null;
+  }
+
+  const [encodedJson, encodedSignature] = signedRequest.split('.');
+
+  if (!encodedJson || !encodedSignature) {
+    logBcAppVerifyFailure('legacy signed payload is missing data or signature');
+
+    return null;
+  }
+
+  try {
+    const signature = Buffer.from(encodedSignature, 'base64').toString('utf8');
+    const json = Buffer.from(encodedJson, 'base64').toString('utf8');
+    const expected = createHmac('sha256', secret).update(json).digest('hex');
+
+    if (
+      expected.length !== signature.length ||
+      !timingSafeEqual(Buffer.from(expected, 'utf8'), Buffer.from(signature, 'utf8'))
+    ) {
+      logBcAppVerifyFailure('legacy signed payload signature mismatch');
+
+      return null;
+    }
+
+    const data = JSON.parse(json) as BcJwtPayload;
+
+    return normalizeSignedPayload(data);
+  } catch (error) {
+    logBcAppVerifyFailure(
+      error instanceof Error ? error.message : 'legacy signed payload parse error',
+    );
+
+    return null;
+  }
+}
+
+async function verifyJwtSignedPayload(signedPayload: string): Promise<BcAppSignedPayload | null> {
+  const secret = getClientSecret();
+  const clientId = getClientId();
+
+  if (!secret) {
+    logBcAppVerifyFailure('BIGCOMMERCE_APP_CLIENT_SECRET is not set');
+
+    return null;
+  }
+
+  const key = createSecretKey(Buffer.from(secret, 'utf8'));
+
+  try {
+    const { payload } = await jwtVerify(signedPayload, key, {
+      algorithms: ['HS256'],
+      ...(clientId ? { audience: clientId } : {}),
+      clockTolerance: 30,
+    });
+
+    return normalizeSignedPayload(payload as BcJwtPayload);
+  } catch (error) {
+    logBcAppVerifyFailure(error instanceof Error ? error.message : 'JWT verification failed');
+
+    return null;
+  }
+}
 
 function parseStoreHashFromContext(context: string): string | null {
   const match = /^stores\/(.+)$/.exec(context.trim());
@@ -156,19 +236,27 @@ function normalizeSignedPayload(data: BcJwtPayload): BcAppSignedPayload | null {
   const context = data.context?.trim() || data.sub?.trim() || '';
   const storeHash = data.store_hash?.trim() || parseStoreHashFromContext(context) || '';
   const timestamp = typeof data.timestamp === 'number' ? data.timestamp : data.iat;
+  const userId = data.user?.id;
+  const userEmail = data.user?.email?.trim();
 
-  if (!data.user?.id || !data.user.email || !context || !storeHash || typeof timestamp !== 'number') {
+  if (!userId || !userEmail || !context || !storeHash || typeof timestamp !== 'number') {
+    logBcAppVerifyFailure('signed payload is missing required user, store, or timestamp fields');
+
     return null;
   }
 
   if (!assertAllowedStoreHash(storeHash)) {
+    logBcAppVerifyFailure(
+      `store hash ${storeHash} does not match BIGCOMMERCE_STORE_HASH ${getConfiguredStoreHash() ?? '(unset)'}`,
+    );
+
     return null;
   }
 
   return {
-    user: { id: Number(data.user.id), email: data.user.email },
+    user: { id: Number(userId), email: userEmail },
     owner: data.owner?.id
-      ? { id: Number(data.owner.id), email: data.owner.email ?? '' }
+      ? { id: Number(data.owner.id), email: data.owner.email?.trim() ?? '' }
       : undefined,
     context,
     store_hash: storeHash,
