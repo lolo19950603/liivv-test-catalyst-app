@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useMemo, useState } from 'react';
+import { useActionState, useEffect, useId, useMemo, useState } from 'react';
 
 import {
   pharmacyAction,
@@ -47,6 +47,23 @@ export function AddPrescriptionDialog({
     pharmacyAction,
     null,
   );
+  const titleId = useId();
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [onClose, open]);
 
   const faxEmail = useMemo(
     () =>
@@ -110,20 +127,29 @@ export function AddPrescriptionDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      onClick={onClose}
+      role="presentation"
+    >
       <div
+        aria-labelledby={titleId}
         aria-modal="true"
         className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[#e5dfd5] bg-white p-6 shadow-xl"
+        onClick={(event) => event.stopPropagation()}
         role="dialog"
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-[#2c2a26]">Add prescription</h2>
+            <h2 className="text-xl font-semibold text-[#2c2a26]" id={titleId}>
+              Add prescription
+            </h2>
             <p className="mt-1 text-sm text-[#6b6560]">
               Transfer from your pharmacy, request a doctor fax, or upload a photo.
             </p>
           </div>
           <button
+            aria-label="Close dialog"
             className="rounded-lg px-2 py-1 text-sm text-[#6b6560] hover:bg-[#f7f4ef]"
             onClick={onClose}
             type="button"
@@ -167,7 +193,7 @@ export function AddPrescriptionDialog({
               <label className="block text-sm">
                 <span className="font-medium text-[#2c2a26]">Pharmacy name</span>
                 <input
-                  className="mt-1 w-full rounded-lg border border-[#e0d9ce] px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-lg border border-[#e0d9ce] px-3 py-2 text-sm focus:border-[#8a9a7b] focus:outline-none focus:ring-2 focus:ring-[#8a9a7b]/30"
                   onChange={(e) => setPharmacyName(e.target.value)}
                   required
                   value={pharmacyName}
@@ -176,7 +202,7 @@ export function AddPrescriptionDialog({
               <label className="block text-sm">
                 <span className="font-medium text-[#2c2a26]">Pharmacy phone</span>
                 <input
-                  className="mt-1 w-full rounded-lg border border-[#e0d9ce] px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-lg border border-[#e0d9ce] px-3 py-2 text-sm focus:border-[#8a9a7b] focus:outline-none focus:ring-2 focus:ring-[#8a9a7b]/30"
                   onChange={(e) => setPharmacyPhone(e.target.value)}
                   required
                   value={pharmacyPhone}
@@ -186,7 +212,7 @@ export function AddPrescriptionDialog({
             <label className="block text-sm">
               <span className="font-medium text-[#2c2a26]">Pharmacy address (optional)</span>
               <input
-                className="mt-1 w-full rounded-lg border border-[#e0d9ce] px-3 py-2 text-sm"
+                className="mt-1 w-full rounded-lg border border-[#e0d9ce] px-3 py-2 text-sm focus:border-[#8a9a7b] focus:outline-none focus:ring-2 focus:ring-[#8a9a7b]/30"
                 onChange={(e) => setPharmacyAddress(e.target.value)}
                 value={pharmacyAddress}
               />
@@ -272,13 +298,18 @@ export function AddPrescriptionDialog({
             <input name="intent" type="hidden" value="upload_prescription_photo" />
             <label className="block text-sm">
               <span className="font-medium text-[#2c2a26]">Prescription photo</span>
-              <input
-                accept="image/*"
-                className="mt-1 block w-full text-sm"
-                name="photo"
-                required
-                type="file"
-              />
+              <span className="mt-1 block rounded-xl border border-dashed border-[#ddd4c8] bg-[#faf8f5] p-4">
+                <input
+                  accept="image/*"
+                  className="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-[#eef4ee] file:px-3 file:py-2 file:text-sm file:font-medium file:text-[#2d4a2d]"
+                  name="photo"
+                  required
+                  type="file"
+                />
+                <span className="mt-2 block text-xs text-[#8a8176]">
+                  JPG or PNG, up to 5 MB. Include the full prescription label.
+                </span>
+              </span>
             </label>
             <button
               className="liivv-btn-primary inline-flex px-4 py-2.5 text-sm disabled:opacity-50"

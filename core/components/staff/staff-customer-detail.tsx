@@ -286,6 +286,17 @@ function StaffCarePackSection({
                 {intake?.frequentDoseChangeMeds ? (
                   <p className="mt-1 text-[#8a8176]">Dose changes: {intake.frequentDoseChangeMeds}</p>
                 ) : null}
+                {intake?.asNeededMeds ? (
+                  <p className="mt-1 text-[#8a8176]">As-needed meds: {intake.asNeededMeds}</p>
+                ) : null}
+                {intake?.includeOtcVitamins ? (
+                  <p className="mt-1 text-[#8a8176]">
+                    OTC vitamins: {intake.otcVitaminsNotes?.trim() || 'Yes'}
+                  </p>
+                ) : null}
+                {intake?.holdOrVacationNotes ? (
+                  <p className="mt-1 text-[#8a8176]">Hold/vacation: {intake.holdOrVacationNotes}</p>
+                ) : null}
                 <form action={formAction} className="mt-2">
                   <input name="intent" type="hidden" value="carepack_set_status" />
                   <input name="profileId" type="hidden" value={profileId} />

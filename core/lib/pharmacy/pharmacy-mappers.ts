@@ -32,6 +32,17 @@ export type PharmacyCarePackRequest = {
   createdAt: string;
 };
 
+/** CarePack eligibility: tablet dosage forms (case-insensitive, e.g. "Tablet, coated"). */
+export function isTabletDosageForm(dosageForm?: string | null): boolean {
+  const normalized = String(dosageForm ?? '').trim().toLowerCase();
+
+  if (!normalized) {
+    return false;
+  }
+
+  return normalized === 'tablet' || normalized.includes('tablet');
+}
+
 export function normalizeBucket(row: PrescriptionRow): RxBucket {
   const status = (row.status ?? '').trim().toLowerCase();
   const approval = (row.approval_status ?? '').trim().toLowerCase();

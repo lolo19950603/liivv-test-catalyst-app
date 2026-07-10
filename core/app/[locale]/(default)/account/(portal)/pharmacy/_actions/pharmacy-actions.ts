@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { getOnboardingCustomer } from '~/app/[locale]/(default)/account/onboarding/page-data';
-import { normalizeBucket } from '~/lib/pharmacy/pharmacy-mappers';
+import { isTabletDosageForm, normalizeBucket } from '~/lib/pharmacy/pharmacy-mappers';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import {
   createCarePackRequest,
@@ -322,13 +322,25 @@ export async function pharmacyAction(
     }
 
     const rows = await listPrescriptionsByProfileId(profile.id);
-    const activeSet = new Set(
-      rows.filter((row) => normalizeBucket(row) === 'active').map((row) => row.id),
+    const activeTabletSet = new Set(
+      rows
+        .filter((row) => normalizeBucket(row) === 'active' && isTabletDosageForm(row.dosage_form))
+        .map((row) => row.id),
     );
-    const requestedActiveIds = prescriptionIds.filter((id) => activeSet.has(id));
+    const requestedTabletIds = prescriptionIds.filter((id) => activeTabletSet.has(id));
 
-    if (requestedActiveIds.length === 0) {
-      return { ok: false, error: 'No active medications were selected for CarePack.' };
+    if (requestedTabletIds.length === 0) {
+      return {
+        ok: false,
+        error: 'CarePack is only available for active tablet medications.',
+      };
+    }
+
+    if (requestedTabletIds.length !== prescriptionIds.length) {
+      return {
+        ok: false,
+        error: 'One or more selected medications are not eligible for CarePack.',
+      };
     }
 
     const intake = (body.intake ?? {}) as CarePackRequestIntake;
@@ -359,7 +371,7 @@ export async function pharmacyAction(
 
     const created = await createCarePackRequest({
       profile_id: profile.id,
-      prescription_ids: requestedActiveIds,
+      prescription_ids: requestedTabletIds,
       notes: JSON.stringify(intakePayload),
     });
 

@@ -11,8 +11,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const likePattern = `%${q}%`;
-    const searchUrl = `https://health-products.canada.ca/api/drug/drugproduct/?lang=en&type=json&brandname=${encodeURIComponent(likePattern)}`;
+    const searchUrl = `https://health-products.canada.ca/api/drug/drugproduct/?lang=en&type=json&brandname=${encodeURIComponent(q)}`;
     const response = await fetch(searchUrl, {
       headers: {
         Accept: 'application/json',
@@ -29,6 +28,7 @@ export async function GET(request: Request) {
 
       if (products.length > 0) {
         const results = products
+          .filter((p) => String(p.brand_name ?? '').toUpperCase().includes(q))
           .slice(0, 20)
           .map((p) => {
             const raw = p.drug_code;
