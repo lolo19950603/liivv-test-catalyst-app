@@ -11,9 +11,8 @@ import {
 import type { HealthProfileRow } from '~/lib/supabase/health-profile';
 import {
   saveHealthProfileStep,
-  updateOnboardingCustomerName,
   type OnboardingActionState,
-} from '../_actions/onboarding-actions';
+} from '~/app/[locale]/(default)/account/onboarding/_actions/onboarding-actions';
 
 export function HealthProfileStepClient({
   isSetupFlow,
@@ -25,17 +24,11 @@ export function HealthProfileStepClient({
     isOntario: boolean;
     initialHealthProfile: HealthProfileRow | null;
     healthProfileCompleted: boolean;
-    profileInitial: { firstName: string; lastName: string };
     supabaseReady: boolean;
-    stateOrProvince: string;
   };
 }) {
   const [state, formAction, isPending] = useActionState<OnboardingActionState, FormData>(
     saveHealthProfileStep,
-    null,
-  );
-  const [nameState, nameFormAction] = useActionState<OnboardingActionState, FormData>(
-    updateOnboardingCustomerName,
     null,
   );
 
@@ -46,13 +39,12 @@ export function HealthProfileStepClient({
 
   return (
     <HealthProfileForm
-      actionData={state ?? nameState}
+      actionData={state}
       data={{
         initialCategories: stepData.initialCategories,
         primaryCategoryOptions,
         isOntario: stepData.isOntario,
         initialHealthProfile: stepData.initialHealthProfile,
-        profileInitial: stepData.profileInitial,
         supabaseReady: stepData.supabaseReady,
         healthProfileCompleted: stepData.healthProfileCompleted,
         showSkipForNow: isOnboardingChrome,
@@ -61,7 +53,6 @@ export function HealthProfileStepClient({
       }}
       formAction={formAction}
       isSubmitting={isPending}
-      nameFormAction={nameFormAction}
     />
   );
 }

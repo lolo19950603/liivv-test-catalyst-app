@@ -8,7 +8,6 @@ const accountUrls = [
   '/account/orders',
   '/account/subscriptions',
   '/account/settings',
-  '/account/addresses',
   '/account/wishlists',
 ];
 
@@ -39,7 +38,6 @@ test('Account page displays the menu items for each section', async ({ page, cus
 
   await expect(page.getByRole('link', { name: t('orders') })).toBeVisible();
   await expect(page.getByRole('link', { name: t('subscriptions') })).toBeVisible();
-  await expect(page.getByRole('link', { name: t('addresses') })).toBeVisible();
   await expect(page.getByRole('link', { name: t('settings') })).toBeVisible();
   await expect(page.getByRole('link', { name: t('wishlists') })).toBeVisible();
   await expect(page.getByRole('link', { name: t('logout') })).toBeVisible();

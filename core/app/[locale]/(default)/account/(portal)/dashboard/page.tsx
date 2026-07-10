@@ -48,7 +48,7 @@ export default async function AccountDashboardPage({ params }: Props) {
   const firstNameForGreeting = firstName.length > 0 ? firstName : customerName;
   const primaryCategoryId = wellness.primaryCategory?.id;
   const shopHref = '/shop-all';
-  const wellnessSelectionHref = '/account/onboarding/health-profile/';
+  const wellnessSelectionHref = '/account/health-profile/';
 
   const labels = buildDashboardLabels(
     t as (key: string, values?: Record<string, string>) => string,

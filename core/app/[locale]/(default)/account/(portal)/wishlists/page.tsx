@@ -12,15 +12,15 @@ import { defaultPageInfo, pageInfoTransformer } from '~/data-transformers/page-i
 import { wishlistsTransformer } from '~/data-transformers/wishlists-transformer';
 import { isMobileUser } from '~/lib/user-agent';
 
-import { NewWishlistButton } from './_components/new-wishlist-button';
-import { WishlistActionsMenu } from './_components/wishlist-actions-menu';
+import { NewWishlistButton } from '../../wishlists/_components/new-wishlist-button';
+import { WishlistActionsMenu } from '../../wishlists/_components/wishlist-actions-menu';
 import {
   getChangeWishlistVisibilityModal,
   getDeleteWishlistModal,
   getNewWishlistModal,
   getRenameWishlistModal,
-} from './modals';
-import { getCustomerWishlists } from './page-data';
+} from '../../wishlists/modals';
+import { getCustomerWishlists } from '../../wishlists/page-data';
 
 interface Props {
   params: Promise<{ locale: string }>;

@@ -498,6 +498,12 @@
     },
     "Settings": {
       "title": "Account settings",
+      "profileTitle": "Your name",
+      "profileDescription": "This name appears on orders, packing slips, and in your account.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "company": "Company",
       "changePassword": "Change password",
       "passwordUpdated": "Password has been updated successfully!",
       "settingsUpdated": "Account settings have been updated successfully!",

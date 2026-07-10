@@ -30,10 +30,10 @@ const SubscribeToNewsletterMutation = graphql(`
           ... on CreateSubscriberUnexpectedError {
             message
           }
-          ... on CreateSubscriberLastNameInvalidError {
+          ... on CreateSubscriberFirstNameInvalidError {
             message
           }
-          ... on CreateSubscriberFirstNameInvalidError {
+          ... on CreateSubscriberLastNameInvalidError {
             message
           }
         }

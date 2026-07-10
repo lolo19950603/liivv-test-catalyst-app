@@ -3,7 +3,7 @@
 import { clsx } from 'clsx';
 import { type ReactNode } from 'react';
 
-import { usePathname } from '~/i18n/routing';
+import { useLocalizedPathname } from '~/i18n/use-localized-pathname';
 
 interface Props {
   children: ReactNode;
@@ -11,13 +11,16 @@ interface Props {
 
 /** Full-screen portal routes skip the classic account page shell padding. */
 export function AccountLayoutShell({ children }: Props) {
-  const pathname = usePathname() ?? '';
+  const pathname = useLocalizedPathname();
   const isPortalRoute =
     pathname.includes('/account/dashboard') ||
     pathname.includes('/account/orders') ||
     pathname.includes('/account/subscriptions') ||
     pathname.includes('/account/pharmacy') ||
-    pathname.includes('/account/virtual-care');
+    pathname.includes('/account/virtual-care') ||
+    pathname.includes('/account/settings') ||
+    pathname.includes('/account/health-profile') ||
+    pathname.includes('/account/wishlists');
   const isOnboarding = pathname.includes('/account/onboarding');
 
   if (isPortalRoute || isOnboarding) {

@@ -21,17 +21,15 @@ export type HealthProfileFormProps = {
     primaryCategoryOptions: (typeof LIIV_PRIMARY_HEALTH_CATEGORIES)[number][];
     isOntario: boolean;
     initialHealthProfile: HealthProfileRow | null;
-    profileInitial: { firstName: string; lastName: string };
     supabaseReady: boolean;
     healthProfileCompleted: boolean;
     showSkipForNow: boolean;
     isOnboardingChrome: boolean;
     isSetupFlow: boolean;
   };
-  actionData?: { error?: string; nameError?: string } | null;
+  actionData?: { error?: string } | null;
   isSubmitting?: boolean;
   formAction: (formData: FormData) => void;
-  nameFormAction?: (formData: FormData) => void;
 };
 
 export function HealthProfileForm({
@@ -39,7 +37,6 @@ export function HealthProfileForm({
   actionData = null,
   isSubmitting = false,
   formAction,
-  nameFormAction,
 }: HealthProfileFormProps) {
 
   const {
@@ -47,7 +44,6 @@ export function HealthProfileForm({
     primaryCategoryOptions,
     isOntario,
     initialHealthProfile,
-    profileInitial,
     supabaseReady,
     healthProfileCompleted,
     showSkipForNow,
@@ -787,73 +783,6 @@ export function HealthProfileForm({
 
         {isSetupFlow ? (
           <OnboardingProgressBar current={2} label="Onboarding progress" total={3} />
-        ) : null}
-
-        {!isSetupFlow && healthProfileCompleted ? (
-          <>
-            <section className="space-y-4 rounded-2xl border border-[#e8e2d8] bg-white p-6 shadow-sm">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">Personal</p>
-                <h2 className="mt-1 text-3xl font-semibold tracking-tight text-[#2c2a26]">Your name</h2>
-                <p className="mt-2 text-sm text-[#6b6560]">
-                  This name appears on orders, packing slips, and in your account.
-                </p>
-              </div>
-              <form action={nameFormAction} className="onboarding-profile-form w-full max-w-none space-y-5">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <label className="block text-sm font-medium text-[#5c564c]">
-                    First name
-                    <input
-                      type="text"
-                      name="firstName"
-                      required
-                      defaultValue={profileInitial.firstName}
-                      className="mt-1 w-full rounded-lg border border-[#d6d0c5] px-3 py-2.5"
-                    />
-                  </label>
-                  <label className="block text-sm font-medium text-[#5c564c]">
-                    Last name
-                    <input
-                      type="text"
-                      name="lastName"
-                      required
-                      defaultValue={profileInitial.lastName}
-                      className="mt-1 w-full rounded-lg border border-[#d6d0c5] px-3 py-2.5"
-                    />
-                  </label>
-                </div>
-                {actionData && 'nameError' in actionData && actionData.nameError ? (
-                  <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-                    {actionData.nameError}
-                  </p>
-                ) : null}
-                <div className="flex items-center justify-start">
-                  <button
-                    type="submit"
-                    className="liivv-btn-primary px-6 py-2.5 text-sm"
-                  >
-                    Save name
-                  </button>
-                </div>
-              </form>
-            </section>
-
-            <section className="space-y-4 rounded-2xl border border-[#e8e2d8] bg-white p-6 shadow-sm">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">Shipping</p>
-                <h2 className="mt-1 text-3xl font-semibold tracking-tight text-[#2c2a26]">Addresses</h2>
-                <p className="mt-2 text-sm text-[#6b6560]">
-                  Manage your saved shipping and billing addresses.
-                </p>
-              </div>
-              <Link
-                href="/account/addresses/"
-                className="liivv-btn-primary inline-flex items-center gap-2 px-4 py-2.5 text-sm"
-              >
-                Manage addresses
-              </Link>
-            </section>
-          </>
         ) : null}
 
         <form action={formAction} className="onboarding-health-form w-full max-w-none space-y-8" onSubmit={handleFormSubmit}>

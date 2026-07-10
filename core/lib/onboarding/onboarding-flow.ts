@@ -5,7 +5,7 @@ export const SETUP_FLOW_VALUE = '1';
 /** Canonical onboarding URLs (no locale prefix; the storefront router adds it). */
 export const ACCOUNT_ONBOARDING_BASE = '/account/onboarding';
 export const ACCOUNT_ONBOARDING_PROFILE = `${ACCOUNT_ONBOARDING_BASE}/profile`;
-export const ACCOUNT_ONBOARDING_HEALTH_PROFILE = `${ACCOUNT_ONBOARDING_BASE}/health-profile`;
+export const ACCOUNT_ONBOARDING_HEALTH_PROFILE = '/account/health-profile';
 export const ACCOUNT_ONBOARDING_MEDICATIONS = `${ACCOUNT_ONBOARDING_BASE}/medications`;
 export const ACCOUNT_ONBOARDING_INSURANCE = `${ACCOUNT_ONBOARDING_BASE}/insurance`;
 

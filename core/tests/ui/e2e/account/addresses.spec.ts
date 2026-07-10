@@ -77,7 +77,7 @@ test(
     // Ensure addresses are in a reliable state before the test
     await customer.deleteAllAddresses(id);
 
-    await page.goto('/account/addresses/');
+    await page.goto('/account/settings#addresses');
     await page.getByRole('button', { name: t('cta') }).click();
 
     const address = await fillAddressForm(page);
@@ -100,7 +100,7 @@ test(
 
     const address = await customer.createAddress(id);
 
-    await page.goto('/account/addresses/');
+    await page.goto('/account/settings#addresses');
     await page.getByRole('button', { name: t('edit') }).click();
 
     await expect(page.getByLabel('First name')).toHaveValue(address.firstName);
@@ -131,7 +131,7 @@ test('Deleting an address works as expected', async ({ page, customer }) => {
 
   const address = await customer.createAddress(id);
 
-  await page.goto('/account/addresses/');
+  await page.goto('/account/settings#addresses');
   await page.getByRole('button', { name: t('delete') }).click();
   await page.waitForLoadState('networkidle');
 

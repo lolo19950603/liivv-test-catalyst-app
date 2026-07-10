@@ -331,7 +331,7 @@ export async function updateOnboardingCustomerName(
     };
   }
 
-  revalidatePath('/account/onboarding/health-profile');
+  revalidatePath('/account/health-profile');
 
   return null;
 }

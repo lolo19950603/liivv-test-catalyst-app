@@ -84,7 +84,7 @@ test('JWT login redirects to the specified redirect_to value in the token payloa
   const jwt = await customer.generateLoginJwt(id, '/account/addresses/');
 
   await page.goto(`/login/token/${jwt}`);
-  await page.waitForURL('/account/addresses/');
+  await page.waitForURL(/\/account\/settings/);
   await expect(page.getByRole('heading', { name: t('title'), exact: true })).toBeVisible();
 });
 

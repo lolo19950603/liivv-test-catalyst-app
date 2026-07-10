@@ -6,7 +6,7 @@ import { Link } from '~/components/link';
 import { AccountNotificationsBell } from '~/components/account-notifications';
 import { OnboardingBanner } from '~/components/onboarding/onboarding-banner';
 import { initialsFromName } from '~/lib/account/customer-initials';
-import { usePathname } from '~/i18n/routing';
+import { useLocalizedPathname } from '~/i18n/use-localized-pathname';
 
 import {
   ACCOUNT_DASHBOARD_ROOT_ID,
@@ -30,7 +30,10 @@ function isAccountSubPage(pathname: string): boolean {
     pathname.includes('/account/orders') ||
     pathname.includes('/account/subscriptions') ||
     pathname.includes('/account/pharmacy') ||
-    pathname.includes('/account/virtual-care')
+    pathname.includes('/account/virtual-care') ||
+    pathname.includes('/account/settings') ||
+    pathname.includes('/account/health-profile') ||
+    pathname.includes('/account/wishlists')
   );
 }
 
@@ -63,7 +66,7 @@ export function AccountDashboardPortal({
   settingsHref,
   contactHref,
 }: AccountDashboardShellProps) {
-  const pathname = usePathname() ?? '';
+  const pathname = useLocalizedPathname();
   const [accountOpen, setAccountOpen] = useState(false);
   const [cartCount, setCartCount] = useState<number | null>(initialCartCount);
   const accountRef = useRef<HTMLDivElement>(null);
@@ -183,7 +186,12 @@ export function AccountDashboardPortal({
                 label={labels.sidebar.orders}
               />
               <SidebarLink href="/" icon={<IconShop />} label={labels.sidebar.shop} />
-              <SidebarLink href={wishlistsHref} icon={<IconLoyalty />} label={labels.sidebar.wishlists} />
+              <SidebarLink
+                active={isNavActive(pathname, wishlistsHref)}
+                href={wishlistsHref}
+                icon={<IconLoyalty />}
+                label={labels.sidebar.wishlists}
+              />
             </nav>
 
             <nav aria-label={labels.aria.secondaryNavigation} className="mhd-sidebar__footer">

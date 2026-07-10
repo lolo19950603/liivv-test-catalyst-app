@@ -142,7 +142,7 @@ export function getHelpTopics(): HelpTopic[] {
         'Go to Account → Addresses.',
         'Add, edit, or remove saved shipping addresses.',
       ],
-      `${base}/account/addresses`,
+      `${base}/account/settings#addresses`,
     ),
     topic(
       'account-settings',

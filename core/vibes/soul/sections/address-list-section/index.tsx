@@ -277,7 +277,7 @@ export function AddressListSection<A extends Address, F extends Field>({
                           : undefined
                       }
                     />
-                    <div className="flex gap-1">
+                    <div className="address-list-actions flex gap-2">
                       <Button
                         aria-label={`${editLabel}: ${address.firstName} ${address.lastName}`}
                         onClick={() => setActiveAddressIds((prev) => [...prev, address.id])}

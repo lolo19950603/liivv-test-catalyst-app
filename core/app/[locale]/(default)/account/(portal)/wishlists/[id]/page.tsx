@@ -12,13 +12,12 @@ import { wishlistDetailsTransformer } from '~/data-transformers/wishlists-transf
 import { redirect } from '~/i18n/routing';
 import { isMobileUser } from '~/lib/user-agent';
 
-import { removeWishlistItem } from '../_actions/remove-wishlist-item';
-import { getDeleteWishlistModal, getRenameWishlistModal } from '../modals';
-
-import { addWishlistItemToCart } from './_actions/add-to-cart';
-import { WishlistActions, WishlistActionsSkeleton } from './_components/wishlist-actions';
-import { WishlistAnalyticsProvider } from './_components/wishlist-analytics-provider';
-import { getCustomerWishlist } from './page-data';
+import { removeWishlistItem } from '../../../wishlists/_actions/remove-wishlist-item';
+import { getDeleteWishlistModal, getRenameWishlistModal } from '../../../wishlists/modals';
+import { addWishlistItemToCart } from '../../../wishlists/[id]/_actions/add-to-cart';
+import { WishlistActions, WishlistActionsSkeleton } from '../../../wishlists/[id]/_components/wishlist-actions';
+import { WishlistAnalyticsProvider } from '../../../wishlists/[id]/_components/wishlist-analytics-provider';
+import { getCustomerWishlist } from '../../../wishlists/[id]/page-data';
 
 interface Props {
   params: Promise<{ locale: string; id: string }>;

@@ -9,9 +9,15 @@ import { Account, UpdateAccountAction, UpdateAccountForm } from './update-accoun
 
 export interface AccountSettingsSectionProps {
   title?: string;
+  profileTitle?: string;
+  profileDescription?: string;
   account: Account;
   updateAccountAction: UpdateAccountAction;
   updateAccountSubmitLabel?: string;
+  firstNameLabel?: string;
+  lastNameLabel?: string;
+  emailLabel?: string;
+  companyLabel?: string;
   changePasswordTitle?: string;
   changePasswordAction: ChangePasswordAction;
   changePasswordSubmitLabel?: string;
@@ -43,9 +49,15 @@ export interface AccountSettingsSectionProps {
  */
 export function AccountSettingsSection({
   title = 'Account Settings',
+  profileTitle,
+  profileDescription,
   account,
   updateAccountAction,
   updateAccountSubmitLabel,
+  firstNameLabel,
+  lastNameLabel,
+  emailLabel,
+  companyLabel,
   changePasswordTitle = 'Change Password',
   changePasswordAction,
   changePasswordSubmitLabel,
@@ -70,9 +82,25 @@ export function AccountSettingsSection({
       <div className="flex flex-col gap-y-24 @xl:flex-row">
         <div className="my-4 flex w-full flex-col @xl:max-w-lg">
           <div className="pb-12">
+            {profileTitle ? (
+              <div className="mb-10">
+                <h2 className="font-[family-name:var(--account-settings-section-font-family,var(--font-family-heading))] text-2xl font-medium leading-none text-[var(--account-settings-section-text,var(--foreground))] @xl:text-2xl">
+                  {profileTitle}
+                </h2>
+                {profileDescription ? (
+                  <p className="mt-3 text-sm leading-relaxed text-[var(--account-settings-section-text,var(--foreground))]/70">
+                    {profileDescription}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
             <UpdateAccountForm
               account={account}
               action={updateAccountAction}
+              companyLabel={companyLabel}
+              emailLabel={emailLabel}
+              firstNameLabel={firstNameLabel}
+              lastNameLabel={lastNameLabel}
               submitLabel={updateAccountSubmitLabel}
             />
           </div>
