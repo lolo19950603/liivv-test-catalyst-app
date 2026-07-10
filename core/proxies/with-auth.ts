@@ -1,6 +1,7 @@
 import { NextResponse, URLPattern } from 'next/server';
 
 import { anonymousSignIn, auth, clearAnonymousSession, getAnonymousSession } from '~/auth';
+import { ACCOUNT_DEFAULT_REDIRECT_PATH } from '~/lib/makeswift/site-header/resolve-account-href';
 
 import { type ProxyFactory } from './compose-proxies';
 
@@ -10,7 +11,7 @@ const protectedPathPattern = new URLPattern({ pathname: `{/:locale}?/(account)/*
 function redirectToLogin(url: string) {
   const loginUrl = new URL('/login', url);
 
-  loginUrl.searchParams.set('redirectTo', '/account/orders');
+  loginUrl.searchParams.set('redirectTo', ACCOUNT_DEFAULT_REDIRECT_PATH);
 
   return NextResponse.redirect(loginUrl, { status: 302 });
 }

@@ -7,9 +7,9 @@ test('Login and logout flows work as expected', async ({ page, customer }) => {
   const t = await getTranslations();
 
   await customer.login();
-  await page.waitForURL('/account/orders/');
+  await page.waitForURL('/account/dashboard/');
   await expect(
-    page.getByRole('heading', { name: t('Account.Orders.title') }).first(),
+    page.getByText(t('Account.Dashboard.wellness.welcomeLead')),
   ).toBeVisible();
 
   await customer.logout();
@@ -47,33 +47,32 @@ test('Login with invalid credentials returns an error', async ({ page }) => {
   await expect(page.getByText(t('invalidCredentials'))).toBeVisible();
 });
 
-test('Browsing to /login/ when already logged in redirects to /account/orders/', async ({
+test('Browsing to /login/ when already logged in redirects to /account/dashboard/', async ({
   page,
   customer,
 }) => {
   const t = await getTranslations();
-  const ordersHeader = t('Account.Orders.title');
 
   await customer.login();
-  await page.waitForURL('/account/orders/');
-  await expect(page.getByRole('heading', { name: ordersHeader, exact: true })).toBeVisible();
+  await page.waitForURL('/account/dashboard/');
+  await expect(page.getByText(t('Account.Dashboard.wellness.welcomeLead'))).toBeVisible();
 
   await page.goto('/login/');
-  await page.waitForURL('/account/orders/');
-  await expect(page.getByRole('heading', { name: ordersHeader, exact: true })).toBeVisible();
+  await page.waitForURL('/account/dashboard/');
+  await expect(page.getByText(t('Account.Dashboard.wellness.welcomeLead'))).toBeVisible();
 });
 
-test('JWT login works as expected and redirects to /account/orders/ by default', async ({
+test('JWT login works as expected and redirects to /account/dashboard/ by default', async ({
   page,
   customer,
 }) => {
-  const t = await getTranslations('Account.Orders');
+  const t = await getTranslations('Account.Dashboard');
   const { id } = await customer.getOrCreateTestCustomer();
   const jwt = await customer.generateLoginJwt(id);
 
   await page.goto(`/login/token/${jwt}`);
-  await page.waitForURL('/account/orders/');
-  await expect(page.getByRole('heading', { name: t('title'), exact: true })).toBeVisible();
+  await page.waitForURL('/account/dashboard/');
+  await expect(page.getByText(t('wellness.welcomeLead'))).toBeVisible();
 });
 
 test('JWT login redirects to the specified redirect_to value in the token payload', async ({

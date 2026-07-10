@@ -7,6 +7,7 @@ import { SignInSection } from '@/vibes/soul/sections/sign-in-section';
 import { buildConfig } from '~/build-config/reader';
 import { ForceRefresh } from '~/components/force-refresh';
 import { Slot } from '~/lib/makeswift/slot';
+import { ACCOUNT_DEFAULT_REDIRECT_PATH } from '~/lib/makeswift/site-header/resolve-account-href';
 
 import { login } from './_actions/login';
 
@@ -30,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Login({ params, searchParams }: Props) {
   const { locale } = await params;
-  const { redirectTo = '/account/orders', error } = await searchParams;
+  const { redirectTo = ACCOUNT_DEFAULT_REDIRECT_PATH, error } = await searchParams;
 
   setRequestLocale(locale);
 

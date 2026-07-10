@@ -7,28 +7,28 @@ const makeswiftBaseUrl =
   process.env.MAKESWIFT_APP_ORIGIN ??
   'https://app.makeswift.com';
 
-const frameAncestors = makeswiftEnabled ? makeswiftBaseUrl : 'none';
+const storeHash = process.env.BIGCOMMERCE_STORE_HASH?.trim();
+const bcGraphqlDomain = process.env.BIGCOMMERCE_GRAPHQL_API_DOMAIN?.trim() || 'mybigcommerce.com';
+
+function buildCsp(frameAncestors: string[]): string {
+  return builder({
+    directives: {
+      baseUri: ['self'],
+      frameAncestors,
+    },
+  });
+}
+
+const defaultFrameAncestors = makeswiftEnabled ? [makeswiftBaseUrl] : ['none'];
+
+const bcAppFrameAncestors = [
+  'https://*.mybigcommerce.com',
+  'https://login.bigcommerce.com',
+  ...(storeHash ? [`https://store-${storeHash}.${bcGraphqlDomain}`] : []),
+  ...(makeswiftEnabled ? [makeswiftBaseUrl] : []),
+];
 
 // customize the directives as needed
-export const cspHeader = builder({
-  directives: {
-    baseUri: ['self'],
-    frameAncestors: [frameAncestors],
-    // formAction: ['self'],
-    // defaultSrc: ['self'],
-    // scriptSrc: ['self'],
-    // styleSrc: ['self'],
-    // imgSrc: ['self'],
-    // connectSrc: ['self'],
-    // fontSrc: ['self'],
-    // objectSrc: ['none'],
-    // mediaSrc: ['self'],
-    // frameSrc: ['self'],
-    // childSrc: ['self'],
-    // manifestSrc: ['self'],
-    // workerSrc: ['self'],
-    // prefetchSrc: ['self'],
-    // navigateTo: ['self'],
-    // reportUri: ['none'],
-  },
-});
+export const cspHeader = buildCsp(defaultFrameAncestors);
+
+export const bcAppCspHeader = buildCsp(bcAppFrameAncestors);

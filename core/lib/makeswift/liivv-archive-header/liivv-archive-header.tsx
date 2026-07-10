@@ -1266,7 +1266,7 @@ export function LiivvArchiveHeader({
                 >
                   <IconCart />
                   {cartLineCount != null && cartLineCount > 0 ? (
-                    <span className="header-utility-badge" aria-hidden>
+                    <span className="header-utility-badge header-utility-badge--count" aria-hidden>
                       {cartLineCount > 99 ? '99+' : cartLineCount}
                     </span>
                   ) : null}

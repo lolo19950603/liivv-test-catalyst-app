@@ -76,7 +76,7 @@ test('Changing password works as expected', async ({ page, customer }) => {
 
   await customer.loginAs(testCustomer);
 
-  await expect(page).toHaveURL('/account/orders/');
+  await expect(page).toHaveURL('/account/dashboard/');
 });
 
 test(

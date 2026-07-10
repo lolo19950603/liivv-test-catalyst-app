@@ -116,7 +116,7 @@ export class CustomerFixture extends Fixture {
     return wishlist;
   }
 
-  async generateLoginJwt(customerId: number, redirectTo = '/account/orders'): Promise<string> {
+  async generateLoginJwt(customerId: number, redirectTo = '/account/dashboard/'): Promise<string> {
     try {
       return await generateCustomerLoginApiJwt(
         customerId,

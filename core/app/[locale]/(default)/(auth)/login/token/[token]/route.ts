@@ -10,6 +10,7 @@ import { redirect, unstable_rethrow as rethrow } from 'next/navigation';
 
 import { signIn } from '~/auth';
 import { getCartId } from '~/lib/cart';
+import { ACCOUNT_DEFAULT_REDIRECT_PATH } from '~/lib/makeswift/site-header/resolve-account-href';
 
 export async function GET(_: Request, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
@@ -21,7 +22,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ token: str
     // token validity and signature are checked in the signIn function
     const claims = decodeJwt(token);
     const redirectTo =
-      typeof claims.redirect_to === 'string' ? claims.redirect_to : '/account/orders';
+      typeof claims.redirect_to === 'string' ? claims.redirect_to : ACCOUNT_DEFAULT_REDIRECT_PATH;
 
     // sign in with token which will check validity against BigCommerce API
     // and redirect to redirectTo

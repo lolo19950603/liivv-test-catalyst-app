@@ -1,7 +1,10 @@
+import { LIIVV_HEADER_UTILITY_SHARED_CSS } from '~/lib/makeswift/site-header/header-utility-shared-css';
+
 /** Scoped root for the member health dashboard (PC Health archive layout). */
 export const ACCOUNT_DASHBOARD_ROOT_ID = 'liivv-account-dashboard';
 
 export const ACCOUNT_DASHBOARD_STYLE = `
+${LIIVV_HEADER_UTILITY_SHARED_CSS}
 #${ACCOUNT_DASHBOARD_ROOT_ID}{
   /* Diabetes-care archive design tokens (see core/public/archive/diabetes-care-head.css). */
   --mhd-navy:49 47 47;
@@ -146,7 +149,7 @@ body.adc-portal-active main{
   flex-direction:column;
   align-items:stretch;
   gap:1rem;
-  padding:2rem 1.25rem 1.25rem;
+  padding:1.25rem var(--liivv-header-utility-inline-end, 1.25rem) 1.25rem 1.25rem;
   background:rgb(var(--mhd-white));
   border-bottom:1px solid rgb(var(--mhd-border));
   --mhd-search-drawer-duration:0.45s;
@@ -188,7 +191,7 @@ body.adc-portal-active main{
 }
 @media screen and (min-width:900px){
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header{
-    padding:1.75rem 2rem 1.25rem;
+    padding-inline-start:2rem;
   }
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header__body{
@@ -201,18 +204,31 @@ body.adc-portal-active main{
 @media screen and (min-width:768px){
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header__body{
     flex-direction:row;
-    align-items:flex-start;
-    justify-content:space-between;
+    align-items:center;
+    justify-content:flex-start;
     gap:1.5rem;
+    min-height:var(--liivv-header-utility-size, 2.75rem);
+    padding-inline-end:var(--liivv-header-utility-cluster-width, 21rem);
   }
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header__greeting{
+  min-width:0;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header__utilities{
   display:flex;
   align-items:center;
   justify-content:flex-end;
-  flex-wrap:wrap;
-  gap:0.5rem;
+  flex-wrap:nowrap;
+  gap:var(--liivv-header-utility-gap, 0.5rem);
   flex-shrink:0;
+}
+@media screen and (min-width:768px){
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header__utilities{
+    position:fixed;
+    top:var(--liivv-header-utility-offset-block, 0.75rem);
+    right:var(--liivv-header-utility-inline-end, 1.25rem);
+    z-index:210;
+  }
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-btn--avatar .mhd-account-btn__label{
   display:none;
@@ -1199,8 +1215,10 @@ body.adc-portal-active main{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  width:2.75rem;
-  height:2.75rem;
+  width:var(--liivv-header-utility-size, 2.75rem);
+  height:var(--liivv-header-utility-size, 2.75rem);
+  min-width:var(--liivv-header-utility-size, 2.75rem);
+  min-height:var(--liivv-header-utility-size, 2.75rem);
   border-radius:999px;
   border:1px solid rgb(var(--mhd-border));
   background:rgb(var(--mhd-white));
@@ -1208,6 +1226,8 @@ body.adc-portal-active main{
   text-decoration:none;
   position:relative;
   cursor:pointer;
+  overflow:visible;
+  flex-shrink:0;
   transition:background-color 0.2s ease,border-color 0.2s ease,color 0.2s ease;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-icon-btn:hover,#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-icon-btn:focus-visible{
@@ -1217,25 +1237,8 @@ body.adc-portal-active main{
   outline:none;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-icon-btn svg{
-  width:1.35rem;
-  height:1.35rem;
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-icon-btn__badge{
-  position:absolute;
-  top:-0.125rem;
-  right:-0.125rem;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-width:1.125rem;
-  height:1.125rem;
-  padding-inline:0.25rem;
-  border-radius:999px;
-  background:rgb(var(--mhd-text));
-  color:rgb(var(--mhd-white));
-  font-size:0.625rem;
-  font-weight:600;
-  line-height:1;
+  width:var(--liivv-header-utility-icon-size, 1.35rem);
+  height:var(--liivv-header-utility-icon-size, 1.35rem);
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-search-trigger svg{
   stroke-width:1.5;
@@ -1310,29 +1313,12 @@ body.adc-portal-active main{
   background:rgb(var(--mhd-btn-bg));
   border-color:rgb(var(--mhd-btn-bg));
 }
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-badge{
-  position:absolute;
-  top:0.2rem;
-  right:0.2rem;
-  min-width:1.125rem;
-  height:1.125rem;
-  padding:0 0.25rem;
-  border-radius:999px;
-  background:#dc2626;
-  color:#ffffff;
-  border:2px solid #ffffff;
-  font-family:var(--mhd-font-body);
-  font-size:0.625rem;
-  font-weight:700;
-  line-height:1;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  z-index:2;
-}
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications{
   position:relative;
+  display:flex;
+  align-items:center;
+  flex-shrink:0;
+  overflow:visible;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications__panel{
   position:absolute;

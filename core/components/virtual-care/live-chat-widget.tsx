@@ -33,6 +33,7 @@ import {
 } from '~/components/virtual-care/use-chat-poll-refresh';
 
 const CHAT_CLOSED_UNREAD_POLL_MS = 3000;
+const CHAT_GUEST_AUTH_POLL_MS = 3000;
 
 export const LIVE_CHAT_OPEN_EVENT = 'liivv:open-live-chat';
 
@@ -441,7 +442,47 @@ export function LiveChatWidget() {
 
     setSessionReady(false);
     void refreshSession();
-  }, [open]);
+
+    if (searchParams.get('chat') === 'open') {
+      const soon = window.setTimeout(() => {
+        void refreshSession();
+      }, 500);
+
+      const later = window.setTimeout(() => {
+        void refreshSession();
+      }, 1500);
+
+      return () => {
+        window.clearTimeout(soon);
+        window.clearTimeout(later);
+      };
+    }
+  }, [open, pathname, searchParams]);
+
+  useEffect(() => {
+    if (!open || !sessionReady || isLoggedIn) {
+      return;
+    }
+
+    const refreshAuth = () => {
+      if (document.visibilityState === 'visible') {
+        void refreshSession();
+      }
+    };
+
+    void refreshAuth();
+
+    const id = window.setInterval(refreshAuth, CHAT_GUEST_AUTH_POLL_MS);
+
+    window.addEventListener('focus', refreshAuth);
+    document.addEventListener('visibilitychange', refreshAuth);
+
+    return () => {
+      window.clearInterval(id);
+      window.removeEventListener('focus', refreshAuth);
+      document.removeEventListener('visibilitychange', refreshAuth);
+    };
+  }, [open, sessionReady, isLoggedIn]);
 
   useEffect(() => {
     if (open) {

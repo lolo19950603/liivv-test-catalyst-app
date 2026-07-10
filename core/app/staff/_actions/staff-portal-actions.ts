@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { isValidStaffSession } from '~/lib/admin-auth';
+import { hasStaffAccess, revalidateStaffPortalPaths } from '~/lib/staff-access';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import {
   appendStaffMessage,
@@ -22,7 +22,7 @@ const UUID_RE =
 export type StaffActionState = { ok?: boolean; error?: string } | null;
 
 async function requireStaffSession(): Promise<{ ok: true } | { ok: false; error: string }> {
-  if (!(await isValidStaffSession())) {
+  if (!(await hasStaffAccess())) {
     return { ok: false, error: 'Unauthorized.' };
   }
 
@@ -62,7 +62,7 @@ export async function staffPortalAction(
       return { ok: false, error: updated.message };
     }
 
-    revalidatePath('/staff');
+    revalidateStaffPortalPaths(revalidatePath);
     return { ok: true };
   }
 
@@ -95,7 +95,7 @@ export async function staffPortalAction(
       return { ok: false, error: updated.message };
     }
 
-    revalidatePath('/staff');
+    revalidateStaffPortalPaths(revalidatePath);
     return { ok: true };
   }
 
@@ -126,7 +126,7 @@ export async function staffPortalAction(
       return { ok: false, error: updated.message };
     }
 
-    revalidatePath('/staff');
+    revalidateStaffPortalPaths(revalidatePath);
     return { ok: true };
   }
 
@@ -144,7 +144,7 @@ export async function staffPortalAction(
       return { ok: false, error: updated.message };
     }
 
-    revalidatePath('/staff');
+    revalidateStaffPortalPaths(revalidatePath);
     return { ok: true };
   }
 
@@ -166,7 +166,7 @@ export async function staffPortalAction(
       return { ok: false, error: updated.message };
     }
 
-    revalidatePath('/staff');
+    revalidateStaffPortalPaths(revalidatePath);
     return { ok: true };
   }
 
@@ -184,7 +184,7 @@ export async function staffPortalAction(
       return { ok: false, error: updated.message };
     }
 
-    revalidatePath('/staff');
+    revalidateStaffPortalPaths(revalidatePath);
     return { ok: true };
   }
 
@@ -206,7 +206,7 @@ export async function staffPortalAction(
       return { ok: false, error: updated.message };
     }
 
-    revalidatePath('/staff');
+    revalidateStaffPortalPaths(revalidatePath);
     return { ok: true };
   }
 
@@ -234,7 +234,7 @@ export async function staffPortalAction(
       return { ok: false, error: result.message };
     }
 
-    revalidatePath('/staff');
+    revalidateStaffPortalPaths(revalidatePath);
     return { ok: true };
   }
 
@@ -245,7 +245,7 @@ export async function staffPortalAction(
       return { ok: false, error: result.message };
     }
 
-    revalidatePath('/staff');
+    revalidateStaffPortalPaths(revalidatePath);
     return { ok: true };
   }
 
@@ -256,7 +256,7 @@ export async function staffPortalAction(
       return { ok: false, error: result.message };
     }
 
-    revalidatePath('/staff');
+    revalidateStaffPortalPaths(revalidatePath);
     return { ok: true };
   }
 

@@ -1,6 +1,8 @@
 import { randomUUID } from 'crypto';
 import { SignJWT } from 'jose';
 
+import { ACCOUNT_DEFAULT_REDIRECT_PATH } from '~/lib/makeswift/site-header/resolve-account-href';
+
 /**
  * Build a Customer Login API JWT which can be used in auth/index.ts to log in a customer
  * using the LoginWithTokenMutation, or used as a redirect to /login/token/[token]
@@ -21,7 +23,7 @@ import { SignJWT } from 'jose';
 export const generateCustomerLoginApiJwt = async (
   customerId: number,
   channelId: number,
-  redirectTo = '/account/orders',
+  redirectTo = ACCOUNT_DEFAULT_REDIRECT_PATH,
   additionalClaims?: Record<string, unknown>,
 ): Promise<string> => {
   const clientId = process.env.BIGCOMMERCE_CLIENT_ID;

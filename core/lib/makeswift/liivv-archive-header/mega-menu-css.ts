@@ -1,5 +1,8 @@
 /** Desktop mega menu panel (hover dropdown under top-level nav). */
+import { LIIVV_HEADER_UTILITY_SHARED_CSS } from '~/lib/makeswift/site-header/header-utility-shared-css';
+
 export const LIIVV_HEADER_MEGA_MENU_CSS = `
+${LIIVV_HEADER_UTILITY_SHARED_CSS}
 .liivv-archive-header {
   --animation-primary: 0.5s cubic-bezier(0.3, 1, 0.3, 1);
   --mega-menu-drawer-duration: 0.45s;
@@ -303,21 +306,26 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   color: rgb(var(--color-foreground));
 }
 .liivv-archive-header .header__buttons {
-  gap: 0.5rem;
+  gap: var(--liivv-header-utility-gap, 0.5rem);
 }
 @media screen and (min-width: 768px) {
-  .liivv-archive-header .header__buttons {
-    gap: 0.625rem;
+  .liivv-archive-header .header__icons--end {
+    position: fixed;
+    top: var(--liivv-header-utility-offset-block, 0.75rem);
+    right: var(--liivv-header-utility-inline-end, 1.25rem);
+    z-index: 101;
+    width: auto;
+    min-width: 0;
   }
 }
 .liivv-archive-header .header-utility-icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  min-width: 2.75rem;
-  min-height: 2.75rem;
+  width: var(--liivv-header-utility-size, 2.75rem);
+  height: var(--liivv-header-utility-size, 2.75rem);
+  min-width: var(--liivv-header-utility-size, 2.75rem);
+  min-height: var(--liivv-header-utility-size, 2.75rem);
   border-radius: 999px;
   border: 1px solid rgb(var(--color-foreground) / 0.12);
   background: rgb(var(--color-background));
@@ -327,6 +335,7 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
+  overflow: visible;
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 .liivv-archive-header .header-utility-icon-btn:hover,
@@ -337,32 +346,15 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
   outline: none;
 }
 .liivv-archive-header .header-utility-icon-btn svg {
-  width: 1.35rem;
-  height: 1.35rem;
-}
-.liivv-archive-header .header-utility-badge {
-  position: absolute;
-  top: -0.2rem;
-  right: -0.2rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.125rem;
-  height: 1.125rem;
-  padding: 0 0.25rem;
-  border-radius: 999px;
-  background: #dc2626;
-  color: #ffffff;
-  border: 2px solid #ffffff;
-  font-size: 0.625rem;
-  font-weight: 700;
-  line-height: 1;
+  width: var(--liivv-header-utility-icon-size, 1.35rem);
+  height: var(--liivv-header-utility-icon-size, 1.35rem);
 }
 .liivv-archive-header .header-notifications {
   position: relative;
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  overflow: visible;
 }
 .liivv-archive-header .header-notifications__trigger {
   display: inline-flex;

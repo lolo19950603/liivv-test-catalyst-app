@@ -33,7 +33,7 @@ function customerName(
   return name || email || fallback;
 }
 
-function staffHref(params: Record<string, string | undefined>): string {
+function portalHref(basePath: string, params: Record<string, string | undefined>): string {
   const search = new URLSearchParams();
 
   for (const [key, value] of Object.entries(params)) {
@@ -44,10 +44,20 @@ function staffHref(params: Record<string, string | undefined>): string {
 
   const qs = search.toString();
 
-  return qs ? `/staff?${qs}` : '/staff';
+  return qs ? `${basePath}?${qs}` : basePath;
 }
 
-export function StaffPortalClient({ data }: { data: StaffPortalData }) {
+export function StaffPortalClient({
+  data,
+  basePath = '/staff',
+  embedded = false,
+  embeddedUserEmail,
+}: {
+  data: StaffPortalData;
+  basePath?: string;
+  embedded?: boolean;
+  embeddedUserEmail?: string;
+}) {
   const router = useRouter();
   const [actionState, formAction, isPending] = useActionState<StaffActionState, FormData>(
     staffPortalAction,
@@ -55,6 +65,7 @@ export function StaffPortalClient({ data }: { data: StaffPortalData }) {
   );
   const bottomRef = useRef<HTMLDivElement>(null);
   const [chatRefreshTrigger, setChatRefreshTrigger] = useState(0);
+  const staffHref = (params: Record<string, string | undefined>) => portalHref(basePath, params);
 
   const tab = data.adminTab;
 
@@ -74,20 +85,27 @@ export function StaffPortalClient({ data }: { data: StaffPortalData }) {
   }, [data.messages.length, data.selectedConversationId, tab]);
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] text-[#2c2a26]">
+    <div className={embedded ? 'min-h-0 bg-[#faf8f5] text-[#2c2a26]' : 'min-h-screen bg-[#faf8f5] text-[#2c2a26]'}>
       <header className="border-b border-[#ebe6df] bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">Liivv staff</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">
+              {embedded ? 'Liivv Staff' : 'Liivv staff'}
+            </p>
             <h1 className="text-xl font-semibold" style={{ color: forest }}>
               Pharmacy & care portal
             </h1>
+            {embedded && embeddedUserEmail ? (
+              <p className="mt-1 text-sm text-[#6b6560]">Signed in as {embeddedUserEmail}</p>
+            ) : null}
           </div>
-          <form action={staffLogoutAction}>
-            <button className="text-sm font-medium text-[#6b6560] hover:underline" type="submit">
-              Sign out
-            </button>
-          </form>
+          {!embedded ? (
+            <form action={staffLogoutAction}>
+              <button className="text-sm font-medium text-[#6b6560] hover:underline" type="submit">
+                Sign out
+              </button>
+            </form>
+          ) : null}
         </div>
         <nav className="mx-auto flex max-w-7xl gap-2 px-4 pb-3">
           {(
@@ -126,16 +144,17 @@ export function StaffPortalClient({ data }: { data: StaffPortalData }) {
         ) : null}
 
         {tab === 'pharmacy' ? (
-          <PharmacyTab data={data} formAction={formAction} isPending={isPending} />
+          <PharmacyTab basePath={basePath} data={data} formAction={formAction} isPending={isPending} />
         ) : null}
 
         {tab === 'customers' ? (
-          <CustomersTab data={data} formAction={formAction} />
+          <CustomersTab basePath={basePath} data={data} formAction={formAction} />
         ) : null}
 
         {tab === 'chat' ? (
           <ChatTab
             actionRefreshTrigger={chatRefreshTrigger}
+            basePath={basePath}
             bottomRef={bottomRef}
             data={data}
             formAction={formAction}
@@ -149,14 +168,17 @@ export function StaffPortalClient({ data }: { data: StaffPortalData }) {
 }
 
 function PharmacyTab({
+  basePath,
   data,
   formAction,
   isPending,
 }: {
+  basePath: string;
   data: StaffPortalData;
   formAction: (formData: FormData) => void;
   isPending: boolean;
 }) {
+  const staffHref = (params: Record<string, string | undefined>) => portalHref(basePath, params);
   const queue = data.pharmacyQueue;
   const queueRows =
     queue === 'refill'
@@ -266,17 +288,21 @@ function PharmacyTab({
 }
 
 function CustomersTab({
+  basePath,
   data,
   formAction,
 }: {
+  basePath: string;
   data: StaffPortalData;
   formAction: (formData: FormData) => void;
 }) {
+  const staffHref = (params: Record<string, string | undefined>) => portalHref(basePath, params);
+
   return (
     <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
       <section className="rounded-xl border border-[#e5dfd5] bg-white p-4 shadow-sm">
         <h2 className="text-sm font-semibold text-[#2c2a26]">Search customers</h2>
-        <form action="/staff" className="mt-3 flex gap-2" method="get">
+        <form action={basePath} className="mt-3 flex gap-2" method="get">
           <input name="tab" type="hidden" value="customers" />
           <input
             className="min-w-0 flex-1 rounded-lg border border-[#e0d9ce] px-3 py-2 text-sm"
@@ -365,6 +391,7 @@ function CustomersTab({
 }
 
 function ChatTab({
+  basePath,
   data,
   formAction,
   isPending,
@@ -372,6 +399,7 @@ function ChatTab({
   onRefresh,
   actionRefreshTrigger,
 }: {
+  basePath: string;
   data: StaffPortalData;
   formAction: (formData: FormData) => void;
   isPending: boolean;
@@ -379,6 +407,8 @@ function ChatTab({
   onRefresh: () => void;
   actionRefreshTrigger: number;
 }) {
+  const staffHref = (params: Record<string, string | undefined>) => portalHref(basePath, params);
+
   const selectedConversation =
     data.conversations.find((c) => c.conversationId === data.selectedConversationId) ?? null;
   const staffClosedAt = selectedConversation?.staffClosedAt ?? null;

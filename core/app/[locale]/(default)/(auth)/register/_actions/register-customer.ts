@@ -13,6 +13,7 @@ import { client } from '~/client';
 import { graphql, VariablesOf } from '~/client/graphql';
 import { FieldNameToFieldId } from '~/data-transformers/form-field-transformer/utils';
 import { redirect } from '~/i18n/routing';
+import { ACCOUNT_DEFAULT_REDIRECT_PATH } from '~/lib/makeswift/site-header/resolve-account-href';
 import { getCartId } from '~/lib/cart';
 import { assertRecaptchaTokenPresent, getRecaptchaFromForm } from '~/lib/recaptcha';
 
@@ -422,5 +423,5 @@ export async function registerCustomer<F extends Field>(
     };
   }
 
-  return redirect({ href: '/account/orders', locale });
+  return redirect({ href: ACCOUNT_DEFAULT_REDIRECT_PATH, locale });
 }

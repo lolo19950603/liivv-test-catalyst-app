@@ -64,5 +64,5 @@ test('Account icon is visible in the header menu and navigates to the account pa
   await customer.login('/');
 
   await page.getByLabel(t('account')).click();
-  await expect(page).toHaveURL('/account/orders/');
+  await expect(page).toHaveURL('/account/dashboard/');
 });

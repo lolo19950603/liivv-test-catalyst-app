@@ -11,7 +11,7 @@ loadEnvConfig(process.cwd());
 import { writeBuildConfig } from './build-config/writer';
 import { client } from './client';
 import { graphql } from './client/graphql';
-import { cspHeader } from './lib/content-security-policy';
+import { cspHeader, bcAppCspHeader } from './lib/content-security-policy';
 
 const withMakeswift = createWithMakeswift();
 const withNextIntl = createNextIntlPlugin({
@@ -85,6 +85,24 @@ export default async (): Promise<NextConfig> => {
       }));
 
       return [
+        {
+          source: '/bc-app/:path*',
+          headers: [
+            {
+              key: 'Content-Security-Policy',
+              value: bcAppCspHeader.replace(/\n/g, ''),
+            },
+          ],
+        },
+        {
+          source: '/api/bigcommerce/app/:path*',
+          headers: [
+            {
+              key: 'Content-Security-Policy',
+              value: bcAppCspHeader.replace(/\n/g, ''),
+            },
+          ],
+        },
         {
           source: '/(.*)',
           headers: [

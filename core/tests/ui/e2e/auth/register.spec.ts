@@ -49,9 +49,9 @@ test('Registration works as expected', { tag: [TAGS.writesData] }, async ({ page
 
   await page.getByRole('button', { name: t('Auth.Register.cta') }).click();
 
-  await expect(page).toHaveURL('/account/orders/');
+  await expect(page).toHaveURL('/account/dashboard/');
   await expect(
-    page.getByRole('heading', { name: t('Account.Orders.title'), exact: true }),
+    page.getByText(t('Account.Dashboard.wellness.welcomeLead')),
   ).toBeVisible();
 
   const { id } = await customer.getByEmail(email);
