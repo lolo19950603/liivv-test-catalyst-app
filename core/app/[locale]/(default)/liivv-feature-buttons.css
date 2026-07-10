@@ -83,7 +83,57 @@ button.liivv-live-chat-launcher:hover {
   color: #ffffff !important;
 }
 
+button.liivv-live-chat-launcher--icon-only {
+  position: relative;
+  width: 4.25rem !important;
+  height: 4.25rem !important;
+  padding: 0 !important;
+}
+
+button.liivv-live-chat-launcher--icon-only svg {
+  width: 1.75rem !important;
+  height: 1.75rem !important;
+}
+
+.liivv-live-chat-launcher__badge {
+  position: absolute;
+  top: -0.2rem;
+  right: -0.2rem;
+  min-width: 1.125rem;
+  height: 1.125rem;
+  padding: 0 0.25rem;
+  border-radius: 9999px;
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
 button.liivv-live-chat-launcher svg {
   color: #ffffff !important;
   flex-shrink: 0;
+}
+
+/* Virtual care hub card — same archive `button { background: transparent }` override. */
+button.liivv-virtual-care-card {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid #e5dfd5 !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: border-color 150ms ease;
+}
+
+button.liivv-virtual-care-card:hover {
+  border-color: #c4b8a8 !important;
 }

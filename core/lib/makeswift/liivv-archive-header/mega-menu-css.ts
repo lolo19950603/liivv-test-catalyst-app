@@ -342,19 +342,20 @@ export const LIIVV_HEADER_MEGA_MENU_CSS = `
 }
 .liivv-archive-header .header-utility-badge {
   position: absolute;
-  top: -0.125rem;
-  right: -0.125rem;
-  display: flex;
+  top: -0.2rem;
+  right: -0.2rem;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 1.125rem;
   height: 1.125rem;
-  padding-inline: 0.25rem;
+  padding: 0 0.25rem;
   border-radius: 999px;
-  background: rgb(var(--color-foreground));
-  color: rgb(var(--color-background));
+  background: #dc2626;
+  color: #ffffff;
+  border: 2px solid #ffffff;
   font-size: 0.625rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1;
 }
 .liivv-archive-header .header-notifications {

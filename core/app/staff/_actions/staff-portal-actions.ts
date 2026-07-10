@@ -6,9 +6,9 @@ import { isValidStaffSession } from '~/lib/admin-auth';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import {
   appendStaffMessage,
+  joinStaffConversation,
   listConversationsForAdmin,
   markStaffClosedConversation,
-  reopenStaffConversation,
 } from '~/lib/supabase/chat-messages';
 import {
   updateCarePackRequestStatus,
@@ -249,8 +249,8 @@ export async function staffPortalAction(
     return { ok: true };
   }
 
-  if (intent === 'reopenConversation') {
-    const result = await reopenStaffConversation(conversationId);
+  if (intent === 'joinConversation' || intent === 'reopenConversation') {
+    const result = await joinStaffConversation(conversationId);
 
     if (!result.ok) {
       return { ok: false, error: result.message };

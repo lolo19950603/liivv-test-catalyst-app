@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState, useEffect, useMemo, useRef, type RefObject } from 'react';
+import { useActionState, useEffect, useEffectEvent, useRef, useState, type RefObject } from 'react';
 import { useRouter } from 'next/navigation';
 
 import {
@@ -11,6 +11,14 @@ import {
 import { staffLogoutAction } from '~/app/staff/_actions/staff-auth-actions';
 import type { StaffPortalData } from '~/app/staff/page-data';
 import { StaffCustomerDetail } from '~/components/staff/staff-customer-detail';
+import { ChatMessageBody } from '~/components/virtual-care/chat-message-body';
+import { ChatSystemMessage } from '~/components/virtual-care/chat-system-message';
+import {
+  CHAT_ACTIVE_POLL_MS,
+  useChatBurstRefresh,
+  useChatPollRefresh,
+} from '~/components/virtual-care/use-chat-poll-refresh';
+import { isStaffJoinedToChat } from '~/lib/chat/session';
 
 const forest = '#375a37';
 
@@ -46,27 +54,24 @@ export function StaffPortalClient({ data }: { data: StaffPortalData }) {
     null,
   );
   const bottomRef = useRef<HTMLDivElement>(null);
+  const [chatRefreshTrigger, setChatRefreshTrigger] = useState(0);
 
   const tab = data.adminTab;
 
   useEffect(() => {
     if (actionState?.ok) {
       router.refresh();
+      if (tab === 'chat') {
+        setChatRefreshTrigger((value) => value + 1);
+      }
     }
-  }, [actionState?.ok, router]);
+  }, [actionState?.ok, router, tab]);
 
   useEffect(() => {
     if (tab === 'chat' && data.selectedConversationId) {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [data.messages.length, data.selectedConversationId, tab]);
-
-  const selectedConversation = useMemo(
-    () => data.conversations.find((c) => c.conversationId === data.selectedConversationId) ?? null,
-    [data.conversations, data.selectedConversationId],
-  );
-
-  const staffClosedAt = selectedConversation?.staffClosedAt ?? null;
 
   return (
     <div className="min-h-screen bg-[#faf8f5] text-[#2c2a26]">
@@ -128,7 +133,16 @@ export function StaffPortalClient({ data }: { data: StaffPortalData }) {
           <CustomersTab data={data} formAction={formAction} />
         ) : null}
 
-        {tab === 'chat' ? <ChatTab bottomRef={bottomRef} data={data} formAction={formAction} isPending={isPending} /> : null}
+        {tab === 'chat' ? (
+          <ChatTab
+            actionRefreshTrigger={chatRefreshTrigger}
+            bottomRef={bottomRef}
+            data={data}
+            formAction={formAction}
+            isPending={isPending}
+            onRefresh={() => router.refresh()}
+          />
+        ) : null}
       </main>
     </div>
   );
@@ -355,15 +369,39 @@ function ChatTab({
   formAction,
   isPending,
   bottomRef,
+  onRefresh,
+  actionRefreshTrigger,
 }: {
   data: StaffPortalData;
   formAction: (formData: FormData) => void;
   isPending: boolean;
   bottomRef: RefObject<HTMLDivElement | null>;
+  onRefresh: () => void;
+  actionRefreshTrigger: number;
 }) {
-  const staffClosedAt =
-    data.conversations.find((c) => c.conversationId === data.selectedConversationId)?.staffClosedAt ??
-    null;
+  const selectedConversation =
+    data.conversations.find((c) => c.conversationId === data.selectedConversationId) ?? null;
+  const staffClosedAt = selectedConversation?.staffClosedAt ?? null;
+  const staffJoinedAt = selectedConversation?.staffJoinedAt ?? null;
+  const staffInChat = isStaffJoinedToChat({ staffJoinedAt, staffClosedAt });
+  const refresh = useEffectEvent(onRefresh);
+
+  useChatPollRefresh({
+    enabled: Boolean(data.selectedConversationId),
+    intervalMs: CHAT_ACTIVE_POLL_MS,
+    onRefresh: refresh,
+  });
+
+  useChatBurstRefresh({
+    trigger: actionRefreshTrigger,
+    onRefresh: refresh,
+  });
+
+  useEffect(() => {
+    if (data.selectedConversationId) {
+      refresh();
+    }
+  }, [data.selectedConversationId]);
 
   return (
     <div className="rounded-xl border border-[#e5dfd5] bg-white shadow-sm">
@@ -390,7 +428,14 @@ function ChatTab({
                       <p className="mt-1 text-[10px] text-[#8a8176]">
                         {new Date(c.updatedAt).toLocaleString()}
                         {c.escalatedToPharmacistAt ? ' • Pharmacist requested' : ''}
-                        {c.staffClosedAt ? ' • Closed' : ''}
+                        {isStaffJoinedToChat({
+                          staffJoinedAt: c.staffJoinedAt,
+                          staffClosedAt: c.staffClosedAt,
+                        })
+                          ? ' • In chat'
+                          : c.staffClosedAt
+                            ? ' • Left chat'
+                            : ''}
                       </p>
                     </Link>
                   </li>
@@ -408,6 +453,10 @@ function ChatTab({
               <>
                 <div className="max-h-[50vh] space-y-3 overflow-y-auto rounded-lg border border-[#ece6dc] bg-white p-3">
                   {data.messages.map((m) => {
+                    if (m.sender_type === 'system') {
+                      return <ChatSystemMessage body={m.body} key={m.id} />;
+                    }
+
                     const alignEnd = m.sender_type === 'staff';
                     const label =
                       m.sender_type === 'staff'
@@ -430,7 +479,7 @@ function ChatTab({
                               : 'border border-[#dcd6cc] bg-white text-[#2c2a26]'
                         }`}
                       >
-                        <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                        <ChatMessageBody body={m.body} />
                         <p className="mt-1 text-[10px] opacity-70">
                           {label} · {new Date(m.created_at).toLocaleString()}
                         </p>
@@ -441,22 +490,7 @@ function ChatTab({
                   <div ref={bottomRef} />
                 </div>
 
-                {staffClosedAt ? (
-                  <div className="mt-3 space-y-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
-                    <p>Conversation closed. Reopen to reply.</p>
-                    <form action={formAction}>
-                      <input name="intent" type="hidden" value="reopenConversation" />
-                      <input name="conversationId" type="hidden" value={data.selectedConversationId} />
-                      <button
-                        className="liivv-btn-secondary px-3 py-1.5 text-sm"
-                        disabled={isPending}
-                        type="submit"
-                      >
-                        Reopen
-                      </button>
-                    </form>
-                  </div>
-                ) : (
+                {staffInChat ? (
                   <form action={formAction} className="mt-3">
                     <input name="intent" type="hidden" value="endConversation" />
                     <input name="conversationId" type="hidden" value={data.selectedConversationId} />
@@ -465,9 +499,24 @@ function ChatTab({
                       disabled={isPending}
                       type="submit"
                     >
-                      End conversation
+                      Leave chat
                     </button>
                   </form>
+                ) : (
+                  <div className="mt-3 space-y-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
+                    <p>Join this chat to reply to the customer.</p>
+                    <form action={formAction}>
+                      <input name="intent" type="hidden" value="joinConversation" />
+                      <input name="conversationId" type="hidden" value={data.selectedConversationId} />
+                      <button
+                        className="liivv-btn-primary px-3 py-1.5 text-sm"
+                        disabled={isPending}
+                        type="submit"
+                      >
+                        Join chat
+                      </button>
+                    </form>
+                  </div>
                 )}
 
                 <form action={formAction} className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end">
@@ -475,16 +524,22 @@ function ChatTab({
                   <input name="conversationId" type="hidden" value={data.selectedConversationId} />
                   <textarea
                     className="min-h-20 w-full rounded-xl border border-[#e0d9ce] px-3 py-2 text-sm"
-                    disabled={isPending || Boolean(staffClosedAt)}
+                    disabled={isPending || !staffInChat}
                     maxLength={8000}
                     name="body"
-                    placeholder="Type staff reply…"
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' && !event.shiftKey) {
+                        event.preventDefault();
+                        event.currentTarget.form?.requestSubmit();
+                      }
+                    }}
+                    placeholder={staffInChat ? 'Type staff reply…' : 'Join chat to reply…'}
                     required
                     rows={3}
                   />
                   <button
                     className="liivv-btn-primary px-5 py-2.5 text-sm disabled:opacity-60"
-                    disabled={isPending || Boolean(staffClosedAt)}
+                    disabled={isPending || !staffInChat}
                     type="submit"
                   >
                     {isPending ? 'Sending…' : 'Send'}

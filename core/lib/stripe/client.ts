@@ -24,7 +24,9 @@ export function isStripeConfigured(): boolean {
 
 export function getStripe(): Stripe {
   if (!stripeClient) {
-    stripeClient = new Stripe(getStripeSecretKey());
+    stripeClient = new Stripe(getStripeSecretKey(), {
+      telemetry: false,
+    });
   }
 
   return stripeClient;

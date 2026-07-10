@@ -122,19 +122,23 @@ async function getHasUnreadChatMessage(lastSeen: Date | null): Promise<boolean> 
   }
 }
 
-export const getAccountDashboardNotifications = cache(
-  async (locale: string): Promise<AccountDashboardNotifications> => {
-    const lastSeen = await getAccountNotificationsLastSeen();
-    const headerNotifications = await buildHeaderNotifications(locale);
-    const unreadCount = headerNotifications.filter((notification) =>
-      isAccountNotificationUnread(notification.createdAt, lastSeen),
-    ).length;
-    const hasUnreadChatMessage = await getHasUnreadChatMessage(lastSeen);
-
-    return {
-      headerNotifications,
-      unreadCount,
-      hasUnreadChatMessage,
-    };
-  },
+export const getCachedHeaderNotifications = cache(async (locale: string) =>
+  buildHeaderNotifications(locale),
 );
+
+export async function getAccountDashboardNotifications(
+  locale: string,
+): Promise<AccountDashboardNotifications> {
+  const lastSeen = await getAccountNotificationsLastSeen();
+  const headerNotifications = await getCachedHeaderNotifications(locale);
+  const unreadCount = headerNotifications.filter((notification) =>
+    isAccountNotificationUnread(notification.createdAt, lastSeen),
+  ).length;
+  const hasUnreadChatMessage = await getHasUnreadChatMessage(lastSeen);
+
+  return {
+    headerNotifications,
+    unreadCount,
+    hasUnreadChatMessage,
+  };
+}

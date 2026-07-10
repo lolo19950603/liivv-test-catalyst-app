@@ -4,20 +4,35 @@ import {
   useActionState,
   useEffect,
   useEffectEvent,
+  useMemo,
   useRef,
   useState,
+  type FormEvent,
   type ReactNode,
 } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import {
   getLiveChatSessionAction,
+  getLiveChatUnreadStaffCountAction,
+  markLiveChatReadAction,
   virtualCareChatAction,
   type LiveChatSessionPayload,
   type VirtualCareChatActionState,
 } from '~/app/[locale]/(default)/account/(portal)/virtual-care/_actions/virtual-care-actions';
 import { Link } from '~/components/link';
 import type { ChatMessageRow } from '~/lib/supabase/chat-messages';
+import { ChatMessageBody } from '~/components/virtual-care/chat-message-body';
+import { ChatSystemMessage } from '~/components/virtual-care/chat-system-message';
+import { ChatTypingIndicator } from '~/components/virtual-care/chat-typing-indicator';
+import {
+  CHAT_ACTIVE_POLL_MS,
+  CHAT_IDLE_POLL_MS,
+  useChatBurstRefresh,
+  useChatPollRefresh,
+} from '~/components/virtual-care/use-chat-poll-refresh';
+
+const CHAT_CLOSED_UNREAD_POLL_MS = 3000;
 
 export const LIVE_CHAT_OPEN_EVENT = 'liivv:open-live-chat';
 
@@ -61,9 +76,9 @@ function ChatIcon({ className }: { className?: string }) {
       aria-hidden="true"
       className={className}
       fill="none"
-      height="22"
+      height="28"
       viewBox="0 0 24 24"
-      width="22"
+      width="28"
     >
       <path
         d="M7 9.5h10M7 13h6"
@@ -136,11 +151,9 @@ function AuthenticatedPanel({
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const [sendBurstTrigger, setSendBurstTrigger] = useState(0);
+  const [optimisticBody, setOptimisticBody] = useState<string | null>(null);
   const [sendState, sendAction, sendPending] = useActionState<
-    VirtualCareChatActionState,
-    FormData
-  >(virtualCareChatAction, null);
-  const [leaveState, leaveAction, leavePending] = useActionState<
     VirtualCareChatActionState,
     FormData
   >(virtualCareChatAction, null);
@@ -148,25 +161,50 @@ function AuthenticatedPanel({
 
   const supabaseReady = data?.supabaseReady ?? false;
   const botEnabled = data?.botEnabled ?? false;
+  const careTeamActive = data?.careTeamActive ?? false;
   const conversationId = data?.conversationId ?? null;
   const messages = data?.messages ?? [];
-  const customerLeftAt = data?.customerLeftAt ?? null;
-  const staffClosedAt = data?.staffClosedAt ?? null;
   const escalatedToPharmacistAt = data?.escalatedToPharmacistAt ?? null;
+  const assistantActive = botEnabled && !careTeamActive && !escalatedToPharmacistAt;
 
-  useEffect(() => {
-    if (!supabaseReady || !conversationId) {
-      return;
+  const displayMessages = useMemo(() => {
+    if (!optimisticBody) {
+      return messages;
     }
 
-    const id = window.setInterval(() => {
-      if (document.visibilityState === 'visible') {
-        refresh();
-      }
-    }, 15000);
+    const alreadyPersisted = messages.some(
+      (m) => m.sender_type === 'customer' && m.body === optimisticBody,
+    );
 
-    return () => window.clearInterval(id);
-  }, [conversationId, supabaseReady]);
+    if (alreadyPersisted) {
+      return messages;
+    }
+
+    return [
+      ...messages,
+      {
+        id: 'optimistic-customer',
+        conversation_id: conversationId ?? 'pending',
+        sender_type: 'customer' as const,
+        body: optimisticBody,
+        created_at: new Date().toISOString(),
+      },
+    ];
+  }, [conversationId, messages, optimisticBody]);
+
+  const showTyping = Boolean(sendPending && optimisticBody && assistantActive);
+  const pollIntervalMs = conversationId ? CHAT_ACTIVE_POLL_MS : CHAT_IDLE_POLL_MS;
+
+  useChatPollRefresh({
+    enabled: supabaseReady,
+    intervalMs: pollIntervalMs,
+    onRefresh: refresh,
+  });
+
+  useChatBurstRefresh({
+    trigger: sendBurstTrigger,
+    onRefresh: refresh,
+  });
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -174,20 +212,48 @@ function AuthenticatedPanel({
     if (el) {
       el.scrollTop = el.scrollHeight;
     }
-  }, [messages.length]);
+  }, [displayMessages.length, showTyping]);
+
+  useEffect(() => {
+    if (sendPending) {
+      formRef.current?.reset();
+    }
+  }, [sendPending]);
+
+  useEffect(() => {
+    if (!optimisticBody) {
+      return;
+    }
+
+    const persisted = messages.some(
+      (m) => m.sender_type === 'customer' && m.body === optimisticBody,
+    );
+
+    if (persisted && !sendPending) {
+      setOptimisticBody(null);
+    }
+  }, [messages, optimisticBody, sendPending]);
+
+  useEffect(() => {
+    if (sendState?.error) {
+      setOptimisticBody(null);
+    }
+  }, [sendState?.error]);
 
   useEffect(() => {
     if (sendState?.ok) {
-      formRef.current?.reset();
+      setSendBurstTrigger((value) => value + 1);
       refresh();
     }
   }, [sendState?.ok]);
 
-  useEffect(() => {
-    if (leaveState?.ok) {
-      refresh();
+  function handleSendSubmit(event: FormEvent<HTMLFormElement>) {
+    const body = String(new FormData(event.currentTarget).get('body') ?? '').trim();
+
+    if (body) {
+      setOptimisticBody(body);
     }
-  }, [leaveState?.ok]);
+  }
 
   if (!data || !supabaseReady) {
     return (
@@ -216,39 +282,36 @@ function AuthenticatedPanel({
   return (
     <div className="flex h-full flex-col">
       <div className="flex-1 space-y-3 overflow-y-auto bg-[#f4f4f4] p-4" ref={scrollRef}>
-        {botEnabled ? (
+        {careTeamActive ? (
+          <div className="rounded-xl border border-[#c5ccd4] bg-[#f4f6f8] px-3 py-2.5 text-xs text-[#3d4a36]">
+            You&apos;re connected with a care team member. They&apos;ll reply here when available.
+          </div>
+        ) : assistantActive ? (
           <div className="rounded-xl border border-[#d4dfc8] bg-[#f8faf6] px-3 py-2.5 text-xs text-[#3d4a36]">
             Ask about products, orders, or your account. For medication advice, a pharmacist will
             join.
-            {escalatedToPharmacistAt ? (
-              <span className="mt-1 block font-medium">
-                A pharmacist has been notified and will join this conversation.
-              </span>
-            ) : null}
+          </div>
+        ) : escalatedToPharmacistAt ? (
+          <div className="rounded-xl border border-[#d4dfc8] bg-[#f8faf6] px-3 py-2.5 text-xs text-[#3d4a36]">
+            A pharmacist has been notified and will join this conversation.
           </div>
         ) : null}
 
-        {customerLeftAt ? (
-          <div className="rounded-xl border border-[#c4d4b8] bg-[#f4f7f0] px-3 py-2 text-xs">
-            You previously left this chat. Send a message to continue.
-          </div>
-        ) : null}
-
-        {staffClosedAt ? (
-          <div className="rounded-xl border border-[#c5ccd4] bg-[#f4f6f8] px-3 py-2 text-xs">
-            Our team closed this conversation. Send a message below to continue.
-          </div>
-        ) : null}
-
-        {!conversationId && messages.length === 0 ? (
+        {!conversationId && displayMessages.length === 0 ? (
           <div className="rounded-2xl bg-white px-4 py-3 text-sm leading-relaxed text-[#2c2a26] shadow-sm">
-            {botEnabled
+            {assistantActive
               ? 'Hi! I can help with products, orders, prescriptions, and your account. What do you need?'
-              : 'Send a message to our care team. Conversations are saved so we can follow up.'}
+              : careTeamActive
+                ? 'A care team member will join this conversation shortly.'
+                : 'Send a message to our care team. Conversations are saved so we can follow up.'}
           </div>
         ) : null}
 
-        {messages.map((m) => {
+        {displayMessages.map((m) => {
+          if (m.sender_type === 'system') {
+            return <ChatSystemMessage body={m.body} key={m.id} />;
+          }
+
           const alignEnd = m.sender_type === 'customer';
 
           return (
@@ -261,7 +324,7 @@ function AuthenticatedPanel({
                     {messageLabel(m.sender_type)}
                   </p>
                 ) : null}
-                <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                <ChatMessageBody body={m.body} />
                 <p className="mt-1 text-[10px] opacity-75">
                   {new Date(m.created_at).toLocaleString()}
                 </p>
@@ -269,33 +332,30 @@ function AuthenticatedPanel({
             </div>
           );
         })}
+
+        {showTyping ? <ChatTypingIndicator /> : null}
       </div>
 
       <div className="border-t border-[#e8e2d8] bg-white p-3">
-        {conversationId && !customerLeftAt ? (
-          <form action={leaveAction} className="mb-2">
-            <input name="intent" type="hidden" value="leave" />
-            <button
-              className="text-xs text-[#6b6560] hover:underline disabled:opacity-50"
-              disabled={leavePending}
-              type="submit"
-            >
-              Leave chat
-            </button>
-            {leaveState?.error ? (
-              <p className="text-xs text-red-700">{leaveState.error}</p>
-            ) : null}
-          </form>
-        ) : null}
-
-        <form action={sendAction} className="flex gap-2" ref={formRef}>
+        <form
+          action={sendAction}
+          className="flex gap-2"
+          onSubmit={handleSendSubmit}
+          ref={formRef}
+        >
           <input name="intent" type="hidden" value="send" />
           <input
             className="min-w-0 flex-1 rounded-xl border-0 bg-[#f0ebe3] px-3.5 py-3 text-sm text-[#2c2a26] outline-none placeholder:text-[#8a8176] focus:ring-2 focus:ring-[#8a9a7b]"
             disabled={sendPending}
             maxLength={8000}
             name="body"
-            placeholder="Type your message"
+            placeholder={
+              careTeamActive
+                ? 'Message the care team…'
+                : assistantActive
+                  ? 'Ask the store assistant…'
+                  : 'Type your message'
+            }
             required
             type="text"
           />
@@ -304,7 +364,7 @@ function AuthenticatedPanel({
             disabled={sendPending}
             type="submit"
           >
-            {sendPending ? '…' : 'Send'}
+            Send
           </button>
         </form>
         {sendState?.error ? <p className="mt-2 text-xs text-red-700">{sendState.error}</p> : null}
@@ -335,6 +395,7 @@ export function LiveChatWidget() {
   const [sessionReady, setSessionReady] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [data, setData] = useState<LiveChatWidgetData | null>(null);
+  const [unreadStaffCount, setUnreadStaffCount] = useState(0);
 
   const refreshSession = useEffectEvent(async () => {
     const session = await getLiveChatSessionAction();
@@ -344,14 +405,29 @@ export function LiveChatWidget() {
     setSessionReady(true);
   });
 
+  const refreshUnreadStaffCount = useEffectEvent(async () => {
+    const result = await getLiveChatUnreadStaffCountAction();
+
+    setUnreadStaffCount(result.count);
+  });
+
+  const markChatRead = useEffectEvent(async () => {
+    await markLiveChatReadAction();
+    setUnreadStaffCount(0);
+  });
+
   useEffect(() => {
     if (searchParams.get('chat') === 'open') {
+      void markChatRead();
       setOpen(true);
     }
   }, [searchParams]);
 
   useEffect(() => {
-    const onOpen = () => setOpen(true);
+    const onOpen = () => {
+      void markChatRead();
+      setOpen(true);
+    };
 
     window.addEventListener(LIVE_CHAT_OPEN_EVENT, onOpen);
 
@@ -366,6 +442,30 @@ export function LiveChatWidget() {
     setSessionReady(false);
     void refreshSession();
   }, [open]);
+
+  useEffect(() => {
+    if (open) {
+      return;
+    }
+
+    void refreshUnreadStaffCount();
+
+    const id = window.setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        void refreshUnreadStaffCount();
+      }
+    }, CHAT_CLOSED_UNREAD_POLL_MS);
+
+    return () => window.clearInterval(id);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open || !sessionReady) {
+      return;
+    }
+
+    void markChatRead();
+  }, [open, sessionReady, data?.messages.length]);
 
   const clearChatQuery = () => {
     if (searchParams.get('chat') !== 'open') {
@@ -386,6 +486,7 @@ export function LiveChatWidget() {
   };
 
   const handleOpen = () => {
+    void markChatRead();
     setOpen(true);
   };
 
@@ -411,9 +512,13 @@ export function LiveChatWidget() {
                   {!sessionReady
                     ? 'Connecting…'
                     : isLoggedIn
-                      ? data?.botEnabled
-                        ? 'Store assistant'
-                        : 'Care team'
+                      ? data?.careTeamActive
+                        ? 'Care team'
+                        : data?.escalatedToPharmacistAt
+                          ? 'Pharmacist requested'
+                          : data?.botEnabled
+                            ? 'Store assistant'
+                            : 'Care team'
                       : 'Sign in to continue'}
                 </p>
               </div>
@@ -428,21 +533,6 @@ export function LiveChatWidget() {
                 <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 24 24" width="18">
                   <path
                     d="M6 14h12"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeWidth="1.75"
-                  />
-                </svg>
-              </button>
-              <button
-                aria-label="Close chat"
-                className="rounded-md p-1.5 text-white/90 hover:bg-white/10"
-                onClick={handleClose}
-                type="button"
-              >
-                <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 24 24" width="18">
-                  <path
-                    d="M7 7l10 10M17 7 7 17"
                     stroke="currentColor"
                     strokeLinecap="round"
                     strokeWidth="1.75"
@@ -472,13 +562,21 @@ export function LiveChatWidget() {
         </div>
       ) : (
         <button
-          aria-label="Need Help? Open live chat"
-          className="liivv-live-chat-launcher pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8a9a7b] focus-visible:ring-offset-2"
+          aria-label={
+            unreadStaffCount > 0
+              ? `Open live chat, ${unreadStaffCount} unread message${unreadStaffCount === 1 ? '' : 's'}`
+              : 'Open live chat'
+          }
+          className="liivv-live-chat-launcher liivv-live-chat-launcher--icon-only pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8a9a7b] focus-visible:ring-offset-2"
           onClick={handleOpen}
           type="button"
         >
           <ChatIcon />
-          Need Help?
+          {unreadStaffCount > 0 ? (
+            <span aria-hidden="true" className="liivv-live-chat-launcher__badge">
+              {unreadStaffCount > 9 ? '9+' : unreadStaffCount}
+            </span>
+          ) : null}
         </button>
       )}
     </div>

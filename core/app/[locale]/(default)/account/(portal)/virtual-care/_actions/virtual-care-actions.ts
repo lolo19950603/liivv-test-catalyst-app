@@ -2,11 +2,18 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 
 import { getVirtualCareChatData } from '~/app/[locale]/(default)/account/(portal)/pharmacy/page-data';
 import { getOnboardingCustomer } from '~/app/[locale]/(default)/account/onboarding/page-data';
 import {
+  getLiveChatLastSeen,
+  getLiveChatLastSeenCookieOptions,
+  LIVE_CHAT_LAST_SEEN_COOKIE,
+} from '~/lib/chat/cookie';
+import {
   appendCustomerMessage,
+  countUnreadStaffMessages,
   getConversationByProfileId,
   getOrCreateConversation,
   markCustomerLeftChat,
@@ -18,6 +25,7 @@ import { processCustomerMessageForBot } from '~/lib/virtual-care-bot/process-cus
 export type LiveChatSessionPayload = {
   supabaseReady: boolean;
   botEnabled: boolean;
+  careTeamActive: boolean;
   conversationId: string | null;
   customerLeftAt: string | null;
   staffClosedAt: string | null;
@@ -46,6 +54,7 @@ export async function getLiveChatSessionAction(): Promise<{
     data: {
       supabaseReady: chat.supabaseReady,
       botEnabled: chat.botEnabled,
+      careTeamActive: chat.careTeamActive,
       conversationId: chat.conversationId,
       customerLeftAt: chat.customerLeftAt,
       staffClosedAt: chat.staffClosedAt,
@@ -53,6 +62,53 @@ export async function getLiveChatSessionAction(): Promise<{
       messages: chat.messages,
     },
   };
+}
+
+export async function getLiveChatUnreadStaffCountAction(): Promise<{ count: number }> {
+  const customer = await getOnboardingCustomer();
+
+  if (!customer || !isSupabaseConfigured()) {
+    return { count: 0 };
+  }
+
+  const ensured = await ensureCustomerProfile(customer);
+
+  if (ensured.status !== 'ok') {
+    return { count: 0 };
+  }
+
+  const conversation = await getConversationByProfileId(ensured.profile.id);
+
+  if (!conversation.ok || !conversation.conversationId) {
+    return { count: 0 };
+  }
+
+  const lastSeen = await getLiveChatLastSeen();
+  const unread = await countUnreadStaffMessages(conversation.conversationId, lastSeen);
+
+  if (!unread.ok) {
+    return { count: 0 };
+  }
+
+  return { count: unread.count };
+}
+
+export async function markLiveChatReadAction(): Promise<{ ok: true }> {
+  const customer = await getOnboardingCustomer();
+
+  if (!customer) {
+    return { ok: true };
+  }
+
+  const cookieStore = await cookies();
+
+  cookieStore.set(
+    LIVE_CHAT_LAST_SEEN_COOKIE,
+    encodeURIComponent(new Date().toISOString()),
+    getLiveChatLastSeenCookieOptions(),
+  );
+
+  return { ok: true };
 }
 
 export type VirtualCareChatActionState = { ok?: boolean; error?: string } | null;
@@ -121,6 +177,8 @@ export async function virtualCareChatAction(
     conversationId: conv.conversationId,
     profileId: ensured.profile.id,
     customerMessage: body,
+    staffJoinedAt: conv.staffJoinedAt,
+    staffClosedAt: conv.staffClosedAt,
   });
 
   if (!botResult.ok) {

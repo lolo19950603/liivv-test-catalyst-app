@@ -1312,18 +1312,22 @@ body.adc-portal-active main{
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-badge{
   position:absolute;
-  top:0.35rem;
-  right:0.35rem;
+  top:0.2rem;
+  right:0.2rem;
   min-width:1.125rem;
   height:1.125rem;
   padding:0 0.25rem;
   border-radius:999px;
-  background:rgb(var(--mhd-btn-bg));
-  color:rgb(var(--mhd-btn-text));
+  background:#dc2626;
+  color:#ffffff;
+  border:2px solid #ffffff;
   font-family:var(--mhd-font-body);
   font-size:0.625rem;
-  font-weight:500;
-  line-height:1.125rem;
+  font-weight:700;
+  line-height:1;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
   text-align:center;
   z-index:2;
 }

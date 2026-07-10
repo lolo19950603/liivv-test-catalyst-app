@@ -114,11 +114,13 @@ export const Header = async () => {
       ? [firstName, lastName].filter(Boolean).join(' ') || tDashboard('guestName')
       : undefined;
   const accountLabel = loggedIn ? tDashboard('myAccount') : undefined;
-  const accountNotifications = loggedIn
-    ? await getAccountDashboardNotifications(locale)
-    : null;
-  const notifications = accountNotifications
-    ? {
+  let notifications = null;
+
+  if (loggedIn) {
+    try {
+      const accountNotifications = await getAccountDashboardNotifications(locale);
+
+      notifications = {
         items: accountNotifications.headerNotifications,
         unreadCount: accountNotifications.unreadCount,
         labels: {
@@ -128,8 +130,11 @@ export const Header = async () => {
           kindOrder: tDashboard('notificationKindOrder'),
           kindSubscription: tDashboard('notificationKindSubscription'),
         },
-      }
-    : null;
+      };
+    } catch (error) {
+      console.error('[header] account notifications', error);
+    }
+  }
   const requestPathname = stripLocaleFromPathname((await headers()).get('x-pathname') ?? '/');
 
   return (

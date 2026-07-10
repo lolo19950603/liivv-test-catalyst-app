@@ -10,6 +10,7 @@ import {
   type PharmacyPrescription,
   type PharmacyRefillRequest,
 } from '~/lib/pharmacy/pharmacy-mappers';
+import { isCareTeamChatActive } from '~/lib/chat/session';
 import { getConversationByProfileId, getLatestMessageForConversation } from '~/lib/supabase/chat-messages';
 import {
   getAccountNotificationsLastSeen,
@@ -140,10 +141,12 @@ export const getVirtualCareChatData = cache(async () => {
     return {
       supabaseReady: false as const,
       botEnabled: isVirtualCareBotEnabled(),
+      careTeamActive: false,
       messages: [],
       conversationId: null,
       customerLeftAt: null,
       staffClosedAt: null,
+      staffJoinedAt: null,
       escalatedToPharmacistAt: null,
     };
   }
@@ -154,10 +157,12 @@ export const getVirtualCareChatData = cache(async () => {
     return {
       supabaseReady: false as const,
       botEnabled: isVirtualCareBotEnabled(),
+      careTeamActive: false,
       messages: [],
       conversationId: null,
       customerLeftAt: null,
       staffClosedAt: null,
+      staffJoinedAt: null,
       escalatedToPharmacistAt: null,
     };
   }
@@ -168,9 +173,11 @@ export const getVirtualCareChatData = cache(async () => {
     return {
       supabaseReady: true as const,
       botEnabled: isVirtualCareBotEnabled(),
+      careTeamActive: false,
       conversationId: null,
       customerLeftAt: conv.ok ? conv.customerLeftAt : null,
       staffClosedAt: conv.ok ? conv.staffClosedAt : null,
+      staffJoinedAt: conv.ok ? conv.staffJoinedAt : null,
       escalatedToPharmacistAt: conv.ok ? conv.escalatedToPharmacistAt : null,
       messages: [],
     };
@@ -178,15 +185,21 @@ export const getVirtualCareChatData = cache(async () => {
 
   const { listMessagesForConversation } = await import('~/lib/supabase/chat-messages');
   const listed = await listMessagesForConversation(conv.conversationId);
+  const messages = listed.ok ? listed.messages : [];
 
   return {
     supabaseReady: true as const,
     botEnabled: isVirtualCareBotEnabled(),
+    careTeamActive: isCareTeamChatActive({
+      staffJoinedAt: conv.staffJoinedAt,
+      staffClosedAt: conv.staffClosedAt,
+    }),
     conversationId: conv.conversationId,
     customerLeftAt: conv.customerLeftAt,
+    staffJoinedAt: conv.staffJoinedAt,
     staffClosedAt: conv.staffClosedAt,
     escalatedToPharmacistAt: conv.escalatedToPharmacistAt,
-    messages: listed.ok ? listed.messages : [],
+    messages,
   };
 });
 

@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS public.chat_conversations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   profile_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   customer_left_at timestamptz,
+  staff_joined_at timestamptz,
   staff_closed_at timestamptz,
   escalated_to_pharmacist_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -67,7 +68,7 @@ CREATE TABLE IF NOT EXISTS public.chat_conversations (
 CREATE TABLE IF NOT EXISTS public.chat_messages (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   conversation_id uuid NOT NULL REFERENCES public.chat_conversations(id) ON DELETE CASCADE,
-  sender_type text NOT NULL CHECK (sender_type IN ('customer', 'staff', 'bot')),
+  sender_type text NOT NULL CHECK (sender_type IN ('customer', 'staff', 'bot', 'system')),
   body text NOT NULL CHECK (char_length(body) <= 8000),
   created_at timestamptz NOT NULL DEFAULT now()
 );

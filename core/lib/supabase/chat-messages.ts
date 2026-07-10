@@ -1,8 +1,14 @@
 import 'server-only';
 
+import {
+  STAFF_JOINED_CHAT_MESSAGE,
+  STAFF_LEFT_CHAT_FOLLOWUP_MESSAGE,
+  STAFF_LEFT_CHAT_MESSAGE,
+  isCareTeamChatActive,
+} from '~/lib/chat/session';
 import { getSupabaseClient } from '~/lib/supabase/client';
 
-export type ChatMessageSenderType = 'customer' | 'staff' | 'bot';
+export type ChatMessageSenderType = 'customer' | 'staff' | 'bot' | 'system';
 
 export type ChatMessageRow = {
   id: string;
@@ -14,11 +20,20 @@ export type ChatMessageRow = {
 
 const MAX_BODY = 8000;
 
+export {
+  STAFF_JOINED_CHAT_MESSAGE,
+  STAFF_LEFT_CHAT_FOLLOWUP_MESSAGE,
+  STAFF_LEFT_CHAT_MESSAGE,
+  isCareTeamChatActive,
+  isStaffJoinedToChat,
+};
+
 export async function getConversationByProfileId(profileId: string): Promise<
   | {
       ok: true;
       conversationId: string | null;
       customerLeftAt: string | null;
+      staffJoinedAt: string | null;
       staffClosedAt: string | null;
       escalatedToPharmacistAt: string | null;
     }
@@ -27,7 +42,7 @@ export async function getConversationByProfileId(profileId: string): Promise<
   const supabase = getSupabaseClient();
   const { data, error } = await supabase
     .from('chat_conversations')
-    .select('id, customer_left_at, staff_closed_at, escalated_to_pharmacist_at')
+    .select('id, customer_left_at, staff_joined_at, staff_closed_at, escalated_to_pharmacist_at')
     .eq('profile_id', profileId)
     .maybeSingle();
 
@@ -40,6 +55,7 @@ export async function getConversationByProfileId(profileId: string): Promise<
       ok: true,
       conversationId: null,
       customerLeftAt: null,
+      staffJoinedAt: null,
       staffClosedAt: null,
       escalatedToPharmacistAt: null,
     };
@@ -49,6 +65,7 @@ export async function getConversationByProfileId(profileId: string): Promise<
     ok: true,
     conversationId: data.id,
     customerLeftAt: (data.customer_left_at as string | null) ?? null,
+    staffJoinedAt: (data.staff_joined_at as string | null) ?? null,
     staffClosedAt: (data.staff_closed_at as string | null) ?? null,
     escalatedToPharmacistAt: (data.escalated_to_pharmacist_at as string | null) ?? null,
   };
@@ -80,6 +97,7 @@ export async function getOrCreateConversation(profileId: string): Promise<
       ok: true;
       conversationId: string;
       customerLeftAt: string | null;
+      staffJoinedAt: string | null;
       staffClosedAt: string | null;
       escalatedToPharmacistAt: string | null;
     }
@@ -97,6 +115,7 @@ export async function getOrCreateConversation(profileId: string): Promise<
       ok: true,
       conversationId: existing.conversationId,
       customerLeftAt: existing.customerLeftAt,
+      staffJoinedAt: existing.staffJoinedAt,
       staffClosedAt: existing.staffClosedAt,
       escalatedToPharmacistAt: existing.escalatedToPharmacistAt,
     };
@@ -117,9 +136,50 @@ export async function getOrCreateConversation(profileId: string): Promise<
     ok: true,
     conversationId: data.id,
     customerLeftAt: null,
+    staffJoinedAt: null,
     staffClosedAt: null,
     escalatedToPharmacistAt: null,
   };
+}
+
+export async function appendSystemMessage(
+  conversationId: string,
+  body: string,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const trimmed = body.trim();
+
+  if (!trimmed) {
+    return { ok: false, message: 'System message cannot be empty.' };
+  }
+
+  if (trimmed.length > MAX_BODY) {
+    return { ok: false, message: `Message must be at most ${MAX_BODY} characters.` };
+  }
+
+  const supabase = getSupabaseClient();
+  const now = new Date().toISOString();
+
+  const { error: insertError } = await supabase.from('chat_messages').insert({
+    conversation_id: conversationId,
+    sender_type: 'system',
+    body: trimmed,
+    created_at: now,
+  });
+
+  if (insertError) {
+    return { ok: false, message: insertError.message };
+  }
+
+  const { error: updateError } = await supabase
+    .from('chat_conversations')
+    .update({ updated_at: now })
+    .eq('id', conversationId);
+
+  if (updateError) {
+    return { ok: false, message: updateError.message };
+  }
+
+  return { ok: true };
 }
 
 export async function appendBotMessage(
@@ -215,6 +275,29 @@ export async function getLatestMessageForConversation(
   return { ok: true, message: (data as ChatMessageRow | null) ?? null };
 }
 
+export async function countUnreadStaffMessages(
+  conversationId: string,
+  lastSeen: Date | null,
+): Promise<{ ok: true; count: number } | { ok: false; message: string }> {
+  const supabase = getSupabaseClient();
+  const since = lastSeen
+    ? lastSeen.toISOString()
+    : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+  const { count, error } = await supabase
+    .from('chat_messages')
+    .select('id', { count: 'exact', head: true })
+    .eq('conversation_id', conversationId)
+    .eq('sender_type', 'staff')
+    .gt('created_at', since);
+
+  if (error) {
+    return { ok: false, message: error.message };
+  }
+
+  return { ok: true, count: count ?? 0 };
+}
+
 export async function appendCustomerMessage(
   conversationId: string,
   body: string,
@@ -245,7 +328,7 @@ export async function appendCustomerMessage(
 
   const { error: updateError } = await supabase
     .from('chat_conversations')
-    .update({ updated_at: now, customer_left_at: null, staff_closed_at: null })
+    .update({ updated_at: now, customer_left_at: null })
     .eq('id', conversationId);
 
   if (updateError) {
@@ -281,6 +364,7 @@ export type AdminConversationSummary = {
   lastName: string | null;
   updatedAt: string;
   customerLeftAt: string | null;
+  staffJoinedAt: string | null;
   staffClosedAt: string | null;
   escalatedToPharmacistAt: string | null;
 };
@@ -291,7 +375,9 @@ export async function listConversationsForAdmin(): Promise<
   const supabase = getSupabaseClient();
   const { data: convs, error: convErr } = await supabase
     .from('chat_conversations')
-    .select('id, profile_id, updated_at, customer_left_at, staff_closed_at, escalated_to_pharmacist_at')
+    .select(
+      'id, profile_id, updated_at, customer_left_at, staff_joined_at, staff_closed_at, escalated_to_pharmacist_at',
+    )
     .order('updated_at', { ascending: false });
 
   if (convErr) {
@@ -339,6 +425,7 @@ export async function listConversationsForAdmin(): Promise<
       lastName: p?.last_name ?? null,
       updatedAt: c.updated_at,
       customerLeftAt: (c as { customer_left_at?: string | null }).customer_left_at ?? null,
+      staffJoinedAt: (c as { staff_joined_at?: string | null }).staff_joined_at ?? null,
       staffClosedAt: (c as { staff_closed_at?: string | null }).staff_closed_at ?? null,
       escalatedToPharmacistAt:
         (c as { escalated_to_pharmacist_at?: string | null }).escalated_to_pharmacist_at ?? null,
@@ -365,7 +452,7 @@ export async function appendStaffMessage(
   const supabase = getSupabaseClient();
   const { data: convRow, error: convReadErr } = await supabase
     .from('chat_conversations')
-    .select('staff_closed_at')
+    .select('staff_joined_at, staff_closed_at')
     .eq('id', conversationId)
     .maybeSingle();
 
@@ -373,11 +460,13 @@ export async function appendStaffMessage(
     return { ok: false, message: convReadErr.message };
   }
 
-  if ((convRow as { staff_closed_at?: string | null } | null)?.staff_closed_at) {
+  const joinedAt = (convRow as { staff_joined_at?: string | null } | null)?.staff_joined_at ?? null;
+  const closedAt = (convRow as { staff_closed_at?: string | null } | null)?.staff_closed_at ?? null;
+
+  if (!joinedAt || closedAt) {
     return {
       ok: false,
-      message:
-        'This conversation is closed. Reopen it before replying, or wait for the customer to message.',
+      message: 'Join the chat before replying.',
     };
   }
 
@@ -409,6 +498,23 @@ export async function markStaffClosedConversation(
   conversationId: string,
 ): Promise<{ ok: true } | { ok: false; message: string }> {
   const supabase = getSupabaseClient();
+  const { data: convRow, error: convReadErr } = await supabase
+    .from('chat_conversations')
+    .select('staff_joined_at, staff_closed_at')
+    .eq('id', conversationId)
+    .maybeSingle();
+
+  if (convReadErr) {
+    return { ok: false, message: convReadErr.message };
+  }
+
+  const joinedAt = (convRow as { staff_joined_at?: string | null } | null)?.staff_joined_at ?? null;
+  const closedAt = (convRow as { staff_closed_at?: string | null } | null)?.staff_closed_at ?? null;
+
+  if (!joinedAt || closedAt) {
+    return { ok: true };
+  }
+
   const now = new Date().toISOString();
   const { error } = await supabase
     .from('chat_conversations')
@@ -419,22 +525,51 @@ export async function markStaffClosedConversation(
     return { ok: false, message: error.message };
   }
 
-  return { ok: true };
+  const left = await appendSystemMessage(conversationId, STAFF_LEFT_CHAT_MESSAGE);
+
+  if (!left.ok) {
+    return left;
+  }
+
+  return appendSystemMessage(conversationId, STAFF_LEFT_CHAT_FOLLOWUP_MESSAGE);
 }
 
-export async function reopenStaffConversation(
+export async function joinStaffConversation(
   conversationId: string,
 ): Promise<{ ok: true } | { ok: false; message: string }> {
   const supabase = getSupabaseClient();
+  const { data: convRow, error: convReadErr } = await supabase
+    .from('chat_conversations')
+    .select('staff_joined_at, staff_closed_at')
+    .eq('id', conversationId)
+    .maybeSingle();
+
+  if (convReadErr) {
+    return { ok: false, message: convReadErr.message };
+  }
+
+  const joinedAt = (convRow as { staff_joined_at?: string | null } | null)?.staff_joined_at ?? null;
+  const closedAt = (convRow as { staff_closed_at?: string | null } | null)?.staff_closed_at ?? null;
+
+  if (joinedAt && !closedAt) {
+    return { ok: true };
+  }
+
   const now = new Date().toISOString();
   const { error } = await supabase
     .from('chat_conversations')
-    .update({ staff_closed_at: null, updated_at: now })
+    .update({ staff_joined_at: now, staff_closed_at: null, updated_at: now })
     .eq('id', conversationId);
 
   if (error) {
     return { ok: false, message: error.message };
   }
 
-  return { ok: true };
+  return appendSystemMessage(conversationId, STAFF_JOINED_CHAT_MESSAGE);
+}
+
+export async function reopenStaffConversation(
+  conversationId: string,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  return joinStaffConversation(conversationId);
 }

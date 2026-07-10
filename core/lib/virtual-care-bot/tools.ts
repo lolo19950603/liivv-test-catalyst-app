@@ -94,26 +94,57 @@ export async function toolSearchProducts(query: string) {
 }
 
 export async function toolGetRecentOrders(limit = 3) {
-  const data = await getCustomerOrders({ limit });
+  const base = getAppBaseUrl();
+  const ordersPageUrl = `${base}/account/orders`;
 
-  if (!data?.orders?.length) {
+  try {
+    const data = await getCustomerOrders({ limit });
+
+    if (!data) {
+      return {
+        authenticated: true,
+        ok: false,
+        message:
+          'Could not load orders right now. Ask the customer to open their orders page, or try again shortly.',
+        orders: [] as Array<Record<string, string>>,
+        ordersPageUrl,
+      };
+    }
+
+    if (!data.orders.length) {
+      return {
+        authenticated: true,
+        ok: true,
+        message: 'This customer has no recent orders on file.',
+        orders: [] as Array<Record<string, string>>,
+        ordersPageUrl,
+      };
+    }
+
+    const orders = data.orders.map((order) => ({
+      orderNumber: String(order.entityId),
+      status: order.status?.label ?? 'Unknown',
+      orderedAt: order.orderedAt?.utc ?? '',
+      total: formatMoney(order.totalIncTax?.value, order.totalIncTax?.currencyCode),
+      url: `${base}/account/orders/${order.entityId}`,
+    }));
+
     return {
+      authenticated: true,
+      ok: true,
+      message: `Found ${orders.length} recent order(s).`,
+      orders,
+      ordersPageUrl,
+    };
+  } catch (error) {
+    return {
+      authenticated: true,
+      ok: false,
+      message: error instanceof Error ? error.message : 'Order lookup failed.',
       orders: [] as Array<Record<string, string>>,
-      ordersPageUrl: `${getAppBaseUrl()}/account/orders`,
+      ordersPageUrl,
     };
   }
-
-  const base = getAppBaseUrl();
-
-  const orders = data.orders.map((order) => ({
-    orderNumber: String(order.entityId),
-    status: order.status?.label ?? 'Unknown',
-    orderedAt: order.orderedAt?.utc ?? '',
-    total: formatMoney(order.totalIncTax?.value, order.totalIncTax?.currencyCode),
-    url: `${base}/account/orders/${order.entityId}`,
-  }));
-
-  return { orders, ordersPageUrl: `${base}/account/orders` };
 }
 
 export async function toolGetPrescriptionStatus(profileId: string) {
@@ -174,7 +205,7 @@ export const VIRTUAL_CARE_BOT_TOOLS = [
     function: {
       name: 'get_recent_orders',
       description:
-        'Get the logged-in customer recent orders with status and links. Only works for authenticated customers.',
+        'Get this signed-in customer recent orders with status and links. The customer is always authenticated in this chat. Empty orders means they have no orders — not that they are logged out.',
       parameters: {
         type: 'object',
         properties: {

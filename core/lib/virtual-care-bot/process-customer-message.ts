@@ -6,6 +6,7 @@ import {
   getConversationEscalationStatus,
   listMessagesForConversation,
 } from '~/lib/supabase/chat-messages';
+import { isCareTeamChatActive } from '~/lib/chat/session';
 
 import {
   classifyCustomerMessage,
@@ -21,10 +22,14 @@ export async function processCustomerMessageForBot({
   conversationId,
   profileId,
   customerMessage,
+  staffJoinedAt,
+  staffClosedAt,
 }: {
   conversationId: string;
   profileId: string;
   customerMessage: string;
+  staffJoinedAt: string | null;
+  staffClosedAt: string | null;
 }): Promise<{ ok: true } | { ok: false; message: string }> {
   if (!isVirtualCareBotEnabled()) {
     return { ok: true };
@@ -37,6 +42,10 @@ export async function processCustomerMessageForBot({
   }
 
   if (escalation.escalatedToPharmacistAt) {
+    return { ok: true };
+  }
+
+  if (isCareTeamChatActive({ staffJoinedAt, staffClosedAt })) {
     return { ok: true };
   }
 

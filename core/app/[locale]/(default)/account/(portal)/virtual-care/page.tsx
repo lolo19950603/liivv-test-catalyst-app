@@ -64,7 +64,9 @@ export default async function VirtualCareHubPage({ params }: Props) {
           <span className="mt-4 inline-flex text-sm font-medium text-[#5a6d4d]">Continue →</span>
         </Link>
 
-        <OpenLiveChatButton className={`${cardClass} block w-full text-left no-underline`}>
+        <OpenLiveChatButton
+          className={`liivv-virtual-care-card ${cardClass} block w-full text-left no-underline`}
+        >
           <h2 className="text-lg font-semibold text-[#2c2a26]">Live chat</h2>
           <p className="mt-2 text-sm text-[#6b6560]">
             Open the chat assistant from any page — ask about products, orders, or your account.
