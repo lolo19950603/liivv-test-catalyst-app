@@ -537,8 +537,8 @@ body.adc-portal-active main{
 }
 @media screen and (min-width:900px) and (min-height:640px){
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content:has(.mhd-wellness) .mhd-content-header{
-    padding-top:1rem;
-    padding-bottom:0.75rem;
+    padding-top:1.25rem;
+    padding-bottom:0.875rem;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content:has(.mhd-wellness) .mhd-greeting__lead{
     margin-top:0.25rem;
@@ -559,14 +559,14 @@ body.adc-portal-active main{
     display:flex;
     flex-direction:column;
     margin-bottom:0;
-    padding:1.25rem 2rem 1.25rem;
+    padding:2rem 2rem 2rem;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-wellness{
     flex:1 1 auto;
     min-height:0;
     display:grid;
-    grid-template-rows:minmax(0,1fr) auto;
-    gap:1rem;
+    grid-template-rows:minmax(0,1fr) clamp(14rem,30vh,17.5rem);
+    gap:1.125rem;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-hero{
     min-height:0;
@@ -585,11 +585,11 @@ body.adc-portal-active main{
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-hero__body{
     flex:1 1 auto;
     min-height:0;
-    padding:1.375rem 1.5rem 1.125rem;
-    gap:0.875rem;
+    padding:1.125rem 1.5rem 1rem;
+    gap:0.75rem;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-hero__title{
-    font-size:clamp(1.625rem,1.2rem + 1.2vw,2.25rem);
+    font-size:clamp(1.5rem,1.1rem + 1vw,2rem);
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-hero__cards{
     gap:0.625rem;
@@ -604,72 +604,78 @@ body.adc-portal-active main{
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-bottom{
     min-height:0;
-    height:auto;
-    gap:0.875rem;
-    align-items:start;
+    height:100%;
+    gap:1rem;
+    align-items:stretch;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-action-center{
-    height:auto;
+    height:100%;
     min-height:0;
-    gap:0.75rem;
-    align-items:start;
+    gap:0.875rem;
+    align-items:stretch;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-action-card{
     min-height:0;
-    height:auto;
-    justify-content:flex-start;
-    padding:0.875rem 1rem;
-    gap:0.625rem;
+    height:100%;
+    justify-content:space-between;
+    padding:1rem 1.125rem;
+    gap:0.75rem;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-action-card__icon svg{
-    width:1.5rem;
-    height:1.5rem;
+    width:1.75rem;
+    height:1.75rem;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-action-card__content{
-    gap:0.25rem;
+    gap:0.3125rem;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-action-card__label--bottom{
-    margin-top:0;
-    font-size:1rem;
+    margin-top:auto;
+    font-size:1.0625rem;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-action-card__link{
-    margin-top:0.25rem;
+    margin-top:0.375rem;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-action-card__value{
-    font-size:clamp(1.0625rem,0.95rem + 0.45vw,1.375rem);
+    font-size:clamp(1.125rem,0.95rem + 0.55vw,1.5rem);
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-virtual-care{
     min-height:0;
-    height:auto;
-    align-self:stretch;
-    padding:0.875rem 1rem;
-    gap:0.5rem;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    padding:1rem 1.125rem 1.125rem;
+    gap:0.625rem;
     overflow:visible;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-virtual-care__title{
-    font-size:1.125rem;
+    font-size:1.1875rem;
+    flex-shrink:0;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-virtual-care__grid{
-    gap:0.4375rem;
+    gap:0.5rem;
+    flex:1 1 auto;
+    min-height:0;
+    align-content:start;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-virtual-card{
-    padding:0.5rem 0.75rem;
+    padding:0.6875rem 0.875rem;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-virtual-card__label{
-    font-size:0.75rem;
-    line-height:1.25;
+    font-size:0.8125rem;
+    line-height:1.3;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-unread-messages{
-    margin-top:0.25rem;
-    padding:0.5rem 0.75rem;
+    margin-top:auto;
+    flex-shrink:0;
+    padding:0.625rem 0.875rem;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-unread-messages__body{
-    margin-top:0.125rem;
-    font-size:0.75rem;
+    margin-top:0.25rem;
+    font-size:0.8125rem;
   }
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-unread-messages__link{
-    margin-top:0.25rem;
-    font-size:0.75rem;
+    margin-top:0.375rem;
+    font-size:0.8125rem;
   }
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero{

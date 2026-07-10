@@ -86,6 +86,15 @@ export default async (): Promise<NextConfig> => {
 
       return [
         {
+          source: '/bc-app',
+          headers: [
+            {
+              key: 'Content-Security-Policy',
+              value: bcAppCspHeader.replace(/\n/g, ''),
+            },
+          ],
+        },
+        {
           source: '/bc-app/:path*',
           headers: [
             {
@@ -95,7 +104,25 @@ export default async (): Promise<NextConfig> => {
           ],
         },
         {
-          source: '/api/bigcommerce/app/:path*',
+          source: '/api/bigcommerce/app/load',
+          headers: [
+            {
+              key: 'Content-Security-Policy',
+              value: bcAppCspHeader.replace(/\n/g, ''),
+            },
+          ],
+        },
+        {
+          source: '/api/bigcommerce/app/auth',
+          headers: [
+            {
+              key: 'Content-Security-Policy',
+              value: bcAppCspHeader.replace(/\n/g, ''),
+            },
+          ],
+        },
+        {
+          source: '/api/bigcommerce/app/uninstall',
           headers: [
             {
               key: 'Content-Security-Policy',

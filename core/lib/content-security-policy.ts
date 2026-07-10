@@ -32,3 +32,11 @@ const bcAppFrameAncestors = [
 export const cspHeader = buildCsp(defaultFrameAncestors);
 
 export const bcAppCspHeader = buildCsp(bcAppFrameAncestors);
+
+export function withBcAppCspHeaders(init?: HeadersInit): Headers {
+  const headers = new Headers(init);
+
+  headers.set('Content-Security-Policy', bcAppCspHeader.replace(/\n/g, ''));
+
+  return headers;
+}

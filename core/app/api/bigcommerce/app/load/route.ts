@@ -6,6 +6,7 @@ import {
   isBcAppConfigured,
   verifyBcAppSignedPayload,
 } from '~/lib/bigcommerce/app-oauth';
+import { withBcAppCspHeaders } from '~/lib/content-security-policy';
 import { bcAppHtmlResponse } from '~/lib/bigcommerce/app-html';
 
 export const runtime = 'nodejs';
@@ -48,5 +49,9 @@ export async function GET(request: Request) {
   const appUrl = getBcAppPublicUrl();
   const destination = appUrl ? `${appUrl}/bc-app` : new URL('/bc-app', url.origin).toString();
 
-  return NextResponse.redirect(destination);
+  const response = NextResponse.redirect(destination);
+
+  withBcAppCspHeaders(response.headers);
+
+  return response;
 }

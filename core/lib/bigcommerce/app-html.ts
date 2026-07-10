@@ -1,3 +1,5 @@
+import { withBcAppCspHeaders } from '~/lib/content-security-policy';
+
 function escapeHtml(value: string): string {
   return value
     .replaceAll('&', '&amp;')
@@ -63,9 +65,9 @@ export function bcAppHtmlResponse(title: string, body: string, redirectTo?: stri
 
   return new Response(html, {
     status: 200,
-    headers: {
+    headers: withBcAppCspHeaders({
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 'no-store',
-    },
+    }),
   });
 }
