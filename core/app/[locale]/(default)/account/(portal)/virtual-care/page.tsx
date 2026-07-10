@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 
 import { Link } from '~/components/link';
 import { OnboardingSectionHeader } from '~/components/onboarding/onboarding-section-header';
+import { OpenLiveChatButton } from '~/components/virtual-care/live-chat-widget';
 import { getOnboardingCustomer } from '~/app/[locale]/(default)/account/onboarding/page-data';
 
 interface Props {
@@ -63,13 +64,13 @@ export default async function VirtualCareHubPage({ params }: Props) {
           <span className="mt-4 inline-flex text-sm font-medium text-[#5a6d4d]">Continue →</span>
         </Link>
 
-        <Link className={`${cardClass} block no-underline`} href="/account/virtual-care/chat">
+        <OpenLiveChatButton className={`${cardClass} block w-full text-left no-underline`}>
           <h2 className="text-lg font-semibold text-[#2c2a26]">Live chat</h2>
           <p className="mt-2 text-sm text-[#6b6560]">
-            Send messages to our team; conversations are stored so we can follow up.
+            Open the chat assistant from any page — ask about products, orders, or your account.
           </p>
-          <span className="mt-4 inline-flex text-sm font-medium text-[#5a6d4d]">Continue →</span>
-        </Link>
+          <span className="mt-4 inline-flex text-sm font-medium text-[#5a6d4d]">Open chat →</span>
+        </OpenLiveChatButton>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

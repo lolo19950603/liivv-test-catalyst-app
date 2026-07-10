@@ -55,3 +55,24 @@ export function LiivvIconCart({ className }: { className?: string }) {
     </svg>
   );
 }
+
+export function LiivvIconBell({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="none"
+      role="presentation"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M10 20a2 2 0 0 0 4 0" strokeLinecap="round" />
+    </svg>
+  );
+}

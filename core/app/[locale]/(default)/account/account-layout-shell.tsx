@@ -15,7 +15,9 @@ export function AccountLayoutShell({ children }: Props) {
   const isPortalRoute =
     pathname.includes('/account/dashboard') ||
     pathname.includes('/account/orders') ||
-    pathname.includes('/account/subscriptions');
+    pathname.includes('/account/subscriptions') ||
+    pathname.includes('/account/pharmacy') ||
+    pathname.includes('/account/virtual-care');
   const isOnboarding = pathname.includes('/account/onboarding');
 
   if (isPortalRoute || isOnboarding) {

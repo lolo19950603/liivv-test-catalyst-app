@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS public.chat_conversations (
   profile_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   customer_left_at timestamptz,
   staff_closed_at timestamptz,
+  escalated_to_pharmacist_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (profile_id)
@@ -66,10 +67,14 @@ CREATE TABLE IF NOT EXISTS public.chat_conversations (
 CREATE TABLE IF NOT EXISTS public.chat_messages (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   conversation_id uuid NOT NULL REFERENCES public.chat_conversations(id) ON DELETE CASCADE,
-  sender_type text NOT NULL CHECK (sender_type IN ('customer', 'staff')),
+  sender_type text NOT NULL CHECK (sender_type IN ('customer', 'staff', 'bot')),
   body text NOT NULL CHECK (char_length(body) <= 8000),
   created_at timestamptz NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_chat_messages_conversation_created
   ON public.chat_messages(conversation_id, created_at);
+
+CREATE INDEX IF NOT EXISTS idx_chat_conversations_escalated
+  ON public.chat_conversations (escalated_to_pharmacist_at)
+  WHERE escalated_to_pharmacist_at IS NOT NULL;

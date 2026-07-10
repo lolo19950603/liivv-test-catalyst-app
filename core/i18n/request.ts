@@ -10,25 +10,29 @@ const fallbackLocale = 'en';
 export default getRequestConfig(async ({ requestLocale }) => {
   const locale = await requestLocale;
 
-  if (!locale || !locales.includes(locale)) {
+  // `/staff` and `/admin` sit outside `[locale]` and bypass the intl proxy.
+  if (locale != null && !locales.includes(locale)) {
     notFound();
   }
 
-  if (locale === fallbackLocale) {
+  const resolvedLocale =
+    locale != null && locales.includes(locale) ? locale : fallbackLocale;
+
+  if (resolvedLocale === fallbackLocale) {
     return {
-      locale,
+      locale: resolvedLocale,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-      messages: (await import(`../messages/${locale}.json`)).default,
+      messages: (await import(`../messages/${resolvedLocale}.json`)).default,
     };
   }
 
   return {
-    locale,
+    locale: resolvedLocale,
     messages: deepmerge(
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
       (await import(`../messages/${fallbackLocale}.json`)).default,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
-      (await import(`../messages/${locale}.json`)).default,
+      (await import(`../messages/${resolvedLocale}.json`)).default,
     ),
   };
 });

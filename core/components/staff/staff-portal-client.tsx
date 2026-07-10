@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useActionState, useEffect, useMemo, useRef, type RefObject } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -9,7 +10,6 @@ import {
 } from '~/app/staff/_actions/staff-portal-actions';
 import { staffLogoutAction } from '~/app/staff/_actions/staff-auth-actions';
 import type { StaffPortalData } from '~/app/staff/page-data';
-import { Link } from '~/components/link';
 import { StaffCustomerDetail } from '~/components/staff/staff-customer-detail';
 
 const forest = '#375a37';
@@ -389,6 +389,7 @@ function ChatTab({
                       <p className="truncate text-xs text-[#6b6560]">{c.email}</p>
                       <p className="mt-1 text-[10px] text-[#8a8176]">
                         {new Date(c.updatedAt).toLocaleString()}
+                        {c.escalatedToPharmacistAt ? ' • Pharmacist requested' : ''}
                         {c.staffClosedAt ? ' • Closed' : ''}
                       </p>
                     </Link>
@@ -406,26 +407,37 @@ function ChatTab({
             ) : (
               <>
                 <div className="max-h-[50vh] space-y-3 overflow-y-auto rounded-lg border border-[#ece6dc] bg-white p-3">
-                  {data.messages.map((m) => (
+                  {data.messages.map((m) => {
+                    const alignEnd = m.sender_type === 'staff';
+                    const label =
+                      m.sender_type === 'staff'
+                        ? 'Staff'
+                        : m.sender_type === 'bot'
+                          ? 'Assistant'
+                          : 'Customer';
+
+                    return (
                     <div
-                      className={`flex ${m.sender_type === 'staff' ? 'justify-end' : 'justify-start'}`}
+                      className={`flex ${alignEnd ? 'justify-end' : 'justify-start'}`}
                       key={m.id}
                     >
                       <div
                         className={`max-w-[90%] rounded-2xl px-3 py-2 text-sm ${
                           m.sender_type === 'staff'
                             ? 'bg-[#2c2a26] text-white'
-                            : 'border border-[#dcd6cc] bg-white text-[#2c2a26]'
+                            : m.sender_type === 'bot'
+                              ? 'border border-[#c8d4bc] bg-[#f4f7f0] text-[#2c2a26]'
+                              : 'border border-[#dcd6cc] bg-white text-[#2c2a26]'
                         }`}
                       >
                         <p className="whitespace-pre-wrap break-words">{m.body}</p>
                         <p className="mt-1 text-[10px] opacity-70">
-                          {m.sender_type === 'staff' ? 'Staff' : 'Customer'} ·{' '}
-                          {new Date(m.created_at).toLocaleString()}
+                          {label} · {new Date(m.created_at).toLocaleString()}
                         </p>
                       </div>
                     </div>
-                  ))}
+                  );
+                  })}
                   <div ref={bottomRef} />
                 </div>
 

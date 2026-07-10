@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { Link } from '~/components/link';
+import { OpenLiveChatButton } from '~/components/virtual-care/live-chat-widget';
 
 import {
   IconChevronRight,
@@ -22,7 +23,6 @@ export function HealthDashboardMain({
   consultingHref,
   carePackHref,
   pharmacyHref,
-  chatHref,
   hasUnreadChatMessage,
   heroPanels,
   heroTabs,
@@ -36,7 +36,6 @@ export function HealthDashboardMain({
   consultingHref: string;
   carePackHref: string;
   pharmacyHref: string;
-  chatHref: string;
   hasUnreadChatMessage: boolean;
   heroPanels: DashboardHeroPanel[];
   heroTabs: DashboardHeroTab[];
@@ -173,9 +172,9 @@ export function HealthDashboardMain({
                 ? wellness.virtualCare.hasNewMessage
                 : wellness.virtualCare.noNewMessages}
             </p>
-            <Link className="mhd-unread-messages__link" href={chatHref}>
+            <OpenLiveChatButton className="mhd-unread-messages__link">
               {wellness.virtualCare.openInbox}
-            </Link>
+            </OpenLiveChatButton>
           </article>
         </section>
       </div>

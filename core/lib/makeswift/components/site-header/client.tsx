@@ -24,6 +24,7 @@ import {
 } from '~/lib/makeswift/makeswift-visible-slot-content';
 import { ACCOUNT_LOGIN_PATH } from '~/lib/makeswift/site-header/resolve-account-href';
 import type { AccountMenuLink } from '~/lib/account/account-menu-links';
+import type { SiteHeaderNotifications } from '~/lib/account-notifications/header-notification-labels';
 import {
   mapMakeswiftAdditionalLinks,
   type MakeswiftAdditionalLinkInput,
@@ -42,12 +43,15 @@ type BannerProps = ComponentPropsWithoutRef<typeof Banner>;
 export type SiteHeaderContextValue = {
   accountHref: string;
   accountMenuLinks?: AccountMenuLink[];
+  accountCustomerName?: string;
+  accountLabel?: string;
   categoryTree: StoreCategoryNode[];
   initialPathname: string;
   storeLogo: StoreLogo;
   storeLogoLabel: string;
   cartCount: number | null;
   searchPlaceholder: string;
+  notifications?: SiteHeaderNotifications | null;
   banner?: BannerProps;
 };
 
@@ -59,6 +63,7 @@ const PropsContext = createContext<SiteHeaderContextValue>({
   storeLogoLabel: 'Home',
   cartCount: null,
   searchPlaceholder: 'search all products, categories, brands....',
+  notifications: null,
 });
 
 export const PropsContextProvider = ({
@@ -175,11 +180,14 @@ function PageOverrideHeader({
     storeLogoLabel,
   );
 
-  const { accountHref, accountMenuLinks } = useContext(PropsContext);
+  const { accountHref, accountMenuLinks, accountCustomerName, accountLabel, notifications } =
+    useContext(PropsContext);
 
   return (
     <LiivvArchiveHeader
+      accountCustomerName={accountCustomerName}
       accountHref={accountHref}
+      accountLabel={accountLabel}
       accountMenuLinks={accountMenuLinks}
       background={background}
       className="liivv-site-header liivv-site-header--override"
@@ -187,6 +195,7 @@ function PageOverrideHeader({
       logo={logo}
       navAriaLabel="Specialized page"
       navLinks={links}
+      notifications={notifications}
       searchPlaceholder={searchPlaceholder}
       sectionId={ARCHIVE_HEADER_SECTION_ID}
       showLogo={Boolean(logo?.src || logo?.text)}
@@ -219,12 +228,15 @@ export const MakeswiftHeader = forwardRef(
     const {
       accountHref,
       accountMenuLinks,
+      accountCustomerName,
+      accountLabel,
       categoryTree,
       storeLogo,
       storeLogoLabel,
       cartCount,
       searchPlaceholder,
       banner: passedBanner,
+      notifications,
     } = useContext(PropsContext);
 
     const override = findMatchingPathConfig(pathname, pageOverrides);
@@ -263,7 +275,9 @@ export const MakeswiftHeader = forwardRef(
 
     return (
       <LiivvArchiveHeader
+        accountCustomerName={accountCustomerName}
         accountHref={accountHref}
+        accountLabel={accountLabel}
         accountMenuLinks={accountMenuLinks}
         background={background}
         banner={bannerNode}
@@ -273,6 +287,7 @@ export const MakeswiftHeader = forwardRef(
         logo={desktopLogo}
         navAriaLabel="Store"
         navLinks={navLinks}
+        notifications={notifications}
         searchPlaceholder={searchPlaceholder}
         sectionId={LIIVV_SITE_HEADER_SECTION_ID}
         showLogo={Boolean(desktopLogo?.src || desktopLogo?.text)}

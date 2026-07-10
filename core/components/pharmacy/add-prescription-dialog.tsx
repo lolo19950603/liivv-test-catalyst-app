@@ -5,7 +5,7 @@ import { useActionState, useMemo, useState } from 'react';
 import {
   pharmacyAction,
   type PharmacyActionState,
-} from '~/app/[locale]/(default)/account/pharmacy/_actions/pharmacy-actions';
+} from '~/app/[locale]/(default)/account/(portal)/pharmacy/_actions/pharmacy-actions';
 import {
   DpdMedicationSearchField,
   type MedicationDetails,

@@ -3,6 +3,8 @@ import { PropsWithChildren } from 'react';
 
 import { Footer, FooterBottomBar, FooterContextProvider } from '~/components/footer';
 import { Header } from '~/components/header';
+import { LiveChatWidgetHost } from '~/components/virtual-care/live-chat-widget-host';
+import './liivv-feature-buttons.css';
 import './store-archive.css';
 
 import { DiabetesCareArchiveTheme } from '~/lib/archived-pages/diabetes-care-archive-theme';
@@ -43,6 +45,7 @@ export default async function DefaultLayout({ params, children }: Props) {
               </main>
             </SiteFooterRevealShell>
           </FooterContextProvider>
+          <LiveChatWidgetHost />
         </StoreThemeProvider>
       </DiabetesCareArchiveTheme>
     </>

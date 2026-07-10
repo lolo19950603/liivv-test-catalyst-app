@@ -1,23 +1,56 @@
 import 'server-only';
 
 import { getTranslations } from 'next-intl/server';
+import { cache } from 'react';
 
 import { getWellnessDashboardContext } from '~/app/[locale]/(default)/account/onboarding/page-data';
 import {
   getDashboardCustomer,
 } from '~/app/[locale]/(default)/account/(portal)/dashboard/page-data';
+import { getSessionCustomerAccessToken } from '~/auth';
+import { client } from '~/client';
+import { graphql } from '~/client/graphql';
+import { TAGS } from '~/client/tags';
 import { buildDashboardLabels } from '~/lib/account-dashboard/dashboard-labels';
+import { buildAccountMenuLinks } from '~/lib/account/account-menu-links';
 import { getAccountDashboardNotifications } from '~/lib/account-notifications/get-header-notifications';
+import { getCartId } from '~/lib/cart';
 import { appendSetupFlowQuery } from '~/lib/onboarding/onboarding-flow';
 import { getFirstIncompleteOnboardingHref } from '~/lib/supabase/onboarding-redirect';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
 import { getStoreLogoFallback } from '~/lib/store-theme/get-store-logo-fallback';
 
-import { getDashboardStoreNav } from '~/lib/account-dashboard/get-dashboard-store-nav';
-import type { DashboardStoreNav } from '~/lib/account-dashboard/get-dashboard-store-nav';
-
+import type { AccountMenuLink } from '~/lib/account/account-menu-links';
 import type { AccountDashboardLabels } from '~/components/account-dashboard/types';
 import type { AccountHeaderNotification } from '~/lib/account-notifications/types';
+
+const GetCartCountQuery = graphql(`
+  query GetDashboardCartCountQuery($cartId: String) {
+    site {
+      cart(entityId: $cartId) {
+        lineItems {
+          totalQuantity
+        }
+      }
+    }
+  }
+`);
+
+const getCartCount = cache(async (cartId: string, customerAccessToken?: string) => {
+  const response = await client.fetch({
+    document: GetCartCountQuery,
+    variables: { cartId },
+    customerAccessToken,
+    fetchOptions: {
+      cache: 'no-store',
+      next: {
+        tags: [TAGS.cart],
+      },
+    },
+  });
+
+  return response.data.site.cart?.lineItems.totalQuantity ?? null;
+});
 
 export interface AccountDashboardShellData {
   customerName: string;
@@ -28,6 +61,7 @@ export interface AccountDashboardShellData {
   headerNotifications: AccountHeaderNotification[];
   notificationsUnreadCount: number;
   cartHref: string;
+  cartCount: number | null;
   ordersHref: string;
   subscriptionsHref: string;
   shopHref: string;
@@ -35,7 +69,8 @@ export interface AccountDashboardShellData {
   settingsHref: string;
   contactHref: string;
   logoutHref: string;
-  storeNav: DashboardStoreNav;
+  searchPlaceholder: string;
+  accountMenuLinks: AccountMenuLink[];
 }
 
 export async function getAccountDashboardShellProps(
@@ -48,12 +83,18 @@ export async function getAccountDashboardShellProps(
   }
 
   const t = await getTranslations({ locale, namespace: 'Account.Dashboard' });
-  const [wellness, accountNotifications, storeLogo, storeNav] = await Promise.all([
-    getWellnessDashboardContext(),
-    getAccountDashboardNotifications(locale),
-    getStoreLogoFallback(),
-    getDashboardStoreNav(),
-  ]);
+  const tAccount = await getTranslations({ locale, namespace: 'Account.Layout' });
+  const tSearch = await getTranslations({ locale, namespace: 'Components.Header.Search' });
+  const [wellness, accountNotifications, storeLogo, cartId, customerAccessToken] =
+    await Promise.all([
+      getWellnessDashboardContext(),
+      getAccountDashboardNotifications(locale),
+      getStoreLogoFallback(),
+      getCartId(),
+      getSessionCustomerAccessToken(),
+    ]);
+
+  const cartCount = cartId ? await getCartCount(cartId, customerAccessToken) : null;
 
   const firstName = customer.firstName.trim();
   const lastName = customer.lastName.trim();
@@ -106,6 +147,7 @@ export async function getAccountDashboardShellProps(
     headerNotifications: accountNotifications.headerNotifications,
     notificationsUnreadCount: accountNotifications.unreadCount,
     cartHref: '/cart',
+    cartCount,
     ordersHref: '/account/orders/',
     subscriptionsHref: '/account/subscriptions/',
     shopHref: '/shop-all',
@@ -113,6 +155,7 @@ export async function getAccountDashboardShellProps(
     settingsHref: '/account/settings/',
     contactHref: '/contact-us',
     logoutHref: '/logout',
-    storeNav,
+    searchPlaceholder: tSearch('inputPlaceholder'),
+    accountMenuLinks: buildAccountMenuLinks((key) => tAccount(key)),
   };
 }

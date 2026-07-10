@@ -16,8 +16,11 @@ import {
 } from 'react';
 
 import { Link } from '~/components/link';
+import { AccountNotificationsBell } from '~/components/account-notifications';
+import { IconAccount, IconCart, IconChevronDown, IconSearch } from '~/components/account-dashboard/icons';
+import { initialsFromName } from '~/lib/account/customer-initials';
 import { usePathname } from '~/i18n/routing';
-import { LiivvIconAccount, LiivvIconCart, LiivvIconSearch } from '~/lib/liivv/header-icons';
+import type { SiteHeaderNotifications } from '~/lib/account-notifications/header-notification-labels';
 import {
   resolveSectionBackgroundChannels,
   type SectionBackgroundProps,
@@ -100,7 +103,6 @@ function isMegaMenuInteractionTarget(
 }
 const ACCOUNT_ARIA_LABEL = 'Account';
 const CART_ARIA_LABEL = 'Shopping cart';
-const ACCOUNT_MENU_CLOSE_DELAY_MS = 200;
 
 /** Archive header palette — scoped to each header root so vars are not inherited from page `:root`. */
 export const LIIVV_ARCHIVE_HEADER_SECTION_VARS = `#shopify-section-sections--26374736970019__header,#liivv-site-header,.liivv-archive-header{--section-padding-top:0px;--section-padding-bottom:0px;--color-background:255 255 255;--color-foreground:49 47 47;--color-transparent:168 156 148;--color-localization:255 255 255}`;
@@ -131,7 +133,10 @@ export interface LiivvArchiveHeaderProps {
   showUtilityIcons?: boolean;
   accountHref?: string;
   accountMenuLinks?: AccountMenuLink[];
+  accountCustomerName?: string;
+  accountLabel?: string;
   searchPlaceholder?: string;
+  notifications?: SiteHeaderNotifications | null;
   linksPosition?: LiivvArchiveLinksPosition;
   initialCartCount?: number | null;
   banner?: ReactNode;
@@ -724,122 +729,91 @@ function HeaderAccountMenu({
   accountHref,
   links,
   panelId,
+  customerName,
+  accountLabel,
 }: {
   accountHref: string;
   links: AccountMenuLink[];
   panelId: string;
+  customerName?: string;
+  accountLabel?: string;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const suppressHoverOpenRef = useRef(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const closeMenu = useCallback(() => {
-    if (closeTimerRef.current != null) {
-      clearTimeout(closeTimerRef.current);
-      closeTimerRef.current = null;
-    }
-
     setOpen(false);
-
-    const activeElement = document.activeElement;
-
-    if (activeElement instanceof HTMLElement && menuRef.current?.contains(activeElement)) {
-      activeElement.blur();
-    }
   }, []);
-
-  const openMenu = useCallback(() => {
-    if (suppressHoverOpenRef.current) {
-      return;
-    }
-
-    if (closeTimerRef.current != null) {
-      clearTimeout(closeTimerRef.current);
-      closeTimerRef.current = null;
-    }
-
-    setOpen(true);
-  }, []);
-
-  const scheduleCloseMenu = useCallback(() => {
-    suppressHoverOpenRef.current = false;
-
-    if (closeTimerRef.current != null) {
-      clearTimeout(closeTimerRef.current);
-    }
-
-    closeTimerRef.current = setTimeout(() => {
-      setOpen(false);
-      closeTimerRef.current = null;
-    }, ACCOUNT_MENU_CLOSE_DELAY_MS);
-  }, []);
-
-  useEffect(
-    () => () => {
-      if (closeTimerRef.current != null) {
-        clearTimeout(closeTimerRef.current);
-      }
-    },
-    [],
-  );
 
   useEffect(() => {
     closeMenu();
   }, [pathname, closeMenu]);
 
-  const handleMenuLinkClick = useCallback(() => {
-    // Keep the menu closed after a link click while the pointer is still over
-    // the trigger; clear on mouse leave via scheduleCloseMenu.
-    suppressHoverOpenRef.current = true;
-    closeMenu();
-  }, [closeMenu]);
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const onPointerDown = (event: MouseEvent) => {
+      if (menuRef.current != null && !menuRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpen(false);
+        buttonRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('mousedown', onPointerDown);
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [open]);
+
+  const avatarInitials = useMemo(
+    () => initialsFromName(customerName ?? ''),
+    [customerName],
+  );
 
   if (links.length === 0) {
     return (
       <Link
         aria-label={ACCOUNT_ARIA_LABEL}
-        className="flex items-center justify-center"
+        className="header-utility-icon-btn"
         href={accountHref}
       >
-        <span className="sr-only">{ACCOUNT_ARIA_LABEL}</span>
-        <LiivvIconAccount className="icon icon-account icon-md" />
+        <IconAccount />
       </Link>
     );
   }
 
   return (
-    <div
-      className={clsx('header-account-menu', open && 'is-open')}
-      onMouseEnter={openMenu}
-      onMouseLeave={scheduleCloseMenu}
-      ref={menuRef}
-    >
-      <Link
+    <div className="header-account-menu" ref={menuRef}>
+      <button
         aria-controls={panelId}
         aria-expanded={open}
         aria-haspopup="menu"
-        aria-label={ACCOUNT_ARIA_LABEL}
-        className="header-account-menu__trigger"
-        href={accountHref}
-        onClick={(event) => {
-          if (typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches) {
-            event.preventDefault();
-            setOpen((current) => !current);
-          }
-        }}
+        aria-label={accountLabel ?? ACCOUNT_ARIA_LABEL}
+        className="header-account-btn header-account-btn--avatar"
+        onClick={() => setOpen((current) => !current)}
+        ref={buttonRef}
+        type="button"
       >
-        <span className="sr-only">{ACCOUNT_ARIA_LABEL}</span>
-        <LiivvIconAccount className="icon icon-account icon-md" />
-      </Link>
-      <div
-        className="header-account-menu__panel"
-        id={panelId}
-        onMouseEnter={openMenu}
-        onMouseLeave={scheduleCloseMenu}
-        role="menu"
-      >
+        <span aria-hidden className="header-account-avatar">
+          {avatarInitials}
+        </span>
+        <span className="header-account-btn__label">{accountLabel ?? ACCOUNT_ARIA_LABEL}</span>
+        <IconChevronDown className="header-account-btn__chevron" />
+      </button>
+      <div className="header-account-menu__panel" hidden={!open} id={panelId} role="menu">
         {links.map((link) => {
           const isActive = pathname.includes(link.href);
 
@@ -851,7 +825,7 @@ function HeaderAccountMenu({
               )}
               href={link.href}
               key={link.href}
-              onClick={handleMenuLinkClick}
+              onClick={() => setOpen(false)}
               prefetch={link.prefetch}
               role="menuitem"
             >
@@ -888,7 +862,10 @@ export function LiivvArchiveHeader({
   showUtilityIcons = true,
   accountHref = ACCOUNT_LOGIN_PATH,
   accountMenuLinks = [],
+  accountCustomerName,
+  accountLabel,
   searchPlaceholder = 'Search products',
+  notifications = null,
   linksPosition = 'left',
   initialCartCount = null,
   banner,
@@ -1268,31 +1245,39 @@ export function LiivvArchiveHeader({
                   aria-controls={searchPanelId}
                   aria-expanded={searchOpen}
                   aria-label={SEARCH_ARIA_LABEL}
-                  className="search-drawer-button flex shrink-0 items-center justify-center border-0 bg-transparent p-0 text-inherit outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--color-keyboard-focus))]"
+                  className="header-utility-icon-btn search-drawer-button"
                   type="button"
                   onClick={toggleSearch}
                 >
-                  <span className="sr-only">{SEARCH_ARIA_LABEL}</span>
-                  <LiivvIconSearch className="icon icon-search icon-md" />
+                  <IconSearch />
                 </button>
-                <HeaderAccountMenu
-                  accountHref={accountHref}
-                  links={accountMenuLinks}
-                  panelId={accountMenuPanelId}
-                />
+                {notifications ? (
+                  <AccountNotificationsBell
+                    labels={notifications.labels}
+                    notifications={notifications.items}
+                    unreadCount={notifications.unreadCount}
+                    variant="storefront"
+                  />
+                ) : null}
                 <Link
                   aria-label={cartCountLabel}
-                  className="cart-drawer-button relative flex shrink-0 items-center justify-center"
+                  className="header-utility-icon-btn cart-drawer-button"
                   href={CART_PATH}
                 >
-                  <span className="sr-only">{CART_ARIA_LABEL}</span>
-                  <LiivvIconCart className="icon icon-cart icon-md" />
+                  <IconCart />
                   {cartLineCount != null && cartLineCount > 0 ? (
-                    <span className="count absolute right-0 top-0 text-xs tabular-nums">
+                    <span className="header-utility-badge" aria-hidden>
                       {cartLineCount > 99 ? '99+' : cartLineCount}
                     </span>
                   ) : null}
                 </Link>
+                <HeaderAccountMenu
+                  accountHref={accountHref}
+                  accountLabel={accountLabel}
+                  customerName={accountCustomerName}
+                  links={accountMenuLinks}
+                  panelId={accountMenuPanelId}
+                />
               </div>
             </div>
           ) : null}

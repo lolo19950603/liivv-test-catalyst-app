@@ -1,16 +1,18 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 import { Link } from '~/components/link';
 import { AccountNotificationsBell } from '~/components/account-notifications';
 import { OnboardingBanner } from '~/components/onboarding/onboarding-banner';
+import { initialsFromName } from '~/lib/account/customer-initials';
 import { usePathname } from '~/i18n/routing';
 
 import {
   ACCOUNT_DASHBOARD_ROOT_ID,
   ACCOUNT_DASHBOARD_STYLE,
 } from './dashboard-styles';
+import { useAccountDashboardSearch } from './use-account-dashboard-search';
 import {
   IconCart,
   IconChevronDown,
@@ -19,27 +21,16 @@ import {
   IconLock,
   IconLoyalty,
   IconOrders,
-  IconSearch,
   IconShop,
 } from './icons';
 import type { AccountDashboardShellProps } from './types';
 
-function initialsFromName(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-
-  if (parts.length === 0) {
-    return 'LV';
-  }
-
-  return parts
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? '')
-    .join('');
-}
-
 function isAccountSubPage(pathname: string): boolean {
   return (
-    pathname.includes('/account/orders') || pathname.includes('/account/subscriptions')
+    pathname.includes('/account/orders') ||
+    pathname.includes('/account/subscriptions') ||
+    pathname.includes('/account/pharmacy') ||
+    pathname.includes('/account/virtual-care')
   );
 }
 
@@ -58,27 +49,76 @@ export function AccountDashboardPortal({
   children,
   customerName,
   cartHref,
+  cartCount: initialCartCount,
   labels,
-  logoutHref,
   wishlistsHref,
   onboardingBannerHref,
   headerNotifications,
   notificationsUnreadCount,
   logoSrc,
   logoAlt,
-  storeNav,
+  searchPlaceholder,
+  accountMenuLinks,
   ordersHref,
   settingsHref,
-  shopHref,
-  subscriptionsHref,
   contactHref,
 }: AccountDashboardShellProps) {
   const pathname = usePathname() ?? '';
   const [accountOpen, setAccountOpen] = useState(false);
+  const [cartCount, setCartCount] = useState<number | null>(initialCartCount);
   const accountRef = useRef<HTMLDivElement>(null);
   const accountButtonRef = useRef<HTMLButtonElement>(null);
-
   const avatarInitials = useMemo(() => initialsFromName(customerName), [customerName]);
+  const search = useAccountDashboardSearch({
+    ariaLabel: labels.search,
+    searchPlaceholder,
+  });
+  const cartAriaLabel =
+    cartCount != null && cartCount > 0
+      ? `${cartCount} item${cartCount === 1 ? '' : 's'}`
+      : labels.cart;
+
+  const refreshCartCount = useCallback(async () => {
+    try {
+      const response = await fetch('/api/cart/line-item-count', { cache: 'no-store' });
+
+      if (!response.ok) {
+        setCartCount(null);
+
+        return;
+      }
+
+      const data = (await response.json()) as { count: number | null };
+
+      setCartCount(data.count ?? null);
+    } catch {
+      setCartCount(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    setCartCount(initialCartCount);
+  }, [initialCartCount]);
+
+  useEffect(() => {
+    void refreshCartCount();
+
+    const refetch = () => void refreshCartCount();
+
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        void refreshCartCount();
+      }
+    };
+
+    window.addEventListener('focus', refetch);
+    document.addEventListener('visibilitychange', onVisible);
+
+    return () => {
+      window.removeEventListener('focus', refetch);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [pathname, refreshCartCount]);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -126,7 +166,7 @@ export function AccountDashboardPortal({
         <div className="mhd-shell">
           <aside aria-label={labels.aria.accountNavigation} className="mhd-sidebar">
             <Link aria-label={logoAlt} className="mhd-sidebar__logo" href="/">
-              <img alt={logoAlt} className="mhd-sidebar__logo-img" height={32} src={logoSrc} width={32} />
+              <img alt={logoAlt} className="mhd-sidebar__logo-img" height={52} src={logoSrc} width={120} />
             </Link>
 
             <nav aria-label={labels.aria.primaryNavigation} className="mhd-sidebar__nav">
@@ -159,31 +199,6 @@ export function AccountDashboardPortal({
 
           <div className="mhd-content">
             <header className="mhd-content-header">
-              <div className="mhd-store-nav">
-                <Link aria-label={storeNav.logo.alt} className="mhd-store-nav__logo" href={storeNav.logo.href}>
-                  {storeNav.logo.src ? (
-                    <img
-                      alt={storeNav.logo.alt}
-                      className="mhd-store-nav__logo-img"
-                      height={32}
-                      src={storeNav.logo.src}
-                      width={120}
-                    />
-                  ) : (
-                    <span className="mhd-store-nav__logo-text">{storeNav.logo.text ?? labels.brandName}</span>
-                  )}
-                </Link>
-                {storeNav.links.length > 0 ? (
-                  <nav aria-label="Store" className="mhd-store-nav__links">
-                    {storeNav.links.map((link) => (
-                      <Link className="mhd-store-nav__link" href={link.href} key={link.href}>
-                        {link.label}
-                      </Link>
-                    ))}
-                  </nav>
-                ) : null}
-              </div>
-
               <div className="mhd-content-header__body">
                 <div className="mhd-content-header__greeting">
                   <h1 className="mhd-greeting__title">{labels.wellness.greeting}</h1>
@@ -191,9 +206,7 @@ export function AccountDashboardPortal({
                 </div>
 
                 <div className="mhd-content-header__utilities">
-                  <Link aria-label={labels.search} className="mhd-icon-btn" href={shopHref}>
-                    <IconSearch />
-                  </Link>
+                  {search.trigger}
                   <AccountNotificationsBell
                     labels={{
                       ariaLabel: labels.notifications,
@@ -205,10 +218,14 @@ export function AccountDashboardPortal({
                     notifications={headerNotifications}
                     unreadCount={notificationsUnreadCount}
                   />
-                  <Link aria-label={labels.cart} className="mhd-icon-btn" href={cartHref}>
+                  <Link aria-label={cartAriaLabel} className="mhd-icon-btn" href={cartHref}>
                     <IconCart />
+                    {cartCount != null && cartCount > 0 ? (
+                      <span aria-hidden className="mhd-icon-btn__badge">
+                        {cartCount > 99 ? '99+' : cartCount}
+                      </span>
+                    ) : null}
                   </Link>
-
                   <div className="mhd-account-wrap" ref={accountRef}>
                     <button
                       aria-expanded={accountOpen}
@@ -225,60 +242,24 @@ export function AccountDashboardPortal({
                       <IconChevronDown className="mhd-chevron" />
                     </button>
                     <ul className="mhd-account-menu" hidden={!accountOpen} role="menu">
-                      <li className="mhd-account-menu__notifications-item" role="none">
-                        <AccountNotificationsBell
-                          labels={{
-                            ariaLabel: labels.notifications,
-                            empty: labels.notificationsEmpty,
-                            kindOrder: labels.notificationKindOrder,
-                            kindSubscription: labels.notificationKindSubscription,
-                            panelTitle: labels.notificationsPanelTitle,
-                          }}
-                          notifications={headerNotifications}
-                          onOpen={() => setAccountOpen(false)}
-                          unreadCount={notificationsUnreadCount}
-                          variant="menu"
-                        />
-                      </li>
-                      <li role="none">
-                        <Link
-                          aria-current={isNavActive(pathname, ordersHref) ? 'page' : undefined}
-                          href={ordersHref}
-                          onClick={() => setAccountOpen(false)}
-                          role="menuitem"
-                        >
-                          {labels.sidebar.orders}
-                        </Link>
-                      </li>
-                      <li role="none">
-                        <Link
-                          aria-current={isNavActive(pathname, subscriptionsHref) ? 'page' : undefined}
-                          href={subscriptionsHref}
-                          onClick={() => setAccountOpen(false)}
-                          role="menuitem"
-                        >
-                          {labels.wellness.actionCenter.subscriptionManage}
-                        </Link>
-                      </li>
-                      <li role="none">
-                        <Link
-                          aria-current={isNavActive(pathname, settingsHref) ? 'page' : undefined}
-                          href={settingsHref}
-                          onClick={() => setAccountOpen(false)}
-                          role="menuitem"
-                        >
-                          {labels.accountSettings}
-                        </Link>
-                      </li>
-                      <li role="none">
-                        <Link href={logoutHref} onClick={() => setAccountOpen(false)} prefetch="none" role="menuitem">
-                          {labels.signOut}
-                        </Link>
-                      </li>
+                      {accountMenuLinks.map((link) => (
+                        <li key={link.href} role="none">
+                          <Link
+                            aria-current={isNavActive(pathname, link.href) ? 'page' : undefined}
+                            href={link.href}
+                            onClick={() => setAccountOpen(false)}
+                            prefetch={link.prefetch}
+                            role="menuitem"
+                          >
+                            {link.label}
+                          </Link>
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 </div>
               </div>
+              {search.drawer}
             </header>
 
             <main className="mhd-main">

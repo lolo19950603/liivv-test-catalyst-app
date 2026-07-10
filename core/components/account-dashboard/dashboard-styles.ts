@@ -80,9 +80,15 @@ body.adc-portal-active main{
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-sidebar__logo-img{
   display:block;
-  width:2rem;
-  height:2rem;
+  width:auto;
+  height:2.75rem;
+  max-width:100%;
   object-fit:contain;
+}
+@media screen and (min-width:900px){
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-sidebar__logo-img{
+    height:3.25rem;
+  }
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-sidebar__nav,#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-sidebar__footer{
   display:flex;
@@ -135,65 +141,55 @@ body.adc-portal-active main{
   min-height:0;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header{
+  position:relative;
   display:flex;
   flex-direction:column;
   align-items:stretch;
   gap:1rem;
-  padding:1.5rem 1.25rem 1rem;
+  padding:2rem 1.25rem 1.25rem;
   background:rgb(var(--mhd-white));
   border-bottom:1px solid rgb(var(--mhd-border));
+  --mhd-search-drawer-duration:0.45s;
+  --mhd-search-drawer-ease:cubic-bezier(0.45,0.05,0.25,1);
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-header-search-wrap{
+  position:absolute;
+  left:0;
+  right:0;
+  top:100%;
+  z-index:5;
+  overflow:hidden;
+  pointer-events:none;
+  visibility:hidden;
+  transition:visibility 0s linear var(--mhd-search-drawer-duration);
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-header-search-wrap.is-open{
+  pointer-events:auto;
+  visibility:visible;
+  transition:visibility 0s;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-header-search-drawer{
+  --color-background:var(--mhd-white);
+  --color-foreground:var(--mhd-text);
+  background:rgb(var(--mhd-white));
+  border-block-start:1px solid rgb(var(--mhd-border));
+  box-shadow:0 12px 40px rgb(33 33 33 / 0.08);
+  transform:translateY(-100%);
+  transition:transform var(--mhd-search-drawer-duration) var(--mhd-search-drawer-ease);
+  will-change:transform;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-header-search-wrap.is-open .mhd-header-search-drawer{
+  transform:translateY(0);
+}
+@media screen and (min-width:900px){
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-header-search-drawer .liivv-archive-search-form{
+    padding:0.875rem 2rem;
+  }
 }
 @media screen and (min-width:900px){
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header{
-    padding:1rem 2rem;
+    padding:1.75rem 2rem 1.25rem;
   }
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-store-nav{
-  display:flex;
-  align-items:center;
-  flex-wrap:wrap;
-  gap:1rem 1.5rem;
-  width:100%;
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-store-nav__logo{
-  display:inline-flex;
-  align-items:center;
-  flex-shrink:0;
-  text-decoration:none;
-  color:rgb(var(--mhd-text));
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-store-nav__logo-img{
-  display:block;
-  height:2rem;
-  width:auto;
-  max-width:8.5rem;
-  object-fit:contain;
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-store-nav__logo-text{
-  font-family:var(--mhd-font-heading);
-  font-size:1.375rem;
-  font-weight:500;
-  letter-spacing:-0.03em;
-  line-height:1;
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-store-nav__links{
-  display:flex;
-  align-items:center;
-  flex-wrap:wrap;
-  gap:0.75rem 1.25rem;
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-store-nav__link{
-  font-family:var(--mhd-font-body);
-  font-size:0.9375rem;
-  font-weight:500;
-  line-height:1.2;
-  color:rgb(var(--mhd-text));
-  text-decoration:none;
-  transition:color 0.2s ease;
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-store-nav__link:hover,#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-store-nav__link:focus-visible{
-  color:rgb(var(--mhd-accent));
-  outline:none;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header__body{
   display:flex;
@@ -368,8 +364,8 @@ body.adc-portal-active main{
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-menu{
   position:absolute;
-  inset-inline-end:1rem;
-  top:calc(100% + 0.25rem);
+  right:0;
+  top:calc(100% + 0.75rem);
   min-width:12rem;
   padding:0.75rem 0;
   background:rgb(var(--mhd-white));
@@ -404,25 +400,6 @@ body.adc-portal-active main{
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-menu a:hover,#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-menu button:hover{
   background:rgb(var(--mhd-surface));
   color:rgb(var(--mhd-accent));
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-menu__notifications-item{
-  padding:0;
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-menu__notifications{
-  position:relative;
-  justify-content:flex-start;
-  gap:0.625rem;
-  width:100%;
-  padding:0.5rem 0.75rem;
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications--menu{
-  width:100%;
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-notifications--menu .mhd-notifications__panel{
-  left:0;
-  right:auto;
-  top:calc(100% + 0.25rem);
-  width:min(20rem,calc(100vw - 2rem));
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-mega-nav{
   display:none;
@@ -530,11 +507,11 @@ body.adc-portal-active main{
   width:100%;
   max-width:var(--mhd-max);
   margin:0 auto 2rem;
-  padding:0 1.25rem 1.5rem;
+  padding:2.5rem 1.25rem 1.5rem;
 }
 @media screen and (min-width:900px){
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-container{
-    padding-inline:2rem;
+    padding:3rem 2rem 1.5rem;
   }
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-wellness{
@@ -1242,6 +1219,26 @@ body.adc-portal-active main{
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-icon-btn svg{
   width:1.35rem;
   height:1.35rem;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-icon-btn__badge{
+  position:absolute;
+  top:-0.125rem;
+  right:-0.125rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:1.125rem;
+  height:1.125rem;
+  padding-inline:0.25rem;
+  border-radius:999px;
+  background:rgb(var(--mhd-text));
+  color:rgb(var(--mhd-white));
+  font-size:0.625rem;
+  font-weight:600;
+  line-height:1;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-search-trigger svg{
+  stroke-width:1.5;
 }
 /* Rich-text-lower CTA "circle blob" sweep fill: big oval sits hidden above, slides over content on hover, exits below on leave. */
 /* Override the global archive .button defaults (box-shadow / pill radius / max-height / padding) that leak in from /archive/diabetes-care-sections.css. */

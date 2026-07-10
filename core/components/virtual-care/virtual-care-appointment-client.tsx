@@ -5,7 +5,7 @@ import { useActionState } from 'react';
 import {
   virtualCareAppointmentAction,
   type VirtualCareAppointmentActionState,
-} from '~/app/[locale]/(default)/account/virtual-care/_actions/virtual-care-actions';
+} from '~/app/[locale]/(default)/account/(portal)/virtual-care/_actions/virtual-care-actions';
 import { Link } from '~/components/link';
 import { OnboardingSectionHeader } from '~/components/onboarding/onboarding-section-header';
 

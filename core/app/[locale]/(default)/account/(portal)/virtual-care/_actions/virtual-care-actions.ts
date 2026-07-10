@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
+import { getVirtualCareChatData } from '~/app/[locale]/(default)/account/(portal)/pharmacy/page-data';
 import { getOnboardingCustomer } from '~/app/[locale]/(default)/account/onboarding/page-data';
 import {
   appendCustomerMessage,
@@ -12,6 +13,47 @@ import {
 } from '~/lib/supabase/chat-messages';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
+import { processCustomerMessageForBot } from '~/lib/virtual-care-bot/process-customer-message';
+
+export type LiveChatSessionPayload = {
+  supabaseReady: boolean;
+  botEnabled: boolean;
+  conversationId: string | null;
+  customerLeftAt: string | null;
+  staffClosedAt: string | null;
+  escalatedToPharmacistAt: string | null;
+  messages: NonNullable<Awaited<ReturnType<typeof getVirtualCareChatData>>>['messages'];
+};
+
+export async function getLiveChatSessionAction(): Promise<{
+  isLoggedIn: boolean;
+  data: LiveChatSessionPayload | null;
+}> {
+  const customer = await getOnboardingCustomer();
+
+  if (!customer) {
+    return { isLoggedIn: false, data: null };
+  }
+
+  const chat = await getVirtualCareChatData();
+
+  if (!chat) {
+    return { isLoggedIn: true, data: null };
+  }
+
+  return {
+    isLoggedIn: true,
+    data: {
+      supabaseReady: chat.supabaseReady,
+      botEnabled: chat.botEnabled,
+      conversationId: chat.conversationId,
+      customerLeftAt: chat.customerLeftAt,
+      staffClosedAt: chat.staffClosedAt,
+      escalatedToPharmacistAt: chat.escalatedToPharmacistAt,
+      messages: chat.messages,
+    },
+  };
+}
 
 export type VirtualCareChatActionState = { ok?: boolean; error?: string } | null;
 
@@ -22,7 +64,7 @@ export async function virtualCareChatAction(
   const customer = await getOnboardingCustomer();
 
   if (!customer) {
-    redirect('/login?redirectTo=/account/virtual-care/chat');
+    redirect('/login?redirectTo=/?chat=open');
   }
 
   if (!isSupabaseConfigured()) {
@@ -54,7 +96,7 @@ export async function virtualCareChatAction(
       return { ok: false, error: left.message };
     }
 
-    revalidatePath('/account/virtual-care/chat');
+    revalidatePath('/', 'layout');
     return { ok: true };
   }
 
@@ -75,7 +117,17 @@ export async function virtualCareChatAction(
     return { ok: false, error: result.message };
   }
 
-  revalidatePath('/account/virtual-care/chat');
+  const botResult = await processCustomerMessageForBot({
+    conversationId: conv.conversationId,
+    profileId: ensured.profile.id,
+    customerMessage: body,
+  });
+
+  if (!botResult.ok) {
+    console.error('[virtual-care-bot]', botResult.message);
+  }
+
+  revalidatePath('/', 'layout');
   return { ok: true };
 }
 

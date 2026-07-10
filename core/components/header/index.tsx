@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { headers } from 'next/headers';
 import { cache } from 'react';
 
@@ -12,7 +12,9 @@ import { TAGS } from '~/client/tags';
 import { logoTransformer } from '~/data-transformers/logo-transformer';
 import { getCartId } from '~/lib/cart';
 import { getPreferredCurrencyCode } from '~/lib/currency';
+import { getDashboardCustomer } from '~/app/[locale]/(default)/account/(portal)/dashboard/page-data';
 import { buildAccountMenuLinks } from '~/lib/account/account-menu-links';
+import { getAccountDashboardNotifications } from '~/lib/account-notifications/get-header-notifications';
 import { SiteHeader } from '~/lib/makeswift/components/site-header';
 import { resolveAccountHref } from '~/lib/makeswift/site-header/resolve-account-href';
 import { mapCategoryTreeFromStore } from '~/lib/makeswift/site-header/map-category-tree';
@@ -71,8 +73,10 @@ const getHeaderData = cache(async () => {
 });
 
 export const Header = async () => {
+  const locale = await getLocale();
   const t = await getTranslations('Components.Header');
   const tAccount = await getTranslations('Account.Layout');
+  const tDashboard = await getTranslations('Account.Dashboard');
 
   const data = await getHeaderData();
   const logo = data.settings ? logoTransformer(data.settings) : '';
@@ -101,16 +105,43 @@ export const Header = async () => {
 
   const loggedIn = await isLoggedIn();
   const accountHref = resolveAccountHref(loggedIn);
+  const customer = loggedIn ? await getDashboardCustomer() : null;
   const accountMenuLinks = loggedIn ? buildAccountMenuLinks((key) => tAccount(key)) : undefined;
+  const firstName = customer?.firstName.trim() ?? '';
+  const lastName = customer?.lastName.trim() ?? '';
+  const accountCustomerName =
+    loggedIn && customer
+      ? [firstName, lastName].filter(Boolean).join(' ') || tDashboard('guestName')
+      : undefined;
+  const accountLabel = loggedIn ? tDashboard('myAccount') : undefined;
+  const accountNotifications = loggedIn
+    ? await getAccountDashboardNotifications(locale)
+    : null;
+  const notifications = accountNotifications
+    ? {
+        items: accountNotifications.headerNotifications,
+        unreadCount: accountNotifications.unreadCount,
+        labels: {
+          ariaLabel: tDashboard('notifications'),
+          panelTitle: tDashboard('notificationsPanelTitle'),
+          empty: tDashboard('notificationsEmpty'),
+          kindOrder: tDashboard('notificationKindOrder'),
+          kindSubscription: tDashboard('notificationKindSubscription'),
+        },
+      }
+    : null;
   const requestPathname = stripLocaleFromPathname((await headers()).get('x-pathname') ?? '/');
 
   return (
     <SiteHeader
+      accountCustomerName={accountCustomerName}
       accountHref={accountHref}
+      accountLabel={accountLabel}
       accountMenuLinks={accountMenuLinks}
       cartCount={streamableCartCount}
       categoryTree={streamableCategoryTree}
       initialPathname={requestPathname}
+      notifications={notifications}
       storeLogo={logo}
       storeLogoLabel={t('home')}
       searchPlaceholder={t('Search.inputPlaceholder')}

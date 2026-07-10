@@ -74,7 +74,6 @@ export default async function AccountDashboardPage({ params }: Props) {
   return (
     <HealthDashboardMain
       carePackHref="/account/pharmacy?section=carepack"
-      chatHref="/account/virtual-care/chat"
       consultingHref="/account/virtual-care"
       hasUnreadChatMessage={accountNotifications.hasUnreadChatMessage}
       heroPanels={heroPanels}

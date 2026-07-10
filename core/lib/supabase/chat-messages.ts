@@ -2,10 +2,12 @@ import 'server-only';
 
 import { getSupabaseClient } from '~/lib/supabase/client';
 
+export type ChatMessageSenderType = 'customer' | 'staff' | 'bot';
+
 export type ChatMessageRow = {
   id: string;
   conversation_id: string;
-  sender_type: 'customer' | 'staff';
+  sender_type: ChatMessageSenderType;
   body: string;
   created_at: string;
 };
@@ -18,13 +20,14 @@ export async function getConversationByProfileId(profileId: string): Promise<
       conversationId: string | null;
       customerLeftAt: string | null;
       staffClosedAt: string | null;
+      escalatedToPharmacistAt: string | null;
     }
   | { ok: false; message: string }
 > {
   const supabase = getSupabaseClient();
   const { data, error } = await supabase
     .from('chat_conversations')
-    .select('id, customer_left_at, staff_closed_at')
+    .select('id, customer_left_at, staff_closed_at, escalated_to_pharmacist_at')
     .eq('profile_id', profileId)
     .maybeSingle();
 
@@ -33,7 +36,13 @@ export async function getConversationByProfileId(profileId: string): Promise<
   }
 
   if (!data?.id) {
-    return { ok: true, conversationId: null, customerLeftAt: null, staffClosedAt: null };
+    return {
+      ok: true,
+      conversationId: null,
+      customerLeftAt: null,
+      staffClosedAt: null,
+      escalatedToPharmacistAt: null,
+    };
   }
 
   return {
@@ -41,11 +50,39 @@ export async function getConversationByProfileId(profileId: string): Promise<
     conversationId: data.id,
     customerLeftAt: (data.customer_left_at as string | null) ?? null,
     staffClosedAt: (data.staff_closed_at as string | null) ?? null,
+    escalatedToPharmacistAt: (data.escalated_to_pharmacist_at as string | null) ?? null,
+  };
+}
+
+export async function getConversationEscalationStatus(conversationId: string): Promise<
+  | { ok: true; escalatedToPharmacistAt: string | null }
+  | { ok: false; message: string }
+> {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from('chat_conversations')
+    .select('escalated_to_pharmacist_at')
+    .eq('id', conversationId)
+    .maybeSingle();
+
+  if (error) {
+    return { ok: false, message: error.message };
+  }
+
+  return {
+    ok: true,
+    escalatedToPharmacistAt: (data?.escalated_to_pharmacist_at as string | null) ?? null,
   };
 }
 
 export async function getOrCreateConversation(profileId: string): Promise<
-  | { ok: true; conversationId: string; customerLeftAt: string | null; staffClosedAt: string | null }
+  | {
+      ok: true;
+      conversationId: string;
+      customerLeftAt: string | null;
+      staffClosedAt: string | null;
+      escalatedToPharmacistAt: string | null;
+    }
   | { ok: false; message: string }
 > {
   const supabase = getSupabaseClient();
@@ -61,6 +98,7 @@ export async function getOrCreateConversation(profileId: string): Promise<
       conversationId: existing.conversationId,
       customerLeftAt: existing.customerLeftAt,
       staffClosedAt: existing.staffClosedAt,
+      escalatedToPharmacistAt: existing.escalatedToPharmacistAt,
     };
   }
 
@@ -75,7 +113,70 @@ export async function getOrCreateConversation(profileId: string): Promise<
     return { ok: false, message: error?.message ?? 'Could not create conversation.' };
   }
 
-  return { ok: true, conversationId: data.id, customerLeftAt: null, staffClosedAt: null };
+  return {
+    ok: true,
+    conversationId: data.id,
+    customerLeftAt: null,
+    staffClosedAt: null,
+    escalatedToPharmacistAt: null,
+  };
+}
+
+export async function appendBotMessage(
+  conversationId: string,
+  body: string,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const trimmed = body.trim();
+
+  if (!trimmed) {
+    return { ok: false, message: 'Bot message cannot be empty.' };
+  }
+
+  if (trimmed.length > MAX_BODY) {
+    return { ok: false, message: `Message must be at most ${MAX_BODY} characters.` };
+  }
+
+  const supabase = getSupabaseClient();
+  const now = new Date().toISOString();
+
+  const { error: insertError } = await supabase.from('chat_messages').insert({
+    conversation_id: conversationId,
+    sender_type: 'bot',
+    body: trimmed,
+    created_at: now,
+  });
+
+  if (insertError) {
+    return { ok: false, message: insertError.message };
+  }
+
+  const { error: updateError } = await supabase
+    .from('chat_conversations')
+    .update({ updated_at: now })
+    .eq('id', conversationId);
+
+  if (updateError) {
+    return { ok: false, message: updateError.message };
+  }
+
+  return { ok: true };
+}
+
+export async function escalateConversationToPharmacist(
+  conversationId: string,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const supabase = getSupabaseClient();
+  const now = new Date().toISOString();
+  const { error } = await supabase
+    .from('chat_conversations')
+    .update({ escalated_to_pharmacist_at: now, updated_at: now })
+    .eq('id', conversationId);
+
+  if (error) {
+    return { ok: false, message: error.message };
+  }
+
+  return { ok: true };
 }
 
 export async function listMessagesForConversation(
@@ -181,6 +282,7 @@ export type AdminConversationSummary = {
   updatedAt: string;
   customerLeftAt: string | null;
   staffClosedAt: string | null;
+  escalatedToPharmacistAt: string | null;
 };
 
 export async function listConversationsForAdmin(): Promise<
@@ -189,7 +291,7 @@ export async function listConversationsForAdmin(): Promise<
   const supabase = getSupabaseClient();
   const { data: convs, error: convErr } = await supabase
     .from('chat_conversations')
-    .select('id, profile_id, updated_at, customer_left_at, staff_closed_at')
+    .select('id, profile_id, updated_at, customer_left_at, staff_closed_at, escalated_to_pharmacist_at')
     .order('updated_at', { ascending: false });
 
   if (convErr) {
@@ -238,6 +340,8 @@ export async function listConversationsForAdmin(): Promise<
       updatedAt: c.updated_at,
       customerLeftAt: (c as { customer_left_at?: string | null }).customer_left_at ?? null,
       staffClosedAt: (c as { staff_closed_at?: string | null }).staff_closed_at ?? null,
+      escalatedToPharmacistAt:
+        (c as { escalated_to_pharmacist_at?: string | null }).escalated_to_pharmacist_at ?? null,
     };
   });
 

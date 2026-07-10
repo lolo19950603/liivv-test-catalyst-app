@@ -6,16 +6,42 @@ import { useRouter } from 'next/navigation';
 import {
   virtualCareChatAction,
   type VirtualCareChatActionState,
-} from '~/app/[locale]/(default)/account/virtual-care/_actions/virtual-care-actions';
+} from '~/app/[locale]/(default)/account/(portal)/virtual-care/_actions/virtual-care-actions';
 import { Link } from '~/components/link';
 import { OnboardingSectionHeader } from '~/components/onboarding/onboarding-section-header';
 import type { ChatMessageRow } from '~/lib/supabase/chat-messages';
+
+function messageBubbleClass(senderType: ChatMessageRow['sender_type']): string {
+  if (senderType === 'customer') {
+    return 'bg-[#6b7f5c] text-white';
+  }
+
+  if (senderType === 'bot') {
+    return 'border border-[#c8d4bc] bg-[#f4f7f0] text-[#2c2a26]';
+  }
+
+  return 'border border-[#dcd6cc] bg-white text-[#2c2a26]';
+}
+
+function messageLabel(senderType: ChatMessageRow['sender_type']): string | null {
+  if (senderType === 'bot') {
+    return 'Store assistant';
+  }
+
+  if (senderType === 'staff') {
+    return 'Care team';
+  }
+
+  return null;
+}
 
 export function VirtualCareChatClient({
   supabaseReady,
   conversationId,
   customerLeftAt,
   staffClosedAt,
+  escalatedToPharmacistAt,
+  botEnabled,
   messages,
   loadError,
 }: {
@@ -23,6 +49,8 @@ export function VirtualCareChatClient({
   conversationId: string | null;
   customerLeftAt: string | null;
   staffClosedAt: string | null;
+  escalatedToPharmacistAt: string | null;
+  botEnabled: boolean;
   messages: ChatMessageRow[];
   loadError: string | null;
 }) {
@@ -68,10 +96,14 @@ export function VirtualCareChatClient({
   return (
     <section className="mx-auto w-full max-w-5xl space-y-6 pb-10">
       <OnboardingSectionHeader
-        description="Send updates and questions to your care team. Messages are saved so staff can follow up."
+        description={
+          botEnabled
+            ? 'Ask about products, orders, prescriptions, or your account. For medication advice, a pharmacist will join the chat.'
+            : 'Send updates and questions to your care team. Messages are saved so staff can follow up.'
+        }
         kicker="Secure messaging"
-        titleAccent="team"
-        titleBefore="Chat with our "
+        titleAccent={botEnabled ? 'assistant' : 'team'}
+        titleBefore={botEnabled ? 'Chat with our ' : 'Chat with our '}
       />
       <Link className="text-sm font-medium text-[#375a37] hover:underline" href="/account/virtual-care">
         ‹ Virtual care
@@ -90,6 +122,16 @@ export function VirtualCareChatClient({
         </div>
       ) : (
         <div className="space-y-4">
+          {botEnabled ? (
+            <div className="rounded-lg border border-[#d4dfc8] bg-[#f8faf6] px-4 py-3 text-sm text-[#3d4a36]">
+              This assistant helps with store and account questions only — not medical advice.
+              {escalatedToPharmacistAt ? (
+                <span className="mt-1 block font-medium">
+                  A pharmacist has been notified and will join this conversation.
+                </span>
+              ) : null}
+            </div>
+          ) : null}
           {customerLeftAt ? (
             <div className="rounded-lg border border-[#c4d4b8] bg-[#f4f7f0] px-4 py-3 text-sm">
               You previously left this chat ({new Date(customerLeftAt).toLocaleString()}).
@@ -111,25 +153,30 @@ export function VirtualCareChatClient({
                 No conversation yet — send a message below to start.
               </p>
             ) : null}
-            {messages.map((m) => (
+            {messages.map((m) => {
+              const alignEnd = m.sender_type === 'customer';
+
+              return (
               <div
-                className={`flex ${m.sender_type === 'customer' ? 'justify-end' : 'justify-start'}`}
+                className={`flex ${alignEnd ? 'justify-end' : 'justify-start'}`}
                 key={m.id}
               >
                 <div
-                  className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${
-                    m.sender_type === 'customer'
-                      ? 'bg-[#6b7f5c] text-white'
-                      : 'border border-[#dcd6cc] bg-white text-[#2c2a26]'
-                  }`}
+                  className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm ${messageBubbleClass(m.sender_type)}`}
                 >
+                  {messageLabel(m.sender_type) ? (
+                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide opacity-80">
+                      {messageLabel(m.sender_type)}
+                    </p>
+                  ) : null}
                   <p className="whitespace-pre-wrap break-words">{m.body}</p>
                   <p className="mt-1 text-[10px] opacity-75">
                     {new Date(m.created_at).toLocaleString()}
                   </p>
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
 
           {conversationId && !customerLeftAt ? (
@@ -153,7 +200,7 @@ export function VirtualCareChatClient({
               disabled={sendPending || Boolean(loadError)}
               maxLength={8000}
               name="body"
-              placeholder="Type your message…"
+              placeholder={botEnabled ? 'Ask about products, orders, or your account…' : 'Type your message…'}
               required
               rows={3}
             />

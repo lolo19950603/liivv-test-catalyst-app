@@ -13,8 +13,7 @@ export function AccountNotificationsBell({
   notifications,
   unreadCount,
   labels,
-  variant = 'icon',
-  onOpen,
+  variant = 'dashboard',
 }: {
   notifications: AccountHeaderNotification[];
   unreadCount: number;
@@ -25,8 +24,7 @@ export function AccountNotificationsBell({
     kindOrder: string;
     kindSubscription: string;
   };
-  variant?: 'icon' | 'menu';
-  onOpen?: () => void;
+  variant?: 'dashboard' | 'storefront';
 }) {
   const t = useTranslations('Account.Dashboard');
   const [open, setOpen] = useState(false);
@@ -84,7 +82,6 @@ export function AccountNotificationsBell({
     setOpen(next);
 
     if (next) {
-      onOpen?.();
       void markRead();
     }
   };
@@ -92,11 +89,13 @@ export function AccountNotificationsBell({
   const kindLabel = (kind: AccountHeaderNotification['kind']) =>
     kind === 'order' ? labels.kindOrder : labels.kindSubscription;
 
+  const isStorefront = variant === 'storefront';
+
+  const storefrontTriggerClassName = 'header-utility-icon-btn header-notifications__trigger';
+
   return (
     <div
-      className={
-        variant === 'menu' ? 'mhd-notifications mhd-notifications--menu' : 'mhd-notifications'
-      }
+      className={isStorefront ? 'header-notifications' : 'mhd-notifications'}
       ref={rootRef}
     >
       <button
@@ -107,38 +106,93 @@ export function AccountNotificationsBell({
             ? t('notificationsUnread', { count: badgeCount })
             : labels.ariaLabel
         }
-        className={variant === 'menu' ? 'mhd-account-menu__notifications' : 'mhd-icon-btn'}
+        className={isStorefront ? storefrontTriggerClassName : 'mhd-icon-btn'}
         onClick={onToggle}
         type="button"
       >
         <IconBell />
-        {variant === 'menu' ? <span>{labels.ariaLabel}</span> : null}
         {badgeCount > 0 ? (
-          <span aria-hidden className="mhd-badge">
+          <span
+            aria-hidden
+            className={isStorefront ? 'header-utility-badge' : 'mhd-badge'}
+          >
             {badgeCount > 9 ? '9+' : badgeCount}
           </span>
         ) : null}
       </button>
 
       {open ? (
-        <div className="mhd-notifications__panel" role="menu">
-          <div className="mhd-notifications__title">{labels.panelTitle}</div>
-          <div className="mhd-notifications__list">
+        <div
+          className={
+            isStorefront ? 'header-notifications__panel' : 'mhd-notifications__panel'
+          }
+          role="menu"
+        >
+          <div
+            className={
+              isStorefront ? 'header-notifications__title' : 'mhd-notifications__title'
+            }
+          >
+            {labels.panelTitle}
+          </div>
+          <div
+            className={
+              isStorefront ? 'header-notifications__list' : 'mhd-notifications__list'
+            }
+          >
             {notifications.length === 0 ? (
-              <p className="mhd-notifications__empty">{labels.empty}</p>
+              <p
+                className={
+                  isStorefront ? 'header-notifications__empty' : 'mhd-notifications__empty'
+                }
+              >
+                {labels.empty}
+              </p>
             ) : (
-              <ul className="mhd-notifications__items">
+              <ul
+                className={
+                  isStorefront ? 'header-notifications__items' : 'mhd-notifications__items'
+                }
+              >
                 {notifications.map((notification) => (
                   <li key={notification.id}>
                     <Link
-                      className="mhd-notifications__item"
+                      className={
+                        isStorefront
+                          ? 'header-notifications__item'
+                          : 'mhd-notifications__item'
+                      }
                       href={notification.href}
                       onClick={() => setOpen(false)}
                       role="menuitem"
                     >
-                      <p className="mhd-notifications__kind">{kindLabel(notification.kind)}</p>
-                      <p className="mhd-notifications__item-title">{notification.title}</p>
-                      <p className="mhd-notifications__item-body">{notification.body}</p>
+                      <p
+                        className={
+                          isStorefront
+                            ? 'header-notifications__kind'
+                            : 'mhd-notifications__kind'
+                        }
+                      >
+                        {kindLabel(notification.kind)}
+                      </p>
+                      <p
+                        className={
+                          isStorefront
+                            ? 'header-notifications__item-title'
+                            : 'mhd-notifications__item-title'
+                        }
+                      >
+                        {notification.title}
+                      </p>
+                      <p
+                        className={
+                          isStorefront
+                            ? 'header-notifications__item-body'
+                            : 'mhd-notifications__item-body'
+                        }
+                      >
+                        {notification.body}
+                      </p>
                     </Link>
                   </li>
                 ))}

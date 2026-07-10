@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import {
   pharmacyAction,
   type PharmacyActionState,
-} from '~/app/[locale]/(default)/account/pharmacy/_actions/pharmacy-actions';
+} from '~/app/[locale]/(default)/account/(portal)/pharmacy/_actions/pharmacy-actions';
 import { AddPrescriptionDialog } from '~/components/pharmacy/add-prescription-dialog';
 import { OnboardingSectionHeader } from '~/components/onboarding/onboarding-section-header';
 import type {

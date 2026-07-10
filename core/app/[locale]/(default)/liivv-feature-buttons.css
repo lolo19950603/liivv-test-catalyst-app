@@ -58,3 +58,32 @@ button.liivv-btn-secondary:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
+
+/* Floating live-chat launcher — archive CSS sets `button { background: transparent }`. */
+button.liivv-live-chat-launcher {
+  background-color: #375a37 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 8px 24px rgba(55, 90, 55, 0.35) !important;
+  cursor: pointer;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  padding: 0.875rem 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25;
+}
+
+button.liivv-live-chat-launcher:hover {
+  background-color: #2d4a2d !important;
+  color: #ffffff !important;
+}
+
+button.liivv-live-chat-launcher svg {
+  color: #ffffff !important;
+  flex-shrink: 0;
+}

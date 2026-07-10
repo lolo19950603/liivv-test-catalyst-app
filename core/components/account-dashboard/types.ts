@@ -1,5 +1,5 @@
 import type { AccountHeaderNotification } from '~/lib/account-notifications/types';
-import type { DashboardStoreNav } from '~/lib/account-dashboard/get-dashboard-store-nav';
+import type { AccountMenuLink } from '~/lib/account/account-menu-links';
 import type { ReactNode } from 'react';
 
 export type DashboardHeroTab = {
@@ -89,6 +89,7 @@ export interface AccountDashboardLabels {
 export interface AccountDashboardShellProps {
   customerName: string;
   cartHref: string;
+  cartCount: number | null;
   ordersHref: string;
   subscriptionsHref: string;
   shopHref: string;
@@ -102,6 +103,7 @@ export interface AccountDashboardShellProps {
   notificationsUnreadCount: number;
   logoSrc: string;
   logoAlt: string;
-  storeNav: DashboardStoreNav;
+  searchPlaceholder: string;
+  accountMenuLinks: AccountMenuLink[];
   children: ReactNode;
 }

@@ -23,6 +23,7 @@ import {
 } from '~/lib/supabase/prescriptions';
 import { getPrescriptionPhotoSignedUrl } from '~/lib/supabase/prescription-storage';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
+import { isVirtualCareBotEnabled } from '~/lib/virtual-care-bot/config';
 
 export type PharmacyPageData = {
   displayName: string;
@@ -136,13 +137,29 @@ export const getVirtualCareChatData = cache(async () => {
   }
 
   if (!isSupabaseConfigured()) {
-    return { supabaseReady: false as const, messages: [], conversationId: null };
+    return {
+      supabaseReady: false as const,
+      botEnabled: isVirtualCareBotEnabled(),
+      messages: [],
+      conversationId: null,
+      customerLeftAt: null,
+      staffClosedAt: null,
+      escalatedToPharmacistAt: null,
+    };
   }
 
   const ensured = await ensureCustomerProfile(customer);
 
   if (ensured.status !== 'ok') {
-    return { supabaseReady: false as const, messages: [], conversationId: null };
+    return {
+      supabaseReady: false as const,
+      botEnabled: isVirtualCareBotEnabled(),
+      messages: [],
+      conversationId: null,
+      customerLeftAt: null,
+      staffClosedAt: null,
+      escalatedToPharmacistAt: null,
+    };
   }
 
   const conv = await getConversationByProfileId(ensured.profile.id);
@@ -150,9 +167,11 @@ export const getVirtualCareChatData = cache(async () => {
   if (!conv.ok || !conv.conversationId) {
     return {
       supabaseReady: true as const,
+      botEnabled: isVirtualCareBotEnabled(),
       conversationId: null,
       customerLeftAt: conv.ok ? conv.customerLeftAt : null,
       staffClosedAt: conv.ok ? conv.staffClosedAt : null,
+      escalatedToPharmacistAt: conv.ok ? conv.escalatedToPharmacistAt : null,
       messages: [],
     };
   }
@@ -162,9 +181,11 @@ export const getVirtualCareChatData = cache(async () => {
 
   return {
     supabaseReady: true as const,
+    botEnabled: isVirtualCareBotEnabled(),
     conversationId: conv.conversationId,
     customerLeftAt: conv.customerLeftAt,
     staffClosedAt: conv.staffClosedAt,
+    escalatedToPharmacistAt: conv.escalatedToPharmacistAt,
     messages: listed.ok ? listed.messages : [],
   };
 });

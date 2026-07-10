@@ -171,6 +171,27 @@ export function IconSupplies({ className }: { className?: string }) {
   );
 }
 
+export function IconAccount({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="12" cy="8" r="4" />
+      <path
+        d="M5 20c0-3.314 3.134-6 7-6s7 2.686 7 6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function IconBell({ className }: { className?: string }) {
   return (
     <svg
