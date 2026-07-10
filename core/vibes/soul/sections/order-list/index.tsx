@@ -161,9 +161,12 @@ export function OrderList({
                         </div>
                       </div>
 
-                      <ButtonLink className="w-fit shrink-0" href={order.href} size="medium" variant="secondary">
+                      <Link
+                        className="order-list-view-details shrink-0 text-sm font-medium text-[var(--order-list-info,hsl(var(--foreground)))] underline-offset-4 transition hover:underline"
+                        href={order.href}
+                      >
                         {viewDetailsLabel}
-                      </ButtonLink>
+                      </Link>
                     </div>
 
                     {order.lineItems.length > 0 ? (
@@ -217,7 +220,7 @@ function OrderListSkeleton({ title }: { title: string }) {
                   </div>
                   <Skeleton.Box className="h-6 w-28 rounded-full" />
                 </div>
-                <Skeleton.Box className="h-10 w-32 rounded-lg" />
+                <Skeleton.Text characterCount={12} className="rounded text-sm" />
               </div>
               <div className="flex flex-wrap items-center gap-3 px-5 py-4 @md:px-6">
                 {Array.from({ length: 4 }).map((_, itemId) => (

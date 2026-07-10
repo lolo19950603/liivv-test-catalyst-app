@@ -583,12 +583,13 @@ function SubscriptionProductImage({
           aria-label={`${shipToLabel} ${subscription.shippingAddressGroupNumber}${
             subscription.shippingAddressLabel ? `: ${subscription.shippingAddressLabel}` : ''
           }`}
-          className="absolute right-0 top-0 z-10 flex h-5 min-w-5 translate-x-1/4 -translate-y-1/4 items-center justify-center rounded bg-[#2b2b2b] px-1 text-[11px] font-medium leading-none text-white"
+          className="absolute left-0 top-0 z-10 flex h-5 min-w-5 -translate-x-1/4 -translate-y-1/4 items-center justify-center rounded bg-[#2b2b2b] px-1 text-[11px] font-medium leading-none text-white"
           title={subscription.shippingAddressLabel}
         >
           {subscription.shippingAddressGroupNumber}
         </span>
-      ) : showQuantityBadge && subscription.quantity >= 1 ? (
+      ) : null}
+      {showQuantityBadge && subscription.quantity >= 1 ? (
         <span
           aria-label={`${quantityLabel} ${subscription.quantity}`}
           className="absolute right-0 top-0 z-10 flex h-5 min-w-5 translate-x-1/4 -translate-y-1/4 items-center justify-center rounded bg-[#2b2b2b] px-1 text-[11px] font-medium leading-none text-white"
