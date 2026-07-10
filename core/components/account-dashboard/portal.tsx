@@ -166,7 +166,7 @@ export function AccountDashboardPortal({
         <div className="mhd-shell">
           <aside aria-label={labels.aria.accountNavigation} className="mhd-sidebar">
             <Link aria-label={logoAlt} className="mhd-sidebar__logo" href="/">
-              <img alt={logoAlt} className="mhd-sidebar__logo-img" height={52} src={logoSrc} width={120} />
+              <img alt={logoAlt} className="mhd-sidebar__logo-img" height={60} src={logoSrc} width={138} />
             </Link>
 
             <nav aria-label={labels.aria.primaryNavigation} className="mhd-sidebar__nav">

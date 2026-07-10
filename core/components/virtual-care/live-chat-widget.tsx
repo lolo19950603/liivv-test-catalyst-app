@@ -392,11 +392,15 @@ export function LiveChatWidget() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const chatQuery = searchParams.get('chat');
+  const openFromQuery = chatQuery === 'open';
   const [open, setOpen] = useState(false);
   const [sessionReady, setSessionReady] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [data, setData] = useState<LiveChatWidgetData | null>(null);
   const [unreadStaffCount, setUnreadStaffCount] = useState(0);
+  const pathnameRef = useRef(pathname);
+  const skipPathnameRefreshRef = useRef(true);
 
   const refreshSession = useEffectEvent(async () => {
     const session = await getLiveChatSessionAction();
@@ -418,11 +422,11 @@ export function LiveChatWidget() {
   });
 
   useEffect(() => {
-    if (searchParams.get('chat') === 'open') {
+    if (openFromQuery) {
       void markChatRead();
       setOpen(true);
     }
-  }, [searchParams]);
+  }, [openFromQuery]);
 
   useEffect(() => {
     const onOpen = () => {
@@ -437,27 +441,52 @@ export function LiveChatWidget() {
 
   useEffect(() => {
     if (!open) {
+      skipPathnameRefreshRef.current = true;
       return;
     }
 
     setSessionReady(false);
     void refreshSession();
+  }, [open]);
 
-    if (searchParams.get('chat') === 'open') {
-      const soon = window.setTimeout(() => {
-        void refreshSession();
-      }, 500);
-
-      const later = window.setTimeout(() => {
-        void refreshSession();
-      }, 1500);
-
-      return () => {
-        window.clearTimeout(soon);
-        window.clearTimeout(later);
-      };
+  useEffect(() => {
+    if (!open) {
+      pathnameRef.current = pathname;
+      return;
     }
-  }, [open, pathname, searchParams]);
+
+    if (skipPathnameRefreshRef.current) {
+      skipPathnameRefreshRef.current = false;
+      pathnameRef.current = pathname;
+      return;
+    }
+
+    if (pathnameRef.current === pathname) {
+      return;
+    }
+
+    pathnameRef.current = pathname;
+    void refreshSession();
+  }, [open, pathname]);
+
+  useEffect(() => {
+    if (!open || !openFromQuery) {
+      return;
+    }
+
+    const soon = window.setTimeout(() => {
+      void refreshSession();
+    }, 500);
+
+    const later = window.setTimeout(() => {
+      void refreshSession();
+    }, 1500);
+
+    return () => {
+      window.clearTimeout(soon);
+      window.clearTimeout(later);
+    };
+  }, [open, openFromQuery]);
 
   useEffect(() => {
     if (!open || !sessionReady || isLoggedIn) {
@@ -509,7 +538,7 @@ export function LiveChatWidget() {
   }, [open, sessionReady, data?.messages.length]);
 
   const clearChatQuery = () => {
-    if (searchParams.get('chat') !== 'open') {
+    if (!openFromQuery) {
       return;
     }
 

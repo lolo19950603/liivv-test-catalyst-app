@@ -9,7 +9,7 @@ export const LIIVV_HEADER_UTILITY_SHARED_CSS = `
   --liivv-header-utility-icon-size: 1.35rem;
   --liivv-header-utility-gap: 0.5rem;
   --liivv-header-utility-inline-end: var(--page-padding, 1.25rem);
-  --liivv-header-utility-offset-block: clamp(0.75rem, 2vw, 1rem);
+  --liivv-header-utility-offset-block: clamp(1.5rem, 3vw, 2rem);
   --liivv-header-utility-cluster-width: 21rem;
   --liivv-header-utility-badge-size: 1.125rem;
   --liivv-header-utility-badge-font-size: 0.625rem;

@@ -311,7 +311,7 @@ ${LIIVV_HEADER_UTILITY_SHARED_CSS}
 @media screen and (min-width: 768px) {
   .liivv-archive-header .header__icons--end {
     position: fixed;
-    top: var(--liivv-header-utility-offset-block, 0.75rem);
+    top: var(--liivv-header-utility-offset-block, 1.5rem);
     right: var(--liivv-header-utility-inline-end, 1.25rem);
     z-index: 101;
     width: auto;

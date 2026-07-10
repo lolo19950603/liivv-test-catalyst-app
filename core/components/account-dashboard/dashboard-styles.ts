@@ -84,13 +84,13 @@ body.adc-portal-active main{
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-sidebar__logo-img{
   display:block;
   width:auto;
-  height:2.75rem;
+  height:3.25rem;
   max-width:100%;
   object-fit:contain;
 }
 @media screen and (min-width:900px){
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-sidebar__logo-img{
-    height:3.25rem;
+    height:3.75rem;
   }
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-sidebar__nav,#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-sidebar__footer{
@@ -149,7 +149,7 @@ body.adc-portal-active main{
   flex-direction:column;
   align-items:stretch;
   gap:1rem;
-  padding:1.25rem var(--liivv-header-utility-inline-end, 1.25rem) 1.25rem 1.25rem;
+  padding:var(--liivv-header-utility-offset-block, 1.5rem) var(--liivv-header-utility-inline-end, 1.25rem) 1.25rem 1.25rem;
   background:rgb(var(--mhd-white));
   border-bottom:1px solid rgb(var(--mhd-border));
   --mhd-search-drawer-duration:0.45s;
@@ -225,7 +225,7 @@ body.adc-portal-active main{
 @media screen and (min-width:768px){
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header__utilities{
     position:fixed;
-    top:var(--liivv-header-utility-offset-block, 0.75rem);
+    top:var(--liivv-header-utility-offset-block, 1.5rem);
     right:var(--liivv-header-utility-inline-end, 1.25rem);
     z-index:210;
   }
