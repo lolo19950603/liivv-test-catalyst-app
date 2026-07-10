@@ -122,6 +122,7 @@ export async function verifyBcAppSignedPayload(
   signedPayload: string,
 ): Promise<BcAppSignedPayload | null> {
   const secret = getClientSecret();
+  const clientId = getClientId();
 
   if (!secret) {
     return null;
@@ -131,36 +132,48 @@ export async function verifyBcAppSignedPayload(
     const key = new TextEncoder().encode(secret);
     const { payload } = await jwtVerify(signedPayload, key, {
       algorithms: ['HS256'],
+      ...(clientId ? { audience: clientId } : {}),
     });
 
-    const data = payload as Partial<BcAppSignedPayload>;
-
-    if (
-      !data.user?.id ||
-      !data.user.email ||
-      !data.context ||
-      !data.store_hash ||
-      typeof data.timestamp !== 'number'
-    ) {
-      return null;
-    }
-
-    if (!assertAllowedStoreHash(data.store_hash)) {
-      return null;
-    }
-
-    return {
-      user: { id: data.user.id, email: data.user.email },
-      owner: data.owner?.id
-        ? { id: data.owner.id, email: data.owner.email ?? '' }
-        : undefined,
-      context: data.context,
-      store_hash: data.store_hash,
-      timestamp: data.timestamp,
-    };
+    return normalizeSignedPayload(payload as BcJwtPayload);
   } catch {
     return null;
   }
+}
+
+type BcJwtPayload = Partial<BcAppSignedPayload> & {
+  sub?: string;
+  iat?: number;
+};
+
+function parseStoreHashFromContext(context: string): string | null {
+  const match = /^stores\/(.+)$/.exec(context.trim());
+
+  return match?.[1] ?? null;
+}
+
+function normalizeSignedPayload(data: BcJwtPayload): BcAppSignedPayload | null {
+  const context = data.context?.trim() || data.sub?.trim() || '';
+  const storeHash = data.store_hash?.trim() || parseStoreHashFromContext(context) || '';
+  const timestamp = typeof data.timestamp === 'number' ? data.timestamp : data.iat;
+
+  if (!data.user?.id || !data.user.email || !context || !storeHash || typeof timestamp !== 'number') {
+    return null;
+  }
+
+  if (!assertAllowedStoreHash(storeHash)) {
+    return null;
+  }
+
+  return {
+    user: { id: Number(data.user.id), email: data.user.email },
+    owner: data.owner?.id
+      ? { id: Number(data.owner.id), email: data.owner.email ?? '' }
+      : undefined,
+    context,
+    store_hash: storeHash,
+    timestamp,
+  };
 }
 
 export async function exchangeBcAppAuthCode(
