@@ -10,11 +10,17 @@ import { WishlistModalProps } from './wishlist-actions-menu';
 
 interface Props {
   label: string;
-  variant?: 'primary' | 'tertiary';
+  variant?: 'primary' | 'secondary' | 'tertiary';
+  appearance?: 'default' | 'archive' | 'inherit';
   modal: WishlistModalProps;
 }
 
-export const NewWishlistButton = ({ modal, variant = 'primary', label }: Props) => {
+export const NewWishlistButton = ({
+  modal,
+  variant = 'primary',
+  appearance = 'inherit',
+  label,
+}: Props) => {
   const [isOpen, setOpen] = useState(false);
   const { formAction: action, ...props } = modal;
   const onSuccess = ({ successMessage }: ModalFormState) => {
@@ -41,7 +47,7 @@ export const NewWishlistButton = ({ modal, variant = 'primary', label }: Props) 
       isOpen={isOpen}
       setOpen={setOpen}
       trigger={
-        <Button size="small" variant={variant}>
+        <Button appearance={appearance} size="small" variant={variant}>
           {label}
         </Button>
       }

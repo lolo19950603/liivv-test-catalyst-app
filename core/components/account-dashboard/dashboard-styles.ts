@@ -1742,6 +1742,32 @@ body.adc-portal-active main{
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page .group\\/order-list > ul > li > div:first-child{
   border-bottom:1px solid rgb(var(--mhd-border)) !important;
 }
+/* Wishlist list cards */
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page .wishlist-list-item{
+  background-color:rgb(var(--mhd-white)) !important;
+  border:1px solid rgb(var(--mhd-border)) !important;
+  border-radius:1rem !important;
+  box-shadow:0 1px 2px rgba(49,47,47,0.04);
+  overflow:hidden;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page .wishlist-list-item > div:first-child{
+  border-bottom:1px solid rgb(var(--mhd-border)) !important;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page .group\\/wishlists > header h1{
+  margin:0;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page .group\\/wishlists > header button{
+  background-color:#312f2f !important;
+  background-image:none !important;
+  border:1px solid #312f2f !important;
+  color:#fff !important;
+  border-radius:9999px !important;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page .group\\/wishlists > header button:hover:not(:disabled){
+  background-color:#1f1d1d !important;
+  border-color:#1f1d1d !important;
+  color:#fff !important;
+}
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page .onboarding-health-form .rounded-2xl.border,
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page .onboarding-health-form .rounded-xl.border{
   border-color:rgb(var(--mhd-border)) !important;

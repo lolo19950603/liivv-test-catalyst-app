@@ -41,14 +41,12 @@ export const WishlistsSection = ({
   itemActions,
 }: Props) => {
   return (
-    <section className="w-full">
-      <header className="mb-4 border-[var(--wishlists-section-border,hsl(var(--contrast-100)))] @2xl:min-h-[72px] @2xl:border-b">
-        <div className="mb-4 flex items-center justify-between">
-          <h1 className="hidden font-[family-name:var(--wishlists-section-title-font-family,var(--font-family-heading))] text-4xl font-medium leading-none tracking-tight text-[var(--wishlists-section-title,hsl(var(--foreground)))] @2xl:block">
-            {title}
-          </h1>
-          {actions}
-        </div>
+    <section className="group/wishlists w-full @container">
+      <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <h1 className="font-[family-name:var(--wishlists-section-title-font-family,var(--font-family-heading))] text-4xl font-medium leading-none tracking-tight text-[var(--wishlists-section-title,hsl(var(--foreground)))]">
+          {title}
+        </h1>
+        {actions ? <div className="shrink-0">{actions}</div> : null}
       </header>
 
       <WishlistList
@@ -60,7 +58,11 @@ export const WishlistsSection = ({
         wishlists={wishlists}
       />
 
-      {paginationInfo && <CursorPagination info={paginationInfo} />}
+      {paginationInfo ? (
+        <div className="mt-6">
+          <CursorPagination info={paginationInfo} />
+        </div>
+      ) : null}
     </section>
   );
 };

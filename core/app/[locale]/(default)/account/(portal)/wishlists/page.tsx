@@ -70,9 +70,21 @@ export default async function Wishlists({ params, searchParams }: Props) {
 
   return (
     <WishlistsSection
-      actions={<NewWishlistButton label={t('new')} modal={newWishlistModal} variant="tertiary" />}
+      actions={
+        <NewWishlistButton
+          appearance="default"
+          label={t('new')}
+          modal={newWishlistModal}
+          variant="secondary"
+        />
+      }
       emptyStateCallToAction={
-        <NewWishlistButton label={t('noWishlistsCallToAction')} modal={newWishlistModal} />
+        <NewWishlistButton
+          appearance="default"
+          label={t('noWishlistsCallToAction')}
+          modal={newWishlistModal}
+          variant="primary"
+        />
       }
       emptyStateTitle={t('noWishlists')}
       emptyWishlistStateText={t('emptyWishlist')}

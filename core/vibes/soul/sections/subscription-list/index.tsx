@@ -506,14 +506,12 @@ function SubscriptionProductImage({
   size = 'large',
   fallbackLogo,
   showQuantityBadge = true,
-  shipToLabel = 'Ship to',
 }: {
   subscription: SubscriptionListItem;
   quantityLabel: string;
   size?: 'large' | 'medium' | 'compact';
   fallbackLogo?: ProductImageFallbackLogo | null;
   showQuantityBadge?: boolean;
-  shipToLabel?: string;
 }) {
   const dimension = size === 'large' ? 96 : size === 'medium' ? 80 : 56;
   const hasLogoImage = Boolean(fallbackLogo?.src?.trim());
@@ -556,17 +554,6 @@ function SubscriptionProductImage({
         )}
       </div>
 
-      {subscription.shippingAddressGroupNumber != null ? (
-        <span
-          aria-label={`${shipToLabel} ${subscription.shippingAddressGroupNumber}${
-            subscription.shippingAddressLabel ? `: ${subscription.shippingAddressLabel}` : ''
-          }`}
-          className="absolute left-0 top-0 z-10 flex h-5 min-w-5 -translate-x-1/4 -translate-y-1/4 items-center justify-center rounded bg-[#2b2b2b] px-1 text-[11px] font-medium leading-none text-white"
-          title={subscription.shippingAddressLabel}
-        >
-          {subscription.shippingAddressGroupNumber}
-        </span>
-      ) : null}
       {showQuantityBadge && subscription.quantity >= 1 ? (
         <span
           aria-label={`${quantityLabel} ${subscription.quantity}`}
@@ -705,7 +692,6 @@ function SubscriptionProductCard({
   manageItemLabel,
   variant = 'standalone',
   fallbackLogo,
-  shipToLabel,
 }: {
   subscription: SubscriptionListItem;
   quantityLabel: string;
@@ -715,7 +701,6 @@ function SubscriptionProductCard({
   manageItemLabel?: string;
   variant?: 'standalone' | 'embedded';
   fallbackLogo?: ProductImageFallbackLogo | null;
-  shipToLabel?: string;
 }) {
   if (variant === 'embedded') {
     return (
@@ -723,7 +708,6 @@ function SubscriptionProductCard({
         <SubscriptionProductImage
           fallbackLogo={fallbackLogo}
           quantityLabel={quantityLabel}
-          shipToLabel={shipToLabel}
           size="medium"
           subscription={subscription}
         />
@@ -762,7 +746,6 @@ function SubscriptionProductCard({
       <SubscriptionProductImage
         fallbackLogo={fallbackLogo}
         quantityLabel={quantityLabel}
-        shipToLabel={shipToLabel}
         subscription={subscription}
       />
 
@@ -1133,7 +1116,6 @@ function SubscriptionFlatItemCard({
   manageItemAction,
   manageItemLabel,
   fallbackLogo,
-  shipToLabel,
 }: {
   subscription: SubscriptionListItem;
   quantityLabel: string;
@@ -1142,7 +1124,6 @@ function SubscriptionFlatItemCard({
   manageItemAction?: (subscriptionId: string) => Promise<void>;
   manageItemLabel?: string;
   fallbackLogo?: ProductImageFallbackLogo | null;
-  shipToLabel?: string;
 }) {
   return (
     <SubscriptionProductCard
@@ -1152,7 +1133,6 @@ function SubscriptionFlatItemCard({
       manageItemLabel={manageItemLabel}
       paymentLabel={paymentLabel}
       quantityLabel={quantityLabel}
-      shipToLabel={shipToLabel}
       subscription={subscription}
       variant="standalone"
     />
@@ -1199,13 +1179,11 @@ function SubscriptionFlatItemsGrid({
   manageItemLabel,
   labels,
   fallbackLogo,
-  shipToLabel,
 }: {
   items: SubscriptionListItem[];
   manageItemAction?: (subscriptionId: string) => Promise<void>;
   manageItemLabel?: string;
   fallbackLogo?: ProductImageFallbackLogo | null;
-  shipToLabel?: string;
   labels: {
     quantityLabel: string;
     paymentLabel: string;
@@ -1223,7 +1201,6 @@ function SubscriptionFlatItemsGrid({
           manageItemLabel={manageItemLabel}
           paymentLabel={labels.paymentLabel}
           quantityLabel={labels.quantityLabel}
-          shipToLabel={shipToLabel}
           subscription={subscription}
         />
       ))}
@@ -1256,7 +1233,6 @@ function SubscriptionFlatItemsSection({
     labels,
     manageItemAction,
     manageItemLabel,
-    shipToLabel,
   };
 
   if (addressGroups.length <= 1) {
