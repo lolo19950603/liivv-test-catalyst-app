@@ -293,6 +293,7 @@
     },
     "Subscriptions": {
       "title": "Subscriptions",
+      "loading": "Loading your subscriptions…",
       "manage": "Manage billing",
       "manageItem": "Edit",
       "manageModal": {

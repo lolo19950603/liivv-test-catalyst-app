@@ -200,20 +200,29 @@ body.subscription-manage-modal-open .subscription-manage-modal-blur-target {
   gap: 0.5rem;
   border: 1px solid rgba(49, 47, 47, 0.18);
   border-radius: 9999px;
-  background: #fff;
+  /* !important: archive diabetes-care CSS sets `button { background: transparent }` */
+  background: #fff !important;
+  background-color: #fff !important;
+  background-image: none !important;
   padding: 0.625rem 1.25rem;
   font-size: 0.9375rem;
   font-weight: 500;
   line-height: 1.25;
-  color: #312f2f;
+  color: #312f2f !important;
   cursor: pointer;
-  transition: background-color 150ms ease, border-color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease;
 }
 
-.subscription-manage-modal__cancel-button:hover,
-.subscription-manage-modal__secondary-button:hover {
-  background: #f7f5f2;
-  border-color: rgba(49, 47, 47, 0.28);
+.subscription-manage-modal__cancel-button:hover:not(:disabled),
+.subscription-manage-modal__secondary-button:hover:not(:disabled) {
+  background: #f0ebe4 !important;
+  background-color: #f0ebe4 !important;
+  border-color: rgba(49, 47, 47, 0.4);
+  box-shadow: 0 1px 3px rgba(49, 47, 47, 0.08);
+  color: #1f1d1d !important;
 }
 
 .subscription-manage-modal__cancel-button:disabled,
