@@ -36,8 +36,8 @@ flowchart LR
     B[BC Control Panel iframe /bc-app]
   end
 
-  subgraph Hub["Next.js 16 — Catalyst (Vercel)"]
-    N[App Router · Server Actions · API Routes]
+  subgraph Hub["Next.js 16 - Catalyst on Vercel"]
+    N[App Router / Server Actions / API Routes]
   end
 
   subgraph Commerce
@@ -48,7 +48,7 @@ flowchart LR
 
   subgraph Data
     SB[(Supabase Postgres)]
-    ST[(Supabase Storage\nprescription-photos)]
+    ST[(Supabase Storage)]
     KV[(KV / Redis)]
   end
 
@@ -178,13 +178,13 @@ sequenceDiagram
 
   U->>N: Send message
   N->>SB: append chat_messages
-  alt Bot enabled AND care team not active
+  alt Bot enabled and care team not active
     N->>AI: Chat Completions + tools
-    AI-->>N: Reply / escalate
-    N->>SB: bot message; maybe escalate flag
+    AI-->>N: Reply or escalate
+    N->>SB: bot message, maybe escalate flag
   end
   Staff->>N: Join / reply / close
-  N->>SB: staff messages; pause bot while staff active
+  N->>SB: staff messages, pause bot while staff active
   Note over U,N: UI polls for new messages (not Realtime yet)
 ```
 
@@ -219,7 +219,7 @@ flowchart TB
   end
 
   subgraph Edge["Vercel edge / Node runtime"]
-    Next[Next.js — sole secret holder]
+    Next[Next.js - sole secret holder]
   end
 
   subgraph SaaS["Third-party SaaS"]
@@ -231,7 +231,7 @@ flowchart TB
     DPD[Health Canada]
   end
 
-  Browser -->|HTTPS HTML/JS · no service keys| Next
+  Browser -->|HTTPS HTML/JS - no service keys| Next
   StripeWH -->|Signed payload| Next
   BCWH -->|Bearer secret| Next
   Next -->|TLS + API tokens| BC
