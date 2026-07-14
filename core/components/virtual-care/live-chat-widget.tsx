@@ -24,6 +24,7 @@ import { ChatMessageBody } from '~/components/virtual-care/chat-message-body';
 import {
   ChatSpeakMessageButton,
   ChatVoiceControls,
+  ChatVoiceStatus,
 } from '~/components/virtual-care/chat-voice-controls';
 import { ChatSystemMessage } from '~/components/virtual-care/chat-system-message';
 import { ChatTypingIndicator } from '~/components/virtual-care/chat-typing-indicator';
@@ -171,7 +172,7 @@ function AuthenticatedPanel({
   const escalatedToPharmacistAt = data?.escalatedToPharmacistAt ?? null;
   const assistantActive = botEnabled && !careTeamActive && !escalatedToPharmacistAt;
 
-  const { draft, displayMessages, handleSendSubmit, inputLocked, setDraft, showTyping } =
+  const { draft, displayMessages, handleSendSubmit, inputLocked, sendMessage, setDraft, showTyping } =
     useChatOptimisticSend({
       assistantActive,
       conversationId,
@@ -191,9 +192,11 @@ function AuthenticatedPanel({
         return trimmed ? `${trimmed} ${text}` : text;
       });
     },
+    onVoiceTurn: (text) => sendMessage(text),
   });
 
   const latestBot = [...displayMessages].reverse().find((m) => m.sender_type === 'bot');
+  const autoSpeak = voice.speakReplies || voice.voiceChatActive;
   const pollIntervalMs = conversationId ? CHAT_ACTIVE_POLL_MS : CHAT_IDLE_POLL_MS;
 
   useChatPollRefresh({
@@ -223,7 +226,7 @@ function AuthenticatedPanel({
   }, [sendState?.ok]);
 
   useEffect(() => {
-    if (!assistantActive || !voice.speakReplies) {
+    if (!assistantActive || !autoSpeak) {
       seededSpeakRef.current = false;
       return;
     }
@@ -234,15 +237,15 @@ function AuthenticatedPanel({
       );
       seededSpeakRef.current = true;
     }
-  }, [assistantActive, voice.speakReplies]);
+  }, [assistantActive, autoSpeak]);
 
   useEffect(() => {
-    if (!assistantActive || !voice.speakReplies || !latestBot || !seededSpeakRef.current) {
+    if (!assistantActive || !autoSpeak || !latestBot || !seededSpeakRef.current) {
       return;
     }
 
     voice.maybeSpeakBotReply(latestBot.id, latestBot.body);
-  }, [assistantActive, latestBot?.body, latestBot?.id, voice.speakReplies]);
+  }, [assistantActive, autoSpeak, latestBot?.body, latestBot?.id]);
 
   if (!data || !supabaseReady) {
     return (
@@ -338,20 +341,22 @@ function AuthenticatedPanel({
           <input name="intent" type="hidden" value="send" />
           <input
             className="min-w-0 flex-1 rounded-xl border-0 bg-[#f0ebe3] px-3.5 py-3 text-sm text-[#2c2a26] outline-none placeholder:text-[#8a8176] focus:ring-2 focus:ring-[#8a9a7b]"
-            disabled={inputLocked}
+            disabled={inputLocked || voice.voiceChatActive}
             maxLength={8000}
             name="body"
             onChange={(event) => setDraft(event.target.value)}
             placeholder={
-              voice.recording
-                ? 'Listening… tap mic to stop'
-                : voice.transcribing
-                  ? 'Transcribing…'
-                  : careTeamActive
-                    ? 'Message the care team…'
-                    : assistantActive
-                      ? 'Ask the store assistant…'
-                      : 'Type your message'
+              voice.voiceChatActive
+                ? voice.recording
+                  ? 'Listening… tap Done'
+                  : voice.speaking
+                    ? 'Speaking…'
+                    : 'Voice chat…'
+                : careTeamActive
+                  ? 'Message the care team…'
+                  : assistantActive
+                    ? 'Ask the store assistant…'
+                    : 'Type your message'
             }
             type="text"
             value={draft}
@@ -361,22 +366,27 @@ function AuthenticatedPanel({
             disabled={inputLocked}
             enabled={assistantActive}
             micSupported={voice.micSupported}
-            onStopSpeaking={voice.stopSpeaking}
-            onToggleRecording={voice.toggleRecording}
-            onToggleSpeakReplies={voice.toggleSpeakReplies}
+            onEndVoiceChat={voice.endVoiceChat}
+            onVoiceChatPrimaryAction={voice.handleVoiceChatPrimaryAction}
             recording={voice.recording}
-            speakReplies={voice.speakReplies}
             speaking={voice.speaking}
             transcribing={voice.transcribing}
+            voiceChatActive={voice.voiceChatActive}
+            voicePhase={voice.voicePhase}
           />
           <button
             className="liivv-btn-primary shrink-0 rounded-xl px-4 py-3 text-sm disabled:opacity-60"
-            disabled={inputLocked}
+            disabled={inputLocked || voice.voiceChatActive}
             type="submit"
           >
             Send
           </button>
         </form>
+        <ChatVoiceStatus
+          enabled={assistantActive}
+          voiceChatActive={voice.voiceChatActive}
+          voicePhase={voice.voicePhase}
+        />
         {voice.voiceError ? <p className="mt-2 text-xs text-red-700">{voice.voiceError}</p> : null}
         {sendState?.error ? <p className="mt-2 text-xs text-red-700">{sendState.error}</p> : null}
       </div>

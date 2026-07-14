@@ -10,6 +10,8 @@ import {
 const SPEAK_REPLIES_KEY = 'liivv-chat-speak-replies';
 const MAX_RECORD_MS = 60_000;
 
+export type VoiceChatPhase = 'idle' | 'listening' | 'thinking' | 'speaking';
+
 function pickRecorderMimeType(): string | undefined {
   if (typeof MediaRecorder === 'undefined') {
     return undefined;
@@ -24,15 +26,19 @@ export function useChatVoice({
   enabled,
   disabled,
   onTranscript,
+  onVoiceTurn,
 }: {
   enabled: boolean;
   disabled?: boolean;
   onTranscript: (text: string) => void;
+  /** When set, voice-chat mode auto-sends the transcript as a full turn. */
+  onVoiceTurn?: (text: string) => boolean | void;
 }) {
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [speakReplies, setSpeakReplies] = useState(false);
+  const [voiceChatActive, setVoiceChatActive] = useState(false);
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const [micSupported, setMicSupported] = useState(false);
 
@@ -43,8 +49,20 @@ export function useChatVoice({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioUrlRef = useRef<string | null>(null);
   const spokenMessageIdsRef = useRef<Set<string>>(new Set());
+  const voiceChatActiveRef = useRef(false);
+  const cancellingVoiceTurnRef = useRef(false);
+  const listenAfterSpeakRef = useRef(false);
 
   const applyTranscript = useEffectEvent(onTranscript);
+  const applyVoiceTurn = useEffectEvent((text: string) => onVoiceTurn?.(text));
+
+  const voicePhase: VoiceChatPhase = recording
+    ? 'listening'
+    : transcribing || (voiceChatActive && disabled && !speaking)
+      ? 'thinking'
+      : speaking
+        ? 'speaking'
+        : 'idle';
 
   useEffect(() => {
     setMicSupported(
@@ -59,6 +77,13 @@ export function useChatVoice({
       // ignore
     }
   }, []);
+
+  useEffect(() => {
+    if (!enabled && voiceChatActive) {
+      endVoiceChat();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only react to assistant availability
+  }, [enabled]);
 
   useEffect(() => {
     return () => {
@@ -90,6 +115,11 @@ export function useChatVoice({
     stopTracks();
     setRecording(false);
 
+    if (cancellingVoiceTurnRef.current) {
+      cancellingVoiceTurnRef.current = false;
+      return;
+    }
+
     if (!blob.size) {
       setVoiceError('No audio captured. Please try again.');
       return;
@@ -111,7 +141,16 @@ export function useChatVoice({
         return;
       }
 
-      applyTranscript(result.text);
+      if (voiceChatActiveRef.current) {
+        const sent = applyVoiceTurn(result.text);
+
+        if (sent === false) {
+          applyTranscript(result.text);
+          setVoiceError('Could not send that message. Try again.');
+        }
+      } else {
+        applyTranscript(result.text);
+      }
     } catch {
       setVoiceError('Could not transcribe that recording.');
     } finally {
@@ -120,11 +159,12 @@ export function useChatVoice({
   }
 
   async function startRecording() {
-    if (!enabled || disabled || recording || transcribing || !micSupported) {
+    if (!enabled || disabled || recording || transcribing || speaking || !micSupported) {
       return;
     }
 
     setVoiceError(null);
+    cancellingVoiceTurnRef.current = false;
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -162,15 +202,21 @@ export function useChatVoice({
     } catch {
       stopTracks();
       setRecording(false);
-      setVoiceError('Microphone access is required for voice input.');
+      setVoiceError('Microphone access is required for voice chat.');
+      if (voiceChatActiveRef.current) {
+        voiceChatActiveRef.current = false;
+        setVoiceChatActive(false);
+      }
     }
   }
 
-  function stopRecording() {
+  function stopRecording({ cancel = false }: { cancel?: boolean } = {}) {
     if (recordTimerRef.current !== null) {
       window.clearTimeout(recordTimerRef.current);
       recordTimerRef.current = null;
     }
+
+    cancellingVoiceTurnRef.current = cancel;
 
     const recorder = mediaRecorderRef.current;
 
@@ -189,6 +235,16 @@ export function useChatVoice({
     }
 
     void startRecording();
+  }
+
+  function setSpeakRepliesPersisted(next: boolean) {
+    setSpeakReplies(next);
+
+    try {
+      window.localStorage.setItem(SPEAK_REPLIES_KEY, next ? '1' : '0');
+    } catch {
+      // ignore
+    }
   }
 
   function toggleSpeakReplies() {
@@ -216,6 +272,7 @@ export function useChatVoice({
   }
 
   function stopSpeaking() {
+    listenAfterSpeakRef.current = false;
     audioRef.current?.pause();
 
     if (audioUrlRef.current) {
@@ -238,6 +295,7 @@ export function useChatVoice({
     stopSpeaking();
     setVoiceError(null);
     setSpeaking(true);
+    listenAfterSpeakRef.current = voiceChatActiveRef.current;
 
     try {
       const result = await synthesizeChatVoiceAction(text);
@@ -269,6 +327,11 @@ export function useChatVoice({
           URL.revokeObjectURL(url);
           audioUrlRef.current = null;
         }
+
+        if (listenAfterSpeakRef.current && voiceChatActiveRef.current && enabled) {
+          listenAfterSpeakRef.current = false;
+          void startRecording();
+        }
       };
       audio.onerror = () => {
         setSpeaking(false);
@@ -283,7 +346,9 @@ export function useChatVoice({
   }
 
   function maybeSpeakBotReply(messageId: string, body: string) {
-    if (!speakReplies || !enabled || spokenMessageIdsRef.current.has(messageId)) {
+    const shouldSpeak = speakReplies || voiceChatActiveRef.current;
+
+    if (!shouldSpeak || !enabled || spokenMessageIdsRef.current.has(messageId)) {
       return;
     }
 
@@ -294,17 +359,70 @@ export function useChatVoice({
     void speakText(body, messageId);
   }
 
+  function startVoiceChat() {
+    if (!enabled || !micSupported || disabled) {
+      return;
+    }
+
+    voiceChatActiveRef.current = true;
+    setVoiceChatActive(true);
+    setSpeakRepliesPersisted(true);
+    setVoiceError(null);
+    void startRecording();
+  }
+
+  function endVoiceChat() {
+    voiceChatActiveRef.current = false;
+    setVoiceChatActive(false);
+    listenAfterSpeakRef.current = false;
+    stopRecording({ cancel: recording });
+    stopSpeaking();
+  }
+
+  function toggleVoiceChat() {
+    if (voiceChatActive) {
+      endVoiceChat();
+      return;
+    }
+
+    startVoiceChat();
+  }
+
+  /** While voice chat is listening, tap again to finish the turn. */
+  function handleVoiceChatPrimaryAction() {
+    if (!voiceChatActive) {
+      startVoiceChat();
+      return;
+    }
+
+    if (recording) {
+      stopRecording();
+      return;
+    }
+
+    if (speaking || transcribing || disabled) {
+      return;
+    }
+
+    void startRecording();
+  }
+
   return {
     micSupported,
     recording,
     transcribing,
     speaking,
     speakReplies,
+    voiceChatActive,
+    voicePhase,
     voiceError,
     voiceBusy: recording || transcribing || speaking,
     clearVoiceError: () => setVoiceError(null),
     toggleRecording,
     toggleSpeakReplies,
+    toggleVoiceChat,
+    handleVoiceChatPrimaryAction,
+    endVoiceChat,
     speakText,
     stopSpeaking,
     maybeSpeakBotReply,

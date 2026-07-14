@@ -116,11 +116,32 @@ export function useChatOptimisticSend({
     });
   }
 
+  function sendMessage(body: string) {
+    const trimmed = body.trim();
+
+    if (!trimmed || pendingSend) {
+      return false;
+    }
+
+    const formData = new FormData();
+
+    formData.set('intent', 'send');
+    formData.set('body', trimmed);
+    capturePendingSend(trimmed);
+    setDraft('');
+    startTransition(() => {
+      sendAction(formData);
+    });
+
+    return true;
+  }
+
   return {
     draft,
     displayMessages,
     handleSendSubmit,
     inputLocked: Boolean(pendingSend),
+    sendMessage,
     setDraft,
     showTyping,
   };

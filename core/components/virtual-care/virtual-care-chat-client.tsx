@@ -13,6 +13,7 @@ import { ChatMessageBody } from '~/components/virtual-care/chat-message-body';
 import {
   ChatSpeakMessageButton,
   ChatVoiceControls,
+  ChatVoiceStatus,
 } from '~/components/virtual-care/chat-voice-controls';
 import { ChatSystemMessage } from '~/components/virtual-care/chat-system-message';
 import { ChatTypingIndicator } from '~/components/virtual-care/chat-typing-indicator';
@@ -71,7 +72,7 @@ export function VirtualCareChatClient({
 
   const assistantActive = botEnabled && !careTeamActive && !escalatedToPharmacistAt;
 
-  const { draft, displayMessages, handleSendSubmit, inputLocked, setDraft, showTyping } =
+  const { draft, displayMessages, handleSendSubmit, inputLocked, sendMessage, setDraft, showTyping } =
     useChatOptimisticSend({
       assistantActive,
       conversationId,
@@ -91,9 +92,11 @@ export function VirtualCareChatClient({
         return trimmed ? `${trimmed} ${text}` : text;
       });
     },
+    onVoiceTurn: (text) => sendMessage(text),
   });
 
   const latestBot = [...displayMessages].reverse().find((m) => m.sender_type === 'bot');
+  const autoSpeak = voice.speakReplies || voice.voiceChatActive;
 
   useEffect(() => {
     if (!supabaseReady || !conversationId) {
@@ -124,7 +127,7 @@ export function VirtualCareChatClient({
   }, [router, sendState?.ok]);
 
   useEffect(() => {
-    if (!assistantActive || !voice.speakReplies) {
+    if (!assistantActive || !autoSpeak) {
       seededSpeakRef.current = false;
       return;
     }
@@ -135,15 +138,15 @@ export function VirtualCareChatClient({
       );
       seededSpeakRef.current = true;
     }
-  }, [assistantActive, voice.speakReplies]);
+  }, [assistantActive, autoSpeak]);
 
   useEffect(() => {
-    if (!assistantActive || !voice.speakReplies || !latestBot || !seededSpeakRef.current) {
+    if (!assistantActive || !autoSpeak || !latestBot || !seededSpeakRef.current) {
       return;
     }
 
     voice.maybeSpeakBotReply(latestBot.id, latestBot.body);
-  }, [assistantActive, latestBot?.body, latestBot?.id, voice.speakReplies]);
+  }, [assistantActive, autoSpeak, latestBot?.body, latestBot?.id]);
 
   return (
     <section className="mx-auto w-full max-w-5xl space-y-6 pb-10">
@@ -152,7 +155,7 @@ export function VirtualCareChatClient({
           careTeamActive
             ? 'A care team member is in this conversation. They will reply here when available.'
             : assistantActive
-              ? 'Ask about products, orders, prescriptions, or your account. Use the mic to speak — for medication advice, a pharmacist will join the chat.'
+              ? 'Ask about products, orders, prescriptions, or your account. Tap Voice chat to talk — for medication advice, a pharmacist will join the chat.'
               : 'Send updates and questions to your care team. Messages are saved so staff can follow up.'
         }
         kicker="Secure messaging"
@@ -183,7 +186,7 @@ export function VirtualCareChatClient({
           ) : assistantActive ? (
             <div className="rounded-lg border border-[#d4dfc8] bg-[#f8faf6] px-4 py-3 text-sm text-[#3d4a36]">
               This assistant helps with store and account questions only — not medical advice. Tap
-              the mic to speak, or turn on spoken replies.
+              Voice chat to talk hands-free.
             </div>
           ) : escalatedToPharmacistAt ? (
             <div className="rounded-lg border border-[#d4dfc8] bg-[#f8faf6] px-4 py-3 text-sm text-[#3d4a36]">
@@ -257,15 +260,17 @@ export function VirtualCareChatClient({
                 }
               }}
               placeholder={
-                voice.recording
-                  ? 'Listening… tap the mic again to stop'
-                  : voice.transcribing
-                    ? 'Transcribing…'
-                    : careTeamActive
-                      ? 'Message the care team…'
-                      : assistantActive
-                        ? 'Ask the store assistant…'
-                        : 'Type your message…'
+                voice.voiceChatActive
+                  ? voice.recording
+                    ? 'Listening… tap Done when finished'
+                    : voice.speaking
+                      ? 'Assistant is speaking…'
+                      : 'Voice chat active…'
+                  : careTeamActive
+                    ? 'Message the care team…'
+                    : assistantActive
+                      ? 'Ask the store assistant…'
+                      : 'Type your message…'
               }
               rows={3}
               value={draft}
@@ -275,26 +280,28 @@ export function VirtualCareChatClient({
                 disabled={inputLocked || Boolean(loadError)}
                 enabled={assistantActive}
                 micSupported={voice.micSupported}
-                onStopSpeaking={voice.stopSpeaking}
-                onToggleRecording={voice.toggleRecording}
-                onToggleSpeakReplies={voice.toggleSpeakReplies}
+                onEndVoiceChat={voice.endVoiceChat}
+                onVoiceChatPrimaryAction={voice.handleVoiceChatPrimaryAction}
                 recording={voice.recording}
-                speakReplies={voice.speakReplies}
                 speaking={voice.speaking}
                 transcribing={voice.transcribing}
+                voiceChatActive={voice.voiceChatActive}
+                voicePhase={voice.voicePhase}
               />
               <button
                 className="liivv-btn-primary px-5 py-2.5 text-sm disabled:opacity-60"
-                disabled={inputLocked || Boolean(loadError)}
+                disabled={inputLocked || Boolean(loadError) || voice.voiceChatActive}
                 type="submit"
               >
                 Send
               </button>
             </div>
           </form>
-          {voice.recording ? (
-            <p className="text-sm text-[#375a37]">Recording… tap the mic to finish.</p>
-          ) : null}
+          <ChatVoiceStatus
+            enabled={assistantActive}
+            voiceChatActive={voice.voiceChatActive}
+            voicePhase={voice.voicePhase}
+          />
           {voice.voiceError ? <p className="text-sm text-red-700">{voice.voiceError}</p> : null}
           {sendState?.error ? <p className="text-sm text-red-700">{sendState.error}</p> : null}
         </div>
