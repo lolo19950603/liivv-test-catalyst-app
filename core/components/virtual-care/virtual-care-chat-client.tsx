@@ -243,69 +243,68 @@ export function VirtualCareChatClient({
           </div>
 
           <form
-            className="flex flex-col gap-3 sm:flex-row sm:items-end"
+            className="flex flex-col gap-3"
             onSubmit={handleSendSubmit}
           >
             <input name="intent" type="hidden" value="send" />
-            <textarea
-              className="min-h-22 w-full resize-y rounded-xl border border-[#e0d9ce] px-3.5 py-2.5 text-sm"
-              disabled={inputLocked || Boolean(loadError)}
-              maxLength={8000}
-              name="body"
-              onChange={(event) => setDraft(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' && !event.shiftKey) {
-                  event.preventDefault();
-                  event.currentTarget.form?.requestSubmit();
-                }
-              }}
-              placeholder={
-                voice.voiceChatActive
-                  ? voice.recording
-                    ? voice.heardSpeech
-                      ? 'Listening… pause when you are done'
-                      : 'Listening… just start talking'
-                    : voice.speaking
-                      ? 'Assistant is speaking…'
-                      : 'Thinking…'
-                  : careTeamActive
-                    ? 'Message the care team…'
-                    : assistantActive
-                      ? 'Ask the store assistant…'
-                      : 'Type your message…'
-              }
-              rows={3}
-              value={draft}
-            />
-            <div className="flex items-center gap-2 sm:flex-col sm:items-stretch">
-              <ChatVoiceControls
-                compact={false}
-                enabled={assistantActive}
-                heardSpeech={voice.heardSpeech}
-                micSupported={voice.micSupported}
-                onEndVoiceChat={voice.endVoiceChat}
-                onVoiceChatPrimaryAction={voice.handleVoiceChatPrimaryAction}
-                recording={voice.recording}
-                speaking={voice.speaking}
-                transcribing={voice.transcribing}
-                voiceChatActive={voice.voiceChatActive}
-                voicePhase={voice.voicePhase}
-              />
-              <button
-                className="liivv-btn-primary px-5 py-2.5 text-sm disabled:opacity-60"
-                disabled={inputLocked || Boolean(loadError) || voice.voiceChatActive}
-                type="submit"
+            {assistantActive ? (
+              <div
+                className={`flex items-center gap-2 ${voice.voiceChatActive ? 'justify-between' : 'justify-end'}`}
               >
-                Send
-              </button>
-            </div>
+                <ChatVoiceStatus
+                  enabled={assistantActive}
+                  heardSpeech={voice.heardSpeech}
+                  voiceChatActive={voice.voiceChatActive}
+                  voicePhase={voice.voicePhase}
+                />
+                <ChatVoiceControls
+                  enabled={assistantActive}
+                  heardSpeech={voice.heardSpeech}
+                  micSupported={voice.micSupported}
+                  onEndVoiceChat={voice.endVoiceChat}
+                  onVoiceChatPrimaryAction={voice.handleVoiceChatPrimaryAction}
+                  recording={voice.recording}
+                  speaking={voice.speaking}
+                  transcribing={voice.transcribing}
+                  voiceChatActive={voice.voiceChatActive}
+                  voicePhase={voice.voicePhase}
+                />
+              </div>
+            ) : null}
+            {voice.voiceChatActive ? null : (
+              <>
+                <textarea
+                  className="min-h-22 w-full resize-y rounded-xl border border-[#e0d9ce] px-3.5 py-2.5 text-sm"
+                  disabled={inputLocked || Boolean(loadError)}
+                  maxLength={8000}
+                  name="body"
+                  onChange={(event) => setDraft(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' && !event.shiftKey) {
+                      event.preventDefault();
+                      event.currentTarget.form?.requestSubmit();
+                    }
+                  }}
+                  placeholder={
+                    careTeamActive
+                      ? 'Message the care team…'
+                      : assistantActive
+                        ? 'Ask the store assistant…'
+                        : 'Type your message…'
+                  }
+                  rows={3}
+                  value={draft}
+                />
+                <button
+                  className="liivv-btn-primary self-end px-5 py-2.5 text-sm disabled:opacity-60"
+                  disabled={inputLocked || Boolean(loadError)}
+                  type="submit"
+                >
+                  Send
+                </button>
+              </>
+            )}
           </form>
-          <ChatVoiceStatus
-            enabled={assistantActive}
-            heardSpeech={voice.heardSpeech}
-            voiceChatActive={voice.voiceChatActive}
-            voicePhase={voice.voicePhase}
-          />
           {voice.voiceError ? <p className="text-sm text-red-700">{voice.voiceError}</p> : null}
           {sendState?.error ? <p className="text-sm text-red-700">{sendState.error}</p> : null}
         </div>

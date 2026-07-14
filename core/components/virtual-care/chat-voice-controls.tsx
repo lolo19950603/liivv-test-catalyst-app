@@ -165,7 +165,7 @@ export function ChatVoiceStatus({
   }
 
   return (
-    <p className="text-sm text-[#375a37]" role="status">
+    <p className="min-w-0 flex-1 text-sm text-[#375a37]" role="status">
       {phaseLabel(voicePhase, true, heardSpeech)}
     </p>
   );

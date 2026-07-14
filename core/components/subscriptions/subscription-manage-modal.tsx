@@ -274,7 +274,9 @@ function SubscriptionManageModalShell({
 
           <div className="subscription-manage-modal__body">{children}</div>
 
-          {footer ? <footer className="subscription-manage-modal__footer">{footer}</footer> : null}
+          {footer ? (
+            <div className="subscription-manage-modal__footer">{footer}</div>
+          ) : null}
         </Dialog.Content>
 
         {isBlocking ? (
@@ -905,34 +907,23 @@ export function SubscriptionManageModal({
       <SubscriptionManageModalShell
         blockingMessage={skippingDeliveryLabel}
         contentClassName="subscription-manage-modal__content--cancel"
-        footer={
-          <div className="subscription-manage-modal__cancel-footer">
-            <button
-              className="subscription-manage-modal__footer-button"
-              disabled={isSkippingDelivery}
-              onClick={() => {
-                setStep('menu');
-                setErrorMessage(null);
-              }}
-              type="button"
-            >
-              {goBackLabel}
-            </button>
-            <button
-              className="subscription-manage-modal__footer-button"
-              disabled={confirmDisabled}
-              onClick={handleSkipDelivery}
-              type="button"
-            >
-              {confirmSkipDeliveryLabel}
-            </button>
-          </div>
-        }
         isBlocking={isSkippingDelivery}
         isOpen={isOpen}
         onClose={handleClose}
         title={skipDeliveryTitle || title}
       >
+        <button
+          className="subscription-manage-modal__back"
+          disabled={isSkippingDelivery}
+          onClick={() => {
+            setStep('menu');
+            setErrorMessage(null);
+          }}
+          type="button"
+        >
+          {goBackLabel}
+        </button>
+
         <p className="subscription-manage-modal__payment-intro">{skipDeliveryDescription}</p>
         <p className="subscription-manage-modal__payment-intro">{skipDeliveryDateLabel}</p>
 
@@ -983,6 +974,20 @@ export function SubscriptionManageModal({
         ) : null}
 
         {errorMessage ? <p className="subscription-manage-modal__error">{errorMessage}</p> : null}
+
+        <div className="subscription-manage-modal__payment-actions">
+          <Button
+            className="w-full justify-center"
+            disabled={confirmDisabled}
+            loading={isSkippingDelivery}
+            onClick={handleSkipDelivery}
+            size="medium"
+            type="button"
+            variant="primary"
+          >
+            {confirmSkipDeliveryLabel}
+          </Button>
+        </div>
       </SubscriptionManageModalShell>
     );
   }

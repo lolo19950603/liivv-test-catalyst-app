@@ -10,10 +10,11 @@ export const ARCHIVE_SLIDESHOW_SECTION_ID = 'archive-slideshow-section';
 /**
  * Section vars + color tokens. Mirrors the diabetes-care archive convention
  * (white text on dark image overlay, neutral button colors). Background defaults
- * to white; symmetric 20px vertical padding frames the carousel.
+ * to white; bottom padding is larger than top so the next section's rounded
+ * overlap does not cover the carousel controls.
  */
 export const ARCHIVE_SLIDESHOW_VARS =
-  `#${ARCHIVE_SLIDESHOW_SECTION_ID}{--section-padding-top:20px;--section-padding-bottom:20px;` +
+  `#${ARCHIVE_SLIDESHOW_SECTION_ID}{--section-padding-top:20px;--section-padding-bottom:48px;` +
   `#${ARCHIVE_SLIDESHOW_SECTION_ID} [data-dc-scroll-reveal]{overflow:hidden}` +
   `--color-foreground:255 255 255;--color-border:var(--color-foreground)/0.1;` +
   `--color-border-dark:var(--color-foreground)/0.4;` +

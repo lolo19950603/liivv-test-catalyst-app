@@ -44,7 +44,9 @@ ${LIIVV_HEADER_UTILITY_SHARED_CSS}
 body.adc-portal-active #liivv-site-header,
 body.adc-portal-active .liivv-archive-header,
 body.adc-portal-active .site-header-slideshow,
-body.adc-portal-active footer{
+body.adc-portal-active .site-footer-reveal-footer,
+body.adc-portal-active footer.site-footer-makeswift__panel,
+body.adc-portal-active .site-footer-makeswift{
   display:none!important;
 }
 body.adc-portal-active main{

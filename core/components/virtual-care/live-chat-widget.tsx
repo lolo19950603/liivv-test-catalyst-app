@@ -337,59 +337,59 @@ function AuthenticatedPanel({
       </div>
 
       <div className="border-t border-[#e8e2d8] bg-white p-3">
-        <form className="flex gap-2" onSubmit={handleSendSubmit}>
-          <input name="intent" type="hidden" value="send" />
-          <input
-            className="min-w-0 flex-1 rounded-xl border-0 bg-[#f0ebe3] px-3.5 py-3 text-sm text-[#2c2a26] outline-none placeholder:text-[#8a8176] focus:ring-2 focus:ring-[#8a9a7b]"
-            disabled={inputLocked || voice.voiceChatActive}
-            maxLength={8000}
-            name="body"
-            onChange={(event) => setDraft(event.target.value)}
-            placeholder={
-              voice.voiceChatActive
-                ? voice.recording
-                  ? voice.heardSpeech
-                    ? 'Listening… pause when done'
-                    : 'Just start talking…'
-                  : voice.speaking
-                    ? 'Speaking…'
-                    : 'Thinking…'
-                : careTeamActive
+        {assistantActive ? (
+          <div
+            className={`mb-2 flex items-center gap-2 ${voice.voiceChatActive ? 'justify-between' : 'justify-end'}`}
+          >
+            <ChatVoiceStatus
+              enabled={assistantActive}
+              heardSpeech={voice.heardSpeech}
+              voiceChatActive={voice.voiceChatActive}
+              voicePhase={voice.voicePhase}
+            />
+            <ChatVoiceControls
+              compact
+              enabled={assistantActive}
+              heardSpeech={voice.heardSpeech}
+              micSupported={voice.micSupported}
+              onEndVoiceChat={voice.endVoiceChat}
+              onVoiceChatPrimaryAction={voice.handleVoiceChatPrimaryAction}
+              recording={voice.recording}
+              speaking={voice.speaking}
+              transcribing={voice.transcribing}
+              voiceChatActive={voice.voiceChatActive}
+              voicePhase={voice.voicePhase}
+            />
+          </div>
+        ) : null}
+        {voice.voiceChatActive ? null : (
+          <form className="flex gap-2" onSubmit={handleSendSubmit}>
+            <input name="intent" type="hidden" value="send" />
+            <input
+              className="min-w-0 flex-1 rounded-xl border-0 bg-[#f0ebe3] px-3.5 py-3 text-sm text-[#2c2a26] outline-none placeholder:text-[#8a8176] focus:ring-2 focus:ring-[#8a9a7b]"
+              disabled={inputLocked}
+              maxLength={8000}
+              name="body"
+              onChange={(event) => setDraft(event.target.value)}
+              placeholder={
+                careTeamActive
                   ? 'Message the care team…'
                   : assistantActive
                     ? 'Ask the store assistant…'
                     : 'Type your message'
-            }
-            type="text"
-            value={draft}
-          />
-          <ChatVoiceControls
-            compact
-            enabled={assistantActive}
-            heardSpeech={voice.heardSpeech}
-            micSupported={voice.micSupported}
-            onEndVoiceChat={voice.endVoiceChat}
-            onVoiceChatPrimaryAction={voice.handleVoiceChatPrimaryAction}
-            recording={voice.recording}
-            speaking={voice.speaking}
-            transcribing={voice.transcribing}
-            voiceChatActive={voice.voiceChatActive}
-            voicePhase={voice.voicePhase}
-          />
-          <button
-            className="liivv-btn-primary shrink-0 rounded-xl px-4 py-3 text-sm disabled:opacity-60"
-            disabled={inputLocked || voice.voiceChatActive}
-            type="submit"
-          >
-            Send
-          </button>
-        </form>
-        <ChatVoiceStatus
-          enabled={assistantActive}
-          heardSpeech={voice.heardSpeech}
-          voiceChatActive={voice.voiceChatActive}
-          voicePhase={voice.voicePhase}
-        />
+              }
+              type="text"
+              value={draft}
+            />
+            <button
+              className="liivv-btn-primary shrink-0 rounded-xl px-4 py-3 text-sm disabled:opacity-60"
+              disabled={inputLocked}
+              type="submit"
+            >
+              Send
+            </button>
+          </form>
+        )}
         {voice.voiceError ? <p className="mt-2 text-xs text-red-700">{voice.voiceError}</p> : null}
         {sendState?.error ? <p className="mt-2 text-xs text-red-700">{sendState.error}</p> : null}
       </div>

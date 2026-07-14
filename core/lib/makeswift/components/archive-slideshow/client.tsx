@@ -473,12 +473,14 @@ export function ArchiveSlideshow({
                   // Anchored to the slideshow region (which has the explicit
                   // image height + `overflow-hidden`), so the controls always
                   // render inside the image bounds regardless of any outer
-                  // section padding. Side insets clear the `rounded-3xl`
-                  // corner curve (24 px) and the 8 px per-slide padding.
-                  className="pointer-events-none absolute bottom-6 left-0 right-0 z-10 px-10 md:bottom-10 md:px-14"
+                  // section padding. Bottom offset clears the next section's
+                  // rounded overlap (`margin-block-start: -border-radius`).
+                  // Side insets clear the `rounded-3xl` corner curve (24 px)
+                  // and the 8 px per-slide padding.
+                  className="pointer-events-none absolute bottom-12 left-0 right-0 z-10 px-10 md:bottom-16 md:px-14"
                   role="group"
                 >
-                  <div className="pointer-events-auto mx-auto flex w-[96%] items-center justify-between gap-4 border-t border-white/30 py-3 md:w-[94%] md:py-4">
+                  <div className="pointer-events-auto mx-auto flex w-[96%] items-center justify-between gap-4 border-t border-white/30 py-4 md:w-[94%] md:py-5">
                     {showArrows ? (
                       <button
                         aria-controls={ARCHIVE_SLIDESHOW_SECTION_ID}
