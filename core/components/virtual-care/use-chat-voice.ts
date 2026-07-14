@@ -461,6 +461,24 @@ export function useChatVoice({
     }
   }
 
+  function toggleSpeakReplies() {
+    setSpeakReplies((prev) => {
+      const next = !prev;
+
+      try {
+        window.localStorage.setItem(SPEAK_REPLIES_KEY, next ? '1' : '0');
+      } catch {
+        // ignore
+      }
+
+      if (!next) {
+        stopSpeaking();
+      }
+
+      return next;
+    });
+  }
+
   function rememberExistingBotMessages(messageIds: string[]) {
     for (const id of messageIds) {
       spokenMessageIdsRef.current.add(id);

@@ -214,10 +214,13 @@ export async function transcribeChatVoiceAction(
   }
 
   try {
+    const mimeType = 'type' in audio && typeof audio.type === 'string' && audio.type
+      ? audio.type
+      : 'audio/webm';
     const file =
       audio instanceof File
         ? audio
-        : new File([audio], 'voice.webm', { type: audio.type || 'audio/webm' });
+        : new File([audio], 'voice.webm', { type: mimeType });
     const text = await transcribeChatAudio(file);
 
     return { ok: true, text };
