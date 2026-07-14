@@ -1135,6 +1135,34 @@ export function SubscriptionManageModal({
               {editPaymentLabel}
             </button>
           )}
+
+          {canSkipDelivery ? (
+            <div className="subscription-manage-modal__detail-row">
+              <span className="subscription-manage-modal__detail-icon" aria-hidden>
+                <SkipForward className="size-4" strokeWidth={1.75} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="subscription-manage-modal__detail-label">{skipDeliveryLabel}</p>
+                  <button
+                    className="subscription-manage-modal__text-action"
+                    onClick={() => setStep('skip')}
+                    type="button"
+                  >
+                    <SkipForward className="size-3.5" strokeWidth={1.75} />
+                    <span>{skipDeliveryLabel}</span>
+                  </button>
+                </div>
+                <p className="subscription-manage-modal__detail-value">
+                  {subscription?.skippableDeliveries?.find((option) => option.isNext)?.label
+                    ? `${skipDeliveryNextLabel}: ${
+                        subscription.skippableDeliveries.find((option) => option.isNext)?.label
+                      }`
+                    : skipDeliveryDateLabel}
+                </p>
+              </div>
+            </div>
+          ) : null}
         </div>
 
         {errorMessage ? <p className="subscription-manage-modal__error">{errorMessage}</p> : null}
