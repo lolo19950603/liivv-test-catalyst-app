@@ -186,7 +186,7 @@ export function VirtualCareChatClient({
           ) : assistantActive ? (
             <div className="rounded-lg border border-[#d4dfc8] bg-[#f8faf6] px-4 py-3 text-sm text-[#3d4a36]">
               This assistant helps with store and account questions only — not medical advice. Tap
-              Voice chat to talk hands-free.
+              Voice chat once, then talk naturally — pause when finished, and tap End to stop.
             </div>
           ) : escalatedToPharmacistAt ? (
             <div className="rounded-lg border border-[#d4dfc8] bg-[#f8faf6] px-4 py-3 text-sm text-[#3d4a36]">
@@ -262,10 +262,12 @@ export function VirtualCareChatClient({
               placeholder={
                 voice.voiceChatActive
                   ? voice.recording
-                    ? 'Listening… tap Done when finished'
+                    ? voice.heardSpeech
+                      ? 'Listening… pause when you are done'
+                      : 'Listening… just start talking'
                     : voice.speaking
                       ? 'Assistant is speaking…'
-                      : 'Voice chat active…'
+                      : 'Thinking…'
                   : careTeamActive
                     ? 'Message the care team…'
                     : assistantActive
@@ -277,8 +279,9 @@ export function VirtualCareChatClient({
             />
             <div className="flex items-center gap-2 sm:flex-col sm:items-stretch">
               <ChatVoiceControls
-                disabled={inputLocked || Boolean(loadError)}
+                compact={false}
                 enabled={assistantActive}
+                heardSpeech={voice.heardSpeech}
                 micSupported={voice.micSupported}
                 onEndVoiceChat={voice.endVoiceChat}
                 onVoiceChatPrimaryAction={voice.handleVoiceChatPrimaryAction}
@@ -299,6 +302,7 @@ export function VirtualCareChatClient({
           </form>
           <ChatVoiceStatus
             enabled={assistantActive}
+            heardSpeech={voice.heardSpeech}
             voiceChatActive={voice.voiceChatActive}
             voicePhase={voice.voicePhase}
           />

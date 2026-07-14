@@ -34,13 +34,13 @@ function PhoneHangupIcon({ className }: { className?: string }) {
   );
 }
 
-function phaseLabel(phase: VoiceChatPhase, voiceChatActive: boolean): string {
+function phaseLabel(phase: VoiceChatPhase, voiceChatActive: boolean, heardSpeech: boolean): string {
   if (!voiceChatActive) {
     return 'Voice chat';
   }
 
   if (phase === 'listening') {
-    return 'Listening… tap when done';
+    return heardSpeech ? 'Listening… pause when finished' : 'Listening… just start talking';
   }
 
   if (phase === 'thinking') {
@@ -51,17 +51,17 @@ function phaseLabel(phase: VoiceChatPhase, voiceChatActive: boolean): string {
     return 'Speaking…';
   }
 
-  return 'Your turn — tap to talk';
+  return 'Connecting…';
 }
 
 export function ChatVoiceControls({
   enabled,
-  disabled,
   compact,
   micSupported,
   recording,
   transcribing,
   speaking,
+  heardSpeech,
   voiceChatActive,
   voicePhase,
   onVoiceChatPrimaryAction,
@@ -74,6 +74,7 @@ export function ChatVoiceControls({
   recording: boolean;
   transcribing: boolean;
   speaking: boolean;
+  heardSpeech: boolean;
   voiceChatActive: boolean;
   voicePhase: VoiceChatPhase;
   onVoiceChatPrimaryAction: () => void;
@@ -83,54 +84,36 @@ export function ChatVoiceControls({
     return null;
   }
 
-  const busyThinking = Boolean(disabled) || transcribing || speaking;
-  const primaryDisabled = !micSupported || (voiceChatActive && busyThinking && !recording);
   const buttonClass = compact
     ? 'inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl px-3 text-sm font-medium transition disabled:opacity-50'
     : 'inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-xl px-3 text-sm font-medium transition disabled:opacity-50';
 
-  const activeClass = recording
-    ? 'border border-red-300 bg-red-50 text-red-700'
-    : voiceChatActive
-      ? 'border border-[#8a9a7b] bg-[#f4f7f0] text-[#375a37]'
-      : 'border border-[#d8d1c6] bg-white text-[#2c2a26] hover:bg-[#f7f4ef]';
-
-  return (
-    <div className={`flex shrink-0 items-center gap-2 ${compact ? '' : 'flex-wrap'}`}>
-      <button
-        aria-label={phaseLabel(voicePhase, voiceChatActive)}
-        aria-pressed={voiceChatActive}
-        className={`${buttonClass} ${activeClass} ${compact ? 'min-w-11' : ''}`}
-        disabled={primaryDisabled}
-        onClick={onVoiceChatPrimaryAction}
-        title={
-          !micSupported
-            ? 'Voice chat is not supported in this browser'
-            : phaseLabel(voicePhase, voiceChatActive)
-        }
-        type="button"
-      >
-        {transcribing || (voiceChatActive && disabled && !recording && !speaking) ? (
-          <span className="h-3.5 w-3.5 animate-pulse rounded-full bg-current" />
-        ) : (
-          <MicIcon />
-        )}
-        {!compact || voiceChatActive ? (
-          <span className={compact ? 'max-w-[7.5rem] truncate text-xs' : ''}>
-            {voiceChatActive
-              ? recording
-                ? 'Done'
-                : speaking
-                  ? 'Speaking'
-                  : transcribing || disabled
-                    ? 'Wait'
-                    : 'Talk'
-              : 'Voice chat'}
-          </span>
-        ) : null}
-      </button>
-
-      {voiceChatActive ? (
+  if (voiceChatActive) {
+    return (
+      <div className="flex shrink-0 items-center gap-2">
+        <div
+          aria-live="polite"
+          className={`${buttonClass} ${
+            recording
+              ? 'border border-red-300 bg-red-50 text-red-700'
+              : 'border border-[#8a9a7b] bg-[#f4f7f0] text-[#375a37]'
+          } ${compact ? 'min-w-11' : ''}`}
+        >
+          {transcribing || speaking || (!recording && voicePhase === 'thinking') ? (
+            <span className="h-3.5 w-3.5 animate-pulse rounded-full bg-current" />
+          ) : (
+            <MicIcon className={recording && heardSpeech ? 'animate-pulse' : undefined} />
+          )}
+          {!compact ? (
+            <span>
+              {recording ? 'Listening' : speaking ? 'Speaking' : transcribing ? 'Thinking' : 'Voice'}
+            </span>
+          ) : (
+            <span className="max-w-[5.5rem] truncate text-xs">
+              {recording ? 'Live' : speaking ? 'Reply' : 'Wait'}
+            </span>
+          )}
+        </div>
         <button
           aria-label="End voice chat"
           className={`${buttonClass} border border-[#d8d1c6] bg-white text-[#2c2a26] hover:bg-[#f7f4ef] ${compact ? 'w-11 px-0' : ''}`}
@@ -141,7 +124,27 @@ export function ChatVoiceControls({
           <PhoneHangupIcon />
           {compact ? null : <span>End</span>}
         </button>
-      ) : null}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex shrink-0 items-center gap-2">
+      <button
+        aria-label="Start voice chat"
+        className={`${buttonClass} border border-[#d8d1c6] bg-white text-[#2c2a26] hover:bg-[#f7f4ef]`}
+        disabled={!micSupported}
+        onClick={onVoiceChatPrimaryAction}
+        title={
+          !micSupported
+            ? 'Voice chat is not supported in this browser'
+            : 'Start continuous voice chat'
+        }
+        type="button"
+      >
+        <MicIcon />
+        <span className={compact ? 'text-xs' : undefined}>Voice chat</span>
+      </button>
     </div>
   );
 }
@@ -150,10 +153,12 @@ export function ChatVoiceStatus({
   enabled,
   voiceChatActive,
   voicePhase,
+  heardSpeech,
 }: {
   enabled: boolean;
   voiceChatActive: boolean;
   voicePhase: VoiceChatPhase;
+  heardSpeech: boolean;
 }) {
   if (!enabled || !voiceChatActive) {
     return null;
@@ -161,7 +166,7 @@ export function ChatVoiceStatus({
 
   return (
     <p className="text-sm text-[#375a37]" role="status">
-      {phaseLabel(voicePhase, true)}
+      {phaseLabel(voicePhase, true, heardSpeech)}
     </p>
   );
 }

@@ -348,10 +348,12 @@ function AuthenticatedPanel({
             placeholder={
               voice.voiceChatActive
                 ? voice.recording
-                  ? 'Listening… tap Done'
+                  ? voice.heardSpeech
+                    ? 'Listening… pause when done'
+                    : 'Just start talking…'
                   : voice.speaking
                     ? 'Speaking…'
-                    : 'Voice chat…'
+                    : 'Thinking…'
                 : careTeamActive
                   ? 'Message the care team…'
                   : assistantActive
@@ -363,8 +365,8 @@ function AuthenticatedPanel({
           />
           <ChatVoiceControls
             compact
-            disabled={inputLocked}
             enabled={assistantActive}
+            heardSpeech={voice.heardSpeech}
             micSupported={voice.micSupported}
             onEndVoiceChat={voice.endVoiceChat}
             onVoiceChatPrimaryAction={voice.handleVoiceChatPrimaryAction}
@@ -384,6 +386,7 @@ function AuthenticatedPanel({
         </form>
         <ChatVoiceStatus
           enabled={assistantActive}
+          heardSpeech={voice.heardSpeech}
           voiceChatActive={voice.voiceChatActive}
           voicePhase={voice.voicePhase}
         />

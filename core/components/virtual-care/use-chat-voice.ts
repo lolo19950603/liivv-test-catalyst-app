@@ -8,7 +8,11 @@ import {
 } from '~/app/[locale]/(default)/account/(portal)/virtual-care/_actions/virtual-care-actions';
 
 const SPEAK_REPLIES_KEY = 'liivv-chat-speak-replies';
-const MAX_RECORD_MS = 60_000;
+const MAX_RECORD_MS = 45_000;
+const SILENCE_MS = 1_350;
+const MIN_SPEECH_MS = 500;
+const SPEECH_RMS = 0.018;
+const ANALYSIS_INTERVAL_MS = 50;
 
 export type VoiceChatPhase = 'idle' | 'listening' | 'thinking' | 'speaking';
 
@@ -20,6 +24,19 @@ function pickRecorderMimeType(): string | undefined {
   const candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'];
 
   return candidates.find((type) => MediaRecorder.isTypeSupported(type));
+}
+
+function getRms(analyser: AnalyserNode, buffer: Float32Array): number {
+  analyser.getFloatTimeDomainData(buffer);
+
+  let sum = 0;
+
+  for (let i = 0; i < buffer.length; i += 1) {
+    const sample = buffer[i] ?? 0;
+    sum += sample * sample;
+  }
+
+  return Math.sqrt(sum / buffer.length);
 }
 
 export function useChatVoice({
@@ -39,6 +56,7 @@ export function useChatVoice({
   const [speaking, setSpeaking] = useState(false);
   const [speakReplies, setSpeakReplies] = useState(false);
   const [voiceChatActive, setVoiceChatActive] = useState(false);
+  const [heardSpeech, setHeardSpeech] = useState(false);
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const [micSupported, setMicSupported] = useState(false);
 
@@ -46,15 +64,32 @@ export function useChatVoice({
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const recordTimerRef = useRef<number | null>(null);
+  const vadTimerRef = useRef<number | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioUrlRef = useRef<string | null>(null);
   const spokenMessageIdsRef = useRef<Set<string>>(new Set());
   const voiceChatActiveRef = useRef(false);
   const cancellingVoiceTurnRef = useRef(false);
   const listenAfterSpeakRef = useRef(false);
+  const heardSpeechRef = useRef(false);
+  const speechStartedAtRef = useRef<number | null>(null);
+  const lastLoudAtRef = useRef<number | null>(null);
+  const enabledRef = useRef(enabled);
+  const disabledRef = useRef(Boolean(disabled));
+  const recordingRef = useRef(false);
+  const transcribingRef = useRef(false);
+  const speakingRef = useRef(false);
 
   const applyTranscript = useEffectEvent(onTranscript);
   const applyVoiceTurn = useEffectEvent((text: string) => onVoiceTurn?.(text));
+
+  enabledRef.current = enabled;
+  disabledRef.current = Boolean(disabled);
+  recordingRef.current = recording;
+  transcribingRef.current = transcribing;
+  speakingRef.current = speaking;
 
   const voicePhase: VoiceChatPhase = recording
     ? 'listening'
@@ -86,42 +121,199 @@ export function useChatVoice({
   }, [enabled]);
 
   useEffect(() => {
+    if (
+      !voiceChatActive ||
+      !enabled ||
+      disabled ||
+      recording ||
+      transcribing ||
+      speaking
+    ) {
+      return;
+    }
+
+    const id = window.setTimeout(() => {
+      void startListeningTurn();
+    }, 700);
+
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- resume listening if a turn stalls
+  }, [voiceChatActive, enabled, disabled, recording, transcribing, speaking]);
+
+  useEffect(() => {
     return () => {
-      if (recordTimerRef.current !== null) {
-        window.clearTimeout(recordTimerRef.current);
-      }
-
-      streamRef.current?.getTracks().forEach((track) => track.stop());
-      mediaRecorderRef.current = null;
-
-      if (audioUrlRef.current) {
-        URL.revokeObjectURL(audioUrlRef.current);
-      }
-
-      audioRef.current?.pause();
+      teardownSession();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- unmount only
   }, []);
+
+  function clearRecordTimer() {
+    if (recordTimerRef.current !== null) {
+      window.clearTimeout(recordTimerRef.current);
+      recordTimerRef.current = null;
+    }
+  }
+
+  function clearVadTimer() {
+    if (vadTimerRef.current !== null) {
+      window.clearInterval(vadTimerRef.current);
+      vadTimerRef.current = null;
+    }
+  }
+
+  function stopAnalyser() {
+    clearVadTimer();
+    analyserRef.current = null;
+
+    if (audioContextRef.current) {
+      void audioContextRef.current.close().catch(() => undefined);
+      audioContextRef.current = null;
+    }
+  }
 
   function stopTracks() {
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
   }
 
+  function teardownSession() {
+    clearRecordTimer();
+    clearVadTimer();
+    stopAnalyser();
+
+    const recorder = mediaRecorderRef.current;
+
+    if (recorder && recorder.state === 'recording') {
+      cancellingVoiceTurnRef.current = true;
+      recorder.stop();
+    }
+
+    mediaRecorderRef.current = null;
+    chunksRef.current = [];
+    stopTracks();
+
+    if (audioUrlRef.current) {
+      URL.revokeObjectURL(audioUrlRef.current);
+      audioUrlRef.current = null;
+    }
+
+    audioRef.current?.pause();
+    audioRef.current = null;
+    setRecording(false);
+    setSpeaking(false);
+    setHeardSpeech(false);
+  }
+
+  async function ensureMicStream(): Promise<MediaStream> {
+    if (streamRef.current) {
+      const live = streamRef.current.getAudioTracks().some((track) => track.readyState === 'live');
+
+      if (live) {
+        return streamRef.current;
+      }
+
+      stopTracks();
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+      },
+    });
+
+    streamRef.current = stream;
+
+    return stream;
+  }
+
+  function startVad(stream: MediaStream) {
+    stopAnalyser();
+
+    const AudioContextCtor = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+
+    if (!AudioContextCtor) {
+      return;
+    }
+
+    const audioContext = new AudioContextCtor();
+    const source = audioContext.createMediaStreamSource(stream);
+    const analyser = audioContext.createAnalyser();
+
+    analyser.fftSize = 2048;
+    source.connect(analyser);
+
+    audioContextRef.current = audioContext;
+    analyserRef.current = analyser;
+    heardSpeechRef.current = false;
+    speechStartedAtRef.current = null;
+    lastLoudAtRef.current = null;
+    setHeardSpeech(false);
+
+    const buffer = new Float32Array(analyser.fftSize);
+
+    void audioContext.resume().catch(() => undefined);
+
+    vadTimerRef.current = window.setInterval(() => {
+      if (!analyserRef.current || !voiceChatActiveRef.current || !recordingRef.current) {
+        return;
+      }
+
+      const rms = getRms(analyserRef.current, buffer);
+      const now = Date.now();
+
+      if (rms >= SPEECH_RMS) {
+        if (!heardSpeechRef.current) {
+          heardSpeechRef.current = true;
+          speechStartedAtRef.current = now;
+          setHeardSpeech(true);
+        }
+
+        lastLoudAtRef.current = now;
+        return;
+      }
+
+      if (!heardSpeechRef.current || !speechStartedAtRef.current || !lastLoudAtRef.current) {
+        return;
+      }
+
+      const spokeLongEnough = now - speechStartedAtRef.current >= MIN_SPEECH_MS;
+      const silentLongEnough = now - lastLoudAtRef.current >= SILENCE_MS;
+
+      if (spokeLongEnough && silentLongEnough) {
+        stopRecording();
+      }
+    }, ANALYSIS_INTERVAL_MS);
+  }
+
   async function finishRecording(recorder: MediaRecorder) {
     const mimeType = recorder.mimeType || 'audio/webm';
     const blob = new Blob(chunksRef.current, { type: mimeType });
+    const hadSpeech = heardSpeechRef.current;
 
     chunksRef.current = [];
-    stopTracks();
+    mediaRecorderRef.current = null;
+    clearRecordTimer();
+    stopAnalyser();
     setRecording(false);
+    setHeardSpeech(false);
+    heardSpeechRef.current = false;
+    speechStartedAtRef.current = null;
+    lastLoudAtRef.current = null;
 
     if (cancellingVoiceTurnRef.current) {
       cancellingVoiceTurnRef.current = false;
       return;
     }
 
-    if (!blob.size) {
-      setVoiceError('No audio captured. Please try again.');
+    if (!hadSpeech || !blob.size) {
+      if (voiceChatActiveRef.current && enabledRef.current) {
+        window.setTimeout(() => {
+          void startListeningTurn();
+        }, 250);
+      }
+
       return;
     }
 
@@ -138,28 +330,67 @@ export function useChatVoice({
 
       if (!result.ok) {
         setVoiceError(result.error);
+
+        if (voiceChatActiveRef.current && enabledRef.current) {
+          window.setTimeout(() => {
+            void startListeningTurn();
+          }, 600);
+        }
+
+        return;
+      }
+
+      const text = result.text.trim();
+
+      if (!text) {
+        if (voiceChatActiveRef.current && enabledRef.current) {
+          window.setTimeout(() => {
+            void startListeningTurn();
+          }, 250);
+        }
+
         return;
       }
 
       if (voiceChatActiveRef.current) {
-        const sent = applyVoiceTurn(result.text);
+        const sent = applyVoiceTurn(text);
 
         if (sent === false) {
-          applyTranscript(result.text);
+          applyTranscript(text);
           setVoiceError('Could not send that message. Try again.');
+
+          if (voiceChatActiveRef.current && enabledRef.current) {
+            window.setTimeout(() => {
+              void startListeningTurn();
+            }, 600);
+          }
         }
       } else {
-        applyTranscript(result.text);
+        applyTranscript(text);
       }
     } catch {
       setVoiceError('Could not transcribe that recording.');
+
+      if (voiceChatActiveRef.current && enabledRef.current) {
+        window.setTimeout(() => {
+          void startListeningTurn();
+        }, 600);
+      }
     } finally {
       setTranscribing(false);
     }
   }
 
-  async function startRecording() {
-    if (!enabled || disabled || recording || transcribing || speaking || !micSupported) {
+  async function startListeningTurn() {
+    if (
+      !enabledRef.current ||
+      !voiceChatActiveRef.current ||
+      disabledRef.current ||
+      recordingRef.current ||
+      transcribingRef.current ||
+      speakingRef.current ||
+      !micSupported
+    ) {
       return;
     }
 
@@ -167,13 +398,12 @@ export function useChatVoice({
     cancellingVoiceTurnRef.current = false;
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await ensureMicStream();
       const mimeType = pickRecorderMimeType();
       const recorder = mimeType
         ? new MediaRecorder(stream, { mimeType })
         : new MediaRecorder(stream);
 
-      streamRef.current = stream;
       mediaRecorderRef.current = recorder;
       chunksRef.current = [];
 
@@ -187,35 +417,29 @@ export function useChatVoice({
         void finishRecording(recorder);
       };
 
-      recorder.start();
+      recorder.start(250);
       setRecording(true);
+      recordingRef.current = true;
+      startVad(stream);
 
-      if (recordTimerRef.current !== null) {
-        window.clearTimeout(recordTimerRef.current);
-      }
-
+      clearRecordTimer();
       recordTimerRef.current = window.setTimeout(() => {
         if (mediaRecorderRef.current?.state === 'recording') {
-          mediaRecorderRef.current.stop();
+          stopRecording();
         }
       }, MAX_RECORD_MS);
     } catch {
       stopTracks();
       setRecording(false);
       setVoiceError('Microphone access is required for voice chat.');
-      if (voiceChatActiveRef.current) {
-        voiceChatActiveRef.current = false;
-        setVoiceChatActive(false);
-      }
+      voiceChatActiveRef.current = false;
+      setVoiceChatActive(false);
     }
   }
 
   function stopRecording({ cancel = false }: { cancel?: boolean } = {}) {
-    if (recordTimerRef.current !== null) {
-      window.clearTimeout(recordTimerRef.current);
-      recordTimerRef.current = null;
-    }
-
+    clearRecordTimer();
+    clearVadTimer();
     cancellingVoiceTurnRef.current = cancel;
 
     const recorder = mediaRecorderRef.current;
@@ -223,18 +447,8 @@ export function useChatVoice({
     if (recorder && recorder.state === 'recording') {
       recorder.stop();
     } else {
-      stopTracks();
       setRecording(false);
     }
-  }
-
-  function toggleRecording() {
-    if (recording) {
-      stopRecording();
-      return;
-    }
-
-    void startRecording();
   }
 
   function setSpeakRepliesPersisted(next: boolean) {
@@ -245,24 +459,6 @@ export function useChatVoice({
     } catch {
       // ignore
     }
-  }
-
-  function toggleSpeakReplies() {
-    setSpeakReplies((prev) => {
-      const next = !prev;
-
-      try {
-        window.localStorage.setItem(SPEAK_REPLIES_KEY, next ? '1' : '0');
-      } catch {
-        // ignore
-      }
-
-      if (!next) {
-        stopSpeaking();
-      }
-
-      return next;
-    });
   }
 
   function rememberExistingBotMessages(messageIds: string[]) {
@@ -281,6 +477,7 @@ export function useChatVoice({
     }
 
     setSpeaking(false);
+    speakingRef.current = false;
   }
 
   async function speakText(text: string, messageId?: string) {
@@ -295,6 +492,7 @@ export function useChatVoice({
     stopSpeaking();
     setVoiceError(null);
     setSpeaking(true);
+    speakingRef.current = true;
     listenAfterSpeakRef.current = voiceChatActiveRef.current;
 
     try {
@@ -302,7 +500,15 @@ export function useChatVoice({
 
       if (!result.ok) {
         setSpeaking(false);
+        speakingRef.current = false;
         setVoiceError(result.error);
+
+        if (voiceChatActiveRef.current && enabledRef.current) {
+          window.setTimeout(() => {
+            void startListeningTurn();
+          }, 500);
+        }
+
         return;
       }
 
@@ -322,26 +528,44 @@ export function useChatVoice({
       audioRef.current = audio;
       audio.onended = () => {
         setSpeaking(false);
+        speakingRef.current = false;
 
         if (audioUrlRef.current === url) {
           URL.revokeObjectURL(url);
           audioUrlRef.current = null;
         }
 
-        if (listenAfterSpeakRef.current && voiceChatActiveRef.current && enabled) {
+        if (listenAfterSpeakRef.current && voiceChatActiveRef.current && enabledRef.current) {
           listenAfterSpeakRef.current = false;
-          void startRecording();
+          // Brief gap so TTS echo doesn't trip VAD.
+          window.setTimeout(() => {
+            void startListeningTurn();
+          }, 400);
         }
       };
       audio.onerror = () => {
         setSpeaking(false);
+        speakingRef.current = false;
         setVoiceError('Could not play the voice reply.');
+
+        if (voiceChatActiveRef.current && enabledRef.current) {
+          window.setTimeout(() => {
+            void startListeningTurn();
+          }, 500);
+        }
       };
 
       await audio.play();
     } catch {
       setSpeaking(false);
+      speakingRef.current = false;
       setVoiceError('Could not play the voice reply.');
+
+      if (voiceChatActiveRef.current && enabledRef.current) {
+        window.setTimeout(() => {
+          void startListeningTurn();
+        }, 500);
+      }
     }
   }
 
@@ -368,15 +592,15 @@ export function useChatVoice({
     setVoiceChatActive(true);
     setSpeakRepliesPersisted(true);
     setVoiceError(null);
-    void startRecording();
+    void startListeningTurn();
   }
 
   function endVoiceChat() {
     voiceChatActiveRef.current = false;
     setVoiceChatActive(false);
     listenAfterSpeakRef.current = false;
-    stopRecording({ cancel: recording });
     stopSpeaking();
+    teardownSession();
   }
 
   function toggleVoiceChat() {
@@ -388,23 +612,9 @@ export function useChatVoice({
     startVoiceChat();
   }
 
-  /** While voice chat is listening, tap again to finish the turn. */
+  /** Start continuous voice chat, or end it if already active. */
   function handleVoiceChatPrimaryAction() {
-    if (!voiceChatActive) {
-      startVoiceChat();
-      return;
-    }
-
-    if (recording) {
-      stopRecording();
-      return;
-    }
-
-    if (speaking || transcribing || disabled) {
-      return;
-    }
-
-    void startRecording();
+    toggleVoiceChat();
   }
 
   return {
@@ -412,13 +622,13 @@ export function useChatVoice({
     recording,
     transcribing,
     speaking,
+    heardSpeech,
     speakReplies,
     voiceChatActive,
     voicePhase,
     voiceError,
     voiceBusy: recording || transcribing || speaking,
     clearVoiceError: () => setVoiceError(null),
-    toggleRecording,
     toggleSpeakReplies,
     toggleVoiceChat,
     handleVoiceChatPrimaryAction,
