@@ -57,6 +57,7 @@ function phaseLabel(phase: VoiceChatPhase, voiceChatActive: boolean, heardSpeech
 export function ChatVoiceControls({
   enabled,
   compact,
+  appearance = 'default',
   micSupported,
   recording,
   transcribing,
@@ -70,6 +71,7 @@ export function ChatVoiceControls({
   enabled: boolean;
   disabled?: boolean;
   compact?: boolean;
+  appearance?: 'default' | 'header';
   micSupported: boolean;
   recording: boolean;
   transcribing: boolean;
@@ -82,6 +84,52 @@ export function ChatVoiceControls({
 }) {
   if (!enabled) {
     return null;
+  }
+
+  if (appearance === 'header') {
+    if (voiceChatActive) {
+      return (
+        <div className="flex shrink-0 items-center gap-0.5">
+          <span
+            aria-live="polite"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-white"
+            title={phaseLabel(voicePhase, true, heardSpeech)}
+          >
+            {transcribing || speaking || (!recording && voicePhase === 'thinking') ? (
+              <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-white" />
+            ) : (
+              <MicIcon className={recording ? 'animate-pulse text-red-300' : undefined} />
+            )}
+          </span>
+          <button
+            aria-label="End voice chat"
+            className="rounded-md p-1.5 text-white/90 hover:bg-white/10"
+            onClick={onEndVoiceChat}
+            title="End voice chat"
+            type="button"
+          >
+            <PhoneHangupIcon />
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <button
+        aria-label="Start voice chat"
+        className="rounded-md p-1.5 text-white/90 hover:bg-white/10 disabled:opacity-40"
+        disabled={!micSupported}
+        onClick={onVoiceChatPrimaryAction}
+        title={
+          !micSupported
+            ? 'Voice chat is not supported in this browser'
+            : 'Start continuous voice chat'
+        }
+        type="button"
+      >
+        <MicIcon />
+      </button>
+    );
   }
 
   const buttonClass = compact

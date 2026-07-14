@@ -146,6 +146,90 @@ function GuestPanel({ onClose }: { onClose: () => void }) {
   );
 }
 
+function phaseLabelForHeader(
+  phase: 'idle' | 'listening' | 'thinking' | 'speaking',
+  heardSpeech: boolean,
+): string {
+  if (phase === 'listening') {
+    return heardSpeech ? 'Listening…' : 'Listening… speak now';
+  }
+
+  if (phase === 'thinking') {
+    return 'Thinking…';
+  }
+
+  if (phase === 'speaking') {
+    return 'Speaking…';
+  }
+
+  return 'Voice chat';
+}
+
+function LiveChatHeader({
+  onClose,
+  subtitle,
+  voice,
+}: {
+  onClose: () => void;
+  subtitle: string;
+  voice?: {
+    enabled: boolean;
+    heardSpeech: boolean;
+    micSupported: boolean;
+    onEndVoiceChat: () => void;
+    onVoiceChatPrimaryAction: () => void;
+    recording: boolean;
+    speaking: boolean;
+    transcribing: boolean;
+    voiceChatActive: boolean;
+    voicePhase: 'idle' | 'listening' | 'thinking' | 'speaking';
+  } | null;
+}) {
+  return (
+    <header className="flex shrink-0 items-center justify-between gap-3 bg-[#2c2a26] px-4 py-3 text-white">
+      <div className="flex min-w-0 items-center gap-2.5">
+        <span
+          aria-hidden="true"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#375a37] text-[11px] font-bold"
+        >
+          L
+        </span>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold">Live Chat</p>
+          <p className="truncate text-[11px] text-white/70">{subtitle}</p>
+        </div>
+      </div>
+      <div className="flex shrink-0 items-center gap-0.5">
+        {voice ? (
+          <ChatVoiceControls
+            appearance="header"
+            enabled={voice.enabled}
+            heardSpeech={voice.heardSpeech}
+            micSupported={voice.micSupported}
+            onEndVoiceChat={voice.onEndVoiceChat}
+            onVoiceChatPrimaryAction={voice.onVoiceChatPrimaryAction}
+            recording={voice.recording}
+            speaking={voice.speaking}
+            transcribing={voice.transcribing}
+            voiceChatActive={voice.voiceChatActive}
+            voicePhase={voice.voicePhase}
+          />
+        ) : null}
+        <button
+          aria-label="Minimize chat"
+          className="rounded-md p-1.5 text-white/90 hover:bg-white/10"
+          onClick={onClose}
+          type="button"
+        >
+          <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 24 24" width="18">
+            <path d="M6 14h12" stroke="currentColor" strokeLinecap="round" strokeWidth="1.75" />
+          </svg>
+        </button>
+      </div>
+    </header>
+  );
+}
+
 function AuthenticatedPanel({
   data,
   onClose,
@@ -249,31 +333,67 @@ function AuthenticatedPanel({
 
   if (!data || !supabaseReady) {
     return (
-      <div className="flex h-full flex-col bg-[#f4f4f4] p-4">
-        <div className="rounded-2xl border border-dashed border-[#c4b8a8] bg-white px-4 py-6 text-sm text-[#5c564c]">
-          <p className="font-medium text-[#2c2a26]">Chat is temporarily unavailable</p>
-          <p className="mt-2">Please try again later, or visit Virtual care from your account.</p>
-          <Link
-            className="mt-4 inline-flex text-sm font-medium text-[#375a37] hover:underline"
-            href="/account/virtual-care"
+      <div className="flex h-full flex-col">
+        <LiveChatHeader
+          onClose={onClose}
+          subtitle="Temporarily unavailable"
+        />
+        <div className="flex flex-1 flex-col bg-[#f4f4f4] p-4">
+          <div className="rounded-2xl border border-dashed border-[#c4b8a8] bg-white px-4 py-6 text-sm text-[#5c564c]">
+            <p className="font-medium text-[#2c2a26]">Chat is temporarily unavailable</p>
+            <p className="mt-2">Please try again later, or visit Virtual care from your account.</p>
+            <Link
+              className="mt-4 inline-flex text-sm font-medium text-[#375a37] hover:underline"
+              href="/account/virtual-care"
+            >
+              Go to Virtual care →
+            </Link>
+          </div>
+          <button
+            className="mt-auto pt-4 text-center text-xs text-[#6b6560] hover:underline"
+            onClick={onClose}
+            type="button"
           >
-            Go to Virtual care →
-          </Link>
+            Close
+          </button>
         </div>
-        <button
-          className="mt-auto pt-4 text-center text-xs text-[#6b6560] hover:underline"
-          onClick={onClose}
-          type="button"
-        >
-          Close
-        </button>
       </div>
     );
   }
 
+  const subtitle = careTeamActive
+    ? 'Care team'
+    : escalatedToPharmacistAt
+      ? 'Pharmacist requested'
+      : assistantActive
+        ? voice.voiceChatActive
+          ? phaseLabelForHeader(voice.voicePhase, voice.heardSpeech)
+          : 'Store assistant'
+        : 'Care team';
+
   return (
     <div className="flex h-full flex-col">
-      <div className="flex-1 space-y-3 overflow-y-auto bg-[#f4f4f4] p-4" ref={scrollRef}>
+      <LiveChatHeader
+        onClose={onClose}
+        subtitle={subtitle}
+        voice={
+          assistantActive
+            ? {
+                enabled: true,
+                heardSpeech: voice.heardSpeech,
+                micSupported: voice.micSupported,
+                onEndVoiceChat: voice.endVoiceChat,
+                onVoiceChatPrimaryAction: voice.handleVoiceChatPrimaryAction,
+                recording: voice.recording,
+                speaking: voice.speaking,
+                transcribing: voice.transcribing,
+                voiceChatActive: voice.voiceChatActive,
+                voicePhase: voice.voicePhase,
+              }
+            : null
+        }
+      />
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-[#f4f4f4] p-4" ref={scrollRef}>
         {careTeamActive ? (
           <div className="rounded-xl border border-[#c5ccd4] bg-[#f4f6f8] px-3 py-2.5 text-xs text-[#3d4a36]">
             You&apos;re connected with a care team member. They&apos;ll reply here when available.
@@ -337,32 +457,14 @@ function AuthenticatedPanel({
       </div>
 
       <div className="border-t border-[#e8e2d8] bg-white p-3">
-        {assistantActive ? (
-          <div
-            className={`mb-2 flex items-center gap-2 ${voice.voiceChatActive ? 'justify-between' : 'justify-end'}`}
-          >
-            <ChatVoiceStatus
-              enabled={assistantActive}
-              heardSpeech={voice.heardSpeech}
-              voiceChatActive={voice.voiceChatActive}
-              voicePhase={voice.voicePhase}
-            />
-            <ChatVoiceControls
-              compact
-              enabled={assistantActive}
-              heardSpeech={voice.heardSpeech}
-              micSupported={voice.micSupported}
-              onEndVoiceChat={voice.endVoiceChat}
-              onVoiceChatPrimaryAction={voice.handleVoiceChatPrimaryAction}
-              recording={voice.recording}
-              speaking={voice.speaking}
-              transcribing={voice.transcribing}
-              voiceChatActive={voice.voiceChatActive}
-              voicePhase={voice.voicePhase}
-            />
-          </div>
-        ) : null}
-        {voice.voiceChatActive ? null : (
+        {voice.voiceChatActive ? (
+          <ChatVoiceStatus
+            enabled={assistantActive}
+            heardSpeech={voice.heardSpeech}
+            voiceChatActive={voice.voiceChatActive}
+            voicePhase={voice.voicePhase}
+          />
+        ) : (
           <form className="flex gap-2" onSubmit={handleSendSubmit}>
             <input name="intent" type="hidden" value="send" />
             <input
@@ -586,6 +688,8 @@ export function LiveChatWidget() {
     setOpen(true);
   };
 
+  const showOuterHeader = !sessionReady || !isLoggedIn;
+
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[60] flex justify-end p-4 sm:p-5">
       {open ? (
@@ -594,49 +698,16 @@ export function LiveChatWidget() {
           className="pointer-events-auto flex h-[min(640px,calc(100vh-5.5rem))] w-[min(100%,380px)] flex-col overflow-hidden rounded-t-2xl border border-[#e5dfd5] bg-white shadow-[0_12px_40px_rgba(44,42,38,0.18)]"
           role="dialog"
         >
-          <header className="flex shrink-0 items-center justify-between gap-3 bg-[#2c2a26] px-4 py-3 text-white">
-            <div className="flex min-w-0 items-center gap-2.5">
-              <span
-                aria-hidden="true"
-                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#375a37] text-[11px] font-bold"
-              >
-                L
-              </span>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold">Live Chat</p>
-                <p className="truncate text-[11px] text-white/70">
-                  {!sessionReady
-                    ? 'Connecting…'
-                    : isLoggedIn
-                      ? data?.careTeamActive
-                        ? 'Care team'
-                        : data?.escalatedToPharmacistAt
-                          ? 'Pharmacist requested'
-                          : data?.botEnabled
-                            ? 'Store assistant'
-                            : 'Care team'
-                      : 'Sign in to continue'}
-                </p>
-              </div>
-            </div>
-            <div className="flex shrink-0 items-center gap-1">
-              <button
-                aria-label="Minimize chat"
-                className="rounded-md p-1.5 text-white/90 hover:bg-white/10"
-                onClick={handleClose}
-                type="button"
-              >
-                <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 24 24" width="18">
-                  <path
-                    d="M6 14h12"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeWidth="1.75"
-                  />
-                </svg>
-              </button>
-            </div>
-          </header>
+          {showOuterHeader ? (
+            <LiveChatHeader
+              onClose={handleClose}
+              subtitle={
+                !sessionReady
+                  ? 'Connecting…'
+                  : 'Sign in to continue'
+              }
+            />
+          ) : null}
 
           <div className="min-h-0 flex-1">
             {!sessionReady ? (

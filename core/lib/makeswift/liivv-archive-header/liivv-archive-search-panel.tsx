@@ -20,10 +20,13 @@ import { PriceLabel } from '@/vibes/soul/primitives/price-label';
 import { Link } from '~/components/link';
 import { search } from '~/components/header/_actions/search';
 import type { LiivvArchiveHeaderLogo } from '~/lib/makeswift/liivv-archive-header/types';
+import { resolveBcCdnImageUrl } from '~/lib/resolve-bc-cdn-image-url';
 
 const SEARCH_RESULTS_PATH = '/search';
 const SEARCH_PARAM_NAME = 'term';
 const MIN_QUERY_LENGTH = 1;
+/** Display size is 3rem; request 2x for retina. */
+const SEARCH_PRODUCT_THUMB_WIDTH = 96;
 
 function buildSearchPanelStyle(searchPanelId: string) {
   return `
@@ -262,7 +265,10 @@ function SearchProductThumbnail({
   productTitle: string;
 }) {
   const [imageFailed, setImageFailed] = useState(false);
-  const productSrc = productImage?.src;
+  // GraphQL returns urlTemplate with `{:size}`; plain <img> must resolve it.
+  const productSrc = productImage?.src
+    ? resolveBcCdnImageUrl(productImage.src, SEARCH_PRODUCT_THUMB_WIDTH)
+    : undefined;
 
   if (productSrc && !imageFailed) {
     return (
