@@ -20,14 +20,17 @@ import {
 } from '~/app/[locale]/(default)/account/(portal)/virtual-care/_actions/virtual-care-actions';
 import { Link } from '~/components/link';
 import type { ChatMessageRow } from '~/lib/supabase/chat-messages';
+import { ChatComposer } from '~/components/virtual-care/chat-composer';
 import { ChatMessageBody } from '~/components/virtual-care/chat-message-body';
 import {
   ChatSpeakMessageButton,
   ChatVoiceControls,
   ChatVoiceStatus,
+  voiceChatStatusLabel,
 } from '~/components/virtual-care/chat-voice-controls';
 import { ChatSystemMessage } from '~/components/virtual-care/chat-system-message';
 import { ChatTypingIndicator } from '~/components/virtual-care/chat-typing-indicator';
+import { useChatMessagePages } from '~/components/virtual-care/use-chat-message-pages';
 import { useChatOptimisticSend } from '~/components/virtual-care/use-chat-optimistic-send';
 import { useChatVoice } from '~/components/virtual-care/use-chat-voice';
 import {
@@ -146,44 +149,12 @@ function GuestPanel({ onClose }: { onClose: () => void }) {
   );
 }
 
-function phaseLabelForHeader(
-  phase: 'idle' | 'listening' | 'thinking' | 'speaking',
-  heardSpeech: boolean,
-): string {
-  if (phase === 'listening') {
-    return heardSpeech ? 'Listening…' : 'Listening… speak now';
-  }
-
-  if (phase === 'thinking') {
-    return 'Thinking…';
-  }
-
-  if (phase === 'speaking') {
-    return 'Speaking…';
-  }
-
-  return 'Voice chat';
-}
-
 function LiveChatHeader({
   onClose,
   subtitle,
-  voice,
 }: {
   onClose: () => void;
   subtitle: string;
-  voice?: {
-    enabled: boolean;
-    heardSpeech: boolean;
-    micSupported: boolean;
-    onEndVoiceChat: () => void;
-    onVoiceChatPrimaryAction: () => void;
-    recording: boolean;
-    speaking: boolean;
-    transcribing: boolean;
-    voiceChatActive: boolean;
-    voicePhase: 'idle' | 'listening' | 'thinking' | 'speaking';
-  } | null;
 }) {
   return (
     <header className="flex shrink-0 items-center justify-between gap-3 bg-[#2c2a26] px-4 py-3 text-white">
@@ -199,33 +170,16 @@ function LiveChatHeader({
           <p className="truncate text-[11px] text-white/70">{subtitle}</p>
         </div>
       </div>
-      <div className="flex shrink-0 items-center gap-0.5">
-        {voice ? (
-          <ChatVoiceControls
-            appearance="header"
-            enabled={voice.enabled}
-            heardSpeech={voice.heardSpeech}
-            micSupported={voice.micSupported}
-            onEndVoiceChat={voice.onEndVoiceChat}
-            onVoiceChatPrimaryAction={voice.onVoiceChatPrimaryAction}
-            recording={voice.recording}
-            speaking={voice.speaking}
-            transcribing={voice.transcribing}
-            voiceChatActive={voice.voiceChatActive}
-            voicePhase={voice.voicePhase}
-          />
-        ) : null}
-        <button
-          aria-label="Minimize chat"
-          className="rounded-md p-1.5 text-white/90 hover:bg-white/10"
-          onClick={onClose}
-          type="button"
-        >
-          <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 24 24" width="18">
-            <path d="M6 14h12" stroke="currentColor" strokeLinecap="round" strokeWidth="1.75" />
-          </svg>
-        </button>
-      </div>
+      <button
+        aria-label="Minimize chat"
+        className="rounded-md p-1.5 text-white/90 hover:bg-white/10"
+        onClick={onClose}
+        type="button"
+      >
+        <svg aria-hidden="true" fill="none" height="18" viewBox="0 0 24 24" width="18">
+          <path d="M6 14h12" stroke="currentColor" strokeLinecap="round" strokeWidth="1.75" />
+        </svg>
+      </button>
     </header>
   );
 }
@@ -252,9 +206,17 @@ function AuthenticatedPanel({
   const botEnabled = data?.botEnabled ?? false;
   const careTeamActive = data?.careTeamActive ?? false;
   const conversationId = data?.conversationId ?? null;
-  const messages = data?.messages ?? [];
+  const recentMessages = data?.messages ?? [];
+  const recentHasMoreOlder = data?.hasMoreOlder ?? false;
   const escalatedToPharmacistAt = data?.escalatedToPharmacistAt ?? null;
   const assistantActive = botEnabled && !careTeamActive && !escalatedToPharmacistAt;
+
+  const { messages, loadingOlder, handleScroll } = useChatMessagePages({
+    conversationId,
+    recentHasMoreOlder,
+    recentMessages,
+    scrollRef,
+  });
 
   const { draft, displayMessages, handleSendSubmit, inputLocked, sendMessage, setDraft, showTyping } =
     useChatOptimisticSend({
@@ -280,7 +242,7 @@ function AuthenticatedPanel({
   });
 
   const latestBot = [...displayMessages].reverse().find((m) => m.sender_type === 'bot');
-  const autoSpeak = voice.speakReplies || voice.voiceChatActive;
+  const autoSpeak = voice.voiceChatActive;
   const pollIntervalMs = conversationId ? CHAT_ACTIVE_POLL_MS : CHAT_IDLE_POLL_MS;
 
   useChatPollRefresh({
@@ -293,14 +255,6 @@ function AuthenticatedPanel({
     trigger: sendBurstTrigger,
     onRefresh: refresh,
   });
-
-  useEffect(() => {
-    const el = scrollRef.current;
-
-    if (el) {
-      el.scrollTop = el.scrollHeight;
-    }
-  }, [displayMessages.length, showTyping]);
 
   useEffect(() => {
     if (sendState?.ok) {
@@ -330,6 +284,16 @@ function AuthenticatedPanel({
 
     voice.maybeSpeakBotReply(latestBot.id, latestBot.body);
   }, [assistantActive, autoSpeak, latestBot?.body, latestBot?.id]);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+
+    if (!el || !showTyping) {
+      return;
+    }
+
+    el.scrollTop = el.scrollHeight;
+  }, [showTyping]);
 
   if (!data || !supabaseReady) {
     return (
@@ -367,33 +331,24 @@ function AuthenticatedPanel({
       ? 'Pharmacist requested'
       : assistantActive
         ? voice.voiceChatActive
-          ? phaseLabelForHeader(voice.voicePhase, voice.heardSpeech)
+          ? voiceChatStatusLabel(voice.voicePhase)
           : 'Store assistant'
         : 'Care team';
 
   return (
     <div className="flex h-full flex-col">
-      <LiveChatHeader
-        onClose={onClose}
-        subtitle={subtitle}
-        voice={
-          assistantActive
-            ? {
-                enabled: true,
-                heardSpeech: voice.heardSpeech,
-                micSupported: voice.micSupported,
-                onEndVoiceChat: voice.endVoiceChat,
-                onVoiceChatPrimaryAction: voice.handleVoiceChatPrimaryAction,
-                recording: voice.recording,
-                speaking: voice.speaking,
-                transcribing: voice.transcribing,
-                voiceChatActive: voice.voiceChatActive,
-                voicePhase: voice.voicePhase,
-              }
-            : null
-        }
-      />
-      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-[#f4f4f4] p-4" ref={scrollRef}>
+      <LiveChatHeader onClose={onClose} subtitle={subtitle} />
+      <div
+        className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-[#f4f4f4] p-4"
+        onScroll={handleScroll}
+        ref={scrollRef}
+      >
+        {loadingOlder ? (
+          <p className="py-1 text-center text-xs text-[#8a8176]" role="status">
+            Loading earlier messages…
+          </p>
+        ) : null}
+
         {careTeamActive ? (
           <div className="rounded-xl border border-[#c5ccd4] bg-[#f4f6f8] px-3 py-2.5 text-xs text-[#3d4a36]">
             You&apos;re connected with a care team member. They&apos;ll reply here when available.
@@ -458,39 +413,43 @@ function AuthenticatedPanel({
 
       <div className="border-t border-[#e8e2d8] bg-white p-3">
         {voice.voiceChatActive ? (
-          <ChatVoiceStatus
-            enabled={assistantActive}
-            heardSpeech={voice.heardSpeech}
-            voiceChatActive={voice.voiceChatActive}
-            voicePhase={voice.voicePhase}
-          />
-        ) : (
-          <form className="flex gap-2" onSubmit={handleSendSubmit}>
-            <input name="intent" type="hidden" value="send" />
-            <input
-              className="min-w-0 flex-1 rounded-xl border-0 bg-[#f0ebe3] px-3.5 py-3 text-sm text-[#2c2a26] outline-none placeholder:text-[#8a8176] focus:ring-2 focus:ring-[#8a9a7b]"
-              disabled={inputLocked}
-              maxLength={8000}
-              name="body"
-              onChange={(event) => setDraft(event.target.value)}
-              placeholder={
-                careTeamActive
-                  ? 'Message the care team…'
-                  : assistantActive
-                    ? 'Ask the store assistant…'
-                    : 'Type your message'
-              }
-              type="text"
-              value={draft}
+          <div className="flex items-center gap-2">
+            <ChatVoiceStatus
+              enabled={assistantActive}
+              voiceChatActive={voice.voiceChatActive}
+              voicePhase={voice.voicePhase}
             />
-            <button
-              className="liivv-btn-primary shrink-0 rounded-xl px-4 py-3 text-sm disabled:opacity-60"
-              disabled={inputLocked}
-              type="submit"
-            >
-              Send
-            </button>
-          </form>
+            <ChatVoiceControls
+              compact
+              enabled={assistantActive}
+              micSupported={voice.micSupported}
+              onEndVoiceChat={voice.endVoiceChat}
+              onVoiceChatPrimaryAction={voice.handleVoiceChatPrimaryAction}
+              voiceChatActive={voice.voiceChatActive}
+            />
+          </div>
+        ) : (
+          <ChatComposer
+            dictateActive={voice.dictateActive}
+            disabled={inputLocked}
+            draft={draft}
+            micSupported={voice.micSupported}
+            onDictateCancel={voice.cancelDictate}
+            onDictateConfirm={voice.confirmDictate}
+            onDictateToggle={voice.toggleDictate}
+            onDraftChange={setDraft}
+            onStartVoiceChat={voice.handleVoiceChatPrimaryAction}
+            onSubmit={handleSendSubmit}
+            placeholder={
+              careTeamActive
+                ? 'Message the care team…'
+                : assistantActive
+                  ? 'Ask anything…'
+                  : 'Type your message'
+            }
+            transcribing={voice.transcribing}
+            voiceEnabled={assistantActive}
+          />
         )}
         {voice.voiceError ? <p className="mt-2 text-xs text-red-700">{voice.voiceError}</p> : null}
         {sendState?.error ? <p className="mt-2 text-xs text-red-700">{sendState.error}</p> : null}

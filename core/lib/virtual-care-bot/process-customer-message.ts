@@ -2,9 +2,10 @@ import 'server-only';
 
 import {
   appendBotMessage,
+  BOT_MESSAGE_HISTORY_LIMIT,
   escalateConversationToPharmacist,
   getConversationEscalationStatus,
-  listMessagesForConversation,
+  listRecentMessagesForConversation,
 } from '~/lib/supabase/chat-messages';
 import { isCareTeamChatActive } from '~/lib/chat/session';
 
@@ -61,7 +62,10 @@ export async function processCustomerMessageForBot({
     return appendBotMessage(conversationId, PHARMACIST_ESCALATION_REPLY);
   }
 
-  const historyResult = await listMessagesForConversation(conversationId);
+  const historyResult = await listRecentMessagesForConversation(
+    conversationId,
+    BOT_MESSAGE_HISTORY_LIMIT,
+  );
 
   if (!historyResult.ok) {
     return historyResult;

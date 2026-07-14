@@ -9,6 +9,7 @@ import {
 } from '~/app/[locale]/(default)/account/(portal)/virtual-care/_actions/virtual-care-actions';
 import { Link } from '~/components/link';
 import { OnboardingSectionHeader } from '~/components/onboarding/onboarding-section-header';
+import { ChatComposer } from '~/components/virtual-care/chat-composer';
 import { ChatMessageBody } from '~/components/virtual-care/chat-message-body';
 import {
   ChatSpeakMessageButton,
@@ -96,7 +97,7 @@ export function VirtualCareChatClient({
   });
 
   const latestBot = [...displayMessages].reverse().find((m) => m.sender_type === 'bot');
-  const autoSpeak = voice.speakReplies || voice.voiceChatActive;
+  const autoSpeak = voice.voiceChatActive;
 
   useEffect(() => {
     if (!supabaseReady || !conversationId) {
@@ -155,7 +156,7 @@ export function VirtualCareChatClient({
           careTeamActive
             ? 'A care team member is in this conversation. They will reply here when available.'
             : assistantActive
-              ? 'Ask about products, orders, prescriptions, or your account. Tap Voice chat to talk — for medication advice, a pharmacist will join the chat.'
+              ? 'Ask about products, orders, prescriptions, or your account. Use voice or dictate when typing is inconvenient — for medication advice, a pharmacist will join the chat.'
               : 'Send updates and questions to your care team. Messages are saved so staff can follow up.'
         }
         kicker="Secure messaging"
@@ -185,8 +186,8 @@ export function VirtualCareChatClient({
             </div>
           ) : assistantActive ? (
             <div className="rounded-lg border border-[#d4dfc8] bg-[#f8faf6] px-4 py-3 text-sm text-[#3d4a36]">
-              This assistant helps with store and account questions only — not medical advice. Tap
-              Voice chat once, then talk naturally — pause when finished, and tap End to stop.
+              This assistant helps with store and account questions only — not medical advice. Tap the
+              voice button to talk hands-free, or the mic to dictate into the message box.
             </div>
           ) : escalatedToPharmacistAt ? (
             <div className="rounded-lg border border-[#d4dfc8] bg-[#f8faf6] px-4 py-3 text-sm text-[#3d4a36]">
@@ -242,69 +243,45 @@ export function VirtualCareChatClient({
             {showTyping ? <ChatTypingIndicator /> : null}
           </div>
 
-          <form
-            className="flex flex-col gap-3"
-            onSubmit={handleSendSubmit}
-          >
-            <input name="intent" type="hidden" value="send" />
-            {assistantActive ? (
-              <div
-                className={`flex items-center gap-2 ${voice.voiceChatActive ? 'justify-between' : 'justify-end'}`}
-              >
-                <ChatVoiceStatus
-                  enabled={assistantActive}
-                  heardSpeech={voice.heardSpeech}
-                  voiceChatActive={voice.voiceChatActive}
-                  voicePhase={voice.voicePhase}
-                />
-                <ChatVoiceControls
-                  enabled={assistantActive}
-                  heardSpeech={voice.heardSpeech}
-                  micSupported={voice.micSupported}
-                  onEndVoiceChat={voice.endVoiceChat}
-                  onVoiceChatPrimaryAction={voice.handleVoiceChatPrimaryAction}
-                  recording={voice.recording}
-                  speaking={voice.speaking}
-                  transcribing={voice.transcribing}
-                  voiceChatActive={voice.voiceChatActive}
-                  voicePhase={voice.voicePhase}
-                />
-              </div>
-            ) : null}
-            {voice.voiceChatActive ? null : (
-              <>
-                <textarea
-                  className="min-h-22 w-full resize-y rounded-xl border border-[#e0d9ce] px-3.5 py-2.5 text-sm"
-                  disabled={inputLocked || Boolean(loadError)}
-                  maxLength={8000}
-                  name="body"
-                  onChange={(event) => setDraft(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' && !event.shiftKey) {
-                      event.preventDefault();
-                      event.currentTarget.form?.requestSubmit();
-                    }
-                  }}
-                  placeholder={
-                    careTeamActive
-                      ? 'Message the care team…'
-                      : assistantActive
-                        ? 'Ask the store assistant…'
-                        : 'Type your message…'
-                  }
-                  rows={3}
-                  value={draft}
-                />
-                <button
-                  className="liivv-btn-primary self-end px-5 py-2.5 text-sm disabled:opacity-60"
-                  disabled={inputLocked || Boolean(loadError)}
-                  type="submit"
-                >
-                  Send
-                </button>
-              </>
-            )}
-          </form>
+          {voice.voiceChatActive ? (
+            <div className="flex items-center gap-2">
+              <ChatVoiceStatus
+                enabled={assistantActive}
+                voiceChatActive={voice.voiceChatActive}
+                voicePhase={voice.voicePhase}
+              />
+              <ChatVoiceControls
+                enabled={assistantActive}
+                micSupported={voice.micSupported}
+                onEndVoiceChat={voice.endVoiceChat}
+                onVoiceChatPrimaryAction={voice.handleVoiceChatPrimaryAction}
+                voiceChatActive={voice.voiceChatActive}
+              />
+            </div>
+          ) : (
+            <ChatComposer
+              dictateActive={voice.dictateActive}
+              disabled={inputLocked || Boolean(loadError)}
+              draft={draft}
+              micSupported={voice.micSupported}
+              multiline
+              onDictateCancel={voice.cancelDictate}
+              onDictateConfirm={voice.confirmDictate}
+              onDictateToggle={voice.toggleDictate}
+              onDraftChange={setDraft}
+              onStartVoiceChat={voice.handleVoiceChatPrimaryAction}
+              onSubmit={handleSendSubmit}
+              placeholder={
+                careTeamActive
+                  ? 'Message the care team…'
+                  : assistantActive
+                    ? 'Ask anything…'
+                    : 'Type your message…'
+              }
+              transcribing={voice.transcribing}
+              voiceEnabled={assistantActive}
+            />
+          )}
           {voice.voiceError ? <p className="text-sm text-red-700">{voice.voiceError}</p> : null}
           {sendState?.error ? <p className="text-sm text-red-700">{sendState.error}</p> : null}
         </div>

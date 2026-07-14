@@ -16,7 +16,9 @@ import {
   countUnreadStaffMessages,
   getConversationByProfileId,
   getOrCreateConversation,
+  listOlderMessagesForConversation,
   markCustomerLeftChat,
+  type ChatMessageRow,
 } from '~/lib/supabase/chat-messages';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
@@ -33,6 +35,7 @@ export type LiveChatSessionPayload = {
   staffClosedAt: string | null;
   escalatedToPharmacistAt: string | null;
   messages: NonNullable<Awaited<ReturnType<typeof getVirtualCareChatData>>>['messages'];
+  hasMoreOlder: boolean;
 };
 
 export async function getLiveChatSessionAction(): Promise<{
@@ -62,8 +65,46 @@ export async function getLiveChatSessionAction(): Promise<{
       staffClosedAt: chat.staffClosedAt,
       escalatedToPharmacistAt: chat.escalatedToPharmacistAt,
       messages: chat.messages,
+      hasMoreOlder: chat.hasMoreOlder,
     },
   };
+}
+
+export async function loadOlderLiveChatMessagesAction(beforeCreatedAt: string): Promise<
+  | { ok: true; messages: ChatMessageRow[]; hasMoreOlder: boolean }
+  | { ok: false; error: string }
+> {
+  const customer = await getOnboardingCustomer();
+
+  if (!customer || !isSupabaseConfigured()) {
+    return { ok: false, error: 'Chat is not available.' };
+  }
+
+  const ensured = await ensureCustomerProfile(customer);
+
+  if (ensured.status !== 'ok') {
+    return { ok: false, error: 'Chat is not available.' };
+  }
+
+  const conversation = await getConversationByProfileId(ensured.profile.id);
+
+  if (!conversation.ok || !conversation.conversationId) {
+    return { ok: false, error: 'No conversation yet.' };
+  }
+
+  const cursor = beforeCreatedAt.trim();
+
+  if (!cursor) {
+    return { ok: false, error: 'Missing message cursor.' };
+  }
+
+  const listed = await listOlderMessagesForConversation(conversation.conversationId, cursor);
+
+  if (!listed.ok) {
+    return { ok: false, error: listed.message };
+  }
+
+  return { ok: true, messages: listed.messages, hasMoreOlder: listed.hasMoreOlder };
 }
 
 export async function getLiveChatUnreadStaffCountAction(): Promise<{ count: number }> {

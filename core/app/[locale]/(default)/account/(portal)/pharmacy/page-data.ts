@@ -143,6 +143,7 @@ export const getVirtualCareChatData = cache(async () => {
       botEnabled: isVirtualCareBotEnabled(),
       careTeamActive: false,
       messages: [],
+      hasMoreOlder: false,
       conversationId: null,
       customerLeftAt: null,
       staffClosedAt: null,
@@ -159,6 +160,7 @@ export const getVirtualCareChatData = cache(async () => {
       botEnabled: isVirtualCareBotEnabled(),
       careTeamActive: false,
       messages: [],
+      hasMoreOlder: false,
       conversationId: null,
       customerLeftAt: null,
       staffClosedAt: null,
@@ -180,12 +182,14 @@ export const getVirtualCareChatData = cache(async () => {
       staffJoinedAt: conv.ok ? conv.staffJoinedAt : null,
       escalatedToPharmacistAt: conv.ok ? conv.escalatedToPharmacistAt : null,
       messages: [],
+      hasMoreOlder: false,
     };
   }
 
-  const { listMessagesForConversation } = await import('~/lib/supabase/chat-messages');
-  const listed = await listMessagesForConversation(conv.conversationId);
+  const { listRecentMessagesForConversation } = await import('~/lib/supabase/chat-messages');
+  const listed = await listRecentMessagesForConversation(conv.conversationId);
   const messages = listed.ok ? listed.messages : [];
+  const hasMoreOlder = listed.ok ? listed.hasMoreOlder : false;
 
   return {
     supabaseReady: true as const,
@@ -200,6 +204,7 @@ export const getVirtualCareChatData = cache(async () => {
     staffClosedAt: conv.staffClosedAt,
     escalatedToPharmacistAt: conv.escalatedToPharmacistAt,
     messages,
+    hasMoreOlder,
   };
 });
 

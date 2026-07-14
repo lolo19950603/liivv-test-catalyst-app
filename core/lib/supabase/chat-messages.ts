@@ -239,6 +239,12 @@ export async function escalateConversationToPharmacist(
   return { ok: true };
 }
 
+/** Default page size for customer chat UI (newest first, then scroll up for older). */
+export const CHAT_MESSAGE_PAGE_SIZE = 40;
+
+/** How many recent turns the bot should see (keeps prompt size bounded). */
+export const BOT_MESSAGE_HISTORY_LIMIT = 40;
+
 export async function listMessagesForConversation(
   conversationId: string,
 ): Promise<{ ok: true; messages: ChatMessageRow[] } | { ok: false; message: string }> {
@@ -254,6 +260,65 @@ export async function listMessagesForConversation(
   }
 
   return { ok: true, messages: (data ?? []) as ChatMessageRow[] };
+}
+
+/**
+ * Newest page of messages, returned oldest→newest within the page.
+ * Uses limit+1 to know whether older messages exist.
+ */
+export async function listRecentMessagesForConversation(
+  conversationId: string,
+  limit: number = CHAT_MESSAGE_PAGE_SIZE,
+): Promise<
+  | { ok: true; messages: ChatMessageRow[]; hasMoreOlder: boolean }
+  | { ok: false; message: string }
+> {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from('chat_messages')
+    .select('id, conversation_id, sender_type, body, created_at')
+    .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: false })
+    .limit(limit + 1);
+
+  if (error) {
+    return { ok: false, message: error.message };
+  }
+
+  const rows = (data ?? []) as ChatMessageRow[];
+  const hasMoreOlder = rows.length > limit;
+  const page = hasMoreOlder ? rows.slice(0, limit) : rows;
+
+  return { ok: true, messages: page.reverse(), hasMoreOlder };
+}
+
+/** Older messages before a cursor (created_at of the currently oldest loaded message). */
+export async function listOlderMessagesForConversation(
+  conversationId: string,
+  beforeCreatedAt: string,
+  limit: number = CHAT_MESSAGE_PAGE_SIZE,
+): Promise<
+  | { ok: true; messages: ChatMessageRow[]; hasMoreOlder: boolean }
+  | { ok: false; message: string }
+> {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from('chat_messages')
+    .select('id, conversation_id, sender_type, body, created_at')
+    .eq('conversation_id', conversationId)
+    .lt('created_at', beforeCreatedAt)
+    .order('created_at', { ascending: false })
+    .limit(limit + 1);
+
+  if (error) {
+    return { ok: false, message: error.message };
+  }
+
+  const rows = (data ?? []) as ChatMessageRow[];
+  const hasMoreOlder = rows.length > limit;
+  const page = hasMoreOlder ? rows.slice(0, limit) : rows;
+
+  return { ok: true, messages: page.reverse(), hasMoreOlder };
 }
 
 export async function getLatestMessageForConversation(

@@ -56,6 +56,7 @@ export function useChatVoice({
   const [speaking, setSpeaking] = useState(false);
   const [speakReplies, setSpeakReplies] = useState(false);
   const [voiceChatActive, setVoiceChatActive] = useState(false);
+  const [dictateActive, setDictateActive] = useState(false);
   const [heardSpeech, setHeardSpeech] = useState(false);
   const [voiceError, setVoiceError] = useState<string | null>(null);
   const [micSupported, setMicSupported] = useState(false);
@@ -71,6 +72,7 @@ export function useChatVoice({
   const audioUrlRef = useRef<string | null>(null);
   const spokenMessageIdsRef = useRef<Set<string>>(new Set());
   const voiceChatActiveRef = useRef(false);
+  const dictateActiveRef = useRef(false);
   const cancellingVoiceTurnRef = useRef(false);
   const listenAfterSpeakRef = useRef(false);
   const heardSpeechRef = useRef(false);
@@ -116,6 +118,13 @@ export function useChatVoice({
   useEffect(() => {
     if (!enabled && voiceChatActive) {
       endVoiceChat();
+    }
+
+    if (!enabled && dictateActiveRef.current) {
+      stopRecording({ cancel: true });
+      dictateActiveRef.current = false;
+      setDictateActive(false);
+      stopTracks();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only react to assistant availability
   }, [enabled]);
@@ -199,6 +208,8 @@ export function useChatVoice({
 
     audioRef.current?.pause();
     audioRef.current = null;
+    dictateActiveRef.current = false;
+    setDictateActive(false);
     setRecording(false);
     setSpeaking(false);
     setHeardSpeech(false);
@@ -256,7 +267,9 @@ export function useChatVoice({
     void audioContext.resume().catch(() => undefined);
 
     vadTimerRef.current = window.setInterval(() => {
-      if (!analyserRef.current || !voiceChatActiveRef.current || !recordingRef.current) {
+      const captureActive = voiceChatActiveRef.current || dictateActiveRef.current;
+
+      if (!analyserRef.current || !captureActive || !recordingRef.current) {
         return;
       }
 
@@ -275,6 +288,11 @@ export function useChatVoice({
       }
 
       if (!heardSpeechRef.current || !speechStartedAtRef.current || !lastLoudAtRef.current) {
+        return;
+      }
+
+      // Dictate is confirmed manually — only continuous voice chat auto-stops on silence.
+      if (dictateActiveRef.current && !voiceChatActiveRef.current) {
         return;
       }
 
@@ -302,16 +320,30 @@ export function useChatVoice({
     speechStartedAtRef.current = null;
     lastLoudAtRef.current = null;
 
+    const wasDictating = dictateActiveRef.current;
+
     if (cancellingVoiceTurnRef.current) {
       cancellingVoiceTurnRef.current = false;
+      dictateActiveRef.current = false;
+      setDictateActive(false);
+
+      if (wasDictating && !voiceChatActiveRef.current) {
+        stopTracks();
+      }
+
       return;
     }
 
-    if (!hadSpeech || !blob.size) {
+    if (!blob.size || (!hadSpeech && !wasDictating)) {
+      dictateActiveRef.current = false;
+      setDictateActive(false);
+
       if (voiceChatActiveRef.current && enabledRef.current) {
         window.setTimeout(() => {
           void startListeningTurn();
         }, 250);
+      } else if (wasDictating) {
+        stopTracks();
       }
 
       return;
@@ -330,11 +362,15 @@ export function useChatVoice({
 
       if (!result.ok) {
         setVoiceError(result.error);
+        dictateActiveRef.current = false;
+        setDictateActive(false);
 
         if (voiceChatActiveRef.current && enabledRef.current) {
           window.setTimeout(() => {
             void startListeningTurn();
           }, 600);
+        } else if (wasDictating) {
+          stopTracks();
         }
 
         return;
@@ -343,10 +379,15 @@ export function useChatVoice({
       const text = result.text.trim();
 
       if (!text) {
+        dictateActiveRef.current = false;
+        setDictateActive(false);
+
         if (voiceChatActiveRef.current && enabledRef.current) {
           window.setTimeout(() => {
             void startListeningTurn();
           }, 250);
+        } else if (wasDictating) {
+          stopTracks();
         }
 
         return;
@@ -377,21 +418,37 @@ export function useChatVoice({
         }, 600);
       }
     } finally {
+      if (wasDictating) {
+        dictateActiveRef.current = false;
+        setDictateActive(false);
+
+        if (!voiceChatActiveRef.current) {
+          stopTracks();
+        }
+      }
+
       setTranscribing(false);
     }
   }
 
-  async function startListeningTurn() {
+  async function beginRecordingCapture({ forDictate }: { forDictate: boolean }) {
     if (
       !enabledRef.current ||
-      !voiceChatActiveRef.current ||
       disabledRef.current ||
       recordingRef.current ||
       transcribingRef.current ||
       speakingRef.current ||
       !micSupported
     ) {
-      return;
+      return false;
+    }
+
+    if (!forDictate && !voiceChatActiveRef.current) {
+      return false;
+    }
+
+    if (forDictate && voiceChatActiveRef.current) {
+      return false;
     }
 
     setVoiceError(null);
@@ -428,13 +485,81 @@ export function useChatVoice({
           stopRecording();
         }
       }, MAX_RECORD_MS);
+
+      return true;
     } catch {
       stopTracks();
       setRecording(false);
-      setVoiceError('Microphone access is required for voice chat.');
-      voiceChatActiveRef.current = false;
-      setVoiceChatActive(false);
+      setVoiceError(
+        forDictate
+          ? 'Microphone access is required for dictation.'
+          : 'Microphone access is required for voice chat.',
+      );
+
+      if (forDictate) {
+        dictateActiveRef.current = false;
+        setDictateActive(false);
+      } else {
+        voiceChatActiveRef.current = false;
+        setVoiceChatActive(false);
+      }
+
+      return false;
     }
+  }
+
+  async function startListeningTurn() {
+    if (!voiceChatActiveRef.current) {
+      return;
+    }
+
+    await beginRecordingCapture({ forDictate: false });
+  }
+
+  async function startDictate() {
+    if (!enabled || !micSupported || disabled || voiceChatActive || recording || transcribing) {
+      return;
+    }
+
+    dictateActiveRef.current = true;
+    setDictateActive(true);
+    stopSpeaking();
+
+    const started = await beginRecordingCapture({ forDictate: true });
+
+    if (!started && !recordingRef.current) {
+      dictateActiveRef.current = false;
+      setDictateActive(false);
+    }
+  }
+
+  /** Finish dictation and insert the transcript into the input. */
+  function confirmDictate() {
+    if (!dictateActiveRef.current || transcribingRef.current) {
+      return;
+    }
+
+    stopRecording();
+  }
+
+  function cancelDictate() {
+    if (!dictateActiveRef.current && !recordingRef.current) {
+      return;
+    }
+
+    stopRecording({ cancel: true });
+    dictateActiveRef.current = false;
+    setDictateActive(false);
+    stopTracks();
+  }
+
+  function toggleDictate() {
+    if (dictateActive) {
+      cancelDictate();
+      return;
+    }
+
+    void startDictate();
   }
 
   function stopRecording({ cancel = false }: { cancel?: boolean } = {}) {
@@ -588,9 +713,8 @@ export function useChatVoice({
   }
 
   function maybeSpeakBotReply(messageId: string, body: string) {
-    const shouldSpeak = speakReplies || voiceChatActiveRef.current;
-
-    if (!shouldSpeak || !enabled || spokenMessageIdsRef.current.has(messageId)) {
+    // Auto-play replies only during continuous voice chat — not while typing or dictating.
+    if (!voiceChatActiveRef.current || !enabled || spokenMessageIdsRef.current.has(messageId)) {
       return;
     }
 
@@ -606,6 +730,12 @@ export function useChatVoice({
       return;
     }
 
+    if (dictateActiveRef.current) {
+      dictateActiveRef.current = false;
+      setDictateActive(false);
+      stopRecording({ cancel: true });
+    }
+
     voiceChatActiveRef.current = true;
     setVoiceChatActive(true);
     setSpeakRepliesPersisted(true);
@@ -617,6 +747,7 @@ export function useChatVoice({
     voiceChatActiveRef.current = false;
     setVoiceChatActive(false);
     listenAfterSpeakRef.current = false;
+    setSpeakRepliesPersisted(false);
     stopSpeaking();
     teardownSession();
   }
@@ -643,6 +774,7 @@ export function useChatVoice({
     heardSpeech,
     speakReplies,
     voiceChatActive,
+    dictateActive,
     voicePhase,
     voiceError,
     voiceBusy: recording || transcribing || speaking,
@@ -651,6 +783,10 @@ export function useChatVoice({
     toggleVoiceChat,
     handleVoiceChatPrimaryAction,
     endVoiceChat,
+    toggleDictate,
+    startDictate,
+    confirmDictate,
+    cancelDictate,
     speakText,
     stopSpeaking,
     maybeSpeakBotReply,
