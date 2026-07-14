@@ -37,6 +37,12 @@ export interface SubscriptionListItem {
   canEditFrequency?: boolean;
   canSkipDelivery?: boolean;
   isCanceled?: boolean;
+  skippableDeliveries?: Array<{
+    dayKey: string;
+    label: string;
+    isNext?: boolean;
+    isPending?: boolean;
+  }>;
 }
 
 export interface SubscriptionDeliveryGroup {
@@ -157,7 +163,12 @@ export interface SubscriptionListProps {
     skippingDeliveryLabel: string;
     skipDeliveryAction: (
       subscriptionId: string,
-    ) => Promise<{ success: boolean; error?: string }>;
+      shipmentDayKey: string,
+    ) => Promise<{ success: boolean; error?: string; mode?: string }>;
+    skipDeliveryDateLabel?: string;
+    skipDeliveryPendingLabel?: string;
+    skipDeliveryNextLabel?: string;
+    skipDeliveryScheduledLabel?: string;
     reactivateLabel: string;
     reactivatingLabel: string;
     reactivateAction: (
@@ -1608,6 +1619,7 @@ export function SubscriptionList({
         canEditFrequency,
         canSkipDelivery,
         isCanceled,
+        skippableDeliveries: item.skippableDeliveries,
       });
     },
     [allManageableItems, pastGroups, upcomingGroups],
@@ -1772,12 +1784,20 @@ export function SubscriptionList({
         savedShippingAddresses={manageItemOptions?.savedShippingAddresses ?? []}
         shipToLabel={shipToLabel}
         skipDeliveryAction={manageItemOptions?.skipDeliveryAction}
+        skipDeliveryDateLabel={manageItemOptions?.skipDeliveryDateLabel ?? 'Choose a delivery to skip'}
         skipDeliveryDescription={
           manageItemOptions?.skipDeliveryDescription ??
-          "We'll skip your next shipment and resume on the following cycle."
+          "Pick a delivery date. We won't ship or charge you for that date."
         }
-        skipDeliveryLabel={manageItemOptions?.skipDeliveryLabel ?? 'Skip next delivery'}
-        skipDeliveryTitle={manageItemOptions?.skipDeliveryTitle ?? 'Skip next delivery?'}
+        skipDeliveryLabel={manageItemOptions?.skipDeliveryLabel ?? 'Skip a delivery'}
+        skipDeliveryNextLabel={manageItemOptions?.skipDeliveryNextLabel ?? 'Next delivery'}
+        skipDeliveryPendingLabel={
+          manageItemOptions?.skipDeliveryPendingLabel ?? 'Already scheduled to skip'
+        }
+        skipDeliveryScheduledLabel={
+          manageItemOptions?.skipDeliveryScheduledLabel ?? 'Skip scheduled for {date}'
+        }
+        skipDeliveryTitle={manageItemOptions?.skipDeliveryTitle ?? 'Skip a delivery'}
         skippingDeliveryLabel={manageItemOptions?.skippingDeliveryLabel ?? 'Skipping delivery…'}
         subscription={managedSubscription ?? undefined}
         title={manageItemOptions?.modalTitle ?? 'Manage subscription'}

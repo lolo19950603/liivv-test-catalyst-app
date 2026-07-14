@@ -12,6 +12,7 @@ import { tryFinalizeSubscriptionShipmentByStorageKey } from './finalize-subscrip
 import { getCustomerSubscriptions } from './subscriptions';
 import { getStripe } from './client';
 import { applySubscriptionInvoiceTax } from './prepare-subscription-invoice';
+import { applyPendingSkipForSubscriptionInvoice } from './subscription-delivery-payment';
 import { getStoredStripeCustomerId, storeStripeCustomerId } from './storage';
 
 function getBigCommerceCustomerId(metadata: Stripe.Metadata | null | undefined): number | null {
@@ -81,6 +82,18 @@ export async function handleStripeWebhookEvent(event: Stripe.Event): Promise<voi
       if (subscriptionId) {
         const stripe = getStripe();
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        const pendingSkip = await applyPendingSkipForSubscriptionInvoice({
+          invoice,
+          subscription,
+        });
+
+        if (pendingSkip.applied) {
+          // eslint-disable-next-line no-console
+          console.info(
+            `Applied pending customer skip for subscription ${subscriptionId} on invoice ${invoice.id}`,
+          );
+          break;
+        }
 
         await applySubscriptionInvoiceTax(invoice, subscription);
       }

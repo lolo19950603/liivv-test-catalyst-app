@@ -391,6 +391,13 @@ const mockPortalSections: SubscriptionPortalSections = {
       statusLabel: 'Active',
       statusKey: 'active',
       scheduleDetail: 'Renews on Jul 31, 2026',
+      canSkipDelivery: true,
+      skippableDeliveries: [
+        { dayKey: '2026-07-31', label: 'Jul 31, 2026', isNext: true },
+        { dayKey: '2026-08-30', label: 'Aug 30, 2026' },
+        { dayKey: '2026-09-29', label: 'Sep 29, 2026' },
+        { dayKey: '2026-10-29', label: 'Oct 29, 2026', isPending: true },
+      ],
       shippingAddressGroupNumber: 1,
       shippingAddressLabel:
         'PinLun Chen, 77 Shuter St, Toronto, Ontario, M5B 0B8, CA',
@@ -406,6 +413,7 @@ const mockPortalSections: SubscriptionPortalSections = {
       statusLabel: 'Active',
       statusKey: 'active',
       scheduleDetail: 'Renews on Jul 31, 2026',
+      canSkipDelivery: true,
       shippingAddressGroupNumber: 1,
       shippingAddressLabel:
         'PinLun Chen, 77 Shuter St, Toronto, Ontario, M5B 0B8, CA',
@@ -623,9 +631,15 @@ export default async function SubscriptionsPreviewPage({ params }: Props) {
           skipDeliveryLabel: t('manageModal.skipDelivery'),
           skipDeliveryTitle: t('manageModal.skipDeliveryTitle'),
           skipDeliveryDescription: t('manageModal.skipDeliveryDescription'),
+          skipDeliveryDateLabel: t('manageModal.skipDeliveryDateLabel'),
+          skipDeliveryNextLabel: t('manageModal.skipDeliveryNextLabel'),
+          skipDeliveryPendingLabel: t('manageModal.skipDeliveryPendingLabel'),
+          skipDeliveryScheduledLabel: t('manageModal.skipDeliveryScheduledLabel'),
           confirmSkipDeliveryLabel: t('manageModal.confirmSkipDelivery'),
           skippingDeliveryLabel: t('manageModal.skippingDelivery'),
-          skipDeliveryAction: async () => ({ success: true }),
+          skipDeliveryAction: async (_subscriptionId: string, _shipmentDayKey: string) => ({
+            success: true,
+          }),
           reactivateLabel: t('manageModal.reactivateSubscription'),
           reactivatingLabel: t('manageModal.reactivatingSubscription'),
           reactivateAction: async () => ({ success: true }),

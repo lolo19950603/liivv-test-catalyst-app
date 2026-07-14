@@ -282,6 +282,11 @@ body.subscription-manage-modal-open .subscription-manage-modal-blur-target {
   background: #f7f5f2;
 }
 
+.subscription-manage-modal__payment-option--disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 .subscription-manage-modal__payment-radio {
   margin-top: 0.125rem;
   flex-shrink: 0;

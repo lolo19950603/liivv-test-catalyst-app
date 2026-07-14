@@ -4,22 +4,28 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { getLocale } from 'next-intl/server';
 
 import { TAGS } from '~/client/tags';
-import { skipSubscriptionDelivery } from '~/lib/stripe/subscription-delivery-payment';
+import { scheduleOrSkipSubscriptionDelivery } from '~/lib/stripe/subscription-delivery-payment';
 
 import { resolveStripeCustomerIdForAccount, syncSubscriptionShipmentsForAccount } from '../page-data';
 
 export async function skipSubscriptionDeliveryManageAction(
   subscriptionId: string,
-): Promise<{ success: boolean; error?: string }> {
+  shipmentDayKey?: string,
+): Promise<{ success: boolean; error?: string; mode?: 'skipped' | 'scheduled' | 'already_scheduled' }> {
   const stripeCustomerId = await resolveStripeCustomerIdForAccount();
 
   if (!stripeCustomerId || !subscriptionId) {
     return { success: false, error: 'Unable to skip delivery' };
   }
 
-  const result = await skipSubscriptionDelivery({
+  if (!shipmentDayKey) {
+    return { success: false, error: 'Choose a delivery date to skip' };
+  }
+
+  const result = await scheduleOrSkipSubscriptionDelivery({
     subscriptionId,
     stripeCustomerId,
+    shipmentDayKey,
   });
 
   if (!result.ok) {
@@ -28,7 +34,9 @@ export async function skipSubscriptionDeliveryManageAction(
       error:
         result.reason === 'not_found'
           ? 'Subscription not found'
-          : 'Unable to skip delivery for this subscription',
+          : result.reason === 'unknown_date'
+            ? 'That delivery date is not available to skip'
+            : 'Unable to skip delivery for this subscription',
     };
   }
 
@@ -38,5 +46,5 @@ export async function skipSubscriptionDeliveryManageAction(
   const locale = await getLocale();
   revalidatePath(`/${locale}/account/subscriptions`);
 
-  return { success: true };
+  return { success: true, mode: result.mode };
 }

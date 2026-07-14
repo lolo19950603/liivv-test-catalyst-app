@@ -21,9 +21,14 @@ import {
 import { Link } from '~/components/link';
 import type { ChatMessageRow } from '~/lib/supabase/chat-messages';
 import { ChatMessageBody } from '~/components/virtual-care/chat-message-body';
+import {
+  ChatSpeakMessageButton,
+  ChatVoiceControls,
+} from '~/components/virtual-care/chat-voice-controls';
 import { ChatSystemMessage } from '~/components/virtual-care/chat-system-message';
 import { ChatTypingIndicator } from '~/components/virtual-care/chat-typing-indicator';
 import { useChatOptimisticSend } from '~/components/virtual-care/use-chat-optimistic-send';
+import { useChatVoice } from '~/components/virtual-care/use-chat-voice';
 import {
   CHAT_ACTIVE_POLL_MS,
   CHAT_IDLE_POLL_MS,
@@ -150,6 +155,7 @@ function AuthenticatedPanel({
   onRefresh: () => void;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const seededSpeakRef = useRef(false);
   const [sendBurstTrigger, setSendBurstTrigger] = useState(0);
   const [sendState, sendAction, sendPending] = useActionState<
     VirtualCareChatActionState,
@@ -174,6 +180,20 @@ function AuthenticatedPanel({
       sendPending,
       sendState,
     });
+
+  const voice = useChatVoice({
+    enabled: assistantActive,
+    disabled: inputLocked,
+    onTranscript: (text) => {
+      setDraft((current) => {
+        const trimmed = current.trim();
+
+        return trimmed ? `${trimmed} ${text}` : text;
+      });
+    },
+  });
+
+  const latestBot = [...displayMessages].reverse().find((m) => m.sender_type === 'bot');
   const pollIntervalMs = conversationId ? CHAT_ACTIVE_POLL_MS : CHAT_IDLE_POLL_MS;
 
   useChatPollRefresh({
@@ -201,6 +221,28 @@ function AuthenticatedPanel({
       refresh();
     }
   }, [sendState?.ok]);
+
+  useEffect(() => {
+    if (!assistantActive || !voice.speakReplies) {
+      seededSpeakRef.current = false;
+      return;
+    }
+
+    if (!seededSpeakRef.current) {
+      voice.rememberExistingBotMessages(
+        displayMessages.filter((m) => m.sender_type === 'bot').map((m) => m.id),
+      );
+      seededSpeakRef.current = true;
+    }
+  }, [assistantActive, voice.speakReplies]);
+
+  useEffect(() => {
+    if (!assistantActive || !voice.speakReplies || !latestBot || !seededSpeakRef.current) {
+      return;
+    }
+
+    voice.maybeSpeakBotReply(latestBot.id, latestBot.body);
+  }, [assistantActive, latestBot?.body, latestBot?.id, voice.speakReplies]);
 
   if (!data || !supabaseReady) {
     return (
@@ -272,6 +314,14 @@ function AuthenticatedPanel({
                   </p>
                 ) : null}
                 <ChatMessageBody body={m.body} />
+                {m.sender_type === 'bot' && assistantActive ? (
+                  <ChatSpeakMessageButton
+                    enabled
+                    onSpeak={() => {
+                      void voice.speakText(m.body, m.id);
+                    }}
+                  />
+                ) : null}
                 <p className="mt-1 text-[10px] opacity-75">
                   {new Date(m.created_at).toLocaleString()}
                 </p>
@@ -293,14 +343,31 @@ function AuthenticatedPanel({
             name="body"
             onChange={(event) => setDraft(event.target.value)}
             placeholder={
-              careTeamActive
-                ? 'Message the care team…'
-                : assistantActive
-                  ? 'Ask the store assistant…'
-                  : 'Type your message'
+              voice.recording
+                ? 'Listening… tap mic to stop'
+                : voice.transcribing
+                  ? 'Transcribing…'
+                  : careTeamActive
+                    ? 'Message the care team…'
+                    : assistantActive
+                      ? 'Ask the store assistant…'
+                      : 'Type your message'
             }
             type="text"
             value={draft}
+          />
+          <ChatVoiceControls
+            compact
+            disabled={inputLocked}
+            enabled={assistantActive}
+            micSupported={voice.micSupported}
+            onStopSpeaking={voice.stopSpeaking}
+            onToggleRecording={voice.toggleRecording}
+            onToggleSpeakReplies={voice.toggleSpeakReplies}
+            recording={voice.recording}
+            speakReplies={voice.speakReplies}
+            speaking={voice.speaking}
+            transcribing={voice.transcribing}
           />
           <button
             className="liivv-btn-primary shrink-0 rounded-xl px-4 py-3 text-sm disabled:opacity-60"
@@ -310,6 +377,7 @@ function AuthenticatedPanel({
             Send
           </button>
         </form>
+        {voice.voiceError ? <p className="mt-2 text-xs text-red-700">{voice.voiceError}</p> : null}
         {sendState?.error ? <p className="mt-2 text-xs text-red-700">{sendState.error}</p> : null}
       </div>
     </div>

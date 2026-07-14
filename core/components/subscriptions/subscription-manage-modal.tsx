@@ -41,6 +41,12 @@ export interface SubscriptionManageDetails {
   canEditFrequency?: boolean;
   canSkipDelivery?: boolean;
   isCanceled?: boolean;
+  skippableDeliveries?: Array<{
+    dayKey: string;
+    label: string;
+    isNext?: boolean;
+    isPending?: boolean;
+  }>;
 }
 
 export interface FrequencyOption {
@@ -122,7 +128,12 @@ export interface SubscriptionManageModalProps {
   ) => Promise<{ success: boolean; error?: string }>;
   skipDeliveryAction?: (
     subscriptionId: string,
-  ) => Promise<{ success: boolean; error?: string }>;
+    shipmentDayKey: string,
+  ) => Promise<{ success: boolean; error?: string; mode?: string }>;
+  skipDeliveryDateLabel?: string;
+  skipDeliveryNextLabel?: string;
+  skipDeliveryPendingLabel?: string;
+  skipDeliveryScheduledLabel?: string;
   reactivateAction?: (
     subscriptionId: string,
   ) => Promise<{ success: boolean; error?: string }>;
@@ -323,6 +334,10 @@ export function SubscriptionManageModal({
   skipDeliveryLabel,
   skipDeliveryTitle,
   skipDeliveryDescription,
+  skipDeliveryDateLabel = 'Choose a delivery to skip',
+  skipDeliveryNextLabel = 'Next delivery',
+  skipDeliveryPendingLabel = 'Already scheduled to skip',
+  skipDeliveryScheduledLabel = 'Skip scheduled for {date}',
   confirmSkipDeliveryLabel,
   skippingDeliveryLabel,
   reactivateLabel,
@@ -352,6 +367,7 @@ export function SubscriptionManageModal({
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState('');
   const [selectedAddressId, setSelectedAddressId] = useState('');
   const [selectedFrequencyKey, setSelectedFrequencyKey] = useState('');
+  const [selectedSkipDayKey, setSelectedSkipDayKey] = useState('');
   const [setupClientSecret, setSetupClientSecret] = useState<string | null>(null);
   const [isLoadingSetupIntent, setIsLoadingSetupIntent] = useState(false);
   const [cancellationReason, setCancellationReason] = useState('');
@@ -404,12 +420,19 @@ export function SubscriptionManageModal({
 
     setSelectedAddressId(matchedAddress?.id ?? '');
     setSelectedFrequencyKey(subscription?.frequencyKey ?? frequencyOptions[0]?.value ?? '');
+
+    const skipOptions = subscription?.skippableDeliveries ?? [];
+    const defaultSkip =
+      skipOptions.find((option) => !option.isPending) ?? skipOptions[0];
+
+    setSelectedSkipDayKey(defaultSkip?.dayKey ?? '');
   }, [
     isOpen,
     savedPaymentMethods,
     savedShippingAddresses,
     subscription?.shippingAddressKey,
     subscription?.frequencyKey,
+    subscription?.skippableDeliveries,
     frequencyOptions,
   ]);
 
@@ -565,13 +588,13 @@ export function SubscriptionManageModal({
   };
 
   const handleSkipDelivery = () => {
-    if (!subscriptionId || !skipDeliveryAction) {
+    if (!subscriptionId || !skipDeliveryAction || !selectedSkipDayKey) {
       return;
     }
 
     startSkipDelivery(async () => {
       setErrorMessage(null);
-      const result = await skipDeliveryAction(subscriptionId);
+      const result = await skipDeliveryAction(subscriptionId, selectedSkipDayKey);
 
       if (!result.success) {
         setErrorMessage(result.error ?? 'Unable to skip delivery');
@@ -873,6 +896,11 @@ export function SubscriptionManageModal({
   }
 
   if (step === 'skip') {
+    const skipOptions = subscription?.skippableDeliveries ?? [];
+    const selectedOption = skipOptions.find((option) => option.dayKey === selectedSkipDayKey);
+    const confirmDisabled =
+      isSkippingDelivery || !selectedSkipDayKey || Boolean(selectedOption?.isPending);
+
     return (
       <SubscriptionManageModalShell
         blockingMessage={skippingDeliveryLabel}
@@ -892,7 +920,7 @@ export function SubscriptionManageModal({
             </button>
             <button
               className="subscription-manage-modal__footer-button"
-              disabled={isSkippingDelivery}
+              disabled={confirmDisabled}
               onClick={handleSkipDelivery}
               type="button"
             >
@@ -903,9 +931,57 @@ export function SubscriptionManageModal({
         isBlocking={isSkippingDelivery}
         isOpen={isOpen}
         onClose={handleClose}
-        title={modalTitle}
+        title={skipDeliveryTitle || title}
       >
         <p className="subscription-manage-modal__payment-intro">{skipDeliveryDescription}</p>
+        <p className="subscription-manage-modal__payment-intro">{skipDeliveryDateLabel}</p>
+
+        {skipOptions.length > 0 ? (
+          <div className="subscription-manage-modal__payment-list">
+            {skipOptions.map((option) => {
+              const isSelected = selectedSkipDayKey === option.dayKey;
+
+              return (
+                <label
+                  className={clsx(
+                    'subscription-manage-modal__payment-option',
+                    isSelected && 'subscription-manage-modal__payment-option--selected',
+                    option.isPending && 'subscription-manage-modal__payment-option--disabled',
+                  )}
+                  key={option.dayKey}
+                >
+                  <input
+                    checked={isSelected}
+                    className="subscription-manage-modal__payment-radio"
+                    disabled={isSkippingDelivery || option.isPending}
+                    name="subscription-skip-delivery"
+                    onChange={() => setSelectedSkipDayKey(option.dayKey)}
+                    type="radio"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="subscription-manage-modal__payment-label">{option.label}</span>
+                    <span className="subscription-manage-modal__payment-expiry">
+                      {option.isPending
+                        ? skipDeliveryPendingLabel
+                        : option.isNext
+                          ? skipDeliveryNextLabel
+                          : null}
+                    </span>
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="subscription-manage-modal__payment-intro">{skipDeliveryDescription}</p>
+        )}
+
+        {selectedOption && !selectedOption.isNext && !selectedOption.isPending ? (
+          <p className="subscription-manage-modal__payment-intro">
+            {skipDeliveryScheduledLabel.replace('{date}', selectedOption.label)}
+          </p>
+        ) : null}
+
         {errorMessage ? <p className="subscription-manage-modal__error">{errorMessage}</p> : null}
       </SubscriptionManageModalShell>
     );

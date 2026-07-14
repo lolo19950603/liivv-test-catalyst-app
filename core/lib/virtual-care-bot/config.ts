@@ -10,6 +10,11 @@ export function getVirtualCareBotModel(): string {
   return process.env.VIRTUAL_CARE_BOT_MODEL?.trim() || 'gpt-4o-mini';
 }
 
+/** Voice UI is available whenever the store assistant (and OPENAI_API_KEY) are enabled. */
+export function isVirtualCareVoiceEnabled(): boolean {
+  return isVirtualCareBotEnabled();
+}
+
 export function getAppBaseUrl(): string {
   const base = process.env.NEXT_PUBLIC_APP_URL?.trim();
 

@@ -20,7 +20,9 @@ import {
 } from '~/lib/supabase/chat-messages';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
+import { isVirtualCareVoiceEnabled } from '~/lib/virtual-care-bot/config';
 import { processCustomerMessageForBot } from '~/lib/virtual-care-bot/process-customer-message';
+import { synthesizeChatSpeech, transcribeChatAudio } from '~/lib/virtual-care-bot/voice';
 
 export type LiveChatSessionPayload = {
   supabaseReady: boolean;
@@ -186,6 +188,82 @@ export async function virtualCareChatAction(
   }
 
   return { ok: true };
+}
+
+export type TranscribeChatVoiceResult =
+  | { ok: true; text: string }
+  | { ok: false; error: string };
+
+export async function transcribeChatVoiceAction(
+  formData: FormData,
+): Promise<TranscribeChatVoiceResult> {
+  const customer = await getOnboardingCustomer();
+
+  if (!customer) {
+    return { ok: false, error: 'Please sign in to use voice chat.' };
+  }
+
+  if (!isVirtualCareVoiceEnabled()) {
+    return { ok: false, error: 'Voice chat is not available right now.' };
+  }
+
+  const audio = formData.get('audio');
+
+  if (!(audio instanceof Blob) || audio.size === 0) {
+    return { ok: false, error: 'No audio received.' };
+  }
+
+  try {
+    const file =
+      audio instanceof File
+        ? audio
+        : new File([audio], 'voice.webm', { type: audio.type || 'audio/webm' });
+    const text = await transcribeChatAudio(file);
+
+    return { ok: true, text };
+  } catch (error) {
+    console.error('[virtual-care-voice] transcribe', error);
+
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : 'Could not transcribe that recording.',
+    };
+  }
+}
+
+export type SynthesizeChatVoiceResult =
+  | { ok: true; audioBase64: string; mimeType: string }
+  | { ok: false; error: string };
+
+export async function synthesizeChatVoiceAction(
+  text: string,
+): Promise<SynthesizeChatVoiceResult> {
+  const customer = await getOnboardingCustomer();
+
+  if (!customer) {
+    return { ok: false, error: 'Please sign in to use voice replies.' };
+  }
+
+  if (!isVirtualCareVoiceEnabled()) {
+    return { ok: false, error: 'Voice replies are not available right now.' };
+  }
+
+  try {
+    const { audio, mimeType } = await synthesizeChatSpeech(text);
+
+    return {
+      ok: true,
+      audioBase64: Buffer.from(audio).toString('base64'),
+      mimeType,
+    };
+  } catch (error) {
+    console.error('[virtual-care-voice] synthesize', error);
+
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : 'Could not generate speech.',
+    };
+  }
 }
 
 export type VirtualCareAppointmentActionState = { ok?: boolean; error?: string } | null;

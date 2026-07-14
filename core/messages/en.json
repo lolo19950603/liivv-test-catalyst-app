@@ -334,11 +334,15 @@
           "monthPlural": "Every {count} months",
           "yearPlural": "Every {count} years"
         },
-        "skipDelivery": "Skip next delivery",
-        "skipDeliveryTitle": "Skip next delivery?",
-        "skipDeliveryDescription": "We'll skip your next shipment and resume on the following cycle. You won't be charged for the skipped delivery.",
+        "skipDelivery": "Skip a delivery",
+        "skipDeliveryTitle": "Skip a delivery",
+        "skipDeliveryDescription": "Pick a delivery date. We won't ship that order and you won't be charged for it.",
+        "skipDeliveryDateLabel": "Choose a delivery to skip",
+        "skipDeliveryNextLabel": "Next delivery",
+        "skipDeliveryPendingLabel": "Already scheduled to skip",
         "confirmSkipDelivery": "Skip delivery",
         "skippingDelivery": "Skipping delivery…",
+        "skipDeliveryScheduledLabel": "Skip scheduled for {date}",
         "reactivateSubscription": "Re-activate subscription",
         "reactivatingSubscription": "Re-activating subscription…",
         "cancelForm": {
@@ -368,6 +372,7 @@
       "renewsOn": "Renews on {date}",
       "nextShipmentOn": "Next shipment {date}",
       "firstChargeOn": "First charge on {date}",
+      "skipScheduled": "Skip scheduled for {date}",
       "priceAtBilling": "Price confirmed at billing",
       "subjectToChangeAtBilling": "Subject to change at billing",
       "delivery": {

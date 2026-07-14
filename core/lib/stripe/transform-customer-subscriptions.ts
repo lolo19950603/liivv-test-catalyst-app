@@ -19,6 +19,7 @@ import {
   getShipmentCalendarDayKey,
   resolveUpcomingPortalShipmentTimestamp,
 } from './subscription-shipment-grouping';
+import { parsePendingSkipDays, projectSkippableDeliveries } from './subscription-skip-dates';
 
 export { getShipmentCalendarDayKey } from './subscription-shipment-grouping';
 
@@ -43,6 +44,13 @@ export interface SubscriptionListItem {
   frequencyKey?: string;
   canEditFrequency?: boolean;
   canSkipDelivery?: boolean;
+  isCanceled?: boolean;
+  skippableDeliveries?: Array<{
+    dayKey: string;
+    label: string;
+    isNext?: boolean;
+    isPending?: boolean;
+  }>;
 }
 
 export interface SubscriptionDeliveryGroup {
@@ -175,7 +183,19 @@ function getScheduleDetail(
   }
 
   if (subscription.status === 'active' || subscription.status === 'trialing') {
-    return t('renewsOn', { date: formatDate(subscription.currentPeriodEnd) });
+    const pendingDays = parsePendingSkipDays(subscription.metadata);
+    const renews = t('renewsOn', { date: formatDate(subscription.currentPeriodEnd) });
+
+    if (pendingDays.length > 0) {
+      const nextPending = pendingDays[0];
+      const pendingLabel = t('skipScheduled', {
+        date: format.dateTime(new Date(`${nextPending}T12:00:00`), { dateStyle: 'medium' }),
+      });
+
+      return `${renews} · ${pendingLabel}`;
+    }
+
+    return renews;
   }
 
   return undefined;
@@ -237,6 +257,20 @@ export function transformCustomerSubscription(
       statusKey === 'past_due' ||
       statusKey === 'unpaid',
     isCanceled: statusKey === 'canceled',
+    skippableDeliveries: projectSkippableDeliveries({
+      interval: subscription.interval,
+      intervalCount: subscription.intervalCount,
+      trialEnd: subscription.trialEnd,
+      billingCycleAnchor: subscription.billingCycleAnchor,
+      currentPeriodStart: subscription.currentPeriodStart,
+      currentPeriodEnd: subscription.currentPeriodEnd,
+      metadata: subscription.metadata,
+    }).map((option) => ({
+      dayKey: option.dayKey,
+      label: format.dateTime(new Date(option.timestamp * 1000), { dateStyle: 'medium' }),
+      isNext: option.isNext,
+      isPending: option.isPending,
+    })),
   };
 }
 
