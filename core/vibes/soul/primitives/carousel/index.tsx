@@ -232,7 +232,7 @@ function CarouselButtons({
           onClick={scrollPrev}
           type="button"
         >
-          <span className="btn-fill" data-fill />
+          <span className="btn-fill" data-fill suppressHydrationWarning />
           <span className="btn-text">
             <IconChevronLeft />
           </span>
@@ -249,7 +249,7 @@ function CarouselButtons({
           onClick={scrollNext}
           type="button"
         >
-          <span className="btn-fill" data-fill />
+          <span className="btn-fill" data-fill suppressHydrationWarning />
           <span className="btn-text">
             <IconChevronRight />
           </span>

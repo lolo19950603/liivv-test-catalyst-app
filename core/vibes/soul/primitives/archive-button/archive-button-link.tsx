@@ -27,7 +27,7 @@ export const ArchiveButtonLink = forwardRef<HTMLAnchorElement, ArchiveButtonLink
         ref={ref}
         {...props}
       >
-        <span className="btn-fill" data-fill="" />
+        <span className="btn-fill" data-fill="" suppressHydrationWarning />
         <span className="btn-text">
           <span className="inline-flex items-center justify-center gap-2">{children}</span>
         </span>

@@ -2,6 +2,8 @@
 const BUTTON_BIND_SELECTOR =
   '[data-button-hover="standard"] .button:not(.self-button)';
 
+type FillState = 'visible' | 'exit' | 'hidden';
+
 function isButtonHoverable(button: HTMLElement): boolean {
   return (
     !button.disabled &&
@@ -9,16 +11,6 @@ function isButtonHoverable(button: HTMLElement): boolean {
     button.closest('[data-button-hover="standard"]') != null
   );
 }
-
-const FILL_TRANSITION =
-  'transform var(--animation-primary, 0.5s cubic-bezier(0.3, 1, 0.3, 1))';
-
-/** Hidden above the button (archive default). */
-const FILL_HIDDEN = 'translate3d(0, -76%, 0)';
-/** Resting fill position on hover. */
-const FILL_VISIBLE = 'translate3d(0, 0, 0)';
-/** Exit downward on unhover (curved edge moves down). */
-const FILL_EXIT = 'translate3d(0, 76%, 0)';
 
 const exitListenerByFill = new WeakMap<HTMLElement, (event: TransitionEvent) => void>();
 const boundButtons = new WeakSet<HTMLElement>();
@@ -33,6 +25,15 @@ function fillForButton(button: Element): HTMLElement | null {
   return fill as HTMLElement;
 }
 
+function setFillState(fill: HTMLElement, state: FillState | null): void {
+  if (state == null) {
+    fill.removeAttribute('data-fill-state');
+    return;
+  }
+
+  fill.setAttribute('data-fill-state', state);
+}
+
 function clearExitListener(fill: HTMLElement): void {
   const listener = exitListenerByFill.get(fill);
 
@@ -44,8 +45,7 @@ function clearExitListener(fill: HTMLElement): void {
 
 function showFill(fill: HTMLElement): void {
   clearExitListener(fill);
-  fill.style.transition = FILL_TRANSITION;
-  fill.style.transform = FILL_VISIBLE;
+  setFillState(fill, 'visible');
 }
 
 function hideFill(fill: HTMLElement): void {
@@ -57,14 +57,13 @@ function hideFill(fill: HTMLElement): void {
     }
 
     clearExitListener(fill);
-    fill.style.transition = 'none';
-    fill.style.transform = FILL_HIDDEN;
+    // Snap back above the button without animating upward.
+    setFillState(fill, 'hidden');
   };
 
   exitListenerByFill.set(fill, onTransitionEnd);
   fill.addEventListener('transitionend', onTransitionEnd);
-  fill.style.transition = FILL_TRANSITION;
-  fill.style.transform = FILL_EXIT;
+  setFillState(fill, 'exit');
 }
 
 function bindButton(button: HTMLElement): void {
@@ -123,6 +122,7 @@ export function scanShopifyButtonFillHover(root: ParentNode = document): void {
 
 /**
  * Curved circle fill: enters from above (top → bottom), exits downward on leave.
+ * Uses `data-fill-state` instead of inline styles so React hydration stays clean.
  */
 export function initShopifyButtonFillHover(root: ParentNode = document): () => void {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

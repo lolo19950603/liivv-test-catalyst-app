@@ -112,9 +112,12 @@ export function HealthProfileForm({
 
   const cardBase =
     'flex cursor-pointer items-start gap-3 rounded-xl border border-[#e0d9ce] bg-white p-4 text-left transition hover:border-[#c4b8a8] hover:bg-[#fcfaf7]';
+  // Archive CSS resets `button` border/padding/background; `liivv-option-pill` restores pills.
   const optionPillClass = (active: boolean) =>
-    `inline-flex cursor-pointer rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-      active ? 'border-[#6b7f5c] bg-[#eef4ee] text-[#2d4a2d]' : 'border-[#d6d0c5] bg-white text-[#2c2a26]'
+    `liivv-option-pill inline-flex cursor-pointer rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+      active
+        ? 'liivv-option-pill--active border-[#6b7f5c] bg-[#eef4ee] text-[#2d4a2d]'
+        : 'border-[#d6d0c5] bg-white text-[#2c2a26]'
     }`;
 
   const isMissing = (key: string) => missingRequiredKeys.includes(key);
@@ -147,16 +150,20 @@ export function HealthProfileForm({
           highlightMissing ? 'ring-1 ring-red-200 rounded-lg' : ''
         }`}
       >
-        {options.map((opt) => (
-          <button
-            key={`${key}-${opt.value}`}
-            type="button"
-            onClick={() => setResponse(key, opt.value)}
-            className={optionPillClass(current === opt.value)}
-          >
-            {opt.label}
-          </button>
-        ))}
+        {options.map((opt) => {
+          const active = current === opt.value;
+          return (
+            <button
+              key={`${key}-${opt.value}`}
+              type="button"
+              aria-pressed={active}
+              onClick={() => setResponse(key, opt.value)}
+              className={optionPillClass(active)}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
       </div>
     );
   };
@@ -233,16 +240,20 @@ export function HealthProfileForm({
                     ['daily_meds_or_weekly', 'Daily medications or weekly injectables'],
                     ['food_movement_lifestyle', 'Food, movement, and lifestyle'],
                   ] as const
-                ).map(([value, label]) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => toggleMultiResponse('diabetes_management', value)}
-                    className={optionPillClass(has(value))}
-                  >
-                    {label}
-                  </button>
-                ))}
+                ).map(([value, label]) => {
+                  const active = has(value);
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => toggleMultiResponse('diabetes_management', value)}
+                      className={optionPillClass(active)}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -588,16 +599,20 @@ export function HealthProfileForm({
                     ['high_calorie', 'High-calorie/high-protein'],
                     ['renal', 'Renal-friendly'],
                   ] as const
-                ).map(([value, label]) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => toggleMultiResponse('nutrition_guardrails', value)}
-                    className={optionPillClass(has(value))}
-                  >
-                    {label}
-                  </button>
-                ))}
+                ).map(([value, label]) => {
+                  const active = has(value);
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => toggleMultiResponse('nutrition_guardrails', value)}
+                      className={optionPillClass(active)}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>

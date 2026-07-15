@@ -1788,4 +1788,18 @@ body.adc-portal-active main{
   border-color:#375a37 !important;
   color:#fff !important;
 }
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page .onboarding-health-form button.liivv-option-pill{
+  border:1px solid #d6d0c5 !important;
+  background-color:#ffffff !important;
+  background-image:none !important;
+  color:#2c2a26 !important;
+  padding:0.375rem 0.75rem !important;
+  border-radius:9999px !important;
+  margin:0 !important;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page .onboarding-health-form button.liivv-option-pill.liivv-option-pill--active{
+  border-color:#6b7f5c !important;
+  background-color:#eef4ee !important;
+  color:#2d4a2d !important;
+}
 `;

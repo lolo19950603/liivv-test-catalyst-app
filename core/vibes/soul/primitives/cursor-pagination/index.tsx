@@ -203,7 +203,7 @@ function ArchivePaginationLink({
       href={href}
       scroll={scroll}
     >
-      <span className="btn-fill" data-fill="" />
+      <span className="btn-fill" data-fill="" suppressHydrationWarning />
       <span className="btn-text">{children}</span>
     </Link>
   );
@@ -216,7 +216,7 @@ function ArchiveSkeletonLink({ children }: { children: React.ReactNode }) {
       className="button button--secondary pointer-events-none opacity-50"
       tabIndex={-1}
     >
-      <span className="btn-fill" data-fill="" />
+      <span className="btn-fill" data-fill="" suppressHydrationWarning />
       <span className="btn-text">{children}</span>
     </span>
   );

@@ -44,7 +44,8 @@ export const ArchiveButton = forwardRef<HTMLButtonElement, ArchiveButtonProps>(f
       type={type}
       {...props}
     >
-      <span className="btn-fill" data-fill="" />
+      {/* Hover JS may set data-fill-state; suppress style attr noise from extensions / prior paint. */}
+      <span className="btn-fill" data-fill="" suppressHydrationWarning />
       <span className={clsx('btn-text', loading && 'invisible')}>
         <span className="inline-flex items-center justify-center gap-2">{children}</span>
       </span>
