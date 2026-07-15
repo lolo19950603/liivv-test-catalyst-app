@@ -255,13 +255,21 @@ export async function transcribeChatVoiceAction(
   }
 
   try {
-    const mimeType = 'type' in audio && typeof audio.type === 'string' && audio.type
-      ? audio.type
-      : 'audio/webm';
+    const mimeType =
+      'type' in audio && typeof audio.type === 'string' && audio.type
+        ? audio.type
+        : 'audio/webm';
+    const hasAudioExt =
+      audio instanceof File && /\.(webm|mp4|m4a|wav|mp3|ogg|oga)$/i.test(audio.name);
+    const extension = mimeType.includes('mp4') || mimeType.includes('m4a')
+      ? 'mp4'
+      : mimeType.includes('wav')
+        ? 'wav'
+        : 'webm';
     const file =
-      audio instanceof File
+      audio instanceof File && hasAudioExt
         ? audio
-        : new File([audio], 'voice.webm', { type: mimeType });
+        : new File([audio], `voice.${extension}`, { type: mimeType || `audio/${extension}` });
     const text = await transcribeChatAudio(file);
 
     return { ok: true, text };

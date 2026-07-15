@@ -21,6 +21,46 @@ function requireOpenAiKey(): string {
   return apiKey;
 }
 
+/** OpenAI rejects filenames without a supported audio extension (e.g. bare "blob"). */
+function resolveUploadFilename(file: File): { filename: string; mimeType: string } {
+  const rawType = (file.type || '').split(';')[0]?.trim().toLowerCase() || '';
+  const name = file.name?.trim() || '';
+  const nameExt = name.includes('.') ? name.split('.').pop()?.toLowerCase() : undefined;
+
+  if (rawType.includes('mp4') || rawType === 'audio/m4a' || nameExt === 'mp4' || nameExt === 'm4a') {
+    return { filename: 'voice.mp4', mimeType: rawType || 'audio/mp4' };
+  }
+
+  if (rawType.includes('wav') || nameExt === 'wav') {
+    return { filename: 'voice.wav', mimeType: rawType || 'audio/wav' };
+  }
+
+  if (rawType.includes('mpeg') || rawType.includes('mp3') || nameExt === 'mp3' || nameExt === 'mpga') {
+    return { filename: 'voice.mp3', mimeType: rawType || 'audio/mpeg' };
+  }
+
+  if (rawType.includes('ogg') || nameExt === 'ogg' || nameExt === 'oga') {
+    return { filename: 'voice.ogg', mimeType: rawType || 'audio/ogg' };
+  }
+
+  return { filename: 'voice.webm', mimeType: rawType || 'audio/webm' };
+}
+
+function formatOpenAiError(status: number, body: string, fallback: string): string {
+  try {
+    const parsed = JSON.parse(body) as { error?: { message?: string } };
+    const message = parsed.error?.message?.trim();
+
+    if (message) {
+      return `${fallback} (${status}): ${message}`;
+    }
+  } catch {
+    // ignore non-JSON bodies
+  }
+
+  return `${fallback} (${status}): ${body.slice(0, 300)}`;
+}
+
 export async function transcribeChatAudio(file: File): Promise<string> {
   if (!file.size) {
     throw new Error('No audio recorded.');
@@ -31,9 +71,13 @@ export async function transcribeChatAudio(file: File): Promise<string> {
   }
 
   const apiKey = requireOpenAiKey();
+  const { filename, mimeType } = resolveUploadFilename(file);
+  // Rematerialize — Server Action File blobs often arrive named "blob" without an extension.
+  const bytes = await file.arrayBuffer();
+  const upload = new File([bytes], filename, { type: mimeType });
   const form = new FormData();
 
-  form.append('file', file, file.name || 'voice.webm');
+  form.append('file', upload, filename);
   form.append('model', WHISPER_MODEL);
   form.append('response_format', 'json');
 
@@ -48,7 +92,7 @@ export async function transcribeChatAudio(file: File): Promise<string> {
   if (!response.ok) {
     const text = await response.text();
 
-    throw new Error(`Transcription failed (${response.status}): ${text.slice(0, 300)}`);
+    throw new Error(formatOpenAiError(response.status, text, 'Transcription failed'));
   }
 
   const payload = (await response.json()) as { text?: string };
@@ -90,7 +134,7 @@ export async function synthesizeChatSpeech(rawText: string): Promise<{
   if (!response.ok) {
     const textBody = await response.text();
 
-    throw new Error(`Speech synthesis failed (${response.status}): ${textBody.slice(0, 300)}`);
+    throw new Error(formatOpenAiError(response.status, textBody, 'Speech synthesis failed'));
   }
 
   return {
