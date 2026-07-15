@@ -1,10 +1,11 @@
 import { getSiteVersion } from '@makeswift/runtime/next/server';
 import { clsx } from 'clsx';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, Suspense } from 'react';
 
 import '../globals.css';
 
 import { fonts } from '~/app/fonts';
+import { NavigationLoadingOverlay } from '~/components/navigation-loading';
 import { SiteTheme } from '~/lib/makeswift/components/site-theme';
 import { MakeswiftProvider } from '~/lib/makeswift/provider';
 
@@ -19,7 +20,12 @@ export default async function RootLayout({ children }: PropsWithChildren) {
         <head>
           <SiteTheme />
         </head>
-        <body className="flex min-h-screen flex-col">{children}</body>
+        <body className="flex min-h-screen flex-col">
+          <Suspense fallback={null}>
+            <NavigationLoadingOverlay />
+          </Suspense>
+          {children}
+        </body>
       </html>
     </MakeswiftProvider>
   );
