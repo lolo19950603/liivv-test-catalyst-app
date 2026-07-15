@@ -31,6 +31,7 @@ export interface SubscriptionManageDetails {
   id: string;
   productName: string;
   variantSubtitle?: string;
+  quantity?: number;
   price?: string;
   intervalLabel?: string;
   paymentMethodLabel?: string;
@@ -102,6 +103,7 @@ export interface SubscriptionManageModalProps {
   defaultBadgeLabel: string;
   shipToLabel: string;
   paymentLabel: string;
+  quantityLabel?: string;
   cancelAction?: (
     subscriptionId: string,
     cancellationReason: string,
@@ -128,7 +130,6 @@ export interface SubscriptionManageModalProps {
   ) => Promise<{ success: boolean; error?: string }>;
   skipDeliveryAction?: (
     subscriptionId: string,
-    shipmentDayKey: string,
   ) => Promise<{ success: boolean; error?: string; mode?: string }>;
   skipDeliveryDateLabel?: string;
   skipDeliveryNextLabel?: string;
@@ -336,10 +337,8 @@ export function SubscriptionManageModal({
   skipDeliveryLabel,
   skipDeliveryTitle,
   skipDeliveryDescription,
-  skipDeliveryDateLabel = 'Choose a delivery to skip',
+  skipDeliveryDateLabel = 'Next delivery',
   skipDeliveryNextLabel = 'Next delivery',
-  skipDeliveryPendingLabel = 'Already scheduled to skip',
-  skipDeliveryScheduledLabel = 'Skip scheduled for {date}',
   confirmSkipDeliveryLabel,
   skippingDeliveryLabel,
   reactivateLabel,
@@ -347,6 +346,7 @@ export function SubscriptionManageModal({
   defaultBadgeLabel,
   shipToLabel,
   paymentLabel,
+  quantityLabel = 'Quantity',
   cancelAction,
   updatePaymentMethodAction,
   createSetupIntentAction,
@@ -369,7 +369,6 @@ export function SubscriptionManageModal({
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState('');
   const [selectedAddressId, setSelectedAddressId] = useState('');
   const [selectedFrequencyKey, setSelectedFrequencyKey] = useState('');
-  const [selectedSkipDayKey, setSelectedSkipDayKey] = useState('');
   const [setupClientSecret, setSetupClientSecret] = useState<string | null>(null);
   const [isLoadingSetupIntent, setIsLoadingSetupIntent] = useState(false);
   const [cancellationReason, setCancellationReason] = useState('');
@@ -422,19 +421,12 @@ export function SubscriptionManageModal({
 
     setSelectedAddressId(matchedAddress?.id ?? '');
     setSelectedFrequencyKey(subscription?.frequencyKey ?? frequencyOptions[0]?.value ?? '');
-
-    const skipOptions = subscription?.skippableDeliveries ?? [];
-    const defaultSkip =
-      skipOptions.find((option) => !option.isPending) ?? skipOptions[0];
-
-    setSelectedSkipDayKey(defaultSkip?.dayKey ?? '');
   }, [
     isOpen,
     savedPaymentMethods,
     savedShippingAddresses,
     subscription?.shippingAddressKey,
     subscription?.frequencyKey,
-    subscription?.skippableDeliveries,
     frequencyOptions,
   ]);
 
@@ -590,13 +582,13 @@ export function SubscriptionManageModal({
   };
 
   const handleSkipDelivery = () => {
-    if (!subscriptionId || !skipDeliveryAction || !selectedSkipDayKey) {
+    if (!subscriptionId || !skipDeliveryAction) {
       return;
     }
 
     startSkipDelivery(async () => {
       setErrorMessage(null);
-      const result = await skipDeliveryAction(subscriptionId, selectedSkipDayKey);
+      const result = await skipDeliveryAction(subscriptionId);
 
       if (!result.success) {
         setErrorMessage(result.error ?? 'Unable to skip delivery');
@@ -898,10 +890,8 @@ export function SubscriptionManageModal({
   }
 
   if (step === 'skip') {
-    const skipOptions = subscription?.skippableDeliveries ?? [];
-    const selectedOption = skipOptions.find((option) => option.dayKey === selectedSkipDayKey);
-    const confirmDisabled =
-      isSkippingDelivery || !selectedSkipDayKey || Boolean(selectedOption?.isPending);
+    const nextDeliveryLabel =
+      subscription?.skippableDeliveries?.find((option) => option.isNext)?.label ?? null;
 
     return (
       <SubscriptionManageModalShell
@@ -925,51 +915,9 @@ export function SubscriptionManageModal({
         </button>
 
         <p className="subscription-manage-modal__payment-intro">{skipDeliveryDescription}</p>
-        <p className="subscription-manage-modal__payment-intro">{skipDeliveryDateLabel}</p>
-
-        {skipOptions.length > 0 ? (
-          <div className="subscription-manage-modal__payment-list">
-            {skipOptions.map((option) => {
-              const isSelected = selectedSkipDayKey === option.dayKey;
-
-              return (
-                <label
-                  className={clsx(
-                    'subscription-manage-modal__payment-option',
-                    isSelected && 'subscription-manage-modal__payment-option--selected',
-                    option.isPending && 'subscription-manage-modal__payment-option--disabled',
-                  )}
-                  key={option.dayKey}
-                >
-                  <input
-                    checked={isSelected}
-                    className="subscription-manage-modal__payment-radio"
-                    disabled={isSkippingDelivery || option.isPending}
-                    name="subscription-skip-delivery"
-                    onChange={() => setSelectedSkipDayKey(option.dayKey)}
-                    type="radio"
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="subscription-manage-modal__payment-label">{option.label}</span>
-                    <span className="subscription-manage-modal__payment-expiry">
-                      {option.isPending
-                        ? skipDeliveryPendingLabel
-                        : option.isNext
-                          ? skipDeliveryNextLabel
-                          : null}
-                    </span>
-                  </span>
-                </label>
-              );
-            })}
-          </div>
-        ) : (
-          <p className="subscription-manage-modal__payment-intro">{skipDeliveryDescription}</p>
-        )}
-
-        {selectedOption && !selectedOption.isNext && !selectedOption.isPending ? (
+        {nextDeliveryLabel ? (
           <p className="subscription-manage-modal__payment-intro">
-            {skipDeliveryScheduledLabel.replace('{date}', selectedOption.label)}
+            {skipDeliveryNextLabel}: {nextDeliveryLabel}
           </p>
         ) : null}
 
@@ -978,7 +926,7 @@ export function SubscriptionManageModal({
         <div className="subscription-manage-modal__payment-actions">
           <Button
             className="w-full justify-center"
-            disabled={confirmDisabled}
+            disabled={isSkippingDelivery}
             loading={isSkippingDelivery}
             onClick={handleSkipDelivery}
             size="medium"
@@ -998,16 +946,6 @@ export function SubscriptionManageModal({
         blockingMessage={reactivatingLabel}
         footer={
           <div className="subscription-manage-modal__menu-footer">
-            {canSkipDelivery ? (
-              <button
-                className="subscription-manage-modal__secondary-button w-full"
-                onClick={() => setStep('skip')}
-                type="button"
-              >
-                <SkipForward className="size-4" strokeWidth={1.75} />
-                <span>{skipDeliveryLabel}</span>
-              </button>
-            ) : null}
             {canReactivate ? (
               <button
                 className="subscription-manage-modal__secondary-button w-full"
@@ -1037,11 +975,18 @@ export function SubscriptionManageModal({
           {subscription?.productName ? (
             <h3 className="subscription-manage-modal__product-name">{subscription.productName}</h3>
           ) : null}
-          {subscription?.variantSubtitle ? (
+          {subscription?.quantity != null || subscription?.variantSubtitle ? (
             <div className="subscription-manage-modal__product-meta">
-              {subscription.variantSubtitle.split(/\s*·\s*/).map((part, index) => (
-                <div key={`${part}-${index}`}>{part}</div>
-              ))}
+              {subscription.quantity != null ? (
+                <div>
+                  {quantityLabel}: {subscription.quantity}
+                </div>
+              ) : null}
+              {subscription.variantSubtitle
+                ? subscription.variantSubtitle.split(/\s*·\s*/).map((part, index) => (
+                    <div key={`${part}-${index}`}>{part}</div>
+                  ))
+                : null}
             </div>
           ) : null}
           {priceFrequency ? (
@@ -1148,7 +1093,7 @@ export function SubscriptionManageModal({
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-3">
-                  <p className="subscription-manage-modal__detail-label">{skipDeliveryLabel}</p>
+                  <p className="subscription-manage-modal__detail-label">{skipDeliveryNextLabel}</p>
                   <button
                     className="subscription-manage-modal__text-action"
                     onClick={() => setStep('skip')}
@@ -1159,11 +1104,8 @@ export function SubscriptionManageModal({
                   </button>
                 </div>
                 <p className="subscription-manage-modal__detail-value">
-                  {subscription?.skippableDeliveries?.find((option) => option.isNext)?.label
-                    ? `${skipDeliveryNextLabel}: ${
-                        subscription.skippableDeliveries.find((option) => option.isNext)?.label
-                      }`
-                    : skipDeliveryDateLabel}
+                  {subscription?.skippableDeliveries?.find((option) => option.isNext)?.label ??
+                    skipDeliveryDateLabel}
                 </p>
               </div>
             </div>

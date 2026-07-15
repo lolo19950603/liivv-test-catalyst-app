@@ -126,7 +126,9 @@ export async function searchBigCommerceCustomersForAdmin(
     const path = q.includes('@')
       ? `/v3/customers?email:in=${encodeURIComponent(q)}&limit=${limit}`
       : `/v3/customers?name:like=${encodeURIComponent(`%${q}%`)}&limit=${limit}`;
-    const response = await bigCommerceAdminFetch<BigCommerceCustomersResponse>(path);
+    const response = await bigCommerceAdminFetch<BigCommerceCustomersResponse>(path, {
+      timeoutMs: 4_000,
+    });
 
     const hits = (response.data ?? []).map((row) => ({
       bigcommerce_customer_id: String(row.id),

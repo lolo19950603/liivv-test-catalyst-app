@@ -114,8 +114,6 @@ export default async function SubscriptionsPage({ params }: Props) {
       emptyStateActionLabel={t('browsePlans')}
       emptyStateDescription={t('empty.description')}
       emptyStateTitle={t('empty.title')}
-      manageBillingAction={openBillingPortal}
-      manageBillingLabel={t('manage')}
       manageItemLabel={t('manageItem')}
       manageItemOptions={{
         modalTitle: t('manageModal.title'),

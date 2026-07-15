@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState, useEffect, useEffectEvent, useRef, useState, type RefObject } from 'react';
+import { useActionState, useEffect, useEffectEvent, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 
 import {
+  loadOlderStaffChatMessagesAction,
   staffPortalAction,
   type StaffActionState,
 } from '~/app/staff/_actions/staff-portal-actions';
@@ -14,6 +15,7 @@ import { StaffCustomerDetail } from '~/components/staff/staff-customer-detail';
 import { formatStaffStatusLabel, staffStatusBadgeClass } from '~/components/staff/staff-status';
 import { ChatMessageBody } from '~/components/virtual-care/chat-message-body';
 import { ChatSystemMessage } from '~/components/virtual-care/chat-system-message';
+import { useChatMessagePages } from '~/components/virtual-care/use-chat-message-pages';
 import {
   CHAT_ACTIVE_POLL_MS,
   useChatBurstRefresh,
@@ -64,7 +66,6 @@ export function StaffPortalClient({
     staffPortalAction,
     null,
   );
-  const bottomRef = useRef<HTMLDivElement>(null);
   const [chatRefreshTrigger, setChatRefreshTrigger] = useState(0);
   const staffHref = (params: Record<string, string | undefined>) => portalHref(basePath, params);
 
@@ -78,12 +79,6 @@ export function StaffPortalClient({
       }
     }
   }, [actionState?.ok, router, tab]);
-
-  useEffect(() => {
-    if (tab === 'chat' && data.selectedConversationId) {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [data.messages.length, data.selectedConversationId, tab]);
 
   return (
     <div className={embedded ? 'min-h-0 bg-[#faf8f5] text-[#2c2a26]' : 'min-h-screen bg-[#faf8f5] text-[#2c2a26]'}>
@@ -156,7 +151,6 @@ export function StaffPortalClient({
           <ChatTab
             actionRefreshTrigger={chatRefreshTrigger}
             basePath={basePath}
-            bottomRef={bottomRef}
             data={data}
             formAction={formAction}
             isPending={isPending}
@@ -273,18 +267,20 @@ function PharmacyTab({
         </div>
       </section>
 
-      <aside className="rounded-xl border border-[#e5dfd5] bg-white p-4 shadow-sm">
-        <h2 className="text-sm font-semibold text-[#2c2a26]">Customer detail</h2>
-        {data.pharmacyCustomerDetailError ? (
-          <p className="mt-2 text-sm text-red-700">{data.pharmacyCustomerDetailError}</p>
-        ) : data.pharmacyCustomerDetail ? (
-          <div className="mt-3">
+      <aside className="sticky top-4 flex max-h-[calc(100vh-5rem)] flex-col self-start overflow-hidden rounded-xl border border-[#e5dfd5] bg-white shadow-sm">
+        <div className="shrink-0 border-b border-[#efe9e0] px-4 py-3">
+          <h2 className="text-sm font-semibold text-[#2c2a26]">Customer detail</h2>
+          {isPending ? <p className="mt-1 text-xs text-[#8a8176]">Saving…</p> : null}
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
+          {data.pharmacyCustomerDetailError ? (
+            <p className="text-sm text-red-700">{data.pharmacyCustomerDetailError}</p>
+          ) : data.pharmacyCustomerDetail ? (
             <StaffCustomerDetail detail={data.pharmacyCustomerDetail} formAction={formAction} />
-          </div>
-        ) : (
-          <p className="mt-2 text-sm text-[#8a8176]">Select a queue item to view customer details.</p>
-        )}
-        {isPending ? <p className="mt-2 text-xs text-[#8a8176]">Saving…</p> : null}
+          ) : (
+            <p className="text-sm text-[#8a8176]">Select a queue item to view customer details.</p>
+          )}
+        </div>
       </aside>
     </div>
   );
@@ -299,91 +295,149 @@ function CustomersTab({
   data: StaffPortalData;
   formAction: (formData: FormData) => void;
 }) {
+  const router = useRouter();
+  const [isNavigating, startTransition] = useTransition();
+  const [query, setQuery] = useState(data.customerQuery);
   const staffHref = (params: Record<string, string | undefined>) => portalHref(basePath, params);
 
+  useEffect(() => {
+    setQuery(data.customerQuery);
+  }, [data.customerQuery]);
+
+  function navigate(href: string) {
+    startTransition(() => {
+      router.push(href);
+    });
+  }
+
   return (
-    <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
+    <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
       <section className="rounded-xl border border-[#e5dfd5] bg-white p-4 shadow-sm">
         <h2 className="text-sm font-semibold text-[#2c2a26]">Search customers</h2>
-        <form action={basePath} className="mt-3 flex gap-2" method="get">
-          <input name="tab" type="hidden" value="customers" />
+        <form
+          className="mt-3 flex gap-2"
+          onSubmit={(event) => {
+            event.preventDefault();
+            const nextQuery = query.trim();
+
+            if (nextQuery.length < 2) {
+              return;
+            }
+
+            navigate(staffHref({ tab: 'customers', q: nextQuery }));
+          }}
+        >
           <input
             className="min-w-0 flex-1 rounded-lg border border-[#e0d9ce] px-3 py-2 text-sm"
-            defaultValue={data.customerQuery}
             minLength={2}
             name="q"
+            onChange={(event) => setQuery(event.target.value)}
             placeholder="Name or email"
             required
+            value={query}
           />
-          <button className="liivv-btn-primary px-4 py-2 text-sm" type="submit">
-            Search
+          <button
+            className="liivv-btn-primary px-4 py-2 text-sm disabled:opacity-60"
+            disabled={isNavigating}
+            type="submit"
+          >
+            {isNavigating ? 'Searching…' : 'Search'}
           </button>
         </form>
+        {isNavigating ? (
+          <p className="mt-2 text-xs text-[#8a8176]" role="status">
+            Loading…
+          </p>
+        ) : null}
         {data.customerSearchError ? (
           <p className="mt-2 text-sm text-red-700">{data.customerSearchError}</p>
         ) : null}
         {data.bigcommerceSearchWarning ? (
           <p className="mt-2 text-xs text-amber-800">{data.bigcommerceSearchWarning}</p>
         ) : null}
-        <ul className="mt-4 divide-y divide-[#f0ebe3]">
+        <ul
+          aria-busy={isNavigating}
+          className={`mt-4 divide-y divide-[#f0ebe3] ${isNavigating ? 'pointer-events-none opacity-50' : ''}`}
+        >
+          {data.customerSearchRows.length === 0 && data.customerQuery.trim().length >= 2 && !isNavigating ? (
+            <li className="py-3 text-sm text-[#8a8176]">No customers found.</li>
+          ) : null}
           {data.customerSearchRows.map((row) => {
             if (row.source === 'supabase') {
               const p = row.profile;
               const name = customerName(p.first_name, p.last_name, p.email, 'Customer');
+              const href = staffHref({ tab: 'customers', q: data.customerQuery, p: p.id });
+              const active = data.selectedProfileId === p.id;
 
               return (
                 <li key={p.id}>
-                  <Link
-                    className="block py-3 hover:bg-[#faf8f5]"
-                    href={staffHref({ tab: 'customers', q: data.customerQuery, p: p.id })}
+                  <button
+                    className={`block w-full py-3 text-left hover:bg-[#faf8f5] ${active ? 'bg-[#f7f4ef]' : ''}`}
+                    onClick={() => navigate(href)}
+                    type="button"
                   >
                     <p className="text-sm font-medium">{name}</p>
                     <p className="text-xs text-[#8a8176]">{p.email}</p>
-                  </Link>
+                  </button>
                 </li>
               );
             }
 
             const hit = row.hit;
             const name = customerName(hit.firstName, hit.lastName, hit.email, 'Customer');
+            const href = staffHref({
+              tab: 'customers',
+              q: data.customerQuery,
+              bc: hit.bigcommerce_customer_id,
+            });
+            const active = data.selectedBigCommerceId === hit.bigcommerce_customer_id;
 
             return (
               <li key={hit.bigcommerce_customer_id}>
-                <Link
-                  className="block py-3 hover:bg-[#faf8f5]"
-                  href={staffHref({
-                    tab: 'customers',
-                    q: data.customerQuery,
-                    bc: hit.bigcommerce_customer_id,
-                  })}
+                <button
+                  className={`block w-full py-3 text-left hover:bg-[#faf8f5] ${active ? 'bg-[#f7f4ef]' : ''}`}
+                  onClick={() => navigate(href)}
+                  type="button"
                 >
                   <p className="text-sm font-medium">{name}</p>
                   <p className="text-xs text-[#8a8176]">{hit.email} (BC only)</p>
-                </Link>
+                </button>
               </li>
             );
           })}
         </ul>
       </section>
 
-      <section className="rounded-xl border border-[#e5dfd5] bg-white p-4 shadow-sm">
+      <section className="relative rounded-xl border border-[#e5dfd5] bg-white p-4 shadow-sm">
         <h2 className="text-sm font-semibold text-[#2c2a26]">Customer record</h2>
+        {isNavigating ? (
+          <div
+            aria-live="polite"
+            className="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-white/80"
+            role="status"
+          >
+            <div className="rounded-lg border border-[#e5dfd5] bg-white px-4 py-3 text-sm text-[#5c564c] shadow-sm">
+              Loading…
+            </div>
+          </div>
+        ) : null}
         {data.customerDetailError ? (
           <p className="mt-2 text-sm text-red-700">{data.customerDetailError}</p>
         ) : data.customerDetail ? (
           <div className="mt-3">
-            <StaffCustomerDetail detail={data.customerDetail} formAction={formAction} />
-            {data.customerDetail.profile ? (
-              <Link
-                className="mt-4 inline-flex text-sm font-medium text-[#375a37] hover:underline"
-                href={staffHref({
-                  tab: 'chat',
-                  profile: data.customerDetail.profile.id,
-                })}
-              >
-                Open chat →
-              </Link>
-            ) : null}
+            <StaffCustomerDetail
+              chatHref={
+                data.customerDetail.profile
+                  ? staffHref({
+                      tab: 'chat',
+                      profile: data.customerDetail.profile.id,
+                    })
+                  : undefined
+              }
+              detail={data.customerDetail}
+              formAction={formAction}
+              splitSections
+            />
           </div>
         ) : (
           <p className="mt-2 text-sm text-[#8a8176]">Search and select a customer to view details.</p>
@@ -398,7 +452,6 @@ function ChatTab({
   data,
   formAction,
   isPending,
-  bottomRef,
   onRefresh,
   actionRefreshTrigger,
 }: {
@@ -406,11 +459,11 @@ function ChatTab({
   data: StaffPortalData;
   formAction: (formData: FormData) => void;
   isPending: boolean;
-  bottomRef: RefObject<HTMLDivElement | null>;
   onRefresh: () => void;
   actionRefreshTrigger: number;
 }) {
   const staffHref = (params: Record<string, string | undefined>) => portalHref(basePath, params);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const selectedConversation =
     data.conversations.find((c) => c.conversationId === data.selectedConversationId) ?? null;
@@ -418,9 +471,19 @@ function ChatTab({
   const staffJoinedAt = selectedConversation?.staffJoinedAt ?? null;
   const staffInChat = isStaffJoinedToChat({ staffJoinedAt, staffClosedAt });
   const refresh = useEffectEvent(onRefresh);
+  const conversationId = data.selectedConversationId;
+
+  const { messages, loadingOlder, handleScroll } = useChatMessagePages({
+    conversationId,
+    loadOlderMessages: (beforeCreatedAt) =>
+      loadOlderStaffChatMessagesAction(conversationId ?? '', beforeCreatedAt),
+    recentHasMoreOlder: data.hasMoreOlder,
+    recentMessages: data.messages,
+    scrollRef,
+  });
 
   useChatPollRefresh({
-    enabled: Boolean(data.selectedConversationId),
+    enabled: Boolean(conversationId),
     intervalMs: CHAT_ACTIVE_POLL_MS,
     onRefresh: refresh,
   });
@@ -431,10 +494,10 @@ function ChatTab({
   });
 
   useEffect(() => {
-    if (data.selectedConversationId) {
+    if (conversationId) {
       refresh();
     }
-  }, [data.selectedConversationId]);
+  }, [conversationId]);
 
   return (
     <div className="rounded-xl border border-[#e5dfd5] bg-white shadow-sm">
@@ -448,7 +511,7 @@ function ChatTab({
             ) : (
               data.conversations.map((c) => {
                 const name = customerName(c.firstName, c.lastName, c.email, c.bigcommerceCustomerId);
-                const active = c.conversationId === data.selectedConversationId;
+                const active = c.conversationId === conversationId;
 
                 return (
                   <li key={c.conversationId}>
@@ -478,14 +541,23 @@ function ChatTab({
           </ul>
 
           <div className="min-h-[420px] bg-[#faf8f5] p-4">
-            {!data.selectedConversationId ? (
+            {!conversationId ? (
               <p className="text-sm text-[#8a8176]">Select a conversation.</p>
             ) : data.messagesError ? (
               <p className="text-sm text-red-700">{data.messagesError}</p>
             ) : (
               <>
-                <div className="max-h-[50vh] space-y-3 overflow-y-auto rounded-lg border border-[#ece6dc] bg-white p-3">
-                  {data.messages.map((m) => {
+                <div
+                  className="max-h-[50vh] space-y-3 overflow-y-auto rounded-lg border border-[#ece6dc] bg-white p-3"
+                  onScroll={handleScroll}
+                  ref={scrollRef}
+                >
+                  {loadingOlder ? (
+                    <p className="py-1 text-center text-xs text-[#8a8176]" role="status">
+                      Loading earlier messages…
+                    </p>
+                  ) : null}
+                  {messages.map((m) => {
                     if (m.sender_type === 'system') {
                       return <ChatSystemMessage body={m.body} key={m.id} />;
                     }
@@ -499,34 +571,33 @@ function ChatTab({
                           : 'Customer';
 
                     return (
-                    <div
-                      className={`flex ${alignEnd ? 'justify-end' : 'justify-start'}`}
-                      key={m.id}
-                    >
                       <div
-                        className={`max-w-[90%] rounded-2xl px-3 py-2 text-sm ${
-                          m.sender_type === 'staff'
-                            ? 'bg-[#2c2a26] text-white'
-                            : m.sender_type === 'bot'
-                              ? 'border border-[#c8d4bc] bg-[#f4f7f0] text-[#2c2a26]'
-                              : 'border border-[#dcd6cc] bg-white text-[#2c2a26]'
-                        }`}
+                        className={`flex ${alignEnd ? 'justify-end' : 'justify-start'}`}
+                        key={m.id}
                       >
-                        <ChatMessageBody body={m.body} />
-                        <p className="mt-1 text-[10px] opacity-70">
-                          {label} · {new Date(m.created_at).toLocaleString()}
-                        </p>
+                        <div
+                          className={`max-w-[90%] rounded-2xl px-3 py-2 text-sm ${
+                            m.sender_type === 'staff'
+                              ? 'bg-[#2c2a26] text-white'
+                              : m.sender_type === 'bot'
+                                ? 'border border-[#c8d4bc] bg-[#f4f7f0] text-[#2c2a26]'
+                                : 'border border-[#dcd6cc] bg-white text-[#2c2a26]'
+                          }`}
+                        >
+                          <ChatMessageBody body={m.body} />
+                          <p className="mt-1 text-[10px] opacity-70">
+                            {label} · {new Date(m.created_at).toLocaleString()}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  );
+                    );
                   })}
-                  <div ref={bottomRef} />
                 </div>
 
                 {staffInChat ? (
                   <form action={formAction} className="mt-3">
                     <input name="intent" type="hidden" value="endConversation" />
-                    <input name="conversationId" type="hidden" value={data.selectedConversationId} />
+                    <input name="conversationId" type="hidden" value={conversationId} />
                     <button
                       className="liivv-btn-secondary px-3 py-1.5 text-sm"
                       disabled={isPending}
@@ -540,7 +611,7 @@ function ChatTab({
                     <p>Join this chat to reply to the customer.</p>
                     <form action={formAction}>
                       <input name="intent" type="hidden" value="joinConversation" />
-                      <input name="conversationId" type="hidden" value={data.selectedConversationId} />
+                      <input name="conversationId" type="hidden" value={conversationId} />
                       <button
                         className="liivv-btn-primary px-3 py-1.5 text-sm"
                         disabled={isPending}
@@ -554,7 +625,7 @@ function ChatTab({
 
                 <form action={formAction} className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end">
                   <input name="intent" type="hidden" value="reply" />
-                  <input name="conversationId" type="hidden" value={data.selectedConversationId} />
+                  <input name="conversationId" type="hidden" value={conversationId} />
                   <textarea
                     className="min-h-20 w-full rounded-xl border border-[#e0d9ce] px-3 py-2 text-sm"
                     disabled={isPending || !staffInChat}

@@ -50,28 +50,19 @@ export async function searchProfilesForAdmin(
     const supabase = getSupabaseClient();
     const pattern = ilikePattern(q);
     const cols = 'id, bigcommerce_customer_id, email, first_name, last_name, created_at';
+    // PostgREST `or` filter values that contain commas must be double-quoted.
+    const quoted = `"${pattern.replace(/"/g, '\\"')}"`;
+    const { data, error } = await supabase
+      .from('profiles')
+      .select(cols)
+      .or(`first_name.ilike.${quoted},last_name.ilike.${quoted},email.ilike.${quoted}`)
+      .limit(limit);
 
-    const [fn, ln, em] = await Promise.all([
-      supabase.from('profiles').select(cols).ilike('first_name', pattern).limit(limit),
-      supabase.from('profiles').select(cols).ilike('last_name', pattern).limit(limit),
-      supabase.from('profiles').select(cols).ilike('email', pattern).limit(limit),
-    ]);
-
-    const err = fn.error ?? ln.error ?? em.error;
-
-    if (err) {
-      return { ok: false, message: err.message };
+    if (error) {
+      return { ok: false, message: error.message };
     }
 
-    const byId = new Map<string, AdminProfileSearchRow>();
-
-    for (const row of [...(fn.data ?? []), ...(ln.data ?? []), ...(em.data ?? [])]) {
-      const r = row as AdminProfileSearchRow;
-
-      byId.set(r.id, r);
-    }
-
-    return { ok: true, rows: [...byId.values()].slice(0, limit) };
+    return { ok: true, rows: (data ?? []) as AdminProfileSearchRow[] };
   } catch (error) {
     return {
       ok: false,
@@ -91,7 +82,14 @@ export async function searchMergedCustomersForAdmin(
   | { ok: true; rows: AdminMergedSearchRow[]; bigcommerceSearchError: string | null }
   | { ok: false; message: string }
 > {
-  const supa = await searchProfilesForAdmin(query, limit);
+  const bcConfigured = isBigCommerceAdminConfigured();
+
+  const [supa, bc] = await Promise.all([
+    searchProfilesForAdmin(query, limit),
+    bcConfigured
+      ? searchBigCommerceCustomersForAdmin(query, Math.min(limit, 25))
+      : Promise.resolve({ ok: true as const, hits: [] as AdminBigCommerceSearchHit[] }),
+  ]);
 
   if (!supa.ok) {
     return supa;
@@ -102,11 +100,9 @@ export async function searchMergedCustomersForAdmin(
     profile,
   }));
 
-  if (!isBigCommerceAdminConfigured()) {
+  if (!bcConfigured) {
     return { ok: true, rows, bigcommerceSearchError: null };
   }
-
-  const bc = await searchBigCommerceCustomersForAdmin(query, limit);
 
   if (!bc.ok) {
     return { ok: true, rows, bigcommerceSearchError: bc.message };
@@ -167,25 +163,28 @@ export async function getAdminCustomerDetail(
     }
 
     const profile = data as CustomerProfileRow;
-    const [health, insurances, prescriptions, refillRequests, carePackRequests] = await Promise.all([
-      getHealthProfileByProfileId(profileId),
-      listInsuranceByProfileId(profileId),
-      listPrescriptionsByProfileIdWithSignedPhotos(profileId),
-      listRefillRequestsByProfileId(profileId),
-      listCarePackRequestsByProfileId(profileId),
-    ]);
+    const bcId = profile.bigcommerce_customer_id?.trim();
+
+    const [health, insurances, prescriptions, refillRequests, carePackRequests, bcResult] =
+      await Promise.all([
+        getHealthProfileByProfileId(profileId),
+        listInsuranceByProfileId(profileId),
+        listPrescriptionsByProfileIdWithSignedPhotos(profileId),
+        listRefillRequestsByProfileId(profileId),
+        listCarePackRequestsByProfileId(profileId),
+        bcId && isBigCommerceAdminConfigured()
+          ? fetchAdminBigCommerceCustomerSnapshot(bcId)
+          : Promise.resolve(null),
+      ]);
 
     let bigcommerce: AdminBigCommerceCustomerSnapshot | null = null;
     let bigcommerceLoadError: string | null = null;
-    const bcId = profile.bigcommerce_customer_id?.trim();
 
-    if (bcId && isBigCommerceAdminConfigured()) {
-      const snap = await fetchAdminBigCommerceCustomerSnapshot(bcId);
-
-      if (snap.ok) {
-        bigcommerce = snap.customer;
+    if (bcResult) {
+      if (bcResult.ok) {
+        bigcommerce = bcResult.customer;
       } else {
-        bigcommerceLoadError = snap.message;
+        bigcommerceLoadError = bcResult.message;
       }
     }
 

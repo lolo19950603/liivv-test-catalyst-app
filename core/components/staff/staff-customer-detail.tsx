@@ -1,9 +1,12 @@
 'use client';
 
+import type { ReactNode } from 'react';
+
 import type { AdminCustomerDetail } from '~/lib/supabase/admin-customers';
 import type { CarePackRequestRow, PrescriptionRow, RefillRequestRow } from '~/lib/supabase/prescriptions';
+import { parseHealthProfileCategoryResponses } from '~/lib/onboarding/health-profile-display';
 
-import { formatStaffStatusLabel } from '~/components/staff/staff-status';
+import { formatStaffStatusLabel, staffStatusBadgeClass } from '~/components/staff/staff-status';
 
 type CarePackRequestIntake = {
   frequentDoseChangeMeds?: string;
@@ -15,25 +18,55 @@ type CarePackRequestIntake = {
   feeAcknowledged?: boolean;
 };
 
-function row(k: string, v: string | null | undefined) {
-  if (v == null || String(v).trim() === '') {
-    return null;
-  }
-
+function Field({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid grid-cols-[minmax(0,7rem)_1fr] gap-x-3 gap-y-1 border-b border-[#f0ebe3] py-2 last:border-0">
-      <dt className="text-xs font-medium text-[#8a8176]">{k}</dt>
-      <dd className="text-[#2c2a26]">{String(v)}</dd>
+    <div className="min-w-0">
+      <dt className="text-[11px] font-medium uppercase tracking-wide text-[#8a8176]">{label}</dt>
+      <dd className="mt-0.5 break-words text-sm leading-snug text-[#2c2a26]">{value}</dd>
     </div>
   );
 }
 
+function Section({
+  title,
+  count,
+  children,
+}: {
+  title: string;
+  count?: number;
+  children: ReactNode;
+}) {
+  return (
+    <section>
+      <div className="mb-2.5 flex items-baseline justify-between gap-2 border-b border-[#efe9e0] pb-1.5">
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">{title}</h3>
+        {typeof count === 'number' ? (
+          <span className="text-[11px] tabular-nums text-[#8a8176]">{count}</span>
+        ) : null}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function EmptyLine({ children }: { children: ReactNode }) {
+  return <p className="text-sm text-[#8a8176]">{children}</p>;
+}
+
+const selectClass =
+  'min-w-[9.5rem] rounded-md border border-[#c4b8a8] bg-white px-2 py-1.5 text-xs font-medium text-[#2c2a26]';
+
 export function StaffCustomerDetail({
   detail,
   formAction,
+  chatHref,
+  splitSections = false,
 }: {
   detail: AdminCustomerDetail;
   formAction: (formData: FormData) => void;
+  chatHref?: string;
+  /** Two-column health / prescriptions layout (Customers tab). */
+  splitSections?: boolean;
 }) {
   const { profile, health, insurances, prescriptions, refillRequests, carePackRequests, bigcommerce } =
     detail;
@@ -42,100 +75,164 @@ export function StaffCustomerDetail({
     : bigcommerce
       ? [bigcommerce.firstName, bigcommerce.lastName].filter(Boolean).join(' ').trim() || '—'
       : '—';
+  const email = profile?.email ?? bigcommerce?.email ?? null;
+  const phone = bigcommerce?.phone ?? null;
+  const bcId = profile?.bigcommerce_customer_id ?? (bigcommerce ? String(bigcommerce.id) : null);
 
   return (
-    <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1 text-sm">
-      {profile ? (
-        <section className="rounded-lg border border-[#ece6dc] bg-white p-4 shadow-sm">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">Profile</h3>
-          <dl className="mt-2">
-            {row('Name', name)}
-            {row('Email', profile.email)}
-            {row('BigCommerce ID', profile.bigcommerce_customer_id)}
-            {row('Profile id', profile.id)}
-          </dl>
-        </section>
-      ) : (
-        <section className="rounded-lg border border-[#e8e0d4] bg-[#faf8f5] p-4 shadow-sm">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">Liivv profile</h3>
-          <p className="mt-2 text-[#6b6560]">No Supabase profile. BigCommerce data shown below when available.</p>
-        </section>
-      )}
+    <div className="space-y-5 text-sm">
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0 space-y-1">
+          <p className="text-lg font-semibold leading-snug text-[#2c2a26]">{name}</p>
+          {email ? <p className="break-all text-[#5c564c]">{email}</p> : null}
+          <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-[#8a8176]">
+            {phone ? <span>{phone}</span> : null}
+            {bcId ? <span>Customer ID {bcId}</span> : null}
+            {!profile ? <span>BigCommerce only — no Liivv profile</span> : null}
+          </div>
+        </div>
+        {chatHref ? (
+          <a
+            className="shrink-0 rounded-lg border border-[#c8d4bc] bg-[#f4f7f0] px-3 py-1.5 text-sm font-medium text-[#375a37] hover:bg-[#eaf0e4]"
+            href={chatHref}
+          >
+            Open chat
+          </a>
+        ) : null}
+      </header>
 
-      {bigcommerce ? (
-        <section className="rounded-lg border border-[#ece6dc] bg-white p-4 shadow-sm">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">BigCommerce</h3>
-          <dl className="mt-2">
-            {row('Name', [bigcommerce.firstName, bigcommerce.lastName].filter(Boolean).join(' '))}
-            {row('Email', bigcommerce.email)}
-            {row('Phone', bigcommerce.phone)}
-            {row('Customer ID', String(bigcommerce.id))}
-          </dl>
-          {bigcommerce.addresses.length > 0 ? (
-            <ul className="mt-3 space-y-2 text-xs">
-              {bigcommerce.addresses.map((addr, i) => (
-                <li className="rounded-md border border-[#efe9e0] bg-[#faf9f7] px-3 py-2" key={i}>
-                  {[addr.address1, addr.address2, addr.city, addr.stateOrProvince, addr.postalCode]
-                    .filter(Boolean)
-                    .join(', ')}
+      {bigcommerce && bigcommerce.addresses.length > 0 ? (
+        <Section count={bigcommerce.addresses.length} title="Addresses">
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {bigcommerce.addresses.map((addr, i) => {
+              const line = [addr.address1, addr.address2].filter(Boolean).join(', ');
+              const cityLine = [addr.city, addr.stateOrProvince, addr.postalCode]
+                .filter(Boolean)
+                .join(', ');
+
+              return (
+                <li
+                  className="rounded-lg border border-[#efe9e0] bg-[#faf9f7] px-3 py-2.5"
+                  key={i}
+                >
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-[#8a8176]">
+                    {i === 0 ? 'Primary' : `Address ${i + 1}`}
+                  </p>
+                  <p className="mt-1 leading-snug text-[#2c2a26]">{line || '—'}</p>
+                  {cityLine ? <p className="mt-0.5 text-xs text-[#5c564c]">{cityLine}</p> : null}
+                  {addr.country ? (
+                    <p className="mt-0.5 text-xs text-[#8a8176]">{addr.country}</p>
+                  ) : null}
                 </li>
-              ))}
-            </ul>
-          ) : null}
-        </section>
+              );
+            })}
+          </ul>
+        </Section>
       ) : null}
 
       {profile ? (
-        <>
-          <section className="rounded-lg border border-[#ece6dc] bg-white p-4 shadow-sm">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">Health profile</h3>
-            {health ? (
-              <dl className="mt-2">
-                {row('Doctor', health.doctor_name)}
-                {row('Doctor phone', health.doctor_phone)}
-                {row('Pharmacy', health.pharmacy_name)}
-                {row('Pharmacy phone', health.pharmacy_phone)}
-                {row('Notes', health.notes)}
-              </dl>
-            ) : (
-              <p className="mt-2 text-[#8a8176]">No health profile on file.</p>
-            )}
-          </section>
+        <div className={splitSections ? 'grid gap-5 lg:grid-cols-2' : 'space-y-5'}>
+          <div className="space-y-5">
+            <Section title="Health profile">
+              {health ? (
+                <StaffHealthProfileRows health={health} />
+              ) : (
+                <EmptyLine>No health profile on file.</EmptyLine>
+              )}
+            </Section>
+            <StaffInsuranceSection insurances={insurances} />
+          </div>
 
-          <StaffPrescriptionsSection formAction={formAction} prescriptions={prescriptions} profileId={profile.id} />
-          <StaffRefillsSection formAction={formAction} profileId={profile.id} refillRequests={refillRequests} />
-          <StaffCarePackSection
-            carePackRequests={carePackRequests}
-            formAction={formAction}
-            profileId={profile.id}
-          />
-          <StaffInsuranceSection insurances={insurances} />
-        </>
+          <div className="space-y-5">
+            <StaffPrescriptionsSection
+              formAction={formAction}
+              prescriptions={prescriptions}
+              profileId={profile.id}
+            />
+            <StaffRefillsSection
+              formAction={formAction}
+              profileId={profile.id}
+              refillRequests={refillRequests}
+            />
+            <StaffCarePackSection
+              carePackRequests={carePackRequests}
+              formAction={formAction}
+              profileId={profile.id}
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {detail.bigcommerceLoadError ? (
+        <p className="text-xs text-amber-800">{detail.bigcommerceLoadError}</p>
       ) : null}
     </div>
   );
 }
 
+function StaffHealthProfileRows({ health }: { health: NonNullable<AdminCustomerDetail['health']> }) {
+  const { rows: categoryRows, freeTextNotes } = parseHealthProfileCategoryResponses(health.notes);
+  const structured: Array<{ label: string; value: string }> = [
+    health.doctor_name ? { label: 'Doctor', value: health.doctor_name } : null,
+    health.doctor_phone ? { label: 'Doctor phone', value: health.doctor_phone } : null,
+    health.pharmacy_name ? { label: 'Pharmacy', value: health.pharmacy_name } : null,
+    health.pharmacy_phone ? { label: 'Pharmacy phone', value: health.pharmacy_phone } : null,
+    health.ostomy_type ? { label: 'Ostomy type', value: health.ostomy_type } : null,
+    health.ostomy_tenure ? { label: 'Ostomy journey', value: health.ostomy_tenure } : null,
+    health.ostomy_preferred_brand
+      ? { label: 'Ostomy brand', value: health.ostomy_preferred_brand }
+      : null,
+    health.wound_care_type ? { label: 'Wound care', value: health.wound_care_type } : null,
+    health.respiratory_type ? { label: 'Breathing', value: health.respiratory_type } : null,
+  ].filter((row): row is { label: string; value: string } => row != null);
+
+  const answerRows = categoryRows;
+  const hasContent = structured.length > 0 || answerRows.length > 0 || Boolean(freeTextNotes);
+
+  if (!hasContent) {
+    return <EmptyLine>Health profile saved, but no answers on file.</EmptyLine>;
+  }
+
+  return (
+    <dl className="grid gap-3 sm:grid-cols-2">
+      {structured.map((row) => (
+        <Field key={row.label} label={row.label} value={row.value} />
+      ))}
+      {answerRows.map((row) => (
+        <Field key={row.label} label={row.label} value={row.value} />
+      ))}
+      {freeTextNotes ? (
+        <div className="min-w-0 sm:col-span-2">
+          <Field label="Notes" value={freeTextNotes} />
+        </div>
+      ) : null}
+    </dl>
+  );
+}
+
 function StaffInsuranceSection({ insurances }: { insurances: AdminCustomerDetail['insurances'] }) {
   return (
-    <section className="rounded-lg border border-[#ece6dc] bg-white p-4 shadow-sm">
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">Insurance</h3>
+    <Section count={insurances.length} title="Insurance">
       {insurances.length === 0 ? (
-        <p className="mt-2 text-[#8a8176]">No insurance record on file.</p>
+        <EmptyLine>No insurance on file.</EmptyLine>
       ) : (
-        <div className="mt-2 space-y-3">
+        <ul className="space-y-2">
           {insurances.map((entry) => (
-            <div className="rounded-md border border-[#efe9e0] bg-[#faf9f7] p-3" key={entry.id}>
-              <dl>
-                {row('Provider', entry.provider_name)}
-                {row('Policy #', entry.policy_number)}
-                {row('Member ID', entry.member_id)}
+            <li className="rounded-lg border border-[#efe9e0] bg-[#faf9f7] px-3 py-2.5" key={entry.id}>
+              <dl className="grid gap-2 sm:grid-cols-3">
+                {entry.provider_name ? (
+                  <Field label="Provider" value={entry.provider_name} />
+                ) : null}
+                {entry.policy_number ? (
+                  <Field label="Policy #" value={entry.policy_number} />
+                ) : null}
+                {entry.member_id ? <Field label="Member ID" value={entry.member_id} /> : null}
               </dl>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
-    </section>
+    </Section>
   );
 }
 
@@ -149,39 +246,55 @@ function StaffPrescriptionsSection({
   formAction: (formData: FormData) => void;
 }) {
   return (
-    <section className="rounded-lg border border-[#ece6dc] bg-white p-4 shadow-sm">
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">Prescriptions</h3>
+    <Section count={prescriptions.length} title="Prescriptions">
       {prescriptions.length === 0 ? (
-        <p className="mt-2 text-[#8a8176]">No prescriptions on file.</p>
+        <EmptyLine>No prescriptions on file.</EmptyLine>
       ) : (
-        <ul className="mt-2 space-y-3">
+        <ul className="space-y-2">
           {prescriptions.map((rx) => {
             const approval = String(rx.approval_status ?? '').toLowerCase();
+            const statusValue =
+              approval === 'approved' ||
+              approval === 'rejected' ||
+              approval === 'expired' ||
+              approval === 'pending_review'
+                ? approval
+                : (rx.approval_status ?? rx.status ?? 'pending_review');
+            const meta = [rx.dosage, rx.frequency].filter(Boolean).join(' · ');
 
             return (
-              <li className="rounded-md border border-[#efe9e0] bg-[#faf9f7] px-3 py-2 text-xs" key={rx.id}>
-                <p className="font-semibold text-[#2c2a26]">{rx.medication_name}</p>
-                <p className="mt-1 text-[#5c564c]">
-                  {[rx.dosage, rx.frequency].filter(Boolean).join(' · ') || '—'}
-                </p>
-                <p className="mt-1 text-[#8a8176]">
-                  Approval: {formatStaffStatusLabel(rx.approval_status)} • Status:{' '}
-                  {formatStaffStatusLabel(rx.status)}
-                </p>
+              <li className="rounded-lg border border-[#efe9e0] bg-[#faf9f7] px-3 py-2.5" key={rx.id}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold leading-snug text-[#2c2a26]">{rx.medication_name}</p>
+                    {meta ? <p className="mt-0.5 text-xs text-[#5c564c]">{meta}</p> : null}
+                  </div>
+                  <span className={`shrink-0 ${staffStatusBadgeClass(statusValue)}`}>
+                    {formatStaffStatusLabel(statusValue)}
+                  </span>
+                </div>
                 {rx.photoDisplayUrl ? (
-                  <img alt="" className="mt-2 h-24 rounded border object-contain" src={rx.photoDisplayUrl} />
+                  <img
+                    alt=""
+                    className="mt-2 h-24 rounded border border-[#efe9e0] object-contain"
+                    src={rx.photoDisplayUrl}
+                  />
                 ) : null}
-                <form action={formAction} className="mt-2 flex flex-wrap gap-2">
+                <form action={formAction} className="mt-2">
                   <input name="intent" type="hidden" value="prescription_set_status" />
                   <input name="profileId" type="hidden" value={profileId} />
                   <input name="prescriptionId" type="hidden" value={rx.id} />
+                  <label className="sr-only" htmlFor={`rx-status-${rx.id}`}>
+                    Approval status
+                  </label>
                   <select
-                    className="rounded-md border border-[#c4b8a8] bg-white px-2 py-1 text-[11px] font-semibold"
+                    className={selectClass}
                     defaultValue={
                       approval === 'approved' || approval === 'rejected' || approval === 'expired'
                         ? approval
                         : 'pending_review'
                     }
+                    id={`rx-status-${rx.id}`}
                     name="status"
                     onChange={(e) => e.currentTarget.form?.requestSubmit()}
                   >
@@ -196,7 +309,7 @@ function StaffPrescriptionsSection({
           })}
         </ul>
       )}
-    </section>
+    </Section>
   );
 }
 
@@ -210,22 +323,25 @@ function StaffRefillsSection({
   formAction: (formData: FormData) => void;
 }) {
   return (
-    <section className="rounded-lg border border-[#ece6dc] bg-white p-4 shadow-sm">
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">Refill requests</h3>
+    <Section count={refillRequests.length} title="Refill requests">
       {refillRequests.length === 0 ? (
-        <p className="mt-2 text-[#8a8176]">No refill requests on file.</p>
+        <EmptyLine>No refill requests on file.</EmptyLine>
       ) : (
-        <ul className="mt-2 space-y-3">
+        <ul className="space-y-2">
           {refillRequests.map((req) => (
-            <li className="rounded-md border border-[#efe9e0] bg-[#faf9f7] px-3 py-2 text-xs" key={req.id}>
-              <p className="font-semibold text-[#2c2a26]">Request #{req.id.slice(0, 8)}</p>
-              <p className="mt-1 text-[#8a8176]">Status: {formatStaffStatusLabel(req.status)}</p>
+            <li className="rounded-lg border border-[#efe9e0] bg-[#faf9f7] px-3 py-2.5" key={req.id}>
+              <div className="flex items-start justify-between gap-3">
+                <p className="font-semibold text-[#2c2a26]">Request #{req.id.slice(0, 8)}</p>
+                <span className={`shrink-0 ${staffStatusBadgeClass(req.status)}`}>
+                  {formatStaffStatusLabel(req.status)}
+                </span>
+              </div>
               <form action={formAction} className="mt-2">
                 <input name="intent" type="hidden" value="refill_set_status" />
                 <input name="profileId" type="hidden" value={profileId} />
                 <input name="refillRequestId" type="hidden" value={req.id} />
                 <select
-                  className="rounded-md border border-[#c4b8a8] bg-white px-2 py-1 text-[11px] font-semibold"
+                  className={selectClass}
                   defaultValue={String(req.status ?? '').toLowerCase()}
                   name="status"
                   onChange={(e) => e.currentTarget.form?.requestSubmit()}
@@ -240,7 +356,7 @@ function StaffRefillsSection({
           ))}
         </ul>
       )}
-    </section>
+    </Section>
   );
 }
 
@@ -254,12 +370,11 @@ function StaffCarePackSection({
   formAction: (formData: FormData) => void;
 }) {
   return (
-    <section className="rounded-lg border border-[#ece6dc] bg-white p-4 shadow-sm">
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">CarePack requests</h3>
+    <Section count={carePackRequests.length} title="CarePack requests">
       {carePackRequests.length === 0 ? (
-        <p className="mt-2 text-[#8a8176]">No CarePack requests on file.</p>
+        <EmptyLine>No CarePack requests on file.</EmptyLine>
       ) : (
-        <ul className="mt-2 space-y-3">
+        <ul className="space-y-2">
           {carePackRequests.map((req) => {
             let intake: CarePackRequestIntake | null = null;
 
@@ -272,29 +387,33 @@ function StaffCarePackSection({
             }
 
             return (
-              <li className="rounded-md border border-[#efe9e0] bg-[#faf9f7] px-3 py-2 text-xs" key={req.id}>
-                <p className="font-semibold text-[#2c2a26]">Request #{req.id.slice(0, 8)}</p>
-                <p className="mt-1 text-[#8a8176]">Status: {formatStaffStatusLabel(req.status)}</p>
-                {intake?.frequentDoseChangeMeds ? (
-                  <p className="mt-1 text-[#8a8176]">Dose changes: {intake.frequentDoseChangeMeds}</p>
-                ) : null}
-                {intake?.asNeededMeds ? (
-                  <p className="mt-1 text-[#8a8176]">As-needed meds: {intake.asNeededMeds}</p>
-                ) : null}
-                {intake?.includeOtcVitamins ? (
-                  <p className="mt-1 text-[#8a8176]">
-                    OTC vitamins: {intake.otcVitaminsNotes?.trim() || 'Yes'}
-                  </p>
-                ) : null}
-                {intake?.holdOrVacationNotes ? (
-                  <p className="mt-1 text-[#8a8176]">Hold/vacation: {intake.holdOrVacationNotes}</p>
-                ) : null}
+              <li className="rounded-lg border border-[#efe9e0] bg-[#faf9f7] px-3 py-2.5" key={req.id}>
+                <div className="flex items-start justify-between gap-3">
+                  <p className="font-semibold text-[#2c2a26]">Request #{req.id.slice(0, 8)}</p>
+                  <span className={`shrink-0 ${staffStatusBadgeClass(req.status)}`}>
+                    {formatStaffStatusLabel(req.status)}
+                  </span>
+                </div>
+                <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+                  {intake?.frequentDoseChangeMeds ? (
+                    <Field label="Dose changes" value={intake.frequentDoseChangeMeds} />
+                  ) : null}
+                  {intake?.asNeededMeds ? (
+                    <Field label="As-needed" value={intake.asNeededMeds} />
+                  ) : null}
+                  {intake?.includeOtcVitamins ? (
+                    <Field label="OTC vitamins" value={intake.otcVitaminsNotes?.trim() || 'Yes'} />
+                  ) : null}
+                  {intake?.holdOrVacationNotes ? (
+                    <Field label="Hold / vacation" value={intake.holdOrVacationNotes} />
+                  ) : null}
+                </dl>
                 <form action={formAction} className="mt-2">
                   <input name="intent" type="hidden" value="carepack_set_status" />
                   <input name="profileId" type="hidden" value={profileId} />
                   <input name="carePackRequestId" type="hidden" value={req.id} />
                   <select
-                    className="rounded-md border border-[#c4b8a8] bg-white px-2 py-1 text-[11px] font-semibold"
+                    className={selectClass}
                     defaultValue={String(req.status ?? '').toLowerCase()}
                     name="status"
                     onChange={(e) => e.currentTarget.form?.requestSubmit()}
@@ -310,6 +429,6 @@ function StaffCarePackSection({
           })}
         </ul>
       )}
-    </section>
+    </Section>
   );
 }

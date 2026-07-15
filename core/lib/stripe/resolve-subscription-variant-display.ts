@@ -10,6 +10,10 @@ import {
   parseVariantLabelFromMetadata,
   type ProductOptionSelection,
 } from '~/lib/bigcommerce/product-options';
+import {
+  formatProductOptionDisplayName,
+  normalizeVariantSubtitleLabels,
+} from '~/lib/checkout/format-cart-selected-options-subtitle';
 
 import type { CustomerSubscription } from './subscriptions';
 
@@ -109,13 +113,17 @@ function formatOptionSelectionsLabel(
           (entry) => entry.entityId === selection.valueEntityId,
         );
 
-        return value ? `${option.displayName}: ${value.label}` : undefined;
+        return value
+          ? `${formatProductOptionDisplayName(option.displayName)}: ${value.label}`
+          : undefined;
       }
 
       if (option.checkedOptionValueEntityId != null) {
         const isChecked = selection.valueEntityId === option.checkedOptionValueEntityId;
 
-        return `${option.displayName}: ${isChecked ? option.label ?? 'Yes' : 'No'}`;
+        return `${formatProductOptionDisplayName(option.displayName)}: ${
+          isChecked ? option.label ?? 'Yes' : 'No'
+        }`;
       }
 
       return undefined;
@@ -137,7 +145,7 @@ function buildVariantSubtitle({
   sku?: string;
 }): string | undefined {
   if (storedLabel) {
-    return storedLabel;
+    return normalizeVariantSubtitleLabels(storedLabel);
   }
 
   const optionLabel = formatOptionSelectionsLabel(selections, optionNodes);

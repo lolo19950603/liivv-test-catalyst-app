@@ -219,6 +219,13 @@ body.subscription-manage-modal-open .subscription-manage-modal-blur-target {
     box-shadow 150ms ease;
 }
 
+.subscription-manage-modal__cancel-button {
+  border-color: color-mix(in oklab, hsl(var(--error)), white 35%);
+  background: color-mix(in oklab, hsl(var(--error)), white 88%) !important;
+  background-color: color-mix(in oklab, hsl(var(--error)), white 88%) !important;
+  color: hsl(var(--error)) !important;
+}
+
 .subscription-manage-modal__cancel-button:hover:not(:disabled),
 .subscription-manage-modal__secondary-button:hover:not(:disabled) {
   background: #f0ebe4 !important;
@@ -226,6 +233,14 @@ body.subscription-manage-modal-open .subscription-manage-modal-blur-target {
   border-color: rgba(49, 47, 47, 0.4);
   box-shadow: 0 1px 3px rgba(49, 47, 47, 0.08);
   color: #1f1d1d !important;
+}
+
+.subscription-manage-modal__cancel-button:hover:not(:disabled) {
+  background: color-mix(in oklab, hsl(var(--error)), white 78%) !important;
+  background-color: color-mix(in oklab, hsl(var(--error)), white 78%) !important;
+  border-color: hsl(var(--error));
+  box-shadow: 0 1px 3px color-mix(in oklab, hsl(var(--error)), transparent 70%);
+  color: hsl(var(--error)) !important;
 }
 
 .subscription-manage-modal__cancel-button:disabled,

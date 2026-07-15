@@ -4,7 +4,6 @@ import { clsx } from 'clsx';
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 
-import { Button } from '@/vibes/soul/primitives/button';
 import { ButtonLink } from '@/vibes/soul/primitives/button-link';
 import type { ProductImageFallbackLogo } from '@/vibes/soul/primitives/product-card';
 import { SubscriptionManageModal, type SubscriptionManageDetails } from '~/components/subscriptions/subscription-manage-modal';
@@ -92,8 +91,6 @@ export interface SubscriptionListProps {
   emptyDeliveriesTitle?: string;
   emptyActiveTitle?: string;
   emptyCanceledTitle?: string;
-  manageBillingLabel?: string;
-  manageBillingAction?: () => Promise<void>;
   manageItemLabel?: string;
   manageItemAction?: (subscriptionId: string) => Promise<void>;
   manageItemOptions?: {
@@ -163,7 +160,6 @@ export interface SubscriptionListProps {
     skippingDeliveryLabel: string;
     skipDeliveryAction: (
       subscriptionId: string,
-      shipmentDayKey: string,
     ) => Promise<{ success: boolean; error?: string; mode?: string }>;
     skipDeliveryDateLabel?: string;
     skipDeliveryPendingLabel?: string;
@@ -333,33 +329,6 @@ function SubscriptionStatusBadge({
     >
       {status}
     </span>
-  );
-}
-
-function SubscriptionPortalSubmitButton({
-  label,
-  variant = 'secondary',
-  size = 'medium',
-  className,
-}: {
-  label: string;
-  variant?: 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'danger';
-  size?: 'large' | 'medium' | 'small' | 'x-small';
-  className?: string;
-}) {
-  const { pending } = useFormStatus();
-
-  return (
-    <Button
-      className={clsx('subscription-portal-action-button', className)}
-      disabled={pending}
-      loading={pending}
-      size={size}
-      type="submit"
-      variant={variant}
-    >
-      {label}
-    </Button>
   );
 }
 
@@ -1468,8 +1437,6 @@ export function SubscriptionList({
   emptyDeliveriesTitle = 'You do not have any upcoming deliveries.',
   emptyActiveTitle = 'You do not have any active subscriptions.',
   emptyCanceledTitle = 'You do not have any canceled subscriptions.',
-  manageBillingLabel = 'Manage billing',
-  manageBillingAction,
   manageItemLabel = 'Edit',
   manageItemAction,
   manageItemOptions,
@@ -1609,6 +1576,7 @@ export function SubscriptionList({
         id: item.id,
         productName: item.productName,
         variantSubtitle: item.variantSubtitle,
+        quantity: item.quantity,
         price: item.price,
         intervalLabel: item.intervalLabel,
         paymentMethodLabel: item.paymentMethodLabel,
@@ -1629,16 +1597,10 @@ export function SubscriptionList({
   return (
     <SubscriptionManageClickContext.Provider value={manageClickValue}>
     <section className={clsx('w-full @container', className)}>
-      <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
+      <header className="mb-6">
         <h1 className="font-[family-name:var(--font-family-heading)] text-4xl font-medium leading-none tracking-tight text-[var(--foreground,hsl(var(--foreground)))]">
           {title}
         </h1>
-
-        {manageBillingAction ? (
-          <form action={manageBillingAction}>
-            <SubscriptionPortalSubmitButton label={manageBillingLabel} />
-          </form>
-        ) : null}
       </header>
 
       {message ? (
@@ -1774,6 +1736,7 @@ export function SubscriptionList({
           manageItemOptions?.paymentPickerDescription ?? 'Choose a saved card for your'
         }
         paymentPickerTitle={manageItemOptions?.paymentPickerTitle ?? 'Select a payment method'}
+        quantityLabel={quantityLabel}
         reactivateAction={manageItemOptions?.reactivateAction}
         reactivateLabel={manageItemOptions?.reactivateLabel ?? 'Re-activate subscription'}
         reactivatingLabel={manageItemOptions?.reactivatingLabel ?? 'Re-activating subscription…'}
@@ -1789,7 +1752,7 @@ export function SubscriptionList({
           manageItemOptions?.skipDeliveryDescription ??
           "Pick a delivery date. We won't ship or charge you for that date."
         }
-        skipDeliveryLabel={manageItemOptions?.skipDeliveryLabel ?? 'Skip a delivery'}
+        skipDeliveryLabel={manageItemOptions?.skipDeliveryLabel ?? 'Skip this delivery'}
         skipDeliveryNextLabel={manageItemOptions?.skipDeliveryNextLabel ?? 'Next delivery'}
         skipDeliveryPendingLabel={
           manageItemOptions?.skipDeliveryPendingLabel ?? 'Already scheduled to skip'
@@ -1797,7 +1760,7 @@ export function SubscriptionList({
         skipDeliveryScheduledLabel={
           manageItemOptions?.skipDeliveryScheduledLabel ?? 'Skip scheduled for {date}'
         }
-        skipDeliveryTitle={manageItemOptions?.skipDeliveryTitle ?? 'Skip a delivery'}
+        skipDeliveryTitle={manageItemOptions?.skipDeliveryTitle ?? 'Skip this delivery'}
         skippingDeliveryLabel={manageItemOptions?.skippingDeliveryLabel ?? 'Skipping delivery…'}
         subscription={managedSubscription ?? undefined}
         title={manageItemOptions?.modalTitle ?? 'Manage subscription'}

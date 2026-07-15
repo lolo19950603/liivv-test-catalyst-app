@@ -135,7 +135,9 @@ export function enrichSubscriptionsForPortal(
         ? productImagesByEntityId.get(subscription.productEntityId)
         : undefined;
     const image = variantDisplay?.image ?? fallbackImage;
-    const variantSubtitle = variantDisplay?.variantSubtitle ?? subscription.variantSubtitle;
+    const variantSubtitle = (
+      variantDisplay?.variantSubtitle ?? subscription.variantSubtitle
+    )?.replace(/(^| · )Quantity:/gi, '$1UOM:');
     const catalogProductName =
       subscription.productEntityId != null
         ? productNamesByEntityId.get(subscription.productEntityId)?.trim()

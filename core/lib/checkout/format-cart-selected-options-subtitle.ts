@@ -7,30 +7,37 @@ type CartSelectedOption = {
   date?: { utc: string };
 };
 
+/** BigCommerce packs this option as "Quantity", but it is unit of measure (e.g. Box of 24). */
+export function formatProductOptionDisplayName(name: string): string {
+  return name.trim().toLowerCase() === 'quantity' ? 'UOM' : name;
+}
+
+export function normalizeVariantSubtitleLabels(subtitle: string): string {
+  return subtitle.replace(/(^| · )Quantity:/gi, '$1UOM:');
+}
+
 export function formatCartSelectedOptionsSubtitle(
   selectedOptions: CartSelectedOption[],
   sku?: string | null,
 ): string | undefined {
   const optionParts = selectedOptions
     .map((option) => {
+      const name = option.name ? formatProductOptionDisplayName(option.name) : undefined;
+
       switch (option.__typename) {
         case 'CartSelectedMultipleChoiceOption':
         case 'CartSelectedCheckboxOption':
-          return option.name && option.value ? `${option.name}: ${option.value}` : option.value;
+          return name && option.value ? `${name}: ${option.value}` : option.value;
 
         case 'CartSelectedNumberFieldOption':
-          return option.name && option.number != null
-            ? `${option.name}: ${option.number}`
-            : undefined;
+          return name && option.number != null ? `${name}: ${option.number}` : undefined;
 
         case 'CartSelectedMultiLineTextFieldOption':
         case 'CartSelectedTextFieldOption':
-          return option.name && option.text ? `${option.name}: ${option.text}` : option.text;
+          return name && option.text ? `${name}: ${option.text}` : option.text;
 
         case 'CartSelectedDateFieldOption':
-          return option.name && option.date?.utc
-            ? `${option.name}: ${option.date.utc}`
-            : undefined;
+          return name && option.date?.utc ? `${name}: ${option.date.utc}` : undefined;
 
         default:
           return undefined;

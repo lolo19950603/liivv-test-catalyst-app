@@ -12,6 +12,8 @@ import {
   useEffect,
   useMemo,
   useOptimistic,
+  useRef,
+  useState,
 } from 'react';
 import { useFormStatus } from 'react-dom';
 
@@ -168,7 +170,6 @@ export interface CartProps<LineItem extends CartLineItem> {
   couponCode?: CouponCode;
   giftCertificate?: GiftCertificate;
   shipping?: Shipping;
-  lineItemActionPendingLabel?: string;
 }
 
 const defaultEmptyState = {
@@ -211,7 +212,6 @@ export function CartClient<LineItem extends CartLineItem>({
   incrementLineItemLabel,
   deleteLineItemLabel,
   lineItemAction,
-  lineItemActionPendingLabel = 'You have a cart update in progress. Are you sure you want to leave this page? Your changes may be lost.',
   checkoutAction,
   checkoutLabel = 'Checkout',
   emptyState = defaultEmptyState,
@@ -224,6 +224,8 @@ export function CartClient<LineItem extends CartLineItem>({
     lineItems: cart.lineItems,
     lastResult: null,
   });
+  const wasLineItemActionPendingRef = useRef(false);
+  const [isSummaryRefreshing, setIsSummaryRefreshing] = useState(false);
 
   const [form] = useForm({ lastResult: state.lastResult });
 
@@ -235,85 +237,22 @@ export function CartClient<LineItem extends CartLineItem>({
     }
   }, [form.errors]);
 
-  // Prevent page unload when line item action is pending
+  // Refresh cart summary once after the queued line-item actions settle, instead of
+  // reloading the page on every click (which made multi-delete feel stuck).
   useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (isLineItemActionPending) {
-        event.preventDefault();
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        event.returnValue = ''; // Chrome requires returnValue to be set
-
-        return ''; // For older browsers
-      }
-    };
-
-    if (isLineItemActionPending) {
-      window.addEventListener('beforeunload', handleBeforeUnload);
+    if (wasLineItemActionPendingRef.current && !isLineItemActionPending) {
+      setIsSummaryRefreshing(true);
+      router.refresh();
     }
 
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [isLineItemActionPending]);
+    wasLineItemActionPendingRef.current = isLineItemActionPending;
+  }, [isLineItemActionPending, router]);
 
-  // Prevent client-side navigation when line item action is pending
   useEffect(() => {
-    const handleClick = (event: MouseEvent) => {
-      if (isLineItemActionPending && event.target instanceof HTMLElement) {
-        const link = event.target.closest('a[href]');
+    setIsSummaryRefreshing(false);
+  }, [cart.total, cart.summaryItems]);
 
-        if (
-          link instanceof HTMLAnchorElement &&
-          link.href &&
-          !link.href.startsWith('mailto:') &&
-          !link.href.startsWith('tel:')
-        ) {
-          // eslint-disable-next-line no-alert
-          const shouldNavigate = window.confirm(lineItemActionPendingLabel);
-
-          if (!shouldNavigate) {
-            event.preventDefault();
-            event.stopPropagation();
-          }
-        }
-      }
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (
-        isLineItemActionPending &&
-        (event.key === 'Enter' || event.key === ' ') &&
-        event.target instanceof HTMLElement
-      ) {
-        const link = event.target.closest('a[href]');
-
-        if (
-          link instanceof HTMLAnchorElement &&
-          link.href &&
-          !link.href.startsWith('mailto:') &&
-          !link.href.startsWith('tel:')
-        ) {
-          // eslint-disable-next-line no-alert
-          const shouldNavigate = window.confirm(lineItemActionPendingLabel);
-
-          if (!shouldNavigate) {
-            event.preventDefault();
-            event.stopPropagation();
-          }
-        }
-      }
-    };
-
-    if (isLineItemActionPending) {
-      document.addEventListener('click', handleClick, true);
-      document.addEventListener('keydown', handleKeyDown, true);
-    }
-
-    return () => {
-      document.removeEventListener('click', handleClick, true);
-      document.removeEventListener('keydown', handleKeyDown, true);
-    };
-  }, [isLineItemActionPending, lineItemActionPendingLabel]);
+  const isCartUpdatePending = isLineItemActionPending || isSummaryRefreshing;
 
   const [optimisticLineItems, setOptimisticLineItems] = useOptimistic<CartLineItem[], FormData>(
     state.lineItems,
@@ -370,7 +309,7 @@ export function CartClient<LineItem extends CartLineItem>({
           {cart.summaryItems.map((summaryItem, index) => (
             <div className="flex justify-between py-4" key={index}>
               <dt>{summaryItem.label}</dt>
-              {isLineItemActionPending ? (
+              {isCartUpdatePending ? (
                 <Skeleton.Text characterCount={8} className="animate-pulse rounded-md" />
               ) : (
                 <dd>{summaryItem.value}</dd>
@@ -404,7 +343,7 @@ export function CartClient<LineItem extends CartLineItem>({
         )}
         <div className="flex justify-between border-t border-[var(--cart-border,hsl(var(--contrast-100)))] py-6 text-xl font-bold">
           <dt>{cart.totalLabel ?? 'Total'}</dt>
-          {isLineItemActionPending ? (
+          {isCartUpdatePending ? (
             <Skeleton.Text characterCount={8} className="animate-pulse rounded-md" />
           ) : (
             <dd>{cart.total}</dd>
@@ -414,7 +353,7 @@ export function CartClient<LineItem extends CartLineItem>({
       <CheckoutButton
         action={checkoutAction}
         className="mt-4 w-fit"
-        isCartUpdatePending={isLineItemActionPending}
+        isCartUpdatePending={isCartUpdatePending}
       >
         <span className="inline-flex items-center gap-2">
           {checkoutLabel}
@@ -487,7 +426,6 @@ export function CartClient<LineItem extends CartLineItem>({
                     startTransition(() => {
                       formAction(formData);
                       setOptimisticLineItems(formData);
-                      router.refresh();
 
                       const intent = formData.get('intent');
 

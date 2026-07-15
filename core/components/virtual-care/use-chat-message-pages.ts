@@ -2,8 +2,12 @@
 
 import { useEffect, useEffectEvent, useRef, useState, type RefObject } from 'react';
 
-import { loadOlderLiveChatMessagesAction } from '~/app/[locale]/(default)/account/(portal)/virtual-care/_actions/virtual-care-actions';
 import type { ChatMessageRow } from '~/lib/supabase/chat-messages';
+
+export type LoadOlderChatMessages = (beforeCreatedAt: string) => Promise<
+  | { ok: true; messages: ChatMessageRow[]; hasMoreOlder: boolean }
+  | { ok: false; error: string }
+>;
 
 function mergeChatMessages(
   existing: ChatMessageRow[],
@@ -31,11 +35,13 @@ export function useChatMessagePages({
   recentMessages,
   recentHasMoreOlder,
   scrollRef,
+  loadOlderMessages,
 }: {
   conversationId: string | null;
   recentMessages: ChatMessageRow[];
   recentHasMoreOlder: boolean;
   scrollRef: RefObject<HTMLDivElement | null>;
+  loadOlderMessages: LoadOlderChatMessages;
 }) {
   const [messages, setMessages] = useState<ChatMessageRow[]>(recentMessages);
   const [hasMoreOlder, setHasMoreOlder] = useState(recentHasMoreOlder);
@@ -93,7 +99,7 @@ export function useChatMessagePages({
     setLoadingOlder(true);
 
     try {
-      const result = await loadOlderLiveChatMessagesAction(oldest.created_at);
+      const result = await loadOlderMessages(oldest.created_at);
 
       if (!result.ok) {
         return;

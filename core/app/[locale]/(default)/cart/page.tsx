@@ -95,7 +95,7 @@ export default async function Cart({ params }: Props) {
     <>
       <Slot label="Cart top content" snapshotId="cart-top-content" />
       <CartEmptyState
-        cta={{ label: t('Empty.cta'), href: '/shop-all' }}
+        cta={{ label: t('Empty.cta'), href: '/' }}
         subtitle={t('Empty.subtitle')}
         title={t('Empty.title')}
       />
@@ -396,7 +396,7 @@ export default async function Cart({ params }: Props) {
           emptyState={{
             title: t('Empty.title'),
             subtitle: t('Empty.subtitle'),
-            cta: { label: t('Empty.cta'), href: '/shop-all' },
+            cta: { label: t('Empty.cta'), href: '/' },
           }}
           giftCertificate={
             giftCertificatesEnabled
@@ -413,7 +413,6 @@ export default async function Cart({ params }: Props) {
           incrementLineItemLabel={t('increment')}
           key={`${cart.entityId}-${cart.version}`}
           lineItemAction={updateLineItem}
-          lineItemActionPendingLabel={t('cartUpdateInProgress')}
           shipping={
             requiresShipping
               ? {

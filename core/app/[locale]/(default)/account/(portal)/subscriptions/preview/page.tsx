@@ -383,7 +383,7 @@ const mockPortalSections: SubscriptionPortalSections = {
     {
       id: 'sub_preview_softnit_1',
       productName: 'Softnit 300 Reusable Underpads',
-      variantSubtitle: 'Quantity: One · Size: 86.3 cm x 91.4 cm · SKU: 600011',
+      variantSubtitle: 'UOM: One · Size: 86.3 cm x 91.4 cm · SKU: 600011',
       quantity: 1,
       price: 'CA$8.55',
       intervalLabel: 'every 30 days',
@@ -405,7 +405,7 @@ const mockPortalSections: SubscriptionPortalSections = {
     {
       id: 'sub_preview_softnit_2',
       productName: 'Softnit 300 Reusable Underpads',
-      variantSubtitle: 'Quantity: One · Size: 86.3 cm x 91.4 cm · SKU: 600011',
+      variantSubtitle: 'UOM: One · Size: 86.3 cm x 91.4 cm · SKU: 600011',
       quantity: 1,
       price: 'CA$8.55',
       intervalLabel: 'every 30 days',
@@ -421,7 +421,7 @@ const mockPortalSections: SubscriptionPortalSections = {
     {
       id: 'sub_preview_prevail_1',
       productName: 'Prevail Briefs',
-      variantSubtitle: 'Quantity: Pack of 16 · Size: Small (Waist 20-31 inches) · SKU: 600003',
+      variantSubtitle: 'UOM: Pack of 16 · Size: Small (Waist 20-31 inches) · SKU: 600003',
       quantity: 1,
       price: 'CA$24.88',
       intervalLabel: 'every 14 days',
@@ -436,7 +436,7 @@ const mockPortalSections: SubscriptionPortalSections = {
     {
       id: 'sub_preview_prevail_2',
       productName: 'Prevail Briefs',
-      variantSubtitle: 'Quantity: Pack of 16 · Size: Small (Waist 20-31 inches) · SKU: 600003',
+      variantSubtitle: 'UOM: Pack of 16 · Size: Small (Waist 20-31 inches) · SKU: 600003',
       quantity: 1,
       price: 'CA$24.88',
       intervalLabel: 'every 14 days',
@@ -451,7 +451,7 @@ const mockPortalSections: SubscriptionPortalSections = {
     {
       id: 'sub_preview_wings',
       productName: 'Wings Overnight Quilted Brief (Adult)',
-      variantSubtitle: 'Quantity: Pack of 18 · Size: Medium (Waist 32-44 inches) · SKU: 600004',
+      variantSubtitle: 'UOM: Pack of 18 · Size: Medium (Waist 32-44 inches) · SKU: 600004',
       quantity: 1,
       price: 'CA$33.30',
       intervalLabel: 'per month',
@@ -465,7 +465,7 @@ const mockPortalSections: SubscriptionPortalSections = {
     {
       id: 'sub_preview_tena_active',
       productName: 'Tena Underpad (Moderate Absorbency)',
-      variantSubtitle: 'Quantity: Pack of 25 · Size: 44cm x 61cm · SKU: 700082',
+      variantSubtitle: 'UOM: Pack of 25 · Size: 44cm x 61cm · SKU: 700082',
       quantity: 1,
       price: 'CA$19.50',
       intervalLabel: 'per week',
@@ -537,8 +537,6 @@ export default async function SubscriptionsPreviewPage({ params }: Props) {
         emptyPastShipmentsTitle={t('empty.pastShipments')}
         emptyUpcomingShipmentsTitle={t('empty.upcomingShipments')}
         frequencyLabel={t('delivery.frequency')}
-        manageBillingAction={previewNoopAction}
-        manageBillingLabel={t('manage')}
         manageItemLabel={t('manageItem')}
         manageItemOptions={{
           modalTitle: t('manageModal.title'),
@@ -637,7 +635,7 @@ export default async function SubscriptionsPreviewPage({ params }: Props) {
           skipDeliveryScheduledLabel: t('manageModal.skipDeliveryScheduledLabel'),
           confirmSkipDeliveryLabel: t('manageModal.confirmSkipDelivery'),
           skippingDeliveryLabel: t('manageModal.skippingDelivery'),
-          skipDeliveryAction: async (_subscriptionId: string, _shipmentDayKey: string) => ({
+          skipDeliveryAction: async () => ({
             success: true,
           }),
           reactivateLabel: t('manageModal.reactivateSubscription'),

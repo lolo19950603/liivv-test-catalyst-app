@@ -186,14 +186,16 @@ export async function updateCartLinePurchaseQuantity({
     intent === 'increment' ? 1 : intent === 'decrement' ? -1 : -cartLineItem.quantity;
   const newTotalQty = siblingTotal + delta;
 
-  if (purchaseType === 'subscription' && subscriptionLineKey) {
-    await adjustSubscriptionQuantity(cartId, subscriptionLineKey, delta);
-  }
-
+  // Full line removal clears subscription metadata inside removeItem; skip a separate
+  // adjust pass so delete isn't blocked on two storage writes.
   if (newTotalQty <= 0) {
     await removeItem({ lineItemEntityId });
 
     return;
+  }
+
+  if (purchaseType === 'subscription' && subscriptionLineKey) {
+    await adjustSubscriptionQuantity(cartId, subscriptionLineKey, delta);
   }
 
   await updateQuantity({

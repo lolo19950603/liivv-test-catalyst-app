@@ -8,7 +8,9 @@ import {
   appendStaffMessage,
   joinStaffConversation,
   listConversationsForAdmin,
+  listOlderMessagesForConversation,
   markStaffClosedConversation,
+  type ChatMessageRow,
 } from '~/lib/supabase/chat-messages';
 import {
   updateCarePackRequestStatus,
@@ -240,4 +242,47 @@ export async function staffPortalAction(
   }
 
   return { ok: false, error: 'Invalid request.' };
+}
+
+export async function loadOlderStaffChatMessagesAction(
+  conversationId: string,
+  beforeCreatedAt: string,
+): Promise<
+  | { ok: true; messages: ChatMessageRow[]; hasMoreOlder: boolean }
+  | { ok: false; error: string }
+> {
+  const auth = await requireStaffSession();
+
+  if (!auth.ok) {
+    return auth;
+  }
+
+  const id = conversationId.trim();
+  const cursor = beforeCreatedAt.trim();
+
+  if (!UUID_RE.test(id)) {
+    return { ok: false, error: 'Invalid conversation.' };
+  }
+
+  if (!cursor) {
+    return { ok: false, error: 'Missing message cursor.' };
+  }
+
+  const convs = await listConversationsForAdmin();
+
+  if (!convs.ok) {
+    return { ok: false, error: convs.message };
+  }
+
+  if (!convs.rows.some((row) => row.conversationId === id)) {
+    return { ok: false, error: 'Conversation not found.' };
+  }
+
+  const listed = await listOlderMessagesForConversation(id, cursor);
+
+  if (!listed.ok) {
+    return { ok: false, error: listed.message };
+  }
+
+  return { ok: true, messages: listed.messages, hasMoreOlder: listed.hasMoreOlder };
 }

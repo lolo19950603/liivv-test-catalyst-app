@@ -13,6 +13,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   getLiveChatSessionAction,
   getLiveChatUnreadStaffCountAction,
+  loadOlderLiveChatMessagesAction,
   markLiveChatReadAction,
   virtualCareChatAction,
   type LiveChatSessionPayload,
@@ -213,6 +214,7 @@ function AuthenticatedPanel({
 
   const { messages, loadingOlder, handleScroll } = useChatMessagePages({
     conversationId,
+    loadOlderMessages: loadOlderLiveChatMessagesAction,
     recentHasMoreOlder,
     recentMessages,
     scrollRef,

@@ -12,7 +12,7 @@ import {
 import {
   getOrCreateConversation,
   listConversationsForAdmin,
-  listMessagesForConversation,
+  listRecentMessagesForConversation,
   type AdminConversationSummary,
   type ChatMessageRow,
 } from '~/lib/supabase/chat-messages';
@@ -56,6 +56,7 @@ export type StaffPortalData = {
   listError: string | null;
   selectedConversationId: string | null;
   messages: ChatMessageRow[];
+  hasMoreOlder: boolean;
   messagesError: string | null;
 };
 
@@ -121,6 +122,7 @@ export const getStaffPortalData = cache(
       listError: null,
       selectedConversationId: null,
       messages: [],
+      hasMoreOlder: false,
       messagesError: null,
     };
 
@@ -240,12 +242,13 @@ export const getStaffPortalData = cache(
       base.selectedConversationId = selectedId;
 
       if (selectedId) {
-        const msg = await listMessagesForConversation(selectedId);
+        const msg = await listRecentMessagesForConversation(selectedId);
 
         if (!msg.ok) {
           base.messagesError = msg.message;
         } else {
           base.messages = msg.messages;
+          base.hasMoreOlder = msg.hasMoreOlder;
         }
       }
     }

@@ -36,7 +36,12 @@ export function parseVariantLabelFromMetadata(
 ): string | undefined {
   const label = metadata?.[BIGCOMMERCE_VARIANT_LABEL_METADATA_KEY]?.trim();
 
-  return label || undefined;
+  if (!label) {
+    return undefined;
+  }
+
+  // Catalog option is named "Quantity" in BigCommerce but represents UOM (e.g. Box of 24).
+  return label.replace(/(^| · )Quantity:/gi, '$1UOM:');
 }
 
 export function serializeProductOptionSelections(
