@@ -11,6 +11,7 @@ import {
 import { staffLogoutAction } from '~/app/staff/_actions/staff-auth-actions';
 import type { StaffPortalData } from '~/app/staff/page-data';
 import { StaffCustomerDetail } from '~/components/staff/staff-customer-detail';
+import { formatStaffStatusLabel, staffStatusBadgeClass } from '~/components/staff/staff-status';
 import { ChatMessageBody } from '~/components/virtual-care/chat-message-body';
 import { ChatSystemMessage } from '~/components/virtual-care/chat-system-message';
 import {
@@ -188,7 +189,7 @@ function PharmacyTab({
         : data.prescriptionQueue;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+    <div className="grid gap-6 lg:grid-cols-[1fr_460px]">
       <section className="space-y-4">
         <div className="inline-flex rounded-xl border border-[#ddd4c8] bg-[#f7f4ef] p-1 text-sm">
           {(
@@ -233,6 +234,10 @@ function PharmacyTab({
               const requestType = queue;
               const selected =
                 data.selectedRequestId === row.id && data.selectedRequestType === requestType;
+              const statusValue =
+                'approval_status' in row
+                  ? (row.approval_status ?? row.status ?? 'pending')
+                  : row.status;
 
               return (
                 <Link
@@ -257,10 +262,8 @@ function PharmacyTab({
                         {new Date(row.created_at).toLocaleString()}
                       </p>
                     </div>
-                    <span className="rounded-full bg-[#fff4d6] px-2.5 py-1 text-xs font-medium text-[#9a6b00]">
-                      {'approval_status' in row
-                        ? (row.approval_status ?? row.status ?? 'pending')
-                        : row.status}
+                    <span className={staffStatusBadgeClass(statusValue)}>
+                      {formatStaffStatusLabel(statusValue)}
                     </span>
                   </div>
                 </Link>

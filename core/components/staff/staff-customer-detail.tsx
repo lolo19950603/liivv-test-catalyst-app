@@ -3,6 +3,8 @@
 import type { AdminCustomerDetail } from '~/lib/supabase/admin-customers';
 import type { CarePackRequestRow, PrescriptionRow, RefillRequestRow } from '~/lib/supabase/prescriptions';
 
+import { formatStaffStatusLabel } from '~/components/staff/staff-status';
+
 type CarePackRequestIntake = {
   frequentDoseChangeMeds?: string;
   asNeededMeds?: string;
@@ -163,7 +165,8 @@ function StaffPrescriptionsSection({
                   {[rx.dosage, rx.frequency].filter(Boolean).join(' · ') || '—'}
                 </p>
                 <p className="mt-1 text-[#8a8176]">
-                  Approval: {rx.approval_status ?? '—'} • Status: {rx.status ?? '—'}
+                  Approval: {formatStaffStatusLabel(rx.approval_status)} • Status:{' '}
+                  {formatStaffStatusLabel(rx.status)}
                 </p>
                 {rx.photoDisplayUrl ? (
                   <img alt="" className="mt-2 h-24 rounded border object-contain" src={rx.photoDisplayUrl} />
@@ -187,17 +190,6 @@ function StaffPrescriptionsSection({
                     <option value="rejected">Rejected</option>
                     <option value="expired">Expired</option>
                   </select>
-                </form>
-                <form action={formAction} className="mt-1">
-                  <input name="intent" type="hidden" value="prescription_mark_active" />
-                  <input name="profileId" type="hidden" value={profileId} />
-                  <input name="prescriptionId" type="hidden" value={rx.id} />
-                  <button
-                    className="liivv-btn-primary px-2 py-1 text-[11px]"
-                    type="submit"
-                  >
-                    Mark active
-                  </button>
                 </form>
               </li>
             );
@@ -227,7 +219,7 @@ function StaffRefillsSection({
           {refillRequests.map((req) => (
             <li className="rounded-md border border-[#efe9e0] bg-[#faf9f7] px-3 py-2 text-xs" key={req.id}>
               <p className="font-semibold text-[#2c2a26]">Request #{req.id.slice(0, 8)}</p>
-              <p className="mt-1 text-[#8a8176]">Status: {req.status}</p>
+              <p className="mt-1 text-[#8a8176]">Status: {formatStaffStatusLabel(req.status)}</p>
               <form action={formAction} className="mt-2">
                 <input name="intent" type="hidden" value="refill_set_status" />
                 <input name="profileId" type="hidden" value={profileId} />
@@ -282,7 +274,7 @@ function StaffCarePackSection({
             return (
               <li className="rounded-md border border-[#efe9e0] bg-[#faf9f7] px-3 py-2 text-xs" key={req.id}>
                 <p className="font-semibold text-[#2c2a26]">Request #{req.id.slice(0, 8)}</p>
-                <p className="mt-1 text-[#8a8176]">Status: {req.status}</p>
+                <p className="mt-1 text-[#8a8176]">Status: {formatStaffStatusLabel(req.status)}</p>
                 {intake?.frequentDoseChangeMeds ? (
                   <p className="mt-1 text-[#8a8176]">Dose changes: {intake.frequentDoseChangeMeds}</p>
                 ) : null}

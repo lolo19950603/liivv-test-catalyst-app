@@ -45,27 +45,6 @@ export async function staffPortalAction(
 
   const intent = String(formData.get('intent') ?? '').trim();
 
-  if (intent === 'prescription_mark_active') {
-    const prescriptionId = String(formData.get('prescriptionId') ?? '').trim();
-
-    if (!UUID_RE.test(prescriptionId)) {
-      return { ok: false, error: 'Invalid prescription payload.' };
-    }
-
-    const updated = await updatePrescriptionApprovalStatus({
-      prescriptionId,
-      approval_status: 'approved',
-      status: 'active',
-    });
-
-    if (!updated.ok) {
-      return { ok: false, error: updated.message };
-    }
-
-    revalidateStaffPortalPaths(revalidatePath);
-    return { ok: true };
-  }
-
   if (intent === 'prescription_set_status') {
     const prescriptionId = String(formData.get('prescriptionId') ?? '').trim();
     const nextStatus = String(formData.get('status') ?? '').trim();
