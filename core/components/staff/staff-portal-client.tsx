@@ -249,9 +249,18 @@ function PharmacyTab({
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-semibold text-[#2c2a26]">
-                        {'medication_name' in row ? row.medication_name : `Request #${row.id.slice(0, 8)}`}
+                        {'medication_name' in row
+                          ? row.medication_name
+                          : 'medication_names' in row && row.medication_names.length > 0
+                            ? row.medication_names.join(', ')
+                            : `Request #${row.id.slice(0, 8)}`}
                       </p>
                       <p className="mt-1 text-sm text-[#6b6560]">{name}</p>
+                      {'medication_names' in row ? (
+                        <p className="mt-0.5 text-xs text-[#8a8176]">
+                          Request #{row.id.slice(0, 8)}
+                        </p>
+                      ) : null}
                       <p className="mt-1 text-xs text-[#8a8176]">
                         {new Date(row.created_at).toLocaleString()}
                       </p>

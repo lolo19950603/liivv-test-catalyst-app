@@ -151,12 +151,14 @@ export function StaffCustomerDetail({
             />
             <StaffRefillsSection
               formAction={formAction}
+              prescriptions={prescriptions}
               profileId={profile.id}
               refillRequests={refillRequests}
             />
             <StaffCarePackSection
               carePackRequests={carePackRequests}
               formAction={formAction}
+              prescriptions={prescriptions}
               profileId={profile.id}
             />
           </div>
@@ -313,12 +315,24 @@ function StaffPrescriptionsSection({
   );
 }
 
+function medicationNamesForRequest(
+  prescriptionIds: string[] | null | undefined,
+  prescriptions: PrescriptionRow[],
+): string {
+  const namesById = new Map(prescriptions.map((rx) => [rx.id, rx.medication_name]));
+  const names = (prescriptionIds ?? []).map((id) => namesById.get(id) ?? 'Unknown medication');
+
+  return names.length > 0 ? names.join(', ') : 'No medications listed';
+}
+
 function StaffRefillsSection({
   profileId,
+  prescriptions,
   refillRequests,
   formAction,
 }: {
   profileId: string;
+  prescriptions: PrescriptionRow[];
   refillRequests: RefillRequestRow[];
   formAction: (formData: FormData) => void;
 }) {
@@ -331,7 +345,12 @@ function StaffRefillsSection({
           {refillRequests.map((req) => (
             <li className="rounded-lg border border-[#efe9e0] bg-[#faf9f7] px-3 py-2.5" key={req.id}>
               <div className="flex items-start justify-between gap-3">
-                <p className="font-semibold text-[#2c2a26]">Request #{req.id.slice(0, 8)}</p>
+                <div className="min-w-0">
+                  <p className="font-semibold leading-snug text-[#2c2a26]">
+                    {medicationNamesForRequest(req.prescription_ids, prescriptions)}
+                  </p>
+                  <p className="mt-0.5 text-xs text-[#8a8176]">Request #{req.id.slice(0, 8)}</p>
+                </div>
                 <span className={`shrink-0 ${staffStatusBadgeClass(req.status)}`}>
                   {formatStaffStatusLabel(req.status)}
                 </span>
@@ -362,10 +381,12 @@ function StaffRefillsSection({
 
 function StaffCarePackSection({
   profileId,
+  prescriptions,
   carePackRequests,
   formAction,
 }: {
   profileId: string;
+  prescriptions: PrescriptionRow[];
   carePackRequests: CarePackRequestRow[];
   formAction: (formData: FormData) => void;
 }) {
@@ -389,7 +410,12 @@ function StaffCarePackSection({
             return (
               <li className="rounded-lg border border-[#efe9e0] bg-[#faf9f7] px-3 py-2.5" key={req.id}>
                 <div className="flex items-start justify-between gap-3">
-                  <p className="font-semibold text-[#2c2a26]">Request #{req.id.slice(0, 8)}</p>
+                  <div className="min-w-0">
+                    <p className="font-semibold leading-snug text-[#2c2a26]">
+                      {medicationNamesForRequest(req.prescription_ids, prescriptions)}
+                    </p>
+                    <p className="mt-0.5 text-xs text-[#8a8176]">Request #{req.id.slice(0, 8)}</p>
+                  </div>
                   <span className={`shrink-0 ${staffStatusBadgeClass(req.status)}`}>
                     {formatStaffStatusLabel(req.status)}
                   </span>

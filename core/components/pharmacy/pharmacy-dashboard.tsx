@@ -1,7 +1,16 @@
 'use client';
 
-import { useActionState, useEffect, useId, useMemo, useState, type ReactNode } from 'react';
-import { useSearchParams } from 'next/navigation';
+import {
+  startTransition,
+  useActionState,
+  useEffect,
+  useId,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
+import { createPortal } from 'react-dom';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import {
   pharmacyAction,
@@ -125,6 +134,7 @@ export function PharmacyDashboard({
   refillRequests: PharmacyRefillRequest[];
   carepackRequests: PharmacyCarePackRequest[];
 }) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [section, setSection] = useState<PharmacySection>(() =>
     parseSectionParam(searchParams.get('section')),
@@ -146,6 +156,20 @@ export function PharmacyDashboard({
   useEffect(() => {
     setSection(parseSectionParam(searchParams.get('section')));
   }, [searchParams]);
+
+  useEffect(() => {
+    if (!state?.ok) {
+      return;
+    }
+
+    setRefillOpen(false);
+    setCarePackOpen(false);
+    setEditingRefillRequestId(null);
+    setSelectedRefillIds([]);
+    setSelectedCarePackIds([]);
+    setCarePackForm(emptyCarePackForm);
+    router.refresh();
+  }, [state, router]);
 
   const counts = useMemo(
     () => ({
@@ -199,12 +223,10 @@ export function PharmacyDashboard({
   const setSectionInUrl = (next: PharmacySection) => {
     setSection(next);
 
-    if (typeof window !== 'undefined') {
-      const url = new URL(window.location.href);
+    const params = new URLSearchParams(searchParams.toString());
 
-      url.searchParams.set('section', next);
-      window.history.replaceState(window.history.state, '', url.toString());
-    }
+    params.set('section', next);
+    router.replace(`?${params.toString()}`, { scroll: false });
   };
 
   const openCarePackModal = (preselectedIds: string[] = []) => {
@@ -218,7 +240,9 @@ export function PharmacyDashboard({
 
     fd.set('intent', intent);
     fd.set('payload', JSON.stringify(payload));
-    formAction(fd);
+    startTransition(() => {
+      formAction(fd);
+    });
   };
 
   const toggleRefillSelection = (id: string) => {
@@ -503,21 +527,6 @@ export function PharmacyDashboard({
 
           {filteredRefillRequests.length === 0 ? (
             <EmptyState
-              action={
-                activePrescriptions.length > 0 ? (
-                  <button
-                    className="liivv-btn-primary px-4 py-2 text-sm"
-                    onClick={() => {
-                      setEditingRefillRequestId(null);
-                      setSelectedRefillIds([]);
-                      setRefillOpen(true);
-                    }}
-                    type="button"
-                  >
-                    Request your first refill
-                  </button>
-                ) : undefined
-              }
               description={
                 refillRequests.length === 0
                   ? 'When you need more medication, select your active prescriptions and submit a refill request.'
@@ -555,6 +564,7 @@ export function PharmacyDashboard({
                       <div className="mt-3 flex gap-3 border-t border-[#efe9df] pt-3">
                         <button
                           className="text-sm font-medium text-[#375a37] hover:underline"
+                          disabled={isPending}
                           onClick={() => {
                             setEditingRefillRequestId(req.id);
                             setSelectedRefillIds(req.prescriptionIds);
@@ -564,17 +574,30 @@ export function PharmacyDashboard({
                         >
                           Edit
                         </button>
-                        <form action={formAction}>
-                          <input name="intent" type="hidden" value="delete_refill_request" />
-                          <input name="refillRequestId" type="hidden" value={req.id} />
-                          <button
-                            className="text-sm text-[#9a2c2c] hover:underline"
-                            disabled={isPending}
-                            type="submit"
-                          >
-                            Delete
-                          </button>
-                        </form>
+                        <button
+                          className="text-sm text-[#9a2c2c] hover:underline disabled:opacity-40"
+                          disabled={isPending}
+                          onClick={() => {
+                            if (
+                              !window.confirm(
+                                'Are you sure you want to cancel this refill request?',
+                              )
+                            ) {
+                              return;
+                            }
+
+                            const fd = new FormData();
+
+                            fd.set('intent', 'delete_refill_request');
+                            fd.set('refillRequestId', req.id);
+                            startTransition(() => {
+                              formAction(fd);
+                            });
+                          }}
+                          type="button"
+                        >
+                          Cancel
+                        </button>
                       </div>
                     ) : null}
                   </article>
@@ -882,6 +905,11 @@ function Modal({
   onClose: () => void;
 }) {
   const titleId = useId();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -895,7 +923,11 @@ function Modal({
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [onClose]);
 
-  return (
+  if (!mounted) {
+    return null;
+  }
+
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
       onClick={onClose}
@@ -923,6 +955,7 @@ function Modal({
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

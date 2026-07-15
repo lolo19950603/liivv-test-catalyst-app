@@ -1,6 +1,7 @@
 'use client';
 
-import { useActionState, useEffect, useId, useMemo, useState } from 'react';
+import { startTransition, useActionState, useEffect, useId, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 import {
   pharmacyAction,
@@ -47,6 +48,7 @@ export function AddPrescriptionDialog({
     pharmacyAction,
     null,
   );
+  const router = useRouter();
   const titleId = useId();
 
   useEffect(() => {
@@ -64,6 +66,15 @@ export function AddPrescriptionDialog({
 
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [onClose, open]);
+
+  useEffect(() => {
+    if (!state?.ok) {
+      return;
+    }
+
+    onClose();
+    router.refresh();
+  }, [state, onClose, router]);
 
   const faxEmail = useMemo(
     () =>
@@ -113,7 +124,9 @@ export function AddPrescriptionDialog({
         medications: transferType === 'specific' ? medications : undefined,
       }),
     );
-    formAction(fd);
+    startTransition(() => {
+      formAction(fd);
+    });
   };
 
   const copyFaxEmail = async () => {

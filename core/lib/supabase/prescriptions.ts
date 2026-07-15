@@ -260,11 +260,45 @@ export type AdminPrescriptionQueueRow = PrescriptionRow & {
 
 export type AdminRefillQueueRow = RefillRequestRow & {
   customer: AdminProfileLite | null;
+  medication_names: string[];
 };
 
 export type AdminCarePackQueueRow = CarePackRequestRow & {
   customer: AdminProfileLite | null;
+  medication_names: string[];
 };
+
+async function listMedicationNamesByIds(ids: string[]): Promise<Map<string, string>> {
+  const uniqueIds = [...new Set(ids.filter(Boolean))];
+
+  if (uniqueIds.length === 0) {
+    return new Map();
+  }
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from('prescriptions')
+    .select('id, medication_name')
+    .in('id', uniqueIds);
+
+  if (error || !data) {
+    return new Map();
+  }
+
+  return new Map(
+    (data as Array<{ id: string; medication_name: string }>).map((row) => [
+      row.id,
+      row.medication_name,
+    ]),
+  );
+}
+
+function resolveMedicationNames(
+  prescriptionIds: string[] | null | undefined,
+  namesById: Map<string, string>,
+): string[] {
+  return (prescriptionIds ?? []).map((id) => namesById.get(id) ?? 'Unknown medication');
+}
 
 async function listProfileLiteByIds(profileIds: string[]): Promise<Map<string, AdminProfileLite>> {
   if (profileIds.length === 0) {
@@ -322,13 +356,15 @@ export async function listAdminRefillQueue(limit = 200): Promise<AdminRefillQueu
   }
 
   const rows = data as RefillRequestRow[];
-  const profileMap = await listProfileLiteByIds(
-    [...new Set(rows.map((r) => r.profile_id).filter(Boolean))],
-  );
+  const [profileMap, medicationNamesById] = await Promise.all([
+    listProfileLiteByIds([...new Set(rows.map((r) => r.profile_id).filter(Boolean))]),
+    listMedicationNamesByIds(rows.flatMap((r) => r.prescription_ids ?? [])),
+  ]);
 
   return rows.map((row) => ({
     ...row,
     customer: profileMap.get(row.profile_id) ?? null,
+    medication_names: resolveMedicationNames(row.prescription_ids, medicationNamesById),
   }));
 }
 
@@ -345,13 +381,15 @@ export async function listAdminCarePackQueue(limit = 200): Promise<AdminCarePack
   }
 
   const rows = data as CarePackRequestRow[];
-  const profileMap = await listProfileLiteByIds(
-    [...new Set(rows.map((r) => r.profile_id).filter(Boolean))],
-  );
+  const [profileMap, medicationNamesById] = await Promise.all([
+    listProfileLiteByIds([...new Set(rows.map((r) => r.profile_id).filter(Boolean))]),
+    listMedicationNamesByIds(rows.flatMap((r) => r.prescription_ids ?? [])),
+  ]);
 
   return rows.map((row) => ({
     ...row,
     customer: profileMap.get(row.profile_id) ?? null,
+    medication_names: resolveMedicationNames(row.prescription_ids, medicationNamesById),
   }));
 }
 

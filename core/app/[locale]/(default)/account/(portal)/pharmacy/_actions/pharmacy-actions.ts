@@ -123,7 +123,7 @@ export async function pharmacyAction(
     }
 
     revalidatePath('/account/pharmacy');
-    redirect('/account/pharmacy');
+    return { ok: true };
   }
 
   if (intent === 'transfer_prescriptions') {
@@ -217,7 +217,7 @@ export async function pharmacyAction(
     }
 
     revalidatePath('/account/pharmacy');
-    redirect('/account/pharmacy');
+    return { ok: true };
   }
 
   if (intent === 'create_refill_request' || intent === 'update_refill_request') {
@@ -295,7 +295,7 @@ export async function pharmacyAction(
     }
 
     revalidatePath('/account/pharmacy');
-    redirect('/account/pharmacy?section=refill_requests');
+    return { ok: true };
   }
 
   if (intent === 'create_carepack_request') {
@@ -380,7 +380,7 @@ export async function pharmacyAction(
     }
 
     revalidatePath('/account/pharmacy');
-    redirect('/account/pharmacy?section=carepack');
+    return { ok: true };
   }
 
   if (intent === 'delete_refill_request') {
@@ -411,7 +411,7 @@ export async function pharmacyAction(
     }
 
     revalidatePath('/account/pharmacy');
-    redirect('/account/pharmacy?section=refill_requests');
+    return { ok: true };
   }
 
   return { ok: false, error: 'Invalid request.' };
