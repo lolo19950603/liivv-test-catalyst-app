@@ -19,6 +19,7 @@ function buildSubscription(
     currentPeriodStart: 0,
     currentPeriodEnd: 0,
     cancelAtPeriodEnd: false,
+    collectionPaused: false,
     trialEnd: null,
     billingCycleAnchor: null,
     paymentMethodLabel: 'Visa',

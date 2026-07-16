@@ -62,9 +62,9 @@ export function getHelpTopics(): HelpTopic[] {
       'Cancel a subscription',
       ['cancel subscription', 'stop subscription', 'end subscription'],
       [
-        'Go to Account → Subscriptions.',
-        'Open the subscription you want to cancel.',
-        'Use the cancel option and confirm — you can also manage billing in the Stripe customer portal when linked.',
+        'Ask the store assistant in chat to cancel, or go to Account → Subscriptions.',
+        'If using chat: confirm which subscription and that you want to cancel — cancellation is immediate.',
+        'From Subscriptions: open the subscription, use cancel, and confirm. You can also manage billing in the Stripe customer portal when linked.',
       ],
       `${base}/account/subscriptions`,
     ),

@@ -6,6 +6,7 @@ import { parseSubscriptionShippingAddressFromMetadata } from '~/lib/checkout/sub
 
 import { getStripe, isStripeConfigured } from './client';
 import { DYNAMIC_SUBSCRIPTION_PRICING_METADATA_KEY } from './prepare-subscription-invoice';
+import { CUSTOMER_PAUSE_REASON, OUT_OF_STOCK_PAUSE_REASON } from './subscription-pause';
 import {
   parseSubscriptionBillingContext,
   resolveSubscriptionBillingQuote,
@@ -114,7 +115,7 @@ export async function syncSubscriptionPricingFromBigCommerce(
         pause_collection: { behavior: 'void' },
         metadata: {
           ...subscription.metadata,
-          subscription_paused_reason: 'out_of_stock',
+          subscription_paused_reason: OUT_OF_STOCK_PAUSE_REASON,
         },
       });
     }
@@ -123,7 +124,41 @@ export async function syncSubscriptionPricingFromBigCommerce(
   }
 
   const pricingChanged = hasPricingChanged({ subscription, item, quote });
-  const wasPausedForStock = subscription.metadata.subscription_paused_reason === 'out_of_stock';
+  const pauseReason = subscription.metadata.subscription_paused_reason;
+  const wasPausedForStock = pauseReason === OUT_OF_STOCK_PAUSE_REASON;
+  const isCustomerPaused = pauseReason === CUSTOMER_PAUSE_REASON;
+
+  // Never clear a customer-initiated pause from inventory/pricing sync.
+  if (isCustomerPaused) {
+    if (!pricingChanged) {
+      return 'unchanged';
+    }
+
+    await stripe.subscriptionItems.update(item.id, {
+      price_data: {
+        currency: quote.currency.toLowerCase(),
+        unit_amount: quote.unitAmountExTaxPerUnit,
+        recurring: {
+          interval: item.price.recurring.interval,
+          interval_count: item.price.recurring.interval_count ?? 1,
+        },
+        product: getSubscriptionItemProductId(item),
+      },
+      quantity: billingContext.quantity,
+      proration_behavior: 'none',
+    });
+
+    await stripe.subscriptions.update(subscription.id, {
+      metadata: {
+        ...subscription.metadata,
+        billed_subtotal_cents: String(quote.unitAmountExTax),
+        billed_tax_cents: String(quote.taxAmount),
+        billed_total_cents: String(quote.unitAmountIncTax),
+      },
+    });
+
+    return 'updated';
+  }
 
   if (!pricingChanged && !wasPausedForStock && subscription.pause_collection == null) {
     return 'unchanged';

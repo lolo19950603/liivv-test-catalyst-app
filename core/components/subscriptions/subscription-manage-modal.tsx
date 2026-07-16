@@ -42,6 +42,7 @@ export interface SubscriptionManageDetails {
   canEditFrequency?: boolean;
   canSkipDelivery?: boolean;
   isCanceled?: boolean;
+  isPaused?: boolean;
   skippableDeliveries?: Array<{
     dayKey: string;
     label: string;
@@ -100,6 +101,10 @@ export interface SubscriptionManageModalProps {
   skippingDeliveryLabel: string;
   reactivateLabel: string;
   reactivatingLabel: string;
+  pauseLabel: string;
+  pausingLabel: string;
+  resumeLabel: string;
+  resumingLabel: string;
   defaultBadgeLabel: string;
   shipToLabel: string;
   paymentLabel: string;
@@ -136,6 +141,12 @@ export interface SubscriptionManageModalProps {
   skipDeliveryPendingLabel?: string;
   skipDeliveryScheduledLabel?: string;
   reactivateAction?: (
+    subscriptionId: string,
+  ) => Promise<{ success: boolean; error?: string }>;
+  pauseAction?: (
+    subscriptionId: string,
+  ) => Promise<{ success: boolean; error?: string }>;
+  resumeAction?: (
     subscriptionId: string,
   ) => Promise<{ success: boolean; error?: string }>;
   savedShippingAddresses?: SavedShippingAddress[];
@@ -343,6 +354,10 @@ export function SubscriptionManageModal({
   skippingDeliveryLabel,
   reactivateLabel,
   reactivatingLabel,
+  pauseLabel,
+  pausingLabel,
+  resumeLabel,
+  resumingLabel,
   defaultBadgeLabel,
   shipToLabel,
   paymentLabel,
@@ -358,6 +373,8 @@ export function SubscriptionManageModal({
   updateFrequencyAction,
   skipDeliveryAction,
   reactivateAction,
+  pauseAction,
+  resumeAction,
   savedShippingAddresses = [],
   addressFormCountries = [],
   addressFormStates = [],
@@ -378,6 +395,8 @@ export function SubscriptionManageModal({
   const [isUpdatingFrequency, startFrequencyUpdate] = useTransition();
   const [isSkippingDelivery, startSkipDelivery] = useTransition();
   const [isReactivating, startReactivate] = useTransition();
+  const [isPausing, startPause] = useTransition();
+  const [isResuming, startResume] = useTransition();
   const [isCancelling, startCancel] = useTransition();
   const [isSavingPayment, setIsSavingPayment] = useState(false);
   const subscriptionId = subscription?.id;
@@ -389,13 +408,20 @@ export function SubscriptionManageModal({
     isUpdatingFrequency ||
     isSkippingDelivery ||
     isReactivating ||
+    isPausing ||
+    isResuming ||
     isSavingPayment;
   const isCanceled = Boolean(subscription?.isCanceled);
+  const isPaused = Boolean(subscription?.isPaused);
   const canEditFrequency =
     !isCanceled &&
+    !isPaused &&
     Boolean(subscription?.canEditFrequency && updateFrequencyAction && frequencyOptions.length > 0);
-  const canSkipDelivery = !isCanceled && Boolean(subscription?.canSkipDelivery && skipDeliveryAction);
+  const canSkipDelivery =
+    !isCanceled && !isPaused && Boolean(subscription?.canSkipDelivery && skipDeliveryAction);
   const canReactivate = isCanceled && Boolean(reactivateAction);
+  const canPause = !isCanceled && !isPaused && Boolean(pauseAction);
+  const canResume = !isCanceled && isPaused && Boolean(resumeAction);
 
   useEffect(() => {
     if (!isOpen) {
@@ -612,6 +638,46 @@ export function SubscriptionManageModal({
 
       if (!result.success) {
         setErrorMessage(result.error ?? 'Unable to reactivate subscription');
+
+        return;
+      }
+
+      router.refresh();
+      handleClose();
+    });
+  };
+
+  const handlePause = () => {
+    if (!subscriptionId || !pauseAction) {
+      return;
+    }
+
+    startPause(async () => {
+      setErrorMessage(null);
+      const result = await pauseAction(subscriptionId);
+
+      if (!result.success) {
+        setErrorMessage(result.error ?? 'Unable to pause subscription');
+
+        return;
+      }
+
+      router.refresh();
+      handleClose();
+    });
+  };
+
+  const handleResume = () => {
+    if (!subscriptionId || !resumeAction) {
+      return;
+    }
+
+    startResume(async () => {
+      setErrorMessage(null);
+      const result = await resumeAction(subscriptionId);
+
+      if (!result.success) {
+        setErrorMessage(result.error ?? 'Unable to resume subscription');
 
         return;
       }
@@ -943,30 +1009,61 @@ export function SubscriptionManageModal({
   if (step === 'menu') {
     return (
       <SubscriptionManageModalShell
-        blockingMessage={reactivatingLabel}
+        blockingMessage={
+          isReactivating
+            ? reactivatingLabel
+            : isPausing
+              ? pausingLabel
+              : isResuming
+                ? resumingLabel
+                : undefined
+        }
         footer={
           <div className="subscription-manage-modal__menu-footer">
             {canReactivate ? (
               <button
                 className="subscription-manage-modal__secondary-button w-full"
-                disabled={isReactivating}
+                disabled={isBusy}
                 onClick={handleReactivate}
                 type="button"
               >
                 {reactivateLabel}
               </button>
             ) : (
-              <button
-                className="subscription-manage-modal__cancel-button"
-                onClick={() => setStep('cancel')}
-                type="button"
-              >
-                {cancelLabel}
-              </button>
+              <>
+                {canResume ? (
+                  <button
+                    className="subscription-manage-modal__secondary-button w-full"
+                    disabled={isBusy}
+                    onClick={handleResume}
+                    type="button"
+                  >
+                    {resumeLabel}
+                  </button>
+                ) : null}
+                {canPause ? (
+                  <button
+                    className="subscription-manage-modal__secondary-button w-full"
+                    disabled={isBusy}
+                    onClick={handlePause}
+                    type="button"
+                  >
+                    {pauseLabel}
+                  </button>
+                ) : null}
+                <button
+                  className="subscription-manage-modal__cancel-button"
+                  disabled={isBusy}
+                  onClick={() => setStep('cancel')}
+                  type="button"
+                >
+                  {cancelLabel}
+                </button>
+              </>
             )}
           </div>
         }
-        isBlocking={isReactivating}
+        isBlocking={isReactivating || isPausing || isResuming}
         isOpen={isOpen}
         onClose={handleClose}
         title={modalTitle}

@@ -410,10 +410,12 @@ const mockPortalSections: SubscriptionPortalSections = {
       price: 'CA$8.55',
       intervalLabel: 'every 30 days',
       paymentMethodLabel: 'Visa •••• 4242',
-      statusLabel: 'Active',
-      statusKey: 'active',
-      scheduleDetail: 'Renews on Jul 31, 2026',
-      canSkipDelivery: true,
+      statusLabel: 'Paused',
+      statusKey: 'paused',
+      scheduleDetail: 'Billing paused — resume anytime to continue deliveries',
+      isPaused: true,
+      canEditFrequency: false,
+      canSkipDelivery: false,
       shippingAddressGroupNumber: 1,
       shippingAddressLabel:
         'PinLun Chen, 77 Shuter St, Toronto, Ontario, M5B 0B8, CA',
@@ -641,6 +643,12 @@ export default async function SubscriptionsPreviewPage({ params }: Props) {
           reactivateLabel: t('manageModal.reactivateSubscription'),
           reactivatingLabel: t('manageModal.reactivatingSubscription'),
           reactivateAction: async () => ({ success: true }),
+          pauseLabel: t('manageModal.pauseSubscription'),
+          pausingLabel: t('manageModal.pausingSubscription'),
+          pauseAction: async () => ({ success: true }),
+          resumeLabel: t('manageModal.resumeSubscription'),
+          resumingLabel: t('manageModal.resumingSubscription'),
+          resumeAction: async () => ({ success: true }),
         }}
         pastShipmentsTitle={t('sections.pastShipments')}
         paymentLabel={t('delivery.payment')}

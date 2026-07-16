@@ -45,6 +45,7 @@ export interface SubscriptionListItem {
   canEditFrequency?: boolean;
   canSkipDelivery?: boolean;
   isCanceled?: boolean;
+  isPaused?: boolean;
   skippableDeliveries?: Array<{
     dayKey: string;
     label: string;
@@ -134,6 +135,10 @@ function getStatusKey(subscription: CustomerSubscription): string {
     return 'canceled';
   }
 
+  if (isPausedSubscription(subscription)) {
+    return 'paused';
+  }
+
   if (
     subscription.status === 'trialing' ||
     (subscription.status === 'active' &&
@@ -143,8 +148,8 @@ function getStatusKey(subscription: CustomerSubscription): string {
     return 'scheduled';
   }
 
-  if (subscription.status in { active: 1, past_due: 1, unpaid: 1, paused: 1 }) {
-    return subscription.status as 'active' | 'past_due' | 'unpaid' | 'paused';
+  if (subscription.status in { active: 1, past_due: 1, unpaid: 1 }) {
+    return subscription.status as 'active' | 'past_due' | 'unpaid';
   }
 
   if (subscription.status === 'incomplete_expired') {
@@ -165,6 +170,10 @@ function getScheduleDetail(
 ): string | undefined {
   if (isCanceledSubscription(subscription)) {
     return undefined;
+  }
+
+  if (isPausedSubscription(subscription)) {
+    return t('billingPaused');
   }
 
   const formatDate = (timestamp: number) =>
@@ -257,6 +266,7 @@ export function transformCustomerSubscription(
       statusKey === 'past_due' ||
       statusKey === 'unpaid',
     isCanceled: statusKey === 'canceled',
+    isPaused: statusKey === 'paused',
     skippableDeliveries: projectSkippableDeliveries({
       interval: subscription.interval,
       intervalCount: subscription.intervalCount,
@@ -377,6 +387,10 @@ export function isCanceledSubscription(subscription: CustomerSubscription): bool
     subscription.cancelAtPeriodEnd &&
     (subscription.status === 'active' || subscription.status === 'trialing')
   );
+}
+
+export function isPausedSubscription(subscription: CustomerSubscription): boolean {
+  return subscription.collectionPaused || subscription.status === 'paused';
 }
 
 function buildDeliveryTotals(
@@ -838,6 +852,10 @@ function filterSubscriptionsForUpcomingShipments(
   const todayKey = getShipmentCalendarDayKey(Math.floor(Date.now() / 1000));
 
   return subscriptions.filter((subscription) => {
+    if (isPausedSubscription(subscription)) {
+      return false;
+    }
+
     const shipmentTimestamp = getUpcomingPortalShipmentTimestamp(subscription, finalizedShipments);
     const dayKey = getShipmentCalendarDayKey(shipmentTimestamp);
 

@@ -36,6 +36,7 @@ export interface SubscriptionListItem {
   canEditFrequency?: boolean;
   canSkipDelivery?: boolean;
   isCanceled?: boolean;
+  isPaused?: boolean;
   skippableDeliveries?: Array<{
     dayKey: string;
     label: string;
@@ -170,6 +171,16 @@ export interface SubscriptionListProps {
     reactivateAction: (
       subscriptionId: string,
     ) => Promise<{ success: boolean; error?: string }>;
+    pauseLabel: string;
+    pausingLabel: string;
+    pauseAction: (
+      subscriptionId: string,
+    ) => Promise<{ success: boolean; error?: string }>;
+    resumeLabel: string;
+    resumingLabel: string;
+    resumeAction: (
+      subscriptionId: string,
+    ) => Promise<{ success: boolean; error?: string }>;
   };
   updatePaymentLabel?: string;
   updatePaymentAction?: () => Promise<void>;
@@ -301,6 +312,8 @@ function subscriptionStatusBadgeClass(statusKey?: string): string {
     case 'past_due':
     case 'unpaid':
       return 'bg-amber-50 text-amber-950 ring-1 ring-inset ring-amber-200/80';
+    case 'paused':
+      return 'bg-sky-50 text-sky-950 ring-1 ring-inset ring-sky-200/80';
     case 'canceled':
     case 'skipped':
       return 'bg-[#f4f2ef] text-[#6b6560] ring-1 ring-inset ring-[#e5dfd5]';
@@ -1571,6 +1584,7 @@ export function SubscriptionList({
           statusKey === 'past_due' ||
           statusKey === 'unpaid');
       const isCanceled = item.isCanceled ?? statusKey === 'canceled';
+      const isPaused = item.isPaused ?? statusKey === 'paused';
 
       setManagedSubscription({
         id: item.id,
@@ -1584,9 +1598,10 @@ export function SubscriptionList({
         shippingAddressLabel: item.shippingAddressLabel ?? shippingAddressFromDelivery,
         shippingAddressKey: item.shippingAddressKey,
         frequencyKey: item.frequencyKey,
-        canEditFrequency,
-        canSkipDelivery,
+        canEditFrequency: canEditFrequency && !isPaused,
+        canSkipDelivery: canSkipDelivery && !isPaused,
         isCanceled,
+        isPaused,
         skippableDeliveries: item.skippableDeliveries,
       });
     },
@@ -1740,6 +1755,12 @@ export function SubscriptionList({
         reactivateAction={manageItemOptions?.reactivateAction}
         reactivateLabel={manageItemOptions?.reactivateLabel ?? 'Re-activate subscription'}
         reactivatingLabel={manageItemOptions?.reactivatingLabel ?? 'Re-activating subscription…'}
+        pauseAction={manageItemOptions?.pauseAction}
+        pauseLabel={manageItemOptions?.pauseLabel ?? 'Pause subscription'}
+        pausingLabel={manageItemOptions?.pausingLabel ?? 'Pausing subscription…'}
+        resumeAction={manageItemOptions?.resumeAction}
+        resumeLabel={manageItemOptions?.resumeLabel ?? 'Resume subscription'}
+        resumingLabel={manageItemOptions?.resumingLabel ?? 'Resuming subscription…'}
         saveAddressLabel={manageItemOptions?.saveAddressLabel ?? 'Save address'}
         saveAndApplyAddressAction={manageItemOptions?.saveAndApplyAddressAction}
         savePaymentMethodLabel={manageItemOptions?.savePaymentMethodLabel ?? 'Save card'}

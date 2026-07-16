@@ -12,7 +12,9 @@ import { getStoreLogoFallback } from '~/lib/store-theme/get-store-logo-fallback'
 import { openBillingPortal } from './_actions/open-billing-portal';
 import { cancelSubscriptionAction } from './_actions/cancel-subscription';
 import { createAddPaymentMethodSetupIntentAction } from './_actions/create-add-payment-method-setup-intent';
+import { pauseSubscriptionAction } from './_actions/pause-subscription';
 import { reactivateSubscriptionAction } from './_actions/reactivate-subscription';
+import { resumeSubscriptionAction } from './_actions/resume-subscription';
 import { saveAndApplySubscriptionAddressAction } from './_actions/save-and-apply-subscription-address';
 import { skipSubscriptionDeliveryManageAction } from './_actions/skip-subscription-delivery-manage';
 import { updateSubscriptionFrequencyAction } from './_actions/update-subscription-frequency';
@@ -185,6 +187,12 @@ export default async function SubscriptionsPage({ params }: Props) {
         reactivateLabel: t('manageModal.reactivateSubscription'),
         reactivatingLabel: t('manageModal.reactivatingSubscription'),
         reactivateAction: reactivateSubscriptionAction,
+        pauseLabel: t('manageModal.pauseSubscription'),
+        pausingLabel: t('manageModal.pausingSubscription'),
+        pauseAction: pauseSubscriptionAction,
+        resumeLabel: t('manageModal.resumeSubscription'),
+        resumingLabel: t('manageModal.resumingSubscription'),
+        resumeAction: resumeSubscriptionAction,
       }}
       portalSections={portalSections}
       shipToLabel={t('delivery.shipTo')}

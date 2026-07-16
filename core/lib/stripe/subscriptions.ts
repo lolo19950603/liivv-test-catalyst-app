@@ -14,7 +14,10 @@ import {
   parseSubscriptionIntervalKey,
   type SubscriptionBillingInterval,
 } from './subscription-interval';
+import { CUSTOMER_PAUSE_REASON } from './subscription-pause';
 import { syncSubscriptionPricingFromBigCommerce } from './sync-subscription-pricing';
+
+export { CUSTOMER_PAUSE_REASON, OUT_OF_STOCK_PAUSE_REASON } from './subscription-pause';
 
 const PLACEHOLDER_UNIT_AMOUNT = Number(process.env.STRIPE_SUBSCRIPTION_PLACEHOLDER_UNIT_AMOUNT ?? '50');
 
@@ -34,6 +37,8 @@ export interface CustomerSubscription {
   currentPeriodStart: number;
   currentPeriodEnd: number;
   cancelAtPeriodEnd: boolean;
+  /** True when Stripe `pause_collection` is set (customer pause or out-of-stock). */
+  collectionPaused: boolean;
   trialEnd: number | null;
   billingCycleAnchor: number | null;
   paymentMethodLabel: string;
@@ -193,6 +198,7 @@ function toCustomerSubscription(
     currentPeriodStart,
     currentPeriodEnd,
     cancelAtPeriodEnd,
+    collectionPaused: subscription.pause_collection != null,
     trialEnd: subscription.trial_end,
     billingCycleAnchor: subscription.billing_cycle_anchor,
     paymentMethodLabel: formatPaymentMethodLabel(paymentMethod),
@@ -401,6 +407,70 @@ export async function cancelCustomerSubscription({
   });
 
   await stripe.subscriptions.cancel(subscriptionId);
+}
+
+export async function pauseCustomerSubscription({
+  stripeCustomerId,
+  subscriptionId,
+}: {
+  stripeCustomerId: string;
+  subscriptionId: string;
+}): Promise<void> {
+  const stripe = getStripe();
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  const customerId =
+    typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
+
+  if (customerId !== stripeCustomerId) {
+    throw new Error('Subscription not found');
+  }
+
+  if (subscription.status === 'canceled' || subscription.status === 'incomplete_expired') {
+    throw new Error('Unable to pause this subscription');
+  }
+
+  if (subscription.pause_collection != null) {
+    return;
+  }
+
+  await stripe.subscriptions.update(subscriptionId, {
+    pause_collection: { behavior: 'void' },
+    metadata: {
+      ...subscription.metadata,
+      subscription_paused_reason: CUSTOMER_PAUSE_REASON,
+      subscription_paused_at: String(Math.floor(Date.now() / 1000)),
+    },
+  });
+}
+
+export async function resumeCustomerSubscription({
+  stripeCustomerId,
+  subscriptionId,
+}: {
+  stripeCustomerId: string;
+  subscriptionId: string;
+}): Promise<void> {
+  const stripe = getStripe();
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  const customerId =
+    typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
+
+  if (customerId !== stripeCustomerId) {
+    throw new Error('Subscription not found');
+  }
+
+  if (subscription.pause_collection == null && subscription.status !== 'paused') {
+    return;
+  }
+
+  await stripe.subscriptions.update(subscriptionId, {
+    pause_collection: null,
+    metadata: {
+      ...subscription.metadata,
+      subscription_paused_reason: '',
+      subscription_paused_at: '',
+    },
+  });
 }
 
 async function resolveSubscriptionPaymentMethodId(

@@ -345,6 +345,10 @@
         "skipDeliveryScheduledLabel": "Skip scheduled for '{date}'",
         "reactivateSubscription": "Re-activate subscription",
         "reactivatingSubscription": "Re-activating subscription…",
+        "pauseSubscription": "Pause subscription",
+        "pausingSubscription": "Pausing subscription…",
+        "resumeSubscription": "Resume subscription",
+        "resumingSubscription": "Resuming subscription…",
         "cancelForm": {
           "title": "Cancel your subscription",
           "reasonLabel": "Reason",
@@ -372,6 +376,7 @@
       "renewsOn": "Renews on {date}",
       "nextShipmentOn": "Next shipment {date}",
       "firstChargeOn": "First charge on {date}",
+      "billingPaused": "Billing paused — resume anytime to continue deliveries",
       "skipScheduled": "Skip scheduled for {date}",
       "priceAtBilling": "Price confirmed at billing",
       "subjectToChangeAtBilling": "Subject to change at billing",
