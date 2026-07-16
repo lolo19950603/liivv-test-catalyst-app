@@ -38,12 +38,8 @@ export function voiceChatStatusLabel(phase: VoiceChatPhase): string {
     return 'Listening…';
   }
 
-  if (phase === 'thinking') {
-    return 'Getting a reply…';
-  }
-
-  if (phase === 'speaking') {
-    return 'Playing reply…';
+  if (phase === 'replying') {
+    return 'Replying…';
   }
 
   return 'Starting…';

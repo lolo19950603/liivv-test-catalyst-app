@@ -6,6 +6,11 @@ import {
   synthesizeChatVoiceAction,
   transcribeChatVoiceAction,
 } from '~/app/[locale]/(default)/account/(portal)/virtual-care/_actions/virtual-care-actions';
+import {
+  createReplyingSound,
+  playVoiceEndSound,
+  playVoiceStartSound,
+} from '~/components/virtual-care/replying-sound';
 
 const SPEAK_REPLIES_KEY = 'liivv-chat-speak-replies';
 const MAX_RECORD_MS = 45_000;
@@ -14,7 +19,7 @@ const MIN_SPEECH_MS = 500;
 const SPEECH_RMS = 0.018;
 const ANALYSIS_INTERVAL_MS = 50;
 
-export type VoiceChatPhase = 'idle' | 'listening' | 'thinking' | 'speaking';
+export type VoiceChatPhase = 'idle' | 'listening' | 'replying';
 
 function pickRecorderMimeType(): string | undefined {
   if (typeof MediaRecorder === 'undefined') {
@@ -54,6 +59,7 @@ export function useChatVoice({
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const [synthesizing, setSynthesizing] = useState(false);
   const [speakReplies, setSpeakReplies] = useState(false);
   const [voiceChatActive, setVoiceChatActive] = useState(false);
   const [dictateActive, setDictateActive] = useState(false);
@@ -83,6 +89,7 @@ export function useChatVoice({
   const recordingRef = useRef(false);
   const transcribingRef = useRef(false);
   const speakingRef = useRef(false);
+  const replyingSoundRef = useRef(createReplyingSound());
 
   const applyTranscript = useEffectEvent(onTranscript);
   const applyVoiceTurn = useEffectEvent((text: string) => onVoiceTurn?.(text));
@@ -95,11 +102,16 @@ export function useChatVoice({
 
   const voicePhase: VoiceChatPhase = recording
     ? 'listening'
-    : transcribing || (voiceChatActive && disabled && !speaking)
-      ? 'thinking'
-      : speaking
-        ? 'speaking'
-        : 'idle';
+    : transcribing ||
+        synthesizing ||
+        speaking ||
+        (voiceChatActive && disabled)
+      ? 'replying'
+      : 'idle';
+
+  const shouldPlayReplyingSound =
+    voiceChatActive &&
+    (transcribing || synthesizing || (disabled && !speaking));
 
   useEffect(() => {
     setMicSupported(
@@ -156,6 +168,20 @@ export function useChatVoice({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- unmount only
   }, []);
 
+  useEffect(() => {
+    const sound = replyingSoundRef.current;
+
+    if (shouldPlayReplyingSound) {
+      sound.start();
+    } else {
+      sound.stop();
+    }
+
+    return () => {
+      sound.stop();
+    };
+  }, [shouldPlayReplyingSound]);
+
   function clearRecordTimer() {
     if (recordTimerRef.current !== null) {
       window.clearTimeout(recordTimerRef.current);
@@ -208,10 +234,12 @@ export function useChatVoice({
 
     audioRef.current?.pause();
     audioRef.current = null;
+    replyingSoundRef.current.stop();
     dictateActiveRef.current = false;
     setDictateActive(false);
     setRecording(false);
     setSpeaking(false);
+    setSynthesizing(false);
     setHeardSpeech(false);
   }
 
@@ -621,6 +649,7 @@ export function useChatVoice({
 
     setSpeaking(false);
     speakingRef.current = false;
+    setSynthesizing(false);
   }
 
   async function speakText(text: string, messageId?: string) {
@@ -636,6 +665,7 @@ export function useChatVoice({
     setVoiceError(null);
     setSpeaking(true);
     speakingRef.current = true;
+    setSynthesizing(true);
     listenAfterSpeakRef.current = voiceChatActiveRef.current;
 
     try {
@@ -644,6 +674,7 @@ export function useChatVoice({
       if (!result.ok) {
         setSpeaking(false);
         speakingRef.current = false;
+        setSynthesizing(false);
         setVoiceError(result.error);
 
         if (voiceChatActiveRef.current && enabledRef.current) {
@@ -686,6 +717,8 @@ export function useChatVoice({
           }, 400);
         }
       };
+      setSynthesizing(false);
+
       audio.onerror = () => {
         setSpeaking(false);
         speakingRef.current = false;
@@ -702,6 +735,7 @@ export function useChatVoice({
     } catch {
       setSpeaking(false);
       speakingRef.current = false;
+      setSynthesizing(false);
       setVoiceError('Could not play the voice reply.');
 
       if (voiceChatActiveRef.current && enabledRef.current) {
@@ -740,7 +774,13 @@ export function useChatVoice({
     setVoiceChatActive(true);
     setSpeakRepliesPersisted(true);
     setVoiceError(null);
-    void startListeningTurn();
+    void (async () => {
+      const started = await beginRecordingCapture({ forDictate: false });
+
+      if (started) {
+        playVoiceStartSound();
+      }
+    })();
   }
 
   function endVoiceChat() {
@@ -750,6 +790,7 @@ export function useChatVoice({
     setSpeakRepliesPersisted(false);
     stopSpeaking();
     teardownSession();
+    playVoiceEndSound();
   }
 
   function toggleVoiceChat() {
