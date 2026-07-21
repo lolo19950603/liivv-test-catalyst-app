@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Women's Health &amp; Wellness — Liivv (Makeswift build reference)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --cream: #f5f2ed;
+    --soft-cream: #fcf8f4;
+    --sage: #8ea78b;
+    --sage-deep: #6b7f5c;
+    --blush: #f3c7be;
+    --taupe: #a89c94;
+    --charcoal: rgb(49, 47, 47);
+    --font-heading: 'DM Serif Text', serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    color: var(--charcoal);
+    background: var(--cream);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; line-height: 1.15; }
+
+  section { position: relative; }
+
+  .ms-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 20;
+    background: var(--charcoal);
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 5px 12px;
+    border-radius: 999px;
+    opacity: 0.85;
+  }
+
+  .rounded-top { border-radius: 42px 42px 0 0; margin-top: -42px; }
+
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .swash {
+    position: relative;
+    display: inline-block;
+    padding: 0 6px;
+  }
+  .swash::before {
+    content: '';
+    position: absolute;
+    inset: 55% -4px 2px;
+    background: var(--blush);
+    z-index: -1;
+    border-radius: 4px;
+  }
+  .swash.sage::before { background: rgba(142, 167, 139, 0.45); }
+
+  .btn {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 15px;
+    padding: 15px 34px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .btn:hover { transform: translateY(-2px); opacity: 0.92; }
+  .btn-dark { background: var(--charcoal); color: #fff; }
+  .btn-white { background: #fff; color: var(--charcoal); }
+  .btn-outline { background: transparent; color: var(--charcoal); border: 1.5px solid var(--charcoal); }
+
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+  .ph {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: rgba(49, 47, 47, 0.55);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    padding: 16px;
+    background:
+      radial-gradient(120% 90% at 20% 15%, rgba(243, 199, 190, 0.55), transparent 60%),
+      radial-gradient(110% 100% at 85% 80%, rgba(142, 167, 139, 0.5), transparent 65%),
+      linear-gradient(160deg, #efe7dd, #ddd2c4);
+  }
+
+  .hero {
+    min-height: 92vh;
+    display: flex;
+    align-items: flex-end;
+    background:
+      linear-gradient(to top, rgba(35, 40, 32, 0.62), rgba(35, 40, 32, 0.08) 55%),
+      radial-gradient(130% 100% at 75% 20%, rgba(243, 199, 190, 0.4), transparent 55%),
+      linear-gradient(150deg, #7d937a, #55684f 70%, #43523f);
+    color: #fff;
+    overflow: hidden;
+  }
+  .hero-video-note {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .hero-inner {
+    position: relative;
+    width: 100%;
+    padding: 0 24px 9vh;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  .hero h1 { font-size: clamp(44px, 7vw, 88px); max-width: 12ch; }
+  .hero p { margin-top: 20px; max-width: 46ch; font-size: clamp(16px, 1.6vw, 20px); }
+
+  .highlight-text {
+    background: var(--cream);
+    text-align: center;
+    padding: 96px 24px 90px;
+  }
+  .highlight-text h2 { font-size: clamp(34px, 5vw, 64px); max-width: 20ch; margin: 34px auto; }
+  .pill-row { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+  .pill-row .ph { width: 132px; height: 76px; border-radius: 999px; font-size: 11px; }
+
+  .counters { background: var(--soft-cream); padding: 86px 24px; }
+  .counters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 44px;
+    text-align: center;
+  }
+  .counters .num { font-family: var(--font-heading); font-size: clamp(48px, 5vw, 72px); }
+  .counters .num sup { font-size: 0.45em; color: var(--sage-deep); }
+  .counters p { margin-top: 8px; font-size: 15px; max-width: 26ch; margin-left: auto; margin-right: auto; }
+
+  .marquee {
+    background: var(--sage);
+    color: #fff;
+    overflow: hidden;
+    padding: 26px 0;
+  }
+  .marquee-track {
+    display: flex;
+    gap: 56px;
+    white-space: nowrap;
+    width: max-content;
+    animation: scroll 26s linear infinite;
+    font-family: var(--font-heading);
+    font-size: clamp(22px, 2.6vw, 34px);
+    align-items: center;
+  }
+  .marquee-track .logo-dot {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--sage-deep);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-heading); font-size: 20px; font-style: italic;
+    flex: none;
+  }
+  @keyframes scroll { to { transform: translateX(-50%); } }
+
+  .timeline { background: var(--cream); padding: 100px 24px; }
+  .timeline-header { max-width: 720px; margin-bottom: 48px; }
+  .timeline-header .small-heading { font-size: 15px; margin-bottom: 14px; max-width: 52ch; }
+  .timeline-header h2 { font-size: clamp(34px, 4.5vw, 56px); }
+  .timeline-nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 28px;
+    justify-content: flex-end;
+  }
+  .timeline-nav span {
+    width: 44px; height: 44px; border-radius: 999px;
+    border: 1.5px solid var(--charcoal);
+    display: grid; place-items: center;
+    font-size: 18px;
+  }
+  .timeline-slide {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    background: var(--soft-cream);
+    border-radius: 28px;
+    overflow: hidden;
+    min-height: 420px;
+  }
+  .timeline-slide .copy { padding: 48px 44px; display: flex; flex-direction: column; justify-content: center; }
+  .timeline-slide .category {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+  .timeline-slide h3 { font-size: clamp(28px, 3vw, 40px); margin-bottom: 16px; }
+  .timeline-slide .copy p { margin-bottom: 12px; max-width: 40ch; font-size: 15.5px; }
+  .timeline-slide .copy .btn { margin-top: 18px; align-self: flex-start; }
+  .timeline-slide .ph { min-height: 100%; height: 100%; }
+  .timeline-dots {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-top: 40px;
+    align-items: center;
+  }
+  .timeline-dots button {
+    appearance: none;
+    border: 0;
+    background: none;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    color: rgba(49, 47, 47, 0.28);
+    padding: 0;
+    cursor: default;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .timeline-dots button.active { color: var(--charcoal); }
+  .timeline-dots button::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.5;
+  }
+  .timeline-slides-note {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(49, 47, 47, 0.12);
+  }
+  .timeline-slides-note h4 {
+    font-family: var(--font-body);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--sage-deep);
+    margin-bottom: 20px;
+  }
+  .timeline-slide-list { display: grid; gap: 16px; }
+  .timeline-slide-list details {
+    background: var(--soft-cream);
+    border-radius: 16px;
+    padding: 16px 20px;
+  }
+  .timeline-slide-list summary {
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-size: 18px;
+    list-style: none;
+  }
+  .timeline-slide-list summary span {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+    color: var(--sage-deep);
+  }
+  .timeline-slide-list details p { margin-top: 10px; font-size: 14.5px; max-width: 60ch; }
+
+  .pillars { background: var(--sage); color: #fff; padding: 100px 24px; }
+  .pillars .eyebrow { text-align: center; display: block; color: rgba(255, 255, 255, 0.85); }
+  .pillars h2 { text-align: center; font-size: clamp(34px, 4.5vw, 56px); margin: 16px auto 14px; }
+  .pillars .intro { text-align: center; max-width: 56ch; margin: 0 auto 58px; }
+  .pillars-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; }
+  .pillar .ph { height: 190px; border-radius: 20px; margin-bottom: 20px; }
+  .pillar h3 { font-size: 24px; }
+  .pillar .sub { font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; margin-top: 4px; color: rgba(255, 255, 255, 0.8); }
+  .pillar p { margin-top: 10px; font-size: 15px; }
+
+  .images-text { background: var(--taupe); color: #fff; padding: 100px 24px; }
+  .images-text-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 56px; align-items: center; }
+  .images-text .visuals { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+  .images-text .visuals .ph { border-radius: 24px; color: rgba(255, 255, 255, 0.75); }
+  .images-text .visuals .ph.big { height: 420px; }
+  .images-text .visuals .ph.small { height: 300px; align-self: end; }
+  .images-text h2 { font-size: clamp(32px, 4vw, 52px); margin: 18px 0 22px; }
+  .images-text p { margin-bottom: 16px; max-width: 52ch; }
+  .images-text .btn { margin-top: 12px; }
+  .images-text.clair-pair {
+    background: var(--cream);
+    color: var(--charcoal);
+  }
+  .images-text.clair-pair .images-text-grid { grid-template-columns: 1fr 1.05fr; }
+  .images-text.clair-pair .visuals { order: 2; }
+  .images-text.clair-pair .copy { order: 1; }
+  .images-text.clair-pair .visuals .ph { color: rgba(49, 47, 47, 0.5); }
+  .images-text.clair-pair .eyebrow { color: var(--sage-deep); }
+
+  .story { background: var(--cream); padding: 100px 24px 110px; }
+  .story .banner { text-align: center; margin-bottom: 70px; }
+  .story .banner h2 { font-size: clamp(40px, 6.5vw, 90px); }
+  .story .banner .ph { height: 380px; border-radius: 28px; margin-top: 44px; }
+  .story-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 60px; align-items: start; }
+  .story-grid h2 { font-size: clamp(34px, 4vw, 54px); }
+  .story-grid h2 .accent { color: var(--sage-deep); font-style: italic; display: block; }
+  .story-grid p { margin-bottom: 14px; }
+  .story-grid .strong-close { font-weight: 600; margin-top: 22px; }
+  .story-cta { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 30px; }
+
+  .chapters { background: var(--charcoal); }
+  .chapter {
+    position: sticky;
+    top: 0;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 48px;
+    padding: 90px 6vw;
+    border-radius: 42px 42px 0 0;
+  }
+  .chapter:nth-of-type(1) { background: var(--soft-cream); }
+  .chapter:nth-of-type(2) { background: #e9dfd3; }
+  .chapter:nth-of-type(3) { background: #dfe5da; }
+  .chapter:nth-of-type(4) { background: #f0dcd6; }
+  .chapter .ph { height: 62vh; min-height: 340px; border-radius: 28px; }
+  .chapter .eyebrow { color: var(--sage-deep); }
+  .chapter h3 { font-size: clamp(32px, 4vw, 54px); margin: 14px 0 18px; }
+  .chapter p { max-width: 48ch; margin-bottom: 26px; }
+
+  .voices { background: var(--sage); color: #fff; padding: 110px 24px; }
+  .voices h2 { font-size: clamp(36px, 5vw, 64px); text-align: center; margin-bottom: 70px; }
+  .voices h2 em { font-style: italic; }
+  .voice-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px; }
+  .voice {
+    background: var(--soft-cream);
+    color: var(--charcoal);
+    border-radius: 26px;
+    padding: 36px 32px;
+  }
+  .voice:nth-child(2) { transform: translateY(34px); }
+  .voice blockquote { font-family: var(--font-heading); font-size: 21px; line-height: 1.4; }
+  .voice .who { margin-top: 22px; display: flex; align-items: center; gap: 12px; font-size: 14px; }
+  .voice .who .ph { width: 44px; height: 44px; border-radius: 50%; font-size: 0; flex: none; }
+  .voice .who span { display: block; color: rgba(49, 47, 47, 0.6); font-size: 12.5px; }
+
+  .faq { background: var(--cream); padding: 110px 24px; }
+  .faq h2 { font-size: clamp(34px, 4.5vw, 56px); text-align: center; }
+  .faq .intro { text-align: center; margin: 14px auto 54px; max-width: 52ch; }
+  .faq details {
+    max-width: 820px;
+    margin: 0 auto;
+    border-bottom: 1px solid rgba(49, 47, 47, 0.18);
+    padding: 22px 8px;
+  }
+  .faq summary {
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-size: 21px;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+  }
+  .faq summary::after { content: '+'; font-family: var(--font-body); font-size: 26px; color: var(--sage-deep); }
+  .faq details[open] summary::after { content: '–'; }
+  .faq details p { margin-top: 14px; max-width: 68ch; }
+
+  .closing {
+    min-height: 78vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    background:
+      linear-gradient(rgba(45, 52, 42, 0.55), rgba(45, 52, 42, 0.55)),
+      radial-gradient(120% 100% at 30% 20%, rgba(243, 199, 190, 0.45), transparent 60%),
+      linear-gradient(140deg, #8ea78b, #5d7157);
+  }
+  .closing h2 { font-size: clamp(42px, 6.5vw, 84px); }
+  .closing h2 span { display: block; font-style: italic; }
+  .closing p { margin: 22px auto 34px; max-width: 44ch; font-size: 18px; }
+
+  @media (max-width: 840px) {
+    .images-text-grid, .story-grid, .chapter, .timeline-slide { grid-template-columns: 1fr; }
+    .chapter .ph { height: 40vh; }
+    .voice:nth-child(2) { transform: none; }
+    .timeline-dots { grid-template-columns: 1fr; }
+    .timeline-slide .ph { min-height: 220px; }
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <span class="ms-badge">0 · Video hero — diabetes-care-video-hero</span>
+  <div class="hero-video-note">[ Video: warm, slow-motion everyday moments — no clinics, no lab coats ]</div>
+  <div class="hero-inner">
+    <h1>You, in every season</h1>
+    <p>Care that moves with your life — never against it. From your everyday rhythm to whole new chapters, Liivv is right beside you.</p>
+  </div>
+</section>
+
+<section class="highlight-text rounded-top">
+  <span class="ms-badge">1 · Highlight text — health-highlight-text</span>
+  <div class="pill-row">
+    <div class="ph">morning light</div>
+    <div class="ph">fresh linen</div>
+    <div class="ph">tea &amp; a book</div>
+    <div class="ph">a good stretch</div>
+  </div>
+  <h2>Liivv <span class="swash">Women</span> is your <span class="swash sage">everyday rhythm</span> for living well</h2>
+  <div class="pill-row">
+    <div class="ph">walk outside</div>
+    <div class="ph">shelf of favourites</div>
+    <div class="ph">deep breath</div>
+    <div class="ph">golden hour</div>
+  </div>
+</section>
+
+<section class="counters">
+  <span class="ms-badge">2 · Counters — diabetes-care-number-counters</span>
+  <div class="container counters-grid">
+    <div>
+      <div class="num">10k<sup>+</sup></div>
+      <p>women in the Liivv community, and growing every day</p>
+    </div>
+    <div>
+      <div class="num">24<sup>/7</sup></div>
+      <p>chat whenever it suits your day — or your 2 a.m.</p>
+    </div>
+    <div>
+      <div class="num">19<sup>+</sup></div>
+      <p>everyday concerns our Ontario pharmacists can help with, right in chat</p>
+    </div>
+    <div>
+      <div class="num">1</div>
+      <p>place for your wellness — your way, your pace</p>
+    </div>
+  </div>
+</section>
+
+<section class="marquee">
+  <span class="ms-badge">3 · Marquee — health-scrolling-text</span>
+  <div class="marquee-track">
+    <span>Everyday Rhythm</span><span>Glow &amp; Nourish</span><span>Cycle Comfort</span><span>Finding Balance</span><span>Aging Softly</span>
+    <span class="logo-dot">L</span>
+    <span>Personal Care</span><span>Rest &amp; Restore</span><span>Skin &amp; Glow</span><span>Body Kindness</span><span>Quiet Strength</span>
+    <span class="logo-dot">L</span>
+    <span>Everyday Rhythm</span><span>Glow &amp; Nourish</span><span>Cycle Comfort</span><span>Finding Balance</span><span>Aging Softly</span>
+    <span class="logo-dot">L</span>
+    <span>Personal Care</span><span>Rest &amp; Restore</span><span>Skin &amp; Glow</span><span>Body Kindness</span><span>Quiet Strength</span>
+    <span class="logo-dot">L</span>
+  </div>
+</section>
+
+<section class="timeline rounded-top">
+  <span class="ms-badge">4 · Timeline — diabetes-care-timeline</span>
+  <div class="container">
+    <div class="timeline-header">
+      <p class="small-heading">No two of us live the same week. Here's how Liivv fits itself around yours — not the other way around.</p>
+      <h2>Your journey, <span class="swash">your pace</span></h2>
+    </div>
+    <div class="timeline-nav" aria-hidden="true"><span>‹</span><span>›</span></div>
+
+    <!-- Active slide preview (Matches Makeswift: category label + heading + body + CTA + image) -->
+    <div class="timeline-slide">
+      <div class="copy">
+        <p class="category">Know your rhythm</p>
+        <h3>Start with you</h3>
+        <p>Tell us a little about your everyday — what feels good, what feels off, what you'd love more of.</p>
+        <p>That's all we need to start shaping care around your life, not the other way around.</p>
+        <a class="btn btn-dark" href="#">Get Started</a>
+      </div>
+      <div class="ph">journaling at a sunny table</div>
+    </div>
+
+    <div class="timeline-dots" aria-label="Timeline steps (category labels)">
+      <button type="button" class="active">Know your rhythm</button>
+      <button type="button">Stock your calm</button>
+      <button type="button">Ask without the awkward</button>
+      <button type="button">Shop what fits</button>
+      <button type="button">Liivv well</button>
+    </div>
+
+    <div class="timeline-slides-note">
+      <h4>All 5 slides — paste into Makeswift Journey sections</h4>
+      <div class="timeline-slide-list">
+        <details open>
+          <summary><span>Category label</span>Know your rhythm → <em>Start with you</em></summary>
+          <p>Tell us a little about your everyday — what feels good, what feels off, what you'd love more of. That's all we need to start shaping care around your life, not the other way around. · CTA: Get Started</p>
+        </details>
+        <details open>
+          <summary><span>Category label</span>Stock your calm → <em>Essentials on repeat</em></summary>
+          <p>Your comfort staples, chosen once and delivered before you run out. The little things stay on the shelf — so your energy stays on your week. · CTA: Get Started</p>
+        </details>
+        <details open>
+          <summary><span>Category label</span>Ask without the awkward → <em>Chat when you need it</em></summary>
+          <p>Some questions are easier typed than said out loud. Talk with a friendly pharmacist from wherever you're comfiest — no waiting room, no judgment. · CTA: Talk to a Pharmacist</p>
+        </details>
+        <details open>
+          <summary><span>Category label</span>Shop what fits → <em>Your marketplace</em></summary>
+          <p>A marketplace curated for real routines — comfort, care, and glow. Minus the overwhelm of a thousand tabs and the whisper aisle. · CTA: Explore the Shop</p>
+        </details>
+        <details open>
+          <summary><span>Category label</span>Liivv well → <em>Living, not managing</em></summary>
+          <p>Routines that quietly hold you in the background. So your energy goes where it belongs: the life you're actually living. · CTA: Liivv Well</p>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pillars rounded-top">
+  <span class="ms-badge">5 · Multicolumn — diabetes-care-multicolumn</span>
+  <div class="container">
+    <span class="eyebrow">The Liivv Women edit</span>
+    <h2>Four ways to feel like yourself</h2>
+    <p class="intro">Everything here earns its place the same way — it makes an ordinary day a little softer.</p>
+    <div class="pillars-grid">
+      <div class="pillar">
+        <div class="ph">cozy morning-routine still</div>
+        <h3>Daily Comfort</h3>
+        <div class="sub">For the every-month and the every-day</div>
+        <p>Cycle care and comfort essentials that show up on time, so that week is just another week.</p>
+      </div>
+      <div class="pillar">
+        <div class="ph">confident woman, city light</div>
+        <h3>Body Confidence</h3>
+        <div class="sub">Personal care, zero whisper aisle</div>
+        <p>Intimate and personal care picked with honesty — delivered discreetly, discussed openly whenever you want.</p>
+      </div>
+      <div class="pillar">
+        <div class="ph">fresh food and vitamins flat lay</div>
+        <h3>Nourish &amp; Glow</h3>
+        <div class="sub">From the inside out</div>
+        <p>Daily nutrition and skin-loving staples that keep pace with busy weeks and full plates.</p>
+      </div>
+      <div class="pillar">
+        <div class="ph">soft bed, evening light</div>
+        <h3>Rest that Restores</h3>
+        <div class="sub">Because tomorrow needs you</div>
+        <p>Wind-down rituals and sleep support for nights that actually recharge you.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="images-text rounded-top">
+  <span class="ms-badge">6 · Images with text — health-images-with-text</span>
+  <div class="container images-text-grid">
+    <div class="visuals">
+      <div class="ph big">warm chat with a pharmacist, cafe vibe</div>
+      <div class="ph small">phone in hand, cozy blanket</div>
+    </div>
+    <div>
+      <span class="eyebrow">Available in Ontario</span>
+      <h2>Relief that doesn't wait on a waiting room</h2>
+      <p>Some days your body just asks for a little backup — and you shouldn't need to rearrange your whole week to get it.</p>
+      <p>Our friendly Ontario pharmacists can chat through everyday concerns — from monthly cramps to skin flare-ups — and sort out what you need on the spot. No appointment, no waiting room playlist.</p>
+      <p>Real expertise, delivered like a conversation with someone who gets it.</p>
+      <a class="btn btn-white" href="#">Talk to a Pharmacist</a>
+    </div>
+  </div>
+</section>
+
+<section class="images-text clair-pair rounded-top">
+  <span class="ms-badge">7 · Wellness tips — health-images-with-text (suffix: tips)</span>
+  <div class="container images-text-grid">
+    <div class="visuals">
+      <div class="ph big">journal + tea + soft morning light — wellness tip lifestyle</div>
+      <div class="ph small">cycle calendar / gentle self-care flat lay</div>
+    </div>
+    <div class="copy">
+      <span class="eyebrow">A little wisdom for the week</span>
+      <h2>Tips that meet you where you are</h2>
+      <p>Women's health isn't one routine — it's small habits that soften the loud weeks and stretch the quiet ones.</p>
+      <p>Track how you feel across your month. Stock comfort essentials before you need them. Prioritize sleep the same week your energy dips. And when something feels off, ask — our Ontario pharmacists are a chat away.</p>
+      <p>Small adjustments, real rhythm. That's the Liivv Women way.</p>
+      <a class="btn btn-dark" href="#">Explore Women's Essentials</a>
+    </div>
+  </div>
+</section>
+
+<section class="story rounded-top">
+  <span class="ms-badge">8 · Clair feature — diabetes-care-reveal-image-text</span>
+  <div class="container">
+    <div class="banner">
+      <h2>Also in the edit: Clair</h2>
+      <div class="ph">wristband on a woman's wrist in warm morning light — equal feature, not the whole page</div>
+    </div>
+    <div class="story-grid">
+      <h2>Continuous clarity, <span class="accent">when you want it.</span></h2>
+      <div>
+        <p>Clair is a wearable from Clair Health that reads your body's key signals continuously — so you can see the shape of your month instead of guessing through it.</p>
+        <p>It's one part of the Liivv Women lineup, right beside comfort essentials, personal care, nutrition, and sleep support. Same calm place. Same discreet delivery.</p>
+        <p class="strong-close">Curious how it works, when it ships, or how to pre-order? Learn more on our Clair page.</p>
+        <div class="story-cta">
+          <a class="btn btn-dark" href="clair-health.html">Learn more</a>
+          <a class="btn btn-outline" href="#">Shop Women's Essentials</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapters">
+  <span class="ms-badge" style="position:sticky; top:12px; display:inline-block; margin:12px;">9 · Sticky banner — health-scrolling-banner</span>
+
+  <div class="chapter">
+    <div class="ph">sunlit kitchen, mid-morning coffee</div>
+    <div>
+      <span class="eyebrow">Chapter one</span>
+      <h3>Your Everyday</h3>
+      <p>Cycles, energy, and the small routines that carry you. Comfort essentials, personal care, and gentle support that keep your month feeling like yours — every week of it.</p>
+      <a class="btn btn-dark" href="#">Shop Everyday Essentials</a>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <div class="ph">nursery light, tiny socks, calm</div>
+    <div>
+      <span class="eyebrow">Chapter two</span>
+      <h3>Growing &amp; Recovering</h3>
+      <p>Planning, expecting, or finding your feet again — this chapter asks a lot of you. We'll keep the essentials stocked and the answers close, so you can stay present for the good parts.</p>
+      <a class="btn btn-dark" href="#">Explore This Chapter</a>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <div class="ph">woman on a morning walk, headphones in</div>
+    <div>
+      <span class="eyebrow">Chapter three</span>
+      <h3>Finding Your Balance</h3>
+      <p>When your body starts writing a new chapter, it helps to have someone who's read the book. Comfort-first support and easy conversations for the changing years — no euphemisms required.</p>
+      <a class="btn btn-dark" href="#">Explore This Chapter</a>
+    </div>
+  </div>
+
+  <div class="chapter">
+    <div class="ph">gardening hands, sun hat, contentment</div>
+    <div>
+      <span class="eyebrow">Chapter four</span>
+      <h3>Aging with Ease</h3>
+      <p>More living, less managing. Everyday support, home comfort, and one calm place for it all — so the years ahead stay full of your favourite things.</p>
+      <a class="btn btn-dark" href="#">Explore This Chapter</a>
+    </div>
+  </div>
+</section>
+
+<section class="voices rounded-top">
+  <span class="ms-badge">10 · Testimonials — archive-reveal-testimonials</span>
+  <div class="container">
+    <h2>What women <em>are saying</em></h2>
+    <div class="voice-cards">
+      <div class="voice">
+        <blockquote>"I asked a question at 11 p.m. that I'd been too shy to ask anyone for a year. Got a kind, straight answer in minutes."</blockquote>
+        <div class="who">
+          <div class="ph"></div>
+          <div>Priya<span>Toronto · juggling two kids and a startup</span></div>
+        </div>
+      </div>
+      <div class="voice">
+        <blockquote>"My monthly box shows up like clockwork. I genuinely forgot what running-out-of-everything panic feels like."</blockquote>
+        <div class="who">
+          <div class="ph"></div>
+          <div>Dana<span>Ottawa · marathon-in-training</span></div>
+        </div>
+      </div>
+      <div class="voice">
+        <blockquote>"I used to keep three apps and a drawer of half-finished bottles. Now my essentials arrive before I run out — and Sundays feel like mine again."</blockquote>
+        <div class="who">
+          <div class="ph"></div>
+          <div>Maya<span>34 · Liivv member since 2024</span></div>
+        </div>
+      </div>
+      <div class="voice">
+        <blockquote>"The sleep support and skin staples in one place changed my month. I stopped bouncing between three different shops."</blockquote>
+        <div class="who">
+          <div class="ph"></div>
+          <div>Sofia<span>Mississauga · Liivv Women regular</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq rounded-top">
+  <span class="ms-badge">11 · FAQ — diabetes-care-faq-first</span>
+  <h2>Good questions, honest answers</h2>
+  <p class="intro">The things people actually ask us — answered like a friend would, not a form letter.</p>
+
+  <details open>
+    <summary>Is this only for one age or stage of life?</summary>
+    <p>Not at all. Liivv Women is built for every chapter — your everyday rhythm, growing your family, finding a new balance, and everything after. You pick what fits; we follow your lead.</p>
+  </details>
+  <details>
+    <summary>What is Clair?</summary>
+    <p>Clair is a wearable continuous hormone monitor from Clair Health, available through Liivv as part of the Women lineup. For how it works, shipping, and pre-order details, <a href="clair-health.html">visit our Clair page</a>.</p>
+  </details>
+  <details>
+    <summary>What kinds of products does Liivv Women include?</summary>
+    <p>Cycle comfort, personal care, nutrition and glow, sleep support, CarePack for daily essentials — plus pharmacist chat in Ontario. Clair sits in the lineup as an optional wearable if you want continuous clarity on your rhythm.</p>
+  </details>
+  <details>
+    <summary>How private is my order?</summary>
+    <p>Very. Everything arrives in plain, discreet packaging, and your conversations with our team stay between you and us. What you order is nobody's business but yours.</p>
+  </details>
+  <details>
+    <summary>What can I actually chat with a pharmacist about?</summary>
+    <p>Everyday stuff — monthly comfort, skin flare-ups, sleep that won't come, "is this normal?" moments. In Ontario, our pharmacists can assess and help with 19+ everyday concerns right in the chat. If something needs more, we'll point you kindly in the right direction.</p>
+  </details>
+  <details>
+    <summary>What's a CarePack?</summary>
+    <p>Your daily essentials, organized by day and dose into one tidy pack — so mornings start with one small rip instead of a shelf of bottles. Set it once and it keeps arriving.</p>
+  </details>
+  <details>
+    <summary>Can I change or pause my routine anytime?</summary>
+    <p>Always. Life shifts, and your Liivv should shift with it. Swap products, skip a month, or pause entirely — no phone calls, no guilt trips.</p>
+  </details>
+</section>
+
+<section class="closing rounded-top">
+  <span class="ms-badge">12 · Closing banner — diabetes-care-image-text-overlay</span>
+  <div class="container">
+    <h2>Your next chapter <span>starts soft</span></h2>
+    <p>Whatever season you're in, there's a version of well that feels like you. Let's find it together.</p>
+    <a class="btn btn-white" href="#">Shop Women's Wellness</a>
+  </div>
+</section>
+
+</body>
+</html>

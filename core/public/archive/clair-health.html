@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Clair Health — Liivv (Makeswift build reference)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --cream: #f5f2ed;
+    --soft-cream: #fcf8f4;
+    --sage: #8ea78b;
+    --sage-deep: #6b7f5c;
+    --blush: #f3c7be;
+    --taupe: #a89c94;
+    --charcoal: rgb(49, 47, 47);
+    --font-heading: 'DM Serif Text', serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    color: var(--charcoal);
+    background: var(--cream);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; line-height: 1.15; }
+
+  section { position: relative; }
+
+  .ms-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 20;
+    background: var(--charcoal);
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 5px 12px;
+    border-radius: 999px;
+    opacity: 0.85;
+  }
+
+  .rounded-top { border-radius: 42px 42px 0 0; margin-top: -42px; }
+
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .swash {
+    position: relative;
+    display: inline-block;
+    padding: 0 6px;
+  }
+  .swash::before {
+    content: '';
+    position: absolute;
+    inset: 55% -4px 2px;
+    background: var(--blush);
+    z-index: -1;
+    border-radius: 4px;
+  }
+  .swash.sage::before { background: rgba(142, 167, 139, 0.45); }
+
+  .btn {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 15px;
+    padding: 15px 34px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .btn:hover { transform: translateY(-2px); opacity: 0.92; }
+  .btn-dark { background: var(--charcoal); color: #fff; }
+  .btn-white { background: #fff; color: var(--charcoal); }
+  .btn-outline { background: transparent; color: var(--charcoal); border: 1.5px solid var(--charcoal); }
+  .btn-outline-light { background: transparent; color: #fff; border: 1.5px solid rgba(255, 255, 255, 0.85); }
+
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+  .ph {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: rgba(49, 47, 47, 0.55);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    padding: 16px;
+    background:
+      radial-gradient(120% 90% at 20% 15%, rgba(243, 199, 190, 0.55), transparent 60%),
+      radial-gradient(110% 100% at 85% 80%, rgba(142, 167, 139, 0.5), transparent 65%),
+      linear-gradient(160deg, #efe7dd, #ddd2c4);
+  }
+
+  .hero {
+    min-height: 92vh;
+    display: flex;
+    align-items: flex-end;
+    background:
+      linear-gradient(to top, rgba(35, 40, 32, 0.68), rgba(35, 40, 32, 0.12) 55%),
+      radial-gradient(130% 100% at 75% 20%, rgba(243, 199, 190, 0.35), transparent 55%),
+      linear-gradient(150deg, #6b7f5c, #43523f 65%, #2f3a2c);
+    color: #fff;
+    overflow: hidden;
+  }
+  .hero-video-note {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .hero-inner {
+    position: relative;
+    width: 100%;
+    padding: 0 24px 9vh;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  .hero .eyebrow { color: rgba(255, 255, 255, 0.8); margin-bottom: 14px; display: block; }
+  .hero h1 { font-size: clamp(44px, 7vw, 88px); max-width: 12ch; }
+  .hero p { margin-top: 20px; max-width: 46ch; font-size: clamp(16px, 1.6vw, 20px); }
+  .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 28px; }
+
+  .highlight-text {
+    background: var(--cream);
+    text-align: center;
+    padding: 96px 24px 90px;
+  }
+  .highlight-text h2 { font-size: clamp(34px, 5vw, 64px); max-width: 22ch; margin: 34px auto; }
+  .pill-row { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+  .pill-row .ph { width: 132px; height: 76px; border-radius: 999px; font-size: 11px; }
+
+  .counters { background: var(--soft-cream); padding: 86px 24px; }
+  .counters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 44px;
+    text-align: center;
+  }
+  .counters .num { font-family: var(--font-heading); font-size: clamp(48px, 5vw, 72px); }
+  .counters .num sup { font-size: 0.45em; color: var(--sage-deep); }
+  .counters p { margin-top: 8px; font-size: 15px; max-width: 26ch; margin-left: auto; margin-right: auto; }
+
+  .marquee {
+    background: var(--sage);
+    color: #fff;
+    overflow: hidden;
+    padding: 26px 0;
+  }
+  .marquee-track {
+    display: flex;
+    gap: 56px;
+    white-space: nowrap;
+    width: max-content;
+    animation: scroll 28s linear infinite;
+    font-family: var(--font-heading);
+    font-size: clamp(22px, 2.6vw, 34px);
+    align-items: center;
+  }
+  .marquee-track .logo-dot {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--sage-deep);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-heading); font-size: 20px; font-style: italic;
+    flex: none;
+  }
+  @keyframes scroll { to { transform: translateX(-50%); } }
+
+  .story { background: var(--cream); padding: 100px 24px 110px; }
+  .story .banner { text-align: center; margin-bottom: 70px; }
+  .story .banner h2 { font-size: clamp(40px, 6.5vw, 90px); }
+  .story .banner .ph { height: 380px; border-radius: 28px; margin-top: 44px; }
+  .story-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 60px; align-items: start; }
+  .story-grid h2 { font-size: clamp(34px, 4vw, 54px); }
+  .story-grid h2 .accent { color: var(--sage-deep); font-style: italic; display: block; }
+  .story-grid p { margin-bottom: 14px; }
+  .story-grid .strong-close { font-weight: 600; margin-top: 22px; }
+  .story-cta { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 30px; }
+
+  .timeline { background: var(--cream); padding: 100px 24px; }
+  .timeline-header { max-width: 720px; margin-bottom: 48px; }
+  .timeline-header .small-heading { font-size: 15px; margin-bottom: 14px; max-width: 52ch; }
+  .timeline-header h2 { font-size: clamp(34px, 4.5vw, 56px); }
+  .timeline-nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 28px;
+    justify-content: flex-end;
+  }
+  .timeline-nav span {
+    width: 44px; height: 44px; border-radius: 999px;
+    border: 1.5px solid var(--charcoal);
+    display: grid; place-items: center;
+    font-size: 18px;
+  }
+  .timeline-slide {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    background: var(--soft-cream);
+    border-radius: 28px;
+    overflow: hidden;
+    min-height: 420px;
+  }
+  .timeline-slide .copy { padding: 48px 44px; display: flex; flex-direction: column; justify-content: center; }
+  .timeline-slide .category {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+  .timeline-slide h3 { font-size: clamp(28px, 3vw, 40px); margin-bottom: 16px; }
+  .timeline-slide .copy p { margin-bottom: 12px; max-width: 40ch; font-size: 15.5px; }
+  .timeline-slide .copy .btn { margin-top: 18px; align-self: flex-start; }
+  .timeline-slide .ph { min-height: 100%; height: 100%; }
+  .timeline-dots {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 40px;
+    align-items: center;
+  }
+  .timeline-dots button {
+    appearance: none;
+    border: 0;
+    background: none;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    color: rgba(49, 47, 47, 0.28);
+    padding: 0;
+    cursor: default;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .timeline-dots button.active { color: var(--charcoal); }
+  .timeline-dots button::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.5;
+  }
+  .timeline-slides-note {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(49, 47, 47, 0.12);
+  }
+  .timeline-slides-note h4 {
+    font-family: var(--font-body);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--sage-deep);
+    margin-bottom: 20px;
+  }
+  .timeline-slide-list { display: grid; gap: 16px; }
+  .timeline-slide-list details {
+    background: var(--soft-cream);
+    border-radius: 16px;
+    padding: 16px 20px;
+  }
+  .timeline-slide-list summary {
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-size: 18px;
+    list-style: none;
+  }
+  .timeline-slide-list summary span {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+    color: var(--sage-deep);
+  }
+  .timeline-slide-list details p { margin-top: 10px; font-size: 14.5px; max-width: 60ch; }
+
+  .pillars { background: var(--sage); color: #fff; padding: 100px 24px; }
+  .pillars .eyebrow { text-align: center; display: block; color: rgba(255, 255, 255, 0.85); }
+  .pillars h2 { text-align: center; font-size: clamp(34px, 4.5vw, 56px); margin: 16px auto 14px; }
+  .pillars .intro { text-align: center; max-width: 56ch; margin: 0 auto 58px; }
+  .pillars-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; }
+  .pillar .ph { height: 190px; border-radius: 20px; margin-bottom: 20px; }
+  .pillar h3 { font-size: 24px; }
+  .pillar .sub { font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; margin-top: 4px; color: rgba(255, 255, 255, 0.8); }
+  .pillar p { margin-top: 10px; font-size: 15px; }
+
+  .liivv-band {
+    background: var(--soft-cream);
+    padding: 88px 24px;
+    text-align: center;
+  }
+  .liivv-band .logo-mark {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--sage);
+    color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-heading); font-size: 32px; font-style: italic;
+    margin-bottom: 22px;
+  }
+  .liivv-band .eyebrow { color: var(--sage-deep); display: block; margin-bottom: 12px; }
+  .liivv-band h2 { font-size: clamp(30px, 4vw, 48px); max-width: 18ch; margin: 0 auto 18px; }
+  .liivv-band p { max-width: 52ch; margin: 0 auto 16px; font-size: 16px; }
+  .liivv-band .soft-list {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 18px;
+    margin: 28px auto 32px; max-width: 640px;
+    font-size: 14px; font-weight: 500; color: var(--sage-deep);
+  }
+  .liivv-band .soft-list span::before { content: '· '; opacity: 0.5; }
+  .liivv-band .soft-list span:first-child::before { content: ''; }
+
+  .faq { background: var(--cream); padding: 110px 24px; }
+  .faq h2 { font-size: clamp(34px, 4.5vw, 56px); text-align: center; }
+  .faq .intro { text-align: center; margin: 14px auto 54px; max-width: 52ch; }
+  .faq details {
+    max-width: 820px;
+    margin: 0 auto;
+    border-bottom: 1px solid rgba(49, 47, 47, 0.18);
+    padding: 22px 8px;
+  }
+  .faq summary {
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-size: 21px;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+  }
+  .faq summary::after { content: '+'; font-family: var(--font-body); font-size: 26px; color: var(--sage-deep); }
+  .faq details[open] summary::after { content: '–'; }
+  .faq details p { margin-top: 14px; max-width: 68ch; }
+  .faq details a { color: var(--sage-deep); font-weight: 500; }
+
+  .closing {
+    min-height: 78vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    background:
+      linear-gradient(rgba(45, 52, 42, 0.55), rgba(45, 52, 42, 0.55)),
+      radial-gradient(120% 100% at 30% 20%, rgba(243, 199, 190, 0.45), transparent 60%),
+      linear-gradient(140deg, #8ea78b, #5d7157);
+  }
+  .closing h2 { font-size: clamp(42px, 6.5vw, 84px); }
+  .closing h2 span { display: block; font-style: italic; }
+  .closing p { margin: 22px auto 34px; max-width: 44ch; font-size: 18px; }
+  .closing-cta { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+
+  @media (max-width: 840px) {
+    .story-grid, .timeline-slide { grid-template-columns: 1fr; }
+    .timeline-dots { grid-template-columns: 1fr; }
+    .timeline-slide .ph { min-height: 220px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 0 · Video hero -->
+<section class="hero">
+  <span class="ms-badge">0 · Video hero — diabetes-care-video-hero</span>
+  <div class="hero-video-note">[ Video: Clair wristband on wrist in warm morning light — slow, intimate, product-forward ]</div>
+  <div class="hero-inner">
+    <span class="eyebrow">Clair Health · available through Liivv</span>
+    <h1>Know your rhythm</h1>
+    <p>Clair is the first wearable that reads your body's key signals continuously — so you finally see the shape of your month instead of guessing through it. Pre-order through Liivv.</p>
+    <div class="hero-cta">
+      <a class="btn btn-white" href="#">Pre-order Clair</a>
+      <a class="btn btn-outline-light" href="#how-it-works">How Clair Works</a>
+    </div>
+  </div>
+</section>
+
+<!-- 1 · Highlight text — Liivv logo presence -->
+<section class="highlight-text rounded-top">
+  <span class="ms-badge">1 · Highlight text — health-highlight-text (suffix: clair)</span>
+  <div class="pill-row">
+    <div class="ph">wrist close-up</div>
+    <div class="ph">morning glance</div>
+    <div class="ph">soft jewellery feel</div>
+    <div class="ph">phone app glow</div>
+  </div>
+  <h2><span class="swash">Clair</span> by Clair Health — continuous clarity, <span class="swash sage">through Liivv</span></h2>
+  <div class="pill-row">
+    <div class="ph">nightstand calm</div>
+    <div class="ph">warm coffee</div>
+    <div class="ph">quiet stretch</div>
+    <div class="ph">evening wind-down</div>
+  </div>
+</section>
+
+<!-- 2 · Number counters — Clair product proof -->
+<section class="counters">
+  <span class="ms-badge">2 · Counters — diabetes-care-number-counters</span>
+  <div class="container counters-grid">
+    <div>
+      <div class="num">24<sup>/7</sup></div>
+      <p>continuous reading of your body's key signals — no guessing, no gaps</p>
+    </div>
+    <div>
+      <div class="num">0</div>
+      <p>pinpricks, blood draws, or urine strips — just wear it like jewellery</p>
+    </div>
+    <div>
+      <div class="num">4</div>
+      <p>key signals including estrogen, progesterone, LH, and FSH</p>
+    </div>
+    <div>
+      <div class="num">Nov</div>
+      <p>2026 expected ship date — pre-order through Liivv to stay first in line</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 · Marquee — Clair features + Liivv logo across the page -->
+<section class="marquee">
+  <span class="ms-badge">3 · Marquee — health-scrolling-text (suffix: clair) · Liivv logo between labels</span>
+  <div class="marquee-track">
+    <span>Continuous Clarity</span><span>No Pinpricks</span><span>Worn Like Jewellery</span><span>Know Your Month</span><span>Hormone Literacy</span>
+    <span class="logo-dot" title="Liivv logo">L</span>
+    <span>Real-Time Rhythm</span><span>Quiet Weeks &amp; Loud Ones</span><span>Pre-Order Through Liivv</span><span>Meet Clair</span><span>Glance &amp; Know</span>
+    <span class="logo-dot" title="Liivv logo">L</span>
+    <span>Continuous Clarity</span><span>No Pinpricks</span><span>Worn Like Jewellery</span><span>Know Your Month</span><span>Hormone Literacy</span>
+    <span class="logo-dot" title="Liivv logo">L</span>
+    <span>Real-Time Rhythm</span><span>Quiet Weeks &amp; Loud Ones</span><span>Pre-Order Through Liivv</span><span>Meet Clair</span><span>Glance &amp; Know</span>
+    <span class="logo-dot" title="Liivv logo">L</span>
+  </div>
+</section>
+
+<!-- 4 · Clair product story -->
+<section class="story rounded-top" id="how-it-works">
+  <span class="ms-badge">4 · Clair story — diabetes-care-reveal-image-text</span>
+  <div class="container">
+    <div class="banner">
+      <h2>Meet Clair.</h2>
+      <div class="ph">hero product shot — Clair wristband on a woman's wrist in warm morning light, jewellery-like, not clinical</div>
+    </div>
+    <div class="story-grid">
+      <h2>Your body's signals, <span class="accent">worn like jewellery.</span></h2>
+      <div>
+        <p>Clair is a wearable continuous hormone monitor from Clair Health — the first of its kind. It reads your body's key signals without blood or urine, so you can see the shape of your cycle in real time.</p>
+        <p>No pinpricks. No waiting on a lab. Just a clear, gentle picture of your rhythm, checked like a glance at your wrist.</p>
+        <p class="strong-close">Pre-order Clair through Liivv — and stay first in line for expected November 2026 shipping.</p>
+        <div class="story-cta">
+          <a class="btn btn-dark" href="#">Pre-order Clair</a>
+          <a class="btn btn-outline" href="#faq">Good questions</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 · Timeline — how Clair works -->
+<section class="timeline">
+  <span class="ms-badge">5 · Timeline — diabetes-care-timeline (suffix: clair)</span>
+  <div class="container">
+    <div class="timeline-header">
+      <p class="small-heading">From first glance to everyday clarity — here's how Clair fits into your life.</p>
+      <h2>Wear. See. Understand. <span class="swash">Know.</span></h2>
+    </div>
+    <div class="timeline-nav" aria-hidden="true"><span>‹</span><span>›</span></div>
+
+    <div class="timeline-slide">
+      <div class="copy">
+        <p class="category">Wear</p>
+        <h3>Slip it on</h3>
+        <p>Clair sits on your wrist like a quiet piece of jewellery — light, familiar, ready whenever you are.</p>
+        <p>No setup ritual. No lab appointment. Just wear it and let it read.</p>
+        <a class="btn btn-dark" href="#">Pre-order Clair</a>
+      </div>
+      <div class="ph">Clair on wrist — soft lifestyle, morning coffee nearby</div>
+    </div>
+
+    <div class="timeline-dots" aria-label="Timeline steps">
+      <button type="button" class="active">Wear</button>
+      <button type="button">See</button>
+      <button type="button">Understand</button>
+      <button type="button">Know</button>
+    </div>
+
+    <div class="timeline-slides-note">
+      <h4>All timeline slides (for Makeswift)</h4>
+      <div class="timeline-slide-list">
+        <details open>
+          <summary><span>Wear</span>Slip it on</summary>
+          <p>Clair sits on your wrist like a quiet piece of jewellery — light, familiar, ready whenever you are. No setup ritual. No lab appointment. Just wear it and let it read.</p>
+        </details>
+        <details>
+          <summary><span>See</span>Watch your month take shape</summary>
+          <p>Continuous readings paint the quiet weeks and the loud ones — energy dips, cycle shifts, the patterns you used to only feel.</p>
+        </details>
+        <details>
+          <summary><span>Understand</span>Connect the dots</summary>
+          <p>When sleep frays or mood swings, Clair helps you see whether your body's signals line up. Clarity first — then you decide what to do with it.</p>
+        </details>
+        <details>
+          <summary><span>Know</span>Live with the fuller picture</summary>
+          <p>Insights you can glance at anytime. No guessing through your month — just a gentler sense of what's yours this week.</p>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 · What Clair helps you see — Clair benefits only -->
+<section class="pillars rounded-top">
+  <span class="ms-badge">6 · Multicolumn — diabetes-care-multicolumn</span>
+  <div class="container">
+    <span class="eyebrow">What Clair helps you see</span>
+    <h2>Insights that touch real life</h2>
+    <p class="intro">Clair shows the shape of your month — so the weeks that used to feel random start to make sense.</p>
+    <div class="pillars-grid">
+      <div class="pillar">
+        <div class="ph">dim bedroom, soft lamp, restful</div>
+        <h3>Sleep</h3>
+        <div class="sub">Restless nights, explained</div>
+        <p>See when hormone shifts line up with restless nights — so you understand the pattern, not just the tired morning.</p>
+      </div>
+      <div class="pillar">
+        <div class="ph">morning stretch by a sunny window</div>
+        <h3>Energy</h3>
+        <div class="sub">The dips and the peaks</div>
+        <p>Energy that comes and goes isn't random when you can see the shape of your month. Clair maps it for you.</p>
+      </div>
+      <div class="pillar">
+        <div class="ph">soft natural light on skin, mirror moment</div>
+        <h3>Skin</h3>
+        <div class="sub">Glow that follows your cycle</div>
+        <p>Hormonal skin changes often track with the phases Clair watches — so you see the pattern before you guess at it.</p>
+      </div>
+      <div class="pillar">
+        <div class="ph">quiet tea moment, soft smile</div>
+        <h3>Mood</h3>
+        <div class="sub">The weeks that feel louder</div>
+        <p>Some weeks feel like yours; others ask more of you. Clair gives you the map so those weeks make more sense.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 · Light Liivv brand band — logo + brief about Liivv + soft product list -->
+<section class="liivv-band rounded-top">
+  <span class="ms-badge">7 · Liivv brand band — health-highlight-text or custom-band (suffix: liivv)</span>
+  <div class="logo-mark" title="Liivv logo">L</div>
+  <span class="eyebrow">Available through Liivv</span>
+  <h2>Clair, from a brand that stays with you</h2>
+  <p>Liivv is where you pre-order Clair — and where comfort, care, and kind answers already live. We're a calm health home for everyday living, not just one product.</p>
+  <p>Besides Clair, Liivv also supports women's wellness, sleep, skin care, diabetes care, ostomy supplies, and more — whenever you're ready to explore.</p>
+  <div class="soft-list" aria-label="Liivv also offers">
+    <span>Women's wellness</span>
+    <span>Sleep &amp; rest</span>
+    <span>Skin care</span>
+    <span>Diabetes care</span>
+    <span>Ostomy supplies</span>
+    <span>Wound care</span>
+  </div>
+  <a class="btn btn-outline" href="womens-health-wellness.html">Back to Women's Health</a>
+  <a class="btn btn-dark" href="#" style="margin-left: 10px;">Explore Liivv</a>
+</section>
+
+<!-- 8 · FAQ -->
+<section class="faq" id="faq">
+  <span class="ms-badge">8 · FAQ — diabetes-care-faq-first</span>
+  <h2>Good questions, honest answers</h2>
+  <p class="intro">Everything you need to know about Clair — answered like a friend would.</p>
+
+  <details open>
+    <summary>What is Clair?</summary>
+    <p>Clair is a wearable continuous hormone monitor from Clair Health — the first of its kind. It reads your body's key signals (including estrogen, progesterone, LH, and FSH) without blood or urine, so you can see the shape of your cycle in real time. Pre-order it through Liivv.</p>
+  </details>
+  <details>
+    <summary>When does Clair ship?</summary>
+    <p>Clair is expected to ship around November 2026. You can pre-order through Liivv now so you're first in line — we'll keep you posted as dates firm up.</p>
+  </details>
+  <details>
+    <summary>How does Clair work?</summary>
+    <p>You wear Clair like jewellery. It continuously reads your body's key signals and shows the shape of your month — quiet weeks and loud ones — without pinpricks, blood, or urine strips. Check it like a glance at your wrist.</p>
+  </details>
+  <details>
+    <summary>Do I need a lab visit or prescription?</summary>
+    <p>No lab appointment is required to wear Clair. Pre-order through Liivv and we'll guide you through what's next as ship dates firm up.</p>
+  </details>
+  <details>
+    <summary>Who is Liivv?</summary>
+    <p>Liivv is the Canadian health home where you pre-order Clair. Beyond the wristband, Liivv offers women's wellness, sleep support, skin care, diabetes care, ostomy supplies, wound care, and Ontario pharmacist chat — all with discreet delivery. This page stays focused on Clair; explore Liivv whenever you're ready.</p>
+  </details>
+  <details>
+    <summary>How private is my order?</summary>
+    <p>Very. Everything arrives in plain, discreet packaging, and your conversations with our team stay between you and us. What you order is nobody's business but yours.</p>
+  </details>
+</section>
+
+<!-- 9 · Closing -->
+<section class="closing rounded-top">
+  <span class="ms-badge">9 · Closing banner — diabetes-care-image-text-overlay</span>
+  <div class="container">
+    <h2>Know your rhythm. <span>Pre-order Clair.</span></h2>
+    <p>Continuous clarity on your wrist — available through Liivv.</p>
+    <div class="closing-cta">
+      <a class="btn btn-white" href="#">Pre-order Clair</a>
+      <a class="btn btn-outline-light" href="womens-health-wellness.html">Women's Health</a>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
