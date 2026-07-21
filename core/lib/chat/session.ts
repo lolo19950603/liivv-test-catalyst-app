@@ -1,7 +1,7 @@
 export const STAFF_JOINED_CHAT_MESSAGE = 'Care team member has joined the chat';
 export const STAFF_LEFT_CHAT_MESSAGE = 'Care team member has left the chat';
 export const STAFF_LEFT_CHAT_FOLLOWUP_MESSAGE =
-  "It looks like the care team member has left the chat — but don't worry, you can still ask questions here and our store assistant will help.";
+  "It looks like the care team member has left the chat — but don't worry, you can still ask questions here and Olivia will help.";
 
 export function isCareTeamChatActive({
   staffJoinedAt,

@@ -1,7 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, Suspense } from 'react';
 
-import { Footer, FooterBottomBar, FooterContextProvider } from '~/components/footer';
+import { Footer, FooterBottomBar } from '~/components/footer';
 import { Header } from '~/components/header';
 import { LiveChatWidgetHost } from '~/components/virtual-care/live-chat-widget-host';
 import './liivv-feature-buttons.css';
@@ -18,6 +18,10 @@ interface Props extends PropsWithChildren {
   params: Promise<{ locale: string }>;
 }
 
+function HeaderFallback() {
+  return <div aria-hidden className="min-h-[4.5rem] w-full bg-[#faf8f3]" />;
+}
+
 export default async function DefaultLayout({ params, children }: Props) {
   const { locale } = await params;
 
@@ -31,20 +35,34 @@ export default async function DefaultLayout({ params, children }: Props) {
       <link href="/archive/diabetes-care-sections.css" rel="stylesheet" />
       <DiabetesCareArchiveTheme>
         <StoreThemeProvider theme={{ productImageFallbackLogo }}>
-          <SiteHeaderSlideshow />
-          <Header />
+          <Suspense fallback={null}>
+            <SiteHeaderSlideshow />
+          </Suspense>
+          <Suspense fallback={<HeaderFallback />}>
+            <Header />
+          </Suspense>
 
-          <FooterContextProvider>
-            <SiteFooterRevealShell
-              featuredColumns={<SiteFeaturedColumnsFooter />}
-              footer={<Footer />}
-              footerBottom={<FooterBottomBar />}
-            >
-              <main className="liivv-store" role="main">
-                {children}
-              </main>
-            </SiteFooterRevealShell>
-          </FooterContextProvider>
+          <SiteFooterRevealShell
+            featuredColumns={
+              <Suspense fallback={null}>
+                <SiteFeaturedColumnsFooter />
+              </Suspense>
+            }
+            footer={
+              <Suspense fallback={null}>
+                <Footer />
+              </Suspense>
+            }
+            footerBottom={
+              <Suspense fallback={null}>
+                <FooterBottomBar />
+              </Suspense>
+            }
+          >
+            <main className="liivv-store" role="main">
+              {children}
+            </main>
+          </SiteFooterRevealShell>
           <LiveChatWidgetHost />
         </StoreThemeProvider>
       </DiabetesCareArchiveTheme>

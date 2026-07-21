@@ -3,7 +3,8 @@
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const SHOW_DELAY_MS = 120;
+/** Delay before showing so fast navigations never flash a progress UI. */
+const SHOW_DELAY_MS = 400;
 const SAFETY_TIMEOUT_MS = 12_000;
 
 function isModifiedClick(event: MouseEvent) {
@@ -140,19 +141,19 @@ export function NavigationLoadingOverlay() {
     <div
       aria-busy="true"
       aria-live="polite"
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-[#faf8f3]/80 backdrop-blur-[1px]"
+      className="pointer-events-none fixed inset-x-0 top-0 z-[100]"
       role="status"
     >
-      <div className="absolute inset-x-0 top-0 h-1 overflow-hidden bg-[#e0d9ce]">
-        <div className="h-full w-full origin-left animate-pulse bg-[#6b7f5c]" />
+      <span className="sr-only">Loading page…</span>
+      <div className="h-0.5 w-full overflow-hidden bg-[#e0d9ce]/80">
+        <div className="h-full w-1/3 animate-[nav-progress_1.1s_ease-in-out_infinite] bg-[#6b7f5c]" />
       </div>
-      <div className="flex items-center gap-3 rounded-xl border border-[#e0d9ce] bg-white px-5 py-3.5 text-sm text-[#2c2a26] shadow-sm">
-        <span
-          aria-hidden
-          className="inline-block size-4 animate-spin rounded-full border-2 border-[#6b7f5c] border-t-transparent"
-        />
-        <span>Loading page…</span>
-      </div>
+      <style>{`
+        @keyframes nav-progress {
+          0% { transform: translateX(-120%); }
+          100% { transform: translateX(400%); }
+        }
+      `}</style>
     </div>
   );
 }

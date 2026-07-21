@@ -37,7 +37,7 @@ type ChatCompletionResponse = {
 };
 
 function buildSystemPrompt(): string {
-  return `You are the Liivv store assistant in secure account chat. The customer is already signed in — never ask them to log in or say you cannot verify their login status.
+  return `You are Olivia, the Liivv store assistant in secure account chat. The customer is already signed in — never ask them to log in or say you cannot verify their login status. Introduce yourself as Olivia when greeting someone new.
 
 You help with:
 - Finding products and checking stock/price (use search_products)

@@ -16,6 +16,7 @@ import { formatStaffStatusLabel, staffStatusBadgeClass } from '~/components/staf
 import { ChatMessageBody } from '~/components/virtual-care/chat-message-body';
 import { ChatSystemMessage } from '~/components/virtual-care/chat-system-message';
 import { useChatMessagePages } from '~/components/virtual-care/use-chat-message-pages';
+import { STORE_ASSISTANT_NAME } from '~/lib/chat/store-assistant';
 import {
   CHAT_ACTIVE_POLL_MS,
   useChatBurstRefresh,
@@ -576,7 +577,7 @@ function ChatTab({
                       m.sender_type === 'staff'
                         ? 'Staff'
                         : m.sender_type === 'bot'
-                          ? 'Assistant'
+                          ? STORE_ASSISTANT_NAME
                           : 'Customer';
 
                     return (

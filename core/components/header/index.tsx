@@ -15,6 +15,7 @@ import { getPreferredCurrencyCode } from '~/lib/currency';
 import { getDashboardCustomer } from '~/app/[locale]/(default)/account/(portal)/dashboard/page-data';
 import { buildAccountMenuLinks } from '~/lib/account/account-menu-links';
 import { getAccountDashboardNotifications } from '~/lib/account-notifications/get-header-notifications';
+import type { SiteHeaderNotifications } from '~/lib/account-notifications/header-notification-labels';
 import { SiteHeader } from '~/lib/makeswift/components/site-header';
 import { resolveAccountHref } from '~/lib/makeswift/site-header/resolve-account-href';
 import { mapCategoryTreeFromStore } from '~/lib/makeswift/site-header/map-category-tree';
@@ -73,13 +74,20 @@ const getHeaderData = cache(async () => {
 });
 
 export const Header = async () => {
-  const locale = await getLocale();
-  const t = await getTranslations('Components.Header');
-  const tAccount = await getTranslations('Account.Layout');
-  const tDashboard = await getTranslations('Account.Dashboard');
+  const [locale, t, tAccount, tDashboard, data, loggedIn, requestHeaders] = await Promise.all([
+    getLocale(),
+    getTranslations('Components.Header'),
+    getTranslations('Account.Layout'),
+    getTranslations('Account.Dashboard'),
+    getHeaderData(),
+    isLoggedIn(),
+    headers(),
+  ]);
 
-  const data = await getHeaderData();
   const logo = data.settings ? logoTransformer(data.settings) : '';
+  const requestPathname = stripLocaleFromPathname(requestHeaders.get('x-pathname') ?? '/');
+  const accountHref = resolveAccountHref(loggedIn);
+  const accountMenuLinks = loggedIn ? buildAccountMenuLinks((key) => tAccount(key)) : undefined;
 
   const streamableCategoryTree = Streamable.from(async () => {
     const [customerAccessToken, currencyCode] = await Promise.all([
@@ -103,24 +111,32 @@ export const Header = async () => {
     return getCartCount(cartId, customerAccessToken);
   });
 
-  const loggedIn = await isLoggedIn();
-  const accountHref = resolveAccountHref(loggedIn);
-  const customer = loggedIn ? await getDashboardCustomer() : null;
-  const accountMenuLinks = loggedIn ? buildAccountMenuLinks((key) => tAccount(key)) : undefined;
-  const firstName = customer?.firstName.trim() ?? '';
-  const lastName = customer?.lastName.trim() ?? '';
-  const accountCustomerName =
-    loggedIn && customer
-      ? [firstName, lastName].filter(Boolean).join(' ') || tDashboard('guestName')
-      : undefined;
-  const accountLabel = loggedIn ? tDashboard('myAccount') : undefined;
-  let notifications = null;
+  const streamableAccountCustomerName = Streamable.from(async () => {
+    if (!loggedIn) {
+      return undefined;
+    }
 
-  if (loggedIn) {
+    const customer = await getDashboardCustomer();
+
+    if (!customer) {
+      return undefined;
+    }
+
+    const firstName = customer.firstName.trim();
+    const lastName = customer.lastName.trim();
+
+    return [firstName, lastName].filter(Boolean).join(' ') || tDashboard('guestName');
+  });
+
+  const streamableNotifications = Streamable.from(async (): Promise<SiteHeaderNotifications | null> => {
+    if (!loggedIn) {
+      return null;
+    }
+
     try {
       const accountNotifications = await getAccountDashboardNotifications(locale);
 
-      notifications = {
+      return {
         items: accountNotifications.headerNotifications,
         unreadCount: accountNotifications.unreadCount,
         labels: {
@@ -133,20 +149,21 @@ export const Header = async () => {
       };
     } catch (error) {
       console.error('[header] account notifications', error);
+
+      return null;
     }
-  }
-  const requestPathname = stripLocaleFromPathname((await headers()).get('x-pathname') ?? '/');
+  });
 
   return (
     <SiteHeader
-      accountCustomerName={accountCustomerName}
+      accountCustomerName={streamableAccountCustomerName}
       accountHref={accountHref}
-      accountLabel={accountLabel}
+      accountLabel={loggedIn ? tDashboard('myAccount') : undefined}
       accountMenuLinks={accountMenuLinks}
       cartCount={streamableCartCount}
       categoryTree={streamableCategoryTree}
       initialPathname={requestPathname}
-      notifications={notifications}
+      notifications={streamableNotifications}
       storeLogo={logo}
       storeLogoLabel={t('home')}
       searchPlaceholder={t('Search.inputPlaceholder')}

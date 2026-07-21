@@ -16,7 +16,7 @@ type Props = {
   label?: string;
   accountHref: string;
   accountMenuLinks?: AccountMenuLink[];
-  accountCustomerName?: string;
+  accountCustomerName?: Streamable<string | undefined>;
   accountLabel?: string;
   categoryTree: Streamable<StoreCategoryNode[]>;
   initialPathname: string;
@@ -24,7 +24,7 @@ type Props = {
   storeLogoLabel: string;
   cartCount: Streamable<number | null>;
   searchPlaceholder: string;
-  notifications?: SiteHeaderNotifications | null;
+  notifications?: Streamable<SiteHeaderNotifications | null>;
   banner?: SiteHeaderContextValue['banner'];
 };
 
@@ -46,18 +46,26 @@ export const SiteHeader = async ({
 }: Props) => {
   const snapshot = await getComponentSnapshot(snapshotId);
 
+  const [resolvedCategoryTree, resolvedCartCount, resolvedNotifications, resolvedCustomerName] =
+    await Promise.all([
+      categoryTree,
+      cartCount,
+      notifications ?? Promise.resolve(null),
+      accountCustomerName ?? Promise.resolve(undefined),
+    ]);
+
   const contextValue: SiteHeaderContextValue = {
     accountHref,
     accountMenuLinks,
-    accountCustomerName,
+    accountCustomerName: resolvedCustomerName,
     accountLabel,
-    categoryTree: await categoryTree,
+    categoryTree: resolvedCategoryTree,
     initialPathname,
     storeLogo,
     storeLogoLabel,
-    cartCount: await cartCount,
+    cartCount: resolvedCartCount,
     searchPlaceholder,
-    notifications,
+    notifications: resolvedNotifications,
     banner,
   };
 

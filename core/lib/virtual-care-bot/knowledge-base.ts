@@ -64,7 +64,7 @@ export function getHelpTopics(): HelpTopic[] {
         'new address',
       ],
       [
-        'Ask the store assistant in chat, or go to Account → Subscriptions.',
+        'Ask Olivia in chat, or go to Account → Subscriptions.',
         'In chat you can pause, resume, skip the next delivery, change frequency, switch to a saved address, or add a new shipping address after confirming.',
         'Payment method changes are managed on the Subscriptions page.',
       ],
@@ -75,7 +75,7 @@ export function getHelpTopics(): HelpTopic[] {
       'Cancel a subscription',
       ['cancel subscription', 'stop subscription', 'end subscription'],
       [
-        'Ask the store assistant in chat to cancel, or go to Account → Subscriptions.',
+        'Ask Olivia in chat to cancel, or go to Account → Subscriptions.',
         'If using chat: confirm which subscription and that you want to cancel — cancellation is immediate.',
         'From Subscriptions: open the subscription, use cancel, and confirm. You can also manage billing in the Stripe customer portal when linked.',
       ],

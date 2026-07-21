@@ -20,6 +20,7 @@ import { ChatSystemMessage } from '~/components/virtual-care/chat-system-message
 import { ChatTypingIndicator } from '~/components/virtual-care/chat-typing-indicator';
 import { useChatOptimisticSend } from '~/components/virtual-care/use-chat-optimistic-send';
 import { useChatVoice } from '~/components/virtual-care/use-chat-voice';
+import { STORE_ASSISTANT_NAME } from '~/lib/chat/store-assistant';
 import type { ChatMessageRow } from '~/lib/supabase/chat-messages';
 
 function messageBubbleClass(senderType: ChatMessageRow['sender_type']): string {
@@ -36,7 +37,7 @@ function messageBubbleClass(senderType: ChatMessageRow['sender_type']): string {
 
 function messageLabel(senderType: ChatMessageRow['sender_type']): string | null {
   if (senderType === 'bot') {
-    return 'Store assistant';
+    return STORE_ASSISTANT_NAME;
   }
 
   if (senderType === 'staff') {
@@ -160,8 +161,8 @@ export function VirtualCareChatClient({
               : 'Send updates and questions to your care team. Messages are saved so staff can follow up.'
         }
         kicker="Secure messaging"
-        titleAccent={careTeamActive || !botEnabled ? 'team' : 'assistant'}
-        titleBefore="Chat with our "
+        titleAccent={careTeamActive || !botEnabled ? 'team' : STORE_ASSISTANT_NAME}
+        titleBefore={careTeamActive || !botEnabled ? 'Chat with our ' : 'Chat with '}
       />
       <Link className="text-sm font-medium text-[#375a37] hover:underline" href="/account/virtual-care">
         ‹ Virtual care

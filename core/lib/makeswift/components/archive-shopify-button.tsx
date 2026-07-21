@@ -50,7 +50,9 @@ function ArchiveShopifyButtonInner({
   const mergedStyle =
     theme.style != null || style != null ? { ...theme.style, ...style } : undefined;
   const shared = {
-    className: clsx('button', className),
+    // Variant class must match resolveButtonTheme: secondary swaps CSS var roles
+    // (--color-button-background = label, --color-button-text = hover fill).
+    className: clsx('button', `button--${variant}`, className),
     'data-dc-btn': theme.dataDcBtn,
     style: mergedStyle,
   };

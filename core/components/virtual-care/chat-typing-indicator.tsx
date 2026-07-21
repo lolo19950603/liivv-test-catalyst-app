@@ -1,7 +1,9 @@
 'use client';
 
+import { STORE_ASSISTANT_NAME } from '~/lib/chat/store-assistant';
+
 export function ChatTypingIndicator({
-  label = 'Store assistant',
+  label = STORE_ASSISTANT_NAME,
 }: {
   label?: string;
 }) {

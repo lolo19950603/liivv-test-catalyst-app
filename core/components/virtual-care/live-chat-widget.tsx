@@ -20,6 +20,7 @@ import {
   type VirtualCareChatActionState,
 } from '~/app/[locale]/(default)/account/(portal)/virtual-care/_actions/virtual-care-actions';
 import { Link } from '~/components/link';
+import { STORE_ASSISTANT_NAME } from '~/lib/chat/store-assistant';
 import type { ChatMessageRow } from '~/lib/supabase/chat-messages';
 import { ChatComposer } from '~/components/virtual-care/chat-composer';
 import { ChatMessageBody } from '~/components/virtual-care/chat-message-body';
@@ -70,7 +71,7 @@ function messageBubbleClass(senderType: ChatMessageRow['sender_type']): string {
 
 function messageLabel(senderType: ChatMessageRow['sender_type']): string | null {
   if (senderType === 'bot') {
-    return 'Store assistant';
+    return STORE_ASSISTANT_NAME;
   }
 
   if (senderType === 'staff') {
@@ -334,7 +335,7 @@ function AuthenticatedPanel({
       : assistantActive
         ? voice.voiceChatActive
           ? voiceChatStatusLabel(voice.voicePhase)
-          : 'Store assistant'
+          : STORE_ASSISTANT_NAME
         : 'Care team';
 
   return (
@@ -369,7 +370,7 @@ function AuthenticatedPanel({
         {!conversationId && displayMessages.length === 0 ? (
           <div className="rounded-2xl bg-white px-4 py-3 text-sm leading-relaxed text-[#2c2a26] shadow-sm">
             {assistantActive
-              ? 'Hi! I can help with products, orders, prescriptions, and your account. What do you need?'
+              ? `Hi! I'm ${STORE_ASSISTANT_NAME}. I can help with products, orders, prescriptions, and your account. What do you need?`
               : careTeamActive
                 ? 'A care team member will join this conversation shortly.'
                 : 'Send a message to our care team. Conversations are saved so we can follow up.'}

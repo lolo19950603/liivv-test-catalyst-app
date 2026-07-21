@@ -143,16 +143,24 @@ const getFooterContextValue = cache(async () => {
   };
 });
 
-export async function FooterContextProvider({ children }: PropsWithChildren) {
+async function FooterPropsProvider({ children }: PropsWithChildren) {
   const value = await getFooterContextValue();
 
   return <PropsContextProvider value={value}>{children}</PropsContextProvider>;
 }
 
 export const Footer = async () => {
-  return <SiteFooter />;
+  return (
+    <FooterPropsProvider>
+      <SiteFooter />
+    </FooterPropsProvider>
+  );
 };
 
 export const FooterBottomBar = async () => {
-  return <SiteFooterBottomBar />;
+  return (
+    <FooterPropsProvider>
+      <SiteFooterBottomBar />
+    </FooterPropsProvider>
+  );
 };
