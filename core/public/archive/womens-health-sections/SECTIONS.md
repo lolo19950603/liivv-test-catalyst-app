@@ -11,7 +11,17 @@ No new components are needed — everything below already exists in the picker.
 **Voice:** warm, modern, confident. Prefer: rhythm, glow, balance, ease, comfort, chapters, tips.  
 **Palette:** cream `#f5f2ed` / sage `#8ea78b` / blush `#f3c7be` / charcoal `rgb(49,47,47)` — keep component defaults, they already match.
 
-**Related page:** [`../clair-health.html`](../clair-health.html) — Clair product deep-dive + pre-order (`/pages/clair-health`).
+**Related pages:**
+- [`../clair-health.html`](../clair-health.html) — Clair product deep-dive + pre-order (`/pages/clair-health`)
+- Life-stage chapters (section 9 **Learn more**):
+  - [`../foundation-first-cycles.html`](../foundation-first-cycles.html) — Foundation & First Cycles (10–18)
+  - [`../rhythm-and-balance.html`](../rhythm-and-balance.html) — Rhythm & Balance (18–30)
+  - [`../reset-and-recharge.html`](../reset-and-recharge.html) — Reset & Recharge (30s+)
+  - [`../grow-and-recover.html`](../grow-and-recover.html) — Grow & Recover
+  - [`../transition-and-relief.html`](../transition-and-relief.html) — Transition & Relief
+  - [`../longevity-and-vitality.html`](../longevity-and-vitality.html) — Longevity & Vitality
+
+Stage copy + Makeswift notes: [`STAGES.md`](STAGES.md).
 
 ## Page content order (13 sections)
 
@@ -26,7 +36,7 @@ No new components are needed — everything below already exists in the picker.
 | 6 | `health-images-with-text` — Health page / 02 Images with text | Ontario virtual care |
 | 7 | `health-images-with-text` — Health page / 02 (suffix `tips`) | Wellness tips |
 | 8 | `diabetes-care-reveal-image-text` — Specialized page / 05 Reveal + story | Clair equal feature → Learn more |
-| 9 | `health-scrolling-banner` — Health page / 03 Scrolling banner (sticky stack) | Life chapters |
+| 9 | `health-scrolling-banner` — Health page / 03 Scrolling banner (sticky stack) | Six life chapters → Learn more |
 | 10 | `archive-reveal-testimonials` — Home page / 03 Testimonials | Voices |
 | 11 | `diabetes-care-faq-first` — Specialized page / 09 FAQ (first) | FAQ (lineup + 1 Clair pointer) |
 | 12 | `diabetes-care-image-text-overlay` — Specialized page / 14 Image with text overlay | Closing banner |
@@ -165,14 +175,27 @@ Body HTML:
 
 ## 9 — Scrolling banner (`health-scrolling-banner`)
 
-Set **Instance suffix** to `women`. Four sticky panels — no Clair upsell.
+Set **Instance suffix** to `women`. **Six** sticky panels — each **Learn more** links to its life-stage page (same pattern as Clair). No Clair upsell here.
 
-| Panel heading | Button |
-|---------------|--------|
-| `Your Everyday` | `Shop Everyday Essentials` |
-| `Growing & Recovering` | `Explore This Chapter` |
-| `Finding Your Balance` | `Explore This Chapter` |
-| `Aging with Ease` | `Explore This Chapter` |
+| # | Panel heading | Age / focus | Primary CTA | HTML mock |
+|---|---------------|-------------|-------------|-----------|
+| 1 | `Foundation & First Cycles` | Ages 10–18 · Pre-teen & teen | `Learn more` | `foundation-first-cycles.html` → `/pages/foundation-first-cycles` |
+| 2 | `Rhythm & Balance` | Ages 18–30 · Early adulthood | `Learn more` | `rhythm-and-balance.html` → `/pages/rhythm-and-balance` |
+| 3 | `Reset & Recharge` | 30s and beyond | `Learn more` | `reset-and-recharge.html` → `/pages/reset-and-recharge` |
+| 4 | `Grow & Recover` | Fertility, pregnancy & postpartum | `Learn more` | `grow-and-recover.html` → `/pages/grow-and-recover` |
+| 5 | `Transition & Relief` | Perimenopause & menopause | `Learn more` | `transition-and-relief.html` → `/pages/transition-and-relief` |
+| 6 | `Longevity & Vitality` | Healthy aging | `Learn more` | `longevity-and-vitality.html` → `/pages/longevity-and-vitality` |
+
+Each panel includes **The Focus** and **The Liivv Vibe** lines (see HTML mock or [`STAGES.md`](STAGES.md)).
+
+| Panel | Focus (short) | Vibe (short) |
+|-------|---------------|--------------|
+| Foundation | First period nerves, irregular cycles, hormonal skin, school discretion, vitamins | Supportive, demystifying, parent-friendly |
+| Rhythm | Busy schedules, breakouts, gut + vaginal health, sleep + stress, birth control | Modern, functional — "Wellness that works IRL" |
+| Reset | Hormonal imbalance, weight, skin aging, stress, burnout | Aspirational but accessible |
+| Grow | Fertility challenges, discomfort, recovery, breastfeeding stress | Empowering, no shame |
+| Transition | Sleep, bone density, metabolism, night sweats, mood | Reclaiming comfort — sleek & discreet |
+| Longevity | Joint comfort, cognitive health, mobility, energy | Active, capable, vibrant |
 
 ## 10 — Testimonials (`archive-reveal-testimonials`)
 
@@ -189,7 +212,7 @@ Split heading: `What women` / `are saying`. Four cards — all Liivv Women / ser
 
 | Question | Notes |
 |----------|-------|
-| `Is this only for one age or stage of life?` | Lineup |
+| `Is this only for one age or stage of life?` | Six chapters: Foundation, Rhythm, Reset, Grow, Transition, Longevity |
 | `What is Clair?` | Short + link to Clair page |
 | `What kinds of products does Liivv Women include?` | Cycle comfort, personal care, nutrition, sleep, CarePack, Clair optional |
 | `How private is my order?` | Privacy |
@@ -221,6 +244,8 @@ Clair FAQ answer:
 3. Drop components in order; paste copy from this file.
 4. Suffixes: `women` (most), `tips` (section 7).
 5. Wire section 8 **Learn more** → `/pages/clair-health`.
+6. Wire section 9 panel **Learn more** links → the six life-stage pages.
+7. Build each stage page from [`STAGES.md`](STAGES.md) + its HTML mock.
 
 ## Copy guardrails
 

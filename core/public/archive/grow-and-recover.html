@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Grow &amp; Recover — Liivv Women (Makeswift build reference)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --cream: #f5f2ed; --soft-cream: #fcf8f4; --sage: #8ea78b; --sage-deep: #6b7f5c;
+    --blush: #f3c7be; --taupe: #a89c94; --charcoal: rgb(49, 47, 47);
+    --font-heading: 'DM Serif Text', serif; --font-body: 'Inter', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-body); color: var(--charcoal); background: var(--cream); line-height: 1.6; font-weight: 300; }
+  h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; line-height: 1.15; }
+  section { position: relative; }
+  a { color: inherit; }
+  .ms-badge {
+    position: absolute; top: 12px; left: 12px; z-index: 20;
+    background: var(--charcoal); color: #fff; font-size: 11px; letter-spacing: 0.06em;
+    padding: 5px 12px; border-radius: 999px; opacity: 0.85;
+  }
+  .rounded-top { border-radius: 42px 42px 0 0; margin-top: -42px; }
+  .eyebrow { text-transform: uppercase; letter-spacing: 0.22em; font-size: 12px; font-weight: 500; }
+  .btn {
+    display: inline-block; font-family: var(--font-body); font-weight: 500; font-size: 15px;
+    padding: 15px 34px; border-radius: 999px; text-decoration: none;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .btn:hover { transform: translateY(-2px); opacity: 0.92; }
+  .btn-dark { background: var(--charcoal); color: #fff; }
+  .btn-white { background: #fff; color: var(--charcoal); }
+  .btn-outline { background: transparent; color: var(--charcoal); border: 1.5px solid var(--charcoal); }
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+  .ph {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    color: rgba(49, 47, 47, 0.55); font-size: 13px; letter-spacing: 0.04em; padding: 16px;
+    background:
+      radial-gradient(120% 90% at 20% 15%, rgba(243, 199, 190, 0.55), transparent 60%),
+      radial-gradient(110% 100% at 85% 80%, rgba(142, 167, 139, 0.5), transparent 65%),
+      linear-gradient(160deg, #efe7dd, #ddd2c4);
+  }
+  .back-bar { background: var(--soft-cream); padding: 16px 24px; border-bottom: 1px solid rgba(49, 47, 47, 0.08); }
+  .back-bar a { font-size: 14px; font-weight: 500; text-decoration: none; }
+  .hero {
+    min-height: 78vh; display: flex; align-items: flex-end; color: #fff; overflow: hidden;
+    background:
+      linear-gradient(to top, rgba(35, 40, 32, 0.62), rgba(35, 40, 32, 0.08) 55%),
+      linear-gradient(150deg, #f3c7be, #c9a39a 45%, #8ea78b);
+  }
+  .hero-inner { position: relative; width: 100%; padding: 0 24px 8vh; max-width: 1180px; margin: 0 auto; }
+  .hero .eyebrow { color: rgba(255, 255, 255, 0.85); margin-bottom: 12px; display: block; }
+  .hero h1 { font-size: clamp(40px, 6vw, 72px); max-width: 14ch; }
+  .hero .age { margin-top: 12px; font-size: 15px; font-weight: 500; opacity: 0.9; }
+  .hero p { margin-top: 18px; max-width: 48ch; font-size: clamp(16px, 1.5vw, 19px); }
+  .meta-band { background: var(--cream); padding: 64px 24px 72px; }
+  .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 900px; margin: 0 auto; }
+  .meta-grid h3 { font-size: 14px; font-family: var(--font-body); font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--sage-deep); margin-bottom: 10px; }
+  .meta-grid p { font-size: 17px; max-width: 40ch; }
+  .columns { background: var(--soft-cream); padding: 100px 24px; }
+  .columns .eyebrow { text-align: center; display: block; color: var(--sage-deep); }
+  .columns > .container > h2 { text-align: center; font-size: clamp(32px, 4vw, 48px); margin: 14px auto 18px; }
+  .columns .intro { text-align: center; max-width: 52ch; margin: 0 auto 56px; }
+  .col-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .col-card { background: #fff; border-radius: 24px; padding: 32px 26px; }
+  .col-card .ph { height: 120px; border-radius: 16px; margin-bottom: 20px; }
+  .col-card h3 { font-size: 28px; margin-bottom: 18px; }
+  .col-card h4 {
+    font-family: var(--font-body); font-size: 12px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--sage-deep);
+    margin: 18px 0 10px;
+  }
+  .col-card ul { list-style: none; display: grid; gap: 8px; }
+  .col-card li { font-size: 14.5px; padding-left: 14px; position: relative; }
+  .col-card li::before { content: ''; position: absolute; left: 0; top: 0.55em; width: 5px; height: 5px; border-radius: 50%; background: var(--blush); }
+  .col-card .note { margin-top: 12px; font-size: 13px; color: rgba(49, 47, 47, 0.65); font-style: italic; }
+  .soon {
+    display: inline-block; margin-left: 6px; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px;
+    border-radius: 999px; background: rgba(142, 167, 139, 0.25); color: var(--sage-deep); vertical-align: middle;
+  }
+  .pharmacist { background: var(--taupe); color: #fff; padding: 90px 24px; }
+  .pharmacist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .pharmacist h2 { font-size: clamp(30px, 4vw, 46px); margin: 14px 0 18px; }
+  .pharmacist p { margin-bottom: 14px; max-width: 48ch; }
+  .pharmacist .ph { height: 320px; border-radius: 24px; color: rgba(255, 255, 255, 0.7); }
+  .closing {
+    min-height: 56vh; display: flex; align-items: center; justify-content: center; text-align: center; color: #fff;
+    background: linear-gradient(rgba(45, 52, 42, 0.5), rgba(45, 52, 42, 0.5)), linear-gradient(140deg, #f3c7be, #8ea78b);
+  }
+  .closing h2 { font-size: clamp(36px, 5vw, 64px); }
+  .closing p { margin: 18px auto 28px; max-width: 42ch; font-size: 17px; }
+  .closing-cta { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+  @media (max-width: 900px) {
+    .meta-grid, .pharmacist-grid, .col-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="back-bar">
+  <div class="container"><a href="womens-health-wellness.html">← Women's Health &amp; Wellness</a></div>
+</div>
+
+<section class="hero">
+  <span class="ms-badge">0 · Video hero — diabetes-care-video-hero</span>
+  <div class="hero-inner">
+    <span class="eyebrow">Liivv Women · Chapter four</span>
+    <h1>Grow &amp; Recover</h1>
+    <p class="age">Fertility, pregnancy &amp; postpartum</p>
+    <p>Empowering, deeply supportive care for the chapters that ask a lot of you — with strictly no shame.</p>
+  </div>
+</section>
+
+<section class="meta-band rounded-top">
+  <span class="ms-badge">1 · Highlight / meta — health-highlight-text</span>
+  <div class="meta-grid">
+    <div>
+      <h3>The Focus</h3>
+      <p>Fertility challenges, physical discomfort, recovery after birth, and breastfeeding stress — with room to breathe.</p>
+    </div>
+    <div>
+      <h3>The Liivv Vibe</h3>
+      <p>Empowering, deeply supportive, and strictly no shame.</p>
+    </div>
+  </div>
+</section>
+
+<section class="columns">
+  <span class="ms-badge">2 · Three columns — diabetes-care-multicolumn</span>
+  <div class="container">
+    <span class="eyebrow">Three parts of one chapter</span>
+    <h2>Fertility · Pregnancy · Postpartum</h2>
+    <p class="intro">Wherever you are in this chapter, the essentials and answers stay close — so you can stay present for the good parts.</p>
+    <div class="col-grid">
+
+      <article class="col-card">
+        <div class="ph">ovulation kit, soft morning light</div>
+        <h3>Fertility</h3>
+        <ul>
+          <li>Ovulation and fertility tracking kits</li>
+          <li>Nutrition support for trying to conceive</li>
+          <li>Vitamins for fertility journeys</li>
+          <li>Biofeedback devices and electronic pelvic floor stimulators</li>
+          <li>Guidance on physical activity</li>
+        </ul>
+      </article>
+
+      <article class="col-card">
+        <div class="ph">prenatal CarePack, gentle nursery tones</div>
+        <h3>Pregnancy</h3>
+        <h4>Nutrition</h4>
+        <ul>
+          <li>Articles on proper nutrition during pregnancy</li>
+          <li>Nutrition boosters like Ensure</li>
+        </ul>
+        <h4>Vitamins</h4>
+        <ul>
+          <li>Prenatal vitamins — CarePack bundle</li>
+          <li>Option to add your prescriptions</li>
+          <li>Article on pre-eclampsia</li>
+          <li>Gestational diabetes support</li>
+          <li>Track blood sugars with a CGM</li>
+        </ul>
+        <h4>Skin Care</h4>
+        <ul>
+          <li>Bio-Oil and stretch-mark care</li>
+        </ul>
+        <h4>Kits</h4>
+        <ul>
+          <li>Trimester kits</li>
+          <li>Hospital bag essentials</li>
+        </ul>
+      </article>
+
+      <article class="col-card">
+        <div class="ph">postpartum recovery kit, soft towels</div>
+        <h3>Postpartum</h3>
+        <h4>Nutrition</h4>
+        <ul>
+          <li>Articles on proper nutrition after pregnancy</li>
+        </ul>
+        <h4>Recovery Kits</h4>
+        <ul>
+          <li>Pads, sprays, sitz bath</li>
+          <li>Pelvic floor tools</li>
+          <li>Compression wear</li>
+        </ul>
+        <h4>Lactation</h4>
+        <ul>
+          <li>Breast pumps</li>
+          <li>Article on milk vs. formula</li>
+        </ul>
+        <p class="note">No judgement — ever.</p>
+        <h4>Vitamins &amp; Skin</h4>
+        <ul>
+          <li>Postnatal vitamins</li>
+          <li>Bio-Oil for recovering skin</li>
+        </ul>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section class="pharmacist rounded-top">
+  <span class="ms-badge">3 · Images with text — health-images-with-text</span>
+  <div class="container pharmacist-grid">
+    <div class="ph">supportive chat with pharmacist, soft home setting</div>
+    <div>
+      <span class="eyebrow">Available in Ontario</span>
+      <h2>Support without the waiting room</h2>
+      <p>Pregnancy and postpartum come with a lot of quiet questions. Our Ontario pharmacists are a chat away — kind, private, and never judgmental.</p>
+      <a class="btn btn-white" href="#">Talk to a Pharmacist</a>
+    </div>
+  </div>
+</section>
+
+<section class="closing">
+  <span class="ms-badge">4 · Closing — diabetes-care-image-text-overlay</span>
+  <div class="container">
+    <h2>You're not alone in this chapter</h2>
+    <p>Essentials stocked. Answers close. Shame left at the door.</p>
+    <div class="closing-cta">
+      <a class="btn btn-white" href="womens-health-wellness.html">Back to Women's Health</a>
+      <a class="btn btn-outline" href="transition-and-relief.html" style="border-color:#fff;color:#fff;">Next: Transition &amp; Relief</a>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

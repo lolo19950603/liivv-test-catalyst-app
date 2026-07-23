@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Foundation &amp; First Cycles — Liivv Women (Makeswift build reference)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --cream: #f5f2ed;
+    --soft-cream: #fcf8f4;
+    --sage: #8ea78b;
+    --sage-deep: #6b7f5c;
+    --blush: #f3c7be;
+    --taupe: #a89c94;
+    --charcoal: rgb(49, 47, 47);
+    --font-heading: 'DM Serif Text', serif;
+    --font-body: 'Inter', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-body); color: var(--charcoal); background: var(--cream); line-height: 1.6; font-weight: 300; }
+  h1, h2, h3 { font-family: var(--font-heading); font-weight: 400; line-height: 1.15; }
+  section { position: relative; }
+  a { color: inherit; }
+  .ms-badge {
+    position: absolute; top: 12px; left: 12px; z-index: 20;
+    background: var(--charcoal); color: #fff; font-size: 11px; letter-spacing: 0.06em;
+    padding: 5px 12px; border-radius: 999px; opacity: 0.85;
+  }
+  .rounded-top { border-radius: 42px 42px 0 0; margin-top: -42px; }
+  .eyebrow { text-transform: uppercase; letter-spacing: 0.22em; font-size: 12px; font-weight: 500; }
+  .swash { position: relative; display: inline-block; padding: 0 6px; }
+  .swash::before {
+    content: ''; position: absolute; inset: 55% -4px 2px;
+    background: var(--blush); z-index: -1; border-radius: 4px;
+  }
+  .btn {
+    display: inline-block; font-family: var(--font-body); font-weight: 500; font-size: 15px;
+    padding: 15px 34px; border-radius: 999px; text-decoration: none;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .btn:hover { transform: translateY(-2px); opacity: 0.92; }
+  .btn-dark { background: var(--charcoal); color: #fff; }
+  .btn-white { background: #fff; color: var(--charcoal); }
+  .btn-outline { background: transparent; color: var(--charcoal); border: 1.5px solid var(--charcoal); }
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+  .ph {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    color: rgba(49, 47, 47, 0.55); font-size: 13px; letter-spacing: 0.04em; padding: 16px;
+    background:
+      radial-gradient(120% 90% at 20% 15%, rgba(243, 199, 190, 0.55), transparent 60%),
+      radial-gradient(110% 100% at 85% 80%, rgba(142, 167, 139, 0.5), transparent 65%),
+      linear-gradient(160deg, #efe7dd, #ddd2c4);
+  }
+  .back-bar {
+    background: var(--soft-cream); padding: 16px 24px;
+    border-bottom: 1px solid rgba(49, 47, 47, 0.08);
+  }
+  .back-bar a { font-size: 14px; font-weight: 500; text-decoration: none; }
+  .back-bar a:hover { opacity: 0.7; }
+  .hero {
+    min-height: 78vh; display: flex; align-items: flex-end; color: #fff; overflow: hidden;
+    background:
+      linear-gradient(to top, rgba(35, 40, 32, 0.62), rgba(35, 40, 32, 0.08) 55%),
+      radial-gradient(130% 100% at 75% 20%, rgba(243, 199, 190, 0.4), transparent 55%),
+      linear-gradient(150deg, #c9a39a, #8ea78b 70%, #6b7f5c);
+  }
+  .hero-inner { position: relative; width: 100%; padding: 0 24px 8vh; max-width: 1180px; margin: 0 auto; }
+  .hero .eyebrow { color: rgba(255, 255, 255, 0.85); margin-bottom: 12px; display: block; }
+  .hero h1 { font-size: clamp(40px, 6vw, 72px); max-width: 14ch; }
+  .hero .age { margin-top: 12px; font-size: 15px; font-weight: 500; opacity: 0.9; }
+  .hero p { margin-top: 18px; max-width: 48ch; font-size: clamp(16px, 1.5vw, 19px); }
+  .meta-band { background: var(--cream); padding: 64px 24px 72px; }
+  .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 900px; margin: 0 auto; }
+  .meta-grid h3 { font-size: 14px; font-family: var(--font-body); font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--sage-deep); margin-bottom: 10px; }
+  .meta-grid p { font-size: 17px; max-width: 40ch; }
+  .categories { background: var(--soft-cream); padding: 100px 24px; }
+  .categories .intro { text-align: center; max-width: 52ch; margin: 0 auto 56px; }
+  .categories .eyebrow { text-align: center; display: block; color: var(--sage-deep); }
+  .categories > .container > h2 { text-align: center; font-size: clamp(32px, 4vw, 48px); margin: 14px auto 18px; }
+  .cat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px; }
+  .cat-card {
+    background: #fff; border-radius: 24px; padding: 32px 28px;
+    box-shadow: 0 1px 0 rgba(49, 47, 47, 0.06);
+  }
+  .cat-card .ph { height: 140px; border-radius: 16px; margin-bottom: 22px; }
+  .cat-card h3 { font-size: 26px; margin-bottom: 14px; }
+  .cat-card ul { list-style: none; display: grid; gap: 10px; }
+  .cat-card li { font-size: 15px; padding-left: 16px; position: relative; }
+  .cat-card li::before {
+    content: ''; position: absolute; left: 0; top: 0.55em;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--blush);
+  }
+  .cat-card .note { margin-top: 14px; font-size: 13.5px; color: rgba(49, 47, 47, 0.65); }
+  .cat-card a.inline { color: var(--sage-deep); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+  .soon {
+    display: inline-block; margin-left: 6px; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px;
+    border-radius: 999px; background: rgba(142, 167, 139, 0.25); color: var(--sage-deep); vertical-align: middle;
+  }
+  .pharmacist {
+    background: var(--taupe); color: #fff; padding: 90px 24px;
+  }
+  .pharmacist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .pharmacist h2 { font-size: clamp(30px, 4vw, 46px); margin: 14px 0 18px; }
+  .pharmacist p { margin-bottom: 14px; max-width: 48ch; }
+  .pharmacist .ph { height: 320px; border-radius: 24px; color: rgba(255, 255, 255, 0.7); }
+  .closing {
+    min-height: 56vh; display: flex; align-items: center; justify-content: center; text-align: center; color: #fff;
+    background:
+      linear-gradient(rgba(45, 52, 42, 0.55), rgba(45, 52, 42, 0.55)),
+      linear-gradient(140deg, #c9a39a, #8ea78b);
+  }
+  .closing h2 { font-size: clamp(36px, 5vw, 64px); }
+  .closing p { margin: 18px auto 28px; max-width: 42ch; font-size: 17px; }
+  .closing-cta { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+  @media (max-width: 840px) {
+    .meta-grid, .pharmacist-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="back-bar">
+  <div class="container">
+    <a href="womens-health-wellness.html">← Women's Health &amp; Wellness</a>
+  </div>
+</div>
+
+<section class="hero">
+  <span class="ms-badge">0 · Video hero — diabetes-care-video-hero</span>
+  <div class="hero-inner">
+    <span class="eyebrow">Liivv Women · Chapter one</span>
+    <h1>Foundation &amp; First Cycles</h1>
+    <p class="age">Ages 10–18 · Pre-teen &amp; teen</p>
+    <p>A calm, honest start to period care — kits, comfort, skin basics, and vitamins that make the first years feel less mysterious.</p>
+  </div>
+</section>
+
+<section class="meta-band rounded-top">
+  <span class="ms-badge">1 · Highlight / meta — health-highlight-text</span>
+  <div class="meta-grid">
+    <div>
+      <h3>The Focus</h3>
+      <p>First period anxiety, irregular cycles, acne and hormonal skin, discretion at school, and the vitamins that support growing bodies.</p>
+    </div>
+    <div>
+      <h3>The Liivv Vibe</h3>
+      <p>Supportive, demystifying, and parent-friendly — without talking down to the teen.</p>
+    </div>
+  </div>
+</section>
+
+<section class="categories">
+  <span class="ms-badge">2 · Multicolumn categories — diabetes-care-multicolumn</span>
+  <div class="container">
+    <span class="eyebrow">What you'll find here</span>
+    <h2>Care that grows with her</h2>
+    <p class="intro">Everything below is meant to demystify the first cycles — for teens and the parents walking beside them.</p>
+    <div class="cat-grid">
+
+      <article class="cat-card">
+        <div class="ph">First Period Confidence Kit flat lay</div>
+        <h3>Starter Period Kits</h3>
+        <ul>
+          <li><strong>The Hero Bundle:</strong> First Period Confidence Kits — often gifted by a parent</li>
+          <li>Curated boxes with organic cotton pads, tampons, and period underwear</li>
+          <li>Canadian brands like Aisle, KnixTeen, and Joni (organic, sustainable pads)</li>
+          <li>Example: <a class="inline" href="https://www.rubylove.com/en-ca/pages/first-period-kit" target="_blank" rel="noopener">Ruby Love First Period Kit</a></li>
+        </ul>
+      </article>
+
+      <article class="cat-card">
+        <div class="ph">gentle heat wrap, soft lighting</div>
+        <h3>Pain Relief</h3>
+        <ul>
+          <li>Heat patches for cramps</li>
+          <li>ThermaCare Menstrual heat wraps (Class I Medical Devices in Canada)</li>
+          <li>Speak with a pharmacist about dysmenorrhea — Minor Ailment Consulting available in Ontario</li>
+        </ul>
+      </article>
+
+      <article class="cat-card">
+        <div class="ph">gentle cleanser bottles, clean bathroom shelf</div>
+        <h3>Skincare</h3>
+        <ul>
+          <li>Gentle skincare systems for hormonal skin</li>
+          <li>Dermatologist-recommended basics like CeraVe or Cetaphil, bundled as "Hormonal Skin Basics"</li>
+          <li>Speak with a pharmacist about dermatitis or acne</li>
+        </ul>
+      </article>
+
+      <article class="cat-card">
+        <div class="ph">phone with calm cycle calendar UI</div>
+        <h3>Digital Integration</h3>
+        <ul>
+          <li>Cycle tracking app recommendations</li>
+          <li>Exploring whether Liivv builds its own tracker or partners with trusted apps <span class="soon">Exploring</span></li>
+        </ul>
+        <p class="note">The goal: a simple way to notice patterns without overwhelm.</p>
+      </article>
+
+      <article class="cat-card">
+        <div class="ph">organic cotton products, soft textures</div>
+        <h3>Menstrual Care</h3>
+        <ul>
+          <li>Reign Wellness — 100% organic cotton, plastic-free tampons</li>
+          <li>DivaCup menstrual cup</li>
+          <li>Pads, period underwear, and options that fit real school days</li>
+        </ul>
+      </article>
+
+      <article class="cat-card">
+        <div class="ph">daily vitamins in a soft CarePack tray</div>
+        <h3>Vitamins</h3>
+        <ul>
+          <li><strong>Vitamin D (600–1000 IU/day)</strong> — bone development and immunity; often lacking in teens</li>
+          <li><strong>Iron (15 mg/day)</strong> — energy and replacing menstrual blood loss</li>
+          <li><strong>Calcium</strong> — building bone mass during puberty</li>
+          <li><strong>Magnesium</strong> — muscle relaxation and easing menstrual cramps</li>
+          <li><strong>B-Complex / B12</strong> — energy metabolism and nerve health; especially helpful for vegetarians and vegans</li>
+        </ul>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section class="pharmacist rounded-top">
+  <span class="ms-badge">3 · Images with text — health-images-with-text</span>
+  <div class="container pharmacist-grid">
+    <div class="ph">friendly Ontario pharmacist chat, warm cafe vibe</div>
+    <div>
+      <span class="eyebrow">Available in Ontario</span>
+      <h2>Questions are welcome — for teens and parents</h2>
+      <p>First cycles come with a lot of "is this normal?" moments. Our Ontario pharmacists can chat through everyday concerns like cramps and skin flare-ups — kindly, privately, and without a waiting room.</p>
+      <a class="btn btn-white" href="#">Talk to a Pharmacist</a>
+    </div>
+  </div>
+</section>
+
+<section class="closing">
+  <span class="ms-badge">4 · Closing — diabetes-care-image-text-overlay</span>
+  <div class="container">
+    <h2>A softer first chapter</h2>
+    <p>Confidence kits, gentle basics, and someone to ask — so the early years feel less like a secret and more like care.</p>
+    <div class="closing-cta">
+      <a class="btn btn-white" href="womens-health-wellness.html">Back to Women's Health</a>
+      <a class="btn btn-outline" href="rhythm-and-balance.html" style="border-color:#fff;color:#fff;">Next: Rhythm &amp; Balance</a>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
