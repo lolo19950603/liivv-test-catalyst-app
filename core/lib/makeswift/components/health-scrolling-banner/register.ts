@@ -9,7 +9,7 @@ import {
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { healthPageComponentLabel } from '~/lib/makeswift/health-page-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
-import { ARCHIVE_BUTTON_SECONDARY_ON_BANNER } from '~/lib/makeswift/utils/archive-button-presets';
+import { ARCHIVE_BUTTON_PRIMARY_DARK } from '~/lib/makeswift/utils/archive-button-presets';
 
 import { HealthScrollingBanner } from './client';
 
@@ -45,7 +45,7 @@ const panelGroup = Group({
     button: Group({
       label: 'Button',
       preferredLayout: Group.Layout.Popover,
-      props: archiveButtonControls(ARCHIVE_BUTTON_SECONDARY_ON_BANNER, { textDefault: 'Get Started' }),
+      props: archiveButtonControls(ARCHIVE_BUTTON_PRIMARY_DARK, { textDefault: 'Get Started' }),
     }),
   },
 });

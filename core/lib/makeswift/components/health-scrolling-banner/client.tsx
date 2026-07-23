@@ -198,7 +198,7 @@ function PanelCopy({
           href={panelButton.href}
           rel={panelButton.rel}
           target={panelButton.target}
-          variant="secondary"
+          variant="primary"
         >
           {panelButton.text}
           <IconArrowRight />
