@@ -220,7 +220,7 @@ function TestimonialCard({ item }: { item: ArchiveTestimonialItemProps }) {
   return (
     <div className="testimonial with-quote w-full" ref={ref} style={cardStyle}>
       <blockquote>
-        {(author.length > 0 || avatarSrc.length > 0) && (
+        {(author.length > 0 || avatarSrc.length > 0 || role.length > 0) && (
           <div className="flex items-center gap-4 md:gap-6">
             {avatarSrc.length > 0 ? (
               <figure className="m-0 shrink-0">
@@ -233,12 +233,18 @@ function TestimonialCard({ item }: { item: ArchiveTestimonialItemProps }) {
                 />
               </figure>
             ) : null}
-            {author.length > 0 ? (
-              <cite className="text-base-2xl grow shrink not-italic">{author}</cite>
+            {(author.length > 0 || role.length > 0) ? (
+              <div className="min-w-0 grow shrink">
+                {author.length > 0 ? (
+                  <cite className="text-base-2xl block not-italic">{author}</cite>
+                ) : null}
+                {role.length > 0 ? (
+                  <p className="m-0 mt-1 text-sm opacity-80 md:text-base">{role}</p>
+                ) : null}
+              </div>
             ) : null}
           </div>
         )}
-        {role.length > 0 ? <p className="m-0 text-sm opacity-80 md:text-base">{role}</p> : null}
         {quote.length > 0 ? <p>{quote}</p> : null}
       </blockquote>
     </div>

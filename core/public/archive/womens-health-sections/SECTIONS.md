@@ -14,9 +14,9 @@ No new components are needed — everything below already exists in the picker.
 **Related pages:**
 - [`../clair-health.html`](../clair-health.html) — Clair product deep-dive + pre-order (`/pages/clair-health`)
 - Life-stage chapters (section 9 **Learn more**):
-  - [`../foundation-first-cycles.html`](../foundation-first-cycles.html) — Foundation & First Cycles (10–18)
-  - [`../rhythm-and-balance.html`](../rhythm-and-balance.html) — Rhythm & Balance (18–30)
-  - [`../reset-and-recharge.html`](../reset-and-recharge.html) — Reset & Recharge (30s+)
+  - [`../foundation-first-cycles.html`](../foundation-first-cycles.html) — Foundation & First Cycles
+  - [`../rhythm-and-balance.html`](../rhythm-and-balance.html) — Rhythm & Balance
+  - [`../reset-and-recharge.html`](../reset-and-recharge.html) — Reset & Recharge
   - [`../grow-and-recover.html`](../grow-and-recover.html) — Grow & Recover
   - [`../transition-and-relief.html`](../transition-and-relief.html) — Transition & Relief
   - [`../longevity-and-vitality.html`](../longevity-and-vitality.html) — Longevity & Vitality
@@ -177,14 +177,16 @@ Body HTML:
 
 Set **Instance suffix** to `women`. **Six** sticky panels — each **Learn more** links to its life-stage page (same pattern as Clair). No Clair upsell here.
 
-| # | Panel heading | Age / focus | Primary CTA | HTML mock |
-|---|---------------|-------------|-------------|-----------|
-| 1 | `Foundation & First Cycles` | Ages 10–18 · Pre-teen & teen | `Learn more` | `foundation-first-cycles.html` → `/pages/foundation-first-cycles` |
-| 2 | `Rhythm & Balance` | Ages 18–30 · Early adulthood | `Learn more` | `rhythm-and-balance.html` → `/pages/rhythm-and-balance` |
-| 3 | `Reset & Recharge` | 30s and beyond | `Learn more` | `reset-and-recharge.html` → `/pages/reset-and-recharge` |
-| 4 | `Grow & Recover` | Fertility, pregnancy & postpartum | `Learn more` | `grow-and-recover.html` → `/pages/grow-and-recover` |
-| 5 | `Transition & Relief` | Perimenopause & menopause | `Learn more` | `transition-and-relief.html` → `/pages/transition-and-relief` |
-| 6 | `Longevity & Vitality` | Healthy aging | `Learn more` | `longevity-and-vitality.html` → `/pages/longevity-and-vitality` |
+| # | Panel heading | Primary CTA | HTML mock |
+|---|---------------|-------------|-----------|
+| 1 | `Foundation & First Cycles` | `Learn more` | `foundation-first-cycles.html` → `/pages/foundation-first-cycles` |
+| 2 | `Rhythm & Balance` | `Learn more` | `rhythm-and-balance.html` → `/pages/rhythm-and-balance` |
+| 3 | `Reset & Recharge` | `Learn more` | `reset-and-recharge.html` → `/pages/reset-and-recharge` |
+| 4 | `Grow & Recover` | `Learn more` | `grow-and-recover.html` → `/pages/grow-and-recover` |
+| 5 | `Transition & Relief` | `Learn more` | `transition-and-relief.html` → `/pages/transition-and-relief` |
+| 6 | `Longevity & Vitality` | `Learn more` | `longevity-and-vitality.html` → `/pages/longevity-and-vitality` |
+
+Do **not** age-band chapters — women can be in any chapter at any point in life. Lead with Focus + Vibe only.
 
 Each panel includes **The Focus** and **The Liivv Vibe** lines (see HTML mock or [`STAGES.md`](STAGES.md)).
 
@@ -212,7 +214,7 @@ Split heading: `What women` / `are saying`. Four cards — all Liivv Women / ser
 
 | Question | Notes |
 |----------|-------|
-| `Is this only for one age or stage of life?` | Six chapters: Foundation, Rhythm, Reset, Grow, Transition, Longevity |
+| `Is this only for one age or stage of life?` | Emphasize chapters are by life stage/need, not age — anyone can belong in any chapter |
 | `What is Clair?` | Short + link to Clair page |
 | `What kinds of products does Liivv Women include?` | Cycle comfort, personal care, nutrition, sleep, CarePack, Clair optional |
 | `How private is my order?` | Privacy |

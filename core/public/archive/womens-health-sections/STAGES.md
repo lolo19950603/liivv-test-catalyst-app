@@ -5,6 +5,7 @@ Companion to [`SECTIONS.md`](SECTIONS.md). Each stage is a dedicated Makeswift p
 Visual references live in `core/public/archive/`. Open the matching HTML beside the Makeswift editor. Every HTML section has a dark pill badge naming the Makeswift component.
 
 **Shared voice:** warm, modern, confident. Prefer: rhythm, glow, balance, ease, comfort, chapters, tips.  
+**No age bands:** Chapters are by life stage/need, not age — anyone can belong in any chapter.  
 **Palette:** cream `#f5f2ed` / sage `#8ea78b` / blush `#f3c7be` / charcoal `rgb(49,47,47)`.  
 **Parent page:** [`../womens-health-wellness.html`](../womens-health-wellness.html)  
 **Always include:** back link to Women's Health; Ontario pharmacist CTA where clinical chat is mentioned.  
@@ -35,7 +36,6 @@ Grow & Recover uses a **3-column** multicolumn for Fertility / Pregnancy / Postp
 | Field | Copy |
 |-------|------|
 | Hero heading | `Foundation & First Cycles` |
-| Age line | `Ages 10–18 · Pre-teen & teen` |
 | Hero body | `A calm, honest start to period care — kits, comfort, skin basics, and vitamins that make the first years feel less mysterious.` |
 | Focus | First period anxiety, irregular cycles, acne/hormonal skin, discretion at school, vitamins |
 | Vibe | Supportive, demystifying, parent-friendly without talking down to the teen |
@@ -53,7 +53,6 @@ Grow & Recover uses a **3-column** multicolumn for Fertility / Pregnancy / Postp
 | Field | Copy |
 |-------|------|
 | Hero heading | `Rhythm & Balance` |
-| Age line | `Ages 18–30 · Early adulthood` |
 | Hero body | `Wellness that works IRL — cycle care, sleep, stress, skin, and the practical routines that keep a busy month feeling like yours.` |
 | Focus | Busy schedules/convenience, hormonal breakouts, gut + vaginal health, sleep + stress, birth control |
 | Vibe | Modern, aesthetic, highly functional. "Wellness that works IRL." |
@@ -71,7 +70,6 @@ Grow & Recover uses a **3-column** multicolumn for Fertility / Pregnancy / Postp
 | Field | Copy |
 |-------|------|
 | Hero heading | `Reset & Recharge` |
-| Age line | `30s and beyond · Hormone balance & busy life` |
 | Focus | Hormonal imbalance, weight fluctuations, skin aging, stress, burnout |
 | Vibe | Aspirational but accessible. Acknowledging burnout without making it a medical deficiency. |
 
@@ -89,7 +87,6 @@ Grow & Recover uses a **3-column** multicolumn for Fertility / Pregnancy / Postp
 | Field | Copy |
 |-------|------|
 | Hero heading | `Grow & Recover` |
-| Age line | `Fertility, pregnancy & postpartum` |
 | Focus | Fertility challenges, physical discomfort, recovery after birth, breastfeeding stress |
 | Vibe | Empowering, deeply supportive, strictly no shame |
 
@@ -110,7 +107,6 @@ Grow & Recover uses a **3-column** multicolumn for Fertility / Pregnancy / Postp
 | Field | Copy |
 |-------|------|
 | Hero heading | `Transition & Relief` |
-| Age line | `Perimenopause & menopause` |
 | Focus | Sleep disruption, bone density, low metabolism, night sweats, mood swings |
 | Vibe | Reclaiming comfort. Sleek, discreet, highly effective |
 
@@ -129,7 +125,6 @@ Grow & Recover uses a **3-column** multicolumn for Fertility / Pregnancy / Postp
 | Field | Copy |
 |-------|------|
 | Hero heading | `Longevity & Vitality` |
-| Age line | `Healthy aging` |
 | Focus | Joint comfort, cognitive health, mobility, energy |
 | Vibe | Active, capable, vibrant. Removing the stigma of aging aids |
 
