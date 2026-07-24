@@ -1,3 +1,4 @@
+import { waitUntil } from '@vercel/functions';
 import { NextResponse } from 'next/server';
 
 import { handleBigCommerceWebhookEvent } from '~/lib/bigcommerce/webhook-handlers';
@@ -38,14 +39,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
   }
 
-  try {
-    const result = await handleBigCommerceWebhookEvent(payload);
+  // Ack immediately so BigCommerce delivery succeeds even if Stripe sync fails
+  // (e.g. rate limits). Otherwise BC deactivates the webhook after repeated 5xx.
+  waitUntil(
+    handleBigCommerceWebhookEvent(payload).catch((error: unknown) => {
+      // eslint-disable-next-line no-console
+      console.error('BigCommerce webhook handler failed:', error);
+    }),
+  );
 
-    return NextResponse.json({ received: true, ...result });
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('BigCommerce webhook handler failed:', error);
-
-    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
-  }
+  return NextResponse.json({ received: true });
 }
