@@ -306,7 +306,18 @@ ${LIIVV_HEADER_UTILITY_SHARED_CSS}
   color: rgb(var(--color-foreground));
 }
 .liivv-archive-header .header__buttons {
+  /* Archive Shopify CSS uses a negative margin that pulls search into the menu control. */
+  margin-inline: 0;
   gap: var(--liivv-header-utility-gap, 0.5rem);
+}
+.liivv-archive-header .diabetes-care-mobile-nav-slot {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+.liivv-archive-header button.diabetes-care-mobile-nav-trigger {
+  /* Match utility circles; override archive trigger radius / transparent button styles. */
+  border-radius: 999px;
 }
 @media screen and (min-width: 768px) {
   .liivv-archive-header .header__icons--end {

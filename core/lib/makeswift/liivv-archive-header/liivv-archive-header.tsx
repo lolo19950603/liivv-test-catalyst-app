@@ -1120,51 +1120,27 @@ export function LiivvArchiveHeader({
           className="header header--left mobile:header--left page-width page-width--full section section--rounded section--padding relative z-20 grid w-full max-w-full items-center section--next-rounded"
           data-section-id="sections--26374736970019__header"
         >
-          {logoVisible || hasNav ? (
+          {logoVisible ? (
             <div
               className="header__logo z-2 flex min-w-0 items-center justify-center gap-3 lg:justify-center"
               onMouseEnter={closeMegaMenu}
             >
-              {logoVisible ? (
-                <Link
-                  className="header__logo-link has-white-logo relative flex min-w-0 max-w-full items-center"
-                  href={logoHref}
-                >
-                  <span className="sr-only">{logoAlt}</span>
-                  {logo?.src ? (
-                    <img
-                      alt={logoAlt}
-                      className="logo block h-auto max-h-9 w-auto max-w-[min(100%,7.5rem)] object-contain sm:max-h-11 sm:max-w-[8.5rem] md:max-h-[140px] md:max-w-[140px]"
-                      src={logo.src}
-                      style={logoStyle}
-                    />
-                  ) : (
-                    <span className="logo text-lg font-semibold sm:text-xl md:text-2xl">{logo?.text}</span>
-                  )}
-                </Link>
-              ) : null}
-              {hasNav ? (
-                <div className="diabetes-care-mobile-nav-slot">
-                  <button
-                    aria-controls={mobileNavId}
-                    aria-expanded={mobileNavOpen}
-                    className={clsx(
-                      'diabetes-care-mobile-nav-trigger menu-drawer-button',
-                      'border-0 bg-transparent p-0 text-inherit outline-none',
-                      'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--color-keyboard-focus))]',
-                    )}
-                    id={`${mobileNavId}-trigger`}
-                    type="button"
-                    onClick={() => {
-                      closeSearch();
-                      setMobileNavOpen((o) => !o);
-                    }}
-                  >
-                    <span className="sr-only">{mobileNavOpen ? 'Close menu' : 'Open menu'}</span>
-                    <IconMenu className="icon shrink-0" />
-                  </button>
-                </div>
-              ) : null}
+              <Link
+                className="header__logo-link has-white-logo relative flex min-w-0 max-w-full items-center"
+                href={logoHref}
+              >
+                <span className="sr-only">{logoAlt}</span>
+                {logo?.src ? (
+                  <img
+                    alt={logoAlt}
+                    className="logo block h-auto max-h-9 w-auto max-w-[min(100%,7.5rem)] object-contain sm:max-h-11 sm:max-w-[8.5rem] md:max-h-[140px] md:max-w-[140px]"
+                    src={logo.src}
+                    style={logoStyle}
+                  />
+                ) : (
+                  <span className="logo text-lg font-semibold sm:text-xl md:text-2xl">{logo?.text}</span>
+                )}
+              </Link>
             </div>
           ) : null}
 
@@ -1209,50 +1185,74 @@ export function LiivvArchiveHeader({
             </div>
           ) : null}
 
-          {showUtilityIcons ? (
+          {showUtilityIcons || hasNav ? (
             <div
               className="header__icons header__icons--end z-2 flex min-w-0 shrink-0 justify-end"
               onMouseEnter={closeMegaMenu}
             >
               <div className="header__buttons gap-1d5 flex items-center">
-                <LocaleToggle />
-                <button
-                  aria-controls={searchPanelId}
-                  aria-expanded={searchOpen}
-                  aria-label={SEARCH_ARIA_LABEL}
-                  className="header-utility-icon-btn search-drawer-button"
-                  type="button"
-                  onClick={toggleSearch}
-                >
-                  <IconSearch />
-                </button>
-                {notifications ? (
-                  <AccountNotificationsBell
-                    labels={notifications.labels}
-                    notifications={notifications.items}
-                    unreadCount={notifications.unreadCount}
-                    variant="storefront"
-                  />
+                {hasNav ? (
+                  <div className="diabetes-care-mobile-nav-slot">
+                    <button
+                      aria-controls={mobileNavId}
+                      aria-expanded={mobileNavOpen}
+                      className="header-utility-icon-btn diabetes-care-mobile-nav-trigger menu-drawer-button"
+                      id={`${mobileNavId}-trigger`}
+                      type="button"
+                      onClick={() => {
+                        closeSearch();
+                        setMobileNavOpen((o) => !o);
+                      }}
+                    >
+                      <span className="sr-only">
+                        {mobileNavOpen ? 'Close menu' : 'Open menu'}
+                      </span>
+                      <IconMenu className="icon shrink-0" />
+                    </button>
+                  </div>
                 ) : null}
-                <Link
-                  aria-label={cartCountLabel}
-                  className="header-utility-icon-btn cart-drawer-button"
-                  href={CART_PATH}
-                >
-                  <IconCart />
-                  {cartLineCount != null && cartLineCount > 0 ? (
-                    <span className="header-utility-badge header-utility-badge--count" aria-hidden>
-                      {cartLineCount > 99 ? '99+' : cartLineCount}
-                    </span>
-                  ) : null}
-                </Link>
-                <HeaderAccountMenu
-                  accountHref={accountHref}
-                  accountLabel={accountLabel}
-                  customerName={accountCustomerName}
-                  links={accountMenuLinks}
-                  panelId={accountMenuPanelId}
-                />
+                {showUtilityIcons ? (
+                  <>
+                    <LocaleToggle />
+                    <button
+                      aria-controls={searchPanelId}
+                      aria-expanded={searchOpen}
+                      aria-label={SEARCH_ARIA_LABEL}
+                      className="header-utility-icon-btn search-drawer-button"
+                      type="button"
+                      onClick={toggleSearch}
+                    >
+                      <IconSearch />
+                    </button>
+                    {notifications ? (
+                      <AccountNotificationsBell
+                        labels={notifications.labels}
+                        notifications={notifications.items}
+                        unreadCount={notifications.unreadCount}
+                        variant="storefront"
+                      />
+                    ) : null}
+                    <Link
+                      aria-label={cartCountLabel}
+                      className="header-utility-icon-btn cart-drawer-button"
+                      href={CART_PATH}
+                    >
+                      <IconCart />
+                      {cartLineCount != null && cartLineCount > 0 ? (
+                        <span className="header-utility-badge header-utility-badge--count" aria-hidden>
+                          {cartLineCount > 99 ? '99+' : cartLineCount}
+                        </span>
+                      ) : null}
+                    </Link>
+                    <HeaderAccountMenu
+                      accountHref={accountHref}
+                      accountLabel={accountLabel}
+                      customerName={accountCustomerName}
+                      links={accountMenuLinks}
+                      panelId={accountMenuPanelId}
+                    />
+                  </>
+                ) : null}
               </div>
             </div>
           ) : null}
