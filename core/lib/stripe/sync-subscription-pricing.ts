@@ -63,23 +63,30 @@ function hasPricingChanged({
   );
 }
 
+function logSkip(subscription: Stripe.Subscription, reason: string): 'skipped' {
+  // eslint-disable-next-line no-console
+  console.info(`Skipped Stripe subscription ${subscription.id}: ${reason}`);
+
+  return 'skipped';
+}
+
 export async function syncSubscriptionPricingFromBigCommerce(
   subscription: Stripe.Subscription,
 ): Promise<SyncSubscriptionPricingResult> {
   if (!isDynamicSubscription(subscription)) {
-    return 'skipped';
+    return logSkip(subscription, 'not a dynamic_pricing subscription');
   }
 
   const billingContext = parseSubscriptionBillingContext(subscription.metadata);
 
   if (!billingContext) {
-    return 'skipped';
+    return logSkip(subscription, 'missing/invalid billing context metadata');
   }
 
   const item = subscription.items.data[0];
 
   if (!item?.price.recurring) {
-    return 'skipped';
+    return logSkip(subscription, 'subscription item has no recurring price');
   }
 
   const stripe = getStripe();
@@ -106,7 +113,10 @@ export async function syncSubscriptionPricingFromBigCommerce(
   });
 
   if (!quote) {
-    return 'skipped';
+    return logSkip(
+      subscription,
+      `no BigCommerce quote for product ${billingContext.productEntityId} (variant ${billingContext.variantEntityId ?? 'n/a'})`,
+    );
   }
 
   if (!quote.inStock || quote.unitAmountExTaxPerUnit <= 0) {
