@@ -240,7 +240,7 @@ function TestimonialCard({ item }: { item: ArchiveTestimonialItemProps }) {
                   <cite className="block text-sm font-medium not-italic md:text-base">{author}</cite>
                 ) : null}
                 {role.length > 0 ? (
-                  <p className="m-0 text-xs opacity-60 md:text-sm">{role}</p>
+                  <p className="m-0 text-sm opacity-60 md:text-base">{role}</p>
                 ) : null}
               </div>
             ) : null}
