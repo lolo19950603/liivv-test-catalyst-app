@@ -255,7 +255,17 @@ async function fetchCatalogProductState({
       unitPrice,
       currency: 'CAD',
     };
-  } catch {
+  } catch (error) {
+    logQuoteCheckoutStep(
+      'fetchCatalogProductState: admin catalog fetch failed',
+      {
+        productEntityId,
+        variantEntityId: variantEntityId ?? null,
+        ...formatQuoteError(error),
+      },
+      'error',
+    );
+
     return null;
   }
 }
@@ -668,6 +678,52 @@ export async function resolveSubscriptionBillingQuote({
   const inStock = product?.inventory.isInStock ?? catalogState?.inStock ?? false;
 
   if (!product) {
+    // Storefront GraphQL can return null when the product is not visible on the
+    // channel (or options no longer resolve). Fall back to Admin catalog pricing
+    // so webhook-driven subscription sync still works.
+    if (catalogState && (catalogState.inStock || forPortalDisplay) && catalogState.unitPrice > 0) {
+      const unitAmountExTaxPerUnit = Math.round(catalogState.unitPrice * 100);
+      const unitAmountExTax = unitAmountExTaxPerUnit * quantity;
+      const quoteCurrency = currencyCode ?? catalogState.currency;
+
+      logQuoteCheckoutStep(
+        'resolveSubscriptionBillingQuote: falling back to admin catalog price',
+        {
+          customerId,
+          productEntityId,
+          quantity,
+          variantEntityId: variantEntityIdFromContext ?? null,
+          unitAmountExTax,
+          taxAmount: 0,
+          currencyCode: quoteCurrency,
+        },
+        'info',
+      );
+
+      return {
+        inStock: catalogState.inStock,
+        currency: quoteCurrency,
+        quantity,
+        unitAmountExTax,
+        unitAmountIncTax: unitAmountExTax,
+        taxAmount: 0,
+        unitAmountExTaxPerUnit,
+      };
+    }
+
+    logQuoteCheckoutStep(
+      'resolveSubscriptionBillingQuote: no storefront product and no admin catalog fallback',
+      {
+        customerId,
+        productEntityId,
+        variantEntityId: variantEntityIdFromContext ?? null,
+        hasCatalogState: Boolean(catalogState),
+        catalogInStock: catalogState?.inStock ?? null,
+        catalogUnitPrice: catalogState?.unitPrice ?? null,
+      },
+      'error',
+    );
+
     return null;
   }
 
