@@ -629,6 +629,10 @@
                 "invalidCurrency": "Devise non valide",
                 "errorUpdatingCurrency": "Erreur lors de la mise à jour de la devise de votre panier. Veuillez réessayer."
             },
+            "SwitchLocale": {
+                "label": "Langue",
+                "switchTo": "Changer la langue pour {locale}"
+            },
             "Search": {
                 "products": "Produits",
                 "categories": "Catégories",

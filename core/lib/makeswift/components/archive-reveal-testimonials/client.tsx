@@ -235,12 +235,14 @@ function TestimonialCard({ item }: { item: ArchiveTestimonialItemProps }) {
               </figure>
             ) : null}
             {(author.length > 0 || role.length > 0) ? (
-              <div className="min-w-0">
+              <div className="flex min-w-0 flex-col gap-0 leading-snug">
                 {author.length > 0 ? (
-                  <cite className="block text-sm font-medium not-italic md:text-base">{author}</cite>
+                  <cite className="block text-sm font-medium leading-snug not-italic md:text-base">
+                    {author}
+                  </cite>
                 ) : null}
                 {role.length > 0 ? (
-                  <p className="m-0 text-sm opacity-60 md:text-base">{role}</p>
+                  <span className="block text-sm leading-snug opacity-60 md:text-base">{role}</span>
                 ) : null}
               </div>
             ) : null}

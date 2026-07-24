@@ -23,6 +23,8 @@ interface Props extends PropsWithChildren {
   slideOffset?: number;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** When false, opening the menu does not lock body scroll (avoids scrollbar layout shift). */
+  modal?: boolean;
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -53,10 +55,11 @@ export const DropdownMenu = ({
   onOpenChange,
   align = 'end',
   slideOffset = 6,
+  modal = true,
   children,
 }: Props) => {
   return (
-    <DropdownMenuPrimitive.Root onOpenChange={onOpenChange} open={open}>
+    <DropdownMenuPrimitive.Root modal={modal} onOpenChange={onOpenChange} open={open}>
       <DropdownMenuPrimitive.Trigger asChild>{children}</DropdownMenuPrimitive.Trigger>
       <DropdownMenuPrimitive.Portal>
         <DropdownMenuPrimitive.Content

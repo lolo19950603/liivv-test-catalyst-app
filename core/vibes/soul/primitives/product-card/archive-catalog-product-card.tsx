@@ -238,7 +238,7 @@ export function ArchiveCatalogProductCard({
         </div>
 
         {showQuickAdd && quickActions?.addToCartAction ? (
-          <div className="liivv-archive-product-card__cta mt-1 w-full">
+          <div className="liivv-archive-product-card__cta mt-auto w-full pt-2">
             <ProductCardQuickAdd
               addToCartAction={quickActions.addToCartAction}
               addToCartLabel={quickActions.addToCartLabel ?? 'Add to cart'}

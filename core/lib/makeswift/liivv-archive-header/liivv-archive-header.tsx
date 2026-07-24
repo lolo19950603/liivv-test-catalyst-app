@@ -33,6 +33,7 @@ import type { AccountMenuLink } from '~/lib/account/account-menu-links';
 import { LIIVV_HEADER_ACCOUNT_MENU_CSS } from './account-menu-css';
 import { ARCHIVE_HEADER_CSS } from './archive-header-css';
 import { LiivvArchiveSearchPanel } from './liivv-archive-search-panel';
+import { LocaleToggle } from './locale-toggle';
 import { LIIVV_HEADER_MEGA_MENU_CSS } from './mega-menu-css';
 import type {
   LiivvArchiveHeaderLogo,
@@ -1214,6 +1215,7 @@ export function LiivvArchiveHeader({
               onMouseEnter={closeMegaMenu}
             >
               <div className="header__buttons gap-1d5 flex items-center">
+                <LocaleToggle />
                 <button
                   aria-controls={searchPanelId}
                   aria-expanded={searchOpen}

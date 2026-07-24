@@ -1077,6 +1077,10 @@
         "invalidCurrency": "Invalid currency",
         "errorUpdatingCurrency": "Error updating currency for your cart. Please try again."
       },
+      "SwitchLocale": {
+        "label": "Language",
+        "switchTo": "Switch language to {locale}"
+      },
       "Search": {
         "products": "Products",
         "categories": "Categories",

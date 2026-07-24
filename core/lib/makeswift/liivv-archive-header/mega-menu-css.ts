@@ -349,6 +349,77 @@ ${LIIVV_HEADER_UTILITY_SHARED_CSS}
   width: var(--liivv-header-utility-icon-size, 1.35rem);
   height: var(--liivv-header-utility-icon-size, 1.35rem);
 }
+.liivv-archive-header .header-locale-toggle {
+  --locale-toggle-pad: 0.125rem;
+  position: relative;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  align-items: stretch;
+  height: var(--liivv-header-utility-size, 2.75rem);
+  min-height: var(--liivv-header-utility-size, 2.75rem);
+  padding: var(--locale-toggle-pad);
+  border-radius: 999px;
+  border: 1px solid rgb(var(--color-foreground) / 0.12);
+  background: rgb(var(--color-background));
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+.liivv-archive-header .header-locale-toggle.is-pending {
+  opacity: 0.55;
+  pointer-events: none;
+}
+.liivv-archive-header .header-locale-toggle__thumb {
+  position: absolute;
+  top: var(--locale-toggle-pad);
+  left: var(--locale-toggle-pad);
+  bottom: var(--locale-toggle-pad);
+  border-radius: 999px;
+  background: rgb(var(--color-foreground));
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  pointer-events: none;
+  z-index: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .liivv-archive-header .header-locale-toggle__thumb {
+    transition: none;
+  }
+}
+.liivv-archive-header .header-locale-toggle__option {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  padding-inline: 0.7rem;
+  margin: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgb(var(--color-foreground) / 0.55);
+  font-family: var(--font-navigation-family, var(--font-sans));
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.liivv-archive-header .header-locale-toggle__option.is-active {
+  color: rgb(var(--color-background));
+  cursor: default;
+}
+.liivv-archive-header .header-locale-toggle__option:not(.is-active):hover,
+.liivv-archive-header .header-locale-toggle__option:not(.is-active):focus-visible {
+  color: rgb(var(--color-foreground));
+  outline: none;
+}
+.liivv-archive-header .header-locale-toggle__option:focus-visible {
+  box-shadow: inset 0 0 0 2px rgb(var(--color-foreground) / 0.35);
+}
 .liivv-archive-header .header-notifications {
   position: relative;
   display: flex;

@@ -222,6 +222,7 @@ export function ProductCardOverlayActions({
             align="end"
             className="min-w-48 text-nowrap"
             items={items}
+            modal={false}
             onOpenChange={handleOpenChange}
             open={open}
           >
