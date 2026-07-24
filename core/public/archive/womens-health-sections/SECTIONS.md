@@ -188,6 +188,12 @@ Set **Instance suffix** to `women`. **Six** sticky panels — each **Learn more*
 
 Do **not** age-band chapters — women can be in any chapter at any point in life. Lead with Focus + Vibe only.
 
+**Menu / scroll target:** On the scrolling banner component, set **Scroll anchor id** to `life-chapters`. For the header link **Find Your Chapter**, do **not** use Makeswift “Scroll to element” (it only finds Makeswift boxes). Use **Open URL** (or page link) to:
+
+`/womens-health#life-chapters`
+
+(Adjust the path if your Women’s Health page slug differs.)
+
 Each panel includes **The Focus** and **The Liivv Vibe** lines (see HTML mock or [`STAGES.md`](STAGES.md)).
 
 | Panel | Focus (short) | Vibe (short) |

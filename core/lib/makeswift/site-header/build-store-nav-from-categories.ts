@@ -65,7 +65,6 @@ function categoryToNavItem(node: StoreCategoryNode): LiivvArchiveNavLink {
     href: node.path,
     featuredImage: node.image ?? null,
     columns: hasMegaMenu ? columns : undefined,
-    exploreAll: hasMegaMenu ? { label: 'Explore All', href: node.path } : undefined,
   };
 }
 

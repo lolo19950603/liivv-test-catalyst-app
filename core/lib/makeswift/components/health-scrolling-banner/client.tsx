@@ -130,6 +130,8 @@ export type HealthScrollingBannerPanel = {
 export type HealthScrollingBannerProps = {
   className?: string;
   instanceSuffix?: string;
+  /** Friendly hash target for nav (e.g. life-chapters → /womens-health#life-chapters). */
+  anchorId?: string;
   sectionDomId?: string;
   background?: SectionBackgroundProps;
   panels?: HealthScrollingBannerPanel[];
@@ -250,6 +252,7 @@ function MobilePanel({ panel, index }: { panel: HealthScrollingBannerPanel; inde
 export function HealthScrollingBanner({
   className,
   instanceSuffix,
+  anchorId,
   sectionDomId,
   background,
   panels,
@@ -259,6 +262,17 @@ export function HealthScrollingBanner({
     sectionDomId ?? HEALTH_SCROLLING_BANNER_SECTION_ID,
     instanceSuffix,
   );
+  const scrollAnchorId = (() => {
+    const raw = anchorId?.trim() ?? '';
+
+    if (raw.length === 0) {
+      return undefined;
+    }
+
+    const safe = raw.replace(/[^a-zA-Z0-9_-]/g, '');
+
+    return safe.length > 0 ? safe : undefined;
+  })();
   const list = panels ?? [];
   const stickyInsetPx = useStickyHeaderInset(SCROLL_BANNER_SSR_STICKY_INSET_PX);
   const panelCount = list.length;
@@ -339,7 +353,11 @@ export function HealthScrollingBanner({
   });
 
   return (
-    <div className={clsx('health-scrolling-banner', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}>
+    <div
+      className={clsx('health-scrolling-banner', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}
+      id={scrollAnchorId}
+      style={scrollAnchorId != null ? ({ scrollMarginTop: '6rem' } as CSSProperties) : undefined}
+    >
       <div className="shopify-section" id={resolvedSectionId} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className={clsx('section section--padding relative', roundedTop && 'section--rounded')}>

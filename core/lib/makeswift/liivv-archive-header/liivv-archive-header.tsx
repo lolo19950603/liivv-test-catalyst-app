@@ -196,25 +196,6 @@ function HeaderCorner({ className }: { className?: string }) {
   );
 }
 
-function IconArrowRight({ className }: { className?: string }) {
-  return (
-    <svg
-      aria-hidden
-      className={className}
-      fill="none"
-      height="20"
-      role="presentation"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      viewBox="0 0 24 24"
-      width="20"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 function NavMenuTrigger({
   href,
   label,
@@ -712,14 +693,6 @@ function HeaderMegaMenuPanel({
             <MegaMenuCategoryPreview fallbackLogo={fallbackLogo} preview={previewLink} />
           </aside>
         </div>
-        {item.exploreAll ? (
-          <Link className="header-mega-menu__footer" href={item.exploreAll.href}>
-            <span className="header-mega-menu__explore-label">{item.exploreAll.label}</span>
-            <span className="header-mega-menu__arrow" aria-hidden>
-              <IconArrowRight />
-            </span>
-          </Link>
-        ) : null}
       </div>
     </div>
   );
@@ -1419,15 +1392,6 @@ export function LiivvArchiveHeader({
                         </li>
                       ))}
                     </ul>
-                    {item.exploreAll ? (
-                      <Link
-                        className="mx-4 mb-3 inline-flex min-h-11 items-center text-sm font-medium text-[rgb(var(--color-foreground))] underline"
-                        href={item.exploreAll.href}
-                        onClick={closeMobileNav}
-                      >
-                        {item.exploreAll.label}
-                      </Link>
-                    ) : null}
                   </li>
                 );
               })}

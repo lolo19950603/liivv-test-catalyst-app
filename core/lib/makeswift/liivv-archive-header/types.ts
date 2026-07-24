@@ -30,10 +30,6 @@ export interface LiivvArchiveNavLink {
     alt: string;
   } | null;
   columns?: LiivvArchiveNavColumn[];
-  exploreAll?: {
-    label: string;
-    href: string;
-  };
 }
 
 export interface LiivvArchiveHeaderLogo {

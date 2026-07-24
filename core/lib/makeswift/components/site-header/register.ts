@@ -39,7 +39,6 @@ const additionalNavSubLink = Group({
 });
 
 const navLinkMegaMenuFields = {
-  exploreAllLabel: TextInput({ label: 'Explore all label', defaultValue: 'Explore All' }),
   subLinks: List({
     label: 'Sub links (mega menu)',
     type: additionalNavSubLink,

@@ -13,7 +13,6 @@ export type MakeswiftAdditionalSubLinkInput = {
 export type MakeswiftAdditionalLinkInput = {
   label?: string;
   link?: { href?: string };
-  exploreAllLabel?: string;
   subLinks?: MakeswiftAdditionalSubLinkInput[];
 };
 
@@ -63,19 +62,11 @@ export function mapMakeswiftAdditionalLinks(
         });
 
       const columns = subLinks.length > 0 ? distributeIntoColumns(subLinks) : undefined;
-      const exploreAllLabel = item.exploreAllLabel?.trim();
 
       return {
         label,
         href,
         columns,
-        exploreAll:
-          columns != null && columns.length > 0
-            ? {
-                label: exploreAllLabel && exploreAllLabel.length > 0 ? exploreAllLabel : 'Explore All',
-                href,
-              }
-            : undefined,
       };
     });
 }

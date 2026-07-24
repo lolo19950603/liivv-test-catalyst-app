@@ -97,7 +97,6 @@ interface Props {
   links: Array<{
     label: string;
     link: { href?: string };
-    exploreAllLabel?: string;
     subLinks?: Array<{
       label: string;
       link: { href?: string };

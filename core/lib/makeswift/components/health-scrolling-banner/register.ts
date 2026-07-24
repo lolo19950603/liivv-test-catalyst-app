@@ -61,6 +61,12 @@ runtime.registerComponent(HealthScrollingBanner, {
       defaultValue: '',
       description: 'Use "b" for the second scrolling banner on the health page.',
     }),
+    anchorId: TextInput({
+      label: 'Scroll anchor id (optional)',
+      defaultValue: '',
+      description:
+        'For Women’s chapters use life-chapters. Then link with Open URL → /womens-health#life-chapters (not Scroll to element).',
+    }),
     ...sectionBackgroundControls(),
     ...roundedTopControl(),
     panels: List({
