@@ -4,6 +4,7 @@ import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { CompareDrawer, CompareDrawerProvider } from '@/vibes/soul/primitives/compare-drawer';
 import {
   ArchiveCatalogProductCard,
+  type ArchiveCatalogProductCardQuickActions,
   type Product,
   type ProductImageFallbackLogo,
   ProductCard,
@@ -30,6 +31,7 @@ interface ProductListProps {
   maxCompareLimitMessage?: Streamable<string>;
   cardVariant?: 'default' | 'archive';
   fallbackLogo?: ProductImageFallbackLogo | null;
+  quickActions?: ArchiveCatalogProductCardQuickActions;
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -67,6 +69,7 @@ export function ProductList({
   maxCompareLimitMessage: streamableMaxCompareLimitMessage,
   cardVariant = 'default',
   fallbackLogo,
+  quickActions,
 }: ProductListProps) {
   return (
     <Stream
@@ -118,6 +121,7 @@ export function ProductList({
                       imageSizes="(min-width: 80rem) 20vw, (min-width: 64rem) 25vw, (min-width: 42rem) 33vw, (min-width: 24rem) 50vw, 100vw"
                       key={product.id}
                       product={product}
+                      quickActions={quickActions}
                     />
                   ) : (
                     <ProductCard

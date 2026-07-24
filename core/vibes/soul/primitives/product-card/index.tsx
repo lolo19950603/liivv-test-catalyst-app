@@ -11,6 +11,7 @@ import { Rating } from '../rating';
 import { Compare } from './compare';
 
 export { ArchiveCatalogProductCard } from './archive-catalog-product-card';
+export type { ArchiveCatalogProductCardQuickActions } from './archive-catalog-product-card';
 
 export interface ProductImageFallbackLogo {
   src?: string;
@@ -29,6 +30,8 @@ export interface Product {
   rating?: number;
   inventoryMessage?: string;
   numberOfReviews?: number;
+  sku?: string;
+  hasVariants?: boolean;
 }
 
 export interface ProductCardProps {

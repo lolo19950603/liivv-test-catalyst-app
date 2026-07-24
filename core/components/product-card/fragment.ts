@@ -6,6 +6,7 @@ export const ProductCardFragment = graphql(
     fragment ProductCardFragment on Product {
       entityId
       name
+      sku
       defaultImage {
         altText
         url: urlTemplate(lossy: true)
@@ -27,6 +28,13 @@ export const ProductCardFragment = graphql(
       reviewSummary {
         numberOfReviews
         averageRating
+      }
+      productOptions(first: 1) {
+        edges {
+          node {
+            entityId
+          }
+        }
       }
       variants(first: 1) {
         edges {

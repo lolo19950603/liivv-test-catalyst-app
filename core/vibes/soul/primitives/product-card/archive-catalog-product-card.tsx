@@ -8,10 +8,42 @@ import { Image } from '~/components/image';
 import { Link } from '~/components/link';
 
 import type { Product, ProductCardProps, ProductImageFallbackLogo } from './index';
+import {
+  ProductCardOverlayActions,
+  type ProductCardOverlayActionsProps,
+} from './overlay-actions';
+import {
+  ProductCardAddToCartAction,
+  ProductCardQuickAdd,
+} from './quick-add-form';
 
-type ArchiveCatalogProductCardProps = Pick<ProductCardProps, 'className' | 'imageSizes' | 'imagePriority'> & {
+export interface ArchiveCatalogProductCardQuickActions {
+  addToCartAction?: ProductCardAddToCartAction;
+  addToCartLabel?: string;
+  chooseOptionsLabel?: string;
+  showWishlist?: boolean;
+  showSubscribe?: boolean;
+  isLoggedIn?: boolean;
+  subscribeLabel?: string;
+  wishlistLabel?: string;
+  addToNewWishlistLabel?: string;
+  newWishlistTitle?: string;
+  cancelLabel?: string;
+  createLabel?: string;
+  nameLabel?: string;
+  requiredError?: string;
+  wishlistAction?: ProductCardOverlayActionsProps['wishlistAction'];
+  addToNewWishlistAction?: ProductCardOverlayActionsProps['addToNewWishlistAction'];
+  getWishlistsAction?: ProductCardOverlayActionsProps['getWishlistsAction'];
+}
+
+type ArchiveCatalogProductCardProps = Pick<
+  ProductCardProps,
+  'className' | 'imageSizes' | 'imagePriority'
+> & {
   fallbackLogo?: ProductImageFallbackLogo | null;
   product: Product;
+  quickActions?: ArchiveCatalogProductCardQuickActions;
 };
 
 function ArchiveCatalogProductCardPrice({ price }: { price: Price }) {
@@ -53,6 +85,7 @@ function ArchiveCatalogProductCardMedia({
   imageSizes,
   productTitle,
   safeHref,
+  overlay,
 }: {
   fallbackLogo?: ProductImageFallbackLogo | null;
   image?: { src: string; alt: string };
@@ -60,6 +93,7 @@ function ArchiveCatalogProductCardMedia({
   imageSizes: string;
   productTitle: string;
   safeHref: string;
+  overlay?: React.ReactNode;
 }) {
   const [imageFailed, setImageFailed] = useState(false);
   const imgSrc = image?.src.trim() ?? '';
@@ -105,6 +139,7 @@ function ArchiveCatalogProductCardMedia({
           </span>
         )}
       </Link>
+      {overlay}
     </div>
   );
 }
@@ -115,8 +150,9 @@ export function ArchiveCatalogProductCard({
   fallbackLogo,
   imagePriority = false,
   imageSizes = '(min-width: 42rem) 25vw, (min-width: 32rem) 33vw, (min-width: 28rem) 50vw, 100vw',
+  quickActions,
 }: ArchiveCatalogProductCardProps) {
-  const { title, subtitle, price, image, href } = product;
+  const { title, subtitle, price, image, href, hasVariants, sku, id } = product;
   const imgSrc = image?.src.trim() ?? '';
   const hasImage = imgSrc.length > 0;
   const hasLogoFallback =
@@ -125,6 +161,35 @@ export function ArchiveCatalogProductCard({
   const safeHref = href.trim().length > 0 && href !== '#' ? href : '/';
   const vendor = subtitle?.trim() ?? '';
   const productTitle = title.trim() || 'Product';
+
+  const showQuickAdd = quickActions?.addToCartAction != null;
+  const showOverlay =
+    (quickActions?.showWishlist === true && Boolean(sku)) || quickActions?.showSubscribe === true;
+
+  const overlayActions =
+    showOverlay && quickActions ? (
+      <ProductCardOverlayActions
+        addToNewWishlistAction={quickActions.addToNewWishlistAction}
+        getWishlistsAction={quickActions.getWishlistsAction}
+        href={safeHref}
+        isLoggedIn={quickActions.isLoggedIn ?? false}
+        labels={{
+          wishlist: quickActions.wishlistLabel ?? 'Save to wish list',
+          addToNewWishlist: quickActions.addToNewWishlistLabel ?? 'Add to new wish list',
+          newWishlistTitle: quickActions.newWishlistTitle ?? 'Create a new wish list',
+          cancelLabel: quickActions.cancelLabel ?? 'Cancel',
+          createLabel: quickActions.createLabel ?? 'Create',
+          nameLabel: quickActions.nameLabel ?? 'Name',
+          requiredError: quickActions.requiredError ?? 'Wish list name cannot be empty.',
+        }}
+        productId={id}
+        productSku={sku ?? ''}
+        showSubscribe={quickActions.showSubscribe}
+        showWishlist={Boolean(quickActions.showWishlist && sku)}
+        subscribeLabel={quickActions.subscribeLabel ?? 'Subscribe & save'}
+        wishlistAction={quickActions.wishlistAction}
+      />
+    ) : null;
 
   return (
     <div
@@ -140,10 +205,13 @@ export function ArchiveCatalogProductCard({
           image={image}
           imagePriority={imagePriority}
           imageSizes={imageSizes}
+          overlay={overlayActions}
           productTitle={productTitle}
           safeHref={safeHref}
         />
-      ) : null}
+      ) : (
+        overlayActions
+      )}
 
       <div
         className={clsx(
@@ -168,6 +236,19 @@ export function ArchiveCatalogProductCard({
           </Link>
           {price != null ? <ArchiveCatalogProductCardPrice price={price} /> : null}
         </div>
+
+        {showQuickAdd && quickActions?.addToCartAction ? (
+          <div className="liivv-archive-product-card__cta mt-1 w-full">
+            <ProductCardQuickAdd
+              addToCartAction={quickActions.addToCartAction}
+              addToCartLabel={quickActions.addToCartLabel ?? 'Add to cart'}
+              chooseOptionsLabel={quickActions.chooseOptionsLabel ?? 'Choose options'}
+              hasVariants={hasVariants === true}
+              href={safeHref}
+              productId={id}
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );

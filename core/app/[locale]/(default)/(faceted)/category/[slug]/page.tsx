@@ -31,6 +31,7 @@ import { fetchFacetedSearch } from '../../fetch-faceted-search';
 import { CategorySearchPanel } from './_components/category-search-panel';
 import { CategoryViewed } from './_components/category-viewed';
 import { getCategoryPageData } from './page-data';
+import { getFacetedProductCardQuickActions } from '../../_actions/get-product-card-quick-actions';
 
 const getCachedCategory = cache((categoryId: number) => {
   return {
@@ -119,6 +120,7 @@ export default async function Category(props: Props) {
     getTranslations('Faceted'),
     getTranslations('Components.Header'),
   ]);
+  const quickActions = await getFacetedProductCardQuickActions();
 
   const categoryId = Number(slug);
 
@@ -296,6 +298,7 @@ export default async function Category(props: Props) {
         paginationLabel={t('Pagination.label')}
         paginationNextLabel={t('Pagination.next')}
         products={streamableProducts}
+        quickActions={quickActions}
         rangeFilterApplyLabel={t('FacetedSearch.Range.apply')}
         removeLabel={t('Compare.remove')}
         resetFiltersLabel={t('FacetedSearch.resetFilters')}

@@ -25,6 +25,7 @@ import {
 import { fetchFacetedSearch } from '../../fetch-faceted-search';
 
 import { getBrandPageData } from './page-data';
+import { getFacetedProductCardQuickActions } from '../../_actions/get-product-card-quick-actions';
 
 const getCachedBrand = cache((brandId: string) => {
   return {
@@ -105,6 +106,7 @@ export default async function Brand(props: Props) {
   setRequestLocale(locale);
 
   const t = await getTranslations('Faceted');
+  const quickActions = await getFacetedProductCardQuickActions();
 
   const brandId = Number(slug);
 
@@ -240,6 +242,7 @@ export default async function Brand(props: Props) {
       paginationLabel={t('Pagination.label')}
       paginationNextLabel={t('Pagination.next')}
       products={streamableProducts}
+      quickActions={quickActions}
       rangeFilterApplyLabel={t('FacetedSearch.Range.apply')}
       removeLabel={t('Compare.remove')}
       resetFiltersLabel={t('FacetedSearch.resetFilters')}

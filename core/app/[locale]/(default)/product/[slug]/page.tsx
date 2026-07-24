@@ -584,6 +584,9 @@ export default async function Product({ params, searchParams }: Props) {
   });
 
   const showPurchaseOptions = isStripeConfigured();
+  const resolvedSearchParams = await searchParams;
+  const defaultPurchaseType: 'one-time' | 'subscription' =
+    resolvedSearchParams.purchaseType === 'subscription' ? 'subscription' : 'one-time';
   const subscribeT = await getTranslations('Subscribe');
   const subscriptionBillingIntervals = getSubscriptionBillingIntervals();
   const subscriptionIntervalOptions = subscriptionBillingIntervals.map((interval) =>
@@ -610,6 +613,7 @@ export default async function Product({ params, searchParams }: Props) {
         startDateMax: getMaxSubscriptionStartDateValue(),
         startDateDefault: getDefaultSubscriptionStartDateValue(),
         defaultInterval: formatSubscriptionIntervalKey(subscriptionBillingIntervals[0]!),
+        defaultPurchaseType,
         priceConsentLabel: t('ProductDetails.purchaseOptions.priceConsent'),
         productPath: baseProduct.path,
       }

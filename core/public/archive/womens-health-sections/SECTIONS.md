@@ -78,8 +78,8 @@ Pill image rows (calm lifestyle stills, no products-on-white):
 | Number | Suffix | Text below |
 |--------|--------|------------|
 | `10` | `k+` | `women in the Liivv community, and growing every day` |
-| `24` | `/7` | `chat whenever it suits your day — or your 2 a.m.` |
-| `19` | `+` | `everyday concerns our Ontario pharmacists can help with, right in chat` |
+| `24` | `/7` | `Olivia for shopping and account help — anytime` |
+| `19` | `+` | `everyday concerns our Ontario pharmacists can help with in chat during business hours` |
 | `1` | *(empty)* | `place for your wellness — your way, your pace` |
 
 ## 3 — Scrolling text marquee (`health-scrolling-text`)
@@ -133,7 +133,7 @@ Set **Instance suffix** to `women`.
 | Heading | `Relief that doesn't wait on a waiting room` |
 | Button | `Talk to a Pharmacist` |
 
-Body: monthly cramps, skin flare-ups, friendly Ontario pharmacist chat — see HTML.
+Body: monthly cramps, skin flare-ups — Ontario pharmacist chat during business hours (until 5 p.m. ET). Olivia does not give medical advice — see HTML.
 
 ## 7 — Wellness tips (`health-images-with-text`)
 
@@ -149,7 +149,7 @@ Body HTML:
 
 ```html
 <p>Women's health isn't one routine — it's small habits that soften the loud weeks and stretch the quiet ones.</p>
-<p>Track how you feel across your month. Stock comfort essentials before you need them. Prioritize sleep the same week your energy dips. And when something feels off, ask — our Ontario pharmacists are a chat away.</p>
+<p>Track how you feel across your month. Stock comfort essentials before you need them. Prioritize sleep the same week your energy dips. And when something feels off, chat with an Ontario pharmacist during business hours — until 5 p.m. Eastern.</p>
 <p>Small adjustments, real rhythm. That's the Liivv Women way.</p>
 ```
 
@@ -205,7 +205,7 @@ Split heading: `What women` / `are saying`. Four cards — all Liivv Women / ser
 
 | Quote | Author | Role |
 |-------|--------|------|
-| Pharmacist chat at 11 p.m. | `Priya` | `Toronto · juggling two kids and a startup` |
+| Pharmacist chat on lunch break | `Priya` | `Toronto · juggling two kids and a startup` |
 | Monthly box clockwork | `Dana` | `Ottawa · marathon-in-training` |
 | Essentials before running out | `Maya` | `34 · Liivv member since 2024` |
 | Sleep + skin staples in one place | `Sofia` | `Mississauga · Liivv Women regular` |
@@ -218,7 +218,7 @@ Split heading: `What women` / `are saying`. Four cards — all Liivv Women / ser
 | `What is Clair?` | Short + link to Clair page |
 | `What kinds of products does Liivv Women include?` | Cycle comfort, personal care, nutrition, sleep, CarePack, Clair optional |
 | `How private is my order?` | Privacy |
-| `What can I actually chat with a pharmacist about?` | Ontario chat |
+| `What can I actually chat with a pharmacist about?` | Business hours until 5 p.m. ET only; Olivia = store help, no medical advice |
 | `What's a CarePack?` | CarePack |
 | `Can I change or pause my routine anytime?` | Flexibility |
 

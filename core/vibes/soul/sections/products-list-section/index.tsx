@@ -7,7 +7,10 @@ import {
   NumberedPagination,
   NumberedPaginationInfo,
 } from '@/vibes/soul/primitives/numbered-pagination';
-import { Product } from '@/vibes/soul/primitives/product-card';
+import {
+  type ArchiveCatalogProductCardQuickActions,
+  Product,
+} from '@/vibes/soul/primitives/product-card';
 import * as SidePanel from '@/vibes/soul/primitives/side-panel';
 import { Breadcrumb, Breadcrumbs, BreadcrumbsSkeleton } from '@/vibes/soul/sections/breadcrumbs';
 import { type ProductImageFallbackLogo } from '@/vibes/soul/primitives/product-card';
@@ -60,6 +63,7 @@ interface Props {
   paginationVariant?: 'default' | 'archive';
   searchPanel?: ReactNode;
   fallbackLogo?: ProductImageFallbackLogo | null;
+  quickActions?: ArchiveCatalogProductCardQuickActions;
 }
 
 export function ProductsListSection({
@@ -100,6 +104,7 @@ export function ProductsListSection({
   paginationVariant = 'archive',
   searchPanel,
   fallbackLogo,
+  quickActions,
 }: Props) {
   return (
     <div className="group/products-list-section @container">
@@ -221,6 +226,7 @@ export function ProductsListSection({
               maxItems={maxItems}
               placeholderCount={placeholderCount}
               products={products}
+              quickActions={quickActions}
               removeLabel={removeLabel}
               showCompare={showCompare}
               showRating={showRating}

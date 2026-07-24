@@ -20,6 +20,7 @@ import { DEFAULT_FACETED_PAGE_SIZE, getFacetedPageSizeOptions } from '../faceted
 import { fetchFacetedSearch } from '../fetch-faceted-search';
 
 import { getSearchPageData } from './page-data';
+import { getFacetedProductCardQuickActions } from '../_actions/get-product-card-quick-actions';
 
 const compareLoader = createCompareLoader();
 
@@ -79,6 +80,7 @@ export default async function Search(props: Props) {
   setRequestLocale(locale);
 
   const t = await getTranslations('Faceted');
+  const quickActions = await getFacetedProductCardQuickActions();
 
   const { settings } = await getSearchPageData();
 
@@ -259,6 +261,7 @@ export default async function Search(props: Props) {
       paginationLabel={t('Pagination.label')}
       paginationNextLabel={t('Pagination.next')}
       products={streamableProducts}
+      quickActions={quickActions}
       rangeFilterApplyLabel={t('FacetedSearch.Range.apply')}
       removeLabel={t('Compare.remove')}
       resetFiltersLabel={t('FacetedSearch.resetFilters')}

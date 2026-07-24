@@ -46,6 +46,7 @@ import { ArchiveQuantityInput, ArchiveSubmitButton } from './archive-buy-row';
 import {
   ProductPurchaseOptions,
   type ProductPurchaseIntervalOption,
+  type PurchaseType,
 } from './product-purchase-options';
 import { Field, schema, SchemaRawShape } from './schema';
 
@@ -64,6 +65,7 @@ export interface ProductPurchaseOptionsConfig {
   startDateMax: string;
   startDateDefault: string;
   defaultInterval: string;
+  defaultPurchaseType?: PurchaseType;
   productPath: string;
   priceConsentLabel: string;
 }
@@ -376,6 +378,7 @@ export function ProductDetailForm<F extends Field>({
                   <input name="productPath" type="hidden" value={purchaseOptions.productPath} />
                   <ProductPurchaseOptions
                     defaultInterval={purchaseOptions.defaultInterval}
+                    defaultPurchaseType={purchaseOptions.defaultPurchaseType}
                     deliverEveryLabel={purchaseOptions.deliverEveryLabel}
                     formattedPrice={purchaseOptions.formattedPrice}
                     intervalOptions={purchaseOptions.intervalOptions}
@@ -418,6 +421,7 @@ export function ProductDetailForm<F extends Field>({
                   <input name="productPath" type="hidden" value={purchaseOptions.productPath} />
                   <ProductPurchaseOptions
                     defaultInterval={purchaseOptions.defaultInterval}
+                    defaultPurchaseType={purchaseOptions.defaultPurchaseType}
                     deliverEveryLabel={purchaseOptions.deliverEveryLabel}
                     formattedPrice={purchaseOptions.formattedPrice}
                     intervalOptions={purchaseOptions.intervalOptions}
