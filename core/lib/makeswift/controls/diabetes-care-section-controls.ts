@@ -65,6 +65,8 @@ export function roundedTopControl() {
     roundedTop: Checkbox({
       label: 'Rounded top edges',
       defaultValue: true,
+      description:
+        'Soft top corners on this section only — does not pull up over the section above.',
     }),
   };
 }

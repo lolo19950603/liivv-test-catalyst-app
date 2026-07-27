@@ -22,6 +22,7 @@ import {
 import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
 import { resolvePlainTextColor } from '~/lib/makeswift/utils/heading-accent-color';
 import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
+import { roundedTopSectionCss } from '~/lib/makeswift/utils/rounded-top-section';
 
 type VideoElementProps = ComponentPropsWithoutRef<'video'>;
 
@@ -208,6 +209,7 @@ export function AlignedMediaHero({
   const reactId = useId().replace(/:/g, '');
   const fadeScopeClass = `amh-fade-${reactId}`;
   const bgScopeClass = `amh-bg-${reactId}`;
+  const roundedScopeClass = `amh-round-${reactId}`;
 
   const imageSrc = resolveMakeswiftImageSrc(media?.image);
   const videoUrl = media?.videoUrl?.trim() ?? '';
@@ -281,10 +283,10 @@ export function AlignedMediaHero({
   return (
     <section
       className={clsx(
-        'aligned-media-hero relative w-full min-w-0 max-w-full overflow-hidden',
+        'aligned-media-hero relative w-full min-w-0 max-w-full',
         DC_SECTION_ROOT_CLASS,
         bgScopeClass,
-        roundedTop && 'section section--rounded',
+        roundedTop && roundedScopeClass,
         className,
       )}
       style={mergeStyle(
@@ -295,6 +297,7 @@ export function AlignedMediaHero({
         dangerouslySetInnerHTML={{
           __html:
             solidBackgroundCss(bgScopeClass, backgroundColor) +
+            (roundedTop ? roundedTopSectionCss(roundedScopeClass) : '') +
             (showGradientOverlay ? darkFadeOverlayCss(fadeScopeClass) : ''),
         }}
       />

@@ -13,6 +13,7 @@ import { isLightCssColor, resolveCssColor } from '~/lib/makeswift/utils/archive-
 import { type SectionBackgroundProps } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
 import { resolvePlainTextColor } from '~/lib/makeswift/utils/heading-accent-color';
+import { roundedTopSectionCss } from '~/lib/makeswift/utils/rounded-top-section';
 
 const DEFAULT_BACKGROUND = '#fcf8f4';
 const DEFAULT_EYEBROW = '#6b7f5c';
@@ -125,6 +126,7 @@ export function AlignedTextIntro({
 }: AlignedTextIntroProps) {
   const reactId = useId().replace(/:/g, '');
   const bgScopeClass = `ati-bg-${reactId}`;
+  const roundedScopeClass = `ati-round-${reactId}`;
   const scrollAnchorId = resolveScrollAnchorId(anchorId);
   const backgroundColor =
     resolveCssColor(background?.colorHex, background?.color) ?? DEFAULT_BACKGROUND;
@@ -166,10 +168,10 @@ export function AlignedTextIntro({
   return (
     <section
       className={clsx(
-        'aligned-text-intro relative w-full min-w-0 max-w-full overflow-hidden',
+        'aligned-text-intro relative w-full min-w-0 max-w-full',
         DC_SECTION_ROOT_CLASS,
         bgScopeClass,
-        roundedTop && 'section section--rounded',
+        roundedTop && roundedScopeClass,
         className,
       )}
       id={scrollAnchorId}
@@ -180,7 +182,9 @@ export function AlignedTextIntro({
     >
       <style
         dangerouslySetInnerHTML={{
-          __html: solidBackgroundCss(bgScopeClass, backgroundColor),
+          __html:
+            solidBackgroundCss(bgScopeClass, backgroundColor) +
+            (roundedTop ? roundedTopSectionCss(roundedScopeClass) : ''),
         }}
       />
       <div className="mx-auto w-full max-w-[1180px] px-6 py-[clamp(3.5rem,8vw,6.25rem)] md:px-8">
