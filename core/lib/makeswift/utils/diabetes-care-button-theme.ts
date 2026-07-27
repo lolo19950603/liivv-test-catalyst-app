@@ -13,6 +13,8 @@ export type ButtonColorProps = {
   hoverBackgroundColorHex?: string;
   hoverTextColor?: string;
   hoverTextColorHex?: string;
+  /** Outline / ghost: no resting fill (uses outline + text colors). */
+  transparentBackground?: boolean;
 };
 
 export type ArchiveButtonVariant = 'primary' | 'secondary';
@@ -46,6 +48,12 @@ export function resolveButtonTheme(
   const restingText = channels(colors?.textColorHex, colors?.textColor);
   const hoverBg = channels(colors?.hoverBackgroundColorHex, colors?.hoverBackgroundColor);
   const hoverText = channels(colors?.hoverTextColorHex, colors?.hoverTextColor);
+  const transparentRaw = colors?.transparentBackground as unknown;
+  const transparent =
+    transparentRaw === true ||
+    transparentRaw === 'true' ||
+    transparentRaw === 1 ||
+    transparentRaw === '1';
 
   const style: CSSProperties & Record<string, string> = {};
   const isSecondary = options.variant === 'secondary';
@@ -53,16 +61,26 @@ export function resolveButtonTheme(
   /**
    * Archive `.button--secondary` uses `--color-button-background` for the visible label
    * and `--color-button-text` for the hover fill. Map editor fields to user-facing meaning.
+   * Transparent primary keeps outline + text mapping and forces no resting fill.
    */
-  const labelChannels = isSecondary ? restingText : restingBg;
-  const fillChannels = isSecondary ? restingBg : restingText;
-  const borderChannels = outline ?? (isSecondary ? labelChannels : restingBg);
+  const labelChannels = transparent
+    ? (restingText ?? restingBg)
+    : isSecondary
+      ? restingText
+      : restingBg;
+  const fillChannels = transparent
+    ? restingText
+    : isSecondary
+      ? restingBg
+      : restingText;
+  const borderChannels =
+    outline ?? (transparent ? labelChannels : isSecondary ? labelChannels : restingBg);
 
   if (borderChannels != null) {
     style['--color-button-border'] = borderChannels;
   }
 
-  if (labelChannels != null) {
+  if (labelChannels != null && !transparent) {
     style['--color-button-background'] = labelChannels;
 
     if (!isSecondary) {
@@ -72,13 +90,28 @@ export function resolveButtonTheme(
     }
   }
 
-  if (fillChannels != null) {
+  if (transparent) {
+    style['--color-button-gradient'] = 'none';
+
+    if (labelChannels != null) {
+      // Primary reads label from `--color-button-text`; secondary from `--color-button-background`.
+      if (isSecondary) {
+        style['--color-button-background'] = labelChannels;
+      } else {
+        style['--color-button-text'] = labelChannels;
+      }
+    }
+  } else if (fillChannels != null) {
     style['--color-button-text'] = fillChannels;
   }
 
   const hasHover = hoverBg != null || hoverText != null;
   const hasAny =
-    borderChannels != null || labelChannels != null || fillChannels != null || hasHover;
+    transparent ||
+    borderChannels != null ||
+    labelChannels != null ||
+    fillChannels != null ||
+    hasHover;
 
   if (!hasAny) {
     return { style: undefined, scopeCss: '', dataDcBtn: undefined };
@@ -89,6 +122,15 @@ export function resolveButtonTheme(
     options.variant === 'primary' ? '.button.button--primary' : '.button.button--secondary';
 
   let scopeCss = '';
+
+  if (transparent) {
+    scopeCss +=
+      `${selector}${variantClass}{` +
+      `background:transparent!important;` +
+      `background-color:transparent!important;` +
+      `--color-button-gradient:none!important;` +
+      `}`;
+  }
 
   if (hoverText != null) {
     scopeCss += `${selector}${variantClass}:hover:not([disabled]) .btn-text{color:rgb(var(--dc-btn-hover-text))!important;}`;
@@ -105,6 +147,7 @@ export function resolveButtonTheme(
   return {
     style: Object.keys(style).length > 0 ? style : undefined,
     scopeCss,
-    dataDcBtn: hasHover ? options.scopeId : undefined,
+    // Always set data attr when we inject scoped CSS (transparent and/or hover).
+    dataDcBtn: scopeCss.length > 0 ? options.scopeId : undefined,
   };
 }

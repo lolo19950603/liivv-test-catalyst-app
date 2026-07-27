@@ -61,7 +61,7 @@ runtime.registerComponent(AlignedMediaHero, {
           label: 'Dark fade overlay',
           defaultValue: true,
           description:
-            'Soft dark fade from the bottom for white text on light photos. Turn off for solid color + dark text.',
+            'Soft dark fade from the bottom for white text on photos. Only applies when an image or video is set — ignored for solid color backgrounds.',
         }),
       },
     }),
@@ -141,6 +141,8 @@ runtime.registerComponent(AlignedMediaHero, {
         textDefault: 'How Clair Works',
         showButton: true,
         showButtonDefault: true,
+        transparentBackground: true,
+        transparentBackgroundDefault: false,
       },
     ),
   },

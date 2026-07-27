@@ -197,6 +197,9 @@ export type ArchiveButtonControlsOptions = {
   textDefault?: string;
   showButton?: boolean;
   showButtonDefault?: boolean;
+  /** Adds a “Transparent background” checkbox (outline / ghost resting fill). */
+  transparentBackground?: boolean;
+  transparentBackgroundDefault?: boolean;
 };
 
 /** Standard archive CTA fields: text, link, and color pickers. */
@@ -218,6 +221,16 @@ export function archiveButtonControls(
       defaultValue: options?.textDefault ?? '',
     }),
     buttonLink: Link({ label: 'Button link' }),
+    ...(options?.transparentBackground === true
+      ? {
+          transparentBackground: Checkbox({
+            label: 'Transparent background',
+            defaultValue: options.transparentBackgroundDefault ?? false,
+            description:
+              'Outline / ghost style — no resting fill. Uses outline and text colors.',
+          }),
+        }
+      : {}),
     ...buttonColorFields(defaults),
   };
 }

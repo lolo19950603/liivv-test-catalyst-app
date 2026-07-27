@@ -14,7 +14,7 @@ import {
   resolveArchiveButton,
   type ArchiveButtonProps,
 } from '~/lib/makeswift/utils/archive-button';
-import { resolveCssColor } from '~/lib/makeswift/utils/archive-color';
+import { resolveCssColor, isLightCssColor } from '~/lib/makeswift/utils/archive-color';
 import {
   type BodyTextProps,
   type SectionBackgroundProps,
@@ -41,6 +41,9 @@ function DeferredVideo(props: VideoElementProps) {
 
 const MEDIA_COVER_CLASS = 'absolute inset-0 z-0 block h-full w-full object-cover';
 const DEFAULT_BACKGROUND = '#43523f';
+const SOLID_EYEBROW = '#6b7f5c';
+const SOLID_HEADING = 'rgb(49, 47, 47)';
+const SOLID_BODY = 'rgba(49, 47, 47, 0.72)';
 
 /** Soft dark fade from the bottom — scoped so archive CSS cannot strip it. */
 function darkFadeOverlayCss(scopeClass: string): string {
@@ -61,6 +64,39 @@ function darkFadeOverlayCss(scopeClass: string): string {
     `)!important;` +
     `}`
   );
+}
+
+/** Force section fill so archive / page cream cannot show through when there is no image. */
+function solidBackgroundCss(scopeClass: string, backgroundColor: string): string {
+  return (
+    `.${scopeClass}{background-color:${backgroundColor}!important;}` +
+    `.${scopeClass} > .amh-media-shell{background-color:${backgroundColor}!important;}`
+  );
+}
+
+/**
+ * Photo heroes default to white text. On a light solid fill with no media, that becomes
+ * invisible — swap to charcoal when both the fill and the chosen text are light.
+ */
+function resolveSolidReadableTextColor(
+  hasMedia: boolean,
+  backgroundColor: string,
+  resolved: string | undefined,
+  fallbackDark: string,
+): string | undefined {
+  if (hasMedia) {
+    return resolved;
+  }
+
+  if (!isLightCssColor(backgroundColor)) {
+    return resolved ?? '#fff';
+  }
+
+  if (resolved == null || isLightCssColor(resolved)) {
+    return fallbackDark;
+  }
+
+  return resolved;
 }
 
 export type AlignedMediaHeroMediaProps = {
@@ -143,6 +179,11 @@ function resolveShowGradientOverlay(
   raw: AlignedMediaHeroMediaProps['showGradientOverlay'],
   hasMedia: boolean,
 ): boolean {
+  // Solid color-only heroes never get the photo fade — it muddies the picker color.
+  if (!hasMedia) {
+    return false;
+  }
+
   if (raw === true || raw === 'true' || raw === 1 || raw === '1') {
     return true;
   }
@@ -151,7 +192,7 @@ function resolveShowGradientOverlay(
     return false;
   }
 
-  return hasMedia;
+  return true;
 }
 
 export function AlignedMediaHero({
@@ -166,6 +207,7 @@ export function AlignedMediaHero({
 }: AlignedMediaHeroProps) {
   const reactId = useId().replace(/:/g, '');
   const fadeScopeClass = `amh-fade-${reactId}`;
+  const bgScopeClass = `amh-bg-${reactId}`;
 
   const imageSrc = resolveMakeswiftImageSrc(media?.image);
   const videoUrl = media?.videoUrl?.trim() ?? '';
@@ -193,18 +235,33 @@ export function AlignedMediaHero({
     content?.bodyFontSize,
     content?.bodyFontSizeMobile,
   );
-  const eyebrowColor = resolvePlainTextColor({
-    textColor: content?.eyebrowTextColor,
-    textColorHex: content?.eyebrowTextColorHex,
-  });
-  const headingColor = resolvePlainTextColor({
-    textColor: content?.textColor,
-    textColorHex: content?.textColorHex,
-  });
-  const bodyColor = resolvePlainTextColor({
-    textColor: content?.bodyTextColor ?? content?.textColor,
-    textColorHex: content?.bodyTextColorHex ?? content?.textColorHex,
-  });
+  const eyebrowColor = resolveSolidReadableTextColor(
+    hasMedia,
+    backgroundColor,
+    resolvePlainTextColor({
+      textColor: content?.eyebrowTextColor,
+      textColorHex: content?.eyebrowTextColorHex,
+    }),
+    SOLID_EYEBROW,
+  );
+  const headingColor = resolveSolidReadableTextColor(
+    hasMedia,
+    backgroundColor,
+    resolvePlainTextColor({
+      textColor: content?.textColor,
+      textColorHex: content?.textColorHex,
+    }),
+    SOLID_HEADING,
+  );
+  const bodyColor = resolveSolidReadableTextColor(
+    hasMedia,
+    backgroundColor,
+    resolvePlainTextColor({
+      textColor: content?.bodyTextColor ?? content?.textColor,
+      textColorHex: content?.bodyTextColorHex ?? content?.textColorHex,
+    }),
+    SOLID_BODY,
+  );
 
   const primary = resolveArchiveButton(primaryButton, {
     defaultText: 'Pre-order Clair',
@@ -226,15 +283,22 @@ export function AlignedMediaHero({
       className={clsx(
         'aligned-media-hero relative w-full min-w-0 max-w-full overflow-hidden',
         DC_SECTION_ROOT_CLASS,
+        bgScopeClass,
         roundedTop && 'section section--rounded',
         className,
       )}
-      style={headingColor != null ? ({ color: headingColor } as CSSProperties) : { color: '#fff' }}
+      style={mergeStyle(
+        { backgroundColor, color: headingColor ?? '#fff' },
+      )}
     >
-      {showGradientOverlay ? (
-        <style dangerouslySetInnerHTML={{ __html: darkFadeOverlayCss(fadeScopeClass) }} />
-      ) : null}
-      <div className="relative flex w-full items-end" style={heightStyle}>
+      <style
+        dangerouslySetInnerHTML={{
+          __html:
+            solidBackgroundCss(bgScopeClass, backgroundColor) +
+            (showGradientOverlay ? darkFadeOverlayCss(fadeScopeClass) : ''),
+        }}
+      />
+      <div className="amh-media-shell relative flex w-full items-end" style={heightStyle}>
         <div
           className={clsx(
             'absolute inset-0 overflow-hidden',
@@ -295,7 +359,7 @@ export function AlignedMediaHero({
               {heading.length > 0 ? (
                 <h1
                   className={clsx(
-                    'max-w-[14ch] font-serif text-[clamp(2.75rem,7vw,5.5rem)] font-normal leading-[1.1] tracking-tight',
+                    'font-heading text-[clamp(2.25rem,5.5vw,4.25rem)] font-normal leading-[1.08] tracking-[-0.02em]',
                     headingColor == null && 'text-white',
                   )}
                   style={mergeStyle(

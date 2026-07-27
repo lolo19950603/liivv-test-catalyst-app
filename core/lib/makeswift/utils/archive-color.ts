@@ -1,4 +1,4 @@
-/** Normalizes `#RGB`, `#RRGGBB`, or bare hex to a CSS hex color. */
+/** Normalizes `#RGB`, `#RRGGBB`, `#RRGGBBAA`, or bare hex to a CSS hex color. */
 export function normalizeHexColor(color: string): string | null {
   let trimmed = color.trim();
 
@@ -21,6 +21,11 @@ export function normalizeHexColor(color: string): string | null {
   }
 
   if (/^#[0-9a-fA-F]{6}$/.test(trimmed)) {
+    return trimmed.toLowerCase();
+  }
+
+  // 8-digit hex with alpha (e.g. #ffffff00 for fully transparent).
+  if (/^#[0-9a-fA-F]{8}$/.test(trimmed)) {
     return trimmed.toLowerCase();
   }
 
@@ -153,6 +158,11 @@ function hexToChannels(hex: string): string | null {
       .join('');
   }
 
+  // Accept #RRGGBBAA by using the RGB portion only for archive channel vars.
+  if (value.length === 8 && /^[0-9a-f]+$/i.test(value)) {
+    value = value.slice(0, 6);
+  }
+
   if (value.length !== 6 || !/^[0-9a-f]+$/i.test(value)) {
     return null;
   }
@@ -173,6 +183,34 @@ export function cssColorWithOpacity(color: string, opacity: number): string | nu
   }
 
   return `rgb(${channels} / ${opacity})`;
+}
+
+/**
+ * True when the color is light enough that white (or near-white) text would disappear on it.
+ * Used to avoid white-on-cream / white-on-white when a hero has no photo.
+ */
+export function isLightCssColor(color: string | null | undefined): boolean {
+  if (color == null || color.trim().length === 0) {
+    return false;
+  }
+
+  const channels = toArchiveRgbChannels(color);
+
+  if (channels == null) {
+    return false;
+  }
+
+  const parts = channels.split(/\s+/).map((part) => Number.parseInt(part, 10));
+
+  if (parts.length < 3 || parts.some((n) => Number.isNaN(n))) {
+    return false;
+  }
+
+  const [r = 0, g = 0, b = 0] = parts;
+  // Relative luminance (sRGB-ish); threshold ~ light gray / cream.
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+  return luminance >= 0.72;
 }
 
 function hslToRgb(h: number, s: number, l: number): [number, number, number] {

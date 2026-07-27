@@ -5,6 +5,8 @@ export type ArchiveButtonProps = ButtonColorProps & {
   buttonText?: string;
   buttonLink?: { href?: string; target?: string };
   showButton?: boolean;
+  /** Outline / ghost resting state (no fill). */
+  transparentBackground?: boolean;
   /** @deprecated Use `buttonText`. */
   label?: string;
   /** @deprecated Use `buttonLink`. */
@@ -60,6 +62,7 @@ export function pickArchiveButtonColors(
     hoverBackgroundColorHex: button.hoverBackgroundColorHex,
     hoverTextColor: button.hoverTextColor,
     hoverTextColorHex: button.hoverTextColorHex,
+    transparentBackground: button.transparentBackground,
   };
 
   const merged: ButtonColorProps = {
@@ -67,7 +70,13 @@ export function pickArchiveButtonColors(
     ...flat,
   };
 
-  return hasColorOverride(merged) ? merged : undefined;
+  if (button.transparentBackground === true) {
+    merged.transparentBackground = true;
+  }
+
+  return hasColorOverride(merged) || merged.transparentBackground === true
+    ? merged
+    : undefined;
 }
 
 export function resolveArchiveButton(

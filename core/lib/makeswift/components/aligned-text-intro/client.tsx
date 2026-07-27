@@ -1,7 +1,7 @@
 'use client';
 
 import { clsx } from 'clsx';
-import type { CSSProperties } from 'react';
+import { useId, type CSSProperties } from 'react';
 
 import {
   resolveTextAlign,
@@ -9,7 +9,7 @@ import {
   type TextAlign,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
 import { DC_SECTION_ROOT_CLASS } from '~/lib/makeswift/diabetes-care-mobile-classes';
-import { resolveCssColor } from '~/lib/makeswift/utils/archive-color';
+import { isLightCssColor, resolveCssColor } from '~/lib/makeswift/utils/archive-color';
 import { type SectionBackgroundProps } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
 import { resolvePlainTextColor } from '~/lib/makeswift/utils/heading-accent-color';
@@ -95,6 +95,27 @@ function mergeStyle(
   return Object.keys(merged).length > 0 ? merged : undefined;
 }
 
+function solidBackgroundCss(scopeClass: string, backgroundColor: string): string {
+  return `.${scopeClass}{background-color:${backgroundColor}!important;}`;
+}
+
+/** Prefer dark copy when the fill is light and the picker is still on white. */
+function readableOnBackground(
+  backgroundColor: string,
+  resolved: string | undefined,
+  fallbackDark: string,
+): string {
+  if (resolved == null) {
+    return fallbackDark;
+  }
+
+  if (isLightCssColor(backgroundColor) && isLightCssColor(resolved)) {
+    return fallbackDark;
+  }
+
+  return resolved;
+}
+
 export function AlignedTextIntro({
   className,
   anchorId,
@@ -102,6 +123,8 @@ export function AlignedTextIntro({
   background,
   content,
 }: AlignedTextIntroProps) {
+  const reactId = useId().replace(/:/g, '');
+  const bgScopeClass = `ati-bg-${reactId}`;
   const scrollAnchorId = resolveScrollAnchorId(anchorId);
   const backgroundColor =
     resolveCssColor(background?.colorHex, background?.color) ?? DEFAULT_BACKGROUND;
@@ -115,27 +138,37 @@ export function AlignedTextIntro({
     content?.bodyFontSize,
     content?.bodyFontSizeMobile,
   );
-  const eyebrowColor =
+  const eyebrowColor = readableOnBackground(
+    backgroundColor,
     resolvePlainTextColor({
       textColor: content?.eyebrowTextColor,
       textColorHex: content?.eyebrowTextColorHex,
-    }) ?? DEFAULT_EYEBROW;
-  const headingColor =
+    }),
+    DEFAULT_EYEBROW,
+  );
+  const headingColor = readableOnBackground(
+    backgroundColor,
     resolvePlainTextColor({
       textColor: content?.textColor,
       textColorHex: content?.textColorHex,
-    }) ?? DEFAULT_HEADING;
-  const bodyColor =
+    }),
+    DEFAULT_HEADING,
+  );
+  const bodyColor = readableOnBackground(
+    backgroundColor,
     resolvePlainTextColor({
       textColor: content?.bodyTextColor,
       textColorHex: content?.bodyTextColorHex,
-    }) ?? DEFAULT_BODY;
+    }),
+    DEFAULT_BODY,
+  );
 
   return (
     <section
       className={clsx(
         'aligned-text-intro relative w-full min-w-0 max-w-full overflow-hidden',
         DC_SECTION_ROOT_CLASS,
+        bgScopeClass,
         roundedTop && 'section section--rounded',
         className,
       )}
@@ -145,6 +178,11 @@ export function AlignedTextIntro({
         scrollAnchorId != null ? { scrollMarginTop: '6rem' } : undefined,
       )}
     >
+      <style
+        dangerouslySetInnerHTML={{
+          __html: solidBackgroundCss(bgScopeClass, backgroundColor),
+        }}
+      />
       <div className="mx-auto w-full max-w-[1180px] px-6 py-[clamp(3.5rem,8vw,6.25rem)] md:px-8">
         <div className={clsx('flex w-full', contentJustifyClass(align))}>
           <div
