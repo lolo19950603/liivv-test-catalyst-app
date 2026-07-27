@@ -1,5 +1,6 @@
 'use client';
 
+import { useIsInBuilder } from '@makeswift/runtime/react';
 import { clsx } from 'clsx';
 import {
   type CSSProperties,
@@ -204,6 +205,7 @@ function NavMenuTrigger({
   isExpanded,
   onMouseEnter,
   onMouseLeave,
+  onClick,
 }: {
   href: string;
   label: string;
@@ -211,6 +213,7 @@ function NavMenuTrigger({
   isExpanded: boolean;
   onMouseEnter?: () => void;
   onMouseLeave?: (event: MouseEvent<HTMLAnchorElement>) => void;
+  onClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
 }) {
   return (
     <Link
@@ -219,6 +222,7 @@ function NavMenuTrigger({
       aria-label={label}
       className="menu__item text-sm-lg relative z-2 flex cursor-pointer items-center font-medium"
       href={href}
+      onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
@@ -586,6 +590,7 @@ function HeaderMegaMenuPanel({
   open,
   onHover,
   onLeave,
+  onLinkClick,
   fallbackLogo,
 }: {
   item: LiivvArchiveNavLink;
@@ -595,6 +600,7 @@ function HeaderMegaMenuPanel({
   open: boolean;
   onHover: () => void;
   onLeave: () => void;
+  onLinkClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
   fallbackLogo?: LiivvArchiveHeaderLogo | null;
 }) {
   const columns = item.columns ?? [];
@@ -658,6 +664,7 @@ function HeaderMegaMenuPanel({
                               'header-mega-menu__link--active',
                           )}
                           href={column.heading.href}
+                          onClick={onLinkClick}
                           onFocus={() => setPreviewLink(headingPreview)}
                           onMouseEnter={() => setPreviewLink(headingPreview)}
                         >
@@ -677,6 +684,7 @@ function HeaderMegaMenuPanel({
                               isActive && 'header-mega-menu__link--active',
                             )}
                             href={link.href}
+                            onClick={onLinkClick}
                             onFocus={() => setPreviewLink(link)}
                             onMouseEnter={() => setPreviewLink(link)}
                           >
@@ -856,13 +864,14 @@ export function LiivvArchiveHeader({
   const accountMenuPanelId = `liivv-archive-header-account-${safeId}`;
 
   const pathname = usePathname();
+  const isInBuilder = useIsInBuilder();
   const internalSectionRef = useRef<HTMLDivElement>(null);
   const internalSpacerRef = useRef<HTMLDivElement>(null);
   const stickySentinelRef = useRef<HTMLDivElement>(null);
   const sectionRef = sectionRefProp ?? internalSectionRef;
   const spacerRef = spacerRefProp ?? internalSpacerRef;
 
-  useHeaderStickyScrolled(sectionRef, stickySentinelRef, sticky);
+  useHeaderStickyScrolled(sectionRef, stickySentinelRef, sticky && !isInBuilder);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [cartLineCount, setCartLineCount] = useState<number | null>(initialCartCount);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -892,6 +901,41 @@ export function LiivvArchiveHeader({
 
     setActiveMegaIndex(index);
   }, []);
+
+  /** In Makeswift, nav clicks navigate the preview iframe and can hide the editor chrome. */
+  const preventBuilderNavigation = useCallback(
+    (event: MouseEvent<HTMLAnchorElement>) => {
+      if (isInBuilder) {
+        event.preventDefault();
+      }
+    },
+    [isInBuilder],
+  );
+
+  const onMobileNavLinkClick = useCallback(
+    (event: MouseEvent<HTMLAnchorElement>) => {
+      preventBuilderNavigation(event);
+      closeMobileNav();
+    },
+    [closeMobileNav, preventBuilderNavigation],
+  );
+
+  const onNavTriggerClick = useCallback(
+    (index: number, hasMegaMenu: boolean) => (event: MouseEvent<HTMLAnchorElement>) => {
+      if (isInBuilder) {
+        event.preventDefault();
+
+        if (hasMegaMenu) {
+          setActiveMegaIndex((current) => (current === index ? null : index));
+        }
+
+        return;
+      }
+
+      // Live site: keep click navigation; mega menu stays hover-driven.
+    },
+    [isInBuilder],
+  );
 
   const scheduleCloseMegaMenu = useCallback(() => {
     if (megaCloseTimerRef.current != null) {
@@ -1079,7 +1123,7 @@ export function LiivvArchiveHeader({
       className={clsx(
         'liivv-archive-header diabetes-care-section-header liivv-header-skin shopify-section shopify-section-group-header-group header-section header-opaque relative w-full min-w-0',
         hasNav && 'diabetes-care-has-nav',
-        sticky && 'header-sticky',
+        sticky && !isInBuilder && 'header-sticky',
         className,
       )}
       id={sectionId}
@@ -1128,6 +1172,7 @@ export function LiivvArchiveHeader({
               <Link
                 className="header__logo-link has-white-logo relative flex min-w-0 max-w-full items-center"
                 href={logoHref}
+                onClick={preventBuilderNavigation}
               >
                 <span className="sr-only">{logoAlt}</span>
                 {logo?.src ? (
@@ -1169,6 +1214,7 @@ export function LiivvArchiveHeader({
                           href={item.href}
                           isExpanded={isExpanded}
                           label={item.label}
+                          onClick={onNavTriggerClick(index, hasMegaMenu)}
                           onMouseEnter={() => {
                             if (hasMegaMenu) {
                               openMegaMenu(index);
@@ -1302,6 +1348,7 @@ export function LiivvArchiveHeader({
               mobileNavId={mobileNavId}
               onHover={() => openMegaMenu(index)}
               onLeave={scheduleCloseMegaMenu}
+              onLinkClick={preventBuilderNavigation}
               open={activeMegaIndex === index}
             />
           );
@@ -1334,7 +1381,7 @@ export function LiivvArchiveHeader({
                           'rounded-md active:bg-[rgb(var(--color-foreground)/0.06)]',
                         )}
                         href={item.href}
-                        onClick={closeMobileNav}
+                        onClick={onMobileNavLinkClick}
                       >
                         {item.label}
                       </Link>
@@ -1354,7 +1401,7 @@ export function LiivvArchiveHeader({
                         'rounded-md active:bg-[rgb(var(--color-foreground)/0.06)]',
                       )}
                       href={item.href}
-                      onClick={closeMobileNav}
+                      onClick={onMobileNavLinkClick}
                     >
                       {item.label}
                     </Link>
@@ -1369,7 +1416,7 @@ export function LiivvArchiveHeader({
                                 'rounded-md active:bg-[rgb(var(--color-foreground)/0.06)]',
                               )}
                               href={column.heading.href}
-                              onClick={closeMobileNav}
+                              onClick={onMobileNavLinkClick}
                             >
                               {column.heading.label}
                             </Link>
@@ -1384,7 +1431,7 @@ export function LiivvArchiveHeader({
                                     'rounded-md active:bg-[rgb(var(--color-foreground)/0.06)]',
                                   )}
                                   href={link.href}
-                                  onClick={closeMobileNav}
+                                  onClick={onMobileNavLinkClick}
                                 >
                                   {link.label}
                                 </Link>

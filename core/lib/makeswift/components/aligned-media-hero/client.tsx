@@ -51,7 +51,7 @@ export type AlignedMediaHeroMediaProps = {
   muted?: boolean;
   loop?: boolean;
   playsInline?: boolean;
-  showGradientOverlay?: boolean;
+  showGradientOverlay?: boolean | string | number;
 };
 
 export type AlignedMediaHeroContentProps = BodyTextProps & {
@@ -140,7 +140,20 @@ export function AlignedMediaHero({
   const loop = media?.loop ?? true;
   const playsInline = media?.playsInline ?? true;
   const effectiveMuted = autoplay ? true : Boolean(muted);
-  const showGradientOverlay = media?.showGradientOverlay ?? hasMedia;
+  const showGradientOverlay = (() => {
+    const raw = media?.showGradientOverlay;
+
+    if (raw === true || raw === 'true' || raw === 1 || raw === '1') {
+      return true;
+    }
+
+    if (raw === false || raw === 'false' || raw === 0 || raw === '0') {
+      return false;
+    }
+
+    // Legacy instances without the control: fade when media is present.
+    return hasMedia;
+  })();
 
   const backgroundColor =
     resolveCssColor(background?.colorHex, background?.color) ?? DEFAULT_BACKGROUND;
@@ -193,7 +206,7 @@ export function AlignedMediaHero({
       style={headingColor != null ? ({ color: headingColor } as CSSProperties) : { color: '#fff' }}
     >
       <div className="relative flex w-full items-end" style={heightStyle}>
-        <div className="absolute inset-0" style={{ backgroundColor }}>
+        <div className="absolute inset-0 overflow-hidden" style={{ backgroundColor }}>
           {hasVideo ? (
             <>
               {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
@@ -220,24 +233,25 @@ export function AlignedMediaHero({
               width={2400}
             />
           ) : null}
-          {showGradientOverlay ? (
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{
-                background:
-                  'linear-gradient(to top,' +
-                  'rgba(20, 18, 16, 0.62) 0%,' +
-                  'rgba(20, 18, 16, 0.42) 26%,' +
-                  'rgba(20, 18, 16, 0.16) 48%,' +
-                  'rgba(20, 18, 16, 0.04) 68%,' +
-                  'transparent 82%)',
-              }}
-            />
-          ) : null}
         </div>
 
-        <div className="relative z-[1] mx-auto w-full max-w-[1180px] px-6 pb-[clamp(2.5rem,9vh,5.5rem)] pt-24 md:px-8">
+        {showGradientOverlay ? (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-[1]"
+            style={{
+              background:
+                'linear-gradient(to top,' +
+                'rgba(12, 10, 9, 0.78) 0%,' +
+                'rgba(12, 10, 9, 0.55) 22%,' +
+                'rgba(12, 10, 9, 0.28) 45%,' +
+                'rgba(12, 10, 9, 0.1) 62%,' +
+                'transparent 78%)',
+            }}
+          />
+        ) : null}
+
+        <div className="relative z-[2] mx-auto w-full max-w-[1180px] px-6 pb-[clamp(2.5rem,9vh,5.5rem)] pt-24 md:px-8">
           <div className={clsx('flex w-full', contentJustifyClass(align))}>
             <div
               className={clsx(
