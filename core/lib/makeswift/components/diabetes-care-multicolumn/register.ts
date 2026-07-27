@@ -99,9 +99,9 @@ runtime.registerComponent(DiabetesCareMulticolumn, {
       },
     }),
     columns: List({
-      label: 'Columns (4 per row on desktop; order = left to right)',
+      label: 'Columns (max 6; order = left to right)',
       description:
-        'Add as many columns as needed. On desktop they display four per row; additional columns wrap to the next row.',
+        'Up to 6 columns. Desktop: 4 per row by default; with 6 columns, 3 per row (two rows). With 3 columns, also 3 per row.',
       type: Group({
         label: 'Column',
         props: {

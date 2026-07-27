@@ -42,7 +42,8 @@ export const MULTICOLUMN_SECTION_ID = 'shopify-section-template--26520397447459_
 
 const MULTICOLUMN_SLIDER_ID = 'Slider-template--26520397447459__multicolumn_JtTdUn';
 
-/** Desktop grid: four columns per row; additional columns wrap to the next row. */
+/** Desktop: 4 per row by default; 6 columns use 3 per row (2 rows). Cap at 6. */
+const MAX_COLUMNS = 6;
 const DESKTOP_COLUMNS_PER_ROW = 4;
 
 /** Matches archived `--color-background` on `multicolumn_JtTdUn`. */
@@ -50,10 +51,18 @@ const DEFAULT_BACKGROUND_CHANNELS = ARCHIVE_SAGE_BACKGROUND_CHANNELS;
 
 /**
  * Inline `<style>` from `diabetes-care.html` for this section id (theme color tokens + grid gap).
- * Appends `--section-blocks-count` and a four-column-per-row media rule when needed.
+ * Appends `--section-blocks-count` and desktop column-per-row media rules when needed.
  */
 /** Matches archive `card-grid` gap (home `multicolumn_xg87qF` uses ~`var(--sp-6)` at desktop, not 40–60px). */
 const MULTICOLUMN_CARD_GRID_GAP = 'clamp(var(--sp-4),1.263vw,var(--sp-6))';
+
+function usesThreeColumnDesktopGrid(count: number): boolean {
+  return count === 3 || count === 6;
+}
+
+function usesFourColumnDesktopGrid(count: number): boolean {
+  return count === 4 || count === 5;
+}
 
 function multicolumnMobileTitleAlignCss(align: TextAlign): string {
   const justify =
@@ -105,11 +114,11 @@ function multicolumnSectionStyle(
   let style =
     `${MULTICOLUMN_ARCHIVE_STYLE}${multicolumnMobileTitleCss(titleAlign)}${multicolumnIntroAlignCss(introAlign)}${id}{--section-blocks-count:${String(blockCount)}}`;
 
-  if (blockCount >= DESKTOP_COLUMNS_PER_ROW) {
+  if (usesFourColumnDesktopGrid(blockCount)) {
     style += `@media screen and (min-width:768px){${id} .multicolumn.with-4.card-grid.card-grid--4{--card-grid-per-row:${String(DESKTOP_COLUMNS_PER_ROW)}}}`;
   }
 
-  if (blockCount === 3) {
+  if (usesThreeColumnDesktopGrid(blockCount)) {
     style +=
       `@media screen and (min-width:768px){${id} .multicolumn.with-3.card-grid.card-grid--3{--card-grid-per-row:3;--card-grid-gap:${MULTICOLUMN_CARD_GRID_GAP};--card-grid-template:auto-flow dense/repeat(3,minmax(0,1fr))}}` +
       `@media screen and (min-width:768px){${id} .slider.slider--tablet .multicolumn.with-3.card-grid{--slider-item-width:unset;--slider-grid:unset;grid:var(--card-grid-template)}}`;
@@ -123,21 +132,19 @@ function multicolumnCardGridModifierClass(count: number): string | undefined {
     return undefined;
   }
 
-  const n = count;
-
-  if (n >= DESKTOP_COLUMNS_PER_ROW) {
-    return 'with-4 card-grid--4';
-  }
-
-  if (n === 3) {
+  if (usesThreeColumnDesktopGrid(count)) {
     return 'with-3 card-grid--3';
   }
 
-  if (n === 2) {
+  if (usesFourColumnDesktopGrid(count)) {
+    return 'with-4 card-grid--4';
+  }
+
+  if (count === 2) {
     return 'with-2';
   }
 
-  if (n === 1) {
+  if (count === 1) {
     return 'with-1';
   }
 
@@ -456,7 +463,7 @@ export function DiabetesCareMulticolumn({
   const secondaryText = secondaryResolved.text;
   const hasSectionHeading = primaryText.length > 0 || secondaryText.length > 0;
 
-  const rows = (columns ?? []).filter(columnHasContent);
+  const rows = (columns ?? []).filter(columnHasContent).slice(0, MAX_COLUMNS);
   const sectionVars: ShopifyThemeStyle = {
     '--section-blocks-count': rows.length,
   };
