@@ -16,25 +16,25 @@ export const COMPONENT_TYPE = 'diabetes-care-video-hero';
 
 runtime.registerComponent(DiabetesCareVideoHero, {
   type: COMPONENT_TYPE,
-  label: diabetesCareComponentLabel(0, 'Video with text overlay'),
+  label: diabetesCareComponentLabel(0, 'Video / image with text overlay'),
   icon: 'layout',
   props: {
     className: Style(),
     ...sectionBackgroundControls(),
     ...roundedTopControl(),
     video: Group({
-      label: 'Video',
+      label: 'Media',
       preferredLayout: Group.Layout.Popover,
       props: {
         url: TextInput({
-          label: 'Video file URL (MP4)',
+          label: 'Video file URL (MP4) — leave empty for image only',
           defaultValue: DIABETES_CARE_DEFAULT_VIDEO_URL,
         }),
-        poster: Image({ label: 'Poster image (optional)' }),
-        autoplay: Checkbox({ label: 'Autoplay', defaultValue: true }),
-        muted: Checkbox({ label: 'Muted (when autoplay is off)', defaultValue: true }),
-        loop: Checkbox({ label: 'Loop', defaultValue: true }),
-        playsInline: Checkbox({ label: 'Plays inline on mobile', defaultValue: true }),
+        poster: Image({ label: 'Image / video poster' }),
+        autoplay: Checkbox({ label: 'Autoplay (video)', defaultValue: true }),
+        muted: Checkbox({ label: 'Muted when autoplay is off (video)', defaultValue: true }),
+        loop: Checkbox({ label: 'Loop (video)', defaultValue: true }),
+        playsInline: Checkbox({ label: 'Plays inline on mobile (video)', defaultValue: true }),
         showControls: Checkbox({ label: 'Show native video controls', defaultValue: false }),
       },
     }),

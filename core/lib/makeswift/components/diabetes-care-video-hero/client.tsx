@@ -19,6 +19,7 @@ import {
   type SectionBackgroundProps,
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
+import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
 
 type VideoElementProps = ComponentPropsWithoutRef<'video'>;
 
@@ -42,6 +43,21 @@ function DeferredVideo(props: VideoElementProps) {
   return <video {...props} suppressHydrationWarning />;
 }
 
+const MEDIA_COVER_CLASS = 'absolute inset-0 block h-full w-full object-cover object-center';
+
+function HeroImage({ src }: { src: string }) {
+  return (
+    <img
+      alt=""
+      className={MEDIA_COVER_CLASS}
+      decoding="async"
+      height={1200}
+      src={src}
+      width={2000}
+    />
+  );
+}
+
 export const DIABETES_CARE_DEFAULT_VIDEO_URL =
   'https://liivv.ca/cdn/shop/videos/c/vp/2e66f0d8b94242388f3b690c1c727817/2e66f0d8b94242388f3b690c1c727817.HD-1080p-7.2Mbps-83428254.mp4?v=0';
 
@@ -50,7 +66,8 @@ export const VIDEO_HERO_SECTION_ID =
 
 export type VideoSettingsProps = {
   url?: string;
-  poster?: string;
+  /** Makeswift `Image` control — used as still image (no video URL) or video poster. */
+  poster?: unknown;
   autoplay?: boolean;
   muted?: boolean;
   loop?: boolean;
@@ -110,11 +127,13 @@ export function DiabetesCareVideoHero({
   const loop = video?.loop ?? true;
   const playsInline = video?.playsInline ?? true;
   const showControls = video?.showControls ?? false;
-  const src =
-    video?.url != null && video.url.trim().length > 0
-      ? video.url.trim()
-      : DIABETES_CARE_DEFAULT_VIDEO_URL;
-  const poster = video?.poster?.trim().length ? video.poster.trim() : undefined;
+  const videoUrl = video?.url?.trim() ?? '';
+  const imageSrc = resolveMakeswiftImageSrc(video?.poster);
+  const hasVideoUrl = videoUrl.length > 0;
+  /** No video URL + image set → still-image hero. Otherwise fall back to default MP4. */
+  const useImageOnly = !hasVideoUrl && imageSrc.length > 0;
+  const src = hasVideoUrl ? videoUrl : useImageOnly ? '' : DIABETES_CARE_DEFAULT_VIDEO_URL;
+  const poster = imageSrc.length > 0 ? imageSrc : undefined;
   const effectiveMuted = autoplay ? true : Boolean(muted);
   const headingText = headingResolved.text;
   const subheadingText = overlayBody?.subheading?.trim() ?? '';
@@ -161,12 +180,14 @@ export function DiabetesCareVideoHero({
             {...(clientReady ? { 'data-animate': 'zoom-out' as const } : {})}
             suppressHydrationWarning
           >
-            {clientReady ? (
+            {useImageOnly && poster ? (
+              <HeroImage src={poster} />
+            ) : clientReady ? (
               <>
                 {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
                 <DeferredVideo
                   autoPlay={autoplay}
-                  className="absolute inset-0 block h-full w-full object-cover object-center"
+                  className={MEDIA_COVER_CLASS}
                   controls={showControls}
                   loop={loop}
                   muted={effectiveMuted}
@@ -175,38 +196,40 @@ export function DiabetesCareVideoHero({
                   preload="metadata"
                   src={src}
                 />
-                {hasOverlay ? (
-                  <div
-                    className={clsx(
-                      'pointer-events-none absolute inset-0 flex flex-col justify-end',
-                      'bg-gradient-to-t from-[rgb(0_0_0/0.75)] via-[rgb(0_0_0/0.25)] to-transparent',
-                      'p-6 text-white md:p-10 lg:p-12',
-                    )}
-                  >
-                    {headingText.length > 0 ? (
-                      <h2
-                        className="heading max-w-4xl text-balance text-3xl font-semibold tracking-tight md:text-4xl lg:text-5xl"
-                        style={headingStyle}
-                      >
-                        <SplitWordsHeading text={headingText} />
-                      </h2>
-                    ) : null}
-                    {subheadingText.length > 0 ? (
-                      <ScrollReveal delayMs={120}>
-                        <p
-                          className="heading mt-3 max-w-3xl text-pretty text-base leading-relaxed text-white/90 md:text-lg"
-                          style={bodyStyle}
-                        >
-                          {subheadingText}
-                        </p>
-                      </ScrollReveal>
-                    ) : null}
-                  </div>
-                ) : null}
               </>
+            ) : poster ? (
+              <HeroImage src={poster} />
             ) : (
               <div aria-hidden className="absolute inset-0 bg-black" />
             )}
+            {hasOverlay ? (
+              <div
+                className={clsx(
+                  'pointer-events-none absolute inset-0 flex flex-col justify-end',
+                  'bg-gradient-to-t from-[rgb(0_0_0/0.75)] via-[rgb(0_0_0/0.25)] to-transparent',
+                  'p-6 text-white md:p-10 lg:p-12',
+                )}
+              >
+                {headingText.length > 0 ? (
+                  <h2
+                    className="heading max-w-4xl text-balance text-3xl font-semibold tracking-tight md:text-4xl lg:text-5xl"
+                    style={headingStyle}
+                  >
+                    <SplitWordsHeading text={headingText} />
+                  </h2>
+                ) : null}
+                {subheadingText.length > 0 ? (
+                  <ScrollReveal delayMs={120}>
+                    <p
+                      className="heading mt-3 max-w-3xl text-pretty text-base leading-relaxed text-white/90 md:text-lg"
+                      style={bodyStyle}
+                    >
+                      {subheadingText}
+                    </p>
+                  </ScrollReveal>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
