@@ -20,6 +20,19 @@ const panelGroup = Group({
   props: {
     image: Image({ label: 'Image' }),
     imageAlt: TextInput({ label: 'Image alt', defaultValue: '' }),
+    subheading: Group({
+      label: 'Subheading',
+      preferredLayout: Group.Layout.Popover,
+      props: {
+        text: TextInput({
+          label: 'Subheading',
+          defaultValue: '',
+          description: 'Small line shown above the heading.',
+        }),
+        ...textColorFields('99 16% 43%'),
+        ...fontSizeFields(),
+      },
+    }),
     heading: Group({
       label: 'Heading',
       preferredLayout: Group.Layout.Popover,

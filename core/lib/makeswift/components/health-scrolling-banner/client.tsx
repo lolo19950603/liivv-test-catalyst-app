@@ -118,6 +118,7 @@ function useScrollingBannerProgress(
 export type HealthScrollingBannerPanel = {
   image?: unknown;
   imageAlt?: string;
+  subheading?: HeadingTypographyProps;
   heading?: HeadingTypographyProps;
   body?: BodyTextProps & {
     html?: string;
@@ -151,6 +152,8 @@ function PanelCopy({
   panel: HealthScrollingBannerPanel;
   headingClassName?: string;
 }) {
+  const subheadingResolved = resolveHeadingTypography(panel.subheading);
+  const subheadingText = subheadingResolved.text.trim();
   const headingResolved = resolveHeadingTypography(panel.heading);
   const headingText = headingResolved.text.trim();
   const bodyHtml = panel.body?.html?.trim() ?? '';
@@ -158,6 +161,13 @@ function PanelCopy({
   const bodyFontSize = resolveHeadingFontSizeCss(panel.body?.fontSize, panel.body?.fontSizeMobile);
   const panelButton = resolvePanelButton(panel);
 
+  const subheadingStyle: CSSProperties | undefined =
+    subheadingResolved.color != null || subheadingResolved.fontSize != null
+      ? {
+          ...(subheadingResolved.color != null ? { color: subheadingResolved.color } : {}),
+          ...(subheadingResolved.fontSize != null ? { fontSize: subheadingResolved.fontSize } : {}),
+        }
+      : undefined;
   const headingStyle: CSSProperties | undefined =
     headingResolved.color != null || headingResolved.fontSize != null
       ? {
@@ -175,6 +185,14 @@ function PanelCopy({
 
   return (
     <div className="rich-text relative z-[1] text-left lg:text-left">
+      {subheadingText.length > 0 ? (
+        <p
+          className="mb-3 text-[12px] font-medium uppercase tracking-[0.18em]"
+          style={subheadingStyle}
+        >
+          {subheadingText}
+        </p>
+      ) : null}
       {headingText.length > 0 ? (
         <h2
           className={clsx(

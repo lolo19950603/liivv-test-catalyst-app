@@ -85,6 +85,7 @@ export type DiabetesCareImageTextOverlayProps = {
   headingLine2?: ImageTextOverlayHeadingProps;
   body?: ImageTextOverlayBodyProps;
   button?: ArchiveButtonProps;
+  secondaryButton?: ArchiveButtonProps;
   /** @deprecated Use `body` text color and font size. */
   bodyText?: BodyTextProps;
 };
@@ -243,6 +244,7 @@ export function DiabetesCareImageTextOverlay({
   headingLine2,
   body,
   button,
+  secondaryButton,
   bodyText,
 }: DiabetesCareImageTextOverlayProps) {
   const { line1, line2 } = resolveImageTextOverlayHeading({
@@ -265,7 +267,11 @@ export function DiabetesCareImageTextOverlay({
   const line2Text = line2.text.length > 0 ? line2.text : 'You Need Us';
   const html = bodyResolved.html;
   const resolvedButton = resolveArchiveButton(button, { requireHref: false });
+  const resolvedSecondaryButton = resolveArchiveButton(secondaryButton, {
+    requireHref: false,
+  });
   const showLine2 = line2Text.length > 0;
+  const showButtons = resolvedButton.visible || resolvedSecondaryButton.visible;
 
   return (
     <div
@@ -334,17 +340,33 @@ export function DiabetesCareImageTextOverlay({
                         style={bodyResolved.style}
                       />
                     ) : null}
-                    {resolvedButton.visible ? (
-                      <ArchiveShopifyButton
-                        className="button--primary button--fixed button--md icon-with-text mt-6"
-                        colors={resolvedButton.colors}
-                        href={resolvedButton.href}
-                        rel={resolvedButton.rel}
-                        target={resolvedButton.target}
-                      >
-                        {resolvedButton.text}
-                        <IconArrowRight />
-                      </ArchiveShopifyButton>
+                    {showButtons ? (
+                      <div className="mt-6 flex flex-wrap items-center justify-start gap-3 md:justify-center">
+                        {resolvedButton.visible ? (
+                          <ArchiveShopifyButton
+                            className="button--primary button--fixed button--md icon-with-text"
+                            colors={resolvedButton.colors}
+                            href={resolvedButton.href}
+                            rel={resolvedButton.rel}
+                            target={resolvedButton.target}
+                          >
+                            {resolvedButton.text}
+                            <IconArrowRight />
+                          </ArchiveShopifyButton>
+                        ) : null}
+                        {resolvedSecondaryButton.visible ? (
+                          <ArchiveShopifyButton
+                            className="button--secondary button--fixed button--md"
+                            colors={resolvedSecondaryButton.colors}
+                            href={resolvedSecondaryButton.href}
+                            rel={resolvedSecondaryButton.rel}
+                            target={resolvedSecondaryButton.target}
+                            variant="secondary"
+                          >
+                            {resolvedSecondaryButton.text}
+                          </ArchiveShopifyButton>
+                        ) : null}
+                      </div>
                     ) : null}
                   </div>
                 </div>

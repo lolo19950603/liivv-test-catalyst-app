@@ -14,7 +14,13 @@ import {
   resolveArchiveButton,
   type ArchiveButtonProps,
 } from '~/lib/makeswift/utils/archive-button';
+import { resolveCssColor } from '~/lib/makeswift/utils/archive-color';
+import {
+  type BodyTextProps,
+  type SectionBackgroundProps,
+} from '~/lib/makeswift/utils/diabetes-care-section-style';
 import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
+import { resolvePlainTextColor } from '~/lib/makeswift/utils/heading-accent-color';
 import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
 
 type VideoElementProps = ComponentPropsWithoutRef<'video'>;
@@ -34,6 +40,7 @@ function DeferredVideo(props: VideoElementProps) {
 }
 
 const MEDIA_COVER_CLASS = 'absolute inset-0 block h-full w-full object-cover';
+const DEFAULT_BACKGROUND = '#43523f';
 
 export type AlignedMediaHeroMediaProps = {
   image?: unknown;
@@ -44,23 +51,29 @@ export type AlignedMediaHeroMediaProps = {
   muted?: boolean;
   loop?: boolean;
   playsInline?: boolean;
+  showGradientOverlay?: boolean;
 };
 
-export type AlignedMediaHeroContentProps = {
+export type AlignedMediaHeroContentProps = BodyTextProps & {
   contentAlign?: string;
   eyebrow?: string;
+  eyebrowTextColor?: string;
+  eyebrowTextColorHex?: string;
   heading?: string;
   fontSize?: number;
   fontSizeMobile?: number;
   body?: string;
   bodyFontSize?: number;
   bodyFontSizeMobile?: number;
+  bodyTextColor?: string;
+  bodyTextColorHex?: string;
 };
 
 export type AlignedMediaHeroProps = {
   className?: string;
   roundedTop?: boolean;
   minHeightVh?: number;
+  background?: SectionBackgroundProps;
   media?: AlignedMediaHeroMediaProps;
   content?: AlignedMediaHeroContentProps;
   primaryButton?: ArchiveButtonProps;
@@ -91,10 +104,25 @@ function contentBlockMarginClass(align: TextAlign): string {
   return 'mx-auto';
 }
 
+function mergeStyle(
+  ...parts: Array<CSSProperties | undefined>
+): CSSProperties | undefined {
+  const merged = parts.reduce<CSSProperties>((acc, part) => {
+    if (part == null) {
+      return acc;
+    }
+
+    return { ...acc, ...part };
+  }, {});
+
+  return Object.keys(merged).length > 0 ? merged : undefined;
+}
+
 export function AlignedMediaHero({
   className,
   roundedTop = true,
   minHeightVh = 92,
+  background,
   media,
   content,
   primaryButton,
@@ -103,6 +131,8 @@ export function AlignedMediaHero({
   const imageSrc = resolveMakeswiftImageSrc(media?.image);
   const videoUrl = media?.videoUrl?.trim() ?? '';
   const hasVideo = videoUrl.length > 0;
+  const hasImage = imageSrc.length > 0;
+  const hasMedia = hasVideo || hasImage;
   const imageAlt = media?.imageAlt?.trim() || '';
   const objectPosition = media?.objectPosition?.trim() || '50% 50%';
   const autoplay = media?.autoplay ?? true;
@@ -110,6 +140,10 @@ export function AlignedMediaHero({
   const loop = media?.loop ?? true;
   const playsInline = media?.playsInline ?? true;
   const effectiveMuted = autoplay ? true : Boolean(muted);
+  const showGradientOverlay = media?.showGradientOverlay ?? hasMedia;
+
+  const backgroundColor =
+    resolveCssColor(background?.colorHex, background?.color) ?? DEFAULT_BACKGROUND;
 
   const align = resolveTextAlign(content?.contentAlign, 'left');
   const eyebrow = content?.eyebrow?.trim() ?? '';
@@ -120,6 +154,18 @@ export function AlignedMediaHero({
     content?.bodyFontSize,
     content?.bodyFontSizeMobile,
   );
+  const eyebrowColor = resolvePlainTextColor({
+    textColor: content?.eyebrowTextColor,
+    textColorHex: content?.eyebrowTextColorHex,
+  });
+  const headingColor = resolvePlainTextColor({
+    textColor: content?.textColor,
+    textColorHex: content?.textColorHex,
+  });
+  const bodyColor = resolvePlainTextColor({
+    textColor: content?.bodyTextColor ?? content?.textColor,
+    textColorHex: content?.bodyTextColorHex ?? content?.textColorHex,
+  });
 
   const primary = resolveArchiveButton(primaryButton, {
     defaultText: 'Pre-order Clair',
@@ -139,14 +185,15 @@ export function AlignedMediaHero({
   return (
     <section
       className={clsx(
-        'aligned-media-hero relative w-full min-w-0 max-w-full overflow-hidden text-white',
+        'aligned-media-hero relative w-full min-w-0 max-w-full overflow-hidden',
         DC_SECTION_ROOT_CLASS,
         roundedTop && 'section section--rounded',
         className,
       )}
+      style={headingColor != null ? ({ color: headingColor } as CSSProperties) : { color: '#fff' }}
     >
       <div className="relative flex w-full items-end" style={heightStyle}>
-        <div className="absolute inset-0 bg-[#43523f]">
+        <div className="absolute inset-0" style={{ backgroundColor }}>
           {hasVideo ? (
             <>
               {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
@@ -162,7 +209,7 @@ export function AlignedMediaHero({
                 style={mediaStyle}
               />
             </>
-          ) : imageSrc.length > 0 ? (
+          ) : hasImage ? (
             <img
               alt={imageAlt}
               className={MEDIA_COVER_CLASS}
@@ -172,21 +219,13 @@ export function AlignedMediaHero({
               style={mediaStyle}
               width={2400}
             />
-          ) : (
+          ) : null}
+          {showGradientOverlay ? (
             <div
               aria-hidden
-              className="absolute inset-0"
-              style={{
-                background:
-                  'linear-gradient(150deg, #6b7f5c, #43523f 65%, #2f3a2c),' +
-                  'radial-gradient(130% 100% at 75% 20%, rgba(243, 199, 190, 0.35), transparent 55%)',
-              }}
+              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgb(35_40_32/0.72)] via-[rgb(35_40_32/0.28)] to-transparent"
             />
-          )}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgb(35_40_32/0.72)] via-[rgb(35_40_32/0.28)] to-transparent"
-          />
+          ) : null}
         </div>
 
         <div className="relative z-[1] mx-auto w-full max-w-[1180px] px-6 pb-[clamp(2.5rem,9vh,5.5rem)] pt-24 md:px-8">
@@ -199,23 +238,32 @@ export function AlignedMediaHero({
               )}
             >
               {eyebrow.length > 0 ? (
-                <p className="mb-3.5 text-[12px] font-medium uppercase tracking-[0.22em] text-white/80">
+                <p
+                  className={clsx(
+                    'mb-3.5 text-[12px] font-medium uppercase tracking-[0.22em]',
+                    eyebrowColor == null && 'text-white/80',
+                  )}
+                  style={eyebrowColor != null ? { color: eyebrowColor } : undefined}
+                >
                   {eyebrow}
                 </p>
               ) : null}
 
               {heading.length > 0 ? (
                 <h1
-                  className="max-w-[12ch] font-serif text-[clamp(2.75rem,7vw,5.5rem)] font-normal leading-[1.1] tracking-tight text-white"
-                  style={
-                    headingFontSize != null
-                      ? { fontSize: headingFontSize, maxWidth: 'none' }
-                      : align === 'center'
-                        ? { marginInline: 'auto' }
-                        : align === 'right'
-                          ? { marginLeft: 'auto' }
-                          : undefined
-                  }
+                  className={clsx(
+                    'max-w-[12ch] font-serif text-[clamp(2.75rem,7vw,5.5rem)] font-normal leading-[1.1] tracking-tight',
+                    headingColor == null && 'text-white',
+                  )}
+                  style={mergeStyle(
+                    headingColor != null ? { color: headingColor } : undefined,
+                    headingFontSize != null ? { fontSize: headingFontSize, maxWidth: 'none' } : undefined,
+                    align === 'center'
+                      ? { marginInline: 'auto' }
+                      : align === 'right'
+                        ? { marginLeft: 'auto' }
+                        : undefined,
+                  )}
                 >
                   {heading}
                 </h1>
@@ -224,11 +272,15 @@ export function AlignedMediaHero({
               {body.length > 0 ? (
                 <p
                   className={clsx(
-                    'mt-5 max-w-[46ch] text-[clamp(1rem,1.6vw,1.25rem)] font-light leading-relaxed text-white/90',
+                    'mt-5 max-w-[46ch] text-[clamp(1rem,1.6vw,1.25rem)] font-light leading-relaxed',
+                    bodyColor == null && 'text-white/90',
                     align === 'center' && 'mx-auto',
                     align === 'right' && 'ml-auto',
                   )}
-                  style={bodyFontSize != null ? { fontSize: bodyFontSize } : undefined}
+                  style={mergeStyle(
+                    bodyColor != null ? { color: bodyColor } : undefined,
+                    bodyFontSize != null ? { fontSize: bodyFontSize } : undefined,
+                  )}
                 >
                   {body}
                 </p>

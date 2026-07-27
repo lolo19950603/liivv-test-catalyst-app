@@ -15,7 +15,10 @@ import {
   sectionBackgroundControls,
   textColorFields,
 } from '~/lib/makeswift/controls/diabetes-care-section-controls';
-import { ARCHIVE_BUTTON_PRIMARY_WHITE_ON_BANNER } from '~/lib/makeswift/utils/archive-button-presets';
+import {
+  ARCHIVE_BUTTON_PRIMARY_WHITE_ON_BANNER,
+  ARCHIVE_BUTTON_SECONDARY_ON_BANNER,
+} from '~/lib/makeswift/utils/archive-button-presets';
 import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 
@@ -55,8 +58,19 @@ runtime.registerComponent(DiabetesCareImageTextOverlay, {
         ...fontSizeFields(),
       },
     }),
-    button: archiveButtonGroup('Button', ARCHIVE_BUTTON_PRIMARY_WHITE_ON_BANNER, {
+    button: archiveButtonGroup('Primary button', ARCHIVE_BUTTON_PRIMARY_WHITE_ON_BANNER, {
       textDefault: 'Reach Out',
+      showButton: true,
+      showButtonDefault: true,
     }),
+    secondaryButton: archiveButtonGroup(
+      'Secondary button',
+      ARCHIVE_BUTTON_SECONDARY_ON_BANNER,
+      {
+        textDefault: 'Learn more',
+        showButton: true,
+        showButtonDefault: false,
+      },
+    ),
   },
 });
