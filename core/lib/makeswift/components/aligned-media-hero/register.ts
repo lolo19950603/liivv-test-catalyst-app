@@ -58,9 +58,10 @@ runtime.registerComponent(AlignedMediaHero, {
         loop: Checkbox({ label: 'Loop video', defaultValue: true }),
         playsInline: Checkbox({ label: 'Plays inline on mobile', defaultValue: true }),
         showGradientOverlay: Checkbox({
-          label: 'Dark gradient overlay',
+          label: 'Dark fade overlay',
           defaultValue: true,
-          description: 'Turn off when using a solid background color with dark text.',
+          description:
+            'Soft dark fade from the bottom for white text on light photos. Turn off for solid color + dark text.',
         }),
       },
     }),

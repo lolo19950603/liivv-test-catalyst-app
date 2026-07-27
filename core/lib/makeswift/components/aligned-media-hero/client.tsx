@@ -223,7 +223,16 @@ export function AlignedMediaHero({
           {showGradientOverlay ? (
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgb(35_40_32/0.72)] via-[rgb(35_40_32/0.28)] to-transparent"
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  'linear-gradient(to top,' +
+                  'rgba(20, 18, 16, 0.62) 0%,' +
+                  'rgba(20, 18, 16, 0.42) 26%,' +
+                  'rgba(20, 18, 16, 0.16) 48%,' +
+                  'rgba(20, 18, 16, 0.04) 68%,' +
+                  'transparent 82%)',
+              }}
             />
           ) : null}
         </div>
