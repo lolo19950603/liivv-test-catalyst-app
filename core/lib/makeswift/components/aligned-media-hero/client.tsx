@@ -1,7 +1,7 @@
 'use client';
 
 import { clsx } from 'clsx';
-import { useEffect, useState, type ComponentPropsWithoutRef, type CSSProperties } from 'react';
+import { useEffect, useId, useState, type ComponentPropsWithoutRef, type CSSProperties } from 'react';
 
 import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
 import {
@@ -39,8 +39,29 @@ function DeferredVideo(props: VideoElementProps) {
   return <video {...props} suppressHydrationWarning />;
 }
 
-const MEDIA_COVER_CLASS = 'absolute inset-0 block h-full w-full object-cover';
+const MEDIA_COVER_CLASS = 'absolute inset-0 z-0 block h-full w-full object-cover';
 const DEFAULT_BACKGROUND = '#43523f';
+
+/** Soft dark fade from the bottom — scoped so archive CSS cannot strip it. */
+function darkFadeOverlayCss(scopeClass: string): string {
+  return (
+    `.${scopeClass}::after{` +
+    `content:'';` +
+    `position:absolute;` +
+    `inset:0;` +
+    `z-index:1;` +
+    `pointer-events:none;` +
+    `background-image:linear-gradient(` +
+    `to top,` +
+    `rgba(12,10,9,.82) 0%,` +
+    `rgba(12,10,9,.58) 28%,` +
+    `rgba(12,10,9,.32) 52%,` +
+    `rgba(12,10,9,.12) 70%,` +
+    `transparent 88%` +
+    `)!important;` +
+    `}`
+  );
+}
 
 export type AlignedMediaHeroMediaProps = {
   image?: unknown;
@@ -118,6 +139,21 @@ function mergeStyle(
   return Object.keys(merged).length > 0 ? merged : undefined;
 }
 
+function resolveShowGradientOverlay(
+  raw: AlignedMediaHeroMediaProps['showGradientOverlay'],
+  hasMedia: boolean,
+): boolean {
+  if (raw === true || raw === 'true' || raw === 1 || raw === '1') {
+    return true;
+  }
+
+  if (raw === false || raw === 'false' || raw === 0 || raw === '0') {
+    return false;
+  }
+
+  return hasMedia;
+}
+
 export function AlignedMediaHero({
   className,
   roundedTop = true,
@@ -128,6 +164,9 @@ export function AlignedMediaHero({
   primaryButton,
   secondaryButton,
 }: AlignedMediaHeroProps) {
+  const reactId = useId().replace(/:/g, '');
+  const fadeScopeClass = `amh-fade-${reactId}`;
+
   const imageSrc = resolveMakeswiftImageSrc(media?.image);
   const videoUrl = media?.videoUrl?.trim() ?? '';
   const hasVideo = videoUrl.length > 0;
@@ -140,20 +179,7 @@ export function AlignedMediaHero({
   const loop = media?.loop ?? true;
   const playsInline = media?.playsInline ?? true;
   const effectiveMuted = autoplay ? true : Boolean(muted);
-  const showGradientOverlay = (() => {
-    const raw = media?.showGradientOverlay;
-
-    if (raw === true || raw === 'true' || raw === 1 || raw === '1') {
-      return true;
-    }
-
-    if (raw === false || raw === 'false' || raw === 0 || raw === '0') {
-      return false;
-    }
-
-    // Legacy instances without the control: fade when media is present.
-    return hasMedia;
-  })();
+  const showGradientOverlay = resolveShowGradientOverlay(media?.showGradientOverlay, hasMedia);
 
   const backgroundColor =
     resolveCssColor(background?.colorHex, background?.color) ?? DEFAULT_BACKGROUND;
@@ -205,8 +231,17 @@ export function AlignedMediaHero({
       )}
       style={headingColor != null ? ({ color: headingColor } as CSSProperties) : { color: '#fff' }}
     >
+      {showGradientOverlay ? (
+        <style dangerouslySetInnerHTML={{ __html: darkFadeOverlayCss(fadeScopeClass) }} />
+      ) : null}
       <div className="relative flex w-full items-end" style={heightStyle}>
-        <div className="absolute inset-0 overflow-hidden" style={{ backgroundColor }}>
+        <div
+          className={clsx(
+            'absolute inset-0 overflow-hidden',
+            showGradientOverlay && fadeScopeClass,
+          )}
+          style={{ backgroundColor }}
+        >
           {hasVideo ? (
             <>
               {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
@@ -235,23 +270,8 @@ export function AlignedMediaHero({
           ) : null}
         </div>
 
-        {showGradientOverlay ? (
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 z-[1]"
-            style={{
-              background:
-                'linear-gradient(to top,' +
-                'rgba(12, 10, 9, 0.78) 0%,' +
-                'rgba(12, 10, 9, 0.55) 22%,' +
-                'rgba(12, 10, 9, 0.28) 45%,' +
-                'rgba(12, 10, 9, 0.1) 62%,' +
-                'transparent 78%)',
-            }}
-          />
-        ) : null}
-
-        <div className="relative z-[2] mx-auto w-full max-w-[1180px] px-6 pb-[clamp(2.5rem,9vh,5.5rem)] pt-24 md:px-8">
+        {/* Match header `page-width--full` gutters so left align lines up with the logo. */}
+        <div className="page-width page-width--full relative z-[2] w-full pb-[clamp(2.5rem,9vh,5.5rem)] pt-24">
           <div className={clsx('flex w-full', contentJustifyClass(align))}>
             <div
               className={clsx(
@@ -275,12 +295,14 @@ export function AlignedMediaHero({
               {heading.length > 0 ? (
                 <h1
                   className={clsx(
-                    'max-w-[12ch] font-serif text-[clamp(2.75rem,7vw,5.5rem)] font-normal leading-[1.1] tracking-tight',
+                    'max-w-[14ch] font-serif text-[clamp(2.75rem,7vw,5.5rem)] font-normal leading-[1.1] tracking-tight',
                     headingColor == null && 'text-white',
                   )}
                   style={mergeStyle(
                     headingColor != null ? { color: headingColor } : undefined,
-                    headingFontSize != null ? { fontSize: headingFontSize, maxWidth: 'none' } : undefined,
+                    headingFontSize != null
+                      ? { fontSize: headingFontSize, maxWidth: 'none' }
+                      : undefined,
                     align === 'center'
                       ? { marginInline: 'auto' }
                       : align === 'right'
@@ -333,7 +355,7 @@ export function AlignedMediaHero({
                       href={secondary.href || '#'}
                       rel={secondary.rel}
                       target={secondary.target}
-                      variant="secondary"
+                      variant="primary"
                     >
                       {secondary.text}
                     </ArchiveShopifyButton>

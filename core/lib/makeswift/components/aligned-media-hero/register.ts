@@ -11,8 +11,8 @@ import {
 import { diabetesCareComponentLabel } from '~/lib/makeswift/diabetes-care-component-label';
 import { runtime } from '~/lib/makeswift/runtime';
 import {
+  ARCHIVE_BUTTON_PRIMARY_DARK,
   ARCHIVE_BUTTON_PRIMARY_WHITE_ON_BANNER,
-  ARCHIVE_BUTTON_SECONDARY_ON_BANNER,
 } from '~/lib/makeswift/utils/archive-button-presets';
 import { hsl } from '~/lib/makeswift/utils/color';
 
@@ -136,7 +136,7 @@ runtime.registerComponent(AlignedMediaHero, {
     ),
     secondaryButton: archiveButtonGroup(
       'Secondary button',
-      ARCHIVE_BUTTON_SECONDARY_ON_BANNER,
+      ARCHIVE_BUTTON_PRIMARY_DARK,
       {
         textDefault: 'How Clair Works',
         showButton: true,
