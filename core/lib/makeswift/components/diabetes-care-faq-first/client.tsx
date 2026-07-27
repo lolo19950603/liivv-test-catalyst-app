@@ -32,6 +32,8 @@ export type FaqFirstIntroBodyProps = BodyTextProps & {
 
 export interface DiabetesCareFaqFirstProps {
   className?: string;
+  /** Short id for in-page links (e.g. `#faq`). Separate from the Shopify section id. */
+  anchorId?: string;
   background?: SectionBackgroundProps;
   roundedTop?: boolean;
   heading?: HeadingWithHighlightProps;
@@ -41,6 +43,18 @@ export interface DiabetesCareFaqFirstProps {
   items?: FaqRow[];
   /** @deprecated Use `introBody` popover colors. */
   bodyText?: BodyTextProps;
+}
+
+function resolveScrollAnchorId(anchorId?: string): string | undefined {
+  const raw = anchorId?.trim() ?? '';
+
+  if (raw.length === 0) {
+    return undefined;
+  }
+
+  const safe = raw.replace(/[^a-zA-Z0-9_-]/g, '');
+
+  return safe.length > 0 ? safe : undefined;
 }
 
 function resolveIntroBody(props: {
@@ -78,6 +92,7 @@ function resolveIntroBody(props: {
 
 export function DiabetesCareFaqFirst({
   className,
+  anchorId,
   background,
   roundedTop = true,
   heading,
@@ -86,6 +101,7 @@ export function DiabetesCareFaqFirst({
   items,
   bodyText,
 }: DiabetesCareFaqFirstProps) {
+  const scrollAnchorId = resolveScrollAnchorId(anchorId);
   const headingResolved = resolveHeadingTypography(heading);
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: FAQ_FIRST_SECTION_ID,
@@ -123,7 +139,11 @@ export function DiabetesCareFaqFirst({
   }, [rows]);
 
   return (
-    <div className={clsx('diabetes-care-faq-first', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}>
+    <div
+      className={clsx('diabetes-care-faq-first', DC_SECTION_ROOT_CLASS, 'max-w-full', className)}
+      id={scrollAnchorId}
+      style={scrollAnchorId != null ? ({ scrollMarginTop: '6rem' } as CSSProperties) : undefined}
+    >
       <div className="shopify-section" id={FAQ_FIRST_SECTION_ID} style={sectionStyle}>
         <style dangerouslySetInnerHTML={{ __html: sectionCss }} />
         <div className={clsx('section section--padding', roundedTop && 'section--rounded')}>

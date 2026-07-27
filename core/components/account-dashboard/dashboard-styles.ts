@@ -147,6 +147,8 @@ body.adc-portal-active main{
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header{
   position:relative;
+  /* Above quantity badges in .mhd-main (z-10) so the open search drawer is not covered. */
+  z-index:20;
   display:flex;
   flex-direction:column;
   align-items:stretch;

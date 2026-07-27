@@ -20,6 +20,12 @@ runtime.registerComponent(DiabetesCareFaqFirst, {
   icon: 'layout',
   props: {
     className: Style(),
+    anchorId: TextInput({
+      label: 'Scroll anchor id (optional)',
+      defaultValue: 'faq',
+      description:
+        'For Clair use faq, then link with Open URL → /womens-health/clair-health#faq (not Scroll to element).',
+    }),
     ...sectionBackgroundControls(),
     ...roundedTopControl(),
     ...headingPopoverControls({
