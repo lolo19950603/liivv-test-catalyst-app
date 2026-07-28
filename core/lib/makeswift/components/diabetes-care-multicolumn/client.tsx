@@ -74,17 +74,21 @@ function desktopPerRow(count: number): number {
   return 4;
 }
 
-/** Max width for short rows so 1–2 cards sit centered instead of stretching full bleed. */
+/** Max width for short rows so 1–2 cards sit centered (archive meta band ~900px). */
 function desktopGridMaxWidth(count: number): string {
   if (count <= 1) {
     return '36rem';
   }
 
   if (count === 2) {
-    return '52rem';
+    return '56rem';
   }
 
   return '100%';
+}
+
+function isNarrowCenteredCount(count: number): boolean {
+  return count > 0 && count <= 2;
 }
 
 function multicolumnMobileTitleAlignCss(align: TextAlign): string {
@@ -143,8 +147,15 @@ function multicolumnSectionStyle(
     // Beat archive `.slider--tablet .card-grid { grid: auto/auto-flow 36vw }` which
     // kept all cards on one horizontal track (only ~3 visible, rest clipped).
     const leftover = blockCount % perRow;
+    const narrow = isNarrowCenteredCount(blockCount);
     style +=
+      // Full-width host flex-centers the column grid (needed for 1–2 card rows).
       `@media screen and (min-width:768px){` +
+      `${id} .mc-cols-host{` +
+      `display:flex!important;` +
+      `justify-content:center!important;` +
+      `width:100%!important;` +
+      `}` +
       `${id} .multicolumn.mc-cols,` +
       `${id} .slider .multicolumn.mc-cols,` +
       `${id} .slider--tablet .multicolumn.mc-cols{` +
@@ -159,10 +170,17 @@ function multicolumnSectionStyle(
       `gap:${MULTICOLUMN_CARD_GRID_GAP}!important;` +
       `justify-content:center;` +
       `align-items:stretch;` +
-      `width:100%!important;` +
-      `max-width:${maxWidth}!important;` +
-      `margin-inline:auto!important;` +
       `overflow:visible!important;` +
+      (narrow
+        ? `width:min(100%,${maxWidth})!important;` +
+          `max-width:${maxWidth}!important;` +
+          `flex:0 1 ${maxWidth}!important;` +
+          `margin-left:0!important;` +
+          `margin-right:0!important;`
+        : `width:100%!important;` +
+          `max-width:100%!important;` +
+          `flex:1 1 auto!important;` +
+          `margin-inline:auto!important;`) +
       `}` +
       `${id} .multicolumn.mc-cols > .multicolumn-card,` +
       `${id} .slider--tablet .multicolumn.mc-cols > .multicolumn-card{` +
@@ -645,8 +663,16 @@ export function DiabetesCareMulticolumn({
             ) : null}
 
             <ScrollReveal delayMs={100}>
-              <div className={clsx('w-full', DC_MOBILE_STACK_CLASS)} id={MULTICOLUMN_SLIDER_ID}>
-                <div className="multicolumn mc-cols card-grid mobile:card-grid--1 relative z-1 w-full items-stretch">
+              <div
+                className={clsx('mc-cols-host w-full', DC_MOBILE_STACK_CLASS)}
+                id={MULTICOLUMN_SLIDER_ID}
+              >
+                <div
+                  className={clsx(
+                    'multicolumn mc-cols card-grid mobile:card-grid--1 relative z-1 w-full items-stretch',
+                    isNarrowCenteredCount(rows.length) && 'mc-cols--narrow',
+                  )}
+                >
                   {rows.map((row, index) => {
                     const headingBlock = readColumnHeading(row);
                     const secondaryBlock = readColumnSecondaryHeading(row);
