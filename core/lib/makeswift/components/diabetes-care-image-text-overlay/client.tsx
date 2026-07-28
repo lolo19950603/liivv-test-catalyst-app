@@ -356,12 +356,12 @@ export function DiabetesCareImageTextOverlay({
                         ) : null}
                         {resolvedSecondaryButton.visible ? (
                           <ArchiveShopifyButton
-                            className="button--secondary button--fixed button--md"
+                            className="button--fixed button--md"
                             colors={resolvedSecondaryButton.colors}
                             href={resolvedSecondaryButton.href}
                             rel={resolvedSecondaryButton.rel}
                             target={resolvedSecondaryButton.target}
-                            variant="secondary"
+                            variant="primary"
                           >
                             {resolvedSecondaryButton.text}
                           </ArchiveShopifyButton>

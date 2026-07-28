@@ -70,6 +70,8 @@ runtime.registerComponent(DiabetesCareImageTextOverlay, {
         textDefault: 'Learn more',
         showButton: true,
         showButtonDefault: false,
+        transparentBackground: true,
+        transparentBackgroundDefault: false,
       },
     ),
   },
