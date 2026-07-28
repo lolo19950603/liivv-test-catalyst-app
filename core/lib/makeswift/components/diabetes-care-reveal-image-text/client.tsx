@@ -69,7 +69,9 @@ const DEFAULT_BANNER_HEADING_FONT_SIZE_DESKTOP = 90;
 
 const ROUNDED_RADIUS = 'var(--border-radius,1.5rem)';
 
-/** Reveal uses `section inline` + `shopify-section contents`; scoped rules restore archive rounded-top. */
+/** Reveal uses `section inline` + `shopify-section contents`; scoped rules restore archive rounded-top.
+ * Prefer `overflow: clip` over `hidden` — `hidden` makes a scroll container and breaks sticky, so the
+ * cover image never scrolls over the banner headline. `clip` still masks to the rounded corners. */
 function revealRoundedTopCss(revealSectionId: string, rootId: string, enabled: boolean): string {
   if (!enabled) {
     return '';
@@ -80,7 +82,7 @@ function revealRoundedTopCss(revealSectionId: string, rootId: string, enabled: b
     `#${revealSectionId} .section.section--rounded{` +
     `position:relative;z-index:1;display:block!important;width:100%;` +
     `margin-block-start:calc(-1 * ${ROUNDED_RADIUS});` +
-    `overflow:hidden!important;` +
+    `overflow:clip;` +
     `background-color:rgb(var(--color-background))!important;` +
     `border-start-end-radius:${ROUNDED_RADIUS}!important;` +
     `border-start-start-radius:${ROUNDED_RADIUS}!important}` +
@@ -180,12 +182,13 @@ export function DiabetesCareRevealImageWithText({
   /** Theme vars on the component root so reveal banner + image and rich text share background. */
   /** Shorter scroll runway on phone/tablet; portrait uses intrinsic ratio (no 16:9 crop). */
   const revealSectionCss =
+    `#${revealSectionId} .reveal-banner{isolation:isolate}` +
     `#${revealSectionId} .reveal-banner__scroller{z-index:1}` +
     `#${revealSectionId} [data-dc-scroll-reveal].section--padding{position:relative;z-index:2;background-color:rgb(var(--color-background))}` +
+    `#${revealSectionId} .dcrift-reveal-media-wrap{position:relative;z-index:2;display:flex;justify-content:center;width:100%}` +
     `#${revealSectionId} .reveal-banner .banner__box{min-width:0!important;width:100%;max-width:${REVEAL_COLUMN_MAX_WIDTH};margin-inline:auto}` +
     `#${revealSectionId} .reveal-banner .splitting-wrapper,#${revealSectionId} .reveal-banner .splitting-wrapper h2,#${revealSectionId} .reveal-banner .split-words.words{max-width:100%}` +
     `#${revealSectionId} .reveal-banner .split-words.words{display:inline-flex;flex-wrap:wrap;justify-content:center;text-wrap:balance}` +
-    `#${revealSectionId} .dcrift-reveal-media-wrap{display:flex;justify-content:center;width:100%}` +
     `@media screen and (min-width:1024px){#${revealSectionId} .reveal-banner .splitting-wrapper h2.dcrift-banner-heading--default{font-size:${String(DEFAULT_BANNER_HEADING_FONT_SIZE_DESKTOP)}px;line-height:1.05;letter-spacing:-0.02em;text-wrap:balance}}` +
     `@media screen and (max-width:1023px){#${revealSectionId} .reveal-banner .splitting-wrapper h2.dcrift-banner-heading--default{font-size:clamp(2rem,5.5vw,3.25rem);line-height:1.05;letter-spacing:-0.02em;text-wrap:balance}}` +
     `@media screen and (min-width:1024px){#${revealSectionId} .dcrift-reveal-media.media--adapt{height:auto!important;width:fit-content!important;max-width:${REVEAL_COLUMN_MAX_WIDTH};margin-inline:auto;padding-block-end:0!important}` +
@@ -331,7 +334,7 @@ export function DiabetesCareRevealImageWithText({
         <div
           className={clsx(
             'section relative w-full',
-            roundedTop ? 'section--rounded overflow-hidden' : 'inline',
+            roundedTop ? 'section--rounded' : 'inline',
           )}
           style={roundedSectionStyle}
         >
