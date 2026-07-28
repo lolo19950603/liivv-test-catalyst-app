@@ -75,23 +75,16 @@ function desktopPerRow(count: number): number {
 }
 
 /**
- * Cap short rows so 1–2 cards sit as a centered band (archive `.meta-grid` uses 900px).
- * Full-bleed 1fr tracks otherwise look left-heavy because copy is text-left.
+ * Prefer content-sized tracks + justify-center for short rows over full-bleed 1fr
+ * (left-aligned copy makes equal 1fr halves look off-center).
  */
-function desktopGridMaxWidth(count: number): string {
-  if (count <= 1) {
-    return '36rem';
-  }
-
-  if (count === 2) {
-    return '900px';
-  }
-
-  return '100%';
-}
-
 function isNarrowCenteredCount(count: number): boolean {
   return count > 0 && count <= 2;
+}
+
+/** Per-card max width when centering a short row as a flex group. */
+function narrowCardMaxWidth(count: number): string {
+  return count <= 1 ? '36rem' : '26rem';
 }
 
 function multicolumnMobileTitleAlignCss(align: TextAlign): string {
@@ -142,7 +135,6 @@ function multicolumnSectionStyle(
 ): string {
   const id = `#${MULTICOLUMN_SECTION_ID}`;
   const perRow = desktopPerRow(blockCount);
-  const maxWidth = desktopGridMaxWidth(blockCount);
   let style =
     `${MULTICOLUMN_ARCHIVE_STYLE}${multicolumnMobileTitleCss(titleAlign)}${multicolumnIntroAlignCss(introAlign)}${id}{--section-blocks-count:${String(blockCount)}}`;
 
@@ -151,58 +143,76 @@ function multicolumnSectionStyle(
     // kept all cards on one horizontal track (only ~3 visible, rest clipped).
     const leftover = blockCount % perRow;
     const narrow = isNarrowCenteredCount(blockCount);
+    const cardMax = narrowCardMaxWidth(blockCount);
     style +=
       `@media screen and (min-width:768px){` +
-      // Host + reveal wrappers stay full width so margin:auto on the grid can center.
       `${id} .mc-cols-host,` +
-      `${id} [data-dc-scroll-reveal]:has(.mc-cols--narrow){` +
+      `${id} [data-dc-scroll-reveal]:has(.mc-cols){` +
       `display:block!important;` +
       `width:100%!important;` +
       `max-width:100%!important;` +
       `}` +
-      `${id} .multicolumn.mc-cols,` +
-      `${id} .slider .multicolumn.mc-cols,` +
-      `${id} .slider--tablet .multicolumn.mc-cols{` +
-      `display:grid!important;` +
-      `grid:none!important;` +
-      `grid-template-columns:repeat(${String(perRow)},minmax(0,1fr))!important;` +
-      `grid-auto-flow:row!important;` +
-      `--card-grid-template:none!important;` +
-      `--slider-grid:none!important;` +
-      `--slider-item-width:unset!important;` +
-      `--card-grid-per-row:${String(perRow)}!important;` +
-      `gap:${MULTICOLUMN_CARD_GRID_GAP}!important;` +
-      `justify-content:center;` +
-      `justify-items:stretch;` +
-      `align-items:stretch;` +
-      `overflow:visible!important;` +
-      `width:100%!important;` +
       (narrow
-        ? // Archive meta-band: capped width + horizontal auto margins (not flex alone).
-          `max-width:${maxWidth}!important;` +
-          `margin-left:auto!important;` +
-          `margin-right:auto!important;`
-        : `max-width:100%!important;` +
-          `margin-inline:auto!important;`) +
-      `}` +
-      (narrow
-        ? `${id} .multicolumn.mc-cols.mc-cols--narrow{` +
-          `max-width:${maxWidth}!important;` +
-          `margin-left:auto!important;` +
-          `margin-right:auto!important;` +
+        ? // 1–2 columns: flex-center a content-sized group in the full row.
+          `${id} .multicolumn.mc-cols.mc-cols--narrow,` +
+          `${id} .slider .multicolumn.mc-cols.mc-cols--narrow,` +
+          `${id} .slider--tablet .multicolumn.mc-cols.mc-cols--narrow{` +
+          `display:flex!important;` +
+          `flex-direction:row!important;` +
+          `flex-wrap:wrap!important;` +
+          `justify-content:center!important;` +
+          `align-items:stretch!important;` +
+          `align-content:center!important;` +
+          `gap:${MULTICOLUMN_CARD_GRID_GAP}!important;` +
+          `grid:none!important;` +
+          `grid-template-columns:none!important;` +
+          `--card-grid-template:none!important;` +
+          `--slider-grid:none!important;` +
+          `--slider-item-width:unset!important;` +
+          `--card-grid-per-row:${String(perRow)}!important;` +
+          `width:100%!important;` +
+          `max-width:100%!important;` +
+          `margin-left:0!important;` +
+          `margin-right:0!important;` +
+          `overflow:visible!important;` +
+          `}` +
+          `${id} .multicolumn.mc-cols.mc-cols--narrow > .multicolumn-card{` +
+          `flex:0 1 ${cardMax}!important;` +
+          `width:100%!important;` +
+          `max-width:${cardMax}!important;` +
+          `min-width:min(100%,16rem)!important;` +
           `}`
-        : '') +
-      `${id} .multicolumn.mc-cols > .multicolumn-card,` +
-      `${id} .slider--tablet .multicolumn.mc-cols > .multicolumn-card{` +
-      `width:auto!important;` +
-      `max-width:none!important;` +
-      `min-width:0!important;` +
-      `flex:none!important;` +
-      `}` +
+        : `${id} .multicolumn.mc-cols,` +
+          `${id} .slider .multicolumn.mc-cols,` +
+          `${id} .slider--tablet .multicolumn.mc-cols{` +
+          `display:grid!important;` +
+          `grid:none!important;` +
+          `grid-template-columns:repeat(${String(perRow)},minmax(0,1fr))!important;` +
+          `grid-auto-flow:row!important;` +
+          `--card-grid-template:none!important;` +
+          `--slider-grid:none!important;` +
+          `--slider-item-width:unset!important;` +
+          `--card-grid-per-row:${String(perRow)}!important;` +
+          `gap:${MULTICOLUMN_CARD_GRID_GAP}!important;` +
+          `justify-content:center;` +
+          `justify-items:stretch;` +
+          `align-items:stretch;` +
+          `overflow:visible!important;` +
+          `width:100%!important;` +
+          `max-width:100%!important;` +
+          `margin-inline:auto!important;` +
+          `}` +
+          `${id} .multicolumn.mc-cols > .multicolumn-card,` +
+          `${id} .slider--tablet .multicolumn.mc-cols > .multicolumn-card{` +
+          `width:auto!important;` +
+          `max-width:none!important;` +
+          `min-width:0!important;` +
+          `flex:none!important;` +
+          `}`) +
       `}`;
 
     // Incomplete last row (e.g. 5 cards → 4+1): center leftover card(s).
-    if (perRow > 1 && leftover !== 0) {
+    if (!narrow && perRow > 1 && leftover !== 0) {
       const startCol = Math.floor((perRow - leftover) / 2) + 1;
       style += `@media screen and (min-width:768px){`;
       for (let i = 0; i < leftover; i += 1) {
@@ -680,17 +690,8 @@ export function DiabetesCareMulticolumn({
                 <div
                   className={clsx(
                     'multicolumn mc-cols card-grid mobile:card-grid--1 relative z-1 w-full items-stretch',
-                    isNarrowCenteredCount(rows.length) && 'mc-cols--narrow mx-auto',
+                    isNarrowCenteredCount(rows.length) && 'mc-cols--narrow',
                   )}
-                  style={
-                    isNarrowCenteredCount(rows.length)
-                      ? {
-                          maxWidth: desktopGridMaxWidth(rows.length),
-                          marginLeft: 'auto',
-                          marginRight: 'auto',
-                        }
-                      : undefined
-                  }
                 >
                   {rows.map((row, index) => {
                     const headingBlock = readColumnHeading(row);
