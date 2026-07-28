@@ -124,9 +124,9 @@ function multicolumnIntroAlignCss(introAlign: TextAlign): string {
 
 const MULTICOLUMN_ARCHIVE_STYLE =
   `#${MULTICOLUMN_SECTION_ID}{--section-padding-top:72px;--section-padding-bottom:72px;--color-background:${DEFAULT_BACKGROUND_CHANNELS};--color-foreground:49 47 47;--color-border:var(--color-foreground)/0.1;--color-border-dark:var(--color-foreground)/0.4;--color-border-light:var(--color-foreground)/0.06;--color-highlight:243 199 190;--color-button-background:255 255 255;--color-button-border:255 255 255;--color-button-text:49 47 47}` +
-  `#${MULTICOLUMN_SECTION_ID} [data-dc-scroll-reveal]{overflow:hidden}` +
-  `@media screen and (min-width:768px){#${MULTICOLUMN_SECTION_ID} .multicolumn{--card-grid-gap:${MULTICOLUMN_CARD_GRID_GAP}}}` +
-  `@media screen and (min-width:1024px){#${MULTICOLUMN_SECTION_ID} .slider.slider--tablet{overflow:visible;padding-inline:0;margin-inline:0;padding-block-end:0}}`;
+  // Allow wrapped rows to paint; archive scroll-reveal overflow was clipping row 2.
+  `#${MULTICOLUMN_SECTION_ID} [data-dc-scroll-reveal]{overflow:visible}` +
+  `@media screen and (min-width:768px){#${MULTICOLUMN_SECTION_ID} .multicolumn{--card-grid-gap:${MULTICOLUMN_CARD_GRID_GAP}}}`;
 
 function multicolumnSectionStyle(
   blockCount: number,
@@ -140,24 +140,51 @@ function multicolumnSectionStyle(
     `${MULTICOLUMN_ARCHIVE_STYLE}${multicolumnMobileTitleCss(titleAlign)}${multicolumnIntroAlignCss(introAlign)}${id}{--section-blocks-count:${String(blockCount)}}`;
 
   if (blockCount > 0) {
-    // Flex + justify-content:center so incomplete last rows (e.g. 5→4+1, 2 cards) sit centered.
+    // Beat archive `.slider--tablet .card-grid { grid: auto/auto-flow 36vw }` which
+    // kept all cards on one horizontal track (only ~3 visible, rest clipped).
+    const leftover = blockCount % perRow;
     style +=
       `@media screen and (min-width:768px){` +
-      `${id} .multicolumn.mc-cols{` +
-      `display:flex!important;flex-flow:row wrap;justify-content:center;align-items:stretch;` +
-      `gap:${MULTICOLUMN_CARD_GRID_GAP};` +
-      `width:100%;max-width:${maxWidth};margin-inline:auto;` +
-      `--card-grid-per-row:${String(perRow)};` +
-      `--slider-item-width:unset;--slider-grid:unset;` +
+      `${id} .multicolumn.mc-cols,` +
+      `${id} .slider .multicolumn.mc-cols,` +
+      `${id} .slider--tablet .multicolumn.mc-cols{` +
+      `display:grid!important;` +
+      `grid:none!important;` +
+      `grid-template-columns:repeat(${String(perRow)},minmax(0,1fr))!important;` +
+      `grid-auto-flow:row!important;` +
+      `--card-grid-template:none!important;` +
+      `--slider-grid:none!important;` +
+      `--slider-item-width:unset!important;` +
+      `--card-grid-per-row:${String(perRow)}!important;` +
+      `gap:${MULTICOLUMN_CARD_GRID_GAP}!important;` +
+      `justify-content:center;` +
+      `align-items:stretch;` +
+      `width:100%!important;` +
+      `max-width:${maxWidth}!important;` +
+      `margin-inline:auto!important;` +
+      `overflow:visible!important;` +
       `}` +
-      `${id} .multicolumn.mc-cols > .multicolumn-card{` +
-      `flex:0 1 calc((100% - (${String(perRow)} - 1) * ${MULTICOLUMN_CARD_GRID_GAP}) / ${String(perRow)});` +
-      `width:calc((100% - (${String(perRow)} - 1) * ${MULTICOLUMN_CARD_GRID_GAP}) / ${String(perRow)});` +
-      `max-width:calc((100% - (${String(perRow)} - 1) * ${MULTICOLUMN_CARD_GRID_GAP}) / ${String(perRow)});` +
-      `min-width:0;` +
+      `${id} .multicolumn.mc-cols > .multicolumn-card,` +
+      `${id} .slider--tablet .multicolumn.mc-cols > .multicolumn-card{` +
+      `width:auto!important;` +
+      `max-width:none!important;` +
+      `min-width:0!important;` +
+      `flex:none!important;` +
       `}` +
-      `${id} .slider.slider--tablet .multicolumn.mc-cols{overflow:visible;padding-inline:0;margin-inline:auto;padding-block-end:0}` +
       `}`;
+
+    // Incomplete last row (e.g. 5 cards → 4+1): center leftover card(s).
+    if (perRow > 1 && leftover !== 0) {
+      const startCol = Math.floor((perRow - leftover) / 2) + 1;
+      style += `@media screen and (min-width:768px){`;
+      for (let i = 0; i < leftover; i += 1) {
+        const childIndex = blockCount - leftover + i + 1;
+        style +=
+          `${id} .multicolumn.mc-cols > .multicolumn-card:nth-child(${String(childIndex)})` +
+          `{grid-column:${String(startCol + i)} / span 1}`;
+      }
+      style += `}`;
+    }
   }
 
   return style;
@@ -618,15 +645,8 @@ export function DiabetesCareMulticolumn({
             ) : null}
 
             <ScrollReveal delayMs={100}>
-              <div
-                className={clsx('grid slider slider--tablet', DC_MOBILE_STACK_CLASS)}
-                id={MULTICOLUMN_SLIDER_ID}
-              >
-                <div
-                  className={clsx(
-                    'multicolumn mc-cols card-grid mobile:card-grid--1 relative z-1 grid items-stretch',
-                  )}
-                >
+              <div className={clsx('w-full', DC_MOBILE_STACK_CLASS)} id={MULTICOLUMN_SLIDER_ID}>
+                <div className="multicolumn mc-cols card-grid mobile:card-grid--1 relative z-1 w-full items-stretch">
                   {rows.map((row, index) => {
                     const headingBlock = readColumnHeading(row);
                     const secondaryBlock = readColumnSecondaryHeading(row);
