@@ -45,7 +45,6 @@ const MULTICOLUMN_SLIDER_ID = 'Slider-template--26520397447459__multicolumn_JtTd
 
 /** Desktop: 4 per row by default; 6 columns use 3 per row (2 rows). Cap at 6. */
 const MAX_COLUMNS = 6;
-const DESKTOP_COLUMNS_PER_ROW = 4;
 
 /** Matches archived `--color-background` on `multicolumn_JtTdUn`. */
 const DEFAULT_BACKGROUND_CHANNELS = ARCHIVE_SAGE_BACKGROUND_CHANNELS;
@@ -57,12 +56,35 @@ const DEFAULT_BACKGROUND_CHANNELS = ARCHIVE_SAGE_BACKGROUND_CHANNELS;
 /** Matches archive `card-grid` gap (home `multicolumn_xg87qF` uses ~`var(--sp-6)` at desktop, not 40–60px). */
 const MULTICOLUMN_CARD_GRID_GAP = 'clamp(var(--sp-4),1.263vw,var(--sp-6))';
 
-function usesThreeColumnDesktopGrid(count: number): boolean {
-  return count === 3 || count === 6;
+/** How many cards sit on one desktop row for a given total count. */
+function desktopPerRow(count: number): number {
+  if (count <= 1) {
+    return 1;
+  }
+
+  if (count === 2) {
+    return 2;
+  }
+
+  if (count === 3 || count === 6) {
+    return 3;
+  }
+
+  // 4 or 5 → four across (5th centers on the next row via flex).
+  return 4;
 }
 
-function usesFourColumnDesktopGrid(count: number): boolean {
-  return count === 4 || count === 5;
+/** Max width for short rows so 1–2 cards sit centered instead of stretching full bleed. */
+function desktopGridMaxWidth(count: number): string {
+  if (count <= 1) {
+    return '36rem';
+  }
+
+  if (count === 2) {
+    return '52rem';
+  }
+
+  return '100%';
 }
 
 function multicolumnMobileTitleAlignCss(align: TextAlign): string {
@@ -112,44 +134,33 @@ function multicolumnSectionStyle(
   introAlign: TextAlign,
 ): string {
   const id = `#${MULTICOLUMN_SECTION_ID}`;
+  const perRow = desktopPerRow(blockCount);
+  const maxWidth = desktopGridMaxWidth(blockCount);
   let style =
     `${MULTICOLUMN_ARCHIVE_STYLE}${multicolumnMobileTitleCss(titleAlign)}${multicolumnIntroAlignCss(introAlign)}${id}{--section-blocks-count:${String(blockCount)}}`;
 
-  if (usesFourColumnDesktopGrid(blockCount)) {
-    style += `@media screen and (min-width:768px){${id} .multicolumn.with-4.card-grid.card-grid--4{--card-grid-per-row:${String(DESKTOP_COLUMNS_PER_ROW)}}}`;
-  }
-
-  if (usesThreeColumnDesktopGrid(blockCount)) {
+  if (blockCount > 0) {
+    // Flex + justify-content:center so incomplete last rows (e.g. 5→4+1, 2 cards) sit centered.
     style +=
-      `@media screen and (min-width:768px){${id} .multicolumn.with-3.card-grid.card-grid--3{--card-grid-per-row:3;--card-grid-gap:${MULTICOLUMN_CARD_GRID_GAP};--card-grid-template:auto-flow dense/repeat(3,minmax(0,1fr))}}` +
-      `@media screen and (min-width:768px){${id} .slider.slider--tablet .multicolumn.with-3.card-grid{--slider-item-width:unset;--slider-grid:unset;grid:var(--card-grid-template)}}`;
+      `@media screen and (min-width:768px){` +
+      `${id} .multicolumn.mc-cols{` +
+      `display:flex!important;flex-flow:row wrap;justify-content:center;align-items:stretch;` +
+      `gap:${MULTICOLUMN_CARD_GRID_GAP};` +
+      `width:100%;max-width:${maxWidth};margin-inline:auto;` +
+      `--card-grid-per-row:${String(perRow)};` +
+      `--slider-item-width:unset;--slider-grid:unset;` +
+      `}` +
+      `${id} .multicolumn.mc-cols > .multicolumn-card{` +
+      `flex:0 1 calc((100% - (${String(perRow)} - 1) * ${MULTICOLUMN_CARD_GRID_GAP}) / ${String(perRow)});` +
+      `width:calc((100% - (${String(perRow)} - 1) * ${MULTICOLUMN_CARD_GRID_GAP}) / ${String(perRow)});` +
+      `max-width:calc((100% - (${String(perRow)} - 1) * ${MULTICOLUMN_CARD_GRID_GAP}) / ${String(perRow)});` +
+      `min-width:0;` +
+      `}` +
+      `${id} .slider.slider--tablet .multicolumn.mc-cols{overflow:visible;padding-inline:0;margin-inline:auto;padding-block-end:0}` +
+      `}`;
   }
 
   return style;
-}
-
-function multicolumnCardGridModifierClass(count: number): string | undefined {
-  if (count <= 0) {
-    return undefined;
-  }
-
-  if (usesThreeColumnDesktopGrid(count)) {
-    return 'with-3 card-grid--3';
-  }
-
-  if (usesFourColumnDesktopGrid(count)) {
-    return 'with-4 card-grid--4';
-  }
-
-  if (count === 2) {
-    return 'with-2';
-  }
-
-  if (count === 1) {
-    return 'with-1';
-  }
-
-  return undefined;
 }
 
 function IconArrowRight() {
@@ -248,6 +259,8 @@ export type DiabetesCareMulticolumnProps = {
   className?: string;
   background?: SectionBackgroundProps;
   roundedTop?: boolean;
+  /** Thin border around each column card (archive `with-border`). */
+  showCardBorders?: boolean;
   topHeading?: TopHeadingTypographyProps;
   primaryHeading?: HeadingTypographyProps;
   secondaryHeading?: HeadingWithHighlightProps;
@@ -475,6 +488,7 @@ export function DiabetesCareMulticolumn({
   className,
   background,
   roundedTop = true,
+  showCardBorders = true,
   topHeading,
   primaryHeading,
   secondaryHeading,
@@ -492,7 +506,6 @@ export function DiabetesCareMulticolumn({
   const sectionVars: ShopifyThemeStyle = {
     '--section-blocks-count': rows.length,
   };
-  const useThemeColumnsOnly = rows.length >= 3;
   const topHeadingText = topHeading?.text?.trim() ?? '';
   const topHeadingAlign = resolveTextAlign(topHeading?.textAlign);
   const titleAlign = resolveTextAlign(
@@ -611,10 +624,7 @@ export function DiabetesCareMulticolumn({
               >
                 <div
                   className={clsx(
-                    'multicolumn card-grid mobile:card-grid--1 relative z-1 grid items-stretch',
-                    multicolumnCardGridModifierClass(rows.length),
-                    !useThemeColumnsOnly &&
-                      (rows.length === 1 ? 'md:grid-cols-1' : 'md:grid-cols-2 lg:grid-cols-2'),
+                    'multicolumn mc-cols card-grid mobile:card-grid--1 relative z-1 grid items-stretch',
                   )}
                 >
                   {rows.map((row, index) => {
@@ -639,7 +649,10 @@ export function DiabetesCareMulticolumn({
 
                     return (
                       <div
-                        className="multicolumn-card with-border card flex h-full w-full min-h-0 flex-col items-start gap-5 text-left md:text-left"
+                        className={clsx(
+                          'multicolumn-card card flex h-full w-full min-h-0 flex-col items-start gap-5 text-left md:text-left',
+                          showCardBorders && 'with-border',
+                        )}
                         key={`multicolumn-${index}`}
                       >
                         {showImage ? (

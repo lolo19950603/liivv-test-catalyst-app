@@ -1,4 +1,4 @@
-import { Group, Image, Link, List, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
+import { Checkbox, Group, Image, Link, List, Style, TextArea, TextInput } from '@makeswift/runtime/controls';
 
 import {
   archiveButtonControls,
@@ -82,6 +82,11 @@ runtime.registerComponent(DiabetesCareMulticolumn, {
     className: Style(),
     ...sectionBackgroundControls(ARCHIVE_SAGE_BACKGROUND_HSL),
     ...roundedTopControl(),
+    showCardBorders: Checkbox({
+      label: 'Show card outlines',
+      defaultValue: true,
+      description: 'Thin border around each column card. Turn off for borderless columns.',
+    }),
     topHeading: Group({
       label: 'Top heading',
       preferredLayout: Group.Layout.Popover,
@@ -119,7 +124,7 @@ runtime.registerComponent(DiabetesCareMulticolumn, {
     columns: List({
       label: 'Columns (max 6; order = left to right)',
       description:
-        'Up to 6 columns. Desktop: 4 per row by default; with 6 columns, 3 per row (two rows). With 3 columns, also 3 per row.',
+        'Up to 6 columns. Desktop: centered by count — 1–2 nest mid-width; 3 or 6 → 3/row; 4–5 → 4/row (last row centered).',
       type: Group({
         label: 'Column',
         props: {
