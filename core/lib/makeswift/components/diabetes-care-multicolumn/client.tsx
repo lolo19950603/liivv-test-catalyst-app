@@ -2,6 +2,8 @@ import { clsx } from 'clsx';
 import type { CSSProperties } from 'react';
 
 import { ArchiveShopifyButton } from '~/lib/makeswift/components/archive-shopify-button';
+import { answerHtmlForRte } from '~/lib/makeswift/components/diabetes-care-faq/shared';
+import { ArchiveHighlightedText } from '~/lib/makeswift/components/diabetes-care-faq/archive-highlighted-text';
 import {
   DC_MOBILE_STACK_CLASS,
   DC_SECTION_ROOT_CLASS,
@@ -11,7 +13,6 @@ import {
   resolveArchiveButton,
   type ArchiveButtonProps,
 } from '~/lib/makeswift/utils/archive-button';
-import { ArchiveHighlightedText } from '~/lib/makeswift/components/diabetes-care-faq/archive-highlighted-text';
 import {
   resolveTextAlign,
   textAlignClass,
@@ -170,9 +171,20 @@ function IconArrowRight() {
   );
 }
 
-/** Column secondary / body: color + font size only (no swash). */
+/** Column secondary: color + font size only (no swash). */
 export type MulticolumnPlainTextBlockProps = {
   text?: string;
+  textColor?: string;
+  textColorHex?: string;
+  fontSize?: number;
+  fontSizeMobile?: number;
+};
+
+/** Column body: HTML in `text` (and optional `bodyHtml`). */
+export type MulticolumnBodyBlockProps = {
+  /** HTML or plain text (rendered as RTE). */
+  text?: string;
+  bodyHtml?: string;
   textColor?: string;
   textColorHex?: string;
   fontSize?: number;
@@ -205,7 +217,7 @@ export type MulticolumnCardContentProps = {
 export interface DiabetesCareMulticolumnColumn {
   heading?: MulticolumnSwashTextBlockProps;
   secondaryHeading?: MulticolumnPlainTextBlockProps;
-  body?: MulticolumnPlainTextBlockProps;
+  body?: MulticolumnBodyBlockProps;
   image?: MulticolumnColumnImageProps;
   button?: MulticolumnColumnButtonProps;
   content?: MulticolumnCardContentProps;
@@ -273,7 +285,7 @@ function readColumnSecondaryHeading(
   return undefined;
 }
 
-function readColumnBody(row: DiabetesCareMulticolumnColumn): MulticolumnPlainTextBlockProps | undefined {
+function readColumnBody(row: DiabetesCareMulticolumnColumn): MulticolumnBodyBlockProps | undefined {
   if (row.body != null) {
     return row.body;
   }
@@ -285,6 +297,27 @@ function readColumnBody(row: DiabetesCareMulticolumnColumn): MulticolumnPlainTex
   }
 
   return undefined;
+}
+
+function resolveColumnBodyHtml(body: MulticolumnBodyBlockProps | undefined): string {
+  const htmlRaw = body?.bodyHtml?.trim() ?? '';
+
+  if (htmlRaw.length > 0) {
+    return answerHtmlForRte(htmlRaw);
+  }
+
+  const textRaw = body?.text?.trim() ?? '';
+
+  if (textRaw.length === 0) {
+    return '';
+  }
+
+  if (/<[a-z][\s\S]*>/i.test(textRaw)) {
+    return answerHtmlForRte(textRaw);
+  }
+
+  // Legacy plain TextArea: each non-empty line becomes a paragraph.
+  return answerHtmlForRte(textRaw.replace(/\n+/g, '\n\n'));
 }
 
 function readColumnImage(row: DiabetesCareMulticolumnColumn): MulticolumnColumnImageProps {
@@ -307,7 +340,7 @@ function readColumnButton(row: DiabetesCareMulticolumnColumn): MulticolumnColumn
 function columnHasContent(row: DiabetesCareMulticolumnColumn): boolean {
   const headingText = readColumnHeading(row)?.text?.trim() ?? '';
   const secondaryText = readColumnSecondaryHeading(row)?.text?.trim() ?? '';
-  const bodyText = readColumnBody(row)?.text?.trim() ?? '';
+  const bodyHtml = resolveColumnBodyHtml(readColumnBody(row));
   const { imageSrc } = readColumnImage(row);
   const { buttonText } = readColumnButton(row);
   const image = imageSrc?.trim() ?? '';
@@ -316,18 +349,10 @@ function columnHasContent(row: DiabetesCareMulticolumnColumn): boolean {
   return (
     headingText.length > 0 ||
     secondaryText.length > 0 ||
-    bodyText.length > 0 ||
+    bodyHtml.length > 0 ||
     image.length > 0 ||
     button.length > 0
   );
-}
-
-/** Body split into paragraphs; empty lines omitted. */
-function bodyParagraphs(body: string): string[] {
-  return body
-    .split(/\n+/)
-    .map((p) => p.trim())
-    .filter((p) => p.length > 0);
 }
 
 function topHeadingStyle(topHeading?: TopHeadingTypographyProps | null): CSSProperties | undefined {
@@ -407,7 +432,7 @@ function legacyColumnBodyTypographyStyle(
 }
 
 function columnPlainTypographyStyle(
-  block?: MulticolumnPlainTextBlockProps | null,
+  block?: MulticolumnPlainTextBlockProps | MulticolumnBodyBlockProps | null,
 ): CSSProperties | undefined {
   const color = resolvePlainTextColor({
     textColor: block?.textColor,
@@ -426,7 +451,7 @@ function columnPlainTypographyStyle(
 }
 
 function mergePlainWithLegacy(
-  block: MulticolumnPlainTextBlockProps | undefined,
+  block: MulticolumnPlainTextBlockProps | MulticolumnBodyBlockProps | undefined,
   legacy?: CSSProperties | null,
 ): CSSProperties | undefined {
   const primary = columnPlainTypographyStyle(block);
@@ -597,10 +622,11 @@ export function DiabetesCareMulticolumn({
                     const secondaryBlock = readColumnSecondaryHeading(row);
                     const bodyBlock = readColumnBody(row);
                     const legacyBodyStyle = legacyColumnBodyTypographyStyle(row.bodyText);
+                    const bodyHtml = resolveColumnBodyHtml(bodyBlock);
 
                     const headingText = headingBlock?.text?.trim() ?? '';
                     const secondaryText = secondaryBlock?.text?.trim() ?? '';
-                    const bodyText = bodyBlock?.text?.trim() ?? '';
+                    const bodyText = bodyHtml;
 
                     const img = readColumnImage(row);
                     const btn = readColumnButton(row);
@@ -675,18 +701,21 @@ export function DiabetesCareMulticolumn({
                                 </p>
                               ) : null}
 
-                              {bodyText.length > 0 ? (
+                              {bodyHtml.length > 0 ? (
                                 <div
                                   className={clsx(
                                     COLUMN_COPY_TEXT,
-                                    'rte min-h-0 flex-1 leading-normal [&_p]:m-0 [&_p+p]:mt-3',
+                                    'rte min-h-0 flex-1 leading-normal',
+                                    '[&_p]:m-0 [&_p+p]:mt-3',
+                                    '[&_ul]:m-0 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:space-y-2',
+                                    '[&_ol]:m-0 [&_ol]:list-decimal [&_ol]:pl-4 [&_ol]:space-y-2',
+                                    '[&_li]:m-0',
+                                    '[&_a]:underline [&_a]:underline-offset-2',
+                                    '[&_strong]:font-semibold',
                                   )}
+                                  dangerouslySetInnerHTML={{ __html: bodyHtml }}
                                   style={mergePlainWithLegacy(bodyBlock, legacyBodyStyle)}
-                                >
-                                  {bodyParagraphs(bodyText).map((para, pi) => (
-                                    <p key={`col-${index}-b-${pi}`}>{para}</p>
-                                  ))}
-                                </div>
+                                />
                               ) : null}
                             </div>
                           ) : null}

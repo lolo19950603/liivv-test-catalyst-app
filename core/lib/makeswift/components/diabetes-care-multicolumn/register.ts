@@ -56,6 +56,24 @@ function multicolumnPlainTextPopover(label: string, textDefault: string, textAre
   });
 }
 
+function multicolumnBodyHtmlPopover(label: string, htmlDefault = '') {
+  return Group({
+    label,
+    preferredLayout: Group.Layout.Popover,
+    props: {
+      // Keep prop key `text` so existing Makeswift column bodies still load.
+      text: TextArea({
+        label: 'Body (HTML)',
+        defaultValue: htmlDefault,
+        description:
+          'Supports HTML (e.g. &lt;ul&gt;&lt;li&gt;, &lt;p&gt;, &lt;a&gt;, &lt;strong&gt;). Plain text: each line becomes a paragraph.',
+      }),
+      ...textColorFields(),
+      ...fontSizeFields(),
+    },
+  });
+}
+
 runtime.registerComponent(DiabetesCareMulticolumn, {
   type: COMPONENT_TYPE,
   label: diabetesCareComponentLabel(4, 'Multicolumn'),
@@ -107,7 +125,7 @@ runtime.registerComponent(DiabetesCareMulticolumn, {
         props: {
           heading: multicolumnHeadingPopover('Heading', ''),
           secondaryHeading: multicolumnPlainTextPopover('Secondary heading', ''),
-          body: multicolumnPlainTextPopover('Body', '', true),
+          body: multicolumnBodyHtmlPopover('Body'),
           image: Group({
             label: 'Image',
             preferredLayout: Group.Layout.Popover,
