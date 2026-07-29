@@ -11,6 +11,16 @@ create table if not exists public.cart_subscription_lines (
 create index if not exists cart_subscription_lines_updated_at_idx
   on public.cart_subscription_lines (updated_at);
 
+-- Build-your-own-kit composition (persists for packing notes on BC orders)
+create table if not exists public.cart_kit_sessions (
+  cart_id text primary key,
+  kits jsonb not null default '[]'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists cart_kit_sessions_updated_at_idx
+  on public.cart_kit_sessions (updated_at);
+
 -- Finalized subscription shipment records (past shipments tab)
 create table if not exists public.finalized_shipment_records (
   storage_key text primary key,

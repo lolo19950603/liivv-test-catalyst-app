@@ -17,7 +17,7 @@ import {
   buildSubscriptionShippingMetadata,
 } from '../checkout/subscription-shipping-metadata';
 import type { CheckoutAddressSnapshot, CheckoutSnapshot } from '../checkout/types';
-import { formatKitPackingStaffNotes } from '../kit';
+import { assignKitIdsToCartLines, formatKitPackingStaffNotes, getKitSession } from '../kit';
 import { isDeferredSubscriptionLine } from '../checkout/subscription-charge-timing';
 
 function resolveShippingAddressForMetadata(
@@ -59,7 +59,16 @@ export async function createBigCommerceOrderFromCheckoutSnapshot(
   const immediateLines = snapshot.lineItems.filter((line) => !isDeferredSubscriptionLine(line));
   const lineTaxes = buildImmediateOrderLineTaxes(snapshot);
 
-  const products = immediateLines.map((line, index) => {
+  // Snapshot may have been built before durable kit storage was available; re-read as fallback.
+  const kits =
+    snapshot.kits && snapshot.kits.length > 0
+      ? snapshot.kits
+      : ((await getKitSession(snapshot.cartId))?.kits ?? []);
+
+  const linesWithKits =
+    kits.length > 0 ? assignKitIdsToCartLines(immediateLines, kits) : immediateLines;
+
+  const products = linesWithKits.map((line, index) => {
     const productOptions = toBigCommerceOrderProductOptions(line.productOptions);
     const { priceExTax, priceIncTax } = buildLinePricesWithTax(line, lineTaxes[index] ?? 0);
     const name = line.kitId ? `[${line.kitId}] ${line.name}` : line.name;
@@ -78,7 +87,7 @@ export async function createBigCommerceOrderFromCheckoutSnapshot(
     throw new Error('Checkout order has no immediate line items to fulfill');
   }
 
-  const kitPackingNotes = formatKitPackingStaffNotes(snapshot.kits ?? []);
+  const kitPackingNotes = formatKitPackingStaffNotes(kits);
 
   const staffNotes = [
     `Stripe payment: ${stripeReferenceId}`,
