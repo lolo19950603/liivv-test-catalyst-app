@@ -26,6 +26,7 @@ import {
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
 import type { HeadingAccentColorProps } from '~/lib/makeswift/utils/heading-accent-color';
 import { resolveHeadingFontSizeCss } from '~/lib/makeswift/utils/heading-font-size';
+import { resolveMakeswiftImageSrc } from '~/lib/makeswift/utils/makeswift-image-src';
 import { useIsInBuilderAfterMount } from '~/lib/makeswift/utils/use-is-in-builder-after-mount';
 
 function storyAccentUsesHighlightSwash(heading?: HeadingWithHighlightProps | null): boolean {
@@ -94,7 +95,8 @@ function revealRoundedTopCss(revealSectionId: string, rootId: string, enabled: b
 }
 
 export type DiabetesCareRevealBannerImageProps = {
-  heroImageSrc?: string;
+  /** Makeswift `Image` may be a URL string or a value object. */
+  heroImageSrc?: unknown;
   heroImageAlt?: string;
 };
 
@@ -107,7 +109,7 @@ export type DiabetesCareRevealImageTextProps = {
   /** @deprecated Use `bannerHeading` + `bannerImage`. */
   banner?: {
     title?: string;
-    heroImageSrc?: string;
+    heroImageSrc?: unknown;
     heroImageAlt?: string;
   };
   primaryHeading?: HeadingTypographyProps;
@@ -184,7 +186,7 @@ export function DiabetesCareRevealImageWithText({
   const revealSectionCss =
     `#${revealSectionId} .reveal-banner{isolation:isolate}` +
     `#${revealSectionId} .reveal-banner__scroller{z-index:1}` +
-    `#${revealSectionId} [data-dc-scroll-reveal].section--padding{position:relative;z-index:2;background-color:rgb(var(--color-background))}` +
+    `#${revealSectionId} .reveal-banner > .section--padding{position:relative;z-index:2;background-color:rgb(var(--color-background))}` +
     `#${revealSectionId} .dcrift-reveal-media-wrap{position:relative;z-index:2;display:flex;justify-content:center;width:100%}` +
     `#${revealSectionId} .reveal-banner .banner__box{min-width:0!important;width:100%;max-width:${REVEAL_COLUMN_MAX_WIDTH};margin-inline:auto}` +
     `#${revealSectionId} .reveal-banner .splitting-wrapper,#${revealSectionId} .reveal-banner .splitting-wrapper h2,#${revealSectionId} .reveal-banner .split-words.words{max-width:100%}` +
@@ -229,7 +231,9 @@ export function DiabetesCareRevealImageWithText({
 
   const title =
     bannerHeadline.text.length > 0 ? bannerHeadline.text : 'Meet Armaan...';
-  const imageSrc = (bannerImage?.heroImageSrc ?? banner?.heroImageSrc)?.trim() ?? '';
+  const imageSrc = resolveMakeswiftImageSrc(
+    bannerImage?.heroImageSrc ?? banner?.heroImageSrc,
+  );
   const imageAlt = (bannerImage?.heroImageAlt ?? banner?.heroImageAlt)?.trim() ?? '';
   const revealImageRef = useRef<HTMLImageElement>(null);
   const [imageRatioPercent, setImageRatioPercent] = useState(
@@ -365,7 +369,9 @@ export function DiabetesCareRevealImageWithText({
                   </div>
                 </div>
               </div>
-              <ScrollReveal className="section--padding relative w-full" delayMs={80}>
+              {/* Cover image must stay opaque — ScrollReveal fade would hide it while it
+                  should be rising over the sticky headline. */}
+              <div className="section--padding relative w-full">
                 {imageSrc.length > 0 ? (
                   <div className="dcrift-reveal-media-wrap page-width page-width--narrow relative mx-auto w-full px-4 sm:px-5 md:px-0">
                     <picture
@@ -376,7 +382,7 @@ export function DiabetesCareRevealImageWithText({
                         alt={imageAlt}
                         className="mx-auto block h-auto max-w-full"
                         height={DEFAULT_HERO_HEIGHT}
-                        loading="lazy"
+                        loading="eager"
                         onLoad={(event) => {
                           syncRevealColumnWidth(event.currentTarget);
                         }}
@@ -398,7 +404,7 @@ export function DiabetesCareRevealImageWithText({
                     </div>
                   </div>
                 ) : null}
-              </ScrollReveal>
+              </div>
             </SplittingBanner>
           </div>
         </div>

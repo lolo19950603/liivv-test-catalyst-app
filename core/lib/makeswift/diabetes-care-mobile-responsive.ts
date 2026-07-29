@@ -114,7 +114,7 @@ export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
   `${MOBILE}{[id^="dcrift-reveal"] .reveal-banner .banner__content{padding-block:2rem}}`,
   `${MOBILE}{[id^="dcrift-rich"]{--section-padding-top:48px;--section-padding-bottom:56px}}`,
   `${MOBILE}{[id^="dcrift-reveal"] .page-width--narrow,[id^="dcrift-rich"] .page-width--narrow{padding-inline:max(1rem,env(safe-area-inset-left,0px)) max(1rem,env(safe-area-inset-right,0px))}}`,
-  `${MOBILE}{[id^="dcrift-"] [data-dc-scroll-reveal].section--padding{padding-block:var(--sp-8)}}`,
+  `${MOBILE}{[id^="dcrift-"] .reveal-banner > .section--padding{padding-block:var(--sp-8)}}`,
   `@media screen and (max-width:500px){[id^="dcrift-reveal"] .reveal-banner .banner__content .page-width{max-width:100%}}`,
   `@media screen and (max-width:500px){[id^="dcrift-reveal"] .reveal-banner .banner__box{max-width:100%;margin-inline:auto}}`,
   `@media screen and (max-width:500px){[id^="dcrift-reveal"] .reveal-banner .splitting-wrapper h2.dcrift-banner-heading--default{font-size:clamp(1.5rem,6vw,2.125rem)!important;line-height:1.05!important;letter-spacing:-0.02em;text-wrap:balance}}`,
