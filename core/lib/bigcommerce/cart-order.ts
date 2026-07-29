@@ -17,6 +17,8 @@ import {
   buildSubscriptionShippingMetadata,
 } from '../checkout/subscription-shipping-metadata';
 import type { CheckoutAddressSnapshot, CheckoutSnapshot } from '../checkout/types';
+import { formatKitPackingStaffNotes } from '../kit';
+import { isDeferredSubscriptionLine } from '../checkout/subscription-charge-timing';
 
 function resolveShippingAddressForMetadata(
   snapshot: CheckoutSnapshot,
@@ -35,7 +37,6 @@ function resolveShippingAddressForMetadata(
     address2: shipping.address2?.trim() ? shipping.address2 : billing.address2,
   };
 }
-import { isDeferredSubscriptionLine } from '../checkout/subscription-charge-timing';
 
 function getOrderStatusId(): number {
   const configured = Number(process.env.STRIPE_BC_ORDER_STATUS_ID ?? '11');
@@ -61,9 +62,11 @@ export async function createBigCommerceOrderFromCheckoutSnapshot(
   const products = immediateLines.map((line, index) => {
     const productOptions = toBigCommerceOrderProductOptions(line.productOptions);
     const { priceExTax, priceIncTax } = buildLinePricesWithTax(line, lineTaxes[index] ?? 0);
+    const name = line.kitId ? `[${line.kitId}] ${line.name}` : line.name;
 
     return {
       product_id: line.productEntityId,
+      name,
       quantity: line.quantity,
       price_ex_tax: priceExTax,
       price_inc_tax: priceIncTax,
@@ -75,6 +78,8 @@ export async function createBigCommerceOrderFromCheckoutSnapshot(
     throw new Error('Checkout order has no immediate line items to fulfill');
   }
 
+  const kitPackingNotes = formatKitPackingStaffNotes(snapshot.kits ?? []);
+
   const staffNotes = [
     `Stripe payment: ${stripeReferenceId}`,
     `Checkout snapshot: ${snapshot.id}`,
@@ -83,6 +88,7 @@ export async function createBigCommerceOrderFromCheckoutSnapshot(
     ...snapshot.lineItems
       .filter((line) => line.isSubscription)
       .map((line) => `Subscription line: ${line.name} (${line.sku ?? line.productEntityId})`),
+    ...(kitPackingNotes ? ['', kitPackingNotes] : []),
   ].join('\n');
 
   const orderTaxTotals = buildImmediateOrderTaxTotals(snapshot);

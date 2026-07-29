@@ -20,6 +20,7 @@ import {
   findSubscriptionLineByKey,
   reconcileSubscriptionLinesWithCart,
 } from './subscription-lines';
+import { assignKitIdsToCartLines, getKitSession } from '~/lib/kit';
 import type { CheckoutAddressSnapshot, CheckoutLineItemSnapshot, CheckoutSnapshot } from './types';
 import type { SubscriptionLineMeta } from './types';
 
@@ -148,8 +149,18 @@ export async function buildCheckoutSnapshot({
     ),
   ];
 
-  const requiresShippingAddress = lineItems.some((line) => line.isPhysical);
-  const shippingSections = buildCheckoutShippingSections(lineItems);
+  const kitSession = await getKitSession(cartId);
+  const kits = kitSession?.kits ?? [];
+  const lineItemsWithKits =
+    kits.length > 0
+      ? assignKitIdsToCartLines(lineItems, kits).map((line) => ({
+          ...line,
+          ...(line.kitId ? { kitId: line.kitId } : {}),
+        }))
+      : lineItems;
+
+  const requiresShippingAddress = lineItemsWithKits.some((line) => line.isPhysical);
+  const shippingSections = buildCheckoutShippingSections(lineItemsWithKits);
   const sectionShippingState = await getSectionShippingState(cartId);
   const sectionShippingCosts = getSectionShippingCosts(sectionShippingState);
   const requiresShippingMethod = shippingSections.some((section) => section.requiresShippingMethod);
@@ -172,7 +183,7 @@ export async function buildCheckoutSnapshot({
   const immediateShipping = sectionShippingCosts['due-today'] ?? 0;
   const shippingAddress = shippingConsignmentWithAddress?.address ?? checkout.shippingConsignments?.[0]?.address;
   const amounts = calculateCheckoutAmounts({
-    lineItems,
+    lineItems: lineItemsWithKits,
     cartSubtotal: checkout.subtotal?.value ?? 0,
     cartTax: checkout.taxTotal?.value ?? 0,
     sectionShippingCosts,
@@ -201,7 +212,8 @@ export async function buildCheckoutSnapshot({
     shipping: immediateShipping,
     grandTotal: checkout.grandTotal.value,
     amounts,
-    lineItems,
+    lineItems: lineItemsWithKits,
+    ...(kits.length > 0 ? { kits } : {}),
     sectionShipping,
     billingAddress,
     shippingAddress: shippingAddress

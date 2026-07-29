@@ -1,4 +1,5 @@
 import type { ProductOptionSelection } from '~/lib/bigcommerce/product-options';
+import type { KitRecord } from '~/lib/kit';
 import type { SubscriptionBillingInterval } from '~/lib/stripe/subscription-interval';
 
 export interface SubscriptionLineMeta {
@@ -60,6 +61,7 @@ export interface CheckoutLineItemSnapshot {
   billingInterval?: SubscriptionBillingInterval;
   billingCycleAnchor?: number;
   variantSubtitle?: string;
+  kitId?: string;
 }
 
 export interface CheckoutSectionAmounts {
@@ -94,6 +96,7 @@ export interface CheckoutSnapshot {
   grandTotal: number;
   amounts: CheckoutAmountsSnapshot;
   lineItems: CheckoutLineItemSnapshot[];
+  kits?: KitRecord[];
   sectionShipping?: Record<
     string,
     {

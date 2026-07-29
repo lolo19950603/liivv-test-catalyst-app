@@ -19,9 +19,9 @@ import {
 import { getSubscriptionLineDetails } from '~/lib/checkout/format-subscription-line';
 import {
   findSubscriptionLineByKey,
-  getSubscriptionLinesForCart,
   reconcileSubscriptionLinesWithCart,
 } from '~/lib/checkout/subscription-lines';
+import { assignKitIdsToCartLines, getKitSession } from '~/lib/kit';
 import type { SubscriptionBillingInterval } from '~/lib/stripe/subscription-interval';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { Slot } from '~/lib/makeswift/slot';
@@ -135,6 +135,8 @@ export default async function Cart({ params }: Props) {
 
   const productLineItems = lineItems.filter((item) => item.__typename !== 'CartGiftCertificate');
   const subscriptionLines = await reconcileSubscriptionLinesWithCart(cartId, productLineItems);
+  const kitSession = await getKitSession(cartId);
+  const kits = kitSession?.kits ?? [];
 
   const formattedGiftCertificates: CartGiftCertificateLineItem[] = lineItems
     .filter((item) => item.__typename === 'CartGiftCertificate')
@@ -273,9 +275,38 @@ export default async function Cart({ params }: Props) {
     };
   });
 
+  const productsWithKitIds = assignKitIdsToCartLines(
+    formattedProducts.map((product) => ({
+      id: product.id,
+      productEntityId: product.productEntityId,
+      quantity: product.quantity,
+    })),
+    kits,
+  );
+  const kitIdByLineId = new Map(
+    productsWithKitIds
+      .filter((line): line is typeof line & { kitId: string } => Boolean(line.kitId))
+      .map((line) => [line.id, line.kitId]),
+  );
+
+  const formattedProductsWithKits: CartLineItem[] = formattedProducts.map((product) => {
+    const kitId = kitIdByLineId.get(product.id);
+
+    if (!kitId) {
+      return product;
+    }
+
+    const kitLabel = t('partOfKit', { kitId });
+
+    return {
+      ...product,
+      subtitle: product.subtitle ? `${product.subtitle} · ${kitLabel}` : kitLabel,
+    };
+  });
+
   const formattedLineItems: Array<CartLineItem | CartGiftCertificateLineItem> = [
     ...formattedGiftCertificates,
-    ...formattedProducts,
+    ...formattedProductsWithKits,
   ];
 
   const totalCouponDiscount =

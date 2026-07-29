@@ -129,6 +129,7 @@
     "Category": {
       "subCategories": "Categories",
       "searchPlaceholder": "Search in {categoryName}…",
+      "buildYourOwnKit": "Build your own kit",
       "Empty": {
         "title": "No products in this category",
         "subtitle": "Try using different filters."
@@ -183,6 +184,37 @@
       "compare": "Compare",
       "remove": "Remove",
       "maxCompareLimit": "You've reached the maximum number of products for comparison. Remove a product to add a new one."
+    },
+    "BuildYourOwnKit": {
+      "title": "Build your own kit",
+      "subtitle": "Pick any products, set quantities, then add the kit to your cart.",
+      "searchPlaceholder": "Search products…",
+      "search": "Search",
+      "productCount": "{count} products",
+      "addToKit": "Add to kit",
+      "trayTitle": "Your kit",
+      "traySubtitle": "These items will be added to your cart together.",
+      "trayEmpty": "No products in your kit yet.",
+      "runningTotal": "Kit total",
+      "addKitToCart": "Add kit to cart",
+      "increment": "Increase quantity",
+      "decrement": "Decrease quantity",
+      "remove": "Remove",
+      "paginationLabel": "Pagination",
+      "paginationNext": "Next",
+      "successMessage": "Kit {kitId} added to your cart",
+      "Empty": {
+        "browseTitle": "No products found",
+        "browseSubtitle": "Try adjusting filters or check back later.",
+        "searchTitle": "Sorry, no results for \"{term}\".",
+        "searchSubtitle": "Please try another search."
+      },
+      "Errors": {
+        "emptyKit": "Add at least one product to your kit.",
+        "missingCart": "There was a problem creating your cart. Please try again.",
+        "addFailed": "Some products could not be added. Products with required options may need to be configured on their product page.",
+        "unexpected": "Something went wrong. Please try again."
+      }
     }
   },
   "Account": {
@@ -791,6 +823,7 @@
   "Cart": {
     "title": "Cart",
     "heading": "Your cart",
+    "partOfKit": "Part of kit {kitId}",
     "subscription": {
       "badge": "Subscription",
       "billing": "Billing",
