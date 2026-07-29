@@ -118,8 +118,9 @@ export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
   `@media screen and (max-width:500px){[id^="dcrift-reveal"] .reveal-banner .banner__content .page-width{max-width:100%}}`,
   `@media screen and (max-width:500px){[id^="dcrift-reveal"] .reveal-banner .banner__box{max-width:100%;margin-inline:auto}}`,
   `@media screen and (max-width:500px){[id^="dcrift-reveal"] .reveal-banner .splitting-wrapper h2.dcrift-banner-heading--default{font-size:clamp(1.5rem,6vw,2.125rem)!important;line-height:1.05!important;letter-spacing:-0.02em;text-wrap:balance}}`,
-  `${MOBILE_TABLET}{[id^="dcrift-reveal"] .dcrift-reveal-media>img{aspect-ratio:unset!important;object-fit:contain!important}}`,
+  `${MOBILE_TABLET}{[id^="dcrift-reveal"] .dcrift-reveal-media>img{aspect-ratio:unset!important;object-fit:cover!important}}`,
   `${MOBILE_TABLET}{[id^="dcrift-reveal"] .dcrift-reveal-media.mobile\\:media--wide>img{aspect-ratio:unset!important}}`,
+  `${MOBILE_TABLET}{[id^="dcrift-reveal"] .dcrift-reveal-media.media--adapt{min-height:100dvh!important}}`,
 
   /* 07 — Blog collage */
   `${MOBILE}{[id^="dccbpc-"]{--section-padding-top:48px;--section-padding-bottom:48px}}`,

@@ -59,7 +59,8 @@ const DEFAULT_BODY_HTML =
 
 /** Headline + hero image share this cap; headline also syncs to rendered image width after load. */
 const REVEAL_COLUMN_MAX_WIDTH = 'min(70rem, 96vw)';
-const REVEAL_IMAGE_MAX_HEIGHT = 'min(95vh, 80rem)';
+/** Cover frame is at least one viewport tall so square/short assets still blanket the sticky headline. */
+const REVEAL_COVER_MIN_HEIGHT = '100dvh';
 
 /** Portrait default avoids landscape letterboxing before `img` onLoad (common for this section). */
 const DEFAULT_HERO_WIDTH = 900;
@@ -182,7 +183,7 @@ export function DiabetesCareRevealImageWithText({
   const richSectionId = `dcrift-rich-${instance}`;
 
   /** Theme vars on the component root so reveal banner + image and rich text share background. */
-  /** Shorter scroll runway on phone/tablet; portrait uses intrinsic ratio (no 16:9 crop). */
+  /** Cover media is viewport-tall (min) + object-fit cover so square/short images still hide the sticky headline. */
   const revealSectionCss =
     `#${revealSectionId} .reveal-banner{isolation:isolate}` +
     `#${revealSectionId} .reveal-banner__scroller{z-index:1}` +
@@ -193,16 +194,21 @@ export function DiabetesCareRevealImageWithText({
     `#${revealSectionId} .reveal-banner .split-words.words{display:inline-flex;flex-wrap:wrap;justify-content:center;text-wrap:balance}` +
     `@media screen and (min-width:1024px){#${revealSectionId} .reveal-banner .splitting-wrapper h2.dcrift-banner-heading--default{font-size:${String(DEFAULT_BANNER_HEADING_FONT_SIZE_DESKTOP)}px;line-height:1.05;letter-spacing:-0.02em;text-wrap:balance}}` +
     `@media screen and (max-width:1023px){#${revealSectionId} .reveal-banner .splitting-wrapper h2.dcrift-banner-heading--default{font-size:clamp(2rem,5.5vw,3.25rem);line-height:1.05;letter-spacing:-0.02em;text-wrap:balance}}` +
-    `@media screen and (min-width:1024px){#${revealSectionId} .dcrift-reveal-media.media--adapt{height:auto!important;width:fit-content!important;max-width:${REVEAL_COLUMN_MAX_WIDTH};margin-inline:auto;padding-block-end:0!important}` +
-    `#${revealSectionId} .dcrift-reveal-media.media--adapt>img{position:static!important;display:block;width:auto!important;height:auto!important;max-width:${REVEAL_COLUMN_MAX_WIDTH};max-height:${REVEAL_IMAGE_MAX_HEIGHT};margin-inline:auto;object-fit:contain!important;object-position:center center}}` +
     `@media screen and (max-width:1023px){#${revealSectionId} .splitting-banner .reveal-banner__scroller{position:sticky!important;top:0!important;height:100lvh!important;max-height:100dvh!important;overflow:hidden!important}` +
     `#${revealSectionId} .reveal-banner__tracker{inset-block-start:12%!important;height:72lvh!important}@supports (height:100lvh){#${revealSectionId} .reveal-banner__tracker{height:72lvh!important}}` +
     `#${revealSectionId} .reveal-banner .banner{height:100%!important;min-height:100%!important}}` +
     `@media screen and (max-width:500px){#${revealSectionId} .reveal-banner .banner__content .page-width--narrow{max-width:100%}` +
     `#${revealSectionId} .reveal-banner .banner__box{max-width:100%;margin-inline:auto}` +
     `#${revealSectionId} .reveal-banner .splitting-wrapper h2.dcrift-banner-heading--default{font-size:clamp(1.5rem,6vw,2.125rem)!important;line-height:1.05!important;letter-spacing:-0.02em;text-wrap:balance}}` +
-    `#${revealSectionId} .dcrift-reveal-media.media--adapt{height:0;width:100%;padding-block-end:var(--ratio-percent,133.333%)}` +
-    `#${revealSectionId} .dcrift-reveal-media.media--adapt>img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain!important;object-position:center center}` +
+    // Cover frame: column-wide, at least one viewport tall, grow with taller portraits via aspect-ratio.
+    `#${revealSectionId} .dcrift-reveal-media.media--adapt{` +
+    `position:relative;display:block;width:100%;max-width:${REVEAL_COLUMN_MAX_WIDTH};` +
+    `margin-inline:auto;height:auto!important;min-height:${REVEAL_COVER_MIN_HEIGHT}!important;` +
+    `aspect-ratio:var(--cover-aspect,0.75);padding-block-end:0!important;overflow:hidden}` +
+    `#${revealSectionId} .dcrift-reveal-media.media--adapt>img{` +
+    `position:absolute!important;inset:0;width:100%!important;height:100%!important;` +
+    `max-width:none!important;max-height:none!important;margin:0!important;` +
+    `object-fit:cover!important;object-position:center center}` +
     `#${revealSectionId} .dcrift-reveal-media--placeholder{display:flex;align-items:center;justify-content:center;` +
     `background:rgb(var(--color-foreground)/0.06);border:2px dashed rgb(var(--color-foreground)/0.15);` +
     `color:rgb(var(--color-foreground)/0.45)}` +
@@ -236,17 +242,18 @@ export function DiabetesCareRevealImageWithText({
   );
   const imageAlt = (bannerImage?.heroImageAlt ?? banner?.heroImageAlt)?.trim() ?? '';
   const revealImageRef = useRef<HTMLImageElement>(null);
-  const [imageRatioPercent, setImageRatioPercent] = useState(
-    `${String((DEFAULT_HERO_HEIGHT / DEFAULT_HERO_WIDTH) * 100)}%`,
+  const [coverAspect, setCoverAspect] = useState(
+    DEFAULT_HERO_WIDTH / DEFAULT_HERO_HEIGHT,
   );
   const [revealColumnWidth, setRevealColumnWidth] = useState<number | null>(null);
   const revealMediaStyle = {
-    '--ratio-percent': imageRatioPercent,
+    '--cover-aspect': String(coverAspect),
   } as CSSProperties;
 
   const syncRevealColumnWidth = useCallback((img: HTMLImageElement) => {
     if (img.naturalWidth > 0 && img.naturalHeight > 0) {
-      setImageRatioPercent(`${String((img.naturalHeight / img.naturalWidth) * 100)}%`);
+      // Width/height for CSS aspect-ratio; min-height:100dvh still wins for square/short assets.
+      setCoverAspect(img.naturalWidth / img.naturalHeight);
     }
 
     const width = Math.round(img.getBoundingClientRect().width);
