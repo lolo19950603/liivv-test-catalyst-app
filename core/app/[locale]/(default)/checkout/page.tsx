@@ -48,6 +48,7 @@ import { isCheckoutSubscriptionMetadataReady } from '~/lib/checkout/subscription
 
 import { initializePayment, prepareOrderConfirmation } from './_actions/initialize-payment';
 import {
+  ensureCheckoutShippingAddress,
   ensureDueTodayShippingSyncedToCheckout,
   formatSectionShippingOptions,
 } from './_actions/section-shipping';
@@ -252,9 +253,56 @@ export default async function CheckoutPage({ params }: Props) {
     checkout = refreshed.site.checkout;
   }
 
-  const shippingConsignment =
+  const addressData = await getCustomerAddresses({ limit: 50 });
+  const savedAddresses = (addressData?.addresses ?? []).map((entry, index) => ({
+    id: entry.entityId.toString(),
+    firstName: entry.firstName,
+    lastName: entry.lastName,
+    company: entry.company ?? undefined,
+    address1: entry.address1,
+    address2: entry.address2 ?? undefined,
+    city: entry.city,
+    stateOrProvince: entry.stateOrProvince ?? undefined,
+    countryCode: entry.countryCode,
+    postalCode: entry.postalCode ?? undefined,
+    phone: entry.phone ?? undefined,
+    isDefault: index === 0,
+  }));
+  const defaultSavedAddress = savedAddresses[0];
+
+  const requiresShippingAddress = shippingSections.some(
+    (section) => section.requiresShippingAddress,
+  );
+
+  let shippingConsignment =
     checkout?.shippingConsignments?.find((consignment) => consignment.selectedShippingOption) ||
     checkout?.shippingConsignments?.[0];
+
+  if (
+    requiresShippingAddress &&
+    !shippingConsignment?.address?.countryCode &&
+    defaultSavedAddress?.countryCode
+  ) {
+    try {
+      const applied = await ensureCheckoutShippingAddress({
+        countryCode: defaultSavedAddress.countryCode,
+        city: defaultSavedAddress.city,
+        stateOrProvince: defaultSavedAddress.stateOrProvince,
+        postalCode: defaultSavedAddress.postalCode,
+      });
+
+      if (applied) {
+        const refreshed = await getCart({ cartId });
+        checkout = refreshed.site.checkout;
+        shippingConsignment =
+          checkout?.shippingConsignments?.find((consignment) => consignment.selectedShippingOption) ||
+          checkout?.shippingConsignments?.[0];
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to apply default shipping address at checkout:', error);
+    }
+  }
 
   const cartSubtotal = checkout?.subtotal?.value ?? 0;
   const hasShippingAddress = Boolean(shippingConsignment?.address?.countryCode);
@@ -287,9 +335,6 @@ export default async function CheckoutPage({ params }: Props) {
     });
 
   const sectionShippingCosts = getSectionShippingCosts(sectionShippingState);
-  const requiresShippingAddress = shippingSections.some(
-    (section) => section.requiresShippingAddress,
-  );
   const requiresShippingMethod = shippingSections.some((section) => section.requiresShippingMethod);
   const shippingMethodReady =
     !requiresShippingMethod || isSectionShippingReady(shippingSections, sectionShippingState);
@@ -370,7 +415,6 @@ export default async function CheckoutPage({ params }: Props) {
       })),
   }));
 
-  const addressData = await getCustomerAddresses({ limit: 50 });
   const stripeCustomerId = customer
     ? (await resolveStripeCustomerId(customer.entityId)) ??
       (customer.email ? await findStripeCustomerIdByEmail(customer.email) : null)
@@ -378,22 +422,6 @@ export default async function CheckoutPage({ params }: Props) {
   const savedPaymentMethods = stripeCustomerId
     ? await getCustomerSavedPaymentMethods(stripeCustomerId)
     : [];
-  const savedAddresses = (addressData?.addresses ?? []).map((entry, index) => ({
-    id: entry.entityId.toString(),
-    firstName: entry.firstName,
-    lastName: entry.lastName,
-    company: entry.company ?? undefined,
-    address1: entry.address1,
-    address2: entry.address2 ?? undefined,
-    city: entry.city,
-    stateOrProvince: entry.stateOrProvince ?? undefined,
-    countryCode: entry.countryCode,
-    postalCode: entry.postalCode ?? undefined,
-    phone: entry.phone ?? undefined,
-    isDefault: index === 0,
-  }));
-
-  const defaultSavedAddress = savedAddresses[0];
 
   const billingDefaults = {
     firstName: customer?.firstName ?? defaultSavedAddress?.firstName ?? '',
@@ -522,14 +550,10 @@ export default async function CheckoutPage({ params }: Props) {
           savedAddresses={savedAddresses}
           savedPaymentMethods={savedPaymentMethods}
           states={statesOrProvinces}
+          shippingMethodReady={shippingMethodReady}
           shippingReady={shippingReady}
-          shippingRequiredMessage={
-            !shippingReady
-              ? !shippingAddressReady
-                ? t('shipTo.required')
-                : t('payment.shippingRequired')
-              : undefined
-          }
+          shippingAddressRequiredMessage={t('shipTo.required')}
+          shippingMethodRequiredMessage={t('payment.shippingRequired')}
           submitLabel={t('payment.submit')}
         />
         </>

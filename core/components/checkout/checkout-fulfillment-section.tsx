@@ -284,6 +284,9 @@ interface CheckoutFulfillmentSectionProps {
   ) => Promise<{ snapshotId: string }>;
   returnUrl: string;
   shippingReady: boolean;
+  shippingMethodReady?: boolean;
+  shippingAddressRequiredMessage?: string;
+  shippingMethodRequiredMessage?: string;
   shippingRequiredMessage?: string;
   savedPaymentMethods?: SavedPaymentMethod[];
 }
@@ -380,7 +383,9 @@ export function CheckoutFulfillmentSection({
   initializePaymentAction,
   prepareOrderConfirmationAction,
   returnUrl,
-  shippingReady,
+  shippingMethodReady = true,
+  shippingAddressRequiredMessage,
+  shippingMethodRequiredMessage,
   shippingRequiredMessage,
   savedPaymentMethods = [],
 }: CheckoutFulfillmentSectionProps) {
@@ -433,6 +438,10 @@ export function CheckoutFulfillmentSection({
 
   const resolvedAddress = shippingState.address ?? address;
   const hasShippingAddress = Boolean(resolvedAddress?.country);
+  // Payment unlocks once the consignment (or just-applied local state) has an address
+  // and any required shipping method is ready — not merely when the Ship-to UI shows a saved address.
+  const paymentShippingReady =
+    (!requiresShipping || hasShippingAddress) && shippingMethodReady;
   const shippingErrors = shippingState.lastResult?.error?.[''] ?? [];
 
   const applyAddressToCheckout = useCallback(
@@ -484,7 +493,7 @@ export function CheckoutFulfillmentSection({
   }, [syncBillingFromShipping, selectedAddress, billingMode, shippingState.address]);
 
   useEffect(() => {
-    if (!requiresShipping || hasAutoApplied.current) {
+    if (!requiresShipping || hasAutoApplied.current || isApplyingAddress) {
       return;
     }
 
@@ -512,6 +521,7 @@ export function CheckoutFulfillmentSection({
     applyAddressToCheckout(defaultAddress);
   }, [
     applyAddressToCheckout,
+    isApplyingAddress,
     requiresShipping,
     resolvedAddress,
     savedAddresses,
@@ -573,13 +583,19 @@ export function CheckoutFulfillmentSection({
           .join(', ')
       : labels.shippingMethodEmpty;
 
+  const paymentBlockedMessage = !paymentShippingReady
+    ? requiresShipping && !hasShippingAddress
+      ? shippingAddressRequiredMessage ?? shippingRequiredMessage
+      : shippingMethodRequiredMessage ?? shippingRequiredMessage
+    : undefined;
+
   return (
     <CheckoutPaymentProvider
       billingFormId={billingFormId}
       initializePaymentAction={initializePaymentAction}
       prepareOrderConfirmationAction={prepareOrderConfirmationAction}
       returnUrl={returnUrl}
-      shippingReady={shippingReady}
+      shippingReady={paymentShippingReady}
     >
       <CheckoutFulfillmentContent
         action={action}
@@ -610,8 +626,8 @@ export function CheckoutFulfillmentSection({
         shipToOpen={shipToOpen}
         shipToSummary={shipToSummary}
         shippingErrors={shippingErrors}
-        shippingReady={shippingReady}
-        shippingRequiredMessage={shippingRequiredMessage}
+        shippingReady={paymentShippingReady}
+        shippingRequiredMessage={paymentBlockedMessage}
         states={states}
         submitLabel={submitLabel}
         syncBillingFromShipping={syncBillingFromShipping}
@@ -870,7 +886,9 @@ function CheckoutFulfillmentContent({
             <div className="rounded-lg border border-[var(--contrast-200,hsl(var(--contrast-200)))] p-4">
               {!shippingReady ? (
                 <p className="text-sm text-[var(--contrast-500,hsl(var(--contrast-500)))]">
-                  {shippingRequiredMessage}
+                  {isApplyingAddress
+                    ? labels.shippingMethodUpdating
+                    : shippingRequiredMessage}
                 </p>
               ) : (
                 <p className="text-sm text-[var(--contrast-500,hsl(var(--contrast-500)))]">

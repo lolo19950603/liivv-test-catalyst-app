@@ -18,7 +18,11 @@ export async function fulfillCheckoutStripeSessionAction(
 
   const result = await fulfillCheckoutStripeSession(stripeSessionId);
 
-  await kv.set(fulfillmentKey, true);
+  // Only lock after a definitive result so a race with the webhook (order claim
+  // held but not yet written) can still be retried on refresh.
+  if (result != null) {
+    await kv.set(fulfillmentKey, true);
+  }
 
   return result;
 }

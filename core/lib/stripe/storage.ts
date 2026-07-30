@@ -36,13 +36,14 @@ export async function claimSubscriptionOrderCreation(referenceId: string): Promi
   const key = subscriptionOrderKey(referenceId);
   const existing = await kv.get<string>(key);
 
-  if (existing && existing !== 'pending') {
+  // Reject when another caller already claimed ('pending'), finished (order id),
+  // or marked complete. Treating 'pending' as claimable caused duplicate BC orders
+  // when the Stripe webhook and checkout success page raced.
+  if (existing === 'pending' || (existing && existing !== '')) {
     return false;
   }
 
-  await kv.set(key, 'pending');
-
-  return true;
+  return kv.setIfNotExists(key, 'pending');
 }
 
 export async function markSubscriptionOrderCreated(

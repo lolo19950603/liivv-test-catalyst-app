@@ -547,7 +547,7 @@ export async function fulfillCheckoutPayment(
   }
 
   const fulfillmentRef = `payment:${paymentIntentId}`;
-  const existingOrderId = await getCheckoutFulfillmentOrderId(fulfillmentRef);
+  let orderId = await getCheckoutFulfillmentOrderId(fulfillmentRef);
   const fulfillmentComplete = await isCheckoutFulfillmentComplete(fulfillmentRef);
   let claimed = false;
 
@@ -555,9 +555,22 @@ export async function fulfillCheckoutPayment(
     claimed = await claimSubscriptionOrderCreation(fulfillmentRef);
 
     if (!claimed) {
-      const pendingOrderId = await getCheckoutFulfillmentOrderId(fulfillmentRef);
+      orderId = await getCheckoutFulfillmentOrderId(fulfillmentRef);
 
-      if (!pendingOrderId) {
+      // Wait briefly for the winning caller (usually the Stripe webhook) to persist
+      // the order id so this path can still clear the cart without creating a duplicate.
+      for (let attempt = 0; !orderId && attempt < 15; attempt += 1) {
+        if (await isCheckoutFulfillmentComplete(fulfillmentRef)) {
+          break;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        orderId = await getCheckoutFulfillmentOrderId(fulfillmentRef);
+      }
+
+      // Another caller owns creation. Never create a second BigCommerce order
+      // for the same payment intent.
+      if (!orderId && !(await isCheckoutFulfillmentComplete(fulfillmentRef))) {
         return null;
       }
     }
@@ -575,9 +588,8 @@ export async function fulfillCheckoutPayment(
 
   try {
     const immediateLines = snapshot.lineItems.filter((line) => !isDeferredSubscriptionLine(line));
-    let orderId = existingOrderId;
 
-    if (!orderId && immediateLines.length > 0) {
+    if (claimed && !orderId && immediateLines.length > 0) {
       orderId = await createBigCommerceOrderFromCheckoutSnapshot(snapshot, paymentIntentId);
       await markSubscriptionOrderCreated(fulfillmentRef, orderId);
     }

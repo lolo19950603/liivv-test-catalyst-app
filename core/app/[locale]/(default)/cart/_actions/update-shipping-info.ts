@@ -228,7 +228,9 @@ export const updateShippingInfo = async (
 
         updatedShippingConsignment = result ? result.shippingConsignments?.[0] : undefined;
 
-        if (!updatedShippingConsignment?.availableShippingOptions) {
+        // Address can be applied even when BC returns no quote options yet
+        // (e.g. deferred-only physical subscriptions that only need a ship-to).
+        if (!updatedShippingConsignment) {
           return {
             ...prevState,
             lastResult: submission.reply({ formErrors: [t('cartNotFound')] }),

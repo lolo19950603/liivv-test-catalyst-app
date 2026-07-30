@@ -37,6 +37,7 @@ import {
   type SectionShippingOption,
   updateSectionShippingEntry,
 } from '~/lib/checkout/section-shipping-storage';
+import { resolveShippingStateOrProvince } from '~/lib/checkout/resolve-shipping-state';
 import type { CheckoutLineItemSnapshot } from '~/lib/checkout/types';
 import { getCartId } from '~/lib/cart';
 
@@ -405,6 +406,79 @@ export async function syncImmediateCheckoutConsignment(): Promise<void> {
     consignmentEntityId,
     shippingOptionEntityId: immediateEntry.selectedOptionId,
   });
+}
+
+/**
+ * Apply a customer shipping address to the checkout consignment when missing.
+ * Returns true when checkout was mutated and the caller should refresh cart data.
+ */
+export async function ensureCheckoutShippingAddress(
+  address: ShippingAddress,
+): Promise<boolean> {
+  if (!address.countryCode) {
+    return false;
+  }
+
+  const cartId = await getCartId();
+
+  if (!cartId) {
+    return false;
+  }
+
+  const data = await getCart({ cartId });
+  const checkout = data.site.checkout;
+  const cart = data.site.cart;
+
+  if (!checkout?.entityId || !cart) {
+    return false;
+  }
+
+  const existingConsignment =
+    checkout.shippingConsignments?.find((consignment) => consignment.address?.countryCode) ??
+    checkout.shippingConsignments?.[0];
+
+  if (existingConsignment?.address?.countryCode) {
+    return false;
+  }
+
+  const lineItems = [
+    ...cart.lineItems.physicalItems.filter((item) => !item.parentEntityId),
+    ...cart.lineItems.digitalItems.filter((item) => !item.parentEntityId),
+  ].map((item) => ({
+    lineItemEntityId: item.entityId,
+    quantity: item.quantity,
+  }));
+
+  if (lineItems.length === 0) {
+    return false;
+  }
+
+  const consignmentAddress = {
+    countryCode: address.countryCode,
+    city: address.city,
+    postalCode: address.postalCode,
+    stateOrProvince: await resolveShippingStateOrProvince(
+      address.countryCode,
+      address.stateOrProvince,
+    ),
+  };
+
+  if (existingConsignment?.entityId) {
+    await updateCheckoutShippingConsignment({
+      checkoutEntityId: checkout.entityId,
+      shippingId: existingConsignment.entityId,
+      address: consignmentAddress,
+      lineItems,
+    });
+  } else {
+    await addCheckoutShippingConsignments({
+      checkoutEntityId: checkout.entityId,
+      address: consignmentAddress,
+      lineItems,
+    });
+  }
+
+  return true;
 }
 
 /** Apply KV due-today shipping to BigCommerce when consignment selection is out of sync (fixes stale tax). */
