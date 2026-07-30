@@ -60,7 +60,9 @@ export function formatKitPackingStaffNotes(kits: KitRecord[]): string {
       });
 
       return [
-        `KIT PACKING — ${kit.kitId}`,
+        kit.name
+          ? `KIT PACKING — ${kit.kitId} (${kit.name})`
+          : `KIT PACKING — ${kit.kitId}`,
         'Pack these into the kit box first:',
         ...lines,
         'Then place the kit box with any other items into the shipping box.',

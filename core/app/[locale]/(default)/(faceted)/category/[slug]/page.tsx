@@ -28,7 +28,7 @@ import {
 } from '../../faceted-page-size';
 import { fetchFacetedSearch } from '../../fetch-faceted-search';
 
-import { BuildYourOwnKitCta } from './_components/build-your-own-kit-cta';
+import { CategoryCuratedKits } from './_components/category-curated-kits';
 import { CategorySearchPanel } from './_components/category-search-panel';
 import { CategoryViewed } from './_components/category-viewed';
 import { getCategoryPageData } from './page-data';
@@ -278,7 +278,7 @@ export default async function Category(props: Props) {
         label={`${category.name} top content`}
         snapshotId={`category-${categoryId}-top-content`}
       />
-      <BuildYourOwnKitCta />
+      <CategoryCuratedKits categoryPath={category.path} />
       <ProductsListSection
         breadcrumbs={breadcrumbs}
         compareLabel={t('Compare.compare')}

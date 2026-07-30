@@ -18,6 +18,7 @@ const kitItemSchema = z.object({
 });
 
 const addKitSchema = z.object({
+  kitName: z.string().optional(),
   items: z.array(kitItemSchema).min(1),
 });
 
@@ -34,7 +35,7 @@ type KitMessages = {
 
 export async function addKitToCart(input: AddKitToCartInput): Promise<AddKitToCartResult> {
   // Namespace typing hits TS depth limits on this large messages tree; cast is intentional.
-  const t = (await getTranslations('Faceted.BuildYourOwnKit')) as unknown as KitMessages;
+  const t = (await getTranslations('Faceted.CuratedKit')) as unknown as KitMessages;
   const parsed = addKitSchema.safeParse(input);
 
   if (!parsed.success) {
@@ -42,7 +43,7 @@ export async function addKitToCart(input: AddKitToCartInput): Promise<AddKitToCa
   }
 
   const kitId = generateKitId();
-  const { items } = parsed.data;
+  const { items, kitName } = parsed.data;
 
   try {
     const result = await addToOrCreateCart({
@@ -54,6 +55,7 @@ export async function addKitToCart(input: AddKitToCartInput): Promise<AddKitToCa
 
     await appendKitToSession(result.cartId, {
       kitId,
+      ...(kitName ? { name: kitName } : {}),
       items: items.map((item) => ({
         productEntityId: item.productEntityId,
         quantity: item.quantity,
