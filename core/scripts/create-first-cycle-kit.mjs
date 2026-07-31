@@ -121,6 +121,8 @@ async function main() {
         related_products: COMPONENT_IDS,
         categories: Array.from(new Set([...(existing.categories || []), category.id])),
         is_visible: true,
+        description:
+          '<p>A thoughtfully curated starter set for first-period care — gentle, practical essentials chosen to help you feel prepared from day one.</p><p>Review what’s included, remove anything you don’t need, or adjust quantities before adding the kit to your cart. Everything ships as one kit so packing and fulfillment stay simple.</p><ul><li>Organic and skin-kind period care staples</li><li>Pads, liners, tampons, wipes, wash, and reusable underwear</li><li>Customize quantities or remove items before checkout</li></ul>',
       }),
     });
     const fields = existing.custom_fields || [];
@@ -167,7 +169,7 @@ async function main() {
       price,
       sku: KIT_SKU,
       description:
-        '<p>A thoughtfully curated starter set for first-period care. Customize what’s included before adding the kit to your cart.</p>',
+        '<p>A thoughtfully curated starter set for first-period care — gentle, practical essentials chosen to help you feel prepared from day one.</p><p>Review what’s included, remove anything you don’t need, or adjust quantities before adding the kit to your cart. Everything ships as one kit so packing and fulfillment stay simple.</p><ul><li>Organic and skin-kind period care staples</li><li>Pads, liners, tampons, wipes, wash, and reusable underwear</li><li>Customize quantities or remove items before checkout</li></ul>',
       categories: [category.id],
       related_products: COMPONENT_IDS,
       is_visible: true,

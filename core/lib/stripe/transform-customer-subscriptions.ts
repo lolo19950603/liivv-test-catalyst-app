@@ -723,7 +723,7 @@ function buildPastShipmentDeliveryGroups(
     return {
       id: `past-${record.storageKey}`,
       shippingAddressLabel: record.shippingAddressLabel,
-      shippingMethodLabel: record.shippingMethodLabel ?? t('delivery.freeShipping'),
+      shippingMethodLabel: t('delivery.freeShipping'),
       isPast: true,
       bigcommerceOrderId: record.bigcommerceOrderId,
       bigcommerceOrderHref: record.bigcommerceOrderId

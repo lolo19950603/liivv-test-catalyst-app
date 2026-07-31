@@ -15,6 +15,8 @@ import { getPreferredCurrencyCode } from '~/lib/currency';
 import { CuratedKitCustomizer, type CuratedKitProduct } from '~/components/curated-kit-customizer';
 import {
   isCuratedKitFromProductConnection,
+  KIT_TYPE_FIELD,
+  KIT_VARIANTS_FIELD,
   parseKitVariantOverridesFromConnection,
   resolveKitComponentVariantSelection,
 } from '~/lib/kit';
@@ -49,6 +51,7 @@ import { Reviews } from './_components/reviews';
 import { WishlistButton } from './_components/wishlist-button';
 import { WishlistButtonForm } from './_components/wishlist-button/form';
 import {
+  getKitComponentConfiguredPrices,
   getKitComponentProducts,
   getProduct,
   getProductPageMetadata,
@@ -476,10 +479,26 @@ export default async function Product({ params, searchParams }: Props) {
     };
   });
 
+  const isCuratedKit = isCuratedKitFromProductConnection(baseProduct);
+
   const streameableAccordions = Streamable.from(async () => {
     const product = await streamableProduct;
 
-    const customFields = removeEdgesAndNodes(product.customFields);
+    const customFields = removeEdgesAndNodes(product.customFields).filter((field) => {
+      const name = field.name.trim().toLowerCase();
+
+      // Kit internals — never show on the storefront.
+      if (name === KIT_TYPE_FIELD || name === KIT_VARIANTS_FIELD) {
+        return false;
+      }
+
+      // Curated kits: hide all custom fields from specs.
+      if (isCuratedKit) {
+        return false;
+      }
+
+      return true;
+    });
 
     const specifications = [
       {
@@ -547,8 +566,6 @@ export default async function Product({ params, searchParams }: Props) {
     return productCardTransformer(relatedProducts, format);
   });
 
-  const isCuratedKit = isCuratedKitFromProductConnection(baseProduct);
-
   const streamableKitProducts = Streamable.from(async (): Promise<CuratedKitProduct[]> => {
     if (!isCuratedKit) {
       return [];
@@ -568,9 +585,10 @@ export default async function Product({ params, searchParams }: Props) {
     }
 
     const variantOverrides = parseKitVariantOverridesFromConnection(baseProduct);
+    const currencyCode = await getPreferredCurrencyCode();
     const components = await getKitComponentProducts({
       entityIds,
-      currencyCode: await getPreferredCurrencyCode(),
+      currencyCode,
       customerAccessToken,
     });
 
@@ -586,9 +604,6 @@ export default async function Product({ params, searchParams }: Props) {
             return null;
           }
 
-          const unitPrice =
-            component.prices?.salePrice?.value ?? component.prices?.price.value ?? 0;
-          const componentCurrency = component.prices?.price.currencyCode ?? 'USD';
           const options = removeEdgesAndNodes(component.productOptions).flatMap((option) => {
             if (option.__typename !== 'MultipleChoiceOption') {
               return [];
@@ -641,6 +656,34 @@ export default async function Product({ params, searchParams }: Props) {
               ? { multipleChoices: fallbackMultipleChoices }
               : undefined);
 
+          const optionValueIds = selectedOptions?.multipleChoices.map((choice) => ({
+            optionEntityId: choice.optionEntityId,
+            valueEntityId: choice.optionValueEntityId,
+          }));
+
+          const configuredPrices = await getKitComponentConfiguredPrices({
+            entityId,
+            optionValueIds,
+            currencyCode,
+            customerAccessToken,
+          });
+
+          const prices = configuredPrices ?? component.prices;
+          const unitPrice = prices?.salePrice?.value ?? prices?.price.value ?? 0;
+          const componentCurrency = prices?.price.currencyCode ?? 'USD';
+
+          // Configured/variant prices should be a single amount — avoid range labels.
+          const displayPrices =
+            prices && prices.priceRange.min.value !== prices.priceRange.max.value
+              ? {
+                  ...prices,
+                  priceRange: {
+                    min: prices.price,
+                    max: prices.price,
+                  },
+                }
+              : prices;
+
           return {
             productEntityId: component.entityId,
             title: component.name,
@@ -648,7 +691,7 @@ export default async function Product({ params, searchParams }: Props) {
             image: component.defaultImage
               ? { src: component.defaultImage.url, alt: component.defaultImage.altText }
               : undefined,
-            price: pricesTransformer(component.prices, format),
+            price: pricesTransformer(displayPrices, format),
             unitPrice,
             currencyCode: componentCurrency,
             sku: component.sku,

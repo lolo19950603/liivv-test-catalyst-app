@@ -504,6 +504,55 @@ export const getKitComponentProducts = cache(
   },
 );
 
+const KitComponentConfiguredPricingQuery = graphql(
+  `
+    query KitComponentConfiguredPricingQuery(
+      $entityId: Int!
+      $optionValueIds: [OptionValueId!]
+      $currencyCode: currencyCode
+    ) {
+      site {
+        product(
+          entityId: $entityId
+          optionValueIds: $optionValueIds
+          useDefaultOptionSelections: true
+        ) {
+          ...PricingFragment
+        }
+      }
+    }
+  `,
+  [PricingFragment],
+);
+
+/** Product prices for a specific option/variant configuration (no price range). */
+export const getKitComponentConfiguredPrices = cache(
+  async ({
+    entityId,
+    optionValueIds,
+    currencyCode,
+    customerAccessToken,
+  }: {
+    entityId: number;
+    optionValueIds?: Array<{ optionEntityId: number; valueEntityId: number }>;
+    currencyCode?: Variables['currencyCode'];
+    customerAccessToken?: string;
+  }) => {
+    const { data } = await client.fetch({
+      document: KitComponentConfiguredPricingQuery,
+      variables: {
+        entityId,
+        optionValueIds: optionValueIds?.length ? optionValueIds : undefined,
+        currencyCode,
+      },
+      customerAccessToken,
+      fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate } },
+    });
+
+    return data.site.product?.prices ?? null;
+  },
+);
+
 const InventorySettingsQuery = graphql(`
   query InventorySettingsQuery {
     site {
