@@ -3,7 +3,7 @@
 import { clsx } from 'clsx';
 import { useLocale, useTranslations } from 'next-intl';
 import { useParams, useSearchParams } from 'next/navigation';
-import { useCallback, useTransition } from 'react';
+import { useCallback, useEffect, useState, useTransition } from 'react';
 
 import { locales } from '~/i18n/locales';
 import { usePathname, useRouter } from '~/i18n/routing';
@@ -21,30 +21,47 @@ export function LocaleToggle({ className }: { className?: string }) {
   const params = useParams();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+  // Show the target locale immediately on click; sync back when navigation finishes.
+  const [displayedLocale, setDisplayedLocale] = useState(activeLocale);
+
+  useEffect(() => {
+    setDisplayedLocale(activeLocale);
+  }, [activeLocale]);
 
   const switchLocale = useCallback(
-    async (targetLocale: string) => {
-      if (targetLocale === activeLocale) {
+    (targetLocale: string) => {
+      if (targetLocale === activeLocale || targetLocale === displayedLocale) {
         return;
       }
 
-      const localizedPathname = await getLocalizedPathname({
-        pathname,
-        activeLocale,
-        targetLocale,
-      });
+      // Slide the pill immediately; content catches up after the locale route loads.
+      setDisplayedLocale(targetLocale);
 
-      router.push(
-        {
-          pathname: localizedPathname,
-          // @ts-expect-error -- pathname and params always match the current route
-          params,
-          query: Object.fromEntries(searchParams.entries()),
-        },
-        { locale: targetLocale },
-      );
+      void (async () => {
+        try {
+          const localizedPathname = await getLocalizedPathname({
+            pathname,
+            activeLocale,
+            targetLocale,
+          });
+
+          startTransition(() => {
+            router.push(
+              {
+                pathname: localizedPathname,
+                // @ts-expect-error -- pathname and params always match the current route
+                params,
+                query: Object.fromEntries(searchParams.entries()),
+              },
+              { locale: targetLocale },
+            );
+          });
+        } catch {
+          setDisplayedLocale(activeLocale);
+        }
+      })();
     },
-    [pathname, activeLocale, params, router, searchParams],
+    [pathname, activeLocale, displayedLocale, params, router, searchParams],
   );
 
   if (locales.length < 2) {
@@ -53,13 +70,14 @@ export function LocaleToggle({ className }: { className?: string }) {
 
   const activeIndex = Math.max(
     0,
-    locales.findIndex((code) => code === activeLocale),
+    locales.findIndex((code) => code === displayedLocale),
   );
+  const isSwitching = isPending || displayedLocale !== activeLocale;
 
   return (
     <div
       aria-label={t('label')}
-      className={clsx('header-locale-toggle', isPending && 'is-pending', className)}
+      className={clsx('header-locale-toggle', isSwitching && 'is-pending', className)}
       role="group"
     >
       <span
@@ -71,18 +89,18 @@ export function LocaleToggle({ className }: { className?: string }) {
         }}
       />
       {locales.map((code) => {
-        const isActive = code === activeLocale;
+        const isActive = code === displayedLocale;
 
         return (
           <button
             aria-label={t('switchTo', { locale: localeLabel(code) })}
             aria-pressed={isActive}
             className={clsx('header-locale-toggle__option', isActive && 'is-active')}
-            disabled={isPending}
+            disabled={isSwitching}
             key={code}
             onClick={() => {
               if (!isActive) {
-                startTransition(() => switchLocale(code));
+                switchLocale(code);
               }
             }}
             type="button"

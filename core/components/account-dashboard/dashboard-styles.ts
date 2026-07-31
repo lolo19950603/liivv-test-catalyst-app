@@ -212,7 +212,7 @@ body.adc-portal-active main{
     justify-content:flex-start;
     gap:1.5rem;
     min-height:var(--liivv-header-utility-size, 2.75rem);
-    padding-inline-end:var(--liivv-header-utility-cluster-width, 21rem);
+    padding-inline-end:var(--liivv-header-utility-cluster-width, 27rem);
   }
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-content-header__greeting{

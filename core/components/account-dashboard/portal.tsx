@@ -7,6 +7,7 @@ import { AccountNotificationsBell } from '~/components/account-notifications';
 import { OnboardingBanner } from '~/components/onboarding/onboarding-banner';
 import { initialsFromName } from '~/lib/account/customer-initials';
 import { useLocalizedPathname } from '~/i18n/use-localized-pathname';
+import { LocaleToggle } from '~/lib/makeswift/liivv-archive-header/locale-toggle';
 
 import {
   ACCOUNT_DASHBOARD_ROOT_ID,
@@ -214,6 +215,7 @@ export function AccountDashboardPortal({
                 </div>
 
                 <div className="mhd-content-header__utilities">
+                  <LocaleToggle />
                   {search.trigger}
                   <AccountNotificationsBell
                     labels={{
