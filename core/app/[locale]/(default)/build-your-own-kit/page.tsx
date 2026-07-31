@@ -1,8 +1,9 @@
 import { redirect } from 'next/navigation';
 
 /**
- * Legacy DIY kit builder route. Curated kits replaced free-form building.
+ * Legacy DIY / hardcoded kit routes. Kits are now real BigCommerce products
+ * (custom field kit_type=curated + related products) under their category.
  */
 export default function LegacyBuildYourOwnKitRedirect() {
-  redirect('/kit/first-cycle-starter-kit');
+  redirect('/liivv-health/womens-health/shop-womens-health');
 }

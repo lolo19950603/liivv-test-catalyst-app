@@ -1,7 +1,7 @@
 'use client';
 
 import { useFormatter, useTranslations } from 'next-intl';
-import { useMemo, useState, useTransition } from 'react';
+import { type ReactNode, useMemo, useState, useTransition } from 'react';
 
 import { PriceLabel, type Price } from '@/vibes/soul/primitives/price-label';
 import { Button } from '@/vibes/soul/primitives/button';
@@ -9,7 +9,7 @@ import { toast } from '@/vibes/soul/primitives/toaster';
 import { Image } from '~/components/image';
 import { Link } from '~/components/link';
 
-import { addKitToCart } from '../_actions/add-kit-to-cart';
+import { addKitToCart } from '~/lib/kit/add-kit-to-cart';
 
 export interface CuratedKitProduct {
   productEntityId: number;
@@ -30,7 +30,7 @@ interface SelectedItem {
 
 interface Props {
   kitName: string;
-  kitDescription: string;
+  kitDescription: ReactNode;
   products: CuratedKitProduct[];
 }
 
@@ -124,7 +124,7 @@ export function CuratedKitCustomizer({ kitName, kitDescription, products }: Prop
         <h1 className="font-[family-name:var(--font-family-heading)] text-3xl font-medium text-[var(--foreground)] md:text-4xl">
           {kitName}
         </h1>
-        <p className="max-w-2xl text-[var(--contrast-500)]">{kitDescription}</p>
+        <div className="prose max-w-2xl text-[var(--contrast-500)]">{kitDescription}</div>
       </header>
 
       <section className="space-y-4">

@@ -193,6 +193,15 @@ const ProductQuery = graphql(
             numberOfReviews
           }
           description
+          customFields {
+            edges {
+              node {
+                entityId
+                name
+                value
+              }
+            }
+          }
           ...ProductOptionsFragment
         }
       }
@@ -396,7 +405,7 @@ const ProductPricingAndRelatedProductsQuery = graphql(
           useDefaultOptionSelections: $useDefaultOptionSelections
         ) {
           ...PricingFragment
-          relatedProducts(first: 8) {
+          relatedProducts(first: 50) {
             edges {
               node {
                 ...FeaturedProductsCarouselFragment
