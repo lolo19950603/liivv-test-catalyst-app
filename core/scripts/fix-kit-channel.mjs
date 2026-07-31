@@ -1,5 +1,6 @@
 const h = process.env.BIGCOMMERCE_STORE_HASH;
-const t = process.env.BIGCOMMERCE_ACCESS_TOKEN;
+// Prefer write-scoped token; keep app BIGCOMMERCE_ACCESS_TOKEN unchanged.
+const t = process.env.CATALYST_PRODUCT_EDIT_TOKEN || process.env.BIGCOMMERCE_ACCESS_TOKEN;
 const c = Number(process.env.BIGCOMMERCE_CHANNEL_ID);
 
 async function bc(path, init = {}) {

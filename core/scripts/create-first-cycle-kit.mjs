@@ -4,15 +4,20 @@
  * (or load env manually)
  */
 const STORE_HASH = process.env.BIGCOMMERCE_STORE_HASH;
-const TOKEN = process.env.BIGCOMMERCE_ACCESS_TOKEN;
+// Prefer write-scoped token; keep app BIGCOMMERCE_ACCESS_TOKEN unchanged.
+const TOKEN = process.env.CATALYST_PRODUCT_EDIT_TOKEN || process.env.BIGCOMMERCE_ACCESS_TOKEN;
 const CHANNEL_ID = Number(process.env.BIGCOMMERCE_CHANNEL_ID || '1');
 
 const COMPONENT_IDS = [7828, 7847, 7810, 7876, 7849, 7970, 7971, 7972];
+/** Component product id → locked variant SKU for this kit. */
+const KIT_VARIANTS = { 7828: 'WC-211157' };
 const KIT_NAME = 'First Cycle Starter Kit';
 const KIT_SKU = 'KIT-FIRST-CYCLE-STARTER';
 
 if (!STORE_HASH || !TOKEN) {
-  console.error('Missing BIGCOMMERCE_STORE_HASH or BIGCOMMERCE_ACCESS_TOKEN');
+  console.error(
+    'Missing BIGCOMMERCE_STORE_HASH or CATALYST_PRODUCT_EDIT_TOKEN / BIGCOMMERCE_ACCESS_TOKEN',
+  );
   process.exit(1);
 }
 
@@ -128,6 +133,19 @@ async function main() {
         body: JSON.stringify({ name: 'kit_type', value: 'curated' }),
       });
     }
+    const kitVariantsValue = JSON.stringify(KIT_VARIANTS);
+    const variantsField = fields.find((f) => f.name === 'kit_variants');
+    if (!variantsField) {
+      await bc(`/v3/catalog/products/${existing.id}/custom-fields`, {
+        method: 'POST',
+        body: JSON.stringify({ name: 'kit_variants', value: kitVariantsValue }),
+      });
+    } else if (variantsField.value !== kitVariantsValue) {
+      await bc(`/v3/catalog/products/${existing.id}/custom-fields/${variantsField.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ name: 'kit_variants', value: kitVariantsValue }),
+      });
+    }
     await bc('/v3/catalog/products/channel-assignments', {
       method: 'PUT',
       body: JSON.stringify([{ product_id: existing.id, channel_id: CHANNEL_ID }]),
@@ -154,7 +172,10 @@ async function main() {
       related_products: COMPONENT_IDS,
       is_visible: true,
       inventory_tracking: 'none',
-      custom_fields: [{ name: 'kit_type', value: 'curated' }],
+      custom_fields: [
+        { name: 'kit_type', value: 'curated' },
+        { name: 'kit_variants', value: JSON.stringify(KIT_VARIANTS) },
+      ],
     }),
   });
 

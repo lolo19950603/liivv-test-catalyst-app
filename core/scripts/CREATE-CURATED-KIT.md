@@ -24,18 +24,51 @@ Your API token does not currently allow creating products (`403` missing product
    `7828, 7847, 7810, 7876, 7849, 7970, 7971, 7972`
 
 3. **Custom fields** — add:  
-   - Name: `kit_type`  
-   - Value: `curated`
+   - Name: `kit_type` / Value: `curated`  
+   - Name: `kit_variants` / Value: `{"7828":"WC-211157"}`  
+     (component product id → locked variant SKU; omit simple products)
 
 4. Assign the product to your storefront **channel** if using multi-storefront.
 
 5. Open the product on the storefront — you should see the kit customizer (not the normal buy box).
 
-## Script (optional, needs Products modify scope)
+## Variants / required options
 
-```bash
-cd core
-node --env-file=../.env.local scripts/create-first-cycle-kit.mjs
+Customers only change **qty** or **remove** items — no option pickers.
+
+Per-kit locked variants are set on the **kit product** with custom field:
+
+- Name: `kit_variants`
+- Value (JSON): map of component **product ID → variant SKU** (or variant entity id)
+
+```json
+{"7828":"WC-211157","7971":"WC-265740"}
 ```
 
-Update the API account in BigCommerce to include **Products → modify**, then re-run.
+Another kit can map the same product to a different SKU. If a component is omitted,
+the app falls back to that product’s default option value.
+
+Example for First Cycle Starter Kit (pads → 12 Count SKU):
+
+```json
+{"7828":"WC-211157"}
+```
+
+## Script (optional, needs Products modify scope)
+
+Keep the app’s `BIGCOMMERCE_ACCESS_TOKEN` as-is. Create a separate store API token with
+**Products → modify**, and put it in `.env.local` as:
+
+```
+CATALYST_PRODUCT_EDIT_TOKEN=...
+```
+
+Catalog scripts prefer that token, then fall back to `BIGCOMMERCE_ACCESS_TOKEN`.
+
+```bash
+# Assign kit to Catalyst channel + Shop Women's Health (tree 10)
+node --env-file=.env.local core/scripts/fix-kit-channel.mjs
+
+# Or create/update the kit product
+node --env-file=.env.local core/scripts/create-first-cycle-kit.mjs
+```

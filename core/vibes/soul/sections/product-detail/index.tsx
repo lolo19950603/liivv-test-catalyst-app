@@ -86,6 +86,8 @@ export interface ProductDetailProps<F extends Field> {
   buyRowVariant?: ProductDetailBuyRowVariant;
   showPurchaseOptions?: boolean;
   purchaseOptions?: ProductPurchaseOptionsConfig;
+  /** When set, replaces the default product options / add-to-cart form. */
+  purchaseSlot?: ReactNode;
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -132,6 +134,7 @@ export function ProductDetail<F extends Field>({
   buyRowVariant = 'default',
   showPurchaseOptions = false,
   purchaseOptions,
+  purchaseSlot,
 }: ProductDetailProps<F>) {
   return (
     <section className="@container">
@@ -251,50 +254,54 @@ export function ProductDetail<F extends Field>({
                     </Stream>
                   </div>
                   <div className="group/product-detail-form">
-                    <Stream
-                      fallback={<ProductDetailFormSkeleton />}
-                      value={Streamable.all([
-                        streamableFields,
-                        streamableCtaLabel,
-                        streamableCtaDisabled,
-                        product.minQuantity,
-                        product.maxQuantity,
-                        product.stockDisplayData,
-                        product.backorderDisplayData,
-                      ])}
-                    >
-                      {([
-                        fields,
-                        ctaLabel,
-                        ctaDisabled,
-                        minQuantity,
-                        maxQuantity,
-                        stockDisplayData,
-                        backorderDisplayData,
-                      ]) => (
-                        <ProductDetailFormHydrationGate
-                          action={action}
-                          additionalActions={additionalActions}
-                          backorderDisplayData={backorderDisplayData ?? undefined}
-                          buyRowVariant={buyRowVariant}
-                          ctaDisabled={ctaDisabled ?? undefined}
-                          ctaLabel={ctaLabel ?? undefined}
-                          decrementLabel={decrementLabel}
-                          emptySelectPlaceholder={emptySelectPlaceholder}
-                          fields={fields}
-                          incrementLabel={incrementLabel}
-                          maxQuantity={maxQuantity ?? undefined}
-                          minQuantity={minQuantity ?? undefined}
-                          prefetch={prefetch}
-                          productId={product.id}
-                          purchaseOptions={purchaseOptions}
-                          quantityLabel={quantityLabel}
-                          showPurchaseOptions={showPurchaseOptions}
-                          skeleton={<ProductDetailFormSkeleton />}
-                          stockDisplayData={stockDisplayData ?? undefined}
-                        />
-                      )}
-                    </Stream>
+                    {purchaseSlot ? (
+                      purchaseSlot
+                    ) : (
+                      <Stream
+                        fallback={<ProductDetailFormSkeleton />}
+                        value={Streamable.all([
+                          streamableFields,
+                          streamableCtaLabel,
+                          streamableCtaDisabled,
+                          product.minQuantity,
+                          product.maxQuantity,
+                          product.stockDisplayData,
+                          product.backorderDisplayData,
+                        ])}
+                      >
+                        {([
+                          fields,
+                          ctaLabel,
+                          ctaDisabled,
+                          minQuantity,
+                          maxQuantity,
+                          stockDisplayData,
+                          backorderDisplayData,
+                        ]) => (
+                          <ProductDetailFormHydrationGate
+                            action={action}
+                            additionalActions={additionalActions}
+                            backorderDisplayData={backorderDisplayData ?? undefined}
+                            buyRowVariant={buyRowVariant}
+                            ctaDisabled={ctaDisabled ?? undefined}
+                            ctaLabel={ctaLabel ?? undefined}
+                            decrementLabel={decrementLabel}
+                            emptySelectPlaceholder={emptySelectPlaceholder}
+                            fields={fields}
+                            incrementLabel={incrementLabel}
+                            maxQuantity={maxQuantity ?? undefined}
+                            minQuantity={minQuantity ?? undefined}
+                            prefetch={prefetch}
+                            productId={product.id}
+                            purchaseOptions={purchaseOptions}
+                            quantityLabel={quantityLabel}
+                            showPurchaseOptions={showPurchaseOptions}
+                            skeleton={<ProductDetailFormSkeleton />}
+                            stockDisplayData={stockDisplayData ?? undefined}
+                          />
+                        )}
+                      </Stream>
+                    )}
                   </div>
                   <div className="group/product-description">
                     <Stream fallback={<ProductDescriptionSkeleton />} value={product.description}>

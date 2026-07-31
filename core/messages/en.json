@@ -207,7 +207,7 @@
       "Errors": {
         "emptyKit": "Add at least one product to your kit.",
         "missingCart": "There was a problem creating your cart. Please try again.",
-        "addFailed": "Some products could not be added. Products with required options may need to be configured on their product page.",
+        "addFailed": "Some products could not be added. Check each item’s options and try again.",
         "unexpected": "Something went wrong. Please try again.",
         "productsUnavailable": "The products in this kit could not be loaded right now. Please try again later."
       }

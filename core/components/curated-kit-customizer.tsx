@@ -1,7 +1,7 @@
 'use client';
 
 import { useFormatter, useTranslations } from 'next-intl';
-import { type ReactNode, useMemo, useState, useTransition } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 
 import { PriceLabel, type Price } from '@/vibes/soul/primitives/price-label';
 import { Button } from '@/vibes/soul/primitives/button';
@@ -10,6 +10,19 @@ import { Image } from '~/components/image';
 import { Link } from '~/components/link';
 
 import { addKitToCart } from '~/lib/kit/add-kit-to-cart';
+
+export interface CuratedKitOptionValue {
+  entityId: number;
+  label: string;
+  isDefault: boolean;
+}
+
+export interface CuratedKitOption {
+  entityId: number;
+  displayName: string;
+  isRequired: boolean;
+  values: CuratedKitOptionValue[];
+}
 
 export interface CuratedKitProduct {
   productEntityId: number;
@@ -21,6 +34,16 @@ export interface CuratedKitProduct {
   currencyCode: string;
   sku?: string;
   defaultQuantity: number;
+  /** Fallback option catalog when kit_variants does not override this component. */
+  options?: CuratedKitOption[];
+  /** Kit-specific locked selections (from kit_variants or product defaults). */
+  selectedOptions?: {
+    multipleChoices: Array<{
+      optionEntityId: number;
+      optionValueEntityId: number;
+    }>;
+  };
+  variantEntityId?: number;
 }
 
 interface SelectedItem {
@@ -30,11 +53,37 @@ interface SelectedItem {
 
 interface Props {
   kitName: string;
-  kitDescription: ReactNode;
   products: CuratedKitProduct[];
 }
 
-export function CuratedKitCustomizer({ kitName, kitDescription, products }: Props) {
+function fallbackSelectedOptions(product: CuratedKitProduct) {
+  if (product.selectedOptions?.multipleChoices?.length) {
+    return product.selectedOptions;
+  }
+
+  const multipleChoices = (product.options ?? []).flatMap((option) => {
+    const preferred = option.values.find((value) => value.isDefault) ?? option.values[0];
+
+    if (!preferred) {
+      return [];
+    }
+
+    return [
+      {
+        optionEntityId: option.entityId,
+        optionValueEntityId: preferred.entityId,
+      },
+    ];
+  });
+
+  return multipleChoices.length > 0 ? { multipleChoices } : undefined;
+}
+
+/**
+ * Buy-box for curated kits — qty / remove only. Meant to replace the normal
+ * ProductDetail add-to-cart form while keeping the rest of the PDP intact.
+ */
+export function CuratedKitCustomizer({ kitName, products }: Props) {
   // Namespace typing can hit TS depth limits on this large messages tree.
   const t = useTranslations('Faceted.CuratedKit') as unknown as {
     (key: string, values?: Record<string, string | number | Date>): string;
@@ -99,12 +148,15 @@ export function CuratedKitCustomizer({ kitName, kitDescription, products }: Prop
         kitName,
         items: included.map((item) => {
           const product = productById.get(item.productEntityId);
+          const selectedOptions = product ? fallbackSelectedOptions(product) : undefined;
 
           return {
             productEntityId: item.productEntityId,
             quantity: item.quantity,
             name: product?.title ?? String(item.productEntityId),
             ...(product?.sku ? { sku: product.sku } : {}),
+            ...(product?.variantEntityId ? { variantEntityId: product.variantEntityId } : {}),
+            ...(selectedOptions ? { selectedOptions } : {}),
           };
         }),
       });
@@ -116,27 +168,17 @@ export function CuratedKitCustomizer({ kitName, kitDescription, products }: Prop
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 lg:px-6">
-      <header className="mb-8 space-y-3">
-        <p className="text-sm font-medium uppercase tracking-wide text-[var(--contrast-500)]">
-          {t('eyebrow')}
-        </p>
-        <h1 className="font-[family-name:var(--font-family-heading)] text-3xl font-medium text-[var(--foreground)] md:text-4xl">
-          {kitName}
-        </h1>
-        <div className="prose max-w-2xl text-[var(--contrast-500)]">{kitDescription}</div>
-      </header>
-
-      <section className="space-y-4">
+    <div className="space-y-6 pb-8">
+      <div className="space-y-3">
         <div className="flex items-end justify-between gap-4">
-          <h2 className="text-lg font-medium">{t('includedTitle')}</h2>
+          <h2 className="text-base font-medium">{t('includedTitle')}</h2>
           <p className="text-sm text-[var(--contrast-500)]">
             {t('includedCount', { count: included.length })}
           </p>
         </div>
 
         {included.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-[var(--contrast-200)] px-4 py-8 text-center text-sm text-[var(--contrast-500)]">
+          <p className="rounded-xl border border-dashed border-[var(--contrast-200)] px-4 py-6 text-center text-sm text-[var(--contrast-500)]">
             {t('allRemoved')}
           </p>
         ) : (
@@ -149,9 +191,9 @@ export function CuratedKitCustomizer({ kitName, kitDescription, products }: Prop
               }
 
               return (
-                <li className="flex gap-4 p-4" key={item.productEntityId}>
+                <li className="flex gap-3 p-3" key={item.productEntityId}>
                   <Link
-                    className="relative size-20 shrink-0 overflow-hidden rounded-lg bg-[var(--contrast-100)]"
+                    className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-[var(--contrast-100)]"
                     href={product.href}
                   >
                     {product.image ? (
@@ -159,37 +201,37 @@ export function CuratedKitCustomizer({ kitName, kitDescription, products }: Prop
                         alt={product.image.alt}
                         className="object-cover"
                         fill
-                        sizes="80px"
+                        sizes="56px"
                         src={product.image.src}
                       />
                     ) : null}
                   </Link>
                   <div className="min-w-0 flex-1">
                     <Link
-                      className="font-medium text-[var(--foreground)] hover:underline"
+                      className="line-clamp-2 text-sm font-medium text-[var(--foreground)] hover:underline"
                       href={product.href}
                     >
                       {product.title}
                     </Link>
                     {product.price ? (
-                      <div className="mt-1">
-                        <PriceLabel price={product.price} />
+                      <div className="mt-0.5">
+                        <PriceLabel className="text-sm" price={product.price} />
                       </div>
                     ) : null}
-                    <div className="mt-3 flex flex-wrap items-center gap-3">
-                      <div className="flex items-center gap-2">
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <button
                           aria-label={t('decrement')}
-                          className="flex size-8 items-center justify-center rounded border border-[var(--contrast-200)] text-sm"
+                          className="flex size-7 items-center justify-center rounded border border-[var(--contrast-200)] text-sm"
                           onClick={() => setQuantity(item.productEntityId, item.quantity - 1)}
                           type="button"
                         >
                           −
                         </button>
-                        <span className="min-w-6 text-center text-sm">{item.quantity}</span>
+                        <span className="min-w-5 text-center text-sm">{item.quantity}</span>
                         <button
                           aria-label={t('increment')}
-                          className="flex size-8 items-center justify-center rounded border border-[var(--contrast-200)] text-sm"
+                          className="flex size-7 items-center justify-center rounded border border-[var(--contrast-200)] text-sm"
                           onClick={() => setQuantity(item.productEntityId, item.quantity + 1)}
                           type="button"
                         >
@@ -197,7 +239,7 @@ export function CuratedKitCustomizer({ kitName, kitDescription, products }: Prop
                         </button>
                       </div>
                       <button
-                        className="text-sm text-[var(--contrast-500)] underline"
+                        className="text-xs text-[var(--contrast-500)] underline"
                         onClick={() => setQuantity(item.productEntityId, 0)}
                         type="button"
                       >
@@ -210,32 +252,29 @@ export function CuratedKitCustomizer({ kitName, kitDescription, products }: Prop
             })}
           </ul>
         )}
-      </section>
+      </div>
 
       {removed.length > 0 ? (
-        <section className="mt-10 space-y-4">
-          <h2 className="text-lg font-medium">{t('removedTitle')}</h2>
-          <p className="text-sm text-[var(--contrast-500)]">{t('removedSubtitle')}</p>
-          <ul className="grid gap-3 sm:grid-cols-2">
+        <div className="space-y-3">
+          <h3 className="text-sm font-medium">{t('removedTitle')}</h3>
+          <ul className="space-y-2">
             {removed.map((product) => (
               <li
-                className="flex items-center gap-3 rounded-xl border border-[var(--contrast-100)] p-3"
+                className="flex items-center gap-3 rounded-lg border border-[var(--contrast-100)] p-2"
                 key={product.productEntityId}
               >
-                <div className="relative size-14 shrink-0 overflow-hidden rounded-md bg-[var(--contrast-100)]">
+                <div className="relative size-10 shrink-0 overflow-hidden rounded-md bg-[var(--contrast-100)]">
                   {product.image ? (
                     <Image
                       alt={product.image.alt}
                       className="object-cover"
                       fill
-                      sizes="56px"
+                      sizes="40px"
                       src={product.image.src}
                     />
                   ) : null}
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="line-clamp-2 text-sm font-medium">{product.title}</p>
-                </div>
+                <p className="min-w-0 flex-1 line-clamp-2 text-xs font-medium">{product.title}</p>
                 <Button
                   onClick={() => setQuantity(product.productEntityId, product.defaultQuantity)}
                   size="x-small"
@@ -247,27 +286,25 @@ export function CuratedKitCustomizer({ kitName, kitDescription, products }: Prop
               </li>
             ))}
           </ul>
-        </section>
+        </div>
       ) : null}
 
-      <div className="sticky bottom-0 mt-10 border-t border-[var(--contrast-100)] bg-[var(--background)]/95 py-4 backdrop-blur">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm text-[var(--contrast-500)]">{t('runningTotal')}</p>
-            <p className="text-xl font-semibold">
-              {format.number(runningTotal, { style: 'currency', currency: currencyCode })}
-            </p>
-          </div>
-          <Button
-            className="w-full sm:w-auto"
-            disabled={included.length === 0 || isPending}
-            loading={isPending}
-            onClick={handleAddKitToCart}
-            type="button"
-          >
-            {t('addKitToCart')}
-          </Button>
+      <div className="flex flex-col gap-3 border-t border-[var(--contrast-100)] pt-4">
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="text-sm text-[var(--contrast-500)]">{t('runningTotal')}</p>
+          <p className="text-lg font-semibold">
+            {format.number(runningTotal, { style: 'currency', currency: currencyCode })}
+          </p>
         </div>
+        <Button
+          className="w-full"
+          disabled={included.length === 0 || isPending}
+          loading={isPending}
+          onClick={handleAddKitToCart}
+          type="button"
+        >
+          {t('addKitToCart')}
+        </Button>
       </div>
     </div>
   );

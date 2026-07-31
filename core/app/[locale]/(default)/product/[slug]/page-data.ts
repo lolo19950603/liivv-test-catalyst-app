@@ -1,3 +1,4 @@
+import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
 import { cache } from 'react';
 
 import { client } from '~/client';
@@ -429,6 +430,77 @@ export const getProductPricingAndRelatedProducts = cache(
     });
 
     return data.site.product;
+  },
+);
+
+const KitComponentProductsQuery = graphql(
+  `
+    query KitComponentProductsQuery($entityIds: [Int!], $currencyCode: currencyCode) {
+      site {
+        products(entityIds: $entityIds) {
+          edges {
+            node {
+              entityId
+              name
+              path
+              sku
+              defaultImage {
+                altText
+                url: urlTemplate(lossy: true)
+              }
+              ...PricingFragment
+              productOptions(first: 50) {
+                edges {
+                  node {
+                    __typename
+                    entityId
+                    displayName
+                    isRequired
+                    ... on MultipleChoiceOption {
+                      values(first: 50) {
+                        edges {
+                          node {
+                            entityId
+                            label
+                            isDefault
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `,
+  [PricingFragment],
+);
+
+export const getKitComponentProducts = cache(
+  async ({
+    entityIds,
+    currencyCode,
+    customerAccessToken,
+  }: {
+    entityIds: number[];
+    currencyCode?: Variables['currencyCode'];
+    customerAccessToken?: string;
+  }) => {
+    if (entityIds.length === 0) {
+      return [];
+    }
+
+    const { data } = await client.fetch({
+      document: KitComponentProductsQuery,
+      variables: { entityIds, currencyCode },
+      customerAccessToken,
+      fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate } },
+    });
+
+    return removeEdgesAndNodes(data.site.products);
   },
 );
 

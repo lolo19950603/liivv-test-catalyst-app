@@ -13,7 +13,11 @@ import { productCardTransformer } from '~/data-transformers/product-card-transfo
 import { productOptionsTransformer } from '~/data-transformers/product-options-transformer';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { CuratedKitCustomizer, type CuratedKitProduct } from '~/components/curated-kit-customizer';
-import { isCuratedKitFromProductConnection } from '~/lib/kit';
+import {
+  isCuratedKitFromProductConnection,
+  parseKitVariantOverridesFromConnection,
+  resolveKitComponentVariantSelection,
+} from '~/lib/kit';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { ProductDetail } from '~/lib/makeswift/components/product-detail';
 import { Slot } from '~/lib/makeswift/slot';
@@ -45,6 +49,7 @@ import { Reviews } from './_components/reviews';
 import { WishlistButton } from './_components/wishlist-button';
 import { WishlistButtonForm } from './_components/wishlist-button/form';
 import {
+  getKitComponentProducts,
   getProduct,
   getProductPageMetadata,
   getProductPricingAndRelatedProducts,
@@ -556,25 +561,107 @@ export default async function Product({ params, searchParams }: Props) {
     }
 
     const relatedProducts = removeEdgesAndNodes(product.relatedProducts);
+    const entityIds = relatedProducts.map((related) => related.entityId);
 
-    return relatedProducts.map((related) => {
-      const unitPrice = related.prices?.salePrice?.value ?? related.prices?.price.value ?? 0;
-      const currencyCode = related.prices?.price.currencyCode ?? 'USD';
+    if (entityIds.length === 0) {
+      return [];
+    }
 
-      return {
-        productEntityId: related.entityId,
-        title: related.name,
-        href: related.path,
-        image: related.defaultImage
-          ? { src: related.defaultImage.url, alt: related.defaultImage.altText }
-          : undefined,
-        price: pricesTransformer(related.prices, format),
-        unitPrice,
-        currencyCode,
-        sku: related.sku,
-        defaultQuantity: 1,
-      };
+    const variantOverrides = parseKitVariantOverridesFromConnection(baseProduct);
+    const components = await getKitComponentProducts({
+      entityIds,
+      currencyCode: await getPreferredCurrencyCode(),
+      customerAccessToken,
     });
+
+    // Preserve related-products order from the kit parent.
+    const byId = new Map(components.map((component) => [component.entityId, component] as const));
+
+    return (
+      await Promise.all(
+        entityIds.map(async (entityId) => {
+          const component = byId.get(entityId);
+
+          if (!component) {
+            return null;
+          }
+
+          const unitPrice =
+            component.prices?.salePrice?.value ?? component.prices?.price.value ?? 0;
+          const componentCurrency = component.prices?.price.currencyCode ?? 'USD';
+          const options = removeEdgesAndNodes(component.productOptions).flatMap((option) => {
+            if (option.__typename !== 'MultipleChoiceOption') {
+              return [];
+            }
+
+            const values = removeEdgesAndNodes(option.values).map((value) => ({
+              entityId: value.entityId,
+              label: value.label,
+              isDefault: value.isDefault,
+            }));
+
+            if (values.length === 0) {
+              return [];
+            }
+
+            return [
+              {
+                entityId: option.entityId,
+                displayName: option.displayName,
+                isRequired: option.isRequired,
+                values,
+              },
+            ];
+          });
+
+          const overrideSelection = await resolveKitComponentVariantSelection(
+            entityId,
+            variantOverrides,
+          );
+
+          const fallbackMultipleChoices = options.flatMap((option) => {
+            const preferred =
+              option.values.find((value) => value.isDefault) ?? option.values[0];
+
+            if (!preferred) {
+              return [];
+            }
+
+            return [
+              {
+                optionEntityId: option.entityId,
+                optionValueEntityId: preferred.entityId,
+              },
+            ];
+          });
+
+          const selectedOptions =
+            overrideSelection?.selectedOptions ??
+            (fallbackMultipleChoices.length > 0
+              ? { multipleChoices: fallbackMultipleChoices }
+              : undefined);
+
+          return {
+            productEntityId: component.entityId,
+            title: component.name,
+            href: component.path,
+            image: component.defaultImage
+              ? { src: component.defaultImage.url, alt: component.defaultImage.altText }
+              : undefined,
+            price: pricesTransformer(component.prices, format),
+            unitPrice,
+            currencyCode: componentCurrency,
+            sku: component.sku,
+            defaultQuantity: 1,
+            options,
+            ...(overrideSelection?.variantEntityId
+              ? { variantEntityId: overrideSelection.variantEntityId }
+              : {}),
+            ...(selectedOptions ? { selectedOptions } : {}),
+          } satisfies CuratedKitProduct;
+        }),
+      )
+    ).filter((item): item is CuratedKitProduct => item != null);
   });
 
   const streamableMinQuantity = Streamable.from(async () => {
@@ -660,92 +747,85 @@ export default async function Product({ params, searchParams }: Props) {
     <>
       <Slot label="Product (all products) — top" snapshotId="product-page-top-content" />
 
-      {isCuratedKit ? (
-        <Stream
-          fallback={
-            <div className="mx-auto max-w-4xl px-4 py-16 text-center text-[var(--contrast-500)] lg:px-6">
-              Loading kit…
-            </div>
-          }
-          value={streamableKitProducts}
-        >
-          {(kitProducts) => (
-            <CuratedKitCustomizer
-              kitDescription={
-                <div dangerouslySetInnerHTML={{ __html: baseProduct.description }} />
-              }
-              kitName={baseProduct.name}
-              products={kitProducts}
-            />
-          )}
-        </Stream>
-      ) : (
-        <>
-          <div className="liivv-product-page-feel">
-            <ProductAnalyticsProvider data={streamableAnalyticsData}>
-              <ProductDetail
-                action={addToCart}
-                additionalActions={
-                  <WishlistButton
-                    formId={detachedWishlistFormId}
-                    productId={productId}
-                    productSku={streamableProductSku}
-                  />
-                }
-                additionalInformationTitle={t('ProductDetails.additionalInformation')}
-                buyRowVariant="archive"
-                ctaDisabled={streameableCtaDisabled}
-                ctaLabel={streameableCtaLabel}
-                decrementLabel={t('ProductDetails.decreaseQuantity')}
-                emptySelectPlaceholder={t('ProductDetails.emptySelectPlaceholder')}
-                fields={productOptionsTransformer(baseProduct.productOptions)}
-                incrementLabel={t('ProductDetails.increaseQuantity')}
-                loadMoreImagesAction={getMoreProductImages}
-                prefetch={true}
-                product={{
-                  id: baseProduct.entityId.toString(),
-                  title: baseProduct.name,
-                  description: (
-                    <div dangerouslySetInnerHTML={{ __html: baseProduct.description }} />
-                  ),
-                  href: baseProduct.path,
-                  images: streamableImages,
-                  price: streamablePrices,
-                  reviewsEnabled,
-                  showRating,
-                  numberOfReviews: baseProduct.reviewSummary.numberOfReviews,
-                  subtitle: baseProduct.brand?.name,
-                  rating: baseProduct.reviewSummary.averageRating,
-                  accordions: streameableAccordions,
-                  minQuantity: streamableMinQuantity,
-                  maxQuantity: streamableMaxQuantity,
-                  stockDisplayData: streamableStockDisplayData,
-                  backorderDisplayData: streamableBackorderDisplayData,
-                }}
-                productId={baseProduct.entityId}
-                purchaseOptions={purchaseOptions}
-                quantityLabel={t('ProductDetails.quantity')}
-                recaptchaSiteKey={recaptchaSiteKey}
-                reviewFormAction={submitReview}
-                showPurchaseOptions={showPurchaseOptions}
-                thumbnailLabel={t('ProductDetails.thumbnail')}
-                user={streamableUser}
+      <div className="liivv-product-page-feel">
+        <ProductAnalyticsProvider data={streamableAnalyticsData}>
+          <ProductDetail
+            action={addToCart}
+            additionalActions={
+              <WishlistButton
+                formId={detachedWishlistFormId}
+                productId={productId}
+                productSku={streamableProductSku}
               />
-            </ProductAnalyticsProvider>
-          </div>
-
-          <FeaturedProductCarousel
-            appearance="liivv-archive"
-            emptyStateSubtitle={t('RelatedProducts.browseCatalog')}
-            emptyStateTitle={t('RelatedProducts.noRelatedProducts')}
-            nextLabel={t('RelatedProducts.nextProducts')}
-            previousLabel={t('RelatedProducts.previousProducts')}
-            products={streameableRelatedProducts}
-            scrollbarLabel={t('RelatedProducts.scrollbar')}
-            title={t('RelatedProducts.title')}
+            }
+            additionalInformationTitle={t('ProductDetails.additionalInformation')}
+            buyRowVariant="archive"
+            ctaDisabled={streameableCtaDisabled}
+            ctaLabel={streameableCtaLabel}
+            decrementLabel={t('ProductDetails.decreaseQuantity')}
+            emptySelectPlaceholder={t('ProductDetails.emptySelectPlaceholder')}
+            fields={isCuratedKit ? [] : productOptionsTransformer(baseProduct.productOptions)}
+            incrementLabel={t('ProductDetails.increaseQuantity')}
+            loadMoreImagesAction={getMoreProductImages}
+            prefetch={true}
+            product={{
+              id: baseProduct.entityId.toString(),
+              title: baseProduct.name,
+              description: (
+                <div dangerouslySetInnerHTML={{ __html: baseProduct.description }} />
+              ),
+              href: baseProduct.path,
+              images: streamableImages,
+              price: streamablePrices,
+              reviewsEnabled,
+              showRating,
+              numberOfReviews: baseProduct.reviewSummary.numberOfReviews,
+              subtitle: baseProduct.brand?.name,
+              rating: baseProduct.reviewSummary.averageRating,
+              accordions: streameableAccordions,
+              minQuantity: streamableMinQuantity,
+              maxQuantity: streamableMaxQuantity,
+              stockDisplayData: streamableStockDisplayData,
+              backorderDisplayData: streamableBackorderDisplayData,
+            }}
+            productId={baseProduct.entityId}
+            purchaseOptions={isCuratedKit ? undefined : purchaseOptions}
+            purchaseSlot={
+              isCuratedKit ? (
+                <Stream
+                  fallback={
+                    <div className="py-8 text-sm text-[var(--contrast-500)]">Loading kit…</div>
+                  }
+                  value={streamableKitProducts}
+                >
+                  {(kitProducts) => (
+                    <CuratedKitCustomizer kitName={baseProduct.name} products={kitProducts} />
+                  )}
+                </Stream>
+              ) : undefined
+            }
+            quantityLabel={t('ProductDetails.quantity')}
+            recaptchaSiteKey={recaptchaSiteKey}
+            reviewFormAction={submitReview}
+            showPurchaseOptions={isCuratedKit ? false : showPurchaseOptions}
+            thumbnailLabel={t('ProductDetails.thumbnail')}
+            user={streamableUser}
           />
-        </>
-      )}
+        </ProductAnalyticsProvider>
+      </div>
+
+      {!isCuratedKit ? (
+        <FeaturedProductCarousel
+          appearance="liivv-archive"
+          emptyStateSubtitle={t('RelatedProducts.browseCatalog')}
+          emptyStateTitle={t('RelatedProducts.noRelatedProducts')}
+          nextLabel={t('RelatedProducts.nextProducts')}
+          previousLabel={t('RelatedProducts.previousProducts')}
+          products={streameableRelatedProducts}
+          scrollbarLabel={t('RelatedProducts.scrollbar')}
+          title={t('RelatedProducts.title')}
+        />
+      ) : null}
 
       <Slot
         label="Product (all products) — between related and reviews"
