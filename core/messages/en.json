@@ -196,6 +196,18 @@
       "addBack": "Add back",
       "runningTotal": "Kit total",
       "addKitToCart": "Add kit to cart",
+      "saveForLater": "Save kit for later",
+      "saveSuccess": "Saved “{name}” to your account",
+      "addedToKit": "Product added to your kit",
+      "addedLabel": "Added by you",
+      "suggestedTitle": "Suggested add-ons",
+      "suggestedSubtitle": "Popular products you can include in this kit.",
+      "addProduct": "Add",
+      "searchAddProduct": "Search for more products",
+      "searchModalTitle": "Add a product to your kit",
+      "searchPlaceholder": "Search products…",
+      "searchSubmit": "Search",
+      "searchEmpty": "No products found. Try another search.",
       "increment": "Increase quantity",
       "decrement": "Decrease quantity",
       "remove": "Remove",
@@ -209,7 +221,9 @@
         "missingCart": "There was a problem creating your cart. Please try again.",
         "addFailed": "Some products could not be added. Check each item’s options and try again.",
         "unexpected": "Something went wrong. Please try again.",
-        "productsUnavailable": "The products in this kit could not be loaded right now. Please try again later."
+        "productsUnavailable": "The products in this kit could not be loaded right now. Please try again later.",
+        "saveFailed": "We couldn’t save your kit. Please try again.",
+        "saveUnavailable": "Saving kits is temporarily unavailable."
       }
     }
   },
@@ -222,7 +236,27 @@
       "orders": "Orders",
       "subscriptions": "Subscriptions",
       "settings": "Account",
-      "wishlists": "Wish lists"
+      "wishlists": "Wish lists",
+      "savedKits": "Saved kits"
+    },
+    "SavedKits": {
+      "title": "Saved kits",
+      "empty": "You don’t have any saved kits yet.",
+      "emptyHint": "Customize a curated kit and choose “Save kit for later”, or complete a kit purchase.",
+      "itemCount": "{count, plural, =1 {1 item} other {# items}}",
+      "updated": "Updated {date}",
+      "addToCart": "Add to cart",
+      "rename": "Rename",
+      "delete": "Delete",
+      "saveName": "Save name",
+      "cancel": "Cancel",
+      "renameSuccess": "Kit renamed",
+      "deleteSuccess": "Kit deleted",
+      "deleteConfirm": "Delete this saved kit?",
+      "Errors": {
+        "unexpected": "Something went wrong. Please try again.",
+        "notFound": "That saved kit could not be found."
+      }
     },
     "Dashboard": {
       "metaTitle": "My Health Dashboard",
@@ -260,6 +294,7 @@
         "orders": "Orders",
         "shop": "Shop",
         "wishlists": "Wish lists",
+        "savedKits": "Saved kits",
         "settings": "Account settings",
         "help": "Help"
       },

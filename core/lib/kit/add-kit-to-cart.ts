@@ -8,27 +8,8 @@ import { z } from 'zod';
 import { addToOrCreateCart } from '~/lib/cart';
 import { MissingCartError } from '~/lib/cart/error';
 import { appendKitToSession, generateKitId } from '~/lib/kit';
+import { kitItemSchema } from '~/lib/kit/kit-item-schema';
 import { serverToast } from '~/lib/server-toast';
-
-const selectedOptionsSchema = z.object({
-  multipleChoices: z
-    .array(
-      z.object({
-        optionEntityId: z.number().int().positive(),
-        optionValueEntityId: z.number().int().positive(),
-      }),
-    )
-    .optional(),
-});
-
-const kitItemSchema = z.object({
-  productEntityId: z.number().int().positive(),
-  quantity: z.number().int().positive(),
-  name: z.string().min(1),
-  sku: z.string().optional(),
-  variantEntityId: z.number().int().positive().optional(),
-  selectedOptions: selectedOptionsSchema.optional(),
-});
 
 const addKitSchema = z.object({
   kitName: z.string().optional(),
@@ -76,6 +57,8 @@ export async function addKitToCart(input: AddKitToCartInput): Promise<AddKitToCa
         quantity: item.quantity,
         name: item.name,
         ...(item.sku ? { sku: item.sku } : {}),
+        ...(item.variantEntityId ? { variantEntityId: item.variantEntityId } : {}),
+        ...(item.selectedOptions ? { selectedOptions: item.selectedOptions } : {}),
       })),
     });
   } catch (error) {

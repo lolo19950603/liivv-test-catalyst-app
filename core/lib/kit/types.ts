@@ -1,8 +1,17 @@
+export interface KitSelectedOptions {
+  multipleChoices: Array<{
+    optionEntityId: number;
+    optionValueEntityId: number;
+  }>;
+}
+
 export interface KitItem {
   productEntityId: number;
   quantity: number;
   name: string;
   sku?: string;
+  variantEntityId?: number;
+  selectedOptions?: KitSelectedOptions;
 }
 
 export interface KitRecord {

@@ -1,6 +1,9 @@
 export { generateKitId } from './generate-kit-id';
+export { formatYourCustomKitName } from './custom-kit-name';
+export { kitCompositionFingerprint } from './kit-fingerprint';
 export { assignKitIdsToCartLines, formatKitPackingStaffNotes } from './match-lines';
 export { appendKitToSession, getKitSession } from './session';
+export { saveKitsFromOrder } from './save-kits-from-order';
 export {
   isCuratedKitFromProductConnection,
   isCuratedKitProduct,
@@ -19,4 +22,4 @@ export type {
   KitComponentVariantSelection,
   KitSelectedMultipleChoice,
 } from './resolve-kit-variant';
-export type { KitItem, KitRecord, KitSession } from './types';
+export type { KitItem, KitRecord, KitSelectedOptions, KitSession } from './types';

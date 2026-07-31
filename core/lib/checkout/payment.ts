@@ -592,6 +592,24 @@ export async function fulfillCheckoutPayment(
     if (claimed && !orderId && immediateLines.length > 0) {
       orderId = await createBigCommerceOrderFromCheckoutSnapshot(snapshot, paymentIntentId);
       await markSubscriptionOrderCreated(fulfillmentRef, orderId);
+
+      if (
+        snapshot.kits &&
+        snapshot.kits.length > 0 &&
+        snapshot.bigcommerceCustomerId > 0
+      ) {
+        try {
+          const { saveKitsFromOrder } = await import('~/lib/kit/save-kits-from-order');
+
+          await saveKitsFromOrder({
+            bigcommerceCustomerId: snapshot.bigcommerceCustomerId,
+            kits: snapshot.kits,
+          });
+        } catch (saveKitError) {
+          // eslint-disable-next-line no-console
+          console.error('Failed to save kits to customer account after order:', saveKitError);
+        }
+      }
     }
 
     const needsStripeSubscriptions = snapshot.lineItems.some((line) => line.isSubscription);

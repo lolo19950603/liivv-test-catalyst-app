@@ -5,7 +5,16 @@ export type AccountMenuLink = {
 };
 
 export function buildAccountMenuLinks(
-  t: (key: 'dashboard' | 'orders' | 'subscriptions' | 'settings' | 'wishlists' | 'logout') => string,
+  t: (
+    key:
+      | 'dashboard'
+      | 'orders'
+      | 'subscriptions'
+      | 'settings'
+      | 'wishlists'
+      | 'savedKits'
+      | 'logout',
+  ) => string,
 ): AccountMenuLink[] {
   return [
     { href: '/account/dashboard/', label: t('dashboard') },
@@ -13,6 +22,7 @@ export function buildAccountMenuLinks(
     { href: '/account/subscriptions/', label: t('subscriptions') },
     { href: '/account/settings/', label: t('settings') },
     { href: '/account/wishlists/', label: t('wishlists') },
+    { href: '/account/saved-kits/', label: t('savedKits') },
     { href: '/logout', label: t('logout'), prefetch: 'none' },
   ];
 }

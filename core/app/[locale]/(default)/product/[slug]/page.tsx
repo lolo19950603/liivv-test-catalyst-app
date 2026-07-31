@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
 import { SearchParams } from 'nuqs/server';
 import type { CSSProperties } from 'react';
+import { Suspense } from 'react';
 
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { FeaturedProductCarousel } from '@/vibes/soul/sections/featured-product-carousel';
@@ -12,7 +13,12 @@ import { pricesTransformer } from '~/data-transformers/prices-transformer';
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { productOptionsTransformer } from '~/data-transformers/product-options-transformer';
 import { getPreferredCurrencyCode } from '~/lib/currency';
-import { CuratedKitCustomizer, type CuratedKitProduct } from '~/components/curated-kit-customizer';
+import {
+  CuratedKitCustomizer,
+  type CuratedKitProduct,
+  type CuratedKitSuggestedProduct,
+} from '~/components/curated-kit-customizer';
+import { getFeaturedProducts } from '~/client/queries/get-products';
 import {
   isCuratedKitFromProductConnection,
   KIT_TYPE_FIELD,
@@ -595,9 +601,9 @@ export default async function Product({ params, searchParams }: Props) {
     // Preserve related-products order from the kit parent.
     const byId = new Map(components.map((component) => [component.entityId, component] as const));
 
-    return (
+    const kitProducts = (
       await Promise.all(
-        entityIds.map(async (entityId) => {
+        entityIds.map(async (entityId): Promise<CuratedKitProduct | null> => {
           const component = byId.get(entityId);
 
           if (!component) {
@@ -701,11 +707,49 @@ export default async function Product({ params, searchParams }: Props) {
               ? { variantEntityId: overrideSelection.variantEntityId }
               : {}),
             ...(selectedOptions ? { selectedOptions } : {}),
-          } satisfies CuratedKitProduct;
+          };
         }),
       )
     ).filter((item): item is CuratedKitProduct => item != null);
+
+    return kitProducts;
   });
+
+  const streamableSuggestedKitProducts = Streamable.from(
+    async (): Promise<CuratedKitSuggestedProduct[]> => {
+      if (!isCuratedKit) {
+        return [];
+      }
+
+      const kitProducts = await streamableKitProducts;
+      const excludeIds = new Set(kitProducts.map((product) => product.productEntityId));
+      excludeIds.add(baseProduct.entityId);
+
+      const featured = await getFeaturedProducts({});
+
+      if (featured.status !== 'success' || !featured.products) {
+        return [];
+      }
+
+      return featured.products
+        .filter((product) => !excludeIds.has(product.entityId))
+        .slice(0, 6)
+        .map((product) => {
+          const optionEdges = product.productOptions?.edges ?? [];
+
+          return {
+            productEntityId: product.entityId,
+            title: product.name,
+            href: product.path,
+            image: product.defaultImage
+              ? { src: product.defaultImage.url, alt: product.defaultImage.altText }
+              : undefined,
+            price: pricesTransformer(product.prices, format),
+            hasOptions: optionEdges.length > 0,
+          } satisfies CuratedKitSuggestedProduct;
+        });
+    },
+  );
 
   const streamableMinQuantity = Streamable.from(async () => {
     const product = await streamableProduct;
@@ -839,10 +883,20 @@ export default async function Product({ params, searchParams }: Props) {
                   fallback={
                     <div className="py-8 text-sm text-[var(--contrast-500)]">Loading kit…</div>
                   }
-                  value={streamableKitProducts}
+                  value={Streamable.all([streamableKitProducts, streamableSuggestedKitProducts])}
                 >
-                  {(kitProducts) => (
-                    <CuratedKitCustomizer kitName={baseProduct.name} products={kitProducts} />
+                  {([kitProducts, suggestedProducts]) => (
+                    <Suspense
+                      fallback={
+                        <div className="py-8 text-sm text-[var(--contrast-500)]">Loading kit…</div>
+                      }
+                    >
+                      <CuratedKitCustomizer
+                        kitName={baseProduct.name}
+                        products={kitProducts}
+                        suggestedProducts={suggestedProducts}
+                      />
+                    </Suspense>
                   )}
                 </Stream>
               ) : undefined

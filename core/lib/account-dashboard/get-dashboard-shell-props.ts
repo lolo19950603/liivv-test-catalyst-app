@@ -66,6 +66,7 @@ export interface AccountDashboardShellData {
   subscriptionsHref: string;
   shopHref: string;
   wishlistsHref: string;
+  savedKitsHref: string;
   settingsHref: string;
   contactHref: string;
   logoutHref: string;
@@ -152,10 +153,15 @@ export async function getAccountDashboardShellProps(
     subscriptionsHref: '/account/subscriptions/',
     shopHref: '/shop-all',
     wishlistsHref: '/account/wishlists/',
+    savedKitsHref: '/account/saved-kits/',
     settingsHref: '/account/settings/',
     contactHref: '/contact-us',
     logoutHref: '/logout',
     searchPlaceholder: tSearch('inputPlaceholder'),
-    accountMenuLinks: buildAccountMenuLinks((key) => tAccount(key)),
+    accountMenuLinks: buildAccountMenuLinks(
+      ((key: string) => tAccount(key as 'dashboard')) as Parameters<
+        typeof buildAccountMenuLinks
+      >[0],
+    ),
   };
 }

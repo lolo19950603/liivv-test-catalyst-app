@@ -46,6 +46,7 @@ export interface AccountDashboardLabels {
     orders: string;
     shop: string;
     wishlists: string;
+    savedKits: string;
     settings: string;
     help: string;
   };
@@ -94,6 +95,7 @@ export interface AccountDashboardShellProps {
   subscriptionsHref: string;
   shopHref: string;
   wishlistsHref: string;
+  savedKitsHref: string;
   settingsHref: string;
   contactHref: string;
   logoutHref: string;

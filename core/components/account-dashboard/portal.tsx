@@ -23,6 +23,7 @@ import {
   IconLoyalty,
   IconOrders,
   IconShop,
+  IconSupplies,
 } from './icons';
 import type { AccountDashboardShellProps } from './types';
 
@@ -34,7 +35,8 @@ function isAccountSubPage(pathname: string): boolean {
     pathname.includes('/account/virtual-care') ||
     pathname.includes('/account/settings') ||
     pathname.includes('/account/health-profile') ||
-    pathname.includes('/account/wishlists')
+    pathname.includes('/account/wishlists') ||
+    pathname.includes('/account/saved-kits')
   );
 }
 
@@ -56,6 +58,7 @@ export function AccountDashboardPortal({
   cartCount: initialCartCount,
   labels,
   wishlistsHref,
+  savedKitsHref,
   onboardingBannerHref,
   headerNotifications,
   notificationsUnreadCount,
@@ -192,6 +195,12 @@ export function AccountDashboardPortal({
                 href={wishlistsHref}
                 icon={<IconLoyalty />}
                 label={labels.sidebar.wishlists}
+              />
+              <SidebarLink
+                active={isNavActive(pathname, savedKitsHref)}
+                href={savedKitsHref}
+                icon={<IconSupplies />}
+                label={labels.sidebar.savedKits}
               />
             </nav>
 
