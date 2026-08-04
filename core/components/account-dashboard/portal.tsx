@@ -23,7 +23,6 @@ import {
   IconLoyalty,
   IconOrders,
   IconShop,
-  IconSupplies,
 } from './icons';
 import type { AccountDashboardShellProps } from './types';
 
@@ -58,7 +57,6 @@ export function AccountDashboardPortal({
   cartCount: initialCartCount,
   labels,
   wishlistsHref,
-  savedKitsHref,
   onboardingBannerHref,
   headerNotifications,
   notificationsUnreadCount,
@@ -195,12 +193,6 @@ export function AccountDashboardPortal({
                 href={wishlistsHref}
                 icon={<IconLoyalty />}
                 label={labels.sidebar.wishlists}
-              />
-              <SidebarLink
-                active={isNavActive(pathname, savedKitsHref)}
-                href={savedKitsHref}
-                icon={<IconSupplies />}
-                label={labels.sidebar.savedKits}
               />
             </nav>
 

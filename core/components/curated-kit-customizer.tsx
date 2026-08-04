@@ -1,14 +1,7 @@
 'use client';
 
 import { useFormatter, useTranslations } from 'next-intl';
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useTransition,
-  type FormEvent,
-} from 'react';
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { usePathname, useRouter } from '~/i18n/routing';
 
@@ -426,7 +419,7 @@ export function CuratedKitCustomizer({
       const result = await saveKitToAccount({
         kitName: pending.kitName,
         items: pending.items,
-        returnTo: '/account/saved-kits/',
+        returnTo: '/account/wishlists/',
       });
 
       try {
@@ -458,30 +451,41 @@ export function CuratedKitCustomizer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function handleSearch(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const term = searchTerm.trim();
-
-    if (term.length < 2) {
+  useEffect(() => {
+    if (!searchOpen) {
       return;
     }
 
-    startSearchTransition(async () => {
-      const formData = new FormData();
-      formData.set('term', term);
-      const result = await searchKitProducts(
-        {
-          lastResult: null,
-          searchResults: null,
-        },
-        formData,
-      );
+    const term = searchTerm.trim();
 
-      const productsGroup = result.searchResults?.find((group) => group.type === 'products');
+    if (term.length < 2) {
+      setSearchResults([]);
 
-      setSearchResults(productsGroup?.type === 'products' ? productsGroup.products : []);
-    });
-  }
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      startSearchTransition(async () => {
+        const formData = new FormData();
+        formData.set('term', term);
+        const result = await searchKitProducts(
+          {
+            lastResult: null,
+            searchResults: null,
+          },
+          formData,
+        );
+
+        const productsGroup = result.searchResults?.find((group) => group.type === 'products');
+
+        setSearchResults(productsGroup?.type === 'products' ? productsGroup.products : []);
+      });
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [searchOpen, searchTerm]);
 
   return (
     <div className="space-y-6 pb-8">
@@ -695,7 +699,7 @@ export function CuratedKitCustomizer({
           className="w-full"
           onClick={() => setSearchOpen(true)}
           type="button"
-          variant="ghost"
+          variant="secondary"
         >
           {t('searchAddProduct')}
         </Button>
@@ -731,22 +735,28 @@ export function CuratedKitCustomizer({
 
       <Modal
         isOpen={searchOpen}
-        setOpen={setSearchOpen}
+        setOpen={(open) => {
+          setSearchOpen(open);
+
+          if (!open) {
+            setSearchTerm('');
+            setSearchResults([]);
+          }
+        }}
         title={t('searchModalTitle')}
       >
-        <form className="space-y-4" onSubmit={handleSearch}>
-          <div className="flex gap-2">
-            <input
-              className="min-w-0 flex-1 rounded-lg border border-[var(--contrast-200)] px-3 py-2 text-sm"
-              onChange={(event) => setSearchTerm(event.target.value)}
-              placeholder={t('searchPlaceholder')}
-              type="search"
-              value={searchTerm}
-            />
-            <Button loading={isSearching} size="small" type="submit">
-              {t('searchSubmit')}
-            </Button>
-          </div>
+        <div className="space-y-4">
+          <input
+            autoFocus
+            className="w-full rounded-lg border border-[var(--contrast-200)] px-3 py-2 text-sm"
+            onChange={(event) => setSearchTerm(event.target.value)}
+            placeholder={t('searchPlaceholder')}
+            type="search"
+            value={searchTerm}
+          />
+          {isSearching ? (
+            <p className="text-sm text-[var(--contrast-500)]">{t('searching')}</p>
+          ) : null}
           {searchResults.length > 0 ? (
             <ul className="max-h-72 space-y-2 overflow-y-auto">
               {searchResults.map((product) => {
@@ -788,7 +798,7 @@ export function CuratedKitCustomizer({
           ) : searchTerm.trim().length >= 2 && !isSearching ? (
             <p className="text-sm text-[var(--contrast-500)]">{t('searchEmpty')}</p>
           ) : null}
-        </form>
+        </div>
       </Modal>
     </div>
   );

@@ -56,7 +56,7 @@ export async function saveKitToAccount(
   }
 
   const customerAccessToken = await getSessionCustomerAccessToken();
-  const returnTo = parsed.data.returnTo ?? '/account/saved-kits/';
+  const returnTo = parsed.data.returnTo ?? '/account/wishlists/';
 
   if (!customerAccessToken) {
     const loginParams = new URLSearchParams({ redirectTo: returnTo });

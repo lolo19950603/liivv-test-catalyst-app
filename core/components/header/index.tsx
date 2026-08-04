@@ -87,13 +87,7 @@ export const Header = async () => {
   const logo = data.settings ? logoTransformer(data.settings) : '';
   const requestPathname = stripLocaleFromPathname(requestHeaders.get('x-pathname') ?? '/');
   const accountHref = resolveAccountHref(loggedIn);
-  const accountMenuLinks = loggedIn
-    ? buildAccountMenuLinks(
-        ((key: string) => tAccount(key as 'dashboard')) as Parameters<
-          typeof buildAccountMenuLinks
-        >[0],
-      )
-    : undefined;
+  const accountMenuLinks = loggedIn ? buildAccountMenuLinks((key) => tAccount(key)) : undefined;
 
   const streamableCategoryTree = Streamable.from(async () => {
     const [customerAccessToken, currencyCode] = await Promise.all([

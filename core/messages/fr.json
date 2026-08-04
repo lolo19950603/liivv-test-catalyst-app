@@ -207,6 +207,7 @@
             "searchModalTitle": "Ajouter un produit à votre kit",
             "searchPlaceholder": "Rechercher des produits…",
             "searchSubmit": "Rechercher",
+            "searching": "Recherche…",
             "searchEmpty": "Aucun produit trouvé. Essayez une autre recherche.",
             "increment": "Augmenter la quantité",
             "decrement": "Diminuer la quantité",
@@ -241,11 +242,14 @@
         },
         "SavedKits": {
             "title": "Kits enregistrés",
+            "badge": "Kit",
             "empty": "Vous n’avez aucun kit enregistré pour le moment.",
             "emptyHint": "Personnalisez un kit et choisissez « Enregistrer le kit pour plus tard », ou finalisez un achat de kit.",
+            "emptyProducts": "Les produits de ce kit n’ont pas pu être chargés pour le moment.",
             "itemCount": "{count, plural, =1 {1 article} other {# articles}}",
             "updated": "Mis à jour le {date}",
             "addToCart": "Ajouter au panier",
+            "actionsTitle": "Actions du kit",
             "rename": "Renommer",
             "delete": "Supprimer",
             "saveName": "Enregistrer le nom",
@@ -253,6 +257,7 @@
             "renameSuccess": "Kit renommé",
             "deleteSuccess": "Kit supprimé",
             "deleteConfirm": "Supprimer ce kit enregistré ?",
+            "renameModalTitle": "Renommer le kit",
             "Errors": {
                 "unexpected": "Une erreur est survenue. Veuillez réessayer.",
                 "notFound": "Ce kit enregistré est introuvable."

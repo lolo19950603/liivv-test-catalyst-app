@@ -86,7 +86,6 @@ export function buildDashboardLabels(
       orders: t('sidebar.orders'),
       shop: t('sidebar.shop'),
       wishlists: t('sidebar.wishlists'),
-      savedKits: t('sidebar.savedKits'),
       settings: t('sidebar.settings'),
       help: t('sidebar.help'),
     },

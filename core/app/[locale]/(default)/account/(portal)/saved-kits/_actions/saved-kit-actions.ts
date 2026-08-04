@@ -55,6 +55,7 @@ export async function renameSavedKitAction(input: {
     return { status: 'error', message: t('Errors.notFound') };
   }
 
+  revalidatePath('/account/wishlists');
   revalidatePath('/account/saved-kits');
 
   return { status: 'success' };
@@ -82,6 +83,7 @@ export async function deleteSavedKitAction(
     return { status: 'error', message: t('Errors.notFound') };
   }
 
+  revalidatePath('/account/wishlists');
   revalidatePath('/account/saved-kits');
 
   return { status: 'success' };

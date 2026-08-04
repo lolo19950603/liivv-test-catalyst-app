@@ -207,6 +207,7 @@
       "searchModalTitle": "Add a product to your kit",
       "searchPlaceholder": "Search products…",
       "searchSubmit": "Search",
+      "searching": "Searching…",
       "searchEmpty": "No products found. Try another search.",
       "increment": "Increase quantity",
       "decrement": "Decrease quantity",
@@ -241,11 +242,14 @@
     },
     "SavedKits": {
       "title": "Saved kits",
+      "badge": "Kit",
       "empty": "You don’t have any saved kits yet.",
       "emptyHint": "Customize a curated kit and choose “Save kit for later”, or complete a kit purchase.",
+      "emptyProducts": "Products in this kit couldn’t be loaded right now.",
       "itemCount": "{count, plural, =1 {1 item} other {# items}}",
       "updated": "Updated {date}",
       "addToCart": "Add to cart",
+      "actionsTitle": "Kit actions",
       "rename": "Rename",
       "delete": "Delete",
       "saveName": "Save name",
@@ -253,6 +257,7 @@
       "renameSuccess": "Kit renamed",
       "deleteSuccess": "Kit deleted",
       "deleteConfirm": "Delete this saved kit?",
+      "renameModalTitle": "Rename kit",
       "Errors": {
         "unexpected": "Something went wrong. Please try again.",
         "notFound": "That saved kit could not be found."

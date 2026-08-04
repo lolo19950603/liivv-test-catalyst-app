@@ -12,7 +12,6 @@ export function buildAccountMenuLinks(
       | 'subscriptions'
       | 'settings'
       | 'wishlists'
-      | 'savedKits'
       | 'logout',
   ) => string,
 ): AccountMenuLink[] {
@@ -22,7 +21,6 @@ export function buildAccountMenuLinks(
     { href: '/account/subscriptions/', label: t('subscriptions') },
     { href: '/account/settings/', label: t('settings') },
     { href: '/account/wishlists/', label: t('wishlists') },
-    { href: '/account/saved-kits/', label: t('savedKits') },
     { href: '/logout', label: t('logout'), prefetch: 'none' },
   ];
 }

@@ -3,9 +3,35 @@
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { Spinner } from '@/vibes/soul/primitives/spinner';
+
 /** Delay before showing so fast navigations never flash a progress UI. */
 const SHOW_DELAY_MS = 400;
 const SAFETY_TIMEOUT_MS = 12_000;
+
+const START_EVENT = 'liivv:navigation-loading-start';
+const STOP_EVENT = 'liivv:navigation-loading-stop';
+
+type StartDetail = {
+  /** Skip the delay and show the full loading screen immediately. */
+  immediate?: boolean;
+};
+
+export function startNavigationLoading(options?: StartDetail) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  window.dispatchEvent(new CustomEvent(START_EVENT, { detail: options ?? {} }));
+}
+
+export function stopNavigationLoading() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  window.dispatchEvent(new CustomEvent(STOP_EVENT));
+}
 
 function isModifiedClick(event: MouseEvent) {
   return event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0;
@@ -53,9 +79,11 @@ export function NavigationLoadingOverlay() {
   const searchParams = useSearchParams();
   const search = searchParams.toString();
   const [visible, setVisible] = useState(false);
+  const [isImmediate, setIsImmediate] = useState(false);
   const showTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const safetyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navigatingRef = useRef(false);
+  const isImmediateRef = useRef(false);
 
   const clearTimers = useCallback(() => {
     if (showTimerRef.current) {
@@ -71,28 +99,47 @@ export function NavigationLoadingOverlay() {
 
   const stopNavigating = useCallback(() => {
     navigatingRef.current = false;
+    isImmediateRef.current = false;
     clearTimers();
     setVisible(false);
+    setIsImmediate(false);
   }, [clearTimers]);
 
-  const startNavigating = useCallback(() => {
-    if (navigatingRef.current) {
-      return;
-    }
+  const startNavigating = useCallback(
+    (options?: StartDetail) => {
+      const showImmediately = options?.immediate === true;
 
-    navigatingRef.current = true;
-    clearTimers();
-
-    showTimerRef.current = setTimeout(() => {
       if (navigatingRef.current) {
-        setVisible(true);
-      }
-    }, SHOW_DELAY_MS);
+        if (showImmediately && !isImmediateRef.current) {
+          isImmediateRef.current = true;
+          setIsImmediate(true);
+          setVisible(true);
+        }
 
-    safetyTimerRef.current = setTimeout(() => {
-      stopNavigating();
-    }, SAFETY_TIMEOUT_MS);
-  }, [clearTimers, stopNavigating]);
+        return;
+      }
+
+      navigatingRef.current = true;
+      isImmediateRef.current = showImmediately;
+      clearTimers();
+      setIsImmediate(showImmediately);
+
+      if (showImmediately) {
+        setVisible(true);
+      } else {
+        showTimerRef.current = setTimeout(() => {
+          if (navigatingRef.current) {
+            setVisible(true);
+          }
+        }, SHOW_DELAY_MS);
+      }
+
+      safetyTimerRef.current = setTimeout(() => {
+        stopNavigating();
+      }, SAFETY_TIMEOUT_MS);
+    },
+    [clearTimers, stopNavigating],
+  );
 
   useEffect(() => {
     stopNavigating();
@@ -123,18 +170,45 @@ export function NavigationLoadingOverlay() {
       startNavigating();
     };
 
+    const onStart = (event: Event) => {
+      const detail = (event as CustomEvent<StartDetail>).detail;
+      startNavigating(detail);
+    };
+
+    const onStop = () => {
+      stopNavigating();
+    };
+
     document.addEventListener('click', onClick, true);
     window.addEventListener('popstate', onPopState);
+    window.addEventListener(START_EVENT, onStart);
+    window.addEventListener(STOP_EVENT, onStop);
 
     return () => {
       document.removeEventListener('click', onClick, true);
       window.removeEventListener('popstate', onPopState);
+      window.removeEventListener(START_EVENT, onStart);
+      window.removeEventListener(STOP_EVENT, onStop);
       clearTimers();
     };
-  }, [clearTimers, startNavigating]);
+  }, [clearTimers, startNavigating, stopNavigating]);
 
   if (!visible) {
     return null;
+  }
+
+  if (isImmediate) {
+    return (
+      <div
+        aria-busy="true"
+        aria-live="polite"
+        className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-4 bg-[#faf8f3]/90"
+        role="status"
+      >
+        <Spinner loadingAriaLabel="Loading page" size="md" />
+        <p className="text-sm text-[#6b6560]">Loading page…</p>
+      </div>
+    );
   }
 
   return (

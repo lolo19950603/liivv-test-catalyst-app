@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState, useTransition } from 'react';
 
+import { startNavigationLoading, stopNavigationLoading } from '~/components/navigation-loading';
 import { locales } from '~/i18n/locales';
 import { usePathname, useRouter } from '~/i18n/routing';
 import { getLocalizedPathname } from '@/vibes/soul/primitives/navigation/_actions/localized-pathname';
@@ -34,8 +35,9 @@ export function LocaleToggle({ className }: { className?: string }) {
         return;
       }
 
-      // Slide the pill immediately; content catches up after the locale route loads.
+      // Slide the pill and show loading immediately; path lookup + route change catch up after.
       setDisplayedLocale(targetLocale);
+      startNavigationLoading({ immediate: true });
 
       void (async () => {
         try {
@@ -58,6 +60,7 @@ export function LocaleToggle({ className }: { className?: string }) {
           });
         } catch {
           setDisplayedLocale(activeLocale);
+          stopNavigationLoading();
         }
       })();
     },
