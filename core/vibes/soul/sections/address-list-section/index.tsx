@@ -168,15 +168,13 @@ export function AddressListSection<A extends Address, F extends Field>({
 
   return (
     <section className="w-full">
-      <header className="mb-4 border-[var(--address-list-section-border,hsl(var(--contrast-100)))] @2xl:min-h-[72px] @2xl:border-b">
-        <div className="mb-4 flex items-center justify-between">
-          <Title>{title}</Title>
-          {!showNewAddressForm && !isEmpty && (
-            <Button onClick={() => setShowNewAddressForm(true)} size="small" variant="tertiary">
-              {showAddFormLabel}
-            </Button>
-          )}
-        </div>
+      <header>
+        <Title>{title}</Title>
+        {!showNewAddressForm && !isEmpty && (
+          <Button onClick={() => setShowNewAddressForm(true)} size="small" variant="tertiary">
+            {showAddFormLabel}
+          </Button>
+        )}
       </header>
       <div>
         {showNewAddressForm && (
@@ -349,7 +347,7 @@ function Title({ children }: { children: ReactNode }) {
   const { pending } = useFormStatus();
 
   return (
-    <h1 className="hidden font-[family-name:var(--address-list-section-title-font-family,var(--font-family-heading))] text-4xl font-medium leading-none tracking-tight text-[var(--address-list-section-title,hsl(var(--foreground)))] @2xl:block">
+    <h1 className="mb-10 font-[family-name:var(--address-list-section-title-font-family,var(--font-family-heading))] text-2xl font-medium leading-none text-[var(--address-list-section-title,hsl(var(--foreground)))] @xl:text-2xl">
       {children}
       {pending && (
         <span className="ml-2">

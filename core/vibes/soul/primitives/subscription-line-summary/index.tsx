@@ -10,7 +10,9 @@ export function SubscriptionLineSummary({
   className,
 }: SubscriptionLineSummaryProps) {
   return (
-    <div className={className}>
+    <div
+      className={`rounded-lg border border-[var(--cart-border,hsl(var(--contrast-100)))] px-3 py-2.5 ${className ?? ''}`}
+    >
       <p className="text-xs font-medium uppercase tracking-wide text-[var(--primary,hsl(var(--primary)))]">
         {badge}
       </p>
