@@ -2,6 +2,8 @@
 
 import { useState, type ReactNode } from 'react';
 
+import { CHAPTERS as CHAPTER_PAGES, chapterHref } from './chapters/chapters-data';
+
 import './womens-health-demo.css';
 
 const SHOP_HREF = '/liivv-health/womens-health/shop-womens-health';
@@ -88,62 +90,15 @@ const TIMELINE = [
   },
 ] as const;
 
-const CHAPTERS = [
-  {
-    eyebrow: 'Chapter one',
-    num: '01',
-    title: 'Foundation & First Cycles',
-    focus:
-      'First period nerves, irregular cycles, hormonal skin, discretion at school, and the vitamins that build a strong start.',
-    vibe: 'Supportive, demystifying, and parent-friendly — without talking down to the teen.',
-    image: `${IMG}/chapter-1.jpg`,
-  },
-  {
-    eyebrow: 'Chapter two',
-    num: '02',
-    title: 'Rhythm & Balance',
-    focus:
-      'Busy schedules, hormonal breakouts, gut + vaginal health, sleep + stress, and birth control side effects or options.',
-    vibe: 'Modern, aesthetic, and highly functional. Wellness that works IRL.',
-    image: `${IMG}/chapter-2.jpg`,
-  },
-  {
-    eyebrow: 'Chapter three',
-    num: '03',
-    title: 'Reset & Recharge',
-    focus:
-      'Hormonal imbalance, weight fluctuations, skin aging, stress, and burnout — met with care, not judgment.',
-    vibe: 'Aspirational but accessible. Acknowledging burnout without making it a medical deficiency.',
-    image: `${IMG}/chapter-3.jpg`,
-  },
-  {
-    eyebrow: 'Chapter four',
-    num: '04',
-    title: 'Grow & Recover',
-    focus:
-      'Fertility challenges, physical discomfort, recovery after birth, and breastfeeding stress — with room to breathe.',
-    vibe: 'Empowering, deeply supportive, and strictly no shame.',
-    image: `${IMG}/chapter-4.jpg`,
-  },
-  {
-    eyebrow: 'Chapter five',
-    num: '05',
-    title: 'Transition & Relief',
-    focus:
-      'Sleep disruption, bone density, low metabolism, night sweats, and mood swings — comfort you can feel.',
-    vibe: 'Reclaiming comfort. Sleek, discreet, and highly effective.',
-    image: `${IMG}/chapter-5.jpg`,
-  },
-  {
-    eyebrow: 'Chapter six',
-    num: '06',
-    title: 'Longevity & Vitality',
-    focus:
-      'Joint comfort, cognitive health, mobility, and energy — so the years ahead stay full of your favourite things.',
-    vibe: 'Active, capable, and vibrant. Removing the stigma of aging aids.',
-    image: `${IMG}/chapter-6.jpg`,
-  },
-] as const;
+const CHAPTERS = CHAPTER_PAGES.map((chapter) => ({
+  eyebrow: `Chapter ${chapter.chapterWord}`,
+  num: chapter.num,
+  title: chapter.title,
+  focus: chapter.focus,
+  vibe: chapter.vibe,
+  image: chapter.heroImage,
+  href: chapterHref(chapter.slug),
+}));
 
 const COUNTERS = [
   {
@@ -554,7 +509,7 @@ export function WomensHealthDemoPage() {
                   <p>{chapter.vibe}</p>
                 </div>
               </div>
-              <a className="btn btn-dark" href="#find-your-chapter">
+              <a className="btn btn-dark" href={chapter.href}>
                 Learn more
               </a>
             </div>

@@ -104,20 +104,14 @@ export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
   `${MOBILE}{#${MULTICOLUMN_SECTION_ID} .multicolumn .media img{aspect-ratio:16/9!important;height:auto!important;object-fit:cover}}`,
   `${MOBILE}{#${MULTICOLUMN_SECTION_ID} .multicolumn-card__info .heading .highlighted-text[data-style=half_text]{display:inline-block;max-width:100%;box-decoration-break:clone;-webkit-box-decoration-break:clone}}`,
 
-  /* 06 — Reveal + story (scroll-driven headline; shorter runway than desktop 120vh).
-   * Keep rounded section overflow visible so sticky headline isn’t hard-clipped mid-fade.
-   * Scroller may use overflow:hidden for its own box; that doesn’t clip the rising cover. */
+  /* 06 — Reveal + story — headline on portrait, opacity fade only (no sticky cover). */
   `${MOBILE_TABLET}{[id^="dcrift-reveal"] .section.section--rounded{overflow:visible!important}}` +
-  `${MOBILE_TABLET}{[id^="dcrift-"] .splitting-banner .reveal-banner__scroller{position:sticky!important;top:0!important;height:100lvh!important;max-height:100dvh!important;overflow:hidden!important;padding-inline:0!important;margin-inline:0!important}}`,
-  `${MOBILE_TABLET}{[id^="dcrift-"] .reveal-banner__tracker{inset-block-start:12%!important;height:72lvh!important}}`,
-  `${MOBILE_TABLET}{[id^="dcrift-"] .reveal-banner .banner{height:100%!important;min-height:100%!important}}`,
-  `${MOBILE}{[id^="dcrift-reveal"] .reveal-banner .banner__content{padding-block:2rem}}`,
+  `${MOBILE_TABLET}{[id^="dcrift-"] .splitting-banner .reveal-banner__scroller,` +
+  `[id^="dcrift-"] .reveal-banner__scroller,[id^="dcrift-"] .reveal-banner__tracker{display:none!important;height:0!important}}`,
   `${MOBILE}{[id^="dcrift-rich"]{--section-padding-top:48px;--section-padding-bottom:56px}}`,
   `${MOBILE}{[id^="dcrift-reveal"] .page-width--narrow,[id^="dcrift-rich"] .page-width--narrow{padding-inline:max(1rem,env(safe-area-inset-left,0px)) max(1rem,env(safe-area-inset-right,0px))}}`,
   `${MOBILE}{[id^="dcrift-"] .reveal-banner > .section--padding{padding-block:var(--sp-8)}}`,
-  `@media screen and (max-width:500px){[id^="dcrift-reveal"] .reveal-banner .banner__content .page-width{max-width:100%}}`,
-  `@media screen and (max-width:500px){[id^="dcrift-reveal"] .reveal-banner .banner__box{max-width:100%;margin-inline:auto}}`,
-  `@media screen and (max-width:500px){[id^="dcrift-reveal"] .reveal-banner .splitting-wrapper h2.dcrift-banner-heading--default{font-size:clamp(1.5rem,6vw,2.125rem)!important;line-height:1.05!important;letter-spacing:-0.02em;text-wrap:balance}}`,
+  `@media screen and (max-width:500px){[id^="dcrift-reveal"] .dcrift-reveal-headline h2.dcrift-banner-heading--default{font-size:clamp(1.5rem,6vw,2.125rem)!important;line-height:1.05!important;letter-spacing:-0.02em;text-wrap:balance}}`,
   `${MOBILE_TABLET}{[id^="dcrift-reveal"] .dcrift-reveal-media>img{aspect-ratio:unset!important;object-fit:contain!important}}`,
   `${MOBILE_TABLET}{[id^="dcrift-reveal"] .dcrift-reveal-media.mobile\\:media--wide>img{aspect-ratio:unset!important}}`,
 

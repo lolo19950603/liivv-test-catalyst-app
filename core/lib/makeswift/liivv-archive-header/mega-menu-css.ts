@@ -319,14 +319,53 @@ ${LIIVV_HEADER_UTILITY_SHARED_CSS}
   /* Match utility circles; override archive trigger radius / transparent button styles. */
   border-radius: 999px;
 }
+/* Archive CSS forces 140px logo at all widths; keep mobile logo compact so utilities fit. */
+.liivv-archive-header.diabetes-care-section-header .header__logo-link img {
+  max-height: 2.25rem;
+  max-width: min(100%, 7.5rem);
+}
+/* Keep locale / search / cart / account pinned top-right so they never collide with the logo. */
+.liivv-archive-header .header__icons--end {
+  position: fixed;
+  top: var(--liivv-header-utility-offset-block, 1rem);
+  right: var(--liivv-header-utility-inline-end, 1rem);
+  z-index: 101;
+  width: auto;
+  min-width: 0;
+}
+@media screen and (min-width: 640px) {
+  .liivv-archive-header.diabetes-care-section-header .header__logo-link img {
+    max-height: 2.75rem;
+    max-width: min(100%, 8.5rem);
+  }
+}
 @media screen and (min-width: 768px) {
+  .liivv-archive-header.diabetes-care-section-header .header__logo-link img {
+    max-height: 140px;
+    max-width: 140px;
+  }
   .liivv-archive-header .header__icons--end {
-    position: fixed;
     top: var(--liivv-header-utility-offset-block, 1.5rem);
     right: var(--liivv-header-utility-inline-end, 1.25rem);
-    z-index: 101;
-    width: auto;
-    min-width: 0;
+  }
+}
+@media screen and (max-width: 767px) {
+  :root {
+    --liivv-header-utility-size: 2.5rem;
+    --liivv-header-utility-icon-size: 1.2rem;
+    --liivv-header-utility-gap: 0.375rem;
+    --liivv-header-utility-offset-block: 0.875rem;
+  }
+  .liivv-archive-header .header-locale-toggle__option {
+    min-width: 1.75rem;
+    padding-inline: 0.45rem;
+  }
+  .liivv-archive-header .header__buttons {
+    flex-wrap: nowrap;
+  }
+  /* Leave room for fixed EN/FR + utility icons on the right. */
+  .liivv-archive-header .header__logo {
+    max-width: calc(100vw - 13.5rem);
   }
 }
 .liivv-archive-header .header-utility-icon-btn {

@@ -327,7 +327,7 @@
 
 /* —— PHOTO RIVER —— */
 #wh-demo .photo-river {
-  background: var(--cream);
+  background: var(--sand);
   overflow: hidden;
   padding: 28px 0 80px;
   position: relative;
@@ -376,7 +376,7 @@
 
 /* —— HIGHLIGHT + mosaic —— */
 #wh-demo .highlight-text {
-  background: var(--cream);
+  background: var(--soft);
   text-align: center;
   padding: 88px 24px 40px;
 }
@@ -480,7 +480,7 @@
 /* —— COUNTERS on photos —— */
 #wh-demo .counters {
   padding: 72px 24px 90px;
-  background: var(--soft);
+  background: #e7eee5; /* soft sage wash */
 }
 
 #wh-demo .counters-grid {
@@ -562,7 +562,7 @@
 
 /* —— IMAGE MARQUEE —— */
 #wh-demo .img-marquee {
-  background: var(--cream);
+  background: var(--taupe);
   overflow: hidden;
   /* Extra bottom pad so .rounded-top overlap (-48px) doesn't clip the photos */
   padding: 28px 0 72px;
@@ -586,11 +586,12 @@
 
 #wh-demo .img-marquee-track .chip {
   align-self: center;
-  color: var(--ink);
+  color: #fff;
   font-family: var(--font-heading);
   font-size: 28px;
   padding: 0 18px;
   white-space: nowrap;
+  text-shadow: 0 1px 0 rgba(49, 47, 47, 0.15);
 }
 
 @keyframes wh-scroll {
@@ -851,7 +852,7 @@
 
 /* —— SPLIT STORIES —— */
 #wh-demo .images-text {
-  background: #2c2926;
+  background: var(--taupe);
   color: #fff;
   padding: 100px 24px;
 }
@@ -917,7 +918,7 @@
 }
 
 #wh-demo .images-text.tips-pair {
-  background: var(--cream);
+  background: #f8ebe6; /* blush wash */
   color: var(--ink);
 }
 
@@ -939,7 +940,7 @@
 
 /* —— CLAIR collage —— */
 #wh-demo .story {
-  background: var(--soft);
+  background: var(--sand);
   padding: 100px 24px 110px;
 }
 
@@ -1011,8 +1012,8 @@
 
 /* —— CHAPTERS full-bleed —— */
 #wh-demo .chapters {
-  /* Must match chapter cards — ink here shows as black corner “bezels” under border-radius */
-  background: var(--cream);
+  /* Match first chapter tone — avoids corner bezels under border-radius */
+  background: #fbf8f4;
 }
 
 #wh-demo .chapter {
@@ -1122,19 +1123,19 @@
   background: #fbf8f4;
 }
 #wh-demo .chapter:nth-of-type(2) .copy {
-  background: #efe6db;
+  background: #ebe2d6;
 }
 #wh-demo .chapter:nth-of-type(3) .copy {
-  background: #e4ebdf;
+  background: #dce6d7;
 }
 #wh-demo .chapter:nth-of-type(4) .copy {
-  background: #f3ddd6;
+  background: #f0d5cd;
 }
 #wh-demo .chapter:nth-of-type(5) .copy {
-  background: #e2e9dd;
+  background: #d5e0d0;
 }
 #wh-demo .chapter:nth-of-type(6) .copy {
-  background: #f6e8e1;
+  background: #f2ddd4;
 }
 
 #wh-demo .chapter:nth-child(even) {
@@ -1151,7 +1152,7 @@
 
 /* —— VOICES —— */
 #wh-demo .voices {
-  background: var(--sage);
+  background: #6f8a6c; /* deeper sage for stronger contrast */
   color: #fff;
   padding: 110px 24px;
 }
@@ -1173,13 +1174,14 @@
 }
 
 #wh-demo .voice {
-  background: var(--soft);
+  background: #fff;
   color: var(--ink);
   border-radius: 28px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   padding: 28px 26px 32px;
+  box-shadow: 0 16px 36px rgba(49, 47, 47, 0.1);
 }
 
 #wh-demo .voice-mark {
@@ -1260,7 +1262,7 @@
 
 /* —— FAQ with side art —— */
 #wh-demo .faq {
-  background: var(--cream);
+  background: #fff;
   padding: 110px 24px;
 }
 

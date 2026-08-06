@@ -182,25 +182,31 @@ export function DiabetesCareRevealImageWithText({
   const richSectionId = `dcrift-rich-${instance}`;
 
   /** Theme vars on the component root so reveal banner + image and rich text share background. */
-  /** Shorter scroll runway on phone/tablet; portrait uses intrinsic ratio (no 16:9 crop). */
+  /** Headline sits on the portrait (behind cutout); opacity fades on scroll — no sticky cover runway. */
   const revealSectionCss =
     `#${revealSectionId} .reveal-banner{isolation:isolate}` +
-    `#${revealSectionId} .reveal-banner__scroller{z-index:1}` +
-    `#${revealSectionId} .reveal-banner > .section--padding{position:relative;z-index:2;background-color:rgb(var(--color-background))}` +
+    /* Kill archive sticky 120vh scroller styles — we no longer use that pattern. */
+    `#${revealSectionId} .splitting-banner .reveal-banner__scroller,` +
+    `#${revealSectionId} .reveal-banner__scroller{display:none!important;height:0!important;min-height:0!important}` +
+    `#${revealSectionId} .reveal-banner__tracker{display:none!important}` +
+    `#${revealSectionId} .dcrift-reveal-stage{` +
+    `position:relative;display:flex;justify-content:center;width:100%;` +
+    `max-width:${REVEAL_COLUMN_MAX_WIDTH};margin-inline:auto}` +
+    `#${revealSectionId} .dcrift-reveal-headline{` +
+    `position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;` +
+    `pointer-events:none;padding-inline:1rem}` +
     `#${revealSectionId} .dcrift-reveal-media-wrap{position:relative;z-index:2;display:flex;justify-content:center;width:100%}` +
-    `#${revealSectionId} .reveal-banner .banner__box{min-width:0!important;width:100%;max-width:${REVEAL_COLUMN_MAX_WIDTH};margin-inline:auto}` +
-    `#${revealSectionId} .reveal-banner .splitting-wrapper,#${revealSectionId} .reveal-banner .splitting-wrapper h2,#${revealSectionId} .reveal-banner .split-words.words{max-width:100%}` +
-    `#${revealSectionId} .reveal-banner .split-words.words{display:inline-flex;flex-wrap:wrap;justify-content:center;text-wrap:balance}` +
-    `@media screen and (min-width:1024px){#${revealSectionId} .reveal-banner .splitting-wrapper h2.dcrift-banner-heading--default{font-size:${String(DEFAULT_BANNER_HEADING_FONT_SIZE_DESKTOP)}px;line-height:1.05;letter-spacing:-0.02em;text-wrap:balance}}` +
-    `@media screen and (max-width:1023px){#${revealSectionId} .reveal-banner .splitting-wrapper h2.dcrift-banner-heading--default{font-size:clamp(2rem,5.5vw,3.25rem);line-height:1.05;letter-spacing:-0.02em;text-wrap:balance}}` +
+    `#${revealSectionId} .dcrift-reveal-headline .banner__box{min-width:0!important;width:100%;max-width:100%;margin-inline:auto}` +
+    `#${revealSectionId} .dcrift-reveal-headline .splitting-wrapper,` +
+    `#${revealSectionId} .dcrift-reveal-headline .splitting-wrapper h2,` +
+    `#${revealSectionId} .dcrift-reveal-headline .split-words.words{max-width:100%}` +
+    `#${revealSectionId} .dcrift-reveal-headline .split-words.words{display:inline-flex;flex-wrap:wrap;justify-content:center;text-wrap:balance}` +
+    `@media screen and (min-width:1024px){#${revealSectionId} .dcrift-reveal-headline h2.dcrift-banner-heading--default{font-size:${String(DEFAULT_BANNER_HEADING_FONT_SIZE_DESKTOP)}px;line-height:1.05;letter-spacing:-0.02em;text-wrap:balance}}` +
+    `@media screen and (max-width:1023px){#${revealSectionId} .dcrift-reveal-headline h2.dcrift-banner-heading--default{font-size:clamp(2rem,5.5vw,3.25rem);line-height:1.05;letter-spacing:-0.02em;text-wrap:balance}}` +
     `@media screen and (min-width:1024px){#${revealSectionId} .dcrift-reveal-media.media--adapt{height:auto!important;width:fit-content!important;max-width:${REVEAL_COLUMN_MAX_WIDTH};margin-inline:auto;padding-block-end:0!important}` +
     `#${revealSectionId} .dcrift-reveal-media.media--adapt>img{position:static!important;display:block;width:auto!important;height:auto!important;max-width:${REVEAL_COLUMN_MAX_WIDTH};max-height:${REVEAL_IMAGE_MAX_HEIGHT};margin-inline:auto;object-fit:contain!important;object-position:center center}}` +
-    `@media screen and (max-width:1023px){#${revealSectionId} .splitting-banner .reveal-banner__scroller{position:sticky!important;top:0!important;height:100lvh!important;max-height:100dvh!important;overflow:hidden!important}` +
-    `#${revealSectionId} .reveal-banner__tracker{inset-block-start:12%!important;height:72lvh!important}@supports (height:100lvh){#${revealSectionId} .reveal-banner__tracker{height:72lvh!important}}` +
-    `#${revealSectionId} .reveal-banner .banner{height:100%!important;min-height:100%!important}}` +
-    `@media screen and (max-width:500px){#${revealSectionId} .reveal-banner .banner__content .page-width--narrow{max-width:100%}` +
-    `#${revealSectionId} .reveal-banner .banner__box{max-width:100%;margin-inline:auto}` +
-    `#${revealSectionId} .reveal-banner .splitting-wrapper h2.dcrift-banner-heading--default{font-size:clamp(1.5rem,6vw,2.125rem)!important;line-height:1.05!important;letter-spacing:-0.02em;text-wrap:balance}}` +
+    `@media screen and (max-width:500px){#${revealSectionId} .dcrift-reveal-headline{padding-inline:max(1rem,env(safe-area-inset-left,0px))}` +
+    `#${revealSectionId} .dcrift-reveal-headline h2.dcrift-banner-heading--default{font-size:clamp(1.5rem,6vw,2.125rem)!important;line-height:1.05!important;letter-spacing:-0.02em;text-wrap:balance}}` +
     `#${revealSectionId} .dcrift-reveal-media.media--adapt{height:0;width:100%;padding-block-end:var(--ratio-percent,133.333%)}` +
     `#${revealSectionId} .dcrift-reveal-media.media--adapt>img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain!important;object-position:center center}` +
     `#${revealSectionId} .dcrift-reveal-media--placeholder{display:flex;align-items:center;justify-content:center;` +
@@ -343,12 +349,15 @@ export function DiabetesCareRevealImageWithText({
           style={roundedSectionStyle}
         >
           <div className="relative contents">
-            <SplittingBanner className="splitting-banner reveal-banner relative inline">
-              <span className="reveal-banner__tracker absolute top-0 h-full" />
-              <div className="reveal-banner__scroller sticky top-0 overflow-hidden">
-                <div className="banner relative h-full min-h-[100dvh] w-full md:h-screen">
-                  <div className="banner__content left-0 h-full w-full overflow-hidden">
-                    <div className="page-width page-width--narrow flex h-full w-full items-center justify-center px-4 sm:px-5 md:px-0">
+            <SplittingBanner className="splitting-banner reveal-banner relative block w-full">
+              <div className="section--padding relative w-full">
+                <div className="page-width page-width--narrow relative mx-auto w-full px-4 sm:px-5 md:px-0">
+                  <div
+                    className="dcrift-reveal-stage"
+                    style={revealHeadlineBoxStyle}
+                  >
+                    {/* Headline behind the cutout — fades on scroll, does not get covered by a sticky runway. */}
+                    <div className="dcrift-reveal-headline">
                       <div
                         className="banner__box banner__box--large text-center"
                         style={revealHeadlineBoxStyle}
@@ -366,44 +375,40 @@ export function DiabetesCareRevealImageWithText({
                         </div>
                       </div>
                     </div>
+                    {imageSrc.length > 0 ? (
+                      <div className="dcrift-reveal-media-wrap relative w-full">
+                        <picture
+                          className="dcrift-reveal-media reveal-banner__cover-media media media--adapt media--transparent relative mx-auto block max-w-full overflow-hidden rounded-3xl"
+                          style={revealMediaStyle}
+                        >
+                          <img
+                            alt={imageAlt}
+                            className="mx-auto block h-auto max-w-full"
+                            height={DEFAULT_HERO_HEIGHT}
+                            loading="eager"
+                            onLoad={(event) => {
+                              syncRevealColumnWidth(event.currentTarget);
+                            }}
+                            ref={revealImageRef}
+                            sizes="(max-width: 768px) 100vw, min(70rem, 96vw)"
+                            src={imageSrc}
+                            width={DEFAULT_HERO_WIDTH}
+                          />
+                        </picture>
+                      </div>
+                    ) : isInBuilder ? (
+                      <div className="dcrift-reveal-media-wrap relative w-full">
+                        <div
+                          aria-hidden
+                          className="dcrift-reveal-media dcrift-reveal-media--placeholder reveal-banner__cover-media media media--adapt relative mx-auto block max-w-full overflow-hidden rounded-3xl"
+                          style={revealMediaStyle}
+                        >
+                          <span>Banner image</span>
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
-              </div>
-              {/* Cover image must stay opaque — ScrollReveal fade would hide it while it
-                  should be rising over the sticky headline. */}
-              <div className="section--padding relative w-full">
-                {imageSrc.length > 0 ? (
-                  <div className="dcrift-reveal-media-wrap page-width page-width--narrow relative mx-auto w-full px-4 sm:px-5 md:px-0">
-                    <picture
-                      className="dcrift-reveal-media reveal-banner__cover-media media media--adapt media--transparent relative mx-auto block max-w-full overflow-hidden rounded-3xl"
-                      style={revealMediaStyle}
-                    >
-                      <img
-                        alt={imageAlt}
-                        className="mx-auto block h-auto max-w-full"
-                        height={DEFAULT_HERO_HEIGHT}
-                        loading="eager"
-                        onLoad={(event) => {
-                          syncRevealColumnWidth(event.currentTarget);
-                        }}
-                        ref={revealImageRef}
-                        sizes="(max-width: 768px) 100vw, min(70rem, 96vw)"
-                        src={imageSrc}
-                        width={DEFAULT_HERO_WIDTH}
-                      />
-                    </picture>
-                  </div>
-                ) : isInBuilder ? (
-                  <div className="dcrift-reveal-media-wrap page-width page-width--narrow relative mx-auto w-full px-4 sm:px-5 md:px-0">
-                    <div
-                      aria-hidden
-                      className="dcrift-reveal-media dcrift-reveal-media--placeholder reveal-banner__cover-media media media--adapt relative mx-auto block max-w-full overflow-hidden rounded-3xl"
-                      style={revealMediaStyle}
-                    >
-                      <span>Banner image</span>
-                    </div>
-                  </div>
-                ) : null}
               </div>
             </SplittingBanner>
           </div>

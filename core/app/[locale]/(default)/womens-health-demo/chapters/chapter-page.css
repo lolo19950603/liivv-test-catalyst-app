@@ -1,0 +1,537 @@
+/* Women's Health chapter pages — Neutral Modern */
+
+#wh-chapter {
+  --cream: #f5f2ed;
+  --ink: #312f2f;
+  --taupe: #a89c94;
+  --sand: #d7cfc7;
+  --sage: #8ea58d;
+  --blush: #f3c7be;
+  --soft: #faf8f5;
+  --chapter-accent: var(--blush);
+  --font-heading: var(--font-family-dm-serif-text), Georgia, serif;
+  --font-body: var(--font-family-inter), system-ui, sans-serif;
+
+  color: var(--ink);
+  background: var(--cream);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.55;
+  overflow-x: clip;
+}
+
+#wh-chapter *,
+#wh-chapter *::before,
+#wh-chapter *::after {
+  box-sizing: border-box;
+}
+
+#wh-chapter h1,
+#wh-chapter h2,
+#wh-chapter h3,
+#wh-chapter h4 {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: inherit;
+}
+
+#wh-chapter a {
+  color: inherit;
+}
+
+#wh-chapter .wh-ch-container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+#wh-chapter .wh-ch-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+#wh-chapter .wh-ch-btn {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 15px;
+  padding: 15px 34px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
+}
+
+#wh-chapter .wh-ch-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.92;
+}
+
+#wh-chapter .wh-ch-btn-white {
+  background: #fff;
+  color: var(--ink);
+}
+
+#wh-chapter .wh-ch-btn-ghost {
+  background: transparent;
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+}
+
+#wh-chapter .wh-ch-rounded {
+  border-radius: 48px 48px 0 0;
+  margin-top: -48px;
+  position: relative;
+  z-index: 2;
+}
+
+#wh-chapter .wh-ch-pic {
+  position: relative;
+  overflow: hidden;
+}
+
+#wh-chapter .wh-ch-pic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Back bar */
+#wh-chapter .wh-ch-back {
+  background: var(--soft);
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(49, 47, 47, 0.08);
+}
+
+#wh-chapter .wh-ch-back a {
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+#wh-chapter .wh-ch-back a:hover {
+  opacity: 0.7;
+}
+
+/* Hero */
+#wh-chapter .wh-ch-hero {
+  position: relative;
+  min-height: 72vh;
+  display: flex;
+  align-items: flex-end;
+  color: #fff;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+#wh-chapter .wh-ch-hero-bg {
+  position: absolute;
+  inset: 0;
+}
+
+#wh-chapter .wh-ch-hero-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(49, 47, 47, 0.78), rgba(49, 47, 47, 0.2) 55%),
+    radial-gradient(120% 80% at 80% 10%, color-mix(in srgb, var(--chapter-accent) 45%, transparent), transparent 55%);
+}
+
+#wh-chapter .wh-ch-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px 9vh;
+}
+
+#wh-chapter .wh-ch-hero .wh-ch-eyebrow {
+  color: rgba(255, 255, 255, 0.85);
+  display: block;
+  margin-bottom: 10px;
+}
+
+#wh-chapter .wh-ch-num {
+  font-family: var(--font-heading);
+  font-size: clamp(64px, 12vw, 120px);
+  line-height: 0.85;
+  opacity: 0.22;
+  margin: 0 0 8px;
+}
+
+#wh-chapter .wh-ch-hero h1 {
+  font-size: clamp(40px, 6vw, 72px);
+  max-width: 14ch;
+  color: #fff !important;
+}
+
+#wh-chapter .wh-ch-hero p:not(.wh-ch-num) {
+  margin-top: 18px;
+  max-width: 48ch;
+  font-size: clamp(16px, 1.5vw, 19px);
+}
+
+/* Meta */
+#wh-chapter .wh-ch-meta {
+  background: var(--cream);
+  padding: 72px 24px 80px;
+}
+
+#wh-chapter .wh-ch-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+#wh-chapter .wh-ch-meta h2 {
+  font-size: 14px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 10px;
+}
+
+#wh-chapter .wh-ch-meta p {
+  font-size: 17px;
+  max-width: 40ch;
+}
+
+/* Categories */
+#wh-chapter .wh-ch-categories {
+  background: var(--soft);
+  padding: 100px 24px;
+}
+
+#wh-chapter .wh-ch-categories .wh-ch-eyebrow {
+  text-align: center;
+  display: block;
+  color: var(--sage);
+}
+
+#wh-chapter .wh-ch-categories > .wh-ch-container > h2 {
+  text-align: center;
+  font-size: clamp(32px, 4vw, 48px);
+  margin: 14px auto 18px;
+}
+
+#wh-chapter .wh-ch-intro {
+  text-align: center;
+  max-width: 52ch;
+  margin: 0 auto 56px;
+}
+
+#wh-chapter .wh-ch-cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 28px;
+}
+
+#wh-chapter .wh-ch-cat-grid--grow {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+#wh-chapter .wh-ch-cat {
+  background: #fff;
+  border-radius: 24px;
+  padding: 22px 22px 28px;
+  box-shadow: 0 1px 0 rgba(49, 47, 47, 0.06);
+}
+
+#wh-chapter .wh-ch-group {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 10px;
+}
+
+#wh-chapter .wh-ch-cat .wh-ch-pic {
+  height: 150px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+#wh-chapter .wh-ch-cat h3 {
+  font-size: 26px;
+  margin-bottom: 14px;
+}
+
+#wh-chapter .wh-ch-soon {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(142, 165, 141, 0.25);
+  color: #5f735e;
+  vertical-align: middle;
+}
+
+#wh-chapter .wh-ch-cat ul {
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+}
+
+#wh-chapter .wh-ch-cat li {
+  font-size: 15px;
+  padding-left: 16px;
+  position: relative;
+}
+
+#wh-chapter .wh-ch-cat li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--blush);
+}
+
+#wh-chapter .wh-ch-subsection {
+  margin-top: 18px;
+}
+
+#wh-chapter .wh-ch-subsection h4 {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  color: var(--sage);
+}
+
+#wh-chapter .wh-ch-note {
+  margin-top: 14px;
+  font-size: 13.5px;
+  color: rgba(49, 47, 47, 0.65);
+}
+
+/* Programs */
+#wh-chapter .wh-ch-programs {
+  background: #e7eee5;
+  padding: 72px 24px;
+}
+
+#wh-chapter .wh-ch-programs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+#wh-chapter .wh-ch-program {
+  background: #fff;
+  border-radius: 24px;
+  padding: 36px 32px;
+}
+
+#wh-chapter .wh-ch-program h3 {
+  font-size: clamp(26px, 3vw, 34px);
+  margin-bottom: 12px;
+}
+
+#wh-chapter .wh-ch-program p {
+  max-width: 42ch;
+  font-size: 16px;
+}
+
+/* Pharmacist */
+#wh-chapter .wh-ch-pharmacist {
+  background: var(--taupe);
+  color: #fff;
+  padding: 90px 24px;
+}
+
+#wh-chapter .wh-ch-pharmacist-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+#wh-chapter .wh-ch-pharmacist .wh-ch-pic {
+  height: 320px;
+  border-radius: 24px;
+}
+
+#wh-chapter .wh-ch-pharmacist .wh-ch-eyebrow {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+#wh-chapter .wh-ch-pharmacist h2 {
+  font-size: clamp(30px, 4vw, 46px);
+  margin: 14px 0 18px;
+  color: #fff !important;
+}
+
+#wh-chapter .wh-ch-pharmacist p {
+  margin-bottom: 22px;
+  max-width: 48ch;
+}
+
+/* Chapter strip */
+#wh-chapter .wh-ch-nav {
+  background: var(--sand);
+  padding: 72px 24px;
+}
+
+#wh-chapter .wh-ch-nav .wh-ch-eyebrow {
+  display: block;
+  margin-bottom: 22px;
+  color: rgba(49, 47, 47, 0.65);
+}
+
+#wh-chapter .wh-ch-nav-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+#wh-chapter .wh-ch-nav-grid a {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 18px;
+  padding: 18px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+#wh-chapter .wh-ch-nav-grid a span {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 400;
+  opacity: 0.55;
+}
+
+#wh-chapter .wh-ch-nav-grid a:hover,
+#wh-chapter .wh-ch-nav-grid a.is-active {
+  background: #fff;
+  transform: translateY(-2px);
+}
+
+#wh-chapter .wh-ch-nav-grid a.is-active {
+  box-shadow: 0 0 0 2px var(--ink);
+}
+
+/* Closing */
+#wh-chapter .wh-ch-closing {
+  position: relative;
+  min-height: 56vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+#wh-chapter .wh-ch-closing-bg {
+  position: absolute;
+  inset: 0;
+}
+
+#wh-chapter .wh-ch-closing-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(49, 47, 47, 0.62);
+}
+
+#wh-chapter .wh-ch-closing .wh-ch-container {
+  position: relative;
+  z-index: 1;
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
+#wh-chapter .wh-ch-closing h2 {
+  font-size: clamp(36px, 5vw, 64px);
+  color: #fff !important;
+}
+
+#wh-chapter .wh-ch-closing p {
+  margin: 18px auto 28px;
+  max-width: 42ch;
+  font-size: 17px;
+}
+
+#wh-chapter .wh-ch-closing-cta {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#wh-chapter .wh-ch-prev {
+  margin-top: 28px;
+  font-size: 14px;
+}
+
+#wh-chapter .wh-ch-prev a {
+  text-decoration: none;
+  opacity: 0.85;
+}
+
+#wh-chapter .wh-ch-prev a:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  #wh-chapter .wh-ch-meta-grid,
+  #wh-chapter .wh-ch-pharmacist-grid,
+  #wh-chapter .wh-ch-programs-grid,
+  #wh-chapter .wh-ch-cat-grid--grow,
+  #wh-chapter .wh-ch-nav-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #wh-chapter .wh-ch-hero {
+    min-height: 64vh;
+  }
+
+  #wh-chapter .wh-ch-rounded {
+    border-radius: 32px 32px 0 0;
+    margin-top: -32px;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1100px) {
+  #wh-chapter .wh-ch-nav-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #wh-chapter .wh-ch-cat-grid--grow {
+    grid-template-columns: 1fr 1fr;
+  }
+}
