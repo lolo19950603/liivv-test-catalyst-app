@@ -71,8 +71,8 @@ const DEFAULT_BANNER_HEADING_FONT_SIZE_DESKTOP = 90;
 const ROUNDED_RADIUS = 'var(--border-radius,1.5rem)';
 
 /** Reveal uses `section inline` + `shopify-section contents`; scoped rules restore archive rounded-top.
- * Prefer `overflow: clip` over `hidden` — `hidden` makes a scroll container and breaks sticky, so the
- * cover image never scrolls over the banner headline. `clip` still masks to the rounded corners. */
+ * Do not set overflow clip/hidden here — either breaks sticky or hard-clips the sticky headline
+ * (sharp cut across “Meet Mya” instead of a soft opacity fade). Archive uses border-radius only. */
 function revealRoundedTopCss(revealSectionId: string, rootId: string, enabled: boolean): string {
   if (!enabled) {
     return '';
@@ -83,7 +83,7 @@ function revealRoundedTopCss(revealSectionId: string, rootId: string, enabled: b
     `#${revealSectionId} .section.section--rounded{` +
     `position:relative;z-index:1;display:block!important;width:100%;` +
     `margin-block-start:calc(-1 * ${ROUNDED_RADIUS});` +
-    `overflow:clip;` +
+    `overflow:visible;` +
     `background-color:rgb(var(--color-background))!important;` +
     `border-start-end-radius:${ROUNDED_RADIUS}!important;` +
     `border-start-start-radius:${ROUNDED_RADIUS}!important}` +

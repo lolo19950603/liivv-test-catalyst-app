@@ -23,11 +23,29 @@ function revealProgress(tracker: Element, mobile: boolean): number {
   return Math.min(1, Math.max(0, (revealStart - top) / range));
 }
 
-/** Fade headline out once the cover image overlaps it or passes below it (prevents bottom leak). */
+/** Ease-out so the last bit of the fade lingers a little longer. */
+function easeFadeOut(t: number): number {
+  const clamped = Math.min(1, Math.max(0, t));
+
+  return 1 - (1 - clamped) * (1 - clamped);
+}
+
+/**
+ * Headline opacity for the cutout reveal:
+ * 1. Fade in via scroll progress (`revealIn`).
+ * 2. Stay fully opaque while the transparent cover sits over the type (letters show
+ *    beside the subject — the “Meet Mya” look).
+ * 3. Slowly fade out over a long scroll runway as the cover rises further.
+ * 4. Hard-hide once the headline is past the image (prevents leak into the story).
+ *
+ * Do not fade from image-box overlap alone — for cutouts the media box covers the
+ * headline long before the type should disappear.
+ */
 function resolveHeadlineOpacity(
   revealIn: number,
   headlineRect: DOMRect,
   imageRect: DOMRect | null,
+  mobile: boolean,
 ): number {
   if (imageRect == null) {
     return revealIn;
@@ -38,15 +56,27 @@ function resolveHeadlineOpacity(
     return 0;
   }
 
-  // Image rising over the headline — fade out as overlap grows.
-  if (imageRect.top < headlineRect.bottom) {
-    const overlap = headlineRect.bottom - imageRect.top;
-    const hide = overlap / Math.max(headlineRect.height, 1);
-
-    return revealIn * Math.max(0, 1 - hide);
+  if (revealIn <= 0) {
+    return 0;
   }
 
-  return revealIn;
+  const viewportHeight = window.innerHeight;
+  /**
+   * Fade starts only after the cover has risen well past the headline (cutout still
+   * readable). Completes over ~0.55–0.7vh of further scroll — slow, not a snap.
+   */
+  const fadeStartY = headlineRect.top - viewportHeight * (mobile ? 0.08 : 0.12);
+  const fadeRange = viewportHeight * (mobile ? 0.55 : 0.7);
+  const fadeEndY = fadeStartY - fadeRange;
+
+  if (imageRect.top >= fadeStartY) {
+    return revealIn;
+  }
+
+  const raw = (fadeStartY - imageRect.top) / (fadeStartY - fadeEndY);
+  const faded = easeFadeOut(raw);
+
+  return revealIn * Math.max(0, 1 - faded);
 }
 
 /**
@@ -105,7 +135,7 @@ export function SplittingBanner({
       const coverMedia = root.querySelector(COVER_MEDIA_SELECTOR);
       const imageRect = coverMedia?.getBoundingClientRect() ?? null;
       const headlineRect = headlineEl.getBoundingClientRect();
-      let opacity = resolveHeadlineOpacity(progress, headlineRect, imageRect);
+      let opacity = resolveHeadlineOpacity(progress, headlineRect, imageRect, mobile);
 
       if (inEditorPreview && progress < 0.85) {
         const scroller = root.querySelector('.reveal-banner__scroller');
@@ -123,6 +153,7 @@ export function SplittingBanner({
               progress,
               headlineEl.getBoundingClientRect(),
               coverMedia?.getBoundingClientRect() ?? null,
+              mobile,
             );
           }
         }
