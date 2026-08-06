@@ -108,7 +108,7 @@ export const DIABETES_CARE_MOBILE_RESPONSIVE_CSS = [
    * Keep rounded section overflow visible so sticky headline isn’t hard-clipped mid-fade.
    * Scroller may use overflow:hidden for its own box; that doesn’t clip the rising cover. */
   `${MOBILE_TABLET}{[id^="dcrift-reveal"] .section.section--rounded{overflow:visible!important}}` +
-  `${MOBILE_TABLET}{[id^="dcrift-"] .splitting-banner .reveal-banner__scroller{position:sticky!important;top:0!important;height:100lvh!important;max-height:100dvh!important;overflow:hidden!important;padding-inline:0!important;margin-inline:0!important}}`,
+  `${MOBILE_TABLET}{[id^="dcrift-"] .splitting-banner .reveal-banner__scroller{position:sticky!important;top:0!important;height:100lvh!important;max-height:100dvh!important;overflow:visible!important;z-index:20!important;background:transparent!important;padding-inline:0!important;margin-inline:0!important}}`,
   `${MOBILE_TABLET}{[id^="dcrift-"] .reveal-banner__tracker{inset-block-start:12%!important;height:72lvh!important}}`,
   `${MOBILE_TABLET}{[id^="dcrift-"] .reveal-banner .banner{height:100%!important;min-height:100%!important}}`,
   `${MOBILE}{[id^="dcrift-reveal"] .reveal-banner .banner__content{padding-block:2rem}}`,

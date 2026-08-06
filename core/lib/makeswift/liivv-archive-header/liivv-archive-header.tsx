@@ -11,6 +11,7 @@ import {
   useCallback,
   useEffect,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -1039,7 +1040,7 @@ export function LiivvArchiveHeader({
   }, [mobileNavOpen, searchOpen, closeMobileNav, closeSearch, closeMegaMenu]);
 
   useEffect(() => {
-    if (searchOpen || !searchDrawerMounted) {
+    if (!searchOpen || !searchDrawerMounted) {
       return;
     }
 
@@ -1062,18 +1063,43 @@ export function LiivvArchiveHeader({
     return () => window.cancelAnimationFrame(id);
   }, [searchDrawerOpen]);
 
-  useEffect(() => {
-    if (!mobileNavOpen) {
+  // Pin header while mobile nav/search is open. `overflow: hidden` on body breaks
+  // `position: sticky`, so switch to fixed and reserve flow space with a spacer.
+  useLayoutEffect(() => {
+    const overlayOpen = mobileNavOpen || searchOpen;
+
+    if (!overlayOpen || typeof window === 'undefined') {
       return;
     }
 
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    const section = sectionRef.current;
+    const headerHeight = section?.getBoundingClientRect().height ?? 0;
+
+    let spacer: HTMLDivElement | null = null;
+    if (section?.parentElement && headerHeight > 0) {
+      spacer = document.createElement('div');
+      spacer.setAttribute('aria-hidden', 'true');
+      spacer.className = 'liivv-header-overlay-spacer';
+      spacer.style.cssText = `height:${String(headerHeight)}px;width:100%;flex-shrink:0;pointer-events:none;`;
+      section.parentElement.insertBefore(spacer, section);
+    }
+
+    const body = document.body;
+    const prevOverflow = body.style.overflow;
+    const prevPaddingRight = body.style.paddingRight;
+    const scrollbarGap = window.innerWidth - document.documentElement.clientWidth;
+
+    body.style.overflow = 'hidden';
+    if (scrollbarGap > 0) {
+      body.style.paddingRight = `${String(scrollbarGap)}px`;
+    }
 
     return () => {
-      document.body.style.overflow = prev;
+      spacer?.remove();
+      body.style.overflow = prevOverflow;
+      body.style.paddingRight = prevPaddingRight;
     };
-  }, [mobileNavOpen]);
+  }, [mobileNavOpen, searchOpen, sectionRef]);
 
   useEffect(() => {
     if (!mobileNavOpen || typeof window === 'undefined') {
@@ -1111,9 +1137,18 @@ export function LiivvArchiveHeader({
         }
       : undefined;
 
+  const overlayOpen = mobileNavOpen || searchOpen;
   const backgroundChannels = resolveSectionBackgroundChannels(background, '255 255 255');
   const pinStyle: CSSProperties = {
-    ...(sticky ? { position: 'sticky', insetBlockStart: 0, top: 0, zIndex: 50 } : {}),
+    ...(sticky || overlayOpen
+      ? {
+          position: overlayOpen ? 'fixed' : 'sticky',
+          insetBlockStart: 0,
+          top: 0,
+          zIndex: overlayOpen ? 100 : 50,
+          ...(overlayOpen ? { left: 0, right: 0, width: '100%' } : {}),
+        }
+      : {}),
     ...(backgroundChannels != null ? { '--color-background': backgroundChannels } : {}),
   };
   const sectionStyle = Object.keys(pinStyle).length > 0 ? pinStyle : undefined;

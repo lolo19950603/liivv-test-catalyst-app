@@ -31,56 +31,42 @@ function easeFadeOut(t: number): number {
 }
 
 /**
- * Headline opacity for the cutout reveal:
- * 1. Fade in via scroll progress (`revealIn`).
- * 2. Stay fully opaque while the transparent cover sits over the type (letters show
- *    beside the subject — the “Meet Mya” look).
- * 3. Slowly fade out over a long scroll runway as the cover rises further.
- * 4. Hard-hide once the headline is past the image (prevents leak into the story).
- *
- * Do not fade from image-box overlap alone — for cutouts the media box covers the
- * headline long before the type should disappear.
+ * Headline sits above the image (z-index). Fade in on enter, then slowly fade out
+ * as the portrait rises — opacity only.
  */
 function resolveHeadlineOpacity(
   revealIn: number,
-  headlineRect: DOMRect,
   imageRect: DOMRect | null,
   mobile: boolean,
 ): number {
-  if (imageRect == null) {
-    return revealIn;
-  }
-
-  // Headline sits entirely below the image frame — hide to stop post-scroll leak.
-  if (headlineRect.top >= imageRect.bottom - 4) {
-    return 0;
-  }
-
   if (revealIn <= 0) {
     return 0;
   }
 
+  if (imageRect == null) {
+    return revealIn;
+  }
+
   const viewportHeight = window.innerHeight;
   /**
-   * Fade starts only after the cover has risen well past the headline (cutout still
-   * readable). Completes over ~0.55–0.7vh of further scroll — slow, not a snap.
+   * Stay fully opaque while the portrait is coming into view. Start fading once
+   * the image top reaches ~mid viewport; ease out over nearly a full viewport of scroll.
    */
-  const fadeStartY = headlineRect.top - viewportHeight * (mobile ? 0.08 : 0.12);
-  const fadeRange = viewportHeight * (mobile ? 0.55 : 0.7);
-  const fadeEndY = fadeStartY - fadeRange;
+  const fadeStartY = viewportHeight * (mobile ? 0.45 : 0.4);
+  const fadeRange = viewportHeight * (mobile ? 0.75 : 0.9);
 
   if (imageRect.top >= fadeStartY) {
     return revealIn;
   }
 
-  const raw = (fadeStartY - imageRect.top) / (fadeStartY - fadeEndY);
+  const raw = (fadeStartY - imageRect.top) / fadeRange;
   const faded = easeFadeOut(raw);
 
   return revealIn * Math.max(0, 1 - faded);
 }
 
 /**
- * Scroll-driven headline reveal for the diabetes-care “Meet Armaan…” banner.
+ * Scroll-driven headline fade for Reveal + story.
  * Replaces the Shopify theme `splitting-banner` custom element (needs `html.js`).
  */
 export function SplittingBanner({
@@ -108,8 +94,6 @@ export function SplittingBanner({
     }
 
     const wrapperEl = wrapper as HTMLElement;
-    const headlineEl =
-      (wrapper.querySelector('h2, .heading') as HTMLElement | null) ?? wrapperEl;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const inEditorPreview = window.self !== window.top;
 
@@ -134,8 +118,7 @@ export function SplittingBanner({
       let revealed = progress >= (mobile ? 0.08 : 0.12);
       const coverMedia = root.querySelector(COVER_MEDIA_SELECTOR);
       const imageRect = coverMedia?.getBoundingClientRect() ?? null;
-      const headlineRect = headlineEl.getBoundingClientRect();
-      let opacity = resolveHeadlineOpacity(progress, headlineRect, imageRect, mobile);
+      let opacity = resolveHeadlineOpacity(progress, imageRect, mobile);
 
       if (inEditorPreview && progress < 0.85) {
         const scroller = root.querySelector('.reveal-banner__scroller');
@@ -151,7 +134,6 @@ export function SplittingBanner({
             revealed = true;
             opacity = resolveHeadlineOpacity(
               progress,
-              headlineEl.getBoundingClientRect(),
               coverMedia?.getBoundingClientRect() ?? null,
               mobile,
             );

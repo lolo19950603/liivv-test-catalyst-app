@@ -15,9 +15,7 @@
 .diabetes-care-section-header .lg\:gap-5{gap:var(--sp-5)}
 .diabetes-care-section-header .lg\:justify-start{justify-content:flex-start}
 .diabetes-care-section-header .header__logo-link{text-decoration:none;color:inherit}
-.diabetes-care-section-header .header__logo-link img{display:block;max-height:2.25rem;max-width:min(100%,7.5rem);width:auto;height:auto}
-@media screen and (min-width:640px){.diabetes-care-section-header .header__logo-link img{max-height:2.75rem;max-width:min(100%,8.5rem)}}
-@media screen and (min-width:768px){.diabetes-care-section-header .header__logo-link img{max-height:140px;max-width:140px}}
+.diabetes-care-section-header .header__logo-link img{display:block;max-height:140px;max-width:140px;width:auto;height:auto}
 @media screen and (min-width:768px){
   .diabetes-care-section-header .md\:block{display:block}
 }

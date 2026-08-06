@@ -182,12 +182,18 @@ export function DiabetesCareRevealImageWithText({
   const richSectionId = `dcrift-rich-${instance}`;
 
   /** Theme vars on the component root so reveal banner + image and rich text share background. */
-  /** Shorter scroll runway on phone/tablet; portrait uses intrinsic ratio (no 16:9 crop). */
+  /** Sticky headline above the portrait; transparent so type sits on the image, then fades out. */
   const revealSectionCss =
-    `#${revealSectionId} .reveal-banner{isolation:isolate}` +
-    `#${revealSectionId} .reveal-banner__scroller{z-index:1}` +
-    `#${revealSectionId} .reveal-banner > .section--padding{position:relative;z-index:2;background-color:rgb(var(--color-background))}` +
-    `#${revealSectionId} .dcrift-reveal-media-wrap{position:relative;z-index:2;display:flex;justify-content:center;width:100%}` +
+    `#${revealSectionId} .reveal-banner{isolation:isolate;position:relative}` +
+    `#${revealSectionId} .reveal-banner__scroller{` +
+    `position:sticky!important;top:0;z-index:20!important;pointer-events:none;` +
+    `background:transparent!important;background-color:transparent!important}` +
+    `#${revealSectionId} .reveal-banner__scroller .banner,` +
+    `#${revealSectionId} .reveal-banner__scroller .banner__content{background:transparent!important}` +
+    `#${revealSectionId} .reveal-banner__scroller .splitting-wrapper{position:relative;z-index:21}` +
+    `#${revealSectionId} .reveal-banner > .section--padding{position:relative;z-index:1!important;background-color:rgb(var(--color-background))}` +
+    `#${revealSectionId} .dcrift-reveal-media-wrap{position:relative;z-index:1!important;display:flex;justify-content:center;width:100%}` +
+    `#${revealSectionId} .dcrift-reveal-media,#${revealSectionId} .reveal-banner__cover-media{position:relative;z-index:1!important}` +
     `#${revealSectionId} .reveal-banner .banner__box{min-width:0!important;width:100%;max-width:${REVEAL_COLUMN_MAX_WIDTH};margin-inline:auto}` +
     `#${revealSectionId} .reveal-banner .splitting-wrapper,#${revealSectionId} .reveal-banner .splitting-wrapper h2,#${revealSectionId} .reveal-banner .split-words.words{max-width:100%}` +
     `#${revealSectionId} .reveal-banner .split-words.words{display:inline-flex;flex-wrap:wrap;justify-content:center;text-wrap:balance}` +
@@ -195,7 +201,7 @@ export function DiabetesCareRevealImageWithText({
     `@media screen and (max-width:1023px){#${revealSectionId} .reveal-banner .splitting-wrapper h2.dcrift-banner-heading--default{font-size:clamp(2rem,5.5vw,3.25rem);line-height:1.05;letter-spacing:-0.02em;text-wrap:balance}}` +
     `@media screen and (min-width:1024px){#${revealSectionId} .dcrift-reveal-media.media--adapt{height:auto!important;width:fit-content!important;max-width:${REVEAL_COLUMN_MAX_WIDTH};margin-inline:auto;padding-block-end:0!important}` +
     `#${revealSectionId} .dcrift-reveal-media.media--adapt>img{position:static!important;display:block;width:auto!important;height:auto!important;max-width:${REVEAL_COLUMN_MAX_WIDTH};max-height:${REVEAL_IMAGE_MAX_HEIGHT};margin-inline:auto;object-fit:contain!important;object-position:center center}}` +
-    `@media screen and (max-width:1023px){#${revealSectionId} .splitting-banner .reveal-banner__scroller{position:sticky!important;top:0!important;height:100lvh!important;max-height:100dvh!important;overflow:hidden!important}` +
+    `@media screen and (max-width:1023px){#${revealSectionId} .splitting-banner .reveal-banner__scroller{position:sticky!important;top:0!important;height:100lvh!important;max-height:100dvh!important;overflow:visible!important;z-index:20!important}` +
     `#${revealSectionId} .reveal-banner__tracker{inset-block-start:12%!important;height:72lvh!important}@supports (height:100lvh){#${revealSectionId} .reveal-banner__tracker{height:72lvh!important}}` +
     `#${revealSectionId} .reveal-banner .banner{height:100%!important;min-height:100%!important}}` +
     `@media screen and (max-width:500px){#${revealSectionId} .reveal-banner .banner__content .page-width--narrow{max-width:100%}` +
@@ -209,6 +215,7 @@ export function DiabetesCareRevealImageWithText({
     `#${revealSectionId} .dcrift-reveal-media--placeholder>span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;` +
     `padding:1rem;text-align:center;font-size:0.875rem;font-weight:500;line-height:1.25;white-space:nowrap}` +
     `@media screen and (max-width:1023px){#${revealSectionId} .dcrift-reveal-media.mobile\\:media--wide>img,#${revealSectionId} .dcrift-reveal-media>img{aspect-ratio:unset!important}}`;
+
 
   const { sectionCss, sectionStyle } = buildSectionTheme({
     sectionId: rootId,
@@ -342,18 +349,18 @@ export function DiabetesCareRevealImageWithText({
           )}
           style={roundedSectionStyle}
         >
-          <div className="relative contents">
-            <SplittingBanner className="splitting-banner reveal-banner relative inline">
+          <div className="relative">
+            <SplittingBanner className="splitting-banner reveal-banner relative block w-full">
               <span className="reveal-banner__tracker absolute top-0 h-full" />
-              <div className="reveal-banner__scroller sticky top-0 overflow-hidden">
-                <div className="banner relative h-full min-h-[100dvh] w-full md:h-screen">
-                  <div className="banner__content left-0 h-full w-full overflow-hidden">
+              <div className="reveal-banner__scroller sticky top-0 z-20 overflow-visible bg-transparent">
+                <div className="banner relative h-full min-h-[100dvh] w-full bg-transparent md:h-screen">
+                  <div className="banner__content left-0 h-full w-full overflow-visible bg-transparent">
                     <div className="page-width page-width--narrow flex h-full w-full items-center justify-center px-4 sm:px-5 md:px-0">
                       <div
                         className="banner__box banner__box--large text-center"
                         style={revealHeadlineBoxStyle}
                       >
-                        <div className="splitting-wrapper relative">
+                        <div className="splitting-wrapper relative z-[21]">
                           <h2
                             className={clsx(
                               'heading title-lg tracking-heading splitting words chars leading-none',
@@ -369,13 +376,12 @@ export function DiabetesCareRevealImageWithText({
                   </div>
                 </div>
               </div>
-              {/* Cover image must stay opaque — ScrollReveal fade would hide it while it
-                  should be rising over the sticky headline. */}
-              <div className="section--padding relative w-full">
+              {/* Image under sticky headline; headline fades via opacity. */}
+              <div className="section--padding relative z-[1] w-full">
                 {imageSrc.length > 0 ? (
-                  <div className="dcrift-reveal-media-wrap page-width page-width--narrow relative mx-auto w-full px-4 sm:px-5 md:px-0">
+                  <div className="dcrift-reveal-media-wrap page-width page-width--narrow relative z-[1] mx-auto w-full px-4 sm:px-5 md:px-0">
                     <picture
-                      className="dcrift-reveal-media reveal-banner__cover-media media media--adapt media--transparent relative mx-auto block max-w-full overflow-hidden rounded-3xl"
+                      className="dcrift-reveal-media reveal-banner__cover-media media media--adapt media--transparent relative z-[1] mx-auto block max-w-full overflow-hidden rounded-3xl"
                       style={revealMediaStyle}
                     >
                       <img
@@ -394,10 +400,10 @@ export function DiabetesCareRevealImageWithText({
                     </picture>
                   </div>
                 ) : isInBuilder ? (
-                  <div className="dcrift-reveal-media-wrap page-width page-width--narrow relative mx-auto w-full px-4 sm:px-5 md:px-0">
+                  <div className="dcrift-reveal-media-wrap page-width page-width--narrow relative z-[1] mx-auto w-full px-4 sm:px-5 md:px-0">
                     <div
                       aria-hidden
-                      className="dcrift-reveal-media dcrift-reveal-media--placeholder reveal-banner__cover-media media media--adapt relative mx-auto block max-w-full overflow-hidden rounded-3xl"
+                      className="dcrift-reveal-media dcrift-reveal-media--placeholder reveal-banner__cover-media media media--adapt relative z-[1] mx-auto block max-w-full overflow-hidden rounded-3xl"
                       style={revealMediaStyle}
                     >
                       <span>Banner image</span>
