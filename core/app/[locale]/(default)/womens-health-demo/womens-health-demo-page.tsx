@@ -1,14 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import './womens-health-demo.css';
 
 const SHOP_HREF = '/liivv-health/womens-health/shop-womens-health';
 const PHARMACIST_HREF = '/account/virtual-care';
+const IMG = '/archive/womens-health-demo';
 
-const u = (id: string, w = 1200) =>
-  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=85`;
+function Pic({
+  src,
+  className = '',
+  alt = '',
+}: {
+  src: string;
+  className?: string;
+  alt?: string;
+}) {
+  return (
+    <div aria-hidden={alt === '' || undefined} className={`wh-pic ${className}`.trim()}>
+      {/* Local assets under /public — avoids Unsplash / archive .media conflicts */}
+      <img alt={alt} src={src} />
+    </div>
+  );
+}
 
 const TIMELINE = [
   {
@@ -20,8 +35,8 @@ const TIMELINE = [
     ],
     cta: 'Get Started',
     href: SHOP_HREF,
-    image: u('photo-1492725764893-90b379c2b6e1'),
-    peek: u('photo-1516589178581-6cd7833ae3b2', 800),
+    image: `${IMG}/timeline-1.jpg`,
+    peek: `${IMG}/timeline-1b.jpg`,
   },
   {
     category: 'Stock your calm',
@@ -32,8 +47,8 @@ const TIMELINE = [
     ],
     cta: 'Get Started',
     href: SHOP_HREF,
-    image: u('photo-1556228578-0d85b1a4d571'),
-    peek: u('photo-1571781926291-c77df8097c0a', 800),
+    image: `${IMG}/timeline-2.jpg`,
+    peek: `${IMG}/timeline-2b.jpg`,
   },
   {
     category: 'Ask without the awkward',
@@ -44,8 +59,8 @@ const TIMELINE = [
     ],
     cta: 'Talk to a Pharmacist',
     href: PHARMACIST_HREF,
-    image: u('photo-1576091160399-112ba8d25d1d'),
-    peek: u('photo-1512941937669-90a1b58e7e9c', 800),
+    image: `${IMG}/timeline-3.jpg`,
+    peek: `${IMG}/timeline-3b.jpg`,
   },
   {
     category: 'Shop what fits',
@@ -56,8 +71,8 @@ const TIMELINE = [
     ],
     cta: 'Explore the Shop',
     href: SHOP_HREF,
-    image: u('photo-1487412720507-e7ab37603c6f'),
-    peek: u('photo-1596462502278-27bfdc403348', 800),
+    image: `${IMG}/timeline-4.jpg`,
+    peek: `${IMG}/timeline-4b.jpg`,
   },
   {
     category: 'Liivv well',
@@ -68,8 +83,8 @@ const TIMELINE = [
     ],
     cta: 'Liivv Well',
     href: SHOP_HREF,
-    image: u('photo-1518611012118-696072aa579a'),
-    peek: u('photo-1506126613408-eca07ce68773', 800),
+    image: `${IMG}/timeline-5.jpg`,
+    peek: `${IMG}/timeline-5b.jpg`,
   },
 ] as const;
 
@@ -80,7 +95,7 @@ const CHAPTERS = [
     focus:
       'First period nerves, irregular cycles, hormonal skin, discretion at school, and the vitamins that build a strong start.',
     vibe: 'Supportive, demystifying, and parent-friendly — without talking down to the teen.',
-    image: u('photo-1529626455594-4ff0802cfb7e', 1400),
+    image: `${IMG}/chapter-1.jpg`,
   },
   {
     eyebrow: 'Chapter two',
@@ -88,7 +103,7 @@ const CHAPTERS = [
     focus:
       'Busy schedules, hormonal breakouts, gut + vaginal health, sleep + stress, and birth control side effects or options.',
     vibe: 'Modern, aesthetic, and highly functional. Wellness that works IRL.',
-    image: u('photo-1487412912498-0447578c4214', 1400),
+    image: `${IMG}/chapter-2.jpg`,
   },
   {
     eyebrow: 'Chapter three',
@@ -96,7 +111,7 @@ const CHAPTERS = [
     focus:
       'Hormonal imbalance, weight fluctuations, skin aging, stress, and burnout — met with care, not judgment.',
     vibe: 'Aspirational but accessible. Acknowledging burnout without making it a medical deficiency.',
-    image: u('photo-1545205597-3d9d02c29597', 1400),
+    image: `${IMG}/chapter-3.jpg`,
   },
   {
     eyebrow: 'Chapter four',
@@ -104,7 +119,7 @@ const CHAPTERS = [
     focus:
       'Fertility challenges, physical discomfort, recovery after birth, and breastfeeding stress — with room to breathe.',
     vibe: 'Empowering, deeply supportive, and strictly no shame.',
-    image: u('photo-1515488042361-ee00e0ddd4e4', 1400),
+    image: `${IMG}/chapter-4.jpg`,
   },
   {
     eyebrow: 'Chapter five',
@@ -112,7 +127,7 @@ const CHAPTERS = [
     focus:
       'Sleep disruption, bone density, low metabolism, night sweats, and mood swings — comfort you can feel.',
     vibe: 'Reclaiming comfort. Sleek, discreet, and highly effective.',
-    image: u('photo-1506126613408-eca07ce68773', 1400),
+    image: `${IMG}/chapter-5.jpg`,
   },
   {
     eyebrow: 'Chapter six',
@@ -120,38 +135,106 @@ const CHAPTERS = [
     focus:
       'Joint comfort, cognitive health, mobility, and energy — so the years ahead stay full of your favourite things.',
     vibe: 'Active, capable, and vibrant. Removing the stigma of aging aids.',
-    image: u('photo-1469474968028-56623f02e42e', 1400),
+    image: `${IMG}/chapter-6.jpg`,
   },
 ] as const;
 
-const RIVER = [
-  u('photo-1494790108377-be9c29b29330', 800),
-  u('photo-1515886657613-9f3515b0c78f', 800),
-  u('photo-1534528741775-53994a69daeb', 800),
-  u('photo-1524504388940-b1c1722653e1', 800),
-  u('photo-1544005313-94ddf0286df2', 800),
-];
+const COUNTERS = [
+  {
+    num: '10k',
+    suffix: '+',
+    text: 'women in the Liivv community, and growing every day',
+    image: `${IMG}/counter-1.jpg`,
+  },
+  {
+    num: '24',
+    suffix: '/7',
+    text: 'Olivia for shopping and account help — anytime',
+    image: `${IMG}/counter-2.jpg`,
+  },
+  {
+    num: '19',
+    suffix: '+',
+    text: 'everyday concerns our Ontario pharmacists can help with in chat',
+    image: `${IMG}/counter-3.jpg`,
+  },
+  {
+    num: '1',
+    suffix: '',
+    text: 'place for your wellness — your way, your pace',
+    image: `${IMG}/counter-4.jpg`,
+  },
+] as const;
 
-const MOSAIC = [
-  u('photo-1515886657613-9f3515b0c78f', 900),
-  u('photo-1484101403537-ffe3e70ffa29', 800),
-  u('photo-1514228742587-6b1558fcca3d', 800),
-  u('photo-1476480862126-209bfaa8edc8', 700),
-  u('photo-1506126613408-eca07ce68773', 900),
-  u('photo-1438761681033-6461ffad8d80', 700),
-];
+const PILLARS = [
+  {
+    title: 'Daily Comfort',
+    sub: 'For the every-month and the every-day',
+    body: 'Cycle care and comfort essentials that show up on time, so that week is just another week.',
+    image: `${IMG}/pillar-1.jpg`,
+  },
+  {
+    title: 'Body Confidence',
+    sub: 'Personal care, zero whisper aisle',
+    body: 'Intimate and personal care picked with honesty — delivered discreetly, discussed openly whenever you want.',
+    image: `${IMG}/pillar-2.jpg`,
+  },
+  {
+    title: 'Nourish & Glow',
+    sub: 'From the inside out',
+    body: 'Daily nutrition and skin-loving staples that keep pace with busy weeks and full plates.',
+    image: `${IMG}/pillar-3.jpg`,
+  },
+  {
+    title: 'Rest that Restores',
+    sub: 'Because tomorrow needs you',
+    body: 'Wind-down rituals and sleep support for nights that actually recharge you.',
+    image: `${IMG}/pillar-4.jpg`,
+  },
+] as const;
+
+const VOICES = [
+  {
+    quote:
+      'I finally asked a pharmacist a question I’d been too shy to ask anyone for a year. Got a kind, straight answer on my lunch break — no waiting room, no judgment.',
+    name: 'Priya',
+    meta: 'Toronto · juggling two kids and a startup',
+    image: `${IMG}/voice-1.jpg`,
+  },
+  {
+    quote:
+      'My monthly box shows up like clockwork. I genuinely forgot what running-out-of-everything panic feels like.',
+    name: 'Dana',
+    meta: 'Ottawa · marathon-in-training',
+    image: `${IMG}/voice-2.jpg`,
+  },
+  {
+    quote:
+      'I used to keep three apps and a drawer of half-finished bottles. Now my essentials arrive before I run out — and Sundays feel like mine again.',
+    name: 'Maya',
+    meta: '34 · Liivv member since 2024',
+    image: `${IMG}/voice-3.jpg`,
+  },
+  {
+    quote:
+      'The sleep support and skin staples in one place changed my month. I stopped bouncing between three different shops.',
+    name: 'Sofia',
+    meta: 'Mississauga · Liivv Women regular',
+    image: `${IMG}/voice-4.jpg`,
+  },
+] as const;
 
 const MARQUEE_IMGS = [
-  u('photo-1596462502278-27bfdc403348', 600),
-  u('photo-1571781926291-c77df8097c0a', 600),
-  u('photo-1556228720-195a672e8a03', 600),
-  u('photo-1608571423902-eed4a5ad8108', 600),
-  u('photo-1611930022073-b7a4ba5fcccd', 600),
-  u('photo-1580870069867-74c57ee1bb07', 600),
-  u('photo-1515377905703-c4788e51af15', 600),
-  u('photo-1487412720507-e7ab37603c6f', 600),
-  u('photo-1492725764893-90b379c2b6e1', 600),
-  u('photo-1518611012118-696072aa579a', 600),
+  `${IMG}/marquee-1.jpg`,
+  `${IMG}/marquee-2.jpg`,
+  `${IMG}/marquee-3.jpg`,
+  `${IMG}/marquee-4.jpg`,
+  `${IMG}/marquee-5.jpg`,
+  `${IMG}/pillar-1.jpg`,
+  `${IMG}/pillar-2.jpg`,
+  `${IMG}/mosaic-3.jpg`,
+  `${IMG}/mosaic-5.jpg`,
+  `${IMG}/river-3.jpg`,
 ];
 
 const MARQUEE_LABELS = [
@@ -167,106 +250,16 @@ const MARQUEE_LABELS = [
   'Quiet Strength',
 ];
 
-const COUNTERS = [
-  {
-    num: '10k',
-    suffix: '+',
-    text: 'women in the Liivv community, and growing every day',
-    image: u('photo-1529626455594-4ff0802cfb7e', 800),
-  },
-  {
-    num: '24',
-    suffix: '/7',
-    text: 'Olivia for shopping and account help — anytime',
-    image: u('photo-1512941937669-90a1b58e7e9c', 800),
-  },
-  {
-    num: '19',
-    suffix: '+',
-    text: 'everyday concerns our Ontario pharmacists can help with in chat',
-    image: u('photo-1576091160550-2173dba999ef', 800),
-  },
-  {
-    num: '1',
-    suffix: '',
-    text: 'place for your wellness — your way, your pace',
-    image: u('photo-1515377905703-c4788e51af15', 800),
-  },
-] as const;
-
-const PILLARS = [
-  {
-    title: 'Daily Comfort',
-    sub: 'For the every-month and the every-day',
-    body: 'Cycle care and comfort essentials that show up on time, so that week is just another week.',
-    image: u('photo-1514228742587-6b1558fcca3d', 900),
-  },
-  {
-    title: 'Body Confidence',
-    sub: 'Personal care, zero whisper aisle',
-    body: 'Intimate and personal care picked with honesty — delivered discreetly, discussed openly whenever you want.',
-    image: u('photo-1487412720507-e7ab37603c6f', 900),
-  },
-  {
-    title: 'Nourish & Glow',
-    sub: 'From the inside out',
-    body: 'Daily nutrition and skin-loving staples that keep pace with busy weeks and full plates.',
-    image: u('photo-1490645935967-10de6ba17061', 900),
-  },
-  {
-    title: 'Rest that Restores',
-    sub: 'Because tomorrow needs you',
-    body: 'Wind-down rituals and sleep support for nights that actually recharge you.',
-    image: u('photo-1506126613408-eca07ce68773', 900),
-  },
-] as const;
-
-const VOICES = [
-  {
-    quote:
-      'I finally asked a pharmacist a question I’d been too shy to ask anyone for a year. Got a kind, straight answer on my lunch break — no waiting room, no judgment.',
-    name: 'Priya',
-    meta: 'Toronto · juggling two kids and a startup',
-    image: u('photo-1494790108377-be9c29b29330', 700),
-  },
-  {
-    quote:
-      'My monthly box shows up like clockwork. I genuinely forgot what running-out-of-everything panic feels like.',
-    name: 'Dana',
-    meta: 'Ottawa · marathon-in-training',
-    image: u('photo-1438761681033-6461ffad8d80', 700),
-  },
-  {
-    quote:
-      'I used to keep three apps and a drawer of half-finished bottles. Now my essentials arrive before I run out — and Sundays feel like mine again.',
-    name: 'Maya',
-    meta: '34 · Liivv member since 2024',
-    image: u('photo-1534528741775-53994a69daeb', 700),
-  },
-  {
-    quote:
-      'The sleep support and skin staples in one place changed my month. I stopped bouncing between three different shops.',
-    name: 'Sofia',
-    meta: 'Mississauga · Liivv Women regular',
-    image: u('photo-1544005313-94ddf0286df2', 700),
-  },
-] as const;
-
 export function WomensHealthDemoPage() {
   const [timelineIndex, setTimelineIndex] = useState(0);
   const slide = TIMELINE[timelineIndex] ?? TIMELINE[0];
 
-  const goPrev = () => {
-    setTimelineIndex((i) => (i === 0 ? TIMELINE.length - 1 : i - 1));
-  };
-
-  const goNext = () => {
-    setTimelineIndex((i) => (i === TIMELINE.length - 1 ? 0 : i + 1));
-  };
-
   return (
     <div id="wh-demo">
       <section className="hero" aria-label="Women's Health hero">
+        <div className="hero-bg">
+          <img alt="" src={`${IMG}/hero.jpg`} />
+        </div>
         <div className="hero-inner">
           <span className="hero-kicker">Liivv Women</span>
           <h1>You, in every season</h1>
@@ -278,30 +271,31 @@ export function WomensHealthDemoPage() {
             <a className="btn btn-white" href={SHOP_HREF}>
               Shop the edit
             </a>
-            <a className="btn btn-outline" href="#find-your-chapter" style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.7)' }}>
+            <a
+              className="btn btn-outline"
+              href="#find-your-chapter"
+              style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.7)' }}
+            >
               Find your chapter
             </a>
           </div>
         </div>
         <div aria-hidden className="hero-stack">
-          <div
-            className="hero-frame hero-frame--a"
-            style={{ backgroundImage: `url('${u('photo-1515886657613-9f3515b0c78f', 900)}')` }}
-          />
-          <div
-            className="hero-frame hero-frame--b"
-            style={{ backgroundImage: `url('${u('photo-1529626455594-4ff0802cfb7e', 700)}')` }}
-          />
-          <div
-            className="hero-frame hero-frame--c"
-            style={{ backgroundImage: `url('${u('photo-1494790108377-be9c29b29330', 500)}')` }}
-          />
+          <div className="hero-frame hero-frame--a">
+            <img alt="" src={`${IMG}/hero-a.jpg`} />
+          </div>
+          <div className="hero-frame hero-frame--b">
+            <img alt="" src={`${IMG}/hero-b.jpg`} />
+          </div>
+          <div className="hero-frame hero-frame--c">
+            <img alt="" src={`${IMG}/hero-c.jpg`} />
+          </div>
         </div>
       </section>
 
       <div aria-hidden className="photo-river">
-        {RIVER.map((src) => (
-          <div className="media" key={src} style={{ backgroundImage: `url('${src}')` }} />
+        {[1, 2, 3, 4, 5].map((n) => (
+          <Pic key={n} src={`${IMG}/river-${n}.jpg`} />
         ))}
       </div>
 
@@ -311,8 +305,8 @@ export function WomensHealthDemoPage() {
           <span className="swash sage">everyday rhythm</span> for living well
         </h2>
         <div aria-hidden className="mosaic">
-          {MOSAIC.map((src, i) => (
-            <div className={`media m${i + 1}`} key={src} style={{ backgroundImage: `url('${src}')` }} />
+          {[1, 2, 3, 4, 5, 6].map((n) => (
+            <Pic className={`m${n}`} key={n} src={`${IMG}/mosaic-${n}.jpg`} />
           ))}
         </div>
       </section>
@@ -321,7 +315,7 @@ export function WomensHealthDemoPage() {
         <div className="container counters-grid">
           {COUNTERS.map((c) => (
             <div className="counter-card" key={c.text}>
-              <div aria-hidden className="media" style={{ backgroundImage: `url('${c.image}')` }} />
+              <Pic src={c.image} />
               <div className="num">
                 {c.num}
                 {c.suffix ? <sup>{c.suffix}</sup> : null}
@@ -335,12 +329,16 @@ export function WomensHealthDemoPage() {
       <section aria-hidden className="img-marquee">
         <div className="img-marquee-track">
           {[0, 1].flatMap((copy) =>
-            MARQUEE_IMGS.flatMap((src, i) => [
-              <div className="media" key={`${copy}-img-${src}`} style={{ backgroundImage: `url('${src}')` }} />,
-              <span className="chip" key={`${copy}-chip-${MARQUEE_LABELS[i]}`}>
-                {MARQUEE_LABELS[i]}
-              </span>,
-            ]),
+            MARQUEE_IMGS.flatMap((src, i) => {
+              const nodes: ReactNode[] = [
+                <Pic key={`${copy}-img-${src}`} src={src} />,
+                <span className="chip" key={`${copy}-chip-${MARQUEE_LABELS[i]}`}>
+                  {MARQUEE_LABELS[i]}
+                </span>,
+              ];
+
+              return nodes;
+            }),
           )}
         </div>
       </section>
@@ -358,10 +356,18 @@ export function WomensHealthDemoPage() {
           </div>
 
           <div className="timeline-nav">
-            <button aria-label="Previous journey step" onClick={goPrev} type="button">
+            <button
+              aria-label="Previous journey step"
+              onClick={() => setTimelineIndex((i) => (i === 0 ? TIMELINE.length - 1 : i - 1))}
+              type="button"
+            >
               ‹
             </button>
-            <button aria-label="Next journey step" onClick={goNext} type="button">
+            <button
+              aria-label="Next journey step"
+              onClick={() => setTimelineIndex((i) => (i === TIMELINE.length - 1 ? 0 : i + 1))}
+              type="button"
+            >
               ›
             </button>
           </div>
@@ -378,16 +384,8 @@ export function WomensHealthDemoPage() {
               </a>
             </div>
             <div className="timeline-visual">
-              <div
-                aria-hidden
-                className="media media-main"
-                style={{ backgroundImage: `url('${slide.image}')` }}
-              />
-              <div
-                aria-hidden
-                className="media media-peek"
-                style={{ backgroundImage: `url('${slide.peek}')` }}
-              />
+              <Pic className="wh-pic-main" src={slide.image} />
+              <Pic className="wh-pic-peek" src={slide.peek} />
             </div>
           </div>
 
@@ -418,7 +416,7 @@ export function WomensHealthDemoPage() {
           <div className="pillars-grid">
             {PILLARS.map((pillar) => (
               <div className="pillar" key={pillar.title}>
-                <div aria-hidden className="media" style={{ backgroundImage: `url('${pillar.image}')` }} />
+                <Pic src={pillar.image} />
                 <h3>{pillar.title}</h3>
                 <div className="sub">{pillar.sub}</div>
                 <p>{pillar.body}</p>
@@ -431,21 +429,9 @@ export function WomensHealthDemoPage() {
       <section className="images-text rounded-top">
         <div className="container images-text-grid">
           <div className="visuals">
-            <div
-              aria-hidden
-              className="media big"
-              style={{ backgroundImage: `url('${u('photo-1576091160550-2173dba999ef', 1100)}')` }}
-            />
-            <div
-              aria-hidden
-              className="media mid"
-              style={{ backgroundImage: `url('${u('photo-1516589178581-6cd7833ae3b2', 800)}')` }}
-            />
-            <div
-              aria-hidden
-              className="media small"
-              style={{ backgroundImage: `url('${u('photo-1512941937669-90a1b58e7e9c', 700)}')` }}
-            />
+            <Pic className="big" src={`${IMG}/care-1.jpg`} />
+            <Pic className="mid" src={`${IMG}/care-2.jpg`} />
+            <Pic className="small" src={`${IMG}/care-3.jpg`} />
           </div>
           <div>
             <span className="eyebrow">Available in Ontario</span>
@@ -473,21 +459,9 @@ export function WomensHealthDemoPage() {
       <section className="images-text tips-pair rounded-top">
         <div className="container images-text-grid">
           <div className="visuals">
-            <div
-              aria-hidden
-              className="media big"
-              style={{ backgroundImage: `url('${u('photo-1484101403537-ffe3e70ffa29', 1100)}')` }}
-            />
-            <div
-              aria-hidden
-              className="media mid"
-              style={{ backgroundImage: `url('${u('photo-1515377905703-c4788e51af15', 800)}')` }}
-            />
-            <div
-              aria-hidden
-              className="media small"
-              style={{ backgroundImage: `url('${u('photo-1492725764893-90b379c2b6e1', 700)}')` }}
-            />
+            <Pic className="big" src={`${IMG}/tips-1.jpg`} />
+            <Pic className="mid" src={`${IMG}/tips-2.jpg`} />
+            <Pic className="small" src={`${IMG}/tips-3.jpg`} />
           </div>
           <div className="copy">
             <span className="eyebrow">A little wisdom for the week</span>
@@ -514,22 +488,10 @@ export function WomensHealthDemoPage() {
           <div className="banner">
             <h2>Also in the edit: Clair</h2>
             <div aria-hidden className="clair-collage">
-              <div
-                className="media c1"
-                style={{ backgroundImage: `url('${u('photo-1611652022419-a9419f74343d', 1200)}')` }}
-              />
-              <div
-                className="media c2"
-                style={{ backgroundImage: `url('${u('photo-1515886657613-9f3515b0c78f', 800)}')` }}
-              />
-              <div
-                className="media c3"
-                style={{ backgroundImage: `url('${u('photo-1524504388940-b1c1722653e1', 800)}')` }}
-              />
-              <div
-                className="media c4"
-                style={{ backgroundImage: `url('${u('photo-1494790108377-be9c29b29330', 600)}')` }}
-              />
+              <Pic className="c1" src={`${IMG}/clair-1.jpg`} />
+              <Pic className="c2" src={`${IMG}/clair-2.jpg`} />
+              <Pic className="c3" src={`${IMG}/clair-3.jpg`} />
+              <Pic className="c4" src={`${IMG}/clair-4.jpg`} />
             </div>
           </div>
           <div className="story-grid">
@@ -565,7 +527,7 @@ export function WomensHealthDemoPage() {
       <section aria-label="Find your chapter" className="chapters" id="find-your-chapter">
         {CHAPTERS.map((chapter) => (
           <div className="chapter" key={chapter.title}>
-            <div aria-hidden className="media" style={{ backgroundImage: `url('${chapter.image}')` }} />
+            <Pic src={chapter.image} />
             <div className="copy">
               <span className="eyebrow">{chapter.eyebrow}</span>
               <h3>{chapter.title}</h3>
@@ -589,11 +551,7 @@ export function WomensHealthDemoPage() {
           <div className="voice-cards">
             {VOICES.map((v) => (
               <div className="voice" key={v.name}>
-                <div
-                  aria-hidden
-                  className="media portrait"
-                  style={{ backgroundImage: `url('${v.image}')` }}
-                />
+                <Pic className="portrait" src={v.image} />
                 <div className="body">
                   <blockquote>&ldquo;{v.quote}&rdquo;</blockquote>
                   <div className="who">
@@ -610,14 +568,8 @@ export function WomensHealthDemoPage() {
       <section className="faq rounded-top">
         <div className="faq-layout">
           <div aria-hidden className="faq-art">
-            <div
-              className="media"
-              style={{ backgroundImage: `url('${u('photo-1515886657613-9f3515b0c78f', 900)}')` }}
-            />
-            <div
-              className="media"
-              style={{ backgroundImage: `url('${u('photo-1487412912498-0447578c4214', 900)}')` }}
-            />
+            <Pic src={`${IMG}/faq-1.jpg`} />
+            <Pic src={`${IMG}/faq-2.jpg`} />
           </div>
           <div>
             <h2>Good questions, honest answers</h2>
@@ -685,20 +637,14 @@ export function WomensHealthDemoPage() {
       </section>
 
       <section className="closing rounded-top">
+        <div className="closing-bg">
+          <img alt="" src={`${IMG}/closing.jpg`} />
+        </div>
         <div className="container">
           <div aria-hidden className="closing-thumbs">
-            <div
-              className="media"
-              style={{ backgroundImage: `url('${u('photo-1494790108377-be9c29b29330', 300)}')` }}
-            />
-            <div
-              className="media"
-              style={{ backgroundImage: `url('${u('photo-1534528741775-53994a69daeb', 300)}')` }}
-            />
-            <div
-              className="media"
-              style={{ backgroundImage: `url('${u('photo-1544005313-94ddf0286df2', 300)}')` }}
-            />
+            <Pic src={`${IMG}/voice-1.jpg`} />
+            <Pic src={`${IMG}/voice-3.jpg`} />
+            <Pic src={`${IMG}/voice-4.jpg`} />
           </div>
           <h2>
             Your next chapter <span>starts soft</span>
