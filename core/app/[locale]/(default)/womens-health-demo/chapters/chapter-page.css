@@ -102,21 +102,22 @@
   display: block;
 }
 
-/* Back bar */
+/* Back link overlaid on hero — no separate strip */
 #wh-chapter .wh-ch-back {
-  background: var(--soft);
-  padding: 16px 0;
-  border-bottom: 1px solid rgba(49, 47, 47, 0.08);
-}
-
-#wh-chapter .wh-ch-back a {
-  font-size: 14px;
+  position: absolute;
+  top: 28px;
+  left: max(24px, calc((100% - 1180px) / 2 + 24px));
+  z-index: 2;
+  font-size: 13px;
   font-weight: 500;
+  letter-spacing: 0.04em;
   text-decoration: none;
+  color: rgba(255, 255, 255, 0.82);
+  transition: color 0.2s ease;
 }
 
-#wh-chapter .wh-ch-back a:hover {
-  opacity: 0.7;
+#wh-chapter .wh-ch-back:hover {
+  color: #fff;
 }
 
 /* Hero */
@@ -140,7 +141,7 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(to top, rgba(49, 47, 47, 0.78), rgba(49, 47, 47, 0.2) 55%),
+    linear-gradient(to top, rgba(49, 47, 47, 0.78), rgba(49, 47, 47, 0.25) 55%, rgba(49, 47, 47, 0.4)),
     radial-gradient(120% 80% at 80% 10%, color-mix(in srgb, var(--chapter-accent) 45%, transparent), transparent 55%);
 }
 

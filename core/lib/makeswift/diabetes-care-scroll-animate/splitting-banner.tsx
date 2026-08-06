@@ -6,8 +6,22 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { SplittingBannerRevealContext } from './splitting-banner-reveal-context';
 
 const MOBILE_REVEAL_MQ = '(max-width: 1023px)';
-/** Prefer the stacked stage; fall back to cover media / root. */
-const STAGE_SELECTOR = '.dcrift-reveal-stage, .dcrift-reveal-media, .reveal-banner__cover-media';
+const COVER_MEDIA_SELECTOR = '.dcrift-reveal-media, .reveal-banner__cover-media';
+
+function revealProgress(tracker: Element, mobile: boolean): number {
+  const { top } = tracker.getBoundingClientRect();
+  const viewportHeight = window.innerHeight;
+  const revealStart = viewportHeight;
+  /** Shorter scroll range on phone/tablet so the portrait image follows sooner. */
+  const revealEnd = viewportHeight * (mobile ? 0.5 : 0.35);
+  const range = revealStart - revealEnd;
+
+  if (range <= 0) {
+    return 1;
+  }
+
+  return Math.min(1, Math.max(0, (revealStart - top) / range));
+}
 
 /** Ease-out so the last bit of the fade lingers a little longer. */
 function easeFadeOut(t: number): number {
@@ -17,43 +31,57 @@ function easeFadeOut(t: number): number {
 }
 
 /**
- * Opacity for a headline layered on the portrait:
- * fully visible while the stage sits in view, then slowly fades as it scrolls up.
- * No sticky cover / image-over-text runway.
+ * Headline opacity for the cutout reveal:
+ * 1. Fade in via scroll progress (`revealIn`).
+ * 2. Stay fully opaque while the transparent cover sits over the type (letters show
+ *    beside the subject — the “Meet Mya” look).
+ * 3. Slowly fade out over a long scroll runway as the cover rises further.
+ * 4. Hard-hide once the headline is past the image (prevents leak into the story).
+ *
+ * Do not fade from image-box overlap alone — for cutouts the media box covers the
+ * headline long before the type should disappear.
  */
-function resolveHeadlineOpacity(stage: Element, mobile: boolean): number {
-  const rect = stage.getBoundingClientRect();
-  const viewportHeight = window.innerHeight;
+function resolveHeadlineOpacity(
+  revealIn: number,
+  headlineRect: DOMRect,
+  imageRect: DOMRect | null,
+  mobile: boolean,
+): number {
+  if (imageRect == null) {
+    return revealIn;
+  }
 
-  // Fully off-screen — hide.
-  if (rect.bottom <= 0 || rect.top >= viewportHeight) {
+  // Headline sits entirely below the image frame — hide to stop post-scroll leak.
+  if (headlineRect.top >= imageRect.bottom - 4) {
     return 0;
   }
 
+  if (revealIn <= 0) {
+    return 0;
+  }
+
+  const viewportHeight = window.innerHeight;
   /**
-   * Stay fully opaque while the portrait is mostly on screen. Start fading once
-   * the top edge is near the top of the viewport; finish over ~0.6vh more scroll.
+   * Fade starts only after the cover has risen well past the headline (cutout still
+   * readable). Completes over ~0.55–0.7vh of further scroll — slow, not a snap.
    */
-  const fadeStartY = viewportHeight * (mobile ? 0.18 : 0.12);
-  const fadeRange = viewportHeight * (mobile ? 0.6 : 0.7);
+  const fadeStartY = headlineRect.top - viewportHeight * (mobile ? 0.08 : 0.12);
+  const fadeRange = viewportHeight * (mobile ? 0.55 : 0.7);
   const fadeEndY = fadeStartY - fadeRange;
 
-  if (rect.top >= fadeStartY) {
-    return 1;
+  if (imageRect.top >= fadeStartY) {
+    return revealIn;
   }
 
-  if (rect.top <= fadeEndY) {
-    return 0;
-  }
+  const raw = (fadeStartY - imageRect.top) / (fadeStartY - fadeEndY);
+  const faded = easeFadeOut(raw);
 
-  const raw = (fadeStartY - rect.top) / (fadeStartY - fadeEndY);
-
-  return Math.max(0, 1 - easeFadeOut(raw));
+  return revealIn * Math.max(0, 1 - faded);
 }
 
 /**
- * Scroll-driven headline fade for Reveal + story (“Meet Mya” on the cutout).
- * Headline is composited on the image; opacity only — no sticky cover runway.
+ * Scroll-driven headline reveal for the diabetes-care “Meet Armaan…” banner.
+ * Replaces the Shopify theme `splitting-banner` custom element (needs `html.js`).
  */
 export function SplittingBanner({
   children,
@@ -72,13 +100,16 @@ export function SplittingBanner({
       return;
     }
 
+    const tracker = root.querySelector('.reveal-banner__tracker');
     const wrapper = root.querySelector('.splitting-wrapper');
 
-    if (wrapper == null) {
+    if (tracker == null || wrapper == null) {
       return;
     }
 
     const wrapperEl = wrapper as HTMLElement;
+    const headlineEl =
+      (wrapper.querySelector('h2, .heading') as HTMLElement | null) ?? wrapperEl;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const inEditorPreview = window.self !== window.top;
 
@@ -99,23 +130,38 @@ export function SplittingBanner({
       raf = 0;
 
       const mobile = window.matchMedia(MOBILE_REVEAL_MQ).matches;
-      const stage = root.querySelector(STAGE_SELECTOR) ?? root;
-      let opacity = resolveHeadlineOpacity(stage, mobile);
+      let progress = revealProgress(tracker, mobile);
+      let revealed = progress >= (mobile ? 0.08 : 0.12);
+      const coverMedia = root.querySelector(COVER_MEDIA_SELECTOR);
+      const imageRect = coverMedia?.getBoundingClientRect() ?? null;
+      const headlineRect = headlineEl.getBoundingClientRect();
+      let opacity = resolveHeadlineOpacity(progress, headlineRect, imageRect, mobile);
 
-      if (inEditorPreview && opacity < 0.85) {
-        const rect = stage.getBoundingClientRect();
-        const visibleHeight =
-          Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
-        const visibleRatio = rect.height > 0 ? visibleHeight / rect.height : 0;
+      if (inEditorPreview && progress < 0.85) {
+        const scroller = root.querySelector('.reveal-banner__scroller');
 
-        if (visibleRatio > (mobile ? 0.12 : 0.2)) {
-          opacity = 1;
+        if (scroller != null) {
+          const rect = scroller.getBoundingClientRect();
+          const visibleHeight =
+            Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+          const visibleRatio = rect.height > 0 ? visibleHeight / rect.height : 0;
+
+          if (visibleRatio > (mobile ? 0.12 : 0.25)) {
+            progress = 1;
+            revealed = true;
+            opacity = resolveHeadlineOpacity(
+              progress,
+              headlineEl.getBoundingClientRect(),
+              coverMedia?.getBoundingClientRect() ?? null,
+              mobile,
+            );
+          }
         }
       }
 
       wrapperEl.style.opacity = String(opacity);
       wrapperEl.style.visibility = opacity <= 0.01 ? 'hidden' : 'visible';
-      setHeadlineRevealed(opacity > 0.05);
+      setHeadlineRevealed(revealed && opacity > 0.05);
     };
 
     const scheduleUpdate = (): void => {
@@ -130,22 +176,9 @@ export function SplittingBanner({
     window.addEventListener('scroll', scheduleUpdate, { passive: true });
     window.addEventListener('resize', scheduleUpdate, { passive: true });
 
-    const stageEl = root.querySelector(STAGE_SELECTOR);
-    const resizeObserver =
-      stageEl != null && typeof ResizeObserver !== 'undefined'
-        ? new ResizeObserver(() => {
-            scheduleUpdate();
-          })
-        : null;
-
-    if (stageEl != null && resizeObserver != null) {
-      resizeObserver.observe(stageEl);
-    }
-
     return () => {
       window.removeEventListener('scroll', scheduleUpdate);
       window.removeEventListener('resize', scheduleUpdate);
-      resizeObserver?.disconnect();
 
       if (raf !== 0) {
         window.cancelAnimationFrame(raf);

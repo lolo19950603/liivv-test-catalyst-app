@@ -25,14 +25,11 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
 
   return (
     <div id="wh-chapter" style={{ ['--chapter-accent' as string]: chapter.accent }}>
-      <div className="wh-ch-back">
-        <div className="wh-ch-container">
-          <a href={LANDING_HREF}>← Women&apos;s Health &amp; Wellness</a>
-        </div>
-      </div>
-
       <section className="wh-ch-hero">
         <Pic className="wh-ch-hero-bg" src={chapter.heroImage} />
+        <a className="wh-ch-back" href={LANDING_HREF}>
+          ← Women&apos;s Health &amp; Wellness
+        </a>
         <div className="wh-ch-hero-inner">
           <span className="wh-ch-eyebrow">Liivv Women · Chapter {chapter.chapterWord}</span>
           <p className="wh-ch-num" aria-hidden>
