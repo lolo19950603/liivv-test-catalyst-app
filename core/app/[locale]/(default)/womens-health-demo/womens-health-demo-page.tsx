@@ -3,12 +3,47 @@
 import { useState, type ReactNode } from 'react';
 
 import { CHAPTERS as CHAPTER_PAGES, chapterHref } from './chapters/chapters-data';
+import type { WhDemoCatalog, WhDemoCatalogItem } from './get-wh-demo-catalog';
 
 import './womens-health-demo.css';
 
 const SHOP_HREF = '/liivv-health/womens-health/shop-womens-health';
 const PHARMACIST_HREF = '/account/virtual-care';
 const IMG = '/archive/womens-health-demo';
+
+const KIT_FEATURES = [
+  {
+    title: 'Start with a curated edit',
+    body: 'Each kit arrives prebuilt with essentials chosen for that chapter — no guesswork, no whisper aisle.',
+  },
+  {
+    title: 'Make it yours',
+    body: 'Adjust quantities, remove what you don’t need, and add new items so the kit matches your real routine.',
+  },
+  {
+    title: 'Save for later',
+    body: 'Lock in your customized kit on your account and come back when you’re ready — your edits stay put.',
+  },
+] as const;
+
+function ProductThumb({ product }: { product: WhDemoCatalogItem }) {
+  return (
+    <a className="wh-product-card" href={product.path}>
+      <div className="wh-product-media">
+        {product.image ? (
+          <img alt={product.image.alt} src={product.image.src} />
+        ) : (
+          <div aria-hidden className="wh-product-fallback" />
+        )}
+      </div>
+      <div className="wh-product-meta">
+        {product.isKit ? <span className="wh-product-badge">Customizable kit</span> : null}
+        <h3>{product.name}</h3>
+        {product.priceLabel ? <p className="wh-product-price">{product.priceLabel}</p> : null}
+      </div>
+    </a>
+  );
+}
 
 function Pic({
   src,
@@ -215,9 +250,18 @@ const MARQUEE_LABELS = [
   'Quiet Strength',
 ];
 
-export function WomensHealthDemoPage() {
+export function WomensHealthDemoPage({
+  catalog,
+}: {
+  catalog?: WhDemoCatalog;
+}) {
   const [timelineIndex, setTimelineIndex] = useState(0);
   const slide = TIMELINE[timelineIndex] ?? TIMELINE[0];
+  const featuredKit = catalog?.featuredKit ?? null;
+  const otherKits = (catalog?.kits ?? []).filter((k) => k.entityId !== featuredKit?.entityId);
+  const shopProducts = catalog?.products ?? [];
+  const hasKits = Boolean(featuredKit) || otherKits.length > 0;
+  const hasShop = shopProducts.length > 0;
 
   return (
     <div id="wh-demo">
@@ -232,6 +276,9 @@ export function WomensHealthDemoPage() {
           <div className="hero-cta">
             <a className="btn btn-dark" href={SHOP_HREF}>
               Shop the edit
+            </a>
+            <a className="btn btn-outline" href="#build-your-kit">
+              Build your kit
             </a>
             <a className="btn btn-outline" href="#find-your-chapter">
               Find your chapter
@@ -390,6 +437,93 @@ export function WomensHealthDemoPage() {
           </div>
         </div>
       </section>
+
+      {hasKits ? (
+        <section aria-label="Customizable kits" className="wh-kits rounded-top" id="build-your-kit">
+          <div className="container">
+            <span className="eyebrow">Liivv kits</span>
+            <h2>Start curated. Finish as yours.</h2>
+            <p className="wh-kits-intro">
+              Kits like the First Cycle Starter Kit arrive with a thoughtful prebuilt edit — then you tune
+              quantities, add what was missing, and save the whole thing for later. More chapter kits are
+              coming; the flow stays the same.
+            </p>
+
+            <div className="wh-kit-features">
+              {KIT_FEATURES.map((feature) => (
+                <article key={feature.title}>
+                  <h3>{feature.title}</h3>
+                  <p>{feature.body}</p>
+                </article>
+              ))}
+            </div>
+
+            {featuredKit ? (
+              <div className="wh-kit-feature">
+                <div className="wh-kit-feature-media">
+                  {featuredKit.image ? (
+                    <img alt={featuredKit.image.alt} src={featuredKit.image.src} />
+                  ) : (
+                    <div aria-hidden className="wh-product-fallback" />
+                  )}
+                </div>
+                <div className="wh-kit-feature-copy">
+                  <span className="wh-product-badge">Featured kit</span>
+                  <h3>{featuredKit.name}</h3>
+                  <p>
+                    A calm first-chapter edit — comfort, skin basics, and everyday essentials. Open the kit
+                    to adjust qty, add new items, and save your custom version to your account.
+                  </p>
+                  {featuredKit.priceLabel ? (
+                    <p className="wh-product-price">{featuredKit.priceLabel}</p>
+                  ) : null}
+                  <div className="wh-kit-feature-cta">
+                    <a className="btn btn-dark" href={featuredKit.path}>
+                      Customize this kit
+                    </a>
+                    <a className="btn btn-outline" href={SHOP_HREF}>
+                      Browse all kits &amp; essentials
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
+            {otherKits.length > 0 ? (
+              <div className="wh-kit-more">
+                <h3>More kits in the edit</h3>
+                <div className="wh-product-grid">
+                  {otherKits.map((kit) => (
+                    <ProductThumb key={kit.entityId} product={kit} />
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
+
+      {hasShop ? (
+        <section aria-label="Shop Women's Health" className="wh-shop" id="shop-womens-health">
+          <div className="container">
+            <span className="eyebrow">Shop Women&apos;s Health</span>
+            <h2>Essentials from the Women&apos;s edit</h2>
+            <p className="wh-shop-intro">
+              Live products tagged to Shop Women&apos;s Health — comfort, care, and glow, ready to open.
+            </p>
+            <div className="wh-product-grid">
+              {shopProducts.slice(0, 12).map((product) => (
+                <ProductThumb key={product.entityId} product={product} />
+              ))}
+            </div>
+            <div className="wh-shop-cta">
+              <a className="btn btn-dark" href={SHOP_HREF}>
+                Shop all Women&apos;s Health
+              </a>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <section className="images-text rounded-top">
         <div className="container images-text-grid">

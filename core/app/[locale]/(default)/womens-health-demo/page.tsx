@@ -3,6 +3,7 @@ import { setRequestLocale } from 'next-intl/server';
 
 import { locales } from '~/i18n/locales';
 
+import { getWhDemoCatalog } from './get-wh-demo-catalog';
 import { WomensHealthDemoPage } from './womens-health-demo-page';
 
 interface Props {
@@ -24,5 +25,7 @@ export default async function Page({ params }: Props) {
 
   setRequestLocale(locale);
 
-  return <WomensHealthDemoPage />;
+  const catalog = await getWhDemoCatalog(locale);
+
+  return <WomensHealthDemoPage catalog={catalog} />;
 }
