@@ -298,9 +298,13 @@ export function WomensHealthDemoPage() {
       </section>
 
       <div aria-hidden className="photo-river">
-        {[1, 2, 3, 4, 5].map((n) => (
-          <Pic key={n} src={`${IMG}/river-${n}.jpg`} />
-        ))}
+        <div className="photo-river-track">
+          {[0, 1].flatMap((copy) =>
+            [1, 2, 3, 4, 5].map((n) => (
+              <Pic key={`${copy}-${n}`} src={`${IMG}/river-${n}.jpg`} />
+            )),
+          )}
+        </div>
       </div>
 
       <section className="highlight-text rounded-top">
