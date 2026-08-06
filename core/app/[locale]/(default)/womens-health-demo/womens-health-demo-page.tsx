@@ -91,6 +91,7 @@ const TIMELINE = [
 const CHAPTERS = [
   {
     eyebrow: 'Chapter one',
+    num: '01',
     title: 'Foundation & First Cycles',
     focus:
       'First period nerves, irregular cycles, hormonal skin, discretion at school, and the vitamins that build a strong start.',
@@ -99,6 +100,7 @@ const CHAPTERS = [
   },
   {
     eyebrow: 'Chapter two',
+    num: '02',
     title: 'Rhythm & Balance',
     focus:
       'Busy schedules, hormonal breakouts, gut + vaginal health, sleep + stress, and birth control side effects or options.',
@@ -107,6 +109,7 @@ const CHAPTERS = [
   },
   {
     eyebrow: 'Chapter three',
+    num: '03',
     title: 'Reset & Recharge',
     focus:
       'Hormonal imbalance, weight fluctuations, skin aging, stress, and burnout — met with care, not judgment.',
@@ -115,6 +118,7 @@ const CHAPTERS = [
   },
   {
     eyebrow: 'Chapter four',
+    num: '04',
     title: 'Grow & Recover',
     focus:
       'Fertility challenges, physical discomfort, recovery after birth, and breastfeeding stress — with room to breathe.',
@@ -123,6 +127,7 @@ const CHAPTERS = [
   },
   {
     eyebrow: 'Chapter five',
+    num: '05',
     title: 'Transition & Relief',
     focus:
       'Sleep disruption, bone density, low metabolism, night sweats, and mood swings — comfort you can feel.',
@@ -131,6 +136,7 @@ const CHAPTERS = [
   },
   {
     eyebrow: 'Chapter six',
+    num: '06',
     title: 'Longevity & Vitality',
     focus:
       'Joint comfort, cognitive health, mobility, and energy — so the years ahead stay full of your favourite things.',
@@ -261,38 +267,35 @@ export function WomensHealthDemoPage() {
   return (
     <div id="wh-demo">
       <section className="hero" aria-label="Women's Health hero">
-        <div className="hero-bg">
-          <img alt="" src={`${IMG}/hero.jpg`} />
-        </div>
         <div className="hero-inner">
-          <span className="hero-kicker">Liivv Women</span>
+          <span className="hero-kicker">Liivv Women · Health, your way</span>
           <h1>You, in every season</h1>
           <p>
-            Care that moves with your life — never against it. From your everyday rhythm to whole new
-            chapters, Liivv is right beside you.
+            No quick fixes — just real care that moves with your life. From everyday rhythm to whole new
+            chapters, wellness that works IRL, at your pace.
           </p>
           <div className="hero-cta">
-            <a className="btn btn-white" href={SHOP_HREF}>
+            <a className="btn btn-dark" href={SHOP_HREF}>
               Shop the edit
             </a>
-            <a
-              className="btn btn-outline"
-              href="#find-your-chapter"
-              style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.7)' }}
-            >
+            <a className="btn btn-outline" href="#find-your-chapter">
               Find your chapter
             </a>
           </div>
         </div>
         <div aria-hidden className="hero-stack">
+          <div className="hero-stack-main">
+            <img alt="" src={`${IMG}/hero.jpg`} />
+          </div>
+          <div className="hero-chip">
+            <span>Liivv vibe</span>
+            Wellness that works IRL
+          </div>
           <div className="hero-frame hero-frame--a">
             <img alt="" src={`${IMG}/hero-a.jpg`} />
           </div>
           <div className="hero-frame hero-frame--b">
             <img alt="" src={`${IMG}/hero-b.jpg`} />
-          </div>
-          <div className="hero-frame hero-frame--c">
-            <img alt="" src={`${IMG}/hero-c.jpg`} />
           </div>
         </div>
       </section>
@@ -355,8 +358,7 @@ export function WomensHealthDemoPage() {
         <div className="container">
           <div className="timeline-header">
             <p className="small-heading">
-              No two of us live the same week. Here&apos;s how Liivv fits itself around yours — not the
-              other way around.
+              No two of us live the same week. Liivv fits itself around yours — your health, your pace.
             </p>
             <h2>
               Your journey, <span className="swash">your pace</span>
@@ -419,7 +421,7 @@ export function WomensHealthDemoPage() {
           <span className="eyebrow">The Liivv Women edit</span>
           <h2>Four ways to feel like yourself</h2>
           <p className="intro">
-            Everything here earns its place the same way — it makes an ordinary day a little softer.
+            Health, simplified — everything here earns its place by making an ordinary day a little softer.
           </p>
           <div className="pillars-grid">
             {PILLARS.map((pillar) => (
@@ -446,7 +448,7 @@ export function WomensHealthDemoPage() {
             <h2>Relief that doesn&apos;t wait on a waiting room</h2>
             <p>
               Some days your body just asks for a little backup — and you shouldn&apos;t need to rearrange
-              your whole week to get it.
+              your whole week to get it. Clear answers, no med-speak, no judgment.
             </p>
             <p>
               Our friendly Ontario pharmacists can chat through everyday concerns — from monthly cramps to
@@ -476,14 +478,14 @@ export function WomensHealthDemoPage() {
             <h2>Tips that meet you where you are</h2>
             <p>
               Women&apos;s health isn&apos;t one routine — it&apos;s small habits that soften the loud weeks
-              and stretch the quiet ones.
+              and stretch the quiet ones. No shame. Just health.
             </p>
             <p>
               Track how you feel across your month. Stock comfort essentials before you need them. Prioritize
               sleep the same week your energy dips. And when something feels off, chat with an Ontario
               pharmacist during business hours — until 5 p.m. Eastern.
             </p>
-            <p>Small adjustments, real rhythm. That&apos;s the Liivv Women way.</p>
+            <p>Small adjustments, real rhythm. Wellness that works IRL.</p>
             <a className="btn btn-dark" href={SHOP_HREF}>
               Explore Women&apos;s Essentials
             </a>
@@ -537,12 +539,21 @@ export function WomensHealthDemoPage() {
           <div className="chapter" key={chapter.title}>
             <Pic src={chapter.image} />
             <div className="copy">
+              <span aria-hidden className="chapter-num">
+                {chapter.num}
+              </span>
               <span className="eyebrow">{chapter.eyebrow}</span>
               <h3>{chapter.title}</h3>
-              <p className="focus-label">The Focus</p>
-              <p>{chapter.focus}</p>
-              <p className="vibe-label">The Liivv Vibe</p>
-              <p>{chapter.vibe}</p>
+              <div className="chapter-meta">
+                <div>
+                  <span className="chapter-pill">The Focus</span>
+                  <p>{chapter.focus}</p>
+                </div>
+                <div>
+                  <span className="chapter-pill chapter-pill--vibe">The Liivv Vibe</span>
+                  <p>{chapter.vibe}</p>
+                </div>
+              </div>
               <a className="btn btn-dark" href="#find-your-chapter">
                 Learn more
               </a>
@@ -554,7 +565,7 @@ export function WomensHealthDemoPage() {
       <section className="voices rounded-top">
         <div className="container">
           <h2>
-            What women <em>are saying</em>
+            Real talk <em>from the community</em>
           </h2>
           <div className="voice-cards">
             {VOICES.map((v) => (
@@ -660,8 +671,8 @@ export function WomensHealthDemoPage() {
             Your next chapter <span>starts soft</span>
           </h2>
           <p>
-            Whatever season you&apos;re in, there&apos;s a version of well that feels like you. Let&apos;s find
-            it together.
+            No shame. No hype. Just you — at your best. Whatever season you&apos;re in, there&apos;s a
+            version of well that feels like yours.
           </p>
           <a className="btn btn-white" href={SHOP_HREF}>
             Shop Women&apos;s Wellness
