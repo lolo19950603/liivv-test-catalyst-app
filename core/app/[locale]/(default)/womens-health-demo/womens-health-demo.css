@@ -435,7 +435,10 @@
 #wh-demo .img-marquee {
   background: var(--ink);
   overflow: hidden;
-  padding: 18px 0;
+  /* Extra bottom pad so .rounded-top overlap (-48px) doesn't clip the photos */
+  padding: 28px 0 72px;
+  position: relative;
+  z-index: 1;
 }
 
 #wh-demo .img-marquee-track {
