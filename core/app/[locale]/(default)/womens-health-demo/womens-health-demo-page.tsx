@@ -7,6 +7,9 @@ import './womens-health-demo.css';
 const SHOP_HREF = '/liivv-health/womens-health/shop-womens-health';
 const PHARMACIST_HREF = '/account/virtual-care';
 
+const u = (id: string, w = 1200) =>
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=85`;
+
 const TIMELINE = [
   {
     category: 'Know your rhythm',
@@ -17,8 +20,8 @@ const TIMELINE = [
     ],
     cta: 'Get Started',
     href: SHOP_HREF,
-    image:
-      'https://images.unsplash.com/photo-1492725764893-90b379c2b6e1?auto=format&fit=crop&w=1200&q=80',
+    image: u('photo-1492725764893-90b379c2b6e1'),
+    peek: u('photo-1516589178581-6cd7833ae3b2', 800),
   },
   {
     category: 'Stock your calm',
@@ -29,8 +32,8 @@ const TIMELINE = [
     ],
     cta: 'Get Started',
     href: SHOP_HREF,
-    image:
-      'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=1200&q=80',
+    image: u('photo-1556228578-0d85b1a4d571'),
+    peek: u('photo-1571781926291-c77df8097c0a', 800),
   },
   {
     category: 'Ask without the awkward',
@@ -41,8 +44,8 @@ const TIMELINE = [
     ],
     cta: 'Talk to a Pharmacist',
     href: PHARMACIST_HREF,
-    image:
-      'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80',
+    image: u('photo-1576091160399-112ba8d25d1d'),
+    peek: u('photo-1512941937669-90a1b58e7e9c', 800),
   },
   {
     category: 'Shop what fits',
@@ -53,8 +56,8 @@ const TIMELINE = [
     ],
     cta: 'Explore the Shop',
     href: SHOP_HREF,
-    image:
-      'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=1200&q=80',
+    image: u('photo-1487412720507-e7ab37603c6f'),
+    peek: u('photo-1596462502278-27bfdc403348', 800),
   },
   {
     category: 'Liivv well',
@@ -65,8 +68,8 @@ const TIMELINE = [
     ],
     cta: 'Liivv Well',
     href: SHOP_HREF,
-    image:
-      'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=80',
+    image: u('photo-1518611012118-696072aa579a'),
+    peek: u('photo-1506126613408-eca07ce68773', 800),
   },
 ] as const;
 
@@ -77,8 +80,7 @@ const CHAPTERS = [
     focus:
       'First period nerves, irregular cycles, hormonal skin, discretion at school, and the vitamins that build a strong start.',
     vibe: 'Supportive, demystifying, and parent-friendly — without talking down to the teen.',
-    image:
-      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=1200&q=80',
+    image: u('photo-1529626455594-4ff0802cfb7e', 1400),
   },
   {
     eyebrow: 'Chapter two',
@@ -86,8 +88,7 @@ const CHAPTERS = [
     focus:
       'Busy schedules, hormonal breakouts, gut + vaginal health, sleep + stress, and birth control side effects or options.',
     vibe: 'Modern, aesthetic, and highly functional. Wellness that works IRL.',
-    image:
-      'https://images.unsplash.com/photo-1487412912498-0447578c4214?auto=format&fit=crop&w=1200&q=80',
+    image: u('photo-1487412912498-0447578c4214', 1400),
   },
   {
     eyebrow: 'Chapter three',
@@ -95,8 +96,7 @@ const CHAPTERS = [
     focus:
       'Hormonal imbalance, weight fluctuations, skin aging, stress, and burnout — met with care, not judgment.',
     vibe: 'Aspirational but accessible. Acknowledging burnout without making it a medical deficiency.',
-    image:
-      'https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=1200&q=80',
+    image: u('photo-1545205597-3d9d02c29597', 1400),
   },
   {
     eyebrow: 'Chapter four',
@@ -104,8 +104,7 @@ const CHAPTERS = [
     focus:
       'Fertility challenges, physical discomfort, recovery after birth, and breastfeeding stress — with room to breathe.',
     vibe: 'Empowering, deeply supportive, and strictly no shame.',
-    image:
-      'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=1200&q=80',
+    image: u('photo-1515488042361-ee00e0ddd4e4', 1400),
   },
   {
     eyebrow: 'Chapter five',
@@ -113,8 +112,7 @@ const CHAPTERS = [
     focus:
       'Sleep disruption, bone density, low metabolism, night sweats, and mood swings — comfort you can feel.',
     vibe: 'Reclaiming comfort. Sleek, discreet, and highly effective.',
-    image:
-      'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=80',
+    image: u('photo-1506126613408-eca07ce68773', 1400),
   },
   {
     eyebrow: 'Chapter six',
@@ -122,12 +120,41 @@ const CHAPTERS = [
     focus:
       'Joint comfort, cognitive health, mobility, and energy — so the years ahead stay full of your favourite things.',
     vibe: 'Active, capable, and vibrant. Removing the stigma of aging aids.',
-    image:
-      'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80',
+    image: u('photo-1469474968028-56623f02e42e', 1400),
   },
 ] as const;
 
-const MARQUEE = [
+const RIVER = [
+  u('photo-1494790108377-be9c29b29330', 800),
+  u('photo-1515886657613-9f3515b0c78f', 800),
+  u('photo-1534528741775-53994a69daeb', 800),
+  u('photo-1524504388940-b1c1722653e1', 800),
+  u('photo-1544005313-94ddf0286df2', 800),
+];
+
+const MOSAIC = [
+  u('photo-1515886657613-9f3515b0c78f', 900),
+  u('photo-1484101403537-ffe3e70ffa29', 800),
+  u('photo-1514228742587-6b1558fcca3d', 800),
+  u('photo-1476480862126-209bfaa8edc8', 700),
+  u('photo-1506126613408-eca07ce68773', 900),
+  u('photo-1438761681033-6461ffad8d80', 700),
+];
+
+const MARQUEE_IMGS = [
+  u('photo-1596462502278-27bfdc403348', 600),
+  u('photo-1571781926291-c77df8097c0a', 600),
+  u('photo-1556228720-195a672e8a03', 600),
+  u('photo-1608571423902-eed4a5ad8108', 600),
+  u('photo-1611930022073-b7a4ba5fcccd', 600),
+  u('photo-1580870069867-74c57ee1bb07', 600),
+  u('photo-1515377905703-c4788e51af15', 600),
+  u('photo-1487412720507-e7ab37603c6f', 600),
+  u('photo-1492725764893-90b379c2b6e1', 600),
+  u('photo-1518611012118-696072aa579a', 600),
+];
+
+const MARQUEE_LABELS = [
   'Everyday Rhythm',
   'Glow & Nourish',
   'Cycle Comfort',
@@ -138,17 +165,91 @@ const MARQUEE = [
   'Skin & Glow',
   'Body Kindness',
   'Quiet Strength',
+];
+
+const COUNTERS = [
+  {
+    num: '10k',
+    suffix: '+',
+    text: 'women in the Liivv community, and growing every day',
+    image: u('photo-1529626455594-4ff0802cfb7e', 800),
+  },
+  {
+    num: '24',
+    suffix: '/7',
+    text: 'Olivia for shopping and account help — anytime',
+    image: u('photo-1512941937669-90a1b58e7e9c', 800),
+  },
+  {
+    num: '19',
+    suffix: '+',
+    text: 'everyday concerns our Ontario pharmacists can help with in chat',
+    image: u('photo-1576091160550-2173dba999ef', 800),
+  },
+  {
+    num: '1',
+    suffix: '',
+    text: 'place for your wellness — your way, your pace',
+    image: u('photo-1515377905703-c4788e51af15', 800),
+  },
 ] as const;
 
-const PILL_IMAGES = [
-  'https://images.unsplash.com/photo-1492725764893-90b379c2b6e1?auto=format&fit=crop&w=400&q=80',
-  'https://images.unsplash.com/photo-1484101403537-ffe3e70ffa29?auto=format&fit=crop&w=400&q=80',
-  'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?auto=format&fit=crop&w=400&q=80',
-  'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=400&q=80',
-  'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=400&q=80',
-  'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=400&q=80',
-  'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=400&q=80',
-  'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=400&q=80',
+const PILLARS = [
+  {
+    title: 'Daily Comfort',
+    sub: 'For the every-month and the every-day',
+    body: 'Cycle care and comfort essentials that show up on time, so that week is just another week.',
+    image: u('photo-1514228742587-6b1558fcca3d', 900),
+  },
+  {
+    title: 'Body Confidence',
+    sub: 'Personal care, zero whisper aisle',
+    body: 'Intimate and personal care picked with honesty — delivered discreetly, discussed openly whenever you want.',
+    image: u('photo-1487412720507-e7ab37603c6f', 900),
+  },
+  {
+    title: 'Nourish & Glow',
+    sub: 'From the inside out',
+    body: 'Daily nutrition and skin-loving staples that keep pace with busy weeks and full plates.',
+    image: u('photo-1490645935967-10de6ba17061', 900),
+  },
+  {
+    title: 'Rest that Restores',
+    sub: 'Because tomorrow needs you',
+    body: 'Wind-down rituals and sleep support for nights that actually recharge you.',
+    image: u('photo-1506126613408-eca07ce68773', 900),
+  },
+] as const;
+
+const VOICES = [
+  {
+    quote:
+      'I finally asked a pharmacist a question I’d been too shy to ask anyone for a year. Got a kind, straight answer on my lunch break — no waiting room, no judgment.',
+    name: 'Priya',
+    meta: 'Toronto · juggling two kids and a startup',
+    image: u('photo-1494790108377-be9c29b29330', 700),
+  },
+  {
+    quote:
+      'My monthly box shows up like clockwork. I genuinely forgot what running-out-of-everything panic feels like.',
+    name: 'Dana',
+    meta: 'Ottawa · marathon-in-training',
+    image: u('photo-1438761681033-6461ffad8d80', 700),
+  },
+  {
+    quote:
+      'I used to keep three apps and a drawer of half-finished bottles. Now my essentials arrive before I run out — and Sundays feel like mine again.',
+    name: 'Maya',
+    meta: '34 · Liivv member since 2024',
+    image: u('photo-1534528741775-53994a69daeb', 700),
+  },
+  {
+    quote:
+      'The sleep support and skin staples in one place changed my month. I stopped bouncing between three different shops.',
+    name: 'Sofia',
+    meta: 'Mississauga · Liivv Women regular',
+    image: u('photo-1544005313-94ddf0286df2', 700),
+  },
 ] as const;
 
 export function WomensHealthDemoPage() {
@@ -167,74 +268,79 @@ export function WomensHealthDemoPage() {
     <div id="wh-demo">
       <section className="hero" aria-label="Women's Health hero">
         <div className="hero-inner">
+          <span className="hero-kicker">Liivv Women</span>
           <h1>You, in every season</h1>
           <p>
             Care that moves with your life — never against it. From your everyday rhythm to whole new
             chapters, Liivv is right beside you.
           </p>
+          <div className="hero-cta">
+            <a className="btn btn-white" href={SHOP_HREF}>
+              Shop the edit
+            </a>
+            <a className="btn btn-outline" href="#find-your-chapter" style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.7)' }}>
+              Find your chapter
+            </a>
+          </div>
+        </div>
+        <div aria-hidden className="hero-stack">
+          <div
+            className="hero-frame hero-frame--a"
+            style={{ backgroundImage: `url('${u('photo-1515886657613-9f3515b0c78f', 900)}')` }}
+          />
+          <div
+            className="hero-frame hero-frame--b"
+            style={{ backgroundImage: `url('${u('photo-1529626455594-4ff0802cfb7e', 700)}')` }}
+          />
+          <div
+            className="hero-frame hero-frame--c"
+            style={{ backgroundImage: `url('${u('photo-1494790108377-be9c29b29330', 500)}')` }}
+          />
         </div>
       </section>
 
+      <div aria-hidden className="photo-river">
+        {RIVER.map((src) => (
+          <div className="media" key={src} style={{ backgroundImage: `url('${src}')` }} />
+        ))}
+      </div>
+
       <section className="highlight-text rounded-top">
-        <div className="pill-row">
-          {PILL_IMAGES.slice(0, 4).map((src) => (
-            <div className="media media--pill" key={src} style={{ backgroundImage: `url('${src}')` }} />
-          ))}
-        </div>
         <h2>
           Liivv <span className="swash">Women</span> is your{' '}
           <span className="swash sage">everyday rhythm</span> for living well
         </h2>
-        <div className="pill-row">
-          {PILL_IMAGES.slice(4).map((src) => (
-            <div className="media media--pill" key={src} style={{ backgroundImage: `url('${src}')` }} />
+        <div aria-hidden className="mosaic">
+          {MOSAIC.map((src, i) => (
+            <div className={`media m${i + 1}`} key={src} style={{ backgroundImage: `url('${src}')` }} />
           ))}
         </div>
       </section>
 
       <section className="counters">
         <div className="container counters-grid">
-          <div>
-            <div className="num">
-              10k<sup>+</sup>
+          {COUNTERS.map((c) => (
+            <div className="counter-card" key={c.text}>
+              <div aria-hidden className="media" style={{ backgroundImage: `url('${c.image}')` }} />
+              <div className="num">
+                {c.num}
+                {c.suffix ? <sup>{c.suffix}</sup> : null}
+              </div>
+              <p>{c.text}</p>
             </div>
-            <p>women in the Liivv community, and growing every day</p>
-          </div>
-          <div>
-            <div className="num">
-              24<sup>/7</sup>
-            </div>
-            <p>Olivia for shopping and account help — anytime</p>
-          </div>
-          <div>
-            <div className="num">
-              19<sup>+</sup>
-            </div>
-            <p>everyday concerns our Ontario pharmacists can help with in chat during business hours</p>
-          </div>
-          <div>
-            <div className="num">1</div>
-            <p>place for your wellness — your way, your pace</p>
-          </div>
+          ))}
         </div>
       </section>
 
-      <section aria-hidden className="marquee">
-        <div className="marquee-track">
+      <section aria-hidden className="img-marquee">
+        <div className="img-marquee-track">
           {[0, 1].flatMap((copy) =>
-            MARQUEE.flatMap((label, i) => {
-              const nodes = [<span key={`${copy}-${label}`}>{label}</span>];
-
-              if ((i + 1) % 5 === 0) {
-                nodes.push(
-                  <span className="logo-dot" key={`${copy}-logo-${i}`}>
-                    L
-                  </span>,
-                );
-              }
-
-              return nodes;
-            }),
+            MARQUEE_IMGS.flatMap((src, i) => [
+              <div className="media" key={`${copy}-img-${src}`} style={{ backgroundImage: `url('${src}')` }} />,
+              <span className="chip" key={`${copy}-chip-${MARQUEE_LABELS[i]}`}>
+                {MARQUEE_LABELS[i]}
+              </span>,
+            ]),
           )}
         </div>
       </section>
@@ -271,11 +377,18 @@ export function WomensHealthDemoPage() {
                 {slide.cta}
               </a>
             </div>
-            <div
-              aria-hidden
-              className="media"
-              style={{ backgroundImage: `url('${slide.image}')` }}
-            />
+            <div className="timeline-visual">
+              <div
+                aria-hidden
+                className="media media-main"
+                style={{ backgroundImage: `url('${slide.image}')` }}
+              />
+              <div
+                aria-hidden
+                className="media media-peek"
+                style={{ backgroundImage: `url('${slide.peek}')` }}
+              />
+            </div>
           </div>
 
           <div aria-label="Timeline steps" className="timeline-dots" role="tablist">
@@ -303,61 +416,14 @@ export function WomensHealthDemoPage() {
             Everything here earns its place the same way — it makes an ordinary day a little softer.
           </p>
           <div className="pillars-grid">
-            <div className="pillar">
-              <div
-                aria-hidden
-                className="media"
-                style={{
-                  backgroundImage:
-                    "url('https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?auto=format&fit=crop&w=800&q=80')",
-                }}
-              />
-              <h3>Daily Comfort</h3>
-              <div className="sub">For the every-month and the every-day</div>
-              <p>Cycle care and comfort essentials that show up on time, so that week is just another week.</p>
-            </div>
-            <div className="pillar">
-              <div
-                aria-hidden
-                className="media"
-                style={{
-                  backgroundImage:
-                    "url('https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=800&q=80')",
-                }}
-              />
-              <h3>Body Confidence</h3>
-              <div className="sub">Personal care, zero whisper aisle</div>
-              <p>
-                Intimate and personal care picked with honesty — delivered discreetly, discussed openly
-                whenever you want.
-              </p>
-            </div>
-            <div className="pillar">
-              <div
-                aria-hidden
-                className="media"
-                style={{
-                  backgroundImage:
-                    "url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=800&q=80')",
-                }}
-              />
-              <h3>Nourish &amp; Glow</h3>
-              <div className="sub">From the inside out</div>
-              <p>Daily nutrition and skin-loving staples that keep pace with busy weeks and full plates.</p>
-            </div>
-            <div className="pillar">
-              <div
-                aria-hidden
-                className="media"
-                style={{
-                  backgroundImage:
-                    "url('https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80')",
-                }}
-              />
-              <h3>Rest that Restores</h3>
-              <div className="sub">Because tomorrow needs you</div>
-              <p>Wind-down rituals and sleep support for nights that actually recharge you.</p>
-            </div>
+            {PILLARS.map((pillar) => (
+              <div className="pillar" key={pillar.title}>
+                <div aria-hidden className="media" style={{ backgroundImage: `url('${pillar.image}')` }} />
+                <h3>{pillar.title}</h3>
+                <div className="sub">{pillar.sub}</div>
+                <p>{pillar.body}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -368,18 +434,17 @@ export function WomensHealthDemoPage() {
             <div
               aria-hidden
               className="media big"
-              style={{
-                backgroundImage:
-                  "url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1000&q=80')",
-              }}
+              style={{ backgroundImage: `url('${u('photo-1576091160550-2173dba999ef', 1100)}')` }}
+            />
+            <div
+              aria-hidden
+              className="media mid"
+              style={{ backgroundImage: `url('${u('photo-1516589178581-6cd7833ae3b2', 800)}')` }}
             />
             <div
               aria-hidden
               className="media small"
-              style={{
-                backgroundImage:
-                  "url('https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=800&q=80')",
-              }}
+              style={{ backgroundImage: `url('${u('photo-1512941937669-90a1b58e7e9c', 700)}')` }}
             />
           </div>
           <div>
@@ -411,18 +476,17 @@ export function WomensHealthDemoPage() {
             <div
               aria-hidden
               className="media big"
-              style={{
-                backgroundImage:
-                  "url('https://images.unsplash.com/photo-1484101403537-ffe3e70ffa29?auto=format&fit=crop&w=1000&q=80')",
-              }}
+              style={{ backgroundImage: `url('${u('photo-1484101403537-ffe3e70ffa29', 1100)}')` }}
+            />
+            <div
+              aria-hidden
+              className="media mid"
+              style={{ backgroundImage: `url('${u('photo-1515377905703-c4788e51af15', 800)}')` }}
             />
             <div
               aria-hidden
               className="media small"
-              style={{
-                backgroundImage:
-                  "url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80')",
-              }}
+              style={{ backgroundImage: `url('${u('photo-1492725764893-90b379c2b6e1', 700)}')` }}
             />
           </div>
           <div className="copy">
@@ -449,14 +513,24 @@ export function WomensHealthDemoPage() {
         <div className="container">
           <div className="banner">
             <h2>Also in the edit: Clair</h2>
-            <div
-              aria-hidden
-              className="media"
-              style={{
-                backgroundImage:
-                  "url('https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1400&q=80')",
-              }}
-            />
+            <div aria-hidden className="clair-collage">
+              <div
+                className="media c1"
+                style={{ backgroundImage: `url('${u('photo-1611652022419-a9419f74343d', 1200)}')` }}
+              />
+              <div
+                className="media c2"
+                style={{ backgroundImage: `url('${u('photo-1515886657613-9f3515b0c78f', 800)}')` }}
+              />
+              <div
+                className="media c3"
+                style={{ backgroundImage: `url('${u('photo-1524504388940-b1c1722653e1', 800)}')` }}
+              />
+              <div
+                className="media c4"
+                style={{ backgroundImage: `url('${u('photo-1494790108377-be9c29b29330', 600)}')` }}
+              />
+            </div>
           </div>
           <div className="story-grid">
             <h2>
@@ -491,12 +565,8 @@ export function WomensHealthDemoPage() {
       <section aria-label="Find your chapter" className="chapters" id="find-your-chapter">
         {CHAPTERS.map((chapter) => (
           <div className="chapter" key={chapter.title}>
-            <div
-              aria-hidden
-              className="media"
-              style={{ backgroundImage: `url('${chapter.image}')` }}
-            />
-            <div>
+            <div aria-hidden className="media" style={{ backgroundImage: `url('${chapter.image}')` }} />
+            <div className="copy">
               <span className="eyebrow">{chapter.eyebrow}</span>
               <h3>{chapter.title}</h3>
               <p className="focus-label">The Focus</p>
@@ -517,157 +587,126 @@ export function WomensHealthDemoPage() {
             What women <em>are saying</em>
           </h2>
           <div className="voice-cards">
-            <div className="voice">
-              <blockquote>
-                &ldquo;I finally asked a pharmacist a question I&apos;d been too shy to ask anyone for a year.
-                Got a kind, straight answer on my lunch break — no waiting room, no judgment.&rdquo;
-              </blockquote>
-              <div className="who">
+            {VOICES.map((v) => (
+              <div className="voice" key={v.name}>
                 <div
                   aria-hidden
-                  className="media media--avatar"
-                  style={{
-                    backgroundImage:
-                      "url('https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80')",
-                  }}
+                  className="media portrait"
+                  style={{ backgroundImage: `url('${v.image}')` }}
                 />
-                <div>
-                  Priya
-                  <span>Toronto · juggling two kids and a startup</span>
+                <div className="body">
+                  <blockquote>&ldquo;{v.quote}&rdquo;</blockquote>
+                  <div className="who">
+                    {v.name}
+                    <span>{v.meta}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="voice">
-              <blockquote>
-                &ldquo;My monthly box shows up like clockwork. I genuinely forgot what running-out-of-everything
-                panic feels like.&rdquo;
-              </blockquote>
-              <div className="who">
-                <div
-                  aria-hidden
-                  className="media media--avatar"
-                  style={{
-                    backgroundImage:
-                      "url('https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80')",
-                  }}
-                />
-                <div>
-                  Dana
-                  <span>Ottawa · marathon-in-training</span>
-                </div>
-              </div>
-            </div>
-            <div className="voice">
-              <blockquote>
-                &ldquo;I used to keep three apps and a drawer of half-finished bottles. Now my essentials arrive
-                before I run out — and Sundays feel like mine again.&rdquo;
-              </blockquote>
-              <div className="who">
-                <div
-                  aria-hidden
-                  className="media media--avatar"
-                  style={{
-                    backgroundImage:
-                      "url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80')",
-                  }}
-                />
-                <div>
-                  Maya
-                  <span>34 · Liivv member since 2024</span>
-                </div>
-              </div>
-            </div>
-            <div className="voice">
-              <blockquote>
-                &ldquo;The sleep support and skin staples in one place changed my month. I stopped bouncing
-                between three different shops.&rdquo;
-              </blockquote>
-              <div className="who">
-                <div
-                  aria-hidden
-                  className="media media--avatar"
-                  style={{
-                    backgroundImage:
-                      "url('https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80')",
-                  }}
-                />
-                <div>
-                  Sofia
-                  <span>Mississauga · Liivv Women regular</span>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       <section className="faq rounded-top">
-        <h2>Good questions, honest answers</h2>
-        <p className="intro">The things people actually ask us — answered like a friend would, not a form letter.</p>
+        <div className="faq-layout">
+          <div aria-hidden className="faq-art">
+            <div
+              className="media"
+              style={{ backgroundImage: `url('${u('photo-1515886657613-9f3515b0c78f', 900)}')` }}
+            />
+            <div
+              className="media"
+              style={{ backgroundImage: `url('${u('photo-1487412912498-0447578c4214', 900)}')` }}
+            />
+          </div>
+          <div>
+            <h2>Good questions, honest answers</h2>
+            <p className="intro">
+              The things people actually ask us — answered like a friend would, not a form letter.
+            </p>
 
-        <details open>
-          <summary>Is this only for one age or stage of life?</summary>
-          <p>
-            Not at all. Liivv Women is built around life chapters — Foundation &amp; First Cycles, Rhythm
-            &amp; Balance, Reset &amp; Recharge, Grow &amp; Recover, Transition &amp; Relief, and Longevity
-            &amp; Vitality. Chapters follow where you are, not a number. You pick what fits; we follow your
-            lead.
-          </p>
-        </details>
-        <details>
-          <summary>What is Clair?</summary>
-          <p>
-            Clair is a wearable continuous hormone monitor from Clair Health, available through Liivv as part
-            of the Women lineup. For how it works, shipping, and pre-order details, see the Clair feature
-            above — a dedicated Clair page is next in this demo set.
-          </p>
-        </details>
-        <details>
-          <summary>What kinds of products does Liivv Women include?</summary>
-          <p>
-            Cycle comfort, personal care, nutrition and glow, sleep support, CarePack for daily essentials —
-            plus pharmacist chat in Ontario. Clair sits in the lineup as an optional wearable if you want
-            continuous clarity on your rhythm.
-          </p>
-        </details>
-        <details>
-          <summary>How private is my order?</summary>
-          <p>
-            Very. Everything arrives in plain, discreet packaging, and your conversations with our team stay
-            between you and us. What you order is nobody&apos;s business but yours.
-          </p>
-        </details>
-        <details>
-          <summary>What can I actually chat with a pharmacist about?</summary>
-          <p>
-            Everyday stuff — monthly comfort, skin flare-ups, sleep that won&apos;t come, &ldquo;is this
-            normal?&rdquo; moments. In Ontario, our pharmacists can assess and help with 19+ everyday concerns
-            in chat during business hours (until 5 p.m. Eastern). Olivia is available anytime for orders,
-            products, and account help — she does not give medical advice.
-          </p>
-        </details>
-        <details>
-          <summary>What&apos;s a CarePack?</summary>
-          <p>
-            Your daily essentials, organized by day and dose into one tidy pack — so mornings start with one
-            small rip instead of a shelf of bottles. Set it once and it keeps arriving.
-          </p>
-        </details>
-        <details>
-          <summary>Can I change or pause my routine anytime?</summary>
-          <p>
-            Always. Life shifts, and your Liivv should shift with it. Swap products, skip a month, or pause
-            entirely — no phone calls, no guilt trips.
-          </p>
-        </details>
+            <details open>
+              <summary>Is this only for one age or stage of life?</summary>
+              <p>
+                Not at all. Liivv Women is built around life chapters — Foundation &amp; First Cycles, Rhythm
+                &amp; Balance, Reset &amp; Recharge, Grow &amp; Recover, Transition &amp; Relief, and Longevity
+                &amp; Vitality. Chapters follow where you are, not a number. You pick what fits; we follow your
+                lead.
+              </p>
+            </details>
+            <details>
+              <summary>What is Clair?</summary>
+              <p>
+                Clair is a wearable continuous hormone monitor from Clair Health, available through Liivv as
+                part of the Women lineup. For how it works, shipping, and pre-order details, see the Clair
+                feature above — a dedicated Clair page is next in this demo set.
+              </p>
+            </details>
+            <details>
+              <summary>What kinds of products does Liivv Women include?</summary>
+              <p>
+                Cycle comfort, personal care, nutrition and glow, sleep support, CarePack for daily essentials
+                — plus pharmacist chat in Ontario. Clair sits in the lineup as an optional wearable if you
+                want continuous clarity on your rhythm.
+              </p>
+            </details>
+            <details>
+              <summary>How private is my order?</summary>
+              <p>
+                Very. Everything arrives in plain, discreet packaging, and your conversations with our team
+                stay between you and us. What you order is nobody&apos;s business but yours.
+              </p>
+            </details>
+            <details>
+              <summary>What can I actually chat with a pharmacist about?</summary>
+              <p>
+                Everyday stuff — monthly comfort, skin flare-ups, sleep that won&apos;t come, &ldquo;is this
+                normal?&rdquo; moments. In Ontario, our pharmacists can assess and help with 19+ everyday
+                concerns in chat during business hours (until 5 p.m. Eastern). Olivia is available anytime for
+                orders, products, and account help — she does not give medical advice.
+              </p>
+            </details>
+            <details>
+              <summary>What&apos;s a CarePack?</summary>
+              <p>
+                Your daily essentials, organized by day and dose into one tidy pack — so mornings start with
+                one small rip instead of a shelf of bottles. Set it once and it keeps arriving.
+              </p>
+            </details>
+            <details>
+              <summary>Can I change or pause my routine anytime?</summary>
+              <p>
+                Always. Life shifts, and your Liivv should shift with it. Swap products, skip a month, or pause
+                entirely — no phone calls, no guilt trips.
+              </p>
+            </details>
+          </div>
+        </div>
       </section>
 
       <section className="closing rounded-top">
         <div className="container">
+          <div aria-hidden className="closing-thumbs">
+            <div
+              className="media"
+              style={{ backgroundImage: `url('${u('photo-1494790108377-be9c29b29330', 300)}')` }}
+            />
+            <div
+              className="media"
+              style={{ backgroundImage: `url('${u('photo-1534528741775-53994a69daeb', 300)}')` }}
+            />
+            <div
+              className="media"
+              style={{ backgroundImage: `url('${u('photo-1544005313-94ddf0286df2', 300)}')` }}
+            />
+          </div>
           <h2>
             Your next chapter <span>starts soft</span>
           </h2>
-          <p>Whatever season you&apos;re in, there&apos;s a version of well that feels like you. Let&apos;s find it together.</p>
+          <p>
+            Whatever season you&apos;re in, there&apos;s a version of well that feels like you. Let&apos;s find
+            it together.
+          </p>
           <a className="btn btn-white" href={SHOP_HREF}>
             Shop Women&apos;s Wellness
           </a>
