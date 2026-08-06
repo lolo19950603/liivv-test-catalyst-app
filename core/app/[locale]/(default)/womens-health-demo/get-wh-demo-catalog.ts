@@ -10,6 +10,7 @@ import { graphql } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { isCuratedKitProduct } from '~/lib/kit/is-curated-kit';
+import { resolveBcCdnImageUrl } from '~/lib/resolve-bc-cdn-image-url';
 import { pricesTransformer } from '~/data-transformers/prices-transformer';
 
 /** Shop Women's Health category (see create-clair-wristband / CREATE-CURATED-KIT). */
@@ -126,7 +127,10 @@ function toItem(
     name: node.name,
     path: node.path,
     image: node.defaultImage
-      ? { src: node.defaultImage.url, alt: node.defaultImage.altText || node.name }
+      ? {
+          src: resolveBcCdnImageUrl(node.defaultImage.url, 640),
+          alt: node.defaultImage.altText || node.name,
+        }
       : undefined,
     priceLabel,
     isKit: isCuratedKitProduct(customFields),
