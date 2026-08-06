@@ -562,7 +562,7 @@
 
 /* —— IMAGE MARQUEE —— */
 #wh-demo .img-marquee {
-  background: var(--ink);
+  background: var(--cream);
   overflow: hidden;
   /* Extra bottom pad so .rounded-top overlap (-48px) doesn't clip the photos */
   padding: 28px 0 72px;
@@ -586,7 +586,7 @@
 
 #wh-demo .img-marquee-track .chip {
   align-self: center;
-  color: #fff;
+  color: var(--ink);
   font-family: var(--font-heading);
   font-size: 28px;
   padding: 0 18px;
@@ -1011,7 +1011,8 @@
 
 /* —— CHAPTERS full-bleed —— */
 #wh-demo .chapters {
-  background: var(--ink);
+  /* Must match chapter cards — ink here shows as black corner “bezels” under border-radius */
+  background: var(--cream);
 }
 
 #wh-demo .chapter {
