@@ -199,28 +199,32 @@ const VOICES = [
       'I finally asked a pharmacist a question I’d been too shy to ask anyone for a year. Got a kind, straight answer on my lunch break — no waiting room, no judgment.',
     name: 'Priya',
     meta: 'Toronto · juggling two kids and a startup',
-    image: `${IMG}/voice-1.jpg`,
+    monogram: 'P',
+    tone: 'blush',
   },
   {
     quote:
       'My monthly box shows up like clockwork. I genuinely forgot what running-out-of-everything panic feels like.',
     name: 'Dana',
     meta: 'Ottawa · marathon-in-training',
-    image: `${IMG}/voice-2.jpg`,
+    monogram: 'D',
+    tone: 'sage',
   },
   {
     quote:
       'I used to keep three apps and a drawer of half-finished bottles. Now my essentials arrive before I run out — and Sundays feel like mine again.',
     name: 'Maya',
     meta: '34 · Liivv member since 2024',
-    image: `${IMG}/voice-3.jpg`,
+    monogram: 'M',
+    tone: 'sand',
   },
   {
     quote:
       'The sleep support and skin staples in one place changed my month. I stopped bouncing between three different shops.',
     name: 'Sofia',
     meta: 'Mississauga · Liivv Women regular',
-    image: `${IMG}/voice-4.jpg`,
+    monogram: 'S',
+    tone: 'taupe',
   },
 ] as const;
 
@@ -232,9 +236,9 @@ const MARQUEE_IMGS = [
   `${IMG}/marquee-5.jpg`,
   `${IMG}/pillar-1.jpg`,
   `${IMG}/pillar-2.jpg`,
+  `${IMG}/mosaic-1.jpg`,
   `${IMG}/mosaic-3.jpg`,
   `${IMG}/mosaic-5.jpg`,
-  `${IMG}/river-3.jpg`,
 ];
 
 const MARQUEE_LABELS = [
@@ -551,7 +555,9 @@ export function WomensHealthDemoPage() {
           <div className="voice-cards">
             {VOICES.map((v) => (
               <div className="voice" key={v.name}>
-                <Pic className="portrait" src={v.image} />
+                <div aria-hidden className={`voice-mark voice-mark--${v.tone}`}>
+                  <span>{v.monogram}</span>
+                </div>
                 <div className="body">
                   <blockquote>&ldquo;{v.quote}&rdquo;</blockquote>
                   <div className="who">
@@ -642,9 +648,9 @@ export function WomensHealthDemoPage() {
         </div>
         <div className="container">
           <div aria-hidden className="closing-thumbs">
-            <Pic src={`${IMG}/voice-1.jpg`} />
-            <Pic src={`${IMG}/voice-3.jpg`} />
-            <Pic src={`${IMG}/voice-4.jpg`} />
+            <Pic src={`${IMG}/pillar-1.jpg`} />
+            <Pic src={`${IMG}/mosaic-5.jpg`} />
+            <Pic src={`${IMG}/marquee-4.jpg`} />
           </div>
           <h2>
             Your next chapter <span>starts soft</span>

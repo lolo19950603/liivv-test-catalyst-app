@@ -1,12 +1,14 @@
-/* Women's Health demo — visual-forward editorial look */
+/* Women's Health demo — Neutral Modern brand tokens */
 
 #wh-demo {
-  --ink: #1a1816;
-  --cream: #f7f3ee;
-  --soft: #fbf8f4;
-  --sage: #7f9a7c;
-  --blush: #e8b4a8;
-  --sand: #d4c4b0;
+  /* From Neutral Modern Brand Guidelines A4 */
+  --cream: #f5f2ed; /* Warm beige primary */
+  --ink: #312f2f; /* Jet */
+  --taupe: #a89c94; /* Soft Taupe */
+  --sand: #d7cfc7; /* Sandstone */
+  --sage: #8ea58d; /* Sage accent */
+  --blush: #f3c7be; /* Pink accent */
+  --soft: #faf8f5;
   --font-heading: var(--font-family-dm-serif-text), Georgia, serif;
   --font-body: var(--font-family-inter), system-ui, sans-serif;
 
@@ -146,7 +148,7 @@
   color: #fff;
   overflow: hidden;
   position: relative;
-  background: #1a1816;
+  background: var(--ink);
 }
 
 #wh-demo .hero-bg {
@@ -168,9 +170,9 @@
   inset: 0;
   background: linear-gradient(
     105deg,
-    rgba(18, 16, 14, 0.82) 0%,
-    rgba(18, 16, 14, 0.28) 55%,
-    rgba(18, 16, 14, 0.5) 100%
+    rgba(49, 47, 47, 0.82) 0%,
+    rgba(49, 47, 47, 0.28) 55%,
+    rgba(49, 47, 47, 0.5) 100%
   );
 }
 
@@ -390,7 +392,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(15, 14, 12, 0.85), rgba(15, 14, 12, 0.15) 65%);
+  background: linear-gradient(to top, rgba(49, 47, 47, 0.85), rgba(49, 47, 47, 0.15) 65%);
   z-index: 1;
 }
 
@@ -683,7 +685,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(10, 9, 8, 0.92) 0%, rgba(10, 9, 8, 0.2) 55%, transparent 80%);
+  background: linear-gradient(to top, rgba(49, 47, 47, 0.92) 0%, rgba(49, 47, 47, 0.2) 55%, transparent 80%);
   z-index: 1;
 }
 
@@ -1001,21 +1003,49 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  padding: 28px 26px 32px;
 }
 
-#wh-demo .voice .portrait {
-  height: 220px;
-  width: 100%;
+#wh-demo .voice-mark {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+  flex: none;
 }
 
-#wh-demo .voice .portrait img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+#wh-demo .voice-mark span {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  color: var(--ink);
+  line-height: 1;
+}
+
+#wh-demo .voice-mark--blush {
+  background: var(--blush);
+}
+
+#wh-demo .voice-mark--sage {
+  background: rgba(142, 165, 141, 0.55);
+}
+
+#wh-demo .voice-mark--sand {
+  background: var(--sand);
+}
+
+#wh-demo .voice-mark--taupe {
+  background: var(--taupe);
+  color: #fff;
+}
+
+#wh-demo .voice-mark--taupe span {
+  color: #fff;
 }
 
 #wh-demo .voice .body {
-  padding: 28px 26px 32px;
+  padding: 0;
 }
 
 #wh-demo .voice:nth-child(2) {
@@ -1137,7 +1167,7 @@
   color: #fff;
   position: relative;
   overflow: hidden;
-  background: #1a1816;
+  background: var(--ink);
 }
 
 #wh-demo .closing-bg {
@@ -1156,7 +1186,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(18, 16, 14, 0.55);
+  background: rgba(49, 47, 47, 0.55);
 }
 
 #wh-demo .closing .container {
