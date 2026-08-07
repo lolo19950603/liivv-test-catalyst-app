@@ -35,7 +35,7 @@ const DOORS = [
     title: 'Ask without the awkward',
     body: 'Ontario pharmacists in chat — kind answers, no waiting room.',
     href: '#care',
-    image: `${IMG}/care-2.jpg`,
+    image: `${IMG}/care-3.jpg`,
   },
   {
     id: 'chapters',
