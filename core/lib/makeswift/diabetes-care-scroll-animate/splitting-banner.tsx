@@ -23,11 +23,9 @@ function revealProgress(tracker: Element, mobile: boolean): number {
   return Math.min(1, Math.max(0, (revealStart - top) / range));
 }
 
-/** Ease-out so the last bit of the fade lingers a little longer. */
+/** Linear fade — predictable and snappy over the short scroll range. */
 function easeFadeOut(t: number): number {
-  const clamped = Math.min(1, Math.max(0, t));
-
-  return 1 - (1 - clamped) * (1 - clamped);
+  return Math.min(1, Math.max(0, t));
 }
 
 /**
@@ -49,11 +47,11 @@ function resolveHeadlineOpacity(
 
   const viewportHeight = window.innerHeight;
   /**
-   * Stay fully opaque while the portrait is coming into view. Start fading once
-   * the image top reaches ~mid viewport; ease out over nearly a full viewport of scroll.
+   * Start fading once the portrait is well into view; finish over a short scroll
+   * so the type clears quickly (not a long linger).
    */
-  const fadeStartY = viewportHeight * (mobile ? 0.45 : 0.4);
-  const fadeRange = viewportHeight * (mobile ? 0.75 : 0.9);
+  const fadeStartY = viewportHeight * (mobile ? 0.5 : 0.45);
+  const fadeRange = viewportHeight * (mobile ? 0.28 : 0.32);
 
   if (imageRect.top >= fadeStartY) {
     return revealIn;
