@@ -465,7 +465,7 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
 
           <article className="wh-voice-feature">
             <div className="wh-voice-feature-media">
-              <Pic src={`${IMG}/faq-1.jpg`} />
+              <Pic alt="Priya" src={`${IMG}/voice-1.jpg`} />
             </div>
             <div className="wh-voice-feature-copy">
               <p className="wh-voice-kicker">First kit · Toronto</p>
@@ -474,17 +474,21 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
                 Got a kind, straight answer on my lunch break — no waiting room, no judgment.&rdquo;
               </blockquote>
               <div className="who">
-                Priya
-                <span>Toronto · juggling two kids and a startup</span>
+                <img alt="" className="wh-voice-avatar" src={`${IMG}/voice-1.jpg`} />
+                <div>
+                  Priya
+                  <span>Toronto · juggling two kids and a startup</span>
+                </div>
               </div>
+              <a className="wh-voice-more" href="/blog/asking-the-pharmacist">
+                Read more
+              </a>
             </div>
           </article>
 
           <div className="voice-cards">
-            <div className="voice">
-              <div aria-hidden className="voice-mark voice-mark--sage">
-                <span>D</span>
-              </div>
+            <article className="voice">
+              <img alt="" className="wh-voice-avatar wh-voice-avatar--lg" src={`${IMG}/voice-2.jpg`} />
               <div className="body">
                 <blockquote>
                   &ldquo;My monthly box shows up like clockwork. I genuinely forgot what running-out panic feels
@@ -494,12 +498,13 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
                   Dana
                   <span>Ottawa · marathon-in-training</span>
                 </div>
+                <a className="wh-voice-more" href="/blog/monthly-box-rhythm">
+                  Read more
+                </a>
               </div>
-            </div>
-            <div className="voice">
-              <div aria-hidden className="voice-mark voice-mark--sand">
-                <span>M</span>
-              </div>
+            </article>
+            <article className="voice">
+              <img alt="" className="wh-voice-avatar wh-voice-avatar--lg" src={`${IMG}/voice-3.jpg`} />
               <div className="body">
                 <blockquote>
                   &ldquo;I used to keep three apps and a drawer of half-finished bottles. Sundays feel like
@@ -509,12 +514,13 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
                   Maya
                   <span>Liivv member since 2024</span>
                 </div>
+                <a className="wh-voice-more" href="/blog/one-place-for-essentials">
+                  Read more
+                </a>
               </div>
-            </div>
-            <div className="voice">
-              <div aria-hidden className="voice-mark voice-mark--taupe">
-                <span>S</span>
-              </div>
+            </article>
+            <article className="voice">
+              <img alt="" className="wh-voice-avatar wh-voice-avatar--lg" src={`${IMG}/voice-4.jpg`} />
               <div className="body">
                 <blockquote>
                   &ldquo;Sleep support and skin staples in one place changed my month. No more whisper aisle
@@ -524,8 +530,11 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
                   Sofia
                   <span>Mississauga · Liivv Women regular</span>
                 </div>
+                <a className="wh-voice-more" href="/blog/sleep-and-skin-in-one-place">
+                  Read more
+                </a>
               </div>
-            </div>
+            </article>
           </div>
         </div>
       </section>

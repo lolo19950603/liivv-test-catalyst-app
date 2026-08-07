@@ -1261,15 +1261,66 @@
   box-shadow: 0 16px 36px rgba(49, 47, 47, 0.1);
 }
 
-#wh-demo .voice-mark {
-  width: 56px;
-  height: 56px;
+#wh-demo .wh-voice-avatar {
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  display: grid;
-  place-items: center;
-  margin-bottom: 18px;
+  object-fit: cover;
   flex: none;
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  display: block;
+}
+
+#wh-demo .wh-voice-avatar--lg {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+}
+
+#wh-demo .wh-voice-feature .who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+#wh-demo .wh-voice-feature .who > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-weight: 500;
+}
+
+#wh-demo .wh-voice-feature .who span {
+  font-weight: 400;
+  font-size: 13px;
+  opacity: 0.65;
+}
+
+#wh-demo .wh-voice-more {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 18px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--sage);
+  letter-spacing: 0.02em;
+}
+
+#wh-demo .wh-voice-more::after {
+  content: ' →';
+}
+
+#wh-demo .wh-voice-more:hover {
+  color: var(--ink);
+}
+
+#wh-demo .voices .wh-voice-more {
+  color: #5f735e;
+}
+
+#wh-demo .voice-mark {
+  display: none;
 }
 
 #wh-demo .voice:hover .voice-mark {
