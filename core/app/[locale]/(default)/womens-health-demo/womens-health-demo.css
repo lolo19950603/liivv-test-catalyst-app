@@ -1420,9 +1420,12 @@
 
 /* —— TRUST STRIP —— */
 #wh-demo .wh-trust {
-  background: var(--ink);
-  color: #fff;
+  /* Soft strip — never jet under .rounded-top (causes black corner bezels) */
+  background: var(--sand);
+  color: var(--ink);
   padding: 18px 24px;
+  position: relative;
+  z-index: 3;
 }
 
 #wh-demo .wh-trust-track {
@@ -1434,7 +1437,7 @@
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  opacity: 0.92;
+  opacity: 0.88;
 }
 
 #wh-demo .wh-trust-track span {
@@ -1453,6 +1456,9 @@
   background: var(--cream);
   padding: 88px 24px 96px;
   color: var(--ink);
+  /* No .rounded-top overlap onto trust — keeps corners clean */
+  border-radius: 0;
+  margin-top: 0;
 }
 
 #wh-demo .wh-doors .eyebrow {

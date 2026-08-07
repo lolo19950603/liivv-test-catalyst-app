@@ -217,7 +217,7 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
       </section>
 
       {/* 3 — Three doors */}
-      <section aria-label="Start here" className="wh-doors rounded-top" id="doors">
+      <section aria-label="Start here" className="wh-doors" id="doors">
         <div className="container">
           <span className="eyebrow">Three ways in</span>
           <h2>What do you need today?</h2>
