@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { CHAPTERS as CHAPTER_PAGES, chapterHref } from './chapters/chapters-data';
 import type { WhDemoCatalog, WhDemoCatalogItem } from './get-wh-demo-catalog';
@@ -11,20 +11,88 @@ const SHOP_HREF = '/liivv-health/womens-health/shop-womens-health';
 const PHARMACIST_HREF = '/account/virtual-care';
 const IMG = '/archive/womens-health-demo';
 
-const KIT_FEATURES = [
+const FEELING_WORDS = ['heard', 'steady', 'like yourself', 'in rhythm', 'at ease'] as const;
+
+const TRUST_ITEMS = [
+  'Ontario pharmacist chat',
+  'Discreet delivery',
+  'Customize & save kits',
+  'No shame. Just health.',
+] as const;
+
+const DOORS = [
   {
-    title: 'Start with a curated edit',
-    body: 'Each kit arrives prebuilt with essentials chosen for that chapter — no guesswork, no whisper aisle.',
+    id: 'shop',
+    label: 'Shop',
+    title: 'The Women\'s edit',
+    body: 'Essentials, kits, and glow — curated for real routines.',
+    href: '#shop-womens-health',
+    image: `${IMG}/mosaic-2.jpg`,
   },
   {
-    title: 'Make it yours',
-    body: 'Adjust quantities, remove what you don’t need, and add new items so the kit matches your real routine.',
+    id: 'care',
+    label: 'Care',
+    title: 'Ask without the awkward',
+    body: 'Ontario pharmacists in chat — kind answers, no waiting room.',
+    href: '#care',
+    image: `${IMG}/care-2.jpg`,
   },
   {
-    title: 'Save for later',
-    body: 'Lock in your customized kit on your account and come back when you’re ready — your edits stay put.',
+    id: 'chapters',
+    label: 'Chapters',
+    title: 'Find your season',
+    body: 'Six life chapters — pick where you are, not a number.',
+    href: '#where-are-you',
+    image: `${IMG}/chapter-1.jpg`,
   },
 ] as const;
+
+const CHAPTER_CHOOSER = CHAPTER_PAGES.map((chapter) => ({
+  num: chapter.num,
+  shortTitle: chapter.title.split('&')[0]?.trim() ?? chapter.title,
+  title: chapter.title,
+  blurb: chapter.vibe,
+  href: chapterHref(chapter.slug),
+  image: chapter.heroImage,
+}));
+
+const SHOP_ROOMS = [
+  { id: 'all', label: 'All' },
+  { id: 'cycle', label: 'Cycle comfort' },
+  { id: 'intimate', label: 'Intimate care' },
+  { id: 'prenatal', label: 'Prenatal & grow' },
+  { id: 'glow', label: 'Glow & daily' },
+] as const;
+
+type ShopRoomId = (typeof SHOP_ROOMS)[number]['id'];
+
+const KIT_DEMO_LINES = [
+  { id: 'pads', name: 'Organic cotton pads', qty: 2 },
+  { id: 'heat', name: 'Gentle heat wrap', qty: 1 },
+  { id: 'skin', name: 'Hormonal skin basics', qty: 1 },
+  { id: 'wipe', name: 'Intimate wipes', qty: 1 },
+  { id: 'vitamins', name: 'Teen vitamin edit', qty: 1 },
+] as const;
+
+function roomForProduct(product: WhDemoCatalogItem): Exclude<ShopRoomId, 'all'> {
+  const n = product.name.toLowerCase();
+
+  if (
+    /pad|wipe|period|menstrual|incontinence|poise|natracare|reign|diva/.test(n)
+  ) {
+    return 'cycle';
+  }
+
+  if (/vaginal|replens|repagyn|gynatrof|feminine|intimate wash|moisturizer|lubric/.test(n)) {
+    return 'intimate';
+  }
+
+  if (/prenatal|pregnancy|nursing|milk|motherlove|preconception|trimester/.test(n)) {
+    return 'prenatal';
+  }
+
+  return 'glow';
+}
 
 function ProductThumb({ product }: { product: WhDemoCatalogItem }) {
   return (
@@ -56,232 +124,69 @@ function Pic({
 }) {
   return (
     <div aria-hidden={alt === '' || undefined} className={`wh-pic ${className}`.trim()}>
-      {/* Local assets under /public — avoids Unsplash / archive .media conflicts */}
       <img alt={alt} src={src} />
     </div>
   );
 }
 
-const TIMELINE = [
-  {
-    category: 'Know your rhythm',
-    heading: 'Start with you',
-    paragraphs: [
-      'Tell us a little about your everyday — what feels good, what feels off, what you’d love more of.',
-      'That’s all we need to start shaping care around your life, not the other way around.',
-    ],
-    cta: 'Get Started',
-    href: SHOP_HREF,
-    image: `${IMG}/timeline-1.jpg`,
-    peek: `${IMG}/timeline-1b.jpg`,
-  },
-  {
-    category: 'Stock your calm',
-    heading: 'Essentials on repeat',
-    paragraphs: [
-      'Your comfort staples, chosen once and delivered before you run out.',
-      'The little things stay on the shelf — so your energy stays on your week.',
-    ],
-    cta: 'Get Started',
-    href: SHOP_HREF,
-    image: `${IMG}/timeline-2.jpg`,
-    peek: `${IMG}/timeline-2b.jpg`,
-  },
-  {
-    category: 'Ask without the awkward',
-    heading: 'Chat when you need it',
-    paragraphs: [
-      'Some questions are easier typed than said out loud.',
-      'Talk with a friendly pharmacist from wherever you’re comfiest — no waiting room, no judgment.',
-    ],
-    cta: 'Talk to a Pharmacist',
-    href: PHARMACIST_HREF,
-    image: `${IMG}/timeline-3.jpg`,
-    peek: `${IMG}/timeline-3b.jpg`,
-  },
-  {
-    category: 'Shop what fits',
-    heading: 'Your marketplace',
-    paragraphs: [
-      'A marketplace curated for real routines — comfort, care, and glow.',
-      'Minus the overwhelm of a thousand tabs and the whisper aisle.',
-    ],
-    cta: 'Explore the Shop',
-    href: SHOP_HREF,
-    image: `${IMG}/timeline-4.jpg`,
-    peek: `${IMG}/timeline-4b.jpg`,
-  },
-  {
-    category: 'Liivv well',
-    heading: 'Living, not managing',
-    paragraphs: [
-      'Routines that quietly hold you in the background.',
-      'So your energy goes where it belongs: the life you’re actually living.',
-    ],
-    cta: 'Liivv Well',
-    href: SHOP_HREF,
-    image: `${IMG}/timeline-5.jpg`,
-    peek: `${IMG}/timeline-5b.jpg`,
-  },
-] as const;
+export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
+  const [feelingIndex, setFeelingIndex] = useState(0);
+  const [shopRoom, setShopRoom] = useState<ShopRoomId>('all');
+  const [kitLines, setKitLines] = useState(() =>
+    KIT_DEMO_LINES.map((line) => ({ ...line })),
+  );
 
-const CHAPTERS = CHAPTER_PAGES.map((chapter) => ({
-  eyebrow: `Chapter ${chapter.chapterWord}`,
-  num: chapter.num,
-  title: chapter.title,
-  focus: chapter.focus,
-  vibe: chapter.vibe,
-  image: chapter.heroImage,
-  href: chapterHref(chapter.slug),
-}));
-
-const COUNTERS = [
-  {
-    num: '10k',
-    suffix: '+',
-    text: 'women in the Liivv community, and growing every day',
-    image: `${IMG}/counter-1.jpg`,
-  },
-  {
-    num: '24',
-    suffix: '/7',
-    text: 'Olivia for shopping and account help — anytime',
-    image: `${IMG}/counter-2.jpg`,
-  },
-  {
-    num: '19',
-    suffix: '+',
-    text: 'everyday concerns our Ontario pharmacists can help with in chat',
-    image: `${IMG}/counter-3.jpg`,
-  },
-  {
-    num: '1',
-    suffix: '',
-    text: 'place for your wellness — your way, your pace',
-    image: `${IMG}/counter-4.jpg`,
-  },
-] as const;
-
-const PILLARS = [
-  {
-    title: 'Daily Comfort',
-    sub: 'For the every-month and the every-day',
-    body: 'Cycle care and comfort essentials that show up on time, so that week is just another week.',
-    image: `${IMG}/pillar-1.jpg`,
-  },
-  {
-    title: 'Body Confidence',
-    sub: 'Personal care, zero whisper aisle',
-    body: 'Intimate and personal care picked with honesty — delivered discreetly, discussed openly whenever you want.',
-    image: `${IMG}/pillar-2.jpg`,
-  },
-  {
-    title: 'Nourish & Glow',
-    sub: 'From the inside out',
-    body: 'Daily nutrition and skin-loving staples that keep pace with busy weeks and full plates.',
-    image: `${IMG}/pillar-3.jpg`,
-  },
-  {
-    title: 'Rest that Restores',
-    sub: 'Because tomorrow needs you',
-    body: 'Wind-down rituals and sleep support for nights that actually recharge you.',
-    image: `${IMG}/pillar-4.jpg`,
-  },
-] as const;
-
-const VOICES = [
-  {
-    quote:
-      'I finally asked a pharmacist a question I’d been too shy to ask anyone for a year. Got a kind, straight answer on my lunch break — no waiting room, no judgment.',
-    name: 'Priya',
-    meta: 'Toronto · juggling two kids and a startup',
-    monogram: 'P',
-    tone: 'blush',
-  },
-  {
-    quote:
-      'My monthly box shows up like clockwork. I genuinely forgot what running-out-of-everything panic feels like.',
-    name: 'Dana',
-    meta: 'Ottawa · marathon-in-training',
-    monogram: 'D',
-    tone: 'sage',
-  },
-  {
-    quote:
-      'I used to keep three apps and a drawer of half-finished bottles. Now my essentials arrive before I run out — and Sundays feel like mine again.',
-    name: 'Maya',
-    meta: '34 · Liivv member since 2024',
-    monogram: 'M',
-    tone: 'sand',
-  },
-  {
-    quote:
-      'The sleep support and skin staples in one place changed my month. I stopped bouncing between three different shops.',
-    name: 'Sofia',
-    meta: 'Mississauga · Liivv Women regular',
-    monogram: 'S',
-    tone: 'taupe',
-  },
-] as const;
-
-const MARQUEE_IMGS = [
-  `${IMG}/marquee-1.jpg`,
-  `${IMG}/marquee-2.jpg`,
-  `${IMG}/marquee-3.jpg`,
-  `${IMG}/marquee-4.jpg`,
-  `${IMG}/marquee-5.jpg`,
-  `${IMG}/pillar-1.jpg`,
-  `${IMG}/pillar-2.jpg`,
-  `${IMG}/mosaic-1.jpg`,
-  `${IMG}/mosaic-3.jpg`,
-  `${IMG}/mosaic-5.jpg`,
-];
-
-const MARQUEE_LABELS = [
-  'Everyday Rhythm',
-  'Glow & Nourish',
-  'Cycle Comfort',
-  'Finding Balance',
-  'Aging Softly',
-  'Personal Care',
-  'Rest & Restore',
-  'Skin & Glow',
-  'Body Kindness',
-  'Quiet Strength',
-];
-
-export function WomensHealthDemoPage({
-  catalog,
-}: {
-  catalog?: WhDemoCatalog;
-}) {
-  const [timelineIndex, setTimelineIndex] = useState(0);
-  const slide = TIMELINE[timelineIndex] ?? TIMELINE[0];
   const featuredKit = catalog?.featuredKit ?? null;
   const otherKits = (catalog?.kits ?? []).filter((k) => k.entityId !== featuredKit?.entityId);
   const shopProducts = catalog?.products ?? [];
   const hasKits = Boolean(featuredKit) || otherKits.length > 0;
   const hasShop = shopProducts.length > 0;
 
+  const filteredShop = useMemo(() => {
+    if (shopRoom === 'all') return shopProducts.slice(0, 12);
+
+    return shopProducts.filter((p) => roomForProduct(p) === shopRoom).slice(0, 12);
+  }, [shopProducts, shopRoom]);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setFeelingIndex((i) => (i + 1) % FEELING_WORDS.length);
+    }, 2600);
+
+    return () => window.clearInterval(id);
+  }, []);
+
+  const bumpQty = (id: string, delta: number) => {
+    setKitLines((lines) =>
+      lines.map((line) =>
+        line.id === id ? { ...line, qty: Math.max(0, line.qty + delta) } : line,
+      ),
+    );
+  };
+
   return (
     <div id="wh-demo">
+      {/* 1 — Feeling hero */}
       <section className="hero" aria-label="Women's Health hero">
         <div className="hero-inner">
           <span className="hero-kicker">Liivv Women · Health, your way</span>
-          <h1>You, in every season</h1>
+          <h1>
+            Health that makes you feel{' '}
+            <span aria-live="polite" className="hero-feeling" key={FEELING_WORDS[feelingIndex]}>
+              {FEELING_WORDS[feelingIndex]}
+            </span>
+            .
+          </h1>
           <p>
-            No quick fixes — just real care that moves with your life. From everyday rhythm to whole new
-            chapters, wellness that works IRL, at your pace.
+            No quick fixes — just real care that moves with your life. Wellness that works IRL, at your
+            pace.
           </p>
           <div className="hero-cta">
-            <a className="btn btn-dark" href={SHOP_HREF}>
-              Shop the edit
+            <a className="btn btn-dark" href="#doors">
+              Start here
             </a>
             <a className="btn btn-outline" href="#build-your-kit">
               Build your kit
-            </a>
-            <a className="btn btn-outline" href="#find-your-chapter">
-              Find your chapter
             </a>
           </div>
         </div>
@@ -302,187 +207,135 @@ export function WomensHealthDemoPage({
         </div>
       </section>
 
-      <div aria-hidden className="photo-river">
-        <div className="photo-river-track">
-          {[0, 1].flatMap((copy) =>
-            [1, 2, 3, 4, 5].map((n) => (
-              <Pic key={`${copy}-${n}`} src={`${IMG}/river-${n}.jpg`} />
-            )),
-          )}
-        </div>
-      </div>
-
-      <section className="highlight-text rounded-top">
-        <h2>
-          Liivv <span className="swash">Women</span> is your{' '}
-          <span className="swash sage">everyday rhythm</span> for living well
-        </h2>
-        <div aria-hidden className="mosaic">
-          {[1, 2, 3, 4, 5, 6].map((n) => (
-            <Pic className={`m${n}`} key={n} src={`${IMG}/mosaic-${n}.jpg`} />
+      {/* 2 — Trust strip */}
+      <section aria-label="Why Liivv Women" className="wh-trust">
+        <div className="container wh-trust-track">
+          {TRUST_ITEMS.map((item) => (
+            <span key={item}>{item}</span>
           ))}
         </div>
       </section>
 
-      <section className="counters">
-        <div className="container counters-grid">
-          {COUNTERS.map((c) => (
-            <div className="counter-card" key={c.text}>
-              <Pic src={c.image} />
-              <div className="num">
-                {c.num}
-                {c.suffix ? <sup>{c.suffix}</sup> : null}
-              </div>
-              <p>{c.text}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section aria-hidden className="img-marquee">
-        <div className="img-marquee-track">
-          {[0, 1].flatMap((copy) =>
-            MARQUEE_IMGS.flatMap((src, i) => {
-              const nodes: ReactNode[] = [
-                <Pic key={`${copy}-img-${src}`} src={src} />,
-                <span className="chip" key={`${copy}-chip-${MARQUEE_LABELS[i]}`}>
-                  {MARQUEE_LABELS[i]}
-                </span>,
-              ];
-
-              return nodes;
-            }),
-          )}
-        </div>
-      </section>
-
-      <section className="timeline rounded-top">
+      {/* 3 — Three doors */}
+      <section aria-label="Start here" className="wh-doors rounded-top" id="doors">
         <div className="container">
-          <div className="timeline-header">
-            <p className="small-heading">
-              No two of us live the same week. Liivv fits itself around yours — your health, your pace.
-            </p>
-            <h2>
-              Your journey, <span className="swash">your pace</span>
-            </h2>
-          </div>
-
-          <div className="timeline-nav">
-            <button
-              aria-label="Previous journey step"
-              onClick={() => setTimelineIndex((i) => (i === 0 ? TIMELINE.length - 1 : i - 1))}
-              type="button"
-            >
-              ‹
-            </button>
-            <button
-              aria-label="Next journey step"
-              onClick={() => setTimelineIndex((i) => (i === TIMELINE.length - 1 ? 0 : i + 1))}
-              type="button"
-            >
-              ›
-            </button>
-          </div>
-
-          <div className="timeline-slide">
-            <div className="copy">
-              <p className="category">{slide.category}</p>
-              <h3>{slide.heading}</h3>
-              {slide.paragraphs.map((p) => (
-                <p key={p}>{p}</p>
-              ))}
-              <a className="btn btn-dark" href={slide.href}>
-                {slide.cta}
+          <span className="eyebrow">Three ways in</span>
+          <h2>What do you need today?</h2>
+          <div className="wh-doors-grid">
+            {DOORS.map((door) => (
+              <a className="wh-door" href={door.href} key={door.id}>
+                <div className="wh-door-media">
+                  <img alt="" src={door.image} />
+                </div>
+                <span className="wh-door-label">{door.label}</span>
+                <h3>{door.title}</h3>
+                <p>{door.body}</p>
               </a>
-            </div>
-            <div className="timeline-visual">
-              <Pic className="wh-pic-main" src={slide.image} />
-              <Pic className="wh-pic-peek" src={slide.peek} />
-            </div>
-          </div>
-
-          <div aria-label="Timeline steps" className="timeline-dots" role="tablist">
-            {TIMELINE.map((step, i) => (
-              <button
-                aria-selected={i === timelineIndex}
-                className={i === timelineIndex ? 'active' : undefined}
-                key={step.category}
-                onClick={() => setTimelineIndex(i)}
-                role="tab"
-                type="button"
-              >
-                {step.category}
-              </button>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="pillars rounded-top">
+      {/* 4 — Where are you? */}
+      <section aria-label="Find your chapter" className="wh-chooser" id="where-are-you">
         <div className="container">
-          <span className="eyebrow">The Liivv Women edit</span>
-          <h2>Four ways to feel like yourself</h2>
-          <p className="intro">
-            Health, simplified — everything here earns its place by making an ordinary day a little softer.
+          <span className="eyebrow">Life chapters</span>
+          <h2>Where are you right now?</h2>
+          <p className="wh-chooser-intro">
+            Chapters follow your season — not an age band. Tap one to open the full page.
           </p>
-          <div className="pillars-grid">
-            {PILLARS.map((pillar) => (
-              <div className="pillar" key={pillar.title}>
-                <Pic src={pillar.image} />
-                <h3>{pillar.title}</h3>
-                <div className="sub">{pillar.sub}</div>
-                <p>{pillar.body}</p>
-              </div>
+          <div className="wh-chooser-grid">
+            {CHAPTER_CHOOSER.map((chapter) => (
+              <a className="wh-chooser-card" href={chapter.href} key={chapter.num}>
+                <div className="wh-chooser-media">
+                  <img alt="" src={chapter.image} />
+                  <span className="wh-chooser-num">{chapter.num}</span>
+                </div>
+                <h3>{chapter.title}</h3>
+                <p>{chapter.blurb}</p>
+              </a>
             ))}
           </div>
         </div>
       </section>
 
+      {/* 5 — Kit living object */}
       {hasKits ? (
         <section aria-label="Customizable kits" className="wh-kits rounded-top" id="build-your-kit">
           <div className="container">
             <span className="eyebrow">Liivv kits</span>
             <h2>Start curated. Finish as yours.</h2>
             <p className="wh-kits-intro">
-              Kits like the First Cycle Starter Kit arrive with a thoughtful prebuilt edit — then you tune
-              quantities, add what was missing, and save the whole thing for later. More chapter kits are
-              coming; the flow stays the same.
+              Prebuilt for the chapter — then you tune qty, add what was missing, and save it for later.
+              More kits are coming; the flow stays the same.
             </p>
 
-            <div className="wh-kit-features">
-              {KIT_FEATURES.map((feature) => (
-                <article key={feature.title}>
-                  <h3>{feature.title}</h3>
-                  <p>{feature.body}</p>
-                </article>
-              ))}
-            </div>
-
             {featuredKit ? (
-              <div className="wh-kit-feature">
-                <div className="wh-kit-feature-media">
-                  {featuredKit.image ? (
-                    <img alt={featuredKit.image.alt} src={featuredKit.image.src} />
-                  ) : (
-                    <div aria-hidden className="wh-product-fallback" />
-                  )}
-                </div>
-                <div className="wh-kit-feature-copy">
-                  <span className="wh-product-badge">Featured kit</span>
-                  <h3>{featuredKit.name}</h3>
-                  <p>
-                    A calm first-chapter edit — comfort, skin basics, and everyday essentials. Open the kit
-                    to adjust qty, add new items, and save your custom version to your account.
-                  </p>
-                  {featuredKit.priceLabel ? (
-                    <p className="wh-product-price">{featuredKit.priceLabel}</p>
-                  ) : null}
-                  <div className="wh-kit-feature-cta">
+              <div className="wh-kit-board">
+                <div className="wh-kit-board-visual">
+                  <div className="wh-kit-board-hero">
+                    {featuredKit.image ? (
+                      <img alt={featuredKit.image.alt} src={featuredKit.image.src} />
+                    ) : (
+                      <div aria-hidden className="wh-product-fallback" />
+                    )}
+                  </div>
+                  <div className="wh-kit-board-meta">
+                    <span className="wh-product-badge">Featured kit</span>
+                    <h3>{featuredKit.name}</h3>
+                    {featuredKit.priceLabel ? (
+                      <p className="wh-product-price">{featuredKit.priceLabel}</p>
+                    ) : null}
+                    <p>
+                      A calm first-chapter edit. Play with the tray below — then open the real customizer to
+                      save your version.
+                    </p>
                     <a className="btn btn-dark" href={featuredKit.path}>
                       Customize this kit
                     </a>
-                    <a className="btn btn-outline" href={SHOP_HREF}>
-                      Browse all kits &amp; essentials
+                  </div>
+                </div>
+
+                <div className="wh-kit-tray" aria-label="Demo kit tray">
+                  <div className="wh-kit-tray-head">
+                    <h4>Your kit tray</h4>
+                    <span>Demo — opens fully on the product page</span>
+                  </div>
+                  <ul className="wh-kit-lines">
+                    {kitLines.map((line) => (
+                      <li key={line.id}>
+                        <div>
+                          <strong>{line.name}</strong>
+                          {line.qty === 0 ? <em>Removed</em> : null}
+                        </div>
+                        <div className="wh-kit-qty">
+                          <button
+                            aria-label={`Decrease ${line.name}`}
+                            onClick={() => bumpQty(line.id, -1)}
+                            type="button"
+                          >
+                            −
+                          </button>
+                          <span>{line.qty}</span>
+                          <button
+                            aria-label={`Increase ${line.name}`}
+                            onClick={() => bumpQty(line.id, 1)}
+                            type="button"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                    <li className="wh-kit-add">
+                      <span>+ Add something new</span>
+                      <a href={featuredKit.path}>On the kit page</a>
+                    </li>
+                  </ul>
+                  <div className="wh-kit-tray-foot">
+                    <span className="wh-kit-save-chip">Save for later</span>
+                    <a className="btn btn-outline" href={featuredKit.path}>
+                      Open full customizer
                     </a>
                   </div>
                 </div>
@@ -503,19 +356,38 @@ export function WomensHealthDemoPage({
         </section>
       ) : null}
 
+      {/* 6 — Shop rooms */}
       {hasShop ? (
         <section aria-label="Shop Women's Health" className="wh-shop" id="shop-womens-health">
           <div className="container">
             <span className="eyebrow">Shop Women&apos;s Health</span>
-            <h2>Essentials from the Women&apos;s edit</h2>
+            <h2>Rooms in the edit</h2>
             <p className="wh-shop-intro">
-              Live products tagged to Shop Women&apos;s Health — comfort, care, and glow, ready to open.
+              Live catalog from Shop Women&apos;s Health — filtered into calm rooms so it doesn&apos;t feel
+              like a warehouse.
             </p>
+            <div aria-label="Shop rooms" className="wh-shop-rooms" role="tablist">
+              {SHOP_ROOMS.map((room) => (
+                <button
+                  aria-selected={shopRoom === room.id}
+                  className={shopRoom === room.id ? 'is-active' : undefined}
+                  key={room.id}
+                  onClick={() => setShopRoom(room.id)}
+                  role="tab"
+                  type="button"
+                >
+                  {room.label}
+                </button>
+              ))}
+            </div>
             <div className="wh-product-grid">
-              {shopProducts.slice(0, 12).map((product) => (
+              {filteredShop.map((product) => (
                 <ProductThumb key={product.entityId} product={product} />
               ))}
             </div>
+            {filteredShop.length === 0 ? (
+              <p className="wh-shop-empty">Nothing in this room yet — try All or another filter.</p>
+            ) : null}
             <div className="wh-shop-cta">
               <a className="btn btn-dark" href={SHOP_HREF}>
                 Shop all Women&apos;s Health
@@ -525,7 +397,8 @@ export function WomensHealthDemoPage({
         </section>
       ) : null}
 
-      <section className="images-text rounded-top">
+      {/* 7 — Care */}
+      <section className="images-text rounded-top" id="care">
         <div className="container images-text-grid">
           <div className="visuals">
             <Pic className="big" src={`${IMG}/care-1.jpg`} />
@@ -536,17 +409,12 @@ export function WomensHealthDemoPage({
             <span className="eyebrow">Available in Ontario</span>
             <h2>Relief that doesn&apos;t wait on a waiting room</h2>
             <p>
-              Some days your body just asks for a little backup — and you shouldn&apos;t need to rearrange
-              your whole week to get it. Clear answers, no med-speak, no judgment.
+              Clear answers, no med-speak, no judgment. Chat with an Ontario pharmacist during business hours
+              — until 5 p.m. Eastern.
             </p>
             <p>
-              Our friendly Ontario pharmacists can chat through everyday concerns — from monthly cramps to
-              skin flare-ups — during business hours (until 5 p.m. Eastern). No appointment, no waiting room
-              playlist.
-            </p>
-            <p>
-              Real expertise, delivered like a conversation with someone who gets it. Outside those hours,
-              Olivia can help with shopping and your account — she does not give medical advice.
+              Outside those hours, Olivia can help with shopping and your account — she does not give medical
+              advice.
             </p>
             <a className="btn btn-white" href={PHARMACIST_HREF}>
               Talk to a Pharmacist
@@ -555,33 +423,7 @@ export function WomensHealthDemoPage({
         </div>
       </section>
 
-      <section className="images-text tips-pair rounded-top">
-        <div className="container images-text-grid">
-          <div className="visuals">
-            <Pic className="big" src={`${IMG}/tips-1.jpg`} />
-            <Pic className="mid" src={`${IMG}/tips-2.jpg`} />
-            <Pic className="small" src={`${IMG}/tips-3.jpg`} />
-          </div>
-          <div className="copy">
-            <span className="eyebrow">A little wisdom for the week</span>
-            <h2>Tips that meet you where you are</h2>
-            <p>
-              Women&apos;s health isn&apos;t one routine — it&apos;s small habits that soften the loud weeks
-              and stretch the quiet ones. No shame. Just health.
-            </p>
-            <p>
-              Track how you feel across your month. Stock comfort essentials before you need them. Prioritize
-              sleep the same week your energy dips. And when something feels off, chat with an Ontario
-              pharmacist during business hours — until 5 p.m. Eastern.
-            </p>
-            <p>Small adjustments, real rhythm. Wellness that works IRL.</p>
-            <a className="btn btn-dark" href={SHOP_HREF}>
-              Explore Women&apos;s Essentials
-            </a>
-          </div>
-        </div>
-      </section>
-
+      {/* 8 — Clair room */}
       <section className="story rounded-top" id="clair">
         <div className="container">
           <div className="banner">
@@ -599,23 +441,13 @@ export function WomensHealthDemoPage({
             </h2>
             <div>
               <p>
-                Clair is a wearable from Clair Health that reads your body&apos;s key signals continuously —
-                so you can see the shape of your month instead of guessing through it.
+                Clair is a wearable that reads your body&apos;s key signals continuously — so you can see the
+                shape of your month instead of guessing through it.
               </p>
-              <p>
-                It&apos;s one part of the Liivv Women lineup, right beside comfort essentials, personal care,
-                nutrition, and sleep support. Same calm place. Same discreet delivery.
-              </p>
-              <p className="strong-close">
-                Curious how it works, when it ships, or how to pre-order? A dedicated Clair page is next in
-                this demo set — for now, explore the Women&apos;s edit.
-              </p>
+              <p className="strong-close">Same calm place as the rest of Liivv Women. Same discreet delivery.</p>
               <div className="story-cta">
                 <a className="btn btn-dark" href={SHOP_HREF}>
-                  Shop Women&apos;s Essentials
-                </a>
-                <a className="btn btn-outline" href="#find-your-chapter">
-                  Find your chapter
+                  See Clair in the shop
                 </a>
               </div>
             </div>
@@ -623,58 +455,82 @@ export function WomensHealthDemoPage({
         </div>
       </section>
 
-      <section aria-label="Find your chapter" className="chapters" id="find-your-chapter">
-        {CHAPTERS.map((chapter) => (
-          <div className="chapter" key={chapter.title}>
-            <Pic src={chapter.image} />
-            <div className="copy">
-              <span aria-hidden className="chapter-num">
-                {chapter.num}
-              </span>
-              <span className="eyebrow">{chapter.eyebrow}</span>
-              <h3>{chapter.title}</h3>
-              <div className="chapter-meta">
-                <div>
-                  <span className="chapter-pill">The Focus</span>
-                  <p>{chapter.focus}</p>
-                </div>
-                <div>
-                  <span className="chapter-pill chapter-pill--vibe">The Liivv Vibe</span>
-                  <p>{chapter.vibe}</p>
-                </div>
-              </div>
-              <a className="btn btn-dark" href={chapter.href}>
-                Learn more
-              </a>
-            </div>
-          </div>
-        ))}
-      </section>
-
-      <section className="voices rounded-top">
+      {/* 9 — Voices */}
+      <section className="voices rounded-top" id="voices">
         <div className="container">
+          <span className="eyebrow voices-eyebrow">Beyond the aisle</span>
           <h2>
             Real talk <em>from the community</em>
           </h2>
+
+          <article className="wh-voice-feature">
+            <div className="wh-voice-feature-media">
+              <Pic src={`${IMG}/faq-1.jpg`} />
+            </div>
+            <div className="wh-voice-feature-copy">
+              <p className="wh-voice-kicker">First kit · Toronto</p>
+              <blockquote>
+                &ldquo;I finally asked a pharmacist a question I&apos;d been too shy to ask anyone for a year.
+                Got a kind, straight answer on my lunch break — no waiting room, no judgment.&rdquo;
+              </blockquote>
+              <div className="who">
+                Priya
+                <span>Toronto · juggling two kids and a startup</span>
+              </div>
+            </div>
+          </article>
+
           <div className="voice-cards">
-            {VOICES.map((v) => (
-              <div className="voice" key={v.name}>
-                <div aria-hidden className={`voice-mark voice-mark--${v.tone}`}>
-                  <span>{v.monogram}</span>
-                </div>
-                <div className="body">
-                  <blockquote>&ldquo;{v.quote}&rdquo;</blockquote>
-                  <div className="who">
-                    {v.name}
-                    <span>{v.meta}</span>
-                  </div>
+            <div className="voice">
+              <div aria-hidden className="voice-mark voice-mark--sage">
+                <span>D</span>
+              </div>
+              <div className="body">
+                <blockquote>
+                  &ldquo;My monthly box shows up like clockwork. I genuinely forgot what running-out panic feels
+                  like.&rdquo;
+                </blockquote>
+                <div className="who">
+                  Dana
+                  <span>Ottawa · marathon-in-training</span>
                 </div>
               </div>
-            ))}
+            </div>
+            <div className="voice">
+              <div aria-hidden className="voice-mark voice-mark--sand">
+                <span>M</span>
+              </div>
+              <div className="body">
+                <blockquote>
+                  &ldquo;I used to keep three apps and a drawer of half-finished bottles. Sundays feel like
+                  mine again.&rdquo;
+                </blockquote>
+                <div className="who">
+                  Maya
+                  <span>Liivv member since 2024</span>
+                </div>
+              </div>
+            </div>
+            <div className="voice">
+              <div aria-hidden className="voice-mark voice-mark--taupe">
+                <span>S</span>
+              </div>
+              <div className="body">
+                <blockquote>
+                  &ldquo;Sleep support and skin staples in one place changed my month. No more whisper aisle
+                  hopping.&rdquo;
+                </blockquote>
+                <div className="who">
+                  Sofia
+                  <span>Mississauga · Liivv Women regular</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
+      {/* FAQ — shortened */}
       <section className="faq rounded-top">
         <div className="faq-layout">
           <div aria-hidden className="faq-art">
@@ -683,89 +539,62 @@ export function WomensHealthDemoPage({
           </div>
           <div>
             <h2>Good questions, honest answers</h2>
-            <p className="intro">
-              The things people actually ask us — answered like a friend would, not a form letter.
-            </p>
-
+            <p className="intro">The things people actually ask — answered like a friend would.</p>
             <details open>
-              <summary>Is this only for one age or stage of life?</summary>
+              <summary>Is this only for one age or stage?</summary>
               <p>
-                Not at all. Liivv Women is built around life chapters — Foundation &amp; First Cycles, Rhythm
-                &amp; Balance, Reset &amp; Recharge, Grow &amp; Recover, Transition &amp; Relief, and Longevity
-                &amp; Vitality. Chapters follow where you are, not a number. You pick what fits; we follow your
-                lead.
+                No. Chapters follow where you are — Foundation, Rhythm, Reset, Grow, Transition, Longevity —
+                not a number on a birthday cake.
               </p>
             </details>
             <details>
-              <summary>What is Clair?</summary>
+              <summary>Can I customize a kit?</summary>
               <p>
-                Clair is a wearable continuous hormone monitor from Clair Health, available through Liivv as
-                part of the Women lineup. For how it works, shipping, and pre-order details, see the Clair
-                feature above — a dedicated Clair page is next in this demo set.
-              </p>
-            </details>
-            <details>
-              <summary>What kinds of products does Liivv Women include?</summary>
-              <p>
-                Cycle comfort, personal care, nutrition and glow, sleep support, CarePack for daily essentials
-                — plus pharmacist chat in Ontario. Clair sits in the lineup as an optional wearable if you
-                want continuous clarity on your rhythm.
+                Yes. Start with a curated kit, adjust quantities, add items, and save your version for later.
               </p>
             </details>
             <details>
               <summary>How private is my order?</summary>
-              <p>
-                Very. Everything arrives in plain, discreet packaging, and your conversations with our team
-                stay between you and us. What you order is nobody&apos;s business but yours.
-              </p>
+              <p>Plain packaging. Quiet checkout. Your order is nobody&apos;s business but yours.</p>
             </details>
             <details>
-              <summary>What can I actually chat with a pharmacist about?</summary>
+              <summary>What can I chat with a pharmacist about?</summary>
               <p>
-                Everyday stuff — monthly comfort, skin flare-ups, sleep that won&apos;t come, &ldquo;is this
-                normal?&rdquo; moments. In Ontario, our pharmacists can assess and help with 19+ everyday
-                concerns in chat during business hours (until 5 p.m. Eastern). Olivia is available anytime for
-                orders, products, and account help — she does not give medical advice.
-              </p>
-            </details>
-            <details>
-              <summary>What&apos;s a CarePack?</summary>
-              <p>
-                Your daily essentials, organized by day and dose into one tidy pack — so mornings start with
-                one small rip instead of a shelf of bottles. Set it once and it keeps arriving.
-              </p>
-            </details>
-            <details>
-              <summary>Can I change or pause my routine anytime?</summary>
-              <p>
-                Always. Life shifts, and your Liivv should shift with it. Swap products, skip a month, or pause
-                entirely — no phone calls, no guilt trips.
+                Everyday concerns in Ontario during business hours (until 5 p.m. Eastern). Olivia helps with
+                shopping anytime — she does not give medical advice.
               </p>
             </details>
           </div>
         </div>
       </section>
 
-      <section className="closing rounded-top">
+      {/* 10 — Manifesto close */}
+      <section className="closing rounded-top" id="manifesto">
         <div className="closing-bg">
           <img alt="" src={`${IMG}/closing.jpg`} />
         </div>
         <div className="container">
-          <div aria-hidden className="closing-thumbs">
-            <Pic src={`${IMG}/pillar-1.jpg`} />
-            <Pic src={`${IMG}/mosaic-5.jpg`} />
-            <Pic src={`${IMG}/marquee-4.jpg`} />
-          </div>
+          <p className="wh-manifesto-kicker">The Liivv promise</p>
           <h2>
-            Your next chapter <span>starts soft</span>
+            No shame. No hype.
+            <br />
+            <span>Just you — at your best.</span>
           </h2>
           <p>
-            No shame. No hype. Just you — at your best. Whatever season you&apos;re in, there&apos;s a
-            version of well that feels like yours.
+            We&apos;re done with filters and false promises. Health should feel natural, modern, and
+            authentically yours — at your pace.
           </p>
-          <a className="btn btn-white" href={SHOP_HREF}>
-            Shop Women&apos;s Wellness
-          </a>
+          <div className="wh-closing-cta">
+            <a className="btn btn-white" href={SHOP_HREF}>
+              Shop the edit
+            </a>
+            <a className="btn btn-ghost" href="#build-your-kit">
+              Build a kit
+            </a>
+            <a className="btn btn-ghost" href="#where-are-you">
+              Find your chapter
+            </a>
+          </div>
         </div>
       </section>
     </div>
