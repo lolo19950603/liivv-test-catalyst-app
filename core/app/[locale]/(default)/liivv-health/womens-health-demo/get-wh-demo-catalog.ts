@@ -13,11 +13,19 @@ import { isCuratedKitProduct } from '~/lib/kit/is-curated-kit';
 import { resolveBcCdnImageUrl } from '~/lib/resolve-bc-cdn-image-url';
 import { pricesTransformer } from '~/data-transformers/prices-transformer';
 
-/** Shop Women's Health category (see create-clair-wristband / CREATE-CURATED-KIT). */
-export const SHOP_WOMENS_HEALTH_CATEGORY_ID = 1152;
+import {
+  CLAIR_HEALTH_WRISTBAND_ID,
+  FIRST_CYCLE_STARTER_KIT_ID,
+  HERO_FLOAT_MOISTURIZER_ID,
+  SHOP_WOMENS_HEALTH_CATEGORY_ID,
+} from './wh-demo-ids';
 
-/** Seed curated kit — First Cycle Starter Kit. More kits will share kit_type=curated. */
-export const FIRST_CYCLE_STARTER_KIT_ID = 8017;
+export {
+  CLAIR_HEALTH_WRISTBAND_ID,
+  FIRST_CYCLE_STARTER_KIT_ID,
+  HERO_FLOAT_MOISTURIZER_ID,
+  SHOP_WOMENS_HEALTH_CATEGORY_ID,
+} from './wh-demo-ids';
 
 const WhDemoCatalogQuery = graphql(
   `
@@ -151,7 +159,7 @@ export const getWhDemoCatalog = cache(async (locale?: string): Promise<WhDemoCat
       variables: {
         currencyCode,
         first: 36,
-        featuredIds: [FIRST_CYCLE_STARTER_KIT_ID],
+        featuredIds: [FIRST_CYCLE_STARTER_KIT_ID, CLAIR_HEALTH_WRISTBAND_ID, HERO_FLOAT_MOISTURIZER_ID],
         filters: {
           categoryEntityIds: [SHOP_WOMENS_HEALTH_CATEGORY_ID],
           searchSubCategories: true,

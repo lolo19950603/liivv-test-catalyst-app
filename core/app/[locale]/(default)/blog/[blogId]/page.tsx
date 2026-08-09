@@ -5,6 +5,7 @@ import { cache } from 'react';
 
 import { BlogPostContent, BlogPostContentBlogPost } from '@/vibes/soul/sections/blog-post-content';
 import { Breadcrumb } from '@/vibes/soul/sections/breadcrumbs';
+import { getBlogPostImageFallback } from '~/lib/blog/image-fallback';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
 
@@ -60,6 +61,8 @@ async function getBlogPost(props: Props): Promise<BlogPostContentBlogPost> {
     return notFound();
   }
 
+  const fallbackImage = getBlogPostImageFallback(blogPost.path);
+
   return {
     author: blogPost.author ?? undefined,
     title: blogPost.name,
@@ -67,7 +70,7 @@ async function getBlogPost(props: Props): Promise<BlogPostContentBlogPost> {
     date: format.dateTime(new Date(blogPost.publishedDate.utc)),
     image: blogPost.thumbnailImage
       ? { alt: blogPost.thumbnailImage.altText, src: blogPost.thumbnailImage.url }
-      : undefined,
+      : fallbackImage,
     tags: blogPost.tags.map((tag) => ({
       label: tag,
       link: {

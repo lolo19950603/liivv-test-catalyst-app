@@ -6,6 +6,7 @@ import { client } from '~/client';
 import { PaginationFragment } from '~/client/fragments/pagination';
 import { graphql } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
+import { getBlogPostImageFallback } from '~/lib/blog/image-fallback';
 
 const BlogQuery = graphql(`
   query BlogQuery {
@@ -112,7 +113,7 @@ export const getBlogPosts = cache(
               src: post.thumbnailImage.url,
               alt: post.thumbnailImage.altText,
             }
-          : undefined,
+          : getBlogPostImageFallback(post.path),
         href: post.path,
         title: post.name,
       })),

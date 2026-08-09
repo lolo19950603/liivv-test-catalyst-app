@@ -4,12 +4,26 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { CHAPTERS as CHAPTER_PAGES, chapterHref } from './chapters/chapters-data';
 import type { WhDemoCatalog, WhDemoCatalogItem } from './get-wh-demo-catalog';
+import {
+  CLAIR_HEALTH_WRISTBAND_ID,
+  FIRST_CYCLE_STARTER_KIT_ID,
+} from './wh-demo-ids';
 
 import './womens-health-demo.css';
 
 const SHOP_HREF = '/liivv-health/womens-health/shop-womens-health';
 const PHARMACIST_HREF = '/account/virtual-care';
+const CLAIR_HREF = '/liivv-health/womens-health-demo/clair-health';
+const CLAIR_PREORDER_HREF = '/clair-health-wristband/';
 const IMG = '/archive/womens-health-demo';
+
+const CLAIR_HORMONES = ['Estrogen', 'Progesterone', 'LH', 'FSH'] as const;
+const CLAIR_CHAPTERS = [
+  'Fertility planning',
+  'Training & recovery',
+  'Hormonal health',
+  '(Peri)menopause',
+] as const;
 
 const FEELING_WORDS = ['heard', 'steady', 'like yourself', 'in rhythm', 'at ease'] as const;
 
@@ -27,7 +41,7 @@ const DOORS = [
     title: 'The Women\'s edit',
     body: 'Essentials, kits, and glow — curated for real routines.',
     href: '#shop-womens-health',
-    image: `${IMG}/mosaic-2.jpg`,
+    image: `${IMG}/door-shop-kit.jpg`,
   },
   {
     id: 'care',
@@ -35,7 +49,7 @@ const DOORS = [
     title: 'Ask without the awkward',
     body: 'Ontario pharmacists in chat — kind answers, no waiting room.',
     href: '#care',
-    image: `${IMG}/care-3.jpg`,
+    image: `${IMG}/door-care.jpg`,
   },
   {
     id: 'chapters',
@@ -43,7 +57,7 @@ const DOORS = [
     title: 'Find your season',
     body: 'Six life chapters — pick where you are, not a number.',
     href: '#where-are-you',
-    image: `${IMG}/chapter-1.jpg`,
+    image: `${IMG}/door-chapters.jpg`,
   },
 ] as const;
 
@@ -142,6 +156,35 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
   const hasKits = Boolean(featuredKit) || otherKits.length > 0;
   const hasShop = shopProducts.length > 0;
 
+  const heroFloatProducts = useMemo(() => {
+    const all = [...(catalog?.kits ?? []), ...(catalog?.products ?? [])];
+    const byId = new Map(all.map((item) => [item.entityId, item]));
+
+    const resolve = (id: number, fallbackPath: string, fallbackName: string) => {
+      const item = byId.get(id);
+
+      if (item?.path) {
+        return item;
+      }
+
+      return {
+        entityId: id,
+        name: item?.name ?? fallbackName,
+        path: item?.path ?? fallbackPath,
+        image: item?.image,
+        isKit: id === FIRST_CYCLE_STARTER_KIT_ID,
+      } satisfies WhDemoCatalogItem;
+    };
+
+    return {
+      primary: resolve(FIRST_CYCLE_STARTER_KIT_ID, '/first-cycle-starter-kit/', 'First Cycle Starter Kit'),
+      secondary: resolve(CLAIR_HEALTH_WRISTBAND_ID, '/clair-health-wristband/', 'Clair Health Wristband'),
+    };
+  }, [catalog?.kits, catalog?.products]);
+
+  const heroFloatPrimary = heroFloatProducts.primary;
+  const heroFloatSecondary = heroFloatProducts.secondary;
+
   const filteredShop = useMemo(() => {
     if (shopRoom === 'all') return shopProducts.slice(0, 12);
 
@@ -190,19 +233,25 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
             </a>
           </div>
         </div>
-        <div aria-hidden className="hero-stack">
-          <div className="hero-stack-main">
+        <div className="hero-stack">
+          <div aria-hidden className="hero-stack-main">
             <img alt="" src={`${IMG}/hero.jpg`} />
           </div>
-          <div className="hero-chip">
+          <div aria-hidden className="hero-chip">
             <span>Liivv vibe</span>
             Wellness that works IRL
           </div>
-          <div className="hero-frame hero-frame--a">
-            <img alt="" src={`${IMG}/hero-a.jpg`} />
+          <div aria-hidden className="hero-frame hero-frame--a hero-frame--product">
+            <img
+              alt={heroFloatPrimary.image?.alt || heroFloatPrimary.name}
+              src={heroFloatPrimary.image?.src ?? `${IMG}/hero-a.jpg`}
+            />
           </div>
-          <div className="hero-frame hero-frame--b">
-            <img alt="" src={`${IMG}/hero-b.jpg`} />
+          <div aria-hidden className="hero-frame hero-frame--b hero-frame--product">
+            <img
+              alt={heroFloatSecondary.image?.alt || heroFloatSecondary.name}
+              src={heroFloatSecondary.image?.src ?? `${IMG}/hero-b.jpg`}
+            />
           </div>
         </div>
       </section>
@@ -401,9 +450,9 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
       <section className="images-text rounded-top" id="care">
         <div className="container images-text-grid">
           <div className="visuals">
-            <Pic className="big" src={`${IMG}/care-1.jpg`} />
-            <Pic className="mid" src={`${IMG}/care-2.jpg`} />
-            <Pic className="small" src={`${IMG}/care-3.jpg`} />
+            <Pic className="big" src={`${IMG}/care-chat-main.jpg`} />
+            <Pic className="mid" src={`${IMG}/care-chat-desk.jpg`} />
+            <Pic className="small" src={`${IMG}/care-chat-moment.jpg`} />
           </div>
           <div>
             <span className="eyebrow">Available in Ontario</span>
@@ -424,32 +473,59 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
       </section>
 
       {/* 8 — Clair room */}
-      <section className="story rounded-top" id="clair">
-        <div className="container">
-          <div className="banner">
-            <h2>Also in the edit: Clair</h2>
-            <div aria-hidden className="clair-collage">
-              <Pic className="c1" src={`${IMG}/clair-1.jpg`} />
-              <Pic className="c2" src={`${IMG}/clair-2.jpg`} />
-              <Pic className="c3" src={`${IMG}/clair-3.jpg`} />
-              <Pic className="c4" src={`${IMG}/clair-4.jpg`} />
+      <section aria-label="Clair continuous hormone wearable" className="wh-clair rounded-top" id="clair">
+        <div className="container wh-clair-board">
+          <div className="wh-clair-copy">
+            <span className="eyebrow">Also in the edit · Clair Health</span>
+            <h2>
+              Continuous clarity, <em>when you want it.</em>
+            </h2>
+            <p className="wh-clair-lead">
+              Clair is the world&apos;s first continuous, noninvasive hormone wearable — designed for women, by
+              women. It reads your body&apos;s signals in real time so you see the shape of your month instead of
+              guessing through it.
+            </p>
+
+            <div className="wh-clair-signals" role="list">
+              {CLAIR_HORMONES.map((hormone) => (
+                <span key={hormone} role="listitem">
+                  {hormone}
+                </span>
+              ))}
+            </div>
+
+            <ul className="wh-clair-uses">
+              {CLAIR_CHAPTERS.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+
+            <p className="wh-clair-close">
+              Same calm place as the rest of Liivv Women. Same discreet delivery.
+            </p>
+
+            <div className="wh-clair-cta">
+              <a className="btn btn-dark" href={CLAIR_PREORDER_HREF}>
+                Preorder
+              </a>
+              <a className="btn btn-outline" href={CLAIR_HREF}>
+                Learn more
+              </a>
             </div>
           </div>
-          <div className="story-grid">
-            <h2>
-              Continuous clarity, <span className="accent">when you want it.</span>
-            </h2>
-            <div>
-              <p>
-                Clair is a wearable that reads your body&apos;s key signals continuously — so you can see the
-                shape of your month instead of guessing through it.
-              </p>
-              <p className="strong-close">Same calm place as the rest of Liivv Women. Same discreet delivery.</p>
-              <div className="story-cta">
-                <a className="btn btn-dark" href={SHOP_HREF}>
-                  See Clair in the shop
-                </a>
-              </div>
+
+          <div aria-hidden className="wh-clair-float">
+            <div className="wh-clair-float-main">
+              <img alt="" src={`${IMG}/clair-official-hero.jpg`} />
+            </div>
+            <div className="wh-clair-frame wh-clair-frame--chip">
+              <img alt="" src={`${IMG}/clair-official-product.jpg`} />
+            </div>
+            <div className="wh-clair-frame wh-clair-frame--round">
+              <img alt="" src={`${IMG}/clair-official-fertility.jpg`} />
+            </div>
+            <div className="wh-clair-frame wh-clair-frame--product">
+              <img alt="" src={`${IMG}/clair-official-training.jpg`} />
             </div>
           </div>
         </div>
@@ -480,7 +556,12 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
                   <span>Toronto · juggling two kids and a startup</span>
                 </div>
               </div>
-              <a className="wh-voice-more" href="/blog/asking-the-pharmacist">
+              <a
+                className="wh-voice-more"
+                href="/blog/asking-the-pharmacist"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
                 Read more
               </a>
             </div>
@@ -498,7 +579,12 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
                   Dana
                   <span>Ottawa · marathon-in-training</span>
                 </div>
-                <a className="wh-voice-more" href="/blog/monthly-box-rhythm">
+                <a
+                  className="wh-voice-more"
+                  href="/blog/monthly-box-rhythm"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
                   Read more
                 </a>
               </div>
@@ -514,7 +600,12 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
                   Maya
                   <span>Liivv member since 2024</span>
                 </div>
-                <a className="wh-voice-more" href="/blog/one-place-for-essentials">
+                <a
+                  className="wh-voice-more"
+                  href="/blog/one-place-for-essentials"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
                   Read more
                 </a>
               </div>
@@ -530,7 +621,12 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
                   Sofia
                   <span>Mississauga · Liivv Women regular</span>
                 </div>
-                <a className="wh-voice-more" href="/blog/sleep-and-skin-in-one-place">
+                <a
+                  className="wh-voice-more"
+                  href="/blog/sleep-and-skin-in-one-place"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
                   Read more
                 </a>
               </div>
@@ -541,11 +637,7 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
 
       {/* FAQ — shortened */}
       <section className="faq rounded-top">
-        <div className="faq-layout">
-          <div aria-hidden className="faq-art">
-            <Pic src={`${IMG}/faq-1.jpg`} />
-            <Pic src={`${IMG}/faq-2.jpg`} />
-          </div>
+        <div className="faq-layout faq-layout--copy-only">
           <div>
             <h2>Good questions, honest answers</h2>
             <p className="intro">The things people actually ask — answered like a friend would.</p>

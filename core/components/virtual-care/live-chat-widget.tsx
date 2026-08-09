@@ -12,7 +12,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import {
   getLiveChatSessionAction,
-  getLiveChatUnreadStaffCountAction,
   loadOlderLiveChatMessagesAction,
   markLiveChatReadAction,
   virtualCareChatAction,
@@ -502,9 +501,21 @@ export function LiveChatWidget() {
   });
 
   const refreshUnreadStaffCount = useEffectEvent(async () => {
-    const result = await getLiveChatUnreadStaffCountAction();
+    try {
+      const response = await fetch('/api/live-chat/unread-count', { cache: 'no-store' });
 
-    setUnreadStaffCount(result.count);
+      if (!response.ok) {
+        setUnreadStaffCount(0);
+
+        return;
+      }
+
+      const data = (await response.json()) as { count?: number };
+
+      setUnreadStaffCount(typeof data.count === 'number' ? data.count : 0);
+    } catch {
+      setUnreadStaffCount(0);
+    }
   });
 
   const markChatRead = useEffectEvent(async () => {
