@@ -29,6 +29,10 @@ import {
   mapMakeswiftAdditionalLinks,
   type MakeswiftAdditionalLinkInput,
 } from '~/lib/makeswift/site-header/map-makeswift-nav-links';
+import {
+  injectLiivvHealthNav,
+  shouldShowLiivvHealthNav,
+} from '~/lib/makeswift/site-header/inject-liivv-health-nav';
 import { resolveStoreNavLinks } from '~/lib/makeswift/site-header/resolve-store-nav-links';
 import { resolveStoreLogo, type StoreLogo } from '~/lib/makeswift/site-header/resolve-store-logo';
 import { findMatchingPathConfig } from '~/lib/makeswift/site-header/should-hide-store-header';
@@ -270,7 +274,10 @@ export const MakeswiftHeader = forwardRef(
     const bannerNode = combinedBanner ? <Banner {...combinedBanner} /> : null;
 
     const desktopLogo = resolveStoreLogo(storeLogo, storeLogoLabel);
-    const navLinks = resolveStoreNavLinks(links, categoryTree);
+    const resolvedNavLinks = resolveStoreNavLinks(links, categoryTree);
+    const navLinks = shouldShowLiivvHealthNav(pathname)
+      ? injectLiivvHealthNav(resolvedNavLinks)
+      : resolvedNavLinks;
 
     return (
       <LiivvArchiveHeader
