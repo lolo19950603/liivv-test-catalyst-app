@@ -1,3 +1,22 @@
+/*
+ * =============================================================================
+ * CHAPTERS DATA — CONTENT MAP
+ * =============================================================================
+ * This file is the main place to edit chapter page copy.
+ * Layout: ./chapter-page.tsx (search "SECTION N —" there)
+ *
+ * Field → page section:
+ *   title, heroBody, chapterWord, num, heroImage  → SECTION 1 Hero
+ *   focus, vibe                                   → SECTION 2 Pulse cards
+ *   categoriesIntro, categories[]                 → SECTION 3 Care categories
+ *   programsBand (optional)                       → SECTION 4 Programs
+ *   pharmacist                                    → SECTION 5 Pharmacist CTA
+ *   closing, nextLabel                            → SECTION 7 Closing
+ *
+ * Search "CHAPTER 0N —" below to jump to a chapter's content.
+ * =============================================================================
+ */
+
 const IMG = '/archive/womens-health-demo';
 const LANDING = '/liivv-health/womens-health-demo';
 const PHARMACIST_HREF = '/account/virtual-care';
@@ -44,6 +63,9 @@ export type Chapter = {
 };
 
 export const CHAPTERS: Chapter[] = [
+  // -------------------------------------------------------------------------
+  // CHAPTER 01 — Foundation & First Cycles
+  // -------------------------------------------------------------------------
   {
     slug: 'foundation-first-cycles',
     num: '01',
@@ -64,7 +86,7 @@ export const CHAPTERS: Chapter[] = [
     categories: [
       {
         title: 'Starter Period Kits',
-        image: `${IMG}/mosaic-1.jpg`,
+        image: `${IMG}/door-shop-kit.jpg`,
         items: [
           'The Hero Bundle: First Period Confidence Kits — often gifted by a parent',
           'Curated boxes with organic cotton pads, tampons, and period underwear',
@@ -74,7 +96,7 @@ export const CHAPTERS: Chapter[] = [
       },
       {
         title: 'Pain Relief',
-        image: `${IMG}/care-1.jpg`,
+        image: `${IMG}/kit-products/kit-cycle-comfort-cramp.png`,
         items: [
           'Heat patches for cramps',
           'ThermaCare Menstrual heat wraps (Class I Medical Devices in Canada)',
@@ -83,7 +105,7 @@ export const CHAPTERS: Chapter[] = [
       },
       {
         title: 'Skincare',
-        image: `${IMG}/pillar-3.jpg`,
+        image: `${IMG}/kit-products/kit-clear-skin-hormonal-acne.png`,
         items: [
           'Gentle skincare systems for hormonal skin',
           'Dermatologist-recommended basics like CeraVe or Cetaphil, bundled as "Hormonal Skin Basics"',
@@ -92,7 +114,7 @@ export const CHAPTERS: Chapter[] = [
       },
       {
         title: 'Digital Integration',
-        image: `${IMG}/mosaic-3.jpg`,
+        image: `${IMG}/care-2.jpg`,
         items: [
           'Cycle tracking app recommendations',
           'Exploring whether Liivv builds its own tracker or partners with trusted apps',
@@ -102,7 +124,7 @@ export const CHAPTERS: Chapter[] = [
       },
       {
         title: 'Menstrual Care',
-        image: `${IMG}/pillar-1.jpg`,
+        image: `${IMG}/door-shop-kit.jpg`,
         items: [
           'Reign Wellness — 100% organic cotton, plastic-free tampons',
           'DivaCup menstrual cup',
@@ -111,7 +133,7 @@ export const CHAPTERS: Chapter[] = [
       },
       {
         title: 'Vitamins',
-        image: `${IMG}/clair-2.jpg`,
+        image: `${IMG}/kit-products/kit-teen-energy-iron.png`,
         items: [
           'Vitamin D (600–1000 IU/day) — bone development and immunity; often lacking in teens',
           'Iron (15 mg/day) — energy and replacing menstrual blood loss',
@@ -127,7 +149,7 @@ export const CHAPTERS: Chapter[] = [
       body: 'First cycles come with a lot of "is this normal?" moments. Our Ontario pharmacists can chat through everyday concerns like cramps and skin flare-ups — kindly, privately, and without a waiting room.',
       cta: 'Talk to a Pharmacist',
       href: PHARMACIST_HREF,
-      image: `${IMG}/care-2.jpg`,
+      image: `${IMG}/door-care.jpg`,
     },
     closing: {
       heading: 'A softer first chapter',
@@ -135,6 +157,9 @@ export const CHAPTERS: Chapter[] = [
     },
     nextLabel: 'Next: Rhythm & Balance',
   },
+  // -------------------------------------------------------------------------
+  // CHAPTER 02 — Rhythm & Balance
+  // -------------------------------------------------------------------------
   {
     slug: 'rhythm-and-balance',
     num: '02',
@@ -155,7 +180,7 @@ export const CHAPTERS: Chapter[] = [
     categories: [
       {
         title: 'Menstrual Care',
-        image: `${IMG}/mosaic-2.jpg`,
+        image: `${IMG}/door-shop-kit.jpg`,
         items: [
           'Premium period underwear',
           'Menstrual cups, plus pads and tampons when you want them',
@@ -164,7 +189,7 @@ export const CHAPTERS: Chapter[] = [
       },
       {
         title: 'Supplements',
-        image: `${IMG}/clair-1.jpg`,
+        image: `${IMG}/kit-products/kit-rhythm-balance.png`,
         items: ['Probiotics — e.g. CanPrev Women\'s Multi', 'Hormone-balancing supplements'],
       },
       {
@@ -180,7 +205,7 @@ export const CHAPTERS: Chapter[] = [
       },
       {
         title: 'Sleep & Stress',
-        image: `${IMG}/timeline-5.jpg`,
+        image: `${IMG}/kit-products/kit-transition-hot-flash.png`,
         items: [
           'Sleep aids — melatonin, chamomile teas, and gentle options',
           'Sleep essential oils',
@@ -189,7 +214,7 @@ export const CHAPTERS: Chapter[] = [
       },
       {
         title: 'Birth Control',
-        image: `${IMG}/mosaic-4.jpg`,
+        image: `${IMG}/kit-products/kit-transition-intimate.png`,
         items: [
           'Articles on birth control',
           'Birth control Minor Ailment Consulting',
@@ -200,7 +225,7 @@ export const CHAPTERS: Chapter[] = [
       },
       {
         title: 'Hormonal Breakouts',
-        image: `${IMG}/pillar-3.jpg`,
+        image: `${IMG}/kit-products/kit-clear-skin-hormonal-acne.png`,
         items: [
           'Article on the impact of hormones on skin health',
           'Link into Liivv Skin Health essentials',
@@ -215,7 +240,7 @@ export const CHAPTERS: Chapter[] = [
       body: 'From cycle comfort to skin flare-ups, our Ontario pharmacists can chat through everyday concerns — and help you sort what you need on the spot.',
       cta: 'Talk to a Pharmacist',
       href: PHARMACIST_HREF,
-      image: `${IMG}/care-3.jpg`,
+      image: `${IMG}/care-chat-desk.jpg`,
     },
     closing: {
       heading: 'Wellness that works IRL',
@@ -223,6 +248,9 @@ export const CHAPTERS: Chapter[] = [
     },
     nextLabel: 'Next: Reset & Recharge',
   },
+  // -------------------------------------------------------------------------
+  // CHAPTER 03 — Reset & Recharge
+  // -------------------------------------------------------------------------
   {
     slug: 'reset-and-recharge',
     num: '03',
@@ -243,7 +271,7 @@ export const CHAPTERS: Chapter[] = [
     categories: [
       {
         title: 'Home Self-Assessment Kits',
-        image: `${IMG}/mosaic-5.jpg`,
+        image: `${IMG}/kit-products/kit-preeclampsia-monitoring.png`,
         items: [
           'At-home kits to help you notice patterns and start a clearer conversation',
           'More kit options as the lineup grows',
@@ -252,7 +280,7 @@ export const CHAPTERS: Chapter[] = [
       },
       {
         title: 'Essentials for Balance',
-        image: `${IMG}/clair-3.jpg`,
+        image: `${IMG}/kit-products/kit-reset-recharge.png`,
         items: [
           'Hormone supplements',
           'Vitamins for everyday energy and resilience',
@@ -281,7 +309,7 @@ export const CHAPTERS: Chapter[] = [
       body: "Our Ontario pharmacists can chat through everyday concerns — sleep that won't come, skin that suddenly changes, stress that won't quiet — with the same discretion as the rest of Liivv.",
       cta: 'Talk to a Pharmacist',
       href: PHARMACIST_HREF,
-      image: `${IMG}/faq-1.jpg`,
+      image: `${IMG}/care-chat-moment.jpg`,
     },
     closing: {
       heading: 'Reset, without the shame',
@@ -289,6 +317,9 @@ export const CHAPTERS: Chapter[] = [
     },
     nextLabel: 'Next: Grow & Recover',
   },
+  // -------------------------------------------------------------------------
+  // CHAPTER 04 — Grow & Recover
+  // -------------------------------------------------------------------------
   {
     slug: 'grow-and-recover',
     num: '04',
@@ -309,7 +340,7 @@ export const CHAPTERS: Chapter[] = [
     categories: [
       {
         title: 'Fertility',
-        image: `${IMG}/mosaic-6.jpg`,
+        image: `${IMG}/kit-products/kit-trying-to-conceive.png`,
         items: [
           'Ovulation and fertility tracking kits',
           'Nutrition support for trying to conceive',
@@ -320,7 +351,7 @@ export const CHAPTERS: Chapter[] = [
       },
       {
         title: 'Pregnancy',
-        image: `${IMG}/clair-4.jpg`,
+        image: `${IMG}/kit-products/kit-prenatal-trimester.png`,
         sections: [
           {
             heading: 'Nutrition',
@@ -351,7 +382,7 @@ export const CHAPTERS: Chapter[] = [
       },
       {
         title: 'Postpartum',
-        image: `${IMG}/care-1.jpg`,
+        image: `${IMG}/kit-products/kit-fourth-trimester.png`,
         sections: [
           {
             heading: 'Nutrition',
@@ -379,7 +410,7 @@ export const CHAPTERS: Chapter[] = [
       body: 'Pregnancy and postpartum come with a lot of quiet questions. Our Ontario pharmacists are a chat away — kind, private, and never judgmental.',
       cta: 'Talk to a Pharmacist',
       href: PHARMACIST_HREF,
-      image: `${IMG}/faq-2.jpg`,
+      image: `${IMG}/care-chat-main.jpg`,
     },
     closing: {
       heading: "You're not alone in this chapter",
@@ -387,6 +418,9 @@ export const CHAPTERS: Chapter[] = [
     },
     nextLabel: 'Next: Transition & Relief',
   },
+  // -------------------------------------------------------------------------
+  // CHAPTER 05 — Transition & Relief
+  // -------------------------------------------------------------------------
   {
     slug: 'transition-and-relief',
     num: '05',
@@ -408,7 +442,7 @@ export const CHAPTERS: Chapter[] = [
       {
         group: 'Symptom Relief',
         title: 'Articles on Perimenopause',
-        image: `${IMG}/timeline-1.jpg`,
+        image: `${IMG}/clair-official-peri.jpg`,
         items: [
           'Clear, kind resources on what perimenopause can feel like',
           'What to expect — and when to ask a pharmacist',
@@ -417,7 +451,7 @@ export const CHAPTERS: Chapter[] = [
       {
         group: 'Symptom Relief',
         title: 'Products for Comfort',
-        image: `${IMG}/pillar-4.jpg`,
+        image: `${IMG}/kit-products/kit-transition-hot-flash.png`,
         items: [
           'Cooling products for night sweats and hot flashes',
           'Sleep aids for disrupted nights',
@@ -427,7 +461,7 @@ export const CHAPTERS: Chapter[] = [
       {
         group: 'Metabolic & Structural',
         title: 'Weight & Hormone Support',
-        image: `${IMG}/clair-2.jpg`,
+        image: `${IMG}/kit-products/kit-transition-midlife.png`,
         items: [
           'Weight management support and hormone supplements',
           'Vitamin D + K2 for bone density (NPN)',
@@ -455,7 +489,7 @@ export const CHAPTERS: Chapter[] = [
       body: "When your body is writing a new chapter, it helps to have someone who's read the book. Chat with an Ontario pharmacist about sleep, mood, and everyday comfort — privately.",
       cta: 'Talk to a Pharmacist',
       href: PHARMACIST_HREF,
-      image: `${IMG}/care-2.jpg`,
+      image: `${IMG}/door-care.jpg`,
     },
     closing: {
       heading: 'Reclaim the night',
@@ -463,6 +497,9 @@ export const CHAPTERS: Chapter[] = [
     },
     nextLabel: 'Next: Longevity & Vitality',
   },
+  // -------------------------------------------------------------------------
+  // CHAPTER 06 — Longevity & Vitality
+  // -------------------------------------------------------------------------
   {
     slug: 'longevity-and-vitality',
     num: '06',
@@ -483,7 +520,7 @@ export const CHAPTERS: Chapter[] = [
     categories: [
       {
         title: 'Bone & Joint Health',
-        image: `${IMG}/mosaic-1.jpg`,
+        image: `${IMG}/kit-products/kit-transition-midlife.png`,
         items: [
           'Balance & mobility aids — high-end, aesthetically pleasing rollators, canes, and supports',
           'Vertigo support and related everyday care',
@@ -493,7 +530,7 @@ export const CHAPTERS: Chapter[] = [
       },
       {
         title: 'Brain Health',
-        image: `${IMG}/timeline-4.jpg`,
+        image: `${IMG}/pillar-3.jpg`,
         items: [
           'Cognitive wellness essentials and supportive nutrition',
           'Habits and products that keep clarity part of everyday life',
@@ -501,7 +538,7 @@ export const CHAPTERS: Chapter[] = [
       },
       {
         title: 'Daily Wellness Packs',
-        image: `${IMG}/clair-3.jpg`,
+        image: `${IMG}/kit-products/kit-reset-recharge.png`,
         items: [
           'Day-by-day essentials organized into one calm pack',
           'Vitamins and supplements that travel with your routine',
@@ -515,7 +552,7 @@ export const CHAPTERS: Chapter[] = [
       body: 'Joint discomfort, vertigo, energy dips — when something needs a professional ear, our Ontario pharmacists can assess and help with everyday concerns right in chat.',
       cta: 'Talk to a Pharmacist',
       href: PHARMACIST_HREF,
-      image: `${IMG}/care-3.jpg`,
+      image: `${IMG}/care-chat-moment.jpg`,
     },
     closing: {
       heading: 'Stay in your favourite things',

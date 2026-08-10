@@ -11,20 +11,39 @@ import {
 
 import './womens-health-demo.css';
 
+/*
+ * =============================================================================
+ * WOMEN'S HEALTH DEMO — CONTENT MAP
+ * =============================================================================
+ * Page URL: /liivv-health/womens-health-demo
+ *
+ * Edit copy in two places:
+ *   1. Constants below (shared lists: doors, trust items, Clair chips, etc.)
+ *   2. JSX sections in WomensHealthDemoPage (search "SECTION N —")
+ *
+ * Chapter cards pull titles/blurbs from: ./chapters/chapters-data.ts
+ * Images live under: /public/archive/womens-health-demo/
+ * =============================================================================
+ */
+
+/** Links used by CTAs across the page */
 const SHOP_HREF = '/liivv-health/womens-health/shop-womens-health';
 const PHARMACIST_HREF = '/account/virtual-care';
 const CLAIR_HREF = '/liivv-health/womens-health-demo/clair-health';
 const CLAIR_PREORDER_HREF = '/clair-health-wristband/';
 const IMG = '/archive/womens-health-demo';
+/** SECTION 1 — Hero float product images */
 const HERO_FLOAT_KIT_IMG = `${IMG}/door-shop-kit.jpg`;
 const HERO_FLOAT_CLAIR_IMG = `${IMG}/clair-official-hero.jpg`;
 
+/** SECTION 8 — Clair hormone wearable frame animation */
 const CLAIR_FRAME_COUNT = 40;
 const CLAIR_FRAME_FPS = 14;
 const CLAIR_FRAME_SRC = (index: number) =>
   `${IMG}/clair-frames/frame-${String(index + 1).padStart(3, '0')}.webp`;
 const CLAIR_FRAME_POSTER = CLAIR_FRAME_SRC(0);
 
+/** SECTION 4 — Kit flow demo step labels + captions */
 const KIT_FLOW_STEPS = [
   {
     id: 'customize',
@@ -52,7 +71,9 @@ const KIT_FLOW_STEPS = [
   },
 ] as const;
 
+/** SECTION 8 — Clair hormone signal chips */
 const CLAIR_HORMONES = ['Estrogen', 'Progesterone', 'LH', 'FSH'] as const;
+/** SECTION 8 — Clair use-case list under the lead paragraph */
 const CLAIR_CHAPTERS = [
   'Fertility planning',
   'Training & recovery',
@@ -60,8 +81,10 @@ const CLAIR_CHAPTERS = [
   '(Peri)menopause',
 ] as const;
 
+/** SECTION 1 — Rotating words in the hero headline ("feel ___") */
 const FEELING_WORDS = ['heard', 'steady', 'like yourself', 'in rhythm', 'at ease'] as const;
 
+/** SECTION 2 — Trust strip items under the hero */
 const TRUST_ITEMS = [
   'Ontario pharmacist chat',
   'Discreet delivery',
@@ -69,6 +92,7 @@ const TRUST_ITEMS = [
   'No shame. Just health.',
 ] as const;
 
+/** SECTION 3 — Three "doors" cards (Shop / Care / Chapters) */
 const DOORS = [
   {
     id: 'shop',
@@ -96,6 +120,10 @@ const DOORS = [
   },
 ] as const;
 
+/**
+ * SECTION 6 — Life chapter cards
+ * Titles/blurbs come from ./chapters/chapters-data.ts — edit that file to change chapter copy.
+ */
 const CHAPTER_CHOOSER = CHAPTER_PAGES.map((chapter) => ({
   num: chapter.num,
   shortTitle: chapter.title.split('&')[0]?.trim() ?? chapter.title,
@@ -105,6 +133,7 @@ const CHAPTER_CHOOSER = CHAPTER_PAGES.map((chapter) => ({
   image: chapter.heroImage,
 }));
 
+/** SECTION 5 — Shop room filter tab labels */
 const SHOP_ROOMS = [
   { id: 'all', label: 'All' },
   { id: 'kits', label: 'Curated kits' },
@@ -1023,7 +1052,11 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
 
   return (
     <div id="wh-demo">
-      {/* 1 — Feeling hero */}
+      {/* =====================================================================
+          SECTION 1 — HERO
+          Kicker, headline, subcopy, CTAs, hero image + float chips.
+          Rotating feeling words: FEELING_WORDS (top of file).
+          ===================================================================== */}
       <section className="hero" aria-label="Women's Health hero">
         <div className="hero-inner">
           <span className="hero-kicker">Liivv Women · Health, your way</span>
@@ -1070,7 +1103,11 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
         </div>
       </section>
 
-      {/* 2 — Trust strip */}
+      {/* =====================================================================
+          SECTION 2 — TRUST STRIP
+          Scrolling / row of trust bullets under the hero.
+          Edit items in: TRUST_ITEMS (top of file).
+          ===================================================================== */}
       <section aria-label="Why Liivv Women" className="wh-trust">
         <div className="container wh-trust-track">
           {TRUST_ITEMS.map((item) => (
@@ -1079,7 +1116,12 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
         </div>
       </section>
 
-      {/* 3 — Three doors */}
+      {/* =====================================================================
+          SECTION 3 — THREE DOORS (Shop / Care / Chapters)
+          Anchor: #doors
+          Edit card copy + images in: DOORS (top of file).
+          Eyebrow + headline below are edited inline.
+          ===================================================================== */}
       <section aria-label="Start here" className="wh-doors" id="doors">
         <div className="container">
           <span className="eyebrow">Three ways in</span>
@@ -1099,7 +1141,12 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
         </div>
       </section>
 
-      {/* 4 — Featured kit */}
+      {/* =====================================================================
+          SECTION 4 — CUSTOMIZABLE KITS
+          Anchor: #build-your-kit
+          Eyebrow / headline / intro below. Kit products come from catalog.
+          Step captions: KIT_FLOW_STEPS. Demo UI: KitFlowDemo component.
+          ===================================================================== */}
       {hasKits ? (
         <section aria-label="Customizable kits" className="wh-kits rounded-top" id="build-your-kit">
           <div className="container">
@@ -1121,7 +1168,12 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
         </section>
       ) : null}
 
-      {/* 5 — Shop rooms */}
+      {/* =====================================================================
+          SECTION 5 — SHOP ROOMS
+          Anchor: #shop-womens-health
+          Filter tab labels: SHOP_ROOMS. Products come from live catalog.
+          Eyebrow / headline / intro / CTA below are edited inline.
+          ===================================================================== */}
       {hasShop ? (
         <section aria-label="Shop Women's Health" className="wh-shop rounded-top" id="shop-womens-health">
           <div className="container">
@@ -1162,7 +1214,12 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
         </section>
       ) : null}
 
-      {/* 6 — Life chapters */}
+      {/* =====================================================================
+          SECTION 6 — LIFE CHAPTERS
+          Anchor: #where-are-you
+          Eyebrow / headline / intro below. Card titles & blurbs:
+          ./chapters/chapters-data.ts
+          ===================================================================== */}
       <section aria-label="Find your chapter" className="wh-chooser rounded-top" id="where-are-you">
         <div className="container">
           <span className="eyebrow">Life chapters</span>
@@ -1185,7 +1242,11 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
         </div>
       </section>
 
-      {/* 7 — Care */}
+      {/* =====================================================================
+          SECTION 7 — CARE / PHARMACIST CHAT
+          Anchor: #care
+          Images, eyebrow, headline, body copy, CTA — all edited inline below.
+          ===================================================================== */}
       <section className="images-text rounded-top" id="care">
         <div className="container images-text-grid">
           <div className="visuals">
@@ -1211,7 +1272,12 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
         </div>
       </section>
 
-      {/* 8 — Clair room */}
+      {/* =====================================================================
+          SECTION 8 — CLAIR HEALTH WEARABLE
+          Anchor: #clair
+          Headline + lead + closing copy edited inline below.
+          Hormone chips: CLAIR_HORMONES · Use cases: CLAIR_CHAPTERS
+          ===================================================================== */}
       <section aria-label="Clair continuous hormone wearable" className="wh-clair rounded-top" id="clair">
         <div aria-hidden className="wh-clair-media">
           <ClairFrameLoop />
@@ -1259,7 +1325,11 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
         </div>
       </section>
 
-      {/* 9 — Voices */}
+      {/* =====================================================================
+          SECTION 9 — COMMUNITY VOICES / TESTIMONIALS
+          Anchor: #voices
+          Featured quote + three smaller cards — all edited inline below.
+          ===================================================================== */}
       <section className="voices rounded-top" id="voices">
         <div className="container">
           <span className="eyebrow voices-eyebrow">Beyond the aisle</span>
@@ -1363,7 +1433,10 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
         </div>
       </section>
 
-      {/* FAQ — shortened */}
+      {/* =====================================================================
+          SECTION 10 — FAQ
+          Questions + answers edited inline in the <details> blocks below.
+          ===================================================================== */}
       <section className="faq rounded-top">
         <div className="faq-layout faq-layout--copy-only">
           <div>
@@ -1397,7 +1470,11 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
         </div>
       </section>
 
-      {/* 10 — Manifesto close */}
+      {/* =====================================================================
+          SECTION 11 — CLOSING / MANIFESTO
+          Anchor: #manifesto
+          Kicker, headline, body, CTAs — all edited inline below.
+          ===================================================================== */}
       <section className="closing rounded-top" id="manifesto">
         <div className="closing-bg">
           <img alt="" src={`${IMG}/closing.jpg`} />

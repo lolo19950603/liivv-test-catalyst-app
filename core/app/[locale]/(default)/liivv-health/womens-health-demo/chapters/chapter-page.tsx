@@ -2,10 +2,23 @@
 
 import { useEffect, useState } from 'react';
 
-import type { Chapter } from './chapters-data';
+import type { CategoryCard, Chapter } from './chapters-data';
 import { CHAPTERS, LANDING_HREF, chapterHref, getChapterNeighbors } from './chapters-data';
 
 import './chapter-page.css';
+
+/*
+ * =============================================================================
+ * CHAPTER PAGE — CONTENT MAP
+ * =============================================================================
+ * Routes: /liivv-health/womens-health-demo/chapters/[slug]
+ *
+ * Layout lives in this file. Almost all copy lives in:
+ *   ./chapters-data.ts  ← edit chapter titles, focus, vibe, categories, etc.
+ *
+ * Search "SECTION N —" below to jump to each layout block.
+ * =============================================================================
+ */
 
 function Pic({
   src,
@@ -30,13 +43,56 @@ function renderBadge(text?: string) {
   return <span className="wh-ch-soon">{text}</span>;
 }
 
+/** Pick a proportional grid from the total category count. */
+function categoryGridClass(count: number) {
+  if (count <= 1) return 'wh-ch-cat-grid wh-ch-cat-grid--cols-1';
+  if (count === 2 || count === 4) return 'wh-ch-cat-grid wh-ch-cat-grid--cols-2';
+  return 'wh-ch-cat-grid wh-ch-cat-grid--cols-3';
+}
+
+function CategoryCardView({ card, index }: { card: CategoryCard; index: number }) {
+  return (
+    <article className="wh-ch-cat" style={{ ['--stagger' as string]: `${index * 40}ms` }}>
+      {card.group ? <span className="wh-ch-group">{card.group}</span> : null}
+      <Pic src={card.image} />
+      <div className="wh-ch-cat-body">
+        <h3>
+          {card.title}
+          {renderBadge(card.badge)}
+        </h3>
+        {card.items ? (
+          <ul>
+            {card.items.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        ) : null}
+        {card.sections?.map((section) => (
+          <div className="wh-ch-subsection" key={section.heading}>
+            <h4>{section.heading}</h4>
+            <ul>
+              {section.items.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            {section.note ? <p className="wh-ch-note">{section.note}</p> : null}
+          </div>
+        ))}
+        {card.note ? <p className="wh-ch-note">{card.note}</p> : null}
+      </div>
+    </article>
+  );
+}
+
 export function ChapterPage({ chapter }: { chapter: Chapter }) {
   const { prev, next } = getChapterNeighbors(chapter.slug);
   const nextHref = next ? chapterHref(next.slug) : `${LANDING_HREF}#find-your-chapter`;
-  const growLayout = chapter.slug === 'grow-and-recover';
   const [scrolled, setScrolled] = useState(false);
   const chapterIndex = CHAPTERS.findIndex((item) => item.slug === chapter.slug);
-  const [featured, ...restCategories] = chapter.categories;
+  const categories = chapter.categories;
+  const categoryCount = categories.length;
+  const showFeaturedSolo = categoryCount === 1;
+  const featured = showFeaturedSolo ? categories[0] : null;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -47,10 +103,16 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
 
   return (
     <div id="wh-chapter" style={{ ['--chapter-accent' as string]: chapter.accent }}>
+      {/* Sticky back link — label edited inline */}
       <a className={`wh-ch-back${scrolled ? ' is-scrolled' : ''}`} href={LANDING_HREF}>
         ← Women&apos;s Health
       </a>
 
+      {/* =====================================================================
+          SECTION 1 — HERO
+          Copy from chapters-data: title, heroBody, chapterWord, num, heroImage
+          CTA labels below are edited inline.
+          ===================================================================== */}
       <section className="wh-ch-hero">
         <Pic className="wh-ch-hero-bg" priority src={chapter.heroImage} />
         <div className="wh-ch-hero-veil" aria-hidden />
@@ -88,6 +150,12 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </a>
       </section>
 
+      {/* =====================================================================
+          SECTION 2 — FOCUS + VIBE PULSE
+          Anchor: #chapter-pulse
+          Copy from chapters-data: focus, vibe
+          Card labels ("The Focus" / "The Liivv Vibe") edited inline.
+          ===================================================================== */}
       <section className="wh-ch-pulse wh-ch-rounded" id="chapter-pulse">
         <div className="wh-ch-container wh-ch-pulse-grid">
           <article className="wh-ch-pulse-card">
@@ -101,6 +169,13 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </div>
       </section>
 
+      {/* =====================================================================
+          SECTION 3 — CARE CATEGORIES
+          Anchor: #chapter-care
+          Copy from chapters-data: categoriesIntro, categories[]
+          Layout adapts to count: 1 featured · 2/4 → 2-col · 3/5/6+ → 3-col
+          (last row centers when incomplete).
+          ===================================================================== */}
       <section className="wh-ch-categories" id="chapter-care">
         <div className="wh-ch-container">
           <header className="wh-ch-section-head">
@@ -139,48 +214,21 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
                 {featured.note ? <p className="wh-ch-note">{featured.note}</p> : null}
               </div>
             </article>
-          ) : null}
-
-          <div className={`wh-ch-cat-grid${growLayout ? ' wh-ch-cat-grid--grow' : ''}`}>
-            {restCategories.map((card, index) => (
-              <article
-                className={`wh-ch-cat${index % 3 === 0 ? ' wh-ch-cat--tall' : ''}`}
-                key={card.title}
-                style={{ ['--stagger' as string]: `${index * 40}ms` }}
-              >
-                {card.group ? <span className="wh-ch-group">{card.group}</span> : null}
-                <Pic src={card.image} />
-                <div className="wh-ch-cat-body">
-                  <h3>
-                    {card.title}
-                    {renderBadge(card.badge)}
-                  </h3>
-                  {card.items ? (
-                    <ul>
-                      {card.items.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  ) : null}
-                  {card.sections?.map((section) => (
-                    <div className="wh-ch-subsection" key={section.heading}>
-                      <h4>{section.heading}</h4>
-                      <ul>
-                        {section.items.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                      {section.note ? <p className="wh-ch-note">{section.note}</p> : null}
-                    </div>
-                  ))}
-                  {card.note ? <p className="wh-ch-note">{card.note}</p> : null}
-                </div>
-              </article>
-            ))}
-          </div>
+          ) : (
+            <div className={categoryGridClass(categoryCount)}>
+              {categories.map((card, index) => (
+                <CategoryCardView card={card} index={index} key={card.title} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
+      {/* =====================================================================
+          SECTION 4 — PROGRAMS BAND (optional — only some chapters)
+          Copy from chapters-data: programsBand
+          Eyebrow "Programs" edited inline.
+          ===================================================================== */}
       {chapter.programsBand ? (
         <section className="wh-ch-programs">
           <div className="wh-ch-container">
@@ -205,6 +253,10 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </section>
       ) : null}
 
+      {/* =====================================================================
+          SECTION 5 — PHARMACIST CTA
+          Copy from chapters-data: pharmacist (eyebrow, heading, body, cta, image)
+          ===================================================================== */}
       <section className="wh-ch-pharmacist wh-ch-rounded">
         <div className="wh-ch-container wh-ch-pharmacist-grid">
           <div className="wh-ch-pharmacist-media">
@@ -222,6 +274,11 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </div>
       </section>
 
+      {/* =====================================================================
+          SECTION 6 — JOURNEY MAP / ALL CHAPTERS NAV
+          Chapter titles come from CHAPTERS in chapters-data.ts
+          "Journey map" / "All six chapters" edited inline.
+          ===================================================================== */}
       <section className="wh-ch-nav">
         <div className="wh-ch-container">
           <div className="wh-ch-nav-head">
@@ -248,6 +305,11 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </div>
       </section>
 
+      {/* =====================================================================
+          SECTION 7 — CLOSING
+          Copy from chapters-data: closing, nextLabel
+          Eyebrow + "Back to Women's Health" CTA edited inline.
+          ===================================================================== */}
       <section className="wh-ch-closing">
         <Pic className="wh-ch-closing-bg" src={chapter.heroImage} />
         <div className="wh-ch-closing-veil" aria-hidden />

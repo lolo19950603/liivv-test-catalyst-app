@@ -4,6 +4,20 @@ import { useCallback, useEffect, useRef, useState, type MutableRefObject, type R
 
 import './clair-health-demo.css';
 
+/*
+ * =============================================================================
+ * CLAIR HEALTH DEMO — CONTENT MAP
+ * =============================================================================
+ * Page URL: /liivv-health/womens-health-demo/clair-health
+ *
+ * Edit copy in two places:
+ *   1. Constants below (OFFER, PRESS, TEAM, STAGES, FAQS)
+ *   2. JSX sections in ClairHealthDemoPage / ScrollFrameHero (search "SECTION N —")
+ *
+ * Images live under: /public/archive/womens-health-demo/clair-site/
+ * =============================================================================
+ */
+
 const IMG = '/archive/womens-health-demo';
 const SITE = `${IMG}/clair-site`;
 const FRAME_COUNT = 40;
@@ -13,12 +27,14 @@ const HERO_POSTER = FRAME_SRC(0);
 const WOMEN_HREF = '/liivv-health/womens-health-demo';
 const PREORDER_HREF = '/clair-health-wristband/';
 
+/** SECTION 2 — Pre-order offer bullets */
 const OFFER = [
   { strong: 'Pre-order', label: 'through Liivv' },
   { strong: 'Nov 2026', label: 'expected ship' },
   { strong: 'No labs', label: 'worn like jewellery' },
 ] as const;
 
+/** SECTION 3 — Press / media logo marquee */
 const PRESS = [
   { src: `${SITE}/press/ncwh.svg`, alt: "HHS National Conference on Women's Health" },
   { src: `${SITE}/press/forbes.svg`, alt: 'Forbes' },
@@ -31,6 +47,7 @@ const PRESS = [
   { src: `${SITE}/press/wellworthy.svg`, alt: 'wellworthy' },
 ] as const;
 
+/** SECTION 6 — Team / institutions logo marquee */
 const TEAM = [
   { src: `${SITE}/team/whoop.svg`, alt: 'Whoop' },
   { src: `${SITE}/team/apple.svg`, alt: 'Apple' },
@@ -46,6 +63,7 @@ const TEAM = [
   { src: `${SITE}/team/mercedes.svg`, alt: 'Mercedes-Benz' },
 ] as const;
 
+/** SECTION 4 — Life-stage cards around the product photo */
 const STAGES = [
   {
     title: 'Training & Recovery',
@@ -238,6 +256,7 @@ function StageStarField({
   return <canvas aria-hidden className="clair-stages-stars" ref={canvasRef} />;
 }
 
+/** SECTION 7 — FAQ questions + answers */
 const FAQS = [
   {
     q: 'How does Clair track hormones without a blood draw?',
@@ -457,6 +476,10 @@ function ScrollFrameHero() {
 
   return (
     <div className="clair-hero-scroll" ref={wrapperRef}>
+      {/* =====================================================================
+          SECTION 1 — HERO (scroll-driven frame animation)
+          Headline, keywords, lead, CTAs edited inline below.
+          ===================================================================== */}
       <section aria-label="Introducing Clair" className="clair-hero" ref={stageRef}>
         <img
           alt="Clair Health wearable hormone monitor"
@@ -530,12 +553,20 @@ export function ClairHealthDemoPage() {
 
   return (
     <div id="clair-demo">
+      {/* Sticky back link — label edited inline */}
       <a className={`clair-back${scrolled ? ' is-scrolled' : ''}`} href={WOMEN_HREF}>
         ← Women&apos;s Health
       </a>
 
+      {/* SECTION 1 — Hero (see ScrollFrameHero above) */}
       <ScrollFrameHero />
 
+      {/* =====================================================================
+          SECTION 2 — PRE-ORDER OFFER
+          Anchor: #preorder
+          Headline / body / note / CTA edited inline.
+          Offer bullets: OFFER (top of file).
+          ===================================================================== */}
       <section className="clair-offer" id="preorder">
         <div className="clair-container clair-offer-grid">
           <div className="clair-offer-copy">
@@ -567,6 +598,10 @@ export function ClairHealthDemoPage() {
         </div>
       </section>
 
+      {/* =====================================================================
+          SECTION 3 — PRESS / FEATURED IN
+          Logos: PRESS (top of file). Pill label edited inline.
+          ===================================================================== */}
       <section aria-label="Featured in" className="clair-press">
         <div className="clair-press-pill">
           <img alt="" height={12} src={`${SITE}/press/megaphone.svg`} width={12} />
@@ -591,6 +626,11 @@ export function ClairHealthDemoPage() {
         </div>
       </section>
 
+      {/* =====================================================================
+          SECTION 4 — STAGES OF WOMEN'S HEALTH
+          Anchor: #stages
+          Section head edited inline. Stage cards: STAGES (top of file).
+          ===================================================================== */}
       <section className="clair-stages" id="stages">
         <div className="clair-container">
           <header className="clair-section-head">
@@ -651,6 +691,11 @@ export function ClairHealthDemoPage() {
         </div>
       </section>
 
+      {/* =====================================================================
+          SECTION 5 — HOW CLAIR WORKS
+          Anchor: #how-it-works
+          Pill, headline, body, CTA — all edited inline below.
+          ===================================================================== */}
       <section className="clair-story" id="how-it-works">
         <div className="clair-container clair-story-grid">
           <div className="clair-story-media">
@@ -677,6 +722,10 @@ export function ClairHealthDemoPage() {
         </div>
       </section>
 
+      {/* =====================================================================
+          SECTION 6 — EXPERT TEAM
+          Logos: TEAM (top of file). Head copy edited inline.
+          ===================================================================== */}
       <section aria-label="Expert team behind Clair" className="clair-team">
         <div className="clair-team-head">
           <div className="clair-team-pill">
@@ -705,6 +754,11 @@ export function ClairHealthDemoPage() {
         </div>
       </section>
 
+      {/* =====================================================================
+          SECTION 7 — FAQ
+          Anchor: #faq
+          Head copy edited inline. Q&A: FAQS (top of file).
+          ===================================================================== */}
       <section className="clair-faq" id="faq">
         <div className="clair-container clair-faq-grid">
           <header className="clair-faq-head">
@@ -733,6 +787,11 @@ export function ClairHealthDemoPage() {
         </div>
       </section>
 
+      {/* =====================================================================
+          SECTION 8 — CLOSING / RESERVE
+          Anchor: #reserve
+          Kicker, headline, body, CTAs — all edited inline below.
+          ===================================================================== */}
       <section className="clair-closing" id="reserve">
         <div aria-hidden className="clair-closing-bg">
           <img alt="" decoding="async" loading="lazy" src={`${SITE}/closing.jpg`} />
