@@ -1848,7 +1848,7 @@
 
 /* —— KITS UPSELL / LIVING OBJECT —— */
 #wh-demo .wh-kits {
-  background: var(--cream);
+  background: var(--soft);
   padding: 100px 24px 110px;
   color: var(--ink);
 }

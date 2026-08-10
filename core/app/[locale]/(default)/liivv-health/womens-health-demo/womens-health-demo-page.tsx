@@ -20,7 +20,7 @@ const HERO_FLOAT_KIT_IMG = `${IMG}/door-shop-kit.jpg`;
 const HERO_FLOAT_CLAIR_IMG = `${IMG}/clair-official-hero.jpg`;
 
 const CLAIR_FRAME_COUNT = 40;
-const CLAIR_FRAME_FPS = 8;
+const CLAIR_FRAME_FPS = 14;
 const CLAIR_FRAME_SRC = (index: number) =>
   `${IMG}/clair-frames/frame-${String(index + 1).padStart(3, '0')}.webp`;
 const CLAIR_FRAME_POSTER = CLAIR_FRAME_SRC(0);
@@ -107,6 +107,7 @@ const CHAPTER_CHOOSER = CHAPTER_PAGES.map((chapter) => ({
 
 const SHOP_ROOMS = [
   { id: 'all', label: 'All' },
+  { id: 'kits', label: 'Curated kits' },
   { id: 'cycle', label: 'Cycle comfort' },
   { id: 'intimate', label: 'Intimate care' },
   { id: 'prenatal', label: 'Prenatal & grow' },
@@ -115,7 +116,7 @@ const SHOP_ROOMS = [
 
 type ShopRoomId = (typeof SHOP_ROOMS)[number]['id'];
 
-function roomForProduct(product: WhDemoCatalogItem): Exclude<ShopRoomId, 'all'> {
+function roomForProduct(product: WhDemoCatalogItem): Exclude<ShopRoomId, 'all' | 'kits'> {
   const n = product.name.toLowerCase();
 
   if (
@@ -390,10 +391,21 @@ function ClairFrameLoop() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const frame =
-      framesRef.current[index] ??
-      framesRef.current.slice(0, index + 1).reverse().find(Boolean) ??
-      framesRef.current.find(Boolean);
+    const frames = framesRef.current;
+    let frame = frames[index] ?? null;
+
+    if (!frame) {
+      for (let i = index - 1; i >= 0; i -= 1) {
+        if (frames[i]) {
+          frame = frames[i]!;
+          break;
+        }
+      }
+    }
+
+    if (!frame) {
+      frame = frames.find(Boolean) ?? null;
+    }
 
     if (!frame) return;
 
@@ -402,15 +414,22 @@ function ClairFrameLoop() {
     if (width < 1 || height < 1) return;
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
-      canvas.width = Math.round(width * dpr);
-      canvas.height = Math.round(height * dpr);
+    const nextWidth = Math.round(width * dpr);
+    const nextHeight = Math.round(height * dpr);
+    const sizeChanged = canvas.width !== nextWidth || canvas.height !== nextHeight;
+
+    if (sizeChanged) {
+      canvas.width = nextWidth;
+      canvas.height = nextHeight;
     }
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (sizeChanged) {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
     const scale = Math.max(width / frame.naturalWidth, height / frame.naturalHeight);
     const drawW = frame.naturalWidth * scale;
     const drawH = frame.naturalHeight * scale;
@@ -465,8 +484,10 @@ function ClairFrameLoop() {
     let last = performance.now();
 
     const tick = (now: number) => {
-      if (now - last >= intervalMs) {
-        last = now;
+      const elapsed = now - last;
+      if (elapsed >= intervalMs) {
+        // Catch up cleanly without drifting slower over time
+        last = now - (elapsed % intervalMs);
         let next = frameIndexRef.current + directionRef.current;
 
         if (next >= lastFrame) {
@@ -929,7 +950,7 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
   const featuredKit = catalog?.featuredKit ?? allKits[0] ?? null;
   const shopProducts = catalog?.products ?? EMPTY_PRODUCTS;
   const hasKits = allKits.length > 0;
-  const hasShop = shopProducts.length > 0;
+  const hasShop = shopProducts.length > 0 || allKits.length > 0;
   const kitSearchPool = useMemo(
     () => (catalog?.products ?? []).map((product) => product.name),
     [catalog?.products],
@@ -965,10 +986,11 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
   const heroFloatSecondary = heroFloatProducts.secondary;
 
   const filteredShop = useMemo(() => {
+    if (shopRoom === 'kits') return allKits.slice(0, 12);
     if (shopRoom === 'all') return shopProducts.slice(0, 12);
 
     return shopProducts.filter((p) => roomForProduct(p) === shopRoom).slice(0, 12);
-  }, [shopProducts, shopRoom]);
+  }, [allKits, shopProducts, shopRoom]);
 
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -1080,7 +1102,7 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
 
       {/* 5 — Shop rooms */}
       {hasShop ? (
-        <section aria-label="Shop Women's Health" className="wh-shop" id="shop-womens-health">
+        <section aria-label="Shop Women's Health" className="wh-shop rounded-top" id="shop-womens-health">
           <div className="container">
             <span className="eyebrow">Shop Women&apos;s Health</span>
             <h2>Rooms in the edit</h2>
@@ -1120,7 +1142,7 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
       ) : null}
 
       {/* 6 — Life chapters */}
-      <section aria-label="Find your chapter" className="wh-chooser" id="where-are-you">
+      <section aria-label="Find your chapter" className="wh-chooser rounded-top" id="where-are-you">
         <div className="container">
           <span className="eyebrow">Life chapters</span>
           <h2>Six chapters. One that fits.</h2>

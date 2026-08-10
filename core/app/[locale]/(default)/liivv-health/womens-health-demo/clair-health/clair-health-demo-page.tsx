@@ -331,6 +331,7 @@ export function ClairHealthDemoPage() {
   const [scrolled, setScrolled] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [activeStage, setActiveStage] = useState(0);
+  const [stagesPaused, setStagesPaused] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -338,6 +339,23 @@ export function ClairHealthDemoPage() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  useEffect(() => {
+    if (stagesPaused) return;
+
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (media.matches) return;
+
+    const timer = window.setInterval(() => {
+      setActiveStage((current) => (current + 1) % STAGES.length);
+    }, 4200);
+
+    return () => window.clearInterval(timer);
+  }, [stagesPaused]);
+
+  const selectStage = (index: number) => {
+    setActiveStage(index);
+  };
 
   return (
     <div id="clair-demo">
@@ -413,7 +431,13 @@ export function ClairHealthDemoPage() {
             <p>Personalized insights across training, fertility, hormonal health, and perimenopause.</p>
           </header>
 
-          <div className="clair-stages-layout">
+          <div
+            className="clair-stages-layout"
+            onBlurCapture={() => setStagesPaused(false)}
+            onFocusCapture={() => setStagesPaused(true)}
+            onMouseEnter={() => setStagesPaused(true)}
+            onMouseLeave={() => setStagesPaused(false)}
+          >
             <div className="clair-stages-center">
               <div aria-hidden className="clair-pic clair-stages-photo">
                 {STAGES.map((stage, index) => (
@@ -434,9 +458,9 @@ export function ClairHealthDemoPage() {
                   aria-pressed={activeStage === index}
                   className={`clair-stage-card${activeStage === index ? ' is-active' : ''}`}
                   key={stage.title}
-                  onClick={() => setActiveStage(index)}
-                  onFocus={() => setActiveStage(index)}
-                  onMouseEnter={() => setActiveStage(index)}
+                  onClick={() => selectStage(index)}
+                  onFocus={() => selectStage(index)}
+                  onMouseEnter={() => selectStage(index)}
                   type="button"
                 >
                   <h3>{stage.title}</h3>
@@ -532,7 +556,7 @@ export function ClairHealthDemoPage() {
 
       <section className="clair-closing" id="reserve">
         <div aria-hidden className="clair-closing-bg">
-          <img alt="" decoding="async" loading="lazy" src={`${IMG}/closing.jpg`} />
+          <img alt="" decoding="async" loading="lazy" src={`${SITE}/closing.jpg`} />
         </div>
         <div className="clair-container clair-closing-inner">
           <p className="clair-closing-kicker">Through Liivv</p>
