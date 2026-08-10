@@ -557,6 +557,7 @@ function KitFlowDemo({
   searchPool?: string[];
 }) {
   const [step, setStep] = useState(0);
+  const [hoverStep, setHoverStep] = useState<number | null>(null);
   const [padsCount, setPadsCount] = useState(2);
   const [addedItem, setAddedItem] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -765,6 +766,7 @@ function KitFlowDemo({
   }, [measurePointer, reduceMotion]);
 
   const active = KIT_FLOW_STEPS[step] ?? KIT_FLOW_STEPS[0];
+  const caption = KIT_FLOW_STEPS[hoverStep ?? step] ?? active;
   const searchResults = catalogNames
     .filter((name) => name.toLowerCase().includes(searchQuery.toLowerCase()) || searchQuery.length < 2)
     .slice(0, 4);
@@ -772,23 +774,42 @@ function KitFlowDemo({
 
   return (
     <div className="wh-kit-flow" data-step={active.id}>
-      <div className="wh-kit-flow-steps" role="tablist" aria-label="How kits work">
+      <div
+        className="wh-kit-flow-steps"
+        onMouseLeave={() => setHoverStep(null)}
+        role="tablist"
+        aria-label="How kits work"
+      >
         {KIT_FLOW_STEPS.map((item, index) => (
-          <button
-            aria-selected={index === step}
-            className={index === step ? 'is-active' : undefined}
-            key={item.id}
-            role="tab"
-            type="button"
-          >
-            <span className="wh-kit-flow-num">{item.num}</span>
-            <span className="wh-kit-flow-label">{item.title}</span>
-          </button>
+          <div className="wh-kit-flow-step" key={item.id}>
+            <button
+              aria-selected={index === step}
+              className={[
+                index === step ? 'is-active' : '',
+                hoverStep === index ? 'is-preview' : '',
+              ]
+                .filter(Boolean)
+                .join(' ') || undefined}
+              onBlur={() => setHoverStep(null)}
+              onFocus={() => setHoverStep(index)}
+              onMouseEnter={() => setHoverStep(index)}
+              role="tab"
+              type="button"
+            >
+              <span className="wh-kit-flow-num">{item.num}</span>
+              <span className="wh-kit-flow-label">{item.title}</span>
+            </button>
+            {index < KIT_FLOW_STEPS.length - 1 ? (
+              <span aria-hidden className="wh-kit-flow-arrow">
+                →
+              </span>
+            ) : null}
+          </div>
         ))}
       </div>
 
       <p className="wh-kit-flow-caption" aria-live="polite">
-        <strong>{active.title}.</strong> {active.body}
+        <strong>{caption.title}.</strong> {caption.body}
       </p>
 
       <div aria-hidden className="wh-kit-page" ref={pageRef}>
@@ -1031,8 +1052,8 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
             <img alt="" src={`${IMG}/hero.jpg`} />
           </div>
           <div aria-hidden className="hero-chip">
-            <span>Liivv vibe</span>
-            Wellness that works IRL
+            <span>Made for real life</span>
+            Care that keeps up with you
           </div>
           <div aria-hidden className="hero-frame hero-frame--a hero-frame--product">
             <img
