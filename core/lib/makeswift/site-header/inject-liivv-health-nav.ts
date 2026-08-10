@@ -2,45 +2,68 @@ import type { LiivvArchiveNavLink } from '~/lib/makeswift/liivv-archive-header/t
 import { pathnameMatchesPrefix } from '~/lib/makeswift/site-header/should-hide-store-header';
 
 export const WOMEN_HEALTH_DEMO_PATH = '/liivv-health/womens-health-demo';
+export const CLAIR_HEALTH_PATH = `${WOMEN_HEALTH_DEMO_PATH}/clair-health`;
+export const SHOP_WOMENS_HEALTH_PATH = '/liivv-health/womens-health/shop-womens-health';
 
-const LIIVV_HEALTH_NAV: LiivvArchiveNavLink = {
-  label: 'Liivv Health',
-  href: WOMEN_HEALTH_DEMO_PATH,
-  columns: [
+/**
+ * Keep labels/slugs in sync with
+ * `app/.../womens-health-demo/chapters/chapters-data.ts`.
+ * Defined here (not imported) so the site header stays free of chapter page copy.
+ */
+const CHAPTER_LINKS = [
+  {
+    label: 'Foundation & First Cycles',
+    href: `${WOMEN_HEALTH_DEMO_PATH}/chapters/foundation-first-cycles`,
+  },
+  {
+    label: 'Rhythm & Balance',
+    href: `${WOMEN_HEALTH_DEMO_PATH}/chapters/rhythm-and-balance`,
+  },
+  {
+    label: 'Reset & Recharge',
+    href: `${WOMEN_HEALTH_DEMO_PATH}/chapters/reset-and-recharge`,
+  },
+  {
+    label: 'Grow & Recover',
+    href: `${WOMEN_HEALTH_DEMO_PATH}/chapters/grow-and-recover`,
+  },
+  {
+    label: 'Transition & Relief',
+    href: `${WOMEN_HEALTH_DEMO_PATH}/chapters/transition-and-relief`,
+  },
+  {
+    label: 'Longevity & Vitality',
+    href: `${WOMEN_HEALTH_DEMO_PATH}/chapters/longevity-and-vitality`,
+  },
+] as const;
+
+/** Custom header nav for the Women’s Health demo route only. */
+export function getWomensHealthDemoNav(): LiivvArchiveNavLink[] {
+  return [
     {
-      links: [
+      label: "Women's Health",
+      href: WOMEN_HEALTH_DEMO_PATH,
+    },
+    {
+      label: 'Find Your Chapter',
+      href: `${WOMEN_HEALTH_DEMO_PATH}#where-are-you`,
+      columns: [
         {
-          label: "Women's Health Demo",
-          href: WOMEN_HEALTH_DEMO_PATH,
+          links: [...CHAPTER_LINKS],
         },
       ],
     },
-  ],
-};
+    {
+      label: "Shop Women's Health Essentials",
+      href: SHOP_WOMENS_HEALTH_PATH,
+    },
+    {
+      label: 'Clair Health',
+      href: CLAIR_HEALTH_PATH,
+    },
+  ];
+}
 
 export function shouldShowLiivvHealthNav(pathname: string): boolean {
   return pathnameMatchesPrefix(pathname, WOMEN_HEALTH_DEMO_PATH);
-}
-
-/** Insert Liivv Health after “Liivv Your Life” (or before Blog) when on the WH demo. */
-export function injectLiivvHealthNav(links: LiivvArchiveNavLink[]): LiivvArchiveNavLink[] {
-  if (links.some((link) => link.label.trim().toLowerCase() === 'liivv health')) {
-    return links;
-  }
-
-  const afterYourLife = links.findIndex((link) =>
-    /liivv\s+your\s+life/i.test(link.label.trim()),
-  );
-
-  if (afterYourLife >= 0) {
-    return [...links.slice(0, afterYourLife + 1), LIIVV_HEALTH_NAV, ...links.slice(afterYourLife + 1)];
-  }
-
-  const beforeBlog = links.findIndex((link) => /^blog$/i.test(link.label.trim()));
-
-  if (beforeBlog >= 0) {
-    return [...links.slice(0, beforeBlog), LIIVV_HEALTH_NAV, ...links.slice(beforeBlog)];
-  }
-
-  return [...links, LIIVV_HEALTH_NAV];
 }

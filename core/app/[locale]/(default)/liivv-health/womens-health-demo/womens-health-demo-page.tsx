@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type TransitionEvent } from 'react';
 
 import { CHAPTERS as CHAPTER_PAGES, chapterHref } from './chapters/chapters-data';
 import type { WhDemoCatalog, WhDemoCatalogItem } from './get-wh-demo-catalog';
@@ -16,6 +16,41 @@ const PHARMACIST_HREF = '/account/virtual-care';
 const CLAIR_HREF = '/liivv-health/womens-health-demo/clair-health';
 const CLAIR_PREORDER_HREF = '/clair-health-wristband/';
 const IMG = '/archive/womens-health-demo';
+const HERO_FLOAT_KIT_IMG = `${IMG}/door-shop-kit.jpg`;
+const HERO_FLOAT_CLAIR_IMG = `${IMG}/clair-official-hero.jpg`;
+
+const CLAIR_FRAME_COUNT = 40;
+const CLAIR_FRAME_FPS = 8;
+const CLAIR_FRAME_SRC = (index: number) =>
+  `${IMG}/clair-frames/frame-${String(index + 1).padStart(3, '0')}.webp`;
+const CLAIR_FRAME_POSTER = CLAIR_FRAME_SRC(0);
+
+const KIT_FLOW_STEPS = [
+  {
+    id: 'customize',
+    num: '01',
+    title: 'Customize',
+    body: 'Tune quantities on what\'s already in your kit — keep what helps, dial back the rest.',
+  },
+  {
+    id: 'add',
+    num: '02',
+    title: 'Add something new',
+    body: 'Missing a wipe, vitamin, or comfort pick? Add it to the tray before you save.',
+  },
+  {
+    id: 'cart',
+    num: '03',
+    title: 'Add to cart',
+    body: 'Checkout when you\'re ready. Same calm flow, same discreet delivery.',
+  },
+  {
+    id: 'save',
+    num: '04',
+    title: 'Save for later',
+    body: 'Keep your version for next month — no starting from scratch.',
+  },
+] as const;
 
 const CLAIR_HORMONES = ['Estrogen', 'Progesterone', 'LH', 'FSH'] as const;
 const CLAIR_CHAPTERS = [
@@ -40,7 +75,7 @@ const DOORS = [
     label: 'Shop',
     title: 'The Women\'s edit',
     body: 'Essentials, kits, and glow — curated for real routines.',
-    href: '#shop-womens-health',
+    href: '#build-your-kit',
     image: `${IMG}/door-shop-kit.jpg`,
   },
   {
@@ -55,7 +90,7 @@ const DOORS = [
     id: 'chapters',
     label: 'Chapters',
     title: 'Find your season',
-    body: 'Six life chapters — pick where you are, not a number.',
+    body: 'Six life chapters of care — for the season you\'re in, not an age band.',
     href: '#where-are-you',
     image: `${IMG}/door-chapters.jpg`,
   },
@@ -80,14 +115,6 @@ const SHOP_ROOMS = [
 
 type ShopRoomId = (typeof SHOP_ROOMS)[number]['id'];
 
-const KIT_DEMO_LINES = [
-  { id: 'pads', name: 'Organic cotton pads', qty: 2 },
-  { id: 'heat', name: 'Gentle heat wrap', qty: 1 },
-  { id: 'skin', name: 'Hormonal skin basics', qty: 1 },
-  { id: 'wipe', name: 'Intimate wipes', qty: 1 },
-  { id: 'vitamins', name: 'Teen vitamin edit', qty: 1 },
-] as const;
-
 function roomForProduct(product: WhDemoCatalogItem): Exclude<ShopRoomId, 'all'> {
   const n = product.name.toLowerCase();
 
@@ -108,6 +135,10 @@ function roomForProduct(product: WhDemoCatalogItem): Exclude<ShopRoomId, 'all'> 
   return 'glow';
 }
 
+function hasDisplayPrice(priceLabel?: string) {
+  return Boolean(priceLabel && !/(\$|CA\$)?\s*0([.,]0+)?\b/i.test(priceLabel));
+}
+
 function ProductThumb({ product }: { product: WhDemoCatalogItem }) {
   return (
     <a className="wh-product-card" href={product.path}>
@@ -121,9 +152,211 @@ function ProductThumb({ product }: { product: WhDemoCatalogItem }) {
       <div className="wh-product-meta">
         {product.isKit ? <span className="wh-product-badge">Customizable kit</span> : null}
         <h3>{product.name}</h3>
-        {product.priceLabel ? <p className="wh-product-price">{product.priceLabel}</p> : null}
+        {hasDisplayPrice(product.priceLabel) ? (
+          <p className="wh-product-price">{product.priceLabel}</p>
+        ) : null}
       </div>
     </a>
+  );
+}
+
+function KitsCarousel({
+  kits,
+  initialId,
+}: {
+  kits: WhDemoCatalogItem[];
+  initialId?: number | null;
+}) {
+  const startIndex = useMemo(() => {
+    if (!initialId) return 0;
+    const index = kits.findIndex((kit) => kit.entityId === initialId);
+    return index >= 0 ? index : 0;
+  }, [kits, initialId]);
+
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const busyRef = useRef(false);
+  const [active, setActive] = useState(startIndex);
+  const [shift, setShift] = useState(0);
+  const [instant, setInstant] = useState(false);
+  const [viewportW, setViewportW] = useState(0);
+  const count = kits.length;
+  const gap = 14;
+
+  useEffect(() => {
+    setActive(startIndex);
+    setShift(0);
+    busyRef.current = false;
+  }, [startIndex]);
+
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    const measure = () => setViewportW(viewport.clientWidth);
+    measure();
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(viewport);
+    return () => observer.disconnect();
+  }, [count]);
+
+  if (count === 0) return null;
+
+  const slideW =
+    viewportW > 0 ? Math.round(Math.min(viewportW * (viewportW < 900 ? 0.92 : 0.72), 820)) : 0;
+  const step = slideW + gap;
+  const baseTx = viewportW > 0 && slideW > 0 ? (viewportW - slideW) / 2 - 2 * step : 0;
+  const tx = baseTx - shift * step;
+
+  const go = (dir: -1 | 1) => {
+    if (busyRef.current || count < 2 || slideW <= 0) return;
+    busyRef.current = true;
+    setShift(dir);
+  };
+
+  const handleTransitionEnd = (event: TransitionEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.propertyName !== 'transform') return;
+    if (shift === 0) return;
+
+    const dir = shift;
+    setInstant(true);
+    setActive((index) => (index + dir + count) % count);
+    setShift(0);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setInstant(false);
+        busyRef.current = false;
+      });
+    });
+  };
+
+  const at = (offset: number) => kits[(active + offset + count) % count]!;
+
+  const slots = [
+    { kit: at(-2), offset: -2 },
+    { kit: at(-1), offset: -1 },
+    { kit: at(0), offset: 0 },
+    { kit: at(1), offset: 1 },
+    { kit: at(2), offset: 2 },
+  ];
+
+  const renderFeature = (kit: WhDemoCatalogItem, offset: number) => {
+    const isFeatured = kit.entityId === FIRST_CYCLE_STARTER_KIT_ID;
+    const isCenter = offset === shift;
+    const body = (
+      <>
+        <div className="wh-kit-feature-media">
+          {kit.image ? (
+            <img alt={isCenter ? kit.image.alt : ''} src={kit.image.src} />
+          ) : (
+            <div aria-hidden className="wh-product-fallback" />
+          )}
+        </div>
+        <div className="wh-kit-feature-copy">
+          <span className="wh-product-badge">{isFeatured ? 'Featured kit' : 'Customizable kit'}</span>
+          <h3>{kit.name}</h3>
+          {hasDisplayPrice(kit.priceLabel) ? (
+            <p className="wh-product-price">{kit.priceLabel}</p>
+          ) : (
+            <p className="wh-product-price wh-product-price--spacer">&nbsp;</p>
+          )}
+          <p>
+            {isFeatured
+              ? 'A calm first-chapter edit — open it to tune quantities, add what was missing, and save your version.'
+              : 'Open it to tune quantities, add what was missing, and save your version.'}
+          </p>
+          {isCenter && shift === 0 ? (
+            <a className="btn btn-dark" href={kit.path}>
+              Customize this kit
+            </a>
+          ) : (
+            <span className="btn btn-dark wh-kit-feature-cta-ghost">Customize this kit</span>
+          )}
+        </div>
+      </>
+    );
+
+    if (isCenter && shift === 0) {
+      return (
+        <article
+          aria-current="true"
+          className="wh-kit-feature wh-kits-carousel-slide is-center"
+          key={`${kit.entityId}-${offset}`}
+          style={{ width: slideW || undefined }}
+        >
+          {body}
+        </article>
+      );
+    }
+
+    return (
+      <button
+        aria-hidden={Math.abs(offset) > 1 || undefined}
+        aria-label={`Show ${kit.name}`}
+        className={`wh-kit-feature wh-kits-carousel-slide${isCenter ? ' is-center' : ' is-side'}${
+          offset < shift ? ' is-prev' : offset > shift ? ' is-next' : ''
+        }`}
+        disabled={shift !== 0}
+        key={`${kit.entityId}-${offset}`}
+        onClick={() => go(offset < 0 ? -1 : 1)}
+        style={{ width: slideW || undefined }}
+        type="button"
+      >
+        {body}
+      </button>
+    );
+  };
+
+  return (
+    <div className="wh-kits-carousel">
+      <p className="wh-kits-carousel-count">
+        {active + 1} / {count} kits
+      </p>
+
+      <div className="wh-kits-carousel-frame">
+        {count > 1 ? (
+          <button
+            aria-label="Previous kit"
+            className="wh-kits-carousel-btn is-prev"
+            onClick={() => go(-1)}
+            type="button"
+          >
+            ←
+          </button>
+        ) : null}
+
+        <div
+          aria-label="Women's Health kits carousel"
+          aria-roledescription="carousel"
+          className="wh-kits-carousel-viewport"
+          ref={viewportRef}
+        >
+          <div
+            className={`wh-kits-carousel-track${instant ? ' is-instant' : ''}`}
+            onTransitionEnd={handleTransitionEnd}
+            style={{
+              gap,
+              transform: slideW > 0 ? `translate3d(${tx}px, 0, 0)` : undefined,
+            }}
+          >
+            {slots.map(({ kit, offset }) => renderFeature(kit, offset))}
+          </div>
+        </div>
+
+        {count > 1 ? (
+          <button
+            aria-label="Next kit"
+            className="wh-kits-carousel-btn is-next"
+            onClick={() => go(1)}
+            type="button"
+          >
+            →
+          </button>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
@@ -143,18 +376,564 @@ function Pic({
   );
 }
 
+/** Clair page frame sequence, autoplayed as a silent ping-pong loop. */
+function ClairFrameLoop() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const framesRef = useRef<(HTMLImageElement | null)[]>([]);
+  const frameIndexRef = useRef(0);
+  const directionRef = useRef<1 | -1>(1);
+  const rafRef = useRef(0);
+  const [ready, setReady] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  const paint = useCallback((index: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const frame =
+      framesRef.current[index] ??
+      framesRef.current.slice(0, index + 1).reverse().find(Boolean) ??
+      framesRef.current.find(Boolean);
+
+    if (!frame) return;
+
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    if (width < 1 || height < 1) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+    }
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const scale = Math.max(width / frame.naturalWidth, height / frame.naturalHeight);
+    const drawW = frame.naturalWidth * scale;
+    const drawH = frame.naturalHeight * scale;
+    ctx.drawImage(frame, (width - drawW) / 2, (height - drawH) / 2, drawW, drawH);
+  }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setReduceMotion(media.matches);
+    sync();
+    media.addEventListener('change', sync);
+    return () => media.removeEventListener('change', sync);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    framesRef.current = Array.from({ length: CLAIR_FRAME_COUNT }, () => null);
+
+    const loadFrame = (index: number) =>
+      new Promise<void>((resolve) => {
+        const image = new Image();
+        image.decoding = 'async';
+        image.onload = () => {
+          if (!cancelled) framesRef.current[index] = image;
+          resolve();
+        };
+        image.onerror = () => resolve();
+        image.src = CLAIR_FRAME_SRC(index);
+      });
+
+    void (async () => {
+      await loadFrame(0);
+      if (cancelled) return;
+      paint(0);
+      setReady(true);
+
+      const rest = Array.from({ length: CLAIR_FRAME_COUNT - 1 }, (_, i) => loadFrame(i + 1));
+      await Promise.all(rest);
+      if (!cancelled) paint(frameIndexRef.current);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [paint]);
+
+  useEffect(() => {
+    if (!ready || reduceMotion) return;
+
+    const intervalMs = 1000 / CLAIR_FRAME_FPS;
+    const lastFrame = CLAIR_FRAME_COUNT - 1;
+    let last = performance.now();
+
+    const tick = (now: number) => {
+      if (now - last >= intervalMs) {
+        last = now;
+        let next = frameIndexRef.current + directionRef.current;
+
+        if (next >= lastFrame) {
+          next = lastFrame;
+          directionRef.current = -1;
+        } else if (next <= 0) {
+          next = 0;
+          directionRef.current = 1;
+        }
+
+        frameIndexRef.current = next;
+        paint(next);
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    const onResize = () => paint(frameIndexRef.current);
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [paint, ready, reduceMotion]);
+
+  return (
+    <>
+      <img
+        alt=""
+        aria-hidden
+        className="wh-clair-poster"
+        decoding="async"
+        src={CLAIR_FRAME_POSTER}
+      />
+      <canvas
+        aria-hidden
+        className={`wh-clair-canvas${ready && !reduceMotion ? ' is-ready' : ''}`}
+        ref={canvasRef}
+      />
+    </>
+  );
+}
+
+const KIT_SEARCH_FALLBACKS = [
+  'Intimate wipes',
+  'Period underwear',
+  'Magnesium calm pack',
+  'Cycle comfort tea',
+  'Soft heat wrap refill',
+] as const;
+
+const EMPTY_SEARCH_POOL: string[] = [];
+const EMPTY_PRODUCTS: WhDemoCatalogItem[] = [];
+
+type KitPointerTarget = 'qty' | 'add' | 'search' | 'cart' | 'save';
+
+function KitFlowDemo({
+  kitName,
+  kitImage,
+  kitHref,
+  searchPool = EMPTY_SEARCH_POOL,
+}: {
+  kitName?: string;
+  kitImage?: { src: string; alt: string } | null;
+  kitHref?: string;
+  searchPool?: string[];
+}) {
+  const [step, setStep] = useState(0);
+  const [padsCount, setPadsCount] = useState(2);
+  const [addedItem, setAddedItem] = useState<string | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchHighlight, setSearchHighlight] = useState(false);
+  const [activeTarget, setActiveTarget] = useState<KitPointerTarget | null>(null);
+  const [pointer, setPointer] = useState({ x: 72, y: 48, visible: false, clicking: false });
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  const pageRef = useRef<HTMLDivElement>(null);
+  const qtyRef = useRef<HTMLSpanElement>(null);
+  const addRef = useRef<HTMLLIElement>(null);
+  const searchResultRef = useRef<HTMLLIElement>(null);
+  const cartRef = useRef<HTMLButtonElement>(null);
+  const saveRef = useRef<HTMLButtonElement>(null);
+  const catalogNamesRef = useRef<string[]>([...KIT_SEARCH_FALLBACKS]);
+
+  const title = kitName ?? 'First Cycle Starter Kit';
+  const href = kitHref ?? '#';
+  const imageSrc = kitImage?.src ?? `${IMG}/door-shop-kit.jpg`;
+  const imageAlt = kitImage?.alt ?? title;
+
+  const catalogNames = useMemo(() => {
+    const names = searchPool.map((name) => name.trim()).filter(Boolean);
+    return names.length > 0 ? names : [...KIT_SEARCH_FALLBACKS];
+  }, [searchPool]);
+
+  catalogNamesRef.current = catalogNames;
+
+  const measurePointer = useCallback((target: KitPointerTarget | null, clicking = false) => {
+    const page = pageRef.current;
+    if (!page || !target) {
+      setPointer((prev) => ({ ...prev, visible: Boolean(target), clicking: false }));
+      return;
+    }
+
+    const node =
+      target === 'qty'
+        ? qtyRef.current
+        : target === 'add'
+          ? addRef.current
+          : target === 'search'
+            ? searchResultRef.current
+            : target === 'cart'
+              ? cartRef.current
+              : saveRef.current;
+
+    if (!node) return;
+
+    const pageBox = page.getBoundingClientRect();
+    const box = node.getBoundingClientRect();
+    const x = box.left - pageBox.left + box.width * 0.55;
+    const y = box.top - pageBox.top + box.height * 0.55;
+    setPointer({ x, y, visible: true, clicking });
+  }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setReduceMotion(media.matches);
+    sync();
+    media.addEventListener('change', sync);
+    return () => media.removeEventListener('change', sync);
+  }, []);
+
+  useEffect(() => {
+    if (reduceMotion || !activeTarget) return;
+    const id = window.requestAnimationFrame(() => {
+      measurePointer(activeTarget, false);
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [activeTarget, searchOpen, searchHighlight, addedItem, padsCount, measurePointer, reduceMotion]);
+
+  useEffect(() => {
+    if (reduceMotion) {
+      setStep(0);
+      setPadsCount(3);
+      setAddedItem(catalogNamesRef.current[0] ?? 'Intimate wipes');
+      setSearchOpen(false);
+      setActiveTarget(null);
+      setPointer((prev) => ({ ...prev, visible: false, clicking: false }));
+      return;
+    }
+
+    let cancelled = false;
+    let timerId = 0;
+
+    const wait = (ms: number) =>
+      new Promise<void>((resolve) => {
+        timerId = window.setTimeout(() => {
+          if (!cancelled) resolve();
+        }, ms);
+      });
+
+    const pickProduct = () => {
+      const names = catalogNamesRef.current;
+      return names[Math.floor(Math.random() * names.length)] ?? 'Intimate wipes';
+    };
+
+    const aim = async (target: KitPointerTarget, settleMs = 700) => {
+      if (cancelled) return;
+      setActiveTarget(target);
+      await wait(50);
+      if (cancelled) return;
+      measurePointer(target, false);
+      await wait(settleMs);
+    };
+
+    const click = async (target: KitPointerTarget) => {
+      if (cancelled) return;
+      setActiveTarget(target);
+      measurePointer(target, true);
+      await wait(260);
+      if (cancelled) return;
+      setPointer((prev) => ({ ...prev, clicking: false }));
+      await wait(200);
+    };
+
+    const run = async () => {
+      while (!cancelled) {
+        setStep(0);
+        setPadsCount(2);
+        setAddedItem(null);
+        setSearchOpen(false);
+        setSearchQuery('');
+        setSearchHighlight(false);
+        setActiveTarget(null);
+        await wait(450);
+        if (cancelled) break;
+
+        await aim('qty');
+        if (cancelled) break;
+        await click('qty');
+        if (cancelled) break;
+        setPadsCount(3);
+        await wait(1200);
+        if (cancelled) break;
+
+        setStep(1);
+        await wait(350);
+        if (cancelled) break;
+        await aim('add');
+        if (cancelled) break;
+        await click('add');
+        if (cancelled) break;
+
+        setSearchOpen(true);
+        setSearchQuery('');
+        setSearchHighlight(false);
+        await wait(300);
+        if (cancelled) break;
+
+        const product = pickProduct();
+        for (let i = 1; i <= product.length; i += 1) {
+          if (cancelled) break;
+          setSearchQuery(product.slice(0, i));
+          await wait(48 + (i % 3) * 10);
+        }
+        if (cancelled) break;
+
+        await wait(250);
+        if (cancelled) break;
+        setSearchHighlight(true);
+        await wait(140);
+        if (cancelled) break;
+
+        await aim('search', 600);
+        if (cancelled) break;
+        await click('search');
+        if (cancelled) break;
+
+        setSearchOpen(false);
+        setSearchHighlight(false);
+        setSearchQuery('');
+        setAddedItem(product);
+        setActiveTarget(null);
+        await wait(1100);
+        if (cancelled) break;
+
+        setStep(2);
+        await wait(350);
+        if (cancelled) break;
+        await aim('cart');
+        if (cancelled) break;
+        await click('cart');
+        if (cancelled) break;
+        await wait(1200);
+        if (cancelled) break;
+
+        setStep(3);
+        await wait(350);
+        if (cancelled) break;
+        await aim('save');
+        if (cancelled) break;
+        await click('save');
+        if (cancelled) break;
+        await wait(1400);
+      }
+    };
+
+    void run();
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timerId);
+    };
+  }, [measurePointer, reduceMotion]);
+
+  const active = KIT_FLOW_STEPS[step] ?? KIT_FLOW_STEPS[0];
+  const searchResults = catalogNames
+    .filter((name) => name.toLowerCase().includes(searchQuery.toLowerCase()) || searchQuery.length < 2)
+    .slice(0, 4);
+  const highlighted = searchResults[0] ?? addedItem ?? 'Intimate wipes';
+
+  return (
+    <div className="wh-kit-flow" data-step={active.id}>
+      <div className="wh-kit-flow-steps" role="tablist" aria-label="How kits work">
+        {KIT_FLOW_STEPS.map((item, index) => (
+          <button
+            aria-selected={index === step}
+            className={index === step ? 'is-active' : undefined}
+            key={item.id}
+            role="tab"
+            type="button"
+          >
+            <span className="wh-kit-flow-num">{item.num}</span>
+            <span className="wh-kit-flow-label">{item.title}</span>
+          </button>
+        ))}
+      </div>
+
+      <p className="wh-kit-flow-caption" aria-live="polite">
+        <strong>{active.title}.</strong> {active.body}
+      </p>
+
+      <div aria-hidden className="wh-kit-page" ref={pageRef}>
+        <div className="wh-kit-page-chrome">
+          <span />
+          <span />
+          <span />
+          <em>liivv.ca{href.startsWith('/') ? href : `/${href}`}</em>
+        </div>
+
+        <div className="wh-kit-page-body">
+          <div className="wh-kit-page-product">
+            <div className="wh-kit-page-media">
+              <img alt={imageAlt} src={imageSrc} />
+            </div>
+            <span className="wh-product-badge">Featured kit</span>
+            <h3>{title}</h3>
+            <p>A calm first-chapter edit — customize quantities, add what was missing, then save or checkout.</p>
+          </div>
+
+          <div className="wh-kit-page-tray">
+            <div className="wh-kit-page-tray-head">
+              <h4>Your kit tray</h4>
+              <span>Live preview</span>
+            </div>
+
+            <ul className="wh-kit-page-lines">
+              <li className={`wh-kit-page-line${activeTarget === 'qty' && pointer.clicking ? ' is-pressed' : ''}`}>
+                <div>
+                  <strong>Organic cotton pads</strong>
+                  <em>Starter staple</em>
+                </div>
+                <div className="wh-kit-page-qty">
+                  <span>−</span>
+                  <b>{padsCount}</b>
+                  <span
+                    className={`wh-kit-page-qty-plus${activeTarget === 'qty' && pointer.clicking ? ' is-pressed' : ''}`}
+                    ref={qtyRef}
+                  >
+                    +
+                  </span>
+                </div>
+              </li>
+              <li className="wh-kit-page-line">
+                <div>
+                  <strong>Gentle heat wrap</strong>
+                  <em>For cramp days</em>
+                </div>
+                <div className="wh-kit-page-qty">
+                  <span>−</span>
+                  <b>1</b>
+                  <span>+</span>
+                </div>
+              </li>
+              <li className="wh-kit-page-line">
+                <div>
+                  <strong>Hormonal skin basics</strong>
+                  <em>Calm routine</em>
+                </div>
+                <div className="wh-kit-page-qty">
+                  <span>−</span>
+                  <b>1</b>
+                  <span>+</span>
+                </div>
+              </li>
+              {addedItem ? (
+                <li className="wh-kit-page-line wh-kit-page-line--new" key={addedItem}>
+                  <div>
+                    <strong>{addedItem}</strong>
+                    <em>Just added</em>
+                  </div>
+                  <div className="wh-kit-page-qty">
+                    <span>−</span>
+                    <b>1</b>
+                    <span>+</span>
+                  </div>
+                </li>
+              ) : null}
+              <li
+                className={`wh-kit-page-line wh-kit-page-line--add${activeTarget === 'add' && pointer.clicking ? ' is-pressed' : ''}`}
+                ref={addRef}
+              >
+                + Add something new
+              </li>
+            </ul>
+
+            <div className="wh-kit-page-actions">
+              <button
+                className={`wh-kit-page-save${activeTarget === 'save' && pointer.clicking ? ' is-pressed' : ''}`}
+                ref={saveRef}
+                type="button"
+              >
+                Save for later
+              </button>
+              <button
+                className={`wh-kit-page-cart${activeTarget === 'cart' && pointer.clicking ? ' is-pressed' : ''}`}
+                ref={cartRef}
+                type="button"
+              >
+                Add to cart
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {searchOpen ? (
+          <div className="wh-kit-search">
+            <div className="wh-kit-search-card">
+              <p className="wh-kit-search-label">Search the edit</p>
+              <div className="wh-kit-search-input">
+                <span>{searchQuery}</span>
+                <i className="wh-kit-search-caret" />
+              </div>
+              <ul className="wh-kit-search-results">
+                {(searchQuery.length > 1 ? searchResults : catalogNames.slice(0, 3)).map((name) => (
+                  <li
+                    className={searchHighlight && name === highlighted ? 'is-active' : undefined}
+                    key={name}
+                    ref={searchHighlight && name === highlighted ? searchResultRef : undefined}
+                  >
+                    {name}
+                    {searchHighlight && name === highlighted ? <em>Add</em> : null}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ) : null}
+
+        {!reduceMotion && pointer.visible ? (
+          <div
+            className={`wh-kit-cursor${pointer.clicking ? ' is-clicking' : ''}`}
+            style={{
+              transform: `translate3d(${Math.max(pointer.x - 3, 0)}px, ${Math.max(pointer.y - 2, 0)}px, 0)`,
+            }}
+          >
+            <svg fill="none" height="28" viewBox="0 0 24 28" width="24" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M4 2.5 4 22.2l5.1-4.4 3.1 7.3 2.6-1.1-3.1-7.2L19.5 16 4 2.5Z"
+                fill="#312f2f"
+                stroke="#f5f2ed"
+                strokeLinejoin="round"
+                strokeWidth="1.4"
+              />
+            </svg>
+            <span className="wh-kit-cursor-ripple" />
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
   const [feelingIndex, setFeelingIndex] = useState(0);
   const [shopRoom, setShopRoom] = useState<ShopRoomId>('all');
-  const [kitLines, setKitLines] = useState(() =>
-    KIT_DEMO_LINES.map((line) => ({ ...line })),
-  );
 
-  const featuredKit = catalog?.featuredKit ?? null;
-  const otherKits = (catalog?.kits ?? []).filter((k) => k.entityId !== featuredKit?.entityId);
-  const shopProducts = catalog?.products ?? [];
-  const hasKits = Boolean(featuredKit) || otherKits.length > 0;
+  const allKits = catalog?.kits ?? [];
+  const featuredKit = catalog?.featuredKit ?? allKits[0] ?? null;
+  const shopProducts = catalog?.products ?? EMPTY_PRODUCTS;
+  const hasKits = allKits.length > 0;
   const hasShop = shopProducts.length > 0;
+  const kitSearchPool = useMemo(
+    () => (catalog?.products ?? []).map((product) => product.name),
+    [catalog?.products],
+  );
 
   const heroFloatProducts = useMemo(() => {
     const all = [...(catalog?.kits ?? []), ...(catalog?.products ?? [])];
@@ -199,14 +978,6 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
     return () => window.clearInterval(id);
   }, []);
 
-  const bumpQty = (id: string, delta: number) => {
-    setKitLines((lines) =>
-      lines.map((line) =>
-        line.id === id ? { ...line, qty: Math.max(0, line.qty + delta) } : line,
-      ),
-    );
-  };
-
   return (
     <div id="wh-demo">
       {/* 1 — Feeling hero */}
@@ -244,13 +1015,13 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
           <div aria-hidden className="hero-frame hero-frame--a hero-frame--product">
             <img
               alt={heroFloatPrimary.image?.alt || heroFloatPrimary.name}
-              src={heroFloatPrimary.image?.src ?? `${IMG}/hero-a.jpg`}
+              src={HERO_FLOAT_KIT_IMG}
             />
           </div>
           <div aria-hidden className="hero-frame hero-frame--b hero-frame--product">
             <img
               alt={heroFloatSecondary.image?.alt || heroFloatSecondary.name}
-              src={heroFloatSecondary.image?.src ?? `${IMG}/hero-b.jpg`}
+              src={HERO_FLOAT_CLAIR_IMG}
             />
           </div>
         </div>
@@ -285,127 +1056,29 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
         </div>
       </section>
 
-      {/* 4 — Where are you? */}
-      <section aria-label="Find your chapter" className="wh-chooser" id="where-are-you">
-        <div className="container">
-          <span className="eyebrow">Life chapters</span>
-          <h2>Where are you right now?</h2>
-          <p className="wh-chooser-intro">
-            Chapters follow your season — not an age band. Tap one to open the full page.
-          </p>
-          <div className="wh-chooser-grid">
-            {CHAPTER_CHOOSER.map((chapter) => (
-              <a className="wh-chooser-card" href={chapter.href} key={chapter.num}>
-                <div className="wh-chooser-media">
-                  <img alt="" src={chapter.image} />
-                  <span className="wh-chooser-num">{chapter.num}</span>
-                </div>
-                <h3>{chapter.title}</h3>
-                <p>{chapter.blurb}</p>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 5 — Kit living object */}
+      {/* 4 — Featured kit */}
       {hasKits ? (
         <section aria-label="Customizable kits" className="wh-kits rounded-top" id="build-your-kit">
           <div className="container">
             <span className="eyebrow">Liivv kits</span>
             <h2>Start curated. Finish as yours.</h2>
             <p className="wh-kits-intro">
-              Prebuilt for the chapter — then you tune qty, add what was missing, and save it for later.
-              More kits are coming; the flow stays the same.
+              Prebuilt for the chapter — then customize on the kit page and save it for later.
             </p>
 
-            {featuredKit ? (
-              <div className="wh-kit-board">
-                <div className="wh-kit-board-visual">
-                  <div className="wh-kit-board-hero">
-                    {featuredKit.image ? (
-                      <img alt={featuredKit.image.alt} src={featuredKit.image.src} />
-                    ) : (
-                      <div aria-hidden className="wh-product-fallback" />
-                    )}
-                  </div>
-                  <div className="wh-kit-board-meta">
-                    <span className="wh-product-badge">Featured kit</span>
-                    <h3>{featuredKit.name}</h3>
-                    {featuredKit.priceLabel ? (
-                      <p className="wh-product-price">{featuredKit.priceLabel}</p>
-                    ) : null}
-                    <p>
-                      A calm first-chapter edit. Play with the tray below — then open the real customizer to
-                      save your version.
-                    </p>
-                    <a className="btn btn-dark" href={featuredKit.path}>
-                      Customize this kit
-                    </a>
-                  </div>
-                </div>
+            <KitFlowDemo
+              kitHref={featuredKit?.path}
+              kitImage={featuredKit?.image}
+              kitName={featuredKit?.name}
+              searchPool={kitSearchPool}
+            />
 
-                <div className="wh-kit-tray" aria-label="Demo kit tray">
-                  <div className="wh-kit-tray-head">
-                    <h4>Your kit tray</h4>
-                    <span>Demo — opens fully on the product page</span>
-                  </div>
-                  <ul className="wh-kit-lines">
-                    {kitLines.map((line) => (
-                      <li key={line.id}>
-                        <div>
-                          <strong>{line.name}</strong>
-                          {line.qty === 0 ? <em>Removed</em> : null}
-                        </div>
-                        <div className="wh-kit-qty">
-                          <button
-                            aria-label={`Decrease ${line.name}`}
-                            onClick={() => bumpQty(line.id, -1)}
-                            type="button"
-                          >
-                            −
-                          </button>
-                          <span>{line.qty}</span>
-                          <button
-                            aria-label={`Increase ${line.name}`}
-                            onClick={() => bumpQty(line.id, 1)}
-                            type="button"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </li>
-                    ))}
-                    <li className="wh-kit-add">
-                      <span>+ Add something new</span>
-                      <a href={featuredKit.path}>On the kit page</a>
-                    </li>
-                  </ul>
-                  <div className="wh-kit-tray-foot">
-                    <span className="wh-kit-save-chip">Save for later</span>
-                    <a className="btn btn-outline" href={featuredKit.path}>
-                      Open full customizer
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ) : null}
-
-            {otherKits.length > 0 ? (
-              <div className="wh-kit-more">
-                <h3>More kits in the edit</h3>
-                <div className="wh-product-grid">
-                  {otherKits.map((kit) => (
-                    <ProductThumb key={kit.entityId} product={kit} />
-                  ))}
-                </div>
-              </div>
-            ) : null}
+            <KitsCarousel initialId={featuredKit?.entityId} kits={allKits} />
           </div>
         </section>
       ) : null}
 
-      {/* 6 — Shop rooms */}
+      {/* 5 — Shop rooms */}
       {hasShop ? (
         <section aria-label="Shop Women's Health" className="wh-shop" id="shop-womens-health">
           <div className="container">
@@ -446,6 +1119,29 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
         </section>
       ) : null}
 
+      {/* 6 — Life chapters */}
+      <section aria-label="Find your chapter" className="wh-chooser" id="where-are-you">
+        <div className="container">
+          <span className="eyebrow">Life chapters</span>
+          <h2>Six chapters. One that fits.</h2>
+          <p className="wh-chooser-intro">
+            Not an age band — a season. Open the one that feels like you.
+          </p>
+          <div className="wh-chooser-grid">
+            {CHAPTER_CHOOSER.map((chapter) => (
+              <a className="wh-chooser-card" href={chapter.href} key={chapter.num}>
+                <div className="wh-chooser-media">
+                  <img alt="" src={chapter.image} />
+                  <span className="wh-chooser-num">{chapter.num}</span>
+                </div>
+                <h3>{chapter.title}</h3>
+                <p>{chapter.blurb}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* 7 — Care */}
       <section className="images-text rounded-top" id="care">
         <div className="container images-text-grid">
@@ -474,6 +1170,10 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
 
       {/* 8 — Clair room */}
       <section aria-label="Clair continuous hormone wearable" className="wh-clair rounded-top" id="clair">
+        <div aria-hidden className="wh-clair-media">
+          <ClairFrameLoop />
+        </div>
+        <div aria-hidden className="wh-clair-veil" />
         <div className="container wh-clair-board">
           <div className="wh-clair-copy">
             <span className="eyebrow">Also in the edit · Clair Health</span>
@@ -511,21 +1211,6 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
               <a className="btn btn-outline" href={CLAIR_HREF}>
                 Learn more
               </a>
-            </div>
-          </div>
-
-          <div aria-hidden className="wh-clair-float">
-            <div className="wh-clair-float-main">
-              <img alt="" src={`${IMG}/clair-official-hero.jpg`} />
-            </div>
-            <div className="wh-clair-frame wh-clair-frame--chip">
-              <img alt="" src={`${IMG}/clair-official-product.jpg`} />
-            </div>
-            <div className="wh-clair-frame wh-clair-frame--round">
-              <img alt="" src={`${IMG}/clair-official-fertility.jpg`} />
-            </div>
-            <div className="wh-clair-frame wh-clair-frame--product">
-              <img alt="" src={`${IMG}/clair-official-training.jpg`} />
             </div>
           </div>
         </div>

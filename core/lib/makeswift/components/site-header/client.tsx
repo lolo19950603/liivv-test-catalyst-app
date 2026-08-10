@@ -30,7 +30,7 @@ import {
   type MakeswiftAdditionalLinkInput,
 } from '~/lib/makeswift/site-header/map-makeswift-nav-links';
 import {
-  injectLiivvHealthNav,
+  getWomensHealthDemoNav,
   shouldShowLiivvHealthNav,
 } from '~/lib/makeswift/site-header/inject-liivv-health-nav';
 import { resolveStoreNavLinks } from '~/lib/makeswift/site-header/resolve-store-nav-links';
@@ -276,7 +276,7 @@ export const MakeswiftHeader = forwardRef(
     const desktopLogo = resolveStoreLogo(storeLogo, storeLogoLabel);
     const resolvedNavLinks = resolveStoreNavLinks(links, categoryTree);
     const navLinks = shouldShowLiivvHealthNav(pathname)
-      ? injectLiivvHealthNav(resolvedNavLinks)
+      ? getWomensHealthDemoNav()
       : resolvedNavLinks;
 
     return (
@@ -291,7 +291,7 @@ export const MakeswiftHeader = forwardRef(
         initialCartCount={cartCount}
         linksPosition={linksPosition ?? 'left'}
         logo={desktopLogo}
-        navAriaLabel="Store"
+        navAriaLabel={shouldShowLiivvHealthNav(pathname) ? "Women's Health" : 'Store'}
         navLinks={navLinks}
         notifications={notifications}
         searchPlaceholder={searchPlaceholder}

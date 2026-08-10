@@ -11,7 +11,6 @@ import {
   useCallback,
   useEffect,
   useId,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -1063,43 +1062,45 @@ export function LiivvArchiveHeader({
     return () => window.cancelAnimationFrame(id);
   }, [searchDrawerOpen]);
 
-  // Pin header while mobile nav/search is open. `overflow: hidden` on body breaks
-  // `position: sticky`, so switch to fixed and reserve flow space with a spacer.
-  useLayoutEffect(() => {
-    const overlayOpen = mobileNavOpen || searchOpen;
-
-    if (!overlayOpen || typeof window === 'undefined') {
+  // Lock page scroll while the mobile nav is open without `overflow: hidden` on
+  // body (that breaks `position: sticky`) and without pinning the header to
+  // `top: 0` (that covers the Site Header Slideshow sitting above the header).
+  useEffect(() => {
+    if (!mobileNavOpen || typeof window === 'undefined') {
       return;
     }
 
-    const section = sectionRef.current;
-    const headerHeight = section?.getBoundingClientRect().height ?? 0;
-
-    let spacer: HTMLDivElement | null = null;
-    if (section?.parentElement && headerHeight > 0) {
-      spacer = document.createElement('div');
-      spacer.setAttribute('aria-hidden', 'true');
-      spacer.className = 'liivv-header-overlay-spacer';
-      spacer.style.cssText = `height:${String(headerHeight)}px;width:100%;flex-shrink:0;pointer-events:none;`;
-      section.parentElement.insertBefore(spacer, section);
-    }
-
     const body = document.body;
-    const prevOverflow = body.style.overflow;
-    const prevPaddingRight = body.style.paddingRight;
+    const scrollY = window.scrollY;
+    const prev = {
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+      paddingRight: body.style.paddingRight,
+    };
     const scrollbarGap = window.innerWidth - document.documentElement.clientWidth;
 
-    body.style.overflow = 'hidden';
+    body.style.position = 'fixed';
+    body.style.top = `-${String(scrollY)}px`;
+    body.style.left = '0';
+    body.style.right = '0';
+    body.style.width = '100%';
     if (scrollbarGap > 0) {
       body.style.paddingRight = `${String(scrollbarGap)}px`;
     }
 
     return () => {
-      spacer?.remove();
-      body.style.overflow = prevOverflow;
-      body.style.paddingRight = prevPaddingRight;
+      body.style.position = prev.position;
+      body.style.top = prev.top;
+      body.style.left = prev.left;
+      body.style.right = prev.right;
+      body.style.width = prev.width;
+      body.style.paddingRight = prev.paddingRight;
+      window.scrollTo(0, scrollY);
     };
-  }, [mobileNavOpen, searchOpen, sectionRef]);
+  }, [mobileNavOpen]);
 
   useEffect(() => {
     if (!mobileNavOpen || typeof window === 'undefined') {
@@ -1137,18 +1138,9 @@ export function LiivvArchiveHeader({
         }
       : undefined;
 
-  const overlayOpen = mobileNavOpen || searchOpen;
   const backgroundChannels = resolveSectionBackgroundChannels(background, '255 255 255');
   const pinStyle: CSSProperties = {
-    ...(sticky || overlayOpen
-      ? {
-          position: overlayOpen ? 'fixed' : 'sticky',
-          insetBlockStart: 0,
-          top: 0,
-          zIndex: overlayOpen ? 100 : 50,
-          ...(overlayOpen ? { left: 0, right: 0, width: '100%' } : {}),
-        }
-      : {}),
+    ...(sticky ? { position: 'sticky', insetBlockStart: 0, top: 0, zIndex: 50 } : {}),
     ...(backgroundChannels != null ? { '--color-background': backgroundChannels } : {}),
   };
   const sectionStyle = Object.keys(pinStyle).length > 0 ? pinStyle : undefined;

@@ -27,18 +27,28 @@ export {
   SHOP_WOMENS_HEALTH_CATEGORY_ID,
 } from './wh-demo-ids';
 
+/** BigCommerce Storefront GraphQL caps product connections at 50. */
+const PAGE_SIZE = 50;
+const MAX_PAGES = 3;
+
 const WhDemoCatalogQuery = graphql(
   `
     query WhDemoCatalog(
       $filters: SearchProductsFiltersInput!
       $first: Int
+      $after: String
       $currencyCode: currencyCode
       $featuredIds: [Int!]!
+      $includeFeatured: Boolean!
     ) {
       site {
         search {
           searchProducts(filters: $filters, sort: FEATURED) {
-            products(first: $first) {
+            products(first: $first, after: $after) {
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
               edges {
                 node {
                   entityId
@@ -47,6 +57,15 @@ const WhDemoCatalogQuery = graphql(
                   defaultImage {
                     altText
                     url: urlTemplate(lossy: true)
+                  }
+                  images(first: 3) {
+                    edges {
+                      node {
+                        altText
+                        url: urlTemplate(lossy: true)
+                        isDefault
+                      }
+                    }
                   }
                   customFields {
                     edges {
@@ -62,7 +81,7 @@ const WhDemoCatalogQuery = graphql(
             }
           }
         }
-        featuredProducts: products(entityIds: $featuredIds) {
+        featuredProducts: products(entityIds: $featuredIds) @include(if: $includeFeatured) {
           edges {
             node {
               entityId
@@ -71,6 +90,15 @@ const WhDemoCatalogQuery = graphql(
               defaultImage {
                 altText
                 url: urlTemplate(lossy: true)
+              }
+              images(first: 3) {
+                edges {
+                  node {
+                    altText
+                    url: urlTemplate(lossy: true)
+                    isDefault
+                  }
+                }
               }
               customFields {
                 edges {
@@ -105,12 +133,47 @@ export type WhDemoCatalog = {
   featuredKit: WhDemoCatalogItem | null;
 };
 
+function pickProductImage(
+  node: {
+    name: string;
+    defaultImage?: { altText: string; url: string } | null;
+    images?: {
+      edges?: Array<{
+        node: { altText: string; url: string; isDefault?: boolean } | null;
+      } | null> | null;
+    } | null;
+  },
+): { src: string; alt: string } | undefined {
+  const gallery = removeEdgesAndNodes(node.images ?? { edges: [] }).filter(
+    (image) => Boolean(image.url?.trim()),
+  );
+  const preferred =
+    (node.defaultImage?.url?.trim() ? node.defaultImage : null) ??
+    gallery.find((image) => image.isDefault) ??
+    gallery[0] ??
+    null;
+
+  if (!preferred?.url?.trim()) {
+    return undefined;
+  }
+
+  return {
+    src: resolveBcCdnImageUrl(preferred.url, 640),
+    alt: preferred.altText || node.name,
+  };
+}
+
 function toItem(
   node: {
     entityId: number;
     name: string;
     path: string;
     defaultImage?: { altText: string; url: string } | null;
+    images?: {
+      edges?: Array<{
+        node: { altText: string; url: string; isDefault?: boolean } | null;
+      } | null> | null;
+    } | null;
     customFields?: {
       edges?: Array<{ node: { name: string; value: string } } | null> | null;
     } | null;
@@ -134,12 +197,7 @@ function toItem(
     entityId: node.entityId,
     name: node.name,
     path: node.path,
-    image: node.defaultImage
-      ? {
-          src: resolveBcCdnImageUrl(node.defaultImage.url, 640),
-          alt: node.defaultImage.altText || node.name,
-        }
-      : undefined,
+    image: pickProductImage(node),
     priceLabel,
     isKit: isCuratedKitProduct(customFields),
   };
@@ -150,36 +208,57 @@ export const getWhDemoCatalog = cache(async (locale?: string): Promise<WhDemoCat
   const currencyCode = await getPreferredCurrencyCode();
   const channelId = getChannelIdFromLocale(locale);
   const format = await getFormatter();
+  const fetchOptions = {
+    ...(locale ? { headers: { 'Accept-Language': locale } } : {}),
+    ...(customerAccessToken ? { cache: 'no-store' as const } : { next: { revalidate } }),
+  };
+  const filters = {
+    categoryEntityIds: [SHOP_WOMENS_HEALTH_CATEGORY_ID],
+    searchSubCategories: true,
+  };
+  const featuredIds = [FIRST_CYCLE_STARTER_KIT_ID, CLAIR_HEALTH_WRISTBAND_ID, HERO_FLOAT_MOISTURIZER_ID];
 
   try {
-    const response = await client.fetch({
-      document: WhDemoCatalogQuery,
-      customerAccessToken,
-      channelId,
-      variables: {
-        currencyCode,
-        first: 36,
-        featuredIds: [FIRST_CYCLE_STARTER_KIT_ID, CLAIR_HEALTH_WRISTBAND_ID, HERO_FLOAT_MOISTURIZER_ID],
-        filters: {
-          categoryEntityIds: [SHOP_WOMENS_HEALTH_CATEGORY_ID],
-          searchSubCategories: true,
-        },
-      },
-      fetchOptions: {
-        ...(locale ? { headers: { 'Accept-Language': locale } } : {}),
-        ...(customerAccessToken ? { cache: 'no-store' } : { next: { revalidate } }),
-      },
-    });
-
-    const categoryNodes = removeEdgesAndNodes(response.data.site.search.searchProducts.products);
-    const featuredNodes = removeEdgesAndNodes(response.data.site.featuredProducts);
-
     const byId = new Map<number, WhDemoCatalogItem>();
+    let after: string | null = null;
 
-    for (const node of [...featuredNodes, ...categoryNodes]) {
-      if (!byId.has(node.entityId)) {
-        byId.set(node.entityId, toItem(node, format));
+    for (let page = 0; page < MAX_PAGES; page += 1) {
+      const response = await client.fetch({
+        document: WhDemoCatalogQuery,
+        customerAccessToken,
+        channelId,
+        variables: {
+          currencyCode,
+          first: PAGE_SIZE,
+          after,
+          includeFeatured: page === 0,
+          featuredIds,
+          filters,
+        },
+        fetchOptions,
+      });
+
+      const productConnection = response.data.site.search.searchProducts.products;
+      const categoryNodes = removeEdgesAndNodes(productConnection);
+      const featuredNodes =
+        page === 0 ? removeEdgesAndNodes(response.data.site.featuredProducts ?? { edges: [] }) : [];
+
+      for (const node of [...featuredNodes, ...categoryNodes]) {
+        const item = toItem(node, format);
+        const existing = byId.get(node.entityId);
+
+        if (!existing) {
+          byId.set(node.entityId, item);
+        } else if (!existing.image && item.image) {
+          byId.set(node.entityId, { ...existing, image: item.image });
+        }
       }
+
+      if (!productConnection.pageInfo.hasNextPage || !productConnection.pageInfo.endCursor) {
+        break;
+      }
+
+      after = productConnection.pageInfo.endCursor;
     }
 
     const all = [...byId.values()];
@@ -196,7 +275,8 @@ export const getWhDemoCatalog = cache(async (locale?: string): Promise<WhDemoCat
       kits.find((k) => k.entityId === FIRST_CYCLE_STARTER_KIT_ID) ?? kits[0] ?? null;
 
     return { kits, products, featuredKit };
-  } catch {
+  } catch (error) {
+    console.error('[getWhDemoCatalog] failed', error);
     return { kits: [], products: [], featuredKit: null };
   }
 });
