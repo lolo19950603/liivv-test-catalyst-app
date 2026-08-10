@@ -5,7 +5,41 @@ export const WOMENS_HEALTH_PATH = '/liivv-health/womens-health';
 export const CLAIR_HEALTH_PATH = `${WOMENS_HEALTH_PATH}/clair-health`;
 export const SHOP_WOMENS_HEALTH_PATH = '/liivv-health/womens-health/shop-womens-health';
 
+/** Hub + care verticals for the global storefront header (not the WH route nav). */
+export const LIIVV_HEALTH_HUB_PATH = '/pages/liivv-health';
+export const DIABETES_CARE_PATH = '/pages/diabetes-care';
+export const OSTOMY_CARE_PATH = '/pages/ostomy-care';
+
 const CHAPTER_IMG = '/archive/womens-health';
+
+/**
+ * Storefront top-level “Liivv Health” item — sits between Liivv Your Life and Blog.
+ * Keep labels in sync with the Liivv Health hub cards on production.
+ */
+export function getStoreLiivvHealthNavItem(): LiivvArchiveNavLink {
+  return {
+    label: 'Liivv Health',
+    href: LIIVV_HEALTH_HUB_PATH,
+    columns: [
+      {
+        links: [
+          {
+            label: 'Diabetes Care & Everyday Living',
+            href: DIABETES_CARE_PATH,
+          },
+          {
+            label: 'Ostomy Care & Everyday Living',
+            href: OSTOMY_CARE_PATH,
+          },
+          {
+            label: "Women's Health",
+            href: WOMENS_HEALTH_PATH,
+          },
+        ],
+      },
+    ],
+  };
+}
 
 /**
  * Keep labels/slugs in sync with
