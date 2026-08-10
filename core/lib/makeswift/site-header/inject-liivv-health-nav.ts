@@ -45,6 +45,10 @@ export function getWomensHealthDemoNav(): LiivvArchiveNavLink[] {
       href: WOMEN_HEALTH_DEMO_PATH,
     },
     {
+      label: 'Clair Health',
+      href: CLAIR_HEALTH_PATH,
+    },
+    {
       label: 'Find Your Chapter',
       href: `${WOMEN_HEALTH_DEMO_PATH}#where-are-you`,
       columns: [
@@ -56,10 +60,6 @@ export function getWomensHealthDemoNav(): LiivvArchiveNavLink[] {
     {
       label: "Shop Women's Health Essentials",
       href: SHOP_WOMENS_HEALTH_PATH,
-    },
-    {
-      label: 'Clair Health',
-      href: CLAIR_HEALTH_PATH,
     },
   ];
 }

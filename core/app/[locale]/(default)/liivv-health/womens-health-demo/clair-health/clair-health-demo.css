@@ -395,10 +395,12 @@
   font-size: 15px;
 }
 
-#clair-demo .clair-offer-note {
-  margin: 14px 0 0;
+#clair-demo .clair-offer-copy > p.clair-offer-note {
+  margin: 20px 0 0;
+  max-width: none;
   color: var(--soft);
-  font-size: 13px;
+  font-size: 12.5px;
+  line-height: 1.4;
 }
 
 #clair-demo .clair-offer-media .clair-pic {
@@ -586,29 +588,49 @@
   pointer-events: none;
 }
 
-/* Stages */
+/* Stages — center photo with corner cards */
 #clair-demo .clair-stages {
   background: #fff;
   padding: 96px 0 110px;
 }
 
 #clair-demo .clair-stages-layout {
+  position: relative;
   display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 40px;
-  align-items: center;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 28px 36px;
+  min-height: min(72vh, 720px);
+  align-items: stretch;
+  isolation: isolate;
+}
+
+#clair-demo .clair-stages-stars {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
 }
 
 #clair-demo .clair-stages-center {
+  position: absolute;
+  inset: 0;
   display: flex;
+  align-items: center;
   justify-content: center;
+  pointer-events: none;
+  z-index: 1;
 }
 
 #clair-demo .clair-stages-photo {
-  width: min(100%, 380px);
+  width: min(42vw, 340px);
   aspect-ratio: 1;
   border-radius: 50%;
-  box-shadow: 0 20px 50px rgba(92, 37, 13, 0.14);
+  box-shadow:
+    0 20px 50px rgba(92, 37, 13, 0.14),
+    0 0 0 12px #fff;
 }
 
 #clair-demo .clair-stages-photo img {
@@ -623,42 +645,68 @@
   z-index: 1;
 }
 
-#clair-demo .clair-stages-cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
 #clair-demo .clair-stage-card {
+  position: relative;
+  z-index: 2;
   text-align: left;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.72);
   border: 1px solid transparent;
-  border-radius: 14px;
-  padding: 20px 18px;
+  border-radius: 16px;
+  padding: 22px 20px;
   cursor: pointer;
-  opacity: 0.45;
+  opacity: 0.5;
+  max-width: 300px;
+  backdrop-filter: blur(6px);
   transition:
     opacity 0.25s ease,
     border-color 0.25s ease,
     background 0.25s ease,
-    box-shadow 0.25s ease;
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+#clair-demo .clair-stage-card--tl {
+  justify-self: start;
+  align-self: start;
+  text-align: left;
+}
+
+#clair-demo .clair-stage-card--tr {
+  justify-self: end;
+  align-self: start;
+  text-align: right;
+}
+
+#clair-demo .clair-stage-card--bl {
+  justify-self: start;
+  align-self: end;
+  text-align: left;
+}
+
+#clair-demo .clair-stage-card--br {
+  justify-self: end;
+  align-self: end;
+  text-align: right;
 }
 
 #clair-demo .clair-stage-card:hover,
 #clair-demo .clair-stage-card.is-active {
   opacity: 1;
+  transform: translateY(-2px);
 }
 
 #clair-demo .clair-stage-card.is-active {
   background: var(--paper);
-  border-color: rgba(233, 117, 48, 0.28);
-  box-shadow: 0 2px 10px rgba(233, 117, 48, 0.08);
+  border-color: rgba(233, 117, 48, 0.34);
+  box-shadow:
+    0 2px 10px rgba(233, 117, 48, 0.1),
+    0 0 28px rgba(233, 117, 48, 0.12);
 }
 
 #clair-demo .clair-stage-card h3 {
   margin: 0 0 8px;
   color: var(--brown);
-  font-size: 22px;
+  font-size: clamp(18px, 2vw, 22px);
 }
 
 #clair-demo .clair-stage-card p {
@@ -666,6 +714,11 @@
   color: var(--muted);
   font-size: 14px;
   line-height: 1.55;
+}
+
+#clair-demo .clair-stage-card--tr p,
+#clair-demo .clair-stage-card--br p {
+  margin-left: auto;
 }
 
 /* Story */
@@ -906,13 +959,44 @@
 @media (max-width: 1024px) {
   #clair-demo .clair-offer-grid,
   #clair-demo .clair-story-grid,
-  #clair-demo .clair-faq-grid,
-  #clair-demo .clair-stages-layout {
+  #clair-demo .clair-faq-grid {
     grid-template-columns: 1fr;
   }
 
-  #clair-demo .clair-stages-cards {
+  #clair-demo .clair-stages-layout {
     grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 14px;
+    min-height: 0;
+    padding-top: 0;
+  }
+
+  #clair-demo .clair-stages-center {
+    position: relative;
+    inset: auto;
+    order: -1;
+    margin: 8px auto 18px;
+    pointer-events: none;
+  }
+
+  #clair-demo .clair-stages-photo {
+    width: min(70vw, 280px);
+  }
+
+  #clair-demo .clair-stage-card,
+  #clair-demo .clair-stage-card--tl,
+  #clair-demo .clair-stage-card--tr,
+  #clair-demo .clair-stage-card--bl,
+  #clair-demo .clair-stage-card--br {
+    justify-self: stretch;
+    align-self: stretch;
+    text-align: left;
+    max-width: none;
+  }
+
+  #clair-demo .clair-stage-card--tr p,
+  #clair-demo .clair-stage-card--br p {
+    margin-left: 0;
   }
 
   #clair-demo .clair-offer-media .clair-pic,

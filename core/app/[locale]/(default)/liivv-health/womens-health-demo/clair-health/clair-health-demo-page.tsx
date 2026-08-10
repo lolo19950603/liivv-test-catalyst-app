@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type MutableRefObject, type RefObject } from 'react';
 
 import './clair-health-demo.css';
 
@@ -51,23 +51,192 @@ const STAGES = [
     title: 'Training & Recovery',
     body: 'Align training, recovery, and daily movement with your cycle to optimize energy, performance, and resilience across every phase.',
     image: `${SITE}/training.webp`,
+    corner: 'tl',
   },
   {
     title: 'Fertility Planning',
     body: 'Understand your cycle and ovulation timing with continuous, data-driven insights to support your fertility decisions.',
     image: `${SITE}/fertility.webp`,
+    corner: 'tr',
   },
   {
     title: 'Understanding Hormonal Health',
     body: 'Identify hormonal patterns and changes across your cycle to better understand symptoms, balance, and overall wellbeing.',
     image: `${SITE}/product.webp`,
+    corner: 'bl',
   },
   {
     title: 'Navigating (Peri)Menopause',
     body: 'Understand how hormonal changes affect your body, energy, and sleep — with insights for perimenopause and menopause.',
     image: `${SITE}/peri.webp`,
+    corner: 'br',
   },
 ] as const;
+
+type StageParticle = {
+  angle: number;
+  radiusNorm: number;
+  phase: number;
+  orbitSpeed: number;
+  phaseSpeed: number;
+  waveAmp: number;
+  size: number;
+  alpha: number;
+  ox: number;
+  oy: number;
+};
+
+function StageStarField({
+  activeIndex,
+  attract,
+  containerRef,
+  cardRefs,
+}: {
+  activeIndex: number;
+  attract: boolean;
+  containerRef: RefObject<HTMLDivElement | null>;
+  cardRefs: MutableRefObject<(HTMLButtonElement | null)[]>;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const particlesRef = useRef<StageParticle[]>([]);
+  const rafRef = useRef(0);
+  const timeRef = useRef(0);
+  const strengthRef = useRef(0);
+  const activeIndexRef = useRef(activeIndex);
+  const attractRef = useRef(attract);
+
+  useEffect(() => {
+    activeIndexRef.current = activeIndex;
+    // Pulse attraction when autoplay/hover switches stages
+    strengthRef.current = Math.max(strengthRef.current, 0.55);
+  }, [activeIndex]);
+
+  useEffect(() => {
+    attractRef.current = attract;
+  }, [attract]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let cancelled = false;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const PARTICLE_COUNT = 900;
+    const WAVE_FREQ = 6;
+
+    const seedParticles = () => {
+      particlesRef.current = Array.from({ length: PARTICLE_COUNT }, () => ({
+        angle: Math.random() * Math.PI * 2,
+        // Bias toward the outer band of a tighter disk (halo around the photo)
+        radiusNorm: 0.35 + Math.pow(Math.random(), 0.65) * 0.65,
+        phase: Math.random() * Math.PI * 2,
+        orbitSpeed: 0.001 + Math.random() * 0.0024,
+        phaseSpeed: 0.01 + Math.random() * 0.022,
+        waveAmp: 5 + Math.random() * 12,
+        size: 0.35 + Math.random() * 0.75,
+        alpha: 0.28 + Math.random() * 0.5,
+        ox: 0,
+        oy: 0,
+      }));
+    };
+
+    const resize = () => {
+      const { width, height } = container.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.max(1, Math.floor(width * dpr));
+      canvas.height = Math.max(1, Math.floor(height * dpr));
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      seedParticles();
+    };
+
+    resize();
+    const observer = new ResizeObserver(resize);
+    observer.observe(container);
+
+    const tick = () => {
+      if (cancelled) return;
+      const { width, height } = container.getBoundingClientRect();
+      ctx.clearRect(0, 0, width, height);
+
+      const cx = width / 2;
+      const cy = height / 2;
+      const photo = container.querySelector('.clair-stages-photo') as HTMLElement | null;
+      const photoSize = photo?.getBoundingClientRect().width ?? Math.min(width, height) * 0.42;
+      // Tight halo around the photo — denser, less spread into the corners
+      const maxRadius = photoSize / 2 + 72;
+
+      if (!reduceMotion) timeRef.current += 1;
+      const t = timeRef.current;
+
+      const card = cardRefs.current[activeIndexRef.current];
+      let attractX = cx;
+      let attractY = cy;
+      if (card && attractRef.current) {
+        const layout = container.getBoundingClientRect();
+        const rect = card.getBoundingClientRect();
+        attractX = rect.left - layout.left + rect.width / 2;
+        attractY = rect.top - layout.top + rect.height / 2;
+        strengthRef.current = Math.min(1, strengthRef.current + 0.05);
+      } else {
+        strengthRef.current = Math.max(0, strengthRef.current - 0.035);
+      }
+      const strength = strengthRef.current;
+
+      for (const particle of particlesRef.current) {
+        if (!reduceMotion) {
+          particle.angle += particle.orbitSpeed * (1 + strength * 0.4);
+          particle.phase += particle.phaseSpeed;
+        }
+
+        const wave =
+          Math.sin(particle.angle * WAVE_FREQ + particle.phase + t * 0.018) * particle.waveAmp * 0.55 +
+          Math.sin(particle.angle * (WAVE_FREQ * 0.5) - particle.phase * 0.7 + t * 0.01) *
+            particle.waveAmp *
+            0.2;
+        const radius = Math.max(2, particle.radiusNorm * maxRadius + wave * particle.radiusNorm);
+        const homeX = cx + Math.cos(particle.angle) * radius;
+        const homeY = cy + Math.sin(particle.angle) * radius;
+
+        if (strength > 0.02) {
+          const dx = attractX - homeX;
+          const dy = attractY - homeY;
+          particle.ox += (dx * 0.14 * strength - particle.ox) * 0.07;
+          particle.oy += (dy * 0.14 * strength - particle.oy) * 0.07;
+        } else {
+          particle.ox *= 0.9;
+          particle.oy *= 0.9;
+        }
+
+        const x = homeX + particle.ox;
+        const y = homeY + particle.oy;
+        const size = particle.size * (1 + strength * 0.35);
+
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(233, 117, 48, ${Math.min(1, particle.alpha * (0.7 + strength * 0.35))})`;
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+      cancelAnimationFrame(rafRef.current);
+    };
+  }, [cardRefs, containerRef]);
+
+  return <canvas aria-hidden className="clair-stages-stars" ref={canvasRef} />;
+}
 
 const FAQS = [
   {
@@ -332,6 +501,8 @@ export function ClairHealthDemoPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [activeStage, setActiveStage] = useState(0);
   const [stagesPaused, setStagesPaused] = useState(false);
+  const stagesLayoutRef = useRef<HTMLDivElement>(null);
+  const stageCardRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -348,7 +519,7 @@ export function ClairHealthDemoPage() {
 
     const timer = window.setInterval(() => {
       setActiveStage((current) => (current + 1) % STAGES.length);
-    }, 4200);
+    }, 3200);
 
     return () => window.clearInterval(timer);
   }, [stagesPaused]);
@@ -437,7 +608,14 @@ export function ClairHealthDemoPage() {
             onFocusCapture={() => setStagesPaused(true)}
             onMouseEnter={() => setStagesPaused(true)}
             onMouseLeave={() => setStagesPaused(false)}
+            ref={stagesLayoutRef}
           >
+            <StageStarField
+              activeIndex={activeStage}
+              attract
+              cardRefs={stageCardRefs}
+              containerRef={stagesLayoutRef}
+            />
             <div className="clair-stages-center">
               <div aria-hidden className="clair-pic clair-stages-photo">
                 {STAGES.map((stage, index) => (
@@ -452,22 +630,23 @@ export function ClairHealthDemoPage() {
                 ))}
               </div>
             </div>
-            <div className="clair-stages-cards">
-              {STAGES.map((stage, index) => (
-                <button
-                  aria-pressed={activeStage === index}
-                  className={`clair-stage-card${activeStage === index ? ' is-active' : ''}`}
-                  key={stage.title}
-                  onClick={() => selectStage(index)}
-                  onFocus={() => selectStage(index)}
-                  onMouseEnter={() => selectStage(index)}
-                  type="button"
-                >
-                  <h3>{stage.title}</h3>
-                  <p>{stage.body}</p>
-                </button>
-              ))}
-            </div>
+            {STAGES.map((stage, index) => (
+              <button
+                aria-pressed={activeStage === index}
+                className={`clair-stage-card clair-stage-card--${stage.corner}${activeStage === index ? ' is-active' : ''}`}
+                key={stage.title}
+                onClick={() => selectStage(index)}
+                onFocus={() => selectStage(index)}
+                onMouseEnter={() => selectStage(index)}
+                ref={(node) => {
+                  stageCardRefs.current[index] = node;
+                }}
+                type="button"
+              >
+                <h3>{stage.title}</h3>
+                <p>{stage.body}</p>
+              </button>
+            ))}
           </div>
         </div>
       </section>
