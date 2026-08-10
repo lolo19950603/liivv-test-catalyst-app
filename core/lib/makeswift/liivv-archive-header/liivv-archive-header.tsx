@@ -1,6 +1,5 @@
 'use client';
 
-import { useIsInBuilder } from '@makeswift/runtime/react';
 import { clsx } from 'clsx';
 import {
   type CSSProperties,
@@ -26,6 +25,7 @@ import {
   resolveSectionBackgroundChannels,
   type SectionBackgroundProps,
 } from '~/lib/makeswift/utils/diabetes-care-section-style';
+import { useIsInBuilderAfterMount } from '~/lib/makeswift/utils/use-is-in-builder-after-mount';
 import { useHeaderStickyScrolled } from '~/lib/makeswift/site-header/use-header-sticky-scrolled';
 import { resolveMakeswiftHref } from '~/lib/makeswift/utils/resolve-makeswift-href';
 
@@ -864,7 +864,7 @@ export function LiivvArchiveHeader({
   const accountMenuPanelId = `liivv-archive-header-account-${safeId}`;
 
   const pathname = usePathname();
-  const isInBuilder = useIsInBuilder();
+  const isInBuilder = useIsInBuilderAfterMount();
   const internalSectionRef = useRef<HTMLDivElement>(null);
   const internalSpacerRef = useRef<HTMLDivElement>(null);
   const stickySentinelRef = useRef<HTMLDivElement>(null);

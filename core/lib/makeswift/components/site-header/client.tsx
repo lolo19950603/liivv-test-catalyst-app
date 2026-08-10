@@ -1,7 +1,6 @@
 'use client';
 
 import { Banner } from '@/vibes/soul/primitives/banner';
-import { useIsInBuilder } from '@makeswift/runtime/react';
 import {
   createContext,
   forwardRef,
@@ -37,6 +36,7 @@ import { resolveStoreNavLinks } from '~/lib/makeswift/site-header/resolve-store-
 import { resolveStoreLogo, type StoreLogo } from '~/lib/makeswift/site-header/resolve-store-logo';
 import { findMatchingPathConfig } from '~/lib/makeswift/site-header/should-hide-store-header';
 import type { SectionBackgroundProps } from '~/lib/makeswift/utils/diabetes-care-section-style';
+import { useIsInBuilderAfterMount } from '~/lib/makeswift/utils/use-is-in-builder-after-mount';
 
 import { ARCHIVE_HEADER_SECTION_ID } from './archive-styles';
 
@@ -227,7 +227,7 @@ export const MakeswiftHeader = forwardRef(
     ref: Ref<HTMLDivElement>,
   ) => {
     const pathname = useStablePathname();
-    const isInBuilder = useIsInBuilder();
+    const isInBuilder = useIsInBuilderAfterMount();
     const {
       accountHref,
       accountMenuLinks,
@@ -243,6 +243,10 @@ export const MakeswiftHeader = forwardRef(
     } = useContext(PropsContext);
 
     const override = findMatchingPathConfig(pathname, pageOverrides);
+    const desktopLogo = resolveStoreLogo(storeLogo, storeLogoLabel);
+    const resolvedNavLinks = resolveStoreNavLinks(links, categoryTree);
+    const showLiivvHealthNav = shouldShowLiivvHealthNav(pathname);
+    const navLinks = showLiivvHealthNav ? getWomensHealthDemoNav() : resolvedNavLinks;
 
     if (override) {
       return (
@@ -273,12 +277,6 @@ export const MakeswiftHeader = forwardRef(
 
     const bannerNode = combinedBanner ? <Banner {...combinedBanner} /> : null;
 
-    const desktopLogo = resolveStoreLogo(storeLogo, storeLogoLabel);
-    const resolvedNavLinks = resolveStoreNavLinks(links, categoryTree);
-    const navLinks = shouldShowLiivvHealthNav(pathname)
-      ? getWomensHealthDemoNav()
-      : resolvedNavLinks;
-
     return (
       <LiivvArchiveHeader
         accountCustomerName={accountCustomerName}
@@ -291,7 +289,7 @@ export const MakeswiftHeader = forwardRef(
         initialCartCount={cartCount}
         linksPosition={linksPosition ?? 'left'}
         logo={desktopLogo}
-        navAriaLabel={shouldShowLiivvHealthNav(pathname) ? "Women's Health" : 'Store'}
+        navAriaLabel={showLiivvHealthNav ? "Women's Health" : 'Store'}
         navLinks={navLinks}
         notifications={notifications}
         searchPlaceholder={searchPlaceholder}
