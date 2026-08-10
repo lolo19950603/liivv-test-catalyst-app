@@ -3,17 +3,16 @@ import { setRequestLocale } from 'next-intl/server';
 
 import { locales } from '~/i18n/locales';
 
-import { getWhDemoCatalog } from './get-wh-demo-catalog';
-import { WomensHealthDemoPage } from './womens-health-demo-page';
+import { ClairHealthPage } from './clair-health-page';
 
 interface Props {
   params: Promise<{ locale: string }>;
 }
 
 export const metadata: Metadata = {
-  title: "Women's Health & Wellness | Liivv",
+  title: 'Clair Health | Liivv',
   description:
-    'Care that moves with your life — from everyday rhythm to whole new chapters. Liivv Women wellness, pharmacist chat, and life-stage chapters.',
+    "Clair is the world's first continuous, noninvasive hormone wearable — available through Liivv. Know your rhythm. Pre-order now.",
 };
 
 export function generateStaticParams() {
@@ -25,7 +24,5 @@ export default async function Page({ params }: Props) {
 
   setRequestLocale(locale);
 
-  const catalog = await getWhDemoCatalog(locale);
-
-  return <WomensHealthDemoPage catalog={catalog} />;
+  return <ClairHealthPage />;
 }

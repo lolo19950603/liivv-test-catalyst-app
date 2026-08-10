@@ -4,7 +4,7 @@
  *
  * Paths match the Voices “Read more” links on the women’s health demo.
  */
-const VOICE_IMAGE_BASE = '/archive/womens-health-demo';
+const VOICE_IMAGE_BASE = '/archive/womens-health';
 
 const FALLBACK_BY_PATH: Record<string, { src: string; alt: string }> = {
   '/blog/asking-the-pharmacist': {

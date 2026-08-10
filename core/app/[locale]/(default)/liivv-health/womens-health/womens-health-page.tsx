@@ -3,35 +3,35 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type TransitionEvent } from 'react';
 
 import { CHAPTERS as CHAPTER_PAGES, chapterHref } from './chapters/chapters-data';
-import type { WhDemoCatalog, WhDemoCatalogItem } from './get-wh-demo-catalog';
+import type { WhCatalog, WhCatalogItem } from './get-wh-catalog';
 import {
   CLAIR_HEALTH_WRISTBAND_ID,
   FIRST_CYCLE_STARTER_KIT_ID,
-} from './wh-demo-ids';
+} from './wh-ids';
 
-import './womens-health-demo.css';
+import './womens-health.css';
 
 /*
  * =============================================================================
- * WOMEN'S HEALTH DEMO — CONTENT MAP
+ * WOMEN'S HEALTH — CONTENT MAP
  * =============================================================================
- * Page URL: /liivv-health/womens-health-demo
+ * Page URL: /liivv-health/womens-health
  *
  * Edit copy in two places:
  *   1. Constants below (shared lists: doors, trust items, Clair chips, etc.)
- *   2. JSX sections in WomensHealthDemoPage (search "SECTION N —")
+ *   2. JSX sections in WomensHealthPage (search "SECTION N —")
  *
  * Chapter cards pull titles/blurbs from: ./chapters/chapters-data.ts
- * Images live under: /public/archive/womens-health-demo/
+ * Images live under: /public/archive/womens-health/
  * =============================================================================
  */
 
 /** Links used by CTAs across the page */
 const SHOP_HREF = '/liivv-health/womens-health/shop-womens-health';
 const PHARMACIST_HREF = '/account/virtual-care';
-const CLAIR_HREF = '/liivv-health/womens-health-demo/clair-health';
+const CLAIR_HREF = '/liivv-health/womens-health/clair-health';
 const CLAIR_PREORDER_HREF = '/clair-health-wristband/';
-const IMG = '/archive/womens-health-demo';
+const IMG = '/archive/womens-health';
 /** SECTION 1 — Hero float product images */
 const HERO_FLOAT_KIT_IMG = `${IMG}/door-shop-kit.jpg`;
 const HERO_FLOAT_CLAIR_IMG = `${IMG}/clair-official-hero.jpg`;
@@ -145,7 +145,7 @@ const SHOP_ROOMS = [
 
 type ShopRoomId = (typeof SHOP_ROOMS)[number]['id'];
 
-function roomForProduct(product: WhDemoCatalogItem): Exclude<ShopRoomId, 'all' | 'kits'> {
+function roomForProduct(product: WhCatalogItem): Exclude<ShopRoomId, 'all' | 'kits'> {
   const n = product.name.toLowerCase();
 
   if (
@@ -169,7 +169,7 @@ function hasDisplayPrice(priceLabel?: string) {
   return Boolean(priceLabel && !/(\$|CA\$)?\s*0([.,]0+)?\b/i.test(priceLabel));
 }
 
-function ProductThumb({ product }: { product: WhDemoCatalogItem }) {
+function ProductThumb({ product }: { product: WhCatalogItem }) {
   return (
     <a className="wh-product-card" href={product.path}>
       <div className="wh-product-media">
@@ -194,7 +194,7 @@ function KitsCarousel({
   kits,
   initialId,
 }: {
-  kits: WhDemoCatalogItem[];
+  kits: WhCatalogItem[];
   initialId?: number | null;
 }) {
   const startIndex = useMemo(() => {
@@ -272,7 +272,7 @@ function KitsCarousel({
     { kit: at(2), offset: 2 },
   ];
 
-  const renderFeature = (kit: WhDemoCatalogItem, offset: number) => {
+  const renderFeature = (kit: WhCatalogItem, offset: number) => {
     const isFeatured = kit.entityId === FIRST_CYCLE_STARTER_KIT_ID;
     const isCenter = offset === shift;
     const body = (
@@ -570,7 +570,7 @@ const KIT_SEARCH_FALLBACKS = [
 ] as const;
 
 const EMPTY_SEARCH_POOL: string[] = [];
-const EMPTY_PRODUCTS: WhDemoCatalogItem[] = [];
+const EMPTY_PRODUCTS: WhCatalogItem[] = [];
 
 type KitPointerTarget = 'qty' | 'add' | 'search' | 'cart' | 'save';
 
@@ -992,7 +992,7 @@ function KitFlowDemo({
   );
 }
 
-export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
+export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
   const [feelingIndex, setFeelingIndex] = useState(0);
   const [shopRoom, setShopRoom] = useState<ShopRoomId>('all');
 
@@ -1023,7 +1023,7 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
         path: item?.path ?? fallbackPath,
         image: item?.image,
         isKit: id === FIRST_CYCLE_STARTER_KIT_ID,
-      } satisfies WhDemoCatalogItem;
+      } satisfies WhCatalogItem;
     };
 
     return {
@@ -1051,7 +1051,7 @@ export function WomensHealthDemoPage({ catalog }: { catalog?: WhDemoCatalog }) {
   }, []);
 
   return (
-    <div id="wh-demo">
+    <div id="womens-health">
       {/* =====================================================================
           SECTION 1 — HERO
           Kicker, headline, subcopy, CTAs, hero image + float chips.

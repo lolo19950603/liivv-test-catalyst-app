@@ -15,7 +15,7 @@ const TOKEN = process.env.CATALYST_PRODUCT_EDIT_TOKEN || process.env.BIGCOMMERCE
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CURSOR_ASSETS =
   'C:\\Users\\loren\\.cursor\\projects\\d-liivv-test-catalyst-app\\assets';
-const LOCAL_OUT = join(__dirname, '../public/archive/womens-health-demo/kit-products');
+const LOCAL_OUT = join(__dirname, '../public/archive/womens-health/kit-products');
 
 const KITS = [
   { id: 8019, file: 'kit-cycle-comfort-cramp.png', name: 'Cycle Comfort Cramp-Relief Kit' },

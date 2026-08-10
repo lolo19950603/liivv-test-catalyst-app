@@ -1,6 +1,6 @@
-/* Women's Health demo — Neutral Modern brand tokens */
+/* Women's Health — Neutral Modern brand tokens */
 
-#wh-demo {
+#womens-health {
   /* From Neutral Modern Brand Guidelines A4 */
   --cream: #f5f2ed; /* Warm beige primary */
   --ink: #312f2f; /* Jet */
@@ -20,16 +20,16 @@
   overflow-x: clip;
 }
 
-#wh-demo *,
-#wh-demo *::before,
-#wh-demo *::after {
+#womens-health *,
+#womens-health *::before,
+#womens-health *::after {
   box-sizing: border-box;
 }
 
 /* Beat archive `h1,h2,h3{color:rgb(var(--color-foreground))}` */
-#wh-demo h1,
-#wh-demo h2,
-#wh-demo h3 {
+#womens-health h1,
+#womens-health h2,
+#womens-health h3 {
   font-family: var(--font-heading);
   font-weight: 400;
   line-height: 1.08;
@@ -37,41 +37,41 @@
   color: inherit;
 }
 
-#wh-demo section {
+#womens-health section {
   position: relative;
 }
 
-#wh-demo section[id] {
+#womens-health section[id] {
   scroll-margin-top: 6.5rem;
 }
 
-#wh-demo .rounded-top {
+#womens-health .rounded-top {
   border-radius: 48px 48px 0 0;
   margin-top: -48px;
   position: relative;
   z-index: 2;
 }
 
-#wh-demo section.rounded-top[id] {
+#womens-health section.rounded-top[id] {
   /* Negative overlap pulls the box up — keep heading clear of sticky header */
   scroll-margin-top: calc(6.5rem + 48px);
 }
 
-#wh-demo .eyebrow {
+#womens-health .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.2em;
   font-size: 11px;
   font-weight: 600;
 }
 
-#wh-demo .swash {
+#womens-health .swash {
   position: relative;
   display: inline-block;
   padding: 0 6px;
   z-index: 0;
 }
 
-#wh-demo .swash::before {
+#womens-health .swash::before {
   content: '';
   position: absolute;
   inset: 55% -4px 2px;
@@ -82,11 +82,11 @@
   animation: wh-swash 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
 }
 
-#wh-demo .swash.sage::before {
+#womens-health .swash.sage::before {
   background: rgba(127, 154, 124, 0.45);
 }
 
-#wh-demo .btn {
+#womens-health .btn {
   display: inline-block;
   font-family: var(--font-body);
   font-weight: 500;
@@ -102,51 +102,51 @@
     box-shadow 0.35s ease;
 }
 
-#wh-demo .btn:hover {
+#womens-health .btn:hover {
   transform: translateY(-3px) scale(1.02);
   opacity: 0.96;
   box-shadow: 0 14px 28px rgba(49, 47, 47, 0.14);
 }
 
-#wh-demo .btn:active {
+#womens-health .btn:active {
   transform: translateY(-1px) scale(0.99);
 }
 
-#wh-demo .btn-dark {
+#womens-health .btn-dark {
   background: var(--ink);
   color: #fff;
 }
 
-#wh-demo .btn-white {
+#womens-health .btn-white {
   background: #fff;
   color: var(--ink);
 }
 
-#wh-demo .btn-outline {
+#womens-health .btn-outline {
   background: transparent;
   color: var(--ink);
   border: 1.5px solid var(--ink);
 }
 
-#wh-demo .btn-ghost {
+#womens-health .btn-ghost {
   background: transparent;
   color: #fff;
   border: 1.5px solid rgba(255, 255, 255, 0.7);
 }
 
-#wh-demo .container {
+#womens-health .container {
   max-width: 1240px;
   margin: 0 auto;
   padding: 0 24px;
 }
 
-#wh-demo .wh-pic {
+#womens-health .wh-pic {
   position: relative;
   overflow: hidden;
   background-color: #cfc3b4;
 }
 
-#wh-demo .wh-pic img {
+#womens-health .wh-pic img {
   display: block;
   width: 100%;
   height: 100%;
@@ -154,17 +154,17 @@
   object-position: center;
 }
 
-#wh-demo .hero h1,
-#wh-demo .pillars h2,
-#wh-demo .pillar h3,
-#wh-demo .images-text:not(.tips-pair) h2,
-#wh-demo .voices h2,
-#wh-demo .closing h2 {
+#womens-health .hero h1,
+#womens-health .pillars h2,
+#womens-health .pillar h3,
+#womens-health .images-text:not(.tips-pair) h2,
+#womens-health .voices h2,
+#womens-health .closing h2 {
   color: #ffffff !important;
 }
 
 /* —— HERO: airy Neutral Modern split —— */
-#wh-demo .hero {
+#womens-health .hero {
   min-height: 92vh;
   min-height: 92dvh;
   display: grid;
@@ -179,15 +179,15 @@
     var(--cream);
 }
 
-#wh-demo .hero-bg {
+#womens-health .hero-bg {
   display: none;
 }
 
-#wh-demo .hero h1 {
+#womens-health .hero h1 {
   color: var(--ink) !important;
 }
 
-#wh-demo .hero-inner {
+#womens-health .hero-inner {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -197,7 +197,7 @@
   z-index: 2;
 }
 
-#wh-demo .hero-kicker {
+#womens-health .hero-kicker {
   display: inline-block;
   align-self: flex-start;
   margin-bottom: 22px;
@@ -213,13 +213,13 @@
   animation: wh-fade-up 0.7s ease both;
 }
 
-#wh-demo .hero h1 {
+#womens-health .hero h1 {
   font-size: clamp(42px, 6.2vw, 78px);
   max-width: 14ch;
   animation: wh-fade-up 0.85s ease 0.08s both;
 }
 
-#wh-demo .hero-feeling {
+#womens-health .hero-feeling {
   display: inline-block;
   position: relative;
   color: var(--ink);
@@ -239,7 +239,7 @@
   }
 }
 
-#wh-demo .hero p {
+#womens-health .hero p {
   margin-top: 22px;
   max-width: 38ch;
   font-size: clamp(16px, 1.5vw, 19px);
@@ -247,7 +247,7 @@
   animation: wh-fade-up 0.85s ease 0.16s both;
 }
 
-#wh-demo .hero-cta {
+#womens-health .hero-cta {
   margin-top: 36px;
   display: flex;
   gap: 12px;
@@ -255,7 +255,7 @@
   animation: wh-fade-up 0.85s ease 0.24s both;
 }
 
-#wh-demo .hero-stack {
+#womens-health .hero-stack {
   position: relative;
   min-height: 70vh;
   margin: 24px 24px 24px 0;
@@ -264,12 +264,12 @@
   background: var(--sand);
 }
 
-#wh-demo .hero-stack-main {
+#womens-health .hero-stack-main {
   position: absolute;
   inset: 0;
 }
 
-#wh-demo .hero-stack-main img {
+#womens-health .hero-stack-main img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -286,7 +286,7 @@
   }
 }
 
-#wh-demo .hero-frame {
+#womens-health .hero-frame {
   position: absolute;
   border-radius: 24px;
   overflow: hidden;
@@ -297,7 +297,7 @@
   z-index: 2;
 }
 
-#wh-demo .hero-frame img {
+#womens-health .hero-frame img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -305,7 +305,7 @@
   display: block;
 }
 
-#wh-demo .hero-frame--product {
+#womens-health .hero-frame--product {
   text-decoration: none;
   color: inherit;
   background: transparent;
@@ -313,13 +313,13 @@
   z-index: 2;
 }
 
-#wh-demo .hero-frame--product img {
+#womens-health .hero-frame--product img {
   object-fit: cover;
   padding: 0;
   background: transparent;
 }
 
-#wh-demo .hero-frame--a {
+#womens-health .hero-frame--a {
   width: min(38%, 200px);
   height: min(34%, 180px);
   left: 8%;
@@ -327,7 +327,7 @@
   animation-delay: 0s;
 }
 
-#wh-demo .hero-frame--b {
+#womens-health .hero-frame--b {
   width: min(32%, 160px);
   height: min(32%, 160px);
   right: 8%;
@@ -336,19 +336,19 @@
   animation-delay: -2.5s;
 }
 
-#wh-demo .hero-frame--b img {
+#womens-health .hero-frame--b img {
   object-position: 28% 55%;
 }
 
-#wh-demo .hero-frame--a img {
+#womens-health .hero-frame--a img {
   object-position: center 40%;
 }
 
-#wh-demo .hero-frame--c {
+#womens-health .hero-frame--c {
   display: none;
 }
 
-#wh-demo .hero-chip {
+#womens-health .hero-chip {
   position: absolute;
   left: 8%;
   top: 10%;
@@ -366,7 +366,7 @@
   pointer-events: none;
 }
 
-#wh-demo .hero-chip span {
+#womens-health .hero-chip span {
   display: block;
   font-size: 12px;
   letter-spacing: 0.14em;
@@ -387,7 +387,7 @@
 }
 
 /* —— PHOTO RIVER —— */
-#wh-demo .photo-river {
+#womens-health .photo-river {
   background: var(--sand);
   overflow: hidden;
   padding: 28px 0 80px;
@@ -395,7 +395,7 @@
   z-index: 1;
 }
 
-#wh-demo .photo-river-track {
+#womens-health .photo-river-track {
   display: flex;
   gap: 16px;
   width: max-content;
@@ -403,11 +403,11 @@
   padding: 8px 16px;
 }
 
-#wh-demo .photo-river:hover .photo-river-track {
+#womens-health .photo-river:hover .photo-river-track {
   animation-play-state: paused;
 }
 
-#wh-demo .photo-river-track .wh-pic {
+#womens-health .photo-river-track .wh-pic {
   width: clamp(180px, 22vw, 280px);
   height: clamp(140px, 18vw, 220px);
   border-radius: 22px;
@@ -416,16 +416,16 @@
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#wh-demo .photo-river-track .wh-pic:nth-child(even) {
+#womens-health .photo-river-track .wh-pic:nth-child(even) {
   transform: translateY(18px);
 }
 
-#wh-demo .photo-river-track .wh-pic:hover {
+#womens-health .photo-river-track .wh-pic:hover {
   transform: translateY(-6px) scale(1.04);
   z-index: 2;
 }
 
-#wh-demo .photo-river-track .wh-pic:nth-child(even):hover {
+#womens-health .photo-river-track .wh-pic:nth-child(even):hover {
   transform: translateY(10px) scale(1.04);
 }
 
@@ -436,13 +436,13 @@
 }
 
 /* —— HIGHLIGHT + mosaic —— */
-#wh-demo .highlight-text {
+#womens-health .highlight-text {
   background: var(--soft);
   text-align: center;
   padding: 88px 24px 40px;
 }
 
-#wh-demo .highlight-text h2 {
+#womens-health .highlight-text h2 {
   font-size: clamp(36px, 5.5vw, 68px);
   max-width: 18ch;
   margin: 0 auto 48px;
@@ -469,7 +469,7 @@
   }
 }
 
-#wh-demo .mosaic {
+#womens-health .mosaic {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   grid-template-rows: 160px 200px;
@@ -478,79 +478,79 @@
   margin: 0 auto;
 }
 
-#wh-demo .mosaic .wh-pic {
+#womens-health .mosaic .wh-pic {
   border-radius: 22px;
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease;
   animation: wh-fade-up 0.8s ease both;
 }
 
-#wh-demo .mosaic .m1 {
+#womens-health .mosaic .m1 {
   animation-delay: 0.05s;
 }
-#wh-demo .mosaic .m2 {
+#womens-health .mosaic .m2 {
   animation-delay: 0.12s;
 }
-#wh-demo .mosaic .m3 {
+#womens-health .mosaic .m3 {
   animation-delay: 0.18s;
 }
-#wh-demo .mosaic .m4 {
+#womens-health .mosaic .m4 {
   animation-delay: 0.24s;
 }
-#wh-demo .mosaic .m5 {
+#womens-health .mosaic .m5 {
   animation-delay: 0.3s;
 }
-#wh-demo .mosaic .m6 {
+#womens-health .mosaic .m6 {
   animation-delay: 0.36s;
 }
 
-#wh-demo .mosaic .wh-pic:hover {
+#womens-health .mosaic .wh-pic:hover {
   transform: scale(1.05) rotate(-1deg);
   z-index: 1;
   box-shadow: 0 18px 40px rgba(49, 47, 47, 0.14);
 }
 
-#wh-demo .mosaic .m1 {
+#womens-health .mosaic .m1 {
   grid-column: 1 / 3;
   grid-row: 1 / 3;
 }
 
-#wh-demo .mosaic .m2 {
+#womens-health .mosaic .m2 {
   grid-column: 3 / 5;
 }
 
-#wh-demo .mosaic .m3 {
+#womens-health .mosaic .m3 {
   grid-column: 5 / 7;
 }
 
-#wh-demo .mosaic .m4 {
+#womens-health .mosaic .m4 {
   grid-column: 3 / 4;
   grid-row: 2;
 }
 
-#wh-demo .mosaic .m5 {
+#womens-health .mosaic .m5 {
   grid-column: 4 / 6;
   grid-row: 2;
 }
 
-#wh-demo .mosaic .m6 {
+#womens-health .mosaic .m6 {
   grid-column: 6 / 7;
   grid-row: 2;
   border-radius: 50%;
 }
 
 /* —— COUNTERS on photos —— */
-#wh-demo .counters {
+#womens-health .counters {
   padding: 72px 24px 90px;
   background: #e7eee5; /* soft sage wash */
 }
 
-#wh-demo .counters-grid {
+#womens-health .counters-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
 
-#wh-demo .counter-card {
+#womens-health .counter-card {
   position: relative;
   min-height: 280px;
   border-radius: 28px;
@@ -563,20 +563,20 @@
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease;
 }
 
-#wh-demo .counter-card:hover {
+#womens-health .counter-card:hover {
   transform: translateY(-10px);
   box-shadow: 0 24px 48px rgba(49, 47, 47, 0.18);
 }
 
-#wh-demo .counter-card .wh-pic img {
+#womens-health .counter-card .wh-pic img {
   transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#wh-demo .counter-card:hover .wh-pic img {
+#womens-health .counter-card:hover .wh-pic img {
   transform: scale(1.08);
 }
 
-#wh-demo .counter-card::before {
+#womens-health .counter-card::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -584,37 +584,37 @@
   z-index: 1;
 }
 
-#wh-demo .counter-card .wh-pic {
+#womens-health .counter-card .wh-pic {
   position: absolute;
   inset: 0;
   z-index: 0;
 }
 
-#wh-demo .counter-card .wh-pic img {
+#womens-health .counter-card .wh-pic img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-#wh-demo .counter-card .num,
-#wh-demo .counter-card p {
+#womens-health .counter-card .num,
+#womens-health .counter-card p {
   position: relative;
   z-index: 2;
 }
 
-#wh-demo .counter-card .num {
+#womens-health .counter-card .num {
   font-family: var(--font-heading);
   font-size: clamp(44px, 4vw, 64px);
   line-height: 1;
 }
 
-#wh-demo .counter-card .num sup {
+#womens-health .counter-card .num sup {
   font-size: 0.42em;
   color: var(--blush);
 }
 
-#wh-demo .counter-card p {
+#womens-health .counter-card p {
   margin-top: 10px;
   font-size: 14px;
   max-width: 22ch;
@@ -622,7 +622,7 @@
 }
 
 /* —— IMAGE MARQUEE —— */
-#wh-demo .img-marquee {
+#womens-health .img-marquee {
   background: var(--taupe);
   overflow: hidden;
   /* Extra bottom pad so .rounded-top overlap (-48px) doesn't clip the photos */
@@ -631,21 +631,21 @@
   z-index: 1;
 }
 
-#wh-demo .img-marquee-track {
+#womens-health .img-marquee-track {
   display: flex;
   gap: 14px;
   width: max-content;
   animation: wh-scroll 40s linear infinite;
 }
 
-#wh-demo .img-marquee-track .wh-pic {
+#womens-health .img-marquee-track .wh-pic {
   width: 220px;
   height: 150px;
   border-radius: 18px;
   flex: none;
 }
 
-#wh-demo .img-marquee-track .chip {
+#womens-health .img-marquee-track .chip {
   align-self: center;
   color: #fff;
   font-family: var(--font-heading);
@@ -662,34 +662,34 @@
 }
 
 /* —— TIMELINE —— */
-#wh-demo .timeline {
+#womens-health .timeline {
   background: var(--cream);
   padding: 100px 24px;
 }
 
-#wh-demo .timeline-header {
+#womens-health .timeline-header {
   max-width: 720px;
   margin-bottom: 40px;
 }
 
-#wh-demo .timeline-header .small-heading {
+#womens-health .timeline-header .small-heading {
   font-size: 15px;
   margin-bottom: 14px;
   max-width: 48ch;
 }
 
-#wh-demo .timeline-header h2 {
+#womens-health .timeline-header h2 {
   font-size: clamp(36px, 4.5vw, 58px);
 }
 
-#wh-demo .timeline-nav {
+#womens-health .timeline-nav {
   display: flex;
   gap: 10px;
   margin-bottom: 24px;
   justify-content: flex-end;
 }
 
-#wh-demo .timeline-nav button {
+#womens-health .timeline-nav button {
   width: 48px;
   height: 48px;
   border-radius: 999px;
@@ -702,7 +702,7 @@
   color: var(--ink);
 }
 
-#wh-demo .timeline-slide {
+#womens-health .timeline-slide {
   display: grid;
   grid-template-columns: 0.95fr 1.05fr;
   gap: 0;
@@ -712,14 +712,14 @@
   min-height: 480px;
 }
 
-#wh-demo .timeline-slide .copy {
+#womens-health .timeline-slide .copy {
   padding: 52px 48px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-#wh-demo .timeline-slide .category {
+#womens-health .timeline-slide .category {
   font-weight: 600;
   font-size: 13px;
   letter-spacing: 0.08em;
@@ -728,41 +728,41 @@
   color: var(--sage);
 }
 
-#wh-demo .timeline-slide h3 {
+#womens-health .timeline-slide h3 {
   font-size: clamp(30px, 3.2vw, 44px);
   margin-bottom: 16px;
 }
 
-#wh-demo .timeline-slide .copy p {
+#womens-health .timeline-slide .copy p {
   margin-bottom: 12px;
   max-width: 38ch;
   font-size: 15.5px;
 }
 
-#wh-demo .timeline-slide .copy .btn {
+#womens-health .timeline-slide .copy .btn {
   margin-top: 20px;
   align-self: flex-start;
 }
 
-#wh-demo .timeline-visual {
+#womens-health .timeline-visual {
   position: relative;
   min-height: 480px;
 }
 
-#wh-demo .timeline-visual .wh-pic-main {
+#womens-health .timeline-visual .wh-pic-main {
   position: absolute;
   inset: 0;
 }
 
-#wh-demo .timeline-visual .wh-pic-main img,
-#wh-demo .timeline-visual .wh-pic-peek img {
+#womens-health .timeline-visual .wh-pic-main img,
+#womens-health .timeline-visual .wh-pic-peek img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-#wh-demo .timeline-visual .wh-pic-peek {
+#womens-health .timeline-visual .wh-pic-peek {
   position: absolute;
   width: 38%;
   height: 42%;
@@ -774,14 +774,14 @@
   z-index: 2;
 }
 
-#wh-demo .timeline-dots {
+#womens-health .timeline-dots {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 12px;
   margin-top: 36px;
 }
 
-#wh-demo .timeline-dots button {
+#womens-health .timeline-dots button {
   appearance: none;
   border: 0;
   background: none;
@@ -797,11 +797,11 @@
   gap: 10px;
 }
 
-#wh-demo .timeline-dots button.active {
+#womens-health .timeline-dots button.active {
   color: var(--ink);
 }
 
-#wh-demo .timeline-dots button::after {
+#womens-health .timeline-dots button::after {
   content: '';
   flex: 1;
   height: 1px;
@@ -810,38 +810,38 @@
 }
 
 /* —— PILLARS —— */
-#wh-demo .pillars {
+#womens-health .pillars {
   background: var(--ink);
   color: #fff;
   padding: 100px 24px 110px;
 }
 
-#wh-demo .pillars .eyebrow {
+#womens-health .pillars .eyebrow {
   text-align: center;
   display: block;
   color: rgba(255, 255, 255, 0.65);
 }
 
-#wh-demo .pillars h2 {
+#womens-health .pillars h2 {
   text-align: center;
   font-size: clamp(36px, 4.5vw, 58px);
   margin: 16px auto 14px;
 }
 
-#wh-demo .pillars .intro {
+#womens-health .pillars .intro {
   text-align: center;
   max-width: 48ch;
   margin: 0 auto 52px;
   opacity: 0.8;
 }
 
-#wh-demo .pillars-grid {
+#womens-health .pillars-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
 }
 
-#wh-demo .pillar {
+#womens-health .pillar {
   position: relative;
   min-height: 420px;
   border-radius: 28px;
@@ -852,33 +852,33 @@
   padding: 28px;
 }
 
-#wh-demo .pillar .wh-pic {
+#womens-health .pillar .wh-pic {
   position: absolute;
   inset: 0;
   z-index: 0;
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#wh-demo .pillar .wh-pic img {
+#womens-health .pillar .wh-pic img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-#wh-demo .pillar:hover .wh-pic {
+#womens-health .pillar:hover .wh-pic {
   transform: scale(1.08);
 }
 
-#wh-demo .pillar .wh-pic img {
+#womens-health .pillar .wh-pic img {
   transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#wh-demo .pillar:hover .wh-pic img {
+#womens-health .pillar:hover .wh-pic img {
   transform: scale(1.06);
 }
 
-#wh-demo .pillar::after {
+#womens-health .pillar::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -886,18 +886,18 @@
   z-index: 1;
 }
 
-#wh-demo .pillar h3,
-#wh-demo .pillar .sub,
-#wh-demo .pillar p {
+#womens-health .pillar h3,
+#womens-health .pillar .sub,
+#womens-health .pillar p {
   position: relative;
   z-index: 2;
 }
 
-#wh-demo .pillar h3 {
+#womens-health .pillar h3 {
   font-size: 26px;
 }
 
-#wh-demo .pillar .sub {
+#womens-health .pillar .sub {
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -905,27 +905,27 @@
   color: var(--blush);
 }
 
-#wh-demo .pillar p {
+#womens-health .pillar p {
   margin-top: 10px;
   font-size: 14px;
   opacity: 0.88;
 }
 
 /* —— SPLIT STORIES —— */
-#wh-demo .images-text {
+#womens-health .images-text {
   background: var(--taupe);
   color: #fff;
   padding: 100px 24px;
 }
 
-#wh-demo .images-text-grid {
+#womens-health .images-text-grid {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
   gap: 48px;
   align-items: center;
 }
 
-#wh-demo .images-text .visuals {
+#womens-health .images-text .visuals {
   display: grid;
   grid-template-columns: 1.35fr 1fr;
   grid-template-rows: 1fr 1fr;
@@ -933,74 +933,74 @@
   min-height: 520px;
 }
 
-#wh-demo .images-text .visuals .wh-pic {
+#womens-health .images-text .visuals .wh-pic {
   border-radius: 24px;
   height: 100%;
   min-height: 250px;
 }
 
-#wh-demo .images-text .visuals .wh-pic img {
+#womens-health .images-text .visuals .wh-pic img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-#wh-demo .images-text .visuals .big {
+#womens-health .images-text .visuals .big {
   grid-row: 1 / 3;
   height: 100%;
   min-height: 520px;
 }
 
-#wh-demo .images-text .visuals .mid {
+#womens-health .images-text .visuals .mid {
   height: 100%;
   min-height: 250px;
 }
 
-#wh-demo .images-text .visuals .small {
+#womens-health .images-text .visuals .small {
   height: 100%;
   min-height: 250px;
   border-radius: 50% 24px 24px 24px;
 }
 
-#wh-demo .images-text h2 {
+#womens-health .images-text h2 {
   font-size: clamp(34px, 4vw, 52px);
   margin: 16px 0 20px;
 }
 
-#wh-demo .images-text p {
+#womens-health .images-text p {
   margin-bottom: 14px;
   max-width: 46ch;
   opacity: 0.9;
 }
 
-#wh-demo .images-text .btn {
+#womens-health .images-text .btn {
   margin-top: 14px;
 }
 
-#wh-demo .images-text.tips-pair {
+#womens-health .images-text.tips-pair {
   background: #f8ebe6; /* blush wash */
   color: var(--ink);
 }
 
-#wh-demo .images-text.tips-pair .images-text-grid {
+#womens-health .images-text.tips-pair .images-text-grid {
   grid-template-columns: 0.9fr 1.1fr;
 }
 
-#wh-demo .images-text.tips-pair .visuals {
+#womens-health .images-text.tips-pair .visuals {
   order: 2;
 }
 
-#wh-demo .images-text.tips-pair .copy {
+#womens-health .images-text.tips-pair .copy {
   order: 1;
 }
 
-#wh-demo .images-text.tips-pair .eyebrow {
+#womens-health .images-text.tips-pair .eyebrow {
   color: var(--sage);
 }
 
 /* —— CLAIR FEATURE (floating composition, like hero stack) —— */
-#wh-demo .wh-clair {
+#womens-health .wh-clair {
   position: relative;
   isolation: isolate;
   min-height: min(130vh, 1280px);
@@ -1012,38 +1012,38 @@
   align-items: flex-end;
 }
 
-#wh-demo .wh-clair-media {
+#womens-health .wh-clair-media {
   position: absolute;
   inset: 0;
   z-index: 0;
 }
 
-#wh-demo .wh-clair-poster,
-#wh-demo .wh-clair-canvas {
+#womens-health .wh-clair-poster,
+#womens-health .wh-clair-canvas {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-#wh-demo .wh-clair-poster {
+#womens-health .wh-clair-poster {
   z-index: 0;
   object-fit: cover;
   object-position: center;
 }
 
-#wh-demo .wh-clair-canvas {
+#womens-health .wh-clair-canvas {
   z-index: 1;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.35s ease;
 }
 
-#wh-demo .wh-clair-canvas.is-ready {
+#womens-health .wh-clair-canvas.is-ready {
   opacity: 1;
 }
 
-#wh-demo .wh-clair-veil {
+#womens-health .wh-clair-veil {
   position: absolute;
   inset: 0;
   z-index: 2;
@@ -1058,7 +1058,7 @@
     linear-gradient(to top, rgba(20, 12, 8, 0.55) 0%, transparent 48%);
 }
 
-#wh-demo .wh-clair-board {
+#womens-health .wh-clair-board {
   position: relative;
   z-index: 3;
   display: grid;
@@ -1070,18 +1070,18 @@
   padding: 96px 24px 112px;
 }
 
-#wh-demo .wh-clair-copy {
+#womens-health .wh-clair-copy {
   max-width: 36rem;
 }
 
-#wh-demo .wh-clair-copy .eyebrow {
+#womens-health .wh-clair-copy .eyebrow {
   display: inline-block;
   color: rgba(245, 242, 237, 0.78);
   margin-bottom: 16px;
   animation: wh-fade-up 0.7s ease both;
 }
 
-#wh-demo .wh-clair-copy h2 {
+#womens-health .wh-clair-copy h2 {
   font-size: clamp(34px, 4.6vw, 54px);
   margin: 0 0 18px;
   max-width: 14ch;
@@ -1089,13 +1089,13 @@
   animation: wh-fade-up 0.85s ease 0.06s both;
 }
 
-#wh-demo .wh-clair-copy h2 em {
+#womens-health .wh-clair-copy h2 em {
   color: #c5d4c0;
   font-style: italic;
   font-weight: 400;
 }
 
-#wh-demo .wh-clair-lead {
+#womens-health .wh-clair-lead {
   margin: 0 0 22px;
   max-width: 40ch;
   font-size: 17px;
@@ -1104,7 +1104,7 @@
   animation: wh-fade-up 0.85s ease 0.12s both;
 }
 
-#wh-demo .wh-clair-signals {
+#womens-health .wh-clair-signals {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -1112,7 +1112,7 @@
   animation: wh-fade-up 0.85s ease 0.18s both;
 }
 
-#wh-demo .wh-clair-signals span {
+#womens-health .wh-clair-signals span {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -1124,7 +1124,7 @@
   padding: 8px 14px;
 }
 
-#wh-demo .wh-clair-uses {
+#womens-health .wh-clair-uses {
   list-style: none;
   margin: 0 0 20px;
   padding: 0;
@@ -1135,14 +1135,14 @@
   animation: wh-fade-up 0.85s ease 0.22s both;
 }
 
-#wh-demo .wh-clair-uses li {
+#womens-health .wh-clair-uses li {
   position: relative;
   padding-left: 14px;
   font-size: 14px;
   color: rgba(245, 242, 237, 0.88);
 }
 
-#wh-demo .wh-clair-uses li::before {
+#womens-health .wh-clair-uses li::before {
   content: '';
   position: absolute;
   left: 0;
@@ -1153,7 +1153,7 @@
   background: var(--blush);
 }
 
-#wh-demo .wh-clair-close {
+#womens-health .wh-clair-close {
   font-weight: 600;
   margin: 0 0 22px;
   max-width: 34ch;
@@ -1161,46 +1161,46 @@
   animation: wh-fade-up 0.85s ease 0.26s both;
 }
 
-#wh-demo .wh-clair-cta {
+#womens-health .wh-clair-cta {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   animation: wh-fade-up 0.85s ease 0.3s both;
 }
 
-#wh-demo .wh-clair .btn-dark {
+#womens-health .wh-clair .btn-dark {
   background: #f5f2ed;
   color: var(--ink);
 }
 
-#wh-demo .wh-clair .btn-outline {
+#womens-health .wh-clair .btn-outline {
   color: #f5f2ed;
   border-color: rgba(245, 242, 237, 0.7);
 }
 
-#wh-demo .wh-clair-float {
+#womens-health .wh-clair-float {
   display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #wh-demo .wh-clair-copy .eyebrow,
-  #wh-demo .wh-clair-copy h2,
-  #wh-demo .wh-clair-lead,
-  #wh-demo .wh-clair-signals,
-  #wh-demo .wh-clair-uses,
-  #wh-demo .wh-clair-close,
-  #wh-demo .wh-clair-cta {
+  #womens-health .wh-clair-copy .eyebrow,
+  #womens-health .wh-clair-copy h2,
+  #womens-health .wh-clair-lead,
+  #womens-health .wh-clair-signals,
+  #womens-health .wh-clair-uses,
+  #womens-health .wh-clair-close,
+  #womens-health .wh-clair-cta {
     animation: none !important;
   }
 }
 
 /* —— CHAPTERS full-bleed —— */
-#wh-demo .chapters {
+#womens-health .chapters {
   /* Match first chapter tone — avoids corner bezels under border-radius */
   background: #fbf8f4;
 }
 
-#wh-demo .chapter {
+#womens-health .chapter {
   position: sticky;
   top: 0;
   min-height: 100vh;
@@ -1212,13 +1212,13 @@
   overflow: hidden;
 }
 
-#wh-demo .chapter .wh-pic {
+#womens-health .chapter .wh-pic {
   position: relative;
   min-height: 100%;
   height: 100%;
 }
 
-#wh-demo .chapter .wh-pic img {
+#womens-health .chapter .wh-pic img {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -1226,11 +1226,11 @@
   transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#wh-demo .chapter:hover .wh-pic img {
+#womens-health .chapter:hover .wh-pic img {
   transform: scale(1.04);
 }
 
-#wh-demo .chapter .copy {
+#womens-health .chapter .copy {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -1240,7 +1240,7 @@
   overflow: hidden;
 }
 
-#wh-demo .chapter-num {
+#womens-health .chapter-num {
   position: absolute;
   right: -2%;
   top: 8%;
@@ -1252,23 +1252,23 @@
   user-select: none;
 }
 
-#wh-demo .chapter .eyebrow {
+#womens-health .chapter .eyebrow {
   color: var(--sage);
 }
 
-#wh-demo .chapter h3 {
+#womens-health .chapter h3 {
   font-size: clamp(34px, 4vw, 56px);
   margin: 14px 0 22px;
   position: relative;
 }
 
-#wh-demo .chapter-meta {
+#womens-health .chapter-meta {
   display: grid;
   gap: 14px;
   margin-bottom: 8px;
 }
 
-#wh-demo .chapter-pill {
+#womens-health .chapter-pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1283,82 +1283,82 @@
   width: fit-content;
 }
 
-#wh-demo .chapter-pill--vibe {
+#womens-health .chapter-pill--vibe {
   background: rgba(243, 199, 190, 0.45);
   color: #8a5f55;
 }
 
-#wh-demo .chapter .focus-label,
-#wh-demo .chapter .vibe-label {
+#womens-health .chapter .focus-label,
+#womens-health .chapter .vibe-label {
   display: none;
 }
 
-#wh-demo .chapter p {
+#womens-health .chapter p {
   max-width: 42ch;
   margin-bottom: 0;
 }
 
-#wh-demo .chapter .btn {
+#womens-health .chapter .btn {
   margin-top: 32px;
   align-self: flex-start;
 }
 
-#wh-demo .chapter:nth-of-type(1) .copy {
+#womens-health .chapter:nth-of-type(1) .copy {
   background: #fbf8f4;
 }
-#wh-demo .chapter:nth-of-type(2) .copy {
+#womens-health .chapter:nth-of-type(2) .copy {
   background: #ebe2d6;
 }
-#wh-demo .chapter:nth-of-type(3) .copy {
+#womens-health .chapter:nth-of-type(3) .copy {
   background: #dce6d7;
 }
-#wh-demo .chapter:nth-of-type(4) .copy {
+#womens-health .chapter:nth-of-type(4) .copy {
   background: #f0d5cd;
 }
-#wh-demo .chapter:nth-of-type(5) .copy {
+#womens-health .chapter:nth-of-type(5) .copy {
   background: #d5e0d0;
 }
-#wh-demo .chapter:nth-of-type(6) .copy {
+#womens-health .chapter:nth-of-type(6) .copy {
   background: #f2ddd4;
 }
 
-#wh-demo .chapter:nth-child(even) {
+#womens-health .chapter:nth-child(even) {
   grid-template-columns: 0.85fr 1.15fr;
 }
 
-#wh-demo .chapter:nth-child(even) .wh-pic {
+#womens-health .chapter:nth-child(even) .wh-pic {
   order: 2;
 }
 
-#wh-demo .chapter:nth-child(even) .copy {
+#womens-health .chapter:nth-child(even) .copy {
   order: 1;
 }
 
 /* —— VOICES —— */
-#wh-demo .voices {
+#womens-health .voices {
   background: #6f8a6c;
   color: #fff;
   padding: 110px 24px;
 }
 
-#wh-demo .voices .voices-eyebrow {
+#womens-health .voices .voices-eyebrow {
   display: block;
   text-align: center;
   color: rgba(255, 255, 255, 0.75);
   margin-bottom: 10px;
 }
 
-#wh-demo .voices h2 {
+#womens-health .voices h2 {
   font-size: clamp(36px, 5vw, 64px);
   text-align: center;
   margin-bottom: 40px;
 }
 
-#wh-demo .voices h2 em {
+#womens-health .voices h2 em {
   font-style: italic;
 }
 
-#wh-demo .wh-voice-feature {
+#womens-health .wh-voice-feature {
   display: grid;
   grid-template-columns: 0.95fr 1.05fr;
   gap: 0;
@@ -1370,23 +1370,23 @@
   box-shadow: 0 18px 40px rgba(49, 47, 47, 0.12);
 }
 
-#wh-demo .wh-voice-feature-media {
+#womens-health .wh-voice-feature-media {
   min-height: 320px;
 }
 
-#wh-demo .wh-voice-feature-media .wh-pic {
+#womens-health .wh-voice-feature-media .wh-pic {
   height: 100%;
   min-height: 320px;
 }
 
-#wh-demo .wh-voice-feature-copy {
+#womens-health .wh-voice-feature-copy {
   padding: 40px 40px 42px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-#wh-demo .wh-voice-kicker {
+#womens-health .wh-voice-kicker {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.14em;
@@ -1395,20 +1395,20 @@
   margin-bottom: 14px;
 }
 
-#wh-demo .wh-voice-feature blockquote {
+#womens-health .wh-voice-feature blockquote {
   font-family: var(--font-heading);
   font-size: clamp(24px, 2.8vw, 34px);
   line-height: 1.25;
   margin: 0 0 22px;
 }
 
-#wh-demo .voice-cards {
+#womens-health .voice-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
 }
 
-#wh-demo .voice {
+#womens-health .voice {
   background: #fff;
   color: var(--ink);
   border-radius: 28px;
@@ -1419,7 +1419,7 @@
   box-shadow: 0 16px 36px rgba(49, 47, 47, 0.1);
 }
 
-#wh-demo .wh-voice-avatar {
+#womens-health .wh-voice-avatar {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -1428,33 +1428,33 @@
   display: block;
 }
 
-#wh-demo .wh-voice-avatar--lg {
+#womens-health .wh-voice-avatar--lg {
   width: 64px;
   height: 64px;
   margin-bottom: 16px;
 }
 
-#wh-demo .wh-voice-feature .who {
+#womens-health .wh-voice-feature .who {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-top: 8px;
 }
 
-#wh-demo .wh-voice-feature .who > div {
+#womens-health .wh-voice-feature .who > div {
   display: flex;
   flex-direction: column;
   gap: 2px;
   font-weight: 500;
 }
 
-#wh-demo .wh-voice-feature .who span {
+#womens-health .wh-voice-feature .who span {
   font-weight: 400;
   font-size: 13px;
   opacity: 0.65;
 }
 
-#wh-demo .wh-voice-more {
+#womens-health .wh-voice-more {
   display: inline-flex;
   align-items: center;
   margin-top: 18px;
@@ -1465,80 +1465,80 @@
   letter-spacing: 0.02em;
 }
 
-#wh-demo .wh-voice-more::after {
+#womens-health .wh-voice-more::after {
   content: ' →';
 }
 
-#wh-demo .wh-voice-more:hover {
+#womens-health .wh-voice-more:hover {
   color: var(--ink);
 }
 
-#wh-demo .voices .wh-voice-more {
+#womens-health .voices .wh-voice-more {
   color: #5f735e;
 }
 
-#wh-demo .voice-mark {
+#womens-health .voice-mark {
   display: none;
 }
 
-#wh-demo .voice:hover .voice-mark {
+#womens-health .voice:hover .voice-mark {
   transform: scale(1.12) rotate(-6deg);
 }
 
-#wh-demo .voice-mark span {
+#womens-health .voice-mark span {
   font-family: var(--font-heading);
   font-size: 24px;
   color: var(--ink);
   line-height: 1;
 }
 
-#wh-demo .voice-mark--blush {
+#womens-health .voice-mark--blush {
   background: var(--blush);
 }
 
-#wh-demo .voice-mark--sage {
+#womens-health .voice-mark--sage {
   background: rgba(142, 165, 141, 0.55);
 }
 
-#wh-demo .voice-mark--sand {
+#womens-health .voice-mark--sand {
   background: var(--sand);
 }
 
-#wh-demo .voice-mark--taupe {
+#womens-health .voice-mark--taupe {
   background: var(--taupe);
   color: #fff;
 }
 
-#wh-demo .voice-mark--taupe span {
+#womens-health .voice-mark--taupe span {
   color: #fff;
 }
 
-#wh-demo .voice .body {
+#womens-health .voice .body {
   padding: 0;
 }
 
-#wh-demo .voice:nth-child(2) {
+#womens-health .voice:nth-child(2) {
   transform: translateY(28px);
 }
 
-#wh-demo .voice:nth-child(4) {
+#womens-health .voice:nth-child(4) {
   transform: translateY(14px);
 }
 
-#wh-demo .voice blockquote {
+#womens-health .voice blockquote {
   font-family: var(--font-heading);
   font-size: 19px;
   line-height: 1.35;
   margin: 0;
 }
 
-#wh-demo .voice .who {
+#womens-health .voice .who {
   margin-top: 20px;
   font-size: 14px;
   font-weight: 500;
 }
 
-#wh-demo .voice .who span {
+#womens-health .voice .who span {
   display: block;
   color: rgba(26, 24, 22, 0.55);
   font-size: 12.5px;
@@ -1547,12 +1547,12 @@
 }
 
 /* —— FAQ with side art —— */
-#wh-demo .faq {
+#womens-health .faq {
   background: #fff;
   padding: 110px 24px;
 }
 
-#wh-demo .faq-layout {
+#womens-health .faq-layout {
   display: grid;
   grid-template-columns: 0.85fr 1.15fr;
   gap: 56px;
@@ -1561,12 +1561,12 @@
   margin: 0 auto;
 }
 
-#wh-demo .faq-layout--copy-only {
+#womens-health .faq-layout--copy-only {
   grid-template-columns: 1fr;
   max-width: 720px;
 }
 
-#wh-demo .faq-art {
+#womens-health .faq-art {
   position: sticky;
   top: 100px;
   display: grid;
@@ -1574,43 +1574,43 @@
   align-content: start;
 }
 
-#wh-demo .faq-art .wh-pic {
+#womens-health .faq-art .wh-pic {
   border-radius: 28px;
   height: auto;
   width: 100%;
   overflow: hidden;
 }
 
-#wh-demo .faq-art .wh-pic:first-child {
+#womens-health .faq-art .wh-pic:first-child {
   aspect-ratio: 4 / 5;
 }
 
-#wh-demo .faq-art .wh-pic:last-child {
+#womens-health .faq-art .wh-pic:last-child {
   aspect-ratio: 5 / 4;
   width: 86%;
   justify-self: end;
   border-radius: 28px;
 }
 
-#wh-demo .faq-art .wh-pic img {
+#womens-health .faq-art .wh-pic img {
   object-position: center;
 }
 
-#wh-demo .faq h2 {
+#womens-health .faq h2 {
   font-size: clamp(34px, 4.5vw, 52px);
 }
 
-#wh-demo .faq .intro {
+#womens-health .faq .intro {
   margin: 12px 0 36px;
   max-width: 42ch;
 }
 
-#wh-demo .faq details {
+#womens-health .faq details {
   border-bottom: 1px solid rgba(26, 24, 22, 0.14);
   padding: 20px 4px;
 }
 
-#wh-demo .faq summary {
+#womens-health .faq summary {
   cursor: pointer;
   font-family: var(--font-heading);
   font-size: 20px;
@@ -1621,32 +1621,32 @@
   gap: 20px;
 }
 
-#wh-demo .faq summary::-webkit-details-marker {
+#womens-health .faq summary::-webkit-details-marker {
   display: none;
 }
 
-#wh-demo .faq summary::after {
+#womens-health .faq summary::after {
   content: '+';
   font-family: var(--font-body);
   font-size: 24px;
   color: var(--sage);
 }
 
-#wh-demo .faq details[open] summary::after {
+#womens-health .faq details[open] summary::after {
   content: '–';
 }
 
-#wh-demo .faq details p {
+#womens-health .faq details p {
   margin-top: 12px;
   max-width: 60ch;
 }
 
-#wh-demo .faq details a {
+#womens-health .faq details a {
   color: var(--sage);
 }
 
 /* —— TRUST STRIP —— */
-#wh-demo .wh-trust {
+#womens-health .wh-trust {
   /* Soft strip — never jet under .rounded-top (causes black corner bezels) */
   background: var(--sand);
   color: var(--ink);
@@ -1655,7 +1655,7 @@
   z-index: 3;
 }
 
-#wh-demo .wh-trust-track {
+#womens-health .wh-trust-track {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -1667,11 +1667,11 @@
   opacity: 0.88;
 }
 
-#wh-demo .wh-trust-track span {
+#womens-health .wh-trust-track span {
   position: relative;
 }
 
-#wh-demo .wh-trust-track span:not(:last-child)::after {
+#womens-health .wh-trust-track span:not(:last-child)::after {
   content: '·';
   position: absolute;
   right: -18px;
@@ -1679,7 +1679,7 @@
 }
 
 /* —— THREE DOORS —— */
-#wh-demo .wh-doors {
+#womens-health .wh-doors {
   background: var(--cream);
   padding: 88px 24px 96px;
   color: var(--ink);
@@ -1688,25 +1688,25 @@
   margin-top: 0;
 }
 
-#wh-demo .wh-doors .eyebrow {
+#womens-health .wh-doors .eyebrow {
   display: block;
   text-align: center;
   color: var(--sage);
 }
 
-#wh-demo .wh-doors > .container > h2 {
+#womens-health .wh-doors > .container > h2 {
   text-align: center;
   font-size: clamp(34px, 4.5vw, 56px);
   margin: 14px auto 40px;
 }
 
-#wh-demo .wh-doors-grid {
+#womens-health .wh-doors-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
 }
 
-#wh-demo .wh-door {
+#womens-health .wh-door {
   display: flex;
   flex-direction: column;
   text-decoration: none;
@@ -1721,19 +1721,19 @@
     box-shadow 0.4s ease;
 }
 
-#wh-demo .wh-door:hover {
+#womens-health .wh-door:hover {
   transform: translateY(-8px) translateZ(0);
   box-shadow: 0 22px 44px rgba(49, 47, 47, 0.1);
 }
 
-#wh-demo .wh-door-media {
+#womens-health .wh-door-media {
   aspect-ratio: 4 / 3;
   overflow: hidden;
   background: var(--sand);
   border-radius: 28px 28px 0 0;
 }
 
-#wh-demo .wh-door-media img {
+#womens-health .wh-door-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -1742,11 +1742,11 @@
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#wh-demo .wh-door:hover .wh-door-media img {
+#womens-health .wh-door:hover .wh-door-media img {
   transform: scale(1.06);
 }
 
-#wh-demo .wh-door-label {
+#womens-health .wh-door-label {
   margin: 20px 22px 0;
   font-size: 11px;
   font-weight: 600;
@@ -1755,12 +1755,12 @@
   color: var(--sage);
 }
 
-#wh-demo .wh-door h3 {
+#womens-health .wh-door h3 {
   margin: 8px 22px 10px;
   font-size: 28px;
 }
 
-#wh-demo .wh-door p {
+#womens-health .wh-door p {
   margin: 0 22px 26px;
   font-size: 15px;
   max-width: 28ch;
@@ -1768,37 +1768,37 @@
 }
 
 /* —— CHAPTER CHOOSER —— */
-#wh-demo .wh-chooser {
+#womens-health .wh-chooser {
   background: #ebe2d6;
   padding: 96px 24px 104px;
   color: var(--ink);
 }
 
-#wh-demo .wh-chooser .eyebrow {
+#womens-health .wh-chooser .eyebrow {
   display: block;
   text-align: center;
   color: #6a5f57;
 }
 
-#wh-demo .wh-chooser > .container > h2 {
+#womens-health .wh-chooser > .container > h2 {
   text-align: center;
   font-size: clamp(34px, 4.5vw, 56px);
   margin: 14px auto 14px;
 }
 
-#wh-demo .wh-chooser-intro {
+#womens-health .wh-chooser-intro {
   text-align: center;
   max-width: 46ch;
   margin: 0 auto 40px;
 }
 
-#wh-demo .wh-chooser-grid {
+#womens-health .wh-chooser-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
 
-#wh-demo .wh-chooser-card {
+#womens-health .wh-chooser-card {
   text-decoration: none;
   color: inherit;
   background: rgba(255, 255, 255, 0.72);
@@ -1811,12 +1811,12 @@
     background 0.35s ease;
 }
 
-#wh-demo .wh-chooser-card:hover {
+#womens-health .wh-chooser-card:hover {
   transform: translateY(-5px) translateZ(0);
   background: #fff;
 }
 
-#wh-demo .wh-chooser-media {
+#womens-health .wh-chooser-media {
   position: relative;
   aspect-ratio: 16 / 10;
   background: var(--sand);
@@ -1824,7 +1824,7 @@
   border-radius: 24px 24px 0 0;
 }
 
-#wh-demo .wh-chooser-media img {
+#womens-health .wh-chooser-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -1832,7 +1832,7 @@
   border-radius: 24px 24px 0 0;
 }
 
-#wh-demo .wh-chooser-num {
+#womens-health .wh-chooser-num {
   position: absolute;
   left: 14px;
   bottom: 10px;
@@ -1843,12 +1843,12 @@
   text-shadow: 0 8px 24px rgba(49, 47, 47, 0.35);
 }
 
-#wh-demo .wh-chooser-card h3 {
+#womens-health .wh-chooser-card h3 {
   font-size: 20px;
   margin: 16px 18px 8px;
 }
 
-#wh-demo .wh-chooser-card p {
+#womens-health .wh-chooser-card p {
   margin: 0 18px 20px;
   font-size: 14px;
   opacity: 0.78;
@@ -1856,37 +1856,37 @@
 }
 
 /* —— KITS UPSELL / LIVING OBJECT —— */
-#wh-demo .wh-kits {
+#womens-health .wh-kits {
   background: var(--soft);
   padding: 100px 24px 110px;
   color: var(--ink);
 }
 
-#wh-demo .wh-kits .eyebrow {
+#womens-health .wh-kits .eyebrow {
   display: block;
   text-align: center;
   color: var(--sage);
 }
 
-#wh-demo .wh-kits > .container > h2 {
+#womens-health .wh-kits > .container > h2 {
   text-align: center;
   font-size: clamp(34px, 4.5vw, 56px);
   margin: 14px auto 16px;
   max-width: 18ch;
 }
 
-#wh-demo .wh-kits-intro {
+#womens-health .wh-kits-intro {
   text-align: center;
   max-width: 54ch;
   margin: 0 auto 36px;
   font-size: 17px;
 }
 
-#wh-demo .wh-kits-carousel {
+#womens-health .wh-kits-carousel {
   margin-top: 8px;
 }
 
-#wh-demo .wh-kits-carousel-count {
+#womens-health .wh-kits-carousel-count {
   margin: 0 auto 16px;
   max-width: 1240px;
   text-align: center;
@@ -1897,7 +1897,7 @@
   opacity: 0.62;
 }
 
-#wh-demo .wh-kits-carousel-frame {
+#womens-health .wh-kits-carousel-frame {
   position: relative;
   display: grid;
   grid-template-columns: 48px minmax(0, 1fr) 48px;
@@ -1907,7 +1907,7 @@
   margin: 0 auto;
 }
 
-#wh-demo .wh-kits-carousel-btn {
+#womens-health .wh-kits-carousel-btn {
   width: 48px;
   height: 48px;
   border-radius: 999px;
@@ -1926,19 +1926,19 @@
   z-index: 3;
 }
 
-#wh-demo .wh-kits-carousel-btn:hover {
+#womens-health .wh-kits-carousel-btn:hover {
   background: var(--soft);
   border-color: rgba(49, 47, 47, 0.28);
   transform: scale(1.04);
 }
 
-#wh-demo .wh-kits-carousel-viewport {
+#womens-health .wh-kits-carousel-viewport {
   min-width: 0;
   overflow: hidden;
   touch-action: pan-y;
 }
 
-#wh-demo .wh-kits-carousel-track {
+#womens-health .wh-kits-carousel-track {
   display: flex;
   align-items: stretch;
   width: max-content;
@@ -1946,11 +1946,11 @@
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#wh-demo .wh-kits-carousel-track.is-instant {
+#womens-health .wh-kits-carousel-track.is-instant {
   transition: none;
 }
 
-#wh-demo .wh-kits-carousel-slide {
+#womens-health .wh-kits-carousel-slide {
   flex: 0 0 auto;
   text-align: left;
   font: inherit;
@@ -1960,7 +1960,7 @@
   cursor: default;
 }
 
-#wh-demo .wh-kits-carousel-slide.is-side {
+#womens-health .wh-kits-carousel-slide.is-side {
   cursor: pointer;
   opacity: 0.4;
   filter: saturate(0.75);
@@ -1972,12 +1972,12 @@
     transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#wh-demo .wh-kits-carousel-slide.is-side:hover {
+#womens-health .wh-kits-carousel-slide.is-side:hover {
   opacity: 0.62;
   filter: saturate(0.9);
 }
 
-#wh-demo .wh-kits-carousel-slide.is-center {
+#womens-health .wh-kits-carousel-slide.is-center {
   opacity: 1;
   filter: none;
   position: relative;
@@ -1989,7 +1989,7 @@
     transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#wh-demo .wh-kit-feature {
+#womens-health .wh-kit-feature {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
   gap: 0;
@@ -2005,14 +2005,14 @@
   box-shadow: 0 18px 40px rgba(49, 47, 47, 0.06);
 }
 
-#wh-demo .wh-kit-feature-media {
+#womens-health .wh-kit-feature-media {
   height: 100%;
   min-height: 0;
   background: var(--sand);
 }
 
-#wh-demo .wh-kit-feature-media img,
-#wh-demo .wh-kit-feature-media .wh-product-fallback {
+#womens-health .wh-kit-feature-media img,
+#womens-health .wh-kit-feature-media .wh-product-fallback {
   width: 100%;
   height: 100%;
   min-height: 0;
@@ -2020,7 +2020,7 @@
   display: block;
 }
 
-#wh-demo .wh-kit-feature-copy {
+#womens-health .wh-kit-feature-copy {
   padding: 36px 40px;
   display: flex;
   flex-direction: column;
@@ -2028,7 +2028,7 @@
   min-height: 0;
 }
 
-#wh-demo .wh-kit-feature-copy h3 {
+#womens-health .wh-kit-feature-copy h3 {
   font-size: clamp(26px, 2.8vw, 36px);
   margin: 10px 0 8px;
   line-height: 1.15;
@@ -2039,7 +2039,7 @@
   min-height: calc(1.15em * 2);
 }
 
-#wh-demo .wh-kit-feature-copy > p {
+#womens-health .wh-kit-feature-copy > p {
   max-width: 38ch;
   margin: 10px 0 22px;
   display: -webkit-box;
@@ -2049,65 +2049,65 @@
   min-height: calc(1.45em * 3);
 }
 
-#wh-demo .wh-kit-feature-copy .wh-product-price {
+#womens-health .wh-kit-feature-copy .wh-product-price {
   margin: 0;
   font-weight: 500;
   min-height: 1.2em;
 }
 
-#wh-demo .wh-kit-feature-copy .wh-product-price--spacer {
+#womens-health .wh-kit-feature-copy .wh-product-price--spacer {
   visibility: hidden;
 }
 
-#wh-demo .wh-kit-feature-copy .btn {
+#womens-health .wh-kit-feature-copy .btn {
   align-self: flex-start;
   margin-top: auto;
 }
 
-#wh-demo .wh-kit-feature-cta-ghost {
+#womens-health .wh-kit-feature-cta-ghost {
   pointer-events: none;
   opacity: 0.85;
 }
 
 @media (max-width: 900px) {
-  #wh-demo .wh-kits-carousel-frame {
+  #womens-health .wh-kits-carousel-frame {
     grid-template-columns: 40px minmax(0, 1fr) 40px;
     gap: 6px;
   }
 
-  #wh-demo .wh-kits-carousel-btn {
+  #womens-health .wh-kits-carousel-btn {
     width: 40px;
     height: 40px;
     font-size: 18px;
   }
 
-  #wh-demo .wh-kit-feature {
+  #womens-health .wh-kit-feature {
     grid-template-columns: 1fr;
     height: auto;
     min-height: 0;
   }
 
-  #wh-demo .wh-kit-feature-media {
+  #womens-health .wh-kit-feature-media {
     aspect-ratio: 4 / 3;
     height: auto;
   }
 
-  #wh-demo .wh-kit-feature-copy {
+  #womens-health .wh-kit-feature-copy {
     padding: 24px;
   }
 
-  #wh-demo .wh-kits-carousel-slide.is-side {
+  #womens-health .wh-kits-carousel-slide.is-side {
     transform: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #wh-demo .wh-kits-carousel-track {
+  #womens-health .wh-kits-carousel-track {
     transition: none;
   }
 }
 
-#wh-demo .wh-kit-flow {
+#womens-health .wh-kit-flow {
   max-width: 1100px;
   margin: 0 auto 48px;
   background: #fff;
@@ -2116,7 +2116,7 @@
   box-shadow: 0 18px 40px rgba(49, 47, 47, 0.06);
 }
 
-#wh-demo .wh-kit-flow-steps {
+#womens-health .wh-kit-flow-steps {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
@@ -2124,7 +2124,7 @@
   align-items: center;
 }
 
-#wh-demo .wh-kit-flow-step {
+#womens-health .wh-kit-flow-step {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -2132,11 +2132,11 @@
   min-width: 0;
 }
 
-#wh-demo .wh-kit-flow-step:last-child {
+#womens-health .wh-kit-flow-step:last-child {
   grid-template-columns: minmax(0, 1fr);
 }
 
-#wh-demo .wh-kit-flow-arrow {
+#womens-health .wh-kit-flow-arrow {
   flex: none;
   color: var(--ink);
   opacity: 0.38;
@@ -2145,7 +2145,7 @@
   padding-right: 2px;
 }
 
-#wh-demo .wh-kit-flow-steps button {
+#womens-health .wh-kit-flow-steps button {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -2167,37 +2167,37 @@
     transform 0.25s ease;
 }
 
-#wh-demo .wh-kit-flow-steps button:hover,
-#wh-demo .wh-kit-flow-steps button.is-preview {
+#womens-health .wh-kit-flow-steps button:hover,
+#womens-health .wh-kit-flow-steps button.is-preview {
   border-color: rgba(49, 47, 47, 0.24);
   box-shadow: 0 10px 22px rgba(49, 47, 47, 0.08);
   transform: translateY(-1px);
 }
 
-#wh-demo .wh-kit-flow-steps button.is-active {
+#womens-health .wh-kit-flow-steps button.is-active {
   background: #fff;
   border-color: rgba(49, 47, 47, 0.28);
   box-shadow: 0 10px 22px rgba(49, 47, 47, 0.1);
 }
 
-#wh-demo .wh-kit-flow-steps button.is-active .wh-kit-flow-num,
-#wh-demo .wh-kit-flow-steps button.is-active .wh-kit-flow-label {
+#womens-health .wh-kit-flow-steps button.is-active .wh-kit-flow-num,
+#womens-health .wh-kit-flow-steps button.is-active .wh-kit-flow-label {
   opacity: 1;
 }
 
-#wh-demo .wh-kit-flow-num {
+#womens-health .wh-kit-flow-num {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.08em;
   opacity: 0.55;
 }
 
-#wh-demo .wh-kit-flow-label {
+#womens-health .wh-kit-flow-label {
   font-size: 14px;
   font-weight: 500;
 }
 
-#wh-demo .wh-kit-flow-caption {
+#womens-health .wh-kit-flow-caption {
   margin: 0 0 20px;
   padding: 2px 0;
   font-size: 18px;
@@ -2206,14 +2206,14 @@
   opacity: 1;
 }
 
-#wh-demo .wh-kit-flow-caption strong {
+#womens-health .wh-kit-flow-caption strong {
   display: inline;
   font-weight: 700;
   color: #4f634e;
   letter-spacing: 0.01em;
 }
 
-#wh-demo .wh-kit-page {
+#womens-health .wh-kit-page {
   position: relative;
   border: 1px solid rgba(49, 47, 47, 0.1);
   border-radius: 24px;
@@ -2222,7 +2222,7 @@
   min-height: 560px;
 }
 
-#wh-demo .wh-kit-page-chrome {
+#womens-health .wh-kit-page-chrome {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -2231,26 +2231,26 @@
   border-bottom: 1px solid rgba(49, 47, 47, 0.08);
 }
 
-#wh-demo .wh-kit-page-chrome span {
+#womens-health .wh-kit-page-chrome span {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   background: rgba(49, 47, 47, 0.18);
 }
 
-#wh-demo .wh-kit-page-chrome span:nth-child(1) {
+#womens-health .wh-kit-page-chrome span:nth-child(1) {
   background: #e8b4a8;
 }
 
-#wh-demo .wh-kit-page-chrome span:nth-child(2) {
+#womens-health .wh-kit-page-chrome span:nth-child(2) {
   background: #d7cfc7;
 }
 
-#wh-demo .wh-kit-page-chrome span:nth-child(3) {
+#womens-health .wh-kit-page-chrome span:nth-child(3) {
   background: #8ea58d;
 }
 
-#wh-demo .wh-kit-page-chrome em {
+#womens-health .wh-kit-page-chrome em {
   margin-left: 10px;
   font-style: normal;
   font-size: 12px;
@@ -2260,20 +2260,20 @@
   text-overflow: ellipsis;
 }
 
-#wh-demo .wh-kit-page-body {
+#womens-health .wh-kit-page-body {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
   gap: 0;
   min-height: 520px;
 }
 
-#wh-demo .wh-kit-page-product {
+#womens-health .wh-kit-page-product {
   padding: 28px 28px 32px;
   border-right: 1px solid rgba(49, 47, 47, 0.08);
   background: #fff;
 }
 
-#wh-demo .wh-kit-page-media {
+#womens-health .wh-kit-page-media {
   border-radius: 20px;
   overflow: hidden;
   background: var(--sand);
@@ -2281,50 +2281,50 @@
   aspect-ratio: 4 / 3;
 }
 
-#wh-demo .wh-kit-page-media img {
+#womens-health .wh-kit-page-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-#wh-demo .wh-kit-page-product h3 {
+#womens-health .wh-kit-page-product h3 {
   margin: 10px 0 10px;
   font-size: clamp(26px, 3vw, 36px);
 }
 
-#wh-demo .wh-kit-page-product > p {
+#womens-health .wh-kit-page-product > p {
   margin: 0;
   max-width: 34ch;
   opacity: 0.78;
   font-size: 15px;
 }
 
-#wh-demo .wh-kit-page-tray {
+#womens-health .wh-kit-page-tray {
   padding: 24px 24px 28px;
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-#wh-demo .wh-kit-page-tray-head {
+#womens-health .wh-kit-page-tray-head {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 12px;
 }
 
-#wh-demo .wh-kit-page-tray-head h4 {
+#womens-health .wh-kit-page-tray-head h4 {
   margin: 0;
   font-size: 22px;
 }
 
-#wh-demo .wh-kit-page-tray-head span {
+#womens-health .wh-kit-page-tray-head span {
   font-size: 12px;
   opacity: 0.55;
 }
 
-#wh-demo .wh-kit-page-lines {
+#womens-health .wh-kit-page-lines {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -2333,7 +2333,7 @@
   flex: 1;
 }
 
-#wh-demo .wh-kit-page-line {
+#womens-health .wh-kit-page-line {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2343,13 +2343,13 @@
   background: #fff;
 }
 
-#wh-demo .wh-kit-page-line strong {
+#womens-health .wh-kit-page-line strong {
   display: block;
   font-size: 14px;
   font-weight: 500;
 }
 
-#wh-demo .wh-kit-page-line em {
+#womens-health .wh-kit-page-line em {
   display: block;
   margin-top: 2px;
   font-style: normal;
@@ -2357,7 +2357,7 @@
   opacity: 0.55;
 }
 
-#wh-demo .wh-kit-page-qty {
+#womens-health .wh-kit-page-qty {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -2366,7 +2366,7 @@
   padding: 4px 8px;
 }
 
-#wh-demo .wh-kit-page-qty span {
+#womens-health .wh-kit-page-qty span {
   width: 22px;
   height: 22px;
   border-radius: 50%;
@@ -2377,13 +2377,13 @@
   font-size: 13px;
 }
 
-#wh-demo .wh-kit-page-qty b {
+#womens-health .wh-kit-page-qty b {
   min-width: 1.2ch;
   text-align: center;
   font-size: 14px;
 }
 
-#wh-demo .wh-kit-page-line--add {
+#womens-health .wh-kit-page-line--add {
   justify-content: center;
   border: 1.5px dashed rgba(49, 47, 47, 0.22);
   background: transparent;
@@ -2391,27 +2391,27 @@
   font-weight: 500;
 }
 
-#wh-demo .wh-kit-page-line--new {
+#womens-health .wh-kit-page-line--new {
   animation: wh-kit-new-item 0.55s ease both;
 }
 
-#wh-demo .wh-kit-page-line.is-pressed,
-#wh-demo .wh-kit-page-qty-plus.is-pressed,
-#wh-demo .wh-kit-page-line--add.is-pressed,
-#wh-demo .wh-kit-page-save.is-pressed,
-#wh-demo .wh-kit-page-cart.is-pressed {
+#womens-health .wh-kit-page-line.is-pressed,
+#womens-health .wh-kit-page-qty-plus.is-pressed,
+#womens-health .wh-kit-page-line--add.is-pressed,
+#womens-health .wh-kit-page-save.is-pressed,
+#womens-health .wh-kit-page-cart.is-pressed {
   animation: wh-kit-target 0.55s ease both;
 }
 
-#wh-demo .wh-kit-page-actions {
+#womens-health .wh-kit-page-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 6px;
 }
 
-#wh-demo .wh-kit-page-save,
-#wh-demo .wh-kit-page-cart {
+#womens-health .wh-kit-page-save,
+#womens-health .wh-kit-page-cart {
   border: 0;
   border-radius: 999px;
   padding: 12px 18px;
@@ -2421,18 +2421,18 @@
   cursor: default;
 }
 
-#wh-demo .wh-kit-page-save {
+#womens-health .wh-kit-page-save {
   background: rgba(142, 165, 141, 0.22);
   color: #4f634e;
 }
 
-#wh-demo .wh-kit-page-cart {
+#womens-health .wh-kit-page-cart {
   position: relative;
   background: var(--ink);
   color: #fff;
 }
 
-#wh-demo .wh-kit-search {
+#womens-health .wh-kit-search {
   position: absolute;
   inset: 0;
   z-index: 6;
@@ -2444,7 +2444,7 @@
   animation: wh-kit-search-in 0.28s ease both;
 }
 
-#wh-demo .wh-kit-search-card {
+#womens-health .wh-kit-search-card {
   width: min(100%, 360px);
   background: #fff;
   border-radius: 22px;
@@ -2452,7 +2452,7 @@
   box-shadow: 0 24px 50px rgba(49, 47, 47, 0.18);
 }
 
-#wh-demo .wh-kit-search-label {
+#womens-health .wh-kit-search-label {
   margin: 0 0 10px;
   font-size: 12px;
   font-weight: 600;
@@ -2461,7 +2461,7 @@
   opacity: 0.55;
 }
 
-#wh-demo .wh-kit-search-input {
+#womens-health .wh-kit-search-input {
   display: flex;
   align-items: center;
   gap: 2px;
@@ -2474,14 +2474,14 @@
   font-weight: 500;
 }
 
-#wh-demo .wh-kit-search-caret {
+#womens-health .wh-kit-search-caret {
   width: 1.5px;
   height: 1.1em;
   background: var(--ink);
   animation: wh-kit-caret 0.9s steps(1) infinite;
 }
 
-#wh-demo .wh-kit-search-results {
+#womens-health .wh-kit-search-results {
   list-style: none;
   margin: 12px 0 0;
   padding: 0;
@@ -2489,7 +2489,7 @@
   gap: 6px;
 }
 
-#wh-demo .wh-kit-search-results li {
+#womens-health .wh-kit-search-results li {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2501,19 +2501,19 @@
   font-weight: 500;
 }
 
-#wh-demo .wh-kit-search-results li.is-active {
+#womens-health .wh-kit-search-results li.is-active {
   background: rgba(142, 165, 141, 0.22);
   box-shadow: 0 0 0 2px rgba(142, 165, 141, 0.35);
 }
 
-#wh-demo .wh-kit-search-results em {
+#womens-health .wh-kit-search-results em {
   font-style: normal;
   font-size: 12px;
   font-weight: 600;
   color: #4f634e;
 }
 
-#wh-demo .wh-kit-cursor {
+#womens-health .wh-kit-cursor {
   position: absolute;
   top: 0;
   left: 0;
@@ -2526,16 +2526,16 @@
   will-change: transform;
 }
 
-#wh-demo .wh-kit-cursor.is-clicking {
+#womens-health .wh-kit-cursor.is-clicking {
   transition-duration: 0.12s;
 }
 
-#wh-demo .wh-kit-cursor.is-clicking svg {
+#womens-health .wh-kit-cursor.is-clicking svg {
   transform: scale(0.88);
   transform-origin: 4px 4px;
 }
 
-#wh-demo .wh-kit-cursor-ripple {
+#womens-health .wh-kit-cursor-ripple {
   position: absolute;
   left: 0;
   top: 0;
@@ -2548,7 +2548,7 @@
   pointer-events: none;
 }
 
-#wh-demo .wh-kit-cursor.is-clicking .wh-kit-cursor-ripple {
+#womens-health .wh-kit-cursor.is-clicking .wh-kit-cursor-ripple {
   animation: wh-kit-ripple 0.45s ease-out both;
 }
 
@@ -2607,51 +2607,51 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #wh-demo .wh-kit-page-line--new,
-  #wh-demo .wh-kit-page-line.is-pressed,
-  #wh-demo .wh-kit-page-qty-plus.is-pressed,
-  #wh-demo .wh-kit-page-line--add.is-pressed,
-  #wh-demo .wh-kit-page-save.is-pressed,
-  #wh-demo .wh-kit-page-cart.is-pressed,
-  #wh-demo .wh-kit-search,
-  #wh-demo .wh-kit-search-caret,
-  #wh-demo .wh-kit-cursor,
-  #wh-demo .wh-kit-cursor-ripple {
+  #womens-health .wh-kit-page-line--new,
+  #womens-health .wh-kit-page-line.is-pressed,
+  #womens-health .wh-kit-page-qty-plus.is-pressed,
+  #womens-health .wh-kit-page-line--add.is-pressed,
+  #womens-health .wh-kit-page-save.is-pressed,
+  #womens-health .wh-kit-page-cart.is-pressed,
+  #womens-health .wh-kit-search,
+  #womens-health .wh-kit-search-caret,
+  #womens-health .wh-kit-cursor,
+  #womens-health .wh-kit-cursor-ripple {
     animation: none !important;
     transition: none !important;
   }
 
-  #wh-demo .wh-kit-cursor {
+  #womens-health .wh-kit-cursor {
     display: none;
   }
 }
 
 /* —— SHOP PRODUCTS / ROOMS —— */
-#wh-demo .wh-shop {
+#womens-health .wh-shop {
   background: #e7eee5;
   padding: 100px 24px 110px;
   color: var(--ink);
 }
 
-#wh-demo .wh-shop .eyebrow {
+#womens-health .wh-shop .eyebrow {
   display: block;
   text-align: center;
   color: #5f735e;
 }
 
-#wh-demo .wh-shop > .container > h2 {
+#womens-health .wh-shop > .container > h2 {
   text-align: center;
   font-size: clamp(34px, 4.5vw, 56px);
   margin: 14px auto 16px;
 }
 
-#wh-demo .wh-shop-intro {
+#womens-health .wh-shop-intro {
   text-align: center;
   max-width: 48ch;
   margin: 0 auto 28px;
 }
 
-#wh-demo .wh-shop-rooms {
+#womens-health .wh-shop-rooms {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -2659,7 +2659,7 @@
   margin-bottom: 36px;
 }
 
-#wh-demo .wh-shop-rooms button {
+#womens-health .wh-shop-rooms button {
   appearance: none;
   border: 1.5px solid rgba(49, 47, 47, 0.18);
   background: rgba(255, 255, 255, 0.55);
@@ -2674,32 +2674,32 @@
     border-color 0.2s ease;
 }
 
-#wh-demo .wh-shop-rooms button.is-active,
-#wh-demo .wh-shop-rooms button:hover {
+#womens-health .wh-shop-rooms button.is-active,
+#womens-health .wh-shop-rooms button:hover {
   background: var(--ink);
   color: #fff;
   border-color: var(--ink);
 }
 
-#wh-demo .wh-shop-empty {
+#womens-health .wh-shop-empty {
   text-align: center;
   opacity: 0.7;
   margin: 24px 0;
 }
 
-#wh-demo .wh-shop-cta {
+#womens-health .wh-shop-cta {
   display: flex;
   justify-content: center;
   margin-top: 40px;
 }
 
-#wh-demo .wh-product-grid {
+#womens-health .wh-product-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
 }
 
-#wh-demo .wh-product-card {
+#womens-health .wh-product-card {
   display: flex;
   flex-direction: column;
   text-decoration: none;
@@ -2712,18 +2712,18 @@
     box-shadow 0.35s ease;
 }
 
-#wh-demo .wh-product-card:hover {
+#womens-health .wh-product-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 18px 36px rgba(49, 47, 47, 0.1);
 }
 
-#wh-demo .wh-product-media {
+#womens-health .wh-product-media {
   aspect-ratio: 1;
   background: var(--sand);
   overflow: hidden;
 }
 
-#wh-demo .wh-product-media img {
+#womens-health .wh-product-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -2731,11 +2731,11 @@
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#wh-demo .wh-product-card:hover .wh-product-media img {
+#womens-health .wh-product-card:hover .wh-product-media img {
   transform: scale(1.05);
 }
 
-#wh-demo .wh-product-fallback {
+#womens-health .wh-product-fallback {
   width: 100%;
   height: 100%;
   min-height: 180px;
@@ -2745,24 +2745,24 @@
     linear-gradient(160deg, #efe7dd, #ddd2c4);
 }
 
-#wh-demo .wh-product-meta {
+#womens-health .wh-product-meta {
   padding: 18px 18px 22px;
   display: grid;
   gap: 8px;
 }
 
-#wh-demo .wh-product-meta h3 {
+#womens-health .wh-product-meta h3 {
   font-size: 18px;
   line-height: 1.25;
 }
 
-#wh-demo .wh-product-price {
+#womens-health .wh-product-price {
   font-size: 14px;
   font-weight: 500;
   opacity: 0.75;
 }
 
-#wh-demo .wh-product-badge {
+#womens-health .wh-product-badge {
   display: inline-block;
   align-self: flex-start;
   font-size: 10px;
@@ -2776,7 +2776,7 @@
 }
 
 /* —— CLOSING —— */
-#wh-demo .closing {
+#womens-health .closing {
   min-height: 85vh;
   display: grid;
   place-items: center;
@@ -2787,47 +2787,47 @@
   background: var(--ink);
 }
 
-#wh-demo .closing-bg {
+#womens-health .closing-bg {
   position: absolute;
   inset: 0;
   z-index: 0;
 }
 
-#wh-demo .closing-bg img {
+#womens-health .closing-bg img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-#wh-demo .closing-bg::after {
+#womens-health .closing-bg::after {
   content: '';
   position: absolute;
   inset: 0;
   background: rgba(49, 47, 47, 0.55);
 }
 
-#wh-demo .closing .container {
+#womens-health .closing .container {
   position: relative;
   z-index: 1;
 }
 
-#wh-demo .closing h2 {
+#womens-health .closing h2 {
   font-size: clamp(40px, 6vw, 78px);
 }
 
-#wh-demo .closing h2 span {
+#womens-health .closing h2 span {
   display: block;
   font-style: italic;
   color: var(--blush);
 }
 
-#wh-demo .closing p {
+#womens-health .closing p {
   margin: 22px auto 34px;
   max-width: 42ch;
   font-size: 18px;
 }
 
-#wh-demo .wh-manifesto-kicker {
+#womens-health .wh-manifesto-kicker {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.18em;
@@ -2836,192 +2836,192 @@
   margin-bottom: 16px;
 }
 
-#wh-demo .wh-closing-cta {
+#womens-health .wh-closing-cta {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 12px;
 }
 
-#wh-demo .closing-thumbs {
+#womens-health .closing-thumbs {
   display: none;
 }
 
 @media (max-width: 980px) {
-  #wh-demo .hero {
+  #womens-health .hero {
     grid-template-columns: 1fr;
     min-height: auto;
   }
 
-  #wh-demo .hero-inner {
+  #womens-health .hero-inner {
     padding: 72px 24px 40px;
   }
 
-  #wh-demo .hero-stack {
+  #womens-health .hero-stack {
     min-height: 52vh;
     margin: 0 16px 24px;
   }
 
-  #wh-demo .mosaic {
+  #womens-health .mosaic {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: auto;
   }
 
-  #wh-demo .mosaic .m1,
-  #wh-demo .mosaic .m2,
-  #wh-demo .mosaic .m3,
-  #wh-demo .mosaic .m4,
-  #wh-demo .mosaic .m5,
-  #wh-demo .mosaic .m6 {
+  #womens-health .mosaic .m1,
+  #womens-health .mosaic .m2,
+  #womens-health .mosaic .m3,
+  #womens-health .mosaic .m4,
+  #womens-health .mosaic .m5,
+  #womens-health .mosaic .m6 {
     grid-column: auto;
     grid-row: auto;
     height: 160px;
   }
 
-  #wh-demo .counters-grid,
-  #wh-demo .pillars-grid,
-  #wh-demo .voice-cards {
+  #womens-health .counters-grid,
+  #womens-health .pillars-grid,
+  #womens-health .voice-cards {
     grid-template-columns: 1fr 1fr;
   }
 
-  #wh-demo .images-text-grid,
-  #wh-demo .chapter,
-  #wh-demo .chapter:nth-child(even),
-  #wh-demo .timeline-slide,
-  #wh-demo .faq-layout,
-  #wh-demo .wh-clair-board {
+  #womens-health .images-text-grid,
+  #womens-health .chapter,
+  #womens-health .chapter:nth-child(even),
+  #womens-health .timeline-slide,
+  #womens-health .faq-layout,
+  #womens-health .wh-clair-board {
     grid-template-columns: 1fr;
   }
 
-  #wh-demo .chapter:nth-child(even) .wh-pic,
-  #wh-demo .chapter:nth-child(even) .copy {
+  #womens-health .chapter:nth-child(even) .wh-pic,
+  #womens-health .chapter:nth-child(even) .copy {
     order: 0;
   }
 
-  #wh-demo .chapter .wh-pic {
+  #womens-health .chapter .wh-pic {
     min-height: 42vh;
   }
 
-  #wh-demo .images-text.tips-pair .visuals,
-  #wh-demo .images-text.tips-pair .copy {
+  #womens-health .images-text.tips-pair .visuals,
+  #womens-health .images-text.tips-pair .copy {
     order: 0;
   }
 
-  #wh-demo .wh-clair {
+  #womens-health .wh-clair {
     min-height: min(120vh, 1100px);
   }
 
-  #wh-demo .wh-clair-board {
+  #womens-health .wh-clair-board {
     padding: 88px 24px 96px;
   }
 
-  #wh-demo .wh-clair-copy h2 {
+  #womens-health .wh-clair-copy h2 {
     max-width: none;
   }
 
-  #wh-demo .voice:nth-child(2),
-  #wh-demo .voice:nth-child(4) {
+  #womens-health .voice:nth-child(2),
+  #womens-health .voice:nth-child(4) {
     transform: none;
   }
 
-  #wh-demo .faq-art {
+  #womens-health .faq-art {
     position: static;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
   }
 
-  #wh-demo .faq-art .wh-pic:first-child,
-  #wh-demo .faq-art .wh-pic:last-child {
+  #womens-health .faq-art .wh-pic:first-child,
+  #womens-health .faq-art .wh-pic:last-child {
     aspect-ratio: 4 / 5;
     width: 100%;
     justify-self: stretch;
   }
 
-  #wh-demo .timeline-dots {
+  #womens-health .timeline-dots {
     grid-template-columns: 1fr;
   }
 
-  #wh-demo .timeline-visual {
+  #womens-health .timeline-visual {
     min-height: 320px;
   }
 
-  #wh-demo .wh-kit-feature {
+  #womens-health .wh-kit-feature {
     grid-template-columns: 1fr;
     height: auto;
     min-height: 0;
   }
 
-  #wh-demo .wh-kit-feature-media {
+  #womens-health .wh-kit-feature-media {
     aspect-ratio: 4 / 3;
     height: auto;
   }
 
-  #wh-demo .wh-kit-feature-copy {
+  #womens-health .wh-kit-feature-copy {
     padding: 28px;
   }
 
-  #wh-demo .wh-kit-feature-copy h3 {
+  #womens-health .wh-kit-feature-copy h3 {
     min-height: 0;
   }
 
-  #wh-demo .wh-kit-feature-copy > p {
+  #womens-health .wh-kit-feature-copy > p {
     min-height: 0;
   }
 
-  #wh-demo .wh-kit-page-body {
+  #womens-health .wh-kit-page-body {
     grid-template-columns: 1fr;
   }
 
-  #wh-demo .wh-kit-page-product {
+  #womens-health .wh-kit-page-product {
     border-right: 0;
     border-bottom: 1px solid rgba(49, 47, 47, 0.08);
   }
 
-  #wh-demo .wh-kit-page {
+  #womens-health .wh-kit-page {
     min-height: 0;
   }
 
-  #wh-demo .wh-kit-flow-steps {
+  #womens-health .wh-kit-flow-steps {
     grid-template-columns: 1fr 1fr;
   }
 
-  #wh-demo .wh-kit-flow-arrow {
+  #womens-health .wh-kit-flow-arrow {
     display: none;
   }
 
-  #wh-demo .wh-kit-flow-step {
+  #womens-health .wh-kit-flow-step {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  #wh-demo .wh-kit-cursor {
+  #womens-health .wh-kit-cursor {
     display: none;
   }
 
-  #wh-demo .wh-doors-grid,
-  #wh-demo .wh-chooser-grid,
-  #wh-demo .wh-voice-feature,
-  #wh-demo .wh-product-grid,
-  #wh-demo .voice-cards {
+  #womens-health .wh-doors-grid,
+  #womens-health .wh-chooser-grid,
+  #womens-health .wh-voice-feature,
+  #womens-health .wh-product-grid,
+  #womens-health .voice-cards {
     grid-template-columns: 1fr 1fr;
   }
 }
 
 @media (max-width: 640px) {
-  #wh-demo .counters-grid,
-  #wh-demo .pillars-grid,
-  #wh-demo .voice-cards,
-  #wh-demo .wh-doors-grid,
-  #wh-demo .wh-chooser-grid,
-  #wh-demo .wh-voice-feature,
-  #wh-demo .wh-product-grid {
+  #womens-health .counters-grid,
+  #womens-health .pillars-grid,
+  #womens-health .voice-cards,
+  #womens-health .wh-doors-grid,
+  #womens-health .wh-chooser-grid,
+  #womens-health .wh-voice-feature,
+  #womens-health .wh-product-grid {
     grid-template-columns: 1fr;
   }
 
-  #wh-demo .wh-clair-uses {
+  #womens-health .wh-clair-uses {
     grid-template-columns: 1fr;
   }
 
-  #wh-demo .hero h1 {
+  #womens-health .hero h1 {
     max-width: 12ch;
   }
 }

@@ -1,13 +1,14 @@
 'use client';
 
 import { useFormatter, useTranslations } from 'next-intl';
+import { ChevronLeft, ChevronRight, Plus, Search, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { usePathname, useRouter } from '~/i18n/routing';
 
 import { Select } from '@/vibes/soul/form/select';
 import { PriceLabel, type Price } from '@/vibes/soul/primitives/price-label';
-import { Button } from '@/vibes/soul/primitives/button';
+import { ArchiveButton } from '@/vibes/soul/primitives/archive-button';
 import { Modal } from '@/vibes/soul/primitives/modal';
 import { toast } from '@/vibes/soul/primitives/toaster';
 import { Image } from '~/components/image';
@@ -120,6 +121,48 @@ function buildKitItemsPayload(
       ...(selectedOptions ? { selectedOptions } : {}),
     };
   });
+}
+
+function KitQuantityStepper({
+  quantity,
+  decrementLabel,
+  incrementLabel,
+  onDecrement,
+  onIncrement,
+}: {
+  quantity: number;
+  decrementLabel: string;
+  incrementLabel: string;
+  onDecrement: () => void;
+  onIncrement: () => void;
+}) {
+  return (
+    <div className="quantity relative inline-flex w-fit shrink-0">
+      <button
+        aria-label={decrementLabel}
+        className="quantity__button"
+        onClick={onDecrement}
+        type="button"
+      >
+        <ChevronLeft className="icon icon-chevron-left icon-sm stroke-2" size={16} strokeWidth={2} />
+      </button>
+      <span className="quantity__input flex min-w-[2.5rem] items-center justify-center text-center text-sm font-medium sm:min-w-[3rem] sm:text-base">
+        {quantity}
+      </span>
+      <button
+        aria-label={incrementLabel}
+        className="quantity__button"
+        onClick={onIncrement}
+        type="button"
+      >
+        <ChevronRight
+          className="icon icon-chevron-right icon-sm stroke-2"
+          size={16}
+          strokeWidth={2}
+        />
+      </button>
+    </div>
+  );
 }
 
 /**
@@ -488,21 +531,26 @@ export function CuratedKitCustomizer({
   }, [searchOpen, searchTerm]);
 
   return (
-    <div className="space-y-6 pb-8">
-      <div className="space-y-3">
-        <div className="flex items-end justify-between gap-4">
-          <h2 className="text-base font-medium">{t('includedTitle')}</h2>
-          <p className="text-sm text-[var(--contrast-500)]">
+    <div className="liivv-kit-customizer">
+      <header className="liivv-kit-customizer__intro">
+        <p className="liivv-kit-customizer__eyebrow">{t('eyebrow')}</p>
+        <p className="liivv-kit-customizer__subtitle">{t('subtitle')}</p>
+      </header>
+
+      <section aria-labelledby="kit-included-heading" className="liivv-kit-customizer__panel">
+        <div className="liivv-kit-customizer__panel-head">
+          <h2 className="liivv-kit-customizer__panel-title" id="kit-included-heading">
+            {t('includedTitle')}
+          </h2>
+          <span className="liivv-kit-customizer__count">
             {t('includedCount', { count: included.length })}
-          </p>
+          </span>
         </div>
 
         {included.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-[var(--contrast-200)] px-4 py-6 text-center text-sm text-[var(--contrast-500)]">
-            {t('allRemoved')}
-          </p>
+          <p className="liivv-kit-customizer__empty">{t('allRemoved')}</p>
         ) : (
-          <ul className="divide-y divide-[var(--contrast-100)] overflow-hidden rounded-xl border border-[var(--contrast-100)]">
+          <ul className="liivv-kit-customizer__items">
             {included.map((item) => {
               const product = productById.get(item.productEntityId);
 
@@ -513,40 +561,50 @@ export function CuratedKitCustomizer({
               const options = product.options ?? [];
               const selectedOptions =
                 item.selectedOptions ?? fallbackSelectedOptions(product);
+              const lineTotal = product.unitPrice * item.quantity;
+              const isAddOn = !baseProductIds.has(product.productEntityId);
 
               return (
-                <li className="flex gap-3 p-3" key={item.productEntityId}>
-                  <Link
-                    className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-[var(--contrast-100)]"
-                    href={product.href}
-                  >
+                <li className="liivv-kit-item" key={item.productEntityId}>
+                  <Link className="liivv-kit-item__media" href={product.href}>
                     {product.image ? (
                       <Image
                         alt={product.image.alt}
                         className="object-cover"
                         fill
-                        sizes="56px"
+                        sizes="80px"
                         src={product.image.src}
                       />
-                    ) : null}
+                    ) : (
+                      <span aria-hidden className="liivv-kit-item__media-fallback" />
+                    )}
                   </Link>
-                  <div className="min-w-0 flex-1">
-                    <Link
-                      className="line-clamp-2 text-sm font-medium text-[var(--foreground)] hover:underline"
-                      href={product.href}
-                    >
-                      {product.title}
-                    </Link>
-                    {!baseProductIds.has(product.productEntityId) ? (
-                      <p className="mt-0.5 text-xs text-[var(--contrast-500)]">{t('addedLabel')}</p>
-                    ) : null}
-                    {product.price ? (
-                      <div className="mt-0.5">
-                        <PriceLabel className="text-sm" price={product.price} />
+
+                  <div className="liivv-kit-item__body">
+                    <div className="liivv-kit-item__top">
+                      <div className="liivv-kit-item__copy">
+                        {isAddOn ? (
+                          <span className="liivv-kit-item__badge">{t('addedLabel')}</span>
+                        ) : null}
+                        <Link className="liivv-kit-item__title" href={product.href}>
+                          {product.title}
+                        </Link>
+                        {product.price ? (
+                          <div className="liivv-kit-item__unit-price">
+                            <PriceLabel className="text-sm" price={product.price} />
+                          </div>
+                        ) : null}
                       </div>
-                    ) : null}
+                      <p className="liivv-kit-item__line-total">
+                        {format.number(lineTotal, {
+                          style: 'currency',
+                          currency: currencyCode,
+                        })}
+                      </p>
+                    </div>
+
                     {options.length > 0 ? (
-                      <div className="mt-2 space-y-2">
+                      <div className="liivv-kit-item__options">
                         {options.map((option) => {
                           const currentValue =
                             selectedOptions?.multipleChoices.find(
@@ -578,31 +636,21 @@ export function CuratedKitCustomizer({
                         })}
                       </div>
                     ) : null}
-                    <div className="mt-2 flex flex-wrap items-center gap-2">
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          aria-label={t('decrement')}
-                          className="flex size-7 items-center justify-center rounded border border-[var(--contrast-200)] text-sm"
-                          onClick={() => setQuantity(item.productEntityId, item.quantity - 1)}
-                          type="button"
-                        >
-                          −
-                        </button>
-                        <span className="min-w-5 text-center text-sm">{item.quantity}</span>
-                        <button
-                          aria-label={t('increment')}
-                          className="flex size-7 items-center justify-center rounded border border-[var(--contrast-200)] text-sm"
-                          onClick={() => setQuantity(item.productEntityId, item.quantity + 1)}
-                          type="button"
-                        >
-                          +
-                        </button>
-                      </div>
+
+                    <div className="liivv-kit-item__actions">
+                      <KitQuantityStepper
+                        decrementLabel={t('decrement')}
+                        incrementLabel={t('increment')}
+                        onDecrement={() => setQuantity(item.productEntityId, item.quantity - 1)}
+                        onIncrement={() => setQuantity(item.productEntityId, item.quantity + 1)}
+                        quantity={item.quantity}
+                      />
                       <button
-                        className="text-xs text-[var(--contrast-500)] underline"
+                        className="liivv-kit-item__remove"
                         onClick={() => setQuantity(item.productEntityId, 0)}
                         type="button"
                       >
+                        <X aria-hidden size={14} strokeWidth={2} />
                         {t('remove')}
                       </button>
                     </div>
@@ -612,125 +660,135 @@ export function CuratedKitCustomizer({
             })}
           </ul>
         )}
-      </div>
+      </section>
 
       {removed.length > 0 ? (
-        <div className="space-y-3">
-          <h3 className="text-sm font-medium">{t('removedTitle')}</h3>
-          <ul className="space-y-2">
+        <section aria-labelledby="kit-removed-heading" className="liivv-kit-customizer__side">
+          <div className="liivv-kit-customizer__side-head">
+            <h3 className="liivv-kit-customizer__side-title" id="kit-removed-heading">
+              {t('removedTitle')}
+            </h3>
+            <p className="liivv-kit-customizer__side-subtitle">{t('removedSubtitle')}</p>
+          </div>
+          <ul className="liivv-kit-side-list">
             {removed.map((product) => (
-              <li
-                className="flex items-center gap-3 rounded-lg border border-[var(--contrast-100)] p-2"
-                key={product.productEntityId}
-              >
-                <div className="relative size-10 shrink-0 overflow-hidden rounded-md bg-[var(--contrast-100)]">
+              <li className="liivv-kit-side-row" key={product.productEntityId}>
+                <div className="liivv-kit-side-row__media">
                   {product.image ? (
                     <Image
                       alt={product.image.alt}
                       className="object-cover"
                       fill
-                      sizes="40px"
+                      sizes="48px"
                       src={product.image.src}
                     />
                   ) : null}
                 </div>
-                <p className="min-w-0 flex-1 line-clamp-2 text-xs font-medium">{product.title}</p>
-                <Button
+                <p className="liivv-kit-side-row__title">{product.title}</p>
+                <ArchiveButton
+                  className="liivv-kit-side-row__cta shrink-0"
                   onClick={() => setQuantity(product.productEntityId, product.defaultQuantity)}
-                  size="x-small"
+                  size="sm"
                   type="button"
                   variant="secondary"
                 >
                   {t('addBack')}
-                </Button>
+                </ArchiveButton>
               </li>
             ))}
           </ul>
-        </div>
+        </section>
       ) : null}
 
       {visibleSuggestions.length > 0 ? (
-        <div className="space-y-3">
-          <h3 className="text-sm font-medium">{t('suggestedTitle')}</h3>
-          <p className="text-xs text-[var(--contrast-500)]">{t('suggestedSubtitle')}</p>
-          <ul className="space-y-2">
+        <section aria-labelledby="kit-suggested-heading" className="liivv-kit-customizer__side">
+          <div className="liivv-kit-customizer__side-head">
+            <h3 className="liivv-kit-customizer__side-title" id="kit-suggested-heading">
+              {t('suggestedTitle')}
+            </h3>
+            <p className="liivv-kit-customizer__side-subtitle">{t('suggestedSubtitle')}</p>
+          </div>
+          <ul className="liivv-kit-side-list">
             {visibleSuggestions.map((product) => (
-              <li
-                className="flex items-center gap-3 rounded-lg border border-[var(--contrast-100)] p-2"
-                key={product.productEntityId}
-              >
-                <div className="relative size-10 shrink-0 overflow-hidden rounded-md bg-[var(--contrast-100)]">
+              <li className="liivv-kit-side-row" key={product.productEntityId}>
+                <div className="liivv-kit-side-row__media">
                   {product.image ? (
                     <Image
                       alt={product.image.alt}
                       className="object-cover"
                       fill
-                      sizes="40px"
+                      sizes="48px"
                       src={product.image.src}
                     />
                   ) : null}
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="line-clamp-2 text-xs font-medium">{product.title}</p>
+                <div className="liivv-kit-side-row__copy">
+                  <p className="liivv-kit-side-row__title">{product.title}</p>
                   {product.price ? (
                     <PriceLabel className="text-xs" price={product.price} />
                   ) : null}
                 </div>
-                <Button
+                <ArchiveButton
+                  className="liivv-kit-side-row__cta shrink-0"
                   disabled={addingProductId === product.productEntityId}
                   loading={addingProductId === product.productEntityId}
                   onClick={() => {
                     void addProductToKit(product.productEntityId);
                   }}
-                  size="x-small"
+                  size="sm"
                   type="button"
                   variant="secondary"
                 >
+                  <Plus aria-hidden size={14} strokeWidth={2} />
                   {t('addProduct')}
-                </Button>
+                </ArchiveButton>
               </li>
             ))}
           </ul>
-        </div>
+        </section>
       ) : null}
 
-      <div>
-        <Button
-          className="w-full"
-          onClick={() => setSearchOpen(true)}
-          type="button"
-          variant="secondary"
-        >
-          {t('searchAddProduct')}
-        </Button>
-      </div>
+      <button
+        className="liivv-kit-customizer__search-trigger"
+        onClick={() => setSearchOpen(true)}
+        type="button"
+      >
+        <Search aria-hidden size={16} strokeWidth={2} />
+        <span>{t('searchAddProduct')}</span>
+      </button>
 
-      <div className="flex flex-col gap-3 border-t border-[var(--contrast-100)] pt-4">
-        <div className="flex items-baseline justify-between gap-3">
-          <p className="text-sm text-[var(--contrast-500)]">{t('runningTotal')}</p>
-          <p className="text-lg font-semibold">
+      <div className="liivv-kit-customizer__checkout">
+        <div className="liivv-kit-customizer__total-row">
+          <span className="liivv-kit-customizer__total-label">{t('runningTotal')}</span>
+          <span className="liivv-kit-customizer__total-value">
             {format.number(runningTotal, { style: 'currency', currency: currencyCode })}
-          </p>
+          </span>
         </div>
-        <Button
-          className="w-full"
-          disabled={included.length === 0 || isPending}
-          loading={isPending}
-          onClick={handleAddKitToCart}
-          type="button"
-        >
-          {t('addKitToCart')}
-        </Button>
-        <Button
-          className="w-full"
-          disabled={included.length === 0 || isSaving}
-          loading={isSaving}
-          onClick={handleSaveForLater}
-          type="button"
-          variant="secondary"
-        >
-          {t('saveForLater')}
-        </Button>
+        <div className="liivv-kit-customizer__checkout-actions">
+          <ArchiveButton
+            className="w-full"
+            disabled={included.length === 0 || isPending}
+            loading={isPending}
+            onClick={handleAddKitToCart}
+            size="fixed"
+            type="button"
+            variant="primary"
+            {...{ is: 'hover-button' }}
+          >
+            {t('addKitToCart')}
+          </ArchiveButton>
+          <ArchiveButton
+            className="w-full"
+            disabled={included.length === 0 || isSaving}
+            loading={isSaving}
+            onClick={handleSaveForLater}
+            size="fixed"
+            type="button"
+            variant="secondary"
+          >
+            {t('saveForLater')}
+          </ArchiveButton>
+        </div>
       </div>
 
       <Modal
@@ -745,58 +803,60 @@ export function CuratedKitCustomizer({
         }}
         title={t('searchModalTitle')}
       >
-        <div className="space-y-4">
-          <input
-            autoFocus
-            className="w-full rounded-lg border border-[var(--contrast-200)] px-3 py-2 text-sm"
-            onChange={(event) => setSearchTerm(event.target.value)}
-            placeholder={t('searchPlaceholder')}
-            type="search"
-            value={searchTerm}
-          />
+        <div className="liivv-kit-search">
+          <label className="liivv-kit-search__field">
+            <Search aria-hidden className="liivv-kit-search__icon" size={16} strokeWidth={2} />
+            <input
+              autoFocus
+              className="liivv-kit-search__input"
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder={t('searchPlaceholder')}
+              type="search"
+              value={searchTerm}
+            />
+          </label>
           {isSearching ? (
-            <p className="text-sm text-[var(--contrast-500)]">{t('searching')}</p>
+            <p className="liivv-kit-search__status">{t('searching')}</p>
           ) : null}
           {searchResults.length > 0 ? (
-            <ul className="max-h-72 space-y-2 overflow-y-auto">
+            <ul className="liivv-kit-search__results">
               {searchResults.map((product) => {
                 const entityId = Number(product.id);
 
                 return (
-                  <li
-                    className="flex items-center gap-3 rounded-lg border border-[var(--contrast-100)] p-2"
-                    key={product.id}
-                  >
-                    <div className="relative size-10 shrink-0 overflow-hidden rounded-md bg-[var(--contrast-100)]">
+                  <li className="liivv-kit-side-row" key={product.id}>
+                    <div className="liivv-kit-side-row__media">
                       {product.image ? (
                         <Image
                           alt={product.image.alt}
                           className="object-cover"
                           fill
-                          sizes="40px"
+                          sizes="48px"
                           src={product.image.src}
                         />
                       ) : null}
                     </div>
-                    <p className="min-w-0 flex-1 line-clamp-2 text-xs font-medium">{product.title}</p>
-                    <Button
+                    <p className="liivv-kit-side-row__title">{product.title}</p>
+                    <ArchiveButton
+                      className="liivv-kit-side-row__cta shrink-0"
                       disabled={!Number.isFinite(entityId) || addingProductId === entityId}
                       loading={addingProductId === entityId}
                       onClick={() => {
                         void addProductToKit(entityId);
                       }}
-                      size="x-small"
+                      size="sm"
                       type="button"
                       variant="secondary"
                     >
+                      <Plus aria-hidden size={14} strokeWidth={2} />
                       {t('addProduct')}
-                    </Button>
+                    </ArchiveButton>
                   </li>
                 );
               })}
             </ul>
           ) : searchTerm.trim().length >= 2 && !isSearching ? (
-            <p className="text-sm text-[var(--contrast-500)]">{t('searchEmpty')}</p>
+            <p className="liivv-kit-search__status">{t('searchEmpty')}</p>
           ) : null}
         </div>
       </Modal>

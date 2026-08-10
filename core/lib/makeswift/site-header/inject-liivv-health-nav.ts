@@ -1,22 +1,22 @@
 import type { LiivvArchiveNavLink } from '~/lib/makeswift/liivv-archive-header/types';
 import { pathnameMatchesPrefix } from '~/lib/makeswift/site-header/should-hide-store-header';
 
-export const WOMEN_HEALTH_DEMO_PATH = '/liivv-health/womens-health-demo';
-export const CLAIR_HEALTH_PATH = `${WOMEN_HEALTH_DEMO_PATH}/clair-health`;
+export const WOMENS_HEALTH_PATH = '/liivv-health/womens-health';
+export const CLAIR_HEALTH_PATH = `${WOMENS_HEALTH_PATH}/clair-health`;
 export const SHOP_WOMENS_HEALTH_PATH = '/liivv-health/womens-health/shop-womens-health';
 
-const CHAPTER_IMG = '/archive/womens-health-demo';
+const CHAPTER_IMG = '/archive/womens-health';
 
 /**
  * Keep labels/slugs in sync with
- * `app/.../womens-health-demo/chapters/chapters-data.ts`.
+ * `app/.../womens-health/chapters/chapters-data.ts`.
  * Defined here (not imported) so the site header stays free of chapter page copy.
  * `image` drives the mega-menu preview (replaces the Liivv logo fallback).
  */
 const CHAPTER_LINKS = [
   {
     label: 'Foundation & First Cycles',
-    href: `${WOMEN_HEALTH_DEMO_PATH}/chapters/foundation-first-cycles`,
+    href: `${WOMENS_HEALTH_PATH}/chapters/foundation-first-cycles`,
     image: {
       src: `${CHAPTER_IMG}/chapter-1.jpg`,
       alt: 'Foundation & First Cycles',
@@ -24,7 +24,7 @@ const CHAPTER_LINKS = [
   },
   {
     label: 'Rhythm & Balance',
-    href: `${WOMEN_HEALTH_DEMO_PATH}/chapters/rhythm-and-balance`,
+    href: `${WOMENS_HEALTH_PATH}/chapters/rhythm-and-balance`,
     image: {
       src: `${CHAPTER_IMG}/chapter-2.jpg`,
       alt: 'Rhythm & Balance',
@@ -32,7 +32,7 @@ const CHAPTER_LINKS = [
   },
   {
     label: 'Reset & Recharge',
-    href: `${WOMEN_HEALTH_DEMO_PATH}/chapters/reset-and-recharge`,
+    href: `${WOMENS_HEALTH_PATH}/chapters/reset-and-recharge`,
     image: {
       src: `${CHAPTER_IMG}/chapter-3.jpg`,
       alt: 'Reset & Recharge',
@@ -40,7 +40,7 @@ const CHAPTER_LINKS = [
   },
   {
     label: 'Grow & Recover',
-    href: `${WOMEN_HEALTH_DEMO_PATH}/chapters/grow-and-recover`,
+    href: `${WOMENS_HEALTH_PATH}/chapters/grow-and-recover`,
     image: {
       src: `${CHAPTER_IMG}/chapter-4.jpg`,
       alt: 'Grow & Recover',
@@ -48,7 +48,7 @@ const CHAPTER_LINKS = [
   },
   {
     label: 'Transition & Relief',
-    href: `${WOMEN_HEALTH_DEMO_PATH}/chapters/transition-and-relief`,
+    href: `${WOMENS_HEALTH_PATH}/chapters/transition-and-relief`,
     image: {
       src: `${CHAPTER_IMG}/chapter-5.jpg`,
       alt: 'Transition & Relief',
@@ -56,7 +56,7 @@ const CHAPTER_LINKS = [
   },
   {
     label: 'Longevity & Vitality',
-    href: `${WOMEN_HEALTH_DEMO_PATH}/chapters/longevity-and-vitality`,
+    href: `${WOMENS_HEALTH_PATH}/chapters/longevity-and-vitality`,
     image: {
       src: `${CHAPTER_IMG}/chapter-6.jpg`,
       alt: 'Longevity & Vitality',
@@ -64,10 +64,10 @@ const CHAPTER_LINKS = [
   },
 ] as const;
 
-const WOMEN_HEALTH_DEMO_NAV: LiivvArchiveNavLink[] = [
+const WOMENS_HEALTH_NAV: LiivvArchiveNavLink[] = [
   {
     label: "Women's Health",
-    href: WOMEN_HEALTH_DEMO_PATH,
+    href: WOMENS_HEALTH_PATH,
   },
   {
     label: 'Clair Health',
@@ -75,7 +75,7 @@ const WOMEN_HEALTH_DEMO_NAV: LiivvArchiveNavLink[] = [
   },
   {
     label: 'Find Your Chapter',
-    href: `${WOMEN_HEALTH_DEMO_PATH}#where-are-you`,
+    href: `${WOMENS_HEALTH_PATH}#where-are-you`,
     columns: [
       {
         links: [...CHAPTER_LINKS],
@@ -88,11 +88,11 @@ const WOMEN_HEALTH_DEMO_NAV: LiivvArchiveNavLink[] = [
   },
 ];
 
-/** Custom header nav for the Women’s Health demo route only. */
-export function getWomensHealthDemoNav(): LiivvArchiveNavLink[] {
-  return WOMEN_HEALTH_DEMO_NAV;
+/** Custom header nav for the Women's Health route. */
+export function getWomensHealthNav(): LiivvArchiveNavLink[] {
+  return WOMENS_HEALTH_NAV;
 }
 
 export function shouldShowLiivvHealthNav(pathname: string): boolean {
-  return pathnameMatchesPrefix(pathname, WOMEN_HEALTH_DEMO_PATH);
+  return pathnameMatchesPrefix(pathname, WOMENS_HEALTH_PATH);
 }

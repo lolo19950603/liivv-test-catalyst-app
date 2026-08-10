@@ -1,6 +1,6 @@
-/* Clair Health demo — inspired by wearclair.com, sold through Liivv */
+/* Clair Health — inspired by wearclair.com, sold through Liivv */
 
-#clair-demo {
+#clair-health {
   --paper: #fdf8f3;
   --ink: #1a1a1a;
   --brown: #5c250d;
@@ -21,15 +21,15 @@
   overflow-x: clip;
 }
 
-#clair-demo *,
-#clair-demo *::before,
-#clair-demo *::after {
+#clair-health *,
+#clair-health *::before,
+#clair-health *::after {
   box-sizing: border-box;
 }
 
-#clair-demo h1,
-#clair-demo h2,
-#clair-demo h3 {
+#clair-health h1,
+#clair-health h2,
+#clair-health h3 {
   font-family: var(--font-heading);
   font-weight: 500;
   line-height: 1.08;
@@ -37,17 +37,17 @@
   color: inherit;
 }
 
-#clair-demo a {
+#clair-health a {
   color: inherit;
 }
 
-#clair-demo .clair-container {
+#clair-health .clair-container {
   max-width: 1180px;
   margin: 0 auto;
   padding: 0 var(--page-pad);
 }
 
-#clair-demo .clair-pill {
+#clair-health .clair-pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -63,7 +63,7 @@
   line-height: 1;
 }
 
-#clair-demo .clair-pill-dot {
+#clair-health .clair-pill-dot {
   width: 6px;
   height: 6px;
   border-radius: 999px;
@@ -71,13 +71,13 @@
   flex: none;
 }
 
-#clair-demo .clair-pill--light {
+#clair-health .clair-pill--light {
   background: rgba(255, 255, 255, 0.14);
   border-color: rgba(255, 255, 255, 0.22);
   color: rgba(255, 255, 255, 0.88);
 }
 
-#clair-demo .clair-btn {
+#clair-health .clair-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -95,11 +95,11 @@
     opacity 0.2s ease;
 }
 
-#clair-demo .clair-btn:hover {
+#clair-health .clair-btn:hover {
   transform: translateY(-1px);
 }
 
-#clair-demo .clair-btn-ember {
+#clair-health .clair-btn-ember {
   color: #fff;
   background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.04)), var(--ember);
   box-shadow:
@@ -108,92 +108,92 @@
     0 0 0 1px rgba(0, 0, 0, 0.15) inset;
 }
 
-#clair-demo .clair-btn-ember:hover {
+#clair-health .clair-btn-ember:hover {
   background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.06)), var(--ember-deep);
 }
 
-#clair-demo .clair-btn-white {
+#clair-health .clair-btn-white {
   background: #fff;
   color: var(--ink);
 }
 
-#clair-demo .clair-btn-white:hover {
+#clair-health .clair-btn-white:hover {
   background: #f5f5f5;
 }
 
-#clair-demo .clair-btn-ghost {
+#clair-health .clair-btn-ghost {
   background: transparent;
   color: #fff;
   border: 1.5px solid rgba(255, 255, 255, 0.7);
 }
 
-#clair-demo .clair-btn-ghost:hover {
+#clair-health .clair-btn-ghost:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
-#clair-demo .clair-btn-ghost-dark {
+#clair-health .clair-btn-ghost-dark {
   background: transparent;
   color: var(--brown);
   border: 1.5px solid rgba(92, 37, 13, 0.28);
 }
 
-#clair-demo .clair-btn-ghost-dark:hover {
+#clair-health .clair-btn-ghost-dark:hover {
   background: rgba(92, 37, 13, 0.05);
 }
 
-#clair-demo .clair-cta-row {
+#clair-health .clair-cta-row {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
   margin-top: 28px;
 }
 
-#clair-demo .clair-pic {
+#clair-health .clair-pic {
   position: relative;
   overflow: hidden;
   background: #efe8df;
 }
 
-#clair-demo .clair-pic img {
+#clair-health .clair-pic img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-#clair-demo .clair-section-head {
+#clair-health .clair-section-head {
   text-align: center;
   max-width: 42rem;
   margin: 0 auto 48px;
 }
 
-#clair-demo .clair-section-head .clair-pill {
+#clair-health .clair-section-head .clair-pill {
   margin-bottom: 18px;
 }
 
-#clair-demo .clair-section-head h2 {
+#clair-health .clair-section-head h2 {
   color: var(--brown);
   font-size: clamp(36px, 5vw, 56px);
   margin: 0 0 14px;
   text-wrap: balance;
 }
 
-#clair-demo .clair-section-head p {
+#clair-health .clair-section-head p {
   margin: 0 auto;
   color: var(--muted);
   font-size: 17px;
   max-width: 42ch;
 }
 
-#clair-demo #stages,
-#clair-demo #how-it-works,
-#clair-demo #faq,
-#clair-demo #preorder {
+#clair-health #stages,
+#clair-health #how-it-works,
+#clair-health #faq,
+#clair-health #preorder {
   scroll-margin-top: 6rem;
 }
 
 /* Back link */
-#clair-demo .clair-back {
+#clair-health .clair-back {
   position: fixed;
   top: calc(env(safe-area-inset-top, 0px) + 5.75rem);
   left: var(--page-pad);
@@ -213,29 +213,29 @@
     box-shadow 0.25s ease;
 }
 
-#clair-demo .clair-back.is-scrolled {
+#clair-health .clair-back.is-scrolled {
   color: var(--ink);
   background: rgba(253, 248, 243, 0.92);
   box-shadow: 0 10px 24px rgba(26, 26, 26, 0.08);
 }
 
-#clair-demo .clair-back:hover {
+#clair-health .clair-back:hover {
   color: #fff;
   background: rgba(26, 26, 26, 0.45);
 }
 
-#clair-demo .clair-back.is-scrolled:hover {
+#clair-health .clair-back.is-scrolled:hover {
   color: var(--ink);
   background: #fff;
 }
 
 /* Hero — scroll frames */
-#clair-demo .clair-hero-scroll {
+#clair-health .clair-hero-scroll {
   position: relative;
   height: 180vh;
 }
 
-#clair-demo .clair-hero {
+#clair-health .clair-hero {
   position: sticky;
   top: 0;
   height: 100vh;
@@ -249,31 +249,31 @@
   text-align: left;
 }
 
-#clair-demo .clair-hero-poster-img,
-#clair-demo .clair-hero-canvas {
+#clair-health .clair-hero-poster-img,
+#clair-health .clair-hero-canvas {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-#clair-demo .clair-hero-poster-img {
+#clair-health .clair-hero-poster-img {
   z-index: 0;
   object-fit: cover;
 }
 
-#clair-demo .clair-hero-canvas {
+#clair-health .clair-hero-canvas {
   z-index: 1;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.35s ease;
 }
 
-#clair-demo .clair-hero-canvas.is-ready {
+#clair-health .clair-hero-canvas.is-ready {
   opacity: 1;
 }
 
-#clair-demo .clair-hero-veil {
+#clair-health .clair-hero-veil {
   position: absolute;
   inset: 0;
   z-index: 2;
@@ -288,7 +288,7 @@
   pointer-events: none;
 }
 
-#clair-demo .clair-hero-inner {
+#clair-health .clair-hero-inner {
   position: relative;
   z-index: 3;
   width: 100%;
@@ -298,12 +298,12 @@
   justify-content: flex-start;
 }
 
-#clair-demo .clair-hero-copy {
+#clair-health .clair-hero-copy {
   max-width: 34rem;
   text-align: left;
 }
 
-#clair-demo .clair-hero h1 {
+#clair-health .clair-hero h1 {
   margin: 0;
   font-size: clamp(42px, 7vw, 72px);
   color: #fff !important;
@@ -312,7 +312,7 @@
   animation: clair-rise 0.9s ease both;
 }
 
-#clair-demo .clair-hero-keywords {
+#clair-health .clair-hero-keywords {
   margin: 16px 0 0;
   color: #fff;
   font-size: clamp(16px, 1.8vw, 20px);
@@ -320,7 +320,7 @@
   animation: clair-rise 0.9s ease 0.06s both;
 }
 
-#clair-demo .clair-hero-lead {
+#clair-health .clair-hero-lead {
   margin: 12px 0 0;
   max-width: 38ch;
   color: rgba(255, 255, 255, 0.88);
@@ -328,47 +328,47 @@
   animation: clair-rise 0.9s ease 0.12s both;
 }
 
-#clair-demo .clair-hero-lead em {
+#clair-health .clair-hero-lead em {
   font-family: var(--font-heading);
   font-style: italic;
   font-weight: 400;
 }
 
-#clair-demo .clair-hero-copy .clair-cta-row {
+#clair-health .clair-hero-copy .clair-cta-row {
   animation: clair-rise 0.9s ease 0.18s both;
 }
 
 /* Offer / founding card */
-#clair-demo .clair-offer {
+#clair-health .clair-offer {
   background: var(--paper);
   padding: 88px 0;
 }
 
-#clair-demo .clair-offer-grid {
+#clair-health .clair-offer-grid {
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
   gap: 48px;
   align-items: center;
 }
 
-#clair-demo .clair-offer-copy .clair-pill {
+#clair-health .clair-offer-copy .clair-pill {
   margin-bottom: 16px;
 }
 
-#clair-demo .clair-offer-copy h2 {
+#clair-health .clair-offer-copy h2 {
   color: var(--brown);
   font-size: clamp(36px, 4.5vw, 52px);
   margin: 0 0 14px;
 }
 
-#clair-demo .clair-offer-copy > p {
+#clair-health .clair-offer-copy > p {
   margin: 0 0 22px;
   max-width: 40ch;
   color: var(--muted);
   font-size: 17px;
 }
 
-#clair-demo .clair-offer-list {
+#clair-health .clair-offer-list {
   list-style: none;
   margin: 0 0 28px;
   padding: 0;
@@ -376,7 +376,7 @@
   gap: 12px;
 }
 
-#clair-demo .clair-offer-list li {
+#clair-health .clair-offer-list li {
   display: flex;
   gap: 10px;
   align-items: baseline;
@@ -384,18 +384,18 @@
   border-bottom: 1px solid var(--line);
 }
 
-#clair-demo .clair-offer-list strong {
+#clair-health .clair-offer-list strong {
   color: var(--brown);
   font-weight: 600;
   min-width: 7.5rem;
 }
 
-#clair-demo .clair-offer-list span {
+#clair-health .clair-offer-list span {
   color: var(--muted);
   font-size: 15px;
 }
 
-#clair-demo .clair-offer-copy > p.clair-offer-note {
+#clair-health .clair-offer-copy > p.clair-offer-note {
   margin: 20px 0 0;
   max-width: none;
   color: var(--soft);
@@ -403,7 +403,7 @@
   line-height: 1.4;
 }
 
-#clair-demo .clair-offer-media .clair-pic {
+#clair-health .clair-offer-media .clair-pic {
   border-radius: 20px;
   aspect-ratio: 4 / 5;
   min-height: 420px;
@@ -411,7 +411,7 @@
 }
 
 /* Press marquee */
-#clair-demo .clair-press {
+#clair-health .clair-press {
   background: #fff;
   padding: 28px 0 34px;
   border-top: 1px solid var(--line);
@@ -420,7 +420,7 @@
   overflow: hidden;
 }
 
-#clair-demo .clair-press-pill {
+#clair-health .clair-press-pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -434,14 +434,14 @@
     0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
-#clair-demo .clair-press-pill img {
+#clair-health .clair-press-pill img {
   width: 12px;
   height: 12px;
   display: block;
   flex: none;
 }
 
-#clair-demo .clair-press-pill p {
+#clair-health .clair-press-pill p {
   margin: 0;
   color: #8f8f8f;
   font-size: 11px;
@@ -451,18 +451,18 @@
   line-height: 1;
 }
 
-#clair-demo .clair-press-track-wrap {
+#clair-health .clair-press-track-wrap {
   overflow: hidden;
   mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }
 
-#clair-demo .clair-press-track {
+#clair-health .clair-press-track {
   display: flex;
   width: max-content;
   animation: clair-marquee 40s linear infinite;
 }
 
-#clair-demo .clair-press-group {
+#clair-health .clair-press-group {
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -472,7 +472,7 @@
   box-sizing: border-box;
 }
 
-#clair-demo .clair-press-logo {
+#clair-health .clair-press-logo {
   display: block;
   height: 28px;
   width: auto;
@@ -484,7 +484,7 @@
 }
 
 /* Team / trusted institutions */
-#clair-demo .clair-team {
+#clair-health .clair-team {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -495,7 +495,7 @@
   overflow: hidden;
 }
 
-#clair-demo .clair-team-head {
+#clair-health .clair-team-head {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -506,7 +506,7 @@
   padding: 0 var(--page-pad);
 }
 
-#clair-demo .clair-team-pill {
+#clair-health .clair-team-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -520,14 +520,14 @@
     0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
-#clair-demo .clair-team-pill img {
+#clair-health .clair-team-pill img {
   width: 12px;
   height: 12px;
   display: block;
   flex: none;
 }
 
-#clair-demo .clair-team-pill p {
+#clair-health .clair-team-pill p {
   margin: 0;
   color: #8f8f8f;
   font-size: 11px;
@@ -537,7 +537,7 @@
   line-height: 1;
 }
 
-#clair-demo .clair-team-head h2 {
+#clair-health .clair-team-head h2 {
   margin: 0;
   color: var(--brown);
   font-size: clamp(28px, 4vw, 32px);
@@ -547,7 +547,7 @@
   text-wrap: balance;
 }
 
-#clair-demo .clair-team-head > p {
+#clair-health .clair-team-head > p {
   margin: 0;
   color: #525252;
   font-size: 16px;
@@ -555,14 +555,14 @@
   text-wrap: pretty;
 }
 
-#clair-demo .clair-team-track-wrap {
+#clair-health .clair-team-track-wrap {
   width: 100vw;
   overflow: hidden;
   position: relative;
   mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }
 
-#clair-demo .clair-team-track {
+#clair-health .clair-team-track {
   display: flex;
   width: max-content;
   align-items: center;
@@ -571,13 +571,13 @@
   backface-visibility: hidden;
 }
 
-#clair-demo .clair-team-group {
+#clair-health .clair-team-group {
   display: flex;
   align-items: center;
   flex: none;
 }
 
-#clair-demo .clair-team-logo {
+#clair-health .clair-team-logo {
   display: block;
   height: 28px;
   width: auto;
@@ -589,12 +589,12 @@
 }
 
 /* Stages — center photo with corner cards */
-#clair-demo .clair-stages {
+#clair-health .clair-stages {
   background: #fff;
   padding: 96px 0 110px;
 }
 
-#clair-demo .clair-stages-layout {
+#clair-health .clair-stages-layout {
   position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -605,7 +605,7 @@
   isolation: isolate;
 }
 
-#clair-demo .clair-stages-stars {
+#clair-health .clair-stages-stars {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -614,7 +614,7 @@
   z-index: 0;
 }
 
-#clair-demo .clair-stages-center {
+#clair-health .clair-stages-center {
   position: absolute;
   inset: 0;
   display: flex;
@@ -624,7 +624,7 @@
   z-index: 1;
 }
 
-#clair-demo .clair-stages-photo {
+#clair-health .clair-stages-photo {
   width: min(42vw, 340px);
   aspect-ratio: 1;
   border-radius: 50%;
@@ -633,19 +633,19 @@
     0 0 0 12px #fff;
 }
 
-#clair-demo .clair-stages-photo img {
+#clair-health .clair-stages-photo img {
   position: absolute;
   inset: 0;
   opacity: 0;
   transition: opacity 0.55s ease;
 }
 
-#clair-demo .clair-stages-photo img.is-active {
+#clair-health .clair-stages-photo img.is-active {
   opacity: 1;
   z-index: 1;
 }
 
-#clair-demo .clair-stage-card {
+#clair-health .clair-stage-card {
   position: relative;
   z-index: 2;
   text-align: left;
@@ -665,37 +665,37 @@
     transform 0.25s ease;
 }
 
-#clair-demo .clair-stage-card--tl {
+#clair-health .clair-stage-card--tl {
   justify-self: start;
   align-self: start;
   text-align: left;
 }
 
-#clair-demo .clair-stage-card--tr {
+#clair-health .clair-stage-card--tr {
   justify-self: end;
   align-self: start;
   text-align: right;
 }
 
-#clair-demo .clair-stage-card--bl {
+#clair-health .clair-stage-card--bl {
   justify-self: start;
   align-self: end;
   text-align: left;
 }
 
-#clair-demo .clair-stage-card--br {
+#clair-health .clair-stage-card--br {
   justify-self: end;
   align-self: end;
   text-align: right;
 }
 
-#clair-demo .clair-stage-card:hover,
-#clair-demo .clair-stage-card.is-active {
+#clair-health .clair-stage-card:hover,
+#clair-health .clair-stage-card.is-active {
   opacity: 1;
   transform: translateY(-2px);
 }
 
-#clair-demo .clair-stage-card.is-active {
+#clair-health .clair-stage-card.is-active {
   background: var(--paper);
   border-color: rgba(233, 117, 48, 0.34);
   box-shadow:
@@ -703,99 +703,99 @@
     0 0 28px rgba(233, 117, 48, 0.12);
 }
 
-#clair-demo .clair-stage-card h3 {
+#clair-health .clair-stage-card h3 {
   margin: 0 0 8px;
   color: var(--brown);
   font-size: clamp(18px, 2vw, 22px);
 }
 
-#clair-demo .clair-stage-card p {
+#clair-health .clair-stage-card p {
   margin: 0;
   color: var(--muted);
   font-size: 14px;
   line-height: 1.55;
 }
 
-#clair-demo .clair-stage-card--tr p,
-#clair-demo .clair-stage-card--br p {
+#clair-health .clair-stage-card--tr p,
+#clair-health .clair-stage-card--br p {
   margin-left: auto;
 }
 
 /* Story */
-#clair-demo .clair-story {
+#clair-health .clair-story {
   background: var(--paper);
   padding: 96px 0 110px;
 }
 
-#clair-demo .clair-story-grid {
+#clair-health .clair-story-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 56px;
   align-items: center;
 }
 
-#clair-demo .clair-story-media .clair-pic {
+#clair-health .clair-story-media .clair-pic {
   border-radius: 20px;
   aspect-ratio: 4 / 5;
   min-height: 420px;
 }
 
-#clair-demo .clair-story-copy .clair-pill {
+#clair-health .clair-story-copy .clair-pill {
   margin-bottom: 16px;
 }
 
-#clair-demo .clair-story-copy h2 {
+#clair-health .clair-story-copy h2 {
   color: var(--brown);
   font-size: clamp(34px, 4vw, 48px);
   margin: 0 0 18px;
   max-width: 14ch;
 }
 
-#clair-demo .clair-story-copy p {
+#clair-health .clair-story-copy p {
   margin: 0 0 14px;
   max-width: 42ch;
   color: var(--muted);
   font-size: 16px;
 }
 
-#clair-demo .clair-story-copy .clair-btn {
+#clair-health .clair-story-copy .clair-btn {
   margin-top: 18px;
 }
 
 /* FAQ */
-#clair-demo .clair-faq {
+#clair-health .clair-faq {
   background: #fff;
   padding: 96px 0 140px;
 }
 
-#clair-demo .clair-faq-grid {
+#clair-health .clair-faq-grid {
   display: grid;
   grid-template-columns: minmax(240px, 0.38fr) minmax(0, 0.62fr);
   gap: 64px;
   align-items: start;
 }
 
-#clair-demo .clair-faq-head .clair-pill {
+#clair-health .clair-faq-head .clair-pill {
   margin-bottom: 16px;
 }
 
-#clair-demo .clair-faq-head h2 {
+#clair-health .clair-faq-head h2 {
   color: var(--brown);
   font-size: clamp(36px, 4.5vw, 56px);
   margin: 0 0 12px;
 }
 
-#clair-demo .clair-faq-head p {
+#clair-health .clair-faq-head p {
   margin: 0;
   color: var(--muted);
   max-width: 28ch;
 }
 
-#clair-demo .clair-faq-list details {
+#clair-health .clair-faq-list details {
   border-bottom: 1px solid var(--line);
 }
 
-#clair-demo .clair-faq-list summary {
+#clair-health .clair-faq-list summary {
   list-style: none;
   cursor: pointer;
   display: flex;
@@ -808,11 +808,11 @@
   color: var(--ink);
 }
 
-#clair-demo .clair-faq-list summary::-webkit-details-marker {
+#clair-health .clair-faq-list summary::-webkit-details-marker {
   display: none;
 }
 
-#clair-demo .clair-faq-list summary::after {
+#clair-health .clair-faq-list summary::after {
   content: '';
   width: 10px;
   height: 10px;
@@ -824,17 +824,17 @@
   margin-top: -4px;
 }
 
-#clair-demo .clair-faq-list details[open] summary {
+#clair-health .clair-faq-list details[open] summary {
   color: var(--brown);
 }
 
-#clair-demo .clair-faq-list details[open] summary::after {
+#clair-health .clair-faq-list details[open] summary::after {
   transform: rotate(225deg);
   border-color: var(--ember);
   margin-top: 4px;
 }
 
-#clair-demo .clair-faq-list details p {
+#clair-health .clair-faq-list details p {
   margin: 0;
   padding: 0 4px 22px;
   color: var(--muted);
@@ -844,7 +844,7 @@
 }
 
 /* Closing — full-bleed manifesto */
-#clair-demo .clair-closing {
+#clair-health .clair-closing {
   position: relative;
   min-height: 85vh;
   display: grid;
@@ -859,13 +859,13 @@
   padding: 96px 0;
 }
 
-#clair-demo .clair-closing-bg {
+#clair-health .clair-closing-bg {
   position: absolute;
   inset: 0;
   z-index: 0;
 }
 
-#clair-demo .clair-closing-bg img {
+#clair-health .clair-closing-bg img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -873,7 +873,7 @@
   display: block;
 }
 
-#clair-demo .clair-closing-bg::after {
+#clair-health .clair-closing-bg::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -882,13 +882,13 @@
     radial-gradient(ellipse 80% 70% at 50% 40%, rgba(92, 37, 13, 0.12), rgba(20, 12, 8, 0.55));
 }
 
-#clair-demo .clair-closing-inner {
+#clair-health .clair-closing-inner {
   position: relative;
   z-index: 1;
   max-width: 720px;
 }
 
-#clair-demo .clair-closing-kicker {
+#clair-health .clair-closing-kicker {
   margin: 0 0 16px;
   font-size: 12px;
   font-weight: 600;
@@ -897,7 +897,7 @@
   opacity: 0.75;
 }
 
-#clair-demo .clair-closing-inner h2 {
+#clair-health .clair-closing-inner h2 {
   margin: 0;
   font-size: clamp(40px, 6vw, 72px);
   color: #fff !important;
@@ -905,14 +905,14 @@
   text-wrap: balance;
 }
 
-#clair-demo .clair-closing-inner h2 span {
+#clair-health .clair-closing-inner h2 span {
   display: block;
   font-style: italic;
   color: #f0c4b0;
   font-weight: 400;
 }
 
-#clair-demo .clair-closing-inner > p {
+#clair-health .clair-closing-inner > p {
   margin: 22px auto 34px;
   max-width: 42ch;
   color: rgba(255, 255, 255, 0.9);
@@ -920,7 +920,7 @@
   line-height: 1.55;
 }
 
-#clair-demo .clair-closing-cta {
+#clair-health .clair-closing-cta {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -957,13 +957,13 @@
 }
 
 @media (max-width: 1024px) {
-  #clair-demo .clair-offer-grid,
-  #clair-demo .clair-story-grid,
-  #clair-demo .clair-faq-grid {
+  #clair-health .clair-offer-grid,
+  #clair-health .clair-story-grid,
+  #clair-health .clair-faq-grid {
     grid-template-columns: 1fr;
   }
 
-  #clair-demo .clair-stages-layout {
+  #clair-health .clair-stages-layout {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
     gap: 14px;
@@ -971,7 +971,7 @@
     padding-top: 0;
   }
 
-  #clair-demo .clair-stages-center {
+  #clair-health .clair-stages-center {
     position: relative;
     inset: auto;
     order: -1;
@@ -979,97 +979,97 @@
     pointer-events: none;
   }
 
-  #clair-demo .clair-stages-photo {
+  #clair-health .clair-stages-photo {
     width: min(70vw, 280px);
   }
 
-  #clair-demo .clair-stage-card,
-  #clair-demo .clair-stage-card--tl,
-  #clair-demo .clair-stage-card--tr,
-  #clair-demo .clair-stage-card--bl,
-  #clair-demo .clair-stage-card--br {
+  #clair-health .clair-stage-card,
+  #clair-health .clair-stage-card--tl,
+  #clair-health .clair-stage-card--tr,
+  #clair-health .clair-stage-card--bl,
+  #clair-health .clair-stage-card--br {
     justify-self: stretch;
     align-self: stretch;
     text-align: left;
     max-width: none;
   }
 
-  #clair-demo .clair-stage-card--tr p,
-  #clair-demo .clair-stage-card--br p {
+  #clair-health .clair-stage-card--tr p,
+  #clair-health .clair-stage-card--br p {
     margin-left: 0;
   }
 
-  #clair-demo .clair-offer-media .clair-pic,
-  #clair-demo .clair-story-media .clair-pic {
+  #clair-health .clair-offer-media .clair-pic,
+  #clair-health .clair-story-media .clair-pic {
     min-height: 300px;
   }
 }
 
 @media (max-width: 720px) {
-  #clair-demo .clair-hero-scroll {
+  #clair-health .clair-hero-scroll {
     height: 160vh;
   }
 
-  #clair-demo .clair-hero-inner {
+  #clair-health .clair-hero-inner {
     padding: 12vh 6vw 10vh;
   }
 
-  #clair-demo .clair-back {
+  #clair-health .clair-back {
     top: calc(env(safe-area-inset-top, 0px) + 4.75rem);
   }
 
-  #clair-demo .clair-stages,
-  #clair-demo .clair-story,
-  #clair-demo .clair-faq,
-  #clair-demo .clair-offer {
+  #clair-health .clair-stages,
+  #clair-health .clair-story,
+  #clair-health .clair-faq,
+  #clair-health .clair-offer {
     padding: 72px 0 80px;
   }
 
-  #clair-demo .clair-closing {
+  #clair-health .clair-closing {
     min-height: 70vh;
     border-radius: 32px 32px 0 0;
     margin-top: -32px;
     padding: 72px 0;
   }
 
-  #clair-demo .clair-closing-inner h2 {
+  #clair-health .clair-closing-inner h2 {
     font-size: clamp(34px, 9vw, 48px);
   }
 
-  #clair-demo .clair-team {
+  #clair-health .clair-team {
     gap: 36px;
     padding: 80px 16px;
   }
 
-  #clair-demo .clair-team-head > p {
+  #clair-health .clair-team-head > p {
     font-size: 14px;
   }
 
-  #clair-demo .clair-team-logo {
+  #clair-health .clair-team-logo {
     height: 22px;
     margin-right: 54px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #clair-demo .clair-hero h1,
-  #clair-demo .clair-hero-keywords,
-  #clair-demo .clair-hero-lead,
-  #clair-demo .clair-hero-copy .clair-cta-row,
-  #clair-demo .clair-press-track,
-  #clair-demo .clair-team-track {
+  #clair-health .clair-hero h1,
+  #clair-health .clair-hero-keywords,
+  #clair-health .clair-hero-lead,
+  #clair-health .clair-hero-copy .clair-cta-row,
+  #clair-health .clair-press-track,
+  #clair-health .clair-team-track {
     animation: none !important;
   }
 
-  #clair-demo .clair-stages-photo img {
+  #clair-health .clair-stages-photo img {
     transition: none;
   }
 
-  #clair-demo .clair-hero-scroll {
+  #clair-health .clair-hero-scroll {
     height: auto;
   }
 
-  #clair-demo .clair-hero {
+  #clair-health .clair-hero {
     position: relative;
   }
 }

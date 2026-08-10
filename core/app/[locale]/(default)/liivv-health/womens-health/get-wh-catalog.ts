@@ -18,22 +18,22 @@ import {
   FIRST_CYCLE_STARTER_KIT_ID,
   HERO_FLOAT_MOISTURIZER_ID,
   SHOP_WOMENS_HEALTH_CATEGORY_ID,
-} from './wh-demo-ids';
+} from './wh-ids';
 
 export {
   CLAIR_HEALTH_WRISTBAND_ID,
   FIRST_CYCLE_STARTER_KIT_ID,
   HERO_FLOAT_MOISTURIZER_ID,
   SHOP_WOMENS_HEALTH_CATEGORY_ID,
-} from './wh-demo-ids';
+} from './wh-ids';
 
 /** BigCommerce Storefront GraphQL caps product connections at 50. */
 const PAGE_SIZE = 50;
 const MAX_PAGES = 3;
 
-const WhDemoCatalogQuery = graphql(
+const WhCatalogQuery = graphql(
   `
-    query WhDemoCatalog(
+    query WhCatalog(
       $filters: SearchProductsFiltersInput!
       $first: Int
       $after: String
@@ -118,7 +118,7 @@ const WhDemoCatalogQuery = graphql(
   [PricingFragment],
 );
 
-export type WhDemoCatalogItem = {
+export type WhCatalogItem = {
   entityId: number;
   name: string;
   path: string;
@@ -127,10 +127,10 @@ export type WhDemoCatalogItem = {
   isKit: boolean;
 };
 
-export type WhDemoCatalog = {
-  kits: WhDemoCatalogItem[];
-  products: WhDemoCatalogItem[];
-  featuredKit: WhDemoCatalogItem | null;
+export type WhCatalog = {
+  kits: WhCatalogItem[];
+  products: WhCatalogItem[];
+  featuredKit: WhCatalogItem | null;
 };
 
 function pickProductImage(
@@ -180,7 +180,7 @@ function toItem(
     prices?: Parameters<typeof pricesTransformer>[0];
   },
   format: Awaited<ReturnType<typeof getFormatter>>,
-): WhDemoCatalogItem {
+): WhCatalogItem {
   const customFields = removeEdgesAndNodes(node.customFields ?? { edges: [] });
   const price = pricesTransformer(node.prices ?? null, format);
   let priceLabel: string | undefined;
@@ -203,7 +203,7 @@ function toItem(
   };
 }
 
-export const getWhDemoCatalog = cache(async (locale?: string): Promise<WhDemoCatalog> => {
+export const getWhCatalog = cache(async (locale?: string): Promise<WhCatalog> => {
   const customerAccessToken = await getSessionCustomerAccessToken();
   const currencyCode = await getPreferredCurrencyCode();
   const channelId = getChannelIdFromLocale(locale);
@@ -219,12 +219,12 @@ export const getWhDemoCatalog = cache(async (locale?: string): Promise<WhDemoCat
   const featuredIds = [FIRST_CYCLE_STARTER_KIT_ID, CLAIR_HEALTH_WRISTBAND_ID, HERO_FLOAT_MOISTURIZER_ID];
 
   try {
-    const byId = new Map<number, WhDemoCatalogItem>();
+    const byId = new Map<number, WhCatalogItem>();
     let after: string | null = null;
 
     for (let page = 0; page < MAX_PAGES; page += 1) {
       const response = await client.fetch({
-        document: WhDemoCatalogQuery,
+        document: WhCatalogQuery,
         customerAccessToken,
         channelId,
         variables: {
@@ -276,7 +276,7 @@ export const getWhDemoCatalog = cache(async (locale?: string): Promise<WhDemoCat
 
     return { kits, products, featuredKit };
   } catch (error) {
-    console.error('[getWhDemoCatalog] failed', error);
+    console.error('[getWhCatalog] failed', error);
     return { kits: [], products: [], featuredKit: null };
   }
 });

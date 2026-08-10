@@ -78,6 +78,21 @@ export default async (): Promise<NextConfig> => {
     // default URL generation in BigCommerce uses trailing slash
     trailingSlash: process.env.TRAILING_SLASH !== 'false',
     // eslint-disable-next-line @typescript-eslint/require-await
+    async redirects() {
+      return [
+        {
+          source: '/liivv-health/womens-health-demo',
+          destination: '/liivv-health/womens-health',
+          permanent: true,
+        },
+        {
+          source: '/liivv-health/womens-health-demo/:path*',
+          destination: '/liivv-health/womens-health/:path*',
+          permanent: true,
+        },
+      ];
+    },
+    // eslint-disable-next-line @typescript-eslint/require-await
     async headers() {
       const cdnLinks = settings.urls.cdnUrls.map((url) => ({
         key: 'Link',

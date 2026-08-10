@@ -2,29 +2,29 @@
 
 import { useCallback, useEffect, useRef, useState, type MutableRefObject, type RefObject } from 'react';
 
-import './clair-health-demo.css';
+import './clair-health.css';
 
 /*
  * =============================================================================
- * CLAIR HEALTH DEMO — CONTENT MAP
+ * CLAIR HEALTH — CONTENT MAP
  * =============================================================================
- * Page URL: /liivv-health/womens-health-demo/clair-health
+ * Page URL: /liivv-health/womens-health/clair-health
  *
  * Edit copy in two places:
  *   1. Constants below (OFFER, PRESS, TEAM, STAGES, FAQS)
- *   2. JSX sections in ClairHealthDemoPage / ScrollFrameHero (search "SECTION N —")
+ *   2. JSX sections in ClairHealthPage / ScrollFrameHero (search "SECTION N —")
  *
- * Images live under: /public/archive/womens-health-demo/clair-site/
+ * Images live under: /public/archive/womens-health/clair-site/
  * =============================================================================
  */
 
-const IMG = '/archive/womens-health-demo';
+const IMG = '/archive/womens-health';
 const SITE = `${IMG}/clair-site`;
 const FRAME_COUNT = 40;
 const FRAME_SRC = (index: number) =>
   `${IMG}/clair-frames/frame-${String(index + 1).padStart(3, '0')}.webp`;
 const HERO_POSTER = FRAME_SRC(0);
-const WOMEN_HREF = '/liivv-health/womens-health-demo';
+const WOMEN_HREF = '/liivv-health/womens-health';
 const PREORDER_HREF = '/clair-health-wristband/';
 
 /** SECTION 2 — Pre-order offer bullets */
@@ -519,7 +519,7 @@ function ScrollFrameHero() {
   );
 }
 
-export function ClairHealthDemoPage() {
+export function ClairHealthPage() {
   const [scrolled, setScrolled] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [activeStage, setActiveStage] = useState(0);
@@ -552,7 +552,7 @@ export function ClairHealthDemoPage() {
   };
 
   return (
-    <div id="clair-demo">
+    <div id="clair-health">
       {/* Sticky back link — label edited inline */}
       <a className={`clair-back${scrolled ? ' is-scrolled' : ''}`} href={WOMEN_HREF}>
         ← Women&apos;s Health

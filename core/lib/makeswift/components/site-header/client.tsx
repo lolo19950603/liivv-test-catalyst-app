@@ -29,7 +29,7 @@ import {
   type MakeswiftAdditionalLinkInput,
 } from '~/lib/makeswift/site-header/map-makeswift-nav-links';
 import {
-  getWomensHealthDemoNav,
+  getWomensHealthNav,
   shouldShowLiivvHealthNav,
 } from '~/lib/makeswift/site-header/inject-liivv-health-nav';
 import { resolveStoreNavLinks } from '~/lib/makeswift/site-header/resolve-store-nav-links';
@@ -246,7 +246,7 @@ export const MakeswiftHeader = forwardRef(
     const desktopLogo = resolveStoreLogo(storeLogo, storeLogoLabel);
     const resolvedNavLinks = resolveStoreNavLinks(links, categoryTree);
     const showLiivvHealthNav = shouldShowLiivvHealthNav(pathname);
-    const navLinks = showLiivvHealthNav ? getWomensHealthDemoNav() : resolvedNavLinks;
+    const navLinks = showLiivvHealthNav ? getWomensHealthNav() : resolvedNavLinks;
 
     if (override) {
       return (

@@ -1,4 +1,4 @@
-/** Shared Women's Health demo product IDs (safe for client + server). */
+/** Shared Women's Health product IDs (safe for client + server). */
 
 /** Seed curated kit — First Cycle Starter Kit. */
 export const FIRST_CYCLE_STARTER_KIT_ID = 8017;

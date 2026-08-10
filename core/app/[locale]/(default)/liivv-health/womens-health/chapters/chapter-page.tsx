@@ -11,7 +11,7 @@ import './chapter-page.css';
  * =============================================================================
  * CHAPTER PAGE — CONTENT MAP
  * =============================================================================
- * Routes: /liivv-health/womens-health-demo/chapters/[slug]
+ * Routes: /liivv-health/womens-health/chapters/[slug]
  *
  * Layout lives in this file. Almost all copy lives in:
  *   ./chapters-data.ts  ← edit chapter titles, focus, vibe, categories, etc.

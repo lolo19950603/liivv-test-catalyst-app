@@ -17,8 +17,8 @@
  * =============================================================================
  */
 
-const IMG = '/archive/womens-health-demo';
-const LANDING = '/liivv-health/womens-health-demo';
+const IMG = '/archive/womens-health';
+const LANDING = '/liivv-health/womens-health';
 const PHARMACIST_HREF = '/account/virtual-care';
 
 export type CategorySection = {
