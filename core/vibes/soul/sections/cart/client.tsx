@@ -3,7 +3,7 @@
 import { getFormProps, getInputProps, SubmissionResult, useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
 import { clsx } from 'clsx';
-import { ArrowRight, GiftIcon, Minus, Plus, Trash2 } from 'lucide-react';
+import { ArrowRight, ChevronDown, GiftIcon, Minus, Plus, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import {
   ComponentPropsWithoutRef,
@@ -62,6 +62,51 @@ export interface CartLineItem {
   lineItemEntityId?: string;
   purchaseType?: 'subscription' | 'one-time';
   subscriptionLineKey?: string;
+  /** Curated kit membership when this line was added as part of a kit. */
+  kitId?: string;
+  kitName?: string;
+}
+
+type CartListEntry =
+  | { type: 'item'; item: CartLineItem }
+  | { type: 'kit'; kitId: string; kitName?: string; items: CartLineItem[] };
+
+function groupCartLineItems(items: CartLineItem[]): CartListEntry[] {
+  const entries: CartListEntry[] = [];
+  const kitIndexById = new Map<string, number>();
+
+  for (const item of items) {
+    if (!item.kitId) {
+      entries.push({ type: 'item', item });
+      continue;
+    }
+
+    const existingIndex = kitIndexById.get(item.kitId);
+
+    if (existingIndex != null) {
+      const entry = entries[existingIndex];
+
+      if (entry?.type === 'kit') {
+        entry.items.push(item);
+
+        if (!entry.kitName && item.kitName) {
+          entry.kitName = item.kitName;
+        }
+      }
+
+      continue;
+    }
+
+    kitIndexById.set(item.kitId, entries.length);
+    entries.push({
+      type: 'kit',
+      kitId: item.kitId,
+      kitName: item.kitName,
+      items: [item],
+    });
+  }
+
+  return entries;
 }
 
 export interface CartGiftCertificateLineItem extends CartLineItem {
@@ -295,9 +340,41 @@ export function CartClient<LineItem extends CartLineItem>({
     [optimisticLineItems],
   );
 
+  const cartEntries = useMemo(
+    () => groupCartLineItems(optimisticLineItems),
+    [optimisticLineItems],
+  );
+
   if (optimisticQuantity === 0) {
     return <CartEmptyState {...emptyState} />;
   }
+
+  const handleLineItemSubmit = (lineItem: CartLineItem, formData: FormData) => {
+    startTransition(() => {
+      formAction(formData);
+      setOptimisticLineItems(formData);
+
+      const intent = formData.get('intent');
+
+      if (intent === 'increment') {
+        formData.set('quantity', '1');
+
+        events.onAddToCart?.(formData);
+      }
+
+      if (intent === 'decrement') {
+        formData.set('quantity', '1');
+
+        events.onRemoveFromCart?.(formData);
+      }
+
+      if (intent === 'delete') {
+        formData.set('quantity', lineItem.quantity.toString());
+
+        events.onRemoveFromCart?.(formData);
+      }
+    });
+  };
 
   const summary = (
     <div>
@@ -379,86 +456,224 @@ export function CartClient<LineItem extends CartLineItem>({
               </span>
             </h1>
             <ul className="flex flex-col gap-5">
-              {optimisticLineItems.map((lineItem) => (
-                <li
-                  className="flex flex-col items-start gap-x-5 gap-y-4 @container @sm:flex-row"
-                  key={lineItem.id}
-                >
-              <div className="relative aspect-square w-full max-w-24 overflow-hidden rounded-xl bg-[var(--cart-image-background,hsl(var(--contrast-100)))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cart-focus,hsl(var(--primary)))] focus-visible:ring-offset-4">
-                {lineItem.typename === 'CartGiftCertificate' ? (
-                  <div className="flex h-full w-full flex-col items-center justify-center p-4 text-center">
-                    <GiftIcon className="h-full w-full text-[var(--cart-icon,hsl(var(--contrast-300)))]" />
-                  </div>
-                ) : (
-                  lineItem.image != null && (
-                    <Image
-                      alt={lineItem.image.alt}
-                      className="object-cover"
-                      fill
-                      sizes="(min-width: 28rem) 9rem, (min-width: 24rem) 6rem, 100vw"
-                      src={lineItem.image.src}
+              {cartEntries.map((entry) => {
+                if (entry.type === 'kit') {
+                  return (
+                    <li key={entry.kitId}>
+                      <CartKitSection
+                        decrementLineItemLabel={decrementLineItemLabel}
+                        deleteLineItemLabel={deleteLineItemLabel}
+                        incrementLineItemLabel={incrementLineItemLabel}
+                        kitId={entry.kitId}
+                        kitName={entry.kitName}
+                        lineItemAction={formAction}
+                        lineItems={entry.items}
+                        onLineItemSubmit={handleLineItemSubmit}
+                      />
+                    </li>
+                  );
+                }
+
+                return (
+                  <li key={entry.item.id}>
+                    <CartLineItemRow
+                      decrementLineItemLabel={decrementLineItemLabel}
+                      deleteLineItemLabel={deleteLineItemLabel}
+                      incrementLineItemLabel={incrementLineItemLabel}
+                      lineItem={entry.item}
+                      lineItemAction={formAction}
+                      onLineItemSubmit={handleLineItemSubmit}
                     />
-                  )
-                )}
-              </div>
-              <div className="flex min-w-0 grow flex-col gap-y-3 @xl:flex-row @xl:items-start @xl:justify-between">
-                <div className="flex min-w-0 flex-1 flex-col @xl:pr-6">
-                  <span className="font-medium">{lineItem.title}</span>
-                  <span className="text-[var(--cart-subtext-text,hsl(var(--contrast-400)))] contrast-more:text-[var(--cart-subtitle-text,hsl(var(--contrast-500)))]">
-                    {lineItem.subtitle}
-                  </span>
-                  {lineItem.subscriptionBadge ? (
-                    <SubscriptionLineSummary
-                      badge={lineItem.subscriptionBadge}
-                      className="mt-2"
-                      details={lineItem.subscriptionDetails}
-                    />
-                  ) : null}
-                </div>
-                <div className="w-full shrink-0 @xl:w-[min(100%,16rem)]">
-                <CounterForm
-                  action={formAction}
-                  decrementLabel={decrementLineItemLabel}
-                  deleteLabel={deleteLineItemLabel}
-                  incrementLabel={incrementLineItemLabel}
-                  lineItem={lineItem}
-                  onSubmit={(formData) => {
-                    startTransition(() => {
-                      formAction(formData);
-                      setOptimisticLineItems(formData);
-
-                      const intent = formData.get('intent');
-
-                      if (intent === 'increment') {
-                        formData.set('quantity', '1');
-
-                        events.onAddToCart?.(formData);
-                      }
-
-                      if (intent === 'decrement') {
-                        formData.set('quantity', '1');
-
-                        events.onRemoveFromCart?.(formData);
-                      }
-
-                      if (intent === 'delete') {
-                        formData.set('quantity', lineItem.quantity.toString());
-
-                        events.onRemoveFromCart?.(formData);
-                      }
-                    });
-                  }}
-                />
-                </div>
-              </div>
-            </li>
-          ))}
+                  </li>
+                );
+              })}
             </ul>
           </div>
           <aside className="min-w-0 @lg:sticky @lg:top-10">{summary}</aside>
         </div>
       </div>
     </section>
+  );
+}
+
+function CartKitSection({
+  kitId,
+  kitName,
+  lineItems,
+  lineItemAction,
+  onLineItemSubmit,
+  incrementLineItemLabel,
+  decrementLineItemLabel,
+  deleteLineItemLabel,
+}: {
+  kitId: string;
+  kitName?: string;
+  lineItems: CartLineItem[];
+  lineItemAction: (payload: FormData) => void;
+  onLineItemSubmit: (lineItem: CartLineItem, formData: FormData) => void;
+  incrementLineItemLabel?: string;
+  decrementLineItemLabel?: string;
+  deleteLineItemLabel?: string;
+}) {
+  const t = useTranslations('Cart');
+  const [open, setOpen] = useState(true);
+  const itemCount = lineItems.reduce((total, item) => total + item.quantity, 0);
+  const previewImages = lineItems.filter((item) => item.image).slice(0, 4);
+  const title = kitName?.trim() || t('kitSection.fallbackName', { kitId });
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-[var(--cart-border,hsl(var(--contrast-100)))] bg-white">
+      <button
+        aria-controls={`cart-kit-${kitId}`}
+        aria-expanded={open}
+        className="flex w-full items-start gap-4 px-4 py-4 text-left transition-colors hover:bg-[hsl(var(--contrast-100)/35%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cart-focus,hsl(var(--primary)))] focus-visible:ring-offset-2 @sm:px-5"
+        onClick={() => setOpen((prev) => !prev)}
+        type="button"
+      >
+        <div className="flex shrink-0 -space-x-2">
+          {previewImages.length > 0 ? (
+            previewImages.map((item) => (
+              <div
+                className="relative size-11 overflow-hidden rounded-lg border-2 border-white bg-[var(--cart-image-background,hsl(var(--contrast-100)))]"
+                key={item.id}
+              >
+                {item.image ? (
+                  <Image
+                    alt={item.image.alt}
+                    className="object-cover"
+                    fill
+                    sizes="44px"
+                    src={item.image.src}
+                  />
+                ) : null}
+              </div>
+            ))
+          ) : (
+            <div className="size-11 rounded-lg bg-[var(--cart-image-background,hsl(var(--contrast-100)))]" />
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-[family-name:var(--font-family-mono)] text-[0.6875rem] font-medium uppercase tracking-[0.08em] text-[var(--cart-subtitle-text,hsl(var(--contrast-500)))]">
+            {t('kitSection.eyebrow')} · {kitId}
+          </p>
+          <p className="mt-1 font-medium leading-snug">{title}</p>
+          <p className="mt-1 text-sm text-[var(--cart-subtext-text,hsl(var(--contrast-400)))] contrast-more:text-[var(--cart-subtitle-text,hsl(var(--contrast-500)))]">
+            {t('kitSection.itemCount', { count: itemCount })}
+          </p>
+        </div>
+        <span className="mt-1 inline-flex size-8 shrink-0 items-center justify-center rounded-full text-[var(--cart-icon,hsl(var(--contrast-300)))]">
+          <ChevronDown
+            aria-hidden
+            className={clsx('transition-transform duration-200', open && 'rotate-180')}
+            size={20}
+            strokeWidth={1.5}
+          />
+          <span className="sr-only">
+            {open ? t('kitSection.collapse') : t('kitSection.expand')}
+          </span>
+        </span>
+      </button>
+
+      {open ? (
+        <ul
+          className="flex flex-col gap-4 border-t border-[var(--cart-border,hsl(var(--contrast-100)))] px-4 py-4 @sm:px-5"
+          id={`cart-kit-${kitId}`}
+        >
+          {lineItems.map((lineItem) => (
+            <li key={lineItem.id}>
+              <CartLineItemRow
+                compact
+                decrementLineItemLabel={decrementLineItemLabel}
+                deleteLineItemLabel={deleteLineItemLabel}
+                incrementLineItemLabel={incrementLineItemLabel}
+                lineItem={lineItem}
+                lineItemAction={lineItemAction}
+                onLineItemSubmit={onLineItemSubmit}
+              />
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
+function CartLineItemRow({
+  lineItem,
+  lineItemAction,
+  onLineItemSubmit,
+  incrementLineItemLabel,
+  decrementLineItemLabel,
+  deleteLineItemLabel,
+  compact = false,
+}: {
+  lineItem: CartLineItem;
+  lineItemAction: (payload: FormData) => void;
+  onLineItemSubmit: (lineItem: CartLineItem, formData: FormData) => void;
+  incrementLineItemLabel?: string;
+  decrementLineItemLabel?: string;
+  deleteLineItemLabel?: string;
+  compact?: boolean;
+}) {
+  return (
+    <div
+      className={clsx(
+        'flex flex-col items-start gap-x-5 gap-y-4 @container @sm:flex-row',
+        compact && 'gap-x-4',
+      )}
+    >
+      <div
+        className={clsx(
+          'relative aspect-square w-full overflow-hidden rounded-xl bg-[var(--cart-image-background,hsl(var(--contrast-100)))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cart-focus,hsl(var(--primary)))] focus-visible:ring-offset-4',
+          compact ? 'max-w-16' : 'max-w-24',
+        )}
+      >
+        {lineItem.typename === 'CartGiftCertificate' ? (
+          <div className="flex h-full w-full flex-col items-center justify-center p-4 text-center">
+            <GiftIcon className="h-full w-full text-[var(--cart-icon,hsl(var(--contrast-300)))]" />
+          </div>
+        ) : (
+          lineItem.image != null && (
+            <Image
+              alt={lineItem.image.alt}
+              className="object-cover"
+              fill
+              sizes="(min-width: 28rem) 9rem, (min-width: 24rem) 6rem, 100vw"
+              src={lineItem.image.src}
+            />
+          )
+        )}
+      </div>
+      <div className="flex min-w-0 grow flex-col gap-y-3 @xl:flex-row @xl:items-start @xl:justify-between">
+        <div className="flex min-w-0 flex-1 flex-col @xl:pr-6">
+          <span className="font-medium">{lineItem.title}</span>
+          {lineItem.subtitle ? (
+            <span className="text-[var(--cart-subtext-text,hsl(var(--contrast-400)))] contrast-more:text-[var(--cart-subtitle-text,hsl(var(--contrast-500)))]">
+              {lineItem.subtitle}
+            </span>
+          ) : null}
+          {lineItem.subscriptionBadge ? (
+            <SubscriptionLineSummary
+              badge={lineItem.subscriptionBadge}
+              className="mt-2"
+              details={lineItem.subscriptionDetails}
+            />
+          ) : null}
+        </div>
+        <div className="w-full shrink-0 @xl:w-[min(100%,16rem)]">
+          <CounterForm
+            action={lineItemAction}
+            decrementLabel={decrementLineItemLabel}
+            deleteLabel={deleteLineItemLabel}
+            incrementLabel={incrementLineItemLabel}
+            lineItem={lineItem}
+            onSubmit={(formData) => {
+              onLineItemSubmit(lineItem, formData);
+            }}
+          />
+        </div>
+      </div>
+    </div>
   );
 }
 

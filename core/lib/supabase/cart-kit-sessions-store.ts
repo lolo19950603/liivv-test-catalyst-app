@@ -4,6 +4,25 @@ import type { KitRecord, KitSession } from '~/lib/kit/types';
 
 import { getSupabaseClient, isSupabaseConfigured } from './client';
 
+/** PostgREST: table missing from schema cache (not migrated yet). */
+function isMissingTableError(error: { code?: string; message?: string }): boolean {
+  return (
+    error.code === 'PGRST205' ||
+    (error.message?.includes('schema cache') ?? false) ||
+    (error.message?.includes('does not exist') ?? false)
+  );
+}
+
+function logCartKitSessionError(action: 'load' | 'save', error: { code?: string; message: string }) {
+  // Expected until cart_kit_sessions is created — callers fall back to cookie/KV.
+  if (isMissingTableError(error)) {
+    return;
+  }
+
+  // eslint-disable-next-line no-console
+  console.error(`Failed to ${action} cart kit session: ${error.message}`);
+}
+
 export async function getCartKitSessionFromSupabase(cartId: string): Promise<KitSession | null> {
   if (!isSupabaseConfigured()) {
     return null;
@@ -17,9 +36,7 @@ export async function getCartKitSessionFromSupabase(cartId: string): Promise<Kit
     .maybeSingle();
 
   if (error) {
-    // Table may not exist yet — callers fall back to cookie/KV.
-    // eslint-disable-next-line no-console
-    console.error(`Failed to load cart kit session: ${error.message}`);
+    logCartKitSessionError('load', error);
 
     return null;
   }
@@ -52,8 +69,7 @@ export async function setCartKitSessionInSupabase(
   );
 
   if (error) {
-    // eslint-disable-next-line no-console
-    console.error(`Failed to save cart kit session: ${error.message}`);
+    logCartKitSessionError('save', error);
 
     return false;
   }

@@ -1,0 +1,1022 @@
+/* Liivv Home — Living Map (distinct from Women's Health editorial) */
+
+#liivv-home {
+  /* Neutral Modern Brand Guidelines A4 */
+  --cream: #f5f2ed;
+  --ink: #312f2f;
+  --taupe: #a89c94;
+  --sand: #d7cfc7;
+  --sage: #8ea58d;
+  --blush: #f3c7be;
+  --soft: #faf8f5;
+  /* Sage wash = brand sage into cream (not an extra green) */
+  --leaf: color-mix(in srgb, var(--sage) 16%, var(--cream));
+  --font-heading: var(--font-family-dm-serif-text), Georgia, serif;
+  --font-body: var(--font-family-inter), system-ui, sans-serif;
+
+  color: var(--ink);
+  background: var(--cream);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.55;
+  overflow-x: clip;
+}
+
+#liivv-home *,
+#liivv-home *::before,
+#liivv-home *::after {
+  box-sizing: border-box;
+}
+
+#liivv-home h1,
+#liivv-home h2,
+#liivv-home h3 {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: inherit;
+}
+
+#liivv-home section {
+  position: relative;
+}
+
+#liivv-home section[id] {
+  scroll-margin-top: 6.5rem;
+}
+
+#liivv-home .eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--sage);
+}
+
+#liivv-home .btn {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 14px;
+  padding: 15px 32px;
+  border-radius: 4px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.3s ease;
+}
+
+#liivv-home .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(49, 47, 47, 0.12);
+}
+
+#liivv-home .btn-dark {
+  background: var(--ink);
+  color: #fff;
+}
+
+#liivv-home .btn-outline {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid var(--ink);
+}
+
+#liivv-home .lh-pill {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+#liivv-home .lh-pill--live {
+  background: var(--sage);
+  color: #fff;
+}
+
+#liivv-home .lh-pill--soon {
+  background: var(--sand);
+  color: var(--ink);
+}
+
+#liivv-home .lh-pill--on {
+  background: var(--ink);
+  color: #fff;
+}
+
+/* —— Wave divider (logo / Bayshore continuity cue) —— */
+#liivv-home .lh-wave {
+  line-height: 0;
+  background: var(--cream);
+  color: var(--leaf);
+}
+
+#liivv-home .lh-wave svg {
+  display: block;
+  width: 100%;
+  height: 48px;
+  fill: currentColor;
+}
+
+#liivv-home .lh-wave.is-flip {
+  background: var(--leaf);
+  color: var(--cream);
+  transform: scaleY(-1);
+}
+
+/* —— HERO: brand billboard + side panel + ribbon —— */
+#liivv-home .lh-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  grid-template-rows: 1fr auto;
+  min-height: min(92vh, 920px);
+  background:
+    linear-gradient(135deg, var(--cream) 0%, var(--cream) 55%, var(--leaf) 55%, var(--leaf) 100%);
+  overflow: hidden;
+}
+
+#liivv-home .lh-hero-board {
+  grid-column: 1;
+  grid-row: 1;
+  padding: clamp(48px, 8vh, 96px) clamp(24px, 5vw, 72px) 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 40rem;
+}
+
+#liivv-home .lh-hero-brand {
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+  font-size: clamp(64px, 12vw, 128px);
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  animation: lh-rise 0.8s ease both;
+}
+
+#liivv-home .lh-hero-kicker {
+  margin: 0 0 28px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--taupe);
+  animation: lh-rise 0.8s ease 0.06s both;
+}
+
+#liivv-home .lh-hero h1 {
+  margin: 0;
+  font-size: clamp(28px, 3.6vw, 44px);
+  max-width: 16ch;
+  animation: lh-rise 0.85s ease 0.1s both;
+}
+
+#liivv-home .lh-feel {
+  display: inline-block;
+  font-style: italic;
+  color: var(--ink);
+  border-bottom: 3px solid var(--blush);
+  animation: lh-swap 0.5s ease both;
+}
+
+#liivv-home .lh-hero-lead {
+  margin: 22px 0 0;
+  max-width: 38ch;
+  font-size: clamp(16px, 1.4vw, 18px);
+  opacity: 0.88;
+  animation: lh-rise 0.85s ease 0.16s both;
+}
+
+#liivv-home .lh-hero-cta {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  animation: lh-rise 0.85s ease 0.22s both;
+}
+
+#liivv-home .lh-hero-panel {
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
+  margin: 32px 32px 32px 0;
+  min-height: 420px;
+  overflow: hidden;
+  clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%);
+  background: var(--sand);
+}
+
+#liivv-home .lh-hero-panel img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  animation: lh-drift 20s ease-in-out infinite alternate;
+}
+
+#liivv-home .lh-hero-stamp {
+  position: absolute;
+  left: 18%;
+  bottom: 10%;
+  background: rgba(245, 242, 237, 0.94);
+  padding: 18px 20px;
+  max-width: 11ch;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+  box-shadow: 0 16px 40px rgba(49, 47, 47, 0.12);
+  animation: lh-bob 6s ease-in-out infinite;
+}
+
+#liivv-home .lh-hero-stamp span {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 42px;
+  line-height: 1;
+  margin-bottom: 4px;
+  color: var(--sage);
+}
+
+#liivv-home .lh-hero-ribbon {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  background: var(--ink);
+  color: #fff;
+  overflow: hidden;
+  padding: 14px 0;
+}
+
+#liivv-home .lh-hero-ribbon-track {
+  display: flex;
+  width: max-content;
+  gap: 0;
+  animation: lh-marquee 55s linear infinite;
+}
+
+#liivv-home .lh-hero-ribbon-track span {
+  display: inline-flex;
+  align-items: center;
+  gap: 28px;
+  padding: 0 28px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0.88;
+}
+
+#liivv-home .lh-hero-ribbon-track i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sage);
+  display: block;
+}
+
+/* —— TRUST TICKER —— */
+#liivv-home .lh-ticker {
+  background: var(--sand);
+  overflow: hidden;
+  padding: 16px 0;
+}
+
+#liivv-home .lh-ticker-track {
+  display: flex;
+  width: max-content;
+  gap: 48px;
+  animation: lh-marquee 40s linear infinite reverse;
+}
+
+#liivv-home .lh-ticker-track span {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ink);
+  opacity: 0.75;
+}
+
+/* —— WAYFINDING LIST —— */
+#liivv-home .lh-ways {
+  background: var(--leaf);
+  padding: clamp(64px, 8vw, 104px) clamp(24px, 5vw, 72px);
+}
+
+#liivv-home .lh-ways-head {
+  max-width: 36rem;
+  margin-bottom: 36px;
+}
+
+#liivv-home .lh-ways-head h2 {
+  margin: 12px 0 0;
+  font-size: clamp(32px, 4.5vw, 52px);
+}
+
+#liivv-home .lh-ways-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid rgba(49, 47, 47, 0.14);
+}
+
+#liivv-home .lh-ways-list li {
+  border-bottom: 1px solid rgba(49, 47, 47, 0.14);
+}
+
+#liivv-home .lh-ways-list a {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+  padding: 28px 4px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.25s ease, padding-left 0.3s ease;
+}
+
+#liivv-home .lh-ways-list a:hover {
+  background: rgba(255, 255, 255, 0.45);
+  padding-left: 12px;
+}
+
+#liivv-home .lh-ways-num {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  color: var(--sage);
+}
+
+#liivv-home .lh-ways-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#liivv-home .lh-ways-copy strong {
+  font-family: var(--font-heading);
+  font-size: clamp(22px, 2.4vw, 30px);
+  font-weight: 400;
+}
+
+#liivv-home .lh-ways-copy em {
+  font-style: normal;
+  font-size: 15px;
+  max-width: 48ch;
+  opacity: 0.78;
+}
+
+#liivv-home .lh-ways-arrow {
+  font-size: 22px;
+  opacity: 0.45;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+#liivv-home .lh-ways-list a:hover .lh-ways-arrow {
+  transform: translateX(6px);
+  opacity: 1;
+  color: var(--sage);
+}
+
+/* —— ATLAS: index + preview —— */
+#liivv-home .lh-atlas {
+  background: var(--cream);
+  padding: clamp(64px, 8vw, 110px) clamp(24px, 4vw, 48px);
+}
+
+#liivv-home .lh-atlas-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) auto;
+  gap: 24px;
+  align-items: end;
+  max-width: 1240px;
+  margin: 0 auto 40px;
+}
+
+#liivv-home .lh-atlas-head h2 {
+  margin: 12px 0 14px;
+  font-size: clamp(32px, 4.5vw, 52px);
+  max-width: 16ch;
+}
+
+#liivv-home .lh-atlas-head p {
+  margin: 0;
+  max-width: 46ch;
+  opacity: 0.85;
+}
+
+#liivv-home .lh-atlas-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+#liivv-home .lh-atlas-filters button {
+  appearance: none;
+  border: 1.5px solid rgba(49, 47, 47, 0.18);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+#liivv-home .lh-atlas-filters button.is-active {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+
+#liivv-home .lh-atlas-shell {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.95fr) minmax(0, 1.15fr);
+  gap: 20px;
+  max-width: 1240px;
+  margin: 0 auto;
+  min-height: 560px;
+}
+
+#liivv-home .lh-atlas-index {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 640px;
+  overflow: auto;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sand) transparent;
+}
+
+#liivv-home .lh-atlas-index button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 14px;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  border-radius: 0 8px 8px 0;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+#liivv-home .lh-atlas-index button:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+#liivv-home .lh-atlas-index button.is-active {
+  background: #fff;
+  border-left-color: var(--sage);
+  box-shadow: 0 10px 28px rgba(49, 47, 47, 0.06);
+}
+
+#liivv-home .lh-atlas-index button[data-accent='blush'].is-active {
+  border-left-color: var(--blush);
+}
+
+#liivv-home .lh-atlas-index button[data-accent='sand'].is-active {
+  border-left-color: var(--sand);
+}
+
+#liivv-home .lh-atlas-index button[data-accent='taupe'].is-active {
+  border-left-color: var(--taupe);
+}
+
+#liivv-home .lh-atlas-index-num {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  opacity: 0.45;
+}
+
+#liivv-home .lh-atlas-index button.is-active .lh-atlas-index-num {
+  opacity: 1;
+  color: var(--sage);
+}
+
+#liivv-home .lh-atlas-index-title {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+#liivv-home .lh-atlas-index-status {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+#liivv-home .lh-atlas-index-status.is-live {
+  background: color-mix(in srgb, var(--sage) 22%, transparent);
+  color: var(--ink);
+}
+
+#liivv-home .lh-atlas-index-status.is-soon {
+  background: color-mix(in srgb, var(--taupe) 28%, transparent);
+  color: var(--ink);
+}
+
+#liivv-home .lh-atlas-empty {
+  padding: 24px;
+  opacity: 0.7;
+}
+
+#liivv-home .lh-atlas-preview {
+  position: relative;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: minmax(240px, 1.1fr) auto;
+  box-shadow: 0 20px 50px rgba(49, 47, 47, 0.08);
+  min-height: 520px;
+}
+
+#liivv-home .lh-atlas-preview-media {
+  position: relative;
+  min-height: 260px;
+  background: var(--sand);
+  overflow: hidden;
+}
+
+#liivv-home .lh-atlas-preview-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  animation: lh-preview-in 0.45s ease both;
+}
+
+#liivv-home .lh-atlas-preview-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(49, 47, 47, 0.35), transparent 50%);
+  pointer-events: none;
+}
+
+#liivv-home .lh-atlas-preview[data-accent='blush'] .lh-atlas-preview-veil {
+  background: linear-gradient(to top, rgba(49, 47, 47, 0.35), rgba(243, 199, 190, 0.2) 45%, transparent 70%);
+}
+
+#liivv-home .lh-atlas-preview[data-accent='sage'] .lh-atlas-preview-veil {
+  background: linear-gradient(to top, rgba(49, 47, 47, 0.35), rgba(142, 165, 141, 0.22) 45%, transparent 70%);
+}
+
+#liivv-home .lh-atlas-preview-num {
+  position: absolute;
+  left: 20px;
+  bottom: 14px;
+  font-family: var(--font-heading);
+  font-size: clamp(48px, 6vw, 72px);
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 8px 24px rgba(49, 47, 47, 0.35);
+  z-index: 1;
+}
+
+#liivv-home .lh-atlas-preview-copy {
+  padding: 28px 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: lh-rise 0.4s ease both;
+}
+
+#liivv-home .lh-atlas-preview-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#liivv-home .lh-atlas-preview-copy h3 {
+  margin: 0;
+  font-size: clamp(26px, 3vw, 36px);
+}
+
+#liivv-home .lh-atlas-preview-copy p {
+  margin: 0;
+  max-width: 40ch;
+  opacity: 0.82;
+}
+
+#liivv-home .lh-atlas-preview-copy .btn,
+#liivv-home .lh-soon-note {
+  margin-top: 8px;
+  align-self: flex-start;
+}
+
+#liivv-home .lh-soon-note {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--taupe);
+  padding: 12px 0;
+}
+
+/* —— MANIFEST (sun orb) —— */
+#liivv-home .lh-manifest {
+  background: var(--cream);
+  padding: clamp(80px, 10vw, 130px) clamp(24px, 5vw, 72px);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+#liivv-home .lh-manifest-orb {
+  position: absolute;
+  width: min(70vw, 520px);
+  height: min(70vw, 520px);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 40% 35%, rgba(243, 199, 190, 0.55), transparent 55%),
+    radial-gradient(circle at 60% 65%, rgba(142, 165, 141, 0.4), transparent 55%),
+    rgba(215, 207, 199, 0.35);
+  animation: lh-orb 12s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+#liivv-home .lh-manifest-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 40rem;
+}
+
+#liivv-home .lh-manifest-copy h2 {
+  margin: 14px 0 18px;
+  font-size: clamp(36px, 5.5vw, 64px);
+}
+
+#liivv-home .lh-manifest-copy p {
+  margin: 0 auto;
+  max-width: 42ch;
+  opacity: 0.88;
+  font-size: 17px;
+}
+
+#liivv-home .lh-manifest-traits {
+  list-style: none;
+  margin: 36px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 28px;
+}
+
+#liivv-home .lh-manifest-traits li {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--taupe);
+  position: relative;
+}
+
+#liivv-home .lh-manifest-traits li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: -16px;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--sage);
+  transform: translateY(-50%);
+}
+
+/* —— CARE postcard —— */
+#liivv-home .lh-care {
+  background: var(--soft);
+  padding: clamp(48px, 6vw, 80px) clamp(20px, 4vw, 40px);
+}
+
+#liivv-home .lh-care-card {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(49, 47, 47, 0.08);
+}
+
+#liivv-home .lh-care-media {
+  min-height: 420px;
+  background: var(--sand);
+}
+
+#liivv-home .lh-care-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+#liivv-home .lh-care-copy {
+  padding: clamp(36px, 5vw, 56px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#liivv-home .lh-care-copy h2 {
+  margin: 12px 0 16px;
+  font-size: clamp(28px, 3.4vw, 42px);
+}
+
+#liivv-home .lh-care-copy p {
+  margin: 0 0 12px;
+  max-width: 42ch;
+  opacity: 0.88;
+}
+
+#liivv-home .lh-care-copy .btn {
+  margin-top: 16px;
+  align-self: flex-start;
+}
+
+/* —— FAQ —— */
+#liivv-home .lh-faq {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 48px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(72px, 9vw, 120px) clamp(24px, 4vw, 40px);
+}
+
+#liivv-home .lh-faq-rail h2 {
+  margin: 12px 0 14px;
+  font-size: clamp(32px, 4vw, 48px);
+}
+
+#liivv-home .lh-faq-rail p {
+  margin: 0;
+  max-width: 28ch;
+  opacity: 0.8;
+}
+
+#liivv-home .lh-faq-list details {
+  border-bottom: 1px solid rgba(49, 47, 47, 0.14);
+  padding: 18px 0;
+}
+
+#liivv-home .lh-faq-list summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--font-heading);
+  font-size: 22px;
+}
+
+#liivv-home .lh-faq-list summary::-webkit-details-marker {
+  display: none;
+}
+
+#liivv-home .lh-faq-list summary::after {
+  content: '+';
+  color: var(--sage);
+  font-family: var(--font-body);
+  font-size: 22px;
+}
+
+#liivv-home .lh-faq-list details[open] summary::after {
+  content: '–';
+}
+
+#liivv-home .lh-faq-list details p {
+  margin: 12px 0 4px;
+  max-width: 54ch;
+  opacity: 0.85;
+}
+
+/* —— CLOSING (soft, not dark photo) —— */
+#liivv-home .lh-close {
+  text-align: center;
+  padding: clamp(88px, 12vw, 140px) 24px;
+  background:
+    radial-gradient(80% 60% at 50% 0%, rgba(142, 165, 141, 0.22), transparent 60%),
+    radial-gradient(60% 50% at 80% 100%, rgba(243, 199, 190, 0.28), transparent 55%),
+    var(--cream);
+}
+
+#liivv-home .lh-close-kicker {
+  margin: 0 0 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+
+#liivv-home .lh-close h2 {
+  margin: 0;
+  font-size: clamp(36px, 6vw, 68px);
+}
+
+#liivv-home .lh-close h2 span {
+  display: block;
+  margin-top: 8px;
+  font-style: italic;
+  color: var(--sage);
+}
+
+#liivv-home .lh-close > p {
+  margin: 22px auto 32px;
+  max-width: 40ch;
+  font-size: 17px;
+  opacity: 0.88;
+}
+
+#liivv-home .lh-close-cta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* —— MOTION —— */
+@keyframes lh-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lh-swap {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lh-drift {
+  from {
+    transform: scale(1) translate(0, 0);
+  }
+  to {
+    transform: scale(1.06) translate(-1.5%, 1%);
+  }
+}
+
+@keyframes lh-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes lh-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes lh-orb {
+  from {
+    transform: scale(1) translate(-2%, 0);
+  }
+  to {
+    transform: scale(1.08) translate(2%, 3%);
+  }
+}
+
+@keyframes lh-preview-in {
+  from {
+    opacity: 0.4;
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* —— RESPONSIVE —— */
+@media (max-width: 980px) {
+  #liivv-home .lh-hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    background: var(--cream);
+  }
+
+  #liivv-home .lh-hero-board {
+    max-width: none;
+    padding: 64px 24px 32px;
+  }
+
+  #liivv-home .lh-hero-panel {
+    grid-column: 1;
+    margin: 0 16px 0;
+    min-height: 48vh;
+    clip-path: polygon(0 8%, 100% 0, 100% 100%, 0 100%);
+  }
+
+  #liivv-home .lh-atlas-head,
+  #liivv-home .lh-atlas-shell,
+  #liivv-home .lh-care-card,
+  #liivv-home .lh-faq {
+    grid-template-columns: 1fr;
+  }
+
+  #liivv-home .lh-atlas-filters {
+    justify-content: flex-start;
+  }
+
+  #liivv-home .lh-atlas-index {
+    max-height: none;
+  }
+
+  #liivv-home .lh-atlas-preview {
+    min-height: 0;
+  }
+
+  #liivv-home .lh-care-media {
+    min-height: 260px;
+  }
+
+  #liivv-home .lh-ways-list a {
+    grid-template-columns: 3rem minmax(0, 1fr);
+  }
+
+  #liivv-home .lh-ways-arrow {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  #liivv-home .lh-hero-brand {
+    font-size: clamp(56px, 18vw, 88px);
+  }
+
+  #liivv-home .lh-hero-stamp {
+    left: 8%;
+    bottom: 8%;
+  }
+
+  #liivv-home .lh-atlas-index button {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+  }
+
+  #liivv-home .lh-atlas-index-status {
+    display: none;
+  }
+
+  #liivv-home .lh-manifest-traits li:not(:last-child)::after {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #liivv-home .lh-hero-panel img,
+  #liivv-home .lh-hero-stamp,
+  #liivv-home .lh-hero-ribbon-track,
+  #liivv-home .lh-ticker-track,
+  #liivv-home .lh-manifest-orb,
+  #liivv-home .lh-feel,
+  #liivv-home .lh-atlas-preview-media img {
+    animation: none !important;
+  }
+
+  #liivv-home .btn:hover,
+  #liivv-home .lh-ways-list a:hover {
+    transform: none;
+  }
+}

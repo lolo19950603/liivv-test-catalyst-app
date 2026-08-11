@@ -829,6 +829,13 @@
             "somethingWentWrong": "Une erreur s'est produite. Veuillez réessayer plus tard."
         },
         "partOfKit": "Fait partie du kit {kitId}",
+        "kitSection": {
+            "eyebrow": "Kit sélectionné",
+            "fallbackName": "Kit {kitId}",
+            "itemCount": "{count, plural, =1 {1 article} other {# articles}}",
+            "expand": "Afficher les articles du kit",
+            "collapse": "Masquer les articles du kit"
+        },
         "subscription": {
             "badge": "Abonnement",
             "billing": "Facturation",

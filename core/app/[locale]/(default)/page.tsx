@@ -1,8 +1,10 @@
 import { Metadata } from 'next';
+import { setRequestLocale } from 'next-intl/server';
 
 import { locales } from '~/i18n/locales';
-import { getMakeswiftPageMetadata, Page as MakeswiftPage } from '~/lib/makeswift';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
+
+import { LiivvHomePage } from './home/liivv-home-page';
 
 interface Params {
   locale: string;
@@ -14,11 +16,11 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const metadata = await getMakeswiftPageMetadata({ path: '/', locale });
 
   return {
-    ...(metadata?.title != null && { title: metadata.title }),
-    ...(metadata?.description != null && { description: metadata.description }),
+    title: 'Liivv | Health, your way',
+    description:
+      "Eleven calm corners of everyday living — Women's Health, Diabetes Care, Ostomy Care, and more. Shop, learn, and ask without the awkward. No shame. Just health.",
     alternates: await getMetadataAlternates({ path: '/', locale }),
   };
 }
@@ -30,5 +32,7 @@ export function generateStaticParams(): Params[] {
 export default async function Home({ params }: Props) {
   const { locale } = await params;
 
-  return <MakeswiftPage locale={locale} path="/" />;
+  setRequestLocale(locale);
+
+  return <LiivvHomePage />;
 }

@@ -1054,7 +1054,7 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
     <div id="womens-health">
       {/* =====================================================================
           SECTION 1 — HERO
-          Kicker, headline, subcopy, CTAs, hero image + float chips.
+          Kicker, headline, subcopy, CTAs, hero video + float chips.
           Rotating feeling words: FEELING_WORDS (top of file).
           ===================================================================== */}
       <section className="hero" aria-label="Women's Health hero">
@@ -1082,7 +1082,16 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
         </div>
         <div className="hero-stack">
           <div aria-hidden className="hero-stack-main">
-            <img alt="" src={`${IMG}/hero.jpg`} />
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              poster={`${IMG}/hero.jpg`}
+              preload="metadata"
+            >
+              <source src={`${IMG}/womens-health-hero-video.mp4`} type="video/mp4" />
+            </video>
           </div>
           <div aria-hidden className="hero-chip">
             <span>Made for real life</span>

@@ -288,6 +288,11 @@ export default async function Cart({ params }: Props) {
       .filter((line): line is typeof line & { kitId: string } => Boolean(line.kitId))
       .map((line) => [line.id, line.kitId]),
   );
+  const kitNameById = new Map(
+    kits
+      .filter((kit): kit is typeof kit & { name: string } => Boolean(kit.name))
+      .map((kit) => [kit.kitId, kit.name]),
+  );
 
   const formattedProductsWithKits: CartLineItem[] = formattedProducts.map((product) => {
     const kitId = kitIdByLineId.get(product.id);
@@ -296,11 +301,10 @@ export default async function Cart({ params }: Props) {
       return product;
     }
 
-    const kitLabel = t('partOfKit', { kitId });
-
     return {
       ...product,
-      subtitle: product.subtitle ? `${product.subtitle} · ${kitLabel}` : kitLabel,
+      kitId,
+      kitName: kitNameById.get(kitId),
     };
   });
 

@@ -860,6 +860,13 @@
     "title": "Cart",
     "heading": "Your cart",
     "partOfKit": "Part of kit {kitId}",
+    "kitSection": {
+      "eyebrow": "Curated kit",
+      "fallbackName": "Kit {kitId}",
+      "itemCount": "{count, plural, =1 {1 item} other {# items}}",
+      "expand": "Show kit items",
+      "collapse": "Hide kit items"
+    },
     "subscription": {
       "badge": "Subscription",
       "billing": "Billing",
