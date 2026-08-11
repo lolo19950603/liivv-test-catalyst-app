@@ -271,10 +271,21 @@
 
 #womens-health .hero-stack-main img,
 #womens-health .hero-stack-main video {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+#womens-health .hero-stack-main video {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#womens-health .hero-stack-main video.is-active {
+  opacity: 1;
 }
 
 #womens-health .hero-stack-main img {

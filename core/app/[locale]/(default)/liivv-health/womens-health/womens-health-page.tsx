@@ -992,6 +992,95 @@ function KitFlowDemo({
   );
 }
 
+/**
+ * Ping-pong hero: native-play forward clip, then a pre-rendered reverse clip,
+ * forever. Much smoother than seeking currentTime backwards.
+ */
+function HeroLoopVideo({
+  src,
+  reverseSrc,
+  poster,
+}: {
+  src: string;
+  reverseSrc: string;
+  poster: string;
+}) {
+  const forwardRef = useRef<HTMLVideoElement>(null);
+  const reverseRef = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState<'forward' | 'reverse'>('forward');
+
+  useEffect(() => {
+    const forward = forwardRef.current;
+    const reverse = reverseRef.current;
+    if (!forward || !reverse) return;
+
+    let alive = true;
+    let mode: 'forward' | 'reverse' = 'forward';
+
+    const playClip = (el: HTMLVideoElement) => {
+      el.currentTime = 0;
+      void el.play().catch(() => {
+        /* muted + playsInline usually allowed */
+      });
+    };
+
+    const show = (next: 'forward' | 'reverse') => {
+      mode = next;
+      setPlaying(next);
+      if (next === 'forward') {
+        reverse.pause();
+        playClip(forward);
+      } else {
+        forward.pause();
+        playClip(reverse);
+      }
+    };
+
+    const onForwardEnded = () => {
+      if (alive && mode === 'forward') show('reverse');
+    };
+    const onReverseEnded = () => {
+      if (alive && mode === 'reverse') show('forward');
+    };
+
+    forward.addEventListener('ended', onForwardEnded);
+    reverse.addEventListener('ended', onReverseEnded);
+    playClip(forward);
+
+    return () => {
+      alive = false;
+      forward.removeEventListener('ended', onForwardEnded);
+      reverse.removeEventListener('ended', onReverseEnded);
+      forward.pause();
+      reverse.pause();
+    };
+  }, []);
+
+  return (
+    <>
+      <video
+        ref={forwardRef}
+        className={playing === 'forward' ? 'is-active' : undefined}
+        muted
+        playsInline
+        poster={poster}
+        preload="auto"
+      >
+        <source src={src} type="video/mp4" />
+      </video>
+      <video
+        ref={reverseRef}
+        className={playing === 'reverse' ? 'is-active' : undefined}
+        muted
+        playsInline
+        preload="auto"
+      >
+        <source src={reverseSrc} type="video/mp4" />
+      </video>
+    </>
+  );
+}
+
 export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
   const [feelingIndex, setFeelingIndex] = useState(0);
   const [shopRoom, setShopRoom] = useState<ShopRoomId>('all');
@@ -1082,16 +1171,11 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
         </div>
         <div className="hero-stack">
           <div aria-hidden className="hero-stack-main">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
+            <HeroLoopVideo
               poster={`${IMG}/hero.jpg`}
-              preload="metadata"
-            >
-              <source src={`${IMG}/womens-health-hero-video.mp4`} type="video/mp4" />
-            </video>
+              reverseSrc={`${IMG}/womens-health-hero-video-reverse.mp4`}
+              src={`${IMG}/womens-health-hero-video.mp4`}
+            />
           </div>
           <div aria-hidden className="hero-chip">
             <span>Made for real life</span>
