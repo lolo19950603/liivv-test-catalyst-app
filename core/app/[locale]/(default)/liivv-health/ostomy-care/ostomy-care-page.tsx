@@ -2,62 +2,52 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type TransitionEvent } from 'react';
 
-import { CHAPTERS as CHAPTER_PAGES, chapterHref } from './chapters/chapters-data';
-import type { WhCatalog, WhCatalogItem } from './get-wh-catalog';
-import { useWhMotion } from './use-wh-motion';
+import { CHAPTERS as CHAPTER_PAGES, SHOP_OSTOMY_HREF, chapterHref } from './chapters/chapters-data';
+import type { OcCatalog, OcCatalogItem } from './get-oc-catalog';
 import {
-  CLAIR_HEALTH_WRISTBAND_ID,
-  FIRST_CYCLE_STARTER_KIT_ID,
-} from './wh-ids';
+  HERO_FLOAT_BARRIER_ID,
+  HERO_FLOAT_POUCH_ID,
+  NEW_JOURNEY_STARTER_KIT_ID,
+} from './oc-ids';
 
-import './womens-health.css';
-import './wh-motion.css';
+import './ostomy-care.css';
 
 /*
  * =============================================================================
- * WOMEN'S HEALTH — CONTENT MAP
+ * OSTOMY CARE ? CONTENT MAP
  * =============================================================================
- * Page URL: /liivv-health/womens-health
+ * Page URL: /liivv-health/ostomy-care
  *
  * Edit copy in two places:
- *   1. Constants below (shared lists: doors, trust items, Clair chips, etc.)
- *   2. JSX sections in WomensHealthPage (search "SECTION N —")
+ *   1. Constants below (shared lists: doors, trust items, brands, etc.)
+ *   2. JSX sections in OstomyCarePage (search "SECTION N ?")
  *
  * Chapter cards pull titles/blurbs from: ./chapters/chapters-data.ts
- * Images live under: /public/archive/womens-health/
+ * Images live under: /public/archive/ostomy-care/
  * =============================================================================
  */
 
 /** Links used by CTAs across the page */
-const SHOP_HREF = '/liivv-health/womens-health/shop-womens-health';
+const SHOP_HREF = SHOP_OSTOMY_HREF;
 const PHARMACIST_HREF = '/account/virtual-care';
-const CLAIR_HREF = '/liivv-health/womens-health/clair-health';
-const CLAIR_PREORDER_HREF = '/clair-health-wristband/';
-const IMG = '/archive/womens-health';
-/** SECTION 1 — Hero float product images */
-const HERO_FLOAT_KIT_IMG = `${IMG}/door-shop-kit.jpg`;
-const HERO_FLOAT_CLAIR_IMG = `${IMG}/clair-official-hero.jpg`;
+const IMG = '/archive/ostomy-care';
+/** SECTION 1 ? Hero float product images */
+const HERO_FLOAT_KIT_IMG = `${IMG}/door-shop.jpg`;
+const HERO_FLOAT_ACCESSORY_IMG = `${IMG}/door-care.jpg`;
 
-/** SECTION 8 — Clair hormone wearable frame animation */
-const CLAIR_FRAME_COUNT = 40;
-const CLAIR_FRAME_FPS = 14;
-const CLAIR_FRAME_SRC = (index: number) =>
-  `${IMG}/clair-frames/frame-${String(index + 1).padStart(3, '0')}.webp`;
-const CLAIR_FRAME_POSTER = CLAIR_FRAME_SRC(0);
-
-/** SECTION 4 — Kit flow demo step labels + captions */
+/** SECTION 4 ? Kit flow demo step labels + captions */
 const KIT_FLOW_STEPS = [
   {
     id: 'customize',
     num: '01',
     title: 'Customize',
-    body: 'Tune quantities on what\'s already in your kit — keep what helps, dial back the rest.',
+    body: 'Tune quantities on what\'s already in your kit ? keep what helps, dial back the rest.',
   },
   {
     id: 'add',
     num: '02',
     title: 'Add something new',
-    body: 'Missing a wipe, vitamin, or comfort pick? Add it to the tray before you save.',
+    body: 'Missing a wipe, ring, or spare pouch? Add it to the tray before you save.',
   },
   {
     id: 'cart',
@@ -69,111 +59,126 @@ const KIT_FLOW_STEPS = [
     id: 'save',
     num: '04',
     title: 'Save for later',
-    body: 'Keep your version for next month — no starting from scratch.',
+    body: 'Keep your version for next restock ? no starting from scratch.',
   },
 ] as const;
 
-/** SECTION 8 — Clair hormone signal chips */
-const CLAIR_HORMONES = ['Estrogen', 'Progesterone', 'LH', 'FSH'] as const;
-/** SECTION 8 — Clair use-case list under the lead paragraph */
-const CLAIR_CHAPTERS = [
-  'Fertility planning',
-  'Training & recovery',
-  'Hormonal health',
-  '(Peri)menopause',
+/** SECTION 8 ? Preferred brands (shop context, not clinical endorsement) */
+const PREFERRED_BRANDS = ['Coloplast', 'Hollister', 'Convatec'] as const;
+const BRAND_POINTS = [
+  'Pouches & barriers',
+  'Skin comfort accessories',
+  'Belts, rings & paste',
+  'Discreet restock',
 ] as const;
 
-/** SECTION 1 — Rotating words in the hero headline ("feel ___") */
-const FEELING_WORDS = ['heard', 'steady', 'like yourself', 'in rhythm', 'at ease'] as const;
+/** SECTION 1 ? Rotating words in the hero headline */
+const FEELING_WORDS = ['at ease', 'discreet', 'prepared', 'confident', 'like yourself'] as const;
 
-/** SECTION 2 — Trust strip items under the hero */
+/** SECTION 2 ? Trust strip items under the hero */
 const TRUST_ITEMS = [
   'Ontario pharmacist chat',
   'Discreet delivery',
   'Customize & save kits',
-  'No shame. Just health.',
+  'Preferred brands in one place',
 ] as const;
 
-/** SECTION 3 — Three "doors" cards (Shop / Care / Chapters) */
+/** SECTION 3 ? Three "doors" cards (Shop / Care / Chapters) */
 const DOORS = [
   {
     id: 'shop',
     label: 'Shop',
-    title: 'The Women\'s edit',
-    body: 'Essentials, kits, and glow — curated for real routines.',
+    title: 'The Ostomy edit',
+    body: 'Pouches, barriers, accessories, and kits ? curated for real routines.',
     href: '#build-your-kit',
-    image: `${IMG}/door-shop-kit.jpg`,
+    image: `${IMG}/door-shop.jpg`,
   },
   {
     id: 'care',
     label: 'Care',
     title: 'Ask without the awkward',
-    body: 'Ontario pharmacists in chat — kind answers, no waiting room.',
+    body: 'Ontario pharmacists in chat ? kind answers, no waiting room.',
     href: '#care',
     image: `${IMG}/door-care.jpg`,
   },
   {
     id: 'chapters',
     label: 'Chapters',
-    title: 'Find your season',
-    body: 'Six life chapters of care — for the season you\'re in, not an age band.',
+    title: 'Find your place',
+    body: 'Everyday Liivving, stoma basics, and new-to-journey guidance ? at your pace.',
     href: '#where-are-you',
     image: `${IMG}/door-chapters.jpg`,
   },
 ] as const;
 
 /**
- * SECTION 6 — Life chapter cards
- * Titles/blurbs come from ./chapters/chapters-data.ts — edit that file to change chapter copy.
+ * SECTION 6 ? Journey chapter cards (+ shop essentials link)
  */
-const CHAPTER_CHOOSER = CHAPTER_PAGES.map((chapter) => ({
-  num: chapter.num,
-  shortTitle: chapter.title.split('&')[0]?.trim() ?? chapter.title,
-  title: chapter.title,
-  blurb: chapter.vibe,
-  href: chapterHref(chapter.slug),
-  image: chapter.heroImage,
-}));
+const CHAPTER_CHOOSER = [
+  ...CHAPTER_PAGES.map((chapter) => ({
+    num: chapter.num,
+    shortTitle: chapter.title,
+    title: chapter.title,
+    blurb: chapter.vibe,
+    href: chapterHref(chapter.slug),
+    image: chapter.heroImage,
+  })),
+  {
+    num: '04',
+    shortTitle: 'Shop Ostomy Essentials',
+    title: 'Shop Ostomy Essentials',
+    blurb: 'Pouches, barriers, skin care, and preferred brands ? restocked discreetly.',
+    href: SHOP_HREF,
+    image: `${IMG}/door-shop.jpg`,
+  },
+];
 
-/** SECTION 5 — Shop room filter tab labels */
+/** SECTION 5 ? Shop room filter tab labels */
 const SHOP_ROOMS = [
   { id: 'all', label: 'All' },
   { id: 'kits', label: 'Curated kits' },
-  { id: 'cycle', label: 'Cycle comfort' },
-  { id: 'intimate', label: 'Intimate care' },
-  { id: 'prenatal', label: 'Prenatal & grow' },
-  { id: 'glow', label: 'Glow & daily' },
+  { id: 'onePiece', label: 'One-piece' },
+  { id: 'twoPiece', label: 'Two-piece' },
+  { id: 'barriers', label: 'Barriers & flanges' },
+  { id: 'accessories', label: 'Accessories' },
 ] as const;
 
 type ShopRoomId = (typeof SHOP_ROOMS)[number]['id'];
 
-function roomForProduct(product: WhCatalogItem): Exclude<ShopRoomId, 'all' | 'kits'> {
+function roomForProduct(product: OcCatalogItem): Exclude<ShopRoomId, 'all' | 'kits'> {
   const n = product.name.toLowerCase();
 
-  if (
-    /pad|wipe|period|menstrual|incontinence|poise|natracare|reign|diva/.test(n)
-  ) {
-    return 'cycle';
+  if (/1-piece|one-piece|1 piece|premier one-piece|pouchkins newborn|pouchkins drainable pediatric one|activelife/.test(n)) {
+    return 'onePiece';
   }
 
-  if (/vaginal|replens|repagyn|gynatrof|feminine|intimate wash|moisturizer|lubric/.test(n)) {
-    return 'intimate';
+  if (/2-piece|two-piece|2 piece|new image two|sensura mio click|sensura click|natura 2|sur-fit/.test(n)) {
+    return 'twoPiece';
   }
 
-  if (/prenatal|pregnancy|nursing|milk|motherlove|preconception|trimester/.test(n)) {
-    return 'prenatal';
+  if (/barrier|flange|wafer|ring|paste|powder|flextend|flexwear|ceraplus|stomahesive|eakin/.test(n) && !/pouch/.test(n)) {
+    return 'barriers';
   }
 
-  return 'glow';
+  if (/belt|clamp|deodorant|odor|adapter|wipe|remover|sheet|lubricat|sponge/.test(n)) {
+    return 'accessories';
+  }
+
+  if (/pouch/.test(n) && /urostom|drainable|closed/.test(n)) {
+    return /1-piece|one-piece|premier one|assura 1|sensura 1|sensura light 1|activelife|pouchkins/.test(n)
+      ? 'onePiece'
+      : 'twoPiece';
+  }
+
+  return 'accessories';
 }
-
 function hasDisplayPrice(priceLabel?: string) {
   return Boolean(priceLabel && !/(\$|CA\$)?\s*0([.,]0+)?\b/i.test(priceLabel));
 }
 
-function ProductThumb({ product, index = 0 }: { product: WhCatalogItem; index?: number }) {
+function ProductThumb({ product }: { product: OcCatalogItem }) {
   return (
-    <a className="wh-product-card" href={product.path} style={{ ['--stagger' as string]: index }}>
+    <a className="wh-product-card" href={product.path}>
       <div className="wh-product-media">
         {product.image ? (
           <img alt={product.image.alt} src={product.image.src} />
@@ -196,7 +201,7 @@ function KitsCarousel({
   kits,
   initialId,
 }: {
-  kits: WhCatalogItem[];
+  kits: OcCatalogItem[];
   initialId?: number | null;
 }) {
   const startIndex = useMemo(() => {
@@ -274,8 +279,8 @@ function KitsCarousel({
     { kit: at(2), offset: 2 },
   ];
 
-  const renderFeature = (kit: WhCatalogItem, offset: number) => {
-    const isFeatured = kit.entityId === FIRST_CYCLE_STARTER_KIT_ID;
+  const renderFeature = (kit: OcCatalogItem, offset: number) => {
+    const isFeatured = kit.entityId === NEW_JOURNEY_STARTER_KIT_ID;
     const isCenter = offset === shift;
     const body = (
       <>
@@ -296,7 +301,7 @@ function KitsCarousel({
           )}
           <p>
             {isFeatured
-              ? 'A calm first-chapter edit — open it to tune quantities, add what was missing, and save your version.'
+              ? 'A calm first-weeks edit — open it to tune quantities, add what was missing, and save your version.'
               : 'Open it to tune quantities, add what was missing, and save your version.'}
           </p>
           {isCenter && shift === 0 ? (
@@ -360,7 +365,7 @@ function KitsCarousel({
         ) : null}
 
         <div
-          aria-label="Women's Health kits carousel"
+          aria-label="Ostomy Care kits carousel"
           aria-roledescription="carousel"
           className="wh-kits-carousel-viewport"
           ref={viewportRef}
@@ -408,171 +413,16 @@ function Pic({
   );
 }
 
-/** Clair page frame sequence, autoplayed as a silent ping-pong loop. */
-function ClairFrameLoop() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const framesRef = useRef<(HTMLImageElement | null)[]>([]);
-  const frameIndexRef = useRef(0);
-  const directionRef = useRef<1 | -1>(1);
-  const rafRef = useRef(0);
-  const [ready, setReady] = useState(false);
-  const [reduceMotion, setReduceMotion] = useState(false);
-
-  const paint = useCallback((index: number) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const frames = framesRef.current;
-    let frame = frames[index] ?? null;
-
-    if (!frame) {
-      for (let i = index - 1; i >= 0; i -= 1) {
-        if (frames[i]) {
-          frame = frames[i]!;
-          break;
-        }
-      }
-    }
-
-    if (!frame) {
-      frame = frames.find(Boolean) ?? null;
-    }
-
-    if (!frame) return;
-
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    if (width < 1 || height < 1) return;
-
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const nextWidth = Math.round(width * dpr);
-    const nextHeight = Math.round(height * dpr);
-    const sizeChanged = canvas.width !== nextWidth || canvas.height !== nextHeight;
-
-    if (sizeChanged) {
-      canvas.width = nextWidth;
-      canvas.height = nextHeight;
-    }
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    if (sizeChanged) {
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-
-    const scale = Math.max(width / frame.naturalWidth, height / frame.naturalHeight);
-    const drawW = frame.naturalWidth * scale;
-    const drawH = frame.naturalHeight * scale;
-    ctx.drawImage(frame, (width - drawW) / 2, (height - drawH) / 2, drawW, drawH);
-  }, []);
-
-  useEffect(() => {
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const sync = () => setReduceMotion(media.matches);
-    sync();
-    media.addEventListener('change', sync);
-    return () => media.removeEventListener('change', sync);
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    framesRef.current = Array.from({ length: CLAIR_FRAME_COUNT }, () => null);
-
-    const loadFrame = (index: number) =>
-      new Promise<void>((resolve) => {
-        const image = new Image();
-        image.decoding = 'async';
-        image.onload = () => {
-          if (!cancelled) framesRef.current[index] = image;
-          resolve();
-        };
-        image.onerror = () => resolve();
-        image.src = CLAIR_FRAME_SRC(index);
-      });
-
-    void (async () => {
-      await loadFrame(0);
-      if (cancelled) return;
-      paint(0);
-      setReady(true);
-
-      const rest = Array.from({ length: CLAIR_FRAME_COUNT - 1 }, (_, i) => loadFrame(i + 1));
-      await Promise.all(rest);
-      if (!cancelled) paint(frameIndexRef.current);
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [paint]);
-
-  useEffect(() => {
-    if (!ready || reduceMotion) return;
-
-    const intervalMs = 1000 / CLAIR_FRAME_FPS;
-    const lastFrame = CLAIR_FRAME_COUNT - 1;
-    let last = performance.now();
-
-    const tick = (now: number) => {
-      const elapsed = now - last;
-      if (elapsed >= intervalMs) {
-        // Catch up cleanly without drifting slower over time
-        last = now - (elapsed % intervalMs);
-        let next = frameIndexRef.current + directionRef.current;
-
-        if (next >= lastFrame) {
-          next = lastFrame;
-          directionRef.current = -1;
-        } else if (next <= 0) {
-          next = 0;
-          directionRef.current = 1;
-        }
-
-        frameIndexRef.current = next;
-        paint(next);
-      }
-      rafRef.current = requestAnimationFrame(tick);
-    };
-
-    rafRef.current = requestAnimationFrame(tick);
-    const onResize = () => paint(frameIndexRef.current);
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-      window.removeEventListener('resize', onResize);
-    };
-  }, [paint, ready, reduceMotion]);
-
-  return (
-    <>
-      <img
-        alt=""
-        aria-hidden
-        className="wh-clair-poster"
-        decoding="async"
-        src={CLAIR_FRAME_POSTER}
-      />
-      <canvas
-        aria-hidden
-        className={`wh-clair-canvas${ready && !reduceMotion ? ' is-ready' : ''}`}
-        ref={canvasRef}
-      />
-    </>
-  );
-}
-
 const KIT_SEARCH_FALLBACKS = [
-  'Intimate wipes',
-  'Period underwear',
-  'Magnesium calm pack',
-  'Cycle comfort tea',
-  'Soft heat wrap refill',
+  'Barrier wipe',
+  'Barrier ring',
+  'Ostomy belt',
+  'Odor eliminator',
+  'Stoma powder',
 ] as const;
 
 const EMPTY_SEARCH_POOL: string[] = [];
-const EMPTY_PRODUCTS: WhCatalogItem[] = [];
+const EMPTY_PRODUCTS: OcCatalogItem[] = [];
 
 type KitPointerTarget = 'qty' | 'add' | 'search' | 'cart' | 'save';
 
@@ -858,7 +708,7 @@ function KitFlowDemo({
             </div>
             <span className="wh-product-badge">Featured kit</span>
             <h3>{title}</h3>
-            <p>A calm first-chapter edit — customize quantities, add what was missing, then save or checkout.</p>
+            <p>A calm first-weeks edit — customize quantities, add what was missing, then save or checkout.</p>
           </div>
 
           <div className="wh-kit-page-tray">
@@ -994,99 +844,9 @@ function KitFlowDemo({
   );
 }
 
-/**
- * Ping-pong hero: native-play forward clip, then a pre-rendered reverse clip,
- * forever. Much smoother than seeking currentTime backwards.
- */
-function HeroLoopVideo({
-  src,
-  reverseSrc,
-  poster,
-}: {
-  src: string;
-  reverseSrc: string;
-  poster: string;
-}) {
-  const forwardRef = useRef<HTMLVideoElement>(null);
-  const reverseRef = useRef<HTMLVideoElement>(null);
-  const [playing, setPlaying] = useState<'forward' | 'reverse'>('forward');
-
-  useEffect(() => {
-    const forward = forwardRef.current;
-    const reverse = reverseRef.current;
-    if (!forward || !reverse) return;
-
-    let alive = true;
-    let mode: 'forward' | 'reverse' = 'forward';
-
-    const playClip = (el: HTMLVideoElement) => {
-      el.currentTime = 0;
-      void el.play().catch(() => {
-        /* muted + playsInline usually allowed */
-      });
-    };
-
-    const show = (next: 'forward' | 'reverse') => {
-      mode = next;
-      setPlaying(next);
-      if (next === 'forward') {
-        reverse.pause();
-        playClip(forward);
-      } else {
-        forward.pause();
-        playClip(reverse);
-      }
-    };
-
-    const onForwardEnded = () => {
-      if (alive && mode === 'forward') show('reverse');
-    };
-    const onReverseEnded = () => {
-      if (alive && mode === 'reverse') show('forward');
-    };
-
-    forward.addEventListener('ended', onForwardEnded);
-    reverse.addEventListener('ended', onReverseEnded);
-    playClip(forward);
-
-    return () => {
-      alive = false;
-      forward.removeEventListener('ended', onForwardEnded);
-      reverse.removeEventListener('ended', onReverseEnded);
-      forward.pause();
-      reverse.pause();
-    };
-  }, []);
-
-  return (
-    <>
-      <video
-        ref={forwardRef}
-        className={playing === 'forward' ? 'is-active' : undefined}
-        muted
-        playsInline
-        poster={poster}
-        preload="auto"
-      >
-        <source src={src} type="video/mp4" />
-      </video>
-      <video
-        ref={reverseRef}
-        className={playing === 'reverse' ? 'is-active' : undefined}
-        muted
-        playsInline
-        preload="auto"
-      >
-        <source src={reverseSrc} type="video/mp4" />
-      </video>
-    </>
-  );
-}
-
-export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
+export function OstomyCarePage({ catalog }: { catalog?: OcCatalog }) {
   const [feelingIndex, setFeelingIndex] = useState(0);
   const [shopRoom, setShopRoom] = useState<ShopRoomId>('all');
-  const { reduceMotion, rootClassName } = useWhMotion('womens-health');
 
   const allKits = catalog?.kits ?? [];
   const featuredKit = catalog?.featuredKit ?? allKits[0] ?? null;
@@ -1114,13 +874,14 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
         name: item?.name ?? fallbackName,
         path: item?.path ?? fallbackPath,
         image: item?.image,
-        isKit: id === FIRST_CYCLE_STARTER_KIT_ID,
-      } satisfies WhCatalogItem;
+        isKit: id === NEW_JOURNEY_STARTER_KIT_ID,
+      } satisfies OcCatalogItem;
     };
 
     return {
-      primary: resolve(FIRST_CYCLE_STARTER_KIT_ID, '/first-cycle-starter-kit/', 'First Cycle Starter Kit'),
-      secondary: resolve(CLAIR_HEALTH_WRISTBAND_ID, '/clair-health-wristband/', 'Clair Health Wristband'),
+      primary: resolve(NEW_JOURNEY_STARTER_KIT_ID, '/new-journey-starter-kit/', 'New Journey Starter Kit'),
+      secondary: resolve(HERO_FLOAT_POUCH_ID, '/sensura-1-piece-drainable-pouch-flat-opaque/', 'SenSura 1-Piece Drainable Pouch'),
+      tertiary: resolve(HERO_FLOAT_BARRIER_ID, '/adapt-barrier-rings/', 'Adapt Barrier Rings'),
     };
   }, [catalog?.kits, catalog?.products]);
 
@@ -1135,39 +896,31 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
   }, [allKits, shopProducts, shopRoom]);
 
   useEffect(() => {
-    if (reduceMotion) return;
     const id = window.setInterval(() => {
       setFeelingIndex((i) => (i + 1) % FEELING_WORDS.length);
     }, 2600);
 
     return () => window.clearInterval(id);
-  }, [reduceMotion]);
+  }, []);
 
   return (
-    <div className={rootClassName} id="womens-health">
+    <div id="ostomy-care">
       {/* =====================================================================
           SECTION 1 — HERO
-          Kicker, headline, subcopy, CTAs, hero video + float chips.
-          Rotating feeling words: FEELING_WORDS (top of file).
           ===================================================================== */}
-      <section className="hero" aria-label="Women's Health hero">
-        <div aria-hidden className="wh-orb-field">
-          <span />
-          <span />
-          <span />
-        </div>
+      <section className="hero" aria-label="Ostomy Care hero">
         <div className="hero-inner">
-          <span className="hero-kicker">Liivv Women · Health, your way</span>
+          <span className="hero-kicker">Ostomy Care and Everyday Liivving</span>
           <h1>
-            Health that makes you feel{' '}
+            Care that stays{' '}
             <span aria-live="polite" className="hero-feeling" key={FEELING_WORDS[feelingIndex]}>
               {FEELING_WORDS[feelingIndex]}
             </span>
             .
           </h1>
           <p>
-            No quick fixes — just real care that moves with your life. Wellness that works IRL, at your
-            pace.
+            Ostomy supplies, everyday living support, and kind guidance — so your routine feels like yours
+            again.
           </p>
           <div className="hero-cta">
             <a className="btn btn-dark" href="#doors">
@@ -1180,26 +933,22 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
         </div>
         <div className="hero-stack">
           <div aria-hidden className="hero-stack-main">
-            <HeroLoopVideo
-              poster={`${IMG}/hero.jpg`}
-              reverseSrc={`${IMG}/womens-health-hero-video-reverse.mp4`}
-              src={`${IMG}/womens-health-hero-video.mp4`}
-            />
+            <img alt="" src={`${IMG}/hero.jpg`} />
           </div>
           <div aria-hidden className="hero-chip">
-            <span>Made for real life</span>
-            Care that keeps up with you
+            <span>Care that stays discreet</span>
+            Supplies, fit support, everyday living
           </div>
           <div aria-hidden className="hero-frame hero-frame--a hero-frame--product">
             <img
               alt={heroFloatPrimary.image?.alt || heroFloatPrimary.name}
-              src={HERO_FLOAT_KIT_IMG}
+              src={heroFloatPrimary.image?.src || HERO_FLOAT_KIT_IMG}
             />
           </div>
           <div aria-hidden className="hero-frame hero-frame--b hero-frame--product">
             <img
               alt={heroFloatSecondary.image?.alt || heroFloatSecondary.name}
-              src={HERO_FLOAT_CLAIR_IMG}
+              src={heroFloatSecondary.image?.src || HERO_FLOAT_ACCESSORY_IMG}
             />
           </div>
         </div>
@@ -1207,10 +956,8 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
 
       {/* =====================================================================
           SECTION 2 — TRUST STRIP
-          Scrolling / row of trust bullets under the hero.
-          Edit items in: TRUST_ITEMS (top of file).
           ===================================================================== */}
-      <section aria-label="Why Liivv Women" className="wh-trust">
+      <section aria-label="Why Liivv Ostomy" className="wh-trust">
         <div className="container wh-trust-track">
           {TRUST_ITEMS.map((item) => (
             <span key={item}>{item}</span>
@@ -1225,17 +972,12 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
           Eyebrow + headline below are edited inline.
           ===================================================================== */}
       <section aria-label="Start here" className="wh-doors" id="doors">
-        <div className="container" data-reveal>
+        <div className="container">
           <span className="eyebrow">Three ways in</span>
           <h2>What do you need today?</h2>
-          <div className="wh-doors-grid" data-reveal data-reveal-stagger>
-            {DOORS.map((door, index) => (
-              <a
-                className="wh-door"
-                href={door.href}
-                key={door.id}
-                style={{ ['--stagger' as string]: index }}
-              >
+          <div className="wh-doors-grid">
+            {DOORS.map((door) => (
+              <a className="wh-door" href={door.href} key={door.id}>
                 <div className="wh-door-media">
                   <img alt="" src={door.image} />
                 </div>
@@ -1257,26 +999,20 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
       {hasKits ? (
         <section aria-label="Customizable kits" className="wh-kits rounded-top" id="build-your-kit">
           <div className="container">
-            <div data-reveal>
-              <span className="eyebrow">Liivv kits</span>
-              <h2>Start curated. Finish as yours.</h2>
-              <p className="wh-kits-intro">
-                Prebuilt for the chapter — then customize on the kit page and save it for later.
-              </p>
-            </div>
+            <span className="eyebrow">Liivv kits</span>
+            <h2>Start curated. Finish as yours.</h2>
+            <p className="wh-kits-intro">
+              Prebuilt for your journey — then customize on the kit page and save it for later restock.
+            </p>
 
-            <div data-reveal>
-              <KitFlowDemo
-                kitHref={featuredKit?.path}
-                kitImage={featuredKit?.image}
-                kitName={featuredKit?.name}
-                searchPool={kitSearchPool}
-              />
-            </div>
+            <KitFlowDemo
+              kitHref={featuredKit?.path}
+              kitImage={featuredKit?.image}
+              kitName={featuredKit?.name}
+              searchPool={kitSearchPool}
+            />
 
-            <div data-reveal>
-              <KitsCarousel initialId={featuredKit?.entityId} kits={allKits} />
-            </div>
+            <KitsCarousel initialId={featuredKit?.entityId} kits={allKits} />
           </div>
         </section>
       ) : null}
@@ -1288,17 +1024,15 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
           Eyebrow / headline / intro / CTA below are edited inline.
           ===================================================================== */}
       {hasShop ? (
-        <section aria-label="Shop Women's Health" className="wh-shop rounded-top" id="shop-womens-health">
+        <section aria-label="Shop Ostomy Care" className="wh-shop rounded-top" id="shop-ostomy-care">
           <div className="container">
-            <div data-reveal>
-              <span className="eyebrow">Shop Women&apos;s Health</span>
-              <h2>Rooms in the edit</h2>
-              <p className="wh-shop-intro">
-                Live catalog from Shop Women&apos;s Health — filtered into calm rooms so it doesn&apos;t feel
-                like a warehouse.
-              </p>
-            </div>
-            <div aria-label="Shop rooms" className="wh-shop-rooms" data-reveal role="tablist">
+            <span className="eyebrow">Shop Ostomy Essentials</span>
+            <h2>Rooms in the edit</h2>
+            <p className="wh-shop-intro">
+              Live catalog from Shop Ostomy Care — filtered into calm rooms so it doesn&apos;t feel like a
+              warehouse.
+            </p>
+            <div aria-label="Shop rooms" className="wh-shop-rooms" role="tablist">
               {SHOP_ROOMS.map((room) => (
                 <button
                   aria-selected={shopRoom === room.id}
@@ -1312,17 +1046,17 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
                 </button>
               ))}
             </div>
-            <div className="wh-product-grid" data-reveal data-reveal-stagger>
-              {filteredShop.map((product, index) => (
-                <ProductThumb index={index} key={product.entityId} product={product} />
+            <div className="wh-product-grid">
+              {filteredShop.map((product) => (
+                <ProductThumb key={product.entityId} product={product} />
               ))}
             </div>
             {filteredShop.length === 0 ? (
               <p className="wh-shop-empty">Nothing in this room yet — try All or another filter.</p>
             ) : null}
-            <div className="wh-shop-cta" data-reveal>
+            <div className="wh-shop-cta">
               <a className="btn btn-dark" href={SHOP_HREF}>
-                Shop all Women&apos;s Health
+                Shop all Ostomy Essentials
               </a>
             </div>
           </div>
@@ -1330,28 +1064,18 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
       ) : null}
 
       {/* =====================================================================
-          SECTION 6 — LIFE CHAPTERS
-          Anchor: #where-are-you
-          Eyebrow / headline / intro below. Card titles & blurbs:
-          ./chapters/chapters-data.ts
+          SECTION 6 — JOURNEY CHAPTERS
           ===================================================================== */}
       <section aria-label="Find your chapter" className="wh-chooser rounded-top" id="where-are-you">
         <div className="container">
-          <div data-reveal>
-            <span className="eyebrow">Life chapters</span>
-            <h2>Six chapters. One that fits.</h2>
-            <p className="wh-chooser-intro">
-              Not an age band — a season. Open the one that feels like you.
-            </p>
-          </div>
-          <div className="wh-chooser-grid" data-reveal data-reveal-stagger>
-            {CHAPTER_CHOOSER.map((chapter, index) => (
-              <a
-                className="wh-chooser-card"
-                href={chapter.href}
-                key={chapter.num}
-                style={{ ['--stagger' as string]: index }}
-              >
+          <span className="eyebrow">Your journey</span>
+          <h2>Four ways in. One that fits.</h2>
+          <p className="wh-chooser-intro">
+            Everyday Liivving, stoma education, new-to-journey basics, or jump straight to the shop.
+          </p>
+          <div className="wh-chooser-grid">
+            {CHAPTER_CHOOSER.map((chapter) => (
+              <a className="wh-chooser-card" href={chapter.href} key={chapter.num}>
                 <div className="wh-chooser-media">
                   <img alt="" src={chapter.image} />
                   <span className="wh-chooser-num">{chapter.num}</span>
@@ -1369,7 +1093,7 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
           Anchor: #care
           Images, eyebrow, headline, body copy, CTA — all edited inline below.
           ===================================================================== */}
-      <section className="images-text rounded-top" data-reveal id="care">
+      <section className="images-text rounded-top" id="care">
         <div className="container images-text-grid">
           <div className="visuals">
             <Pic className="big" src={`${IMG}/care-chat-main.jpg`} />
@@ -1378,14 +1102,14 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
           </div>
           <div>
             <span className="eyebrow">Available in Ontario</span>
-            <h2>Relief that doesn&apos;t wait on a waiting room</h2>
+            <h2>Fit questions that don&apos;t need a waiting room</h2>
             <p>
-              Clear answers, no med-speak, no judgment. Chat with an Ontario pharmacist during business hours
-              — until 5 p.m. Eastern.
+              Product fit, restock questions, and everyday concerns — chat with an Ontario pharmacist during
+              business hours until 5 p.m. Eastern.
             </p>
             <p>
               Outside those hours, Olivia can help with shopping and your account — she does not give medical
-              advice.
+              advice. Clinical stoma concerns belong with your WOC nurse or care team.
             </p>
             <a className="btn btn-white" href={PHARMACIST_HREF}>
               Talk to a Pharmacist
@@ -1395,52 +1119,49 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
       </section>
 
       {/* =====================================================================
-          SECTION 8 — CLAIR HEALTH WEARABLE
-          Anchor: #clair
-          Headline + lead + closing copy edited inline below.
-          Hormone chips: CLAIR_HORMONES · Use cases: CLAIR_CHAPTERS
+          SECTION 8 — PREFERRED BRANDS
           ===================================================================== */}
-      <section aria-label="Clair continuous hormone wearable" className="wh-clair rounded-top" data-reveal id="clair">
+      <section aria-label="Preferred ostomy brands" className="wh-clair rounded-top" id="brands">
         <div aria-hidden className="wh-clair-media">
-          <ClairFrameLoop />
+          <img alt="" src={`${IMG}/door-shop.jpg`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
         <div aria-hidden className="wh-clair-veil" />
         <div className="container wh-clair-board">
           <div className="wh-clair-copy">
-            <span className="eyebrow">Also in the edit · Clair Health</span>
+            <span className="eyebrow">Preferred brands · shop context</span>
             <h2>
-              Continuous clarity, <em>when you want it.</em>
+              Names you already know, <em>restocked discreetly.</em>
             </h2>
             <p className="wh-clair-lead">
-              Clair is the world&apos;s first continuous, noninvasive hormone wearable — designed for women, by
-              women. It reads your body&apos;s signals in real time so you see the shape of your month instead of
-              guessing through it.
+              Coloplast, Hollister, and Convatec — listed as shop context so you can find familiar systems
+              and accessories in one calm place. Not a clinical endorsement; your WOC nurse remains your guide
+              for fit.
             </p>
 
             <div className="wh-clair-signals" role="list">
-              {CLAIR_HORMONES.map((hormone) => (
-                <span key={hormone} role="listitem">
-                  {hormone}
+              {PREFERRED_BRANDS.map((brand) => (
+                <span key={brand} role="listitem">
+                  {brand}
                 </span>
               ))}
             </div>
 
             <ul className="wh-clair-uses">
-              {CLAIR_CHAPTERS.map((item) => (
+              {BRAND_POINTS.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
 
             <p className="wh-clair-close">
-              Same calm place as the rest of Liivv Women. Same discreet delivery.
+              Same calm place as the rest of Liivv Health. Same discreet delivery.
             </p>
 
             <div className="wh-clair-cta">
-              <a className="btn btn-dark" href={CLAIR_PREORDER_HREF}>
-                Preorder
+              <a className="btn btn-dark" href={SHOP_HREF}>
+                Shop Ostomy Essentials
               </a>
-              <a className="btn btn-outline" href={CLAIR_HREF}>
-                Learn more
+              <a className="btn btn-outline" href="#build-your-kit">
+                Browse kits
               </a>
             </div>
           </div>
@@ -1454,103 +1175,69 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
           ===================================================================== */}
       <section className="voices rounded-top" id="voices">
         <div className="container">
-          <div data-reveal>
-            <span className="eyebrow voices-eyebrow">Beyond the aisle</span>
-            <h2>
-              Real talk <em>from the community</em>
-            </h2>
-          </div>
+          <span className="eyebrow voices-eyebrow">Beyond the aisle</span>
+          <h2>
+            Real talk <em>from the community</em>
+          </h2>
 
-          <article className="wh-voice-feature" data-reveal>
+          <article className="wh-voice-feature">
             <div className="wh-voice-feature-media">
-              <Pic alt="Priya" src={`${IMG}/voice-1.jpg`} />
+              <Pic alt="Morgan" src={`${IMG}/voice-1.jpg`} />
             </div>
             <div className="wh-voice-feature-copy">
-              <p className="wh-voice-kicker">First kit · Toronto</p>
+              <p className="wh-voice-kicker">Fit question · Toronto</p>
               <blockquote>
-                &ldquo;I finally asked a pharmacist a question I&apos;d been too shy to ask anyone for a year.
-                Got a kind, straight answer on my lunch break — no waiting room, no judgment.&rdquo;
+                &ldquo;I finally asked about convex vs flat without feeling silly. Got a kind, practical answer
+                on my lunch break — no waiting room, no awkward aisle.&rdquo;
               </blockquote>
               <div className="who">
                 <img alt="" className="wh-voice-avatar" src={`${IMG}/voice-1.jpg`} />
                 <div>
-                  Priya
-                  <span>Toronto · juggling two kids and a startup</span>
+                  Morgan
+                  <span>Toronto · colostomy · busy parent</span>
                 </div>
               </div>
-              <a
-                className="wh-voice-more"
-                href="/blog/asking-the-pharmacist"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                Read more
-              </a>
             </div>
           </article>
 
-          <div className="voice-cards" data-reveal data-reveal-stagger>
-            <article className="voice" style={{ ['--stagger' as string]: 0 }}>
+          <div className="voice-cards">
+            <article className="voice">
               <img alt="" className="wh-voice-avatar wh-voice-avatar--lg" src={`${IMG}/voice-2.jpg`} />
               <div className="body">
                 <blockquote>
-                  &ldquo;My monthly box shows up like clockwork. I genuinely forgot what running-out panic feels
+                  &ldquo;My usuals show up like clockwork. I genuinely forgot what running-out panic feels
                   like.&rdquo;
                 </blockquote>
                 <div className="who">
-                  Dana
-                  <span>Ottawa · marathon-in-training</span>
+                  Casey
+                  <span>Ottawa · ileostomy · veteran restocker</span>
                 </div>
-                <a
-                  className="wh-voice-more"
-                  href="/blog/monthly-box-rhythm"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Read more
-                </a>
               </div>
             </article>
-            <article className="voice" style={{ ['--stagger' as string]: 1 }}>
+            <article className="voice">
               <img alt="" className="wh-voice-avatar wh-voice-avatar--lg" src={`${IMG}/voice-3.jpg`} />
               <div className="body">
                 <blockquote>
-                  &ldquo;I used to keep three apps and a drawer of half-finished bottles. Sundays feel like
-                  mine again.&rdquo;
+                  &ldquo;The go-bag kit idea changed travel for me. Extra pouch, wipes, done — quiet
+                  confidence.&rdquo;
                 </blockquote>
                 <div className="who">
-                  Maya
-                  <span>Liivv member since 2024</span>
+                  Jordan
+                  <span>Hamilton · new to the journey</span>
                 </div>
-                <a
-                  className="wh-voice-more"
-                  href="/blog/one-place-for-essentials"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Read more
-                </a>
               </div>
             </article>
-            <article className="voice" style={{ ['--stagger' as string]: 2 }}>
+            <article className="voice">
               <img alt="" className="wh-voice-avatar wh-voice-avatar--lg" src={`${IMG}/voice-4.jpg`} />
               <div className="body">
                 <blockquote>
-                  &ldquo;Sleep support and skin staples in one place changed my month. No more whisper aisle
-                  hopping.&rdquo;
+                  &ldquo;Skin was angry until I got the seal right. Powder, ring, and a pharmacist chat — then
+                  quiet days again.&rdquo;
                 </blockquote>
                 <div className="who">
-                  Sofia
-                  <span>Mississauga · Liivv Women regular</span>
+                  Avery
+                  <span>Mississauga · Liivv Ostomy regular</span>
                 </div>
-                <a
-                  className="wh-voice-more"
-                  href="/blog/sleep-and-skin-in-one-place"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Read more
-                </a>
               </div>
             </article>
           </div>
@@ -1561,33 +1248,39 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
           SECTION 10 — FAQ
           Questions + answers edited inline in the <details> blocks below.
           ===================================================================== */}
-      <section className="faq rounded-top" data-reveal>
+      <section className="faq rounded-top">
         <div className="faq-layout faq-layout--copy-only">
           <div>
             <h2>Good questions, honest answers</h2>
             <p className="intro">The things people actually ask — answered like a friend would.</p>
             <details open>
-              <summary>Is this only for one age or stage?</summary>
+              <summary>How often should I empty or change my pouch?</summary>
               <p>
-                No. Chapters follow where you are — Foundation, Rhythm, Reset, Grow, Transition, Longevity —
-                not a number on a birthday cake.
+                Empty drainable pouches when they are about one-third to one-half full. Full system changes are
+                often every few days — or sooner if you feel burning, itching, or a leak. Your WOC nurse can
+                help you find a wear time that fits you.
               </p>
             </details>
             <details>
               <summary>Can I customize a kit?</summary>
               <p>
-                Yes. Start with a curated kit, adjust quantities, add items, and save your version for later.
+                Yes. Start with a curated kit, adjust quantities, add items, and save your version for later
+                restock.
               </p>
             </details>
             <details>
-              <summary>How private is my order?</summary>
-              <p>Plain packaging. Quiet checkout. Your order is nobody&apos;s business but yours.</p>
+              <summary>What should I keep in a go-bag?</summary>
+              <p>
+                Spare barrier and pouch, soft wipes, disposal bags, and any skin protectant or remover you use —
+                plus a spare underwear or liner if it helps you feel ready.
+              </p>
             </details>
             <details>
               <summary>What can I chat with a pharmacist about?</summary>
               <p>
-                Everyday concerns in Ontario during business hours (until 5 p.m. Eastern). Olivia helps with
-                shopping anytime — she does not give medical advice.
+                Everyday product and restock questions in Ontario during business hours (until 5 p.m. Eastern).
+                Olivia helps with shopping anytime — she does not give medical advice. Clinical concerns belong
+                with your WOC nurse or care team.
               </p>
             </details>
           </div>
@@ -1599,24 +1292,24 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
           Anchor: #manifesto
           Kicker, headline, body, CTAs — all edited inline below.
           ===================================================================== */}
-      <section className="closing rounded-top" data-reveal id="manifesto">
+      <section className="closing rounded-top" id="manifesto">
         <div className="closing-bg">
           <img alt="" src={`${IMG}/closing.jpg`} />
         </div>
         <div className="container">
           <p className="wh-manifesto-kicker">The Liivv promise</p>
           <h2>
-            No shame. No hype.
+            No awkward aisle.
             <br />
-            <span>Just you — at your best.</span>
+            <span>Just everyday Liivving.</span>
           </h2>
           <p>
-            We&apos;re done with filters and false promises. Health should feel natural, modern, and
-            authentically yours — at your pace.
+            Supplies that show up on time, guidance without overwhelm, and room for the rest of your life —
+            at your pace.
           </p>
           <div className="wh-closing-cta">
             <a className="btn btn-white" href={SHOP_HREF}>
-              Shop the edit
+              Shop Ostomy Essentials
             </a>
             <a className="btn btn-ghost" href="#build-your-kit">
               Build a kit

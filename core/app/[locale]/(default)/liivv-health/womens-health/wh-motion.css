@@ -1,0 +1,325 @@
+/* Shared playful motion for Women's Health hub, chapters, and Clair.
+ * Activate by adding class `wh-motion` on the page root (#womens-health, #wh-chapter, #clair-health).
+ */
+
+.wh-motion [data-reveal]:not(.is-revealed) {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+.wh-motion [data-reveal] {
+  transition:
+    opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wh-motion [data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+.wh-motion [data-reveal-stagger]:not(.is-revealed) > *,
+.wh-motion [data-reveal-stagger]:not(.is-revealed) .wh-product-card,
+.wh-motion [data-reveal-stagger]:not(.is-revealed) .wh-door,
+.wh-motion [data-reveal-stagger]:not(.is-revealed) .wh-chooser-card,
+.wh-motion [data-reveal-stagger]:not(.is-revealed) .wh-ch-cat,
+.wh-motion [data-reveal-stagger]:not(.is-revealed) .wh-ch-pulse-card,
+.wh-motion [data-reveal-stagger]:not(.is-revealed) .clair-stage-card,
+.wh-motion [data-reveal-stagger]:not(.is-revealed) .clair-offer-list li,
+.wh-motion [data-reveal-stagger]:not(.is-revealed) .voice {
+  opacity: 0;
+  transform: translateY(22px);
+}
+
+.wh-motion [data-reveal-stagger] > *,
+.wh-motion [data-reveal-stagger] .wh-product-card,
+.wh-motion [data-reveal-stagger] .wh-door,
+.wh-motion [data-reveal-stagger] .wh-chooser-card,
+.wh-motion [data-reveal-stagger] .wh-ch-cat,
+.wh-motion [data-reveal-stagger] .wh-ch-pulse-card,
+.wh-motion [data-reveal-stagger] .clair-stage-card,
+.wh-motion [data-reveal-stagger] .clair-offer-list li,
+.wh-motion [data-reveal-stagger] .voice {
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s ease,
+    border-color 0.3s ease,
+    color 0.25s ease,
+    background 0.25s ease;
+}
+
+.wh-motion [data-reveal-stagger].is-revealed > *,
+.wh-motion [data-reveal-stagger].is-revealed .wh-product-card,
+.wh-motion [data-reveal-stagger].is-revealed .wh-door,
+.wh-motion [data-reveal-stagger].is-revealed .wh-chooser-card,
+.wh-motion [data-reveal-stagger].is-revealed .wh-ch-cat,
+.wh-motion [data-reveal-stagger].is-revealed .wh-ch-pulse-card,
+.wh-motion [data-reveal-stagger].is-revealed .clair-stage-card,
+.wh-motion [data-reveal-stagger].is-revealed .clair-offer-list li,
+.wh-motion [data-reveal-stagger].is-revealed .voice {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: calc(var(--stagger, 0) * 70ms);
+}
+
+/* —— Ambient / playful accents —— */
+.wh-motion .wh-orb-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.wh-motion .wh-orb-field span {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(2px);
+  opacity: 0.45;
+  animation: wh-orb-drift 14s ease-in-out infinite alternate;
+}
+
+.wh-motion .wh-orb-field span:nth-child(1) {
+  width: 200px;
+  height: 200px;
+  left: 6%;
+  top: 20%;
+  background: color-mix(in srgb, #f3c7be 55%, transparent);
+  animation-duration: 16s;
+}
+
+.wh-motion .wh-orb-field span:nth-child(2) {
+  width: 150px;
+  height: 150px;
+  left: 42%;
+  bottom: 10%;
+  background: color-mix(in srgb, #8ea58d 40%, transparent);
+  animation-duration: 12s;
+  animation-delay: -3s;
+}
+
+.wh-motion .wh-orb-field span:nth-child(3) {
+  width: 110px;
+  height: 110px;
+  right: 12%;
+  top: 14%;
+  background: color-mix(in srgb, #d7cfc7 70%, transparent);
+  animation-duration: 18s;
+  animation-delay: -6s;
+}
+
+@keyframes wh-orb-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(24px, -18px, 0) scale(1.1);
+  }
+}
+
+@keyframes wh-soft-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes wh-faq-open {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes wh-underline-in {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Hub card lifts */
+#womens-health.wh-motion .wh-door,
+#womens-health.wh-motion .wh-chooser-card,
+#womens-health.wh-motion .wh-product-card,
+#womens-health.wh-motion .voice {
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s ease,
+    border-color 0.3s ease;
+}
+
+#womens-health.wh-motion .wh-door:hover,
+#womens-health.wh-motion .wh-chooser-card:hover,
+#womens-health.wh-motion .wh-product-card:hover,
+#womens-health.wh-motion .voice:hover {
+  transform: translateY(-5px);
+}
+
+#womens-health.wh-motion [data-reveal-stagger].is-revealed > .wh-door:hover,
+#womens-health.wh-motion [data-reveal-stagger].is-revealed > .wh-chooser-card:hover,
+#womens-health.wh-motion [data-reveal-stagger].is-revealed .wh-product-card:hover,
+#womens-health.wh-motion [data-reveal-stagger].is-revealed > .voice:hover {
+  transform: translateY(-5px);
+}
+
+#womens-health.wh-motion .hero-chip {
+  animation: wh-soft-float 5.5s ease-in-out infinite;
+}
+
+#womens-health.wh-motion .faq details p {
+  animation: wh-faq-open 0.35s ease both;
+}
+
+#womens-health.wh-motion .faq summary {
+  transition: color 0.25s ease;
+}
+
+#womens-health.wh-motion .faq summary:hover {
+  color: #8ea58d;
+}
+
+#womens-health.wh-motion .faq summary::after {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#womens-health.wh-motion .faq details[open] summary::after {
+  transform: rotate(180deg);
+}
+
+#womens-health.wh-motion .wh-manifesto-kicker {
+  position: relative;
+  display: inline-block;
+}
+
+#womens-health.wh-motion .closing[data-reveal].is-revealed .wh-manifesto-kicker::after,
+#womens-health.wh-motion .closing .wh-manifesto-kicker.is-drawn::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 2px;
+  background: #f3c7be;
+  transform-origin: left center;
+  animation: wh-underline-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Chapter lifts */
+#wh-chapter.wh-motion .wh-ch-pulse-card,
+#wh-chapter.wh-motion .wh-ch-cat {
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s ease;
+  animation: none;
+}
+
+#wh-chapter.wh-motion .wh-ch-pulse-card:hover,
+#wh-chapter.wh-motion .wh-ch-cat:hover {
+  transform: translateY(-5px);
+}
+
+#wh-chapter.wh-motion [data-reveal-stagger].is-revealed > .wh-ch-pulse-card:hover,
+#wh-chapter.wh-motion [data-reveal-stagger].is-revealed .wh-ch-cat:hover {
+  transform: translateY(-5px);
+}
+
+#wh-chapter.wh-motion .wh-ch-scroll span {
+  animation: wh-soft-float 2.2s ease-in-out infinite;
+}
+
+/* Clair lifts */
+#clair-health.wh-motion .clair-stage-card {
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s ease,
+    border-color 0.3s ease;
+}
+
+.wh-motion [data-reveal-stagger]:not(.is-revealed) > .clair-stages-center,
+.wh-motion [data-reveal-stagger]:not(.is-revealed) > .clair-stages-stars,
+.wh-motion [data-reveal-stagger].is-revealed > .clair-stages-center,
+.wh-motion [data-reveal-stagger].is-revealed > .clair-stages-stars {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0ms;
+}
+
+#clair-health.wh-motion [data-reveal-stagger].is-revealed .clair-stage-card:hover {
+  transform: translateY(-5px);
+}
+
+#clair-health.wh-motion .clair-faq details p {
+  animation: wh-faq-open 0.35s ease both;
+}
+
+#clair-health.wh-motion .clair-pill-dot {
+  animation: wh-soft-float 2.4s ease-in-out infinite;
+}
+
+#clair-health.wh-motion .clair-closing[data-reveal].is-revealed .clair-closing-kicker::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 4.5rem;
+  height: 2px;
+  margin-left: -2.25rem;
+  background: #f3c7be;
+  transform-origin: center;
+  animation: wh-underline-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+#clair-health.wh-motion .clair-closing-kicker {
+  position: relative;
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wh-motion [data-reveal],
+  .wh-motion [data-reveal-stagger] > *,
+  .wh-motion [data-reveal-stagger] .wh-product-card,
+  .wh-motion [data-reveal-stagger] .wh-door,
+  .wh-motion [data-reveal-stagger] .wh-chooser-card,
+  .wh-motion [data-reveal-stagger] .wh-ch-cat,
+  .wh-motion [data-reveal-stagger] .wh-ch-pulse-card,
+  .wh-motion [data-reveal-stagger] .clair-stage-card,
+  .wh-motion [data-reveal-stagger] .clair-offer-list li,
+  .wh-motion [data-reveal-stagger] .voice {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .wh-motion .wh-orb-field span,
+  .wh-motion .hero-chip,
+  .wh-motion .wh-ch-scroll span,
+  .wh-motion .clair-pill-dot {
+    animation: none !important;
+  }
+}
+
+.wh-motion.is-reduce-motion [data-reveal],
+.wh-motion.is-reduce-motion [data-reveal-stagger] > *,
+.wh-motion.is-reduce-motion [data-reveal-stagger] .wh-product-card,
+.wh-motion.is-reduce-motion [data-reveal-stagger] .wh-door,
+.wh-motion.is-reduce-motion [data-reveal-stagger] .wh-chooser-card,
+.wh-motion.is-reduce-motion [data-reveal-stagger] .wh-ch-cat,
+.wh-motion.is-reduce-motion [data-reveal-stagger] .wh-ch-pulse-card,
+.wh-motion.is-reduce-motion [data-reveal-stagger] .clair-stage-card,
+.wh-motion.is-reduce-motion [data-reveal-stagger] .clair-offer-list li,
+.wh-motion.is-reduce-motion [data-reveal-stagger] .voice {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}

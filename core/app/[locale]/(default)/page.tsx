@@ -1,10 +1,24 @@
 import { Metadata } from 'next';
-import { setRequestLocale } from 'next-intl/server';
+import { getFormatter, setRequestLocale } from 'next-intl/server';
 
+import { getSessionCustomerAccessToken } from '~/auth';
+import { client } from '~/client';
+import { readFragment } from '~/client/graphql';
+import { revalidate } from '~/client/revalidate-target';
+import { HeaderLinksFragment } from '~/components/header/fragment';
 import { locales } from '~/i18n/locales';
+import { getPreferredCurrencyCode } from '~/lib/currency';
+import { mapCategoryTreeFromStore } from '~/lib/makeswift/site-header/map-category-tree';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
 
 import { LiivvHomePage } from './home/liivv-home-page';
+import {
+  filterYourLifeProducts,
+  findYourLifeRoot,
+  mapHomeProducts,
+  pickYourLifeCategories,
+} from './home/map-home-catalog';
+import { GetLinksAndSectionsQuery, getPageData } from './page-data';
 
 interface Params {
   locale: string;
@@ -18,9 +32,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
 
   return {
-    title: 'Liivv | Health, your way',
+    title: 'Liivv Your Life | Shop everyday wellness',
     description:
-      "Eleven calm corners of everyday living — Women's Health, Diabetes Care, Ostomy Care, and more. Shop, learn, and ask without the awkward. No shame. Just health.",
+      'Shop everyday essentials, manage prescriptions, CarePak, refills, subscriptions, and pharmacist chat — then explore Liivv Health when you need a deeper care story.',
     alternates: await getMetadataAlternates({ path: '/', locale }),
   };
 }
@@ -34,5 +48,39 @@ export default async function Home({ params }: Props) {
 
   setRequestLocale(locale);
 
-  return <LiivvHomePage />;
+  const [customerAccessToken, currencyCode, format] = await Promise.all([
+    getSessionCustomerAccessToken(),
+    getPreferredCurrencyCode(),
+    getFormatter(),
+  ]);
+
+  const fetchOptions = customerAccessToken
+    ? { cache: 'no-store' as const }
+    : { next: { revalidate } };
+
+  const [pageData, linksResponse] = await Promise.all([
+    getPageData(currencyCode, customerAccessToken),
+    client.fetch({
+      document: GetLinksAndSectionsQuery,
+      customerAccessToken,
+      variables: { currencyCode },
+      validateCustomerAccessToken: false,
+      fetchOptions,
+    }),
+  ]);
+
+  const siteLinks = readFragment(HeaderLinksFragment, linksResponse.data).site;
+  const categoryTree = mapCategoryTreeFromStore(siteLinks.categoryTree);
+
+  const categories = pickYourLifeCategories(categoryTree);
+  const yourLifeRoot = findYourLifeRoot(categoryTree);
+  const featured = mapHomeProducts(pageData.site.featuredProducts, format);
+  const newest = filterYourLifeProducts(
+    mapHomeProducts(pageData.site.newestProducts, format),
+    categories,
+    yourLifeRoot,
+    24,
+  );
+
+  return <LiivvHomePage categories={categories} featured={featured} newest={newest} />;
 }

@@ -90,6 +90,36 @@ export default async (): Promise<NextConfig> => {
           destination: '/liivv-health/womens-health/:path*',
           permanent: true,
         },
+        {
+          source: '/pages/liivv-health',
+          destination: '/liivv-health',
+          permanent: true,
+        },
+        {
+          source: '/pages/ostomy-care',
+          destination: '/liivv-health/ostomy-care',
+          permanent: false,
+        },
+        {
+          source: '/pages/ostomy-every-day-living',
+          destination: '/liivv-health/ostomy-care/chapters/everyday-liivving',
+          permanent: false,
+        },
+        {
+          source: '/pages/ostomy-get-to-know-your-stoma',
+          destination: '/liivv-health/ostomy-care/chapters/get-to-know-your-stoma',
+          permanent: false,
+        },
+        {
+          source: '/pages/ostomy-new-to-the-journey',
+          destination: '/liivv-health/ostomy-care/chapters/new-to-the-journey',
+          permanent: false,
+        },
+        {
+          source: '/pages/ostomy-essentials',
+          destination: '/liivv-health/ostomy-care/shop-ostomy-care',
+          permanent: false,
+        },
       ];
     },
     // eslint-disable-next-line @typescript-eslint/require-await

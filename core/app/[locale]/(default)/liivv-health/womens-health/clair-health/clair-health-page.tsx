@@ -2,7 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState, type MutableRefObject, type RefObject } from 'react';
 
+import { useWhMotion } from '../use-wh-motion';
+
 import './clair-health.css';
+import '../wh-motion.css';
 
 /*
  * =============================================================================
@@ -526,6 +529,7 @@ export function ClairHealthPage() {
   const [stagesPaused, setStagesPaused] = useState(false);
   const stagesLayoutRef = useRef<HTMLDivElement>(null);
   const stageCardRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const { rootClassName } = useWhMotion('clair-health');
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -552,7 +556,7 @@ export function ClairHealthPage() {
   };
 
   return (
-    <div id="clair-health">
+    <div className={rootClassName} id="clair-health">
       {/* Sticky back link — label edited inline */}
       <a className={`clair-back${scrolled ? ' is-scrolled' : ''}`} href={WOMEN_HREF}>
         ← Women&apos;s Health
@@ -568,7 +572,7 @@ export function ClairHealthPage() {
           Offer bullets: OFFER (top of file).
           ===================================================================== */}
       <section className="clair-offer" id="preorder">
-        <div className="clair-container clair-offer-grid">
+        <div className="clair-container clair-offer-grid" data-reveal>
           <div className="clair-offer-copy">
             <span className="clair-pill">
               <span className="clair-pill-dot" />
@@ -579,9 +583,9 @@ export function ClairHealthPage() {
               Limited founding window before retail. Continuous hormone clarity on your wrist — expected to ship
               November 2026.
             </p>
-            <ul className="clair-offer-list">
-              {OFFER.map((item) => (
-                <li key={item.strong}>
+            <ul className="clair-offer-list" data-reveal data-reveal-stagger>
+              {OFFER.map((item, index) => (
+                <li key={item.strong} style={{ ['--stagger' as string]: index }}>
                   <strong>{item.strong}</strong>
                   <span>{item.label}</span>
                 </li>
@@ -602,7 +606,7 @@ export function ClairHealthPage() {
           SECTION 3 — PRESS / FEATURED IN
           Logos: PRESS (top of file). Pill label edited inline.
           ===================================================================== */}
-      <section aria-label="Featured in" className="clair-press">
+      <section aria-label="Featured in" className="clair-press" data-reveal>
         <div className="clair-press-pill">
           <img alt="" height={12} src={`${SITE}/press/megaphone.svg`} width={12} />
           <p>Featured in 50+ media platforms</p>
@@ -633,7 +637,7 @@ export function ClairHealthPage() {
           ===================================================================== */}
       <section className="clair-stages" id="stages">
         <div className="clair-container">
-          <header className="clair-section-head">
+          <header className="clair-section-head" data-reveal>
             <span className="clair-pill">
               <span className="clair-pill-dot" />
               Clair supports your needs
@@ -644,6 +648,8 @@ export function ClairHealthPage() {
 
           <div
             className="clair-stages-layout"
+            data-reveal
+            data-reveal-stagger
             onBlurCapture={() => setStagesPaused(false)}
             onFocusCapture={() => setStagesPaused(true)}
             onMouseEnter={() => setStagesPaused(true)}
@@ -681,6 +687,7 @@ export function ClairHealthPage() {
                 ref={(node) => {
                   stageCardRefs.current[index] = node;
                 }}
+                style={{ ['--stagger' as string]: index }}
                 type="button"
               >
                 <h3>{stage.title}</h3>
@@ -696,7 +703,7 @@ export function ClairHealthPage() {
           Anchor: #how-it-works
           Pill, headline, body, CTA — all edited inline below.
           ===================================================================== */}
-      <section className="clair-story" id="how-it-works">
+      <section className="clair-story" data-reveal id="how-it-works">
         <div className="clair-container clair-story-grid">
           <div className="clair-story-media">
             <Pic alt="Clair worn like jewellery" src={`${SITE}/product.webp`} />
@@ -726,7 +733,7 @@ export function ClairHealthPage() {
           SECTION 6 — EXPERT TEAM
           Logos: TEAM (top of file). Head copy edited inline.
           ===================================================================== */}
-      <section aria-label="Expert team behind Clair" className="clair-team">
+      <section aria-label="Expert team behind Clair" className="clair-team" data-reveal>
         <div className="clair-team-head">
           <div className="clair-team-pill">
             <img alt="" height={12} src={`${SITE}/team/user.svg`} width={12} />
@@ -759,7 +766,7 @@ export function ClairHealthPage() {
           Anchor: #faq
           Head copy edited inline. Q&A: FAQS (top of file).
           ===================================================================== */}
-      <section className="clair-faq" id="faq">
+      <section className="clair-faq" data-reveal id="faq">
         <div className="clair-container clair-faq-grid">
           <header className="clair-faq-head">
             <span className="clair-pill">
@@ -792,7 +799,7 @@ export function ClairHealthPage() {
           Anchor: #reserve
           Kicker, headline, body, CTAs — all edited inline below.
           ===================================================================== */}
-      <section className="clair-closing" id="reserve">
+      <section className="clair-closing" data-reveal id="reserve">
         <div aria-hidden className="clair-closing-bg">
           <img alt="" decoding="async" loading="lazy" src={`${SITE}/closing.jpg`} />
         </div>

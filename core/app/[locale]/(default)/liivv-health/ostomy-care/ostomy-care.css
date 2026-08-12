@@ -1,6 +1,6 @@
 /* Women's Health — Neutral Modern brand tokens */
 
-#womens-health {
+#ostomy-care {
   /* From Neutral Modern Brand Guidelines A4 */
   --cream: #f5f2ed; /* Warm beige primary */
   --ink: #312f2f; /* Jet */
@@ -20,16 +20,16 @@
   overflow-x: clip;
 }
 
-#womens-health *,
-#womens-health *::before,
-#womens-health *::after {
+#ostomy-care *,
+#ostomy-care *::before,
+#ostomy-care *::after {
   box-sizing: border-box;
 }
 
 /* Beat archive `h1,h2,h3{color:rgb(var(--color-foreground))}` */
-#womens-health h1,
-#womens-health h2,
-#womens-health h3 {
+#ostomy-care h1,
+#ostomy-care h2,
+#ostomy-care h3 {
   font-family: var(--font-heading);
   font-weight: 400;
   line-height: 1.08;
@@ -37,41 +37,41 @@
   color: inherit;
 }
 
-#womens-health section {
+#ostomy-care section {
   position: relative;
 }
 
-#womens-health section[id] {
+#ostomy-care section[id] {
   scroll-margin-top: 6.5rem;
 }
 
-#womens-health .rounded-top {
+#ostomy-care .rounded-top {
   border-radius: 48px 48px 0 0;
   margin-top: -48px;
   position: relative;
   z-index: 2;
 }
 
-#womens-health section.rounded-top[id] {
+#ostomy-care section.rounded-top[id] {
   /* Negative overlap pulls the box up — keep heading clear of sticky header */
   scroll-margin-top: calc(6.5rem + 48px);
 }
 
-#womens-health .eyebrow {
+#ostomy-care .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.2em;
   font-size: 11px;
   font-weight: 600;
 }
 
-#womens-health .swash {
+#ostomy-care .swash {
   position: relative;
   display: inline-block;
   padding: 0 6px;
   z-index: 0;
 }
 
-#womens-health .swash::before {
+#ostomy-care .swash::before {
   content: '';
   position: absolute;
   inset: 55% -4px 2px;
@@ -82,11 +82,11 @@
   animation: wh-swash 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
 }
 
-#womens-health .swash.sage::before {
+#ostomy-care .swash.sage::before {
   background: rgba(127, 154, 124, 0.45);
 }
 
-#womens-health .btn {
+#ostomy-care .btn {
   display: inline-block;
   font-family: var(--font-body);
   font-weight: 500;
@@ -102,51 +102,51 @@
     box-shadow 0.35s ease;
 }
 
-#womens-health .btn:hover {
+#ostomy-care .btn:hover {
   transform: translateY(-3px) scale(1.02);
   opacity: 0.96;
   box-shadow: 0 14px 28px rgba(49, 47, 47, 0.14);
 }
 
-#womens-health .btn:active {
+#ostomy-care .btn:active {
   transform: translateY(-1px) scale(0.99);
 }
 
-#womens-health .btn-dark {
+#ostomy-care .btn-dark {
   background: var(--ink);
   color: #fff;
 }
 
-#womens-health .btn-white {
+#ostomy-care .btn-white {
   background: #fff;
   color: var(--ink);
 }
 
-#womens-health .btn-outline {
+#ostomy-care .btn-outline {
   background: transparent;
   color: var(--ink);
   border: 1.5px solid var(--ink);
 }
 
-#womens-health .btn-ghost {
+#ostomy-care .btn-ghost {
   background: transparent;
   color: #fff;
   border: 1.5px solid rgba(255, 255, 255, 0.7);
 }
 
-#womens-health .container {
+#ostomy-care .container {
   max-width: 1240px;
   margin: 0 auto;
   padding: 0 24px;
 }
 
-#womens-health .wh-pic {
+#ostomy-care .wh-pic {
   position: relative;
   overflow: hidden;
   background-color: #cfc3b4;
 }
 
-#womens-health .wh-pic img {
+#ostomy-care .wh-pic img {
   display: block;
   width: 100%;
   height: 100%;
@@ -154,17 +154,17 @@
   object-position: center;
 }
 
-#womens-health .hero h1,
-#womens-health .pillars h2,
-#womens-health .pillar h3,
-#womens-health .images-text:not(.tips-pair) h2,
-#womens-health .voices h2,
-#womens-health .closing h2 {
+#ostomy-care .hero h1,
+#ostomy-care .pillars h2,
+#ostomy-care .pillar h3,
+#ostomy-care .images-text:not(.tips-pair) h2,
+#ostomy-care .voices h2,
+#ostomy-care .closing h2 {
   color: #ffffff !important;
 }
 
 /* —— HERO: airy Neutral Modern split —— */
-#womens-health .hero {
+#ostomy-care .hero {
   min-height: 92vh;
   min-height: 92dvh;
   display: grid;
@@ -179,25 +179,25 @@
     var(--cream);
 }
 
-#womens-health .hero-bg {
+#ostomy-care .hero-bg {
   display: none;
 }
 
-#womens-health .hero h1 {
+#ostomy-care .hero h1 {
   color: var(--ink) !important;
 }
 
-#womens-health .hero-inner {
+#ostomy-care .hero-inner {
   position: relative;
-  z-index: 2;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 10vh 6vw 10vh;
   max-width: none;
+  z-index: 2;
 }
 
-#womens-health .hero-kicker {
+#ostomy-care .hero-kicker {
   display: inline-block;
   align-self: flex-start;
   margin-bottom: 22px;
@@ -213,13 +213,13 @@
   animation: wh-fade-up 0.7s ease both;
 }
 
-#womens-health .hero h1 {
+#ostomy-care .hero h1 {
   font-size: clamp(42px, 6.2vw, 78px);
   max-width: 14ch;
   animation: wh-fade-up 0.85s ease 0.08s both;
 }
 
-#womens-health .hero-feeling {
+#ostomy-care .hero-feeling {
   display: inline-block;
   position: relative;
   color: var(--ink);
@@ -239,7 +239,7 @@
   }
 }
 
-#womens-health .hero p {
+#ostomy-care .hero p {
   margin-top: 22px;
   max-width: 38ch;
   font-size: clamp(16px, 1.5vw, 19px);
@@ -247,7 +247,7 @@
   animation: wh-fade-up 0.85s ease 0.16s both;
 }
 
-#womens-health .hero-cta {
+#ostomy-care .hero-cta {
   margin-top: 36px;
   display: flex;
   gap: 12px;
@@ -255,9 +255,8 @@
   animation: wh-fade-up 0.85s ease 0.24s both;
 }
 
-#womens-health .hero-stack {
+#ostomy-care .hero-stack {
   position: relative;
-  z-index: 2;
   min-height: 70vh;
   margin: 24px 24px 24px 0;
   border-radius: 36px;
@@ -265,13 +264,13 @@
   background: var(--sand);
 }
 
-#womens-health .hero-stack-main {
+#ostomy-care .hero-stack-main {
   position: absolute;
   inset: 0;
 }
 
-#womens-health .hero-stack-main img,
-#womens-health .hero-stack-main video {
+#ostomy-care .hero-stack-main img,
+#ostomy-care .hero-stack-main video {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -280,16 +279,16 @@
   display: block;
 }
 
-#womens-health .hero-stack-main video {
+#ostomy-care .hero-stack-main video {
   opacity: 0;
   pointer-events: none;
 }
 
-#womens-health .hero-stack-main video.is-active {
+#ostomy-care .hero-stack-main video.is-active {
   opacity: 1;
 }
 
-#womens-health .hero-stack-main img {
+#ostomy-care .hero-stack-main img {
   animation: wh-ken 18s ease-in-out infinite alternate;
 }
 
@@ -302,7 +301,7 @@
   }
 }
 
-#womens-health .hero-frame {
+#ostomy-care .hero-frame {
   position: absolute;
   border-radius: 24px;
   overflow: hidden;
@@ -313,7 +312,7 @@
   z-index: 2;
 }
 
-#womens-health .hero-frame img {
+#ostomy-care .hero-frame img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -321,7 +320,7 @@
   display: block;
 }
 
-#womens-health .hero-frame--product {
+#ostomy-care .hero-frame--product {
   text-decoration: none;
   color: inherit;
   background: transparent;
@@ -329,13 +328,13 @@
   z-index: 2;
 }
 
-#womens-health .hero-frame--product img {
+#ostomy-care .hero-frame--product img {
   object-fit: cover;
   padding: 0;
   background: transparent;
 }
 
-#womens-health .hero-frame--a {
+#ostomy-care .hero-frame--a {
   width: min(38%, 200px);
   height: min(34%, 180px);
   left: 8%;
@@ -343,7 +342,7 @@
   animation-delay: 0s;
 }
 
-#womens-health .hero-frame--b {
+#ostomy-care .hero-frame--b {
   width: min(32%, 160px);
   height: min(32%, 160px);
   right: 8%;
@@ -352,19 +351,19 @@
   animation-delay: -2.5s;
 }
 
-#womens-health .hero-frame--b img {
+#ostomy-care .hero-frame--b img {
   object-position: 28% 55%;
 }
 
-#womens-health .hero-frame--a img {
+#ostomy-care .hero-frame--a img {
   object-position: center 40%;
 }
 
-#womens-health .hero-frame--c {
+#ostomy-care .hero-frame--c {
   display: none;
 }
 
-#womens-health .hero-chip {
+#ostomy-care .hero-chip {
   position: absolute;
   left: 8%;
   top: 10%;
@@ -382,7 +381,7 @@
   pointer-events: none;
 }
 
-#womens-health .hero-chip span {
+#ostomy-care .hero-chip span {
   display: block;
   font-size: 12px;
   letter-spacing: 0.14em;
@@ -403,7 +402,7 @@
 }
 
 /* —— PHOTO RIVER —— */
-#womens-health .photo-river {
+#ostomy-care .photo-river {
   background: var(--sand);
   overflow: hidden;
   padding: 28px 0 80px;
@@ -411,7 +410,7 @@
   z-index: 1;
 }
 
-#womens-health .photo-river-track {
+#ostomy-care .photo-river-track {
   display: flex;
   gap: 16px;
   width: max-content;
@@ -419,11 +418,11 @@
   padding: 8px 16px;
 }
 
-#womens-health .photo-river:hover .photo-river-track {
+#ostomy-care .photo-river:hover .photo-river-track {
   animation-play-state: paused;
 }
 
-#womens-health .photo-river-track .wh-pic {
+#ostomy-care .photo-river-track .wh-pic {
   width: clamp(180px, 22vw, 280px);
   height: clamp(140px, 18vw, 220px);
   border-radius: 22px;
@@ -432,16 +431,16 @@
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#womens-health .photo-river-track .wh-pic:nth-child(even) {
+#ostomy-care .photo-river-track .wh-pic:nth-child(even) {
   transform: translateY(18px);
 }
 
-#womens-health .photo-river-track .wh-pic:hover {
+#ostomy-care .photo-river-track .wh-pic:hover {
   transform: translateY(-6px) scale(1.04);
   z-index: 2;
 }
 
-#womens-health .photo-river-track .wh-pic:nth-child(even):hover {
+#ostomy-care .photo-river-track .wh-pic:nth-child(even):hover {
   transform: translateY(10px) scale(1.04);
 }
 
@@ -452,13 +451,13 @@
 }
 
 /* —— HIGHLIGHT + mosaic —— */
-#womens-health .highlight-text {
+#ostomy-care .highlight-text {
   background: var(--soft);
   text-align: center;
   padding: 88px 24px 40px;
 }
 
-#womens-health .highlight-text h2 {
+#ostomy-care .highlight-text h2 {
   font-size: clamp(36px, 5.5vw, 68px);
   max-width: 18ch;
   margin: 0 auto 48px;
@@ -485,7 +484,7 @@
   }
 }
 
-#womens-health .mosaic {
+#ostomy-care .mosaic {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   grid-template-rows: 160px 200px;
@@ -494,79 +493,79 @@
   margin: 0 auto;
 }
 
-#womens-health .mosaic .wh-pic {
+#ostomy-care .mosaic .wh-pic {
   border-radius: 22px;
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease;
   animation: wh-fade-up 0.8s ease both;
 }
 
-#womens-health .mosaic .m1 {
+#ostomy-care .mosaic .m1 {
   animation-delay: 0.05s;
 }
-#womens-health .mosaic .m2 {
+#ostomy-care .mosaic .m2 {
   animation-delay: 0.12s;
 }
-#womens-health .mosaic .m3 {
+#ostomy-care .mosaic .m3 {
   animation-delay: 0.18s;
 }
-#womens-health .mosaic .m4 {
+#ostomy-care .mosaic .m4 {
   animation-delay: 0.24s;
 }
-#womens-health .mosaic .m5 {
+#ostomy-care .mosaic .m5 {
   animation-delay: 0.3s;
 }
-#womens-health .mosaic .m6 {
+#ostomy-care .mosaic .m6 {
   animation-delay: 0.36s;
 }
 
-#womens-health .mosaic .wh-pic:hover {
+#ostomy-care .mosaic .wh-pic:hover {
   transform: scale(1.05) rotate(-1deg);
   z-index: 1;
   box-shadow: 0 18px 40px rgba(49, 47, 47, 0.14);
 }
 
-#womens-health .mosaic .m1 {
+#ostomy-care .mosaic .m1 {
   grid-column: 1 / 3;
   grid-row: 1 / 3;
 }
 
-#womens-health .mosaic .m2 {
+#ostomy-care .mosaic .m2 {
   grid-column: 3 / 5;
 }
 
-#womens-health .mosaic .m3 {
+#ostomy-care .mosaic .m3 {
   grid-column: 5 / 7;
 }
 
-#womens-health .mosaic .m4 {
+#ostomy-care .mosaic .m4 {
   grid-column: 3 / 4;
   grid-row: 2;
 }
 
-#womens-health .mosaic .m5 {
+#ostomy-care .mosaic .m5 {
   grid-column: 4 / 6;
   grid-row: 2;
 }
 
-#womens-health .mosaic .m6 {
+#ostomy-care .mosaic .m6 {
   grid-column: 6 / 7;
   grid-row: 2;
   border-radius: 50%;
 }
 
 /* —— COUNTERS on photos —— */
-#womens-health .counters {
+#ostomy-care .counters {
   padding: 72px 24px 90px;
   background: #e7eee5; /* soft sage wash */
 }
 
-#womens-health .counters-grid {
+#ostomy-care .counters-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
 
-#womens-health .counter-card {
+#ostomy-care .counter-card {
   position: relative;
   min-height: 280px;
   border-radius: 28px;
@@ -579,20 +578,20 @@
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease;
 }
 
-#womens-health .counter-card:hover {
+#ostomy-care .counter-card:hover {
   transform: translateY(-10px);
   box-shadow: 0 24px 48px rgba(49, 47, 47, 0.18);
 }
 
-#womens-health .counter-card .wh-pic img {
+#ostomy-care .counter-card .wh-pic img {
   transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#womens-health .counter-card:hover .wh-pic img {
+#ostomy-care .counter-card:hover .wh-pic img {
   transform: scale(1.08);
 }
 
-#womens-health .counter-card::before {
+#ostomy-care .counter-card::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -600,37 +599,37 @@
   z-index: 1;
 }
 
-#womens-health .counter-card .wh-pic {
+#ostomy-care .counter-card .wh-pic {
   position: absolute;
   inset: 0;
   z-index: 0;
 }
 
-#womens-health .counter-card .wh-pic img {
+#ostomy-care .counter-card .wh-pic img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-#womens-health .counter-card .num,
-#womens-health .counter-card p {
+#ostomy-care .counter-card .num,
+#ostomy-care .counter-card p {
   position: relative;
   z-index: 2;
 }
 
-#womens-health .counter-card .num {
+#ostomy-care .counter-card .num {
   font-family: var(--font-heading);
   font-size: clamp(44px, 4vw, 64px);
   line-height: 1;
 }
 
-#womens-health .counter-card .num sup {
+#ostomy-care .counter-card .num sup {
   font-size: 0.42em;
   color: var(--blush);
 }
 
-#womens-health .counter-card p {
+#ostomy-care .counter-card p {
   margin-top: 10px;
   font-size: 14px;
   max-width: 22ch;
@@ -638,7 +637,7 @@
 }
 
 /* —— IMAGE MARQUEE —— */
-#womens-health .img-marquee {
+#ostomy-care .img-marquee {
   background: var(--taupe);
   overflow: hidden;
   /* Extra bottom pad so .rounded-top overlap (-48px) doesn't clip the photos */
@@ -647,21 +646,21 @@
   z-index: 1;
 }
 
-#womens-health .img-marquee-track {
+#ostomy-care .img-marquee-track {
   display: flex;
   gap: 14px;
   width: max-content;
   animation: wh-scroll 40s linear infinite;
 }
 
-#womens-health .img-marquee-track .wh-pic {
+#ostomy-care .img-marquee-track .wh-pic {
   width: 220px;
   height: 150px;
   border-radius: 18px;
   flex: none;
 }
 
-#womens-health .img-marquee-track .chip {
+#ostomy-care .img-marquee-track .chip {
   align-self: center;
   color: #fff;
   font-family: var(--font-heading);
@@ -678,34 +677,34 @@
 }
 
 /* —— TIMELINE —— */
-#womens-health .timeline {
+#ostomy-care .timeline {
   background: var(--cream);
   padding: 100px 24px;
 }
 
-#womens-health .timeline-header {
+#ostomy-care .timeline-header {
   max-width: 720px;
   margin-bottom: 40px;
 }
 
-#womens-health .timeline-header .small-heading {
+#ostomy-care .timeline-header .small-heading {
   font-size: 15px;
   margin-bottom: 14px;
   max-width: 48ch;
 }
 
-#womens-health .timeline-header h2 {
+#ostomy-care .timeline-header h2 {
   font-size: clamp(36px, 4.5vw, 58px);
 }
 
-#womens-health .timeline-nav {
+#ostomy-care .timeline-nav {
   display: flex;
   gap: 10px;
   margin-bottom: 24px;
   justify-content: flex-end;
 }
 
-#womens-health .timeline-nav button {
+#ostomy-care .timeline-nav button {
   width: 48px;
   height: 48px;
   border-radius: 999px;
@@ -718,7 +717,7 @@
   color: var(--ink);
 }
 
-#womens-health .timeline-slide {
+#ostomy-care .timeline-slide {
   display: grid;
   grid-template-columns: 0.95fr 1.05fr;
   gap: 0;
@@ -728,14 +727,14 @@
   min-height: 480px;
 }
 
-#womens-health .timeline-slide .copy {
+#ostomy-care .timeline-slide .copy {
   padding: 52px 48px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-#womens-health .timeline-slide .category {
+#ostomy-care .timeline-slide .category {
   font-weight: 600;
   font-size: 13px;
   letter-spacing: 0.08em;
@@ -744,41 +743,41 @@
   color: var(--sage);
 }
 
-#womens-health .timeline-slide h3 {
+#ostomy-care .timeline-slide h3 {
   font-size: clamp(30px, 3.2vw, 44px);
   margin-bottom: 16px;
 }
 
-#womens-health .timeline-slide .copy p {
+#ostomy-care .timeline-slide .copy p {
   margin-bottom: 12px;
   max-width: 38ch;
   font-size: 15.5px;
 }
 
-#womens-health .timeline-slide .copy .btn {
+#ostomy-care .timeline-slide .copy .btn {
   margin-top: 20px;
   align-self: flex-start;
 }
 
-#womens-health .timeline-visual {
+#ostomy-care .timeline-visual {
   position: relative;
   min-height: 480px;
 }
 
-#womens-health .timeline-visual .wh-pic-main {
+#ostomy-care .timeline-visual .wh-pic-main {
   position: absolute;
   inset: 0;
 }
 
-#womens-health .timeline-visual .wh-pic-main img,
-#womens-health .timeline-visual .wh-pic-peek img {
+#ostomy-care .timeline-visual .wh-pic-main img,
+#ostomy-care .timeline-visual .wh-pic-peek img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-#womens-health .timeline-visual .wh-pic-peek {
+#ostomy-care .timeline-visual .wh-pic-peek {
   position: absolute;
   width: 38%;
   height: 42%;
@@ -790,14 +789,14 @@
   z-index: 2;
 }
 
-#womens-health .timeline-dots {
+#ostomy-care .timeline-dots {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 12px;
   margin-top: 36px;
 }
 
-#womens-health .timeline-dots button {
+#ostomy-care .timeline-dots button {
   appearance: none;
   border: 0;
   background: none;
@@ -813,11 +812,11 @@
   gap: 10px;
 }
 
-#womens-health .timeline-dots button.active {
+#ostomy-care .timeline-dots button.active {
   color: var(--ink);
 }
 
-#womens-health .timeline-dots button::after {
+#ostomy-care .timeline-dots button::after {
   content: '';
   flex: 1;
   height: 1px;
@@ -826,38 +825,38 @@
 }
 
 /* —— PILLARS —— */
-#womens-health .pillars {
+#ostomy-care .pillars {
   background: var(--ink);
   color: #fff;
   padding: 100px 24px 110px;
 }
 
-#womens-health .pillars .eyebrow {
+#ostomy-care .pillars .eyebrow {
   text-align: center;
   display: block;
   color: rgba(255, 255, 255, 0.65);
 }
 
-#womens-health .pillars h2 {
+#ostomy-care .pillars h2 {
   text-align: center;
   font-size: clamp(36px, 4.5vw, 58px);
   margin: 16px auto 14px;
 }
 
-#womens-health .pillars .intro {
+#ostomy-care .pillars .intro {
   text-align: center;
   max-width: 48ch;
   margin: 0 auto 52px;
   opacity: 0.8;
 }
 
-#womens-health .pillars-grid {
+#ostomy-care .pillars-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
 }
 
-#womens-health .pillar {
+#ostomy-care .pillar {
   position: relative;
   min-height: 420px;
   border-radius: 28px;
@@ -868,33 +867,33 @@
   padding: 28px;
 }
 
-#womens-health .pillar .wh-pic {
+#ostomy-care .pillar .wh-pic {
   position: absolute;
   inset: 0;
   z-index: 0;
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#womens-health .pillar .wh-pic img {
+#ostomy-care .pillar .wh-pic img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-#womens-health .pillar:hover .wh-pic {
+#ostomy-care .pillar:hover .wh-pic {
   transform: scale(1.08);
 }
 
-#womens-health .pillar .wh-pic img {
+#ostomy-care .pillar .wh-pic img {
   transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#womens-health .pillar:hover .wh-pic img {
+#ostomy-care .pillar:hover .wh-pic img {
   transform: scale(1.06);
 }
 
-#womens-health .pillar::after {
+#ostomy-care .pillar::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -902,18 +901,18 @@
   z-index: 1;
 }
 
-#womens-health .pillar h3,
-#womens-health .pillar .sub,
-#womens-health .pillar p {
+#ostomy-care .pillar h3,
+#ostomy-care .pillar .sub,
+#ostomy-care .pillar p {
   position: relative;
   z-index: 2;
 }
 
-#womens-health .pillar h3 {
+#ostomy-care .pillar h3 {
   font-size: 26px;
 }
 
-#womens-health .pillar .sub {
+#ostomy-care .pillar .sub {
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -921,27 +920,27 @@
   color: var(--blush);
 }
 
-#womens-health .pillar p {
+#ostomy-care .pillar p {
   margin-top: 10px;
   font-size: 14px;
   opacity: 0.88;
 }
 
 /* —— SPLIT STORIES —— */
-#womens-health .images-text {
+#ostomy-care .images-text {
   background: var(--taupe);
   color: #fff;
   padding: 100px 24px;
 }
 
-#womens-health .images-text-grid {
+#ostomy-care .images-text-grid {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
   gap: 48px;
   align-items: center;
 }
 
-#womens-health .images-text .visuals {
+#ostomy-care .images-text .visuals {
   display: grid;
   grid-template-columns: 1.35fr 1fr;
   grid-template-rows: 1fr 1fr;
@@ -949,74 +948,74 @@
   min-height: 520px;
 }
 
-#womens-health .images-text .visuals .wh-pic {
+#ostomy-care .images-text .visuals .wh-pic {
   border-radius: 24px;
   height: 100%;
   min-height: 250px;
 }
 
-#womens-health .images-text .visuals .wh-pic img {
+#ostomy-care .images-text .visuals .wh-pic img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-#womens-health .images-text .visuals .big {
+#ostomy-care .images-text .visuals .big {
   grid-row: 1 / 3;
   height: 100%;
   min-height: 520px;
 }
 
-#womens-health .images-text .visuals .mid {
+#ostomy-care .images-text .visuals .mid {
   height: 100%;
   min-height: 250px;
 }
 
-#womens-health .images-text .visuals .small {
+#ostomy-care .images-text .visuals .small {
   height: 100%;
   min-height: 250px;
   border-radius: 50% 24px 24px 24px;
 }
 
-#womens-health .images-text h2 {
+#ostomy-care .images-text h2 {
   font-size: clamp(34px, 4vw, 52px);
   margin: 16px 0 20px;
 }
 
-#womens-health .images-text p {
+#ostomy-care .images-text p {
   margin-bottom: 14px;
   max-width: 46ch;
   opacity: 0.9;
 }
 
-#womens-health .images-text .btn {
+#ostomy-care .images-text .btn {
   margin-top: 14px;
 }
 
-#womens-health .images-text.tips-pair {
+#ostomy-care .images-text.tips-pair {
   background: #f8ebe6; /* blush wash */
   color: var(--ink);
 }
 
-#womens-health .images-text.tips-pair .images-text-grid {
+#ostomy-care .images-text.tips-pair .images-text-grid {
   grid-template-columns: 0.9fr 1.1fr;
 }
 
-#womens-health .images-text.tips-pair .visuals {
+#ostomy-care .images-text.tips-pair .visuals {
   order: 2;
 }
 
-#womens-health .images-text.tips-pair .copy {
+#ostomy-care .images-text.tips-pair .copy {
   order: 1;
 }
 
-#womens-health .images-text.tips-pair .eyebrow {
+#ostomy-care .images-text.tips-pair .eyebrow {
   color: var(--sage);
 }
 
 /* —— CLAIR FEATURE (floating composition, like hero stack) —— */
-#womens-health .wh-clair {
+#ostomy-care .wh-clair {
   position: relative;
   isolation: isolate;
   min-height: min(130vh, 1280px);
@@ -1028,38 +1027,38 @@
   align-items: flex-end;
 }
 
-#womens-health .wh-clair-media {
+#ostomy-care .wh-clair-media {
   position: absolute;
   inset: 0;
   z-index: 0;
 }
 
-#womens-health .wh-clair-poster,
-#womens-health .wh-clair-canvas {
+#ostomy-care .wh-clair-poster,
+#ostomy-care .wh-clair-canvas {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-#womens-health .wh-clair-poster {
+#ostomy-care .wh-clair-poster {
   z-index: 0;
   object-fit: cover;
   object-position: center;
 }
 
-#womens-health .wh-clair-canvas {
+#ostomy-care .wh-clair-canvas {
   z-index: 1;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.35s ease;
 }
 
-#womens-health .wh-clair-canvas.is-ready {
+#ostomy-care .wh-clair-canvas.is-ready {
   opacity: 1;
 }
 
-#womens-health .wh-clair-veil {
+#ostomy-care .wh-clair-veil {
   position: absolute;
   inset: 0;
   z-index: 2;
@@ -1074,7 +1073,7 @@
     linear-gradient(to top, rgba(20, 12, 8, 0.55) 0%, transparent 48%);
 }
 
-#womens-health .wh-clair-board {
+#ostomy-care .wh-clair-board {
   position: relative;
   z-index: 3;
   display: grid;
@@ -1086,18 +1085,18 @@
   padding: 96px 24px 112px;
 }
 
-#womens-health .wh-clair-copy {
+#ostomy-care .wh-clair-copy {
   max-width: 36rem;
 }
 
-#womens-health .wh-clair-copy .eyebrow {
+#ostomy-care .wh-clair-copy .eyebrow {
   display: inline-block;
   color: rgba(245, 242, 237, 0.78);
   margin-bottom: 16px;
   animation: wh-fade-up 0.7s ease both;
 }
 
-#womens-health .wh-clair-copy h2 {
+#ostomy-care .wh-clair-copy h2 {
   font-size: clamp(34px, 4.6vw, 54px);
   margin: 0 0 18px;
   max-width: 14ch;
@@ -1105,13 +1104,13 @@
   animation: wh-fade-up 0.85s ease 0.06s both;
 }
 
-#womens-health .wh-clair-copy h2 em {
+#ostomy-care .wh-clair-copy h2 em {
   color: #c5d4c0;
   font-style: italic;
   font-weight: 400;
 }
 
-#womens-health .wh-clair-lead {
+#ostomy-care .wh-clair-lead {
   margin: 0 0 22px;
   max-width: 40ch;
   font-size: 17px;
@@ -1120,7 +1119,7 @@
   animation: wh-fade-up 0.85s ease 0.12s both;
 }
 
-#womens-health .wh-clair-signals {
+#ostomy-care .wh-clair-signals {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -1128,7 +1127,7 @@
   animation: wh-fade-up 0.85s ease 0.18s both;
 }
 
-#womens-health .wh-clair-signals span {
+#ostomy-care .wh-clair-signals span {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -1140,7 +1139,7 @@
   padding: 8px 14px;
 }
 
-#womens-health .wh-clair-uses {
+#ostomy-care .wh-clair-uses {
   list-style: none;
   margin: 0 0 20px;
   padding: 0;
@@ -1151,14 +1150,14 @@
   animation: wh-fade-up 0.85s ease 0.22s both;
 }
 
-#womens-health .wh-clair-uses li {
+#ostomy-care .wh-clair-uses li {
   position: relative;
   padding-left: 14px;
   font-size: 14px;
   color: rgba(245, 242, 237, 0.88);
 }
 
-#womens-health .wh-clair-uses li::before {
+#ostomy-care .wh-clair-uses li::before {
   content: '';
   position: absolute;
   left: 0;
@@ -1169,7 +1168,7 @@
   background: var(--blush);
 }
 
-#womens-health .wh-clair-close {
+#ostomy-care .wh-clair-close {
   font-weight: 600;
   margin: 0 0 22px;
   max-width: 34ch;
@@ -1177,46 +1176,46 @@
   animation: wh-fade-up 0.85s ease 0.26s both;
 }
 
-#womens-health .wh-clair-cta {
+#ostomy-care .wh-clair-cta {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   animation: wh-fade-up 0.85s ease 0.3s both;
 }
 
-#womens-health .wh-clair .btn-dark {
+#ostomy-care .wh-clair .btn-dark {
   background: #f5f2ed;
   color: var(--ink);
 }
 
-#womens-health .wh-clair .btn-outline {
+#ostomy-care .wh-clair .btn-outline {
   color: #f5f2ed;
   border-color: rgba(245, 242, 237, 0.7);
 }
 
-#womens-health .wh-clair-float {
+#ostomy-care .wh-clair-float {
   display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #womens-health .wh-clair-copy .eyebrow,
-  #womens-health .wh-clair-copy h2,
-  #womens-health .wh-clair-lead,
-  #womens-health .wh-clair-signals,
-  #womens-health .wh-clair-uses,
-  #womens-health .wh-clair-close,
-  #womens-health .wh-clair-cta {
+  #ostomy-care .wh-clair-copy .eyebrow,
+  #ostomy-care .wh-clair-copy h2,
+  #ostomy-care .wh-clair-lead,
+  #ostomy-care .wh-clair-signals,
+  #ostomy-care .wh-clair-uses,
+  #ostomy-care .wh-clair-close,
+  #ostomy-care .wh-clair-cta {
     animation: none !important;
   }
 }
 
 /* —— CHAPTERS full-bleed —— */
-#womens-health .chapters {
+#ostomy-care .chapters {
   /* Match first chapter tone — avoids corner bezels under border-radius */
   background: #fbf8f4;
 }
 
-#womens-health .chapter {
+#ostomy-care .chapter {
   position: sticky;
   top: 0;
   min-height: 100vh;
@@ -1228,13 +1227,13 @@
   overflow: hidden;
 }
 
-#womens-health .chapter .wh-pic {
+#ostomy-care .chapter .wh-pic {
   position: relative;
   min-height: 100%;
   height: 100%;
 }
 
-#womens-health .chapter .wh-pic img {
+#ostomy-care .chapter .wh-pic img {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -1242,11 +1241,11 @@
   transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#womens-health .chapter:hover .wh-pic img {
+#ostomy-care .chapter:hover .wh-pic img {
   transform: scale(1.04);
 }
 
-#womens-health .chapter .copy {
+#ostomy-care .chapter .copy {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -1256,7 +1255,7 @@
   overflow: hidden;
 }
 
-#womens-health .chapter-num {
+#ostomy-care .chapter-num {
   position: absolute;
   right: -2%;
   top: 8%;
@@ -1268,23 +1267,23 @@
   user-select: none;
 }
 
-#womens-health .chapter .eyebrow {
+#ostomy-care .chapter .eyebrow {
   color: var(--sage);
 }
 
-#womens-health .chapter h3 {
+#ostomy-care .chapter h3 {
   font-size: clamp(34px, 4vw, 56px);
   margin: 14px 0 22px;
   position: relative;
 }
 
-#womens-health .chapter-meta {
+#ostomy-care .chapter-meta {
   display: grid;
   gap: 14px;
   margin-bottom: 8px;
 }
 
-#womens-health .chapter-pill {
+#ostomy-care .chapter-pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1299,82 +1298,82 @@
   width: fit-content;
 }
 
-#womens-health .chapter-pill--vibe {
+#ostomy-care .chapter-pill--vibe {
   background: rgba(243, 199, 190, 0.45);
   color: #8a5f55;
 }
 
-#womens-health .chapter .focus-label,
-#womens-health .chapter .vibe-label {
+#ostomy-care .chapter .focus-label,
+#ostomy-care .chapter .vibe-label {
   display: none;
 }
 
-#womens-health .chapter p {
+#ostomy-care .chapter p {
   max-width: 42ch;
   margin-bottom: 0;
 }
 
-#womens-health .chapter .btn {
+#ostomy-care .chapter .btn {
   margin-top: 32px;
   align-self: flex-start;
 }
 
-#womens-health .chapter:nth-of-type(1) .copy {
+#ostomy-care .chapter:nth-of-type(1) .copy {
   background: #fbf8f4;
 }
-#womens-health .chapter:nth-of-type(2) .copy {
+#ostomy-care .chapter:nth-of-type(2) .copy {
   background: #ebe2d6;
 }
-#womens-health .chapter:nth-of-type(3) .copy {
+#ostomy-care .chapter:nth-of-type(3) .copy {
   background: #dce6d7;
 }
-#womens-health .chapter:nth-of-type(4) .copy {
+#ostomy-care .chapter:nth-of-type(4) .copy {
   background: #f0d5cd;
 }
-#womens-health .chapter:nth-of-type(5) .copy {
+#ostomy-care .chapter:nth-of-type(5) .copy {
   background: #d5e0d0;
 }
-#womens-health .chapter:nth-of-type(6) .copy {
+#ostomy-care .chapter:nth-of-type(6) .copy {
   background: #f2ddd4;
 }
 
-#womens-health .chapter:nth-child(even) {
+#ostomy-care .chapter:nth-child(even) {
   grid-template-columns: 0.85fr 1.15fr;
 }
 
-#womens-health .chapter:nth-child(even) .wh-pic {
+#ostomy-care .chapter:nth-child(even) .wh-pic {
   order: 2;
 }
 
-#womens-health .chapter:nth-child(even) .copy {
+#ostomy-care .chapter:nth-child(even) .copy {
   order: 1;
 }
 
 /* —— VOICES —— */
-#womens-health .voices {
+#ostomy-care .voices {
   background: #6f8a6c;
   color: #fff;
   padding: 110px 24px;
 }
 
-#womens-health .voices .voices-eyebrow {
+#ostomy-care .voices .voices-eyebrow {
   display: block;
   text-align: center;
   color: rgba(255, 255, 255, 0.75);
   margin-bottom: 10px;
 }
 
-#womens-health .voices h2 {
+#ostomy-care .voices h2 {
   font-size: clamp(36px, 5vw, 64px);
   text-align: center;
   margin-bottom: 40px;
 }
 
-#womens-health .voices h2 em {
+#ostomy-care .voices h2 em {
   font-style: italic;
 }
 
-#womens-health .wh-voice-feature {
+#ostomy-care .wh-voice-feature {
   display: grid;
   grid-template-columns: 0.95fr 1.05fr;
   gap: 0;
@@ -1386,23 +1385,23 @@
   box-shadow: 0 18px 40px rgba(49, 47, 47, 0.12);
 }
 
-#womens-health .wh-voice-feature-media {
+#ostomy-care .wh-voice-feature-media {
   min-height: 320px;
 }
 
-#womens-health .wh-voice-feature-media .wh-pic {
+#ostomy-care .wh-voice-feature-media .wh-pic {
   height: 100%;
   min-height: 320px;
 }
 
-#womens-health .wh-voice-feature-copy {
+#ostomy-care .wh-voice-feature-copy {
   padding: 40px 40px 42px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-#womens-health .wh-voice-kicker {
+#ostomy-care .wh-voice-kicker {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.14em;
@@ -1411,20 +1410,20 @@
   margin-bottom: 14px;
 }
 
-#womens-health .wh-voice-feature blockquote {
+#ostomy-care .wh-voice-feature blockquote {
   font-family: var(--font-heading);
   font-size: clamp(24px, 2.8vw, 34px);
   line-height: 1.25;
   margin: 0 0 22px;
 }
 
-#womens-health .voice-cards {
+#ostomy-care .voice-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
 }
 
-#womens-health .voice {
+#ostomy-care .voice {
   background: #fff;
   color: var(--ink);
   border-radius: 28px;
@@ -1435,7 +1434,7 @@
   box-shadow: 0 16px 36px rgba(49, 47, 47, 0.1);
 }
 
-#womens-health .wh-voice-avatar {
+#ostomy-care .wh-voice-avatar {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -1444,33 +1443,33 @@
   display: block;
 }
 
-#womens-health .wh-voice-avatar--lg {
+#ostomy-care .wh-voice-avatar--lg {
   width: 64px;
   height: 64px;
   margin-bottom: 16px;
 }
 
-#womens-health .wh-voice-feature .who {
+#ostomy-care .wh-voice-feature .who {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-top: 8px;
 }
 
-#womens-health .wh-voice-feature .who > div {
+#ostomy-care .wh-voice-feature .who > div {
   display: flex;
   flex-direction: column;
   gap: 2px;
   font-weight: 500;
 }
 
-#womens-health .wh-voice-feature .who span {
+#ostomy-care .wh-voice-feature .who span {
   font-weight: 400;
   font-size: 13px;
   opacity: 0.65;
 }
 
-#womens-health .wh-voice-more {
+#ostomy-care .wh-voice-more {
   display: inline-flex;
   align-items: center;
   margin-top: 18px;
@@ -1481,80 +1480,80 @@
   letter-spacing: 0.02em;
 }
 
-#womens-health .wh-voice-more::after {
+#ostomy-care .wh-voice-more::after {
   content: ' →';
 }
 
-#womens-health .wh-voice-more:hover {
+#ostomy-care .wh-voice-more:hover {
   color: var(--ink);
 }
 
-#womens-health .voices .wh-voice-more {
+#ostomy-care .voices .wh-voice-more {
   color: #5f735e;
 }
 
-#womens-health .voice-mark {
+#ostomy-care .voice-mark {
   display: none;
 }
 
-#womens-health .voice:hover .voice-mark {
+#ostomy-care .voice:hover .voice-mark {
   transform: scale(1.12) rotate(-6deg);
 }
 
-#womens-health .voice-mark span {
+#ostomy-care .voice-mark span {
   font-family: var(--font-heading);
   font-size: 24px;
   color: var(--ink);
   line-height: 1;
 }
 
-#womens-health .voice-mark--blush {
+#ostomy-care .voice-mark--blush {
   background: var(--blush);
 }
 
-#womens-health .voice-mark--sage {
+#ostomy-care .voice-mark--sage {
   background: rgba(142, 165, 141, 0.55);
 }
 
-#womens-health .voice-mark--sand {
+#ostomy-care .voice-mark--sand {
   background: var(--sand);
 }
 
-#womens-health .voice-mark--taupe {
+#ostomy-care .voice-mark--taupe {
   background: var(--taupe);
   color: #fff;
 }
 
-#womens-health .voice-mark--taupe span {
+#ostomy-care .voice-mark--taupe span {
   color: #fff;
 }
 
-#womens-health .voice .body {
+#ostomy-care .voice .body {
   padding: 0;
 }
 
-#womens-health .voice:nth-child(2) {
+#ostomy-care .voice:nth-child(2) {
   transform: translateY(28px);
 }
 
-#womens-health .voice:nth-child(4) {
+#ostomy-care .voice:nth-child(4) {
   transform: translateY(14px);
 }
 
-#womens-health .voice blockquote {
+#ostomy-care .voice blockquote {
   font-family: var(--font-heading);
   font-size: 19px;
   line-height: 1.35;
   margin: 0;
 }
 
-#womens-health .voice .who {
+#ostomy-care .voice .who {
   margin-top: 20px;
   font-size: 14px;
   font-weight: 500;
 }
 
-#womens-health .voice .who span {
+#ostomy-care .voice .who span {
   display: block;
   color: rgba(26, 24, 22, 0.55);
   font-size: 12.5px;
@@ -1563,12 +1562,12 @@
 }
 
 /* —— FAQ with side art —— */
-#womens-health .faq {
+#ostomy-care .faq {
   background: #fff;
   padding: 110px 24px;
 }
 
-#womens-health .faq-layout {
+#ostomy-care .faq-layout {
   display: grid;
   grid-template-columns: 0.85fr 1.15fr;
   gap: 56px;
@@ -1577,12 +1576,12 @@
   margin: 0 auto;
 }
 
-#womens-health .faq-layout--copy-only {
+#ostomy-care .faq-layout--copy-only {
   grid-template-columns: 1fr;
   max-width: 720px;
 }
 
-#womens-health .faq-art {
+#ostomy-care .faq-art {
   position: sticky;
   top: 100px;
   display: grid;
@@ -1590,43 +1589,43 @@
   align-content: start;
 }
 
-#womens-health .faq-art .wh-pic {
+#ostomy-care .faq-art .wh-pic {
   border-radius: 28px;
   height: auto;
   width: 100%;
   overflow: hidden;
 }
 
-#womens-health .faq-art .wh-pic:first-child {
+#ostomy-care .faq-art .wh-pic:first-child {
   aspect-ratio: 4 / 5;
 }
 
-#womens-health .faq-art .wh-pic:last-child {
+#ostomy-care .faq-art .wh-pic:last-child {
   aspect-ratio: 5 / 4;
   width: 86%;
   justify-self: end;
   border-radius: 28px;
 }
 
-#womens-health .faq-art .wh-pic img {
+#ostomy-care .faq-art .wh-pic img {
   object-position: center;
 }
 
-#womens-health .faq h2 {
+#ostomy-care .faq h2 {
   font-size: clamp(34px, 4.5vw, 52px);
 }
 
-#womens-health .faq .intro {
+#ostomy-care .faq .intro {
   margin: 12px 0 36px;
   max-width: 42ch;
 }
 
-#womens-health .faq details {
+#ostomy-care .faq details {
   border-bottom: 1px solid rgba(26, 24, 22, 0.14);
   padding: 20px 4px;
 }
 
-#womens-health .faq summary {
+#ostomy-care .faq summary {
   cursor: pointer;
   font-family: var(--font-heading);
   font-size: 20px;
@@ -1637,32 +1636,32 @@
   gap: 20px;
 }
 
-#womens-health .faq summary::-webkit-details-marker {
+#ostomy-care .faq summary::-webkit-details-marker {
   display: none;
 }
 
-#womens-health .faq summary::after {
+#ostomy-care .faq summary::after {
   content: '+';
   font-family: var(--font-body);
   font-size: 24px;
   color: var(--sage);
 }
 
-#womens-health .faq details[open] summary::after {
+#ostomy-care .faq details[open] summary::after {
   content: '–';
 }
 
-#womens-health .faq details p {
+#ostomy-care .faq details p {
   margin-top: 12px;
   max-width: 60ch;
 }
 
-#womens-health .faq details a {
+#ostomy-care .faq details a {
   color: var(--sage);
 }
 
 /* —— TRUST STRIP —— */
-#womens-health .wh-trust {
+#ostomy-care .wh-trust {
   /* Soft strip — never jet under .rounded-top (causes black corner bezels) */
   background: var(--sand);
   color: var(--ink);
@@ -1671,7 +1670,7 @@
   z-index: 3;
 }
 
-#womens-health .wh-trust-track {
+#ostomy-care .wh-trust-track {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -1683,11 +1682,11 @@
   opacity: 0.88;
 }
 
-#womens-health .wh-trust-track span {
+#ostomy-care .wh-trust-track span {
   position: relative;
 }
 
-#womens-health .wh-trust-track span:not(:last-child)::after {
+#ostomy-care .wh-trust-track span:not(:last-child)::after {
   content: '·';
   position: absolute;
   right: -18px;
@@ -1695,7 +1694,7 @@
 }
 
 /* —— THREE DOORS —— */
-#womens-health .wh-doors {
+#ostomy-care .wh-doors {
   background: var(--cream);
   padding: 88px 24px 96px;
   color: var(--ink);
@@ -1704,25 +1703,25 @@
   margin-top: 0;
 }
 
-#womens-health .wh-doors .eyebrow {
+#ostomy-care .wh-doors .eyebrow {
   display: block;
   text-align: center;
   color: var(--sage);
 }
 
-#womens-health .wh-doors > .container > h2 {
+#ostomy-care .wh-doors > .container > h2 {
   text-align: center;
   font-size: clamp(34px, 4.5vw, 56px);
   margin: 14px auto 40px;
 }
 
-#womens-health .wh-doors-grid {
+#ostomy-care .wh-doors-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
 }
 
-#womens-health .wh-door {
+#ostomy-care .wh-door {
   display: flex;
   flex-direction: column;
   text-decoration: none;
@@ -1737,19 +1736,19 @@
     box-shadow 0.4s ease;
 }
 
-#womens-health .wh-door:hover {
+#ostomy-care .wh-door:hover {
   transform: translateY(-8px) translateZ(0);
   box-shadow: 0 22px 44px rgba(49, 47, 47, 0.1);
 }
 
-#womens-health .wh-door-media {
+#ostomy-care .wh-door-media {
   aspect-ratio: 4 / 3;
   overflow: hidden;
   background: var(--sand);
   border-radius: 28px 28px 0 0;
 }
 
-#womens-health .wh-door-media img {
+#ostomy-care .wh-door-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -1758,11 +1757,11 @@
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#womens-health .wh-door:hover .wh-door-media img {
+#ostomy-care .wh-door:hover .wh-door-media img {
   transform: scale(1.06);
 }
 
-#womens-health .wh-door-label {
+#ostomy-care .wh-door-label {
   margin: 20px 22px 0;
   font-size: 11px;
   font-weight: 600;
@@ -1771,12 +1770,12 @@
   color: var(--sage);
 }
 
-#womens-health .wh-door h3 {
+#ostomy-care .wh-door h3 {
   margin: 8px 22px 10px;
   font-size: 28px;
 }
 
-#womens-health .wh-door p {
+#ostomy-care .wh-door p {
   margin: 0 22px 26px;
   font-size: 15px;
   max-width: 28ch;
@@ -1784,37 +1783,37 @@
 }
 
 /* —— CHAPTER CHOOSER —— */
-#womens-health .wh-chooser {
+#ostomy-care .wh-chooser {
   background: #ebe2d6;
   padding: 96px 24px 104px;
   color: var(--ink);
 }
 
-#womens-health .wh-chooser .eyebrow {
+#ostomy-care .wh-chooser .eyebrow {
   display: block;
   text-align: center;
   color: #6a5f57;
 }
 
-#womens-health .wh-chooser > .container > h2 {
+#ostomy-care .wh-chooser > .container > h2 {
   text-align: center;
   font-size: clamp(34px, 4.5vw, 56px);
   margin: 14px auto 14px;
 }
 
-#womens-health .wh-chooser-intro {
+#ostomy-care .wh-chooser-intro {
   text-align: center;
   max-width: 46ch;
   margin: 0 auto 40px;
 }
 
-#womens-health .wh-chooser-grid {
+#ostomy-care .wh-chooser-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
 
-#womens-health .wh-chooser-card {
+#ostomy-care .wh-chooser-card {
   text-decoration: none;
   color: inherit;
   background: rgba(255, 255, 255, 0.72);
@@ -1827,12 +1826,12 @@
     background 0.35s ease;
 }
 
-#womens-health .wh-chooser-card:hover {
+#ostomy-care .wh-chooser-card:hover {
   transform: translateY(-5px) translateZ(0);
   background: #fff;
 }
 
-#womens-health .wh-chooser-media {
+#ostomy-care .wh-chooser-media {
   position: relative;
   aspect-ratio: 16 / 10;
   background: var(--sand);
@@ -1840,7 +1839,7 @@
   border-radius: 24px 24px 0 0;
 }
 
-#womens-health .wh-chooser-media img {
+#ostomy-care .wh-chooser-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -1848,7 +1847,7 @@
   border-radius: 24px 24px 0 0;
 }
 
-#womens-health .wh-chooser-num {
+#ostomy-care .wh-chooser-num {
   position: absolute;
   left: 14px;
   bottom: 10px;
@@ -1859,12 +1858,12 @@
   text-shadow: 0 8px 24px rgba(49, 47, 47, 0.35);
 }
 
-#womens-health .wh-chooser-card h3 {
+#ostomy-care .wh-chooser-card h3 {
   font-size: 20px;
   margin: 16px 18px 8px;
 }
 
-#womens-health .wh-chooser-card p {
+#ostomy-care .wh-chooser-card p {
   margin: 0 18px 20px;
   font-size: 14px;
   opacity: 0.78;
@@ -1872,37 +1871,37 @@
 }
 
 /* —— KITS UPSELL / LIVING OBJECT —— */
-#womens-health .wh-kits {
+#ostomy-care .wh-kits {
   background: var(--soft);
   padding: 100px 24px 110px;
   color: var(--ink);
 }
 
-#womens-health .wh-kits .eyebrow {
+#ostomy-care .wh-kits .eyebrow {
   display: block;
   text-align: center;
   color: var(--sage);
 }
 
-#womens-health .wh-kits > .container > h2 {
+#ostomy-care .wh-kits > .container > h2 {
   text-align: center;
   font-size: clamp(34px, 4.5vw, 56px);
   margin: 14px auto 16px;
   max-width: 18ch;
 }
 
-#womens-health .wh-kits-intro {
+#ostomy-care .wh-kits-intro {
   text-align: center;
   max-width: 54ch;
   margin: 0 auto 36px;
   font-size: 17px;
 }
 
-#womens-health .wh-kits-carousel {
+#ostomy-care .wh-kits-carousel {
   margin-top: 8px;
 }
 
-#womens-health .wh-kits-carousel-count {
+#ostomy-care .wh-kits-carousel-count {
   margin: 0 auto 16px;
   max-width: 1240px;
   text-align: center;
@@ -1913,7 +1912,7 @@
   opacity: 0.62;
 }
 
-#womens-health .wh-kits-carousel-frame {
+#ostomy-care .wh-kits-carousel-frame {
   position: relative;
   display: grid;
   grid-template-columns: 48px minmax(0, 1fr) 48px;
@@ -1923,7 +1922,7 @@
   margin: 0 auto;
 }
 
-#womens-health .wh-kits-carousel-btn {
+#ostomy-care .wh-kits-carousel-btn {
   width: 48px;
   height: 48px;
   border-radius: 999px;
@@ -1942,19 +1941,19 @@
   z-index: 3;
 }
 
-#womens-health .wh-kits-carousel-btn:hover {
+#ostomy-care .wh-kits-carousel-btn:hover {
   background: var(--soft);
   border-color: rgba(49, 47, 47, 0.28);
   transform: scale(1.04);
 }
 
-#womens-health .wh-kits-carousel-viewport {
+#ostomy-care .wh-kits-carousel-viewport {
   min-width: 0;
   overflow: hidden;
   touch-action: pan-y;
 }
 
-#womens-health .wh-kits-carousel-track {
+#ostomy-care .wh-kits-carousel-track {
   display: flex;
   align-items: stretch;
   width: max-content;
@@ -1962,11 +1961,11 @@
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#womens-health .wh-kits-carousel-track.is-instant {
+#ostomy-care .wh-kits-carousel-track.is-instant {
   transition: none;
 }
 
-#womens-health .wh-kits-carousel-slide {
+#ostomy-care .wh-kits-carousel-slide {
   flex: 0 0 auto;
   text-align: left;
   font: inherit;
@@ -1976,7 +1975,7 @@
   cursor: default;
 }
 
-#womens-health .wh-kits-carousel-slide.is-side {
+#ostomy-care .wh-kits-carousel-slide.is-side {
   cursor: pointer;
   opacity: 0.4;
   filter: saturate(0.75);
@@ -1988,12 +1987,12 @@
     transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#womens-health .wh-kits-carousel-slide.is-side:hover {
+#ostomy-care .wh-kits-carousel-slide.is-side:hover {
   opacity: 0.62;
   filter: saturate(0.9);
 }
 
-#womens-health .wh-kits-carousel-slide.is-center {
+#ostomy-care .wh-kits-carousel-slide.is-center {
   opacity: 1;
   filter: none;
   position: relative;
@@ -2005,7 +2004,7 @@
     transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#womens-health .wh-kit-feature {
+#ostomy-care .wh-kit-feature {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
   gap: 0;
@@ -2021,14 +2020,14 @@
   box-shadow: 0 18px 40px rgba(49, 47, 47, 0.06);
 }
 
-#womens-health .wh-kit-feature-media {
+#ostomy-care .wh-kit-feature-media {
   height: 100%;
   min-height: 0;
   background: var(--sand);
 }
 
-#womens-health .wh-kit-feature-media img,
-#womens-health .wh-kit-feature-media .wh-product-fallback {
+#ostomy-care .wh-kit-feature-media img,
+#ostomy-care .wh-kit-feature-media .wh-product-fallback {
   width: 100%;
   height: 100%;
   min-height: 0;
@@ -2036,7 +2035,7 @@
   display: block;
 }
 
-#womens-health .wh-kit-feature-copy {
+#ostomy-care .wh-kit-feature-copy {
   padding: 36px 40px;
   display: flex;
   flex-direction: column;
@@ -2044,7 +2043,7 @@
   min-height: 0;
 }
 
-#womens-health .wh-kit-feature-copy h3 {
+#ostomy-care .wh-kit-feature-copy h3 {
   font-size: clamp(26px, 2.8vw, 36px);
   margin: 10px 0 8px;
   line-height: 1.15;
@@ -2055,7 +2054,7 @@
   min-height: calc(1.15em * 2);
 }
 
-#womens-health .wh-kit-feature-copy > p {
+#ostomy-care .wh-kit-feature-copy > p {
   max-width: 38ch;
   margin: 10px 0 22px;
   display: -webkit-box;
@@ -2065,65 +2064,65 @@
   min-height: calc(1.45em * 3);
 }
 
-#womens-health .wh-kit-feature-copy .wh-product-price {
+#ostomy-care .wh-kit-feature-copy .wh-product-price {
   margin: 0;
   font-weight: 500;
   min-height: 1.2em;
 }
 
-#womens-health .wh-kit-feature-copy .wh-product-price--spacer {
+#ostomy-care .wh-kit-feature-copy .wh-product-price--spacer {
   visibility: hidden;
 }
 
-#womens-health .wh-kit-feature-copy .btn {
+#ostomy-care .wh-kit-feature-copy .btn {
   align-self: flex-start;
   margin-top: auto;
 }
 
-#womens-health .wh-kit-feature-cta-ghost {
+#ostomy-care .wh-kit-feature-cta-ghost {
   pointer-events: none;
   opacity: 0.85;
 }
 
 @media (max-width: 900px) {
-  #womens-health .wh-kits-carousel-frame {
+  #ostomy-care .wh-kits-carousel-frame {
     grid-template-columns: 40px minmax(0, 1fr) 40px;
     gap: 6px;
   }
 
-  #womens-health .wh-kits-carousel-btn {
+  #ostomy-care .wh-kits-carousel-btn {
     width: 40px;
     height: 40px;
     font-size: 18px;
   }
 
-  #womens-health .wh-kit-feature {
+  #ostomy-care .wh-kit-feature {
     grid-template-columns: 1fr;
     height: auto;
     min-height: 0;
   }
 
-  #womens-health .wh-kit-feature-media {
+  #ostomy-care .wh-kit-feature-media {
     aspect-ratio: 4 / 3;
     height: auto;
   }
 
-  #womens-health .wh-kit-feature-copy {
+  #ostomy-care .wh-kit-feature-copy {
     padding: 24px;
   }
 
-  #womens-health .wh-kits-carousel-slide.is-side {
+  #ostomy-care .wh-kits-carousel-slide.is-side {
     transform: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #womens-health .wh-kits-carousel-track {
+  #ostomy-care .wh-kits-carousel-track {
     transition: none;
   }
 }
 
-#womens-health .wh-kit-flow {
+#ostomy-care .wh-kit-flow {
   max-width: 1100px;
   margin: 0 auto 48px;
   background: #fff;
@@ -2132,7 +2131,7 @@
   box-shadow: 0 18px 40px rgba(49, 47, 47, 0.06);
 }
 
-#womens-health .wh-kit-flow-steps {
+#ostomy-care .wh-kit-flow-steps {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
@@ -2140,7 +2139,7 @@
   align-items: center;
 }
 
-#womens-health .wh-kit-flow-step {
+#ostomy-care .wh-kit-flow-step {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -2148,11 +2147,11 @@
   min-width: 0;
 }
 
-#womens-health .wh-kit-flow-step:last-child {
+#ostomy-care .wh-kit-flow-step:last-child {
   grid-template-columns: minmax(0, 1fr);
 }
 
-#womens-health .wh-kit-flow-arrow {
+#ostomy-care .wh-kit-flow-arrow {
   flex: none;
   color: var(--ink);
   opacity: 0.38;
@@ -2161,7 +2160,7 @@
   padding-right: 2px;
 }
 
-#womens-health .wh-kit-flow-steps button {
+#ostomy-care .wh-kit-flow-steps button {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -2183,37 +2182,37 @@
     transform 0.25s ease;
 }
 
-#womens-health .wh-kit-flow-steps button:hover,
-#womens-health .wh-kit-flow-steps button.is-preview {
+#ostomy-care .wh-kit-flow-steps button:hover,
+#ostomy-care .wh-kit-flow-steps button.is-preview {
   border-color: rgba(49, 47, 47, 0.24);
   box-shadow: 0 10px 22px rgba(49, 47, 47, 0.08);
   transform: translateY(-1px);
 }
 
-#womens-health .wh-kit-flow-steps button.is-active {
+#ostomy-care .wh-kit-flow-steps button.is-active {
   background: #fff;
   border-color: rgba(49, 47, 47, 0.28);
   box-shadow: 0 10px 22px rgba(49, 47, 47, 0.1);
 }
 
-#womens-health .wh-kit-flow-steps button.is-active .wh-kit-flow-num,
-#womens-health .wh-kit-flow-steps button.is-active .wh-kit-flow-label {
+#ostomy-care .wh-kit-flow-steps button.is-active .wh-kit-flow-num,
+#ostomy-care .wh-kit-flow-steps button.is-active .wh-kit-flow-label {
   opacity: 1;
 }
 
-#womens-health .wh-kit-flow-num {
+#ostomy-care .wh-kit-flow-num {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.08em;
   opacity: 0.55;
 }
 
-#womens-health .wh-kit-flow-label {
+#ostomy-care .wh-kit-flow-label {
   font-size: 14px;
   font-weight: 500;
 }
 
-#womens-health .wh-kit-flow-caption {
+#ostomy-care .wh-kit-flow-caption {
   margin: 0 0 20px;
   padding: 2px 0;
   font-size: 18px;
@@ -2222,14 +2221,14 @@
   opacity: 1;
 }
 
-#womens-health .wh-kit-flow-caption strong {
+#ostomy-care .wh-kit-flow-caption strong {
   display: inline;
   font-weight: 700;
   color: #4f634e;
   letter-spacing: 0.01em;
 }
 
-#womens-health .wh-kit-page {
+#ostomy-care .wh-kit-page {
   position: relative;
   border: 1px solid rgba(49, 47, 47, 0.1);
   border-radius: 24px;
@@ -2238,7 +2237,7 @@
   min-height: 560px;
 }
 
-#womens-health .wh-kit-page-chrome {
+#ostomy-care .wh-kit-page-chrome {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -2247,26 +2246,26 @@
   border-bottom: 1px solid rgba(49, 47, 47, 0.08);
 }
 
-#womens-health .wh-kit-page-chrome span {
+#ostomy-care .wh-kit-page-chrome span {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   background: rgba(49, 47, 47, 0.18);
 }
 
-#womens-health .wh-kit-page-chrome span:nth-child(1) {
+#ostomy-care .wh-kit-page-chrome span:nth-child(1) {
   background: #e8b4a8;
 }
 
-#womens-health .wh-kit-page-chrome span:nth-child(2) {
+#ostomy-care .wh-kit-page-chrome span:nth-child(2) {
   background: #d7cfc7;
 }
 
-#womens-health .wh-kit-page-chrome span:nth-child(3) {
+#ostomy-care .wh-kit-page-chrome span:nth-child(3) {
   background: #8ea58d;
 }
 
-#womens-health .wh-kit-page-chrome em {
+#ostomy-care .wh-kit-page-chrome em {
   margin-left: 10px;
   font-style: normal;
   font-size: 12px;
@@ -2276,20 +2275,20 @@
   text-overflow: ellipsis;
 }
 
-#womens-health .wh-kit-page-body {
+#ostomy-care .wh-kit-page-body {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
   gap: 0;
   min-height: 520px;
 }
 
-#womens-health .wh-kit-page-product {
+#ostomy-care .wh-kit-page-product {
   padding: 28px 28px 32px;
   border-right: 1px solid rgba(49, 47, 47, 0.08);
   background: #fff;
 }
 
-#womens-health .wh-kit-page-media {
+#ostomy-care .wh-kit-page-media {
   border-radius: 20px;
   overflow: hidden;
   background: var(--sand);
@@ -2297,50 +2296,50 @@
   aspect-ratio: 4 / 3;
 }
 
-#womens-health .wh-kit-page-media img {
+#ostomy-care .wh-kit-page-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-#womens-health .wh-kit-page-product h3 {
+#ostomy-care .wh-kit-page-product h3 {
   margin: 10px 0 10px;
   font-size: clamp(26px, 3vw, 36px);
 }
 
-#womens-health .wh-kit-page-product > p {
+#ostomy-care .wh-kit-page-product > p {
   margin: 0;
   max-width: 34ch;
   opacity: 0.78;
   font-size: 15px;
 }
 
-#womens-health .wh-kit-page-tray {
+#ostomy-care .wh-kit-page-tray {
   padding: 24px 24px 28px;
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-#womens-health .wh-kit-page-tray-head {
+#ostomy-care .wh-kit-page-tray-head {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 12px;
 }
 
-#womens-health .wh-kit-page-tray-head h4 {
+#ostomy-care .wh-kit-page-tray-head h4 {
   margin: 0;
   font-size: 22px;
 }
 
-#womens-health .wh-kit-page-tray-head span {
+#ostomy-care .wh-kit-page-tray-head span {
   font-size: 12px;
   opacity: 0.55;
 }
 
-#womens-health .wh-kit-page-lines {
+#ostomy-care .wh-kit-page-lines {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -2349,7 +2348,7 @@
   flex: 1;
 }
 
-#womens-health .wh-kit-page-line {
+#ostomy-care .wh-kit-page-line {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2361,13 +2360,13 @@
   box-shadow: 0 1px 2px rgba(49, 47, 47, 0.04);
 }
 
-#womens-health .wh-kit-page-line strong {
+#ostomy-care .wh-kit-page-line strong {
   display: block;
   font-size: 14px;
   font-weight: 500;
 }
 
-#womens-health .wh-kit-page-line em {
+#ostomy-care .wh-kit-page-line em {
   display: block;
   margin-top: 2px;
   font-style: normal;
@@ -2375,7 +2374,7 @@
   opacity: 0.55;
 }
 
-#womens-health .wh-kit-page-qty {
+#ostomy-care .wh-kit-page-qty {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -2384,7 +2383,7 @@
   padding: 4px 8px;
 }
 
-#womens-health .wh-kit-page-qty span {
+#ostomy-care .wh-kit-page-qty span {
   width: 22px;
   height: 22px;
   border-radius: 50%;
@@ -2395,13 +2394,13 @@
   font-size: 13px;
 }
 
-#womens-health .wh-kit-page-qty b {
+#ostomy-care .wh-kit-page-qty b {
   min-width: 1.2ch;
   text-align: center;
   font-size: 14px;
 }
 
-#womens-health .wh-kit-page-line--add {
+#ostomy-care .wh-kit-page-line--add {
   justify-content: center;
   border: 1.5px dashed rgba(49, 47, 47, 0.22);
   background-color: transparent;
@@ -2410,27 +2409,27 @@
   font-weight: 500;
 }
 
-#womens-health .wh-kit-page-line--new {
+#ostomy-care .wh-kit-page-line--new {
   animation: wh-kit-new-item 0.55s ease both;
 }
 
-#womens-health .wh-kit-page-line.is-pressed,
-#womens-health .wh-kit-page-qty-plus.is-pressed,
-#womens-health .wh-kit-page-line--add.is-pressed,
-#womens-health .wh-kit-page-save.is-pressed,
-#womens-health .wh-kit-page-cart.is-pressed {
+#ostomy-care .wh-kit-page-line.is-pressed,
+#ostomy-care .wh-kit-page-qty-plus.is-pressed,
+#ostomy-care .wh-kit-page-line--add.is-pressed,
+#ostomy-care .wh-kit-page-save.is-pressed,
+#ostomy-care .wh-kit-page-cart.is-pressed {
   animation: wh-kit-target 0.55s ease both;
 }
 
-#womens-health .wh-kit-page-actions {
+#ostomy-care .wh-kit-page-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 6px;
 }
 
-#womens-health .wh-kit-page-save,
-#womens-health .wh-kit-page-cart {
+#ostomy-care .wh-kit-page-save,
+#ostomy-care .wh-kit-page-cart {
   border: 0;
   border-radius: 999px;
   padding: 12px 18px;
@@ -2440,18 +2439,18 @@
   cursor: default;
 }
 
-#womens-health .wh-kit-page-save {
+#ostomy-care .wh-kit-page-save {
   background: rgba(142, 165, 141, 0.22);
   color: #4f634e;
 }
 
-#womens-health .wh-kit-page-cart {
+#ostomy-care .wh-kit-page-cart {
   position: relative;
   background: var(--ink);
   color: #fff;
 }
 
-#womens-health .wh-kit-search {
+#ostomy-care .wh-kit-search {
   position: absolute;
   inset: 0;
   z-index: 6;
@@ -2463,7 +2462,7 @@
   animation: wh-kit-search-in 0.28s ease both;
 }
 
-#womens-health .wh-kit-search-card {
+#ostomy-care .wh-kit-search-card {
   width: min(100%, 360px);
   background: #fff;
   border-radius: 22px;
@@ -2471,7 +2470,7 @@
   box-shadow: 0 24px 50px rgba(49, 47, 47, 0.18);
 }
 
-#womens-health .wh-kit-search-label {
+#ostomy-care .wh-kit-search-label {
   margin: 0 0 10px;
   font-size: 12px;
   font-weight: 600;
@@ -2480,7 +2479,7 @@
   opacity: 0.55;
 }
 
-#womens-health .wh-kit-search-input {
+#ostomy-care .wh-kit-search-input {
   display: flex;
   align-items: center;
   gap: 2px;
@@ -2493,14 +2492,14 @@
   font-weight: 500;
 }
 
-#womens-health .wh-kit-search-caret {
+#ostomy-care .wh-kit-search-caret {
   width: 1.5px;
   height: 1.1em;
   background: var(--ink);
   animation: wh-kit-caret 0.9s steps(1) infinite;
 }
 
-#womens-health .wh-kit-search-results {
+#ostomy-care .wh-kit-search-results {
   list-style: none;
   margin: 12px 0 0;
   padding: 0;
@@ -2508,7 +2507,7 @@
   gap: 6px;
 }
 
-#womens-health .wh-kit-search-results li {
+#ostomy-care .wh-kit-search-results li {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2520,19 +2519,19 @@
   font-weight: 500;
 }
 
-#womens-health .wh-kit-search-results li.is-active {
+#ostomy-care .wh-kit-search-results li.is-active {
   background: rgba(142, 165, 141, 0.22);
   box-shadow: 0 0 0 2px rgba(142, 165, 141, 0.35);
 }
 
-#womens-health .wh-kit-search-results em {
+#ostomy-care .wh-kit-search-results em {
   font-style: normal;
   font-size: 12px;
   font-weight: 600;
   color: #4f634e;
 }
 
-#womens-health .wh-kit-cursor {
+#ostomy-care .wh-kit-cursor {
   position: absolute;
   top: 0;
   left: 0;
@@ -2545,16 +2544,16 @@
   will-change: transform;
 }
 
-#womens-health .wh-kit-cursor.is-clicking {
+#ostomy-care .wh-kit-cursor.is-clicking {
   transition-duration: 0.12s;
 }
 
-#womens-health .wh-kit-cursor.is-clicking svg {
+#ostomy-care .wh-kit-cursor.is-clicking svg {
   transform: scale(0.88);
   transform-origin: 4px 4px;
 }
 
-#womens-health .wh-kit-cursor-ripple {
+#ostomy-care .wh-kit-cursor-ripple {
   position: absolute;
   left: 0;
   top: 0;
@@ -2567,7 +2566,7 @@
   pointer-events: none;
 }
 
-#womens-health .wh-kit-cursor.is-clicking .wh-kit-cursor-ripple {
+#ostomy-care .wh-kit-cursor.is-clicking .wh-kit-cursor-ripple {
   animation: wh-kit-ripple 0.45s ease-out both;
 }
 
@@ -2626,51 +2625,51 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #womens-health .wh-kit-page-line--new,
-  #womens-health .wh-kit-page-line.is-pressed,
-  #womens-health .wh-kit-page-qty-plus.is-pressed,
-  #womens-health .wh-kit-page-line--add.is-pressed,
-  #womens-health .wh-kit-page-save.is-pressed,
-  #womens-health .wh-kit-page-cart.is-pressed,
-  #womens-health .wh-kit-search,
-  #womens-health .wh-kit-search-caret,
-  #womens-health .wh-kit-cursor,
-  #womens-health .wh-kit-cursor-ripple {
+  #ostomy-care .wh-kit-page-line--new,
+  #ostomy-care .wh-kit-page-line.is-pressed,
+  #ostomy-care .wh-kit-page-qty-plus.is-pressed,
+  #ostomy-care .wh-kit-page-line--add.is-pressed,
+  #ostomy-care .wh-kit-page-save.is-pressed,
+  #ostomy-care .wh-kit-page-cart.is-pressed,
+  #ostomy-care .wh-kit-search,
+  #ostomy-care .wh-kit-search-caret,
+  #ostomy-care .wh-kit-cursor,
+  #ostomy-care .wh-kit-cursor-ripple {
     animation: none !important;
     transition: none !important;
   }
 
-  #womens-health .wh-kit-cursor {
+  #ostomy-care .wh-kit-cursor {
     display: none;
   }
 }
 
 /* —— SHOP PRODUCTS / ROOMS —— */
-#womens-health .wh-shop {
+#ostomy-care .wh-shop {
   background: #e7eee5;
   padding: 100px 24px 110px;
   color: var(--ink);
 }
 
-#womens-health .wh-shop .eyebrow {
+#ostomy-care .wh-shop .eyebrow {
   display: block;
   text-align: center;
   color: #5f735e;
 }
 
-#womens-health .wh-shop > .container > h2 {
+#ostomy-care .wh-shop > .container > h2 {
   text-align: center;
   font-size: clamp(34px, 4.5vw, 56px);
   margin: 14px auto 16px;
 }
 
-#womens-health .wh-shop-intro {
+#ostomy-care .wh-shop-intro {
   text-align: center;
   max-width: 48ch;
   margin: 0 auto 28px;
 }
 
-#womens-health .wh-shop-rooms {
+#ostomy-care .wh-shop-rooms {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -2678,7 +2677,7 @@
   margin-bottom: 36px;
 }
 
-#womens-health .wh-shop-rooms button {
+#ostomy-care .wh-shop-rooms button {
   appearance: none;
   border: 1.5px solid rgba(49, 47, 47, 0.18);
   background: rgba(255, 255, 255, 0.55);
@@ -2693,32 +2692,32 @@
     border-color 0.2s ease;
 }
 
-#womens-health .wh-shop-rooms button.is-active,
-#womens-health .wh-shop-rooms button:hover {
+#ostomy-care .wh-shop-rooms button.is-active,
+#ostomy-care .wh-shop-rooms button:hover {
   background: var(--ink);
   color: #fff;
   border-color: var(--ink);
 }
 
-#womens-health .wh-shop-empty {
+#ostomy-care .wh-shop-empty {
   text-align: center;
   opacity: 0.7;
   margin: 24px 0;
 }
 
-#womens-health .wh-shop-cta {
+#ostomy-care .wh-shop-cta {
   display: flex;
   justify-content: center;
   margin-top: 40px;
 }
 
-#womens-health .wh-product-grid {
+#ostomy-care .wh-product-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 18px;
 }
 
-#womens-health .wh-product-card {
+#ostomy-care .wh-product-card {
   display: flex;
   flex-direction: column;
   text-decoration: none;
@@ -2731,18 +2730,18 @@
     box-shadow 0.35s ease;
 }
 
-#womens-health .wh-product-card:hover {
+#ostomy-care .wh-product-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 18px 36px rgba(49, 47, 47, 0.1);
 }
 
-#womens-health .wh-product-media {
+#ostomy-care .wh-product-media {
   aspect-ratio: 1;
   background: var(--sand);
   overflow: hidden;
 }
 
-#womens-health .wh-product-media img {
+#ostomy-care .wh-product-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -2750,11 +2749,11 @@
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#womens-health .wh-product-card:hover .wh-product-media img {
+#ostomy-care .wh-product-card:hover .wh-product-media img {
   transform: scale(1.05);
 }
 
-#womens-health .wh-product-fallback {
+#ostomy-care .wh-product-fallback {
   width: 100%;
   height: 100%;
   min-height: 180px;
@@ -2764,24 +2763,24 @@
     linear-gradient(160deg, #efe7dd, #ddd2c4);
 }
 
-#womens-health .wh-product-meta {
+#ostomy-care .wh-product-meta {
   padding: 18px 18px 22px;
   display: grid;
   gap: 8px;
 }
 
-#womens-health .wh-product-meta h3 {
+#ostomy-care .wh-product-meta h3 {
   font-size: 18px;
   line-height: 1.25;
 }
 
-#womens-health .wh-product-price {
+#ostomy-care .wh-product-price {
   font-size: 14px;
   font-weight: 500;
   opacity: 0.75;
 }
 
-#womens-health .wh-product-badge {
+#ostomy-care .wh-product-badge {
   display: inline-block;
   align-self: flex-start;
   font-size: 10px;
@@ -2795,7 +2794,7 @@
 }
 
 /* —— CLOSING —— */
-#womens-health .closing {
+#ostomy-care .closing {
   min-height: 85vh;
   display: grid;
   place-items: center;
@@ -2806,47 +2805,47 @@
   background: var(--ink);
 }
 
-#womens-health .closing-bg {
+#ostomy-care .closing-bg {
   position: absolute;
   inset: 0;
   z-index: 0;
 }
 
-#womens-health .closing-bg img {
+#ostomy-care .closing-bg img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-#womens-health .closing-bg::after {
+#ostomy-care .closing-bg::after {
   content: '';
   position: absolute;
   inset: 0;
   background: rgba(49, 47, 47, 0.55);
 }
 
-#womens-health .closing .container {
+#ostomy-care .closing .container {
   position: relative;
   z-index: 1;
 }
 
-#womens-health .closing h2 {
+#ostomy-care .closing h2 {
   font-size: clamp(40px, 6vw, 78px);
 }
 
-#womens-health .closing h2 span {
+#ostomy-care .closing h2 span {
   display: block;
   font-style: italic;
   color: var(--blush);
 }
 
-#womens-health .closing p {
+#ostomy-care .closing p {
   margin: 22px auto 34px;
   max-width: 42ch;
   font-size: 18px;
 }
 
-#womens-health .wh-manifesto-kicker {
+#ostomy-care .wh-manifesto-kicker {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.18em;
@@ -2855,192 +2854,192 @@
   margin-bottom: 16px;
 }
 
-#womens-health .wh-closing-cta {
+#ostomy-care .wh-closing-cta {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 12px;
 }
 
-#womens-health .closing-thumbs {
+#ostomy-care .closing-thumbs {
   display: none;
 }
 
 @media (max-width: 980px) {
-  #womens-health .hero {
+  #ostomy-care .hero {
     grid-template-columns: 1fr;
     min-height: auto;
   }
 
-  #womens-health .hero-inner {
+  #ostomy-care .hero-inner {
     padding: 72px 24px 40px;
   }
 
-  #womens-health .hero-stack {
+  #ostomy-care .hero-stack {
     min-height: 52vh;
     margin: 0 16px 24px;
   }
 
-  #womens-health .mosaic {
+  #ostomy-care .mosaic {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: auto;
   }
 
-  #womens-health .mosaic .m1,
-  #womens-health .mosaic .m2,
-  #womens-health .mosaic .m3,
-  #womens-health .mosaic .m4,
-  #womens-health .mosaic .m5,
-  #womens-health .mosaic .m6 {
+  #ostomy-care .mosaic .m1,
+  #ostomy-care .mosaic .m2,
+  #ostomy-care .mosaic .m3,
+  #ostomy-care .mosaic .m4,
+  #ostomy-care .mosaic .m5,
+  #ostomy-care .mosaic .m6 {
     grid-column: auto;
     grid-row: auto;
     height: 160px;
   }
 
-  #womens-health .counters-grid,
-  #womens-health .pillars-grid,
-  #womens-health .voice-cards {
+  #ostomy-care .counters-grid,
+  #ostomy-care .pillars-grid,
+  #ostomy-care .voice-cards {
     grid-template-columns: 1fr 1fr;
   }
 
-  #womens-health .images-text-grid,
-  #womens-health .chapter,
-  #womens-health .chapter:nth-child(even),
-  #womens-health .timeline-slide,
-  #womens-health .faq-layout,
-  #womens-health .wh-clair-board {
+  #ostomy-care .images-text-grid,
+  #ostomy-care .chapter,
+  #ostomy-care .chapter:nth-child(even),
+  #ostomy-care .timeline-slide,
+  #ostomy-care .faq-layout,
+  #ostomy-care .wh-clair-board {
     grid-template-columns: 1fr;
   }
 
-  #womens-health .chapter:nth-child(even) .wh-pic,
-  #womens-health .chapter:nth-child(even) .copy {
+  #ostomy-care .chapter:nth-child(even) .wh-pic,
+  #ostomy-care .chapter:nth-child(even) .copy {
     order: 0;
   }
 
-  #womens-health .chapter .wh-pic {
+  #ostomy-care .chapter .wh-pic {
     min-height: 42vh;
   }
 
-  #womens-health .images-text.tips-pair .visuals,
-  #womens-health .images-text.tips-pair .copy {
+  #ostomy-care .images-text.tips-pair .visuals,
+  #ostomy-care .images-text.tips-pair .copy {
     order: 0;
   }
 
-  #womens-health .wh-clair {
+  #ostomy-care .wh-clair {
     min-height: min(120vh, 1100px);
   }
 
-  #womens-health .wh-clair-board {
+  #ostomy-care .wh-clair-board {
     padding: 88px 24px 96px;
   }
 
-  #womens-health .wh-clair-copy h2 {
+  #ostomy-care .wh-clair-copy h2 {
     max-width: none;
   }
 
-  #womens-health .voice:nth-child(2),
-  #womens-health .voice:nth-child(4) {
+  #ostomy-care .voice:nth-child(2),
+  #ostomy-care .voice:nth-child(4) {
     transform: none;
   }
 
-  #womens-health .faq-art {
+  #ostomy-care .faq-art {
     position: static;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
   }
 
-  #womens-health .faq-art .wh-pic:first-child,
-  #womens-health .faq-art .wh-pic:last-child {
+  #ostomy-care .faq-art .wh-pic:first-child,
+  #ostomy-care .faq-art .wh-pic:last-child {
     aspect-ratio: 4 / 5;
     width: 100%;
     justify-self: stretch;
   }
 
-  #womens-health .timeline-dots {
+  #ostomy-care .timeline-dots {
     grid-template-columns: 1fr;
   }
 
-  #womens-health .timeline-visual {
+  #ostomy-care .timeline-visual {
     min-height: 320px;
   }
 
-  #womens-health .wh-kit-feature {
+  #ostomy-care .wh-kit-feature {
     grid-template-columns: 1fr;
     height: auto;
     min-height: 0;
   }
 
-  #womens-health .wh-kit-feature-media {
+  #ostomy-care .wh-kit-feature-media {
     aspect-ratio: 4 / 3;
     height: auto;
   }
 
-  #womens-health .wh-kit-feature-copy {
+  #ostomy-care .wh-kit-feature-copy {
     padding: 28px;
   }
 
-  #womens-health .wh-kit-feature-copy h3 {
+  #ostomy-care .wh-kit-feature-copy h3 {
     min-height: 0;
   }
 
-  #womens-health .wh-kit-feature-copy > p {
+  #ostomy-care .wh-kit-feature-copy > p {
     min-height: 0;
   }
 
-  #womens-health .wh-kit-page-body {
+  #ostomy-care .wh-kit-page-body {
     grid-template-columns: 1fr;
   }
 
-  #womens-health .wh-kit-page-product {
+  #ostomy-care .wh-kit-page-product {
     border-right: 0;
     border-bottom: 1px solid rgba(49, 47, 47, 0.08);
   }
 
-  #womens-health .wh-kit-page {
+  #ostomy-care .wh-kit-page {
     min-height: 0;
   }
 
-  #womens-health .wh-kit-flow-steps {
+  #ostomy-care .wh-kit-flow-steps {
     grid-template-columns: 1fr 1fr;
   }
 
-  #womens-health .wh-kit-flow-arrow {
+  #ostomy-care .wh-kit-flow-arrow {
     display: none;
   }
 
-  #womens-health .wh-kit-flow-step {
+  #ostomy-care .wh-kit-flow-step {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  #womens-health .wh-kit-cursor {
+  #ostomy-care .wh-kit-cursor {
     display: none;
   }
 
-  #womens-health .wh-doors-grid,
-  #womens-health .wh-chooser-grid,
-  #womens-health .wh-voice-feature,
-  #womens-health .wh-product-grid,
-  #womens-health .voice-cards {
+  #ostomy-care .wh-doors-grid,
+  #ostomy-care .wh-chooser-grid,
+  #ostomy-care .wh-voice-feature,
+  #ostomy-care .wh-product-grid,
+  #ostomy-care .voice-cards {
     grid-template-columns: 1fr 1fr;
   }
 }
 
 @media (max-width: 640px) {
-  #womens-health .counters-grid,
-  #womens-health .pillars-grid,
-  #womens-health .voice-cards,
-  #womens-health .wh-doors-grid,
-  #womens-health .wh-chooser-grid,
-  #womens-health .wh-voice-feature,
-  #womens-health .wh-product-grid {
+  #ostomy-care .counters-grid,
+  #ostomy-care .pillars-grid,
+  #ostomy-care .voice-cards,
+  #ostomy-care .wh-doors-grid,
+  #ostomy-care .wh-chooser-grid,
+  #ostomy-care .wh-voice-feature,
+  #ostomy-care .wh-product-grid {
     grid-template-columns: 1fr;
   }
 
-  #womens-health .wh-clair-uses {
+  #ostomy-care .wh-clair-uses {
     grid-template-columns: 1fr;
   }
 
-  #womens-health .hero h1 {
+  #ostomy-care .hero h1 {
     max-width: 12ch;
   }
 }

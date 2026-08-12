@@ -6,11 +6,13 @@ export const CLAIR_HEALTH_PATH = `${WOMENS_HEALTH_PATH}/clair-health`;
 export const SHOP_WOMENS_HEALTH_PATH = '/liivv-health/womens-health/shop-womens-health';
 
 /** Hub + care verticals for the global storefront header (not the WH route nav). */
-export const LIIVV_HEALTH_HUB_PATH = '/pages/liivv-health';
+export const LIIVV_HEALTH_HUB_PATH = '/liivv-health';
 export const DIABETES_CARE_PATH = '/pages/diabetes-care';
-export const OSTOMY_CARE_PATH = '/pages/ostomy-care';
+export const OSTOMY_CARE_PATH = '/liivv-health/ostomy-care';
+export const SHOP_OSTOMY_CARE_PATH = '/liivv-health/ostomy-care/shop-ostomy-care';
 
 const CHAPTER_IMG = '/archive/womens-health';
+const OSTOMY_CHAPTER_IMG = '/archive/ostomy-care';
 
 /**
  * Storefront top-level “Liivv Health” item — sits between Liivv Your Life and Blog.
@@ -28,7 +30,7 @@ export function getStoreLiivvHealthNavItem(): LiivvArchiveNavLink {
             href: DIABETES_CARE_PATH,
           },
           {
-            label: 'Ostomy Care & Everyday Living',
+            label: 'Ostomy Care & Everyday Liivving',
             href: OSTOMY_CARE_PATH,
           },
           {
@@ -98,6 +100,41 @@ const CHAPTER_LINKS = [
   },
 ] as const;
 
+const OSTOMY_CHAPTER_LINKS = [
+  {
+    label: 'Everyday Liivving',
+    href: `${OSTOMY_CARE_PATH}/chapters/everyday-liivving`,
+    image: {
+      src: `${OSTOMY_CHAPTER_IMG}/chapter-everyday.jpg`,
+      alt: 'Everyday Liivving',
+    },
+  },
+  {
+    label: 'Get to Know Your Stoma',
+    href: `${OSTOMY_CARE_PATH}/chapters/get-to-know-your-stoma`,
+    image: {
+      src: `${OSTOMY_CHAPTER_IMG}/chapter-stoma.jpg`,
+      alt: 'Get to Know Your Stoma',
+    },
+  },
+  {
+    label: 'New to the Journey',
+    href: `${OSTOMY_CARE_PATH}/chapters/new-to-the-journey`,
+    image: {
+      src: `${OSTOMY_CHAPTER_IMG}/chapter-new.jpg`,
+      alt: 'New to the Journey',
+    },
+  },
+  {
+    label: 'Shop Ostomy Essentials',
+    href: SHOP_OSTOMY_CARE_PATH,
+    image: {
+      src: `${OSTOMY_CHAPTER_IMG}/door-shop.jpg`,
+      alt: 'Shop Ostomy Essentials',
+    },
+  },
+] as const;
+
 const WOMENS_HEALTH_NAV: LiivvArchiveNavLink[] = [
   {
     label: "Women's Health",
@@ -122,11 +159,45 @@ const WOMENS_HEALTH_NAV: LiivvArchiveNavLink[] = [
   },
 ];
 
+const OSTOMY_CARE_NAV: LiivvArchiveNavLink[] = [
+  {
+    label: 'Ostomy Care',
+    href: OSTOMY_CARE_PATH,
+  },
+  {
+    label: 'Find Your Chapter',
+    href: `${OSTOMY_CARE_PATH}#where-are-you`,
+    columns: [
+      {
+        links: [...OSTOMY_CHAPTER_LINKS],
+      },
+    ],
+  },
+  {
+    label: 'Shop Ostomy Essentials',
+    href: SHOP_OSTOMY_CARE_PATH,
+  },
+];
+
 /** Custom header nav for the Women's Health route. */
 export function getWomensHealthNav(): LiivvArchiveNavLink[] {
   return WOMENS_HEALTH_NAV;
 }
 
-export function shouldShowLiivvHealthNav(pathname: string): boolean {
+/** Custom header nav for the Ostomy Care route. */
+export function getOstomyCareNav(): LiivvArchiveNavLink[] {
+  return OSTOMY_CARE_NAV;
+}
+
+export function shouldShowWomensHealthNav(pathname: string): boolean {
   return pathnameMatchesPrefix(pathname, WOMENS_HEALTH_PATH);
+}
+
+export function shouldShowOstomyCareNav(pathname: string): boolean {
+  return pathnameMatchesPrefix(pathname, OSTOMY_CARE_PATH);
+}
+
+/** @deprecated Prefer shouldShowWomensHealthNav — kept for existing call sites. */
+export function shouldShowLiivvHealthNav(pathname: string): boolean {
+  return shouldShowWomensHealthNav(pathname);
 }

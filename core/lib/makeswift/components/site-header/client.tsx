@@ -29,8 +29,10 @@ import {
   type MakeswiftAdditionalLinkInput,
 } from '~/lib/makeswift/site-header/map-makeswift-nav-links';
 import {
+  getOstomyCareNav,
   getWomensHealthNav,
-  shouldShowLiivvHealthNav,
+  shouldShowOstomyCareNav,
+  shouldShowWomensHealthNav,
 } from '~/lib/makeswift/site-header/inject-liivv-health-nav';
 import { resolveStoreNavLinks } from '~/lib/makeswift/site-header/resolve-store-nav-links';
 import { resolveStoreLogo, type StoreLogo } from '~/lib/makeswift/site-header/resolve-store-logo';
@@ -245,8 +247,13 @@ export const MakeswiftHeader = forwardRef(
     const override = findMatchingPathConfig(pathname, pageOverrides);
     const desktopLogo = resolveStoreLogo(storeLogo, storeLogoLabel);
     const resolvedNavLinks = resolveStoreNavLinks(links, categoryTree);
-    const showLiivvHealthNav = shouldShowLiivvHealthNav(pathname);
-    const navLinks = showLiivvHealthNav ? getWomensHealthNav() : resolvedNavLinks;
+    const showWomensHealthNav = shouldShowWomensHealthNav(pathname);
+    const showOstomyCareNav = shouldShowOstomyCareNav(pathname);
+    const navLinks = showWomensHealthNav
+      ? getWomensHealthNav()
+      : showOstomyCareNav
+        ? getOstomyCareNav()
+        : resolvedNavLinks;
 
     if (override) {
       return (
@@ -289,7 +296,9 @@ export const MakeswiftHeader = forwardRef(
         initialCartCount={cartCount}
         linksPosition={linksPosition ?? 'left'}
         logo={desktopLogo}
-        navAriaLabel={showLiivvHealthNav ? "Women's Health" : 'Store'}
+        navAriaLabel={
+          showWomensHealthNav ? "Women's Health" : showOstomyCareNav ? 'Ostomy Care' : 'Store'
+        }
         navLinks={navLinks}
         notifications={notifications}
         searchPlaceholder={searchPlaceholder}

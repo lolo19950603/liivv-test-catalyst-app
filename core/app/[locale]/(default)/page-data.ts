@@ -50,13 +50,47 @@ const HomePageQuery = graphql(
         featuredProducts(first: 12) {
           edges {
             node {
+              categories {
+                edges {
+                  node {
+                    name
+                    path
+                  }
+                }
+              }
+              images(first: 3) {
+                edges {
+                  node {
+                    altText
+                    url: urlTemplate(lossy: true)
+                    isDefault
+                  }
+                }
+              }
               ...FeaturedProductsListFragment
             }
           }
         }
-        newestProducts(first: 12) {
+        newestProducts(first: 48) {
           edges {
             node {
+              categories {
+                edges {
+                  node {
+                    name
+                    path
+                  }
+                }
+              }
+              images(first: 3) {
+                edges {
+                  node {
+                    altText
+                    url: urlTemplate(lossy: true)
+                    isDefault
+                  }
+                }
+              }
               ...FeaturedProductsCarouselFragment
             }
           }
