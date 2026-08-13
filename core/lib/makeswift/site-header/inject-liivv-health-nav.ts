@@ -102,35 +102,27 @@ const CHAPTER_LINKS = [
 
 const OSTOMY_CHAPTER_LINKS = [
   {
-    label: 'Everyday Liivving',
-    href: `${OSTOMY_CARE_PATH}/chapters/everyday-liivving`,
+    label: 'New to the Journey',
+    href: `${OSTOMY_CARE_PATH}/chapters/new-to-the-journey`,
     image: {
-      src: `${OSTOMY_CHAPTER_IMG}/chapter-everyday.jpg`,
-      alt: 'Everyday Liivving',
+      src: `${OSTOMY_CHAPTER_IMG}/chapter-new.png`,
+      alt: 'New to the Journey',
     },
   },
   {
     label: 'Get to Know Your Stoma',
     href: `${OSTOMY_CARE_PATH}/chapters/get-to-know-your-stoma`,
     image: {
-      src: `${OSTOMY_CHAPTER_IMG}/chapter-stoma.jpg`,
+      src: `${OSTOMY_CHAPTER_IMG}/chapter-stoma.png`,
       alt: 'Get to Know Your Stoma',
     },
   },
   {
-    label: 'New to the Journey',
-    href: `${OSTOMY_CARE_PATH}/chapters/new-to-the-journey`,
+    label: 'Everyday Liivving',
+    href: `${OSTOMY_CARE_PATH}/chapters/everyday-liivving`,
     image: {
-      src: `${OSTOMY_CHAPTER_IMG}/chapter-new.jpg`,
-      alt: 'New to the Journey',
-    },
-  },
-  {
-    label: 'Shop Ostomy Essentials',
-    href: SHOP_OSTOMY_CARE_PATH,
-    image: {
-      src: `${OSTOMY_CHAPTER_IMG}/door-shop.jpg`,
-      alt: 'Shop Ostomy Essentials',
+      src: `${OSTOMY_CHAPTER_IMG}/chapter-everyday.png`,
+      alt: 'Everyday Liivving',
     },
   },
 ] as const;
@@ -165,7 +157,7 @@ const OSTOMY_CARE_NAV: LiivvArchiveNavLink[] = [
     href: OSTOMY_CARE_PATH,
   },
   {
-    label: 'Find Your Chapter',
+    label: 'Your pace',
     href: `${OSTOMY_CARE_PATH}#where-are-you`,
     columns: [
       {

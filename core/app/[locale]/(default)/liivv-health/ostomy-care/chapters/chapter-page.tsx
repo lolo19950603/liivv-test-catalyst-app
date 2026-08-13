@@ -8,57 +8,20 @@ import { CHAPTERS, LANDING_HREF, chapterHref, getChapterNeighbors } from './chap
 import './chapter-page.css';
 
 /*
- * =============================================================================
- * CHAPTER PAGE — CONTENT MAP
- * =============================================================================
- * Routes: /liivv-health/ostomy-care/chapters/[slug]
- *
- * Layout lives in this file. Almost all copy lives in:
- *   ./chapters-data.ts  ← edit chapter titles, focus, vibe, categories, etc.
- *
- * Search "SECTION N —" below to jump to each layout block.
- * =============================================================================
+ * Ostomy chapter page — soft journal / path layout (not Women's Health chapter chrome).
  */
 
-function Pic({
-  src,
-  className = '',
-  alt = '',
-  priority = false,
-}: {
-  src: string;
-  className?: string;
-  alt?: string;
-  priority?: boolean;
-}) {
+function CategoryRow({ card, index }: { card: CategoryCard; index: number }) {
   return (
-    <div aria-hidden={alt === '' || undefined} className={`wh-ch-pic ${className}`.trim()}>
-      <img alt={alt} decoding="async" loading={priority ? 'eager' : 'lazy'} src={src} />
-    </div>
-  );
-}
-
-function renderBadge(text?: string) {
-  if (!text) return null;
-  return <span className="wh-ch-soon">{text}</span>;
-}
-
-/** Pick a proportional grid from the total category count. */
-function categoryGridClass(count: number) {
-  if (count <= 1) return 'wh-ch-cat-grid wh-ch-cat-grid--cols-1';
-  if (count === 2 || count === 4) return 'wh-ch-cat-grid wh-ch-cat-grid--cols-2';
-  return 'wh-ch-cat-grid wh-ch-cat-grid--cols-3';
-}
-
-function CategoryCardView({ card, index }: { card: CategoryCard; index: number }) {
-  return (
-    <article className="wh-ch-cat" style={{ ['--stagger' as string]: `${index * 40}ms` }}>
-      {card.group ? <span className="wh-ch-group">{card.group}</span> : null}
-      <Pic src={card.image} />
-      <div className="wh-ch-cat-body">
+    <article className="oc-ch-row">
+      <span aria-hidden className="oc-ch-row-index">
+        {String(index + 1).padStart(2, '0')}
+      </span>
+      <div>
+        {card.group ? <span className="oc-ch-group">{card.group}</span> : null}
         <h3>
           {card.title}
-          {renderBadge(card.badge)}
+          {card.badge ? ` · ${card.badge}` : ''}
         </h3>
         {card.items ? (
           <ul>
@@ -68,17 +31,17 @@ function CategoryCardView({ card, index }: { card: CategoryCard; index: number }
           </ul>
         ) : null}
         {card.sections?.map((section) => (
-          <div className="wh-ch-subsection" key={section.heading}>
+          <div className="oc-ch-subsection" key={section.heading}>
             <h4>{section.heading}</h4>
             <ul>
               {section.items.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
-            {section.note ? <p className="wh-ch-note">{section.note}</p> : null}
+            {section.note ? <p className="oc-ch-row-note">{section.note}</p> : null}
           </div>
         ))}
-        {card.note ? <p className="wh-ch-note">{card.note}</p> : null}
+        {card.note ? <p className="oc-ch-row-note">{card.note}</p> : null}
       </div>
     </article>
   );
@@ -89,10 +52,6 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
   const nextHref = next ? chapterHref(next.slug) : `${LANDING_HREF}#where-are-you`;
   const [scrolled, setScrolled] = useState(false);
   const chapterIndex = CHAPTERS.findIndex((item) => item.slug === chapter.slug);
-  const categories = chapter.categories;
-  const categoryCount = categories.length;
-  const showFeaturedSolo = categoryCount === 1;
-  const featured = showFeaturedSolo ? categories[0] : null;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -103,147 +62,79 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
 
   return (
     <div id="oc-chapter" style={{ ['--chapter-accent' as string]: chapter.accent }}>
-      {/* Sticky back link — label edited inline */}
-      <a className={`wh-ch-back${scrolled ? ' is-scrolled' : ''}`} href={LANDING_HREF}>
+      <a className={`oc-ch-back${scrolled ? ' is-scrolled' : ''}`} href={LANDING_HREF}>
         ← Ostomy Care
       </a>
 
-      {/* =====================================================================
-          SECTION 1 — HERO
-          Copy from chapters-data: title, heroBody, chapterWord, num, heroImage
-          CTA labels below are edited inline.
-          ===================================================================== */}
-      <section className="wh-ch-hero">
-        <Pic className="wh-ch-hero-bg" priority src={chapter.heroImage} />
-        <div className="wh-ch-hero-veil" aria-hidden />
-        <div className="wh-ch-hero-inner">
-          <div className="wh-ch-hero-copy">
-            <span className="wh-ch-eyebrow wh-ch-hero-kicker">
-              Ostomy Care · Chapter {chapter.chapterWord}
-            </span>
-            <p className="wh-ch-num" aria-hidden>
-              {chapter.num}
-            </p>
-            <h1>{chapter.title}</h1>
-            <p className="wh-ch-hero-lead">{chapter.heroBody}</p>
-            <div className="wh-ch-hero-actions">
-              <a className="wh-ch-btn wh-ch-btn-light" href="#chapter-care">
-                Explore this chapter
-              </a>
-              <a className="wh-ch-btn wh-ch-btn-ghost" href={chapter.pharmacist.href}>
-                Ask a pharmacist
-              </a>
-            </div>
+      <section className="oc-ch-hero">
+        <div className="oc-ch-hero-bg">
+          <img alt="" decoding="async" src={chapter.heroImage} />
+        </div>
+        <div aria-hidden className="oc-ch-hero-veil" />
+        <div className="oc-ch-hero-inner">
+          <span className="oc-ch-kicker">Ostomy Care · Chapter {chapter.chapterWord}</span>
+          <p aria-hidden className="oc-ch-num">
+            {chapter.num}
+          </p>
+          <h1>{chapter.title}</h1>
+          <p className="oc-ch-hero-lead">{chapter.heroBody}</p>
+          <div className="oc-ch-hero-actions">
+            <a className="oc-ch-btn oc-ch-btn-soft" href="#chapter-care">
+              Read this chapter
+            </a>
+            <a className="oc-ch-btn oc-ch-btn-ghost-light" href={chapter.pharmacist.href}>
+              Ask a pharmacist
+            </a>
           </div>
-          <div aria-hidden className="wh-ch-hero-progress">
+          <div aria-hidden className="oc-ch-progress">
             {CHAPTERS.map((item, index) => (
-              <span
-                className={index === chapterIndex ? 'is-current' : undefined}
-                key={item.slug}
-                style={{ ['--i' as string]: index }}
-              />
+              <span className={index === chapterIndex ? 'is-current' : undefined} key={item.slug} />
             ))}
           </div>
         </div>
-        <a aria-label="Scroll to chapter details" className="wh-ch-scroll" href="#chapter-pulse">
-          <span />
-        </a>
       </section>
 
-      {/* =====================================================================
-          SECTION 2 — FOCUS + VIBE PULSE
-          Anchor: #chapter-pulse
-          Copy from chapters-data: focus, vibe
-          Card labels ("The Focus" / "The Liivv Vibe") edited inline.
-          ===================================================================== */}
-      <section className="wh-ch-pulse wh-ch-rounded" id="chapter-pulse">
-        <div className="wh-ch-container wh-ch-pulse-grid">
-          <article className="wh-ch-pulse-card">
-            <span className="wh-ch-pulse-label">The Focus</span>
+      <section className="oc-ch-journal" id="chapter-pulse">
+        <div className="oc-ch-journal-grid">
+          <article className="oc-ch-note">
+            <span className="oc-ch-note-label">The Focus</span>
             <p>{chapter.focus}</p>
           </article>
-          <article className="wh-ch-pulse-card wh-ch-pulse-card--accent">
-            <span className="wh-ch-pulse-label">The Liivv Vibe</span>
+          <article className="oc-ch-note is-vibe">
+            <span className="oc-ch-note-label">The Liivv Vibe</span>
             <p>{chapter.vibe}</p>
           </article>
         </div>
       </section>
 
-      {/* =====================================================================
-          SECTION 3 — CARE CATEGORIES
-          Anchor: #chapter-care
-          Copy from chapters-data: categoriesIntro, categories[]
-          Layout adapts to count: 1 featured · 2/4 → 2-col · 3/5/6+ → 3-col
-          (last row centers when incomplete).
-          ===================================================================== */}
-      <section className="wh-ch-categories" id="chapter-care">
-        <div className="wh-ch-container">
-          <header className="wh-ch-section-head">
-            <span className="wh-ch-eyebrow">{chapter.categoriesIntro.eyebrow}</span>
+      <section className="oc-ch-care" id="chapter-care">
+        <div className="oc-ch-wrap">
+          <header className="oc-ch-care-head">
+            <span className="oc-ch-eyebrow">{chapter.categoriesIntro.eyebrow}</span>
             <h2>{chapter.categoriesIntro.heading}</h2>
-            <p className="wh-ch-intro">{chapter.categoriesIntro.body}</p>
+            <p>{chapter.categoriesIntro.body}</p>
           </header>
-
-          {featured ? (
-            <article className="wh-ch-feature">
-              <Pic className="wh-ch-feature-media" src={featured.image} />
-              <div className="wh-ch-feature-copy">
-                {featured.group ? <span className="wh-ch-group">{featured.group}</span> : null}
-                <h3>
-                  {featured.title}
-                  {renderBadge(featured.badge)}
-                </h3>
-                {featured.items ? (
-                  <ul>
-                    {featured.items.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                ) : null}
-                {featured.sections?.map((section) => (
-                  <div className="wh-ch-subsection" key={section.heading}>
-                    <h4>{section.heading}</h4>
-                    <ul>
-                      {section.items.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                    {section.note ? <p className="wh-ch-note">{section.note}</p> : null}
-                  </div>
-                ))}
-                {featured.note ? <p className="wh-ch-note">{featured.note}</p> : null}
-              </div>
-            </article>
-          ) : (
-            <div className={categoryGridClass(categoryCount)}>
-              {categories.map((card, index) => (
-                <CategoryCardView card={card} index={index} key={card.title} />
-              ))}
-            </div>
-          )}
+          <div className="oc-ch-rows">
+            {chapter.categories.map((card, index) => (
+              <CategoryRow card={card} index={index} key={card.title} />
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* =====================================================================
-          SECTION 4 — PROGRAMS BAND (optional — only some chapters)
-          Copy from chapters-data: programsBand
-          Eyebrow "Programs" edited inline.
-          ===================================================================== */}
       {chapter.programsBand ? (
-        <section className="wh-ch-programs">
-          <div className="wh-ch-container">
+        <section className="oc-ch-programs">
+          <div className="oc-ch-wrap">
             {chapter.programsBand.heading ? (
-              <header className="wh-ch-section-head wh-ch-section-head--left">
-                <span className="wh-ch-eyebrow">Programs</span>
+              <header className="oc-ch-care-head">
+                <span className="oc-ch-eyebrow">Soft map</span>
                 <h2>{chapter.programsBand.heading}</h2>
               </header>
             ) : null}
-            <div className="wh-ch-programs-grid">
+            <div className="oc-ch-programs-grid">
               {chapter.programsBand.cards.map((card, index) => (
-                <article className="wh-ch-program" key={card.heading}>
-                  <span aria-hidden className="wh-ch-program-index">
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
+                <article className="oc-ch-program" key={card.heading}>
+                  <span className="oc-ch-program-index">{String(index + 1).padStart(2, '0')}</span>
                   <h3>{card.heading}</h3>
                   <p>{card.body}</p>
                 </article>
@@ -253,39 +144,29 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </section>
       ) : null}
 
-      {/* =====================================================================
-          SECTION 5 — PHARMACIST CTA
-          Copy from chapters-data: pharmacist (eyebrow, heading, body, cta, image)
-          ===================================================================== */}
-      <section className="wh-ch-pharmacist wh-ch-rounded">
-        <div className="wh-ch-container wh-ch-pharmacist-grid">
-          <div className="wh-ch-pharmacist-media">
-            <Pic src={chapter.pharmacist.image} />
-            <span aria-hidden className="wh-ch-pharmacist-glow" />
-          </div>
-          <div className="wh-ch-pharmacist-copy">
-            <span className="wh-ch-eyebrow">{chapter.pharmacist.eyebrow}</span>
-            <h2>{chapter.pharmacist.heading}</h2>
-            <p>{chapter.pharmacist.body}</p>
-            <a className="wh-ch-btn wh-ch-btn-white" href={chapter.pharmacist.href}>
-              {chapter.pharmacist.cta}
-            </a>
+      <section className="oc-ch-care-cta">
+        <div className="oc-ch-wrap">
+          <div className="oc-ch-care-panel">
+            <div className="oc-ch-care-media">
+              <img alt="" src={chapter.pharmacist.image} />
+            </div>
+            <div className="oc-ch-care-copy">
+              <span className="oc-ch-eyebrow">{chapter.pharmacist.eyebrow}</span>
+              <h2>{chapter.pharmacist.heading}</h2>
+              <p>{chapter.pharmacist.body}</p>
+              <a className="oc-ch-btn oc-ch-btn-soft" href={chapter.pharmacist.href}>
+                {chapter.pharmacist.cta}
+              </a>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* =====================================================================
-          SECTION 6 — JOURNEY MAP / ALL CHAPTERS NAV
-          Chapter titles come from CHAPTERS in chapters-data.ts
-          "Journey map" / "All three chapters" edited inline.
-          ===================================================================== */}
-      <section className="wh-ch-nav">
-        <div className="wh-ch-container">
-          <div className="wh-ch-nav-head">
-            <p className="wh-ch-eyebrow">Journey map</p>
-            <h2>All three chapters</h2>
-          </div>
-          <div className="wh-ch-nav-rail" aria-label="Chapter navigation">
+      <section className="oc-ch-map">
+        <div className="oc-ch-wrap">
+          <span className="oc-ch-eyebrow">Path</span>
+          <h2>All three chapters</h2>
+          <div aria-label="Chapter navigation" className="oc-ch-map-rail">
             {CHAPTERS.map((item) => {
               const active = item.slug === chapter.slug;
               return (
@@ -295,9 +176,8 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
                   href={chapterHref(item.slug)}
                   key={item.slug}
                 >
-                  <span className="wh-ch-nav-num">{item.num}</span>
-                  <span className="wh-ch-nav-title">{item.title}</span>
-                  <span aria-hidden className="wh-ch-nav-dot" />
+                  <span className="oc-ch-map-num">{item.num}</span>
+                  <span>{item.title}</span>
                 </a>
               );
             })}
@@ -305,28 +185,25 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </div>
       </section>
 
-      {/* =====================================================================
-          SECTION 7 — CLOSING
-          Copy from chapters-data: closing, nextLabel
-          Eyebrow + "Back to Women's Health" CTA edited inline.
-          ===================================================================== */}
-      <section className="wh-ch-closing">
-        <Pic className="wh-ch-closing-bg" src={chapter.heroImage} />
-        <div className="wh-ch-closing-veil" aria-hidden />
-        <div className="wh-ch-container">
-          <span className="wh-ch-eyebrow">Keep going</span>
+      <section className="oc-ch-close">
+        <div className="oc-ch-close-bg">
+          <img alt="" src={chapter.heroImage} />
+        </div>
+        <div aria-hidden className="oc-ch-close-veil" />
+        <div className="oc-ch-close-inner">
+          <span className="oc-ch-eyebrow">Keep going</span>
           <h2>{chapter.closing.heading}</h2>
           <p>{chapter.closing.body}</p>
-          <div className="wh-ch-closing-cta">
-            <a className="wh-ch-btn wh-ch-btn-white" href={LANDING_HREF}>
+          <div className="oc-ch-close-cta">
+            <a className="oc-ch-btn oc-ch-btn-soft" href={LANDING_HREF}>
               Back to Ostomy Care
             </a>
-            <a className="wh-ch-btn wh-ch-btn-ghost" href={nextHref}>
+            <a className="oc-ch-btn oc-ch-btn-ghost-light" href={nextHref}>
               {chapter.nextLabel}
             </a>
           </div>
           {prev ? (
-            <p className="wh-ch-prev">
+            <p className="oc-ch-prev">
               <a href={chapterHref(prev.slug)}>← {prev.title}</a>
             </p>
           ) : null}
