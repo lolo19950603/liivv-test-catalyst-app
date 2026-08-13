@@ -5,9 +5,9 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 import { CHAPTERS as CHAPTER_PAGES, SHOP_OSTOMY_HREF, chapterHref } from './chapters/chapters-data';
 import type { OcCatalog, OcCatalogItem } from './get-oc-catalog';
 import {
+  NEW_JOURNEY_STARTER_KIT_ID,
   HERO_FLOAT_BARRIER_ID,
   HERO_FLOAT_POUCH_ID,
-  NEW_JOURNEY_STARTER_KIT_ID,
 } from './oc-ids';
 
 import './ostomy-care.css';
@@ -301,7 +301,7 @@ function KitsCarousel({
           )}
           <p>
             {isFeatured
-              ? 'A calm first-weeks edit — open it to tune quantities, add what was missing, and save your version.'
+              ? 'A calm Fresh Start edit — open it to tune quantities, add what was missing, and save your version.'
               : 'Open it to tune quantities, add what was missing, and save your version.'}
           </p>
           {isCenter && shift === 0 ? (
@@ -708,7 +708,7 @@ function KitFlowDemo({
             </div>
             <span className="wh-product-badge">Featured kit</span>
             <h3>{title}</h3>
-            <p>A calm first-weeks edit — customize quantities, add what was missing, then save or checkout.</p>
+            <p>A calm Fresh Start edit — customize quantities, add what was missing, then save or checkout.</p>
           </div>
 
           <div className="wh-kit-page-tray">
@@ -879,7 +879,7 @@ export function OstomyCarePage({ catalog }: { catalog?: OcCatalog }) {
     };
 
     return {
-      primary: resolve(NEW_JOURNEY_STARTER_KIT_ID, '/new-journey-starter-kit/', 'New Journey Starter Kit'),
+      primary: resolve(NEW_JOURNEY_STARTER_KIT_ID, '/the-fresh-start-new-ostomate-starter-kit/', 'The Fresh Start (New Ostomate Starter Kit)'),
       secondary: resolve(HERO_FLOAT_POUCH_ID, '/sensura-1-piece-drainable-pouch-flat-opaque/', 'SenSura 1-Piece Drainable Pouch'),
       tertiary: resolve(HERO_FLOAT_BARRIER_ID, '/adapt-barrier-rings/', 'Adapt Barrier Rings'),
     };

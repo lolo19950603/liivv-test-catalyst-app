@@ -282,7 +282,7 @@ export const CHAPTERS: Chapter[] = [
           'Skin protectant wipe, powder if recommended, disposal bags',
           'A go-bag for outings from day one',
         ],
-        note: 'Try the New Journey Starter Kit — customize quantities before checkout.',
+        note: 'Try The Fresh Start kit — customize quantities before checkout.',
       },
       {
         title: 'Who to Ask',

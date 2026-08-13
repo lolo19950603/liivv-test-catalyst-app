@@ -1,5 +1,5 @@
 /**
- * Create Ostomy Care curated kits in BigCommerce.
+ * Create Ostomy Care curated kits in BigCommerce from liivv_kit_components_final.csv.
  *
  * Run from repo root:
  *   node --env-file=.env.local core/scripts/create-ostomy-care-kits.mjs
@@ -7,53 +7,70 @@
  * Optional:
  *   --dry-run   validate components / print plan only
  *   --only=SKU  create/update a single kit by SKU
+ *   --retire-old  hide previously AI-invented kits (8036–8040)
  */
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 const STORE_HASH = process.env.BIGCOMMERCE_STORE_HASH;
 const TOKEN = process.env.CATALYST_PRODUCT_EDIT_TOKEN || process.env.BIGCOMMERCE_ACCESS_TOKEN;
 const CHANNEL_ID = Number(process.env.BIGCOMMERCE_CHANNEL_ID || '1');
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const CSV_PATH = join(__dirname, '../../liivv_kit_components_final.csv');
+
+/** Previously AI-invented kits to hide when --retire-old is passed. */
+const OLD_AI_KIT_IDS = [8036, 8037, 8038, 8039, 8040];
+
+/** Kit display name → SKU + short PDP description */
+const KIT_META = {
+  'The Fresh Start (New Ostomate Starter Kit)': {
+    sku: 'KIT-OSTOMY-FRESH-START',
+    description:
+      '<p>A calm new-ostomate starter edit — barrier, drainable pouch, paste, skin prep, and a support belt you can tune before checkout.</p><ul><li>Two-piece pouching and flat FlexWear barrier</li><li>Stomahesive paste and Skin-Prep wipe</li><li>Brava ostomy belt for extra security</li><li>Customize quantities or remove items before checkout</li></ul>',
+  },
+  'Skin Shield (Peristomal Skin Health & Infection Prevention)': {
+    sku: 'KIT-OSTOMY-SKIN-SHIELD',
+    description:
+      '<p>Peristomal skin comfort staples — powder, protective wipe, barrier ring, adhesive remover, and barrier cream.</p><ul><li>Stomahesive powder and AllKare wipe</li><li>Eakin barrier ring and antibacterial ring</li><li>Tac Away remover and Cavilon barrier cream</li><li>Customize quantities or remove items before checkout</li></ul>',
+  },
+  'Inner Balance (Gut Health & Output Management)': {
+    sku: 'KIT-OSTOMY-INNER-BALANCE',
+    description:
+      '<p>Everyday gut and output support — probiotic, fibre, and gentle gas relief options in one customizable kit.</p><ul><li>Probiotic and Benefiber prebiotic fibre</li><li>TUMS Chewy Bites with gas relief</li><li>Phazyme Ultra Strength SoftGels</li><li>Customize quantities or remove items before checkout</li></ul>',
+  },
+  'Stay Hydrated (High-Output & Dehydration Rescue)': {
+    sku: 'KIT-OSTOMY-STAY-HYDRATED',
+    description:
+      '<p>High-output and dehydration rescue staples — electrolytes, thickener, and loperamide support you can tailor.</p><ul><li>Hydralyte and Organika electrolyte options</li><li>Resource ThickenUp Clear</li><li>Option+ loperamide for clinician-guided use</li><li>Customize quantities or remove items before checkout</li></ul>',
+  },
+  'Leak-Free Confidence (Leak & Odor Control)': {
+    sku: 'KIT-OSTOMY-LEAK-FREE',
+    description:
+      '<p>Leak and odor control essentials — barrier ring, strip paste, protective sheet, filtered pouch, and belt.</p><ul><li>Eakin ring and Brava strip paste</li><li>Brava protective sheet</li><li>Filtered closed pouch and ostomy belt</li><li>Customize quantities or remove items before checkout</li></ul>',
+  },
+  'Everyday Living (Ostomy Daily Care & Disposal)': {
+    sku: 'KIT-OSTOMY-EVERYDAY-LIVING',
+    description:
+      '<p>Daily care and disposal comfort — belt, skin gel wipes, soft wipes, and gloves for an easier change routine.</p><ul><li>Adapt ostomy belt</li><li>Hollister Skin Gel Wipes</li><li>Tena ProSkin Ultra Wipes and nitrile gloves</li><li>Customize quantities or remove items before checkout</li></ul>',
+  },
+  'Little Ostomate (Pediatric Ostomy Kit)': {
+    sku: 'KIT-OSTOMY-LITTLE-OSTOMATE',
+    description:
+      '<p>Pediatric ostomy essentials — Pouchkins pouching, pediatric barrier, CeraPlus rings, and gentle baby lotion.</p><ul><li>One-piece and two-piece Pouchkins options</li><li>Pediatric flat skin barrier</li><li>CeraPlus convex barrier rings</li><li>SoluPrep swabstick and CeraVe Baby lotion</li></ul>',
+  },
+  'Newly Diagnosed: New Ostomy Starter Kit': {
+    sku: 'KIT-OSTOMY-NEWLY-DIAGNOSED',
+    description:
+      '<p>Newly diagnosed starter essentials — one-piece drainable pouch, barrier rings, protective wipe, belt, and clamp.</p><ul><li>SenSura 1-piece drainable pouch</li><li>Adapt barrier rings and AllKare wipe</li><li>Adapt belt and drainable pouch clamp</li><li>Customize quantities or remove items before checkout</li></ul>',
+  },
+};
+
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
+const RETIRE_OLD = args.includes('--retire-old');
 const ONLY_SKU = args.find((a) => a.startsWith('--only='))?.slice('--only='.length);
-
-/** @type {Array<{ name: string; sku: string; description: string; componentIds: number[] }>} */
-const KITS = [
-  {
-    name: 'New Journey Starter Kit',
-    sku: 'KIT-OSTOMY-NEW-JOURNEY',
-    description:
-      '<p>A calm first-weeks edit — drainable pouching, skin protectant, powder, and odor care you can tune before checkout.</p><ul><li>One-piece drainable pouching</li><li>Protective barrier wipe and stoma powder</li><li>Odor eliminator drops</li><li>Customize quantities or remove items before checkout</li></ul>',
-    componentIds: [4441, 4531, 4610, 8012],
-  },
-  {
-    name: 'Two-Piece Everyday Restock Kit',
-    sku: 'KIT-OSTOMY-TWO-PIECE-RESTOCK',
-    description:
-      '<p>Everyday restock for two-piece routines — pouch, flange, and barrier ring essentials in one customizable kit.</p><ul><li>Two-piece drainable pouch</li><li>Flat flange</li><li>Barrier ring for a closer seal</li><li>Customize quantities or remove items before checkout</li></ul>',
-    componentIds: [4361, 4583, 4560],
-  },
-  {
-    name: 'Skin Comfort & Seal Kit',
-    sku: 'KIT-OSTOMY-SKIN-COMFORT',
-    description:
-      '<p>Peristomal skin comfort staples — powder, paste, protective wipe, adhesive remover, and a barrier ring.</p><ul><li>Stoma powder and strip paste</li><li>Protective barrier wipe</li><li>Adhesive remover wipes</li><li>Barrier ring for fit support</li></ul>',
-    componentIds: [4610, 4598, 4439, 7998, 5067],
-  },
-  {
-    name: 'Go-Bag Essentials Kit',
-    sku: 'KIT-OSTOMY-GO-BAG',
-    description:
-      '<p>A discreet go-bag edit — spare pouching support, belt, odor drops, and skin wipe for days away from home.</p><ul><li>One-piece drainable pouch</li><li>Ostomy belt</li><li>Odor eliminator drops</li><li>Protective barrier wipe</li></ul>',
-    componentIds: [4891, 4647, 8012, 4531],
-  },
-  {
-    name: 'Urostomy Care Kit',
-    sku: 'KIT-OSTOMY-UROSTOMY',
-    description:
-      '<p>Urostomy-focused essentials — pouching, drain adapter, and skin protectant in one customizable kit.</p><ul><li>Two-piece urostomy pouch</li><li>Drain tube adapter</li><li>Protective barrier wipe</li><li>Customize quantities or remove items before checkout</li></ul>',
-    componentIds: [4581, 4207, 8014],
-  },
-];
 
 if (!STORE_HASH || !TOKEN) {
   console.error(
@@ -88,6 +105,57 @@ async function bc(path, init = {}) {
 function normalizePath(path) {
   const trimmed = path.trim().toLowerCase();
   return trimmed.length > 1 && trimmed.endsWith('/') ? trimmed.slice(0, -1) : trimmed;
+}
+
+/** Minimal CSV row parser (handles quoted fields with commas). */
+function parseCsvRow(line) {
+  const fields = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i += 1) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+    if (ch === ',' && !inQuotes) {
+      fields.push(current);
+      current = '';
+      continue;
+    }
+    current += ch;
+  }
+  fields.push(current);
+  return fields;
+}
+
+function parseCsvKits() {
+  const raw = readFileSync(CSV_PATH, 'utf8');
+  const lines = raw.split(/\r?\n/).filter(Boolean).slice(1);
+  /** @type {Map<string, number[]>} */
+  const byKit = new Map();
+
+  for (const line of lines) {
+    const parts = parseCsvRow(line);
+    if (parts.length < 5) continue;
+    const kit = parts[0];
+    const condition = parts[1];
+    const componentId = Number(parts[2]);
+    const isOstomy =
+      condition === 'Ostomy' ||
+      (condition === 'Cross-condition' && /ostomy/i.test(kit));
+    if (!isOstomy || !Number.isFinite(componentId)) continue;
+    if (!byKit.has(kit)) byKit.set(kit, []);
+    byKit.get(kit).push(componentId);
+  }
+
+  return byKit;
 }
 
 async function findOstomyShopCategoryId() {
@@ -239,33 +307,79 @@ async function upsertKit({ name, sku, description, componentIds, categoryId }) {
   return { id: productId, sku, name, action: 'created' };
 }
 
+async function retireOldAiKits() {
+  console.log('\n=== Retiring old AI-invented kits ===');
+  for (const id of OLD_AI_KIT_IDS) {
+    if (DRY_RUN) {
+      console.log(`  DRY RUN — would hide product ${id}`);
+      continue;
+    }
+    try {
+      await bc(`/v3/catalog/products/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ is_visible: false }),
+      });
+      console.log(`  hid product ${id}`);
+    } catch (error) {
+      console.warn(`  could not hide ${id}: ${error.message}`);
+    }
+  }
+}
+
 async function main() {
+  const byKit = parseCsvKits();
+  console.log(`Parsed ${byKit.size} ostomy-related kits from CSV`);
   console.log('Looking up Shop Ostomy Care category…');
   const category = await findOstomyShopCategoryId();
   if (!category) {
     throw new Error('Could not find Shop Ostomy Care category');
   }
   console.log('Category:', category);
+  if (DRY_RUN) console.log('DRY RUN mode — no writes');
 
-  const kits = ONLY_SKU ? KITS.filter((k) => k.sku === ONLY_SKU) : KITS;
-  if (!kits.length) {
-    throw new Error(`No kits matched --only=${ONLY_SKU}`);
+  if (RETIRE_OLD) {
+    await retireOldAiKits();
   }
 
   const results = [];
-  for (const kit of kits) {
-    results.push(
-      await upsertKit({
-        ...kit,
+  const errors = [];
+
+  for (const [name, componentIds] of byKit) {
+    const meta = KIT_META[name];
+    if (!meta) {
+      errors.push({ name, error: 'Missing KIT_META entry' });
+      console.error(`No KIT_META for: ${name}`);
+      continue;
+    }
+    if (ONLY_SKU && meta.sku !== ONLY_SKU) continue;
+
+    try {
+      const result = await upsertKit({
+        name,
+        sku: meta.sku,
+        description: meta.description,
+        componentIds,
         categoryId: category.id,
-      }),
-    );
+      });
+      results.push({ name, ...result });
+    } catch (error) {
+      console.error(`FAILED ${name}:`, error.message);
+      errors.push({ name, sku: meta.sku, error: error.message });
+    }
   }
 
-  console.log('\n=== SUMMARY ===');
+  console.log('\n========== SUMMARY ==========');
   for (const r of results) {
-    console.log(`${r.action}\t${r.id}\t${r.sku}\t${r.name}`);
+    console.log(`${r.action.toUpperCase()}  ${r.sku}  id=${r.id}  ${r.name}`);
   }
+  if (errors.length) {
+    console.log('\nERRORS:');
+    for (const e of errors) {
+      console.log(`  ${e.name}: ${e.error}`);
+    }
+    process.exitCode = 1;
+  }
+  console.log(`\nDone. ${results.length} kits processed, ${errors.length} errors.`);
 }
 
 main().catch((error) => {
