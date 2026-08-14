@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 
 import { HealthDashboardMain } from '~/components/account-dashboard/health-dashboard-main';
-import { getWellnessDashboardContext } from '~/app/[locale]/(default)/account/onboarding/page-data';
+import { getWellnessDashboardContext } from '~/lib/account-dashboard/get-wellness-dashboard-context';
 import { buildDashboardHeroPanels } from '~/lib/account-dashboard/build-dashboard-hero-panels';
 import { buildDashboardHeroTabs } from '~/lib/account-dashboard/build-hero-tabs';
 import { buildDashboardLabels } from '~/lib/account-dashboard/dashboard-labels';

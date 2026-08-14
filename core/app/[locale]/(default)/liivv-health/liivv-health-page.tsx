@@ -62,7 +62,7 @@ function DoorCard({
 }
 
 export function LiivvHealthPage({ featuredKits }: Props) {
-  const { rootClassName } = useWhMotion('liivv-health');
+  const { reduceMotion, rootClassName } = useWhMotion('liivv-health');
   const marqueeItems = [...HEALTH_HUB_MARQUEE, ...HEALTH_HUB_MARQUEE];
   const hasKits = featuredKits.length > 0;
 
@@ -70,37 +70,47 @@ export function LiivvHealthPage({ featuredKits }: Props) {
     <div className={rootClassName} id="liivv-health">
       {/* SECTION 1 — HERO */}
       <section aria-label="Liivv Health hero" className="lh-hub-hero">
-        <div aria-hidden className="wh-orb-field">
-          <span />
-          <span />
-          <span />
-        </div>
-        <div className="lh-hub-hero-inner">
-          <span className="lh-hub-kicker">Liivv Health</span>
-          <h1>
-            Specialized care, <span className="swash sage">told as a story</span>
-          </h1>
-          <p>
-            Eleven micro-sites for the seasons of care that need more than a product shelf —
-            curated kits, pharmacist support, and a Health Profile that remembers you.
-          </p>
-          <div className="lh-hub-hero-cta">
-            <a className="btn btn-dark" href="#doors">
-              Explore the 11
-            </a>
-            <a className="btn btn-outline" href="#kits">
-              Curated kits
+        <div className="lh-hub-hero-stage">
+          <div aria-hidden className="lh-hub-hero-glow">
+            <span />
+            <span />
+          </div>
+
+          <div className="lh-hub-hero-copy">
+            <span className="lh-hub-hero-kicker">
+              <i />
+              Liivv Health
+            </span>
+            <h1>
+              Care that meets you <em>where you are</em>
+            </h1>
+            <p>
+              One shelf can&apos;t know your story. Step into a hub built around you — Women&apos;s Health,
+              Diabetes, Ostomy, and more. Tailored guidance, honest talk, and products for the season
+              you&apos;re in.
+            </p>
+            <a className="lh-hub-hero-cta" href="#doors">
+              Start your customized path
             </a>
           </div>
-        </div>
-        <div aria-hidden className="lh-hub-hero-mosaic">
-          <div className="lh-hub-mosaic-main">
-            <img alt="" src={`${HOME_IMG}/corner-womens.png`} />
-          </div>
-          <div className="lh-hub-mosaic-stack">
-            <img alt="" src={`${HOME_IMG}/corner-ostomy.png`} />
-            <img alt="" src={`${HOME_IMG}/corner-diabetes.png`} />
-            <img alt="" src={`${HOME_IMG}/corner-sleep.png`} />
+
+          <div aria-hidden className="lh-hub-hero-media">
+            {reduceMotion ? (
+              <img alt="" src={`${HOME_IMG}/corner-womens.png`} />
+            ) : (
+              <video
+                autoPlay
+                className="lh-hub-hero-video"
+                loop
+                muted
+                playsInline
+                poster={`${HOME_IMG}/corner-womens.png`}
+                preload="metadata"
+              >
+                <source src={`${HOME_IMG}/liivvhealth.mp4`} type="video/mp4" />
+              </video>
+            )}
+            <div className="lh-hub-hero-veil" />
           </div>
         </div>
       </section>
@@ -115,7 +125,7 @@ export function LiivvHealthPage({ featuredKits }: Props) {
       </section>
 
       {/* SECTION 3 — 11 MICRO-SITE DOORS */}
-      <section aria-label="Eleven specialized micro-sites" className="lh-hub-doors" id="doors">
+      <section aria-label="Eleven specialized micro-sites" className="lh-hub-doors rounded-top" id="doors">
         <div className="container" data-reveal>
           <span className="eyebrow">Eleven specialized micro-sites</span>
           <h2>Find the care story that fits</h2>

@@ -32,8 +32,6 @@ export interface AccountDashboardLabels {
   accountSettings: string;
   search: string;
   brandName: string;
-  onboardingBannerMessage: string;
-  onboardingBannerCta: string;
   aria: {
     accountNavigation: string;
     primaryNavigation: string;
@@ -97,7 +95,6 @@ export interface AccountDashboardShellProps {
   settingsHref: string;
   contactHref: string;
   logoutHref: string;
-  onboardingBannerHref?: string | null;
   labels: AccountDashboardLabels;
   headerNotifications: AccountHeaderNotification[];
   notificationsUnreadCount: number;

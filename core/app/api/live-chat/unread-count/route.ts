@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { getOnboardingCustomer } from '~/app/[locale]/(default)/account/onboarding/page-data';
+import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
 import { getLiveChatLastSeen } from '~/lib/chat/cookie';
 import {
   countUnreadStaffMessages,

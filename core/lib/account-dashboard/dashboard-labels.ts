@@ -72,8 +72,6 @@ export function buildDashboardLabels(
     myAccount: t('myAccount'),
     accountSettings: t('accountSettings'),
     brandName: t('brandName'),
-    onboardingBannerMessage: t('onboardingBanner.message'),
-    onboardingBannerCta: t('onboardingBanner.cta'),
     aria: {
       accountNavigation: t('aria.accountNavigation'),
       primaryNavigation: t('aria.primaryNavigation'),

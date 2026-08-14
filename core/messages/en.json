@@ -283,10 +283,6 @@
       "brandName": "Liivv",
       "myAccount": "My Account",
       "accountSettings": "Account settings",
-      "onboardingBanner": {
-        "message": "Finish setting up your Liivv wellness profile to personalize your dashboard.",
-        "cta": "Continue setup"
-      },
       "aria": {
         "accountNavigation": "Account navigation",
         "primaryNavigation": "Primary navigation",

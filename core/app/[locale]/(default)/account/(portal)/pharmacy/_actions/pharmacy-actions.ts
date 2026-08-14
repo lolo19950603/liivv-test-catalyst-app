@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { getOnboardingCustomer } from '~/app/[locale]/(default)/account/onboarding/page-data';
+import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
 import { isTabletDosageForm, normalizeBucket } from '~/lib/pharmacy/pharmacy-mappers';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import {

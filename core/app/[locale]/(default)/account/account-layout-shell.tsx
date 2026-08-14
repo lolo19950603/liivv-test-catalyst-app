@@ -21,9 +21,8 @@ export function AccountLayoutShell({ children }: Props) {
     pathname.includes('/account/settings') ||
     pathname.includes('/account/health-profile') ||
     pathname.includes('/account/wishlists');
-  const isOnboarding = pathname.includes('/account/onboarding');
 
-  if (isPortalRoute || isOnboarding) {
+  if (isPortalRoute) {
     return <>{children}</>;
   }
 

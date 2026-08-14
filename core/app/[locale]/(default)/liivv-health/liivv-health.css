@@ -141,105 +141,244 @@
   color: rgba(49, 47, 47, 0.78);
 }
 
-/* —— HERO —— */
+/* —— HERO (dark split — matches home Liivv Health teaser) —— */
 #liivv-health .lh-hub-hero {
-  min-height: 88vh;
-  min-height: 88dvh;
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  align-items: stretch;
+  padding: 0;
+  background: var(--ink);
   overflow: hidden;
-  position: relative;
-  background:
-    radial-gradient(90% 70% at 12% 20%, rgba(243, 199, 190, 0.35), transparent 55%),
-    radial-gradient(70% 60% at 80% 90%, rgba(142, 165, 141, 0.22), transparent 50%),
-    var(--cream);
+  color: #fff;
 }
 
-#liivv-health .lh-hub-hero-inner {
+#liivv-health .lh-hub-hero-stage {
+  position: relative;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.22fr);
+  min-height: min(88vh, 880px);
+  background: var(--ink);
+  color: #fff;
+  overflow: hidden;
+}
+
+#liivv-health .lh-hub-hero-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+#liivv-health .lh-hub-hero-glow span {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(2px);
+  opacity: 0.55;
+  animation: lh-hub-orb 16s ease-in-out infinite alternate;
+}
+
+#liivv-health .lh-hub-hero-glow span:first-child {
+  width: 220px;
+  height: 220px;
+  left: -40px;
+  top: 10%;
+  background: color-mix(in srgb, var(--blush) 45%, transparent);
+}
+
+#liivv-health .lh-hub-hero-glow span:last-child {
+  width: 160px;
+  height: 160px;
+  left: 28%;
+  bottom: -30px;
+  background: color-mix(in srgb, var(--sage) 40%, transparent);
+  animation-delay: -4s;
+}
+
+@keyframes lh-hub-orb {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(18px, -22px, 0) scale(1.08);
+  }
+}
+
+#liivv-health .lh-hub-hero-copy {
   position: relative;
   z-index: 2;
+  padding: clamp(48px, 8vw, 96px) clamp(24px, 6vw, 88px);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 10vh 6vw 10vh;
+  gap: 18px;
+  max-width: 36rem;
+  justify-self: end;
+  width: 100%;
 }
 
-#liivv-health .lh-hub-kicker {
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-size: 12px;
+#liivv-health .lh-hub-hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  align-self: flex-start;
+  margin: 0;
+  padding: 8px 14px;
+  border: 1px solid color-mix(in srgb, #fff 22%, transparent);
+  border-radius: 4px;
+  background: color-mix(in srgb, #fff 6%, transparent);
+  font-size: 11px;
   font-weight: 600;
-  color: var(--sage);
-  margin-bottom: 18px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--sage) 55%, #fff);
 }
 
-#liivv-health .lh-hub-hero h1 {
-  font-size: clamp(40px, 5.6vw, 68px);
-  margin: 0 0 20px;
-  max-width: 14ch;
+#liivv-health .lh-hub-hero-kicker i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--blush);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--blush) 55%, transparent);
+  animation: lh-hub-health-pulse 2.4s ease-out infinite;
 }
 
-#liivv-health .lh-hub-hero p {
-  max-width: 42ch;
-  font-size: 17px;
-  margin: 0 0 28px;
-  color: rgba(49, 47, 47, 0.82);
+@keyframes lh-hub-health-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--blush) 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+#liivv-health .lh-hub-hero-copy h1 {
+  margin: 0;
+  font-size: clamp(36px, 5.2vw, 64px);
+  line-height: 1.02;
+  color: #fff;
+  max-width: 12ch;
+}
+
+#liivv-health .lh-hub-hero-copy h1 em {
+  font-style: italic;
+  color: var(--blush);
+}
+
+#liivv-health .lh-hub-hero-copy p {
+  margin: 0;
+  max-width: 38ch;
+  font-size: clamp(15px, 1.3vw, 17px);
+  line-height: 1.55;
+  opacity: 0.88;
+  color: #fff;
 }
 
 #liivv-health .lh-hub-hero-cta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 16px 28px;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease,
+    background 0.25s ease;
 }
 
-#liivv-health .lh-hub-hero-mosaic {
+#liivv-health .lh-hub-hero-cta:hover {
+  transform: translateY(-3px);
+  background: var(--blush);
+  color: var(--ink);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+}
+
+#liivv-health .lh-hub-hero-media {
   position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 14px;
-  padding: 8vh 5vw 8vh 0;
-  align-content: center;
-}
-
-#liivv-health .lh-hub-mosaic-main,
-#liivv-health .lh-hub-mosaic-stack img {
-  border-radius: 28px;
+  min-height: 100%;
+  align-self: stretch;
+  background: transparent;
   overflow: hidden;
-  background: var(--sand);
+  margin: 0;
+  border-radius: 0;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 8%,
+    rgba(0, 0, 0, 0.75) 16%,
+    #000 28%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 8%,
+    rgba(0, 0, 0, 0.75) 16%,
+    #000 28%
+  );
 }
 
-#liivv-health .lh-hub-mosaic-main img,
-#liivv-health .lh-hub-mosaic-stack img {
-  display: block;
+#liivv-health .lh-hub-hero-media img,
+#liivv-health .lh-hub-hero-media .lh-hub-hero-video {
   width: 100%;
   height: 100%;
+  min-height: 100%;
   object-fit: cover;
+  object-position: center center;
+  display: block;
+  transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#liivv-health .lh-hub-mosaic-main {
-  min-height: 420px;
+#liivv-health .lh-hub-hero-media .lh-hub-hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
-#liivv-health .lh-hub-mosaic-stack {
-  display: grid;
-  gap: 14px;
+#liivv-health .lh-hub-hero-veil {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: min(42%, 320px);
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 90% 55% at 0% 22%, color-mix(in srgb, var(--ink) 92%, transparent) 0%, transparent 72%),
+    radial-gradient(ellipse 70% 48% at 12% 58%, color-mix(in srgb, var(--ink) 78%, transparent) 0%, transparent 68%),
+    radial-gradient(ellipse 55% 40% at 8% 88%, color-mix(in srgb, var(--ink) 70%, transparent) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 30% at 22% 35%, color-mix(in srgb, var(--ink) 45%, transparent) 0%, transparent 70%),
+    linear-gradient(
+      90deg,
+      var(--ink) 0%,
+      color-mix(in srgb, var(--ink) 75%, transparent) 28%,
+      color-mix(in srgb, var(--ink) 35%, transparent) 55%,
+      transparent 100%
+    );
+  opacity: 0.95;
 }
 
-#liivv-health .lh-hub-mosaic-stack img {
-  min-height: 120px;
-  aspect-ratio: 4 / 3;
+#liivv-health .lh-hub-hero-stage:hover .lh-hub-hero-media img,
+#liivv-health .lh-hub-hero-stage:hover .lh-hub-hero-media .lh-hub-hero-video {
+  transform: scale(1.04);
 }
 
 /* —— MARQUEE —— */
 #liivv-health .lh-hub-marquee {
-  background: var(--sand);
-  color: var(--ink);
-  padding: 18px 0;
+  background: var(--ink);
+  color: #fff;
+  padding: 22px 0 56px;
   overflow: hidden;
   position: relative;
-  z-index: 3;
+  z-index: 1;
 }
 
 #liivv-health .lh-hub-marquee-track {
@@ -259,6 +398,7 @@
   content: '·';
   margin-left: 40px;
   opacity: 0.45;
+  color: #fff;
 }
 
 @keyframes lh-hub-marquee {
@@ -274,6 +414,8 @@
 #liivv-health .lh-hub-doors {
   background: var(--cream);
   padding: 88px 24px 120px;
+  position: relative;
+  z-index: 2;
 }
 
 #liivv-health .lh-hub-doors .eyebrow,
@@ -724,6 +866,16 @@
   #liivv-health .lh-hub-marquee-track span:nth-child(n + 12) {
     display: none;
   }
+
+  #liivv-health .lh-hub-hero-glow span,
+  #liivv-health .lh-hub-hero-kicker i {
+    animation: none;
+  }
+
+  #liivv-health .lh-hub-hero-stage:hover .lh-hub-hero-media img,
+  #liivv-health .lh-hub-hero-stage:hover .lh-hub-hero-media .lh-hub-hero-video {
+    transform: none;
+  }
 }
 
 @media (max-width: 1100px) {
@@ -737,21 +889,54 @@
 }
 
 @media (max-width: 980px) {
-  #liivv-health .lh-hub-hero {
+  #liivv-health .lh-hub-hero-stage {
     grid-template-columns: 1fr;
-    min-height: auto;
+    min-height: 0;
   }
 
-  #liivv-health .lh-hub-hero-inner {
-    padding: 72px 24px 32px;
+  #liivv-health .lh-hub-hero-media {
+    min-height: min(52vh, 420px);
+    order: -1;
+    -webkit-mask-image: linear-gradient(
+      180deg,
+      #000 0%,
+      #000 72%,
+      rgba(0, 0, 0, 0.55) 88%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      180deg,
+      #000 0%,
+      #000 72%,
+      rgba(0, 0, 0, 0.55) 88%,
+      transparent 100%
+    );
   }
 
-  #liivv-health .lh-hub-hero-mosaic {
-    padding: 0 24px 56px;
+  #liivv-health .lh-hub-hero-copy {
+    max-width: none;
+    justify-self: stretch;
+    padding: clamp(36px, 8vw, 56px) 24px 48px;
   }
 
-  #liivv-health .lh-hub-mosaic-main {
-    min-height: 260px;
+  #liivv-health .lh-hub-hero-copy h1 {
+    max-width: none;
+    font-size: clamp(32px, 9vw, 44px);
+  }
+
+  #liivv-health .lh-hub-hero-veil {
+    inset: auto 0 0 0;
+    width: 100%;
+    height: min(42%, 180px);
+    background:
+      radial-gradient(ellipse 80% 70% at 20% 100%, color-mix(in srgb, var(--ink) 85%, transparent) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 55% at 70% 100%, color-mix(in srgb, var(--ink) 70%, transparent) 0%, transparent 65%),
+      linear-gradient(
+        180deg,
+        transparent 0%,
+        color-mix(in srgb, var(--ink) 45%, transparent) 45%,
+        var(--ink) 100%
+      );
   }
 
   #liivv-health .lh-hub-story-grid,
@@ -773,11 +958,4 @@
     grid-template-columns: 1fr;
   }
 
-  #liivv-health .lh-hub-hero-mosaic {
-    grid-template-columns: 1fr;
-  }
-
-  #liivv-health .lh-hub-mosaic-stack {
-    grid-template-columns: repeat(3, 1fr);
-  }
 }

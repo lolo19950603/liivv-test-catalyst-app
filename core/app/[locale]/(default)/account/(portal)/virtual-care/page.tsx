@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { Link } from '~/components/link';
 import { OnboardingSectionHeader } from '~/components/onboarding/onboarding-section-header';
 import { OpenLiveChatButton } from '~/components/virtual-care/live-chat-widget';
-import { getOnboardingCustomer } from '~/app/[locale]/(default)/account/onboarding/page-data';
+import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
 
 interface Props {
   params: Promise<{ locale: string }>;

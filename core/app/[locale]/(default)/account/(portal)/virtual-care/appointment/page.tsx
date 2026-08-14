@@ -3,7 +3,7 @@ import { setRequestLocale } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 
 import { VirtualCareAppointmentClient } from '~/components/virtual-care/virtual-care-appointment-client';
-import { getOnboardingCustomer } from '~/app/[locale]/(default)/account/onboarding/page-data';
+import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
 
 interface Props {
   params: Promise<{ locale: string }>;

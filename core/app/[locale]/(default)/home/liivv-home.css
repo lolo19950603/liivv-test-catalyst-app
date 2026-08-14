@@ -17,7 +17,9 @@
   font-family: var(--font-body);
   font-weight: 300;
   line-height: 1.55;
+  --lh-overlap: 48px;
   overflow-x: clip;
+  overflow-y: visible;
 }
 
 #liivv-home *,
@@ -45,14 +47,14 @@
 }
 
 #liivv-home .rounded-top {
-  border-radius: 48px 48px 0 0;
-  margin-top: -48px;
+  border-radius: var(--lh-overlap) var(--lh-overlap) 0 0;
+  margin-top: calc(-1 * var(--lh-overlap));
   position: relative;
   z-index: 2;
 }
 
 #liivv-home section.rounded-top[id] {
-  scroll-margin-top: calc(6.5rem + 48px);
+  scroll-margin-top: calc(6.5rem + var(--lh-overlap));
 }
 
 #liivv-home .eyebrow {
@@ -263,7 +265,7 @@
   background: var(--sand);
 }
 
-#liivv-home .lh-hero-panel img {
+#liivv-home .lh-hero-panel > img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -292,6 +294,143 @@
   line-height: 1;
   margin-bottom: 4px;
   color: var(--sage);
+}
+
+#liivv-home .lh-hero-bubbles {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+#liivv-home .lh-hero-bubble {
+  position: absolute;
+  display: block;
+  width: 144px;
+  text-decoration: none;
+  color: var(--ink);
+  pointer-events: auto;
+}
+
+#liivv-home .lh-hero-bubble--womens {
+  top: 7%;
+  right: 5%;
+  width: 156px;
+}
+
+#liivv-home .lh-hero-bubble--ostomy {
+  top: 34%;
+  left: 10%;
+  width: 136px;
+}
+
+#liivv-home .lh-hero-bubble--diabetes {
+  right: 8%;
+  bottom: 6%;
+  width: 148px;
+}
+
+#liivv-home .lh-hero-bubble-pop {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: lh-bubble-bounce 3.4s cubic-bezier(0.34, 1.4, 0.64, 1) infinite;
+}
+
+#liivv-home .lh-hero-bubble--ostomy .lh-hero-bubble-pop {
+  animation-duration: 3.9s;
+  animation-delay: -0.8s;
+}
+
+#liivv-home .lh-hero-bubble--diabetes .lh-hero-bubble-pop {
+  animation-duration: 4.3s;
+  animation-delay: -1.6s;
+}
+
+#liivv-home .lh-hero-bubble-media {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--sand);
+  box-shadow:
+    0 0 0 5px #fff,
+    0 18px 40px rgba(49, 47, 47, 0.2);
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease;
+}
+
+#liivv-home .lh-hero-bubble-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  animation: none;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#liivv-home .lh-hero-bubble-copy {
+  position: relative;
+  z-index: 1;
+  margin-top: -22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 78%;
+  padding: 10px 14px 12px;
+  background: color-mix(in srgb, var(--cream) 96%, transparent);
+  border-radius: 6px;
+  box-shadow: 0 12px 28px rgba(49, 47, 47, 0.14);
+  text-align: center;
+}
+
+#liivv-home .lh-hero-bubble-kicker {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sage);
+}
+
+#liivv-home .lh-hero-bubble-title {
+  font-family: var(--font-heading);
+  font-size: clamp(15px, 1.35vw, 19px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+#liivv-home .lh-hero-bubble:hover .lh-hero-bubble-pop,
+#liivv-home .lh-hero-bubble:focus-visible .lh-hero-bubble-pop {
+  animation-play-state: paused;
+  transform: translateY(-6px) scale(1.04);
+}
+
+#liivv-home .lh-hero-bubble:hover .lh-hero-bubble-media,
+#liivv-home .lh-hero-bubble:focus-visible .lh-hero-bubble-media {
+  box-shadow:
+    0 0 0 5px #fff,
+    0 22px 44px rgba(49, 47, 47, 0.26);
+}
+
+#liivv-home .lh-hero-bubble:hover .lh-hero-bubble-media img,
+#liivv-home .lh-hero-bubble:focus-visible .lh-hero-bubble-media img {
+  transform: scale(1.06);
+}
+
+#liivv-home .lh-hero-bubble:focus-visible {
+  outline: none;
+}
+
+#liivv-home .lh-hero-bubble:focus-visible .lh-hero-bubble-copy {
+  box-shadow:
+    0 12px 28px rgba(49, 47, 47, 0.14),
+    0 0 0 2px var(--sage);
 }
 
 /* —— TICKER —— */
@@ -553,7 +692,8 @@
 
 /* —— PHARMACY OVERVIEW —— */
 #liivv-home .lh-pharmacy {
-  padding: clamp(64px, 8vw, 100px) 0 40px;
+  /* Extra bottom pad equals the next .rounded-top overlap plus the intended gap. */
+  padding: clamp(64px, 8vw, 100px) 0 calc(var(--lh-overlap) + 40px);
   background: var(--cream);
 }
 
@@ -596,7 +736,7 @@
 
 /* —— FEATURE SPLITS (CarePak / Pharmacist) —— */
 #liivv-home .lh-feature {
-  padding: clamp(48px, 6vw, 80px) 24px;
+  padding: clamp(48px, 6vw, 80px) 24px calc(var(--lh-overlap) + clamp(48px, 6vw, 80px));
 }
 
 #liivv-home .lh-feature--carepak {
@@ -1220,91 +1360,227 @@
 
 /* —— HEALTH TEASER —— */
 #liivv-home .lh-health {
-  padding: clamp(40px, 6vw, 72px) 24px;
-  background: var(--soft);
-}
-
-#liivv-home .lh-health-card {
-  max-width: 1180px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
+  /* No bottom pad — video fills into the next section’s rounded corners */
+  padding: 0;
   background: var(--ink);
-  color: #fff;
-  border-radius: 8px;
   overflow: hidden;
 }
 
+#liivv-home .lh-health-stage {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.22fr);
+  min-height: min(82vh, 820px);
+  background: var(--ink);
+  color: #fff;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+#liivv-home .lh-health-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+#liivv-home .lh-health-glow span {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(2px);
+  opacity: 0.55;
+  animation: lh-orb 16s ease-in-out infinite alternate;
+}
+
+#liivv-home .lh-health-glow span:first-child {
+  width: 220px;
+  height: 220px;
+  left: -40px;
+  top: 10%;
+  background: color-mix(in srgb, var(--blush) 45%, transparent);
+}
+
+#liivv-home .lh-health-glow span:last-child {
+  width: 160px;
+  height: 160px;
+  left: 28%;
+  bottom: -30px;
+  background: color-mix(in srgb, var(--sage) 40%, transparent);
+  animation-delay: -4s;
+}
+
 #liivv-home .lh-health-copy {
-  padding: clamp(36px, 5vw, 56px);
+  position: relative;
+  z-index: 2;
+  padding: clamp(48px, 8vw, 96px) clamp(24px, 6vw, 88px);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 14px;
+  gap: 18px;
+  max-width: 36rem;
+  justify-self: end;
+  width: 100%;
 }
 
-#liivv-home .lh-health-copy .eyebrow {
-  color: color-mix(in srgb, var(--sage) 70%, #fff);
+#liivv-home .lh-health-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  align-self: flex-start;
+  margin: 0;
+  padding: 8px 14px;
+  border: 1px solid color-mix(in srgb, #fff 22%, transparent);
+  border-radius: 4px;
+  background: color-mix(in srgb, #fff 6%, transparent);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--sage) 55%, #fff);
+}
+
+#liivv-home .lh-health-kicker i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--blush);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--blush) 55%, transparent);
+  animation: lh-health-pulse 2.4s ease-out infinite;
 }
 
 #liivv-home .lh-health-copy h2 {
   margin: 0;
-  font-size: clamp(28px, 3.6vw, 44px);
+  font-size: clamp(36px, 5.2vw, 64px);
+  line-height: 1.02;
   color: #fff;
+  max-width: 12ch;
+}
+
+#liivv-home .lh-health-copy h2 em {
+  font-style: italic;
+  color: var(--blush);
 }
 
 #liivv-home .lh-health-copy p {
   margin: 0;
-  max-width: 42ch;
+  max-width: 38ch;
+  font-size: clamp(15px, 1.3vw, 17px);
+  line-height: 1.55;
   opacity: 0.88;
 }
 
-#liivv-home .lh-health-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 4px 0 8px;
-}
-
-#liivv-home .lh-health-chips a {
-  text-decoration: none;
-  color: #fff;
-  border: 1px solid color-mix(in srgb, #fff 35%, transparent);
-  padding: 8px 14px;
+#liivv-home .lh-health-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 16px 28px;
   border-radius: 4px;
-  font-size: 13px;
-  font-weight: 500;
-  transition:
-    background 0.25s ease,
-    border-color 0.25s ease,
-    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-#liivv-home .lh-health-chips a:hover {
-  background: color-mix(in srgb, #fff 12%, transparent);
-  border-color: var(--blush);
-  transform: translateY(-2px);
-}
-
-#liivv-home .lh-health-copy .btn-dark {
   background: #fff;
   color: var(--ink);
-  align-self: flex-start;
-  margin-top: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease,
+    background 0.25s ease;
+}
+
+#liivv-home .lh-health-cta:hover {
+  transform: translateY(-3px);
+  background: var(--blush);
+  color: var(--ink);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
 }
 
 #liivv-home .lh-health-media {
-  min-height: 320px;
-  background: var(--taupe);
+  position: relative;
+  min-height: 100%;
+  align-self: stretch;
+  background: transparent;
+  overflow: hidden;
+  /* Soft left edge — video dissolves into the ink column */
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 8%,
+    rgba(0, 0, 0, 0.75) 16%,
+    #000 28%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 8%,
+    rgba(0, 0, 0, 0.75) 16%,
+    #000 28%
+  );
 }
 
-#liivv-home .lh-health-media img {
+#liivv-home .lh-health-media img,
+#liivv-home .lh-health-media .lh-health-video {
   width: 100%;
   height: 100%;
+  min-height: 100%;
   object-fit: cover;
+  object-position: center center;
   display: block;
-  opacity: 0.92;
   transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#liivv-home .lh-health-media .lh-health-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Mesh blend along the seam */
+#liivv-home .lh-health-media-veil {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: min(42%, 320px);
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 90% 55% at 0% 22%, color-mix(in srgb, var(--ink) 92%, transparent) 0%, transparent 72%),
+    radial-gradient(ellipse 70% 48% at 12% 58%, color-mix(in srgb, var(--ink) 78%, transparent) 0%, transparent 68%),
+    radial-gradient(ellipse 55% 40% at 8% 88%, color-mix(in srgb, var(--ink) 70%, transparent) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 30% at 22% 35%, color-mix(in srgb, var(--ink) 45%, transparent) 0%, transparent 70%),
+    linear-gradient(
+      90deg,
+      var(--ink) 0%,
+      color-mix(in srgb, var(--ink) 75%, transparent) 28%,
+      color-mix(in srgb, var(--ink) 35%, transparent) 55%,
+      transparent 100%
+    );
+  opacity: 0.95;
+}
+
+#liivv-home .lh-health-stage.is-revealed .lh-health-media img,
+#liivv-home .lh-health-stage:hover .lh-health-media img,
+#liivv-home .lh-health-stage.is-revealed .lh-health-media .lh-health-video,
+#liivv-home .lh-health-stage:hover .lh-health-media .lh-health-video {
+  transform: scale(1.04);
+}
+
+@keyframes lh-health-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--blush) 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
 }
 
 /* —— FAQ —— */
@@ -1377,12 +1653,41 @@
 
 /* —— CLOSE —— */
 #liivv-home .lh-close {
+  position: relative;
+  min-height: 78vh;
+  display: grid;
+  place-items: center;
   text-align: center;
   padding: clamp(80px, 11vw, 120px) 24px;
-  background:
-    radial-gradient(80% 60% at 50% 0%, color-mix(in srgb, var(--sage) 22%, transparent), transparent 60%),
-    radial-gradient(60% 50% at 80% 100%, color-mix(in srgb, var(--blush) 28%, transparent), transparent 55%),
-    var(--cream);
+  overflow: hidden;
+  color: #fff;
+  background: var(--ink);
+}
+
+#liivv-home .lh-close-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+#liivv-home .lh-close-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+#liivv-home .lh-close-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(49, 47, 47, 0.52);
+}
+
+#liivv-home .lh-close-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 42rem;
 }
 
 #liivv-home .lh-close-kicker {
@@ -1391,26 +1696,27 @@
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--taupe);
+  color: color-mix(in srgb, #fff 72%, var(--taupe));
 }
 
 #liivv-home .lh-close h2 {
   margin: 0;
   font-size: clamp(34px, 5.5vw, 64px);
+  color: #fff;
 }
 
 #liivv-home .lh-close h2 span {
   display: block;
   margin-top: 8px;
   font-style: italic;
-  color: var(--sage);
+  color: var(--blush);
 }
 
-#liivv-home .lh-close > p {
+#liivv-home .lh-close-inner > p {
   margin: 20px auto 28px;
   max-width: 40ch;
   font-size: 17px;
-  opacity: 0.88;
+  opacity: 0.9;
 }
 
 #liivv-home .lh-close-cta {
@@ -1418,6 +1724,16 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 12px;
+}
+
+#liivv-home .lh-close .btn-dark {
+  background: #fff;
+  color: var(--ink);
+}
+
+#liivv-home .lh-close .btn-outline {
+  border-color: #fff;
+  color: #fff;
 }
 
 /* —— MOTION —— */
@@ -1493,11 +1809,6 @@
   transform: translateY(-3px);
 }
 
-#liivv-home .lh-health-card.is-revealed .lh-health-media img,
-#liivv-home .lh-health-card:hover .lh-health-media img {
-  transform: scale(1.05);
-}
-
 #liivv-home .lh-close-kicker {
   display: inline-block;
   position: relative;
@@ -1551,6 +1862,22 @@
     transform: translateY(0);
   }
   50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes lh-bubble-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-12px);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+  65% {
     transform: translateY(-8px);
   }
 }
@@ -1635,6 +1962,37 @@
     clip-path: polygon(0 6%, 100% 0, 100% 100%, 0 100%);
   }
 
+  #liivv-home .lh-hero-bubble {
+    width: 112px;
+  }
+
+  #liivv-home .lh-hero-bubble--womens {
+    width: 122px;
+    top: 6%;
+    right: 5%;
+  }
+
+  #liivv-home .lh-hero-bubble--ostomy {
+    width: 106px;
+    top: 32%;
+    left: 8%;
+  }
+
+  #liivv-home .lh-hero-bubble--diabetes {
+    width: 114px;
+    right: 5%;
+    bottom: 5%;
+  }
+
+  #liivv-home .lh-hero-bubble-copy {
+    margin-top: -16px;
+    padding: 8px 10px 9px;
+  }
+
+  #liivv-home .lh-hero-bubble-title {
+    font-size: 15px;
+  }
+
   #liivv-home .lh-pharmacy-pair,
   #liivv-home .lh-olivia-grid {
     grid-template-columns: 1fr 1fr;
@@ -1650,7 +2008,7 @@
   #liivv-home .lh-feature-grid--flip .lh-feature-media,
   #liivv-home .lh-feature-grid--flip .lh-feature-copy,
   #liivv-home .lh-sub-page-body,
-  #liivv-home .lh-health-card,
+  #liivv-home .lh-health-stage,
   #liivv-home .lh-faq {
     grid-template-columns: 1fr;
   }
@@ -1666,7 +2024,57 @@
   }
 
   #liivv-home .lh-health-media {
-    min-height: 240px;
+    min-height: min(52vh, 420px);
+    order: -1;
+  }
+
+  #liivv-home .lh-health-stage {
+    min-height: 0;
+    border-radius: 0;
+    grid-template-columns: 1fr;
+  }
+
+  #liivv-home .lh-health-copy {
+    max-width: none;
+    justify-self: stretch;
+    padding: clamp(36px, 8vw, 56px) 24px 48px;
+  }
+
+  #liivv-home .lh-health-copy h2 {
+    max-width: none;
+    font-size: clamp(32px, 9vw, 44px);
+  }
+
+  #liivv-home .lh-health-media-veil {
+    inset: auto 0 0 0;
+    width: 100%;
+    height: min(42%, 180px);
+    background:
+      radial-gradient(ellipse 80% 70% at 20% 100%, color-mix(in srgb, var(--ink) 85%, transparent) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 55% at 70% 100%, color-mix(in srgb, var(--ink) 70%, transparent) 0%, transparent 65%),
+      linear-gradient(
+        180deg,
+        transparent 0%,
+        color-mix(in srgb, var(--ink) 45%, transparent) 45%,
+        var(--ink) 100%
+      );
+  }
+
+  #liivv-home .lh-health-media {
+    -webkit-mask-image: linear-gradient(
+      180deg,
+      #000 0%,
+      #000 72%,
+      rgba(0, 0, 0, 0.55) 88%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      180deg,
+      #000 0%,
+      #000 72%,
+      rgba(0, 0, 0, 0.55) 88%,
+      transparent 100%
+    );
   }
 
   #liivv-home .lh-rail-toolbar {
@@ -1701,13 +2109,34 @@
 }
 
 @media (max-width: 640px) {
-  #liivv-home .rounded-top {
-    border-radius: 28px 28px 0 0;
-    margin-top: -28px;
+  #liivv-home {
+    --lh-overlap: 28px;
   }
 
-  #liivv-home section.rounded-top[id] {
-    scroll-margin-top: calc(6.5rem + 28px);
+  #liivv-home .lh-hero-bubble--womens {
+    width: 102px;
+    top: 8%;
+    right: 4%;
+  }
+
+  #liivv-home .lh-hero-bubble--ostomy {
+    width: 90px;
+    top: 36%;
+    left: 6%;
+  }
+
+  #liivv-home .lh-hero-bubble--diabetes {
+    width: 96px;
+    right: 4%;
+    bottom: 6%;
+  }
+
+  #liivv-home .lh-hero-bubble-kicker {
+    font-size: 9px;
+  }
+
+  #liivv-home .lh-hero-bubble-title {
+    font-size: 14px;
   }
 
   #liivv-home .lh-ticker {
@@ -1736,8 +2165,11 @@
   #liivv-home .lh-ticker-track,
   #liivv-home .lh-feel,
   #liivv-home .lh-hero-stamp,
+  #liivv-home .lh-hero-bubble-pop,
   #liivv-home .lh-hero-orbs span,
-  #liivv-home .lh-soon-badge {
+  #liivv-home .lh-soon-badge,
+  #liivv-home .lh-health-glow span,
+  #liivv-home .lh-health-kicker i {
     animation: none !important;
   }
 
@@ -1746,7 +2178,9 @@
   #liivv-home .lh-product:hover,
   #liivv-home .lh-pharmacy-card:hover,
   #liivv-home .lh-olivia-card:hover,
-  #liivv-home .lh-health-chips a:hover {
+  #liivv-home .lh-health-cta:hover,
+  #liivv-home .lh-hero-bubble:hover .lh-hero-bubble-pop,
+  #liivv-home .lh-hero-bubble:focus-visible .lh-hero-bubble-pop {
     transform: none;
   }
 

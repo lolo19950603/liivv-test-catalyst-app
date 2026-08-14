@@ -11,23 +11,20 @@ import {
 import type { HealthProfileRow } from '~/lib/supabase/health-profile';
 import {
   saveHealthProfileStep,
-  type OnboardingActionState,
-} from '~/app/[locale]/(default)/account/onboarding/_actions/onboarding-actions';
+  type HealthProfileActionState,
+} from './_actions/save-health-profile';
 
 export function HealthProfileStepClient({
-  isSetupFlow,
   stepData,
 }: {
-  isSetupFlow: boolean;
   stepData: {
     initialCategories: LiivPrimaryCategoryId[];
     isOntario: boolean;
     initialHealthProfile: HealthProfileRow | null;
-    healthProfileCompleted: boolean;
     supabaseReady: boolean;
   };
 }) {
-  const [state, formAction, isPending] = useActionState<OnboardingActionState, FormData>(
+  const [state, formAction, isPending] = useActionState<HealthProfileActionState, FormData>(
     saveHealthProfileStep,
     null,
   );
@@ -35,7 +32,6 @@ export function HealthProfileStepClient({
   const primaryCategoryOptions = filterCategoriesForRegion(LIIV_PRIMARY_HEALTH_CATEGORIES, {
     isOntario: stepData.isOntario,
   });
-  const isOnboardingChrome = isSetupFlow && !stepData.healthProfileCompleted;
 
   return (
     <HealthProfileForm
@@ -46,10 +42,6 @@ export function HealthProfileStepClient({
         isOntario: stepData.isOntario,
         initialHealthProfile: stepData.initialHealthProfile,
         supabaseReady: stepData.supabaseReady,
-        healthProfileCompleted: stepData.healthProfileCompleted,
-        showSkipForNow: isOnboardingChrome,
-        isOnboardingChrome,
-        isSetupFlow,
       }}
       formAction={formAction}
       isSubmitting={isPending}

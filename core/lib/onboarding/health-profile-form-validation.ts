@@ -1,5 +1,5 @@
 /**
- * Shared validation for health profile "complete" submit (Continue to insurance / Save).
+ * Shared validation for health profile save.
  */
 
 import { isLiivPrimaryCategoryId } from '~/lib/onboarding/liiv-primary-health-category';

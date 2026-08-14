@@ -377,10 +377,6 @@
             "brandName": "Liivv",
             "myAccount": "Mon compte",
             "accountSettings": "Paramètres du compte",
-            "onboardingBanner": {
-                "message": "Terminez la configuration de votre profil de bien-être Liivv pour personnaliser votre tableau de bord.",
-                "cta": "Continuer la configuration"
-            },
             "aria": {
                 "accountNavigation": "Navigation du compte",
                 "primaryNavigation": "Navigation principale",

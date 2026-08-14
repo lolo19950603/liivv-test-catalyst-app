@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 
 import { Link } from '~/components/link';
 import { AccountNotificationsBell } from '~/components/account-notifications';
-import { OnboardingBanner } from '~/components/onboarding/onboarding-banner';
 import { initialsFromName } from '~/lib/account/customer-initials';
 import { useLocalizedPathname } from '~/i18n/use-localized-pathname';
 import { LocaleToggle } from '~/lib/makeswift/liivv-archive-header/locale-toggle';
@@ -57,7 +56,6 @@ export function AccountDashboardPortal({
   cartCount: initialCartCount,
   labels,
   wishlistsHref,
-  onboardingBannerHref,
   headerNotifications,
   notificationsUnreadCount,
   logoSrc,
@@ -275,13 +273,6 @@ export function AccountDashboardPortal({
 
             <main className="mhd-main">
               <div className="mhd-container">
-                {onboardingBannerHref ? (
-                  <OnboardingBanner
-                    ctaLabel={labels.onboardingBannerCta}
-                    href={onboardingBannerHref}
-                    message={labels.onboardingBannerMessage}
-                  />
-                ) : null}
                 {isAccountSubPage(pathname) ? (
                   <div className="mhd-account-page">{children}</div>
                 ) : (

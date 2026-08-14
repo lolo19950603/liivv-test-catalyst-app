@@ -2,14 +2,10 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link } from '~/components/link';
-import { OnboardingProgressBar } from './onboarding-progress-bar';
 import { OnboardingSubmitOverlay } from './onboarding-submit-overlay';
 import { OnboardingSectionHeader } from './onboarding-section-header';
 import { validateHealthProfileComplete } from '~/lib/onboarding/health-profile-form-validation';
-import { SETUP_FLOW_VALUE } from '~/lib/onboarding/onboarding-flow';
 import {
-  filterCategoriesForRegion,
-  isLiivPrimaryCategoryId,
   LIIV_PRIMARY_HEALTH_CATEGORIES,
   type LiivPrimaryCategoryId,
 } from '~/lib/onboarding/liiv-primary-health-category';
@@ -22,10 +18,6 @@ export type HealthProfileFormProps = {
     isOntario: boolean;
     initialHealthProfile: HealthProfileRow | null;
     supabaseReady: boolean;
-    healthProfileCompleted: boolean;
-    showSkipForNow: boolean;
-    isOnboardingChrome: boolean;
-    isSetupFlow: boolean;
   };
   actionData?: { error?: string } | null;
   isSubmitting?: boolean;
@@ -45,10 +37,6 @@ export function HealthProfileForm({
     isOntario,
     initialHealthProfile,
     supabaseReady,
-    healthProfileCompleted,
-    showSkipForNow,
-    isOnboardingChrome,
-    isSetupFlow,
   } = data;
 
   const [clientError, setClientError] = useState<string | null>(null);
@@ -769,25 +757,14 @@ export function HealthProfileForm({
       <section className="space-y-8">
         <OnboardingSectionHeader
           centerOnMobile
-          kicker={isOnboardingChrome ? 'Onboarding' : 'Account'}
+          kicker="Account"
           title={
-            isOnboardingChrome ? (
-              <>
-                <span className="font-semibold text-[#1a1a1a]">Step 2: Liivv health </span>
-                <span className="font-normal text-[#8E9E88]">categories</span>
-              </>
-            ) : (
-              <>
-                <span className="font-semibold text-[#1a1a1a]">Health </span>
-                <span className="font-normal text-[#8E9E88]">profile</span>
-              </>
-            )
+            <>
+              <span className="font-semibold text-[#1a1a1a]">Health </span>
+              <span className="font-normal text-[#8E9E88]">profile</span>
+            </>
           }
-          description={
-            isOnboardingChrome
-              ? 'Choose one or more Liiv health categories for your journey. Optional fields below appear when they apply. You can edit later from your account.'
-              : 'Update your care details. Save to return to your account home.'
-          }
+          description="Update your care details. Save to return to your account home."
         />
 
         {clientError || (actionData && 'error' in actionData && actionData.error) ? (
@@ -796,13 +773,8 @@ export function HealthProfileForm({
           </div>
         ) : null}
 
-        {isSetupFlow ? (
-          <OnboardingProgressBar current={2} label="Onboarding progress" total={3} />
-        ) : null}
-
         <form action={formAction} className="onboarding-health-form w-full max-w-none space-y-8" onSubmit={handleFormSubmit}>
           <input name="zoneCode" type="hidden" value={data.isOntario ? 'ON' : ''} />
-          {isSetupFlow ? <input type="hidden" name="setup" value={SETUP_FLOW_VALUE} /> : null}
 
           {selectedCategories.map((id) => (
             <input key={`care-interest-input-${id}`} type="hidden" name="care_interests" value={id} />
@@ -899,19 +871,8 @@ export function HealthProfileForm({
             }
           >
             <div className="mb-4 space-y-1 text-xs text-[#8a8176]">
-              {showSkipForNow ? (
-                <p>
-                  To continue to insurance, complete any required fields above for your selections.{' '}
-                  <span className="font-medium text-[#5c564c]">Skip for now</span> continues setup and
-                  lets you personalize this later from your dashboard.
-                </p>
-              ) : (
-                <p>Complete required fields, then save to return to your account.</p>
-              )}
+              <p>Complete required fields, then save to return to your account.</p>
             </div>
-            {/*
-              Match insurance step: Back + Skip + primary in one footer row (InsuranceStepForm).
-            */}
             <div className="flex flex-row flex-wrap items-center gap-3">
               <Link
                 href="/account/dashboard/"
@@ -919,17 +880,6 @@ export function HealthProfileForm({
               >
                 <span aria-hidden>‹</span> Back to dashboard
               </Link>
-              {showSkipForNow ? (
-                <button
-                  type="submit"
-                  name="intent"
-                  value="skip"
-                  disabled={isSubmitting}
-                  className="liivv-btn-secondary px-5 py-2.5 text-sm"
-                >
-                  Skip for now
-                </button>
-              ) : null}
 
               {selectedCategories.length > 0 && microPageIdx > 0 ? (
                 <button
@@ -970,11 +920,7 @@ export function HealthProfileForm({
                   disabled={isSubmitting}
                   className="liivv-btn-primary px-6 py-2.5 text-sm sm:min-w-[120px]"
                 >
-                  {isSubmitting
-                    ? 'Saving...'
-                    : isOnboardingChrome
-                      ? 'Continue to insurance'
-                      : 'Save'}
+                  {isSubmitting ? 'Saving...' : 'Save'}
                 </button>
               )}
             </div>

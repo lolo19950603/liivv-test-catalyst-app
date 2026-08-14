@@ -3,7 +3,7 @@ import 'server-only';
 import { getTranslations } from 'next-intl/server';
 import { cache } from 'react';
 
-import { getWellnessDashboardContext } from '~/app/[locale]/(default)/account/onboarding/page-data';
+import { getWellnessDashboardContext } from '~/lib/account-dashboard/get-wellness-dashboard-context';
 import {
   getDashboardCustomer,
 } from '~/app/[locale]/(default)/account/(portal)/dashboard/page-data';
@@ -15,9 +15,6 @@ import { buildDashboardLabels } from '~/lib/account-dashboard/dashboard-labels';
 import { buildAccountMenuLinks } from '~/lib/account/account-menu-links';
 import { getAccountDashboardNotifications } from '~/lib/account-notifications/get-header-notifications';
 import { getCartId } from '~/lib/cart';
-import { appendSetupFlowQuery } from '~/lib/onboarding/onboarding-flow';
-import { getFirstIncompleteOnboardingHref } from '~/lib/supabase/onboarding-redirect';
-import { ensureCustomerProfile } from '~/lib/supabase/profile';
 import { getStoreLogoFallback } from '~/lib/store-theme/get-store-logo-fallback';
 
 import type { AccountMenuLink } from '~/lib/account/account-menu-links';
@@ -57,7 +54,6 @@ export interface AccountDashboardShellData {
   labels: AccountDashboardLabels;
   logoSrc: string;
   logoAlt: string;
-  onboardingBannerHref: string | null;
   headerNotifications: AccountHeaderNotification[];
   notificationsUnreadCount: number;
   cartHref: string;
@@ -110,29 +106,6 @@ export async function getAccountDashboardShellProps(
     },
   );
 
-  let onboardingBannerHref: string | null = null;
-
-  if (!wellness.onboardingComplete) {
-    const ensured = await ensureCustomerProfile({
-      entityId: customer.entityId,
-      firstName: customer.firstName,
-      lastName: customer.lastName,
-      email: customer.email,
-    });
-    onboardingBannerHref = await getFirstIncompleteOnboardingHref(
-      {
-        entityId: customer.entityId,
-        firstName: customer.firstName,
-        lastName: customer.lastName,
-        email: customer.email,
-      },
-      ensured,
-    );
-    onboardingBannerHref = onboardingBannerHref
-      ? appendSetupFlowQuery(onboardingBannerHref)
-      : null;
-  }
-
   const logoSrc =
     storeLogo?.src ??
     'https://storage.googleapis.com/s.mkswft.com/RmlsZTo4NWQ4MGJiNi03MDZjLTQ4MWEtOGFmNi1kNDI2ZjBlNDYwOTQ=/Liivv_Favicon.png';
@@ -143,7 +116,6 @@ export async function getAccountDashboardShellProps(
     labels,
     logoSrc,
     logoAlt,
-    onboardingBannerHref,
     headerNotifications: accountNotifications.headerNotifications,
     notificationsUnreadCount: accountNotifications.unreadCount,
     cartHref: '/cart',

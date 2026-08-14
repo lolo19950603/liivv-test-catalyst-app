@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 
 import { getVirtualCareChatData } from '~/app/[locale]/(default)/account/(portal)/pharmacy/page-data';
-import { getOnboardingCustomer } from '~/app/[locale]/(default)/account/onboarding/page-data';
+import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
 import {
   getLiveChatLastSeen,
   getLiveChatLastSeenCookieOptions,

@@ -68,6 +68,8 @@ function useScrollReveal(enabled: boolean) {
 }
 
 const TRUST_ITEMS = [
+  'Liivv Health',
+  'Care, customized',
   'Discreet delivery',
   'Prescriptions',
   'CarePak',
@@ -356,25 +358,36 @@ export function LiivvHomePage({
             them.
           </p>
           <div className="lh-hero-cta lh-enter" style={{ '--enter-delay': '320ms' } as CSSProperties}>
-            <a className="btn btn-dark" href={SHOP_ALL_HREF}>
-              Shop all
+            <a className="btn btn-dark" href="#liivv-health">
+              Find care that fits you
             </a>
-            <a className="btn btn-outline" href="#shop">
-              Browse categories
+            <a className="btn btn-outline" href={SHOP_ALL_HREF}>
+              Shop all
             </a>
           </div>
         </div>
 
-        <div
-          aria-hidden
-          className="lh-hero-panel lh-enter"
-          style={{ '--enter-delay': '200ms' } as CSSProperties}
-        >
+        <div className="lh-hero-panel lh-enter" style={{ '--enter-delay': '200ms' } as CSSProperties}>
           <img alt="" src={`${IMG}/hero-living.png`} />
-          <div className="lh-hero-stamp">
+          <div aria-hidden className="lh-hero-stamp">
             <span>Shop</span>
             Everyday living, delivered
           </div>
+          <nav aria-label="Liivv Health paths" className="lh-hero-bubbles">
+            {HEALTH_TEASER_LINKS.map((link) => (
+              <a className={`lh-hero-bubble lh-hero-bubble--${link.id}`} href={link.href} key={link.id}>
+                <span className="lh-hero-bubble-pop">
+                  <span className="lh-hero-bubble-media">
+                    <img alt="" src={link.image} />
+                  </span>
+                  <span className="lh-hero-bubble-copy">
+                    <span className="lh-hero-bubble-kicker">Explore</span>
+                    <span className="lh-hero-bubble-title">{link.label}</span>
+                  </span>
+                </span>
+              </a>
+            ))}
+          </nav>
         </div>
       </section>
 
@@ -387,7 +400,54 @@ export function LiivvHomePage({
         </div>
       </section>
 
-      {/* SECTION 3 — CATEGORIES */}
+      {/* SECTION 3 — LIIVV HEALTH */}
+      <section aria-label="Liivv Health" className="lh-health rounded-top" id="liivv-health">
+        <div className="lh-health-stage" data-reveal>
+          <div aria-hidden className="lh-health-glow">
+            <span />
+            <span />
+          </div>
+
+          <div className="lh-health-copy">
+            <span className="lh-health-kicker">
+              <i />
+              Liivv Health
+            </span>
+            <h2>
+              Care that meets you <em>where you are</em>
+            </h2>
+            <p>
+              One shelf can&apos;t know your story. Step into a hub built around you — Women&apos;s Health,
+              Diabetes, Ostomy, and more. Tailored guidance, honest talk, and products for the season
+              you&apos;re in.
+            </p>
+            <a className="lh-health-cta" href={LIIVV_HEALTH_HUB_HREF}>
+              Start your customized path
+            </a>
+          </div>
+
+          <div className="lh-health-media">
+            {reduceMotion ? (
+              <img alt="" src={`${IMG}/corner-womens.png`} />
+            ) : (
+              <video
+                autoPlay
+                className="lh-health-video"
+                loop
+                muted
+                playsInline
+                poster={`${IMG}/corner-womens.png`}
+                preload="metadata"
+              >
+                <source src={`${IMG}/liivvhealth.mp4`} type="video/mp4" />
+              </video>
+            )}
+            <div aria-hidden className="lh-health-media-veil" />
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 4 — CATEGORIES */}
       <section aria-label="Shop by category" className="lh-categories rounded-top" id="shop">
         <div className="lh-section-head" data-reveal>
           <span className="eyebrow">Shop by category</span>
@@ -416,7 +476,7 @@ export function LiivvHomePage({
         </div>
       </section>
 
-      {/* SECTION 4 — FEATURED */}
+      {/* SECTION 5 — FEATURED */}
       {featured.length > 0 ? (
         <section aria-label="Featured products" className="lh-products rounded-top" id="featured">
           <div className="lh-section-head" data-reveal>
@@ -434,10 +494,10 @@ export function LiivvHomePage({
         </section>
       ) : null}
 
-      {/* SECTION 5 — NEWEST BY CATEGORY */}
+      {/* SECTION 6 — NEWEST BY CATEGORY */}
       {newest.length > 0 ? <NewestByCategory categories={categories} products={newest} /> : null}
 
-      {/* SECTION 6 — PHARMACY FAMILY */}
+      {/* SECTION 7 — PHARMACY FAMILY */}
       <section aria-label="Pharmacy" className="lh-pharmacy rounded-top" id="pharmacy">
         <div className="lh-section-head" data-reveal>
           <span className="eyebrow">Pharmacy</span>
@@ -464,7 +524,7 @@ export function LiivvHomePage({
         </div>
       </section>
 
-      {/* SECTION 7 — CAREPAK FEATURED */}
+      {/* SECTION 8 — CAREPAK FEATURED */}
       <section aria-label="CarePak" className="lh-feature lh-feature--carepak rounded-top" id="carepak">
         <div className="lh-feature-grid" data-reveal>
           <div className="lh-feature-media">
@@ -490,7 +550,7 @@ export function LiivvHomePage({
         </div>
       </section>
 
-      {/* SECTION 8 — ASK A PHARMACIST (COMING SOON) */}
+      {/* SECTION 9 — ASK A PHARMACIST (COMING SOON) */}
       <section
         aria-label="Ask a pharmacist — coming soon"
         className="lh-feature lh-feature--chat lh-feature--soon rounded-top"
@@ -526,7 +586,7 @@ export function LiivvHomePage({
         </div>
       </section>
 
-      {/* SECTION 9 — OLIVIA */}
+      {/* SECTION 10 — OLIVIA */}
       <section aria-label="Olivia AI assistant" className="lh-olivia rounded-top" id="olivia">
         <div className="lh-section-head" data-reveal>
           <span className="eyebrow">Meet Olivia</span>
@@ -560,7 +620,7 @@ export function LiivvHomePage({
         </div>
       </section>
 
-      {/* SECTION 10 — SUBSCRIPTIONS */}
+      {/* SECTION 11 — SUBSCRIPTIONS */}
       <section aria-label="Subscriptions" className="lh-subs rounded-top" id="subscriptions">
         <div className="lh-section-head" data-reveal>
           <span className="eyebrow">Subscriptions</span>
@@ -590,39 +650,12 @@ export function LiivvHomePage({
         </div>
       </section>
 
-      {/* SECTION 11 — LIIVV HEALTH TEASER */}
-      <section aria-label="Liivv Health" className="lh-health rounded-top" id="liivv-health">
-        <div className="lh-health-card" data-reveal>
-          <div className="lh-health-copy">
-            <span className="eyebrow">Also in Liivv</span>
-            <h2>Need a deeper care story?</h2>
-            <p>
-              Liivv Health is home to specialized micro-sites — storytelling and guidance for the seasons of
-              care that need more than a product shelf. Peek in when you are ready.
-            </p>
-            <div className="lh-health-chips">
-              {HEALTH_TEASER_LINKS.map((link) => (
-                <a href={link.href} key={link.id}>
-                  {link.label}
-                </a>
-              ))}
-            </div>
-            <a className="btn btn-dark" href={LIIVV_HEALTH_HUB_HREF}>
-              Explore Liivv Health
-            </a>
-          </div>
-          <div aria-hidden className="lh-health-media">
-            <img alt="" src={`${IMG}/corner-womens.png`} />
-          </div>
-        </div>
-      </section>
-
       {/* SECTION 12 — FAQ + CLOSE */}
       <section aria-label="Frequently asked questions" className="lh-faq rounded-top" id="faq">
         <div className="lh-faq-rail" data-reveal>
           <span className="eyebrow">FAQ</span>
           <h2>Good questions, honest answers</h2>
-          <p>Shopping, pharmacy, Olivia, and when to hop over to Liivv Health.</p>
+          <p>Shopping, pharmacy, Olivia, and how Liivv Health personalizes your care.</p>
         </div>
         <div className="lh-faq-list" data-reveal>
           <details open>
@@ -656,29 +689,35 @@ export function LiivvHomePage({
             </p>
           </details>
           <details>
-            <summary>When should I visit Liivv Health?</summary>
+            <summary>What is Liivv Health?</summary>
             <p>
-              When you want specialized storytelling and micro-sites for a care journey — Women&apos;s Health,
-              Diabetes, Ostomy, and more. Start at the Liivv Health hub, then go as deep as you need.
+              A customized care experience — Women&apos;s Health, Diabetes, Ostomy, and more. Each hub is a
+              tailored path of stories, guidance, and products for your season. Start at the hub, then go as
+              deep as you need.
             </p>
           </details>
         </div>
       </section>
 
       <section aria-label="The Liivv promise" className="lh-close rounded-top" data-reveal id="manifesto">
-        <p className="lh-close-kicker">The Liivv promise</p>
-        <h2>
-          No shame. No hype.
-          <span>Just you — at your best.</span>
-        </h2>
-        <p>Shop Your Life. Explore Health when the story needs more room.</p>
-        <div className="lh-close-cta">
-          <a className="btn btn-dark" href={SHOP_ALL_HREF}>
-            Shop all
-          </a>
-          <a className="btn btn-outline" href={LIIVV_HEALTH_HUB_HREF}>
-            Explore Liivv Health
-          </a>
+        <div aria-hidden className="lh-close-bg">
+          <img alt="" src={`${IMG}/hero-living.png`} />
+        </div>
+        <div className="lh-close-inner">
+          <p className="lh-close-kicker">The Liivv promise</p>
+          <h2>
+            No shame. No hype.
+            <span>Just you — at your best.</span>
+          </h2>
+          <p>Shop Your Life. Explore Health when the story needs more room.</p>
+          <div className="lh-close-cta">
+            <a className="btn btn-dark" href={SHOP_ALL_HREF}>
+              Shop all
+            </a>
+            <a className="btn btn-outline" href={LIIVV_HEALTH_HUB_HREF}>
+              Explore Liivv Health
+            </a>
+          </div>
         </div>
       </section>
     </div>

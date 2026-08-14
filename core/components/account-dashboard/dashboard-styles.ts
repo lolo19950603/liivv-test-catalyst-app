@@ -1566,37 +1566,6 @@ body.adc-portal-active main{
   text-decoration:underline;
   text-underline-offset:0.2em;
 }
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-onboarding-banner{
-  margin-bottom:1.5rem;
-  border-radius:var(--mhd-radius-lg);
-  border:1px solid rgb(var(--mhd-border));
-  background:rgb(238 244 238 / 1);
-  padding:1rem 1.25rem;
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-onboarding-banner__inner{
-  display:flex;
-  flex-direction:column;
-  gap:0.75rem;
-}
-@media screen and (min-width:640px){
-  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-onboarding-banner__inner{
-    flex-direction:row;
-    align-items:center;
-    justify-content:space-between;
-  }
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-onboarding-banner__message{
-  margin:0;
-  font-family:var(--mhd-font-body);
-  font-size:0.875rem;
-  line-height:1.5;
-  color:rgb(var(--mhd-text));
-}
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-onboarding-banner__cta{
-  flex-shrink:0;
-  padding:0.5rem 1rem;
-  font-size:0.875rem;
-}
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-account-page{
   width:100%;
   --order-list-title:rgb(var(--mhd-text));

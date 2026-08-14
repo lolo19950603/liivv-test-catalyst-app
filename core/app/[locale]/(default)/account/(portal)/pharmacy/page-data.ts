@@ -1,6 +1,6 @@
 import { cache } from 'react';
 
-import { getOnboardingCustomer } from '~/app/[locale]/(default)/account/onboarding/page-data';
+import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
 import { getCustomerAddresses } from '~/app/[locale]/(default)/account/addresses/page-data';
 import {
   mapCarePackRequestRow,
