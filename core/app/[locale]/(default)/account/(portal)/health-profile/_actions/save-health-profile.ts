@@ -12,7 +12,7 @@ import {
   isOntarioZoneCode,
   type LiivPrimaryCategoryId,
 } from '~/lib/onboarding/liiv-primary-health-category';
-import { completeOnboardingStep2 } from '~/lib/supabase/onboarding';
+import { completeOnboardingStep2, getOnboardingStatus } from '~/lib/supabase/onboarding';
 import { upsertHealthProfile, type UpsertHealthProfilePayload } from '~/lib/supabase/health-profile';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
@@ -185,5 +185,10 @@ export async function saveHealthProfileStep(
   }
 
   revalidatePath('/account/dashboard');
-  redirect('/account/dashboard/');
+  revalidatePath('/account/health-profile');
+
+  const status = await getOnboardingStatus(String(customer.entityId));
+  const celebrate = Boolean(status?.insurance_info_completed_at);
+
+  redirect(celebrate ? '/account/dashboard/?oliviaCelebrate=1' : '/account/dashboard/');
 }

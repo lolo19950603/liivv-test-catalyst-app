@@ -572,7 +572,8 @@ body.adc-portal-active main{
     grid-template-rows:minmax(0,1fr) clamp(14rem,30vh,17.5rem);
     gap:1.125rem;
   }
-  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-hero{
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-hero,
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-main:has(.mhd-wellness) .mhd-olivia-stage{
     min-height:0;
     height:100%;
   }
@@ -1772,5 +1773,284 @@ body.adc-portal-active main{
   border-color:#6b7f5c !important;
   background-color:#eef4ee !important;
   color:#2d4a2d !important;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-stage{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  min-height:22rem;
+  padding:1.25rem 1rem 1rem;
+  border-radius:var(--mhd-radius-lg);
+  overflow:visible;
+  background:linear-gradient(165deg,#faf8f5 0%,#f5f2ed 55%,#eef4ee 100%);
+  border:1px solid rgb(var(--mhd-border));
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-stage__canvas{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  min-height:18.5rem;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot{
+  position:absolute;
+  z-index:2;
+  display:inline-flex;
+  align-items:center;
+  gap:0.4rem;
+  margin:0;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:#5c564c;
+  font-family:var(--mhd-font-body);
+  font-size:0.8125rem;
+  font-weight:500;
+  letter-spacing:0.01em;
+  cursor:pointer;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot:hover,
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot:focus-visible{
+  color:#2c2a26;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot:focus-visible{
+  outline:2px solid rgb(var(--mhd-accent));
+  outline-offset:4px;
+  border-radius:0.25rem;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--health{
+  left:4%;
+  top:16%;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--insurance{
+  right:4%;
+  top:20%;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--health::after,
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--insurance::after{
+  content:"";
+  position:absolute;
+  top:calc(100% + 0.35rem);
+  width:1px;
+  height:3.75rem;
+  background:#c4b8a8;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--health::after{
+  left:1.1rem;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--insurance::after{
+  right:1.1rem;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot__mark{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:1.15rem;
+  height:1.15rem;
+  border-radius:999px;
+  border:1px solid #c4b8a8;
+  font-size:0.75rem;
+  line-height:1;
+  color:#312f2f;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--done .mhd-olivia-hotspot__mark{
+  border-color:#8ea58d;
+  color:#5a6d4d;
+  background:#eef4ee;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-mascot{
+  position:relative;
+  z-index:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  animation:mhd-olivia-enter 0.7s cubic-bezier(0.22,1,0.36,1) both;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-mascot__figure{
+  position:relative;
+  width:min(17rem,58vw);
+  aspect-ratio:1;
+  transform-origin:center bottom;
+  transition:transform 0.35s ease;
+  filter:drop-shadow(0 16px 12px rgb(49 47 47 / 0.18));
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-mascot__image{
+  object-fit:contain;
+  object-position:center bottom;
+  opacity:0;
+  pointer-events:none;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-mascot__image.is-on{
+  opacity:1;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-mascot[data-mood="idle"] .mhd-olivia-mascot__figure{
+  animation:mhd-olivia-live 4.6s ease-in-out infinite;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-mascot[data-mood="looking-health"] .mhd-olivia-mascot__figure{
+  transform:rotate(-6deg) translateX(-12px);
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-mascot[data-mood="looking-insurance"] .mhd-olivia-mascot__figure{
+  transform:rotate(6deg) translateX(12px);
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-mascot[data-mood="bounce"] .mhd-olivia-mascot__figure{
+  animation:mhd-olivia-bounce 0.52s cubic-bezier(0.22,1,0.36,1) both;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-mascot[data-mood="celebrate"] .mhd-olivia-mascot__figure{
+  animation:mhd-olivia-celebrate 1.2s ease-in-out both;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-stage__later{
+  margin-top:0.5rem;
+  padding:0.35rem 0.75rem;
+  border:0;
+  background:transparent;
+  color:#8a8176;
+  font-size:0.75rem;
+  font-weight:500;
+  text-decoration:underline;
+  text-underline-offset:0.18em;
+  cursor:pointer;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-stage__later:hover,
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-stage__later:focus-visible{
+  color:#312f2f;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-chip{
+  margin-left:auto;
+  padding:0.4rem 0.75rem;
+  border:1px solid rgb(var(--mhd-border));
+  border-radius:var(--mhd-radius-pill);
+  background:#eef4ee;
+  color:#3f523f;
+  font-size:0.75rem;
+  font-weight:600;
+  cursor:pointer;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-chip:hover,
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-chip:focus-visible{
+  background:#e4eedf;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-hero__body--empty{
+  min-height:8rem;
+  justify-content:center;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-sheet{
+  position:fixed;
+  inset:0;
+  z-index:240;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-sheet__backdrop{
+  position:absolute;
+  inset:0;
+  border:0;
+  background:rgb(49 47 47 / 0.32);
+  cursor:pointer;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-sheet__panel{
+  position:absolute;
+  top:0;
+  right:0;
+  bottom:0;
+  display:flex;
+  flex-direction:column;
+  width:min(36rem,100%);
+  background:#faf8f5;
+  box-shadow:-16px 0 40px rgb(49 47 47 / 0.12);
+  animation:mhd-olivia-sheet-in 0.35s cubic-bezier(0.22,1,0.36,1) both;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-sheet__header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  padding:1.15rem 1.25rem;
+  border-bottom:1px solid #e8e2d8;
+  background:#fff;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-sheet__header h2{
+  margin:0;
+  font-family:var(--mhd-font-heading);
+  font-size:1.35rem;
+  font-weight:500;
+  color:#312f2f;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-sheet__close{
+  border:0;
+  background:transparent;
+  color:#6b6560;
+  font-size:0.8125rem;
+  font-weight:500;
+  cursor:pointer;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-sheet__close:hover{
+  color:#312f2f;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-sheet__body{
+  flex:1;
+  overflow:auto;
+  padding:1.25rem 1.25rem 2rem;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-sheet__lead{
+  margin:0;
+  font-size:0.9375rem;
+  line-height:1.5;
+  color:#6b6560;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-sheet .onboarding-health-form input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-sheet .onboarding-health-form select,
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-sheet .onboarding-health-form textarea{
+  background:#fff;
+}
+@keyframes mhd-olivia-enter{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes mhd-olivia-live{
+  0%,100%{transform:translateY(0) rotate(-1.4deg) scale(1,1)}
+  40%{transform:translateY(-7px) rotate(0.6deg) scale(1.02,0.985)}
+  70%{transform:translateY(-3px) rotate(1.6deg) scale(1.01,0.995)}
+}
+@keyframes mhd-olivia-bounce{
+  0%{transform:translateY(0) scale(1)}
+  40%{transform:translateY(-10px) scale(1.03)}
+  100%{transform:translateY(0) scale(1)}
+}
+@keyframes mhd-olivia-celebrate{
+  0%,100%{transform:rotate(0deg) translateY(0)}
+  25%{transform:rotate(-6deg) translateY(-5px)}
+  50%{transform:rotate(6deg) translateY(-8px)}
+  75%{transform:rotate(-3deg) translateY(-2px)}
+}
+@keyframes mhd-olivia-sheet-in{
+  from{transform:translateX(100%)}
+  to{transform:translateX(0)}
+}
+@media screen and (max-width:720px){
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--health,
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--insurance{
+    position:static;
+    margin:0 0 0.75rem;
+  }
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--health::after,
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--insurance::after{
+    display:none;
+  }
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-stage__canvas{
+    flex-direction:column;
+    min-height:0;
+  }
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-mascot__figure{
+    width:min(14rem,70vw);
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-mascot,
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-mascot__figure,
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-sheet__panel{
+    animation:none !important;
+    transition:none !important;
+    transform:none !important;
+  }
 }
 `;

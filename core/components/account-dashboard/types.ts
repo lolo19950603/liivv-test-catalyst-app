@@ -65,6 +65,28 @@ export interface AccountDashboardLabels {
       exploreMore: string;
       changeSelection: string;
     };
+    olivia: {
+      stageLabel: string;
+      healthHotspot: string;
+      insuranceHotspot: string;
+      later: string;
+      laterChip: string;
+      healthSheetTitle: string;
+      insuranceSheetTitle: string;
+      closeSheet: string;
+      mascotAlt: string;
+      insuranceDescription: string;
+      noInsurance: string;
+      providerName: string;
+      policyNumber: string;
+      memberId: string;
+      groupNumber: string;
+      primaryHolderName: string;
+      relationship: string;
+      skip: string;
+      saveInsurance: string;
+      savingInsurance: string;
+    };
     actionCenter: {
       subscriptionTitle: string;
       subscriptionManage: string;

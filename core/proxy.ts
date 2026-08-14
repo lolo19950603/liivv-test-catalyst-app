@@ -23,6 +23,7 @@ export const config = {
      * Match all request paths except for the ones starting with:
      * - api (API routes)
      * - archive (static assets under public/archive, e.g. diabetes-care-sections.css)
+     * - images (static assets under public/images)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
@@ -31,6 +32,6 @@ export const config = {
      * - xmlsitemap.php (legacy sitemap route)
      * - robots.txt (robots route)
      */
-    '/((?!api|admin|staff|bc-app|archive|_next/static|_next/image|favicon.ico|xmlsitemap.php|sitemap.xml|robots.txt).*)',
+    '/((?!api|admin|staff|bc-app|archive|images|_next/static|_next/image|favicon.ico|xmlsitemap.php|sitemap.xml|robots.txt).*)',
   ],
 };

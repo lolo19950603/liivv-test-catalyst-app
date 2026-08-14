@@ -1,135 +1,125 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { Link } from '~/components/link';
 import { OpenLiveChatButton } from '~/components/virtual-care/live-chat-widget';
+import type { LiivPrimaryCategoryId } from '~/lib/onboarding/liiv-primary-health-category';
+import type { HealthProfileRow } from '~/lib/supabase/health-profile';
 
-import {
-  IconChevronRight,
-  IconCrown,
-  IconOrders,
-  IconPrescription,
-  IconSupplies,
-} from './icons';
-import type { AccountDashboardLabels, DashboardHeroPanel, DashboardHeroTab } from './types';
+import { IconChevronRight, IconCrown, IconOrders } from './icons';
+import { OliviaCompanionStage, type OliviaMascotMood } from './olivia-companion-stage';
+import { OliviaSetupSheet, type OliviaSetupSheetKind } from './olivia-setup-sheet';
+import type { AccountDashboardLabels } from './types';
 
 export function HealthDashboardMain({
   labels,
   nextSubscriptionDate,
   ordersHref,
   subscriptionsHref,
-  shopHref,
   consultingHref,
   carePackHref,
   pharmacyHref,
   hasUnreadChatMessage,
-  heroPanels,
-  heroTabs,
-  initialPanelId,
+  healthProfileComplete,
+  insuranceComplete,
+  celebrateOnMount = false,
+  healthProfileStepData,
 }: {
   labels: AccountDashboardLabels;
   nextSubscriptionDate: string | null;
   ordersHref: string;
   subscriptionsHref: string;
-  shopHref: string;
   consultingHref: string;
   carePackHref: string;
   pharmacyHref: string;
   hasUnreadChatMessage: boolean;
-  heroPanels: DashboardHeroPanel[];
-  heroTabs: DashboardHeroTab[];
-  initialPanelId?: string;
+  healthProfileComplete: boolean;
+  insuranceComplete: boolean;
+  celebrateOnMount?: boolean;
+  healthProfileStepData: {
+    initialCategories: LiivPrimaryCategoryId[];
+    isOntario: boolean;
+    initialHealthProfile: HealthProfileRow | null;
+    supabaseReady: boolean;
+  };
 }) {
   const { wellness } = labels;
-  const defaultPanelId = initialPanelId ?? heroPanels[0]?.id ?? null;
-  const [activePanelId, setActivePanelId] = useState(defaultPanelId);
+  const router = useRouter();
+  const [sheet, setSheet] = useState<OliviaSetupSheetKind | null>(null);
+  const [mood, setMood] = useState<OliviaMascotMood>(celebrateOnMount ? 'celebrate' : 'idle');
+  const bounceTimer = useRef<number | null>(null);
 
-  const selectCategory = (tabId: string) => {
-    if (tabId === activePanelId || !heroPanels.some((panel) => panel.id === tabId)) {
+  useEffect(() => {
+    return () => {
+      if (bounceTimer.current) {
+        window.clearTimeout(bounceTimer.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!celebrateOnMount) {
       return;
     }
 
-    setActivePanelId(tabId);
+    setMood('celebrate');
+    const settle = window.setTimeout(() => {
+      setMood('idle');
+      router.replace('/account/dashboard/', { scroll: false });
+    }, 1400);
+
+    return () => window.clearTimeout(settle);
+  }, [celebrateOnMount, router]);
+
+  const openSheet = (kind: OliviaSetupSheetKind) => {
+    if (bounceTimer.current) {
+      window.clearTimeout(bounceTimer.current);
+    }
+    setSheet(kind);
+    setMood('bounce');
+    bounceTimer.current = window.setTimeout(() => {
+      setMood(kind === 'health' ? 'looking-health' : 'looking-insurance');
+    }, 520);
   };
 
-  const isTabActive = (tab: DashboardHeroTab) =>
-    tab.kind === 'category' ? tab.id === activePanelId : tab.active;
-
-  const activePanel = heroPanels.find((panel) => panel.id === activePanelId);
+  const closeSheet = () => {
+    if (bounceTimer.current) {
+      window.clearTimeout(bounceTimer.current);
+      bounceTimer.current = null;
+    }
+    setSheet(null);
+    setMood('idle');
+  };
 
   return (
     <div className="mhd-wellness">
-      <section aria-label={wellness.hero.title} className="mhd-hero">
-        <div className="mhd-hero__header">
-          <p className="mhd-hero__eyebrow">{wellness.hero.basedOnSelection}</p>
-          <nav aria-label={labels.aria.wellnessCategories} className="mhd-hero__tabs">
-            {heroTabs.map((tab) => {
-              const active = isTabActive(tab);
+      <OliviaCompanionStage
+        healthComplete={healthProfileComplete}
+        insuranceComplete={insuranceComplete}
+        labels={wellness.olivia}
+        mood={mood}
+        onHotspotEnter={(side) => {
+          if (sheet) return;
+          setMood(side === 'health' ? 'looking-health' : 'looking-insurance');
+        }}
+        onHotspotLeave={() => {
+          if (sheet) return;
+          setMood('idle');
+        }}
+        onOpenHealth={() => openSheet('health')}
+        onOpenInsurance={() => openSheet('insurance')}
+      />
 
-              if (tab.kind === 'category') {
-                return (
-                  <button
-                    aria-pressed={active}
-                    className={active ? 'mhd-hero-tab mhd-hero-tab--active' : 'mhd-hero-tab'}
-                    key={tab.id}
-                    onClick={() => selectCategory(tab.id)}
-                    type="button"
-                  >
-                    {tab.label}
-                  </button>
-                );
-              }
-
-              return (
-                <Link
-                  aria-current={active ? 'page' : undefined}
-                  className={active ? 'mhd-hero-tab mhd-hero-tab--active' : 'mhd-hero-tab'}
-                  href={tab.href ?? '#'}
-                  key={tab.id}
-                >
-                  {tab.label}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-
-        <div className="mhd-hero__main">
-          {activePanel ? (
-            <div className="mhd-hero__body">
-              <div className="mhd-hero__intro">
-                <h2 className="mhd-hero__title">{activePanel.title}</h2>
-                <p className="mhd-hero__subtitle">{activePanel.subtitle}</p>
-              </div>
-
-              <div className="mhd-hero__cards">
-                <article className="mhd-glass-card mhd-glass-card--tips">
-                  <h3 className="mhd-glass-card__title">{activePanel.dailyTips.title}</h3>
-                  <p className="mhd-glass-card__desc">{activePanel.dailyTips.description}</p>
-                </article>
-                <Link className="mhd-glass-card mhd-glass-card--link" href={shopHref}>
-                  <div className="mhd-glass-card__icon">
-                    <IconSupplies />
-                  </div>
-                  <div>
-                    <h3 className="mhd-glass-card__title">{wellness.hero.yourSupplies.title}</h3>
-                    <p className="mhd-glass-card__desc">{wellness.hero.yourSupplies.description}</p>
-                  </div>
-                </Link>
-                <Link className="mhd-glass-card mhd-glass-card--link" href={consultingHref}>
-                  <div className="mhd-glass-card__icon">
-                    <IconPrescription />
-                  </div>
-                  <div>
-                    <h3 className="mhd-glass-card__title">{wellness.hero.exploreMore}</h3>
-                  </div>
-                </Link>
-              </div>
-            </div>
-          ) : null}
-        </div>
-      </section>
+      {sheet ? (
+        <OliviaSetupSheet
+          healthStepData={healthProfileStepData}
+          kind={sheet}
+          labels={wellness.olivia}
+          onClose={closeSheet}
+        />
+      ) : null}
 
       <div className="mhd-bottom">
         <section aria-label={labels.aria.actionCenter} className="mhd-action-center">
@@ -193,11 +183,7 @@ function VirtualCareLink({
 }) {
   return (
     <Link
-      className={
-        wide
-          ? 'mhd-virtual-card mhd-virtual-card--wide'
-          : 'mhd-virtual-card'
-      }
+      className={wide ? 'mhd-virtual-card mhd-virtual-card--wide' : 'mhd-virtual-card'}
       href={href}
     >
       <span className="mhd-virtual-card__label">{label}</span>

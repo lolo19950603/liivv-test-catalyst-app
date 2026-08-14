@@ -22,6 +22,7 @@ export type HealthProfileFormProps = {
   actionData?: { error?: string } | null;
   isSubmitting?: boolean;
   formAction: (formData: FormData) => void;
+  embedded?: boolean;
 };
 
 export function HealthProfileForm({
@@ -29,6 +30,7 @@ export function HealthProfileForm({
   actionData = null,
   isSubmitting = false,
   formAction,
+  embedded = false,
 }: HealthProfileFormProps) {
 
   const {
@@ -755,17 +757,19 @@ export function HealthProfileForm({
     <div className="w-full">
       <OnboardingSubmitOverlay visible={isSubmitting} message="Saving health profile..." />
       <section className="space-y-8">
-        <OnboardingSectionHeader
-          centerOnMobile
-          kicker="Account"
-          title={
-            <>
-              <span className="font-semibold text-[#1a1a1a]">Health </span>
-              <span className="font-normal text-[#8E9E88]">profile</span>
-            </>
-          }
-          description="Update your care details. Save to return to your account home."
-        />
+        {embedded ? null : (
+          <OnboardingSectionHeader
+            centerOnMobile
+            kicker="Account"
+            title={
+              <>
+                <span className="font-semibold text-[#1a1a1a]">Health </span>
+                <span className="font-normal text-[#8E9E88]">profile</span>
+              </>
+            }
+            description="Update your care details. Save to return to your account home."
+          />
+        )}
 
         {clientError || (actionData && 'error' in actionData && actionData.error) ? (
           <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
@@ -871,15 +875,21 @@ export function HealthProfileForm({
             }
           >
             <div className="mb-4 space-y-1 text-xs text-[#8a8176]">
-              <p>Complete required fields, then save to return to your account.</p>
+              <p>
+                {embedded
+                  ? 'Complete required fields, then save.'
+                  : 'Complete required fields, then save to return to your account.'}
+              </p>
             </div>
             <div className="flex flex-row flex-wrap items-center gap-3">
-              <Link
-                href="/account/dashboard/"
-                className="liivv-btn-secondary inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm"
-              >
-                <span aria-hidden>‹</span> Back to dashboard
-              </Link>
+              {embedded ? null : (
+                <Link
+                  href="/account/dashboard/"
+                  className="liivv-btn-secondary inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm"
+                >
+                  <span aria-hidden>‹</span> Back to dashboard
+                </Link>
+              )}
 
               {selectedCategories.length > 0 && microPageIdx > 0 ? (
                 <button

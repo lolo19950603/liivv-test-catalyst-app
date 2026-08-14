@@ -17,6 +17,8 @@ export const getWellnessDashboardContext = cache(async () => {
       supabaseReady: false,
       primaryCategory: null,
       careInterests: [] as string[],
+      healthProfileComplete: false,
+      insuranceComplete: false,
     };
   }
 
@@ -31,9 +33,14 @@ export const getWellnessDashboardContext = cache(async () => {
   );
   const primary = ranked[0] ? getPrimaryCategoryDisplay(ranked[0].id) : null;
 
+  const careInterests = profile?.care_interests ?? status?.care_interests ?? [];
+
   return {
     supabaseReady: ensured.status === 'ok' || profile != null,
     primaryCategory: primary,
-    careInterests: profile?.care_interests ?? status?.care_interests ?? [],
+    careInterests,
+    healthProfileComplete:
+      Boolean(status?.health_profile_completed_at) && ranked.length > 0,
+    insuranceComplete: Boolean(status?.insurance_info_completed_at),
   };
 });

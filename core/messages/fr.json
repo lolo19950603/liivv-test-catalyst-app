@@ -431,6 +431,28 @@
                     "exploreMore": "Explorer les soins virtuels",
                     "changeSelection": "Modifier votre sélection"
                 },
+                "olivia": {
+                    "stageLabel": "Configurez votre profil Liivv avec Olivia",
+                    "healthHotspot": "Complétez votre profil de santé",
+                    "insuranceHotspot": "Ajoutez votre assurance",
+                    "later": "Je le ferai plus tard",
+                    "laterChip": "Olivia a quelques choses pour vous",
+                    "healthSheetTitle": "Profil de santé",
+                    "insuranceSheetTitle": "Assurance",
+                    "closeSheet": "Fermer",
+                    "mascotAlt": "Olivia, la mascotte Liivv",
+                    "insuranceDescription": "Ajoutez vos informations de couverture ou passez pour l'instant. Vous pourrez les modifier plus tard.",
+                    "noInsurance": "Je n'ai pas d'assurance",
+                    "providerName": "Assureur",
+                    "policyNumber": "Numéro de police",
+                    "memberId": "Numéro de membre",
+                    "groupNumber": "Numéro de groupe",
+                    "primaryHolderName": "Nom du titulaire principal",
+                    "relationship": "Lien avec le titulaire principal",
+                    "skip": "Passer pour l'instant",
+                    "saveInsurance": "Enregistrer",
+                    "savingInsurance": "Enregistrement de l'assurance..."
+                },
                 "actionCenter": {
                     "subscriptionTitle": "Votre prochaine abonnement",
                     "subscriptionManage": "Gérer vos abonnements",

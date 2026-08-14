@@ -16,6 +16,7 @@ import {
 
 export function HealthProfileStepClient({
   stepData,
+  embedded = false,
 }: {
   stepData: {
     initialCategories: LiivPrimaryCategoryId[];
@@ -23,6 +24,7 @@ export function HealthProfileStepClient({
     initialHealthProfile: HealthProfileRow | null;
     supabaseReady: boolean;
   };
+  embedded?: boolean;
 }) {
   const [state, formAction, isPending] = useActionState<HealthProfileActionState, FormData>(
     saveHealthProfileStep,
@@ -45,6 +47,7 @@ export function HealthProfileStepClient({
       }}
       formAction={formAction}
       isSubmitting={isPending}
+      embedded={embedded}
     />
   );
 }
