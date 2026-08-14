@@ -188,7 +188,9 @@
 #clair-health #stages,
 #clair-health #how-it-works,
 #clair-health #faq,
-#clair-health #preorder {
+#clair-health #preorder,
+#clair-health #what-clair-is,
+#clair-health #privacy {
   scroll-margin-top: 6rem;
 }
 
@@ -336,6 +338,45 @@
 
 #clair-health .clair-hero-copy .clair-cta-row {
   animation: clair-rise 0.9s ease 0.18s both;
+}
+
+/* Canada wellness notice — part of the first impression, not a footer-only cure */
+#clair-health .clair-notice {
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  padding: 18px var(--page-pad);
+  text-align: center;
+}
+
+#clair-health .clair-notice p {
+  margin: 0 auto;
+  max-width: 62ch;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#clair-health .clair-callouts {
+  display: grid;
+  gap: 12px;
+  max-width: 52rem;
+  margin: 36px auto 0;
+}
+
+#clair-health .clair-callout {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+#clair-health .clair-story-copy > p.clair-callout {
+  margin: 8px 0 0;
+  max-width: 46ch;
 }
 
 /* Offer / founding card */
@@ -555,37 +596,26 @@
   text-wrap: pretty;
 }
 
-#clair-health .clair-team-track-wrap {
-  width: 100vw;
-  overflow: hidden;
-  position: relative;
-  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-}
-
-#clair-health .clair-team-track {
+#clair-health .clair-team-names {
+  list-style: none;
+  margin: 0;
+  padding: 0 16px;
   display: flex;
-  width: max-content;
-  align-items: center;
-  animation: clair-team-marquee 70s linear infinite;
-  will-change: transform;
-  backface-visibility: hidden;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  max-width: 720px;
 }
 
-#clair-health .clair-team-group {
-  display: flex;
-  align-items: center;
-  flex: none;
-}
-
-#clair-health .clair-team-logo {
-  display: block;
-  height: 28px;
-  width: auto;
-  object-fit: contain;
-  flex: none;
-  margin-right: 84px;
-  user-select: none;
-  pointer-events: none;
+#clair-health .clair-team-names li {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--brown);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 /* Stages — center photo with corner cards */
@@ -762,6 +792,95 @@
   margin-top: 18px;
 }
 
+/* What Clair is / is not */
+#clair-health .clair-position {
+  background: #fff;
+  padding: 96px 0 110px;
+  border-top: 1px solid var(--line);
+}
+
+#clair-health .clair-position-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+#clair-health .clair-position-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 28px 24px;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+#clair-health .clair-position-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(233, 117, 48, 0.28);
+  box-shadow: 0 12px 28px rgba(92, 37, 13, 0.08);
+}
+
+#clair-health .clair-position-index {
+  display: block;
+  margin-bottom: 16px;
+  color: var(--ember);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+}
+
+#clair-health .clair-position-card h3 {
+  margin: 0 0 12px;
+  color: var(--brown);
+  font-size: clamp(20px, 2vw, 24px);
+}
+
+#clair-health .clair-position-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Privacy */
+#clair-health .clair-privacy {
+  background: var(--paper);
+  padding: 96px 0 110px;
+}
+
+#clair-health .clair-privacy-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 56px;
+  align-items: center;
+}
+
+#clair-health .clair-privacy-copy .clair-pill {
+  margin-bottom: 16px;
+}
+
+#clair-health .clair-privacy-copy h2 {
+  color: var(--brown);
+  font-size: clamp(34px, 4vw, 48px);
+  margin: 0 0 18px;
+  max-width: 16ch;
+}
+
+#clair-health .clair-privacy-copy p {
+  margin: 0 0 14px;
+  max-width: 44ch;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+#clair-health .clair-privacy-media .clair-pic {
+  border-radius: 20px;
+  aspect-ratio: 4 / 5;
+  min-height: 380px;
+}
+
 /* FAQ */
 #clair-health .clair-faq {
   background: #fff;
@@ -927,6 +1046,24 @@
   gap: 12px;
 }
 
+#clair-health .clair-legal {
+  background: var(--paper);
+  padding: 40px 0 56px;
+  border-top: 1px solid var(--line);
+}
+
+#clair-health .clair-legal p {
+  margin: 0 0 14px;
+  max-width: 78ch;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+#clair-health .clair-legal p:last-child {
+  margin-bottom: 0;
+}
+
 @keyframes clair-rise {
   from {
     opacity: 0;
@@ -947,19 +1084,12 @@
   }
 }
 
-@keyframes clair-team-marquee {
-  from {
-    transform: translateZ(0);
-  }
-  to {
-    transform: translate3d(-33.333%, 0, 0);
-  }
-}
-
 @media (max-width: 1024px) {
   #clair-health .clair-offer-grid,
   #clair-health .clair-story-grid,
-  #clair-health .clair-faq-grid {
+  #clair-health .clair-faq-grid,
+  #clair-health .clair-privacy-grid,
+  #clair-health .clair-position-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1021,7 +1151,9 @@
   #clair-health .clair-stages,
   #clair-health .clair-story,
   #clair-health .clair-faq,
-  #clair-health .clair-offer {
+  #clair-health .clair-offer,
+  #clair-health .clair-position,
+  #clair-health .clair-privacy {
     padding: 72px 0 80px;
   }
 
@@ -1045,9 +1177,8 @@
     font-size: 14px;
   }
 
-  #clair-health .clair-team-logo {
-    height: 22px;
-    margin-right: 54px;
+  #clair-health .clair-privacy-media .clair-pic {
+    min-height: 280px;
   }
 }
 
@@ -1056,8 +1187,7 @@
   #clair-health .clair-hero-keywords,
   #clair-health .clair-hero-lead,
   #clair-health .clair-hero-copy .clair-cta-row,
-  #clair-health .clair-press-track,
-  #clair-health .clair-team-track {
+  #clair-health .clair-press-track {
     animation: none !important;
   }
 

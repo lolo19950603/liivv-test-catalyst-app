@@ -4,16 +4,25 @@ import { setRequestLocale } from 'next-intl/server';
 import { locales } from '~/i18n/locales';
 
 import { ClairHealthPage } from './clair-health-page';
+import { getClairCopy } from './copy';
 
 interface Props {
   params: Promise<{ locale: string }>;
 }
 
-export const metadata: Metadata = {
-  title: 'Clair Health | Liivv',
-  description:
-    "Clair is the world's first continuous, noninvasive hormone wearable — available through Liivv. Know your rhythm. Pre-order now.",
-};
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const { title, description } = getClairCopy(locale).meta;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+    },
+  };
+}
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));

@@ -73,14 +73,14 @@ const KIT_FLOW_STEPS = [
   },
 ] as const;
 
-/** SECTION 8 — Clair hormone signal chips */
-const CLAIR_HORMONES = ['Estrogen', 'Progesterone', 'LH', 'FSH'] as const;
+/** SECTION 8 — Clair wellness chips (no hormone-output or fertility claims) */
+const CLAIR_SIGNALS = ['Cycle insights', 'Worn like jewellery', 'Everyday signals', 'Wellness wearable'] as const;
 /** SECTION 8 — Clair use-case list under the lead paragraph */
 const CLAIR_CHAPTERS = [
-  'Fertility planning',
   'Training & recovery',
-  'Hormonal health',
-  '(Peri)menopause',
+  'Energy & sleep',
+  'Cycle patterns',
+  'Changes over time',
 ] as const;
 
 /** SECTION 1 — Rotating words in the hero headline ("feel ___") */
@@ -1398,29 +1398,28 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
           SECTION 8 — CLAIR HEALTH WEARABLE
           Anchor: #clair
           Headline + lead + closing copy edited inline below.
-          Hormone chips: CLAIR_HORMONES · Use cases: CLAIR_CHAPTERS
+          Signal chips: CLAIR_SIGNALS · Use cases: CLAIR_CHAPTERS
           ===================================================================== */}
-      <section aria-label="Clair continuous hormone wearable" className="wh-clair rounded-top" data-reveal id="clair">
+      <section aria-label="Clair wellness wearable" className="wh-clair rounded-top" data-reveal id="clair">
         <div aria-hidden className="wh-clair-media">
           <ClairFrameLoop />
         </div>
         <div aria-hidden className="wh-clair-veil" />
         <div className="container wh-clair-board">
           <div className="wh-clair-copy">
-            <span className="eyebrow">Also in the edit · Clair Health</span>
+            <span className="eyebrow">Also in the edit · Clair</span>
             <h2>
-              Continuous clarity, <em>when you want it.</em>
+              Cycle insights, <em>when you want them.</em>
             </h2>
             <p className="wh-clair-lead">
-              Clair is the world&apos;s first continuous, noninvasive hormone wearable — designed for women, by
-              women. It reads your body&apos;s signals in real time so you see the shape of your month instead of
-              guessing through it.
+              Clair is a hormone-aware wellness tracker, built around female physiology. Worn like jewellery, it
+              estimates how your body&apos;s signals shift across your cycle.
             </p>
 
             <div className="wh-clair-signals" role="list">
-              {CLAIR_HORMONES.map((hormone) => (
-                <span key={hormone} role="listitem">
-                  {hormone}
+              {CLAIR_SIGNALS.map((signal) => (
+                <span key={signal} role="listitem">
+                  {signal}
                 </span>
               ))}
             </div>

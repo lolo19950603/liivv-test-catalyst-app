@@ -1,22 +1,22 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState, type MutableRefObject, type RefObject } from 'react';
+import { useLocale } from 'next-intl';
 
 import { useWhMotion } from '../use-wh-motion';
+
+import { getClairCopy, type ClairCopy } from './copy';
 
 import './clair-health.css';
 import '../wh-motion.css';
 
 /*
  * =============================================================================
- * CLAIR HEALTH — CONTENT MAP
+ * CLAIR — CONTENT MAP (Canada wellness positioning)
  * =============================================================================
  * Page URL: /liivv-health/womens-health/clair-health
  *
- * Edit copy in two places:
- *   1. Constants below (OFFER, PRESS, TEAM, STAGES, FAQS)
- *   2. JSX sections in ClairHealthPage / ScrollFrameHero (search "SECTION N —")
- *
+ * Copy lives in ./copy.ts (EN + FR). Guardrails: Clair-Canada-Claims-Audit.md
  * Images live under: /public/archive/womens-health/clair-site/
  * =============================================================================
  */
@@ -30,16 +30,8 @@ const HERO_POSTER = FRAME_SRC(0);
 const WOMEN_HREF = '/liivv-health/womens-health';
 const PREORDER_HREF = '/clair-health-wristband/';
 
-/** SECTION 2 — Pre-order offer bullets */
-const OFFER = [
-  { strong: 'Pre-order', label: 'through Liivv' },
-  { strong: 'Nov 2026', label: 'expected ship' },
-  { strong: 'No labs', label: 'worn like jewellery' },
-] as const;
-
-/** SECTION 3 — Press / media logo marquee */
+/** Editorial coverage only — no government/health-agency marks. */
 const PRESS = [
-  { src: `${SITE}/press/ncwh.svg`, alt: "HHS National Conference on Women's Health" },
   { src: `${SITE}/press/forbes.svg`, alt: 'Forbes' },
   { src: `${SITE}/press/fortune.svg`, alt: 'Fortune' },
   { src: `${SITE}/press/techcrunch.svg`, alt: 'TechCrunch' },
@@ -48,50 +40,6 @@ const PRESS = [
   { src: `${SITE}/press/athletech.svg`, alt: 'Athletech NEWS' },
   { src: `${SITE}/press/indian-express.svg`, alt: 'The Indian Express' },
   { src: `${SITE}/press/wellworthy.svg`, alt: 'wellworthy' },
-] as const;
-
-/** SECTION 6 — Team / institutions logo marquee */
-const TEAM = [
-  { src: `${SITE}/team/whoop.svg`, alt: 'Whoop' },
-  { src: `${SITE}/team/apple.svg`, alt: 'Apple' },
-  { src: `${SITE}/team/stanford-medicine.svg`, alt: 'Stanford Medicine' },
-  { src: `${SITE}/team/fastr.svg`, alt: 'FASTR' },
-  { src: `${SITE}/team/daydream.svg`, alt: 'Daydream' },
-  { src: `${SITE}/team/princeton.svg`, alt: 'Princeton University' },
-  { src: `${SITE}/team/hinge.svg`, alt: 'Hinge' },
-  { src: `${SITE}/team/jj.svg`, alt: 'Johnson & Johnson' },
-  { src: `${SITE}/team/meta.svg`, alt: 'Meta' },
-  { src: `${SITE}/team/eight-sleep.svg`, alt: 'Eight Sleep' },
-  { src: `${SITE}/team/stanford.svg`, alt: 'Stanford' },
-  { src: `${SITE}/team/mercedes.svg`, alt: 'Mercedes-Benz' },
-] as const;
-
-/** SECTION 4 — Life-stage cards around the product photo */
-const STAGES = [
-  {
-    title: 'Training & Recovery',
-    body: 'Align training, recovery, and daily movement with your cycle to optimize energy, performance, and resilience across every phase.',
-    image: `${SITE}/training.webp`,
-    corner: 'tl',
-  },
-  {
-    title: 'Fertility Planning',
-    body: 'Understand your cycle and ovulation timing with continuous, data-driven insights to support your fertility decisions.',
-    image: `${SITE}/fertility.webp`,
-    corner: 'tr',
-  },
-  {
-    title: 'Understanding Hormonal Health',
-    body: 'Identify hormonal patterns and changes across your cycle to better understand symptoms, balance, and overall wellbeing.',
-    image: `${SITE}/product.webp`,
-    corner: 'bl',
-  },
-  {
-    title: 'Navigating (Peri)Menopause',
-    body: 'Understand how hormonal changes affect your body, energy, and sleep — with insights for perimenopause and menopause.',
-    image: `${SITE}/peri.webp`,
-    corner: 'br',
-  },
 ] as const;
 
 type StageParticle = {
@@ -128,7 +76,6 @@ function StageStarField({
 
   useEffect(() => {
     activeIndexRef.current = activeIndex;
-    // Pulse attraction when autoplay/hover switches stages
     strengthRef.current = Math.max(strengthRef.current, 0.55);
   }, [activeIndex]);
 
@@ -152,7 +99,6 @@ function StageStarField({
     const seedParticles = () => {
       particlesRef.current = Array.from({ length: PARTICLE_COUNT }, () => ({
         angle: Math.random() * Math.PI * 2,
-        // Bias toward the outer band of a tighter disk (halo around the photo)
         radiusNorm: 0.35 + Math.pow(Math.random(), 0.65) * 0.65,
         phase: Math.random() * Math.PI * 2,
         orbitSpeed: 0.001 + Math.random() * 0.0024,
@@ -189,7 +135,6 @@ function StageStarField({
       const cy = height / 2;
       const photo = container.querySelector('.clair-stages-photo') as HTMLElement | null;
       const photoSize = photo?.getBoundingClientRect().width ?? Math.min(width, height) * 0.42;
-      // Tight halo around the photo — denser, less spread into the corners
       const maxRadius = photoSize / 2 + 72;
 
       if (!reduceMotion) timeRef.current += 1;
@@ -259,34 +204,6 @@ function StageStarField({
   return <canvas aria-hidden className="clair-stages-stars" ref={canvasRef} />;
 }
 
-/** SECTION 7 — FAQ questions + answers */
-const FAQS = [
-  {
-    q: 'How does Clair track hormones without a blood draw?',
-    a: "Hormones produce measurable physiological effects across your body, continuously. Clair's multi-modal sensor array captures biomarkers spanning cardiovascular, thermoregulatory, autonomic, and other domains, then uses models trained against clinical-grade hormone measurements to decode continuous hormonal insights — estrogen, progesterone, LH, and FSH.",
-  },
-  {
-    q: 'How is Clair different from Oura, Whoop, or Apple Watch?',
-    a: "Other wearables are fitness and recovery platforms — their algorithms treat hormonal variation as noise. Clair was built to treat female hormonal physiology as the primary signal, so you see the shape of your month instead of a smoothed-over recovery score.",
-  },
-  {
-    q: 'What hormones can Clair detect?',
-    a: 'Clair tracks estrogen, progesterone, LH (luteinizing hormone), and FSH (follicle-stimulating hormone). Each produces a distinct multi-system physiological signature the models are trained to recognize.',
-  },
-  {
-    q: 'When does Clair ship?',
-    a: "Clair is expected to ship around November 2026. Pre-order through Liivv now so you're first in line — we'll keep you posted as dates firm up.",
-  },
-  {
-    q: 'Who is Liivv?',
-    a: "Liivv is the Canadian health home where you pre-order Clair. Beyond the wristband, Liivv offers women's wellness, sleep support, skin care, diabetes care, ostomy supplies, wound care, and Ontario pharmacist chat — all with discreet delivery.",
-  },
-  {
-    q: 'How private is my order?',
-    a: 'Very. Everything arrives in plain, discreet packaging, and your conversations with our team stay between you and us.',
-  },
-] as const;
-
 function Pic({
   src,
   className = '',
@@ -341,7 +258,7 @@ function drawCover(
   ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
 }
 
-function ScrollFrameHero() {
+function ScrollFrameHero({ hero }: { hero: ClairCopy['hero'] }) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -479,13 +396,9 @@ function ScrollFrameHero() {
 
   return (
     <div className="clair-hero-scroll" ref={wrapperRef}>
-      {/* =====================================================================
-          SECTION 1 — HERO (scroll-driven frame animation)
-          Headline, keywords, lead, CTAs edited inline below.
-          ===================================================================== */}
-      <section aria-label="Introducing Clair" className="clair-hero" ref={stageRef}>
+      <section aria-label={hero.aria} className="clair-hero" ref={stageRef}>
         <img
-          alt="Clair Health wearable hormone monitor"
+          alt={hero.alt}
           className="clair-hero-poster-img"
           decoding="async"
           fetchPriority="high"
@@ -499,20 +412,17 @@ function ScrollFrameHero() {
         <div aria-hidden className="clair-hero-veil" />
         <div className="clair-hero-inner">
           <div className="clair-hero-copy">
-            <h1>Introducing Clair</h1>
-            <p className="clair-hero-keywords">Continuous. Noninvasive. Real-time.</p>
+            <h1>{hero.h1}</h1>
+            <p className="clair-hero-keywords">{hero.keywords}</p>
             <p className="clair-hero-lead">
-              <em>
-                The world&apos;s first wearable for hormone-aware health, designed for women, by women —
-                available through Liivv.
-              </em>
+              <em>{hero.lead}</em>
             </p>
             <div className="clair-cta-row">
               <a className="clair-btn clair-btn-ember" href={PREORDER_HREF}>
-                Pre-order Clair
+                {hero.cta}
               </a>
               <a className="clair-btn clair-btn-ghost" href="#stages">
-                Explore stages
+                {hero.secondary}
               </a>
             </div>
           </div>
@@ -523,6 +433,9 @@ function ScrollFrameHero() {
 }
 
 export function ClairHealthPage() {
+  const locale = useLocale();
+  const copy = getClairCopy(locale);
+  const stages = copy.stages.cards;
   const [scrolled, setScrolled] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [activeStage, setActiveStage] = useState(0);
@@ -545,11 +458,11 @@ export function ClairHealthPage() {
     if (media.matches) return;
 
     const timer = window.setInterval(() => {
-      setActiveStage((current) => (current + 1) % STAGES.length);
+      setActiveStage((current) => (current + 1) % stages.length);
     }, 3200);
 
     return () => window.clearInterval(timer);
-  }, [stagesPaused]);
+  }, [stages.length, stagesPaused]);
 
   const selectStage = (index: number) => {
     setActiveStage(index);
@@ -557,34 +470,27 @@ export function ClairHealthPage() {
 
   return (
     <div className={rootClassName} id="clair-health">
-      {/* Sticky back link — label edited inline */}
       <a className={`clair-back${scrolled ? ' is-scrolled' : ''}`} href={WOMEN_HREF}>
-        ← Women&apos;s Health
+        {copy.back}
       </a>
 
-      {/* SECTION 1 — Hero (see ScrollFrameHero above) */}
-      <ScrollFrameHero />
+      <ScrollFrameHero hero={copy.hero} />
 
-      {/* =====================================================================
-          SECTION 2 — PRE-ORDER OFFER
-          Anchor: #preorder
-          Headline / body / note / CTA edited inline.
-          Offer bullets: OFFER (top of file).
-          ===================================================================== */}
+      <aside className="clair-notice" data-reveal>
+        <p>{copy.notice}</p>
+      </aside>
+
       <section className="clair-offer" id="preorder">
         <div className="clair-container clair-offer-grid" data-reveal>
           <div className="clair-offer-copy">
             <span className="clair-pill">
               <span className="clair-pill-dot" />
-              Available through Liivv
+              {copy.offer.pill}
             </span>
-            <h2>Pre-order Clair</h2>
-            <p>
-              Limited founding window before retail. Continuous hormone clarity on your wrist — expected to ship
-              November 2026.
-            </p>
+            <h2>{copy.offer.h2}</h2>
+            <p>{copy.offer.body}</p>
             <ul className="clair-offer-list" data-reveal data-reveal-stagger>
-              {OFFER.map((item, index) => (
+              {copy.offer.items.map((item, index) => (
                 <li key={item.strong} style={{ ['--stagger' as string]: index }}>
                   <strong>{item.strong}</strong>
                   <span>{item.label}</span>
@@ -592,35 +498,31 @@ export function ClairHealthPage() {
               ))}
             </ul>
             <a className="clair-btn clair-btn-ember" href={PREORDER_HREF}>
-              Reserve my Clair
+              {copy.offer.cta}
             </a>
-            <p className="clair-offer-note">Founding Members ship November–December 2026.</p>
+            <p className="clair-offer-note">{copy.offer.note}</p>
           </div>
           <div className="clair-offer-media">
-            <Pic alt="Clair Health wristband" src={`${SITE}/product.webp`} />
+            <Pic alt={copy.hero.alt} src={`${SITE}/product.webp`} />
           </div>
         </div>
       </section>
 
-      {/* =====================================================================
-          SECTION 3 — PRESS / FEATURED IN
-          Logos: PRESS (top of file). Pill label edited inline.
-          ===================================================================== */}
-      <section aria-label="Featured in" className="clair-press" data-reveal>
+      <section aria-label={copy.pressLabel} className="clair-press" data-reveal>
         <div className="clair-press-pill">
           <img alt="" height={12} src={`${SITE}/press/megaphone.svg`} width={12} />
-          <p>Featured in 50+ media platforms</p>
+          <p>{copy.pressLabel}</p>
         </div>
         <div className="clair-press-track-wrap">
           <div className="clair-press-track">
-            {[0, 1].map((copy) => (
-              <div className="clair-press-group" key={copy}>
+            {[0, 1].map((duplicate) => (
+              <div className="clair-press-group" key={duplicate}>
                 {PRESS.map((logo) => (
                   <img
                     alt={logo.alt}
                     className="clair-press-logo"
                     draggable={false}
-                    key={`${copy}-${logo.alt}`}
+                    key={`${duplicate}-${logo.alt}`}
                     src={logo.src}
                   />
                 ))}
@@ -630,20 +532,15 @@ export function ClairHealthPage() {
         </div>
       </section>
 
-      {/* =====================================================================
-          SECTION 4 — STAGES OF WOMEN'S HEALTH
-          Anchor: #stages
-          Section head edited inline. Stage cards: STAGES (top of file).
-          ===================================================================== */}
       <section className="clair-stages" id="stages">
         <div className="clair-container">
           <header className="clair-section-head" data-reveal>
             <span className="clair-pill">
               <span className="clair-pill-dot" />
-              Clair supports your needs
+              {copy.stages.pill}
             </span>
-            <h2>Built for every stage of women&apos;s health</h2>
-            <p>Personalized insights across training, fertility, hormonal health, and perimenopause.</p>
+            <h2>{copy.stages.h2}</h2>
+            <p>{copy.stages.body}</p>
           </header>
 
           <div
@@ -664,7 +561,7 @@ export function ClairHealthPage() {
             />
             <div className="clair-stages-center">
               <div aria-hidden className="clair-pic clair-stages-photo">
-                {STAGES.map((stage, index) => (
+                {stages.map((stage, index) => (
                   <img
                     alt=""
                     className={activeStage === index ? 'is-active' : undefined}
@@ -676,7 +573,7 @@ export function ClairHealthPage() {
                 ))}
               </div>
             </div>
-            {STAGES.map((stage, index) => (
+            {stages.map((stage, index) => (
               <button
                 aria-pressed={activeStage === index}
                 className={`clair-stage-card clair-stage-card--${stage.corner}${activeStage === index ? ' is-active' : ''}`}
@@ -695,89 +592,106 @@ export function ClairHealthPage() {
               </button>
             ))}
           </div>
+
+          <div className="clair-callouts" data-reveal>
+            <p className="clair-callout">{copy.estimates}</p>
+            <p className="clair-callout">{copy.reproductive}</p>
+          </div>
         </div>
       </section>
 
-      {/* =====================================================================
-          SECTION 5 — HOW CLAIR WORKS
-          Anchor: #how-it-works
-          Pill, headline, body, CTA — all edited inline below.
-          ===================================================================== */}
       <section className="clair-story" data-reveal id="how-it-works">
         <div className="clair-container clair-story-grid">
           <div className="clair-story-media">
-            <Pic alt="Clair worn like jewellery" src={`${SITE}/product.webp`} />
+            <Pic alt={copy.story.alt} src={`${SITE}/product.webp`} />
           </div>
           <div className="clair-story-copy">
             <span className="clair-pill">
               <span className="clair-pill-dot" />
-              How Clair works
+              {copy.story.pill}
             </span>
-            <h2>Your body&apos;s signals, worn like jewellery</h2>
-            <p>
-              Clair continuously reads key physiological signals and decodes estrogen, progesterone, LH, and FSH —
-              without blood draws or urine strips.
-            </p>
-            <p>
-              Sleep, recovery, activity, heart rate, and HRV come along for the ride. One wearable instead of a
-              calendar app, sticks, and a fitness tracker.
-            </p>
+            <h2>{copy.story.h2}</h2>
+            <p>{copy.story.p1}</p>
+            <p>{copy.story.p2}</p>
+            <p className="clair-callout">{copy.estimates}</p>
             <a className="clair-btn clair-btn-ember" href={PREORDER_HREF}>
-              Pre-order Clair
+              {copy.story.cta}
             </a>
           </div>
         </div>
       </section>
 
-      {/* =====================================================================
-          SECTION 6 — EXPERT TEAM
-          Logos: TEAM (top of file). Head copy edited inline.
-          ===================================================================== */}
-      <section aria-label="Expert team behind Clair" className="clair-team" data-reveal>
-        <div className="clair-team-head">
-          <div className="clair-team-pill">
-            <img alt="" height={12} src={`${SITE}/team/user.svg`} width={12} />
-            <p>Team</p>
-          </div>
-          <h2>Expert team behind Clair</h2>
-          <p>Trusted institutions where the Clair team brings experience and expertise from.</p>
-        </div>
-        <div className="clair-team-track-wrap">
-          <div className="clair-team-track">
-            {[0, 1, 2].map((copy) => (
-              <div className="clair-team-group" key={copy}>
-                {TEAM.map((logo) => (
-                  <img
-                    alt={logo.alt}
-                    className="clair-team-logo"
-                    draggable={false}
-                    key={`${copy}-${logo.alt}`}
-                    src={logo.src}
-                  />
-                ))}
-              </div>
+      <section className="clair-position" data-reveal id="what-clair-is">
+        <div className="clair-container">
+          <header className="clair-section-head">
+            <span className="clair-pill">
+              <span className="clair-pill-dot" />
+              {copy.position.pill}
+            </span>
+            <h2>{copy.position.h2}</h2>
+            <p>{copy.position.body}</p>
+          </header>
+          <div className="clair-position-grid" data-reveal data-reveal-stagger>
+            {copy.position.items.map((item, index) => (
+              <article
+                className="clair-position-card"
+                key={item.title}
+                style={{ ['--stagger' as string]: index }}
+              >
+                <span className="clair-position-index">{String(index + 1).padStart(2, '0')}</span>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* =====================================================================
-          SECTION 7 — FAQ
-          Anchor: #faq
-          Head copy edited inline. Q&A: FAQS (top of file).
-          ===================================================================== */}
+      <section className="clair-privacy" data-reveal id="privacy">
+        <div className="clair-container clair-privacy-grid">
+          <div className="clair-privacy-copy">
+            <span className="clair-pill">
+              <span className="clair-pill-dot" />
+              {copy.privacy.pill}
+            </span>
+            <h2>{copy.privacy.h2}</h2>
+            <p>{copy.privacy.p1}</p>
+            <p>{copy.privacy.p2}</p>
+          </div>
+          <div className="clair-privacy-media">
+            <Pic alt="" src={`${SITE}/about-hero.webp`} />
+          </div>
+        </div>
+      </section>
+
+      <section aria-label={copy.team.h2} className="clair-team" data-reveal>
+        <div className="clair-team-head">
+          <div className="clair-team-pill">
+            <img alt="" height={12} src={`${SITE}/team/user.svg`} width={12} />
+            <p>{copy.team.pill}</p>
+          </div>
+          <h2>{copy.team.h2}</h2>
+          <p>{copy.team.body}</p>
+        </div>
+        <ul className="clair-team-names">
+          {copy.team.names.map((name) => (
+            <li key={name}>{name}</li>
+          ))}
+        </ul>
+      </section>
+
       <section className="clair-faq" data-reveal id="faq">
         <div className="clair-container clair-faq-grid">
           <header className="clair-faq-head">
             <span className="clair-pill">
               <span className="clair-pill-dot" />
-              FAQ
+              {copy.faq.pill}
             </span>
-            <h2>Frequently asked questions</h2>
-            <p>Product science, shipping, and ordering through Liivv.</p>
+            <h2>{copy.faq.h2}</h2>
+            <p>{copy.faq.body}</p>
           </header>
           <div className="clair-faq-list">
-            {FAQS.map((faq, index) => (
+            {copy.faq.items.map((faq, index) => (
               <details key={faq.q} open={openFaq === index}>
                 <summary
                   onClick={(event) => {
@@ -794,39 +708,38 @@ export function ClairHealthPage() {
         </div>
       </section>
 
-      {/* =====================================================================
-          SECTION 8 — CLOSING / RESERVE
-          Anchor: #reserve
-          Kicker, headline, body, CTAs — all edited inline below.
-          ===================================================================== */}
       <section className="clair-closing" data-reveal id="reserve">
         <div aria-hidden className="clair-closing-bg">
           <img alt="" decoding="async" loading="lazy" src={`${SITE}/closing.jpg`} />
         </div>
         <div className="clair-container clair-closing-inner">
-          <p className="clair-closing-kicker">Through Liivv</p>
+          <p className="clair-closing-kicker">{copy.closing.kicker}</p>
           <h2>
-            Reserve your Clair
+            {copy.closing.h2}
             <br />
-            <span>Hormone clarity — on your wrist.</span>
+            <span>{copy.closing.accent}</span>
           </h2>
-          <p>
-            Continuous hormone health, designed for women. Pre-order through Liivv and stay first in line for
-            expected November 2026 shipping.
-          </p>
+          <p>{copy.closing.body}</p>
           <div className="clair-closing-cta">
             <a className="clair-btn clair-btn-white" href={PREORDER_HREF}>
-              Reserve my Clair
+              {copy.closing.cta}
             </a>
             <a className="clair-btn clair-btn-ghost" href="#stages">
-              Explore stages
+              {copy.closing.secondary}
             </a>
             <a className="clair-btn clair-btn-ghost" href={WOMEN_HREF}>
-              Women&apos;s Health
+              {copy.closing.tertiary}
             </a>
           </div>
         </div>
       </section>
+
+      <footer className="clair-legal">
+        <div className="clair-container">
+          <p>{copy.legal}</p>
+          <p>{copy.reproductive}</p>
+        </div>
+      </footer>
     </div>
   );
 }
