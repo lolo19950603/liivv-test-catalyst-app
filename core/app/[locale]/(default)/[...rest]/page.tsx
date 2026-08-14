@@ -11,6 +11,35 @@ interface PageParams {
   rest: string[];
 }
 
+/**
+ * App Router trees that must never be claimed by the Makeswift catch-all.
+ * Without this guard, nested routes (e.g. Clair, WH chapters) can soft-404
+ * when the catch-all wins over a filesystem page indev.
+ */
+const APP_ROUTER_PREFIXES = [
+  '/liivv-health',
+  '/account',
+  '/cart',
+  '/checkout',
+  '/product',
+  '/blog',
+  '/compare',
+  '/wishlist',
+  '/gift-certificates',
+  '/build-your-own-kit',
+  '/kit',
+  '/diabetes-care',
+  '/subscribe',
+  '/webpages',
+] as const;
+
+function isAppRouterPath(path: string) {
+  return APP_ROUTER_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+}
+
+/** Only serve pre-known Makeswift paths; do not greedily steal App Router URLs. */
+export const dynamicParams = false;
+
 export async function generateMetadata({
   params,
 }: {
@@ -24,6 +53,10 @@ export async function generateMetadata({
 
   const path = `/${rest.join('/')}`;
 
+  if (isAppRouterPath(path)) {
+    notFound();
+  }
+
   const metadata = await getMakeswiftPageMetadata({ path, locale });
 
   return metadata ?? {};
@@ -34,6 +67,7 @@ export async function generateStaticParams(): Promise<PageParams[]> {
 
   const params = pages
     .filter((page) => page.path !== '/')
+    .filter((page) => !isAppRouterPath(page.path))
     .flatMap((page) => localesFanOut(page.path));
 
   // Next.js requires providing at least one value in `generateStaticParams`.
@@ -54,6 +88,10 @@ export default async function CatchAllPage({ params }: { params: Promise<PagePar
   }
 
   const path = `/${rest.join('/')}`;
+
+  if (isAppRouterPath(path)) {
+    notFound();
+  }
 
   return <Page locale={locale} path={path} />;
 }
