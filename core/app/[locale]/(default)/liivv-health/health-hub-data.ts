@@ -30,7 +30,7 @@ export const HEALTH_HUB_DOORS: HealthHubDoor[] = [
   {
     id: 'ostomy_care_everyday',
     label: 'Live',
-    title: 'Ostomy Care & Everyday "LIIVVing"',
+    title: 'Ostomy Care & Everyday "Liivving"',
     body: 'Supplies, kits, and kind guidance for every day.',
     image: `${IMG}/corner-ostomy.png`,
     href: '/liivv-health/ostomy-care',
@@ -39,7 +39,7 @@ export const HEALTH_HUB_DOORS: HealthHubDoor[] = [
   {
     id: 'diabetes_care_everyday',
     label: 'Live',
-    title: 'Diabetes Care & Everyday "LIIVVing"',
+    title: 'Diabetes Care & Everyday "Liivving"',
     body: 'A specialized journey for living well with diabetes.',
     image: `${IMG}/corner-diabetes.png`,
     href: '/liivv-health/diabetes-care',
@@ -119,11 +119,26 @@ export const HEALTH_HUB_DOORS: HealthHubDoor[] = [
   },
 ];
 
+/** Short labels for the hero word-shuffle — all eleven care verticals. */
+export const HEALTH_HUB_SHUFFLE_WORDS = [
+  "Women's Health",
+  'Ostomy Care',
+  'Diabetes Care',
+  'Sleep & Rest',
+  'Breathing & Lung Health',
+  'Healing & Wound Care',
+  'Personal Care',
+  'Heart & Blood Pressure',
+  'Daily Nutrition',
+  'Skin Health',
+  'Minor Ailment',
+] as const;
+
 /** Marquee labels — all eleven care verticals. */
 export const HEALTH_HUB_MARQUEE = [
   "Women's Health & Wellness",
-  'Ostomy Care & Everyday "LIIVVing"',
-  'Diabetes Care & Everyday "LIIVVing"',
+  'Ostomy Care & Everyday "Liivving"',
+  'Diabetes Care & Everyday "Liivving"',
   'Sleep & Rest',
   'Healing & Advanced Wound Care',
   'Personal Care & Confidence',

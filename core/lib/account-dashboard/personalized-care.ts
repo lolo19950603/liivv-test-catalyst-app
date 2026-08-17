@@ -281,7 +281,7 @@ function ostomyLane(responses: CategoryResponses, now: Date) {
   const brandLabel =
     brand && brand !== 'not_sure' ? formatHealthProfileAnswer(brand) : null;
 
-  let headline = 'Ostomy care for everyday LIIVVing';
+  let headline = 'Ostomy care for everyday Liivving';
   let lead = 'Pouching, skin, and restock — kept kind, practical, and close at hand.';
   let oliviaLine = 'Ostomy corner, reporting for duty. Leak-free confidence is the vibe.';
   let storyHref = '/liivv-health/ostomy-care';
@@ -308,7 +308,7 @@ function ostomyLane(responses: CategoryResponses, now: Date) {
       : 'Keep your preferred pouching system looping so everyday life stays uneventful.';
     oliviaLine = 'Restocking is my love language. Shall we?';
     storyHref = '/liivv-health/ostomy-care/chapters/everyday-liivving';
-    storyLabel = 'Open everyday LIIVVing';
+    storyLabel = 'Open everyday Liivving';
   } else if (typeLabel) {
     headline = `${typeLabel} care, kept ready`;
     lead = brandLabel

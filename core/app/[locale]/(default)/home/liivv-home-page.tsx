@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 
+import { HubCategoryShuffle } from '../liivv-health/hub-category-shuffle';
 import { HEALTH_TEASER_LINKS, LIIVV_HEALTH_HUB_HREF } from './health-teaser';
 import type { HomeCategory, HomeProduct } from './home-types';
 import { buildNewestCategoryTabs, productMatchesCategory } from './map-home-catalog';
@@ -429,9 +430,9 @@ export function LiivvHomePage({
               Care that meets you <em>where you are</em>
             </h2>
             <p>
-              One shelf can&apos;t know your story. Step into a hub built around you — Women&apos;s Health,
-              Diabetes, Ostomy, and more. Tailored guidance, honest talk, and products for the season
-              you&apos;re in.
+              One shelf can&apos;t know your story. Step into a hub built around you —{' '}
+              <HubCategoryShuffle reduceMotion={reduceMotion} />. Tailored guidance, honest talk, and
+              products for the season you&apos;re in.
             </p>
             <a className="lh-health-cta" href={LIIVV_HEALTH_HUB_HREF}>
               Start your customized path

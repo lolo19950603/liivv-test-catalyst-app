@@ -8,6 +8,7 @@ import {
   HEALTH_HUB_STORY_LINKS,
   type HealthHubKitCard,
 } from './health-hub-data';
+import { HubCategoryShuffle } from './hub-category-shuffle';
 import { useWhMotion } from './womens-health/use-wh-motion';
 
 import './liivv-health.css';
@@ -87,9 +88,9 @@ export function LiivvHealthPage({ featuredKits }: Props) {
               Care that meets you <em>where you are</em>
             </h1>
             <p>
-              One shelf can&apos;t know your story. Step into a hub built around you — Women&apos;s Health,
-              Diabetes, Ostomy, and more. Tailored guidance, honest talk, and products for the season
-              you&apos;re in.
+              One shelf can&apos;t know your story. Step into a hub built around you —{' '}
+              <HubCategoryShuffle reduceMotion={reduceMotion} />. Tailored guidance, honest talk, and
+              products for the season you&apos;re in.
             </p>
             <a className="lh-hub-hero-cta" href="#doors">
               Start your customized path

@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const metadata: Metadata = {
-  title: 'Diabetes Care & Everyday "LIIVVing" | Liivv',
+  title: 'Diabetes Care & Everyday "Liivving" | Liivv',
   description:
     'Supplies, routines, and everyday living support — meters, sensors, restock staples, and Ontario pharmacist chat so diabetes care fits your life.',
 };

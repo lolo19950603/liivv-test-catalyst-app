@@ -1,10 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { OliviaHelpBand } from '~/components/olivia/olivia-help-band';
 import { GuestCategoryQuiz } from '~/components/onboarding/guest-category-quiz';
 import { KitFlowDemo } from '~/components/kit-flow-demo/kit-flow-demo';
+import { SpecializedSubscribe } from '~/components/specialized-subscribe/specialized-subscribe';
 
 import { CHAPTERS as CHAPTER_PAGES, SHOP_DIABETES_HREF, chapterHref } from './chapters/chapters-data';
 import type { DcCatalog, DcCatalogItem } from './get-dc-catalog';
@@ -19,12 +20,28 @@ import './diabetes-care.css';
 const SHOP_HREF = SHOP_DIABETES_HREF;
 const PHARMACIST_HREF = '/account/virtual-care';
 const IMG = '/archive/diabetes-care';
+const HERO_WORDS = ['pace with you', 'you steady', 'in balance', 'your rhythm', 'up with you'] as const;
 
 const TRUST_ITEMS = [
   'Ontario pharmacist chat',
   'Discreet delivery',
-  'CarePacks you can restock',
+  'Subscribe & save restocks',
   'Living, not managing',
+] as const;
+
+const SUBSCRIBE_FEATURES = [
+  {
+    title: 'Never hunt for strips',
+    body: 'Test strips, lancets, and overlays restock on your schedule — not in a last-minute rush.',
+  },
+  {
+    title: 'Match your wear time',
+    body: 'Weekly, monthly, or every 14 / 30 days. Start today or pick a date ahead.',
+  },
+  {
+    title: 'Pause without guilt',
+    body: 'Skip a delivery, change frequency, or cancel in Account. No phone calls.',
+  },
 ] as const;
 
 const STATS = [
@@ -38,7 +55,7 @@ const PATH_LINKS = [
   {
     num: '01',
     title: 'Diabetes Essentials',
-    body: 'Meters, strips, sensors, and the restock staples you should not have to scramble for.',
+    body: 'Meters, strips, sensors — subscribe so the restock staples show up before you scramble.',
     href: SHOP_HREF,
   },
   {
@@ -176,6 +193,25 @@ export function DiabetesCarePage({
   isSignedIn?: boolean;
 }) {
   const [shopRoom, setShopRoom] = useState<ShopRoomId>('all');
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [heroWordIndex, setHeroWordIndex] = useState(0);
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setReduceMotion(media.matches);
+    sync();
+    media.addEventListener('change', sync);
+    return () => media.removeEventListener('change', sync);
+  }, []);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    const id = window.setInterval(() => {
+      setHeroWordIndex((index) => (index + 1) % HERO_WORDS.length);
+    }, 2600);
+
+    return () => window.clearInterval(id);
+  }, [reduceMotion]);
 
   const allKits = catalog?.kits ?? [];
   const featuredKit = catalog?.featuredKit ?? allKits[0] ?? null;
@@ -198,32 +234,55 @@ export function DiabetesCarePage({
   return (
     <div id="diabetes-care">
       <section aria-label="Diabetes Care hero" className="dc-hero">
-        <div aria-hidden className="dc-hero-bg">
-          <img alt="" decoding="async" src={`${IMG}/hero.png`} />
-        </div>
-        <div aria-hidden className="dc-hero-mist" />
-        <div className="dc-hero-inner">
-          <span className="dc-hero-brand">Diabetes Care & Everyday &ldquo;LIIVVing&rdquo;</span>
-          <h1>Care that keeps pace with you</h1>
-          <p className="dc-hero-lead">
-            Supplies, routines, and everyday living support — so diabetes care fits your life, not the other
-            way around.
-          </p>
-          <div className="dc-hero-cta">
-            <a className="dc-btn dc-btn-soft" href="#where-are-you">
-              Find your pace
-            </a>
-            <a
-              className="dc-btn dc-btn-ghost"
-              href="#build-your-kit"
-              style={{ borderColor: 'rgba(255,255,255,0.45)', color: '#fff' }}
-            >
-              {hasKits ? 'Browse CarePacks' : 'See how kits work'}
-            </a>
+        <div className="dc-hero-stage">
+          <div aria-hidden className="dc-hero-glow">
+            <span />
+            <span />
           </div>
-        </div>
-        <div aria-hidden className="dc-hero-mark">
-          <span>Living, not managing</span>
+
+          <div className="dc-hero-copy">
+            <span className="dc-hero-kicker">
+              <i />
+              Diabetes Care
+            </span>
+            <h1>
+              Care that keeps{' '}
+              <span aria-live="polite" className="dc-hero-word" key={HERO_WORDS[heroWordIndex]}>
+                {HERO_WORDS[heroWordIndex]}
+              </span>
+            </h1>
+            <p>
+              Supplies, routines, and everyday living support — so diabetes care fits your life, not the other
+              way around.
+            </p>
+            <div className="dc-hero-actions">
+              <a className="dc-hero-cta" href="#where-are-you">
+                Find your pace
+              </a>
+              <a className="dc-hero-cta-ghost" href="#build-your-kit">
+                {hasKits ? 'Browse CarePacks' : 'See how kits work'}
+              </a>
+            </div>
+          </div>
+
+          <div aria-hidden className="dc-hero-media">
+            {reduceMotion ? (
+              <img alt="" decoding="async" src={`${IMG}/hero.png`} />
+            ) : (
+              <video
+                autoPlay
+                className="dc-hero-video"
+                loop
+                muted
+                playsInline
+                poster={`${IMG}/hero.png`}
+                preload="metadata"
+              >
+                <source src={`${IMG}/diabetes-care.mp4`} type="video/mp4" />
+              </video>
+            )}
+            <div className="dc-hero-veil" />
+          </div>
         </div>
       </section>
 
@@ -281,7 +340,7 @@ export function DiabetesCarePage({
             <p>
               CarePacks gather the daily pieces you already rely on — so mornings start with one small rip
               instead of a shelf of bottles and open boxes. Customize quantities, add what was missing, then
-              save your version for later.
+              save your version — or subscribe so it keeps arriving.
             </p>
           </header>
 
@@ -312,7 +371,7 @@ export function DiabetesCarePage({
                 {hasDisplayPrice(featuredKit.priceLabel) ? (
                   <p className="dc-pack-price">{featuredKit.priceLabel}</p>
                 ) : null}
-                <p>Customize on the kit page, then keep your version for the weeks ahead.</p>
+                <p>Customize on the kit page, then subscribe so your version restocks on your rhythm.</p>
                 <a className="dc-btn dc-btn-solid" href={featuredKit.path}>
                   Customize this kit
                 </a>
@@ -399,6 +458,21 @@ export function DiabetesCarePage({
           </div>
         </section>
       ) : null}
+
+      <SpecializedSubscribe
+        className="dc-subs"
+        demoProductBlurb="Strips, sensors, and staples — restocked on your testing rhythm."
+        demoProductName="Diabetes Essentials"
+        demoProductPath="liivv.ca/product/diabetes-essentials"
+        features={SUBSCRIBE_FEATURES}
+        lead="The staples you already use can show up before you run out. Subscribe on the product page, pick a frequency that matches your testing or sensor cycle, then pause or skip when life shifts."
+        primaryCtaClass="dc-btn dc-btn-solid"
+        secondaryCtaClass="dc-btn dc-btn-ghost"
+        shopHref={SHOP_HREF}
+        shopLabel="Shop to subscribe"
+        title="Strips and sensors, on a rhythm — not a scramble"
+        wrapClassName="dc-wrap"
+      />
 
       <section aria-label="Journey chapters" className="dc-journey" id="where-are-you">
         <div className="dc-wrap">
@@ -544,8 +618,16 @@ export function DiabetesCarePage({
             <details>
               <summary>What is a CarePack?</summary>
               <p>
-                Daily pieces organized so mornings start with one small rip instead of a shelf of bottles. Set
-                it once and it can keep arriving.
+                Daily pieces organized so mornings start with one small rip instead of a shelf of bottles.
+                Customize once, then subscribe so it keeps arriving.
+              </p>
+            </details>
+            <details>
+              <summary>How do subscriptions work?</summary>
+              <p>
+                On a product page, choose Subscribe &amp; save, pick a frequency that matches your strips or
+                sensors, then check out like any order. Pause, skip, or cancel under Account → Subscriptions —
+                no phone calls, no guilt trips.
               </p>
             </details>
             <details>
@@ -570,6 +652,13 @@ export function DiabetesCarePage({
           <div className="dc-close-cta">
             <a className="dc-btn dc-btn-soft" href={SHOP_HREF}>
               Shop Diabetes Care
+            </a>
+            <a
+              className="dc-btn dc-btn-ghost"
+              href="#subscriptions"
+              style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff' }}
+            >
+              Subscribe &amp; save
             </a>
             <a
               className="dc-btn dc-btn-ghost"

@@ -1,10 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { OliviaHelpBand } from '~/components/olivia/olivia-help-band';
 import { GuestCategoryQuiz } from '~/components/onboarding/guest-category-quiz';
 import { KitFlowDemo } from '~/components/kit-flow-demo/kit-flow-demo';
+import { SpecializedSubscribe } from '~/components/specialized-subscribe/specialized-subscribe';
 
 import { CHAPTERS as CHAPTER_PAGES, SHOP_OSTOMY_HREF, chapterHref } from './chapters/chapters-data';
 import type { OcCatalog, OcCatalogItem } from './get-oc-catalog';
@@ -20,12 +21,28 @@ import './ostomy-care.css';
 const SHOP_HREF = SHOP_OSTOMY_HREF;
 const PHARMACIST_HREF = '/account/virtual-care';
 const IMG = '/archive/ostomy-care';
+const HERO_WORDS = ['discreet', 'private', 'quiet', 'personal', 'kind'] as const;
 
 const TRUST_ITEMS = [
   'Ontario pharmacist chat',
   'Discreet delivery',
-  'Customize & save kits',
+  'Subscribe & save restocks',
   'Kind, private, yours',
+] as const;
+
+const SUBSCRIBE_FEATURES = [
+  {
+    title: 'Your usuals, on your wear time',
+    body: 'Pouches, barriers, rings, and skin care — restocked before the last box is empty.',
+  },
+  {
+    title: 'Skip when you have extras',
+    body: 'Travel stash or a slower week? Skip a cycle with no charge and nothing ships.',
+  },
+  {
+    title: 'Plain packaging. Quiet checkout.',
+    body: 'Same discreet delivery as a one-time order. Pause, skip, or cancel in Account.',
+  },
 ] as const;
 
 const PATH_LINKS = [
@@ -38,13 +55,13 @@ const PATH_LINKS = [
   {
     num: '02',
     title: 'The shelf',
-    body: 'Pouches, barriers, and accessories in calm rooms — not a warehouse aisle.',
+    body: 'Pouches, barriers, and accessories — subscribe so restock stays quiet, not a scramble.',
     href: '#shop-ostomy-care',
   },
   {
     num: '03',
-    title: 'Your pace',
-    body: 'Everyday Liivving, stoma basics, or new-to-journey — open what fits today.',
+    title: 'The chapters',
+    body: 'New to the journey, stoma basics, or everyday Liivving — open the story that fits today.',
     href: '#where-are-you',
   },
   {
@@ -55,22 +72,14 @@ const PATH_LINKS = [
   },
 ] as const;
 
-const JOURNEY = [
-  ...CHAPTER_PAGES.map((chapter, index) => ({
-    step: String(index + 1).padStart(2, '0'),
-    title: chapter.title,
-    blurb: chapter.vibe,
-    href: chapterHref(chapter.slug),
-    image: chapter.heroImage,
-  })),
-  {
-    step: '04',
-    title: 'Shop Ostomy Essentials',
-    blurb: 'Pouches, barriers, skin care, and preferred brands — restocked discreetly.',
-    href: SHOP_HREF,
-    image: `${IMG}/door-shop.png`,
-  },
-];
+const LIFE_CHAPTERS = CHAPTER_PAGES.map((chapter) => ({
+  num: chapter.num,
+  word: chapter.chapterWord,
+  title: chapter.title,
+  blurb: chapter.vibe,
+  href: chapterHref(chapter.slug),
+  image: chapter.heroImage,
+}));
 
 const SHOP_ROOMS = [
   { id: 'all', label: 'All' },
@@ -174,6 +183,25 @@ export function OstomyCarePage({
   isSignedIn?: boolean;
 }) {
   const [shopRoom, setShopRoom] = useState<ShopRoomId>('all');
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [heroWordIndex, setHeroWordIndex] = useState(0);
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setReduceMotion(media.matches);
+    sync();
+    media.addEventListener('change', sync);
+    return () => media.removeEventListener('change', sync);
+  }, []);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    const id = window.setInterval(() => {
+      setHeroWordIndex((index) => (index + 1) % HERO_WORDS.length);
+    }, 2600);
+
+    return () => window.clearInterval(id);
+  }, [reduceMotion]);
 
   const allKits = catalog?.kits ?? [];
   const featuredKit =
@@ -200,27 +228,54 @@ export function OstomyCarePage({
   return (
     <div id="ostomy-care">
       <section aria-label="Ostomy Care hero" className="oc-hero">
-        <div aria-hidden className="oc-hero-bg">
-          <img alt="" decoding="async" src={`${IMG}/hero.png`} />
-        </div>
-        <div aria-hidden className="oc-hero-mist" />
-        <div className="oc-hero-inner">
-          <span className="oc-hero-brand">Ostomy Care & Everyday &ldquo;LIIVVing&rdquo;</span>
-          <h1>Care that stays discreet.</h1>
-          <p className="oc-hero-lead">
-            Supplies, everyday living support, and kind guidance — so your routine feels like yours again.
-          </p>
-          <div className="oc-hero-cta">
-            <a className="oc-btn oc-btn-soft" href="#where-are-you">
-              Find your pace
-            </a>
-            <a className="oc-btn oc-btn-ghost" href="#build-your-kit" style={{ borderColor: 'rgba(255,255,255,0.45)', color: '#fff' }}>
-              Browse curated kits
-            </a>
+        <div className="oc-hero-stage">
+          <div aria-hidden className="oc-hero-glow">
+            <span />
+            <span />
           </div>
-        </div>
-        <div aria-hidden className="oc-hero-mark">
-          <span>Living, not managing</span>
+
+          <div className="oc-hero-copy">
+            <span className="oc-hero-kicker">
+              <i />
+              Ostomy Care
+            </span>
+            <h1>
+              Care that stays{' '}
+              <span aria-live="polite" className="oc-hero-word" key={HERO_WORDS[heroWordIndex]}>
+                {HERO_WORDS[heroWordIndex]}
+              </span>
+            </h1>
+            <p>
+              Supplies, everyday living support, and kind guidance — so your routine feels like yours again.
+            </p>
+            <div className="oc-hero-actions">
+              <a className="oc-hero-cta" href="#where-are-you">
+                Find your pace
+              </a>
+              <a className="oc-hero-cta-ghost" href="#build-your-kit">
+                Browse curated kits
+              </a>
+            </div>
+          </div>
+
+          <div aria-hidden className="oc-hero-media">
+            {reduceMotion ? (
+              <img alt="" decoding="async" src={`${IMG}/hero.png`} />
+            ) : (
+              <video
+                autoPlay
+                className="oc-hero-video"
+                loop
+                muted
+                playsInline
+                poster={`${IMG}/hero.png`}
+                preload="metadata"
+              >
+                <source src={`${IMG}/ostomy-care.mp4`} type="video/mp4" />
+              </video>
+            )}
+            <div className="oc-hero-veil" />
+          </div>
         </div>
       </section>
 
@@ -265,7 +320,7 @@ export function OstomyCarePage({
               <h2>Start curated. Finish as yours.</h2>
               <p>
                 Official kits from the Liivv Ostomy edit — open one, tune quantities, add what was missing, and
-                save it for later restock.
+                save it — or subscribe so the quiet restock keeps arriving.
               </p>
             </header>
 
@@ -296,8 +351,8 @@ export function OstomyCarePage({
                     <p className="oc-pack-price">{featuredKit.priceLabel}</p>
                   ) : null}
                   <p>
-                    A calm Fresh Start edit — customize on the kit page, then keep your version for the weeks
-                    ahead.
+                    A calm Fresh Start edit — customize on the kit page, then subscribe so your version
+                    restocks on your wear time.
                   </p>
                   <a className="oc-btn oc-btn-solid" href={featuredKit.path}>
                     Customize this kit
@@ -387,23 +442,43 @@ export function OstomyCarePage({
         </section>
       ) : null}
 
-      <section aria-label="Journey chapters" className="oc-journey" id="where-are-you">
+      <SpecializedSubscribe
+        className="oc-subs"
+        demoProductBlurb="Pouches, barriers, and skin care — restocked before you run out."
+        demoProductName="Ostomy Essentials"
+        demoProductPath="liivv.ca/product/ostomy-essentials"
+        features={SUBSCRIBE_FEATURES}
+        lead="Ostomy supplies are not optional — and running out should not be part of the routine. Subscribe to your usuals so restock stays quiet, discreet, and on time."
+        primaryCtaClass="oc-btn oc-btn-solid"
+        secondaryCtaClass="oc-btn oc-btn-ghost"
+        shopHref={SHOP_HREF}
+        shopLabel="Shop to subscribe"
+        title="Pouches and barriers that arrive before you need them"
+        wrapClassName="oc-wrap"
+      />
+
+      <section aria-label="Life chapters" className="oc-chapters" id="where-are-you">
         <div className="oc-wrap">
-          <header className="oc-journey-head">
-            <span className="oc-eyebrow">Your pace</span>
-            <h2>Four soft ways in.</h2>
-            <p>Open a chapter — or skip to the shelf when you already know what you need.</p>
+          <header className="oc-chapters-head">
+            <span className="oc-eyebrow">Life chapters</span>
+            <h2>Three stories. Open the one that fits.</h2>
+            <p>
+              New to this, learning your stoma, or living the everyday — pick the chapter that feels like today.
+              Already know the aisle?{' '}
+              <a href="#shop-ostomy-care">Skip to the shelf</a>.
+            </p>
           </header>
-          <div className="oc-journey-rail">
-            {JOURNEY.map((item) => (
-              <a className="oc-journey-card" href={item.href} key={item.step}>
-                <div className="oc-journey-thumb">
+          <div className="oc-chapters-grid">
+            {LIFE_CHAPTERS.map((item) => (
+              <a className="oc-chapter-card" href={item.href} key={item.num}>
+                <div className="oc-chapter-media">
                   <img alt="" src={item.image} />
+                  <span className="oc-chapter-word">Chapter {item.word}</span>
                 </div>
-                <div className="oc-journey-body">
-                  <span className="oc-journey-step">Step {item.step}</span>
+                <div className="oc-chapter-body">
                   <h3>{item.title}</h3>
                   <p>{item.blurb}</p>
+                  <span className="oc-chapter-go">Open chapter →</span>
                 </div>
               </a>
             ))}
@@ -502,7 +577,16 @@ export function OstomyCarePage({
             <details>
               <summary>Can I customize a kit?</summary>
               <p>
-                Yes. Start curated, adjust quantities, add items, and save your version for later restock.
+                Yes. Start curated, adjust quantities, add items, and save your version — or subscribe so the
+                restock keeps arriving.
+              </p>
+            </details>
+            <details>
+              <summary>How do subscriptions work?</summary>
+              <p>
+                On a product page, choose Subscribe &amp; save, pick a frequency that matches your wear time,
+                then check out like any order. Skip a delivery when you still have extras — no charge, nothing
+                ships. Manage pause, skip, or cancel under Account → Subscriptions.
               </p>
             </details>
             <details>
@@ -538,11 +622,14 @@ export function OstomyCarePage({
             <a className="oc-btn oc-btn-soft" href={SHOP_HREF}>
               Shop Ostomy Essentials
             </a>
+            <a className="oc-btn oc-btn-ghost" href="#subscriptions" style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff' }}>
+              Subscribe &amp; save
+            </a>
             <a className="oc-btn oc-btn-ghost" href="#build-your-kit" style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff' }}>
               Browse curated kits
             </a>
             <a className="oc-btn oc-btn-ghost" href="#where-are-you" style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff' }}>
-              Find your pace
+              Open a chapter
             </a>
           </div>
         </div>

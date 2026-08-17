@@ -1,0 +1,79 @@
+.sp-subs-head {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  max-width: 42rem;
+}
+
+.sp-subs-head.is-center {
+  margin-inline: auto;
+  text-align: center;
+  max-width: 46rem;
+}
+
+.sp-subs-eyebrow {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sage-deep, var(--sage, #6b7f5c));
+}
+
+.sp-subs-head h2 {
+  margin: 0;
+  font-size: clamp(1.9rem, 4vw, 2.75rem);
+}
+
+.sp-subs-head p {
+  margin: 0;
+  color: color-mix(in srgb, var(--ink, #312f2f) 78%, transparent);
+  font-size: 1.05rem;
+}
+
+.sp-subs-features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.sp-subs-card {
+  background: var(--paper, var(--soft, #fffcf8));
+  border: 1px solid var(--line, rgba(49, 47, 47, 0.12));
+  border-radius: var(--radius, 18px);
+  padding: 1.35rem 1.3rem 1.45rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.sp-subs-card h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.sp-subs-card p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: color-mix(in srgb, var(--ink, #312f2f) 72%, transparent);
+}
+
+.sp-subs-demo {
+  margin: 0 0 2rem;
+}
+
+.sp-subs-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.sp-subs-cta.is-center {
+  justify-content: center;
+}
+
+@media (max-width: 800px) {
+  .sp-subs-features {
+    grid-template-columns: 1fr;
+  }
+}

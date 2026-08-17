@@ -1707,8 +1707,15 @@ body.adc-portal-active main{
   font-size:0.8125rem;
   font-weight:500;
   letter-spacing:0.01em;
+  line-height:1.2;
   text-align:left;
   cursor:pointer;
+  -webkit-appearance:none;
+  appearance:none;
+  box-sizing:border-box;
+  box-shadow:none;
+  transform:none;
+  overflow:visible;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--insurance{
   align-items:flex-end;
@@ -1733,7 +1740,11 @@ body.adc-portal-active main{
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot:hover,
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot:focus-visible{
   color:#2c2a26;
-  border-bottom-color:#8ea58d;
+  border:0;
+  border-bottom:1px solid #8ea58d;
+  transform:none;
+  box-shadow:none;
+  margin:0;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot:focus-visible{
   outline:2px solid rgb(var(--mhd-accent));
@@ -2065,6 +2076,7 @@ body.adc-portal-active main{
   flex-direction:row;
   flex-wrap:wrap;
   justify-content:center;
+  align-items:center;
   gap:0.35rem 0.75rem;
   width:100%;
   margin-top:0.2rem;
@@ -2095,8 +2107,12 @@ body.adc-portal-active main{
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--chip:hover,
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--chip:focus-visible{
-  border-bottom-color:#8ea58d;
+  border:0;
+  border-bottom:1px solid #8ea58d;
   background:transparent;
+  transform:none;
+  box-shadow:none;
+  padding:0.15rem 0;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-care-canvas{
   display:flex;

@@ -30,11 +30,11 @@ export function getStoreLiivvHealthNavItem(): LiivvArchiveNavLink {
       {
         links: [
           {
-            label: 'Diabetes Care & Everyday "LIIVVing"',
+            label: 'Diabetes Care & Everyday "Liivving"',
             href: DIABETES_CARE_PATH,
           },
           {
-            label: 'Ostomy Care & Everyday "LIIVVing"',
+            label: 'Ostomy Care & Everyday "Liivving"',
             href: OSTOMY_CARE_PATH,
           },
           {

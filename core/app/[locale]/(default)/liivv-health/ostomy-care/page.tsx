@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const metadata: Metadata = {
-  title: 'Ostomy Care & Everyday "LIIVVing" | Liivv',
+  title: 'Ostomy Care & Everyday "Liivving" | Liivv',
   description:
     'Ostomy supplies, everyday living support, and kind guidance — pouches, barriers, curated kits, and Ontario pharmacist chat.',
 };

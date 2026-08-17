@@ -37,7 +37,7 @@ const panelGroup = Group({
       label: 'Heading',
       preferredLayout: Group.Layout.Popover,
       props: {
-        text: TextInput({ label: 'Heading', defaultValue: 'Ostomy Care & Everyday "LIIVVing"' }),
+        text: TextInput({ label: 'Heading', defaultValue: 'Ostomy Care & Everyday "Liivving"' }),
         ...textColorFields('0 2% 19%'),
         ...fontSizeFields(),
       },

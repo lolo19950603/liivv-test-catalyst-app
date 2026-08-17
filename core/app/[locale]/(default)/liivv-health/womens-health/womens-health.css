@@ -1903,6 +1903,32 @@
   font-size: 17px;
 }
 
+/* —— SUBSCRIBE & SAVE —— */
+#womens-health .wh-subs {
+  background: color-mix(in srgb, var(--blush) 18%, var(--cream));
+  padding: 100px 24px 110px;
+  color: var(--ink);
+}
+
+#womens-health .wh-subs .sp-subs-eyebrow {
+  color: var(--sage);
+}
+
+#womens-health .wh-subs .sp-subs-head h2 {
+  font-size: clamp(34px, 4.5vw, 56px);
+  max-width: 16ch;
+  margin-inline: auto;
+}
+
+#womens-health .wh-subs .sp-subs-head p {
+  font-size: 17px;
+  margin-inline: auto;
+}
+
+#womens-health .wh-subs .lh-sub-flow {
+  border-radius: 32px;
+}
+
 #womens-health .wh-kits-carousel {
   margin-top: 8px;
 }

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 
 import { OliviaHelpBand } from '~/components/olivia/olivia-help-band';
 import { GuestCategoryQuiz } from '~/components/onboarding/guest-category-quiz';
+import { SpecializedSubscribe } from '~/components/specialized-subscribe/specialized-subscribe';
 
 import { CHAPTERS as CHAPTER_PAGES, chapterHref } from './chapters/chapters-data';
 import type { WhCatalog, WhCatalogItem } from './get-wh-catalog';
@@ -71,8 +72,8 @@ const KIT_FLOW_STEPS = [
   {
     id: 'save',
     num: '04',
-    title: 'Save for later',
-    body: 'Keep your version for next month — no starting from scratch.',
+    title: 'Save or subscribe',
+    body: 'Keep your version for next month — or subscribe so it restocks on its own.',
   },
 ] as const;
 
@@ -93,7 +94,7 @@ const FEELING_WORDS = ['heard', 'steady', 'like yourself', 'in rhythm', 'at ease
 const TRUST_ITEMS = [
   'Ontario pharmacist chat',
   'Discreet delivery',
-  'Customize & save kits',
+  'Subscribe & save staples',
   'No shame. Just health.',
 ] as const;
 
@@ -103,7 +104,7 @@ const DOORS = [
     id: 'shop',
     label: 'Shop',
     title: 'The Women\'s edit',
-    body: 'Essentials, kits, and glow — curated for real routines.',
+    body: 'Essentials, kits, and glow — subscribe so restock keeps the same pace as you.',
     href: '#build-your-kit',
     image: `${IMG}/door-shop-kit.jpg`,
   },
@@ -149,6 +150,21 @@ const SHOP_ROOMS = [
 ] as const;
 
 type ShopRoomId = (typeof SHOP_ROOMS)[number]['id'];
+
+const SUBSCRIBE_FEATURES = [
+  {
+    title: 'A monthly rhythm, not a drawer scramble',
+    body: 'Period and intimate staples show up like clockwork — the rest of the month stays yours.',
+  },
+  {
+    title: 'Kits that keep arriving',
+    body: 'Customize a kit, then subscribe so your version restocks. Change it whenever you want.',
+  },
+  {
+    title: 'Skip a cycle anytime',
+    body: 'Season shift, travel, or a break — pause, skip, or cancel without a phone call.',
+  },
+] as const;
 
 function roomForProduct(product: WhCatalogItem): Exclude<ShopRoomId, 'all' | 'kits'> {
   const n = product.name.toLowerCase();
@@ -1276,7 +1292,8 @@ export function WomensHealthPage({
               <span className="eyebrow">Liivv kits</span>
               <h2>Start curated. Finish as yours.</h2>
               <p className="wh-kits-intro">
-                Prebuilt for the chapter — then customize on the kit page and save it for later.
+                Prebuilt for the chapter — then customize on the kit page, save it, or subscribe so it keeps
+                arriving.
               </p>
             </div>
 
@@ -1343,6 +1360,23 @@ export function WomensHealthPage({
           </div>
         </section>
       ) : null}
+
+      <SpecializedSubscribe
+        align="center"
+        className="wh-subs rounded-top"
+        demoProductBlurb="Period and intimate staples — on a monthly rhythm, not a scramble."
+        demoProductName="Cycle comfort staples"
+        demoProductPath="liivv.ca/product/cycle-comfort"
+        features={SUBSCRIBE_FEATURES}
+        lead="Pads, wipes, comfort staples — subscribe so the month does not start with a scramble. Tune frequency with your season, skip a cycle, or pause when you need a break."
+        primaryCtaClass="btn btn-dark"
+        reveal
+        secondaryCtaClass="btn btn-outline"
+        shopHref={SHOP_HREF}
+        shopLabel="Shop to subscribe"
+        title="Cycle care that keeps the same pace as you"
+        wrapClassName="container"
+      />
 
       {/* =====================================================================
           SECTION 6 — LIFE CHAPTERS
@@ -1599,7 +1633,16 @@ export function WomensHealthPage({
             <details>
               <summary>Can I customize a kit?</summary>
               <p>
-                Yes. Start with a curated kit, adjust quantities, add items, and save your version for later.
+                Yes. Start with a curated kit, adjust quantities, add items, and save your version — or
+                subscribe so it restocks on your rhythm.
+              </p>
+            </details>
+            <details>
+              <summary>How do subscriptions work?</summary>
+              <p>
+                On a product page, choose Subscribe &amp; save, pick a frequency that fits your cycle, then
+                check out like any order. Skip a month, pause, or cancel under Account → Subscriptions — no
+                phone calls, no guilt trips.
               </p>
             </details>
             <details>
@@ -1640,6 +1683,9 @@ export function WomensHealthPage({
           <div className="wh-closing-cta">
             <a className="btn btn-white" href={SHOP_HREF}>
               Shop the edit
+            </a>
+            <a className="btn btn-ghost" href="#subscriptions">
+              Subscribe &amp; save
             </a>
             <a className="btn btn-ghost" href="#build-your-kit">
               Build a kit
