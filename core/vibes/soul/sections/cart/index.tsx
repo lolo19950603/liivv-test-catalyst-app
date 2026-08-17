@@ -2,6 +2,7 @@ import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { ButtonLink } from '@/vibes/soul/primitives/button-link';
 import * as Skeleton from '@/vibes/soul/primitives/skeleton';
 import { SectionLayout } from '@/vibes/soul/sections/section-layout';
+import { OliviaFigure } from '~/components/olivia/olivia-figure';
 
 import { CartClient, Cart as CartData, CartLineItem, CartProps } from './client';
 
@@ -116,6 +117,10 @@ export interface CartEmptyState {
 export function CartEmptyState({ title, subtitle, cta }: CartEmptyState) {
   return (
     <SectionLayout className="text-center font-[family-name:var(--cart-font-family,var(--font-family-body))]">
+      <div className="olivia-empty">
+        <span className="olivia-bubble olivia-bubble--center">Nothing in here yet. Want a hand?</span>
+        <OliviaFigure alt="Olivia waiting by an empty cart" mood="live" size="lg" />
+      </div>
       <h1 className="mb-3 text-center font-[family-name:var(--cart-title-font-family,var(--font-family-heading))] text-3xl leading-none text-[var(--cart-title,hsl(var(--foreground)))] @xl:text-4xl">
         {title}
       </h1>

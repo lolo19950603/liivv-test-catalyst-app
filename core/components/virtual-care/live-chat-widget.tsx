@@ -30,6 +30,7 @@ import {
   voiceChatStatusLabel,
 } from '~/components/virtual-care/chat-voice-controls';
 import { ChatSystemMessage } from '~/components/virtual-care/chat-system-message';
+import { OliviaFigure } from '~/components/olivia/olivia-figure';
 import { ChatTypingIndicator } from '~/components/virtual-care/chat-typing-indicator';
 import { useChatMessagePages } from '~/components/virtual-care/use-chat-message-pages';
 import { useChatOptimisticSend } from '~/components/virtual-care/use-chat-optimistic-send';
@@ -80,38 +81,21 @@ function messageLabel(senderType: ChatMessageRow['sender_type']): string | null 
   return null;
 }
 
-function ChatIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      aria-hidden="true"
-      className={className}
-      fill="none"
-      height="28"
-      viewBox="0 0 24 24"
-      width="28"
-    >
-      <path
-        d="M7 9.5h10M7 13h6"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="1.75"
-      />
-      <path
-        d="M5.5 4.75h13A2.75 2.75 0 0 1 21.25 7.5v7a2.75 2.75 0 0 1-2.75 2.75H11.2L7.4 20.4a.75.75 0 0 1-1.2-.6v-2.55H5.5A2.75 2.75 0 0 1 2.75 14.5v-7A2.75 2.75 0 0 1 5.5 4.75Z"
-        stroke="currentColor"
-        strokeLinejoin="round"
-        strokeWidth="1.75"
-      />
-    </svg>
-  );
-}
+const LAUNCHER_HINTS = [
+  "Hi, I'm Olivia!",
+  'Need a product?',
+  'I can check an order.',
+];
 
 function GuestPanel({ onClose }: { onClose: () => void }) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex-1 space-y-4 overflow-y-auto bg-[#f4f4f4] p-4">
+        <div className="flex justify-center pt-2">
+          <OliviaFigure mood="celebrate" size="md" />
+        </div>
         <div className="rounded-2xl bg-white px-4 py-3 text-sm leading-relaxed text-[#2c2a26] shadow-sm">
-          To help direct your chat to the right place, please sign in to your Liivv account.
+          Olivia is ready — sign in so she can help with products, orders, and your account.
         </div>
         <div className="flex flex-col gap-2.5">
           <Link
@@ -160,14 +144,11 @@ function LiveChatHeader({
   return (
     <header className="flex shrink-0 items-center justify-between gap-3 bg-[#2c2a26] px-4 py-3 text-white">
       <div className="flex min-w-0 items-center gap-2.5">
-        <span
-          aria-hidden="true"
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#375a37] text-[11px] font-bold"
-        >
-          L
+        <span aria-hidden="true" className="olivia-chat-avatar">
+          <OliviaFigure alt="" mood="live" size="xs" />
         </span>
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold">Live Chat</p>
+          <p className="truncate text-sm font-semibold">Chat with Olivia</p>
           <p className="truncate text-[11px] text-white/70">{subtitle}</p>
         </div>
       </div>
@@ -485,6 +466,9 @@ export function LiveChatWidget() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [data, setData] = useState<LiveChatWidgetData | null>(null);
   const [unreadStaffCount, setUnreadStaffCount] = useState(0);
+  const [launcherHover, setLauncherHover] = useState(false);
+  const [hintIndex, setHintIndex] = useState(0);
+  const [showHint, setShowHint] = useState(false);
   const pathnameRef = useRef(pathname);
   const skipPathnameRefreshRef = useRef(true);
 
@@ -529,6 +513,32 @@ export function LiveChatWidget() {
       setOpen(true);
     }
   }, [openFromQuery]);
+
+  useEffect(() => {
+    if (open) {
+      setShowHint(false);
+      return;
+    }
+
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
+    const first = window.setTimeout(() => setShowHint(true), 2800);
+    const cycle = window.setInterval(() => {
+      setHintIndex((current) => (current + 1) % LAUNCHER_HINTS.length);
+      setShowHint(true);
+      window.setTimeout(() => setShowHint(false), 4200);
+    }, 14000);
+
+    const hideFirst = window.setTimeout(() => setShowHint(false), 7000);
+
+    return () => {
+      window.clearTimeout(first);
+      window.clearTimeout(hideFirst);
+      window.clearInterval(cycle);
+    };
+  }, [open]);
 
   useEffect(() => {
     const onOpen = () => {
@@ -684,8 +694,9 @@ export function LiveChatWidget() {
 
           <div className="min-h-0 flex-1">
             {!sessionReady ? (
-              <div className="flex h-full items-center justify-center bg-[#f4f4f4] p-4 text-sm text-[#8a8176]">
-                Loading chat…
+              <div className="flex h-full flex-col items-center justify-center gap-2 bg-[#f4f4f4] p-4 text-sm text-[#8a8176]">
+                <OliviaFigure alt="" mood="loading" size="sm" />
+                Olivia is waking up…
               </div>
             ) : isLoggedIn ? (
               <AuthenticatedPanel
@@ -704,16 +715,30 @@ export function LiveChatWidget() {
         <button
           aria-label={
             unreadStaffCount > 0
-              ? `Open live chat, ${unreadStaffCount} unread message${unreadStaffCount === 1 ? '' : 's'}`
-              : 'Open live chat'
+              ? `Chat with Olivia, ${unreadStaffCount} unread message${unreadStaffCount === 1 ? '' : 's'}`
+              : 'Chat with Olivia'
           }
-          className="liivv-live-chat-launcher liivv-live-chat-launcher--icon-only pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8a9a7b] focus-visible:ring-offset-2"
+          className="olivia-chat-launcher pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8a9a7b] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-lg"
           onClick={handleOpen}
+          onMouseEnter={() => setLauncherHover(true)}
+          onMouseLeave={() => setLauncherHover(false)}
           type="button"
         >
-          <ChatIcon />
+          {showHint || launcherHover ? (
+            <span className="olivia-chat-launcher__hint">
+              <span className="olivia-bubble olivia-bubble--right">
+                {launcherHover ? 'Tap me — I am friendly.' : LAUNCHER_HINTS[hintIndex]}
+              </span>
+            </span>
+          ) : null}
+          <OliviaFigure
+            alt=""
+            mood={launcherHover ? 'wave' : 'live'}
+            pose={launcherHover ? 'wave' : undefined}
+            size="sm"
+          />
           {unreadStaffCount > 0 ? (
-            <span aria-hidden="true" className="liivv-live-chat-launcher__badge">
+            <span aria-hidden="true" className="olivia-chat-launcher__badge">
               {unreadStaffCount > 9 ? '9+' : unreadStaffCount}
             </span>
           ) : null}

@@ -934,6 +934,11 @@
   padding: 100px 24px;
 }
 
+#womens-health .wh-olivia-band {
+  background: var(--cream);
+  padding: 48px 24px 72px;
+}
+
 #womens-health .images-text-grid {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;

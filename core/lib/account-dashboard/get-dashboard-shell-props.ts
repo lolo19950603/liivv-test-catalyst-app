@@ -103,6 +103,7 @@ export async function getAccountDashboardShellProps(
     {
       customerFirstName: firstNameForGreeting,
       primaryCategoryId,
+      healthCategoryLabels: wellness.healthCategoryLabels,
     },
   );
 

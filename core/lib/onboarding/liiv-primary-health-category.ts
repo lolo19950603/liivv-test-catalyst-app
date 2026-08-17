@@ -252,6 +252,7 @@ export function getPrimaryCategoryDisplay(id: LiivPrimaryCategoryId) {
       label: 'Wellness',
       shortLabel: 'Wellness',
       subtitle: 'Products, treatment, or everyday wellness support.',
+      emoji: '💚',
       pageLink: '',
       image: '',
     };

@@ -1,0 +1,491 @@
+/* Olivia — site-wide mascot motion. Prefixed to stay out of archive CSS wars. */
+
+.olivia-figure {
+  --olivia-ink: #2c2a26;
+  --olivia-sage: #6b7f5c;
+  --olivia-sage-deep: #375a37;
+  --olivia-cream: #faf8f3;
+  --olivia-blush: #f3c7be;
+  display: block;
+  width: var(--olivia-size, 7.5rem);
+  user-select: none;
+}
+
+.olivia-figure[data-size='xs'] {
+  --olivia-size: 2.5rem;
+}
+
+.olivia-figure[data-size='sm'] {
+  --olivia-size: 4.25rem;
+}
+
+.olivia-figure[data-size='md'] {
+  --olivia-size: 7.5rem;
+}
+
+.olivia-figure[data-size='lg'] {
+  --olivia-size: 11rem;
+}
+
+.olivia-figure[data-size='xl'] {
+  --olivia-size: 16rem;
+}
+
+.olivia-figure__sway {
+  transform-origin: center bottom;
+  will-change: transform;
+}
+
+.olivia-figure[data-mood='live'] .olivia-figure__sway {
+  animation: olivia-live 5.2s ease-in-out infinite;
+}
+
+.olivia-figure[data-mood='bounce'] .olivia-figure__sway,
+.olivia-figure[data-mood='wave'] .olivia-figure__sway {
+  animation: olivia-bounce 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.olivia-figure[data-mood='celebrate'] .olivia-figure__sway {
+  animation: olivia-celebrate 1.25s ease-in-out infinite;
+}
+
+.olivia-figure[data-mood='loading'] .olivia-figure__sway {
+  animation: olivia-loading 0.72s cubic-bezier(0.45, 0.05, 0.2, 1) infinite;
+}
+
+.olivia-figure[data-mood='look'] .olivia-figure__sway {
+  animation: olivia-look 3.8s ease-in-out infinite;
+}
+
+.olivia-figure__sprite {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  transform-origin: center bottom;
+  filter: drop-shadow(0 10px 16px rgba(55, 90, 55, 0.16));
+}
+
+.olivia-figure__img {
+  object-fit: contain;
+  object-position: center bottom;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.14s ease;
+}
+
+.olivia-figure__img.is-on {
+  opacity: 1;
+}
+
+@keyframes olivia-live {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2.2deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(-0.4deg);
+  }
+}
+
+@keyframes olivia-bounce {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-12px) scale(1.05, 0.96);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes olivia-celebrate {
+  0%,
+  100% {
+    transform: rotate(-4deg) translateY(0);
+  }
+  25% {
+    transform: rotate(-10deg) translateY(-8px);
+  }
+  50% {
+    transform: rotate(4deg) translateY(-11px);
+  }
+  75% {
+    transform: rotate(-6deg) translateY(-4px);
+  }
+}
+
+@keyframes olivia-loading {
+  0%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  35% {
+    transform: translateY(-14px) scale(0.94, 1.08);
+  }
+  55% {
+    transform: translateY(0) scale(1.08, 0.9);
+  }
+}
+
+@keyframes olivia-look {
+  0%,
+  100% {
+    transform: rotate(-8deg) translateX(-4px);
+  }
+  50% {
+    transform: rotate(8deg) translateX(4px);
+  }
+}
+
+/* —— Speech bubble —— */
+.olivia-bubble {
+  position: relative;
+  display: inline-block;
+  max-width: 16rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 1.1rem 1.1rem 1.1rem 0.35rem;
+  background: #fff;
+  color: var(--olivia-ink);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.35;
+  box-shadow: 0 8px 22px rgba(49, 47, 47, 0.1);
+  animation: olivia-bubble-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.olivia-bubble--center {
+  border-radius: 1.1rem;
+}
+
+.olivia-bubble--right {
+  border-radius: 1.1rem 1.1rem 0.35rem 1.1rem;
+}
+
+@keyframes olivia-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* —— Chat launcher —— */
+button.olivia-chat-launcher {
+  position: relative;
+  width: 5.25rem !important;
+  height: 5.5rem !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  overflow: visible !important;
+}
+
+button.olivia-chat-launcher:hover {
+  transform: translateY(-4px) scale(1.05);
+  background: transparent !important;
+}
+
+button.olivia-chat-launcher .olivia-figure {
+  width: 5.25rem;
+  margin: 0 auto;
+}
+
+.olivia-chat-launcher__hint {
+  position: absolute;
+  right: calc(100% + 0.7rem);
+  bottom: 0.65rem;
+  width: max-content;
+  max-width: 11.5rem;
+  pointer-events: none;
+}
+
+.olivia-chat-launcher__badge {
+  position: absolute;
+  top: -0.15rem;
+  right: -0.15rem;
+  z-index: 2;
+  min-width: 1.2rem;
+  height: 1.2rem;
+  padding: 0 0.28rem;
+  border-radius: 9999px;
+  background-color: #dc2626 !important;
+  color: #fff !important;
+  border: 2px solid #fff !important;
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* —— Chat header avatar —— */
+.olivia-chat-avatar {
+  position: relative;
+  width: 2.15rem;
+  height: 2.35rem;
+  overflow: visible;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.olivia-chat-avatar .olivia-figure {
+  width: 2.35rem;
+  margin: -0.15rem auto 0;
+}
+
+/* —— Loading overlay —— */
+.olivia-loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+}
+
+.olivia-loading-screen__caption {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #6b6560;
+  letter-spacing: 0.01em;
+}
+
+.olivia-nav-runner {
+  pointer-events: none;
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 100;
+  height: 4.25rem;
+  overflow: hidden;
+}
+
+.olivia-nav-runner__track {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: rgba(224, 217, 206, 0.85);
+}
+
+.olivia-nav-runner__bar {
+  height: 100%;
+  width: 28%;
+  background: #6b7f5c;
+  animation: olivia-nav-bar 1.15s ease-in-out infinite;
+}
+
+.olivia-nav-runner__mascot {
+  position: absolute;
+  top: 0.15rem;
+  left: 0;
+  width: 3.1rem;
+  animation: olivia-nav-run 1.65s linear infinite;
+}
+
+@keyframes olivia-nav-bar {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+@keyframes olivia-nav-run {
+  0% {
+    transform: translateX(-20vw);
+  }
+  100% {
+    transform: translateX(110vw);
+  }
+}
+
+/* —— Help band —— */
+.olivia-help-band {
+  position: relative;
+  overflow: hidden;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 2.4rem);
+  border: 1px solid rgba(49, 47, 47, 0.1);
+  border-radius: 1.75rem;
+  background:
+    radial-gradient(70% 80% at 8% 12%, rgba(243, 199, 190, 0.42), transparent 58%),
+    radial-gradient(60% 70% at 100% 0%, rgba(142, 167, 139, 0.22), transparent 55%),
+    #fffcf8;
+  box-shadow: 0 16px 40px rgba(49, 47, 47, 0.07);
+}
+
+.olivia-help-band__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1.25rem 2rem;
+  align-items: center;
+}
+
+@media (min-width: 800px) {
+  .olivia-help-band__inner {
+    grid-template-columns: minmax(140px, 200px) minmax(0, 1fr);
+  }
+}
+
+.olivia-help-band__mascot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.olivia-help-band__copy .eyebrow,
+.olivia-help-band__kicker {
+  display: inline-block;
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6b7f5c;
+}
+
+.olivia-help-band__copy h2 {
+  margin: 0 0 0.55rem !important;
+  font-family: var(--font-family-dm-serif-text), Georgia, serif !important;
+  font-size: clamp(1.6rem, 3vw, 2.15rem) !important;
+  font-weight: 400 !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.02em;
+  color: #312f2f !important;
+}
+
+.olivia-help-band__copy p {
+  margin: 0 0 1rem !important;
+  max-width: 46ch;
+  font-size: 0.95rem !important;
+  line-height: 1.55;
+  color: #5c564c !important;
+}
+
+.olivia-help-band__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.olivia-help-band__note {
+  margin: 0.7rem 0 0 !important;
+  font-size: 0.78rem !important;
+  opacity: 0.78;
+}
+
+button.olivia-help-band__cta,
+a.olivia-help-band__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 1.35rem;
+  border-radius: 9999px;
+  border: 1px solid #375a37;
+  background: #375a37 !important;
+  color: #fff !important;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button.olivia-help-band__cta:hover,
+a.olivia-help-band__cta:hover {
+  background: #2d4a2d !important;
+}
+
+.olivia-help-band__ghost {
+  display: inline-flex;
+  align-items: center;
+  color: #375a37;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.olivia-help-band__ghost:hover {
+  text-decoration: underline;
+}
+
+/* —— Empty / 404 stage —— */
+.olivia-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+}
+
+.olivia-empty .olivia-bubble {
+  margin-bottom: 0.4rem;
+}
+
+/* —— Typing row —— */
+.olivia-typing {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.55rem;
+}
+
+.olivia-typing .olivia-figure {
+  flex-shrink: 0;
+}
+
+/* —— Hero cameo —— */
+.olivia-hero-cameo {
+  position: absolute;
+  z-index: 4;
+  left: 6%;
+  bottom: -8%;
+  width: 7.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.olivia-hero-cameo .olivia-bubble {
+  margin-bottom: 0.2rem;
+  font-size: 0.72rem;
+  pointer-events: none;
+}
+
+@media (max-width: 980px) {
+  .olivia-hero-cameo {
+    left: auto;
+    right: 8%;
+    bottom: -6%;
+    width: 5.5rem;
+  }
+
+  .olivia-chat-launcher__hint {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .olivia-figure,
+  .olivia-figure__sway,
+  .olivia-figure__img,
+  .olivia-bubble,
+  button.olivia-chat-launcher,
+  .olivia-nav-runner__bar,
+  .olivia-nav-runner__mascot {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -713,6 +713,11 @@
   color: rgba(49, 47, 47, 0.8);
 }
 
+#liivv-health .lh-hub-olivia {
+  background: var(--cream);
+  padding: 48px 24px 100px;
+}
+
 /* —— HEALTH PROFILE —— */
 #liivv-health .lh-hub-profile {
   background: var(--soft);

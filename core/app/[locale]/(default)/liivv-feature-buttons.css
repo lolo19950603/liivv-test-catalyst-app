@@ -84,48 +84,37 @@ button.liivv-option-pill.liivv-option-pill--active {
 }
 
 /* Floating live-chat launcher — archive CSS sets `button { background: transparent }`. */
-button.liivv-live-chat-launcher {
-  background-color: #375a37 !important;
-  background-image: none !important;
-  color: #ffffff !important;
-  border: 2px solid #ffffff !important;
-  border-radius: 9999px !important;
-  box-shadow: 0 8px 24px rgba(55, 90, 55, 0.35) !important;
-  cursor: pointer;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.625rem;
-  padding: 0.875rem 1.25rem;
-  font-size: 0.875rem;
-  line-height: 1.25;
-}
-
-button.liivv-live-chat-launcher:hover {
-  background-color: #2d4a2d !important;
-  color: #ffffff !important;
-}
-
-button.liivv-live-chat-launcher--icon-only {
+button.olivia-chat-launcher {
   position: relative;
-  width: 4.25rem !important;
-  height: 4.25rem !important;
+  width: 5.25rem !important;
+  height: 5.5rem !important;
   padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  color: #2c2a26 !important;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: visible !important;
 }
 
-button.liivv-live-chat-launcher--icon-only svg {
-  width: 1.75rem !important;
-  height: 1.75rem !important;
+button.olivia-chat-launcher:hover {
+  background: transparent !important;
+  background-image: none !important;
+  transform: translateY(-4px) scale(1.05);
 }
 
-.liivv-live-chat-launcher__badge {
+.olivia-chat-launcher__badge {
   position: absolute;
-  top: -0.2rem;
-  right: -0.2rem;
-  min-width: 1.125rem;
-  height: 1.125rem;
-  padding: 0 0.25rem;
+  top: 0.15rem;
+  right: 0.15rem;
+  min-width: 1.2rem;
+  height: 1.2rem;
+  padding: 0 0.28rem;
   border-radius: 9999px;
   background-color: #dc2626 !important;
   color: #ffffff !important;
@@ -137,11 +126,6 @@ button.liivv-live-chat-launcher--icon-only svg {
   align-items: center;
   justify-content: center;
   pointer-events: none;
-}
-
-button.liivv-live-chat-launcher svg {
-  color: #ffffff !important;
-  flex-shrink: 0;
 }
 
 /* Virtual care hub card — same archive `button { background: transparent }` override. */

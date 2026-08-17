@@ -396,6 +396,7 @@
             "wellness": {
                 "greeting": "Bonjour {name},",
                 "welcomeLead": "Concentrons-nous sur votre parcours de bien-être Liivv.",
+                "welcomeLeadPersonalized": "Votre espace pour {paths}.",
                 "hero": {
                     "basedOnSelection": "Selon votre sélection d'intégration",
                     "title": "Votre bien-être",
@@ -477,6 +478,21 @@
                         "1": "Super — votre tableau de bord peut travailler plus fort pour vous.",
                         "2": "Beau travail. Je suis là si quelque chose change."
                     }
+                },
+                "care": {
+                    "switcherLabel": "Vos parcours de soins",
+                    "todayFocus": "L'essentiel du jour",
+                    "yourSnapshot": "Votre aperçu",
+                    "snapshotEmpty": "Ajoutez quelques détails et ce parcours deviendra plus précis.",
+                    "comingSoon": "Bientôt",
+                    "comingSoonBody": "Nous composons encore cette histoire. Olivia gardera ce parcours au chaud en attendant.",
+                    "editProfile": "Modifier le profil de santé",
+                    "emptyTitle": "Dites à Olivia ce dont vous avez besoin",
+                    "emptyBody": "Choisissez les parcours de soins qui comptent et cet espace se remplira autour de vous — conseils, chapitres et une boutique plus calme.",
+                    "emptyCta": "Commencer le profil de santé",
+                    "nextSteps": "Prochaines étapes utiles",
+                    "basedOn": "Selon votre profil de santé",
+                    "companionHint": "Touchez un parcours, ou modifiez santé et assurance à tout moment."
                 },
                 "actionCenter": {
                     "subscriptionTitle": "Votre prochaine abonnement",

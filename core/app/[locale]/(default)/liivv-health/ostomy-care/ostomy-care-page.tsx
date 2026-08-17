@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
+import { OliviaHelpBand } from '~/components/olivia/olivia-help-band';
 import { GuestCategoryQuiz } from '~/components/onboarding/guest-category-quiz';
 import { KitFlowDemo } from '~/components/kit-flow-demo/kit-flow-demo';
 
@@ -166,9 +167,11 @@ function hasDisplayPrice(priceLabel?: string) {
 export function OstomyCarePage({
   catalog,
   showGuestQuiz = false,
+  isSignedIn = false,
 }: {
   catalog?: OcCatalog;
   showGuestQuiz?: boolean;
+  isSignedIn?: boolean;
 }) {
   const [shopRoom, setShopRoom] = useState<ShopRoomId>('all');
 
@@ -229,7 +232,9 @@ export function OstomyCarePage({
         </div>
       </section>
 
-      {showGuestQuiz ? <GuestCategoryQuiz categoryId="ostomy_care_everyday" /> : null}
+      {showGuestQuiz ? (
+        <GuestCategoryQuiz categoryId="ostomy_care_everyday" isSignedIn={isSignedIn} />
+      ) : null}
 
       <section aria-label="Ways into Ostomy Care" className="oc-path" id="doors">
         <div className="oc-wrap">
@@ -423,6 +428,12 @@ export function OstomyCarePage({
                 Talk to a Pharmacist
               </a>
             </div>
+          </div>
+          <div className="oc-olivia-band">
+            <OliviaHelpBand
+              body="Need a restock, a product match, or help with an order? Olivia is the little sprout in the corner. She does not give medical advice."
+              title="Olivia can fetch the everyday bits."
+            />
           </div>
         </div>
       </section>

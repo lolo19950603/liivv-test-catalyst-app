@@ -17,7 +17,6 @@ export const OSTOMY_CARE_PATH = '/liivv-health/ostomy-care';
 export const SHOP_OSTOMY_CARE_PATH = '/liivv-health/ostomy-care/shop-ostomy-care';
 
 const CHAPTER_IMG = '/archive/womens-health';
-const OSTOMY_CHAPTER_IMG = '/archive/ostomy-care';
 
 /**
  * Storefront top-level “Liivv Health” item — sits between Liivv Your Life and Blog.
@@ -109,26 +108,14 @@ const OSTOMY_CHAPTER_LINKS = [
   {
     label: 'New to the Journey',
     href: `${OSTOMY_CARE_PATH}/chapters/new-to-the-journey`,
-    image: {
-      src: `${OSTOMY_CHAPTER_IMG}/chapter-new.png`,
-      alt: 'New to the Journey',
-    },
   },
   {
     label: 'Get to Know Your Stoma',
     href: `${OSTOMY_CARE_PATH}/chapters/get-to-know-your-stoma`,
-    image: {
-      src: `${OSTOMY_CHAPTER_IMG}/chapter-stoma.png`,
-      alt: 'Get to Know Your Stoma',
-    },
   },
   {
     label: 'Everyday Liivving',
     href: `${OSTOMY_CARE_PATH}/chapters/everyday-liivving`,
-    image: {
-      src: `${OSTOMY_CHAPTER_IMG}/chapter-everyday.png`,
-      alt: 'Everyday Liivving',
-    },
   },
 ] as const;
 
@@ -176,15 +163,7 @@ const OSTOMY_CARE_NAV: LiivvArchiveNavLink[] = [
     label: 'Shop Ostomy Essentials',
     href: SHOP_OSTOMY_CARE_PATH,
   },
-  {
-    label: 'Your pace',
-    href: `${OSTOMY_CARE_PATH}#where-are-you`,
-    columns: [
-      {
-        links: [...OSTOMY_CHAPTER_LINKS],
-      },
-    ],
-  },
+  ...OSTOMY_CHAPTER_LINKS,
 ];
 
 const DIABETES_CARE_NAV: LiivvArchiveNavLink[] = [

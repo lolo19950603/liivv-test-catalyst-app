@@ -118,7 +118,9 @@ function humanizeSlug(value: string): string {
     .join(' ');
 }
 
-function formatAnswerValue(value: string | string[] | boolean | null | undefined): string | null {
+export function formatHealthProfileAnswer(
+  value: string | string[] | boolean | null | undefined,
+): string | null {
   if (value == null) {
     return null;
   }
@@ -159,7 +161,7 @@ function rowsFromCategoryResponses(
   const rows: HealthProfileDisplayRow[] = [];
 
   for (const [key, value] of Object.entries(responses)) {
-    const formatted = formatAnswerValue(value);
+    const formatted = formatHealthProfileAnswer(value);
 
     if (!formatted) {
       continue;
@@ -224,6 +226,18 @@ function normalizeNotesPayload(notes: unknown): CategoryResponsesPayload | null 
   }
 
   return parsed as CategoryResponsesPayload;
+}
+
+export function getRawCategoryResponses(
+  notes: unknown,
+): Record<string, string | string[] | boolean | null> {
+  const payload = normalizeNotesPayload(notes);
+
+  if (!payload?.category_responses || typeof payload.category_responses !== 'object') {
+    return {};
+  }
+
+  return payload.category_responses;
 }
 
 export function parseHealthProfileCategoryResponses(

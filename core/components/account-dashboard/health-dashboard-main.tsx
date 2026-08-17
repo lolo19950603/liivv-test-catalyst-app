@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation';
 
 import { Link } from '~/components/link';
 import { OpenLiveChatButton } from '~/components/virtual-care/live-chat-widget';
+import type { PersonalizedCareLane } from '~/lib/account-dashboard/personalized-care';
 import type { LiivPrimaryCategoryId } from '~/lib/onboarding/liiv-primary-health-category';
 import type { HealthProfileRow } from '~/lib/supabase/health-profile';
 
 import { IconChevronRight, IconCrown, IconOrders } from './icons';
 import { OliviaCompanionStage, type OliviaMascotMood } from './olivia-companion-stage';
 import { OliviaSetupSheet, type OliviaSetupSheetKind } from './olivia-setup-sheet';
+import { PersonalizedCareCanvas } from './personalized-care-canvas';
 import type { AccountDashboardLabels } from './types';
 
 export function HealthDashboardMain({
@@ -28,6 +30,8 @@ export function HealthDashboardMain({
   insuranceProviderName,
   hasInsurance,
   celebrateOnMount = false,
+  careLanes,
+  todayLabel,
   healthProfileStepData,
 }: {
   labels: AccountDashboardLabels;
@@ -44,6 +48,8 @@ export function HealthDashboardMain({
   insuranceProviderName: string | null;
   hasInsurance: boolean | null;
   celebrateOnMount?: boolean;
+  careLanes: PersonalizedCareLane[];
+  todayLabel: string;
   healthProfileStepData: {
     initialCategories: LiivPrimaryCategoryId[];
     isOntario: boolean;
@@ -55,7 +61,16 @@ export function HealthDashboardMain({
   const router = useRouter();
   const [sheet, setSheet] = useState<OliviaSetupSheetKind | null>(null);
   const [mood, setMood] = useState<OliviaMascotMood>(celebrateOnMount ? 'celebrate' : 'idle');
+  const [activeLaneId, setActiveLaneId] = useState<string | null>(careLanes[0]?.id ?? null);
   const bounceTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (careLanes.some((lane) => lane.id === activeLaneId)) {
+      return;
+    }
+
+    setActiveLaneId(careLanes[0]?.id ?? null);
+  }, [activeLaneId, careLanes]);
 
   useEffect(() => {
     return () => {
@@ -99,26 +114,40 @@ export function HealthDashboardMain({
     setMood('idle');
   };
 
+  const activeLane = careLanes.find((lane) => lane.id === activeLaneId) ?? careLanes[0];
+
   return (
     <div className="mhd-wellness">
-      <OliviaCompanionStage
-        hasInsurance={hasInsurance}
-        healthCategoryLabels={healthCategoryLabels}
-        healthComplete={healthProfileComplete}
-        insuranceComplete={insuranceComplete}
-        insuranceProviderName={insuranceProviderName}
-        labels={wellness.olivia}
-        mood={mood}
-        onHotspotEnter={(side) => {
-          if (sheet) return;
-          setMood(side === 'health' ? 'looking-health' : 'looking-insurance');
-        }}
-        onHotspotLeave={() => {
-          if (sheet) return;
-          setMood('idle');
-        }}
-        onOpenHealth={() => openSheet('health')}
-        onOpenInsurance={() => openSheet('insurance')}
+      <PersonalizedCareCanvas
+        activeLaneId={activeLaneId}
+        companion={
+          <OliviaCompanionStage
+            hasInsurance={hasInsurance}
+            healthCategoryLabels={healthCategoryLabels}
+            healthComplete={healthProfileComplete}
+            insuranceComplete={insuranceComplete}
+            insuranceProviderName={insuranceProviderName}
+            labels={wellness.olivia}
+            layout="companion"
+            mood={mood}
+            onHotspotEnter={(side) => {
+              if (sheet) return;
+              setMood(side === 'health' ? 'looking-health' : 'looking-insurance');
+            }}
+            onHotspotLeave={() => {
+              if (sheet) return;
+              setMood('idle');
+            }}
+            onOpenHealth={() => openSheet('health')}
+            onOpenInsurance={() => openSheet('insurance')}
+            speechOverride={activeLane?.oliviaLine}
+          />
+        }
+        labels={wellness.care}
+        lanes={careLanes}
+        onEditProfile={() => openSheet('health')}
+        onSelectLane={setActiveLaneId}
+        todayLabel={todayLabel}
       />
 
       {sheet ? (

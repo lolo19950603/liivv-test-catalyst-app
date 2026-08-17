@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
-import { isLoggedIn } from '~/auth';
 import { locales } from '~/i18n/locales';
+import { shouldShowLandingQuiz } from '~/lib/onboarding/should-show-landing-quiz';
 
 import { getWhCatalog } from './get-wh-catalog';
 import { WomensHealthPage } from './womens-health-page';
@@ -27,7 +27,9 @@ export default async function Page({ params }: Props) {
   setRequestLocale(locale);
 
   const catalog = await getWhCatalog(locale);
-  const showGuestQuiz = !(await isLoggedIn());
+  const { showQuiz, isSignedIn } = await shouldShowLandingQuiz('womens_health_wellness');
 
-  return <WomensHealthPage catalog={catalog} showGuestQuiz={showGuestQuiz} />;
+  return (
+    <WomensHealthPage catalog={catalog} isSignedIn={isSignedIn} showGuestQuiz={showQuiz} />
+  );
 }

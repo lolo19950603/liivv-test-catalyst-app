@@ -255,6 +255,32 @@
   gap: 12px;
 }
 
+#liivv-home .lh-hero-olivia {
+  margin-top: 28px;
+}
+
+#liivv-home .lh-hero-olivia-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+#liivv-home .lh-hero-olivia-btn:focus-visible {
+  outline: 2px solid var(--sage);
+  outline-offset: 6px;
+  border-radius: 12px;
+}
+
+#liivv-home .lh-hero-olivia .olivia-figure {
+  width: 6.5rem;
+}
+
 #liivv-home .lh-hero-panel {
   position: relative;
   z-index: 1;
@@ -882,7 +908,54 @@
 /* —— OLIVIA —— */
 #liivv-home .lh-olivia {
   padding: clamp(64px, 8vw, 100px) 0;
-  background: var(--cream);
+  background:
+    radial-gradient(70% 60% at 12% 20%, color-mix(in srgb, var(--blush) 35%, transparent), transparent 58%),
+    radial-gradient(50% 50% at 92% 8%, color-mix(in srgb, var(--sage) 18%, transparent), transparent 55%),
+    var(--cream);
+}
+
+#liivv-home .lh-olivia-stage {
+  max-width: 1240px;
+  margin: 0 auto 36px;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: minmax(180px, 280px) minmax(0, 1fr);
+  gap: 12px 40px;
+  align-items: center;
+}
+
+#liivv-home .lh-olivia-mascot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+#liivv-home .lh-olivia-caption {
+  margin: 8px 0 0;
+  max-width: 18ch;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sage);
+}
+
+#liivv-home .lh-olivia-intro {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+#liivv-home .lh-olivia-intro h2 {
+  max-width: 14ch;
+}
+
+#liivv-home .lh-olivia-intro p {
+  margin-left: 0;
+}
+
+#liivv-home .lh-olivia-intro .btn {
+  margin-top: 18px;
 }
 
 #liivv-home .lh-olivia-grid {
@@ -1945,6 +2018,15 @@
 }
 
 @media (max-width: 980px) {
+  #liivv-home .lh-olivia-stage {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  #liivv-home .lh-olivia-intro {
+    text-align: center;
+  }
+
   #liivv-home .lh-hero {
     grid-template-columns: 1fr;
     min-height: auto;

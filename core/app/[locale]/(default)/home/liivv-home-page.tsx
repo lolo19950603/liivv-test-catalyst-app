@@ -6,6 +6,7 @@ import { HEALTH_TEASER_LINKS, LIIVV_HEALTH_HUB_HREF } from './health-teaser';
 import type { HomeCategory, HomeProduct } from './home-types';
 import { buildNewestCategoryTabs, productMatchesCategory } from './map-home-catalog';
 import { SubscriptionFlowDemo } from './subscription-flow-demo';
+import { OliviaFigure } from '~/components/olivia/olivia-figure';
 import { openLiveChat } from '~/components/virtual-care/live-chat-widget';
 
 import './liivv-home.css';
@@ -365,6 +366,17 @@ export function LiivvHomePage({
               Shop all
             </a>
           </div>
+          <div className="lh-hero-olivia lh-enter" style={{ '--enter-delay': '420ms' } as CSSProperties}>
+            <button
+              aria-label="Meet Olivia"
+              className="lh-hero-olivia-btn"
+              onClick={() => openLiveChat()}
+              type="button"
+            >
+              <span className="olivia-bubble">Hey — I am Olivia.</span>
+              <OliviaFigure alt="" mood="live" size="md" />
+            </button>
+          </div>
         </div>
 
         <div className="lh-hero-panel lh-enter" style={{ '--enter-delay': '200ms' } as CSSProperties}>
@@ -588,14 +600,26 @@ export function LiivvHomePage({
 
       {/* SECTION 10 — OLIVIA */}
       <section aria-label="Olivia AI assistant" className="lh-olivia rounded-top" id="olivia">
-        <div className="lh-section-head" data-reveal>
-          <span className="eyebrow">Meet Olivia</span>
-          <h2>Your AI store assistant — anytime</h2>
-          <p>
-            Olivia helps with products, orders, subscriptions, and account how-tos in secure chat. She does{' '}
-            <em>not</em> give medical advice — when Ask a pharmacist launches, she&apos;ll escalate clinical
-            questions there.
-          </p>
+        <div className="lh-olivia-stage" data-reveal>
+          <div className="lh-olivia-mascot">
+            <OliviaFigure mood="celebrate" priority size="xl" />
+            <p className="lh-olivia-caption">Waves included. Medical advice not included.</p>
+          </div>
+          <div className="lh-section-head lh-olivia-intro">
+            <span className="eyebrow">Meet Olivia</span>
+            <h2>Your sprout-sized store assistant</h2>
+            <p>
+              Olivia helps with products, orders, subscriptions, and account how-tos in secure chat. She does{' '}
+              <em>not</em> give medical advice — when Ask a pharmacist launches, she&apos;ll escalate clinical
+              questions there.
+            </p>
+            <button className="btn btn-dark" onClick={() => openLiveChat()} type="button">
+              Chat with Olivia
+            </button>
+            <p className="lh-olivia-note">
+              She lives in the corner of every page. Hover the sprout. She will wave back.
+            </p>
+          </div>
         </div>
         <div className="lh-olivia-grid" data-reveal data-reveal-stagger>
           {OLIVIA_CAPABILITIES.map((item, index) => (
@@ -608,15 +632,6 @@ export function LiivvHomePage({
               <p>{item.body}</p>
             </article>
           ))}
-        </div>
-          <div className="lh-section-cta" data-reveal>
-          <button className="btn btn-dark" onClick={() => openLiveChat()} type="button">
-            Chat with Olivia
-          </button>
-          <p className="lh-olivia-note">
-            Opens the Live Chat bubble in the corner — look for Olivia when the care team isn&apos;t in
-            the thread.
-          </p>
         </div>
       </section>
 

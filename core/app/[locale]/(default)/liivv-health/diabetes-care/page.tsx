@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
-import { isLoggedIn } from '~/auth';
 import { locales } from '~/i18n/locales';
+import { shouldShowLandingQuiz } from '~/lib/onboarding/should-show-landing-quiz';
 
 import { DiabetesCarePage } from './diabetes-care-page';
 import { getDcCatalog } from './get-dc-catalog';
@@ -27,7 +27,9 @@ export default async function Page({ params }: Props) {
   setRequestLocale(locale);
 
   const catalog = await getDcCatalog(locale);
-  const showGuestQuiz = !(await isLoggedIn());
+  const { showQuiz, isSignedIn } = await shouldShowLandingQuiz('diabetes_care_everyday');
 
-  return <DiabetesCarePage catalog={catalog} showGuestQuiz={showGuestQuiz} />;
+  return (
+    <DiabetesCarePage catalog={catalog} isSignedIn={isSignedIn} showGuestQuiz={showQuiz} />
+  );
 }

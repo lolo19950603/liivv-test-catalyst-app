@@ -129,15 +129,89 @@ function optStr(value: string | string[] | undefined): string | null {
 function mergeCareInterests(
   existing: string[] | null | undefined,
   categoryId: LiivPrimaryCategoryId,
+  placement: 'primary' | 'append',
 ): string[] {
-  const others = resolveInitialHealthCategoriesWithRank(existing).filter(
+  const ranked = resolveInitialHealthCategoriesWithRank(existing).filter(
     (row) => row.id !== categoryId,
   );
 
+  if (placement === 'append') {
+    return [
+      ...ranked.map((row) => encodeRankedCareInterest(row.id, row.rank)),
+      encodeRankedCareInterest(categoryId, ranked.length + 1),
+    ];
+  }
+
   return [
     encodeRankedCareInterest(categoryId, 1),
-    ...others.map((row, index) => encodeRankedCareInterest(row.id, index + 2)),
+    ...ranked.map((row, index) => encodeRankedCareInterest(row.id, index + 2)),
   ];
+}
+
+export async function saveLandingCategoryAnswers(
+  customer: ApplyCustomer,
+  input: {
+    categoryId: LiivPrimaryCategoryId;
+    responses: CategoryResponses;
+    placement?: 'primary' | 'append';
+  },
+): Promise<boolean> {
+  if (!isSupabaseConfigured()) {
+    return false;
+  }
+
+  const ensured = await ensureCustomerProfile(customer);
+
+  if (ensured.status !== 'ok') {
+    return false;
+  }
+
+  const existing = await getHealthProfileByProfileId(ensured.profile.id);
+  const storedResponses = parseCategoryResponses(existing?.notes);
+  const alreadyHasCategory = resolveInitialHealthCategoriesWithRank(
+    ensured.profile.care_interests,
+  ).some((row) => row.id === input.categoryId);
+
+  if (alreadyHasCategory && responsesAlreadyPresent(storedResponses, input.responses)) {
+    return true;
+  }
+
+  const base = existing ? rowToPayload(existing) : emptyPayload(ensured.profile.id);
+  const mergedResponses = { ...storedResponses, ...input.responses };
+  const payload: UpsertHealthProfilePayload = {
+    ...base,
+    profile_id: ensured.profile.id,
+    ostomy_type: optStr(input.responses.ostomy_type) ?? base.ostomy_type,
+    ostomy_tenure: optStr(input.responses.ostomy_journey_stage) ?? base.ostomy_tenure,
+    ostomy_preferred_brand:
+      optStr(input.responses.ostomy_preferred_brand) ?? base.ostomy_preferred_brand,
+    notes: JSON.stringify({ category_responses: mergedResponses }),
+  };
+
+  const up = await upsertHealthProfile(payload);
+
+  if (!up.ok) {
+    return false;
+  }
+
+  const ranked = mergeCareInterests(
+    ensured.profile.care_interests,
+    input.categoryId,
+    input.placement ?? 'primary',
+  );
+  const saved = await completeOnboardingStep2(customer, ranked);
+
+  if (!saved) {
+    return false;
+  }
+
+  revalidatePath('/account/dashboard');
+  revalidatePath('/account/health-profile');
+  revalidatePath('/liivv-health/diabetes-care');
+  revalidatePath('/liivv-health/ostomy-care');
+  revalidatePath('/liivv-health/womens-health');
+
+  return true;
 }
 
 /**
@@ -156,51 +230,17 @@ export const applyPendingGuestHealthProfile = cache(async (customer: ApplyCustom
       return { applied: false as const };
     }
 
-    const ensured = await ensureCustomerProfile(customer);
-
-    if (ensured.status !== 'ok') {
-      return { applied: false as const };
-    }
-
-    const existing = await getHealthProfileByProfileId(ensured.profile.id);
-    const storedResponses = parseCategoryResponses(existing?.notes);
-    const alreadyHasCategory = resolveInitialHealthCategoriesWithRank(
-      ensured.profile.care_interests,
-    ).some((row) => row.id === pending.categoryId);
-
-    if (alreadyHasCategory && responsesAlreadyPresent(storedResponses, pending.responses)) {
-      await clearPendingGuestHealthProfile();
-      return { applied: false as const };
-    }
-
-    const base = existing ? rowToPayload(existing) : emptyPayload(ensured.profile.id);
-    const mergedResponses = { ...storedResponses, ...pending.responses };
-    const payload: UpsertHealthProfilePayload = {
-      ...base,
-      profile_id: ensured.profile.id,
-      ostomy_type: optStr(pending.responses.ostomy_type) ?? base.ostomy_type,
-      ostomy_tenure: optStr(pending.responses.ostomy_journey_stage) ?? base.ostomy_tenure,
-      ostomy_preferred_brand:
-        optStr(pending.responses.ostomy_preferred_brand) ?? base.ostomy_preferred_brand,
-      notes: JSON.stringify({ category_responses: mergedResponses }),
-    };
-
-    const up = await upsertHealthProfile(payload);
-
-    if (!up.ok) {
-      return { applied: false as const };
-    }
-
-    const ranked = mergeCareInterests(ensured.profile.care_interests, pending.categoryId);
-    const saved = await completeOnboardingStep2(customer, ranked);
+    const saved = await saveLandingCategoryAnswers(customer, {
+      categoryId: pending.categoryId,
+      responses: pending.responses,
+      placement: 'primary',
+    });
 
     if (!saved) {
       return { applied: false as const };
     }
 
     await clearPendingGuestHealthProfile();
-    revalidatePath('/account/dashboard');
-    revalidatePath('/account/health-profile');
 
     return { applied: true as const };
   } catch {

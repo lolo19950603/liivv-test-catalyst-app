@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { HealthDashboardMain } from '~/components/account-dashboard/health-dashboard-main';
 import { getWellnessDashboardContext } from '~/lib/account-dashboard/get-wellness-dashboard-context';
 import { buildDashboardLabels } from '~/lib/account-dashboard/dashboard-labels';
+import { buildPersonalizedCareLanes } from '~/lib/account-dashboard/personalized-care';
 import { getAccountDashboardNotifications } from '~/lib/account-notifications/get-header-notifications';
 
 import { getHealthProfileStepData } from '../health-profile/page-data';
@@ -57,8 +58,19 @@ export default async function AccountDashboardPage({ params, searchParams }: Pro
     {
       customerFirstName: firstNameForGreeting,
       primaryCategoryId,
+      healthCategoryLabels: wellness.healthCategoryLabels,
     },
   );
+
+  const careLanes = buildPersonalizedCareLanes({
+    careInterests: wellness.careInterests,
+    healthProfileNotes: healthProfileStepData?.initialHealthProfile?.notes,
+  });
+  const todayLabel = new Intl.DateTimeFormat(locale, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  }).format(new Date());
 
   return (
     <HealthDashboardMain
@@ -77,6 +89,8 @@ export default async function AccountDashboardPage({ params, searchParams }: Pro
       insuranceComplete={wellness.insuranceComplete}
       insuranceProviderName={wellness.insuranceProviderName}
       celebrateOnMount={oliviaCelebrate === '1'}
+      careLanes={careLanes}
+      todayLabel={todayLabel}
       labels={labels}
       nextSubscriptionDate={nextSubscriptionDate}
       ordersHref="/account/orders/"

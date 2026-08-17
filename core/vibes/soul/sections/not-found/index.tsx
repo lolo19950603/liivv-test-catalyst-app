@@ -2,6 +2,7 @@
 
 import { Button } from '@/vibes/soul/primitives/button';
 import { SectionLayout } from '@/vibes/soul/sections/section-layout';
+import { OliviaFigure } from '~/components/olivia/olivia-figure';
 import { useSearch } from '~/lib/search';
 
 export interface NotFoundProps {
@@ -40,6 +41,10 @@ export function NotFound({
   return (
     <SectionLayout className={className} containerSize="2xl">
       <header className="font-[family-name:var(--not-found-font-family,var(--font-family-body))]">
+        <div className="olivia-empty">
+          <span className="olivia-bubble olivia-bubble--center">Hmm. This path grew over.</span>
+          <OliviaFigure alt="Olivia looking around" mood="look" size="lg" />
+        </div>
         <h1 className="mb-3 font-[family-name:var(--not-found-title-font-family,var(--font-family-heading))] text-3xl font-medium leading-none text-[var(--not-found-title,hsl(var(--foreground)))] @xl:text-4xl @4xl:text-5xl">
           {title}
         </h1>

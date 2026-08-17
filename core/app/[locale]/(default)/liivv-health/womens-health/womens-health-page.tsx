@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type TransitionEvent } from 'react';
 
+import { OliviaHelpBand } from '~/components/olivia/olivia-help-band';
 import { GuestCategoryQuiz } from '~/components/onboarding/guest-category-quiz';
 
 import { CHAPTERS as CHAPTER_PAGES, chapterHref } from './chapters/chapters-data';
@@ -1088,9 +1089,11 @@ function HeroLoopVideo({
 export function WomensHealthPage({
   catalog,
   showGuestQuiz = false,
+  isSignedIn = false,
 }: {
   catalog?: WhCatalog;
   showGuestQuiz?: boolean;
+  isSignedIn?: boolean;
 }) {
   const [feelingIndex, setFeelingIndex] = useState(0);
   const [shopRoom, setShopRoom] = useState<ShopRoomId>('all');
@@ -1226,7 +1229,9 @@ export function WomensHealthPage({
         </div>
       </section>
 
-      {showGuestQuiz ? <GuestCategoryQuiz categoryId="womens_health_wellness" /> : null}
+      {showGuestQuiz ? (
+        <GuestCategoryQuiz categoryId="womens_health_wellness" isSignedIn={isSignedIn} />
+      ) : null}
 
       {/* =====================================================================
           SECTION 3 — THREE DOORS (Shop / Care / Chapters)
@@ -1401,6 +1406,15 @@ export function WomensHealthPage({
               Talk to a Pharmacist
             </a>
           </div>
+        </div>
+      </section>
+
+      <section aria-label="Meet Olivia" className="wh-olivia-band rounded-top">
+        <div className="container">
+          <OliviaHelpBand
+            body="After hours — or for shopping, orders, and account how-tos — Olivia is right there in the corner. She does not give medical advice."
+            title="Olivia handles the store side."
+          />
         </div>
       </section>
 

@@ -1,8 +1,14 @@
+import { OliviaFigure } from '~/components/olivia/olivia-figure';
+
 export default function RootNotFound() {
   return (
     <main className="flex flex-1 items-center justify-center font-[family-name:var(--not-found-font-family,var(--font-family-body))]">
       <div className="mx-auto w-full max-w-screen-2xl px-3 py-10 @container @xl:px-6 @4xl:px-20">
         <header className="text-center">
+          <div className="olivia-empty">
+            <span className="olivia-bubble olivia-bubble--center">Hmm. This path grew over.</span>
+            <OliviaFigure alt="Olivia looking around" mood="look" size="lg" />
+          </div>
           <h1 className="mb-3 font-[family-name:var(--not-found-title-font-family,var(--font-family-heading))] text-3xl font-medium leading-none text-[var(--not-found-title,hsl(var(--foreground)))] @xl:text-4xl @4xl:text-5xl">
             Not found
           </h1>

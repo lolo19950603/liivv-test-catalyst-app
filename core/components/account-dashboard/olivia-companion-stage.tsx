@@ -144,6 +144,8 @@ export function OliviaCompanionStage({
   insuranceProviderName,
   hasInsurance,
   mood,
+  layout = 'stage',
+  speechOverride,
   onHotspotEnter,
   onHotspotLeave,
   onOpenHealth,
@@ -156,72 +158,83 @@ export function OliviaCompanionStage({
   insuranceProviderName: string | null;
   hasInsurance: boolean | null;
   mood: OliviaMascotMood;
+  layout?: 'stage' | 'companion';
+  speechOverride?: string | null;
   onHotspotEnter: (side: 'health' | 'insurance') => void;
   onHotspotLeave: () => void;
   onOpenHealth: () => void;
   onOpenInsurance: () => void;
 }) {
   const pose = useOliviaLiveness(mood);
-  const speechLine = useOliviaSpeech(labels, healthComplete, insuranceComplete, mood);
-
-  const healthSummary =
-    healthComplete && healthCategoryLabels.length > 0
-      ? healthCategoryLabels.join(' · ')
-      : null;
+  const idleSpeech = useOliviaSpeech(labels, healthComplete, insuranceComplete, mood);
+  const usingOverride =
+    Boolean(speechOverride) && (mood === 'idle' || mood === 'celebrate');
+  const speechLine = usingOverride ? speechOverride : idleSpeech;
 
   const insuranceSummary = insuranceComplete
     ? insuranceProviderName ||
       (hasInsurance === false ? labels.noCoverageOnFile : null)
     : null;
 
-  return (
-    <section aria-label={labels.stageLabel} className="mhd-olivia-stage">
-      <div className="mhd-olivia-stage__canvas">
-        <button
-          aria-label={labels.healthHotspot}
-          className={
-            healthComplete
-              ? 'mhd-olivia-hotspot mhd-olivia-hotspot--health mhd-olivia-hotspot--done'
-              : 'mhd-olivia-hotspot mhd-olivia-hotspot--health'
-          }
-          onClick={onOpenHealth}
-          onMouseEnter={() => onHotspotEnter('health')}
-          onMouseLeave={onHotspotLeave}
-          type="button"
-        >
-          <span className="mhd-olivia-hotspot__row">
-            <span className="mhd-olivia-hotspot__label">{labels.healthHotspot}</span>
-            <span aria-hidden className="mhd-olivia-hotspot__mark">
-              {healthComplete ? '✓' : '+'}
-            </span>
-          </span>
-          {healthSummary ? (
-            <span className="mhd-olivia-hotspot__summary">{healthSummary}</span>
-          ) : null}
-        </button>
+  const isCompanion = layout === 'companion';
+  const healthButton = (
+    <button
+      aria-label={labels.healthHotspot}
+      className={
+        healthComplete
+          ? `mhd-olivia-hotspot mhd-olivia-hotspot--health mhd-olivia-hotspot--done${isCompanion ? ' mhd-olivia-hotspot--chip' : ''}`
+          : `mhd-olivia-hotspot mhd-olivia-hotspot--health${isCompanion ? ' mhd-olivia-hotspot--chip' : ''}`
+      }
+      onClick={onOpenHealth}
+      onMouseEnter={() => onHotspotEnter('health')}
+      onMouseLeave={onHotspotLeave}
+      type="button"
+    >
+      <span className="mhd-olivia-hotspot__row">
+        <span className="mhd-olivia-hotspot__label">{labels.healthHotspot}</span>
+        <span aria-hidden className="mhd-olivia-hotspot__mark">
+          {healthComplete ? '✓' : '+'}
+        </span>
+      </span>
+    </button>
+  );
+  const insuranceButton = (
+    <button
+      aria-label={labels.insuranceHotspot}
+      className={
+        insuranceComplete
+          ? `mhd-olivia-hotspot mhd-olivia-hotspot--insurance mhd-olivia-hotspot--done${isCompanion ? ' mhd-olivia-hotspot--chip' : ''}`
+          : `mhd-olivia-hotspot mhd-olivia-hotspot--insurance${isCompanion ? ' mhd-olivia-hotspot--chip' : ''}`
+      }
+      onClick={onOpenInsurance}
+      onMouseEnter={() => onHotspotEnter('insurance')}
+      onMouseLeave={onHotspotLeave}
+      type="button"
+    >
+      <span className="mhd-olivia-hotspot__row">
+        <span className="mhd-olivia-hotspot__label">{labels.insuranceHotspot}</span>
+        <span aria-hidden className="mhd-olivia-hotspot__mark">
+          {insuranceComplete ? '✓' : '+'}
+        </span>
+      </span>
+      {insuranceSummary ? (
+        <span className="mhd-olivia-hotspot__summary">{insuranceSummary}</span>
+      ) : null}
+    </button>
+  );
 
-        <button
-          aria-label={labels.insuranceHotspot}
-          className={
-            insuranceComplete
-              ? 'mhd-olivia-hotspot mhd-olivia-hotspot--insurance mhd-olivia-hotspot--done'
-              : 'mhd-olivia-hotspot mhd-olivia-hotspot--insurance'
-          }
-          onClick={onOpenInsurance}
-          onMouseEnter={() => onHotspotEnter('insurance')}
-          onMouseLeave={onHotspotLeave}
-          type="button"
-        >
-          <span className="mhd-olivia-hotspot__row">
-            <span className="mhd-olivia-hotspot__label">{labels.insuranceHotspot}</span>
-            <span aria-hidden className="mhd-olivia-hotspot__mark">
-              {insuranceComplete ? '✓' : '+'}
-            </span>
-          </span>
-          {insuranceSummary ? (
-            <span className="mhd-olivia-hotspot__summary">{insuranceSummary}</span>
-          ) : null}
-        </button>
+  return (
+    <section
+      aria-label={labels.stageLabel}
+      className={isCompanion ? 'mhd-olivia-stage mhd-olivia-stage--companion' : 'mhd-olivia-stage'}
+    >
+      <div className="mhd-olivia-stage__canvas">
+        {isCompanion ? null : (
+          <>
+            {healthButton}
+            {insuranceButton}
+          </>
+        )}
 
         <div className="mhd-olivia-mascot" data-mood={mood} data-pose={pose}>
           <div className="mhd-olivia-bubble-anchor">
@@ -243,7 +256,7 @@ export function OliviaCompanionStage({
                   fill
                   key={frame.id}
                   priority
-                  sizes="(max-width: 720px) 78vw, 352px"
+                  sizes={isCompanion ? '(max-width: 720px) 56vw, 280px' : '(max-width: 720px) 78vw, 352px'}
                   src={frame.src}
                 />
               ))}
@@ -251,6 +264,12 @@ export function OliviaCompanionStage({
           </div>
         </div>
       </div>
+      {isCompanion ? (
+        <div className="mhd-olivia-stage__chips">
+          {healthButton}
+          {insuranceButton}
+        </div>
+      ) : null}
     </section>
   );
 }

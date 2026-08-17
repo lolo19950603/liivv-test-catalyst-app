@@ -1,5 +1,7 @@
 'use client';
 
+import { OliviaHelpBand } from '~/components/olivia/olivia-help-band';
+
 import {
   HEALTH_HUB_DOORS,
   HEALTH_HUB_MARQUEE,
@@ -242,6 +244,16 @@ export function LiivvHealthPage({ featuredKits }: Props) {
               Talk to a pharmacist
             </a>
           </div>
+        </div>
+      </section>
+
+      {/* SECTION 6b — OLIVIA */}
+      <section aria-label="Meet Olivia" className="lh-hub-olivia rounded-top" id="olivia">
+        <div className="container" data-reveal>
+          <OliviaHelpBand
+            body="Between pharmacist hours — or when you just need a product, an order status, or an account how-to — Olivia is the sprout in the corner. She does not give medical advice."
+            title="Olivia keeps the store lights on"
+          />
         </div>
       </section>
 

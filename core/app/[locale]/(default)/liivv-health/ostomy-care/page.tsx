@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
-import { isLoggedIn } from '~/auth';
 import { locales } from '~/i18n/locales';
+import { shouldShowLandingQuiz } from '~/lib/onboarding/should-show-landing-quiz';
 
 import { getOcCatalog } from './get-oc-catalog';
 import { OstomyCarePage } from './ostomy-care-page';
@@ -27,7 +27,7 @@ export default async function Page({ params }: Props) {
   setRequestLocale(locale);
 
   const catalog = await getOcCatalog(locale);
-  const showGuestQuiz = !(await isLoggedIn());
+  const { showQuiz, isSignedIn } = await shouldShowLandingQuiz('ostomy_care_everyday');
 
-  return <OstomyCarePage catalog={catalog} showGuestQuiz={showGuestQuiz} />;
+  return <OstomyCarePage catalog={catalog} isSignedIn={isSignedIn} showGuestQuiz={showQuiz} />;
 }

@@ -51,6 +51,7 @@ export function buildDashboardLabels(
   options: {
     customerFirstName: string;
     primaryCategoryId?: string;
+    healthCategoryLabels?: string[];
   },
 ): AccountDashboardLabels {
   const dailyTips = resolveDailyTips(t, options.primaryCategoryId);
@@ -59,6 +60,7 @@ export function buildDashboardLabels(
         options.primaryCategoryId as LiivPrimaryCategoryId,
       ) as { shortLabel: string; label: string })
     : null;
+  const welcomeLead = t('wellness.welcomeLead');
 
   return {
     signOut: t('signOut'),
@@ -89,7 +91,7 @@ export function buildDashboardLabels(
     },
     wellness: {
       greeting: t('wellness.greeting', { name: options.customerFirstName }),
-      welcomeLead: t('wellness.welcomeLead'),
+      welcomeLead,
       hero: {
         basedOnSelection: t('wellness.hero.basedOnSelection'),
         title:
@@ -151,6 +153,21 @@ export function buildDashboardLabels(
           t('wellness.olivia.talkDone.1'),
           t('wellness.olivia.talkDone.2'),
         ],
+      },
+      care: {
+        switcherLabel: t('wellness.care.switcherLabel'),
+        todayFocus: t('wellness.care.todayFocus'),
+        yourSnapshot: t('wellness.care.yourSnapshot'),
+        snapshotEmpty: t('wellness.care.snapshotEmpty'),
+        comingSoon: t('wellness.care.comingSoon'),
+        comingSoonBody: t('wellness.care.comingSoonBody'),
+        editProfile: t('wellness.care.editProfile'),
+        emptyTitle: t('wellness.care.emptyTitle'),
+        emptyBody: t('wellness.care.emptyBody'),
+        emptyCta: t('wellness.care.emptyCta'),
+        nextSteps: t('wellness.care.nextSteps'),
+        basedOn: t('wellness.care.basedOn'),
+        companionHint: t('wellness.care.companionHint'),
       },
       actionCenter: {
         subscriptionTitle: t('wellness.actionCenter.subscriptionTitle'),

@@ -3,7 +3,8 @@
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Spinner } from '@/vibes/soul/primitives/spinner';
+import { OliviaFigure } from '~/components/olivia/olivia-figure';
+import { OliviaSpinner } from '~/components/olivia/olivia-spinner';
 
 /** Delay before showing so fast navigations never flash a progress UI. */
 const SHOW_DELAY_MS = 400;
@@ -205,8 +206,7 @@ export function NavigationLoadingOverlay() {
         className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-4 bg-[#faf8f3]/90"
         role="status"
       >
-        <Spinner loadingAriaLabel="Loading page" size="md" />
-        <p className="text-sm text-[#6b6560]">Loading page…</p>
+        <OliviaSpinner caption="Olivia is fetching that…" />
       </div>
     );
   }
@@ -218,16 +218,15 @@ export function NavigationLoadingOverlay() {
       className="pointer-events-none fixed inset-x-0 top-0 z-[100]"
       role="status"
     >
-      <span className="sr-only">Loading page…</span>
-      <div className="h-0.5 w-full overflow-hidden bg-[#e0d9ce]/80">
-        <div className="h-full w-1/3 animate-[nav-progress_1.1s_ease-in-out_infinite] bg-[#6b7f5c]" />
+      <span className="sr-only">Olivia is fetching that…</span>
+      <div className="olivia-nav-runner">
+        <div className="olivia-nav-runner__track">
+          <div className="olivia-nav-runner__bar" />
+        </div>
+        <div className="olivia-nav-runner__mascot">
+          <OliviaFigure alt="" mood="loading" size="xs" />
+        </div>
       </div>
-      <style>{`
-        @keyframes nav-progress {
-          0% { transform: translateX(-120%); }
-          100% { transform: translateX(400%); }
-        }
-      `}</style>
     </div>
   );
 }

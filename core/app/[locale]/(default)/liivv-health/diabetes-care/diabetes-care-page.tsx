@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
+import { OliviaHelpBand } from '~/components/olivia/olivia-help-band';
 import { GuestCategoryQuiz } from '~/components/onboarding/guest-category-quiz';
 import { KitFlowDemo } from '~/components/kit-flow-demo/kit-flow-demo';
 
@@ -168,9 +169,11 @@ function hasDisplayPrice(priceLabel?: string) {
 export function DiabetesCarePage({
   catalog,
   showGuestQuiz = false,
+  isSignedIn = false,
 }: {
   catalog?: DcCatalog;
   showGuestQuiz?: boolean;
+  isSignedIn?: boolean;
 }) {
   const [shopRoom, setShopRoom] = useState<ShopRoomId>('all');
 
@@ -232,7 +235,9 @@ export function DiabetesCarePage({
         </div>
       </section>
 
-      {showGuestQuiz ? <GuestCategoryQuiz categoryId="diabetes_care_everyday" /> : null}
+      {showGuestQuiz ? (
+        <GuestCategoryQuiz categoryId="diabetes_care_everyday" isSignedIn={isSignedIn} />
+      ) : null}
 
       <section aria-label="Liivv Diabetes community notes" className="dc-stats">
         <div className="dc-wrap">
@@ -436,6 +441,12 @@ export function DiabetesCarePage({
                 Talk to a Pharmacist
               </a>
             </div>
+          </div>
+          <div className="dc-olivia-band">
+            <OliviaHelpBand
+              body="Olivia can find supplies, check an order, or walk you through your account — anytime. She does not give medical advice."
+              title="Shopping questions? Wave at Olivia."
+            />
           </div>
         </div>
       </section>

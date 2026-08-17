@@ -730,6 +730,10 @@
   padding: 2rem 0 4rem;
 }
 
+#ostomy-care .oc-olivia-band {
+  margin-top: 1.75rem;
+}
+
 #ostomy-care .oc-care-panel {
   display: grid;
   grid-template-columns: 1.1fr 1fr;

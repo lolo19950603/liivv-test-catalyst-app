@@ -302,6 +302,7 @@
       "wellness": {
         "greeting": "Hi {name},",
         "welcomeLead": "Let's focus on your Liivv wellness journey.",
+        "welcomeLeadPersonalized": "Your home for {paths}.",
         "hero": {
           "basedOnSelection": "Based on your onboarding selection",
           "title": "Your wellness",
@@ -383,6 +384,21 @@
             "1": "Looking good — your dashboard is ready to work harder for you.",
             "2": "Nice work. I'm here if anything changes."
           }
+        },
+        "care": {
+          "switcherLabel": "Your care paths",
+          "todayFocus": "Today's focus",
+          "yourSnapshot": "Your snapshot",
+          "snapshotEmpty": "Add a few details and this path gets more specific.",
+          "comingSoon": "Coming soon",
+          "comingSoonBody": "We're still composing this story. Olivia will keep the lane warm until it opens.",
+          "editProfile": "Edit health profile",
+          "emptyTitle": "Tell Olivia what you need",
+          "emptyBody": "Choose the care paths that matter and this home will fill in around you — tips, chapters, and a quieter shop door.",
+          "emptyCta": "Start your health profile",
+          "nextSteps": "Helpful next steps",
+          "basedOn": "Based on your health profile",
+          "companionHint": "Tap a path, or edit health and insurance anytime."
         },
         "actionCenter": {
           "subscriptionTitle": "Your Next Subscription",

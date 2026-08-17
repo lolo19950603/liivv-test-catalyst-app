@@ -96,6 +96,21 @@ export interface AccountDashboardLabels {
       talkIdle: string[];
       talkDone: string[];
     };
+    care: {
+      switcherLabel: string;
+      todayFocus: string;
+      yourSnapshot: string;
+      snapshotEmpty: string;
+      comingSoon: string;
+      comingSoonBody: string;
+      editProfile: string;
+      emptyTitle: string;
+      emptyBody: string;
+      emptyCta: string;
+      nextSteps: string;
+      basedOn: string;
+      companionHint: string;
+    };
     actionCenter: {
       subscriptionTitle: string;
       subscriptionManage: string;

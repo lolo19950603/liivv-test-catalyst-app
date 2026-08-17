@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import { stashGuestHealthAnswers } from '~/app/[locale]/(default)/liivv-health/_actions/stash-guest-health-answers';
+import { saveSignedInLandingQuiz } from '~/app/[locale]/(default)/liivv-health/_actions/save-signed-in-landing-quiz';
 import oliviaIdle from '~/components/account-dashboard/olivia-mascot.png';
 import oliviaBlink from '~/components/account-dashboard/olivia-mascot-blink.png';
 import oliviaHi from '~/components/account-dashboard/olivia-mascot-hi.png';
@@ -21,6 +22,7 @@ import './guest-category-quiz.css';
 
 type GuestCategoryQuizProps = {
   categoryId: LandingHealthCategoryId;
+  isSignedIn?: boolean;
 };
 
 type OliviaPose = 'idle' | 'blink' | 'wave' | 'hi';
@@ -143,7 +145,7 @@ function oliviaCaption(pose: OliviaPose, submitting: boolean, isLast: boolean) {
   return 'Take your time — no wrong answers.';
 }
 
-export function GuestCategoryQuiz({ categoryId }: GuestCategoryQuizProps) {
+export function GuestCategoryQuiz({ categoryId, isSignedIn = false }: GuestCategoryQuizProps) {
   const router = useRouter();
   const questions = LANDING_CATEGORY_QUESTIONNAIRES[categoryId];
   const meta = getLandingCategoryMeta(categoryId);
@@ -153,6 +155,7 @@ export function GuestCategoryQuiz({ categoryId }: GuestCategoryQuizProps) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reactToken, setReactToken] = useState(0);
+  const [saved, setSaved] = useState(false);
   const { pose, mood } = useQuizOlivia(reactToken, submitting);
 
   const question = questions[step];
@@ -180,7 +183,7 @@ export function GuestCategoryQuiz({ categoryId }: GuestCategoryQuizProps) {
     setReactToken((token) => token + 1);
   };
 
-  if (!question) {
+  if (!question || saved) {
     return null;
   }
 
@@ -195,11 +198,19 @@ export function GuestCategoryQuiz({ categoryId }: GuestCategoryQuizProps) {
     setSubmitting(true);
     setError(null);
 
-    const result = await stashGuestHealthAnswers({ categoryId, responses });
+    const result = isSignedIn
+      ? await saveSignedInLandingQuiz({ categoryId, responses })
+      : await stashGuestHealthAnswers({ categoryId, responses });
 
     if (!result.ok) {
       setError(result.error);
       setSubmitting(false);
+      return;
+    }
+
+    if (isSignedIn) {
+      setSaved(true);
+      router.refresh();
       return;
     }
 
@@ -245,7 +256,11 @@ export function GuestCategoryQuiz({ categoryId }: GuestCategoryQuizProps) {
           <div className="guest-category-quiz-main">
             <p className="guest-category-quiz-kicker">{welcome.kicker}</p>
             <h2 className="guest-category-quiz-title">{welcome.title}</h2>
-            <p className="guest-category-quiz-lead">{welcome.lead}</p>
+            <p className="guest-category-quiz-lead">
+              {isSignedIn
+                ? 'A few quiet questions — then we will add this category to your health profile. No rush. No wrong answers.'
+                : welcome.lead}
+            </p>
 
             <div aria-hidden className="guest-category-quiz-steps">
               {questions.map((_, index) => (
@@ -308,7 +323,9 @@ export function GuestCategoryQuiz({ categoryId }: GuestCategoryQuizProps) {
                 {isLast
                   ? submitting
                     ? 'Saving your place…'
-                    : "That's me — create my profile"
+                    : isSignedIn
+                      ? 'Save to my health profile'
+                      : "That's me — create my profile"
                   : 'Keep going'}
               </button>
             </div>
