@@ -9,7 +9,9 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { schema } from '@/vibes/soul/sections/sign-in-section/schema';
 import { signIn } from '~/auth';
 import { redirect } from '~/i18n/routing';
+import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
 import { getCartId } from '~/lib/cart';
+import { applyPendingGuestHealthProfile } from '~/lib/onboarding/apply-pending-guest-health-profile';
 
 export const login = async (
   { redirectTo }: { redirectTo: string },
@@ -64,6 +66,12 @@ export const login = async (
     }
 
     return submission.reply({ formErrors: [t('somethingWentWrong')] });
+  }
+
+  const customer = await getOnboardingCustomer();
+
+  if (customer) {
+    await applyPendingGuestHealthProfile(customer);
   }
 
   return redirect({ href: redirectTo, locale });

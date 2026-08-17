@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type TransitionEvent } from 'react';
 
+import { GuestCategoryQuiz } from '~/components/onboarding/guest-category-quiz';
+
 import { CHAPTERS as CHAPTER_PAGES, chapterHref } from './chapters/chapters-data';
 import type { WhCatalog, WhCatalogItem } from './get-wh-catalog';
 import { useWhMotion } from './use-wh-motion';
@@ -1083,7 +1085,13 @@ function HeroLoopVideo({
   );
 }
 
-export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
+export function WomensHealthPage({
+  catalog,
+  showGuestQuiz = false,
+}: {
+  catalog?: WhCatalog;
+  showGuestQuiz?: boolean;
+}) {
   const [feelingIndex, setFeelingIndex] = useState(0);
   const [shopRoom, setShopRoom] = useState<ShopRoomId>('all');
   const { reduceMotion, rootClassName } = useWhMotion('womens-health');
@@ -1217,6 +1225,8 @@ export function WomensHealthPage({ catalog }: { catalog?: WhCatalog }) {
           ))}
         </div>
       </section>
+
+      {showGuestQuiz ? <GuestCategoryQuiz categoryId="womens_health_wellness" /> : null}
 
       {/* =====================================================================
           SECTION 3 — THREE DOORS (Shop / Care / Chapters)

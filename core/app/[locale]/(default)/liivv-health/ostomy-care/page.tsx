@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
+import { isLoggedIn } from '~/auth';
 import { locales } from '~/i18n/locales';
 
 import { getOcCatalog } from './get-oc-catalog';
@@ -11,7 +12,7 @@ interface Props {
 }
 
 export const metadata: Metadata = {
-  title: 'Ostomy Care and Everyday Liivving | Liivv',
+  title: 'Ostomy Care & Everyday "LIIVVing" | Liivv',
   description:
     'Ostomy supplies, everyday living support, and kind guidance — pouches, barriers, curated kits, and Ontario pharmacist chat.',
 };
@@ -26,6 +27,7 @@ export default async function Page({ params }: Props) {
   setRequestLocale(locale);
 
   const catalog = await getOcCatalog(locale);
+  const showGuestQuiz = !(await isLoggedIn());
 
-  return <OstomyCarePage catalog={catalog} />;
+  return <OstomyCarePage catalog={catalog} showGuestQuiz={showGuestQuiz} />;
 }

@@ -11,7 +11,7 @@ export const HEALTH_TEASER_LINKS = [
   {
     id: 'diabetes',
     label: 'Diabetes Care',
-    href: '/pages/diabetes-care',
+    href: '/liivv-health/diabetes-care',
     image: '/archive/liivv-home/corner-diabetes.png',
   },
   {

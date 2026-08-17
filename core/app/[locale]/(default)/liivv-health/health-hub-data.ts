@@ -30,7 +30,7 @@ export const HEALTH_HUB_DOORS: HealthHubDoor[] = [
   {
     id: 'ostomy_care_everyday',
     label: 'Live',
-    title: 'Ostomy Care & Everyday Living',
+    title: 'Ostomy Care & Everyday "LIIVVing"',
     body: 'Supplies, kits, and kind guidance for every day.',
     image: `${IMG}/corner-ostomy.png`,
     href: '/liivv-health/ostomy-care',
@@ -39,10 +39,10 @@ export const HEALTH_HUB_DOORS: HealthHubDoor[] = [
   {
     id: 'diabetes_care_everyday',
     label: 'Live',
-    title: 'Diabetes Care & Everyday Living',
+    title: 'Diabetes Care & Everyday "LIIVVing"',
     body: 'A specialized journey for living well with diabetes.',
     image: `${IMG}/corner-diabetes.png`,
-    href: '/pages/diabetes-care',
+    href: '/liivv-health/diabetes-care',
     status: 'live',
   },
   {
@@ -122,8 +122,8 @@ export const HEALTH_HUB_DOORS: HealthHubDoor[] = [
 /** Marquee labels — all eleven care verticals. */
 export const HEALTH_HUB_MARQUEE = [
   "Women's Health & Wellness",
-  'Ostomy Care & Everyday Living',
-  'Diabetes Care & Everyday Living',
+  'Ostomy Care & Everyday "LIIVVing"',
+  'Diabetes Care & Everyday "LIIVVing"',
   'Sleep & Rest',
   'Healing & Advanced Wound Care',
   'Personal Care & Confidence',
@@ -148,7 +148,7 @@ export const HEALTH_HUB_STORY_LINKS = [
   {
     id: 'diabetes',
     label: 'Diabetes Care',
-    href: '/pages/diabetes-care',
+    href: '/liivv-health/diabetes-care',
   },
 ] as const;
 

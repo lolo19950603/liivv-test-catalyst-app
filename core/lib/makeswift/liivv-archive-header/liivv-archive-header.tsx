@@ -1249,14 +1249,30 @@ export function LiivvArchiveHeader({
                 <ul className="list-menu with-block flex flex-wrap" role="list">
                   {links.map((item, index) => {
                     const hasMegaMenu = (item.columns?.length ?? 0) > 0;
+                    const isCompactMenu = Boolean(item.compactMenu) && hasMegaMenu;
                     const menuId = `${mobileNavId}-mega-${index}`;
                     const isExpanded = activeMegaIndex === index;
+                    const compactLinks = isCompactMenu
+                      ? (item.columns ?? []).flatMap((column) => column.links)
+                      : [];
 
                     return (
                       <li
                         aria-controls={hasMegaMenu ? menuId : undefined}
                         aria-expanded={hasMegaMenu ? isExpanded : undefined}
                         key={`${item.label}-${index}`}
+                        onMouseEnter={() => {
+                          if (hasMegaMenu) {
+                            openMegaMenu(index);
+                          } else {
+                            closeMegaMenu();
+                          }
+                        }}
+                        onMouseLeave={() => {
+                          if (isCompactMenu) {
+                            scheduleCloseMegaMenu();
+                          }
+                        }}
                       >
                         <NavMenuTrigger
                           hasMegaMenu={hasMegaMenu}
@@ -1272,6 +1288,25 @@ export function LiivvArchiveHeader({
                             }
                           }}
                         />
+                        {isCompactMenu ? (
+                          <ul
+                            className={clsx('header-compact-menu', isExpanded && 'is-open')}
+                            id={menuId}
+                            role="list"
+                          >
+                            {compactLinks.map((link) => (
+                              <li key={link.href}>
+                                <Link
+                                  className="header-compact-menu__link"
+                                  href={link.href}
+                                  onClick={preventBuilderNavigation}
+                                >
+                                  {link.label}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null}
                       </li>
                     );
                   })}
@@ -1359,7 +1394,7 @@ export function LiivvArchiveHeader({
           const hasMegaMenu = (item.columns?.length ?? 0) > 0;
           const menuId = `${mobileNavId}-mega-${index}`;
 
-          if (!hasMegaMenu) {
+          if (!hasMegaMenu || item.compactMenu) {
             return null;
           }
 

@@ -516,7 +516,7 @@ function CartKitSection({
   deleteLineItemLabel?: string;
 }) {
   const t = useTranslations('Cart');
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const itemCount = lineItems.reduce((total, item) => total + item.quantity, 0);
   const previewImages = lineItems.filter((item) => item.image).slice(0, 4);
   const title = kitName?.trim() || t('kitSection.fallbackName', { kitId });

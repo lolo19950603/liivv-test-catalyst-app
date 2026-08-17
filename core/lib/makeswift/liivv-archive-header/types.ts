@@ -30,6 +30,8 @@ export interface LiivvArchiveNavLink {
     alt: string;
   } | null;
   columns?: LiivvArchiveNavColumn[];
+  /** Compact text dropdown under the item (not the full-width mega menu). */
+  compactMenu?: boolean;
 }
 
 export interface LiivvArchiveHeaderLogo {

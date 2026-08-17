@@ -2,9 +2,10 @@ import { cache } from 'react';
 
 import { getCustomerAddresses } from '~/app/[locale]/(default)/account/addresses/page-data';
 import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
+import { applyPendingGuestHealthProfile } from '~/lib/onboarding/apply-pending-guest-health-profile';
 import { resolveInitialHealthCategoriesWithRank } from '~/lib/onboarding/liiv-primary-health-category';
 import { getHealthProfileByProfileId } from '~/lib/supabase/health-profile';
-import { ensureCustomerProfile } from '~/lib/supabase/profile';
+import { ensureCustomerProfile, getCustomerProfileByBigCommerceId } from '~/lib/supabase/profile';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 
 export const getHealthProfileStepData = cache(async () => {
@@ -42,16 +43,20 @@ export const getHealthProfileStepData = cache(async () => {
     };
   }
 
-  const healthProfile = await getHealthProfileByProfileId(ensured.profile.id);
+  await applyPendingGuestHealthProfile(customer);
+
+  const profile =
+    (await getCustomerProfileByBigCommerceId(String(customer.entityId))) ?? ensured.profile;
+  const healthProfile = await getHealthProfileByProfileId(profile.id);
 
   return {
     customer,
     supabaseReady: true,
     isOntario,
-    initialCategories: resolveInitialHealthCategoriesWithRank(ensured.profile.care_interests).map(
+    initialCategories: resolveInitialHealthCategoriesWithRank(profile.care_interests).map(
       (row) => row.id,
     ),
     initialHealthProfile: healthProfile,
-    profileId: ensured.profile.id,
+    profileId: profile.id,
   };
 });

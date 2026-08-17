@@ -433,16 +433,21 @@
                 },
                 "olivia": {
                     "stageLabel": "Configurez votre profil Liivv avec Olivia",
-                    "healthHotspot": "Complétez votre profil de santé",
-                    "insuranceHotspot": "Ajoutez votre assurance",
+                    "healthHotspot": "Profil de santé",
+                    "insuranceHotspot": "Assurance",
+                    "setupEyebrow": "Avec Olivia",
+                    "setupTitle": "Votre configuration santé",
+                    "healthHint": "Personnalisez vos recommandations",
+                    "insuranceHint": "Ajoutez votre couverture au besoin",
                     "later": "Je le ferai plus tard",
                     "laterChip": "Olivia a quelques choses pour vous",
                     "healthSheetTitle": "Profil de santé",
                     "insuranceSheetTitle": "Assurance",
                     "closeSheet": "Fermer",
                     "mascotAlt": "Olivia, la mascotte Liivv",
-                    "insuranceDescription": "Ajoutez vos informations de couverture ou passez pour l'instant. Vous pourrez les modifier plus tard.",
+                    "insuranceDescription": "Ajoutez votre couverture ou passez pour l'instant — vous pourrez toujours la modifier plus tard.",
                     "noInsurance": "Je n'ai pas d'assurance",
+                    "noCoverageOnFile": "Aucune couverture enregistrée",
                     "providerName": "Assureur",
                     "policyNumber": "Numéro de police",
                     "memberId": "Numéro de membre",
@@ -451,7 +456,27 @@
                     "relationship": "Lien avec le titulaire principal",
                     "skip": "Passer pour l'instant",
                     "saveInsurance": "Enregistrer",
-                    "savingInsurance": "Enregistrement de l'assurance..."
+                    "savingInsurance": "Enregistrement de l'assurance...",
+                    "talkHealth": {
+                        "0": "Un petit profil de santé débloque des soins vraiment adaptés à vous.",
+                        "1": "Parlez-moi un peu de vous — je peaufinerai vos suggestions.",
+                        "2": "Ça ne prendra pas longtemps. Votre futur vous dira merci."
+                    },
+                    "talkInsurance": {
+                        "0": "Vous avez une couverture ? Notons-la ensemble.",
+                        "1": "On collabore avec plein d'assureurs — on garde ça simple.",
+                        "2": "Une assurance au dossier, c'est moins de surprises plus tard."
+                    },
+                    "talkIdle": {
+                        "0": "Bonjour — je suis Olivia, votre complice Liivv.",
+                        "1": "Touchez un côté quand vous êtes prêt·e. Je vous encourage.",
+                        "2": "Pas de précipitation. Excellente posture, patience illimitée."
+                    },
+                    "talkDone": {
+                        "0": "Tout est prêt. Touchez un côté pour ajuster quand vous voulez.",
+                        "1": "Super — votre tableau de bord peut travailler plus fort pour vous.",
+                        "2": "Beau travail. Je suis là si quelque chose change."
+                    }
                 },
                 "actionCenter": {
                     "subscriptionTitle": "Votre prochaine abonnement",

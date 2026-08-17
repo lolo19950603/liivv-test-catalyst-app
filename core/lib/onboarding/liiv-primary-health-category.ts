@@ -10,7 +10,7 @@ export type InterestFlags = {
 export const LIIV_PRIMARY_HEALTH_CATEGORIES = [
   {
     id: 'diabetes_care_everyday',
-    label: 'Diabetes Care and Everyday Living',
+    label: 'Diabetes Care & Everyday "LIIVVing"',
     shortLabel: 'Diabetes Care',
     imageEmoji: '🩸',
     pageLink: '',
@@ -18,7 +18,7 @@ export const LIIV_PRIMARY_HEALTH_CATEGORIES = [
   },
   {
     id: 'ostomy_care_everyday',
-    label: 'Ostomy Care & Everyday Living',
+    label: 'Ostomy Care & Everyday "LIIVVing"',
     shortLabel: 'Ostomy Care',
     imageEmoji: '🩹',
     pageLink: '',

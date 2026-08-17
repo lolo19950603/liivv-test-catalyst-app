@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
 import type { CategoryCard, Chapter } from './chapters-data';
 import { CHAPTERS, LANDING_HREF, chapterHref, getChapterNeighbors } from './chapters-data';
 
@@ -50,22 +48,10 @@ function CategoryRow({ card, index }: { card: CategoryCard; index: number }) {
 export function ChapterPage({ chapter }: { chapter: Chapter }) {
   const { prev, next } = getChapterNeighbors(chapter.slug);
   const nextHref = next ? chapterHref(next.slug) : `${LANDING_HREF}#where-are-you`;
-  const [scrolled, setScrolled] = useState(false);
   const chapterIndex = CHAPTERS.findIndex((item) => item.slug === chapter.slug);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   return (
     <div id="oc-chapter" style={{ ['--chapter-accent' as string]: chapter.accent }}>
-      <a className={`oc-ch-back${scrolled ? ' is-scrolled' : ''}`} href={LANDING_HREF}>
-        ← Ostomy Care
-      </a>
-
       <section className="oc-ch-hero">
         <div className="oc-ch-hero-bg">
           <img alt="" decoding="async" src={chapter.heroImage} />
@@ -196,7 +182,7 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
           <p>{chapter.closing.body}</p>
           <div className="oc-ch-close-cta">
             <a className="oc-ch-btn oc-ch-btn-soft" href={LANDING_HREF}>
-              Back to Ostomy Care
+              Back to Ostomy Care page
             </a>
             <a className="oc-ch-btn oc-ch-btn-ghost-light" href={nextHref}>
               {chapter.nextLabel}

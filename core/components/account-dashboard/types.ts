@@ -69,6 +69,10 @@ export interface AccountDashboardLabels {
       stageLabel: string;
       healthHotspot: string;
       insuranceHotspot: string;
+      setupEyebrow: string;
+      setupTitle: string;
+      healthHint: string;
+      insuranceHint: string;
       later: string;
       laterChip: string;
       healthSheetTitle: string;
@@ -77,6 +81,7 @@ export interface AccountDashboardLabels {
       mascotAlt: string;
       insuranceDescription: string;
       noInsurance: string;
+      noCoverageOnFile: string;
       providerName: string;
       policyNumber: string;
       memberId: string;
@@ -86,6 +91,10 @@ export interface AccountDashboardLabels {
       skip: string;
       saveInsurance: string;
       savingInsurance: string;
+      talkHealth: string[];
+      talkInsurance: string[];
+      talkIdle: string[];
+      talkDone: string[];
     };
     actionCenter: {
       subscriptionTitle: string;

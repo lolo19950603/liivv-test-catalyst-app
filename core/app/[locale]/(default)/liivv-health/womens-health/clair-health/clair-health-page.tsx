@@ -436,20 +436,12 @@ export function ClairHealthPage() {
   const locale = useLocale();
   const copy = getClairCopy(locale);
   const stages = copy.stages.cards;
-  const [scrolled, setScrolled] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [activeStage, setActiveStage] = useState(0);
   const [stagesPaused, setStagesPaused] = useState(false);
   const stagesLayoutRef = useRef<HTMLDivElement>(null);
   const stageCardRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const { rootClassName } = useWhMotion('clair-health');
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   useEffect(() => {
     if (stagesPaused) return;
@@ -470,10 +462,6 @@ export function ClairHealthPage() {
 
   return (
     <div className={rootClassName} id="clair-health">
-      <a className={`clair-back${scrolled ? ' is-scrolled' : ''}`} href={WOMEN_HREF}>
-        {copy.back}
-      </a>
-
       <ScrollFrameHero hero={copy.hero} />
 
       <aside className="clair-notice" data-reveal>

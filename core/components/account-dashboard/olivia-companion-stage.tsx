@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Image } from '~/components/image';
 
@@ -19,6 +19,18 @@ const POSES: Array<{ id: OliviaPose; src: typeof oliviaIdle }> = [
   { id: 'hi', src: oliviaHi },
 ];
 
+type OliviaStageLabels = {
+  stageLabel: string;
+  healthHotspot: string;
+  insuranceHotspot: string;
+  mascotAlt: string;
+  noCoverageOnFile: string;
+  talkHealth: string[];
+  talkInsurance: string[];
+  talkIdle: string[];
+  talkDone: string[];
+};
+
 function useOliviaLiveness(mood: OliviaMascotMood): OliviaPose {
   const [pose, setPose] = useState<OliviaPose>('idle');
 
@@ -28,12 +40,7 @@ function useOliviaLiveness(mood: OliviaMascotMood): OliviaPose {
       return;
     }
 
-    if (mood === 'bounce') {
-      setPose('wave');
-      return;
-    }
-
-    if (mood === 'looking-health' || mood === 'looking-insurance') {
+    if (mood === 'bounce' || mood === 'looking-health' || mood === 'looking-insurance') {
       setPose('wave');
       return;
     }
@@ -50,7 +57,9 @@ function useOliviaLiveness(mood: OliviaMascotMood): OliviaPose {
       timers.push(id);
     };
 
-    const rest = () => {
+    // Ambient life is blink-only. Wave/hi frames are not pixel-aligned with idle,
+    // so swapping them in the idle loop causes visible stutter.
+    const scheduleBlink = () => {
       if (cancelled) return;
       later(() => {
         if (cancelled) return;
@@ -58,41 +67,13 @@ function useOliviaLiveness(mood: OliviaMascotMood): OliviaPose {
         later(() => {
           if (cancelled) return;
           setPose('idle');
-          const continueIdle = () => {
-            if (cancelled) return;
-            if (Math.random() < 0.48) {
-              later(() => {
-                if (cancelled) return;
-                setPose('wave');
-                later(() => {
-                  if (cancelled) return;
-                  setPose('idle');
-                  rest();
-                }, 780);
-              }, 240);
-            } else {
-              rest();
-            }
-          };
-
-          if (Math.random() < 0.28) {
-            later(() => {
-              if (cancelled) return;
-              setPose('blink');
-              later(() => {
-                if (cancelled) return;
-                setPose('idle');
-                continueIdle();
-              }, 120);
-            }, 150);
-          } else {
-            continueIdle();
-          }
-        }, 150);
-      }, 1400 + Math.random() * 2400);
+          scheduleBlink();
+        }, 140);
+      }, 2200 + Math.random() * 2800);
     };
 
-    rest();
+    setPose('idle');
+    scheduleBlink();
 
     return () => {
       cancelled = true;
@@ -103,24 +84,77 @@ function useOliviaLiveness(mood: OliviaMascotMood): OliviaPose {
   return pose;
 }
 
+function buildTalkPool(
+  labels: OliviaStageLabels,
+  healthComplete: boolean,
+  insuranceComplete: boolean,
+  mood: OliviaMascotMood,
+): string[] {
+  if (mood === 'looking-health' && !healthComplete) {
+    return labels.talkHealth;
+  }
+  if (mood === 'looking-insurance' && !insuranceComplete) {
+    return labels.talkInsurance;
+  }
+  if (mood === 'celebrate' || (healthComplete && insuranceComplete)) {
+    return [...labels.talkDone, ...labels.talkIdle];
+  }
+
+  const pool: string[] = [...labels.talkIdle];
+  if (!healthComplete) pool.push(...labels.talkHealth);
+  if (!insuranceComplete) pool.push(...labels.talkInsurance);
+  return pool;
+}
+
+function useOliviaSpeech(
+  labels: OliviaStageLabels,
+  healthComplete: boolean,
+  insuranceComplete: boolean,
+  mood: OliviaMascotMood,
+): string {
+  const pool = useMemo(
+    () => buildTalkPool(labels, healthComplete, insuranceComplete, mood),
+    [labels, healthComplete, insuranceComplete, mood],
+  );
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    setIndex(0);
+  }, [pool]);
+
+  useEffect(() => {
+    if (pool.length <= 1) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const id = window.setInterval(() => {
+      setIndex((current) => (current + 1) % pool.length);
+    }, 4500);
+
+    return () => window.clearInterval(id);
+  }, [pool]);
+
+  return pool[index % Math.max(pool.length, 1)] ?? labels.talkIdle[0] ?? '';
+}
+
 export function OliviaCompanionStage({
   labels,
   healthComplete,
+  healthCategoryLabels,
   insuranceComplete,
+  insuranceProviderName,
+  hasInsurance,
   mood,
   onHotspotEnter,
   onHotspotLeave,
   onOpenHealth,
   onOpenInsurance,
 }: {
-  labels: {
-    stageLabel: string;
-    healthHotspot: string;
-    insuranceHotspot: string;
-    mascotAlt: string;
-  };
+  labels: OliviaStageLabels;
   healthComplete: boolean;
+  healthCategoryLabels: string[];
   insuranceComplete: boolean;
+  insuranceProviderName: string | null;
+  hasInsurance: boolean | null;
   mood: OliviaMascotMood;
   onHotspotEnter: (side: 'health' | 'insurance') => void;
   onHotspotLeave: () => void;
@@ -128,6 +162,17 @@ export function OliviaCompanionStage({
   onOpenInsurance: () => void;
 }) {
   const pose = useOliviaLiveness(mood);
+  const speechLine = useOliviaSpeech(labels, healthComplete, insuranceComplete, mood);
+
+  const healthSummary =
+    healthComplete && healthCategoryLabels.length > 0
+      ? healthCategoryLabels.join(' · ')
+      : null;
+
+  const insuranceSummary = insuranceComplete
+    ? insuranceProviderName ||
+      (hasInsurance === false ? labels.noCoverageOnFile : null)
+    : null;
 
   return (
     <section aria-label={labels.stageLabel} className="mhd-olivia-stage">
@@ -144,10 +189,15 @@ export function OliviaCompanionStage({
           onMouseLeave={onHotspotLeave}
           type="button"
         >
-          <span className="mhd-olivia-hotspot__label">{labels.healthHotspot}</span>
-          <span aria-hidden className="mhd-olivia-hotspot__mark">
-            {healthComplete ? '✓' : '+'}
+          <span className="mhd-olivia-hotspot__row">
+            <span className="mhd-olivia-hotspot__label">{labels.healthHotspot}</span>
+            <span aria-hidden className="mhd-olivia-hotspot__mark">
+              {healthComplete ? '✓' : '+'}
+            </span>
           </span>
+          {healthSummary ? (
+            <span className="mhd-olivia-hotspot__summary">{healthSummary}</span>
+          ) : null}
         </button>
 
         <button
@@ -162,30 +212,42 @@ export function OliviaCompanionStage({
           onMouseLeave={onHotspotLeave}
           type="button"
         >
-          <span className="mhd-olivia-hotspot__label">{labels.insuranceHotspot}</span>
-          <span aria-hidden className="mhd-olivia-hotspot__mark">
-            {insuranceComplete ? '✓' : '+'}
+          <span className="mhd-olivia-hotspot__row">
+            <span className="mhd-olivia-hotspot__label">{labels.insuranceHotspot}</span>
+            <span aria-hidden className="mhd-olivia-hotspot__mark">
+              {insuranceComplete ? '✓' : '+'}
+            </span>
           </span>
+          {insuranceSummary ? (
+            <span className="mhd-olivia-hotspot__summary">{insuranceSummary}</span>
+          ) : null}
         </button>
 
         <div className="mhd-olivia-mascot" data-mood={mood} data-pose={pose}>
-          <div className="mhd-olivia-mascot__figure">
-            {POSES.map((frame) => (
-              <Image
-                alt={frame.id === pose ? labels.mascotAlt : ''}
-                aria-hidden={frame.id !== pose}
-                className={
-                  frame.id === pose
-                    ? 'mhd-olivia-mascot__image is-on'
-                    : 'mhd-olivia-mascot__image'
-                }
-                fill
-                key={frame.id}
-                priority={frame.id === 'idle'}
-                sizes="(max-width: 720px) 70vw, 272px"
-                src={frame.src}
-              />
-            ))}
+          <div className="mhd-olivia-bubble-anchor">
+            <div aria-live="polite" className="mhd-olivia-bubble">
+              <p className="mhd-olivia-bubble__text">{speechLine}</p>
+            </div>
+          </div>
+          <div className="mhd-olivia-mascot__sway">
+            <div className="mhd-olivia-mascot__figure">
+              {POSES.map((frame) => (
+                <Image
+                  alt={frame.id === pose ? labels.mascotAlt : ''}
+                  aria-hidden={frame.id !== pose}
+                  className={
+                    frame.id === pose
+                      ? 'mhd-olivia-mascot__image is-on'
+                      : 'mhd-olivia-mascot__image'
+                  }
+                  fill
+                  key={frame.id}
+                  priority
+                  sizes="(max-width: 720px) 78vw, 352px"
+                  src={frame.src}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>

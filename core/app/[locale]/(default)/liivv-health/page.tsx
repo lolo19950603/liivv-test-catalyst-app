@@ -5,6 +5,7 @@ import { locales } from '~/i18n/locales';
 
 import type { HealthHubKitCard } from './health-hub-data';
 import { LiivvHealthPage } from './liivv-health-page';
+import { getDcCatalog } from './diabetes-care/get-dc-catalog';
 import { getOcCatalog } from './ostomy-care/get-oc-catalog';
 import { getWhCatalog } from './womens-health/get-wh-catalog';
 
@@ -52,7 +53,11 @@ export default async function Page({ params }: Props) {
 
   setRequestLocale(locale);
 
-  const [whCatalog, ocCatalog] = await Promise.all([getWhCatalog(locale), getOcCatalog(locale)]);
+  const [whCatalog, ocCatalog, dcCatalog] = await Promise.all([
+    getWhCatalog(locale),
+    getOcCatalog(locale),
+    getDcCatalog(locale),
+  ]);
 
   const featuredKits: HealthHubKitCard[] = [
     ...pickKits(
@@ -75,6 +80,17 @@ export default async function Page({ params }: Props) {
       'Ostomy Care',
       '/liivv-health/ostomy-care',
       '/liivv-health/ostomy-care#build-your-kit',
+      2,
+    ),
+    ...pickKits(
+      dcCatalog.kits.length > 0
+        ? dcCatalog.featuredKit
+          ? [dcCatalog.featuredKit, ...dcCatalog.kits.filter((k) => k.entityId !== dcCatalog.featuredKit?.entityId)]
+          : dcCatalog.kits
+        : [],
+      'Diabetes Care',
+      '/liivv-health/diabetes-care',
+      '/liivv-health/diabetes-care#shop-diabetes-care',
       2,
     ),
   ].slice(0, 4);

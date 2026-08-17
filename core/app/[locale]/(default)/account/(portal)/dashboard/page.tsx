@@ -65,6 +65,7 @@ export default async function AccountDashboardPage({ params, searchParams }: Pro
       carePackHref="/account/pharmacy?section=carepack"
       consultingHref="/account/virtual-care"
       hasUnreadChatMessage={accountNotifications.hasUnreadChatMessage}
+      healthCategoryLabels={wellness.healthCategoryLabels}
       healthProfileComplete={wellness.healthProfileComplete}
       healthProfileStepData={{
         initialCategories: healthProfileStepData?.initialCategories ?? [],
@@ -72,7 +73,9 @@ export default async function AccountDashboardPage({ params, searchParams }: Pro
         initialHealthProfile: healthProfileStepData?.initialHealthProfile ?? null,
         supabaseReady: healthProfileStepData?.supabaseReady ?? false,
       }}
+      hasInsurance={wellness.hasInsurance}
       insuranceComplete={wellness.insuranceComplete}
+      insuranceProviderName={wellness.insuranceProviderName}
       celebrateOnMount={oliviaCelebrate === '1'}
       labels={labels}
       nextSubscriptionDate={nextSubscriptionDate}

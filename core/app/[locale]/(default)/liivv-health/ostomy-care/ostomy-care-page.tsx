@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
+import { GuestCategoryQuiz } from '~/components/onboarding/guest-category-quiz';
 import { KitFlowDemo } from '~/components/kit-flow-demo/kit-flow-demo';
 
 import { CHAPTERS as CHAPTER_PAGES, SHOP_OSTOMY_HREF, chapterHref } from './chapters/chapters-data';
@@ -19,13 +20,11 @@ const SHOP_HREF = SHOP_OSTOMY_HREF;
 const PHARMACIST_HREF = '/account/virtual-care';
 const IMG = '/archive/ostomy-care';
 
-const RITUAL_CHIPS = [
-  'Empty at one-third full',
-  'Dry skin seals better',
-  'Keep a go-bag ready',
-  'Restock before you run low',
-  'Measure as swelling changes',
-  'Ask without the awkward',
+const TRUST_ITEMS = [
+  'Ontario pharmacist chat',
+  'Discreet delivery',
+  'Customize & save kits',
+  'Kind, private, yours',
 ] as const;
 
 const PATH_LINKS = [
@@ -164,7 +163,13 @@ function hasDisplayPrice(priceLabel?: string) {
   return Boolean(priceLabel && !/(\$|CA\$)?\s*0([.,]0+)?\b/i.test(priceLabel));
 }
 
-export function OstomyCarePage({ catalog }: { catalog?: OcCatalog }) {
+export function OstomyCarePage({
+  catalog,
+  showGuestQuiz = false,
+}: {
+  catalog?: OcCatalog;
+  showGuestQuiz?: boolean;
+}) {
   const [shopRoom, setShopRoom] = useState<ShopRoomId>('all');
 
   const allKits = catalog?.kits ?? [];
@@ -197,7 +202,7 @@ export function OstomyCarePage({ catalog }: { catalog?: OcCatalog }) {
         </div>
         <div aria-hidden className="oc-hero-mist" />
         <div className="oc-hero-inner">
-          <span className="oc-hero-brand">Ostomy Care and Everyday Liivving</span>
+          <span className="oc-hero-brand">Ostomy Care & Everyday &ldquo;LIIVVing&rdquo;</span>
           <h1>Care that stays discreet.</h1>
           <p className="oc-hero-lead">
             Supplies, everyday living support, and kind guidance — so your routine feels like yours again.
@@ -216,15 +221,15 @@ export function OstomyCarePage({ catalog }: { catalog?: OcCatalog }) {
         </div>
       </section>
 
-      <div className="oc-ribbon">
-        <div aria-label="Everyday ritual reminders" className="oc-ribbon-track">
-          {RITUAL_CHIPS.map((chip) => (
-            <span className="oc-ribbon-chip" key={chip}>
-              {chip}
-            </span>
+      <section aria-label="Why Liivv Ostomy Care" className="oc-trust">
+        <div className="oc-trust-track">
+          {TRUST_ITEMS.map((item) => (
+            <span key={item}>{item}</span>
           ))}
         </div>
-      </div>
+      </section>
+
+      {showGuestQuiz ? <GuestCategoryQuiz categoryId="ostomy_care_everyday" /> : null}
 
       <section aria-label="Ways into Ostomy Care" className="oc-path" id="doors">
         <div className="oc-wrap">

@@ -1,0 +1,565 @@
+/* Diabetes chapter pages — steady journal / path (not Ostomy or WH chrome) */
+
+#dc-chapter {
+  --mist: #f5f2ed;
+  --cream: #fcf8f4;
+  --ink: rgb(49, 47, 47);
+  --sage: #8ea78b;
+  --sage-deep: #6b7f5c;
+  --sage-soft: #c9d4c4;
+  --paper: #fffcf8;
+  --line: rgba(42, 50, 44, 0.12);
+  --chapter-accent: var(--sage);
+  --pad: clamp(1.25rem, 4vw, 2rem);
+  --max: 980px;
+  --font-heading: var(--font-family-dm-serif-text), Georgia, serif;
+  --font-body: var(--font-family-inter), system-ui, sans-serif;
+
+  color: var(--ink);
+  background:
+    linear-gradient(90deg, rgba(111, 138, 114, 0.08), transparent 18%),
+    linear-gradient(180deg, var(--mist), var(--cream) 30%, var(--cream));
+  font-family: var(--font-body);
+  font-weight: 350;
+  line-height: 1.6;
+  overflow-x: clip;
+}
+
+#dc-chapter *,
+#dc-chapter *::before,
+#dc-chapter *::after {
+  box-sizing: border-box;
+}
+
+#dc-chapter h1,
+#dc-chapter h2,
+#dc-chapter h3,
+#dc-chapter h4 {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  color: inherit;
+}
+
+#dc-chapter a {
+  color: inherit;
+}
+
+#dc-chapter .dc-ch-wrap {
+  width: min(100% - (var(--pad) * 2), var(--max));
+  margin-inline: auto;
+}
+
+#dc-chapter .dc-ch-eyebrow {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sage-deep);
+}
+
+#dc-chapter .dc-ch-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 1.5rem;
+  border-radius: 999px;
+  border: 1.5px solid transparent;
+  text-decoration: none;
+  font-weight: 550;
+  font-size: 0.92rem;
+  transition: transform 0.28s ease, background 0.2s ease;
+}
+
+#dc-chapter .dc-ch-btn:hover {
+  transform: translateY(-2px);
+}
+
+#dc-chapter .dc-ch-btn-solid {
+  background: var(--sage-deep);
+  color: #fff;
+}
+
+#dc-chapter .dc-ch-btn-soft {
+  background: rgba(255, 252, 248, 0.9);
+  color: var(--ink);
+}
+
+#dc-chapter .dc-ch-btn-ghost {
+  border-color: rgba(42, 50, 44, 0.25);
+  background: transparent;
+}
+
+#dc-chapter .dc-ch-btn-ghost-light {
+  border-color: rgba(255, 255, 255, 0.45);
+  color: #fff;
+  background: transparent;
+}
+
+/* Back chip */
+#dc-chapter .dc-ch-back {
+  position: fixed;
+  top: 5.75rem;
+  left: max(var(--pad), calc((100vw - var(--max)) / 2));
+  z-index: 40;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(255, 252, 248, 0.92);
+  border: 1px solid var(--line);
+  text-decoration: none;
+  font-size: 0.84rem;
+  font-weight: 550;
+  backdrop-filter: blur(8px);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+#dc-chapter .dc-ch-back.is-scrolled {
+  box-shadow: 0 10px 28px rgba(42, 50, 44, 0.08);
+}
+
+/* Hero */
+#dc-chapter .dc-ch-hero {
+  position: relative;
+  min-height: min(78vh, 700px);
+  display: grid;
+  align-items: end;
+  padding: 7rem var(--pad) 3.5rem;
+  color: #f4f7f3;
+  overflow: hidden;
+}
+
+#dc-chapter .dc-ch-hero-bg {
+  position: absolute;
+  inset: 0;
+}
+
+#dc-chapter .dc-ch-hero-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.03);
+}
+
+#dc-chapter .dc-ch-hero-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(115deg, rgba(42, 50, 44, 0.78), rgba(79, 101, 84, 0.42) 55%, rgba(42, 50, 44, 0.25)),
+    linear-gradient(to top, rgba(238, 242, 234, 0.88), transparent 45%);
+}
+
+#dc-chapter .dc-ch-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: min(100%, var(--max));
+  margin-inline: auto;
+}
+
+#dc-chapter .dc-ch-kicker {
+  display: block;
+  margin-bottom: 0.75rem;
+  opacity: 0.85;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+#dc-chapter .dc-ch-num {
+  font-family: var(--font-heading);
+  font-size: clamp(3rem, 8vw, 5rem);
+  line-height: 0.9;
+  opacity: 0.35;
+  margin-bottom: 0.35rem;
+}
+
+#dc-chapter .dc-ch-hero h1 {
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  max-width: 12ch;
+  color: #fff;
+}
+
+#dc-chapter .dc-ch-hero-lead {
+  margin-top: 1rem;
+  max-width: 38ch;
+  font-size: clamp(1.02rem, 1.7vw, 1.18rem);
+  color: rgba(244, 247, 243, 0.9);
+}
+
+#dc-chapter .dc-ch-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
+#dc-chapter .dc-ch-progress {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 1.75rem;
+}
+
+#dc-chapter .dc-ch-progress span {
+  width: 2.25rem;
+  height: 3px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+#dc-chapter .dc-ch-progress span.is-current {
+  background: #fff;
+  width: 3rem;
+}
+
+/* Journal pulse */
+#dc-chapter .dc-ch-journal {
+  position: relative;
+  z-index: 2;
+  margin-top: -2rem;
+  padding: 0 var(--pad) 2rem;
+}
+
+#dc-chapter .dc-ch-journal-grid {
+  width: min(100%, var(--max));
+  margin-inline: auto;
+  display: grid;
+  gap: 0.85rem;
+}
+
+@media (min-width: 760px) {
+  #dc-chapter .dc-ch-journal-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+#dc-chapter .dc-ch-note {
+  padding: 1.35rem 1.4rem;
+  border-radius: 20px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--chapter-accent);
+}
+
+#dc-chapter .dc-ch-note.is-vibe {
+  border-left-color: var(--sage-deep);
+  background: linear-gradient(145deg, rgba(197, 212, 196, 0.35), var(--paper) 60%);
+}
+
+#dc-chapter .dc-ch-note-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sage-deep);
+}
+
+#dc-chapter .dc-ch-note p {
+  margin: 0;
+  font-size: 1.02rem;
+}
+
+/* Categories as numbered rows */
+#dc-chapter .dc-ch-care {
+  padding: 2rem 0 3.5rem;
+}
+
+#dc-chapter .dc-ch-care-head {
+  margin-bottom: 1.75rem;
+  max-width: 38rem;
+}
+
+#dc-chapter .dc-ch-care-head h2 {
+  margin-top: 0.45rem;
+  font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+}
+
+#dc-chapter .dc-ch-care-head p {
+  margin-top: 0.6rem;
+  color: rgba(42, 50, 44, 0.75);
+}
+
+#dc-chapter .dc-ch-rows {
+  display: grid;
+  gap: 0.75rem;
+}
+
+#dc-chapter .dc-ch-row {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr;
+  gap: 1rem;
+  padding: 1.15rem 1.2rem;
+  border-radius: 18px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+
+#dc-chapter .dc-ch-row-index {
+  font-family: var(--font-heading);
+  font-size: 1.45rem;
+  color: var(--sage-deep);
+  line-height: 1;
+}
+
+#dc-chapter .dc-ch-row h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.45rem;
+}
+
+#dc-chapter .dc-ch-group {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sage-deep);
+}
+
+#dc-chapter .dc-ch-row ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.35rem;
+  color: rgba(42, 50, 44, 0.8);
+  font-size: 0.95rem;
+}
+
+#dc-chapter .dc-ch-row-note {
+  margin-top: 0.65rem;
+  font-size: 0.9rem;
+  color: var(--sage-deep);
+}
+
+#dc-chapter .dc-ch-subsection {
+  margin-top: 0.75rem;
+}
+
+#dc-chapter .dc-ch-subsection h4 {
+  font-size: 0.95rem;
+  margin-bottom: 0.35rem;
+}
+
+/* Programs */
+#dc-chapter .dc-ch-programs {
+  padding: 0 0 3.5rem;
+}
+
+#dc-chapter .dc-ch-programs-grid {
+  display: grid;
+  gap: 0.85rem;
+}
+
+@media (min-width: 800px) {
+  #dc-chapter .dc-ch-programs-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+#dc-chapter .dc-ch-program {
+  padding: 1.25rem;
+  border-radius: 18px;
+  background: rgba(197, 212, 196, 0.28);
+  border: 1px solid rgba(111, 138, 114, 0.2);
+}
+
+#dc-chapter .dc-ch-program-index {
+  display: block;
+  margin-bottom: 0.55rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  font-weight: 650;
+  color: var(--sage-deep);
+}
+
+#dc-chapter .dc-ch-program h3 {
+  font-size: 1.15rem;
+  margin-bottom: 0.4rem;
+}
+
+#dc-chapter .dc-ch-program p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: rgba(42, 50, 44, 0.78);
+}
+
+/* Pharmacist */
+#dc-chapter .dc-ch-care-cta {
+  padding: 0 0 3.5rem;
+}
+
+#dc-chapter .dc-ch-care-panel {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--sage-deep);
+  color: #f4f7f3;
+}
+
+#dc-chapter .dc-ch-care-media {
+  min-height: 260px;
+}
+
+#dc-chapter .dc-ch-care-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0.88;
+}
+
+#dc-chapter .dc-ch-care-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: clamp(1.4rem, 3vw, 2.3rem);
+}
+
+#dc-chapter .dc-ch-care-copy .dc-ch-eyebrow {
+  color: rgba(244, 247, 243, 0.75);
+}
+
+#dc-chapter .dc-ch-care-copy h2 {
+  font-size: clamp(1.55rem, 3vw, 2.1rem);
+}
+
+#dc-chapter .dc-ch-care-copy p {
+  margin: 0;
+  color: rgba(244, 247, 243, 0.88);
+  max-width: 38ch;
+}
+
+@media (max-width: 800px) {
+  #dc-chapter .dc-ch-care-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Path nav */
+#dc-chapter .dc-ch-map {
+  padding: 0 0 3.5rem;
+}
+
+#dc-chapter .dc-ch-map h2 {
+  margin: 0.4rem 0 1.1rem;
+  font-size: 1.55rem;
+}
+
+#dc-chapter .dc-ch-map-rail {
+  display: grid;
+  gap: 0.55rem;
+}
+
+#dc-chapter .dc-ch-map-rail a {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  text-decoration: none;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+
+#dc-chapter .dc-ch-map-rail a.is-active {
+  border-color: rgba(111, 138, 114, 0.55);
+  background: rgba(197, 212, 196, 0.35);
+}
+
+#dc-chapter .dc-ch-map-num {
+  font-family: var(--font-heading);
+  color: var(--sage-deep);
+}
+
+/* Closing */
+#dc-chapter .dc-ch-close {
+  position: relative;
+  padding: 4.5rem var(--pad) 5rem;
+  overflow: hidden;
+  color: #f4f7f3;
+  text-align: center;
+}
+
+#dc-chapter .dc-ch-close-bg {
+  position: absolute;
+  inset: 0;
+}
+
+#dc-chapter .dc-ch-close-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+#dc-chapter .dc-ch-close-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(42, 50, 44, 0.8), rgba(79, 101, 84, 0.72));
+}
+
+#dc-chapter .dc-ch-close-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+#dc-chapter .dc-ch-close-inner .dc-ch-eyebrow {
+  color: rgba(244, 247, 243, 0.75);
+}
+
+#dc-chapter .dc-ch-close h2 {
+  margin-top: 0.55rem;
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+}
+
+#dc-chapter .dc-ch-close p {
+  margin-top: 0.85rem;
+  color: rgba(244, 247, 243, 0.88);
+}
+
+#dc-chapter .dc-ch-close-cta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.65rem;
+  margin-top: 1.4rem;
+}
+
+#dc-chapter .dc-ch-prev {
+  margin-top: 1.1rem;
+  font-size: 0.9rem;
+}
+
+#dc-chapter .dc-ch-prev a {
+  color: rgba(244, 247, 243, 0.85);
+  text-decoration: none;
+}
+
+#dc-chapter a.dc-ch-row {
+  text-decoration: none;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+#dc-chapter a.dc-ch-row:hover {
+  transform: translateY(-2px);
+  border-color: rgba(142, 167, 139, 0.55);
+}
+
+#dc-chapter .dc-ch-row-go {
+  display: inline-block;
+  margin-top: 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--sage-deep);
+}
+

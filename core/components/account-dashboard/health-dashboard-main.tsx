@@ -23,7 +23,10 @@ export function HealthDashboardMain({
   pharmacyHref,
   hasUnreadChatMessage,
   healthProfileComplete,
+  healthCategoryLabels,
   insuranceComplete,
+  insuranceProviderName,
+  hasInsurance,
   celebrateOnMount = false,
   healthProfileStepData,
 }: {
@@ -36,7 +39,10 @@ export function HealthDashboardMain({
   pharmacyHref: string;
   hasUnreadChatMessage: boolean;
   healthProfileComplete: boolean;
+  healthCategoryLabels: string[];
   insuranceComplete: boolean;
+  insuranceProviderName: string | null;
+  hasInsurance: boolean | null;
   celebrateOnMount?: boolean;
   healthProfileStepData: {
     initialCategories: LiivPrimaryCategoryId[];
@@ -96,8 +102,11 @@ export function HealthDashboardMain({
   return (
     <div className="mhd-wellness">
       <OliviaCompanionStage
+        hasInsurance={hasInsurance}
+        healthCategoryLabels={healthCategoryLabels}
         healthComplete={healthProfileComplete}
         insuranceComplete={insuranceComplete}
+        insuranceProviderName={insuranceProviderName}
         labels={wellness.olivia}
         mood={mood}
         onHotspotEnter={(side) => {

@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
 import type { CategoryCard, Chapter } from './chapters-data';
 import { CHAPTERS, LANDING_HREF, chapterHref, getChapterNeighbors } from './chapters-data';
 import { useWhMotion } from '../use-wh-motion';
@@ -89,7 +87,6 @@ function CategoryCardView({ card, index }: { card: CategoryCard; index: number }
 export function ChapterPage({ chapter }: { chapter: Chapter }) {
   const { prev, next } = getChapterNeighbors(chapter.slug);
   const nextHref = next ? chapterHref(next.slug) : `${LANDING_HREF}#find-your-chapter`;
-  const [scrolled, setScrolled] = useState(false);
   const { rootClassName } = useWhMotion('wh-chapter');
   const chapterIndex = CHAPTERS.findIndex((item) => item.slug === chapter.slug);
   const categories = chapter.categories;
@@ -97,20 +94,8 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
   const showFeaturedSolo = categoryCount === 1;
   const featured = showFeaturedSolo ? categories[0] : null;
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
   return (
     <div className={rootClassName} id="wh-chapter" style={{ ['--chapter-accent' as string]: chapter.accent }}>
-      {/* Sticky back link — label edited inline */}
-      <a className={`wh-ch-back${scrolled ? ' is-scrolled' : ''}`} href={LANDING_HREF}>
-        ← Women&apos;s Health
-      </a>
-
       {/* =====================================================================
           SECTION 1 — HERO
           Copy from chapters-data: title, heroBody, chapterWord, num, heroImage
@@ -326,7 +311,7 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
           <p>{chapter.closing.body}</p>
           <div className="wh-ch-closing-cta">
             <a className="wh-ch-btn wh-ch-btn-white" href={LANDING_HREF}>
-              Back to Women&apos;s Health
+              Back to Women&apos;s Health page
             </a>
             <a className="wh-ch-btn wh-ch-btn-ghost" href={nextHref}>
               {chapter.nextLabel}

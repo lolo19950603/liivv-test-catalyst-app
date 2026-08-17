@@ -206,6 +206,7 @@ export function LiivvHealthPage({ featuredKits }: Props) {
               <div className="lh-hub-story-links">
                 <a href="/liivv-health/womens-health#build-your-kit">Women&apos;s Health kits</a>
                 <a href="/liivv-health/ostomy-care#build-your-kit">Ostomy Care kits</a>
+                <a href="/liivv-health/diabetes-care#shop-diabetes-care">Diabetes Care shop</a>
               </div>
             </div>
           )}
@@ -215,6 +216,9 @@ export function LiivvHealthPage({ featuredKits }: Props) {
             </a>
             <a className="btn btn-outline" href="/liivv-health/ostomy-care#build-your-kit">
               Ostomy kits
+            </a>
+            <a className="btn btn-outline" href="/liivv-health/diabetes-care#shop-diabetes-care">
+              Diabetes shop
             </a>
           </div>
         </div>

@@ -339,16 +339,21 @@
         },
         "olivia": {
           "stageLabel": "Set up your Liivv profile with Olivia",
-          "healthHotspot": "Complete your health profile",
-          "insuranceHotspot": "Add your insurance",
+          "healthHotspot": "Health profile",
+          "insuranceHotspot": "Insurance",
+          "setupEyebrow": "With Olivia",
+          "setupTitle": "Your care setup",
+          "healthHint": "Personalize recommendations",
+          "insuranceHint": "Add coverage when you have it",
           "later": "I'll do this later",
           "laterChip": "Olivia has a couple of things for you",
           "healthSheetTitle": "Health profile",
           "insuranceSheetTitle": "Insurance",
           "closeSheet": "Close",
           "mascotAlt": "Olivia, the Liivv companion",
-          "insuranceDescription": "Add your coverage details or skip for now. You can update this later.",
+          "insuranceDescription": "Share your coverage or skip for now — you can always update it later.",
           "noInsurance": "I do not have insurance coverage",
+          "noCoverageOnFile": "No coverage on file",
           "providerName": "Insurance provider",
           "policyNumber": "Policy number",
           "memberId": "Member ID",
@@ -357,7 +362,27 @@
           "relationship": "Relationship to primary holder",
           "skip": "Skip for now",
           "saveInsurance": "Save",
-          "savingInsurance": "Saving insurance details..."
+          "savingInsurance": "Saving insurance details...",
+          "talkHealth": {
+            "0": "A quick health profile unlocks care that actually fits you.",
+            "1": "Tell me a little about you — I'll curate smarter picks.",
+            "2": "Won't take long. Future-you will thank you."
+          },
+          "talkInsurance": {
+            "0": "Got coverage? Let's jot it down.",
+            "1": "We work with lots of insurers — keep it easy.",
+            "2": "Insurance on file means fewer surprises later."
+          },
+          "talkIdle": {
+            "0": "Hi — I'm Olivia, your Liivv sidekick.",
+            "1": "Tap a side when you're ready. I'll cheer.",
+            "2": "No rush. Excellent posture, infinite patience."
+          },
+          "talkDone": {
+            "0": "You're all set. Tap a side anytime to tweak.",
+            "1": "Looking good — your dashboard is ready to work harder for you.",
+            "2": "Nice work. I'm here if anything changes."
+          }
         },
         "actionCenter": {
           "subscriptionTitle": "Your Next Subscription",

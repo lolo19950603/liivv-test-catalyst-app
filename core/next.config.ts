@@ -120,6 +120,61 @@ export default async (): Promise<NextConfig> => {
           destination: '/liivv-health/ostomy-care/shop-ostomy-care',
           permanent: false,
         },
+        {
+          source: '/pages/diabetes-care',
+          destination: '/liivv-health/diabetes-care',
+          permanent: false,
+        },
+        {
+          source: '/pages/diabetes-care-everyday-living',
+          destination: '/liivv-health/diabetes-care',
+          permanent: false,
+        },
+        {
+          source: '/pages/diabetes-every-day-living',
+          destination: '/liivv-health/diabetes-care/chapters/every-day-living',
+          permanent: false,
+        },
+        {
+          source: '/pages/diabetes-essentials',
+          destination: '/liivv-health/diabetes-care/shop-diabetes-care',
+          permanent: false,
+        },
+        {
+          source: '/liivv-health/diabetes-care/chapters/diabetes-essentials',
+          destination: '/liivv-health/diabetes-care/shop-diabetes-care',
+          permanent: false,
+        },
+        {
+          source: '/pages/diabetes-new-to-the-journey',
+          destination: '/liivv-health/diabetes-care/chapters/new-to-the-journey',
+          permanent: false,
+        },
+        {
+          source: '/pages/your-diabetes-journey',
+          destination: '/liivv-health/diabetes-care/chapters/your-diabetes-journey',
+          permanent: false,
+        },
+        {
+          source: '/pages/diabetes-gestational',
+          destination: '/liivv-health/diabetes-care/chapters/gestational',
+          permanent: false,
+        },
+        {
+          source: '/pages/diabetes-prediabetes',
+          destination: '/liivv-health/diabetes-care/chapters/prediabetes',
+          permanent: false,
+        },
+        {
+          source: '/pages/diabetes-type-1',
+          destination: '/liivv-health/diabetes-care/chapters/type-1',
+          permanent: false,
+        },
+        {
+          source: '/pages/diabetes-type-2',
+          destination: '/liivv-health/diabetes-care/chapters/type-2',
+          permanent: false,
+        },
       ];
     },
     // eslint-disable-next-line @typescript-eslint/require-await

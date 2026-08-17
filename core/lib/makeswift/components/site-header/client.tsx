@@ -28,9 +28,13 @@ import {
   mapMakeswiftAdditionalLinks,
   type MakeswiftAdditionalLinkInput,
 } from '~/lib/makeswift/site-header/map-makeswift-nav-links';
+import { Link } from '~/components/link';
 import {
+  getCareSectionBackLink,
+  getDiabetesCareNav,
   getOstomyCareNav,
   getWomensHealthNav,
+  shouldShowDiabetesCareNav,
   shouldShowOstomyCareNav,
   shouldShowWomensHealthNav,
 } from '~/lib/makeswift/site-header/inject-liivv-health-nav';
@@ -249,11 +253,14 @@ export const MakeswiftHeader = forwardRef(
     const resolvedNavLinks = resolveStoreNavLinks(links, categoryTree);
     const showWomensHealthNav = shouldShowWomensHealthNav(pathname);
     const showOstomyCareNav = shouldShowOstomyCareNav(pathname);
+    const showDiabetesCareNav = shouldShowDiabetesCareNav(pathname);
     const navLinks = showWomensHealthNav
       ? getWomensHealthNav()
       : showOstomyCareNav
         ? getOstomyCareNav()
-        : resolvedNavLinks;
+        : showDiabetesCareNav
+          ? getDiabetesCareNav()
+          : resolvedNavLinks;
 
     if (override) {
       return (
@@ -283,6 +290,7 @@ export const MakeswiftHeader = forwardRef(
       : undefined;
 
     const bannerNode = combinedBanner ? <Banner {...combinedBanner} /> : null;
+    const careBack = getCareSectionBackLink(pathname);
 
     return (
       <LiivvArchiveHeader
@@ -297,7 +305,13 @@ export const MakeswiftHeader = forwardRef(
         linksPosition={linksPosition ?? 'left'}
         logo={desktopLogo}
         navAriaLabel={
-          showWomensHealthNav ? "Women's Health" : showOstomyCareNav ? 'Ostomy Care' : 'Store'
+          showWomensHealthNav
+            ? "Women's Health"
+            : showOstomyCareNav
+              ? 'Ostomy Care'
+              : showDiabetesCareNav
+                ? 'Diabetes Care'
+                : 'Store'
         }
         navLinks={navLinks}
         notifications={notifications}
@@ -306,7 +320,21 @@ export const MakeswiftHeader = forwardRef(
         showLogo={Boolean(desktopLogo?.src || desktopLogo?.text)}
         sticky
         withPinSpacer={false}
-      />
+      >
+        {careBack ? (
+          <nav
+            aria-label={careBack.label}
+            className="liivv-care-back-bar relative z-[2] w-full border-t border-[rgb(49_47_47/0.08)] bg-white px-5 py-2.5 lg:px-8"
+          >
+            <Link
+              className="inline-flex items-center text-sm font-medium tracking-wide text-[#312f2f] no-underline hover:underline"
+              href={careBack.href}
+            >
+              ← {careBack.label}
+            </Link>
+          </nav>
+        ) : null}
+      </LiivvArchiveHeader>
     );
   },
 );

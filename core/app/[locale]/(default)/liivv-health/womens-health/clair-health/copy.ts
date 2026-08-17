@@ -108,7 +108,7 @@ const EN: ClairCopy = {
     description:
       'Clair is a hormone-aware wellness tracker, worn like jewellery. Pre-order through Liivv. Expected to ship November 2026. Sold in Canada as a general wellness product — not licensed by Health Canada as a medical device.',
   },
-  back: "← Women's Health",
+  back: "← Back to Women's Health page",
   hero: {
     aria: 'Introducing Clair',
     alt: 'Clair wellness wearable, worn like jewellery',
@@ -252,7 +252,7 @@ const EN: ClairCopy = {
     body: 'A hormone-aware wellness tracker, built around female physiology. Pre-order through Liivv. Expected to ship November 2026.',
     cta: 'Reserve my Clair',
     secondary: 'See how it fits',
-    tertiary: "Women's Health",
+    tertiary: "Back to Women's Health page",
   },
   legal:
     'Clair is sold in Canada as a general wellness product. It is not licensed by Health Canada as a medical device and has not been evaluated by Health Canada for safety or effectiveness. Clair does not diagnose, treat, cure, prevent or monitor any disease, disorder or condition. Clair does not measure hormone levels; it estimates patterns from physiological signals such as skin temperature, heart rate and heart rate variability. Clair is not a substitute for advice from a physician, pharmacist, nurse practitioner or other qualified health professional. Always consult a health professional with any question about your health.',
@@ -264,7 +264,7 @@ const FR: ClairCopy = {
     description:
       'Clair est un bracelet de bien-être sensible aux hormones, à porter comme un bijou. Précommandez-le chez Liivv. Expédition prévue en novembre 2026. Vendu au Canada à titre de produit de bien-être général — non homologué par Santé Canada comme instrument médical.',
   },
-  back: '← Santé des femmes',
+  back: '← Retour à la page Santé des femmes',
   hero: {
     aria: 'Présentation de Clair',
     alt: 'Bracelet de bien-être Clair, porté comme un bijou',
@@ -408,7 +408,7 @@ const FR: ClairCopy = {
     body: 'Un bracelet de bien-être sensible aux hormones, conçu autour de la physiologie féminine. Précommandez-le chez Liivv. Expédition prévue en novembre 2026.',
     cta: 'Réserver mon Clair',
     secondary: 'Voir comment ça s’intègre',
-    tertiary: 'Santé des femmes',
+    tertiary: 'Retour à la page Santé des femmes',
   },
   legal:
     'Clair est vendu au Canada à titre de produit de bien-être général. Il n’est pas homologué par Santé Canada comme instrument médical et n’a pas été évalué par Santé Canada quant à son innocuité ou à son efficacité. Clair ne sert pas à diagnostiquer, traiter, guérir, prévenir ni surveiller une maladie, un trouble ou un état de santé. Clair ne mesure pas les taux d’hormones; il estime des tendances à partir de signaux physiologiques tels que la température cutanée, la fréquence cardiaque et la variabilité de la fréquence cardiaque. Clair ne remplace pas l’avis d’un médecin, d’un pharmacien, d’une infirmière praticienne ou d’un autre professionnel de la santé qualifié. Consultez toujours un professionnel de la santé pour toute question concernant votre santé.',

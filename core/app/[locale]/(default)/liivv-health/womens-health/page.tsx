@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 
+import { isLoggedIn } from '~/auth';
 import { locales } from '~/i18n/locales';
 
 import { getWhCatalog } from './get-wh-catalog';
@@ -26,6 +27,7 @@ export default async function Page({ params }: Props) {
   setRequestLocale(locale);
 
   const catalog = await getWhCatalog(locale);
+  const showGuestQuiz = !(await isLoggedIn());
 
-  return <WomensHealthPage catalog={catalog} />;
+  return <WomensHealthPage catalog={catalog} showGuestQuiz={showGuestQuiz} />;
 }

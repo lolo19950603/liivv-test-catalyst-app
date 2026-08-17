@@ -39,7 +39,7 @@ export type HealthScrollingTextProps = {
 };
 
 export const HEALTH_SCROLLING_TEXT_DEFAULT_ITEMS: HealthScrollingTextItem[] = [
-  { kind: 'text', text: 'Ostomy Care & Everyday Living' },
+  { kind: 'text', text: 'Ostomy Care & Everyday "LIIVVing"' },
   { kind: 'text', text: "Women's Health & Wellness" },
   { kind: 'text', text: 'Sleep & Rest' },
   { kind: 'text', text: 'Healing & Advanced Wound Care' },
@@ -47,7 +47,7 @@ export const HEALTH_SCROLLING_TEXT_DEFAULT_ITEMS: HealthScrollingTextItem[] = [
   { kind: 'text', text: 'Heart & Blood Pressure' },
   { kind: 'text', text: 'Breathing & Lung Health' },
   { kind: 'text', text: 'Skin Health & Relief' },
-  { kind: 'text', text: 'Diabetes Care & Everyday Living' },
+  { kind: 'text', text: 'Diabetes Care & Everyday "LIIVVing"' },
   { kind: 'text', text: 'Daily Nutrition & Fuel' },
 ];
 
