@@ -122,7 +122,7 @@
   position: relative;
   width: 100%;
   display: grid;
-  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.22fr);
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.4fr);
   min-height: min(88vh, 880px);
   background: var(--ink);
   color: #fff;
