@@ -1690,6 +1690,8 @@ body.adc-portal-active main{
   min-height:24rem;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot{
+  all:unset;
+  box-sizing:border-box;
   position:absolute;
   z-index:2;
   display:flex;
@@ -1700,7 +1702,6 @@ body.adc-portal-active main{
   margin:0;
   padding:0.15rem 0 0.45rem;
   border:0;
-  border-bottom:1px solid #d4c8b8;
   background:transparent;
   color:#5c564c;
   font-family:var(--mhd-font-body);
@@ -1709,13 +1710,22 @@ body.adc-portal-active main{
   letter-spacing:0.01em;
   line-height:1.2;
   text-align:left;
+  text-decoration:none;
   cursor:pointer;
   -webkit-appearance:none;
   appearance:none;
-  box-sizing:border-box;
-  box-shadow:none;
   transform:none;
   overflow:visible;
+  box-shadow:0 1px 0 #d4c8b8;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot::-moz-focus-inner{
+  border:0;
+  padding:0;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot::before,
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot::after{
+  content:none !important;
+  display:none !important;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--insurance{
   align-items:flex-end;
@@ -1738,12 +1748,18 @@ body.adc-portal-active main{
   line-height:1.35;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot:hover,
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot:focus-visible{
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot:focus-visible,
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot:active{
   color:#2c2a26;
+  font-weight:500;
+  font-size:0.8125rem;
+  line-height:1.2;
+  letter-spacing:0.01em;
+  text-decoration:none;
   border:0;
-  border-bottom:1px solid #8ea58d;
+  background:transparent;
   transform:none;
-  box-shadow:none;
+  box-shadow:0 1px 0 #8ea58d;
   margin:0;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot:focus-visible{
@@ -2049,13 +2065,16 @@ body.adc-portal-active main{
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-stage--companion .mhd-olivia-bubble-anchor{
   width:100%;
-  min-height:0;
-  margin:0 0 0.5rem;
+  height:4.75rem;
+  min-height:4.75rem;
+  margin:0 0 0.35rem;
+  flex-shrink:0;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-stage--companion .mhd-olivia-bubble{
-  position:relative;
-  left:auto;
-  bottom:auto;
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
   width:100%;
   max-width:100%;
   padding:0.7rem 0.95rem;
@@ -2074,26 +2093,45 @@ body.adc-portal-active main{
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-stage__chips{
   display:flex;
   flex-direction:row;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
   justify-content:center;
   align-items:center;
-  gap:0.35rem 0.75rem;
+  gap:0.75rem;
   width:100%;
-  margin-top:0.2rem;
+  margin-top:auto;
   padding:0;
+  flex-shrink:0;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--chip{
   position:static;
+  inset:auto;
+  top:auto;
+  right:auto;
+  bottom:auto;
+  left:auto;
+  display:inline-flex;
+  flex-direction:row;
+  align-items:center;
   max-width:none;
   width:auto;
+  height:1.7rem;
   margin:0;
-  padding:0.15rem 0;
+  padding:0 0 0.2rem;
   border:0;
-  border-bottom:1px solid #d4c8b8;
   border-radius:0;
   background:transparent;
   text-align:left;
-  align-items:flex-start;
+  transform:none !important;
+  translate:none !important;
+  scale:none !important;
+  rotate:none !important;
+}
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--chip.mhd-olivia-hotspot--health,
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--chip.mhd-olivia-hotspot--insurance{
+  top:auto;
+  right:auto;
+  bottom:auto;
+  left:auto;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--chip .mhd-olivia-hotspot__summary{
   display:none;
@@ -2106,13 +2144,17 @@ body.adc-portal-active main{
   flex-direction:row;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--chip:hover,
-#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--chip:focus-visible{
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--chip:focus-visible,
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--chip:active{
   border:0;
-  border-bottom:1px solid #8ea58d;
   background:transparent;
-  transform:none;
-  box-shadow:none;
-  padding:0.15rem 0;
+  height:1.7rem;
+  padding:0 0 0.2rem;
+  transform:none !important;
+  translate:none !important;
+  scale:none !important;
+  rotate:none !important;
+  box-shadow:0 1px 0 #8ea58d;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-care-canvas{
   display:flex;

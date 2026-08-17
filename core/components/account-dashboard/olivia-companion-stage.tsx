@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type KeyboardEvent, type ReactNode } from 'react';
 
 import { Image } from '~/components/image';
 
@@ -136,6 +136,44 @@ function useOliviaSpeech(
   return pool[index % Math.max(pool.length, 1)] ?? labels.talkIdle[0] ?? '';
 }
 
+function OliviaHotspotControl({
+  ariaLabel,
+  className,
+  onLeave,
+  onOpen,
+  onEnter,
+  children,
+}: {
+  ariaLabel: string;
+  className: string;
+  onLeave: () => void;
+  onOpen: () => void;
+  onEnter: () => void;
+  children: ReactNode;
+}) {
+  const onKeyDown = (event: KeyboardEvent<HTMLSpanElement>) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onOpen();
+    }
+  };
+
+  return (
+    <span
+      aria-label={ariaLabel}
+      className={className}
+      onClick={onOpen}
+      onKeyDown={onKeyDown}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+      role="button"
+      tabIndex={0}
+    >
+      {children}
+    </span>
+  );
+}
+
 export function OliviaCompanionStage({
   labels,
   healthComplete,
@@ -178,17 +216,16 @@ export function OliviaCompanionStage({
 
   const isCompanion = layout === 'companion';
   const healthButton = (
-    <button
-      aria-label={labels.healthHotspot}
+    <OliviaHotspotControl
+      ariaLabel={labels.healthHotspot}
       className={
         healthComplete
           ? `mhd-olivia-hotspot mhd-olivia-hotspot--health mhd-olivia-hotspot--done${isCompanion ? ' mhd-olivia-hotspot--chip' : ''}`
           : `mhd-olivia-hotspot mhd-olivia-hotspot--health${isCompanion ? ' mhd-olivia-hotspot--chip' : ''}`
       }
-      onClick={onOpenHealth}
-      onMouseEnter={() => onHotspotEnter('health')}
-      onMouseLeave={onHotspotLeave}
-      type="button"
+      onEnter={() => onHotspotEnter('health')}
+      onLeave={onHotspotLeave}
+      onOpen={onOpenHealth}
     >
       <span className="mhd-olivia-hotspot__row">
         <span className="mhd-olivia-hotspot__label">{labels.healthHotspot}</span>
@@ -196,20 +233,19 @@ export function OliviaCompanionStage({
           {healthComplete ? '✓' : '+'}
         </span>
       </span>
-    </button>
+    </OliviaHotspotControl>
   );
   const insuranceButton = (
-    <button
-      aria-label={labels.insuranceHotspot}
+    <OliviaHotspotControl
+      ariaLabel={labels.insuranceHotspot}
       className={
         insuranceComplete
           ? `mhd-olivia-hotspot mhd-olivia-hotspot--insurance mhd-olivia-hotspot--done${isCompanion ? ' mhd-olivia-hotspot--chip' : ''}`
           : `mhd-olivia-hotspot mhd-olivia-hotspot--insurance${isCompanion ? ' mhd-olivia-hotspot--chip' : ''}`
       }
-      onClick={onOpenInsurance}
-      onMouseEnter={() => onHotspotEnter('insurance')}
-      onMouseLeave={onHotspotLeave}
-      type="button"
+      onEnter={() => onHotspotEnter('insurance')}
+      onLeave={onHotspotLeave}
+      onOpen={onOpenInsurance}
     >
       <span className="mhd-olivia-hotspot__row">
         <span className="mhd-olivia-hotspot__label">{labels.insuranceHotspot}</span>
@@ -217,10 +253,10 @@ export function OliviaCompanionStage({
           {insuranceComplete ? '✓' : '+'}
         </span>
       </span>
-      {insuranceSummary ? (
+      {!isCompanion && insuranceSummary ? (
         <span className="mhd-olivia-hotspot__summary">{insuranceSummary}</span>
       ) : null}
-    </button>
+    </OliviaHotspotControl>
   );
 
   return (
