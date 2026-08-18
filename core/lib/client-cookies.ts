@@ -31,6 +31,10 @@ export function getCookieValue(name: string): string | null {
   return cookieValue ?? null;
 }
 
+export function deleteCookie(name: string): void {
+  setCookie(name, '', { path: '/', maxAge: 0, expires: new Date(0) });
+}
+
 export function setCookie(
   name: string,
   value: string,

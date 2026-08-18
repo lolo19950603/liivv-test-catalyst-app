@@ -3,19 +3,25 @@
 import { useEffect } from 'react';
 
 import { useRouter } from '~/i18n/routing';
-import { FORCE_REFRESH_COOKIE, getCookieValue, setCookie } from '~/lib/client-cookies';
+import { FORCE_REFRESH_COOKIE, deleteCookie, getCookieValue } from '~/lib/client-cookies';
 
 export const ForceRefresh = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const shouldRefresh = getCookieValue(FORCE_REFRESH_COOKIE) === 'true';
+    const forceRefresh = getCookieValue(FORCE_REFRESH_COOKIE);
 
-    if (shouldRefresh) {
-      setCookie(FORCE_REFRESH_COOKIE, 'false', { path: '/' });
+    if (forceRefresh === 'true') {
+      deleteCookie(FORCE_REFRESH_COOKIE);
       router.refresh();
+
+      return;
     }
-  });
+
+    if (forceRefresh === 'false') {
+      deleteCookie(FORCE_REFRESH_COOKIE);
+    }
+  }, [router]);
 
   return null;
 };

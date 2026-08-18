@@ -1,6 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
 import { PropsWithChildren, Suspense } from 'react';
 
+import { ForceRefresh } from '~/components/force-refresh';
 import { Footer, FooterBottomBar } from '~/components/footer';
 import { Header } from '~/components/header';
 import { LiveChatWidgetHost } from '~/components/virtual-care/live-chat-widget-host';
@@ -35,6 +36,7 @@ export default async function DefaultLayout({ params, children }: Props) {
       <link href="/archive/diabetes-care-sections.css" rel="stylesheet" />
       <DiabetesCareArchiveTheme>
         <StoreThemeProvider theme={{ productImageFallbackLogo }}>
+          <ForceRefresh />
           <Suspense fallback={null}>
             <SiteHeaderSlideshow />
           </Suspense>

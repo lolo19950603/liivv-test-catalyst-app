@@ -13,7 +13,24 @@ interface PrefetchOptions {
   prefetchKind?: 'auto' | 'full';
 }
 
-type Props = NextLinkProps & PrefetchOptions;
+type Props = NextLinkProps &
+  PrefetchOptions & {
+    /**
+     * Full document navigation. Logout must reload the shared layout so the
+     * header does not keep showing a stale logged-in "My Account" state.
+     */
+    hard?: boolean;
+  };
+
+function isLogoutHref(href: NextLinkProps['href']): boolean {
+  if (typeof href !== 'string') {
+    return false;
+  }
+
+  const pathname = href.split('?')[0] ?? href;
+
+  return pathname === '/logout' || pathname === '/logout/';
+}
 
 /**
  * This custom `Link` is based on  Next-Intl's `Link` component
@@ -26,10 +43,26 @@ type Props = NextLinkProps & PrefetchOptions;
  * page load performance and resource usage. https://nextjs.org/docs/app/api-reference/components/link#prefetch
  */
 export const Link = forwardRef<ComponentRef<'a'>, Props>(
-  ({ href, prefetch = 'hover', prefetchKind = 'auto', children, className, ...rest }, ref) => {
+  (
+    {
+      href,
+      prefetch = 'hover',
+      prefetchKind = 'auto',
+      hard,
+      children,
+      className,
+      onClick,
+      ...rest
+    },
+    ref,
+  ) => {
     const router = useNextRouter();
     const [prefetched, setPrefetched] = useReducer(() => true, false);
-    const computedPrefetch = computePrefetchProp({ prefetch, prefetchKind });
+    const hardNavigate = hard ?? isLogoutHref(href);
+    const computedPrefetch = computePrefetchProp({
+      prefetch: hardNavigate ? 'none' : prefetch,
+      prefetchKind,
+    });
 
     const triggerPrefetch = () => {
       if (prefetched) {
@@ -55,11 +88,21 @@ export const Link = forwardRef<ComponentRef<'a'>, Props>(
       <NavLink
         className={className}
         href={href}
-        onMouseEnter={prefetch === 'hover' ? triggerPrefetch : undefined}
-        onTouchStart={prefetch === 'hover' ? triggerPrefetch : undefined}
         prefetch={computedPrefetch}
         ref={ref}
         {...rest}
+        onClick={(event) => {
+          onClick?.(event);
+
+          if (!hardNavigate || event.defaultPrevented) {
+            return;
+          }
+
+          event.preventDefault();
+          window.location.assign(event.currentTarget.href);
+        }}
+        onMouseEnter={!hardNavigate && prefetch === 'hover' ? triggerPrefetch : undefined}
+        onTouchStart={!hardNavigate && prefetch === 'hover' ? triggerPrefetch : undefined}
       >
         {children}
       </NavLink>

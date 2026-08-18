@@ -5,7 +5,6 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { ButtonLink } from '@/vibes/soul/primitives/button-link';
 import { SignInSection } from '@/vibes/soul/sections/sign-in-section';
 import { buildConfig } from '~/build-config/reader';
-import { ForceRefresh } from '~/components/force-refresh';
 import { Slot } from '~/lib/makeswift/slot';
 import { ACCOUNT_DEFAULT_REDIRECT_PATH } from '~/lib/makeswift/site-header/resolve-account-href';
 
@@ -44,7 +43,6 @@ export default async function Login({ params, searchParams }: Props) {
 
   return (
     <>
-      <ForceRefresh />
       <SignInSection
         action={login.bind(null, { redirectTo: redirectTarget })}
         emailLabel={t('email')}
