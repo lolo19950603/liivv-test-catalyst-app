@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type TransitionEvent } from 'react';
 
+import { HeroLoopVideo, RotatingHeroWord } from '~/components/health-hero';
 import { OliviaHelpBand } from '~/components/olivia/olivia-help-band';
 import { GuestCategoryQuiz } from '~/components/onboarding/guest-category-quiz';
 import { KitFlowDemo } from '~/components/kit-flow-demo/kit-flow-demo';
 import { SpecializedSubscribe } from '~/components/specialized-subscribe/specialized-subscribe';
 
 import { CHAPTERS as CHAPTER_PAGES, SHOP_DIABETES_HREF, chapterHref } from './chapters/chapters-data';
+import { DAY_ONE_STARTER_KIT_ID } from './dc-ids';
 import type { DcCatalog, DcCatalogItem } from './get-dc-catalog';
 
 import './diabetes-care.css';
@@ -125,9 +127,9 @@ const KIT_FLOW_SEARCH_FALLBACKS = [
 ] as const;
 
 const KIT_FLOW_TRAY = [
-  { name: 'Glucose meter', note: 'Daily staple', qty: 1, isQtyTarget: true },
-  { name: 'Test strips', note: 'Restock rhythm', qty: 2 },
-  { name: 'Lancets', note: 'Site care', qty: 1 },
+  { name: 'FreeStyle Lite Meter', note: 'Day-one staple', qty: 1, isQtyTarget: true },
+  { name: 'Freestyle Lite Test Strips', note: 'Restock rhythm', qty: 2 },
+  { name: 'Freestyle Lancets', note: 'Site care', qty: 1 },
 ] as const;
 
 const VOICES = [
@@ -183,6 +185,206 @@ function hasDisplayPrice(priceLabel?: string) {
   return Boolean(priceLabel && !/(\$|CA\$)?\s*0([.,]0+)?\b/i.test(priceLabel));
 }
 
+function KitsCarousel({
+  kits,
+  initialId,
+}: {
+  kits: DcCatalogItem[];
+  initialId?: number | null;
+}) {
+  const startIndex = useMemo(() => {
+    if (!initialId) return 0;
+    const index = kits.findIndex((kit) => kit.entityId === initialId);
+    return index >= 0 ? index : 0;
+  }, [kits, initialId]);
+
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const busyRef = useRef(false);
+  const [active, setActive] = useState(startIndex);
+  const [shift, setShift] = useState(0);
+  const [instant, setInstant] = useState(false);
+  const [viewportW, setViewportW] = useState(0);
+  const count = kits.length;
+  const gap = 14;
+
+  useEffect(() => {
+    setActive(startIndex);
+    setShift(0);
+    busyRef.current = false;
+  }, [startIndex]);
+
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    const measure = () => setViewportW(viewport.clientWidth);
+    measure();
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(viewport);
+    return () => observer.disconnect();
+  }, [count]);
+
+  if (count === 0) return null;
+
+  const slideW =
+    viewportW > 0 ? Math.round(Math.min(viewportW * (viewportW < 900 ? 0.92 : 0.72), 820)) : 0;
+  const step = slideW + gap;
+  const baseTx = viewportW > 0 && slideW > 0 ? (viewportW - slideW) / 2 - 2 * step : 0;
+  const tx = baseTx - shift * step;
+
+  const go = (dir: -1 | 1) => {
+    if (busyRef.current || count < 2 || slideW <= 0) return;
+    busyRef.current = true;
+    setShift(dir);
+  };
+
+  const handleTransitionEnd = (event: TransitionEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.propertyName !== 'transform') return;
+    if (shift === 0) return;
+
+    const dir = shift;
+    setInstant(true);
+    setActive((index) => (index + dir + count) % count);
+    setShift(0);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setInstant(false);
+        busyRef.current = false;
+      });
+    });
+  };
+
+  const at = (offset: number) => kits[(active + offset + count) % count]!;
+
+  const slots = [
+    { kit: at(-2), offset: -2 },
+    { kit: at(-1), offset: -1 },
+    { kit: at(0), offset: 0 },
+    { kit: at(1), offset: 1 },
+    { kit: at(2), offset: 2 },
+  ];
+
+  const renderFeature = (kit: DcCatalogItem, offset: number) => {
+    const isFeatured = kit.entityId === DAY_ONE_STARTER_KIT_ID;
+    const isCenter = offset === shift;
+    const body = (
+      <>
+        <div className="dc-pack-feature-media">
+          {kit.image ? (
+            <img alt={isCenter ? kit.image.alt : ''} src={kit.image.src} />
+          ) : (
+            <div aria-hidden className="dc-shelf-fallback" />
+          )}
+        </div>
+        <div className="dc-pack-feature-copy">
+          <span className="dc-pack-badge">{isFeatured ? 'Featured kit' : 'Customizable kit'}</span>
+          <h3>{kit.name}</h3>
+          {hasDisplayPrice(kit.priceLabel) ? (
+            <p className="dc-pack-price">{kit.priceLabel}</p>
+          ) : (
+            <p className="dc-pack-price dc-pack-price--spacer">&nbsp;</p>
+          )}
+          <p>
+            {isFeatured
+              ? 'A calm Day-One edit — open it to tune quantities, add what was missing, and save your version.'
+              : 'Open it to tune quantities, add what was missing, and save your version.'}
+          </p>
+          {isCenter && shift === 0 ? (
+            <a className="dc-btn dc-btn-solid" href={kit.path}>
+              Customize this kit
+            </a>
+          ) : (
+            <span className="dc-btn dc-btn-solid dc-pack-feature-cta-ghost">Customize this kit</span>
+          )}
+        </div>
+      </>
+    );
+
+    if (isCenter && shift === 0) {
+      return (
+        <article
+          aria-current="true"
+          className="dc-pack-feature dc-kits-carousel-slide is-center"
+          key={`${kit.entityId}-${offset}`}
+          style={{ width: slideW || undefined }}
+        >
+          {body}
+        </article>
+      );
+    }
+
+    return (
+      <button
+        aria-hidden={Math.abs(offset) > 1 || undefined}
+        aria-label={`Show ${kit.name}`}
+        className={`dc-pack-feature dc-kits-carousel-slide${isCenter ? ' is-center' : ' is-side'}${
+          offset < shift ? ' is-prev' : offset > shift ? ' is-next' : ''
+        }`}
+        disabled={shift !== 0}
+        key={`${kit.entityId}-${offset}`}
+        onClick={() => go(offset < 0 ? -1 : 1)}
+        style={{ width: slideW || undefined }}
+        type="button"
+      >
+        {body}
+      </button>
+    );
+  };
+
+  return (
+    <div className="dc-kits-carousel">
+      <p className="dc-kits-carousel-count">
+        {active + 1} / {count} kits
+      </p>
+
+      <div className="dc-kits-carousel-frame">
+        {count > 1 ? (
+          <button
+            aria-label="Previous kit"
+            className="dc-kits-carousel-btn is-prev"
+            onClick={() => go(-1)}
+            type="button"
+          >
+            ←
+          </button>
+        ) : null}
+
+        <div
+          aria-label="Diabetes kits carousel"
+          aria-roledescription="carousel"
+          className="dc-kits-carousel-viewport"
+          ref={viewportRef}
+        >
+          <div
+            className={`dc-kits-carousel-track${instant ? ' is-instant' : ''}`}
+            onTransitionEnd={handleTransitionEnd}
+            style={{
+              gap,
+              transform: slideW > 0 ? `translate3d(${tx}px, 0, 0)` : undefined,
+            }}
+          >
+            {slots.map(({ kit, offset }) => renderFeature(kit, offset))}
+          </div>
+        </div>
+
+        {count > 1 ? (
+          <button
+            aria-label="Next kit"
+            className="dc-kits-carousel-btn is-next"
+            onClick={() => go(1)}
+            type="button"
+          >
+            →
+          </button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 export function DiabetesCarePage({
   catalog,
   showGuestQuiz = false,
@@ -193,29 +395,13 @@ export function DiabetesCarePage({
   isSignedIn?: boolean;
 }) {
   const [shopRoom, setShopRoom] = useState<ShopRoomId>('all');
-  const [reduceMotion, setReduceMotion] = useState(false);
-  const [heroWordIndex, setHeroWordIndex] = useState(0);
-
-  useEffect(() => {
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const sync = () => setReduceMotion(media.matches);
-    sync();
-    media.addEventListener('change', sync);
-    return () => media.removeEventListener('change', sync);
-  }, []);
-
-  useEffect(() => {
-    if (reduceMotion) return;
-    const id = window.setInterval(() => {
-      setHeroWordIndex((index) => (index + 1) % HERO_WORDS.length);
-    }, 2600);
-
-    return () => window.clearInterval(id);
-  }, [reduceMotion]);
 
   const allKits = catalog?.kits ?? [];
-  const featuredKit = catalog?.featuredKit ?? allKits[0] ?? null;
-  const shelfKits = allKits.filter((kit) => kit.entityId !== featuredKit?.entityId);
+  const featuredKit =
+    catalog?.featuredKit ??
+    allKits.find((kit) => kit.entityId === DAY_ONE_STARTER_KIT_ID) ??
+    allKits[0] ??
+    null;
   const shopProducts = catalog?.products ?? [];
   const hasKits = allKits.length > 0;
   const hasShop = shopProducts.length > 0 || allKits.length > 0;
@@ -246,10 +432,7 @@ export function DiabetesCarePage({
               Diabetes Care
             </span>
             <h1>
-              Care that keeps{' '}
-              <span aria-live="polite" className="dc-hero-word" key={HERO_WORDS[heroWordIndex]}>
-                {HERO_WORDS[heroWordIndex]}
-              </span>
+              Care that keeps <RotatingHeroWord className="dc-hero-word" words={HERO_WORDS} />
             </h1>
             <p>
               Supplies, routines, and everyday living support — so diabetes care fits your life, not the other
@@ -266,21 +449,11 @@ export function DiabetesCarePage({
           </div>
 
           <div aria-hidden className="dc-hero-media">
-            {reduceMotion ? (
-              <img alt="" decoding="async" src={`${IMG}/hero.png`} />
-            ) : (
-              <video
-                autoPlay
-                className="dc-hero-video"
-                loop
-                muted
-                playsInline
-                poster={`${IMG}/hero.png`}
-                preload="metadata"
-              >
-                <source src={`${IMG}/diabetes-care.mp4`} type="video/mp4" />
-              </video>
-            )}
+            <HeroLoopVideo
+              className="dc-hero-video"
+              poster={`${IMG}/hero.png`}
+              src={`${IMG}/diabetes-care.mp4`}
+            />
             <div className="dc-hero-veil" />
           </div>
         </div>
@@ -295,10 +468,14 @@ export function DiabetesCarePage({
       </section>
 
       {showGuestQuiz ? (
-        <GuestCategoryQuiz categoryId="diabetes_care_everyday" isSignedIn={isSignedIn} />
+        <GuestCategoryQuiz
+          categoryId="diabetes_care_everyday"
+          className="rounded-top"
+          isSignedIn={isSignedIn}
+        />
       ) : null}
 
-      <section aria-label="Liivv Diabetes community notes" className="dc-stats">
+      <section aria-label="Liivv Diabetes community notes" className="dc-stats rounded-top">
         <div className="dc-wrap">
           <div className="dc-stats-grid">
             {STATS.map((stat) => (
@@ -311,7 +488,7 @@ export function DiabetesCarePage({
         </div>
       </section>
 
-      <section aria-label="Ways into Diabetes Care" className="dc-path" id="doors">
+      <section aria-label="Ways into Diabetes Care" className="dc-path rounded-top" id="doors">
         <div className="dc-wrap">
           <header className="dc-path-head">
             <span className="dc-eyebrow">The Liivv Diabetes edit</span>
@@ -332,7 +509,7 @@ export function DiabetesCarePage({
         </div>
       </section>
 
-      <section aria-label="Diabetes CarePacks" className="dc-packs" id="build-your-kit">
+      <section aria-label="Diabetes CarePacks" className="dc-packs rounded-top" id="build-your-kit">
         <div className="dc-wrap">
           <header className="dc-packs-head">
             <span className="dc-eyebrow">Also in the edit: CarePacks</span>
@@ -346,64 +523,22 @@ export function DiabetesCarePage({
 
           <KitFlowDemo
             badge="Featured CarePack"
-            description="A calm diabetes edit — customize quantities, add what was missing, then save or checkout."
-            fallbackImageSrc={`${IMG}/door-shop.png`}
+            description="A calm Day-One edit — customize quantities, add what was missing, then save or checkout."
+            fallbackImageSrc={`${IMG}/kit-products/kit-diabetes-day-one.png`}
             kitHref={featuredKit?.path ?? SHOP_HREF}
             kitImage={featuredKit?.image}
-            kitName={featuredKit?.name ?? 'Diabetes CarePack'}
+            kitName={featuredKit?.name ?? 'Just Diagnosed: Diabetes Day-One Starter'}
             searchFallbacks={KIT_FLOW_SEARCH_FALLBACKS}
             searchPool={kitSearchPool}
             trayLines={[...KIT_FLOW_TRAY]}
           />
 
-          {featuredKit ? (
-            <article className="dc-pack-feature">
-              <div className="dc-pack-feature-media">
-                {featuredKit.image ? (
-                  <img alt={featuredKit.image.alt} src={featuredKit.image.src} />
-                ) : (
-                  <div aria-hidden className="dc-shelf-fallback" />
-                )}
-              </div>
-              <div className="dc-pack-feature-copy">
-                <span className="dc-pack-badge">Featured CarePack</span>
-                <h3>{featuredKit.name}</h3>
-                {hasDisplayPrice(featuredKit.priceLabel) ? (
-                  <p className="dc-pack-price">{featuredKit.priceLabel}</p>
-                ) : null}
-                <p>Customize on the kit page, then subscribe so your version restocks on your rhythm.</p>
-                <a className="dc-btn dc-btn-solid" href={featuredKit.path}>
-                  Customize this kit
-                </a>
-              </div>
-            </article>
-          ) : null}
-
-          {shelfKits.length > 0 ? (
-            <div aria-label="More CarePacks" className="dc-shelf">
-              {shelfKits.map((kit) => (
-                <a className="dc-shelf-card" href={kit.path} key={kit.entityId}>
-                  <div className="dc-shelf-media">
-                    {kit.image ? (
-                      <img alt={kit.image.alt} src={kit.image.src} />
-                    ) : (
-                      <div aria-hidden className="dc-shelf-fallback" />
-                    )}
-                  </div>
-                  <div className="dc-shelf-meta">
-                    <span className="dc-product-badge">Customizable kit</span>
-                    <h3>{kit.name}</h3>
-                    {hasDisplayPrice(kit.priceLabel) ? <p>{kit.priceLabel}</p> : null}
-                  </div>
-                </a>
-              ))}
-            </div>
-          ) : null}
+            <KitsCarousel initialId={featuredKit?.entityId} kits={allKits} />
         </div>
       </section>
 
       {hasShop ? (
-        <section aria-label="Shop Diabetes Care" className="dc-shop" id="shop-diabetes-care">
+        <section aria-label="Shop Diabetes Care" className="dc-shop rounded-top" id="shop-diabetes-care">
           <div className="dc-wrap">
             <div className="dc-shop-head">
               <div>
@@ -460,7 +595,7 @@ export function DiabetesCarePage({
       ) : null}
 
       <SpecializedSubscribe
-        className="dc-subs"
+        className="dc-subs rounded-top"
         demoProductBlurb="Strips, sensors, and staples — restocked on your testing rhythm."
         demoProductName="Diabetes Essentials"
         demoProductPath="liivv.ca/product/diabetes-essentials"
@@ -474,7 +609,7 @@ export function DiabetesCarePage({
         wrapClassName="dc-wrap"
       />
 
-      <section aria-label="Journey chapters" className="dc-journey" id="where-are-you">
+      <section aria-label="Journey chapters" className="dc-journey rounded-top" id="where-are-you">
         <div className="dc-wrap">
           <header className="dc-journey-head">
             <span className="dc-eyebrow">Your pace</span>
@@ -498,7 +633,7 @@ export function DiabetesCarePage({
         </div>
       </section>
 
-      <section aria-label="Pharmacist care" className="dc-care" id="care">
+      <section aria-label="Pharmacist care" className="dc-care rounded-top" id="care">
         <div className="dc-wrap">
           <div className="dc-care-panel">
             <div className="dc-care-visual">
@@ -525,7 +660,7 @@ export function DiabetesCarePage({
         </div>
       </section>
 
-      <section aria-label="Preferred brands" className="dc-brands" id="brands">
+      <section aria-label="Preferred brands" className="dc-brands rounded-top" id="brands">
         <div className="dc-wrap">
           <div className="dc-brands-inner">
             <span className="dc-eyebrow">Shop context</span>
@@ -548,7 +683,7 @@ export function DiabetesCarePage({
         </div>
       </section>
 
-      <section aria-label="Community voices" className="dc-voices" id="voices">
+      <section aria-label="Community voices" className="dc-voices rounded-top" id="voices">
         <div className="dc-wrap">
           <header className="dc-voices-head">
             <span className="dc-eyebrow">What people are saying</span>
@@ -571,7 +706,7 @@ export function DiabetesCarePage({
         </div>
       </section>
 
-      <section aria-label="Frequently asked questions" className="dc-faq">
+      <section aria-label="Frequently asked questions" className="dc-faq rounded-top">
         <div className="dc-wrap">
           <div className="dc-faq-panel">
             <h2>Good questions. Honest answers.</h2>
@@ -638,7 +773,7 @@ export function DiabetesCarePage({
         </div>
       </section>
 
-      <section aria-label="Closing" className="dc-close" id="manifesto">
+      <section aria-label="Closing" className="dc-close rounded-top" id="manifesto">
         <div aria-hidden className="dc-close-bg">
           <img alt="" decoding="async" src={`${IMG}/closing.png`} />
         </div>

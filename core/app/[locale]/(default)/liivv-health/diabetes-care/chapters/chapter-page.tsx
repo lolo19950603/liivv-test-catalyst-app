@@ -106,7 +106,7 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </div>
       </section>
 
-      <section className="dc-ch-journal" id="chapter-pulse">
+      <section className="dc-ch-journal rounded-top" id="chapter-pulse">
         <div className="dc-ch-journal-grid">
           <article className="dc-ch-note">
             <span className="dc-ch-note-label">The Focus</span>
@@ -119,7 +119,7 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </div>
       </section>
 
-      <section className="dc-ch-care" id="chapter-care">
+      <section className="dc-ch-care rounded-top" id="chapter-care">
         <div className="dc-ch-wrap">
           <header className="dc-ch-care-head">
             <span className="dc-ch-eyebrow">{chapter.categoriesIntro.eyebrow}</span>
@@ -135,7 +135,7 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
       </section>
 
       {chapter.programsBand ? (
-        <section className="dc-ch-programs">
+        <section className="dc-ch-programs rounded-top">
           <div className="dc-ch-wrap">
             {chapter.programsBand.heading ? (
               <header className="dc-ch-care-head">
@@ -156,7 +156,7 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </section>
       ) : null}
 
-      <section className="dc-ch-care-cta">
+      <section className="dc-ch-care-cta rounded-top">
         <div className="dc-ch-wrap">
           <div className="dc-ch-care-panel">
             <div className="dc-ch-care-media">
@@ -174,7 +174,7 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </div>
       </section>
 
-      <section className="dc-ch-map">
+      <section className="dc-ch-map rounded-top">
         <div className="dc-ch-wrap">
           <span className="dc-ch-eyebrow">Path</span>
           <h2>{isPath ? 'All four paths' : 'All four chapters'}</h2>
@@ -197,7 +197,7 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </div>
       </section>
 
-      <section className="dc-ch-close">
+      <section className="dc-ch-close rounded-top">
         <div className="dc-ch-close-bg">
           <img alt="" src={chapter.heroImage} />
         </div>

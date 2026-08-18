@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type TransitionEvent } from 'react';
 
+import { HeroLoopVideo, RotatingHeroWord } from '~/components/health-hero';
 import { OliviaHelpBand } from '~/components/olivia/olivia-help-band';
 import { GuestCategoryQuiz } from '~/components/onboarding/guest-category-quiz';
 import { KitFlowDemo } from '~/components/kit-flow-demo/kit-flow-demo';
@@ -15,7 +16,7 @@ import './ostomy-care.css';
 
 /*
  * Ostomy Care landing — Quiet Shelf / Everyday Ritual
- * Distinct from Women's Health (no doors / float chips / kit carousel clone).
+ * Distinct from Women's Health (no doors / float chips) — kits carousel matches WH.
  */
 
 const SHOP_HREF = SHOP_OSTOMY_HREF;
@@ -173,6 +174,206 @@ function hasDisplayPrice(priceLabel?: string) {
   return Boolean(priceLabel && !/(\$|CA\$)?\s*0([.,]0+)?\b/i.test(priceLabel));
 }
 
+function KitsCarousel({
+  kits,
+  initialId,
+}: {
+  kits: OcCatalogItem[];
+  initialId?: number | null;
+}) {
+  const startIndex = useMemo(() => {
+    if (!initialId) return 0;
+    const index = kits.findIndex((kit) => kit.entityId === initialId);
+    return index >= 0 ? index : 0;
+  }, [kits, initialId]);
+
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const busyRef = useRef(false);
+  const [active, setActive] = useState(startIndex);
+  const [shift, setShift] = useState(0);
+  const [instant, setInstant] = useState(false);
+  const [viewportW, setViewportW] = useState(0);
+  const count = kits.length;
+  const gap = 14;
+
+  useEffect(() => {
+    setActive(startIndex);
+    setShift(0);
+    busyRef.current = false;
+  }, [startIndex]);
+
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    const measure = () => setViewportW(viewport.clientWidth);
+    measure();
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(viewport);
+    return () => observer.disconnect();
+  }, [count]);
+
+  if (count === 0) return null;
+
+  const slideW =
+    viewportW > 0 ? Math.round(Math.min(viewportW * (viewportW < 900 ? 0.92 : 0.72), 820)) : 0;
+  const step = slideW + gap;
+  const baseTx = viewportW > 0 && slideW > 0 ? (viewportW - slideW) / 2 - 2 * step : 0;
+  const tx = baseTx - shift * step;
+
+  const go = (dir: -1 | 1) => {
+    if (busyRef.current || count < 2 || slideW <= 0) return;
+    busyRef.current = true;
+    setShift(dir);
+  };
+
+  const handleTransitionEnd = (event: TransitionEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.propertyName !== 'transform') return;
+    if (shift === 0) return;
+
+    const dir = shift;
+    setInstant(true);
+    setActive((index) => (index + dir + count) % count);
+    setShift(0);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setInstant(false);
+        busyRef.current = false;
+      });
+    });
+  };
+
+  const at = (offset: number) => kits[(active + offset + count) % count]!;
+
+  const slots = [
+    { kit: at(-2), offset: -2 },
+    { kit: at(-1), offset: -1 },
+    { kit: at(0), offset: 0 },
+    { kit: at(1), offset: 1 },
+    { kit: at(2), offset: 2 },
+  ];
+
+  const renderFeature = (kit: OcCatalogItem, offset: number) => {
+    const isFeatured = kit.entityId === NEW_JOURNEY_STARTER_KIT_ID;
+    const isCenter = offset === shift;
+    const body = (
+      <>
+        <div className="oc-pack-feature-media">
+          {kit.image ? (
+            <img alt={isCenter ? kit.image.alt : ''} src={kit.image.src} />
+          ) : (
+            <div aria-hidden className="oc-shelf-fallback" />
+          )}
+        </div>
+        <div className="oc-pack-feature-copy">
+          <span className="oc-pack-badge">{isFeatured ? 'Featured kit' : 'Customizable kit'}</span>
+          <h3>{kit.name}</h3>
+          {hasDisplayPrice(kit.priceLabel) ? (
+            <p className="oc-pack-price">{kit.priceLabel}</p>
+          ) : (
+            <p className="oc-pack-price oc-pack-price--spacer">&nbsp;</p>
+          )}
+          <p>
+            {isFeatured
+              ? 'A calm Fresh Start edit — open it to tune quantities, add what was missing, and save your version.'
+              : 'Open it to tune quantities, add what was missing, and save your version.'}
+          </p>
+          {isCenter && shift === 0 ? (
+            <a className="oc-btn oc-btn-solid" href={kit.path}>
+              Customize this kit
+            </a>
+          ) : (
+            <span className="oc-btn oc-btn-solid oc-pack-feature-cta-ghost">Customize this kit</span>
+          )}
+        </div>
+      </>
+    );
+
+    if (isCenter && shift === 0) {
+      return (
+        <article
+          aria-current="true"
+          className="oc-pack-feature oc-kits-carousel-slide is-center"
+          key={`${kit.entityId}-${offset}`}
+          style={{ width: slideW || undefined }}
+        >
+          {body}
+        </article>
+      );
+    }
+
+    return (
+      <button
+        aria-hidden={Math.abs(offset) > 1 || undefined}
+        aria-label={`Show ${kit.name}`}
+        className={`oc-pack-feature oc-kits-carousel-slide${isCenter ? ' is-center' : ' is-side'}${
+          offset < shift ? ' is-prev' : offset > shift ? ' is-next' : ''
+        }`}
+        disabled={shift !== 0}
+        key={`${kit.entityId}-${offset}`}
+        onClick={() => go(offset < 0 ? -1 : 1)}
+        style={{ width: slideW || undefined }}
+        type="button"
+      >
+        {body}
+      </button>
+    );
+  };
+
+  return (
+    <div className="oc-kits-carousel">
+      <p className="oc-kits-carousel-count">
+        {active + 1} / {count} kits
+      </p>
+
+      <div className="oc-kits-carousel-frame">
+        {count > 1 ? (
+          <button
+            aria-label="Previous kit"
+            className="oc-kits-carousel-btn is-prev"
+            onClick={() => go(-1)}
+            type="button"
+          >
+            ←
+          </button>
+        ) : null}
+
+        <div
+          aria-label="Ostomy Care kits carousel"
+          aria-roledescription="carousel"
+          className="oc-kits-carousel-viewport"
+          ref={viewportRef}
+        >
+          <div
+            className={`oc-kits-carousel-track${instant ? ' is-instant' : ''}`}
+            onTransitionEnd={handleTransitionEnd}
+            style={{
+              gap,
+              transform: slideW > 0 ? `translate3d(${tx}px, 0, 0)` : undefined,
+            }}
+          >
+            {slots.map(({ kit, offset }) => renderFeature(kit, offset))}
+          </div>
+        </div>
+
+        {count > 1 ? (
+          <button
+            aria-label="Next kit"
+            className="oc-kits-carousel-btn is-next"
+            onClick={() => go(1)}
+            type="button"
+          >
+            →
+          </button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 export function OstomyCarePage({
   catalog,
   showGuestQuiz = false,
@@ -183,25 +384,6 @@ export function OstomyCarePage({
   isSignedIn?: boolean;
 }) {
   const [shopRoom, setShopRoom] = useState<ShopRoomId>('all');
-  const [reduceMotion, setReduceMotion] = useState(false);
-  const [heroWordIndex, setHeroWordIndex] = useState(0);
-
-  useEffect(() => {
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const sync = () => setReduceMotion(media.matches);
-    sync();
-    media.addEventListener('change', sync);
-    return () => media.removeEventListener('change', sync);
-  }, []);
-
-  useEffect(() => {
-    if (reduceMotion) return;
-    const id = window.setInterval(() => {
-      setHeroWordIndex((index) => (index + 1) % HERO_WORDS.length);
-    }, 2600);
-
-    return () => window.clearInterval(id);
-  }, [reduceMotion]);
 
   const allKits = catalog?.kits ?? [];
   const featuredKit =
@@ -209,7 +391,6 @@ export function OstomyCarePage({
     allKits.find((kit) => kit.entityId === NEW_JOURNEY_STARTER_KIT_ID) ??
     allKits[0] ??
     null;
-  const shelfKits = allKits.filter((kit) => kit.entityId !== featuredKit?.entityId);
   const shopProducts = catalog?.products ?? [];
   const hasKits = allKits.length > 0;
   const hasShop = shopProducts.length > 0 || allKits.length > 0;
@@ -240,10 +421,7 @@ export function OstomyCarePage({
               Ostomy Care
             </span>
             <h1>
-              Care that stays{' '}
-              <span aria-live="polite" className="oc-hero-word" key={HERO_WORDS[heroWordIndex]}>
-                {HERO_WORDS[heroWordIndex]}
-              </span>
+              Care that stays <RotatingHeroWord className="oc-hero-word" words={HERO_WORDS} />
             </h1>
             <p>
               Supplies, everyday living support, and kind guidance — so your routine feels like yours again.
@@ -259,27 +437,20 @@ export function OstomyCarePage({
           </div>
 
           <div aria-hidden className="oc-hero-media">
-            {reduceMotion ? (
-              <img alt="" decoding="async" src={`${IMG}/hero.png`} />
-            ) : (
-              <video
-                autoPlay
-                className="oc-hero-video"
-                loop
-                muted
-                playsInline
-                poster={`${IMG}/hero.png`}
-                preload="metadata"
-              >
-                <source src={`${IMG}/ostomy-care.mp4`} type="video/mp4" />
-              </video>
-            )}
+            <HeroLoopVideo
+              className="oc-hero-video"
+              poster={`${IMG}/hero.png`}
+              src={`${IMG}/ostomy-care.mp4`}
+            />
             <div className="oc-hero-veil" />
           </div>
         </div>
       </section>
 
-      <section aria-label="Why Liivv Ostomy Care" className="oc-trust">
+      <section
+        aria-label="Why Liivv Ostomy Care"
+        className={`oc-trust${showGuestQuiz ? ' oc-trust--quiz' : ''}`}
+      >
         <div className="oc-trust-track">
           {TRUST_ITEMS.map((item) => (
             <span key={item}>{item}</span>
@@ -288,10 +459,18 @@ export function OstomyCarePage({
       </section>
 
       {showGuestQuiz ? (
-        <GuestCategoryQuiz categoryId="ostomy_care_everyday" isSignedIn={isSignedIn} />
+        <GuestCategoryQuiz
+          categoryId="ostomy_care_everyday"
+          className="rounded-top"
+          isSignedIn={isSignedIn}
+        />
       ) : null}
 
-      <section aria-label="Ways into Ostomy Care" className="oc-path" id="doors">
+      <section
+        aria-label="Ways into Ostomy Care"
+        className={`oc-path${showGuestQuiz ? ' rounded-top' : ''}`}
+        id="doors"
+      >
         <div className="oc-wrap">
           <header className="oc-path-head">
             <span className="oc-eyebrow">A quiet path in</span>
@@ -313,7 +492,7 @@ export function OstomyCarePage({
       </section>
 
       {hasKits ? (
-        <section aria-label="Ostomy curated kits" className="oc-packs" id="build-your-kit">
+        <section aria-label="Ostomy curated kits" className="oc-packs rounded-top" id="build-your-kit">
           <div className="oc-wrap">
             <header className="oc-packs-head">
               <span className="oc-eyebrow">Curated kits</span>
@@ -335,58 +514,13 @@ export function OstomyCarePage({
               trayLines={[...KIT_FLOW_TRAY]}
             />
 
-            {featuredKit ? (
-              <article className="oc-pack-feature">
-                <div className="oc-pack-feature-media">
-                  {featuredKit.image ? (
-                    <img alt={featuredKit.image.alt} src={featuredKit.image.src} />
-                  ) : (
-                    <div aria-hidden className="oc-shelf-fallback" />
-                  )}
-                </div>
-                <div className="oc-pack-feature-copy">
-                  <span className="oc-pack-badge">Featured kit</span>
-                  <h3>{featuredKit.name}</h3>
-                  {hasDisplayPrice(featuredKit.priceLabel) ? (
-                    <p className="oc-pack-price">{featuredKit.priceLabel}</p>
-                  ) : null}
-                  <p>
-                    A calm Fresh Start edit — customize on the kit page, then subscribe so your version
-                    restocks on your wear time.
-                  </p>
-                  <a className="oc-btn oc-btn-solid" href={featuredKit.path}>
-                    Customize this kit
-                  </a>
-                </div>
-              </article>
-            ) : null}
-
-            {shelfKits.length > 0 ? (
-              <div aria-label="More curated kits" className="oc-shelf">
-                {shelfKits.map((kit) => (
-                  <a className="oc-shelf-card" href={kit.path} key={kit.entityId}>
-                    <div className="oc-shelf-media">
-                      {kit.image ? (
-                        <img alt={kit.image.alt} src={kit.image.src} />
-                      ) : (
-                        <div aria-hidden className="oc-shelf-fallback" />
-                      )}
-                    </div>
-                    <div className="oc-shelf-meta">
-                      <span className="oc-product-badge">Customizable kit</span>
-                      <h3>{kit.name}</h3>
-                      {hasDisplayPrice(kit.priceLabel) ? <p>{kit.priceLabel}</p> : null}
-                    </div>
-                  </a>
-                ))}
-              </div>
-            ) : null}
+            <KitsCarousel initialId={featuredKit?.entityId} kits={allKits} />
           </div>
         </section>
       ) : null}
 
       {hasShop ? (
-        <section aria-label="Shop Ostomy Essentials" className="oc-shop" id="shop-ostomy-care">
+        <section aria-label="Ostomy Essentials" className="oc-shop rounded-top" id="shop-ostomy-care">
           <div className="oc-wrap">
             <div className="oc-shop-head">
               <div>
@@ -443,7 +577,7 @@ export function OstomyCarePage({
       ) : null}
 
       <SpecializedSubscribe
-        className="oc-subs"
+        className="oc-subs rounded-top"
         demoProductBlurb="Pouches, barriers, and skin care — restocked before you run out."
         demoProductName="Ostomy Essentials"
         demoProductPath="liivv.ca/product/ostomy-essentials"
@@ -457,7 +591,7 @@ export function OstomyCarePage({
         wrapClassName="oc-wrap"
       />
 
-      <section aria-label="Life chapters" className="oc-chapters" id="where-are-you">
+      <section aria-label="Life chapters" className="oc-chapters rounded-top" id="where-are-you">
         <div className="oc-wrap">
           <header className="oc-chapters-head">
             <span className="oc-eyebrow">Life chapters</span>
@@ -486,7 +620,7 @@ export function OstomyCarePage({
         </div>
       </section>
 
-      <section aria-label="Pharmacist care" className="oc-care" id="care">
+      <section aria-label="Pharmacist care" className="oc-care rounded-top" id="care">
         <div className="oc-wrap">
           <div className="oc-care-panel">
             <div className="oc-care-visual">
@@ -513,7 +647,7 @@ export function OstomyCarePage({
         </div>
       </section>
 
-      <section aria-label="Preferred brands" className="oc-brands" id="brands">
+      <section aria-label="Preferred brands" className="oc-brands rounded-top" id="brands">
         <div className="oc-wrap">
           <div className="oc-brands-inner">
             <span className="oc-eyebrow">Shop context</span>
@@ -538,7 +672,7 @@ export function OstomyCarePage({
         </div>
       </section>
 
-      <section aria-label="Community voices" className="oc-voices" id="voices">
+      <section aria-label="Community voices" className="oc-voices rounded-top" id="voices">
         <div className="oc-wrap">
           <header className="oc-voices-head">
             <span className="oc-eyebrow">Beyond the aisle</span>
@@ -561,7 +695,7 @@ export function OstomyCarePage({
         </div>
       </section>
 
-      <section aria-label="Frequently asked questions" className="oc-faq">
+      <section aria-label="Frequently asked questions" className="oc-faq rounded-top">
         <div className="oc-wrap">
           <div className="oc-faq-panel">
             <h2>Quiet questions. Honest answers.</h2>
@@ -607,7 +741,7 @@ export function OstomyCarePage({
         </div>
       </section>
 
-      <section aria-label="Closing" className="oc-close" id="manifesto">
+      <section aria-label="Closing" className="oc-close rounded-top" id="manifesto">
         <div aria-hidden className="oc-close-bg">
           <img alt="" decoding="async" src={`${IMG}/closing.png`} />
         </div>
@@ -620,7 +754,7 @@ export function OstomyCarePage({
           </p>
           <div className="oc-close-cta">
             <a className="oc-btn oc-btn-soft" href={SHOP_HREF}>
-              Shop Ostomy Essentials
+              Ostomy Essentials
             </a>
             <a className="oc-btn oc-btn-ghost" href="#subscriptions" style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff' }}>
               Subscribe &amp; save

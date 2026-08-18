@@ -14,8 +14,9 @@ html {
   --store-border: rgba(49, 47, 47, 0.18);
   --store-surface: 245 242 237;
   --liivv-archive-sans-font: var(--font-product-family, var(--font-body-family, Poppins, sans-serif));
-  /* Breadcrumb hover underline matches text, not Catalyst primary green */
+  /* Hover underlines match text, not Catalyst primary green */
   --breadcrumbs-hover: hsl(var(--foreground));
+  --animated-underline-hover: var(--store-primary-text);
 }
 
 .liivv-store .group\/products-list-section h1 {

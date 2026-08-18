@@ -49,8 +49,9 @@ import { ACCOUNT_LOGIN_PATH } from '~/lib/makeswift/site-header/resolve-account-
 
 const CART_PATH = '/cart';
 const SEARCH_ARIA_LABEL = 'Search';
-/** Keep in sync with --mega-menu-drawer-duration in mega-menu-css.ts */
-const SEARCH_DRAWER_DURATION_MS = 450;
+/** Ignore focus/layout scroll right after open; then close once the page moves down. */
+const SEARCH_SCROLL_CLOSE_DELAY_MS = 150;
+const SEARCH_SCROLL_CLOSE_DELTA_PX = 8;
 /** Keep in sync with --mega-menu-close-delay in mega-menu-css.ts */
 const MEGA_MENU_CLOSE_DELAY_MS = 300;
 
@@ -956,12 +957,13 @@ export function LiivvArchiveHeader({
     }
 
     setMobileNavOpen(false);
+    closeMegaMenu();
     setSearchDrawerMounted(true);
 
     window.requestAnimationFrame(() => {
       setSearchOpen(true);
     });
-  }, [searchOpen]);
+  }, [closeMegaMenu, searchOpen]);
 
   const refreshCartCount = useCallback(async () => {
     try {
@@ -1039,16 +1041,77 @@ export function LiivvArchiveHeader({
   }, [mobileNavOpen, searchOpen, closeMobileNav, closeSearch, closeMegaMenu]);
 
   useEffect(() => {
-    if (!searchOpen || !searchDrawerMounted) {
+    if (!searchOpen) {
       return;
     }
 
-    const timer = window.setTimeout(() => {
-      setSearchDrawerMounted(false);
-    }, SEARCH_DRAWER_DURATION_MS);
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target;
 
-    return () => window.clearTimeout(timer);
-  }, [searchDrawerMounted, searchOpen]);
+      if (!(target instanceof Node)) {
+        return;
+      }
+
+      const element = target instanceof Element ? target : target.parentElement;
+
+      if (
+        element?.closest(`#${searchPanelId}`) != null ||
+        element?.closest('.search-drawer-button') != null
+      ) {
+        return;
+      }
+
+      closeSearch();
+    };
+
+    document.addEventListener('pointerdown', onPointerDown);
+
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, [searchOpen, searchPanelId, closeSearch]);
+
+  useEffect(() => {
+    if (!searchOpen) {
+      return;
+    }
+
+    let originY = window.scrollY;
+    let armed = false;
+    const armTimer = window.setTimeout(() => {
+      armed = true;
+      originY = window.scrollY;
+    }, SEARCH_SCROLL_CLOSE_DELAY_MS);
+
+    const onScroll = (event: Event) => {
+      const target = event.target;
+
+      if (target instanceof Element && target.closest(`#${searchPanelId}`) != null) {
+        return;
+      }
+
+      if (!armed) {
+        originY = window.scrollY;
+
+        return;
+      }
+
+      if (target instanceof Element) {
+        closeSearch();
+
+        return;
+      }
+
+      if (window.scrollY - originY >= SEARCH_SCROLL_CLOSE_DELTA_PX) {
+        closeSearch();
+      }
+    };
+
+    document.addEventListener('scroll', onScroll, { capture: true, passive: true });
+
+    return () => {
+      window.clearTimeout(armTimer);
+      document.removeEventListener('scroll', onScroll, { capture: true });
+    };
+  }, [searchOpen, searchPanelId, closeSearch]);
 
   useEffect(() => {
     if (!searchDrawerOpen) {
@@ -1167,7 +1230,7 @@ export function LiivvArchiveHeader({
         <style dangerouslySetInnerHTML={{ __html: LIIVV_HEADER_STICKY_SCROLLED_CSS }} />
       ) : null}
       {banner}
-      {(mobileNavOpen || searchDrawerMounted) && (hasNav || searchDrawerMounted) ? (
+      {(mobileNavOpen || searchOpen) && (hasNav || searchOpen) ? (
         <div
           aria-hidden
           className="diabetes-care-mobile-backdrop fixed inset-0 z-[1] bg-[rgb(33_33_33/0.4)]"
@@ -1376,6 +1439,7 @@ export function LiivvArchiveHeader({
             aria-hidden={!searchDrawerOpen}
             className={clsx('header-search-wrap', searchDrawerOpen && 'is-open')}
             id={searchPanelId}
+            inert={!searchDrawerOpen}
           >
             <div className="header-search-drawer liivv-archive-search-panel">
               <LiivvArchiveSearchPanel

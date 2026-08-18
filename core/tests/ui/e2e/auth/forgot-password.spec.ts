@@ -8,7 +8,7 @@ test('Forgot password form works as expected', async ({ page }) => {
   const email = faker.internet.email({ provider: 'example.com' });
 
   await page.goto('/login/forgot-password');
-  await page.getByRole('heading', { name: t('title') }).waitFor();
+  await page.getByRole('heading', { name: t('heading') }).waitFor();
 
   // TODO: Forgot password form fields and CTA need to be translated
   await page.getByLabel('Email').fill(email);
@@ -21,7 +21,7 @@ test('Forgot password form displays error if email is not valid', async ({ page 
   const t = await getTranslations('Auth.Login.ForgotPassword');
 
   await page.goto('/login/forgot-password');
-  await page.getByRole('heading', { name: t('title') }).waitFor();
+  await page.getByRole('heading', { name: t('heading') }).waitFor();
 
   await page.getByLabel('Email').fill('not-an-email');
   await page.getByRole('button', { name: 'Reset password' }).click();

@@ -324,7 +324,7 @@ export const MakeswiftHeader = forwardRef(
         {careBack ? (
           <nav
             aria-label={careBack.label}
-            className="liivv-care-back-bar relative z-[2] w-full border-t border-[rgb(49_47_47/0.08)] bg-white px-5 py-2.5 lg:px-8"
+            className="liivv-care-back-bar w-full border-t border-[rgb(49_47_47/0.08)] bg-white px-5 py-2.5 lg:px-8"
           >
             <Link
               className="inline-flex items-center text-sm font-medium tracking-wide text-[#312f2f] no-underline hover:underline"

@@ -2,10 +2,9 @@
 import { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 
-import { ButtonLink } from '@/vibes/soul/primitives/button-link';
 import { SignInSection } from '@/vibes/soul/sections/sign-in-section';
 import { buildConfig } from '~/build-config/reader';
-import { Slot } from '~/lib/makeswift/slot';
+import { OliviaAuthStage } from '~/components/olivia/olivia-auth-stage';
 import { ACCOUNT_DEFAULT_REDIRECT_PATH } from '~/lib/makeswift/site-header/resolve-account-href';
 
 import { login } from './_actions/login';
@@ -35,6 +34,7 @@ export default async function Login({ params, searchParams }: Props) {
   setRequestLocale(locale);
 
   const t = await getTranslations('Auth.Login');
+  const tOlivia = await getTranslations('Auth.Login.Olivia');
 
   const vanityUrl = buildConfig.get('urls').vanityUrl;
   const redirectUrl = new URL(redirectTo, vanityUrl);
@@ -42,7 +42,28 @@ export default async function Login({ params, searchParams }: Props) {
   const tokenErrorMessage = error === 'InvalidToken' ? t('invalidToken') : undefined;
 
   return (
-    <>
+    <OliviaAuthStage
+      copy={{
+        kicker: tOlivia('kicker'),
+        heading: t('heading'),
+        lead: tOlivia('lead'),
+        mascotAlt: tOlivia('mascotAlt'),
+        switcherLabel: tOlivia('switcher'),
+        switcherHref: '/register',
+        submitting: tOlivia('submitting'),
+        error: tOlivia('error'),
+        oneStepAway: tOlivia('oneStepAway'),
+        almostDone: tOlivia('almostDone'),
+        named: tOlivia('named'),
+        idle: [tOlivia('idle0'), tOlivia('idle1')],
+        firstName: tOlivia('email'),
+        lastName: tOlivia('email'),
+        email: tOlivia('email'),
+        password: tOlivia('password'),
+        confirmPassword: tOlivia('almostDone'),
+      }}
+      scene="login"
+    >
       <SignInSection
         action={login.bind(null, { redirectTo: redirectTarget })}
         emailLabel={t('email')}
@@ -51,33 +72,8 @@ export default async function Login({ params, searchParams }: Props) {
         forgotPasswordLabel={t('forgotPassword')}
         passwordLabel={t('password')}
         submitLabel={t('cta')}
-        title={t('heading')}
-      >
-        <Slot
-          fallback={
-            <div className="font-[family-name:var(--sign-in-font-family,var(--font-family-body))]">
-              <h2 className="mb-10 font-[family-name:var(--sign-in-title-font-family,var(--font-family-heading))] text-4xl font-medium leading-none text-[var(--reset-password-title,hsl(var(--foreground)))] @xl:text-5xl">
-                {t('CreateAccount.title')}
-              </h2>
-              <div className="text-[var(--sign-in-description,hsl(var(--contrast-500)))]">
-                <p>{t('CreateAccount.accountBenefits')}</p>
-                <ul className="mb-10 ml-4 mt-4 list-disc">
-                  <li>{t('CreateAccount.fastCheckout')}</li>
-                  <li>{t('CreateAccount.multipleAddresses')}</li>
-                  <li>{t('CreateAccount.ordersHistory')}</li>
-                  <li>{t('CreateAccount.ordersTracking')}</li>
-                  <li>{t('CreateAccount.wishlists')}</li>
-                </ul>
-                <ButtonLink className="mt-auto w-full" href="/register" variant="secondary">
-                  {t('CreateAccount.cta')}
-                </ButtonLink>
-              </div>
-            </div>
-          }
-          label="Login sidebar content"
-          snapshotId="login-sidebar-content"
-        />
-      </SignInSection>
-    </>
+        title=""
+      />
+    </OliviaAuthStage>
   );
 }

@@ -314,7 +314,7 @@
   background:
     radial-gradient(90% 80% at 10% 0%, color-mix(in srgb, var(--chapter-accent) 22%, transparent), transparent 55%),
     var(--cream);
-  padding: 80px 24px 88px;
+  padding: 80px 24px 110px;
 }
 
 #wh-chapter .wh-ch-pulse-grid {
@@ -355,7 +355,7 @@
 
 /* Categories */
 #wh-chapter .wh-ch-categories {
-  background: var(--soft);
+  background: var(--sand);
   padding: 100px 24px 110px;
 }
 

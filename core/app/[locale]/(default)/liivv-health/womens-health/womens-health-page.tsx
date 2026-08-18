@@ -1237,7 +1237,10 @@ export function WomensHealthPage({
           Scrolling / row of trust bullets under the hero.
           Edit items in: TRUST_ITEMS (top of file).
           ===================================================================== */}
-      <section aria-label="Why Liivv Women" className="wh-trust">
+      <section
+        aria-label="Why Liivv Women"
+        className={`wh-trust${showGuestQuiz ? ' wh-trust--quiz' : ''}`}
+      >
         <div className="container wh-trust-track">
           {TRUST_ITEMS.map((item) => (
             <span key={item}>{item}</span>
@@ -1246,7 +1249,11 @@ export function WomensHealthPage({
       </section>
 
       {showGuestQuiz ? (
-        <GuestCategoryQuiz categoryId="womens_health_wellness" isSignedIn={isSignedIn} />
+        <GuestCategoryQuiz
+          categoryId="womens_health_wellness"
+          className="rounded-top"
+          isSignedIn={isSignedIn}
+        />
       ) : null}
 
       {/* =====================================================================
@@ -1255,7 +1262,11 @@ export function WomensHealthPage({
           Edit card copy + images in: DOORS (top of file).
           Eyebrow + headline below are edited inline.
           ===================================================================== */}
-      <section aria-label="Start here" className="wh-doors" id="doors">
+      <section
+        aria-label="Start here"
+        className={`wh-doors${showGuestQuiz ? ' rounded-top' : ''}`}
+        id="doors"
+      >
         <div className="container" data-reveal>
           <span className="eyebrow">Three ways in</span>
           <h2>What do you need today?</h2>

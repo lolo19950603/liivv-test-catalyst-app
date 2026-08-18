@@ -153,6 +153,41 @@ export function IconCrown({ className }: { className?: string }) {
   );
 }
 
+export function IconCalendar({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect height="16" rx="2" width="16" x="4" y="5" />
+      <path d="M8 3v4M16 3v4M4 10h16" strokeLinecap="round" />
+      <path d="M8 14h3M8 17h8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function IconVideo({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect height="12" rx="2.5" width="13" x="3" y="6" />
+      <path d="M16 10.2 21 7.5v9l-5-2.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function IconSupplies({ className }: { className?: string }) {
   return (
     <svg

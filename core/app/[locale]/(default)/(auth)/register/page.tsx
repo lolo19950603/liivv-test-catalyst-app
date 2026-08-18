@@ -4,19 +4,16 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { Field } from '@/vibes/soul/form/dynamic-form/schema';
 import { DynamicFormSection } from '@/vibes/soul/sections/dynamic-form-section';
+import { OliviaAuthStage } from '~/components/olivia/olivia-auth-stage';
+import { formFieldTransformer } from '~/data-transformers/form-field-transformer';
 import {
-  formFieldTransformer,
-  injectCountryCodeOptions,
-} from '~/data-transformers/form-field-transformer';
-import {
-  CUSTOMER_FIELDS_TO_EXCLUDE,
+  REGISTER_CUSTOMER_ALLOWED_FIELD_IDS,
   REGISTER_CUSTOMER_FORM_LAYOUT,
   transformFieldsToLayout,
 } from '~/data-transformers/form-field-transformer/utils';
 import { getRecaptchaSiteKey } from '~/lib/recaptcha';
 import { exists } from '~/lib/utils';
 
-import { ADDRESS_FIELDS_NAME_PREFIX, CUSTOMER_FIELDS_NAME_PREFIX } from './_actions/prefixes';
 import { registerCustomer } from './_actions/register-customer';
 import { getRegisterCustomerQuery } from './page-data';
 
@@ -51,6 +48,7 @@ export default async function Register({ params }: Props) {
   setRequestLocale(locale);
 
   const t = await getTranslations('Auth.Register');
+  const tOlivia = await getTranslations('Auth.Register.Olivia');
 
   const registerCustomerData = await getRegisterCustomerQuery({
     address: { sortBy: 'SORT_ORDER' },
@@ -61,34 +59,14 @@ export default async function Register({ params }: Props) {
     notFound();
   }
 
-  const { addressFields, customerFields, countries, passwordComplexitySettings } =
-    registerCustomerData;
+  const { addressFields, customerFields, passwordComplexitySettings } = registerCustomerData;
 
   const recaptchaSiteKey = await getRecaptchaSiteKey();
 
   const fields = transformFieldsToLayout(
-    [
-      ...addressFields.map((field) => {
-        if (!field.isBuiltIn) {
-          return {
-            ...field,
-            name: `${ADDRESS_FIELDS_NAME_PREFIX}${field.label}`,
-          };
-        }
-
-        return field;
-      }),
-      ...customerFields.map((field) => {
-        if (!field.isBuiltIn) {
-          return {
-            ...field,
-            name: `${CUSTOMER_FIELDS_NAME_PREFIX}${field.label}`,
-          };
-        }
-
-        return field;
-      }),
-    ].filter((field) => !CUSTOMER_FIELDS_TO_EXCLUDE.includes(field.entityId)),
+    [...addressFields, ...customerFields].filter((field) =>
+      REGISTER_CUSTOMER_ALLOWED_FIELD_IDS.includes(field.entityId),
+    ),
     REGISTER_CUSTOMER_FORM_LAYOUT,
   )
     .map((field) => {
@@ -99,67 +77,66 @@ export default async function Register({ params }: Props) {
       return formFieldTransformer(field);
     })
     .filter(exists)
-    .map((field) => {
-      if (Array.isArray(field)) {
-        return field.map((f) => injectCountryCodeOptions(f, countries ?? []));
-      }
-
-      return injectCountryCodeOptions(field, countries ?? []);
-    })
-    .filter(exists)
     .filter(removeExlusiveOffersField);
 
   return (
-    <DynamicFormSection
-      action={registerCustomer}
-      errorTranslations={{
-        firstName: {
-          invalid_type: t('FieldErrors.firstNameRequired'),
-        },
-        lastName: {
-          invalid_type: t('FieldErrors.lastNameRequired'),
-        },
-        email: {
-          invalid_type: t('FieldErrors.emailRequired'),
-          invalid_string: t('FieldErrors.emailInvalid'),
-        },
-        password: {
-          invalid_type: t('FieldErrors.passwordRequired'),
-          too_small: t('FieldErrors.passwordTooSmall', {
-            minLength: passwordComplexitySettings?.minimumPasswordLength ?? 0,
-          }),
-          lowercase_required: t('FieldErrors.passwordLowercaseRequired'),
-          uppercase_required: t('FieldErrors.passwordUppercaseRequired'),
-          number_required: t('FieldErrors.passwordNumberRequired', {
-            minNumbers: passwordComplexitySettings?.minimumNumbers ?? 1,
-          }),
-          special_character_required: t('FieldErrors.passwordSpecialCharacterRequired'),
-          passwords_must_match: t('FieldErrors.passwordsMustMatch'),
-        },
-        confirmPassword: {
-          invalid_type: t('FieldErrors.passwordRequired'),
-        },
-        address1: {
-          invalid_type: t('FieldErrors.addressLine1Required'),
-        },
-        city: {
-          invalid_type: t('FieldErrors.cityRequired'),
-        },
-        countryCode: {
-          invalid_type: t('FieldErrors.countryRequired'),
-        },
-        stateOrProvince: {
-          invalid_type: t('FieldErrors.stateRequired'),
-        },
-        postalCode: {
-          invalid_type: t('FieldErrors.postalCodeRequired'),
-        },
+    <OliviaAuthStage
+      copy={{
+        kicker: tOlivia('kicker'),
+        heading: t('heading'),
+        lead: tOlivia('lead'),
+        mascotAlt: tOlivia('mascotAlt'),
+        switcherLabel: t('signIn'),
+        switcherHref: '/login',
+        submitting: tOlivia('submitting'),
+        error: tOlivia('error'),
+        oneStepAway: tOlivia('oneStepAway'),
+        almostDone: tOlivia('almostDone'),
+        named: tOlivia('named'),
+        idle: [tOlivia('idle0'), tOlivia('idle1')],
+        firstName: tOlivia('firstName'),
+        lastName: tOlivia('lastName'),
+        email: tOlivia('email'),
+        password: tOlivia('password'),
+        confirmPassword: tOlivia('confirmPassword'),
       }}
-      fields={fields}
-      passwordComplexity={passwordComplexitySettings}
-      recaptchaSiteKey={recaptchaSiteKey}
-      submitLabel={t('cta')}
-      title={t('heading')}
-    />
+      scene="register"
+    >
+      <DynamicFormSection
+        action={registerCustomer}
+        errorTranslations={{
+          firstName: {
+            invalid_type: t('FieldErrors.firstNameRequired'),
+          },
+          lastName: {
+            invalid_type: t('FieldErrors.lastNameRequired'),
+          },
+          email: {
+            invalid_type: t('FieldErrors.emailRequired'),
+            invalid_string: t('FieldErrors.emailInvalid'),
+          },
+          password: {
+            invalid_type: t('FieldErrors.passwordRequired'),
+            too_small: t('FieldErrors.passwordTooSmall', {
+              minLength: passwordComplexitySettings?.minimumPasswordLength ?? 0,
+            }),
+            lowercase_required: t('FieldErrors.passwordLowercaseRequired'),
+            uppercase_required: t('FieldErrors.passwordUppercaseRequired'),
+            number_required: t('FieldErrors.passwordNumberRequired', {
+              minNumbers: passwordComplexitySettings?.minimumNumbers ?? 1,
+            }),
+            special_character_required: t('FieldErrors.passwordSpecialCharacterRequired'),
+            passwords_must_match: t('FieldErrors.passwordsMustMatch'),
+          },
+          confirmPassword: {
+            invalid_type: t('FieldErrors.passwordRequired'),
+          },
+        }}
+        fields={fields}
+        passwordComplexity={passwordComplexitySettings}
+        recaptchaSiteKey={recaptchaSiteKey}
+        submitLabel={t('cta')}
+      />
+    </OliviaAuthStage>
   );
 }

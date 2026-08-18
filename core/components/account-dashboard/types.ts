@@ -116,10 +116,20 @@ export interface AccountDashboardLabels {
       subscriptionManage: string;
       subscriptionEmpty: string;
       orderHistory: string;
+      orderHistoryHint: string;
+      orderHistoryCta: string;
+      carePackTitle: string;
+      carePackHint: string;
+      carePackCta: string;
+      pharmacyTitle: string;
+      pharmacyHint: string;
+      pharmacyCta: string;
     };
     virtualCare: {
       title: string;
+      subtitle: string;
       consulting: string;
+      consultingHint: string;
       carePack: string;
       pharmacy: string;
       unreadMessages: string;

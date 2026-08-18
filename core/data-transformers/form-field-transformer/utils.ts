@@ -25,17 +25,19 @@ export enum FieldNameToFieldId {
 
 export const CUSTOMER_FIELDS_TO_EXCLUDE = [FieldNameToFieldId.currentPassword];
 
+export const REGISTER_CUSTOMER_ALLOWED_FIELD_IDS = [
+  FieldNameToFieldId.firstName,
+  FieldNameToFieldId.lastName,
+  FieldNameToFieldId.email,
+  FieldNameToFieldId.password,
+  FieldNameToFieldId.confirmPassword,
+];
+
 export const REGISTER_CUSTOMER_FORM_LAYOUT = [
   [FieldNameToFieldId.firstName, FieldNameToFieldId.lastName],
   FieldNameToFieldId.email,
   FieldNameToFieldId.password,
   FieldNameToFieldId.confirmPassword,
-  FieldNameToFieldId.company,
-  FieldNameToFieldId.phone,
-  FieldNameToFieldId.address1,
-  FieldNameToFieldId.address2,
-  [FieldNameToFieldId.city, FieldNameToFieldId.stateOrProvince],
-  [FieldNameToFieldId.postalCode, FieldNameToFieldId.countryCode],
 ];
 
 export const ADDRESS_FORM_LAYOUT = [

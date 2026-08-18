@@ -158,7 +158,6 @@
 #womens-health .pillars h2,
 #womens-health .pillar h3,
 #womens-health .images-text:not(.tips-pair) h2,
-#womens-health .voices h2,
 #womens-health .closing h2 {
   color: #ffffff !important;
 }
@@ -557,7 +556,7 @@
 /* —— COUNTERS on photos —— */
 #womens-health .counters {
   padding: 72px 24px 90px;
-  background: #e7eee5; /* soft sage wash */
+  background: color-mix(in srgb, var(--sage) 40%, var(--cream));
 }
 
 #womens-health .counters-grid {
@@ -1357,15 +1356,15 @@
 
 /* —— VOICES —— */
 #womens-health .voices {
-  background: #6f8a6c;
-  color: #fff;
+  background: var(--sage);
+  color: var(--ink);
   padding: 110px 24px;
 }
 
 #womens-health .voices .voices-eyebrow {
   display: block;
   text-align: center;
-  color: rgba(255, 255, 255, 0.75);
+  color: color-mix(in srgb, var(--ink) 72%, transparent);
   margin-bottom: 10px;
 }
 
@@ -1495,7 +1494,7 @@
 }
 
 #womens-health .voices .wh-voice-more {
-  color: #5f735e;
+  color: var(--ink);
 }
 
 #womens-health .voice-mark {
@@ -1699,14 +1698,28 @@
   opacity: 0.45;
 }
 
+#womens-health .wh-trust--quiz {
+  z-index: 1;
+  padding-bottom: 66px;
+}
+
+#womens-health .guest-category-quiz {
+  padding: clamp(2.1rem, 5vw, 3.5rem) 0 calc(48px + clamp(2rem, 4.5vw, 3.25rem));
+}
+
 /* —— THREE DOORS —— */
 #womens-health .wh-doors {
-  background: var(--cream);
+  background: color-mix(in srgb, var(--sage) 28%, var(--cream));
   padding: 88px 24px 96px;
   color: var(--ink);
-  /* No .rounded-top overlap onto trust — keeps corners clean */
+  /* Keep square against trust; .rounded-top is added only when the quiz is above */
   border-radius: 0;
   margin-top: 0;
+}
+
+#womens-health .wh-doors.rounded-top {
+  border-radius: 48px 48px 0 0;
+  margin-top: -48px;
 }
 
 #womens-health .wh-doors .eyebrow {
@@ -1790,7 +1803,7 @@
 
 /* —— CHAPTER CHOOSER —— */
 #womens-health .wh-chooser {
-  background: #ebe2d6;
+  background: #fff;
   padding: 96px 24px 104px;
   color: var(--ink);
 }
@@ -1798,7 +1811,7 @@
 #womens-health .wh-chooser .eyebrow {
   display: block;
   text-align: center;
-  color: #6a5f57;
+  color: var(--taupe);
 }
 
 #womens-health .wh-chooser > .container > h2 {
@@ -1878,7 +1891,7 @@
 
 /* —— KITS UPSELL / LIVING OBJECT —— */
 #womens-health .wh-kits {
-  background: var(--soft);
+  background: var(--sand);
   padding: 100px 24px 110px;
   color: var(--ink);
 }
@@ -1905,7 +1918,7 @@
 
 /* —— SUBSCRIBE & SAVE —— */
 #womens-health .wh-subs {
-  background: color-mix(in srgb, var(--blush) 18%, var(--cream));
+  background: color-mix(in srgb, var(--blush) 40%, var(--cream));
   padding: 100px 24px 110px;
   color: var(--ink);
 }
@@ -2678,7 +2691,7 @@
 
 /* —— SHOP PRODUCTS / ROOMS —— */
 #womens-health .wh-shop {
-  background: #e7eee5;
+  background: color-mix(in srgb, var(--sage) 40%, var(--cream));
   padding: 100px 24px 110px;
   color: var(--ink);
 }
@@ -2686,7 +2699,7 @@
 #womens-health .wh-shop .eyebrow {
   display: block;
   text-align: center;
-  color: #5f735e;
+  color: var(--sage);
 }
 
 #womens-health .wh-shop > .container > h2 {

@@ -59,6 +59,7 @@
             "title": "Connexion",
             "heading": "Se connecter",
             "forgotPassword": "Mot de passe oublié ?",
+            "signUp": "S'inscrire",
             "cta": "Se connecter",
             "email": "Courriel",
             "password": "Mot de passe",
@@ -495,14 +496,24 @@
                     "companionHint": "Touchez un parcours, ou modifiez santé et assurance à tout moment."
                 },
                 "actionCenter": {
-                    "subscriptionTitle": "Votre prochaine abonnement",
-                    "subscriptionManage": "Gérer vos abonnements",
+                    "subscriptionTitle": "Votre prochain abonnement",
+                    "subscriptionManage": "Gérer les abonnements",
                     "subscriptionEmpty": "Aucune livraison à venir",
-                    "orderHistory": "Historique des commandes"
+                    "orderHistory": "Historique des commandes",
+                    "orderHistoryHint": "Suivez vos envois et commandes passées",
+                    "orderHistoryCta": "Voir les commandes",
+                    "carePackTitle": "CarePack",
+                    "carePackHint": "N'oubliez plus jamais une dose",
+                    "carePackCta": "Composer un pack",
+                    "pharmacyTitle": "Ma pharmacie",
+                    "pharmacyHint": "Gérer mes prescriptions",
+                    "pharmacyCta": "Ouvrir la pharmacie"
                 },
                 "virtualCare": {
                     "title": "Soins virtuels",
-                    "consulting": "Consultation pour plus de 19 ans — Réservez maintenant",
+                    "subtitle": "Prenez rendez-vous ou écrivez à votre équipe",
+                    "consulting": "Consultation pour plus de 19 ans",
+                    "consultingHint": "Soutien le jour même pour les symptômes courants",
                     "carePack": "CarePack — N'oubliez plus jamais une dose",
                     "pharmacy": "Ma pharmacie — Gérer mes RX",
                     "unreadMessages": "Messages non lus",

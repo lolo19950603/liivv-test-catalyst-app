@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { Link } from '~/components/link';
@@ -9,7 +9,14 @@ import type { PersonalizedCareLane } from '~/lib/account-dashboard/personalized-
 import type { LiivPrimaryCategoryId } from '~/lib/onboarding/liiv-primary-health-category';
 import type { HealthProfileRow } from '~/lib/supabase/health-profile';
 
-import { IconChevronRight, IconCrown, IconOrders } from './icons';
+import {
+  IconCalendar,
+  IconChevronRight,
+  IconOrders,
+  IconPrescription,
+  IconSupplies,
+  IconVideo,
+} from './icons';
 import { OliviaCompanionStage, type OliviaMascotMood } from './olivia-companion-stage';
 import { OliviaSetupSheet, type OliviaSetupSheetKind } from './olivia-setup-sheet';
 import { PersonalizedCareCanvas } from './personalized-care-canvas';
@@ -140,7 +147,7 @@ export function HealthDashboardMain({
             }}
             onOpenHealth={() => openSheet('health')}
             onOpenInsurance={() => openSheet('insurance')}
-            speechOverride={activeLane?.oliviaLine}
+            speechLines={activeLane?.oliviaLines}
           />
         }
         labels={wellness.care}
@@ -161,70 +168,125 @@ export function HealthDashboardMain({
 
       <div className="mhd-bottom">
         <section aria-label={labels.aria.actionCenter} className="mhd-action-center">
-          <Link className="mhd-action-card mhd-action-card--subscription" href={subscriptionsHref}>
-            <div className="mhd-action-card__icon">
-              <IconCrown />
-            </div>
-            <div className="mhd-action-card__content">
-              <p className="mhd-action-card__label">{wellness.actionCenter.subscriptionTitle}</p>
-              <p className="mhd-action-card__value">
-                {nextSubscriptionDate ?? wellness.actionCenter.subscriptionEmpty}
-              </p>
-              <span className="mhd-action-card__link">{wellness.actionCenter.subscriptionManage}</span>
-            </div>
-          </Link>
-
-          <Link className="mhd-action-card mhd-action-card--orders" href={ordersHref}>
-            <div className="mhd-action-card__icon">
-              <IconOrders />
-            </div>
-            <p className="mhd-action-card__label mhd-action-card__label--bottom">
-              {wellness.actionCenter.orderHistory}
-            </p>
-          </Link>
+          <ActionCard
+            href={subscriptionsHref}
+            icon={<IconCalendar />}
+            kicker={wellness.actionCenter.subscriptionTitle}
+            title={nextSubscriptionDate ?? wellness.actionCenter.subscriptionEmpty}
+            variant="subscription"
+          />
+          <ActionCard
+            href={ordersHref}
+            hint={wellness.actionCenter.orderHistoryHint}
+            icon={<IconOrders />}
+            title={wellness.actionCenter.orderHistory}
+            variant="orders"
+          />
+          <ActionCard
+            href={carePackHref}
+            hint={wellness.actionCenter.carePackHint}
+            icon={<IconSupplies />}
+            title={wellness.actionCenter.carePackTitle}
+            variant="carepack"
+          />
+          <ActionCard
+            href={pharmacyHref}
+            hint={wellness.actionCenter.pharmacyHint}
+            icon={<IconPrescription />}
+            title={wellness.actionCenter.pharmacyTitle}
+            variant="pharmacy"
+          />
         </section>
 
         <section aria-label={wellness.virtualCare.title} className="mhd-virtual-care">
-          <h2 className="mhd-virtual-care__title">{wellness.virtualCare.title}</h2>
-          <div className="mhd-virtual-care__grid">
-            <VirtualCareLink href={consultingHref} label={wellness.virtualCare.consulting} wide />
-            <VirtualCareLink href={carePackHref} label={wellness.virtualCare.carePack} />
-            <VirtualCareLink href={pharmacyHref} label={wellness.virtualCare.pharmacy} />
+          <div className="mhd-virtual-care__header">
+            <span aria-hidden className="mhd-virtual-care__icon">
+              <IconVideo />
+            </span>
+            <div className="mhd-virtual-care__heading">
+              <h2 className="mhd-virtual-care__title">{wellness.virtualCare.title}</h2>
+              <p className="mhd-virtual-care__subtitle">{wellness.virtualCare.subtitle}</p>
+            </div>
           </div>
-          <article className="mhd-unread-messages">
+          <VirtualCareLink
+            hint={wellness.virtualCare.consultingHint}
+            href={consultingHref}
+            label={wellness.virtualCare.consulting}
+          />
+          <OpenLiveChatButton
+            className={
+              hasUnreadChatMessage
+                ? 'mhd-unread-messages mhd-unread-messages--alert'
+                : 'mhd-unread-messages'
+            }
+          >
             <div className="mhd-unread-messages__header">
-              <h3 className="mhd-unread-messages__title">{wellness.virtualCare.unreadMessages}</h3>
+              <p className="mhd-unread-messages__title">{wellness.virtualCare.unreadMessages}</p>
+              <span
+                aria-hidden
+                className={
+                  hasUnreadChatMessage
+                    ? 'mhd-unread-messages__status is-unread'
+                    : 'mhd-unread-messages__status'
+                }
+              />
             </div>
             <p className="mhd-unread-messages__body">
               {hasUnreadChatMessage
                 ? wellness.virtualCare.hasNewMessage
                 : wellness.virtualCare.noNewMessages}
             </p>
-            <OpenLiveChatButton className="mhd-unread-messages__link">
-              {wellness.virtualCare.openInbox}
-            </OpenLiveChatButton>
-          </article>
+          </OpenLiveChatButton>
         </section>
       </div>
     </div>
   );
 }
 
+function ActionCard({
+  href,
+  variant,
+  icon,
+  kicker,
+  title,
+  hint,
+}: {
+  href: string;
+  variant: 'subscription' | 'orders' | 'carepack' | 'pharmacy';
+  icon: ReactNode;
+  kicker?: string;
+  title: string;
+  hint?: string;
+}) {
+  return (
+    <Link className={`mhd-action-card mhd-action-card--${variant}`} href={href}>
+      <span aria-hidden className="mhd-action-card__icon">
+        {icon}
+      </span>
+      <div className="mhd-action-card__content">
+        {kicker ? <p className="mhd-action-card__kicker">{kicker}</p> : null}
+        <p className={kicker ? 'mhd-action-card__value' : 'mhd-action-card__title'}>{title}</p>
+        {hint ? <p className="mhd-action-card__hint">{hint}</p> : null}
+      </div>
+    </Link>
+  );
+}
+
 function VirtualCareLink({
   href,
   label,
-  wide = false,
+  hint,
 }: {
   href: string;
   label: string;
-  wide?: boolean;
+  hint?: string;
 }) {
   return (
-    <Link
-      className={wide ? 'mhd-virtual-card mhd-virtual-card--wide' : 'mhd-virtual-card'}
-      href={href}
-    >
-      <span className="mhd-virtual-card__label">{label}</span>
+    <Link className="mhd-virtual-card" href={href}>
+      <span className="mhd-virtual-card__copy">
+        <span className="mhd-virtual-card__label">{label}</span>
+        {hint ? <span className="mhd-virtual-card__hint">{hint}</span> : null}
+      </span>
       <span aria-hidden className="mhd-virtual-card__chevron">
         <IconChevronRight />
       </span>

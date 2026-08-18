@@ -80,7 +80,7 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </div>
       </section>
 
-      <section className="oc-ch-journal" id="chapter-pulse">
+      <section className="oc-ch-journal rounded-top" id="chapter-pulse">
         <div className="oc-ch-journal-grid">
           <article className="oc-ch-note">
             <span className="oc-ch-note-label">The Focus</span>
@@ -93,7 +93,7 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </div>
       </section>
 
-      <section className="oc-ch-care" id="chapter-care">
+      <section className="oc-ch-care rounded-top" id="chapter-care">
         <div className="oc-ch-wrap">
           <header className="oc-ch-care-head">
             <span className="oc-ch-eyebrow">{chapter.categoriesIntro.eyebrow}</span>
@@ -109,7 +109,7 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
       </section>
 
       {chapter.programsBand ? (
-        <section className="oc-ch-programs">
+        <section className="oc-ch-programs rounded-top">
           <div className="oc-ch-wrap">
             {chapter.programsBand.heading ? (
               <header className="oc-ch-care-head">
@@ -130,7 +130,7 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </section>
       ) : null}
 
-      <section className="oc-ch-care-cta">
+      <section className="oc-ch-care-cta rounded-top">
         <div className="oc-ch-wrap">
           <div className="oc-ch-care-panel">
             <div className="oc-ch-care-media">
@@ -148,7 +148,7 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </div>
       </section>
 
-      <section className="oc-ch-map">
+      <section className="oc-ch-map rounded-top">
         <div className="oc-ch-wrap">
           <span className="oc-ch-eyebrow">Path</span>
           <h2>All three chapters</h2>
@@ -171,7 +171,7 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </div>
       </section>
 
-      <section className="oc-ch-close">
+      <section className="oc-ch-close rounded-top">
         <div className="oc-ch-close-bg">
           <img alt="" src={chapter.heroImage} />
         </div>

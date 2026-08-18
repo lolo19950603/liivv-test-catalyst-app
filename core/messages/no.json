@@ -59,6 +59,7 @@
             "title": "Logg inn",
             "heading": "Logg inn",
             "forgotPassword": "Har du glemt passordet?",
+            "signUp": "Registrer deg",
             "cta": "Logg inn",
             "email": "E-post",
             "password": "Passord",

@@ -152,7 +152,13 @@
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
   min-height: min(88vh, 860px);
   background:
-    linear-gradient(135deg, var(--cream) 0%, var(--cream) 52%, var(--leaf) 52%, var(--leaf) 100%);
+    linear-gradient(
+      135deg,
+      var(--cream) 0%,
+      var(--cream) 52%,
+      color-mix(in srgb, var(--sage) 40%, var(--cream)) 52%,
+      color-mix(in srgb, var(--sage) 40%, var(--cream)) 100%
+    );
   overflow: hidden;
 }
 
@@ -491,7 +497,7 @@
 /* —— CATEGORIES —— */
 #liivv-home .lh-categories {
   padding: clamp(64px, 8vw, 100px) 0;
-  background: var(--cream);
+  background: var(--sand);
 }
 
 #liivv-home .lh-category-grid {
@@ -555,11 +561,11 @@
 /* —— PRODUCTS —— */
 #liivv-home .lh-products {
   padding: clamp(56px, 7vw, 88px) 0;
-  background: var(--soft);
+  background: #fff;
 }
 
 #liivv-home .lh-products--soft {
-  background: var(--leaf);
+  background: color-mix(in srgb, var(--sage) 40%, var(--cream));
 }
 
 #liivv-home .lh-product-tabs {
@@ -720,7 +726,7 @@
 #liivv-home .lh-pharmacy {
   /* Extra bottom pad equals the next .rounded-top overlap plus the intended gap. */
   padding: clamp(64px, 8vw, 100px) 0 calc(var(--lh-overlap) + 40px);
-  background: var(--cream);
+  background: color-mix(in srgb, var(--blush) 40%, var(--cream));
 }
 
 #liivv-home .lh-pharmacy-pair {
@@ -766,11 +772,11 @@
 }
 
 #liivv-home .lh-feature--carepak {
-  background: var(--soft);
+  background: var(--sand);
 }
 
 #liivv-home .lh-feature--chat {
-  background: var(--leaf);
+  background: color-mix(in srgb, var(--sage) 40%, var(--cream));
 }
 
 #liivv-home .lh-feature-grid {
@@ -1004,7 +1010,7 @@
 /* —— SUBSCRIPTIONS —— */
 #liivv-home .lh-subs {
   padding: clamp(64px, 8vw, 100px) 0;
-  background: var(--soft);
+  background: var(--sand);
 }
 
 #liivv-home .lh-subs-features {
@@ -1666,7 +1672,8 @@
   margin-left: 0;
   margin-right: 0;
   padding: clamp(72px, 9vw, 110px) max(24px, calc((100% - 1180px) / 2));
-  background: var(--cream);
+  background: var(--taupe);
+  color: var(--ink);
 }
 
 #liivv-home .lh-faq-rail h2 {

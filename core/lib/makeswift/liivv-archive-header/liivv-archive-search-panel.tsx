@@ -5,14 +5,7 @@ import { clsx } from 'clsx';
 import debounce from 'lodash.debounce';
 import { ChevronUp, Loader2, XIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import {
-  type RefObject,
-  useActionState,
-  useEffect,
-  useMemo,
-  useState,
-  useTransition,
-} from 'react';
+import { type RefObject, useActionState, useMemo, useState, useTransition } from 'react';
 
 import { FormStatus } from '@/vibes/soul/form/form-status';
 import { type SearchResult } from '@/vibes/soul/primitives/navigation';
@@ -445,7 +438,6 @@ export function LiivvArchiveSearchPanel({
   searchPanelId,
   searchPlaceholder,
   inputRef,
-  open,
   onClose,
   submitPath = SEARCH_RESULTS_PATH,
   variant = 'drawer',
@@ -517,16 +509,7 @@ export function LiivvArchiveSearchPanel({
 
   const [form] = useForm({ lastResult });
   const isDrawer = variant === 'drawer';
-  const panelOpen = open ?? true;
   const panelRootId = `${searchPanelId}-inner`;
-
-  useEffect(() => {
-    if (isDrawer && !panelOpen) {
-      debouncedSearch.cancel();
-      setQuery('');
-      setIsDebouncing(false);
-    }
-  }, [debouncedSearch, isDrawer, panelOpen]);
 
   return (
     <div

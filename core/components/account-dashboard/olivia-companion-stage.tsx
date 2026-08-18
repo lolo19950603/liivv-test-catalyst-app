@@ -106,21 +106,13 @@ function buildTalkPool(
   return pool;
 }
 
-function useOliviaSpeech(
-  labels: OliviaStageLabels,
-  healthComplete: boolean,
-  insuranceComplete: boolean,
-  mood: OliviaMascotMood,
-): string {
-  const pool = useMemo(
-    () => buildTalkPool(labels, healthComplete, insuranceComplete, mood),
-    [labels, healthComplete, insuranceComplete, mood],
-  );
+function useRotatingSpeech(pool: string[], fallback: string): string {
   const [index, setIndex] = useState(0);
+  const poolKey = pool.join('\u0000');
 
   useEffect(() => {
     setIndex(0);
-  }, [pool]);
+  }, [poolKey]);
 
   useEffect(() => {
     if (pool.length <= 1) return;
@@ -131,9 +123,23 @@ function useOliviaSpeech(
     }, 4500);
 
     return () => window.clearInterval(id);
-  }, [pool]);
+  }, [pool.length, poolKey]);
 
-  return pool[index % Math.max(pool.length, 1)] ?? labels.talkIdle[0] ?? '';
+  return pool[index % Math.max(pool.length, 1)] ?? fallback;
+}
+
+function useOliviaSpeech(
+  labels: OliviaStageLabels,
+  healthComplete: boolean,
+  insuranceComplete: boolean,
+  mood: OliviaMascotMood,
+): string {
+  const pool = useMemo(
+    () => buildTalkPool(labels, healthComplete, insuranceComplete, mood),
+    [labels, healthComplete, insuranceComplete, mood],
+  );
+
+  return useRotatingSpeech(pool, labels.talkIdle[0] ?? '');
 }
 
 function OliviaHotspotControl({
@@ -183,7 +189,7 @@ export function OliviaCompanionStage({
   hasInsurance,
   mood,
   layout = 'stage',
-  speechOverride,
+  speechLines,
   onHotspotEnter,
   onHotspotLeave,
   onOpenHealth,
@@ -197,7 +203,7 @@ export function OliviaCompanionStage({
   hasInsurance: boolean | null;
   mood: OliviaMascotMood;
   layout?: 'stage' | 'companion';
-  speechOverride?: string | null;
+  speechLines?: string[] | null;
   onHotspotEnter: (side: 'health' | 'insurance') => void;
   onHotspotLeave: () => void;
   onOpenHealth: () => void;
@@ -205,9 +211,36 @@ export function OliviaCompanionStage({
 }) {
   const pose = useOliviaLiveness(mood);
   const idleSpeech = useOliviaSpeech(labels, healthComplete, insuranceComplete, mood);
+  const categoryPool = useMemo(() => {
+    if (!speechLines?.length) {
+      return [];
+    }
+
+    const greetings = [labels.talkIdle[0], labels.talkIdle[2]].filter(
+      (line): line is string => Boolean(line),
+    );
+    const done =
+      healthComplete && insuranceComplete
+        ? labels.talkDone.slice(0, 1)
+        : [];
+    const seen = new Set<string>();
+    const pool: string[] = [];
+
+    for (const line of [...speechLines, ...greetings, ...done]) {
+      if (!line || seen.has(line)) {
+        continue;
+      }
+
+      seen.add(line);
+      pool.push(line);
+    }
+
+    return pool;
+  }, [speechLines, labels.talkIdle, labels.talkDone, healthComplete, insuranceComplete]);
+  const categorySpeech = useRotatingSpeech(categoryPool, idleSpeech);
   const usingOverride =
-    Boolean(speechOverride) && (mood === 'idle' || mood === 'celebrate');
-  const speechLine = usingOverride ? speechOverride : idleSpeech;
+    categoryPool.length > 0 && (mood === 'idle' || mood === 'celebrate');
+  const speechLine = usingOverride ? categorySpeech : idleSpeech;
 
   const insuranceSummary = insuranceComplete
     ? insuranceProviderName ||

@@ -1,24 +1,26 @@
 /* Diabetes chapter pages — steady journal / path (not Ostomy or WH chrome) */
 
 #dc-chapter {
-  --mist: #f5f2ed;
-  --cream: #fcf8f4;
-  --ink: rgb(49, 47, 47);
-  --sage: #8ea78b;
-  --sage-deep: #6b7f5c;
-  --sage-soft: #c9d4c4;
-  --paper: #fffcf8;
-  --line: rgba(42, 50, 44, 0.12);
+  --cream: #f5f2ed;
+  --ink: #312f2f;
+  --taupe: #a89c94;
+  --sand: #d7cfc7;
+  --sage: #8ea58d;
+  --blush: #f3c7be;
+  --mist: var(--cream);
+  --sage-deep: color-mix(in srgb, var(--sage) 62%, var(--ink));
+  --sage-soft: color-mix(in srgb, var(--sage) 40%, var(--cream));
+  --paper: #fff;
+  --line: rgba(49, 47, 47, 0.12);
   --chapter-accent: var(--sage);
   --pad: clamp(1.25rem, 4vw, 2rem);
   --max: 980px;
+  --ch-overlap: 48px;
   --font-heading: var(--font-family-dm-serif-text), Georgia, serif;
   --font-body: var(--font-family-inter), system-ui, sans-serif;
 
   color: var(--ink);
-  background:
-    linear-gradient(90deg, rgba(111, 138, 114, 0.08), transparent 18%),
-    linear-gradient(180deg, var(--mist), var(--cream) 30%, var(--cream));
+  background: var(--cream);
   font-family: var(--font-body);
   font-weight: 350;
   line-height: 1.6;
@@ -29,6 +31,17 @@
 #dc-chapter *::before,
 #dc-chapter *::after {
   box-sizing: border-box;
+}
+
+#dc-chapter section {
+  position: relative;
+}
+
+#dc-chapter .rounded-top {
+  border-radius: var(--ch-overlap) var(--ch-overlap) 0 0;
+  margin-top: calc(-1 * var(--ch-overlap));
+  position: relative;
+  z-index: 2;
 }
 
 #dc-chapter h1,
@@ -218,8 +231,8 @@
 #dc-chapter .dc-ch-journal {
   position: relative;
   z-index: 2;
-  margin-top: -2rem;
-  padding: 0 var(--pad) 2rem;
+  padding: 3.5rem var(--pad) calc(var(--ch-overlap) + 2.5rem);
+  background: var(--cream);
 }
 
 #dc-chapter .dc-ch-journal-grid {
@@ -265,7 +278,8 @@
 
 /* Categories as numbered rows */
 #dc-chapter .dc-ch-care {
-  padding: 2rem 0 3.5rem;
+  padding: 2rem 0 calc(var(--ch-overlap) + 3.5rem);
+  background: var(--sand);
 }
 
 #dc-chapter .dc-ch-care-head {
@@ -346,7 +360,8 @@
 
 /* Programs */
 #dc-chapter .dc-ch-programs {
-  padding: 0 0 3.5rem;
+  padding: 2rem 0 calc(var(--ch-overlap) + 3.5rem);
+  background: color-mix(in srgb, var(--blush) 40%, var(--cream));
 }
 
 #dc-chapter .dc-ch-programs-grid {
@@ -389,7 +404,8 @@
 
 /* Pharmacist */
 #dc-chapter .dc-ch-care-cta {
-  padding: 0 0 3.5rem;
+  padding: 2rem 0 calc(var(--ch-overlap) + 3.5rem);
+  background: var(--cream);
 }
 
 #dc-chapter .dc-ch-care-panel {
@@ -444,7 +460,8 @@
 
 /* Path nav */
 #dc-chapter .dc-ch-map {
-  padding: 0 0 3.5rem;
+  padding: 2rem 0 calc(var(--ch-overlap) + 3.5rem);
+  background: #fff;
 }
 
 #dc-chapter .dc-ch-map h2 {
@@ -486,6 +503,7 @@
   overflow: hidden;
   color: #f4f7f3;
   text-align: center;
+  background: var(--ink);
 }
 
 #dc-chapter .dc-ch-close-bg {
@@ -562,4 +580,11 @@
   font-weight: 600;
   color: var(--sage-deep);
 }
+
+@media (max-width: 720px) {
+  #dc-chapter {
+    --ch-overlap: 32px;
+  }
+}
+
 

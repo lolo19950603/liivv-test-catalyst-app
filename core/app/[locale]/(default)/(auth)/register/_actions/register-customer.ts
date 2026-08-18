@@ -8,48 +8,12 @@ import { z } from 'zod';
 
 import { DynamicFormActionArgs } from '@/vibes/soul/form/dynamic-form';
 import { Field, FieldGroup, schema } from '@/vibes/soul/form/dynamic-form/schema';
-import { signIn } from '~/auth';
-import { client } from '~/client';
-import { graphql, VariablesOf } from '~/client/graphql';
-import { FieldNameToFieldId } from '~/data-transformers/form-field-transformer/utils';
 import { redirect } from '~/i18n/routing';
-import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
-import { applyPendingGuestHealthProfile } from '~/lib/onboarding/apply-pending-guest-health-profile';
+import { createCustomerAccount } from '~/lib/auth/create-customer-account';
 import { ACCOUNT_DEFAULT_REDIRECT_PATH } from '~/lib/makeswift/site-header/resolve-account-href';
-import { getCartId } from '~/lib/cart';
 import { assertRecaptchaTokenPresent, getRecaptchaFromForm } from '~/lib/recaptcha';
 
-import { ADDRESS_FIELDS_NAME_PREFIX, CUSTOMER_FIELDS_NAME_PREFIX } from './prefixes';
-
-const RegisterCustomerMutation = graphql(`
-  mutation RegisterCustomerMutation(
-    $input: RegisterCustomerInput!
-    $reCaptchaV2: ReCaptchaV2Input
-  ) {
-    customer {
-      registerCustomer(input: $input, reCaptchaV2: $reCaptchaV2) {
-        customer {
-          firstName
-          lastName
-        }
-        errors {
-          ... on EmailAlreadyInUseError {
-            message
-          }
-          ... on AccountCreationDisabledError {
-            message
-          }
-          ... on CustomerRegistrationError {
-            message
-          }
-          ... on ValidationError {
-            message
-          }
-        }
-      }
-    }
-  }
-`);
+import { CUSTOMER_FIELDS_NAME_PREFIX } from './prefixes';
 
 const stringToNumber = z.string().pipe(z.coerce.number());
 
@@ -167,34 +131,10 @@ const inputSchema = z.object({
 function parseRegisterCustomerInput(
   value: Record<string, string | number | string[] | undefined>,
   fields: Array<Field | FieldGroup<Field>>,
-): VariablesOf<typeof RegisterCustomerMutation>['input'] {
-  const customFields = fields
+) {
+  const customCustomerFields = fields
     .flatMap((f) => (Array.isArray(f) ? f : [f]))
-    .filter(
-      (field) =>
-        ![
-          String(FieldNameToFieldId.email),
-          String(FieldNameToFieldId.password),
-          String(FieldNameToFieldId.confirmPassword),
-          String(FieldNameToFieldId.firstName),
-          String(FieldNameToFieldId.lastName),
-          String(FieldNameToFieldId.address1),
-          String(FieldNameToFieldId.address2),
-          String(FieldNameToFieldId.city),
-          String(FieldNameToFieldId.company),
-          String(FieldNameToFieldId.countryCode),
-          String(FieldNameToFieldId.stateOrProvince),
-          String(FieldNameToFieldId.phone),
-          String(FieldNameToFieldId.postalCode),
-        ].includes(field.name),
-    );
-
-  const customAddressFields = customFields.filter((field) =>
-    field.name.startsWith(ADDRESS_FIELDS_NAME_PREFIX),
-  );
-  const customCustomerFields = customFields.filter((field) =>
-    field.name.startsWith(CUSTOMER_FIELDS_NAME_PREFIX),
-  );
+    .filter((field) => field.name.startsWith(CUSTOMER_FIELDS_NAME_PREFIX));
 
   const mappedInput = {
     firstName: value.firstName,
@@ -203,79 +143,6 @@ function parseRegisterCustomerInput(
     password: value.password,
     phone: value.phone,
     company: value.company,
-    address: {
-      firstName: value.firstName,
-      lastName: value.lastName,
-      address1: value.address1,
-      address2: value.address2,
-      city: value.city,
-      company: value.company,
-      countryCode: value.countryCode,
-      stateOrProvince: value.stateOrProvince,
-      phone: value.phone,
-      postalCode: value.postalCode,
-      formFields: {
-        checkboxes: customAddressFields
-          .filter((field) => ['checkbox-group'].includes(field.type))
-          .filter((field) => Boolean(value[field.name]))
-          .map((field) => {
-            return {
-              fieldEntityId: field.id,
-              fieldValueEntityIds: Array.isArray(value[field.name])
-                ? value[field.name]
-                : [value[field.name]],
-            };
-          }),
-        multipleChoices: customAddressFields
-          .filter((field) => ['radio-group', 'button-radio-group'].includes(field.type))
-          .filter((field) => Boolean(value[field.name]))
-          .map((field) => {
-            return {
-              fieldEntityId: field.id,
-              fieldValueEntityId: value[field.name],
-            };
-          }),
-        numbers: customAddressFields
-          .filter((field) => ['number'].includes(field.type))
-          .filter((field) => Boolean(value[field.name]))
-          .map((field) => {
-            return {
-              fieldEntityId: field.id,
-              number: value[field.name],
-            };
-          }),
-        dates: customAddressFields
-          .filter((field) => ['date'].includes(field.type))
-          .filter((field) => Boolean(value[field.name]))
-          .map((field) => {
-            return {
-              fieldEntityId: field.id,
-              date: new Date(String(value[field.name])).toISOString(),
-            };
-          }),
-        passwords: customAddressFields
-          .filter((field) => ['password'].includes(field.type))
-          .filter((field) => Boolean(value[field.name]))
-          .map((field) => ({
-            fieldEntityId: field.id,
-            password: value[field.name],
-          })),
-        multilineTexts: customAddressFields
-          .filter((field) => ['textarea'].includes(field.type))
-          .filter((field) => Boolean(value[field.name]))
-          .map((field) => ({
-            fieldEntityId: field.id,
-            multilineText: value[field.name],
-          })),
-        texts: customAddressFields
-          .filter((field) => ['text'].includes(field.type))
-          .filter((field) => Boolean(value[field.name]))
-          .map((field) => ({
-            fieldEntityId: field.id,
-            text: value[field.name],
-          })),
-      },
-    },
     formFields: {
       checkboxes: customCustomerFields
         .filter((field) => ['checkbox-group'].includes(field.type))
@@ -351,7 +218,6 @@ export async function registerCustomer<F extends Field>(
 ) {
   const t = await getTranslations('Auth.Register');
   const locale = await getLocale();
-  const cartId = await getCartId();
 
   const submission = parseWithZod(formData, {
     schema: schema(fields, passwordComplexity),
@@ -374,34 +240,19 @@ export async function registerCustomer<F extends Field>(
 
   try {
     const input = parseRegisterCustomerInput(submission.value, fields);
-    const response = await client.fetch({
-      document: RegisterCustomerMutation,
-      variables: {
-        input,
-        reCaptchaV2:
-          recaptchaValidation.token != null ? { token: recaptchaValidation.token } : undefined,
-      },
-      fetchOptions: { cache: 'no-store' },
+    const created = await createCustomerAccount({
+      firstName: String(input.firstName),
+      lastName: String(input.lastName),
+      email: String(input.email),
+      password: String(input.password),
+      recaptchaToken: recaptchaValidation.token,
     });
 
-    const result = response.data.customer.registerCustomer;
-
-    if (result.errors.length > 0) {
+    if (!created.ok) {
       return {
-        lastResult: submission.reply({
-          formErrors: response.data.customer.registerCustomer.errors.map((error) => error.message),
-        }),
+        lastResult: submission.reply({ formErrors: [created.error] }),
       };
     }
-
-    await signIn('password', {
-      email: input.email,
-      password: input.password,
-      cartId,
-      // We want to use next/navigation for the redirect as it
-      // follows basePath and trailing slash configurations.
-      redirect: false,
-    });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -423,12 +274,6 @@ export async function registerCustomer<F extends Field>(
     return {
       lastResult: submission.reply({ formErrors: [t('somethingWentWrong')] }),
     };
-  }
-
-  const customer = await getOnboardingCustomer();
-
-  if (customer) {
-    await applyPendingGuestHealthProfile(customer);
   }
 
   return redirect({ href: ACCOUNT_DEFAULT_REDIRECT_PATH, locale });

@@ -164,7 +164,7 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
           Layout adapts to count: 1 featured · 2/4 → 2-col · 3/5/6+ → 3-col
           (last row centers when incomplete).
           ===================================================================== */}
-      <section className="wh-ch-categories" id="chapter-care">
+      <section className="wh-ch-categories wh-ch-rounded" id="chapter-care">
         <div className="wh-ch-container">
           <header className="wh-ch-section-head" data-reveal>
             <span className="wh-ch-eyebrow">{chapter.categoriesIntro.eyebrow}</span>

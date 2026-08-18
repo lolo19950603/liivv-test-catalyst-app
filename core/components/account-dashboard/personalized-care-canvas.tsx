@@ -4,6 +4,8 @@ import { Link } from '~/components/link';
 import type { PersonalizedCareLane } from '~/lib/account-dashboard/personalized-care';
 import type { ReactNode } from 'react';
 
+import { IconChevronRight } from './icons';
+
 type CareLabels = {
   switcherLabel: string;
   todayFocus: string;
@@ -12,6 +14,7 @@ type CareLabels = {
   emptyTitle: string;
   emptyBody: string;
   emptyCta: string;
+  nextSteps: string;
 };
 
 export function PersonalizedCareCanvas({
@@ -117,6 +120,25 @@ export function PersonalizedCareCanvas({
           </div>
         </div>
       </article>
+
+      {activeLane.nextSteps.length > 0 ? (
+        <div className="mhd-care-steps">
+          <p className="mhd-care-steps__title">{labels.nextSteps}</p>
+          <div className="mhd-care-steps__grid">
+            {activeLane.nextSteps.map((step) => (
+              <Link className="mhd-care-step" href={step.href} key={step.id}>
+                <span className="mhd-care-step__text">
+                  <span className="mhd-care-step__label">{step.label}</span>
+                  <span className="mhd-care-step__hint">{step.hint}</span>
+                </span>
+                <span aria-hidden className="mhd-care-step__chevron">
+                  <IconChevronRight />
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

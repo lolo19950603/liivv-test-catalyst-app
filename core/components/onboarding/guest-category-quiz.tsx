@@ -22,6 +22,7 @@ import './guest-category-quiz.css';
 
 type GuestCategoryQuizProps = {
   categoryId: LandingHealthCategoryId;
+  className?: string;
   isSignedIn?: boolean;
 };
 
@@ -145,7 +146,11 @@ function oliviaCaption(pose: OliviaPose, submitting: boolean, isLast: boolean) {
   return 'Take your time — no wrong answers.';
 }
 
-export function GuestCategoryQuiz({ categoryId, isSignedIn = false }: GuestCategoryQuizProps) {
+export function GuestCategoryQuiz({
+  categoryId,
+  className,
+  isSignedIn = false,
+}: GuestCategoryQuizProps) {
   const router = useRouter();
   const questions = LANDING_CATEGORY_QUESTIONNAIRES[categoryId];
   const meta = getLandingCategoryMeta(categoryId);
@@ -222,7 +227,10 @@ export function GuestCategoryQuiz({ categoryId, isSignedIn = false }: GuestCateg
   const prompt = FRIENDLY_PROMPTS[question.key] ?? question.prompt.replace(/\s*\*$/, '');
 
   return (
-    <section aria-label={`${meta.label} welcome`} className="guest-category-quiz">
+    <section
+      aria-label={`${meta.label} welcome`}
+      className={['guest-category-quiz', className].filter(Boolean).join(' ')}
+    >
       <div className="guest-category-quiz-inner">
         <div className="guest-category-quiz-card">
           <div aria-hidden className="guest-category-quiz-orbs">

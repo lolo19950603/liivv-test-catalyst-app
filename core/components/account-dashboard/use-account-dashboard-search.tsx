@@ -7,8 +7,9 @@ import { LiivvArchiveSearchPanel } from '~/lib/makeswift/liivv-archive-header/li
 
 import { IconSearch } from './icons';
 
-/** Keep in sync with --mhd-search-drawer-duration in dashboard-styles.ts */
-const SEARCH_DRAWER_DURATION_MS = 450;
+/** Ignore focus/layout scroll right after open; then close once the page moves down. */
+const SEARCH_SCROLL_CLOSE_DELAY_MS = 150;
+const SEARCH_SCROLL_CLOSE_DELTA_PX = 8;
 
 export function useAccountDashboardSearch({
   ariaLabel,
@@ -40,18 +41,6 @@ export function useAccountDashboardSearch({
   }, [searchOpen]);
 
   useEffect(() => {
-    if (searchOpen || !searchDrawerMounted) {
-      return;
-    }
-
-    const timer = window.setTimeout(() => {
-      setSearchDrawerMounted(false);
-    }, SEARCH_DRAWER_DURATION_MS);
-
-    return () => window.clearTimeout(timer);
-  }, [searchDrawerMounted, searchOpen]);
-
-  useEffect(() => {
     if (!searchOpen) {
       return;
     }
@@ -79,6 +68,79 @@ export function useAccountDashboardSearch({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [searchOpen]);
 
+  useEffect(() => {
+    if (!searchOpen) {
+      return;
+    }
+
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target;
+
+      if (!(target instanceof Node)) {
+        return;
+      }
+
+      const element = target instanceof Element ? target : target.parentElement;
+
+      if (
+        element?.closest(`#${searchPanelId}`) != null ||
+        element?.closest('.mhd-search-trigger') != null
+      ) {
+        return;
+      }
+
+      closeSearch();
+    };
+
+    document.addEventListener('pointerdown', onPointerDown);
+
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, [searchOpen, searchPanelId, closeSearch]);
+
+  useEffect(() => {
+    if (!searchOpen) {
+      return;
+    }
+
+    let originY = window.scrollY;
+    let armed = false;
+    const armTimer = window.setTimeout(() => {
+      armed = true;
+      originY = window.scrollY;
+    }, SEARCH_SCROLL_CLOSE_DELAY_MS);
+
+    const onScroll = (event: Event) => {
+      const target = event.target;
+
+      if (target instanceof Element && target.closest(`#${searchPanelId}`) != null) {
+        return;
+      }
+
+      if (!armed) {
+        originY = window.scrollY;
+
+        return;
+      }
+
+      if (target instanceof Element) {
+        closeSearch();
+
+        return;
+      }
+
+      if (window.scrollY - originY >= SEARCH_SCROLL_CLOSE_DELTA_PX) {
+        closeSearch();
+      }
+    };
+
+    document.addEventListener('scroll', onScroll, { capture: true, passive: true });
+
+    return () => {
+      window.clearTimeout(armTimer);
+      document.removeEventListener('scroll', onScroll, { capture: true });
+    };
+  }, [searchOpen, searchPanelId, closeSearch]);
+
   const trigger = (
     <button
       aria-controls={searchPanelId}
@@ -98,6 +160,7 @@ export function useAccountDashboardSearch({
         aria-hidden={!searchOpen}
         className={clsx('mhd-header-search-wrap', searchOpen && 'is-open')}
         id={searchPanelId}
+        inert={!searchOpen}
       >
         <div className="mhd-header-search-drawer">
           <LiivvArchiveSearchPanel

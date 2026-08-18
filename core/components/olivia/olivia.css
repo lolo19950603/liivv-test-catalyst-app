@@ -420,6 +420,146 @@ a.olivia-help-band__cta:hover {
   text-decoration: underline;
 }
 
+/* —— Auth companion (login / signup) —— */
+.olivia-auth {
+  --olivia-ink: #2c2a26;
+  --olivia-sage: #6b7f5c;
+  --olivia-sage-deep: #375a37;
+  --olivia-cream: #faf8f3;
+  min-height: calc(100dvh - 8rem);
+  padding: clamp(1.25rem, 4vw, 2.75rem) clamp(1rem, 4vw, 2rem) 3rem;
+  background:
+    radial-gradient(70% 60% at 8% 0%, rgba(243, 199, 190, 0.38), transparent 56%),
+    radial-gradient(55% 50% at 100% 8%, rgba(142, 167, 139, 0.22), transparent 52%),
+    var(--olivia-cream);
+}
+
+.olivia-auth__shell {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+  width: min(1080px, 100%);
+  margin: 0 auto;
+}
+
+@media (min-width: 880px) {
+  .olivia-auth__shell {
+    grid-template-columns: minmax(240px, 0.92fr) minmax(0, 1.15fr);
+    gap: 2.25rem;
+    align-items: center;
+  }
+}
+
+.olivia-auth__companion {
+  display: grid;
+  gap: 1rem 1.25rem;
+  align-items: center;
+}
+
+@media (min-width: 560px) and (max-width: 879px) {
+  .olivia-auth__companion {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+}
+
+.olivia-auth__mascot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 9rem;
+}
+
+.olivia-auth__mascot .olivia-figure {
+  width: 8.5rem;
+}
+
+@media (min-width: 880px) {
+  .olivia-auth__mascot .olivia-figure {
+    width: 11rem;
+  }
+}
+
+.olivia-auth__mascot .olivia-bubble {
+  margin-top: 0.35rem;
+  max-width: 16.5rem;
+}
+
+.olivia-auth__speech {
+  display: flex;
+  justify-content: center;
+  min-height: 3.6rem;
+}
+
+.olivia-auth__kicker {
+  display: inline-block;
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--olivia-sage);
+}
+
+.olivia-auth__intro h1 {
+  margin: 0 0 0.55rem;
+  font-family: var(--font-family-dm-serif-text), Georgia, serif;
+  font-size: clamp(2rem, 4.4vw, 3.15rem);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--olivia-ink);
+}
+
+.olivia-auth__intro p {
+  margin: 0;
+  max-width: 34ch;
+  font-size: 1.02rem;
+  line-height: 1.5;
+  color: #5c564c;
+}
+
+.olivia-auth__links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+
+.olivia-auth__switcher {
+  display: inline-flex;
+  color: var(--olivia-sage-deep);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.olivia-auth__switcher:hover,
+.olivia-auth__switcher:focus-visible {
+  text-decoration: underline;
+}
+
+.olivia-auth__card {
+  padding: clamp(1.15rem, 3vw, 1.75rem);
+  border: 1px solid rgba(49, 47, 47, 0.1);
+  border-radius: 1.6rem;
+  background: #fffcf8;
+  box-shadow: 0 18px 40px rgba(49, 47, 47, 0.07);
+  animation: olivia-bubble-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.olivia-auth__card > div > div,
+.olivia-auth__card > section > div {
+  max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.olivia-auth__card h1 {
+  display: none;
+}
+
 /* —— Empty / 404 stage —— */
 .olivia-empty {
   display: flex;
@@ -484,7 +624,8 @@ a.olivia-help-band__cta:hover {
   .olivia-bubble,
   button.olivia-chat-launcher,
   .olivia-nav-runner__bar,
-  .olivia-nav-runner__mascot {
+  .olivia-nav-runner__mascot,
+  .olivia-auth__card {
     animation: none !important;
     transition: none !important;
   }

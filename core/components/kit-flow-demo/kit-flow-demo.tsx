@@ -93,6 +93,8 @@ export function KitFlowDemo({
   const [reduceMotion, setReduceMotion] = useState(false);
 
   const pageRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const inViewRef = useRef(true);
   const qtyRef = useRef<HTMLSpanElement>(null);
   const addRef = useRef<HTMLLIElement>(null);
   const searchResultRef = useRef<HTMLLIElement>(null);
@@ -149,6 +151,21 @@ export function KitFlowDemo({
   }, []);
 
   useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        inViewRef.current = Boolean(entry?.isIntersecting);
+      },
+      { rootMargin: '80px 0px', threshold: 0.08 },
+    );
+
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     if (reduceMotion || !activeTarget) return;
     const id = window.requestAnimationFrame(() => {
       measurePointer(activeTarget, false);
@@ -170,12 +187,26 @@ export function KitFlowDemo({
     let cancelled = false;
     let timerId = 0;
 
-    const wait = (ms: number) =>
+    const sleep = (ms: number) =>
       new Promise<void>((resolve) => {
-        timerId = window.setTimeout(() => {
-          if (!cancelled) resolve();
-        }, ms);
+        timerId = window.setTimeout(() => resolve(), ms);
       });
+
+    const wait = async (ms: number) => {
+      let remaining = ms;
+
+      while (!cancelled && remaining > 0) {
+        if (!inViewRef.current) {
+          await sleep(400);
+          continue;
+        }
+
+        const chunk = Math.min(remaining, 250);
+        const started = performance.now();
+        await sleep(chunk);
+        remaining -= performance.now() - started;
+      }
+    };
 
     const pickProduct = () => {
       const names = catalogNamesRef.current;
@@ -299,7 +330,7 @@ export function KitFlowDemo({
   const highlighted = searchResults[0] ?? addedItem ?? fallbackPick;
 
   return (
-    <div className="kit-flow-demo">
+    <div className="kit-flow-demo" ref={rootRef}>
       <div className="kf-flow" data-step={active.id}>
         <div
           aria-label="How kits work"

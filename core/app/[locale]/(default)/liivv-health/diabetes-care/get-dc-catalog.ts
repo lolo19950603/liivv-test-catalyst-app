@@ -13,9 +13,19 @@ import { isCuratedKitProduct } from '~/lib/kit/is-curated-kit';
 import { resolveBcCdnImageUrl } from '~/lib/resolve-bc-cdn-image-url';
 import { pricesTransformer } from '~/data-transformers/prices-transformer';
 
-import { FEATURED_CGM_ID, FEATURED_METER_ID, SHOP_DIABETES_CARE_CATEGORY_ID } from './dc-ids';
+import {
+  DAY_ONE_STARTER_KIT_ID,
+  FEATURED_CGM_ID,
+  FEATURED_METER_ID,
+  SHOP_DIABETES_CARE_CATEGORY_ID,
+} from './dc-ids';
 
-export { FEATURED_CGM_ID, FEATURED_METER_ID, SHOP_DIABETES_CARE_CATEGORY_ID } from './dc-ids';
+export {
+  DAY_ONE_STARTER_KIT_ID,
+  FEATURED_CGM_ID,
+  FEATURED_METER_ID,
+  SHOP_DIABETES_CARE_CATEGORY_ID,
+} from './dc-ids';
 
 /** BigCommerce Storefront GraphQL caps product connections at 50. */
 const PAGE_SIZE = 50;
@@ -206,7 +216,7 @@ export const getDcCatalog = cache(async (locale?: string): Promise<DcCatalog> =>
     categoryEntityIds: [SHOP_DIABETES_CARE_CATEGORY_ID],
     searchSubCategories: true,
   };
-  const featuredIds = [FEATURED_CGM_ID, FEATURED_METER_ID];
+  const featuredIds = [DAY_ONE_STARTER_KIT_ID, FEATURED_CGM_ID, FEATURED_METER_ID];
 
   try {
     const byId = new Map<number, DcCatalogItem>();
@@ -255,9 +265,16 @@ export const getDcCatalog = cache(async (locale?: string): Promise<DcCatalog> =>
     const kits = all.filter((item) => item.isKit);
     const products = all.filter((item) => !item.isKit);
 
-    kits.sort((a, b) => a.name.localeCompare(b.name));
+    kits.sort((a, b) => {
+      if (a.entityId === DAY_ONE_STARTER_KIT_ID) return -1;
+      if (b.entityId === DAY_ONE_STARTER_KIT_ID) return 1;
+      return a.name.localeCompare(b.name);
+    });
 
-    return { kits, products, featuredKit: kits[0] ?? null };
+    const featuredKit =
+      kits.find((k) => k.entityId === DAY_ONE_STARTER_KIT_ID) ?? kits[0] ?? null;
+
+    return { kits, products, featuredKit };
   } catch (error) {
     console.error('[getDcCatalog] failed', error);
     return { kits: [], products: [], featuredKit: null };

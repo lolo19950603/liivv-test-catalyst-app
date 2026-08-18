@@ -46,7 +46,7 @@ export type PersonalizedCareLane = {
   snapshot: CareSnapshotChip[];
   actions: CareAction[];
   nextSteps: CareNextStep[];
-  oliviaLine: string;
+  oliviaLines: string[];
 };
 
 type CategoryResponses = Record<string, string | string[] | boolean | null>;
@@ -122,6 +122,34 @@ function asList(value: string | string[] | boolean | null | undefined): string[]
   return Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === 'string') : [];
 }
 
+const OLIVIA_GREETINGS = [
+  'Hi — I am Olivia. I saved you a seat.',
+  'Hey. No rush. Excellent posture, infinite patience.',
+  'Welcome in. I live in this corner now.',
+];
+
+function uniqueLines(lines: Array<string | null | undefined>): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+
+  for (const line of lines) {
+    const trimmed = line?.trim();
+
+    if (!trimmed || seen.has(trimmed)) {
+      continue;
+    }
+
+    seen.add(trimmed);
+    out.push(trimmed);
+  }
+
+  return out;
+}
+
+function oliviaVoice(focus: string, flavor: readonly string[]): string[] {
+  return uniqueLines([focus, ...flavor, ...OLIVIA_GREETINGS]);
+}
+
 function pickByDay<T>(items: readonly T[], now: Date): T {
   const first = items[0];
 
@@ -172,7 +200,7 @@ function diabetesLane(responses: CategoryResponses, now: Date) {
   let headline = 'Diabetes care, tuned to this week';
   let lead =
     'Supplies, rhythm, and a quieter place to keep everyday diabetes living on track.';
-  let oliviaLine = 'This is your diabetes corner. I stacked the useful bits up front.';
+  let oliviaFocus = 'This is your diabetes corner. I stacked the useful bits up front.';
   let storyHref = '/liivv-health/diabetes-care/chapters/your-diabetes-journey';
   let storyLabel = 'Open your diabetes journey';
 
@@ -201,21 +229,21 @@ function diabetesLane(responses: CategoryResponses, now: Date) {
   if (stage === 'newly_diagnosed') {
     headline = path ? `New to ${formatHealthProfileAnswer(path) ?? 'diabetes'} — start gently` : 'New to diabetes — start gently';
     lead = 'You do not have to learn everything today. A starter path, a pharmacist, and Olivia for the store bits.';
-    oliviaLine = 'New diagnosis energy is a lot. I made this corner quieter on purpose.';
+    oliviaFocus = 'New diagnosis energy is a lot. I made this corner quieter on purpose.';
     storyHref = '/liivv-health/diabetes-care/chapters/new-to-the-journey';
     storyLabel = 'Start the new-to-the-journey chapter';
   } else if (stage === 'hitting_a_wall') {
     headline = 'A reset, without starting over';
     lead = 'When the routine stops working, restock the tools and rewrite the rhythm — not the whole story.';
-    oliviaLine = 'Walls happen. We restock, we simplify, we keep going.';
+    oliviaFocus = 'Walls happen. We restock, we simplify, we keep going.';
   } else if (stage === 'veteran' && usesCgm) {
     headline = 'Your CGM rhythm, kept stocked';
     lead = 'Sensors, backups, and the everyday bits that keep a veteran routine from wobbling.';
-    oliviaLine = 'Veteran energy. I am here for the unglamorous restock.';
+    oliviaFocus = 'Veteran energy. I am here for the unglamorous restock.';
   } else if (usesPump) {
     headline = 'Pump sites, backups, and the rest of the kit';
     lead = 'Infusion sets and a plan B belong on the same shelf. We will help you keep both close.';
-    oliviaLine = 'Pump life is logistics. I am surprisingly good at logistics.';
+    oliviaFocus = 'Pump life is logistics. I am surprisingly good at logistics.';
   }
 
   const tips = usesCgm
@@ -270,7 +298,18 @@ function diabetesLane(responses: CategoryResponses, now: Date) {
     },
   ];
 
-  return { headline, lead, oliviaLine, tip, nextSteps };
+  return {
+    headline,
+    lead,
+    oliviaLines: oliviaVoice(oliviaFocus, [
+      'This is your diabetes corner. I stacked the useful bits up front.',
+      'Hey — I am Olivia. Supplies and rhythm, without the lecture.',
+      'Food, movement, and rest count. I will not make it a speech.',
+      'I am here for the unglamorous restock. Shall we?',
+    ]),
+    tip,
+    nextSteps,
+  };
 }
 
 function ostomyLane(responses: CategoryResponses, now: Date) {
@@ -283,20 +322,20 @@ function ostomyLane(responses: CategoryResponses, now: Date) {
 
   let headline = 'Ostomy care for everyday Liivving';
   let lead = 'Pouching, skin, and restock — kept kind, practical, and close at hand.';
-  let oliviaLine = 'Ostomy corner, reporting for duty. Leak-free confidence is the vibe.';
+  let oliviaFocus = 'Ostomy corner, reporting for duty. Leak-free confidence is the vibe.';
   let storyHref = '/liivv-health/ostomy-care';
   let storyLabel = 'Open Ostomy Care';
 
   if (stage === 'starting_out') {
     headline = 'New ostomy journey — we will go slowly';
     lead = 'Fit, skin, and first supplies without the overwhelm. A starter path, then the restock habit.';
-    oliviaLine = 'Starting out is a lot of new verbs. I will keep the list short.';
+    oliviaFocus = 'Starting out is a lot of new verbs. I will keep the list short.';
     storyHref = '/liivv-health/ostomy-care/chapters/new-to-the-journey';
     storyLabel = 'Start the new-to-the-journey chapter';
   } else if (stage === 'body_change') {
     headline = 'When the fit changes, so does the kit';
     lead = 'Body shifts are allowed. We will look at barriers, rings, and a calmer way to recast your setup.';
-    oliviaLine = 'Fit issues are information, not failure. I saved the useful chapter.';
+    oliviaFocus = 'Fit issues are information, not failure. I saved the useful chapter.';
     storyHref = '/liivv-health/ostomy-care/chapters/get-to-know-your-stoma';
     storyLabel = 'Open stoma and fit guidance';
   } else if (stage === 'restocking') {
@@ -306,7 +345,7 @@ function ostomyLane(responses: CategoryResponses, now: Date) {
     lead = typeLabel
       ? `${typeLabel} supplies on a quieter loop — order before you are counting wafers.`
       : 'Keep your preferred pouching system looping so everyday life stays uneventful.';
-    oliviaLine = 'Restocking is my love language. Shall we?';
+    oliviaFocus = 'Restocking is my love language. Shall we?';
     storyHref = '/liivv-health/ostomy-care/chapters/everyday-liivving';
     storyLabel = 'Open everyday Liivving';
   } else if (typeLabel) {
@@ -337,7 +376,11 @@ function ostomyLane(responses: CategoryResponses, now: Date) {
   return {
     headline,
     lead,
-    oliviaLine,
+    oliviaLines: oliviaVoice(oliviaFocus, [
+      'Ostomy corner, reporting for duty. Leak-free confidence is the vibe.',
+      'Hey — I am Olivia. Skin care and a backup pouch, same thought.',
+      'Uneventful is the goal. I am surprisingly good at uneventful.',
+    ]),
     tip,
     nextSteps: [
       {
@@ -368,7 +411,7 @@ function womensLane(responses: CategoryResponses, now: Date) {
 
   let headline = "Women's health, in this season";
   let lead = 'Rhythm, comfort, and products that move with the phase you are actually in.';
-  let oliviaLine = 'Your women\'s health lane. I brought the kind chapter, not the lecture.';
+  let oliviaFocus = 'Your women\'s health lane. I brought the kind chapter, not the lecture.';
   let storyHref = '/liivv-health/womens-health';
   let storyLabel = "Open Women's Health";
   let extraStep: CareNextStep | null = null;
@@ -386,7 +429,7 @@ function womensLane(responses: CategoryResponses, now: Date) {
   } else if (phase === 'menopause_comfort') {
     headline = 'Perimenopause and menopause, held with comfort';
     lead = 'Sleep, temperature, intimacy, and the unglamorous supplies that make this chapter livable.';
-    oliviaLine = 'Comfort first. Rhythm second. Shopping third. I have the order.';
+    oliviaFocus = 'Comfort first. Rhythm second. Shopping third. I have the order.';
     storyHref = '/liivv-health/womens-health/chapters/transition-and-relief';
     storyLabel = 'Open transition and relief';
     extraStep = {
@@ -451,7 +494,17 @@ function womensLane(responses: CategoryResponses, now: Date) {
     });
   }
 
-  return { headline, lead, oliviaLine, tip, nextSteps };
+  return {
+    headline,
+    lead,
+    oliviaLines: oliviaVoice(oliviaFocus, [
+      'Your women\'s health lane. I brought the kind chapter, not the lecture.',
+      'Hey — I am Olivia. This season, not a younger one.',
+      'Comfort first. Rhythm second. Shopping third.',
+    ]),
+    tip,
+    nextSteps,
+  };
 }
 
 function genericLane(
@@ -461,7 +514,7 @@ function genericLane(
 ): {
   headline: string;
   lead: string;
-  oliviaLine: string;
+  oliviaLines: string[];
   tip: { title: string; body: string };
   nextSteps: CareNextStep[];
 } {
@@ -471,7 +524,7 @@ function genericLane(
       {
         headline: string;
         lead: string;
-        oliviaLine: string;
+        oliviaLines: string[];
         tips: Array<{ title: string; body: string }>;
       }
     >
@@ -479,7 +532,11 @@ function genericLane(
     sleep_rest: {
       headline: 'Sleep that treats you like a person',
       lead: 'Wind-down, night sweats, apnea comfort — a quieter kit for the hours after the day.',
-      oliviaLine: 'Sleep corner. I dimmed the lights. Metaphorically. I am a mascot.',
+      oliviaLines: [
+        'Sleep corner. I dimmed the lights. Metaphorically. I am a mascot.',
+        'Hey — I am Olivia. The last hour of the day is the job.',
+        'Cooler room, same cue, fewer negotiations with the closet.',
+      ],
       tips: [
         {
           title: 'Protect the last hour',
@@ -498,7 +555,11 @@ function genericLane(
     heart_blood_pressure: {
       headline: 'Heart-forward living, without the noise',
       lead: 'Monitoring, circulation, and everyday habits that keep blood pressure in the conversation — calmly.',
-      oliviaLine: 'Heart lane. We are going for steady, not dramatic.',
+      oliviaLines: [
+        'Heart lane. We are going for steady, not dramatic.',
+        'Hey — I am Olivia. Same time, same chair, calmer numbers.',
+        'Steady is the vibe. I packed the boring rituals.',
+      ],
       tips: [
         {
           title: 'Same time, same chair',
@@ -517,7 +578,11 @@ function genericLane(
     healing_advanced_wound: {
       headline: 'Healing with a plan, not a drawer of maybes',
       lead: 'Dressings, skin protection, and restock cues for wounds that need more than a shelf.',
-      oliviaLine: 'Wound care is logistics plus gentleness. I packed both.',
+      oliviaLines: [
+        'Wound care is logistics plus gentleness. I packed both.',
+        'Hey — I am Olivia. Healing hates hunting. I kept the kit together.',
+        'A schedule beats waiting until it feels urgent.',
+      ],
       tips: [
         {
           title: 'Change on a schedule',
@@ -532,7 +597,11 @@ function genericLane(
     breathing_lung_health: {
       headline: 'Clearer days, one routine at a time',
       lead: 'Nebulizer care, seasonal flare-ups, and the unglamorous parts that keep breathing easier.',
-      oliviaLine: 'Lung lane. Hydration, filters, and fewer surprises.',
+      oliviaLines: [
+        'Lung lane. Hydration, filters, and fewer surprises.',
+        'Hey — I am Olivia. Clearer days, one routine at a time.',
+        'Saline, masks, filters — I kept them in the same thought.',
+      ],
       tips: [
         {
           title: 'Clean the device',
@@ -547,7 +616,11 @@ function genericLane(
     personal_care_confidence: {
       headline: 'Confidence that fits under clothes',
       lead: 'Discreet fit, absorbency, and the products that let the day be about the day.',
-      oliviaLine: 'Personal care, zero embarrassment. I have excellent poker face.',
+      oliviaLines: [
+        'Personal care, zero embarrassment. I have excellent poker face.',
+        'Hey — I am Olivia. Discreet, practical, and not a lecture.',
+        'Fit is the product. I will help you find it.',
+      ],
       tips: [
         {
           title: 'Fit is the product',
@@ -562,7 +635,11 @@ function genericLane(
     skin_health_relief: {
       headline: 'Skin that needs relief, not a 12-step',
       lead: 'Calm flare-ups, hydrate the dry bits, and skip anything that stings for sport.',
-      oliviaLine: 'Skin lane. Fragrance-free is a personality trait here.',
+      oliviaLines: [
+        'Skin lane. Fragrance-free is a personality trait here.',
+        'Hey — I am Olivia. Relief, not a 12-step.',
+        'Patch, then commit. Dramatic skin prefers a dress rehearsal.',
+      ],
       tips: [
         {
           title: 'Patch, then commit',
@@ -577,7 +654,11 @@ function genericLane(
     daily_nutrition_fuel: {
       headline: 'Fuel that matches the day you are having',
       lead: 'Shakes, supplements, and guardrails — diabetic-friendly, dairy-free, or just easier.',
-      oliviaLine: 'Nutrition lane. I will not lecture you about a grain bowl.',
+      oliviaLines: [
+        'Nutrition lane. I will not lecture you about a grain bowl.',
+        'Hey — I am Olivia. Fuel that matches the day you are having.',
+        'One reliable option for the days cooking is not happening.',
+      ],
       tips: [
         {
           title: 'One reliable option',
@@ -592,7 +673,11 @@ function genericLane(
     minor_ailment_on: {
       headline: 'Minor ailment support, Ontario-side',
       lead: 'Pharmacist-led help for the small things that still ruin a Tuesday.',
-      oliviaLine: 'Minor ailments, major dignity. Book the consult — I will hold your cart.',
+      oliviaLines: [
+        'Minor ailments, major dignity. Book the consult — I will hold your cart.',
+        'Hey — I am Olivia. Small things still ruin a Tuesday. I know.',
+        'If it is on the list, a pharmacist can be the shortest path.',
+      ],
       tips: [
         {
           title: 'Do not wait it out by default',
@@ -647,7 +732,10 @@ function genericLane(
     lead:
       entry?.lead ??
       'Products, treatment, and everyday support for this part of your health profile.',
-    oliviaLine: entry?.oliviaLine ?? `This is your ${label} corner. Tap around — I will keep up.`,
+    oliviaLines: oliviaVoice(
+      entry?.oliviaLines?.[0] ?? `This is your ${label} corner. Tap around — I will keep up.`,
+      entry?.oliviaLines ?? [`Your ${label} lane. I will keep up.`],
+    ),
     tip,
     nextSteps,
   };
@@ -738,7 +826,7 @@ export function buildPersonalizedCareLanes(options: {
       snapshot,
       actions,
       nextSteps: copy.nextSteps.slice(0, 3),
-      oliviaLine: copy.oliviaLine,
+      oliviaLines: copy.oliviaLines,
     };
   });
 }

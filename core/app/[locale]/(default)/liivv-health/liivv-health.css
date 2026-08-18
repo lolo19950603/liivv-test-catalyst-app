@@ -412,7 +412,7 @@
 
 /* —— DOORS —— */
 #liivv-health .lh-hub-doors {
-  background: var(--cream);
+  background: var(--sand);
   padding: 88px 24px 120px;
   position: relative;
   z-index: 2;
@@ -505,7 +505,7 @@
 
 /* —— STORY —— */
 #liivv-health .lh-hub-story {
-  background: var(--soft);
+  background: color-mix(in srgb, var(--sage) 40%, var(--cream));
   padding: 100px 24px 120px;
 }
 
@@ -571,7 +571,7 @@
 
 /* —— KITS —— */
 #liivv-health .lh-hub-kits {
-  background: var(--cream);
+  background: color-mix(in srgb, var(--blush) 40%, var(--cream));
   padding: 100px 24px 120px;
   text-align: center;
 }
@@ -714,13 +714,13 @@
 }
 
 #liivv-health .lh-hub-olivia {
-  background: var(--cream);
+  background: var(--sand);
   padding: 48px 24px 100px;
 }
 
 /* —— HEALTH PROFILE —— */
 #liivv-health .lh-hub-profile {
-  background: var(--soft);
+  background: var(--cream);
   padding: 100px 24px 120px;
 }
 

@@ -1,8 +1,36 @@
 import { faker } from '@faker-js/faker';
+import { Page } from '@playwright/test';
 
 import { expect, test } from '~/tests/fixtures';
 import { getTranslations } from '~/tests/lib/i18n';
 import { TAGS } from '~/tests/tags';
+
+async function fillAccountFields(
+  page: Page,
+  {
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  },
+) {
+  await page.getByLabel('First Name').fill(faker.person.firstName());
+  await page.getByLabel('Last Name').fill(faker.person.lastName());
+  await page.getByLabel('Email Address').fill(email);
+  await page.getByLabel('Password', { exact: true }).fill(password);
+  await page.getByLabel('Confirm Password').fill(password);
+}
+
+async function completeRecaptchaIfPresent(page: Page) {
+  const recaptchaFrame = page.frameLocator('iframe[title="reCAPTCHA"]');
+  const recaptchaCheckbox = recaptchaFrame.locator('.recaptcha-checkbox-border');
+
+  if (await recaptchaCheckbox.isVisible()) {
+    await recaptchaCheckbox.click();
+    await recaptchaFrame.locator('.recaptcha-checkbox-checked').waitFor();
+  }
+}
 
 test('Registration works as expected', { tag: [TAGS.writesData] }, async ({ page, customer }) => {
   const t = await getTranslations();
@@ -14,45 +42,17 @@ test('Registration works as expected', { tag: [TAGS.writesData] }, async ({ page
     prefix: '1At!',
     length: 10,
   });
-  const phone = faker.phone.number({ style: 'national' });
-  const streetAddress = faker.location.streetAddress();
-  const city = faker.location.city();
-  const state = faker.location.state();
-  const postalCode = faker.location.zipCode();
 
   await page.goto('/register');
   await page.getByRole('heading', { name: t('Auth.Register.heading') }).waitFor();
 
-  // TODO: Form fields when creating a new account need to be translated
-  await page.getByLabel('First Name').fill(faker.person.firstName());
-  await page.getByLabel('Last Name').fill(faker.person.lastName());
-  await page.getByLabel('Email Address').fill(email);
-  await page.getByLabel('Password', { exact: true }).fill(password);
-  await page.getByLabel('Confirm Password').fill(password);
-  await page.getByLabel('Phone').fill(phone);
-  await page.getByLabel('Address Line 1').fill(streetAddress);
-  await page.getByLabel('Suburb/City').fill(city);
-  await page.getByLabel('State/Province').fill(state);
-  await page.getByLabel('Zip/Postcode').fill(postalCode);
-  await page.getByRole('combobox', { name: 'Country' }).click();
-  await page.keyboard.type('United States');
-  await page.keyboard.press('Enter');
-
-  // Click reCAPTCHA if enabled (uses test key — no challenge, always passes)
-  const recaptchaFrame = page.frameLocator('iframe[title="reCAPTCHA"]');
-  const recaptchaCheckbox = recaptchaFrame.locator('.recaptcha-checkbox-border');
-
-  if (await recaptchaCheckbox.isVisible()) {
-    await recaptchaCheckbox.click();
-    await recaptchaFrame.locator('.recaptcha-checkbox-checked').waitFor();
-  }
+  await fillAccountFields(page, { email, password });
+  await completeRecaptchaIfPresent(page);
 
   await page.getByRole('button', { name: t('Auth.Register.cta') }).click();
 
   await expect(page).toHaveURL('/account/dashboard/');
-  await expect(
-    page.getByText(t('Account.Dashboard.wellness.welcomeLead')),
-  ).toBeVisible();
+  await expect(page.getByText(t('Account.Dashboard.wellness.welcomeLead'))).toBeVisible();
 
   const { id } = await customer.getByEmail(email);
 
@@ -70,38 +70,12 @@ test('Registration fails if email is already in use', async ({ page, customer })
     prefix: '1At!',
     length: 10,
   });
-  const phone = faker.phone.number({ style: 'national' });
-  const streetAddress = faker.location.streetAddress();
-  const city = faker.location.city();
-  const state = faker.location.state();
-  const postalCode = faker.location.zipCode();
 
   await page.goto('/register');
   await page.getByRole('heading', { name: t('heading') }).waitFor();
 
-  // TODO: Form fields when creating a new account need to be translated
-  await page.getByLabel('First Name').fill(faker.person.firstName());
-  await page.getByLabel('Last Name').fill(faker.person.lastName());
-  await page.getByLabel('Email Address').fill(email);
-  await page.getByLabel('Password', { exact: true }).fill(password);
-  await page.getByLabel('Confirm Password').fill(password);
-  await page.getByLabel('Phone').fill(phone);
-  await page.getByLabel('Address Line 1').fill(streetAddress);
-  await page.getByLabel('Suburb/City').fill(city);
-  await page.getByLabel('State/Province').fill(state);
-  await page.getByLabel('Zip/Postcode').fill(postalCode);
-  await page.getByRole('combobox', { name: 'Country' }).click();
-  await page.keyboard.type('United States');
-  await page.keyboard.press('Enter');
-
-  // Click reCAPTCHA if enabled (uses test key — no challenge, always passes)
-  const recaptchaFrame = page.frameLocator('iframe[title="reCAPTCHA"]');
-  const recaptchaCheckbox = recaptchaFrame.locator('.recaptcha-checkbox-border');
-
-  if (await recaptchaCheckbox.isVisible()) {
-    await recaptchaCheckbox.click();
-    await recaptchaFrame.locator('.recaptcha-checkbox-checked').waitFor();
-  }
+  await fillAccountFields(page, { email, password });
+  await completeRecaptchaIfPresent(page);
 
   await page.getByRole('button', { name: t('cta') }).click();
 
@@ -126,23 +100,12 @@ test('Registration fails if reCAPTCHA is not completed', async ({ page }) => {
     test.skip();
   }
 
-  // Fill form but intentionally skip clicking reCAPTCHA
-  await page.getByLabel('First Name').fill(faker.person.firstName());
-  await page.getByLabel('Last Name').fill(faker.person.lastName());
-  await page.getByLabel('Email Address').fill(faker.internet.email({ provider: 'example.com' }));
-
   const password = faker.internet.password({ pattern: /[a-zA-Z0-9]/, prefix: '1At!', length: 10 });
 
-  await page.getByLabel('Password', { exact: true }).fill(password);
-  await page.getByLabel('Confirm Password').fill(password);
-  await page.getByLabel('Phone').fill(faker.phone.number({ style: 'national' }));
-  await page.getByLabel('Address Line 1').fill(faker.location.streetAddress());
-  await page.getByLabel('Suburb/City').fill(faker.location.city());
-  await page.getByLabel('State/Province').fill(faker.location.state());
-  await page.getByLabel('Zip/Postcode').fill(faker.location.zipCode());
-  await page.getByRole('combobox', { name: 'Country' }).click();
-  await page.keyboard.type('United States');
-  await page.keyboard.press('Enter');
+  await fillAccountFields(page, {
+    email: faker.internet.email({ provider: 'example.com' }),
+    password,
+  });
 
   await page.getByRole('button', { name: t('cta') }).click();
 

@@ -140,7 +140,7 @@ const DIABETES_JOURNEY_PATH_LINKS = [
 
 const WOMENS_HEALTH_NAV: LiivvArchiveNavLink[] = [
   {
-    label: "Shop Women's Essentials",
+    label: "Women's Essentials",
     href: SHOP_WOMENS_HEALTH_PATH,
   },
   {
@@ -160,7 +160,7 @@ const WOMENS_HEALTH_NAV: LiivvArchiveNavLink[] = [
 
 const OSTOMY_CARE_NAV: LiivvArchiveNavLink[] = [
   {
-    label: 'Shop Ostomy Essentials',
+    label: 'Ostomy Essentials',
     href: SHOP_OSTOMY_CARE_PATH,
   },
   ...OSTOMY_CHAPTER_LINKS,

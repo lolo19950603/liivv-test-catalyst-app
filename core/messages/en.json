@@ -57,8 +57,9 @@
     },
     "Login": {
       "title": "Login",
-      "heading": "Log in",
+      "heading": "Welcome back",
       "forgotPassword": "Forgot your password?",
+      "signUp": "New here? Create an account",
       "cta": "Log in",
       "email": "Email",
       "password": "Password",
@@ -82,11 +83,41 @@
         "wishlists": "Save items to your Wishlist",
         "cta": "Create account"
       },
+      "Olivia": {
+        "kicker": "Olivia's here",
+        "lead": "Two fields. Then you're in.",
+        "mascotAlt": "Olivia, the Liivv companion",
+        "switcher": "New here? I'll walk you through signup.",
+        "submitting": "Opening the door…",
+        "error": "Let's try that again. No rush.",
+        "oneStepAway": "You're one step away.",
+        "almostDone": "You're almost done. Hit log in when you're ready.",
+        "named": "Welcome back, %name%.",
+        "idle0": "Welcome back — I saved you a seat.",
+        "idle1": "Email, password, done. I'll wait.",
+        "email": "Start with the email you used last time.",
+        "password": "You're one step away."
+      },
       "ForgotPassword": {
         "title": "Forgot password",
+        "heading": "You're one step away",
         "subtitle": "Enter the email associated with your account below. We'll send you instructions to reset your password.",
         "confirmResetPassword": "If the email address {email} is linked to an account in our store, we have sent you a password reset email. Please check your inbox and spam folder if you don't see it.",
         "somethingWentWrong": "Something went wrong. Please try again later.",
+        "backToLogin": "Remembered it? Welcome back.",
+        "Olivia": {
+          "kicker": "Olivia's here",
+          "lead": "Happens to everyone. Type the email and I'll send you a way back in.",
+          "mascotAlt": "Olivia, the Liivv companion",
+          "submitting": "Sending you a way back in…",
+          "error": "Let's try that email again. No rush.",
+          "oneStepAway": "You're one step away.",
+          "almostDone": "You're almost done. I'll send the reset.",
+          "sent": "Check your inbox — I'll wait here.",
+          "idle0": "Happens to everyone. Let's get you back in.",
+          "idle1": "Just the email. I'll take it from there.",
+          "email": "The one you use to log in."
+        },
         "FieldErrors": {
           "emailRequired": "Email is required",
           "emailInvalid": "Please enter a valid email address"
@@ -95,8 +126,26 @@
     },
     "Register": {
       "title": "Register account",
-      "heading": "New account",
+      "heading": "You're one step away",
       "cta": "Create account",
+      "signIn": "Already have a spot? Welcome back.",
+      "Olivia": {
+        "kicker": "With Olivia",
+        "lead": "A few details and you're in. I'll keep you company.",
+        "mascotAlt": "Olivia, the Liivv companion",
+        "submitting": "Setting up your corner…",
+        "error": "Something's off — I'll wait while you fix it.",
+        "oneStepAway": "You're one step away.",
+        "almostDone": "You're almost done. Create your account.",
+        "named": "Nice to meet you, %name%. You're doing great.",
+        "idle0": "Hey — I'm Olivia. Let's get you a spot.",
+        "idle1": "This is the short version. Promise.",
+        "firstName": "Nice to meet you.",
+        "lastName": "Got it. Email next.",
+        "email": "This is how we'll find you later.",
+        "password": "Make it something you'll remember.",
+        "confirmPassword": "You're almost done."
+      },
       "somethingWentWrong": "Something went wrong. Please try again later.",
       "recaptchaRequired": "Please complete the reCAPTCHA verification.",
       "FieldErrors": {
@@ -401,14 +450,24 @@
           "companionHint": "Tap a path, or edit health and insurance anytime."
         },
         "actionCenter": {
-          "subscriptionTitle": "Your Next Subscription",
-          "subscriptionManage": "Manage Your Subscriptions",
+          "subscriptionTitle": "Your next subscription",
+          "subscriptionManage": "Manage subscriptions",
           "subscriptionEmpty": "No upcoming deliveries",
-          "orderHistory": "Order History"
+          "orderHistory": "Order history",
+          "orderHistoryHint": "Track shipments and past orders",
+          "orderHistoryCta": "View orders",
+          "carePackTitle": "CarePack",
+          "carePackHint": "Never forget another dose",
+          "carePackCta": "Build your pack",
+          "pharmacyTitle": "My Pharmacy",
+          "pharmacyHint": "Manage my prescriptions",
+          "pharmacyCta": "Open pharmacy"
         },
         "virtualCare": {
           "title": "Virtual Care",
-          "consulting": "19+ Minor Ailment Consulting — Book Now",
+          "subtitle": "Book a consult or message your care team",
+          "consulting": "19+ Minor Ailment Consulting",
+          "consultingHint": "Same-day support for everyday symptoms",
           "carePack": "CarePack — Never Forget Another Dose",
           "pharmacy": "My Pharmacy — Manage my RXs",
           "unreadMessages": "Unread messages",
