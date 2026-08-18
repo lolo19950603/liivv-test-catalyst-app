@@ -2049,7 +2049,7 @@ body.adc-portal-active main{
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-stage--companion{
   min-height:0;
-  padding:0.15rem 0.25rem 0;
+  padding:0.15rem 0.25rem 1rem;
   border:0;
   background:transparent;
   overflow:visible;
@@ -2099,7 +2099,7 @@ body.adc-portal-active main{
   gap:0.75rem;
   width:100%;
   margin-top:auto;
-  padding:0;
+  padding:0.15rem 0 0.35rem;
   flex-shrink:0;
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-olivia-hotspot--chip{
@@ -2212,7 +2212,7 @@ body.adc-portal-active main{
   grid-template-columns:1fr;
   gap:1.25rem;
   overflow:hidden;
-  padding:1.75rem 1.5rem 1.75rem;
+  padding:1.75rem 1.5rem 2.25rem;
   min-height:22rem;
   border:1px solid rgb(var(--mhd-border));
   border-radius:1.25rem;
@@ -2236,7 +2236,7 @@ body.adc-portal-active main{
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-care-focus{
     grid-template-columns:minmax(16rem,20rem) minmax(0,1fr);
     align-items:center;
-    padding:2rem 2rem 2rem 1.5rem;
+    padding:2rem 2rem 2.35rem 1.5rem;
     gap:1.75rem 2.25rem;
     min-height:28rem;
   }
