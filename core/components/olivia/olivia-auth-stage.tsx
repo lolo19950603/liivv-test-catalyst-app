@@ -268,12 +268,12 @@ export function OliviaAuthStage({
       <div className="olivia-auth__shell">
         <aside className="olivia-auth__companion">
           <div className="olivia-auth__mascot">
-            <OliviaFigure alt={copy.mascotAlt} mood={mood} priority size="lg" />
             <div className="olivia-auth__speech" key={line}>
               <p aria-live="polite" className="olivia-bubble olivia-bubble--center">
                 {line}
               </p>
             </div>
+            <OliviaFigure alt={copy.mascotAlt} mood={mood} priority size="lg" />
           </div>
           <div className="olivia-auth__intro">
             <span className="olivia-auth__kicker">{copy.kicker}</span>
