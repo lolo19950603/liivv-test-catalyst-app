@@ -72,6 +72,20 @@ export default async (): Promise<NextConfig> => {
     experimental: {
       optimizePackageImports: ['@icons-pack/react-simple-icons'],
     },
+    // Archive media is served from /public, not from serverless functions.
+    // Exclude it so NFT cannot bundle ~260MB of images/videos into api/archive/*.
+    outputFileTracingExcludes: {
+      '/*': [
+        './public/archive/**/*.mp4',
+        './public/archive/**/*.png',
+        './public/archive/**/*.jpg',
+        './public/archive/**/*.jpeg',
+        './public/archive/**/*.webp',
+        './public/archive/**/*.avif',
+        './public/archive/**/*.gif',
+        './public/archive/**/*.svg',
+      ],
+    },
     typescript: {
       ignoreBuildErrors: !!process.env.CI,
     },

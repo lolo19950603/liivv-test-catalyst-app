@@ -4,13 +4,34 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { cache } from 'react';
 
+export const ARCHIVE_HTML_FILES = ['diabetes-care.html'] as const;
+
+export type ArchiveHtmlFileName = (typeof ARCHIVE_HTML_FILES)[number];
+
+/**
+ * Resolve with a literal filename so @vercel/nft traces only this HTML file.
+ * A dynamic `public/archive/${name}` path would pull the whole archive folder
+ * (videos, kit images, etc.) into the serverless function and exceed Vercel's 250MB limit.
+ */
+function resolveArchiveHtmlPath(archiveFileName: ArchiveHtmlFileName): string {
+  switch (archiveFileName) {
+    case 'diabetes-care.html':
+      return path.join(process.cwd(), 'public', 'archive', 'diabetes-care.html');
+    default: {
+      const exhaustive: never = archiveFileName;
+
+      throw new Error(`Unknown archive HTML file: ${String(exhaustive)}`);
+    }
+  }
+}
+
 /**
  * Loads a SingleFile-style HTML export from `public/archive/<filename>`:
  * inlined `<style>` blocks from the document head, plus storefront markup between the first
  * `<body>` and a second `<body>` (Shopify preview / admin tail), when present.
  */
-export const getArchiveHtmlParts = cache(async (archiveFileName: string) => {
-  const filePath = path.join(process.cwd(), 'public', 'archive', archiveFileName);
+export const getArchiveHtmlParts = cache(async (archiveFileName: ArchiveHtmlFileName) => {
+  const filePath = resolveArchiveHtmlPath(archiveFileName);
   const html = await readFile(filePath, 'utf-8');
 
   const bodyOpens = [...html.matchAll(/<body[^>]*>/gi)];
