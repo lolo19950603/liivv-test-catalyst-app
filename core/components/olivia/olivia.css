@@ -264,7 +264,7 @@ button.olivia-chat-launcher .olivia-figure {
   position: fixed;
   inset: 0 0 auto;
   z-index: 100;
-  height: 4.25rem;
+  height: 3px;
   overflow: hidden;
 }
 
@@ -282,29 +282,12 @@ button.olivia-chat-launcher .olivia-figure {
   animation: olivia-nav-bar 1.15s ease-in-out infinite;
 }
 
-.olivia-nav-runner__mascot {
-  position: absolute;
-  top: 0.15rem;
-  left: 0;
-  width: 3.1rem;
-  animation: olivia-nav-run 1.65s linear infinite;
-}
-
 @keyframes olivia-nav-bar {
   0% {
     transform: translateX(-120%);
   }
   100% {
     transform: translateX(400%);
-  }
-}
-
-@keyframes olivia-nav-run {
-  0% {
-    transform: translateX(-20vw);
-  }
-  100% {
-    transform: translateX(110vw);
   }
 }
 
@@ -646,7 +629,6 @@ a.olivia-help-band__cta:hover {
   .olivia-bubble,
   button.olivia-chat-launcher,
   .olivia-nav-runner__bar,
-  .olivia-nav-runner__mascot,
   .olivia-auth__card {
     animation: none !important;
     transition: none !important;

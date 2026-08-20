@@ -3,7 +3,6 @@
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { OliviaFigure } from '~/components/olivia/olivia-figure';
 import { OliviaSpinner } from '~/components/olivia/olivia-spinner';
 
 /** Delay before showing so fast navigations never flash a progress UI. */
@@ -222,9 +221,6 @@ export function NavigationLoadingOverlay() {
       <div className="olivia-nav-runner">
         <div className="olivia-nav-runner__track">
           <div className="olivia-nav-runner__bar" />
-        </div>
-        <div className="olivia-nav-runner__mascot">
-          <OliviaFigure alt="" mood="loading" size="xs" />
         </div>
       </div>
     </div>
