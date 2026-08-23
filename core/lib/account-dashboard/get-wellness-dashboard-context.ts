@@ -1,7 +1,6 @@
 import { cache } from 'react';
 
 import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
-import { applyPendingGuestHealthProfile } from '~/lib/onboarding/apply-pending-guest-health-profile';
 import {
   getPrimaryCategoryDisplay,
   resolveInitialHealthCategoriesWithRank,
@@ -28,8 +27,6 @@ export const getWellnessDashboardContext = cache(async () => {
   if (!customer || !isSupabaseConfigured()) {
     return empty;
   }
-
-  await applyPendingGuestHealthProfile(customer);
 
   const ensured = await ensureCustomerProfile(customer);
   const profile =

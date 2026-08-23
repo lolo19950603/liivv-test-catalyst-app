@@ -9,6 +9,7 @@ import { graphql } from '~/client/graphql';
 import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
 import { getCartId } from '~/lib/cart';
 import { applyPendingGuestHealthProfile } from '~/lib/onboarding/apply-pending-guest-health-profile';
+import { clearPendingGuestHealthProfile } from '~/lib/onboarding/pending-guest-health-profile';
 
 const RegisterCustomerMutation = graphql(`
   mutation RegisterCustomerMutation(
@@ -51,65 +52,69 @@ export interface CreateCustomerAccountInput {
 export async function createCustomerAccount(
   credentials: CreateCustomerAccountInput,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
-  const t = await getTranslations('Auth.Register');
-  const cartId = await getCartId();
-
   try {
-    const response = await client.fetch({
-      document: RegisterCustomerMutation,
-      variables: {
-        input: {
-          firstName: credentials.firstName,
-          lastName: credentials.lastName,
-          email: credentials.email,
-          password: credentials.password,
+    const t = await getTranslations('Auth.Register');
+    const cartId = await getCartId();
+
+    try {
+      const response = await client.fetch({
+        document: RegisterCustomerMutation,
+        variables: {
+          input: {
+            firstName: credentials.firstName,
+            lastName: credentials.lastName,
+            email: credentials.email,
+            password: credentials.password,
+          },
+          reCaptchaV2:
+            credentials.recaptchaToken != null && credentials.recaptchaToken !== ''
+              ? { token: credentials.recaptchaToken }
+              : undefined,
         },
-        reCaptchaV2:
-          credentials.recaptchaToken != null && credentials.recaptchaToken !== ''
-            ? { token: credentials.recaptchaToken }
-            : undefined,
-      },
-      fetchOptions: { cache: 'no-store' },
-    });
+        fetchOptions: { cache: 'no-store' },
+      });
 
-    const result = response.data.customer.registerCustomer;
+      const result = response.data.customer.registerCustomer;
 
-    if (result.errors.length > 0) {
-      return {
-        ok: false,
-        error: result.errors.map((error) => error.message).join(' ') || t('somethingWentWrong'),
-      };
+      if (result.errors.length > 0) {
+        return {
+          ok: false,
+          error: result.errors.map((error) => error.message).join(' ') || t('somethingWentWrong'),
+        };
+      }
+
+      await signIn('password', {
+        email: credentials.email,
+        password: credentials.password,
+        cartId,
+        redirect: false,
+      });
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+
+      if (error instanceof BigCommerceGQLError) {
+        return {
+          ok: false,
+          error: error.errors.map(({ message }) => message).join(' ') || t('somethingWentWrong'),
+        };
+      }
+
+      if (error instanceof Error) {
+        return { ok: false, error: error.message };
+      }
+
+      return { ok: false, error: t('somethingWentWrong') };
     }
 
-    await signIn('password', {
-      email: credentials.email,
-      password: credentials.password,
-      cartId,
-      redirect: false,
-    });
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
+    const customer = await getOnboardingCustomer();
 
-    if (error instanceof BigCommerceGQLError) {
-      return {
-        ok: false,
-        error: error.errors.map(({ message }) => message).join(' ') || t('somethingWentWrong'),
-      };
+    if (customer) {
+      await applyPendingGuestHealthProfile(customer);
     }
 
-    if (error instanceof Error) {
-      return { ok: false, error: error.message };
-    }
-
-    return { ok: false, error: t('somethingWentWrong') };
+    return { ok: true };
+  } finally {
+    await clearPendingGuestHealthProfile();
   }
-
-  const customer = await getOnboardingCustomer();
-
-  if (customer) {
-    await applyPendingGuestHealthProfile(customer);
-  }
-
-  return { ok: true };
 }

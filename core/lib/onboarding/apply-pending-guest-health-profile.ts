@@ -236,14 +236,10 @@ export const applyPendingGuestHealthProfile = cache(async (customer: ApplyCustom
       placement: 'primary',
     });
 
-    if (!saved) {
-      return { applied: false as const };
-    }
-
-    await clearPendingGuestHealthProfile();
-
-    return { applied: true as const };
+    return { applied: Boolean(saved) };
   } catch {
     return { applied: false as const };
+  } finally {
+    await clearPendingGuestHealthProfile();
   }
 });

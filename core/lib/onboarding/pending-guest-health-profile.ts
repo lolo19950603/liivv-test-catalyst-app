@@ -13,9 +13,13 @@ import {
 
 export const PENDING_GUEST_HEALTH_COOKIE = 'liivv_pending_health_profile';
 
+/** Quiz answers only follow the guest into register/login if they continue in this window. */
+export const PENDING_GUEST_HEALTH_MAX_AGE_SECONDS = 60 * 60;
+
 const pendingGuestHealthSchema = z.object({
   categoryId: z.string().min(1),
   responses: z.record(z.string(), z.union([z.string().min(1), z.array(z.string().min(1))])),
+  createdAt: z.number().optional(),
 });
 
 export type PendingGuestHealthProfile = {
@@ -23,8 +27,37 @@ export type PendingGuestHealthProfile = {
   responses: CategoryResponses;
 };
 
-function encode(data: PendingGuestHealthProfile): string {
+type StoredPendingGuestHealthProfile = PendingGuestHealthProfile & {
+  createdAt: number;
+};
+
+function pendingGuestCookieOptions(maxAge: number) {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax' as const,
+    path: '/',
+    maxAge,
+    ...(maxAge <= 0 ? { expires: new Date(0) } : {}),
+  };
+}
+
+function encode(data: StoredPendingGuestHealthProfile): string {
   return Buffer.from(JSON.stringify(data), 'utf8').toString('base64url');
+}
+
+function isFresh(createdAt: number | undefined): boolean {
+  if (typeof createdAt !== 'number' || !Number.isFinite(createdAt)) {
+    return false;
+  }
+
+  const ageMs = Date.now() - createdAt;
+
+  if (ageMs < -60_000) {
+    return false;
+  }
+
+  return ageMs <= PENDING_GUEST_HEALTH_MAX_AGE_SECONDS * 1000;
 }
 
 function decode(raw: string): PendingGuestHealthProfile | null {
@@ -33,7 +66,7 @@ function decode(raw: string): PendingGuestHealthProfile | null {
       JSON.parse(Buffer.from(raw, 'base64url').toString('utf8')),
     );
 
-    if (!isLandingHealthCategoryId(parsed.categoryId)) {
+    if (!isLandingHealthCategoryId(parsed.categoryId) || !isFresh(parsed.createdAt)) {
       return null;
     }
 
@@ -71,27 +104,25 @@ export async function setPendingGuestHealthProfile(
 
   const cookieStore = await cookies();
 
-  cookieStore.set(PENDING_GUEST_HEALTH_COOKIE, encode({ categoryId: payload.categoryId, responses }), {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7,
-  });
+  cookieStore.set(
+    PENDING_GUEST_HEALTH_COOKIE,
+    encode({ categoryId: payload.categoryId, responses, createdAt: Date.now() }),
+    pendingGuestCookieOptions(PENDING_GUEST_HEALTH_MAX_AGE_SECONDS),
+  );
 }
 
 export async function clearPendingGuestHealthProfile(): Promise<void> {
   const cookieStore = await cookies();
 
   try {
-    cookieStore.delete(PENDING_GUEST_HEALTH_COOKIE);
+    cookieStore.delete({ name: PENDING_GUEST_HEALTH_COOKIE, path: '/' });
   } catch {
-    cookieStore.set(PENDING_GUEST_HEALTH_COOKIE, '', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 0,
-    });
+    // Server Components cannot mutate cookies.
+  }
+
+  try {
+    cookieStore.set(PENDING_GUEST_HEALTH_COOKIE, '', pendingGuestCookieOptions(0));
+  } catch {
+    // Same as above — login/register actions still clear this.
   }
 }

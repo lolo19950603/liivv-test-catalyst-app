@@ -9,70 +9,67 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { schema } from '@/vibes/soul/sections/sign-in-section/schema';
 import { signIn } from '~/auth';
 import { redirect } from '~/i18n/routing';
-import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
 import { getCartId } from '~/lib/cart';
-import { applyPendingGuestHealthProfile } from '~/lib/onboarding/apply-pending-guest-health-profile';
+import { clearPendingGuestHealthProfile } from '~/lib/onboarding/pending-guest-health-profile';
 
 export const login = async (
   { redirectTo }: { redirectTo: string },
   _lastResult: SubmissionResult | null,
   formData: FormData,
 ) => {
-  const locale = await getLocale();
-  const t = await getTranslations('Auth.Login');
-  const cartId = await getCartId();
-
-  const submission = parseWithZod(formData, { schema });
-
-  if (submission.status !== 'success') {
-    return submission.reply();
-  }
-
   try {
-    await signIn('password', {
-      email: submission.value.email,
-      password: submission.value.password,
-      cartId,
-      redirect: false,
-    });
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
+    const locale = await getLocale();
+    const t = await getTranslations('Auth.Login');
+    const cartId = await getCartId();
 
-    if (error instanceof BigCommerceGQLError) {
-      return submission.reply({
-        formErrors: error.errors.map(({ message }) => message),
+    const submission = parseWithZod(formData, { schema });
+
+    if (submission.status !== 'success') {
+      return submission.reply();
+    }
+
+    try {
+      await signIn('password', {
+        email: submission.value.email,
+        password: submission.value.password,
+        cartId,
+        redirect: false,
       });
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+
+      if (error instanceof BigCommerceGQLError) {
+        return submission.reply({
+          formErrors: error.errors.map(({ message }) => message),
+        });
+      }
+
+      if (
+        error instanceof AuthError &&
+        error.type === 'CallbackRouteError' &&
+        error.cause &&
+        error.cause.err instanceof BigCommerceGQLError &&
+        error.cause.err.message.includes('Reset password"')
+      ) {
+        return submission.reply({ formErrors: [t('passwordResetRequired')] });
+      }
+
+      if (
+        error instanceof AuthError &&
+        error.type === 'CallbackRouteError' &&
+        error.cause &&
+        error.cause.err instanceof BigCommerceGQLError &&
+        error.cause.err.message.includes('Invalid credentials')
+      ) {
+        return submission.reply({ formErrors: [t('invalidCredentials')] });
+      }
+
+      return submission.reply({ formErrors: [t('somethingWentWrong')] });
     }
 
-    if (
-      error instanceof AuthError &&
-      error.type === 'CallbackRouteError' &&
-      error.cause &&
-      error.cause.err instanceof BigCommerceGQLError &&
-      error.cause.err.message.includes('Reset password"')
-    ) {
-      return submission.reply({ formErrors: [t('passwordResetRequired')] });
-    }
-
-    if (
-      error instanceof AuthError &&
-      error.type === 'CallbackRouteError' &&
-      error.cause &&
-      error.cause.err instanceof BigCommerceGQLError &&
-      error.cause.err.message.includes('Invalid credentials')
-    ) {
-      return submission.reply({ formErrors: [t('invalidCredentials')] });
-    }
-
-    return submission.reply({ formErrors: [t('somethingWentWrong')] });
+    return redirect({ href: redirectTo, locale });
+  } finally {
+    await clearPendingGuestHealthProfile();
   }
-
-  const customer = await getOnboardingCustomer();
-
-  if (customer) {
-    await applyPendingGuestHealthProfile(customer);
-  }
-
-  return redirect({ href: redirectTo, locale });
 };

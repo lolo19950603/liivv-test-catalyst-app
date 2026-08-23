@@ -11,6 +11,7 @@ import { Field, FieldGroup, schema } from '@/vibes/soul/form/dynamic-form/schema
 import { redirect } from '~/i18n/routing';
 import { createCustomerAccount } from '~/lib/auth/create-customer-account';
 import { ACCOUNT_DEFAULT_REDIRECT_PATH } from '~/lib/makeswift/site-header/resolve-account-href';
+import { clearPendingGuestHealthProfile } from '~/lib/onboarding/pending-guest-health-profile';
 import { assertRecaptchaTokenPresent, getRecaptchaFromForm } from '~/lib/recaptcha';
 
 import { CUSTOMER_FIELDS_NAME_PREFIX } from './prefixes';
@@ -216,65 +217,69 @@ export async function registerCustomer<F extends Field>(
   },
   formData: FormData,
 ) {
-  const t = await getTranslations('Auth.Register');
-  const locale = await getLocale();
-
-  const submission = parseWithZod(formData, {
-    schema: schema(fields, passwordComplexity),
-  });
-
-  if (submission.status !== 'success') {
-    return {
-      lastResult: submission.reply(),
-    };
-  }
-
-  const { siteKey, token } = await getRecaptchaFromForm(formData);
-  const recaptchaValidation = assertRecaptchaTokenPresent(siteKey, token, t('recaptchaRequired'));
-
-  if (!recaptchaValidation.success) {
-    return {
-      lastResult: submission.reply({ formErrors: recaptchaValidation.formErrors }),
-    };
-  }
-
   try {
-    const input = parseRegisterCustomerInput(submission.value, fields);
-    const created = await createCustomerAccount({
-      firstName: String(input.firstName),
-      lastName: String(input.lastName),
-      email: String(input.email),
-      password: String(input.password),
-      recaptchaToken: recaptchaValidation.token,
+    const t = await getTranslations('Auth.Register');
+    const locale = await getLocale();
+
+    const submission = parseWithZod(formData, {
+      schema: schema(fields, passwordComplexity),
     });
 
-    if (!created.ok) {
+    if (submission.status !== 'success') {
       return {
-        lastResult: submission.reply({ formErrors: [created.error] }),
-      };
-    }
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-
-    if (error instanceof BigCommerceGQLError) {
-      return {
-        lastResult: submission.reply({
-          formErrors: error.errors.map(({ message }) => message),
-        }),
+        lastResult: submission.reply(),
       };
     }
 
-    if (error instanceof Error) {
+    const { siteKey, token } = await getRecaptchaFromForm(formData);
+    const recaptchaValidation = assertRecaptchaTokenPresent(siteKey, token, t('recaptchaRequired'));
+
+    if (!recaptchaValidation.success) {
       return {
-        lastResult: submission.reply({ formErrors: [error.message] }),
+        lastResult: submission.reply({ formErrors: recaptchaValidation.formErrors }),
       };
     }
 
-    return {
-      lastResult: submission.reply({ formErrors: [t('somethingWentWrong')] }),
-    };
+    try {
+      const input = parseRegisterCustomerInput(submission.value, fields);
+      const created = await createCustomerAccount({
+        firstName: String(input.firstName),
+        lastName: String(input.lastName),
+        email: String(input.email),
+        password: String(input.password),
+        recaptchaToken: recaptchaValidation.token,
+      });
+
+      if (!created.ok) {
+        return {
+          lastResult: submission.reply({ formErrors: [created.error] }),
+        };
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+
+      if (error instanceof BigCommerceGQLError) {
+        return {
+          lastResult: submission.reply({
+            formErrors: error.errors.map(({ message }) => message),
+          }),
+        };
+      }
+
+      if (error instanceof Error) {
+        return {
+          lastResult: submission.reply({ formErrors: [error.message] }),
+        };
+      }
+
+      return {
+        lastResult: submission.reply({ formErrors: [t('somethingWentWrong')] }),
+      };
+    }
+
+    return redirect({ href: ACCOUNT_DEFAULT_REDIRECT_PATH, locale });
+  } finally {
+    await clearPendingGuestHealthProfile();
   }
-
-  return redirect({ href: ACCOUNT_DEFAULT_REDIRECT_PATH, locale });
 }

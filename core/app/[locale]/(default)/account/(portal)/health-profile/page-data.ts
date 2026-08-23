@@ -2,7 +2,6 @@ import { cache } from 'react';
 
 import { getCustomerAddresses } from '~/app/[locale]/(default)/account/addresses/page-data';
 import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
-import { applyPendingGuestHealthProfile } from '~/lib/onboarding/apply-pending-guest-health-profile';
 import { resolveInitialHealthCategoriesWithRank } from '~/lib/onboarding/liiv-primary-health-category';
 import { getHealthProfileByProfileId } from '~/lib/supabase/health-profile';
 import { ensureCustomerProfile, getCustomerProfileByBigCommerceId } from '~/lib/supabase/profile';
@@ -42,8 +41,6 @@ export const getHealthProfileStepData = cache(async () => {
       initialHealthProfile: null,
     };
   }
-
-  await applyPendingGuestHealthProfile(customer);
 
   const profile =
     (await getCustomerProfileByBigCommerceId(String(customer.entityId))) ?? ensured.profile;

@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { getSupabaseClient, isSupabaseConfigured } from '~/lib/supabase/client';
+import { deleteSavedKitsForCustomer } from '~/lib/supabase/saved-kits-store';
 
 export type CustomerProfileRow = {
   id: string;
@@ -38,6 +39,7 @@ export async function ensureCustomerProfile(customer: {
   try {
     const supabase = getSupabaseClient();
     const customerId = String(customer.entityId);
+    const existing = await getCustomerProfileByBigCommerceId(customerId);
     const { data, error } = await supabase
       .from('profiles')
       .upsert(
@@ -59,6 +61,10 @@ export async function ensureCustomerProfile(customer: {
 
     if (!data) {
       return { status: 'error', message: 'No profile row returned from upsert.' };
+    }
+
+    if (!existing) {
+      await deleteSavedKitsForCustomer(customerId);
     }
 
     return { status: 'ok', profile: data as CustomerProfileRow };

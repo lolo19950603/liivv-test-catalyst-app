@@ -136,6 +136,25 @@ export async function updateSavedKitName(
   return true;
 }
 
+export async function deleteSavedKitsForCustomer(
+  bigcommerceCustomerId: string,
+): Promise<void> {
+  if (!isSupabaseConfigured()) {
+    return;
+  }
+
+  const supabase = getSupabaseClient();
+  const { error } = await supabase
+    .from('saved_kits')
+    .delete()
+    .eq('bigcommerce_customer_id', bigcommerceCustomerId);
+
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error(`Failed to delete saved kits for customer: ${error.message}`);
+  }
+}
+
 export async function deleteSavedKit(
   bigcommerceCustomerId: string,
   kitId: string,
