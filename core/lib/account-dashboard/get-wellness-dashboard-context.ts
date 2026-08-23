@@ -7,8 +7,7 @@ import {
 } from '~/lib/onboarding/liiv-primary-health-category';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import { listInsuranceByProfileId } from '~/lib/supabase/insurance';
-import { getOnboardingStatus } from '~/lib/supabase/onboarding';
-import { ensureCustomerProfile, getCustomerProfileByBigCommerceId } from '~/lib/supabase/profile';
+import { ensureCustomerProfile } from '~/lib/supabase/profile';
 
 export const getWellnessDashboardContext = cache(async () => {
   const empty = {
@@ -29,17 +28,12 @@ export const getWellnessDashboardContext = cache(async () => {
   }
 
   const ensured = await ensureCustomerProfile(customer);
-  const profile =
-    (await getCustomerProfileByBigCommerceId(String(customer.entityId))) ??
-    (ensured.status === 'ok' ? ensured.profile : null);
-  const status = await getOnboardingStatus(String(customer.entityId));
-  const ranked = resolveInitialHealthCategoriesWithRank(
-    profile?.care_interests ?? status?.care_interests,
-  );
+  const profile = ensured.status === 'ok' ? ensured.profile : null;
+  const ranked = resolveInitialHealthCategoriesWithRank(profile?.care_interests);
   const primary = ranked[0] ? getPrimaryCategoryDisplay(ranked[0].id) : null;
   const healthCategoryLabels = ranked.map((entry) => getPrimaryCategoryDisplay(entry.id).shortLabel);
 
-  const careInterests = profile?.care_interests ?? status?.care_interests ?? [];
+  const careInterests = profile?.care_interests ?? [];
 
   let insuranceProviderName: string | null = null;
   if (profile?.id) {
@@ -49,14 +43,14 @@ export const getWellnessDashboardContext = cache(async () => {
   }
 
   return {
-    supabaseReady: ensured.status === 'ok' || profile != null,
+    supabaseReady: profile != null,
     primaryCategory: primary,
     careInterests,
     healthCategoryLabels,
     healthProfileComplete:
-      Boolean(status?.health_profile_completed_at) && ranked.length > 0,
-    insuranceComplete: Boolean(status?.insurance_info_completed_at),
+      Boolean(profile?.health_profile_completed_at) && ranked.length > 0,
+    insuranceComplete: Boolean(profile?.insurance_info_completed_at),
     insuranceProviderName,
-    hasInsurance: status?.has_insurance ?? null,
+    hasInsurance: profile?.has_insurance ?? null,
   };
 });

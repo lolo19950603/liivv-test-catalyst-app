@@ -5,6 +5,8 @@ import type { ReactNode } from 'react';
 import { AccountDashboardPortal } from '~/components/account-dashboard';
 import { getAccountDashboardShellProps } from '~/lib/account-dashboard/get-dashboard-shell-props';
 
+export const dynamic = 'force-dynamic';
+
 interface Props {
   children: ReactNode;
   params: Promise<{ locale: string }>;

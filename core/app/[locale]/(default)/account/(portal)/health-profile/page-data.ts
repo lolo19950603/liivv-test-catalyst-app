@@ -4,7 +4,7 @@ import { getCustomerAddresses } from '~/app/[locale]/(default)/account/addresses
 import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
 import { resolveInitialHealthCategoriesWithRank } from '~/lib/onboarding/liiv-primary-health-category';
 import { getHealthProfileByProfileId } from '~/lib/supabase/health-profile';
-import { ensureCustomerProfile, getCustomerProfileByBigCommerceId } from '~/lib/supabase/profile';
+import { ensureCustomerProfile } from '~/lib/supabase/profile';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 
 export const getHealthProfileStepData = cache(async () => {
@@ -42,8 +42,7 @@ export const getHealthProfileStepData = cache(async () => {
     };
   }
 
-  const profile =
-    (await getCustomerProfileByBigCommerceId(String(customer.entityId))) ?? ensured.profile;
+  const profile = ensured.profile;
   const healthProfile = await getHealthProfileByProfileId(profile.id);
 
   return {
