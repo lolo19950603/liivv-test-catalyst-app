@@ -10,7 +10,7 @@ import { DynamicFormActionArgs } from '@/vibes/soul/form/dynamic-form';
 import { Field, FieldGroup, schema } from '@/vibes/soul/form/dynamic-form/schema';
 import { redirect } from '~/i18n/routing';
 import { createCustomerAccount } from '~/lib/auth/create-customer-account';
-import { ACCOUNT_DEFAULT_REDIRECT_PATH } from '~/lib/makeswift/site-header/resolve-account-href';
+import { ACCOUNT_DEFAULT_REDIRECT_PATH, withOpenHealthProfile } from '~/lib/makeswift/site-header/resolve-account-href';
 import { clearPendingGuestHealthProfile } from '~/lib/onboarding/pending-guest-health-profile';
 import { assertRecaptchaTokenPresent, getRecaptchaFromForm } from '~/lib/recaptcha';
 
@@ -278,7 +278,7 @@ export async function registerCustomer<F extends Field>(
       };
     }
 
-    return redirect({ href: ACCOUNT_DEFAULT_REDIRECT_PATH, locale });
+    return redirect({ href: withOpenHealthProfile(ACCOUNT_DEFAULT_REDIRECT_PATH), locale });
   } finally {
     await clearPendingGuestHealthProfile();
   }

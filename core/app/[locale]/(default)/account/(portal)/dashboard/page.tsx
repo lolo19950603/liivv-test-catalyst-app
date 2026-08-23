@@ -14,7 +14,7 @@ import { getDashboardCustomer, getDashboardNextSubscriptionDate } from './page-d
 
 interface Props {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ oliviaCelebrate?: string }>;
+  searchParams: Promise<{ oliviaCelebrate?: string; openHealth?: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function AccountDashboardPage({ params, searchParams }: Props) {
   const { locale } = await params;
-  const { oliviaCelebrate } = await searchParams;
+  const { oliviaCelebrate, openHealth } = await searchParams;
 
   setRequestLocale(locale);
 
@@ -89,6 +89,7 @@ export default async function AccountDashboardPage({ params, searchParams }: Pro
       insuranceComplete={wellness.insuranceComplete}
       insuranceProviderName={wellness.insuranceProviderName}
       celebrateOnMount={oliviaCelebrate === '1'}
+      openHealthOnMount={openHealth === '1'}
       careLanes={careLanes}
       todayLabel={todayLabel}
       labels={labels}

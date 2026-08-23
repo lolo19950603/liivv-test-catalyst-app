@@ -9,3 +9,18 @@ export const ACCOUNT_LOGIN_PATH = `/login?redirectTo=${encodeURIComponent(ACCOUN
 export function resolveAccountHref(isLoggedIn: boolean): string {
   return isLoggedIn ? ACCOUNT_DASHBOARD_PATH : ACCOUNT_LOGIN_PATH;
 }
+
+export function withOpenHealthProfile(path: string): string {
+  const [pathname = path, search = ''] = path.split('?');
+  const normalized = pathname.replace(/\/$/, '');
+
+  if (normalized !== '/account/dashboard') {
+    return path;
+  }
+
+  const params = new URLSearchParams(search);
+  params.set('openHealth', '1');
+  const slash = pathname.endsWith('/') ? pathname : `${pathname}/`;
+
+  return `${slash}?${params.toString()}`;
+}

@@ -9,8 +9,12 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { schema } from '@/vibes/soul/sections/sign-in-section/schema';
 import { signIn } from '~/auth';
 import { redirect } from '~/i18n/routing';
+import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
 import { getCartId } from '~/lib/cart';
+import { withOpenHealthProfile } from '~/lib/makeswift/site-header/resolve-account-href';
+import { resolveInitialHealthCategoriesWithRank } from '~/lib/onboarding/liiv-primary-health-category';
 import { clearPendingGuestHealthProfile } from '~/lib/onboarding/pending-guest-health-profile';
+import { getOnboardingStatus } from '~/lib/supabase/onboarding';
 
 export const login = async (
   { redirectTo }: { redirectTo: string },
@@ -68,7 +72,21 @@ export const login = async (
       return submission.reply({ formErrors: [t('somethingWentWrong')] });
     }
 
-    return redirect({ href: redirectTo, locale });
+    let href = redirectTo;
+    const customer = await getOnboardingCustomer();
+
+    if (customer) {
+      const status = await getOnboardingStatus(String(customer.entityId));
+      const ranked = resolveInitialHealthCategoriesWithRank(status?.care_interests);
+      const healthComplete =
+        Boolean(status?.health_profile_completed_at) && ranked.length > 0;
+
+      if (!healthComplete) {
+        href = withOpenHealthProfile(redirectTo);
+      }
+    }
+
+    return redirect({ href, locale });
   } finally {
     await clearPendingGuestHealthProfile();
   }

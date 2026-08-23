@@ -37,6 +37,7 @@ export function HealthDashboardMain({
   insuranceProviderName,
   hasInsurance,
   celebrateOnMount = false,
+  openHealthOnMount = false,
   careLanes,
   todayLabel,
   healthProfileStepData,
@@ -55,6 +56,7 @@ export function HealthDashboardMain({
   insuranceProviderName: string | null;
   hasInsurance: boolean | null;
   celebrateOnMount?: boolean;
+  openHealthOnMount?: boolean;
   careLanes: PersonalizedCareLane[];
   todayLabel: string;
   healthProfileStepData: {
@@ -66,8 +68,12 @@ export function HealthDashboardMain({
 }) {
   const { wellness } = labels;
   const router = useRouter();
-  const [sheet, setSheet] = useState<OliviaSetupSheetKind | null>(null);
-  const [mood, setMood] = useState<OliviaMascotMood>(celebrateOnMount ? 'celebrate' : 'idle');
+  const [sheet, setSheet] = useState<OliviaSetupSheetKind | null>(
+    openHealthOnMount ? 'health' : null,
+  );
+  const [mood, setMood] = useState<OliviaMascotMood>(
+    celebrateOnMount ? 'celebrate' : openHealthOnMount ? 'looking-health' : 'idle',
+  );
   const [activeLaneId, setActiveLaneId] = useState<string | null>(careLanes[0]?.id ?? null);
   const bounceTimer = useRef<number | null>(null);
 
@@ -119,6 +125,10 @@ export function HealthDashboardMain({
     }
     setSheet(null);
     setMood('idle');
+
+    if (openHealthOnMount) {
+      router.replace('/account/dashboard/', { scroll: false });
+    }
   };
 
   const activeLane = careLanes.find((lane) => lane.id === activeLaneId) ?? careLanes[0];
