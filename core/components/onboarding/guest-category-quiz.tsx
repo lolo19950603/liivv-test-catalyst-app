@@ -4,10 +4,6 @@ import { useEffect, useState } from 'react';
 
 import { stashGuestHealthAnswers } from '~/app/[locale]/(default)/liivv-health/_actions/stash-guest-health-answers';
 import { saveSignedInLandingQuiz } from '~/app/[locale]/(default)/liivv-health/_actions/save-signed-in-landing-quiz';
-import oliviaIdle from '~/components/account-dashboard/olivia-mascot.png';
-import oliviaBlink from '~/components/account-dashboard/olivia-mascot-blink.png';
-import oliviaHi from '~/components/account-dashboard/olivia-mascot-hi.png';
-import oliviaWave from '~/components/account-dashboard/olivia-mascot-wave.png';
 import { Image } from '~/components/image';
 import { useRouter } from '~/i18n/routing';
 import {
@@ -17,6 +13,13 @@ import {
   type CategoryResponses,
   type LandingHealthCategoryId,
 } from '~/lib/onboarding/category-questionnaires';
+
+import oliviaDiabetesIdle from './olivia-variants/diabetes.png';
+import oliviaDiabetesBlink from './olivia-variants/diabetes-blink.png';
+import oliviaOstomyIdle from './olivia-variants/ostomy.png';
+import oliviaOstomyBlink from './olivia-variants/ostomy-blink.png';
+import oliviaWomensIdle from './olivia-variants/womens-health.png';
+import oliviaWomensBlink from './olivia-variants/womens-health-blink.png';
 
 import './guest-category-quiz.css';
 
@@ -29,12 +32,14 @@ type GuestCategoryQuizProps = {
 type OliviaPose = 'idle' | 'blink' | 'wave' | 'hi';
 type OliviaMood = 'live' | 'bounce' | 'celebrate';
 
-const OLIVIA_POSES: Array<{ id: OliviaPose; src: typeof oliviaIdle }> = [
-  { id: 'idle', src: oliviaIdle },
-  { id: 'blink', src: oliviaBlink },
-  { id: 'wave', src: oliviaWave },
-  { id: 'hi', src: oliviaHi },
-];
+const OLIVIA_POSES: Record<
+  LandingHealthCategoryId,
+  { idle: typeof oliviaDiabetesIdle; blink: typeof oliviaDiabetesIdle }
+> = {
+  diabetes_care_everyday: { idle: oliviaDiabetesIdle, blink: oliviaDiabetesBlink },
+  ostomy_care_everyday: { idle: oliviaOstomyIdle, blink: oliviaOstomyBlink },
+  womens_health_wellness: { idle: oliviaWomensIdle, blink: oliviaWomensBlink },
+};
 
 const WELCOME: Record<
   LandingHealthCategoryId,
@@ -162,6 +167,7 @@ export function GuestCategoryQuiz({
   const [reactToken, setReactToken] = useState(0);
   const [saved, setSaved] = useState(false);
   const { pose, mood } = useQuizOlivia(reactToken, submitting);
+  const oliviaFrames = OLIVIA_POSES[categoryId];
 
   const question = questions[step];
   const total = questions.length;
@@ -242,17 +248,21 @@ export function GuestCategoryQuiz({
             <div className="guest-category-quiz-olivia" data-mood={mood} data-pose={pose}>
               <div className="guest-category-quiz-olivia-sway">
                 <div className="guest-category-quiz-olivia-figure">
-                  {OLIVIA_POSES.map((frame) => (
-                    <Image
-                      alt={frame.id === pose ? 'Olivia waving hello' : ''}
-                      aria-hidden={frame.id !== pose}
-                      className={`guest-category-quiz-olivia-img${frame.id === pose ? ' is-on' : ''}`}
-                      fill
-                      key={frame.id}
-                      sizes="(min-width: 900px) 220px, 140px"
-                      src={frame.src}
-                    />
-                  ))}
+                  <Image
+                    alt="Olivia"
+                    className="guest-category-quiz-olivia-img is-on"
+                    fill
+                    sizes="(min-width: 900px) 220px, 140px"
+                    src={oliviaFrames.idle}
+                  />
+                  <Image
+                    alt=""
+                    aria-hidden
+                    className={`guest-category-quiz-olivia-img${pose === 'blink' ? ' is-on' : ''}`}
+                    fill
+                    sizes="(min-width: 900px) 220px, 140px"
+                    src={oliviaFrames.blink}
+                  />
                 </div>
               </div>
             </div>

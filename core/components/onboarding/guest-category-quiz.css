@@ -124,7 +124,6 @@
   object-position: center bottom;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.16s ease;
 }
 
 .guest-category-quiz-olivia-img.is-on {
