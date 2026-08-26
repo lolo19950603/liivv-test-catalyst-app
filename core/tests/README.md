@@ -13,11 +13,11 @@ This document provides an overview of how to run tests for your Catalyst storefr
 
 ## Environment setup
 
-To run tests, you first need to make sure you have the necessary environment setup. You should have already installed the required dependencies and configured your Catalyst environment in `.env.local`.
+To run tests, you first need to make sure you have the necessary environment setup. You should have already installed the required dependencies and configured the storefront in the **repo-root** `.env.local` (copied from `.env.example`).
 
-To begin, copy `.env.test.example` to `.env.test`. The Catalyst test environment merges `.env.local` with `.env.test.local`, so any test-related environment variables should **only** be in `.env.test.local`. This allows you to keep your test configuration separate from your development configuration.
+To begin, copy `core/.env.test.example` to `core/.env.test`. The test environment merges the root `.env.local` with `core/.env.test`, so any test-related environment variables should **only** be in `core/.env.test`. This keeps test configuration separate from development secrets.
 
-**NOTE:** Any environment variables defined in `.env.test.local` will override those in `.env.local`.
+**NOTE:** Any environment variables defined in `core/.env.test` will override those in the root `.env.local`.
 
 ## Running tests
 

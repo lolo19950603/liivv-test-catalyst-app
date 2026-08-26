@@ -22,4 +22,6 @@ coverage/
 .unlighthouse
 .bigcommerce
 .mcp.json
+*.log
+.tmp-ffmpeg/
 liivv_kit_components_final.csv

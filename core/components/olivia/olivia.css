@@ -453,6 +453,11 @@ a.olivia-help-band__cta:hover {
   min-width: 9rem;
 }
 
+.olivia-auth[data-scene='login'] .olivia-auth__mascot {
+  min-width: 0;
+  width: 100%;
+}
+
 .olivia-auth__mascot .olivia-figure {
   width: 8.5rem;
 }
@@ -460,6 +465,31 @@ a.olivia-help-band__cta:hover {
 @media (min-width: 880px) {
   .olivia-auth__mascot .olivia-figure {
     width: 11rem;
+  }
+}
+
+.olivia-auth__logo-scene {
+  display: block;
+  width: min(22rem, 100%);
+  height: auto;
+  background: transparent;
+  filter: drop-shadow(0 12px 16px rgba(44, 42, 38, 0.14));
+}
+
+@media (min-width: 880px) {
+  .olivia-auth__logo-scene {
+    width: min(24rem, 100%);
+  }
+}
+
+.olivia-auth[data-scene='login'] .olivia-auth__speech {
+  min-height: 0;
+  margin-bottom: 0.35rem;
+}
+
+@media (min-width: 880px) {
+  .olivia-auth[data-scene='login'] .olivia-auth__speech {
+    margin-bottom: 0.5rem;
   }
 }
 

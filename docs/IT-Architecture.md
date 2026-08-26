@@ -11,20 +11,24 @@
 
 Liivv is a **headless e-commerce + virtual care** application:
 
-| Layer | Technology | Role |
-|-------|------------|------|
-| Storefront | **Next.js 16** (App Router, RSC) on **Vercel** | Only app that holds secrets; renders UI; runs server actions & webhooks |
-| Commerce | **BigCommerce** | Catalog, cart GraphQL, customers, Admin REST orders |
-| CMS | **Makeswift** | Marketing / content pages |
-| Clinical & account data | **Supabase** (Postgres + Storage) | Profiles, health, insurance, pharmacy, chat |
-| Payments | **Stripe** | Checkout, subscriptions, webhooks |
-| AI assistant | **OpenAI** (optional, feature-flagged) | Virtual care chat bot |
-| Drug reference | **Health Canada DPD** | Medication search (server proxy) |
-| Ephemeral cache | **Upstash Redis / Vercel KV** | Checkout snapshots, BC app install token |
+
+| Layer                   | Technology                                     | Role                                                                    |
+| ----------------------- | ---------------------------------------------- | ----------------------------------------------------------------------- |
+| Storefront              | **Next.js 16** (App Router, RSC) on **Vercel** | Only app that holds secrets; renders UI; runs server actions & webhooks |
+| Commerce                | **BigCommerce**                                | Catalog, cart GraphQL, customers, Admin REST orders                     |
+| CMS                     | **Makeswift**                                  | Marketing / content pages                                               |
+| Clinical & account data | **Supabase** (Postgres + Storage)              | Profiles, health, insurance, pharmacy, chat                             |
+| Payments                | **Stripe**                                     | Checkout, subscriptions, webhooks                                       |
+| AI assistant            | **OpenAI** (optional, feature-flagged)         | Virtual care chat bot                                                   |
+| Drug reference          | **Health Canada DPD**                          | Medication search (server proxy)                                        |
+| Ephemeral cache         | **Upstash Redis / Vercel KV**                  | Checkout snapshots, BC app install token                                |
+
 
 **Design principle:** browsers never receive service-role, admin, or payment secrets. Next.js is the trust boundary.
 
 ---
+
+
 
 ## 2. System context diagram
 
@@ -80,23 +84,31 @@ flowchart LR
   BCG -.->|product webhooks| N
 ```
 
+
+
 ---
+
+
 
 ## 3. System of record (ownership)
 
-| Domain | System of record | Notes |
-|--------|------------------|-------|
-| Products, categories, prices | BigCommerce | Synced to Stripe prices via BC webhooks |
-| Customers (login identity) | BigCommerce | Linked in Supabase `profiles.bigcommerce_customer_id` |
-| Cart / checkout cart | BigCommerce GraphQL | Cart ID stored in signed Auth.js / anonymous JWT |
-| Orders | BigCommerce | Created via Admin REST after Stripe success |
-| Payment methods & subscriptions | Stripe | Renewals create BC orders on `invoice.paid` |
-| Health profile, insurance | Supabase | Not modeled in BC |
-| Prescriptions, CarePack, refills | Supabase | Staff queue in /staff or /bc-app |
-| Live chat messages | Supabase | Optional OpenAI bot replies |
-| Marketing page content | Makeswift | Hosted via Catalyst Makeswift integration |
+
+| Domain                           | System of record    | Notes                                                 |
+| -------------------------------- | ------------------- | ----------------------------------------------------- |
+| Products, categories, prices     | BigCommerce         | Synced to Stripe prices via BC webhooks               |
+| Customers (login identity)       | BigCommerce         | Linked in Supabase `profiles.bigcommerce_customer_id` |
+| Cart / checkout cart             | BigCommerce GraphQL | Cart ID stored in signed Auth.js / anonymous JWT      |
+| Orders                           | BigCommerce         | Created via Admin REST after Stripe success           |
+| Payment methods & subscriptions  | Stripe              | Renewals create BC orders on `invoice.paid`           |
+| Health profile, insurance        | Supabase            | Not modeled in BC                                     |
+| Prescriptions, CarePack, refills | Supabase            | Staff queue in /staff or /bc-app                      |
+| Live chat messages               | Supabase            | Optional OpenAI bot replies                           |
+| Marketing page content           | Makeswift           | Hosted via Catalyst Makeswift integration             |
+
 
 ---
+
+
 
 ## 4. Data flow — commerce
 
@@ -134,7 +146,11 @@ sequenceDiagram
   end
 ```
 
+
+
 ---
+
+
 
 ## 5. Data flow — onboarding & pharmacy
 
@@ -164,7 +180,11 @@ sequenceDiagram
   N->>SB: Update pharmacy rows
 ```
 
+
+
 ---
+
+
 
 ## 6. Data flow — virtual care chat
 
@@ -188,16 +208,22 @@ sequenceDiagram
   Note over U,N: UI polls for new messages (not Realtime yet)
 ```
 
+
+
 ---
+
+
 
 ## 7. Authentication boundaries
 
-| Plane | Mechanism | Cookie | Secret | Path / lifetime |
-|-------|-----------|--------|--------|-----------------|
-| Customer | NextAuth → BC GraphQL login or Customer Login JWT | Auth.js session JWT | `AUTH_SECRET` | Site-wide |
-| Anonymous cart | Signed JWT containing `cartId` | `authjs.anonymous-session-token` | `AUTH_SECRET` | 7 days |
-| Staff password | Shared password + HMAC | `liiv_staff` | `ADMIN_DASHBOARD_PASSWORD`, `ADMIN_SESSION_SECRET` | `/staff`, 7 days |
-| BC embedded app | OAuth install + signed load | `liivv_bc_app` | `BIGCOMMERCE_APP_CLIENT_SECRET` | `/bc-app`, 12 hours |
+
+| Plane           | Mechanism                                         | Cookie                           | Secret                                             | Path / lifetime     |
+| --------------- | ------------------------------------------------- | -------------------------------- | -------------------------------------------------- | ------------------- |
+| Customer        | NextAuth → BC GraphQL login or Customer Login JWT | Auth.js session JWT              | `AUTH_SECRET`                                      | Site-wide           |
+| Anonymous cart  | Signed JWT containing `cartId`                    | `authjs.anonymous-session-token` | `AUTH_SECRET`                                      | 7 days              |
+| Staff password  | Shared password + HMAC                            | `liiv_staff`                     | `ADMIN_DASHBOARD_PASSWORD`, `ADMIN_SESSION_SECRET` | `/staff`, 7 days    |
+| BC embedded app | OAuth install + signed load                       | `liivv_bc_app`                   | `BIGCOMMERCE_APP_CLIENT_SECRET`                    | `/bc-app`, 12 hours |
+
 
 Staff features are available if **either** password session **or** valid BC app session for the configured store is present.
 
@@ -207,6 +233,8 @@ Staff features are available if **either** password session **or** valid BC app 
 - BigCommerce: `Authorization: Bearer` + `BIGCOMMERCE_WEBHOOK_SECRET`
 
 ---
+
+
 
 ## 8. Network & trust boundary (security sketch)
 
@@ -242,37 +270,49 @@ flowchart TB
   Next --> DPD
 ```
 
+
+
+
+
 ### Secrets inventory (server-only unless noted)
 
-| Secret | Purpose |
-|--------|---------|
-| `AUTH_SECRET` | Auth.js + anonymous cart JWT |
-| `BIGCOMMERCE_STOREFRONT_TOKEN` | Storefront GraphQL |
-| `BIGCOMMERCE_ACCESS_TOKEN` | Admin REST (orders, customers) |
-| `BIGCOMMERCE_CLIENT_ID` / `CLIENT_SECRET` | Customer Login API JWT |
-| `BIGCOMMERCE_WEBHOOK_SECRET` | Product → Stripe sync |
-| `BIGCOMMERCE_APP_CLIENT_ID` / `SECRET` | Embedded staff app |
-| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | Payments |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | **Public** — Stripe.js only |
-| `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | DB + Storage (bypasses RLS) |
-| `ADMIN_DASHBOARD_PASSWORD` / `ADMIN_SESSION_SECRET` | Staff portal |
-| `OPENAI_API_KEY` | Virtual care bot |
-| `MAKESWIFT_SITE_API_KEY` | CMS |
+
+| Secret                                              | Purpose                        |
+| --------------------------------------------------- | ------------------------------ |
+| `AUTH_SECRET`                                       | Auth.js + anonymous cart JWT   |
+| `BIGCOMMERCE_STOREFRONT_TOKEN`                      | Storefront GraphQL             |
+| `BIGCOMMERCE_ACCESS_TOKEN`                          | Admin REST (orders, customers) |
+| `BIGCOMMERCE_CLIENT_ID` / `CLIENT_SECRET`           | Customer Login API JWT         |
+| `BIGCOMMERCE_WEBHOOK_SECRET`                        | Product → Stripe sync          |
+| `BIGCOMMERCE_APP_CLIENT_ID` / `SECRET`              | Embedded staff app             |
+| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET`       | Payments                       |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`                | **Public** — Stripe.js only    |
+| `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`        | DB + Storage (bypasses RLS)    |
+| `ADMIN_DASHBOARD_PASSWORD` / `ADMIN_SESSION_SECRET` | Staff portal                   |
+| `OPENAI_API_KEY`                                    | Virtual care bot               |
+| `MAKESWIFT_SITE_API_KEY`                            | CMS                            |
+
 
 ---
 
+
+
 ## 9. Security review findings
 
-| ID | Finding | Risk | Recommendation |
-|----|---------|------|----------------|
-| S1 | Supabase uses **service role only**; shipped SQL has **no RLS** | High | Enable RLS + restricted roles, or formally accept app-layer auth; lock network to Vercel egress if possible |
-| S2 | Health / Rx / chat / Rx photos in Supabase | High | Confirm region, encryption, retention, BAAs; verify private bucket + short-lived signed URLs |
-| S3 | Shared staff password (`ADMIN_DASHBOARD_PASSWORD`) | Med | Prefer BC-app-only or SSO; rotate; consider IP allowlist |
-| S4 | OpenAI may process chat when bot enabled | Med | Keep flag off until DPA/BAA; redact PHI; escalate clinical to human |
-| S5 | Many high-value env secrets | Med | Encrypted env per environment; rotate on personnel change; never commit `.env` |
-| S6 | Makeswift / BC iframe need `SameSite=None; Secure` cookies | Med | Review CSP allowlists; HTTPS only |
-| S7 | Customer email largely via BigCommerce | Low | Confirm transactional email ownership & branding |
-| S8 | DPD public API proxied without auth | Low | Rate-limit `/api/medications/*` |
+
+| ID  | Finding                                                         | Risk | Recommendation                                                                                              |
+| --- | --------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------- |
+| S1  | Supabase uses **service role only**; shipped SQL has **no RLS** | High | Enable RLS + restricted roles, or formally accept app-layer auth; lock network to Vercel egress if possible |
+| S2  | Health / Rx / chat / Rx photos in Supabase                      | High | Confirm region, encryption, retention, BAAs; verify private bucket + short-lived signed URLs                |
+| S3  | Shared staff password (`ADMIN_DASHBOARD_PASSWORD`)              | Med  | Prefer BC-app-only or SSO; rotate; consider IP allowlist                                                    |
+| S4  | OpenAI may process chat when bot enabled                        | Med  | Keep flag off until DPA/BAA; redact PHI; escalate clinical to human                                         |
+| S5  | Many high-value env secrets                                     | Med  | Encrypted env per environment; rotate on personnel change; never commit `.env`                              |
+| S6  | Makeswift / BC iframe need `SameSite=None; Secure` cookies      | Med  | Review CSP allowlists; HTTPS only                                                                           |
+| S7  | Customer email largely via BigCommerce                          | Low  | Confirm transactional email ownership & branding                                                            |
+| S8  | DPD public API proxied without auth                             | Low  | Rate-limit `/api/medications/*`                                                                             |
+
+
+
 
 ### Controls already implemented
 
@@ -285,14 +325,18 @@ flowchart TB
 
 ---
 
+
+
 ## 10. Compliance & data classification (for IT discussion)
 
-| Data class | Examples | Storage |
-|------------|----------|---------|
-| PII | Name, email, address, BC customer id | BC + Supabase `profiles` |
-| PHI / PHI-adjacent | Health categories, insurance, Rx, CarePack, chat | Supabase (+ Storage for photos) |
-| Payment card data | PAN / CVC | **Never stored** — Stripe Elements / PCI SAQ-A style flow |
-| Commerce | Orders, SKUs, prices | BigCommerce (+ Stripe for billing) |
+
+| Data class         | Examples                                         | Storage                                                   |
+| ------------------ | ------------------------------------------------ | --------------------------------------------------------- |
+| PII                | Name, email, address, BC customer id             | BC + Supabase `profiles`                                  |
+| PHI / PHI-adjacent | Health categories, insurance, Rx, CarePack, chat | Supabase (+ Storage for photos)                           |
+| Payment card data  | PAN / CVC                                        | **Never stored** — Stripe Elements / PCI SAQ-A style flow |
+| Commerce           | Orders, SKUs, prices                             | BigCommerce (+ Stripe for billing)                        |
+
 
 **Open questions for IT**
 
@@ -303,6 +347,8 @@ flowchart TB
 5. Staff access: shared password acceptable for UAT only, or production blocker?
 
 ---
+
+
 
 ## 11. Suggested IT meeting agenda (IT-02)
 
@@ -316,11 +362,13 @@ flowchart TB
 
 ---
 
+
+
 ## 12. Key evidence paths (code)
 
 ```
 core/package.json
-core/.env.example
+.env.example
 core/auth/index.ts
 core/lib/supabase/client.ts
 core/lib/supabase/onboarding-schema.sql
@@ -338,4 +386,4 @@ core/app/bc-app/
 
 ---
 
-*Prepared for IT-01 (Prepare Architecture Diagram for IT). Companion interactive walkthrough: Cursor canvas `liivv-it-architecture.canvas.tsx`.*
+*Prepared for IT-01 (Prepare Architecture Diagram for IT). Companion interactive walkthrough: Cursor canvas* `liivv-it-architecture.canvas.tsx`*.*

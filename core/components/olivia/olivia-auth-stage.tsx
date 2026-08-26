@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 
+import { Image } from '~/components/image';
 import { Link } from '~/components/link';
 
+import hidingBehindLogo from './olivia-hiding-behind-liivv-logo.png';
 import { OliviaFigure, type OliviaMood } from './olivia-figure';
 
 import './olivia.css';
@@ -273,7 +275,17 @@ export function OliviaAuthStage({
                 {line}
               </p>
             </div>
-            <OliviaFigure alt={copy.mascotAlt} mood={mood} priority size="lg" />
+            {scene === 'login' ? (
+              <Image
+                alt={copy.mascotAlt}
+                className="olivia-auth__logo-scene"
+                priority
+                sizes="(min-width: 880px) 24rem, 22rem"
+                src={hidingBehindLogo}
+              />
+            ) : (
+              <OliviaFigure alt={copy.mascotAlt} mood={mood} priority size="lg" />
+            )}
           </div>
           <div className="olivia-auth__intro">
             <span className="olivia-auth__kicker">{copy.kicker}</span>

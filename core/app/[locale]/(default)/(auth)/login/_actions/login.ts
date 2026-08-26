@@ -74,16 +74,12 @@ export const login = async (
 
     let href = redirectTo;
     const customer = await getOnboardingCustomer();
+    const status = customer ? await getOnboardingStatus(String(customer.entityId)) : null;
+    const ranked = resolveInitialHealthCategoriesWithRank(status?.care_interests);
+    const healthComplete = Boolean(status?.health_profile_completed_at) && ranked.length > 0;
 
-    if (customer) {
-      const status = await getOnboardingStatus(String(customer.entityId));
-      const ranked = resolveInitialHealthCategoriesWithRank(status?.care_interests);
-      const healthComplete =
-        Boolean(status?.health_profile_completed_at) && ranked.length > 0;
-
-      if (!healthComplete) {
-        href = withOpenHealthProfile(redirectTo);
-      }
+    if (!healthComplete) {
+      href = withOpenHealthProfile(redirectTo);
     }
 
     return redirect({ href, locale });

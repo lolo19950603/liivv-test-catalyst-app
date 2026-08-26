@@ -90,6 +90,7 @@ export default async function AccountDashboardPage({ params, searchParams }: Pro
       insuranceProviderName={wellness.insuranceProviderName}
       celebrateOnMount={oliviaCelebrate === '1'}
       openHealthOnMount={openHealth === '1'}
+      profileCreatedAt={wellness.profileCreatedAt}
       careLanes={careLanes}
       todayLabel={todayLabel}
       labels={labels}

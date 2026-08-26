@@ -45,31 +45,30 @@ The easiest way to deploy your Catalyst Storefront is to use the [One-Click Cata
 
 Check out the [Catalyst.dev One-Click Catalyst Documentation](https://www.catalyst.dev/docs/getting-started) for more details.
 
-## Getting Started
+## Local setup (this repo)
 
-**Requirements:**
+This is the **Liivv** storefront, forked from BigCommerce Catalyst + Makeswift. Application code lives in `core/`. Docs, brand, and architecture notes live in `docs/`.
 
-- A [BigCommerce account](https://www.bigcommerce.com/start-your-trial)
-- Node.js version 24
-- Corepack-enabled `pnpm`
+**Requirements:** Node.js 24 and Corepack-enabled `pnpm`.
 
-  ```bash
-  corepack enable pnpm
-  ```
+```bash
+corepack enable pnpm
+pnpm install
+cp .env.example .env.local   # repo root only — not core/
+pnpm dev
+```
 
-1. Install the latest version of Catalyst:
+Environment variables have a single home:
 
-   ```bash
-   pnpm create @bigcommerce/catalyst@latest
-   ```
+| File | Purpose |
+| --- | --- |
+| `.env.example` | Template (committed) |
+| `.env.local` | Your secrets (gitignored). Put this at the **repo root**. |
+| `core/.env.test.example` | Playwright overrides → copy to `core/.env.test` |
 
-2. Run the local development server:
+Do not add a second `core/.env.local`. `pnpm dev` / `pnpm build` load the root file.
 
-   ```bash
-   pnpm run dev
-   ```
-
-Learn more about Catalyst at [catalyst.dev](https://catalyst.dev).
+See [docs/How-Liivv-Works.md](docs/How-Liivv-Works.md) and [docs/IT-Architecture.md](docs/IT-Architecture.md).
 
 ## Resources
 

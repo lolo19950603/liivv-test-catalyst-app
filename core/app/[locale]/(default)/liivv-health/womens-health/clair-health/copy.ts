@@ -1,6 +1,6 @@
 /**
  * Canadian-facing Clair copy.
- * Aligned to Clair-Canada-Claims-Audit.md (Aug 2026).
+ * Aligned to docs/Clair-Canada-Claims-Audit.md (Aug 2026).
  * French is a working draft for Charter parity; regulatory FR still needs
  * a qualified Quebec reviewer before publication.
  */

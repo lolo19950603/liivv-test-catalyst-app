@@ -16,7 +16,7 @@ import '../wh-motion.css';
  * =============================================================================
  * Page URL: /liivv-health/womens-health/clair-health
  *
- * Copy lives in ./copy.ts (EN + FR). Guardrails: Clair-Canada-Claims-Audit.md
+ * Copy lives in ./copy.ts (EN + FR). Guardrails: docs/Clair-Canada-Claims-Audit.md
  * Images live under: /public/archive/womens-health/clair-site/
  * =============================================================================
  */

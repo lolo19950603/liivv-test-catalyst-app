@@ -38,6 +38,7 @@ export function HealthDashboardMain({
   hasInsurance,
   celebrateOnMount = false,
   openHealthOnMount = false,
+  profileCreatedAt = null,
   careLanes,
   todayLabel,
   healthProfileStepData,
@@ -57,6 +58,7 @@ export function HealthDashboardMain({
   hasInsurance: boolean | null;
   celebrateOnMount?: boolean;
   openHealthOnMount?: boolean;
+  profileCreatedAt?: string | null;
   careLanes: PersonalizedCareLane[];
   todayLabel: string;
   healthProfileStepData: {
@@ -76,6 +78,7 @@ export function HealthDashboardMain({
   );
   const [activeLaneId, setActiveLaneId] = useState<string | null>(careLanes[0]?.id ?? null);
   const bounceTimer = useRef<number | null>(null);
+  const didAutoOpenHealth = useRef(openHealthOnMount);
 
   useEffect(() => {
     if (careLanes.some((lane) => lane.id === activeLaneId)) {
@@ -106,6 +109,43 @@ export function HealthDashboardMain({
 
     return () => window.clearTimeout(settle);
   }, [celebrateOnMount, router]);
+
+  useEffect(() => {
+    if (didAutoOpenHealth.current || healthProfileComplete || !profileCreatedAt) {
+      return;
+    }
+
+    const created = Date.parse(profileCreatedAt);
+
+    if (!Number.isFinite(created) || Date.now() - created > 15 * 60 * 1000) {
+      return;
+    }
+
+    try {
+      const storageKey = `liivv-open-health:${profileCreatedAt}`;
+
+      if (sessionStorage.getItem(storageKey)) {
+        didAutoOpenHealth.current = true;
+        return;
+      }
+
+      sessionStorage.setItem(storageKey, '1');
+    } catch {
+      // Ignore storage failures (private mode) and still open once this mount.
+    }
+
+    didAutoOpenHealth.current = true;
+
+    if (bounceTimer.current) {
+      window.clearTimeout(bounceTimer.current);
+    }
+
+    setSheet('health');
+    setMood('bounce');
+    bounceTimer.current = window.setTimeout(() => {
+      setMood('looking-health');
+    }, 520);
+  }, [healthProfileComplete, profileCreatedAt]);
 
   const openSheet = (kind: OliviaSetupSheetKind) => {
     if (bounceTimer.current) {

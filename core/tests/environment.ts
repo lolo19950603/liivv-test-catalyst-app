@@ -4,7 +4,10 @@ import { z } from 'zod/v4';
 
 import { defaultLocale, locales } from '~/i18n/locales';
 
-dotenvConfig({ path: ['.env', '.env.local', '.env.test'], override: true });
+dotenvConfig({
+  path: ['../.env.local', '.env', '.env.local', '.env.test'],
+  override: true,
+});
 
 const localeSchema = z.string().refine((val: string) => locales.includes(val), {
   error: `TESTS_LOCALE must be one of: ${locales.join(', ')}`,

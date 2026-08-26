@@ -14,7 +14,7 @@ export function withOpenHealthProfile(path: string): string {
   const [pathname = path, search = ''] = path.split('?');
   const normalized = pathname.replace(/\/$/, '');
 
-  if (normalized !== '/account/dashboard') {
+  if (!normalized.endsWith('/account/dashboard')) {
     return path;
   }
 

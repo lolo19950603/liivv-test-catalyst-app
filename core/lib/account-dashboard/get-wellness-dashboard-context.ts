@@ -19,6 +19,7 @@ export const getWellnessDashboardContext = cache(async () => {
     insuranceComplete: false,
     insuranceProviderName: null as string | null,
     hasInsurance: null as boolean | null,
+    profileCreatedAt: null as string | null,
   };
 
   const customer = await getOnboardingCustomer();
@@ -52,5 +53,6 @@ export const getWellnessDashboardContext = cache(async () => {
     insuranceComplete: Boolean(profile?.insurance_info_completed_at),
     insuranceProviderName,
     hasInsurance: profile?.has_insurance ?? null,
+    profileCreatedAt: profile?.created_at ?? null,
   };
 });
