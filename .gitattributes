@@ -1,0 +1,26 @@
+# Line-ending policy lives in the repo, not in each developer's git config.
+# Without this file, behaviour depends on core.autocrlf, which differs per
+# machine and silently diverges between contributors on different platforms.
+#
+# text=auto -> git detects text vs binary and normalizes text to LF on checkin
+# eol=lf    -> text files are checked out as LF on every platform, Windows too
+* text=auto eol=lf
+
+# Media and binary assets: never inspected, never converted.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.webp  binary
+*.gif   binary
+*.ico   binary
+*.svg   text eol=lf
+*.mp4   binary
+*.webm  binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.pdf   binary
+
+# Generated lockfile: keep diffs readable, never merge by hand.
+pnpm-lock.yaml -diff linguist-generated
