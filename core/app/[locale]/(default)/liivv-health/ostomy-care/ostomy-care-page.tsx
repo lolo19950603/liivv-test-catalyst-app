@@ -1,5 +1,6 @@
 'use client';
 
+import { useMessages } from 'next-intl';
 import { type TransitionEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { HeroLoopVideo, RotatingHeroWord } from '~/components/health-hero';
@@ -8,7 +9,7 @@ import { OliviaHelpBand } from '~/components/olivia/olivia-help-band';
 import { GuestCategoryQuiz } from '~/components/onboarding/guest-category-quiz';
 import { SpecializedSubscribe } from '~/components/specialized-subscribe/specialized-subscribe';
 
-import { CHAPTERS as CHAPTER_PAGES, chapterHref, SHOP_OSTOMY_HREF } from './chapters/chapters-data';
+import { buildChapters, chapterHref, SHOP_OSTOMY_HREF } from './chapters/chapters-data';
 import type { OcCatalog, OcCatalogItem } from './get-oc-catalog';
 import { NEW_JOURNEY_STARTER_KIT_ID } from './oc-ids';
 
@@ -78,15 +79,6 @@ const PATH_LINKS = [
     href: '#care',
   },
 ] as const;
-
-const LIFE_CHAPTERS = CHAPTER_PAGES.map((chapter) => ({
-  num: chapter.num,
-  word: chapter.chapterWord,
-  title: chapter.title,
-  blurb: chapter.vibe,
-  href: chapterHref(chapter.slug),
-  image: chapter.heroImage,
-}));
 
 const SHOP_ROOMS = [
   { id: 'all', label: 'All' },
@@ -409,6 +401,18 @@ export function OstomyCarePage({
   showGuestQuiz?: boolean;
   isSignedIn?: boolean;
 }) {
+  // Chapter copy is translated, so the card list is built per render rather
+  // than frozen at module scope.
+  const messages = useMessages();
+  const lifeChapters = buildChapters(messages.OstomyCare.chapters).map((chapter) => ({
+    num: chapter.num,
+    word: chapter.chapterWord,
+    title: chapter.title,
+    blurb: chapter.vibe,
+    href: chapterHref(chapter.slug),
+    image: chapter.heroImage,
+  }));
+
   const [shopRoom, setShopRoom] = useState<ShopRoomId>('all');
 
   const allKits = catalog?.kits ?? [];
@@ -638,7 +642,7 @@ export function OstomyCarePage({
             </p>
           </header>
           <div className="oc-chapters-grid">
-            {LIFE_CHAPTERS.map((item) => (
+            {lifeChapters.map((item) => (
               <a className="oc-chapter-card" href={item.href} key={item.num}>
                 <div className="oc-chapter-media">
                   <img alt="" src={item.image} />

@@ -885,3 +885,19 @@
     transform: none;
   }
 }
+
+/*
+ * Machine-translation notice. Shown on non-English pages only, above the scope
+ * disclaimer, so a French reader knows what they are reading before they act on it.
+ */
+
+#oc-chapter .oc-ch-machine {
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--sand) 40%, var(--paper));
+  border: 1px solid var(--line);
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--ink) 72%, var(--cream));
+}

@@ -1418,5 +1418,849 @@
       "invalidInput": "Please check your input and try again",
       "invalidFormat": "The value entered does not match the required format"
     }
+  },
+  "OstomyCare": {
+    "chapters": {
+      "new-to-the-journey": {
+        "title": "New to the Journey",
+        "heroBody": "Just starting out and learning the ropes — calm checklists, first supplies, and who to ask.",
+        "focus": "First weeks after surgery, change routines, starter supplies, who to ask, and soft next steps into everyday living.",
+        "vibe": "Supportive and demystifying — a soft place to land.",
+        "nextLabel": "Get to Know Your Stoma →",
+        "categoriesIntro": {
+          "eyebrow": "First chapters",
+          "heading": "You are not supposed to know everything yet",
+          "body": "Most people find pouch changes become familiar within weeks. Start with a short checklist and one trusted contact."
+        },
+        "categories": {
+          "1": {
+            "title": "First Week Basics",
+            "items": {
+              "1": "Fatigue is normal — rest is part of recovery",
+              "2": "Your care team will send you home with a starter setup; learning takes practice, not perfection",
+              "3": "Many people feel more confident within four to eight weeks"
+            }
+          },
+          "2": {
+            "title": "Change Routine Starters",
+            "items": {
+              "1": "Gather supplies first: new system, measuring guide, scissors if needed, warm water, soft cloth, disposal bag",
+              "2": "Remove gently — never rip; wet a cloth to help release adhesive if needed",
+              "3": "Clean, dry, measure, apply, and hold the barrier so body heat activates the seal"
+            }
+          },
+          "3": {
+            "title": "Starter Supply Lists",
+            "note": "Try The Fresh Start kit — customize quantities before checkout.",
+            "items": {
+              "1": "Pouches and barriers that match your system (one-piece or two-piece)",
+              "2": "Skin protectant wipe, powder if recommended, disposal bags",
+              "3": "A go-bag for outings from day one"
+            }
+          },
+          "4": {
+            "title": "Go-Bags & Backup",
+            "note": "Explore curated go-bag kits in Shop Ostomy Essentials.",
+            "items": {
+              "1": "Spare barrier and pouch, soft wipes, disposal bags",
+              "2": "Adhesive remover and skin protectant if you use them",
+              "3": "A spare underwear or liner for peace of mind away from home"
+            }
+          },
+          "5": {
+            "title": "Who to Ask",
+            "items": {
+              "1": "NSWOC — a nurse specialized in wound, ostomy and continence care. Fit, skin, and clinical troubleshooting",
+              "2": "Surgeon or clinic — recovery and medical concerns",
+              "3": "Ontario pharmacist chat — everyday product and restock questions during business hours"
+            }
+          },
+          "6": {
+            "title": "Soft Next Steps",
+            "items": {
+              "1": "Reintroduce foods gradually; chew thoroughly; notice patterns",
+              "2": "Light walking often comes first; return to activity as cleared by your care team",
+              "3": "Open Everyday Liivving when you are ready to find a peer group or work out what your province covers"
+            }
+          }
+        },
+        "programsBand": {
+          "heading": "A gentle first-month map",
+          "cards": {
+            "1": {
+              "heading": "Weeks 1–2",
+              "body": "Focus on healing, hydration, and one solid change routine. Soft, low-fiber foods as advised by your team."
+            },
+            "2": {
+              "heading": "Weeks 3–4",
+              "body": "Add foods one at a time. Measure the stoma as swelling changes. Keep extras stocked."
+            },
+            "3": {
+              "heading": "Weeks 5–8",
+              "body": "Confidence usually grows here — social plans, workdays, and a go-bag that travels with you."
+            }
+          }
+        },
+        "citations": {
+          "1": {
+            "label": "NSWOCC — Find an NSWOC"
+          },
+          "2": {
+            "label": "NSWOCC — free patient guides (English and French)"
+          },
+          "3": {
+            "label": "RNAO — Getting ready for ostomy surgery (patient fact sheet)"
+          }
+        },
+        "pharmacist": {
+          "eyebrow": "Available in Ontario",
+          "heading": "You do not have to figure the aisle alone",
+          "body": "Starting out can feel like a new language. Chat with an Ontario pharmacist during business hours for product questions — until 5 p.m. Eastern. Clinical concerns still belong with your NSWOC or surgeon.",
+          "cta": "Talk to a Pharmacist"
+        },
+        "closing": {
+          "heading": "A soft place to land",
+          "body": "New to the Journey is permission to learn slowly — with checklists, kind answers, and supplies that show up when you need them."
+        },
+        "governance": {
+          "disclaimer": "This is general information, not medical advice, and it is not a substitute for assessment by your NSWOC, surgeon, or physician. Fit, skin, and product choices depend on your body and your surgery — talk to your care team before changing anything."
+        }
+      },
+      "get-to-know-your-stoma": {
+        "title": "Get to Know Your Stoma",
+        "heroBody": "Clear, kind education about your stoma — how it works, what changes, and what to do when something is not right.",
+        "focus": "Your stoma type, skin comfort, output patterns and fit changes; what to do when something is not right — leaks, pancaking, sore skin, high output, a hernia; and the clothing, travel, intimacy and routine questions that come with living in your body.",
+        "vibe": "Clear, kind, and demystifying — education without overwhelm.",
+        "nextLabel": "Everyday Liivving →",
+        "categoriesIntro": {
+          "eyebrow": "Understanding without overwhelm",
+          "heading": "Know your setup",
+          "body": "A pouching system is a skin barrier (wafer/flange) plus a pouch. Fit and skin health drive comfort more than anything else."
+        },
+        "categories": {
+          "1": {
+            "title": "Stoma Basics",
+            "group": "Start here",
+            "items": {
+              "1": "Colostomy, ileostomy, and urostomy each shape output and daily care a little differently",
+              "2": "A stoma can be temporary or permanent — your care team decides with you",
+              "3": "Healthy peristomal skin should look like the skin on the other side of your abdomen"
+            }
+          },
+          "2": {
+            "title": "One-Piece vs Two-Piece",
+            "items": {
+              "1": "One-piece: barrier and pouch are joined — simple and low-profile",
+              "2": "Two-piece: barrier stays while you change pouches — flexible for frequent emptying",
+              "3": "Your NSWOC or pharmacist can help you find what seals best for your body"
+            }
+          },
+          "3": {
+            "title": "Skin Comfort",
+            "items": {
+              "1": "Clean with warm water; avoid oils, fragrances, and lotion under the barrier",
+              "2": "Pat dry completely — dry skin seals better than damp skin",
+              "3": "Powder, paste, rings, and wipes are tools for seal and comfort — add only what you need"
+            }
+          },
+          "4": {
+            "title": "Output & Patterns",
+            "items": {
+              "1": "Empty drainable pouches at about one-third to one-half full",
+              "2": "Closed pouches are replaced as needed through the day",
+              "3": "Full system changes are often every few days — or sooner if you feel burning, itching, or a leak"
+            }
+          },
+          "5": {
+            "title": "Fit Changes",
+            "items": {
+              "1": "Measure during the first months — stoma size can change as swelling settles",
+              "2": "An opening that is too large exposes skin; too small can injure the stoma",
+              "3": "Aim for a close fit around the stoma edge so output lands in the pouch, not on skin"
+            }
+          },
+          "6": {
+            "title": "When to Ask",
+            "note": "Soft next step: browse Shop Ostomy Essentials for barriers, pouches, and accessories.",
+            "items": {
+              "1": "Persistent leaks, redness, pain, or skin that will not heal",
+              "2": "Sudden changes in output, swelling, or how your barrier wears",
+              "3": "Your NSWOC is the clinical guide; Ontario pharmacists can help with everyday product questions in chat"
+            }
+          },
+          "7": {
+            "title": "Leaks and short wear time",
+            "group": "When something is not right",
+            "sections": {
+              "1": {
+                "heading": "What often helps",
+                "items": {
+                  "1": "Re-measure. Stoma size changes for months after surgery, and an opening cut to last month’s size is the most common cause of a leak",
+                  "2": "Check where the leak starts — from under the barrier, or from the edge. They point at different problems",
+                  "3": "Make sure skin is completely dry before the barrier goes on, and hold it in place so body heat can set the seal"
+                }
+              },
+              "2": {
+                "heading": "When to call your NSWOC",
+                "note": "Repeated leaking usually means the fit is wrong, not that you are doing it wrong. Convexity, rings and pastes can all help — but which one depends on your abdomen and your stoma, so that is an assessment rather than a shopping decision. The wrong convexity can cause a pressure injury.",
+                "items": {
+                  "1": "Leaks more than occasionally, or a pattern you cannot explain",
+                  "2": "Skin that has not fully healed between changes"
+                }
+              }
+            }
+          },
+          "8": {
+            "title": "Pancaking",
+            "group": "When something is not right",
+            "sections": {
+              "1": {
+                "heading": "What is happening",
+                "items": {
+                  "1": "The pouch film sticks to itself, so output cannot drop away from the stoma and pushes up under the barrier instead",
+                  "2": "It is more common with thicker output and with filters that pull the air out quickly"
+                }
+              },
+              "2": {
+                "heading": "What often helps",
+                "note": "If it is constant, or your output has become noticeably thicker than it used to be, mention it — that is worth looking at rather than working around.",
+                "items": {
+                  "1": "A puff of air in the pouch before you close it",
+                  "2": "A lubricating deodorant, which helps output slide to the bottom"
+                }
+              }
+            }
+          },
+          "9": {
+            "title": "Ballooning and gas",
+            "group": "When something is not right",
+            "sections": {
+              "1": {
+                "heading": "What often helps",
+                "items": {
+                  "1": "Filters do wet out and stop working — that is normal rather than a fault",
+                  "2": "Gas patterns often settle over the first months as your gut adjusts",
+                  "3": "Eating and drinking more slowly means swallowing less air"
+                }
+              },
+              "2": {
+                "heading": "When to call your NSWOC",
+                "note": "Food affects gas differently for everyone, and post-surgery advice differs by ostomy type — so this is a conversation with your team or a dietitian rather than a list to follow.",
+                "items": {
+                  "1": "A sudden change in gas alongside pain, or output that stops"
+                }
+              }
+            }
+          },
+          "10": {
+            "title": "Sore, itchy, or weeping skin",
+            "group": "When something is not right",
+            "sections": {
+              "1": {
+                "heading": "Please do not self-diagnose this one",
+                "items": {
+                  "1": "Irritation from output, a fungal rash, a contact allergy, and a few less common conditions look almost identical to the eye",
+                  "2": "They have opposite treatments — the wrong one makes several of them worse"
+                }
+              },
+              "2": {
+                "heading": "What is safe to do meanwhile",
+                "note": "Any skin that is broken, weeping, bleeding, or still not healed by the next change needs an NSWOC to look at it — not a product recommendation from the internet.",
+                "items": {
+                  "1": "Keep the area clean with warm water only — no oils, lotions, or fragranced products under the barrier",
+                  "2": "Check the opening is not cut larger than the stoma, which leaves skin exposed to output",
+                  "3": "Photograph it before your appointment, since skin changes between changes"
+                }
+              }
+            }
+          },
+          "11": {
+            "title": "Output that changes",
+            "group": "When something is not right",
+            "sections": {
+              "1": {
+                "heading": "Why it matters more with an ileostomy",
+                "items": {
+                  "1": "An ileostomy puts out more fluid and more salt, so dehydration builds faster and less obviously than people expect",
+                  "2": "Thirst is not a reliable early sign — dark urine, headache, and feeling washed out often come first"
+                }
+              },
+              "2": {
+                "heading": "When to call",
+                "note": "High output is the leading reason people are readmitted after ostomy surgery. It is worth phoning about early rather than waiting to see.",
+                "items": {
+                  "1": "A sustained jump in output lasting more than a day",
+                  "2": "Watery, high-volume output that is not settling",
+                  "3": "Feeling dizzy, confused, or unusually weak alongside it"
+                }
+              }
+            }
+          },
+          "12": {
+            "title": "A bulge around the stoma",
+            "group": "When something is not right",
+            "sections": {
+              "1": {
+                "heading": "What it usually is",
+                "items": {
+                  "1": "A parastomal hernia — the abdominal wall weakening around the stoma. It is common and it is not something you caused",
+                  "2": "It often changes how your barrier sits, so leaks can start at the same time"
+                }
+              },
+              "2": {
+                "heading": "When to call your NSWOC",
+                "note": "Support garments help many people, but they have to be sized and chosen for the specific hernia — buying one without an assessment can make the fit worse rather than better.",
+                "items": {
+                  "1": "Any new bulge, or a change in the shape of the area around your stoma"
+                }
+              }
+            }
+          },
+          "13": {
+            "title": "Clothing & Confidence",
+            "group": "Body and life",
+            "items": {
+              "1": "High-waisted styles and soft layers can keep a pouch secure and low-profile",
+              "2": "Support belts or wraps for active days when you want extra hold",
+              "3": "You do not have to hide your pouch — comfort and preference come first"
+            }
+          },
+          "14": {
+            "title": "Travel & Workdays",
+            "group": "Body and life",
+            "items": {
+              "1": "Empty when the pouch is about one-third to one-half full to reduce leak risk",
+              "2": "Pack supplies in your carry-on — never only in checked bags",
+              "3": "Plan bathroom stops the way you plan coffee: early and without apology"
+            }
+          },
+          "15": {
+            "title": "Intimacy & Social Ease",
+            "group": "Body and life",
+            "items": {
+              "1": "Talk about what helps you feel secure — timing, clothing, or a support wrap",
+              "2": "Confidence grows with a routine that has already worked at home",
+              "3": "Your pace is the right pace"
+            }
+          },
+          "16": {
+            "title": "Rest & Routine",
+            "group": "Body and life",
+            "items": {
+              "1": "Many people prefer morning changes when output is often lower",
+              "2": "Lay out supplies like a station before you start",
+              "3": "Restock before you run low — clockwork beats last-minute stress"
+            }
+          }
+        },
+        "urgent": {
+          "heading": "Some things are not a website question",
+          "intro": "Most stoma worries can wait for your next NSWOC appointment. These cannot. Seek urgent medical care if you notice:",
+          "action": "Go to your nearest emergency department or call 911. Do not wait for a callback, and do not troubleshoot a dusky stoma at home.",
+          "signs": {
+            "1": "A stoma that turns dark, dusky, purple, or feels cold to the touch",
+            "2": "Severe abdominal pain, or vomiting with no output for several hours — this can mean a blockage",
+            "3": "Heavy or continuous bleeding from the stoma itself, not just a spot from cleaning",
+            "4": "Fever, or skin around the stoma that is hot, spreading red, and painful",
+            "5": "Confusion, severe dizziness, or very dark urine alongside high output — signs of significant dehydration"
+          }
+        },
+        "citations": {
+          "1": {
+            "label": "RNAO — Supporting Adults Who Anticipate or Live with an Ostomy (best practice guideline)"
+          },
+          "2": {
+            "label": "NSWOCC — free patient guides by ostomy type"
+          },
+          "3": {
+            "label": "Wounds Canada — Caring for a Person with an Ostomy"
+          }
+        },
+        "pharmacist": {
+          "eyebrow": "Available in Ontario",
+          "heading": "Ask without the awkward",
+          "body": "Not sure if you need convex, a ring, or a different wipe? Chat with an Ontario pharmacist during business hours — until 5 p.m. Eastern. For clinical stoma concerns, your NSWOC remains your primary resource.",
+          "cta": "Talk to a Pharmacist"
+        },
+        "closing": {
+          "heading": "Comfort is a skill you build",
+          "body": "Knowing your stoma is not a test — it is a quieter relationship with fit, skin, and the products that earn their place on your shelf."
+        },
+        "governance": {
+          "disclaimer": "This is general information, not medical advice, and it is not a substitute for assessment by your NSWOC, surgeon, or physician. Fit, skin, and product choices depend on your body and your surgery — talk to your care team before changing anything."
+        }
+      },
+      "everyday-liivving": {
+        "title": "Everyday Liivving",
+        "heroBody": "The people, programs, and money help that exist in Canada — gathered in one place, so you are not searching alone.",
+        "focus": "Peer support and chapters near you, what coverage actually looks like province by province, free manufacturer programs, youth and young adult community, and awareness dates.",
+        "vibe": "Practical and connecting — the map to everything outside this website.",
+        "nextLabel": "Back to Ostomy Care →",
+        "categoriesIntro": {
+          "eyebrow": "You are not doing this alone",
+          "heading": "What exists, and who it is for",
+          "body": "A lot of good help exists in Canada. Almost none of it is in one place. This chapter is the map — most of it links out, because these organisations do it better than we could."
+        },
+        "categories": {
+          "1": {
+            "title": "Peer support is its own kind of care",
+            "group": "Start here",
+            "note": "A peer visitor is not a substitute for your NSWOC. Most people find they want both.",
+            "items": {
+              "1": "Ostomy Canada Society runs chapters and peer support groups across the country, searchable by distance from where you live",
+              "2": "Their Visitor Program trains people who have an ostomy to talk with people who have just had one — lived experience, not clinical advice",
+              "3": "If you are between roughly 20 and 40, ask about Gutsy Gang social clubs — they run in Vancouver, Calgary, Saskatoon, Winnipeg, Hamilton, Toronto, and Niagara"
+            }
+          },
+          "2": {
+            "title": "What coverage actually looks like in Canada",
+            "group": "Money",
+            "note": "We have checked every province and territory against its own government page — see Funding & Coverage for what yours pays, who has to sign off, and the dates that catch people out.",
+            "items": {
+              "1": "There is no national ostomy program. The amount, the model, and who approves it all change at the provincial border",
+              "2": "Moving provinces resets everything — including which forms you file and who has to sign them",
+              "3": "In most provinces an NSWOC assessment is the gate. Some, like Saskatchewan, will not accept a self-application at all"
+            }
+          },
+          "3": {
+            "title": "Programs that cost you nothing",
+            "group": "Money",
+            "items": {
+              "1": "All three major manufacturers run free support programs — samples, phone lines, and access to ostomy nurses",
+              "2": "You do not have to buy from us, or from them, to use these",
+              "3": "They will also help you work out what your province covers, which is often the fastest way to get an answer"
+            }
+          },
+          "4": {
+            "title": "Awareness, on Canada’s calendar",
+            "group": "Community",
+            "items": {
+              "1": "World Ostomy Day runs every three years, not every year — the last was 4 October 2025, and the next falls in 2028",
+              "2": "In the years between, Canada still marks the first Saturday of October, anchored by Ostomy Canada’s Step Up for Ostomy campaign",
+              "3": "Chapters usually run local events — the chapter finder is the fastest way to see what is happening near you"
+            }
+          },
+          "5": {
+            "title": "Stories from people who have one",
+            "group": "Community",
+            "items": {
+              "1": "Reading someone describe their first month is worth more than any checklist we could write",
+              "2": "We are collecting stories from Canadians with ostomies — surgery, work, travel, dating, sport, all of it",
+              "3": "If you would like to share yours, tell the care team and we will be in touch about how it works"
+            }
+          }
+        },
+        "programsBand": {
+          "heading": "Four ways provinces pay — knowing yours saves you money",
+          "cards": {
+            "1": {
+              "heading": "A flat grant, paid to you",
+              "body": "Ontario and Quebec send a set amount each year and you buy your own supplies. If you use more than the grant covers, the overage is yours — and may be claimable as a medical expense."
+            },
+            "2": {
+              "heading": "A percentage cost-share",
+              "body": "British Columbia, Alberta, Saskatchewan, and Newfoundland cover a share and you pay the rest, often up to an annual cap. Low income can reduce your share to nothing."
+            },
+            "3": {
+              "heading": "Supplies issued to you",
+              "body": "Manitoba does not reimburse — the program sends the supplies. You are registered through an NSWOC after surgery rather than applying yourself."
+            },
+            "4": {
+              "heading": "Only if you qualify",
+              "body": "PEI is income-tiered. Nova Scotia and New Brunswick route by category — seniors, social assistance, or specific programs — so there is no general coverage to apply for."
+            }
+          }
+        },
+        "resources": {
+          "1": {
+            "eyebrow": "Find your people",
+            "heading": "Support that is already out there",
+            "body": "These are run by patient organisations and specialist nurses, not by us. They are free, and they are better at this than any retailer.",
+            "links": {
+              "1": {
+                "title": "Find a chapter or peer support group",
+                "org": "Ostomy Canada Society",
+                "body": "Search by distance from your postal code, from 10 km out to 500 km. Also lists Gutsy Gang social clubs for younger adults."
+              },
+              "2": {
+                "title": "Visitor Program",
+                "org": "Ostomy Canada Society",
+                "body": "Trained peer visitors who have an ostomy themselves. Requested through your local chapter, usually after a referral from your surgeon or NSWOC."
+              },
+              "3": {
+                "title": "Find an NSWOC near you",
+                "org": "NSWOCC",
+                "body": "Nurses Specialized in Wound, Ostomy and Continence — the clinical specialists for stoma care in Canada. Many hospitals have one; some see outpatients for life."
+              },
+              "4": {
+                "title": "Youth Camp",
+                "org": "Ostomy Canada Society",
+                "body": "A week at Camp Horizon in Bragg Creek, Alberta, for kids and teens with ostomies. Partial and full funding is available — ask, do not assume the fee is the barrier."
+              }
+            }
+          },
+          "2": {
+            "eyebrow": "Free programs",
+            "heading": "Manufacturer support, compared plainly",
+            "body": "All three are free and none of them require you to buy from us. We have listed what each program offers — not whose products are better, which is not our call to make.",
+            "links": {
+              "1": {
+                "title": "Secure Start",
+                "org": "Hollister",
+                "body": "Free personalized support regardless of which brand you use, including help navigating coverage. Canadian line: 1-800-263-7421."
+              },
+              "2": {
+                "title": "Coloplast Care",
+                "org": "Coloplast",
+                "body": "Ongoing educational support, phone access, samples, and the MyOstomy app for tracking changes and output. Consumer support: 1-866-293-6349."
+              },
+              "3": {
+                "title": "me+",
+                "org": "Convatec",
+                "body": "Staged around the journey — before surgery, right after, and living with one. Includes video appointments with a certified ostomy nurse. 1-800-465-6302."
+              }
+            }
+          },
+          "3": {
+            "eyebrow": "Money",
+            "heading": "Coverage and tax help",
+            "body": "Amounts and rules change, and they change by province. Always confirm against the official source before you plan around a number.",
+            "links": {
+              "1": {
+                "title": "Provincial government programs",
+                "org": "Ostomy Canada Society",
+                "body": "The best public summary of what each province and territory covers, with links through to the official program pages."
+              },
+              "2": {
+                "title": "Disability Tax Credit (form T2201)",
+                "org": "Canada Revenue Agency",
+                "body": "Many ostomates qualify under the \"eliminating\" category. Approval can also unlock the RDSP and other credits, so it is worth the paperwork."
+              },
+              "3": {
+                "title": "Non-Insured Health Benefits (NIHB)",
+                "org": "Indigenous Services Canada",
+                "body": "Full coverage with no annual cap for registered First Nations and recognized Inuit. This replaces the provincial route rather than topping it up."
+              }
+            }
+          },
+          "4": {
+            "eyebrow": "Read more",
+            "heading": "Guides worth downloading",
+            "body": "Written by nurses and patient organisations, free, and more thorough than anything on this page.",
+            "links": {
+              "1": {
+                "title": "Living with an ileostomy, colostomy, or ileal conduit",
+                "org": "NSWOCC",
+                "body": "Clinician-written patient guides, one per ostomy type, including the less commonly covered ones — jejunostomy, gastrostomy, and gastro-jejunostomy.",
+                "note": "English and French"
+              },
+              "2": {
+                "title": "New Ostomy Patient Guide",
+                "org": "United Ostomy Associations of America",
+                "body": "American, so the funding sections will not apply here — but the clinical and practical content is excellent and freely available."
+              },
+              "3": {
+                "title": "Step Up for Ostomy",
+                "org": "Ostomy Canada Society",
+                "body": "The national awareness and fundraising campaign that anchors the first Saturday of October in Canada."
+              }
+            }
+          }
+        },
+        "citations": {
+          "1": {
+            "label": "Ostomy Canada Society — provincial government programs"
+          },
+          "2": {
+            "label": "Ostomy Canada Society — Ontario ADP grant and why $975 a year is not enough"
+          },
+          "3": {
+            "label": "Canada Revenue Agency — Disability Tax Credit, eliminating category"
+          },
+          "4": {
+            "label": "United Ostomy Associations of America — World Ostomy Day"
+          }
+        },
+        "pharmacist": {
+          "eyebrow": "Available in Ontario",
+          "heading": "Fit questions that do not need a waiting room",
+          "body": "Product fit, restock questions, and everyday concerns — chat with an Ontario pharmacist during business hours (until 5 p.m. Eastern). Olivia helps with shopping anytime; she does not give medical advice.",
+          "cta": "Talk to a Pharmacist"
+        },
+        "closing": {
+          "heading": "Living, not managing",
+          "body": "The help exists. Most people just never find out it is there — which is the only reason this page needed writing."
+        },
+        "governance": {
+          "disclaimer": "This is general information, not medical advice, and it is not a substitute for assessment by your NSWOC, surgeon, or physician. Fit, skin, and product choices depend on your body and your surgery — talk to your care team before changing anything."
+        }
+      }
+    },
+    "funding": {
+      "models": {
+        "flat-grant": {
+          "label": "A flat grant, paid to you",
+          "blurb": "A set amount arrives each year and you buy your own supplies. Anything above the grant is yours to cover — and may be claimable as a medical expense at tax time."
+        },
+        "cost-share": {
+          "label": "A percentage cost-share",
+          "blurb": "The program covers a share and you pay the rest, often up to an annual maximum. Low income usually reduces or removes your share."
+        },
+        "supplies-in-kind": {
+          "label": "Supplies issued to you",
+          "blurb": "The program sends the supplies rather than reimbursing you, so you are registered rather than applying — and you do not buy them at retail."
+        },
+        "categorical": {
+          "label": "Only if you qualify",
+          "blurb": "There is no general program. Coverage runs through specific routes — seniors, social assistance, or a named condition — so the question is which category you fall into."
+        },
+        "none": {
+          "label": "No ostomy-specific program",
+          "blurb": "Nothing covers ostomy supplies directly here. Federal routes and tax credits may still help."
+        }
+      },
+      "provinceLabels": {
+        "BC": "British Columbia",
+        "AB": "Alberta",
+        "SK": "Saskatchewan",
+        "MB": "Manitoba",
+        "ON": "Ontario",
+        "QC": "Quebec",
+        "NB": "New Brunswick",
+        "NS": "Nova Scotia",
+        "PE": "Prince Edward Island",
+        "NL": "Newfoundland and Labrador",
+        "YT": "Yukon",
+        "NT": "Northwest Territories",
+        "NU": "Nunavut"
+      },
+      "programs": {
+        "ON": {
+          "name": "Ontario",
+          "amount": "You receive $975 per ostomy per year, paid in two instalments. That rises to $1,300 if you live in a long-term care home or receive social assistance.",
+          "howToApply": "A physician or nurse practitioner examines you and confirms the ostomy, you both complete form 014-1945-67, and it goes to the Assistive Devices Program. The money is paid to you, not to a vendor, so you can buy supplies wherever you like.",
+          "gatekeeper": "A physician or nurse practitioner — an NSWOC signature is not required here, which differs from several other provinces.",
+          "deadlines": "Renew every two years; ADP sends paperwork about three months before expiry. Reviews take up to eight weeks, with the first payment within 30 days of approval.",
+          "notes": "A temporary ostomy only qualifies if it is needed for longer than six months. If you receive ODSP, the Mandatory Special Necessities benefit can cover costs above the grant — but only once the ADP grant is used up."
+        },
+        "BC": {
+          "name": "British Columbia",
+          "amount": "After an income-based family deductible, PharmaCare pays 70% of eligible costs — 75% if a family member was born before 1940 — then 100% once you reach the family maximum.",
+          "howToApply": "There is no ostomy application. The step that matters is registering for Fair PharmaCare, which sets your deductible. Register at gov.bc.ca or on 1-800-663-7100, then coverage applies automatically at the till through an authorised provider.",
+          "gatekeeper": "Nobody clinical — registration and CRA income verification are the gate. The practical gatekeeper is a provider who can bill under a listed product code.",
+          "deadlines": "Return the mailed consent form within 30 days or registration does not complete. Deductibles run on the calendar year.",
+          "notes": "If you do not register for Fair PharmaCare you are assigned a $10,000 deductible by default, which means paying for everything yourself. Registering is the single highest-value thing a BC reader can do. Note that skin barriers, protectants, deodorants and cleansers are not covered — people routinely assume they are."
+        },
+        "AB": {
+          "name": "Alberta",
+          "amount": "You pay 25% of the cost, up to a maximum of $500 per family per benefit year — after which AADL covers 100% for the rest of the year. The $500 is a ceiling on what you pay, not an amount you receive.",
+          "howToApply": "An AADL-approved authoriser assesses you and authorises the products; an approved vendor then bills AADL directly and charges you your share at the point of sale.",
+          "gatekeeper": "An AADL-approved authoriser — for ostomy products this is a registered nurse, and in practice usually an NSWOC.",
+          "deadlines": "The benefit year runs 1 July to 30 June.",
+          "notes": "Low-income Albertans and income-assistance recipients pay nothing at all. If you are excluded because another plan covers you fully — Veterans Affairs, NIHB, or WCB — that other plan is the route."
+        },
+        "SK": {
+          "name": "Saskatchewan",
+          "amount": "The province pays 50% of eligible supplies within quantity limits, and you pay the other half. There is no annual dollar cap.",
+          "howToApply": "Referral from an ET/NSWOC nurse at a Saskatchewan stoma clinic. This is the only route in — a prescription from your family doctor will not register you, and there is no way to apply for yourself.",
+          "gatekeeper": "An ET/NSWOC nurse at a provincial stoma clinic. Registration comes before coverage.",
+          "notes": "Some people get supplies at no charge rather than at 50% — Paraplegia Program registrants, and holders of Supplementary Health Benefits through SAID, SIS or SEI. Worth asking about before assuming you pay half."
+        },
+        "MB": {
+          "name": "Manitoba",
+          "howToApply": "You are registered by an NSWOC after surgery rather than applying yourself. The program then covers basic supplies in full and sends them to you — there is nothing to pay and nothing to claim back.",
+          "gatekeeper": "An NSWOC, who sets your supply list. Any change to that list also needs NSWOC approval.",
+          "deadlines": "Order at least two weeks ahead. You can request up to three months of supplies at a time.",
+          "notes": "There is no dollar figure here, and that is correct rather than missing — limits are set per product in quantities, not in money. Any number you find quoted for Manitoba is not a current benefit rate."
+        },
+        "QC": {
+          "name": "Quebec",
+          "amount": "An annual lump sum of $1,510 for a permanent ostomy, or $1,007 for a temporary one. Paid per ostomy, so two stomas means two allocations.",
+          "howToApply": "You apply to RAMQ yourself. The only conditions are being insured under the Québec Health Insurance Plan and having had a colostomy, ileostomy or urostomy.",
+          "gatekeeper": "No clinical sign-off is needed to submit — you apply directly.",
+          "deadlines": "Amounts are indexed every 1 January. Temporary-ostomy payments are split — half when the application is accepted, then every six months until the stoma is closed.",
+          "notes": "If you hold a claim slip through social assistance you are reimbursed at actual cost instead of the lump sum. There is also a voluntary agreement that pays your supplier directly and ends the lump-sum payments — useful for some people, but it is a one-way switch worth understanding first."
+        },
+        "NB": {
+          "name": "New Brunswick",
+          "howToApply": "There is no general ostomy program in New Brunswick. If you are a Social Development client with a qualifying health card, eligible supplies cost you nothing and the program pays pharmacies and suppliers directly. If you are not, this route is closed and the federal and tax options below are where to look.",
+          "gatekeeper": "Your Social Development health card is the gate — it must show the right supplementary or ostomy eligibility code.",
+          "notes": "Coverage is capped by monthly quantities per product rather than by dollars — for example a set number of wafers and pouches each month."
+        },
+        "NS": {
+          "name": "Nova Scotia",
+          "amount": "Ostomy products are a listed Pharmacare benefit, so what you pay depends on which plan you are in rather than on an ostomy-specific rate.",
+          "howToApply": "Ostomy products are dispensed as prescriptions through a Nova Scotia pharmacy, so the route is a prescriber plus enrolment in a Pharmacare plan. Family Pharmacare is open to any resident without other drug coverage — worth knowing, because Nova Scotia is often described as having nothing for the general public, and that is not right.",
+          "gatekeeper": "A physician or nurse practitioner prescribes. An NSWOC is not a gatekeeper here. Plan enrolment is the real step.",
+          "deadlines": "Reimbursement claims must be submitted within six months of the prescription being dispensed — the most commonly missed deadline in the province.",
+          "notes": "If you are in active cancer treatment with a combined family income of $35,000 or less, the Boarding, Transportation and Ostomy program reimburses actual supply costs on top. Seniors and Income Assistance clients have their own cost-sharing rules."
+        },
+        "PE": {
+          "name": "Prince Edward Island",
+          "amount": "Reimburses 60% to 100% of what you spend depending on household income, up to $2,400 per full program year.",
+          "howToApply": "A health care professional submits the Health Care Provider Registration Form for you. After that it is income-tested rather than clinical.",
+          "gatekeeper": "A health care professional — the program does not specifically require an NSWOC.",
+          "deadlines": "The program year runs 1 July to 30 June and you must re-apply before it expires or coverage stops. Old invoices are not accepted, so submit regularly rather than saving them up.",
+          "notes": "Joining part-way through the year pro-rates the maximum."
+        },
+        "NL": {
+          "name": "Newfoundland and Labrador",
+          "amount": "Reimburses 75% of the retail cost of eligible items — but only for 65Plus Plan cardholders, meaning seniors receiving both Old Age Security and the Guaranteed Income Supplement.",
+          "howToApply": "Enrolment happens automatically through your OAS and GIS status. You buy the supplies, keep the original prescription receipts, and claim the 75% back.",
+          "gatekeeper": "No separate assessor — a prescription and your 65Plus card are what is needed.",
+          "notes": "If you are under 65, or not receiving GIS, the official page does not name you as eligible for this subsidy. Check the other NLPDP plans and the federal routes below."
+        },
+        "YT": {
+          "name": "Yukon",
+          "howToApply": "Your physician — or a community health nurse where there is no resident doctor — applies on your behalf, and pre-approval before you buy is expected. If you are 65 or over you are covered instead through Seniors Pharmacare, enrolled automatically.",
+          "gatekeeper": "A physician or community health nurse. Note that having an ostomy is not by itself a qualifying condition — coverage runs through a closed list of chronic diseases, and several common causes of ostomy are not on it. Confirm your specific diagnosis before assuming you are covered.",
+          "deadlines": "Apply before you buy. Purchases made outside Yukon without prior approval must be claimed within one year.",
+          "notes": "Yukon publishes no ostomy figure and no deductible amount on its own pages. Numbers circulate elsewhere; we are not repeating them, because we could not confirm them. Call the program to get your own numbers before planning around them."
+        },
+        "NT": {
+          "name": "Northwest Territories",
+          "amount": "Seniors 60+ and lower-income bands pay nothing. Higher bands pay 25% of the cost up to a yearly family maximum of $500 to $1,500 depending on income band, after which the plan pays everything. There is no deductible on medical supplies.",
+          "howToApply": "Register under the Extended Health Benefits policy, which involves an income assessment — unless you are 60 or over, in which case you are enrolled on age. A prescriber then orders the supplies.",
+          "gatekeeper": "Program registration plus a prescription from a recognised health care prescriber.",
+          "deadlines": "Bands and maximums reset on 1 September.",
+          "notes": "Ostomy supplies are covered under general medical supplies rather than a named ostomy benefit. First Nations and Inuit residents go through NIHB instead."
+        },
+        "NU": {
+          "name": "Nunavut",
+          "howToApply": "There is no ostomy-specific program. If you qualify under specified conditions or seniors coverage, prescribed medical supplies are covered including fitting and shipping — which matters a great deal in Nunavut. Most Nunavummiut are Inuit and are covered federally through NIHB instead.",
+          "gatekeeper": "A prescription is required either way.",
+          "notes": "Nunavut publishes no amount, cap, or per-item rate for supplies, and no list we could confirm of which conditions qualify. Call Extended Health Benefits on 867-645-8029 to ask whether your diagnosis is on the list rather than assuming either way."
+        }
+      },
+      "governance": {
+        "disclaimer": "This is general information, not medical advice, and it is not a substitute for assessment by your NSWOC, surgeon, or physician. Fit, skin, and product choices depend on your body and your surgery — talk to your care team before changing anything. Funding amounts and eligibility rules change every year — always confirm on the official government page before planning around a number."
+      }
+    },
+    "ui": {
+      "chapter": {
+        "kicker": "Ostomy Care · Chapter {word}",
+        "readChapter": "Read this chapter",
+        "askPharmacist": "Ask a pharmacist",
+        "theFocus": "The Focus",
+        "theVibe": "The Liivv Vibe",
+        "softMap": "Soft map",
+        "opensOnTheirSite": "Opens on their site ↗",
+        "resourcesEyebrow": "Outside these pages",
+        "resourcesHeading": "Where to go from here",
+        "resourcesIntro": "These are run by patient organisations, specialist nurses, and government programs — not by Liivv. We link out because they do this better than a shop could.",
+        "pathEyebrow": "Path",
+        "allChapters": "All three chapters",
+        "keepGoing": "Keep going",
+        "backToLanding": "Back to Ostomy Care page",
+        "chapterNav": "Chapter navigation"
+      },
+      "discovery": {
+        "eyebrow": "Also from Liivv",
+        "heading": "Ostomy is one of the things we support",
+        "lead": "If something else is part of your everyday — yours or someone you care for — there is a chapter for that too.",
+        "hubTitle": "See everything in Liivv Health",
+        "hubBody": "Eleven areas of care, with more on the way."
+      },
+      "governance": {
+        "reviewedBy": "Clinically reviewed by",
+        "lastReviewed": "Last reviewed {date}",
+        "sourcesHeading": "Where this comes from",
+        "machineTranslated": "This page was translated automatically from English. If anything reads oddly or you are making a decision based on it, check the English version or ask your NSWOC."
+      },
+      "checker": {
+        "formLabel": "Find what your province covers",
+        "provinceLabel": "Where do you live?",
+        "provinceHint": "Coverage changes completely at the provincial border, so this is the one answer we really need.",
+        "provincePlaceholder": "Select a province or territory",
+        "permanenceLegend": "Is your ostomy permanent or temporary?",
+        "permanent": "Permanent",
+        "temporary": "Temporary",
+        "notSure": "Not sure",
+        "indigenousLegend": "Are you First Nations or Inuit?",
+        "indigenousHint": "First Nations and Inuit are covered federally through NIHB instead of the provincial program.",
+        "seniorLegend": "Are you 65 or older?",
+        "seniorHint": "Several programs are seniors-only, or cover more once you turn 65.",
+        "otherCoverageLegend": "Do you have workplace or private insurance?",
+        "otherCoverageHint": "Some programs will not pay until private coverage is used up — and a few exclude you entirely.",
+        "yes": "Yes",
+        "no": "No",
+        "startOver": "Start over",
+        "empty": "Choose where you live and we will show the routes worth pursuing, with a link to the official page for each one.",
+        "verifiedOn": "Checked against the official page on {date}",
+        "caveat": "This is a starting point, not a decision. Programs change their amounts and rules every year — always confirm on the official page before you plan around a number, and your NSWOC can often tell you what actually gets approved locally."
+      },
+      "results": {
+        "nihbTitle": "Non-Insured Health Benefits comes first",
+        "nihbBody": "For registered First Nations and recognized Inuit, NIHB covers approved ostomy items subject to quantity limits and prior approval, and recognized providers bill NIHB directly so you do not pay upfront. This replaces the provincial route rather than topping it up. Ask about the exception process if you need more than the standard quantity — high output is a common reason.",
+        "nihbLink": "NIHB medical supplies and equipment",
+        "noProgramTitle": "{province} — no ostomy-specific program",
+        "gatekeeperTitle": "Who has to sign off",
+        "deadlinesTitle": "Dates that quietly cost people money",
+        "lastResortTitle": "Your workplace plan gets billed first",
+        "lastResortBody": "This territory is a payer of last resort, which means private or employer insurance has to be exhausted before the territorial program pays anything. Submit to your insurer first and keep the statement — you will need it.",
+        "dtcTitle": "The Disability Tax Credit — worth applying for, but read the test first",
+        "dtcBody": "Having an ostomy does not qualify you on its own, and a well-managed routine is often refused. The test is whether you are unable to manage bowel or bladder function, or it takes about three times longer than it would for someone of similar age without the impairment, at least 90% of the time, for a continuous 12 months — judged even with your appliances and routine in place. That means complications, leaks and time burden are what the form has to show. Only a medical doctor or nurse practitioner can certify it.",
+        "dtcLink": "CRA — eliminating (bowel or bladder)",
+        "expensesTitle": "Claim what you paid out of pocket — no approval needed",
+        "expensesBody": "This one has no gate. Ostomy pads and supplies are listed eligible medical expenses, so whatever your province does not cover may be claimable on your return whether or not you have the Disability Tax Credit. Keep every receipt, including shipping where it is not covered.",
+        "expensesLink": "CRA — eligible medical expenses"
+      },
+      "fundingPage": {
+        "kicker": "Ostomy Care · Money",
+        "title": "What your province actually covers",
+        "lead": "There is no national ostomy program in Canada. The amount, the model, and who signs off all change at the provincial border — so the first useful thing to know is which system you are in.",
+        "ctaFind": "Find your coverage",
+        "ctaFederal": "Federal help and tax credits",
+        "focus": "Provincial and territorial coverage, federal programs, the Disability Tax Credit, and what to do when the funding runs out before the year does.",
+        "vibe": "Plain and specific — every number links to the government page it came from, with the date we last checked it.",
+        "modelsEyebrow": "Start here",
+        "modelsHeading": "Four ways provinces pay",
+        "modelsIntro": "Almost every misunderstanding about ostomy funding comes from assuming your province works like a different one. There are really only four models.",
+        "toolEyebrow": "Your situation",
+        "toolHeading": "Find what applies to you",
+        "toolIntro": "Nothing you enter is saved or sent anywhere — this runs entirely in your browser.",
+        "federalEyebrow": "Federal",
+        "federalHeading": "Help that does not depend on where you live",
+        "dtcHeading": "The Disability Tax Credit",
+        "dtcNote": "The most valuable and most misunderstood item on this page — and the one people most often get refused.",
+        "dtcPoint1": "Having an ostomy does not qualify you on its own. This is the part almost every summary gets wrong. A well-managed routine is frequently refused, and the CRA’s own guidance says so.",
+        "dtcPoint2": "The test: you are unable to manage bowel or bladder function, or it takes you roughly three times longer than someone of similar age without the impairment, at least 90% of the time, for a continuous 12 months — assessed with your appliances and routine already in place.",
+        "dtcPoint3": "So what gets approved is complications and time burden, not the stoma itself. Leaks, skin breakdown, repeated changes, night-time management, time lost from work — that is what belongs on the form.",
+        "dtcPoint4": "Apply through the eliminating category — bowel or bladder function — not life-sustaining therapy. Only a medical doctor or nurse practitioner can certify it. Your NSWOC can help you describe your routine accurately, but cannot sign the form.",
+        "dtcPoint5": "It is still worth applying: approval can be backdated up to ten years, and it unlocks the RDSP and the Canada Disability Benefit. A refusal costs you those too, which is why the wording matters so much.",
+        "dtcPoint6": "If you are refused, the medical expense claim below needs no approval at all.",
+        "nihbHeading": "Non-Insured Health Benefits",
+        "nihbPoint1": "For registered First Nations and recognized Inuit, NIHB covers approved ostomy items subject to quantity limits and prior approval. Recognized providers bill NIHB directly, so there is no upfront cost to you.",
+        "nihbPoint2": "This replaces the provincial route rather than topping it up — so start here rather than applying to your province first.",
+        "nihbPoint3": "There is an exception process for quantities or items outside the standard list. High output is a common and legitimate reason to use it.",
+        "expensesHeading": "Medical expenses on your tax return",
+        "expensesPoint1": "Whatever your province does not cover may be claimable. Several provinces say so explicitly on their own program pages.",
+        "expensesPoint2": "Keep receipts, including shipping where it is not covered.",
+        "ranOutEyebrow": "When it is not enough",
+        "ranOutHeading": "The funding ran out before the year did",
+        "ranOut1Heading": "Ask an NSWOC first",
+        "ranOut1Body": "Often the fastest win is not more money but a better fit — fewer changes, longer wear time, less waste. An NSWOC can also tell you what actually gets approved in your region.",
+        "ranOut2Heading": "Use the free manufacturer programs",
+        "ranOut2Body": "Hollister, Coloplast, and Convatec all run free support lines with samples and nurse access, regardless of where you buy. They will also help you navigate coverage.",
+        "ranOut3Heading": "Check social assistance and disability routes",
+        "ranOut3Body": "Provincial disability and social assistance programs sometimes top up ostomy coverage above the standard grant. This is worth asking about directly.",
+        "ranOut4Heading": "Talk to your local chapter",
+        "ranOut4Body": "Ostomy Canada chapters know the local landscape, and some hold donated supplies. Treat second-hand product carefully — check sterility, expiry, and that it is the right size for you.",
+        "movingEyebrow": "Moving",
+        "movingHeading": "If you change provinces",
+        "movingIntro": "Nobody writes this down, and it catches people out. Moving resets your coverage entirely — different model, different amount, different forms, and often a different person who has to sign them.",
+        "beforeHeading": "Before you go",
+        "before1": "Claim anything outstanding — most programs will not pay across a move.",
+        "before2": "Ask your NSWOC for a written summary of your current setup, sizes, and products. It shortens registration at the other end considerably.",
+        "before3": "Stock up enough to cover the gap while new coverage is approved.",
+        "arriveHeading": "When you arrive",
+        "arrive1": "Find an NSWOC early — in several provinces you cannot register at all without one.",
+        "arrive2": "Check the new province’s model above. If you move from a grant province to a supplies-in-kind one, you stop buying at retail entirely.",
+        "arrive3": "Expect a waiting period, and budget for it.",
+        "closingHeading": "Money should not be the reason you ration supplies",
+        "closingBody": "If the numbers are not working, that is worth saying out loud to your care team. There are usually more routes than people realise.",
+        "closingCta": "Everyday Liivving →"
+      }
+    }
   }
 }

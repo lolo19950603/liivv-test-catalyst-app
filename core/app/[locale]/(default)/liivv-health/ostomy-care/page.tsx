@@ -64,10 +64,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: 'Ostomy Care & Everyday "Liivving" | Liivv',
     description:
       'Ostomy supplies, everyday living support, and kind guidance — pouches, barriers, curated kits, and Ontario pharmacist chat.',
-    // includeAlternates is off deliberately. This microsite is hardcoded English
-    // JSX, so /fr/ renders English — declaring an hreflang="fr" alternate would
-    // tell search engines a French version exists when it does not. Turn this
-    // back on the moment the copy moves into messages/ and is translated.
+    // Still suppressed, unlike the chapters and the funding section. The chapter
+    // cards on this page are translated, but the landing's own copy — hero, kits,
+    // shop, subscribe, voices, FAQ — is still hardcoded English in
+    // ostomy-care-page.tsx. Turn this on once that copy moves into messages/.
     alternates: await getMetadataAlternates({ path: PATH, locale, includeAlternates: false }),
   };
 }

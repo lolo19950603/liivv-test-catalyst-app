@@ -1,12 +1,14 @@
 'use client';
 
+import { useMessages, useTranslations } from 'next-intl';
+import type { CSSProperties } from 'react';
+
 import { DiscoveryBand, GovernanceBlock } from '../_components/page-furniture';
 
 import {
+  buildChapters,
   type CategoryCard,
-  type Chapter,
   chapterHref,
-  CHAPTERS,
   getChapterNeighbors,
   LANDING_HREF,
   type ResourceGroup,
@@ -85,6 +87,8 @@ function UrgentBlock({ urgent }: { urgent: UrgentCallout }) {
 }
 
 function ResourceGroupBlock({ group }: { group: ResourceGroup }) {
+  const t = useTranslations('OstomyCare.ui.chapter');
+
   return (
     <div className="oc-ch-res-group">
       <header className="oc-ch-care-head">
@@ -108,7 +112,7 @@ function ResourceGroupBlock({ group }: { group: ResourceGroup }) {
               </span>
               <span className="oc-ch-res-body">{link.body}</span>
               <span aria-hidden className="oc-ch-res-go">
-                Opens on their site ↗
+                {t('opensOnTheirSite')}
               </span>
             </a>
           </li>
@@ -118,20 +122,35 @@ function ResourceGroupBlock({ group }: { group: ResourceGroup }) {
   );
 }
 
-export function ChapterPage({ chapter }: { chapter: Chapter }) {
-  const { prev, next } = getChapterNeighbors(chapter.slug);
+export function ChapterPage({ slug }: { slug: string }) {
+  // Copy comes from the message tree so it can be translated; the structure it
+  // is composed with lives in chapters-meta.ts.
+  const messages = useMessages();
+  const t = useTranslations('OstomyCare.ui.chapter');
+  const chapters = buildChapters(messages.OstomyCare.chapters);
+  const { prev, next, chapter } = getChapterNeighbors(chapters, slug);
+
+  // The route already 404s on an unknown slug, so this only guards against a
+  // chapter present in chapters-meta.ts but absent from the messages.
+  if (!chapter) return null;
+
   const nextHref = next ? chapterHref(next.slug) : `${LANDING_HREF}#where-are-you`;
-  const chapterIndex = CHAPTERS.findIndex((item) => item.slug === chapter.slug);
+  const chapterIndex = chapters.findIndex((item) => item.slug === chapter.slug);
+
+  // CSS custom property, typed without an assertion.
+  const accentStyle: CSSProperties & Record<string, string> = {
+    '--chapter-accent': chapter.accent,
+  };
 
   return (
-    <div id="oc-chapter" style={{ ['--chapter-accent' as string]: chapter.accent }}>
+    <div id="oc-chapter" style={accentStyle}>
       <section className="oc-ch-hero">
         <div className="oc-ch-hero-bg">
           <img alt="" decoding="async" src={chapter.heroImage} />
         </div>
         <div aria-hidden className="oc-ch-hero-veil" />
         <div className="oc-ch-hero-inner">
-          <span className="oc-ch-kicker">Ostomy Care · Chapter {chapter.chapterWord}</span>
+          <span className="oc-ch-kicker">{t('kicker', { word: chapter.chapterWord })}</span>
           <p aria-hidden className="oc-ch-num">
             {chapter.num}
           </p>
@@ -139,14 +158,14 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
           <p className="oc-ch-hero-lead">{chapter.heroBody}</p>
           <div className="oc-ch-hero-actions">
             <a className="oc-ch-btn oc-ch-btn-soft" href="#chapter-care">
-              Read this chapter
+              {t('readChapter')}
             </a>
             <a className="oc-ch-btn oc-ch-btn-ghost-light" href={chapter.pharmacist.href}>
-              Ask a pharmacist
+              {t('askPharmacist')}
             </a>
           </div>
           <div aria-hidden className="oc-ch-progress">
-            {CHAPTERS.map((item, index) => (
+            {chapters.map((item, index) => (
               <span className={index === chapterIndex ? 'is-current' : undefined} key={item.slug} />
             ))}
           </div>
@@ -156,11 +175,11 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
       <section className="oc-ch-journal rounded-top" id="chapter-pulse">
         <div className="oc-ch-journal-grid">
           <article className="oc-ch-note">
-            <span className="oc-ch-note-label">The Focus</span>
+            <span className="oc-ch-note-label">{t('theFocus')}</span>
             <p>{chapter.focus}</p>
           </article>
           <article className="oc-ch-note is-vibe">
-            <span className="oc-ch-note-label">The Liivv Vibe</span>
+            <span className="oc-ch-note-label">{t('theVibe')}</span>
             <p>{chapter.vibe}</p>
           </article>
         </div>
@@ -188,7 +207,7 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
           <div className="oc-ch-wrap">
             {chapter.programsBand.heading ? (
               <header className="oc-ch-care-head">
-                <span className="oc-ch-eyebrow">Soft map</span>
+                <span className="oc-ch-eyebrow">{t('softMap')}</span>
                 <h2>{chapter.programsBand.heading}</h2>
               </header>
             ) : null}
@@ -209,12 +228,9 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         <section className="oc-ch-resources rounded-top" id="chapter-resources">
           <div className="oc-ch-wrap">
             <header className="oc-ch-res-intro">
-              <span className="oc-ch-eyebrow">Outside these pages</span>
-              <h2>Where to go from here</h2>
-              <p>
-                These are run by patient organisations, specialist nurses, and government programs —
-                not by Liivv. We link out because they do this better than a shop could.
-              </p>
+              <span className="oc-ch-eyebrow">{t('resourcesEyebrow')}</span>
+              <h2>{t('resourcesHeading')}</h2>
+              <p>{t('resourcesIntro')}</p>
             </header>
             {chapter.resources.map((group) => (
               <ResourceGroupBlock group={group} key={group.heading} />
@@ -243,10 +259,10 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
 
       <section className="oc-ch-map rounded-top">
         <div className="oc-ch-wrap">
-          <span className="oc-ch-eyebrow">Path</span>
-          <h2>All three chapters</h2>
-          <div aria-label="Chapter navigation" className="oc-ch-map-rail">
-            {CHAPTERS.map((item) => {
+          <span className="oc-ch-eyebrow">{t('pathEyebrow')}</span>
+          <h2>{t('allChapters')}</h2>
+          <div aria-label={t('chapterNav')} className="oc-ch-map-rail">
+            {chapters.map((item) => {
               const active = item.slug === chapter.slug;
 
               return (
@@ -271,12 +287,12 @@ export function ChapterPage({ chapter }: { chapter: Chapter }) {
         </div>
         <div aria-hidden className="oc-ch-close-veil" />
         <div className="oc-ch-close-inner">
-          <span className="oc-ch-eyebrow">Keep going</span>
+          <span className="oc-ch-eyebrow">{t('keepGoing')}</span>
           <h2>{chapter.closing.heading}</h2>
           <p>{chapter.closing.body}</p>
           <div className="oc-ch-close-cta">
             <a className="oc-ch-btn oc-ch-btn-soft" href={LANDING_HREF}>
-              Back to Ostomy Care page
+              {t('backToLanding')}
             </a>
             <a className="oc-ch-btn oc-ch-btn-ghost-light" href={nextHref}>
               {chapter.nextLabel}

@@ -27,9 +27,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: TITLE,
     description: DESCRIPTION,
-    // includeAlternates off deliberately — this copy is hardcoded English, so
-    // /fr/ serves English and an hreflang="fr" alternate would be a false claim.
-    alternates: await getMetadataAlternates({ path: PATH, locale, includeAlternates: false }),
+    // French is populated, so the alternate is truthful.
+    alternates: await getMetadataAlternates({ path: PATH, locale }),
   };
 }
 

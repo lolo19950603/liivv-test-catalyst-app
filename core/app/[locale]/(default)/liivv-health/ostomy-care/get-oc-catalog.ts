@@ -8,10 +8,10 @@ import { client } from '~/client';
 import { PricingFragment } from '~/client/fragments/pricing';
 import { graphql } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
+import { pricesTransformer } from '~/data-transformers/prices-transformer';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { isCuratedKitProduct } from '~/lib/kit/is-curated-kit';
 import { resolveBcCdnImageUrl } from '~/lib/resolve-bc-cdn-image-url';
-import { pricesTransformer } from '~/data-transformers/prices-transformer';
 
 import {
   HERO_FLOAT_BARRIER_ID,
@@ -118,42 +118,40 @@ const OcCatalogQuery = graphql(
   [PricingFragment],
 );
 
-export type OcCatalogItem = {
+export interface OcCatalogItem {
   entityId: number;
   name: string;
   path: string;
   image?: { src: string; alt: string };
   priceLabel?: string;
   isKit: boolean;
-};
+}
 
-export type OcCatalog = {
+export interface OcCatalog {
   kits: OcCatalogItem[];
   products: OcCatalogItem[];
   featuredKit: OcCatalogItem | null;
-};
+}
 
-function pickProductImage(
-  node: {
-    name: string;
-    defaultImage?: { altText: string; url: string } | null;
-    images?: {
-      edges?: Array<{
-        node: { altText: string; url: string; isDefault?: boolean } | null;
-      } | null> | null;
-    } | null;
-  },
-): { src: string; alt: string } | undefined {
-  const gallery = removeEdgesAndNodes(node.images ?? { edges: [] }).filter(
-    (image) => Boolean(image.url?.trim()),
+function pickProductImage(node: {
+  name: string;
+  defaultImage?: { altText: string; url: string } | null;
+  images?: {
+    edges?: Array<{
+      node: { altText: string; url: string; isDefault?: boolean } | null;
+    } | null> | null;
+  } | null;
+}): { src: string; alt: string } | undefined {
+  const gallery = removeEdgesAndNodes(node.images ?? { edges: [] }).filter((image) =>
+    Boolean(image.url.trim()),
   );
   const preferred =
-    (node.defaultImage?.url?.trim() ? node.defaultImage : null) ??
+    (node.defaultImage?.url.trim() ? node.defaultImage : null) ??
     gallery.find((image) => image.isDefault) ??
     gallery[0] ??
     null;
 
-  if (!preferred?.url?.trim()) {
+  if (!preferred?.url.trim()) {
     return undefined;
   }
 
@@ -268,6 +266,7 @@ export const getOcCatalog = cache(async (locale?: string): Promise<OcCatalog> =>
     kits.sort((a, b) => {
       if (a.entityId === NEW_JOURNEY_STARTER_KIT_ID) return -1;
       if (b.entityId === NEW_JOURNEY_STARTER_KIT_ID) return 1;
+
       return a.name.localeCompare(b.name);
     });
 
@@ -277,6 +276,7 @@ export const getOcCatalog = cache(async (locale?: string): Promise<OcCatalog> =>
     return { kits, products, featuredKit };
   } catch (error) {
     console.error('[getOcCatalog] failed', error);
+
     return { kits: [], products: [], featuredKit: null };
   }
 });

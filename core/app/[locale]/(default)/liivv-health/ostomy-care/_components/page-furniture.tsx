@@ -12,6 +12,8 @@
  * spacing tokens, and `.rounded-top` behaviour from chapter-page.css.
  */
 
+import { useLocale, useTranslations } from 'next-intl';
+
 import { HEALTH_HUB_DOORS } from '../../health-hub-data';
 import type { Citation, Governance } from '../chapters/chapters-data';
 
@@ -35,6 +37,7 @@ function formatReviewDate(iso: string) {
  * value, so this is the honest moment to mention Liivv covers more than one thing.
  */
 export function DiscoveryBand() {
+  const t = useTranslations('OstomyCare.ui.discovery');
   const others = HEALTH_HUB_DOORS.filter(
     (door) => door.status === 'live' && door.id !== OSTOMY_DOOR_ID && door.href,
   );
@@ -44,12 +47,9 @@ export function DiscoveryBand() {
   return (
     <section className="oc-ch-discover rounded-top">
       <div className="oc-ch-wrap">
-        <span className="oc-ch-eyebrow">Also from Liivv</span>
-        <h2>Ostomy is one of the things we support</h2>
-        <p className="oc-ch-discover-lead">
-          If something else is part of your everyday — yours or someone you care for — there is a
-          chapter for that too.
-        </p>
+        <span className="oc-ch-eyebrow">{t('eyebrow')}</span>
+        <h2>{t('heading')}</h2>
+        <p className="oc-ch-discover-lead">{t('lead')}</p>
         <div className="oc-ch-discover-grid">
           {others.map((door) => (
             <a className="oc-ch-discover-card" href={door.href ?? undefined} key={door.id}>
@@ -58,8 +58,8 @@ export function DiscoveryBand() {
             </a>
           ))}
           <a className="oc-ch-discover-card is-hub" href="/liivv-health">
-            <span className="oc-ch-discover-title">See everything in Liivv Health</span>
-            <span className="oc-ch-discover-body">Eleven areas of care, with more on the way.</span>
+            <span className="oc-ch-discover-title">{t('hubTitle')}</span>
+            <span className="oc-ch-discover-body">{t('hubBody')}</span>
           </a>
         </div>
       </div>
@@ -74,6 +74,9 @@ export function GovernanceBlock({
   governance: Governance;
   citations?: Citation[];
 }) {
+  const t = useTranslations('OstomyCare.ui.governance');
+  const locale = useLocale();
+
   // Byline is suppressed unless a named reviewer AND a valid date both exist, so
   // an unreviewed page can never imply clinical sign-off it has not had.
   const reviewedOn = governance.reviewedOn ? formatReviewDate(governance.reviewedOn) : null;
@@ -85,20 +88,22 @@ export function GovernanceBlock({
         <div className="oc-ch-governance-inner">
           {showByline ? (
             <p className="oc-ch-review">
-              Clinically reviewed by{' '}
+              {t('reviewedBy')}{' '}
               <strong>
                 {governance.reviewedBy}
                 {governance.credential ? `, ${governance.credential}` : ''}
               </strong>{' '}
-              · Last reviewed {reviewedOn}
+              · {t('lastReviewed', { date: reviewedOn ?? '' })}
             </p>
           ) : null}
+
+          {locale === 'en' ? null : <p className="oc-ch-machine">{t('machineTranslated')}</p>}
 
           <p className="oc-ch-disclaimer">{governance.disclaimer}</p>
 
           {citations?.length ? (
             <div className="oc-ch-sources">
-              <h2>Where this comes from</h2>
+              <h2>{t('sourcesHeading')}</h2>
               <ul>
                 {citations.map((citation) => (
                   <li key={citation.href}>
