@@ -29,9 +29,13 @@ export const config = {
      * - favicon.ico (favicon file)
      * - admin (admin panel)
      * - sitemap.xml (sitemap route)
+     * - liivv-health-sitemap.xml (App Router microsite sitemap)
      * - xmlsitemap.php (legacy sitemap route)
      * - robots.txt (robots route)
+     *
+     * Sitemap routes must be listed here or the proxy will locale-prefix them
+     * and try to resolve them against BigCommerce, which 404s.
      */
-    '/((?!api|admin|staff|bc-app|archive|images|_next/static|_next/image|favicon.ico|xmlsitemap.php|sitemap.xml|robots.txt).*)',
+    '/((?!api|admin|staff|bc-app|archive|images|_next/static|_next/image|favicon.ico|xmlsitemap.php|sitemap.xml|liivv-health-sitemap.xml|robots.txt).*)',
   ],
 };

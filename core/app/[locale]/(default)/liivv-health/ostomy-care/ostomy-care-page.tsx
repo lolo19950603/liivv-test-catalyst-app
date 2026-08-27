@@ -62,7 +62,7 @@ const PATH_LINKS = [
   {
     num: '03',
     title: 'The chapters',
-    body: 'New to the journey, stoma basics, or everyday Liivving — open the story that fits today.',
+    body: 'New to the journey, stoma basics, or the help that exists in Canada — open the story that fits today.',
     href: '#where-are-you',
   },
   {
@@ -597,7 +597,7 @@ export function OstomyCarePage({
             <span className="oc-eyebrow">Life chapters</span>
             <h2>Three stories. Open the one that fits.</h2>
             <p>
-              New to this, learning your stoma, or living the everyday — pick the chapter that feels like today.
+              New to this, learning your stoma, or looking for support and funding — pick the chapter that feels like today.
               Already know the aisle?{' '}
               <a href="#shop-ostomy-care">Skip to the shelf</a>.
             </p>

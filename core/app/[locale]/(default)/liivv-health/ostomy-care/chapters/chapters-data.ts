@@ -11,13 +11,13 @@ const LANDING = '/liivv-health/ostomy-care';
 const PHARMACIST_HREF = '/account/virtual-care';
 const SHOP_HREF = '/liivv-health/ostomy-care/shop-ostomy-care';
 
-export type CategorySection = {
+export interface CategorySection {
   heading: string;
   items: string[];
   note?: string;
-};
+}
 
-export type CategoryCard = {
+export interface CategoryCard {
   title: string;
   image: string;
   items?: string[];
@@ -25,9 +25,70 @@ export type CategoryCard = {
   note?: string;
   group?: string;
   badge?: string;
-};
+}
 
-export type Chapter = {
+/**
+ * An outside resource we point at. We link; we never reproduce.
+ * `org` is required so attribution is structural, not something a writer can forget.
+ */
+export interface ResourceLink {
+  title: string;
+  org: string;
+  body: string;
+  href: string;
+  /** Small qualifier, e.g. 'English and French' or 'Free PDF'. */
+  note?: string;
+}
+
+export interface ResourceGroup {
+  eyebrow: string;
+  heading: string;
+  body?: string;
+  links: ResourceLink[];
+}
+
+/** A source backing a factual claim made in this chapter. */
+export interface Citation {
+  label: string;
+  href: string;
+}
+
+/**
+ * Red-flag callout for anything symptom-adjacent. Deliberately separate from
+ * `note` copy so it can never be styled as an ordinary tip.
+ */
+export interface UrgentCallout {
+  heading: string;
+  intro: string;
+  signs: string[];
+  action: string;
+}
+
+/**
+ * Clinical governance. Rendered on every chapter.
+ *
+ * `reviewedBy` and `reviewedOn` are intentionally allowed to be empty, and the
+ * byline is omitted entirely when they are — an unreviewed chapter must never
+ * display a reviewer it does not have.
+ */
+export interface Governance {
+  reviewedBy: string;
+  credential: string;
+  /** ISO date (YYYY-MM-DD). */
+  reviewedOn: string;
+  disclaimer: string;
+}
+
+/** Fill these in once, before publishing. Empty values suppress the byline. */
+export const CLINICAL_REVIEWER = {
+  reviewedBy: '',
+  credential: 'RN, NSWOC',
+} as const;
+
+export const GENERAL_INFO_DISCLAIMER =
+  'This is general information, not medical advice, and it is not a substitute for assessment by your NSWOC, surgeon, or physician. Fit, skin, and product choices depend on your body and your surgery — talk to your care team before changing anything.';
+
+export interface Chapter {
   slug: string;
   num: string;
   chapterWord: string;
@@ -39,7 +100,13 @@ export type Chapter = {
   accent: string;
   categoriesIntro: { eyebrow: string; heading: string; body: string };
   categories: CategoryCard[];
-  programsBand?: { heading?: string; cards: { heading: string; body: string }[] };
+  programsBand?: { heading?: string; cards: Array<{ heading: string; body: string }> };
+  /** Outward links — support orgs, funding, programs. Rendered after the categories. */
+  resources?: ResourceGroup[];
+  /** Shown high on the page, before anyone scrolls into symptom content. */
+  urgent?: UrgentCallout;
+  citations?: Citation[];
+  governance: Governance;
   pharmacist: {
     eyebrow: string;
     heading: string;
@@ -50,7 +117,7 @@ export type Chapter = {
   };
   closing: { heading: string; body: string };
   nextLabel: string;
-};
+}
 
 export const CHAPTERS: Chapter[] = [
   {
@@ -100,6 +167,16 @@ export const CHAPTERS: Chapter[] = [
         note: 'Try The Fresh Start kit — customize quantities before checkout.',
       },
       {
+        title: 'Go-Bags & Backup',
+        image: `${IMG}/door-care.png`,
+        items: [
+          'Spare barrier and pouch, soft wipes, disposal bags',
+          'Adhesive remover and skin protectant if you use them',
+          'A spare underwear or liner for peace of mind away from home',
+        ],
+        note: 'Explore curated go-bag kits in Shop Ostomy Essentials.',
+      },
+      {
         title: 'Who to Ask',
         image: `${IMG}/care-chat-main.png`,
         items: [
@@ -114,7 +191,7 @@ export const CHAPTERS: Chapter[] = [
         items: [
           'Reintroduce foods gradually; chew thoroughly; notice patterns',
           'Light walking often comes first; return to activity as cleared by your care team',
-          'Open Everyday Liivving when you are ready for clothing, travel, and go-bag habits',
+          'Open Everyday Liivving when you are ready to find a peer group or work out what your province covers',
         ],
       },
     ],
@@ -147,6 +224,25 @@ export const CHAPTERS: Chapter[] = [
       heading: 'A soft place to land',
       body: 'New to the Journey is permission to learn slowly — with checklists, kind answers, and supplies that show up when you need them.',
     },
+    governance: {
+      ...CLINICAL_REVIEWER,
+      reviewedOn: '',
+      disclaimer: GENERAL_INFO_DISCLAIMER,
+    },
+    citations: [
+      {
+        label: 'NSWOCC — Find an NSWOC',
+        href: 'https://www.nswoc.ca/',
+      },
+      {
+        label: 'NSWOCC — free patient guides (English and French)',
+        href: 'https://www.nswoc.ca/guides',
+      },
+      {
+        label: 'RNAO — Getting ready for ostomy surgery (patient fact sheet)',
+        href: 'https://rnao.ca/bpg/guidelines/fact-sheets/getting-ready-ostomy-surgery-fact-sheet-adults',
+      },
+    ],
     nextLabel: 'Get to Know Your Stoma →',
   },
   {
@@ -155,9 +251,9 @@ export const CHAPTERS: Chapter[] = [
     chapterWord: 'two',
     title: 'Get to Know Your Stoma',
     heroBody:
-      'Clear, kind education about your stoma — so comfort and confidence feel possible day to day.',
+      'Clear, kind education about your stoma — how it works, what changes, and what to do when something is not right.',
     focus:
-      'Understanding your stoma type, skin comfort around the stoma, output patterns, fit changes, and when to ask for help.',
+      'Your stoma type, skin comfort, output patterns, fit changes, when to ask for help, and the clothing, travel, intimacy, and routine questions that come with living in your body.',
     vibe: 'Clear, kind, and demystifying — education without overwhelm.',
     heroImage: `${IMG}/chapter-stoma.png`,
     accent: '#f3c7be',
@@ -223,6 +319,46 @@ export const CHAPTERS: Chapter[] = [
         ],
         note: 'Soft next step: browse Shop Ostomy Essentials for barriers, pouches, and accessories.',
       },
+      {
+        title: 'Clothing & Confidence',
+        image: `${IMG}/chapter-everyday.png`,
+        group: 'Body and life',
+        items: [
+          'High-waisted styles and soft layers can keep a pouch secure and low-profile',
+          'Support belts or wraps for active days when you want extra hold',
+          'You do not have to hide your pouch — comfort and preference come first',
+        ],
+      },
+      {
+        title: 'Travel & Workdays',
+        image: `${IMG}/door-shop.png`,
+        group: 'Body and life',
+        items: [
+          'Empty when the pouch is about one-third to one-half full to reduce leak risk',
+          'Pack supplies in your carry-on — never only in checked bags',
+          'Plan bathroom stops the way you plan coffee: early and without apology',
+        ],
+      },
+      {
+        title: 'Intimacy & Social Ease',
+        image: `${IMG}/door-chapters.png`,
+        group: 'Body and life',
+        items: [
+          'Talk about what helps you feel secure — timing, clothing, or a support wrap',
+          'Confidence grows with a routine that has already worked at home',
+          'Your pace is the right pace',
+        ],
+      },
+      {
+        title: 'Rest & Routine',
+        image: `${IMG}/care-chat-moment.png`,
+        group: 'Body and life',
+        items: [
+          'Many people prefer morning changes when output is often lower',
+          'Lay out supplies like a station before you start',
+          'Restock before you run low — clockwork beats last-minute stress',
+        ],
+      },
     ],
     pharmacist: {
       eyebrow: 'Available in Ontario',
@@ -236,6 +372,40 @@ export const CHAPTERS: Chapter[] = [
       heading: 'Comfort is a skill you build',
       body: 'Knowing your stoma is not a test — it is a quieter relationship with fit, skin, and the products that earn their place on your shelf.',
     },
+    urgent: {
+      heading: 'Some things are not a website question',
+      intro:
+        'Most stoma worries can wait for your next NSWOC appointment. These cannot. Seek urgent medical care if you notice:',
+      signs: [
+        'A stoma that turns dark, dusky, purple, or feels cold to the touch',
+        'Severe abdominal pain, or vomiting with no output for several hours — this can mean a blockage',
+        'Heavy or continuous bleeding from the stoma itself, not just a spot from cleaning',
+        'Fever, or skin around the stoma that is hot, spreading red, and painful',
+        'Confusion, severe dizziness, or very dark urine alongside high output — signs of significant dehydration',
+      ],
+      action:
+        'Go to your nearest emergency department or call 911. Do not wait for a callback, and do not troubleshoot a dusky stoma at home.',
+    },
+    governance: {
+      ...CLINICAL_REVIEWER,
+      reviewedOn: '',
+      disclaimer: GENERAL_INFO_DISCLAIMER,
+    },
+    citations: [
+      {
+        label:
+          'RNAO — Supporting Adults Who Anticipate or Live with an Ostomy (best practice guideline)',
+        href: 'https://rnao.ca/bpg/guidelines/ostomy',
+      },
+      {
+        label: 'NSWOCC — free patient guides by ostomy type',
+        href: 'https://www.nswoc.ca/guides',
+      },
+      {
+        label: 'Wounds Canada — Caring for a Person with an Ostomy',
+        href: 'https://www.woundscanada.ca/',
+      },
+    ],
     nextLabel: 'Everyday Liivving →',
   },
   {
@@ -244,82 +414,201 @@ export const CHAPTERS: Chapter[] = [
     chapterWord: 'three',
     title: 'Everyday Liivving',
     heroBody:
-      'Clothing, travel, workdays, and quiet confidence — life beyond the bathroom shelf.',
+      'The people, programs, and money help that exist in Canada — gathered in one place, so you are not searching alone.',
     focus:
-      'Clothing tips, travel and workdays, intimacy confidence, go-bags, social ease, and a routine that feels like yours again.',
-    vibe: 'Discreet, practical, and life-forward — care that fits real days.',
+      'Peer support and chapters near you, what coverage actually looks like province by province, free manufacturer programs, youth and young adult community, and awareness dates.',
+    vibe: 'Practical and connecting — the map to everything outside this website.',
     heroImage: `${IMG}/chapter-everyday.png`,
     accent: '#8ea78b',
     categoriesIntro: {
-      eyebrow: 'Life beyond the shelf',
-      heading: 'Ordinary days, made quieter',
-      body: 'Small habits — a go-bag, a clothing swap, a travel checklist — keep loud days manageable and quiet ones easy.',
+      eyebrow: 'You are not doing this alone',
+      heading: 'What exists, and who it is for',
+      body: 'A lot of good help exists in Canada. Almost none of it is in one place. This chapter is the map — most of it links out, because these organisations do it better than we could.',
     },
     categories: [
       {
-        title: 'Clothing & Confidence',
+        title: 'Peer support is its own kind of care',
         image: `${IMG}/chapter-everyday.png`,
+        group: 'Start here',
         items: [
-          'High-waisted styles and soft layers can keep a pouch secure and low-profile',
-          'Support belts or wraps for active days when you want extra hold',
-          'You do not have to hide your pouch — comfort and preference come first',
+          'Ostomy Canada Society runs chapters and peer support groups across the country, searchable by distance from where you live',
+          'Their Visitor Program trains people who have an ostomy to talk with people who have just had one — lived experience, not clinical advice',
+          'If you are between roughly 20 and 40, ask about Gutsy Gang social clubs — they run in Vancouver, Calgary, Saskatoon, Winnipeg, Hamilton, Toronto, and Niagara',
         ],
+        note: 'A peer visitor is not a substitute for your NSWOC. Most people find they want both.',
       },
       {
-        title: 'Travel & Workdays',
-        image: `${IMG}/door-shop.png`,
-        items: [
-          'Empty when the pouch is about one-third to one-half full to reduce leak risk',
-          'Pack supplies in your carry-on — never only in checked bags',
-          'Plan bathroom stops the way you plan coffee: early and without apology',
-        ],
-      },
-      {
-        title: 'Go-Bags & Backup',
+        title: 'What coverage actually looks like in Canada',
         image: `${IMG}/door-care.png`,
+        group: 'Money',
         items: [
-          'Spare barrier and pouch, soft wipes, disposal bags',
-          'Adhesive remover and skin protectant if you use them',
-          'A spare underwear or liner for peace of mind away from home',
+          'There is no national ostomy program. The amount, the model, and who approves it all change at the provincial border',
+          'Moving provinces resets everything — including which forms you file and who has to sign them',
+          'In most provinces an NSWOC assessment is the gate. Some, like Saskatchewan, will not accept a self-application at all',
         ],
-        note: 'Explore curated go-bag kits in Shop Ostomy Essentials.',
+        note: 'A full province-by-province breakdown with current amounts is in progress. Until it lands, Ostomy Canada maintains the best public summary — linked below.',
       },
       {
-        title: 'Intimacy & Social Ease',
+        title: 'Programs that cost you nothing',
+        image: `${IMG}/door-shop.png`,
+        group: 'Money',
+        items: [
+          'All three major manufacturers run free support programs — samples, phone lines, and access to ostomy nurses',
+          'You do not have to buy from us, or from them, to use these',
+          'They will also help you work out what your province covers, which is often the fastest way to get an answer',
+        ],
+      },
+      {
+        title: 'Awareness, on Canada’s calendar',
         image: `${IMG}/door-chapters.png`,
+        group: 'Community',
         items: [
-          'Talk about what helps you feel secure — timing, clothing, or a support wrap',
-          'Confidence grows with a routine that has already worked at home',
-          'Your pace is the right pace',
+          'World Ostomy Day runs every three years, not every year — the last was 4 October 2025, and the next falls in 2028',
+          'In the years between, Canada still marks the first Saturday of October, anchored by Ostomy Canada’s Step Up for Ostomy campaign',
+          'Chapters usually run local events — the chapter finder is the fastest way to see what is happening near you',
         ],
       },
       {
-        title: 'Rest & Routine',
+        title: 'Stories from people who have one',
         image: `${IMG}/care-chat-moment.png`,
+        group: 'Community',
         items: [
-          'Many people prefer morning changes when output is often lower',
-          'Lay out supplies like a station before you start',
-          'Restock before you run low — clockwork beats last-minute stress',
+          'Reading someone describe their first month is worth more than any checklist we could write',
+          'We are collecting stories from Canadians with ostomies — surgery, work, travel, dating, sport, all of it',
+          'If you would like to share yours, tell the care team and we will be in touch about how it works',
         ],
       },
     ],
     programsBand: {
-      heading: 'Small rituals that stick',
+      heading: 'Four ways provinces pay — knowing yours saves you money',
       cards: [
         {
-          heading: 'Empty early',
-          body: 'Do not wait for a full pouch. Emptying at one-third to one-half full protects the seal.',
+          heading: 'A flat grant, paid to you',
+          body: 'Ontario and Quebec send a set amount each year and you buy your own supplies. If you use more than the grant covers, the overage is yours — and may be claimable as a medical expense.',
         },
         {
-          heading: 'Keep a go-kit',
-          body: 'A compact spare kit turns surprises into a short pause — not a crisis.',
+          heading: 'A percentage cost-share',
+          body: 'British Columbia, Alberta, Saskatchewan, and Newfoundland cover a share and you pay the rest, often up to an annual cap. Low income can reduce your share to nothing.',
         },
         {
-          heading: 'Hydrate on purpose',
-          body: 'Especially with an ileostomy, steady fluids and electrolytes matter on hot or busy days.',
+          heading: 'Supplies issued to you',
+          body: 'Manitoba does not reimburse — the program sends the supplies. You are registered through an NSWOC after surgery rather than applying yourself.',
+        },
+        {
+          heading: 'Only if you qualify',
+          body: 'PEI is income-tiered. Nova Scotia and New Brunswick route by category — seniors, social assistance, or specific programs — so there is no general coverage to apply for.',
         },
       ],
     },
+    resources: [
+      {
+        eyebrow: 'Find your people',
+        heading: 'Support that is already out there',
+        body: 'These are run by patient organisations and specialist nurses, not by us. They are free, and they are better at this than any retailer.',
+        links: [
+          {
+            title: 'Find a chapter or peer support group',
+            org: 'Ostomy Canada Society',
+            body: 'Search by distance from your postal code, from 10 km out to 500 km. Also lists Gutsy Gang social clubs for younger adults.',
+            href: 'https://www.ostomycanada.ca/find-a-chapter-peer-support-group/',
+          },
+          {
+            title: 'Visitor Program',
+            org: 'Ostomy Canada Society',
+            body: 'Trained peer visitors who have an ostomy themselves. Requested through your local chapter, usually after a referral from your surgeon or NSWOC.',
+            href: 'https://www.ostomycanada.ca/ostomy-canada-visitor-program/',
+          },
+          {
+            title: 'Find an NSWOC near you',
+            org: 'NSWOCC',
+            body: 'Nurses Specialized in Wound, Ostomy and Continence — the clinical specialists for stoma care in Canada. Many hospitals have one; some see outpatients for life.',
+            href: 'https://www.nswoc.ca/',
+          },
+          {
+            title: 'Youth Camp',
+            org: 'Ostomy Canada Society',
+            body: 'A week at Camp Horizon in Bragg Creek, Alberta, for kids and teens with ostomies. Partial and full funding is available — ask, do not assume the fee is the barrier.',
+            href: 'https://www.ostomycanada.ca/youth-camp/',
+          },
+        ],
+      },
+      {
+        eyebrow: 'Free programs',
+        heading: 'Manufacturer support, compared plainly',
+        body: 'All three are free and none of them require you to buy from us. We have listed what each program offers — not whose products are better, which is not our call to make.',
+        links: [
+          {
+            title: 'Secure Start',
+            org: 'Hollister',
+            body: 'Free personalized support regardless of which brand you use, including help navigating coverage. Canadian line: 1-800-263-7421.',
+            href: 'https://www.hollister.ca/en-ca/securestartconsumer',
+          },
+          {
+            title: 'Coloplast Care',
+            org: 'Coloplast',
+            body: 'Ongoing educational support, phone access, samples, and the MyOstomy app for tracking changes and output. Consumer support: 1-866-293-6349.',
+            href: 'https://www.coloplast.ca/care-/',
+          },
+          {
+            title: 'me+',
+            org: 'Convatec',
+            body: 'Staged around the journey — before surgery, right after, and living with one. Includes video appointments with a certified ostomy nurse. 1-800-465-6302.',
+            href: 'https://www.convatec.com/en-ca/ostomy-care/me-plus-patient-support/',
+          },
+        ],
+      },
+      {
+        eyebrow: 'Money',
+        heading: 'Coverage and tax help',
+        body: 'Amounts and rules change, and they change by province. Always confirm against the official source before you plan around a number.',
+        links: [
+          {
+            title: 'Provincial government programs',
+            org: 'Ostomy Canada Society',
+            body: 'The best public summary of what each province and territory covers, with links through to the official program pages.',
+            href: 'https://www.ostomycanada.ca/provincial-government-programs/',
+          },
+          {
+            title: 'Disability Tax Credit (form T2201)',
+            org: 'Canada Revenue Agency',
+            body: 'Many ostomates qualify under the "eliminating" category. Approval can also unlock the RDSP and other credits, so it is worth the paperwork.',
+            href: 'https://www.canada.ca/en/revenue-agency/services/tax/individuals/segments/tax-credits-deductions-persons-disabilities/disability-tax-credit/eligible-dtc/eliminating.html',
+          },
+          {
+            title: 'Non-Insured Health Benefits (NIHB)',
+            org: 'Indigenous Services Canada',
+            body: 'Full coverage with no annual cap for registered First Nations and recognized Inuit. This replaces the provincial route rather than topping it up.',
+            href: 'https://www.sac-isc.gc.ca/eng/1579620079031/1579620259238',
+          },
+        ],
+      },
+      {
+        eyebrow: 'Read more',
+        heading: 'Guides worth downloading',
+        body: 'Written by nurses and patient organisations, free, and more thorough than anything on this page.',
+        links: [
+          {
+            title: 'Living with an ileostomy, colostomy, or ileal conduit',
+            org: 'NSWOCC',
+            body: 'Clinician-written patient guides, one per ostomy type, including the less commonly covered ones — jejunostomy, gastrostomy, and gastro-jejunostomy.',
+            href: 'https://www.nswoc.ca/guides',
+            note: 'English and French',
+          },
+          {
+            title: 'New Ostomy Patient Guide',
+            org: 'United Ostomy Associations of America',
+            body: 'American, so the funding sections will not apply here — but the clinical and practical content is excellent and freely available.',
+            href: 'https://www.ostomy.org/new-ostomy-patient-guide/',
+          },
+          {
+            title: 'Step Up for Ostomy',
+            org: 'Ostomy Canada Society',
+            body: 'The national awareness and fundraising campaign that anchors the first Saturday of October in Canada.',
+            href: 'https://www.ostomycanada.ca/events/world-ostomy-day/',
+          },
+        ],
+      },
+    ],
     pharmacist: {
       eyebrow: 'Available in Ontario',
       heading: 'Fit questions that do not need a waiting room',
@@ -330,11 +619,34 @@ export const CHAPTERS: Chapter[] = [
     },
     closing: {
       heading: 'Living, not managing',
-      body: 'Everyday Liivving is the quiet confidence of a routine that works — supplies on time, a go-bag ready, and room for the rest of your life.',
+      body: 'The help exists. Most people just never find out it is there — which is the only reason this page needed writing.',
     },
+    governance: {
+      ...CLINICAL_REVIEWER,
+      reviewedOn: '',
+      disclaimer: GENERAL_INFO_DISCLAIMER,
+    },
+    citations: [
+      {
+        label: 'Ostomy Canada Society — provincial government programs',
+        href: 'https://www.ostomycanada.ca/provincial-government-programs/',
+      },
+      {
+        label: 'Ostomy Canada Society — Ontario ADP grant and why $975 a year is not enough',
+        href: 'https://www.ostomycanada.ca/blog/2025/ontario-adp-grant-why-975-a-year-isnt-enough/',
+      },
+      {
+        label: 'Canada Revenue Agency — Disability Tax Credit, eliminating category',
+        href: 'https://www.canada.ca/en/revenue-agency/services/tax/individuals/segments/tax-credits-deductions-persons-disabilities/disability-tax-credit/eligible-dtc/eliminating.html',
+      },
+      {
+        label: 'United Ostomy Associations of America — World Ostomy Day',
+        href: 'https://www.ostomy.org/world-ostomy-day/',
+      },
+    ],
     nextLabel: 'Back to Ostomy Care →',
   },
-]
+];
 
 export const LANDING_HREF = LANDING;
 export const SHOP_OSTOMY_HREF = SHOP_HREF;
@@ -349,6 +661,7 @@ export function getChapter(slug: string) {
 
 export function getChapterNeighbors(slug: string) {
   const index = CHAPTERS.findIndex((c) => c.slug === slug);
+
   if (index < 0) return { prev: null, next: null, chapter: null };
 
   return {
