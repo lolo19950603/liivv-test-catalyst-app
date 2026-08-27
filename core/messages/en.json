@@ -1423,17 +1423,66 @@
     "chapters": {
       "new-to-the-journey": {
         "title": "New to the Journey",
-        "heroBody": "Just starting out and learning the ropes — calm checklists, first supplies, and who to ask.",
-        "focus": "First weeks after surgery, change routines, starter supplies, who to ask, and soft next steps into everyday living.",
+        "heroBody": "Told you need surgery, or just home with a new stoma — calm answers for both, plus the one thing to ask for before you go in.",
+        "focus": "Before surgery: what to expect, stoma siting, questions to ask, and supporting someone. After surgery: first weeks, change routines, starter supplies, who to ask, and soft next steps.",
         "vibe": "Supportive and demystifying — a soft place to land.",
         "nextLabel": "Get to Know Your Stoma →",
         "categoriesIntro": {
           "eyebrow": "First chapters",
           "heading": "You are not supposed to know everything yet",
-          "body": "Most people find pouch changes become familiar within weeks. Start with a short checklist and one trusted contact."
+          "body": "This chapter covers both sides of the operation. If surgery is still ahead of you, start at the top. If you are already home, skip to First Week Basics — nothing above it will be news."
         },
         "categories": {
           "1": {
+            "title": "You have just been told you need one",
+            "group": "Before surgery",
+            "items": {
+              "1": "Feeling frightened, angry, or numb is an ordinary reaction to this news, not a sign you are handling it badly",
+              "2": "The waiting is hard, and recovery has its own hard parts — learning the routine takes most people months rather than weeks",
+              "3": "People with ostomies work, travel, swim, date, have children, and play sport. That is the ordinary outcome, not the exceptional one — most of it comes back once you have healed, which usually takes months rather than weeks"
+            },
+            "note": "It does get easier. If it is not easing, or you are struggling to get through the day, tell your NSWOC or doctor rather than waiting it out — low mood after this surgery is common and treatable. If you want to talk to someone who has been through it, Ostomy Canada trains peer visitors: ask your surgeon or NSWOC for a referral, or contact your local chapter yourself. See Everyday Liivving."
+          },
+          "2": {
+            "title": "Ask for stoma siting — this one matters most",
+            "group": "Before surgery",
+            "items": {
+              "1": "Siting means an NSWOC or your surgeon marks the best spot on your abdomen before your operation, while you are awake. Your surgeon makes the final call during surgery, so sometimes more than one spot is marked",
+              "2": "They check the spot while you sit, stand, and bend, and keep it clear of your waistband, skin folds, scars, and your beltline",
+              "3": "Placement affects how well every appliance you ever wear will seal, and people marked before surgery tend to have fewer leaks. If leaks do happen they are usually fixable with a different appliance or an added seal, whatever the shape of your abdomen"
+            },
+            "note": "This is the thing people most often do not know to ask for, and it is much harder to fix afterwards. If nobody has mentioned siting, ask. That includes emergency surgery — Canadian guidance says emergency patients should still be marked before the anesthetic wherever possible, and it matters more then, not less."
+          },
+          "3": {
+            "title": "Questions worth asking before you go in",
+            "group": "Before surgery",
+            "items": {
+              "1": "Which type of ostomy, and is it expected to be permanent or reversible? If reversible, roughly when might that be considered?",
+              "2": "Will I be seen by an NSWOC before surgery for siting, and who will teach me afterwards?",
+              "3": "What will my output be like, and what should I expect in the first weeks?",
+              "4": "Who do I contact when I get home, and what counts as urgent?"
+            },
+            "note": "Write them down and take the list in. It is completely normal to forget every question the moment someone in scrubs walks in."
+          },
+          "4": {
+            "title": "What to pack, and what to arrange",
+            "group": "Before surgery",
+            "items": {
+              "1": "Loose, high-waisted clothing for going home — nothing that sits across where the stoma will be",
+              "2": "Your usual medications list, which the ward will want anyway and which matters later for absorption",
+              "3": "Arrange help for the first week or two if you can. Lifting is restricted afterwards, and that includes shopping and laundry"
+            }
+          },
+          "5": {
+            "title": "If you are supporting someone",
+            "group": "Before surgery",
+            "items": {
+              "1": "You do not need to learn the pouch change unless they want you to — many people prefer to keep that private, and that is worth asking rather than assuming",
+              "2": "Practical help lands better than reassurance early on: driving, cooking, and taking over the lifting they are not allowed to do",
+              "3": "Your own reaction is allowed to be complicated. Peer support groups usually welcome partners and family too"
+            }
+          },
+          "6": {
             "title": "First Week Basics",
             "items": {
               "1": "Fatigue is normal — rest is part of recovery",
@@ -1441,7 +1490,7 @@
               "3": "Many people feel more confident within four to eight weeks"
             }
           },
-          "2": {
+          "7": {
             "title": "Change Routine Starters",
             "items": {
               "1": "Gather supplies first: new system, measuring guide, scissors if needed, warm water, soft cloth, disposal bag",
@@ -1449,7 +1498,7 @@
               "3": "Clean, dry, measure, apply, and hold the barrier so body heat activates the seal"
             }
           },
-          "3": {
+          "8": {
             "title": "Starter Supply Lists",
             "note": "Try The Fresh Start kit — customize quantities before checkout.",
             "items": {
@@ -1458,7 +1507,7 @@
               "3": "A go-bag for outings from day one"
             }
           },
-          "4": {
+          "9": {
             "title": "Go-Bags & Backup",
             "note": "Explore curated go-bag kits in Shop Ostomy Essentials.",
             "items": {
@@ -1467,7 +1516,7 @@
               "3": "A spare underwear or liner for peace of mind away from home"
             }
           },
-          "5": {
+          "10": {
             "title": "Who to Ask",
             "items": {
               "1": "NSWOC — a nurse specialized in wound, ostomy and continence care. Fit, skin, and clinical troubleshooting",
@@ -1475,7 +1524,7 @@
               "3": "Ontario pharmacist chat — everyday product and restock questions during business hours"
             }
           },
-          "6": {
+          "11": {
             "title": "Soft Next Steps",
             "items": {
               "1": "Reintroduce foods gradually; chew thoroughly; notice patterns",
@@ -1529,7 +1578,7 @@
       "get-to-know-your-stoma": {
         "title": "Get to Know Your Stoma",
         "heroBody": "Clear, kind education about your stoma — how it works, what changes, and what to do when something is not right.",
-        "focus": "Your stoma type, skin comfort, output patterns and fit changes; what to do when something is not right — leaks, pancaking, sore skin, high output, a hernia; and the clothing, travel, intimacy and routine questions that come with living in your body.",
+        "focus": "Your stoma type including the less common diversions, the words you will hear, skin comfort, output patterns and fit changes; what to do when something is not right — leaks, pancaking, sore skin, high output, a hernia; and the clothing, travel, intimacy, activity and routine questions that come with living in your body.",
         "vibe": "Clear, kind, and demystifying — education without overwhelm.",
         "nextLabel": "Food & Digestion →",
         "categoriesIntro": {
@@ -1548,6 +1597,60 @@
             }
           },
           "2": {
+            "title": "The less common diversions",
+            "group": "Start here",
+            "sections": {
+              "1": {
+                "heading": "Other stomas you may hear about",
+                "items": {
+                  "1": "Jejunostomy — formed higher in the small bowel than an ileostomy. Output is greater and more watery, and fluid, salt and nutrition need closer specialist follow-up",
+                  "2": "Ileal conduit — the most common form of urostomy, where urine is diverted through a short piece of bowel to a stoma",
+                  "3": "Nephrostomy — a tube that drains urine straight from the kidney. It comes out through the skin of your back rather than through a stoma on the abdomen, and drains into a bag usually strapped to your thigh under your clothes. It is often temporary"
+                }
+              },
+              "2": {
+                "heading": "Continent diversions, which work differently",
+                "items": {
+                  "1": "An ileoanal pouch (often called a J-pouch) is designed to leave you with no stoma in the long run — an internal reservoir is joined to the anus, so you pass stool the usual way. It normally takes two or three operations, and most people have a temporary ileostomy for a few months in between. Once it is working, stool is looser and you go more often, commonly five to ten times a day, settling with time",
+                  "2": "A continent ileostomy, such as a Kock pouch, has a small flush stoma and an internal reservoir made from small bowel. There is no pouch to wear — you drain it with a catheter, usually two to four times a day, and cover the stoma with a cap or gauze in between",
+                  "3": "A Mitrofanoff is a different operation, for urine rather than stool. A narrow channel, usually made from the appendix, runs from your own bladder to a small stoma, and you pass a catheter through it to empty"
+                },
+                "note": "Continent diversions are cared for quite differently from a conventional stoma. Advice about pouches, barriers and flanges will not apply to you — advice about diet, chewing well, fluids and salt still does. One thing this site does not cover: if your catheter will not pass, stop rather than persisting, rest an hour and try again, and get medical advice that day if you still cannot drain. Your surgical team and NSWOC are the right source."
+              }
+            },
+            "note": "NSWOCC publishes free patient guides for several of these, including jejunostomy and gastrostomy, in English and French. They are linked from Everyday Liivving."
+          },
+          "3": {
+            "title": "Words you will hear",
+            "group": "Start here",
+            "sections": {
+              "1": {
+                "heading": "Your equipment",
+                "items": {
+                  "1": "Appliance or pouching system — the whole setup: the barrier plus the pouch",
+                  "2": "Barrier, wafer or baseplate — the part that sticks to your skin. Many people say flange for this too, but on some two-piece systems flange means the plastic ring that clicks the pouch on. If you are ordering, check which one your brand means",
+                  "3": "Convexity — a barrier that curves outward towards your skin instead of lying flat, to help a flat or retracted stoma stand out or to smooth a crease. It comes in soft and firm versions and different depths. Helpful for some abdomens, harmful for others, so it is an assessment rather than a purchase"
+                }
+              },
+              "2": {
+                "heading": "Your body",
+                "items": {
+                  "1": "Peristomal skin — the skin around the stoma. It starts where the stoma meets your skin and takes in everything your barrier, tape or belt touches",
+                  "2": "Output — what comes out of the stoma. You will hear it used far more often than you might expect",
+                  "3": "Mucocutaneous junction — where the stoma meets your skin"
+                }
+              },
+              "3": {
+                "heading": "Your people",
+                "items": {
+                  "1": "NSWOC — Nurse Specialized in Wound, Ostomy and Continence. The Canadian specialist for stoma care, and the term used nationally",
+                  "2": "ET nurse or enterostomal therapy nurse — the older term for the same role. It still appears in official documents, including Saskatchewan’s SAIL program rules",
+                  "3": "WOCN Society — the American organization, which you will meet in US-published material. There the nurse is a WOC nurse, and a certified one is a CWOCN"
+                }
+              }
+            }
+          },
+          "4": {
             "title": "One-Piece vs Two-Piece",
             "items": {
               "1": "One-piece: barrier and pouch are joined — simple and low-profile",
@@ -1555,7 +1658,7 @@
               "3": "Your NSWOC or pharmacist can help you find what seals best for your body"
             }
           },
-          "3": {
+          "5": {
             "title": "Skin Comfort",
             "items": {
               "1": "Clean with warm water; avoid oils, fragrances, and lotion under the barrier",
@@ -1563,7 +1666,7 @@
               "3": "Powder, paste, rings, and wipes are tools for seal and comfort — add only what you need"
             }
           },
-          "4": {
+          "6": {
             "title": "Output & Patterns",
             "items": {
               "1": "Empty drainable pouches at about one-third to one-half full",
@@ -1571,7 +1674,7 @@
               "3": "Full system changes are often every few days — or sooner if you feel burning, itching, or a leak"
             }
           },
-          "5": {
+          "7": {
             "title": "Fit Changes",
             "items": {
               "1": "Measure during the first months — stoma size can change as swelling settles",
@@ -1579,7 +1682,7 @@
               "3": "Aim for a close fit around the stoma edge so output lands in the pouch, not on skin"
             }
           },
-          "6": {
+          "8": {
             "title": "When to Ask",
             "note": "Soft next step: browse Shop Ostomy Essentials for barriers, pouches, and accessories.",
             "items": {
@@ -1588,14 +1691,14 @@
               "3": "Your NSWOC is the clinical guide; Ontario pharmacists can help with everyday product questions in chat"
             }
           },
-          "7": {
+          "9": {
             "title": "Leaks and short wear time",
             "group": "When something is not right",
             "sections": {
               "1": {
                 "heading": "What often helps",
                 "items": {
-                  "1": "Re-measure. Stoma size changes for months after surgery, and an opening cut to last month’s size is the most common cause of a leak",
+                  "1": "Re-measure. Stoma size changes for months after surgery, and an opening cut to last month’s size is one of the most common causes of a leak",
                   "2": "Check where the leak starts — from under the barrier, or from the edge. They point at different problems",
                   "3": "Make sure skin is completely dry before the barrier goes on, and hold it in place so body heat can set the seal"
                 }
@@ -1610,7 +1713,7 @@
               }
             }
           },
-          "8": {
+          "10": {
             "title": "Pancaking",
             "group": "When something is not right",
             "sections": {
@@ -1631,7 +1734,7 @@
               }
             }
           },
-          "9": {
+          "11": {
             "title": "Ballooning and gas",
             "group": "When something is not right",
             "sections": {
@@ -1652,7 +1755,7 @@
               }
             }
           },
-          "10": {
+          "12": {
             "title": "Sore, itchy, or weeping skin",
             "group": "When something is not right",
             "sections": {
@@ -1674,7 +1777,7 @@
               }
             }
           },
-          "11": {
+          "13": {
             "title": "Output that changes",
             "group": "When something is not right",
             "sections": {
@@ -1696,7 +1799,7 @@
               }
             }
           },
-          "12": {
+          "14": {
             "title": "A bulge around the stoma",
             "group": "When something is not right",
             "sections": {
@@ -1716,7 +1819,7 @@
               }
             }
           },
-          "13": {
+          "15": {
             "title": "Clothing & Confidence",
             "group": "Body and life",
             "items": {
@@ -1725,7 +1828,7 @@
               "3": "You do not have to hide your pouch — comfort and preference come first"
             }
           },
-          "14": {
+          "16": {
             "title": "Travel & Workdays",
             "group": "Body and life",
             "items": {
@@ -1734,7 +1837,7 @@
               "3": "Plan bathroom stops the way you plan coffee: early and without apology"
             }
           },
-          "15": {
+          "17": {
             "title": "Intimacy & Social Ease",
             "group": "Body and life",
             "items": {
@@ -1743,7 +1846,7 @@
               "3": "Your pace is the right pace"
             }
           },
-          "16": {
+          "18": {
             "title": "Rest & Routine",
             "group": "Body and life",
             "items": {
@@ -1751,6 +1854,26 @@
               "2": "Lay out supplies like a station before you start",
               "3": "Restock before you run low — clockwork beats last-minute stress"
             }
+          },
+          "19": {
+            "title": "Hernias, lifting and your core",
+            "group": "Body and life",
+            "items": {
+              "1": "A parastomal hernia is a bulge beside the stoma, where the abdominal wall has weakened and what is underneath pushes through. It is common, and more likely the longer you have a stoma. Ordinary daily life does not cause it, though not smoking, keeping to a healthy weight and avoiding straining all lower the risk",
+              "2": "Follow the lifting advice your surgical team gives you, and ask them to show you how to lift rather than only what to avoid. Your abdominal wall is still healing in the early weeks, so build up gradually — technique matters more than a fixed weight limit",
+              "3": "Gentle core and breathing exercises usually start within the first few days, and you build from there. What is right for you depends on your fitness as much as your surgery — a physiotherapist can set the pace with you"
+            },
+            "note": "Many people find a support garment comfortable and reassuring, particularly if a hernia is already there. It is worth knowing that support wear has not been shown to prevent a hernia — it is for comfort and confidence. If you have one, ask your NSWOC to measure and fit you, since a garment that is too tight can restrict your movement and breathing."
+          },
+          "20": {
+            "title": "Getting back to activity",
+            "group": "Body and life",
+            "items": {
+              "1": "Walking usually comes first and starts early. Everything beyond that is a conversation about timing with your surgical team",
+              "2": "Swimming is fine once your wounds are fully healed — your pouch is water-resistant and, fitted well, designed not to leak. Change it well before you swim rather than just beforehand so the adhesive can settle, and cover the filter with the sticker provided",
+              "3": "Contact sports are worth raising, since a stoma guard protects against a direct blow. Heavy lifting is a separate question — a guard does not help there. Technique, breathing out on the effort and building up gradually do, and most people get back to what they did before"
+            },
+            "note": "Ostomy Canada and the manufacturer support programs both run activity resources, and plenty of ostomates return to running, swimming, weights, and team sport."
           }
         },
         "urgent": {
@@ -1964,7 +2087,7 @@
         "categoriesIntro": {
           "eyebrow": "You are not doing this alone",
           "heading": "What exists, and who it is for",
-          "body": "A lot of good help exists in Canada. Almost none of it is in one place. This chapter is the map — most of it links out, because these organisations do it better than we could."
+          "body": "A lot of good help exists in Canada. Almost none of it is in one place. This chapter is the map — most of it links out, because these organizations do it better than we could."
         },
         "categories": {
           "1": {
@@ -2040,7 +2163,7 @@
           "1": {
             "eyebrow": "Find your people",
             "heading": "Support that is already out there",
-            "body": "These are run by patient organisations and specialist nurses, not by us. They are free, and they are better at this than any retailer.",
+            "body": "These are run by patient organizations and specialist nurses, not by us. They are free, and they are better at this than any retailer.",
             "links": {
               "1": {
                 "title": "Find a chapter or peer support group",
@@ -2111,7 +2234,7 @@
           "4": {
             "eyebrow": "Read more",
             "heading": "Guides worth downloading",
-            "body": "Written by nurses and patient organisations, free, and more thorough than anything on this page.",
+            "body": "Written by nurses and patient organizations, free, and more thorough than anything on this page.",
             "links": {
               "1": {
                 "title": "Living with an ileostomy, colostomy, or ileal conduit",
@@ -2312,7 +2435,7 @@
         "opensOnTheirSite": "Opens on their site ↗",
         "resourcesEyebrow": "Outside these pages",
         "resourcesHeading": "Where to go from here",
-        "resourcesIntro": "These are run by patient organisations, specialist nurses, and government programs — not by Liivv. We link out because they do this better than a shop could.",
+        "resourcesIntro": "These are run by patient organizations, specialist nurses, and government programs — not by Liivv. We link out because they do this better than a shop could.",
         "pathEyebrow": "Path",
         "allChapters": "All four chapters",
         "keepGoing": "Keep going",

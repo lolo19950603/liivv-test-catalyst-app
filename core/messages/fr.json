@@ -1421,375 +1421,6 @@
     },
     "OstomyCare": {
         "chapters": {
-            "new-to-the-journey": {
-                "categories": {
-                    "1": {
-                        "title": "Les bases de la première semaine",
-                        "items": {
-                            "1": "La fatigue est normale — le repos fait partie de la récupération",
-                            "2": "Votre équipe de soins vous enverra à la maison avec un ensemble de départ; l'apprentissage demande de la pratique, pas la perfection",
-                            "3": "Beaucoup de gens se sentent plus confiants en quatre à huit semaines"
-                        }
-                    },
-                    "2": {
-                        "title": "Modifier les Départs de Routine",
-                        "items": {
-                            "1": "Rassemblez d'abord les fournitures : nouveau système, guide de mesure, ciseaux si nécessaire, eau tiède, chiffon doux, sac d’élimination",
-                            "2": "Retirez doucement — jamais en arrachant; mouillez un chiffon pour aider à libérer l’adhésif si besoin",
-                            "3": "Nettoyez, séchez, mesurez, appliquez et maintenez la barrière pour que la chaleur corporelle active le joint"
-                        }
-                    },
-                    "3": {
-                        "title": "Listes de fournitures de départ",
-                        "note": "Essayez le kit Fresh Start — personnalisez les quantités avant de passer à la caisse.",
-                        "items": {
-                            "1": "Pochettes et barrières qui correspondent à votre système (monobloc ou deux pièces)",
-                            "2": "Lingette protectrice pour la peau, poudre si recommandé, sacs d’élimination",
-                            "3": "Un sac d’urgence pour les sorties dès le premier jour"
-                        }
-                    },
-                    "4": {
-                        "title": "Sacs d’urgence & pièces de rechange",
-                        "note": "Découvrez des kits de sacs d’urgence sélectionnés dans Shop Ostomy Essentials.",
-                        "items": {
-                            "1": "Barrière et poche de rechange, lingettes douces, sacs d’élimination",
-                            "2": "Dissolvant pour adhésif et protecteur cutané si vous les utilisez",
-                            "3": "Un sous-vêtement ou un liner de rechange pour votre tranquillité d’esprit hors de chez vous"
-                        }
-                    },
-                    "5": {
-                        "title": "À qui demander",
-                        "items": {
-                            "1": "NSWOC — une infirmière spécialisée en soins des plaies, stomies et continence. Ajustements, peau et dépannage clinique",
-                            "2": "Chirurgien ou clinique — récupération et préoccupations médicales",
-                            "3": "Chat avec un pharmacien de l'Ontario — questions sur les produits quotidiens et le réapprovisionnement durant les heures d'ouverture"
-                        }
-                    },
-                    "6": {
-                        "title": "Premiers pas en douceur",
-                        "items": {
-                            "1": "Réintroduire les aliments progressivement ; mâcher soigneusement ; remarquer les habitudes",
-                            "2": "La marche légère vient souvent en premier ; reprendre l'activité selon l'autorisation de votre équipe de soins",
-                            "3": "Ouvrir Everyday Liivving quand vous êtes prêt à trouver un groupe de pairs ou à découvrir ce que couvre votre province"
-                        }
-                    }
-                },
-                "title": "Nouveau dans le parcours",
-                "heroBody": "Vous débutez et apprenez les bases — listes de vérification calmes, premiers fournitures, et qui demander.",
-                "focus": "Premières semaines après la chirurgie, changement de routines, fournitures de départ, qui demander, et étapes douces vers la vie quotidienne.",
-                "vibe": "Soutenant et démystifiant — un endroit rassurant.",
-                "nextLabel": "Apprenez à connaître votre stomie →",
-                "categoriesIntro": {
-                    "eyebrow": "Les premiers chapitres",
-                    "heading": "Vous n’êtes pas censé tout savoir encore",
-                    "body": "La plupart des gens trouvent que le changement de poche devient familier en quelques semaines. Commencez avec une courte liste de vérification et un contact de confiance."
-                },
-                "programsBand": {
-                    "heading": "Une carte douce pour le premier mois",
-                    "cards": {
-                        "1": {
-                            "heading": "Semaines 1–2",
-                            "body": "Se concentrer sur la guérison, l'hydratation et une routine de changement solide. Aliments doux, faibles en fibres, selon les conseils de votre équipe."
-                        },
-                        "2": {
-                            "heading": "Semaines 3–4",
-                            "body": "Ajouter les aliments un à la fois. Mesurer la stomie à mesure que le gonflement change. Garder des stocks supplémentaires."
-                        },
-                        "3": {
-                            "heading": "Semaines 5–8",
-                            "body": "La confiance se construit généralement ici — plans sociaux, journées de travail, et un sac de voyage qui vous accompagne."
-                        }
-                    }
-                },
-                "citations": {
-                    "1": {
-                        "label": "NSWOCC — Trouvez une NSWOC"
-                    },
-                    "2": {
-                        "label": "NSWOCC — guides gratuits pour les patients (en anglais et en français)"
-                    },
-                    "3": {
-                        "label": "RNAO — Préparer une chirurgie de stomie ( fiche d'information pour le patient )"
-                    }
-                },
-                "pharmacist": {
-                    "eyebrow": "Disponible en Ontario",
-                    "heading": "Vous n'avez pas à gérer l'allée seul(e)",
-                    "body": "Commencer peut ressembler à apprendre une nouvelle langue. Discutez avec un pharmacien de l'Ontario durant les heures d'ouverture pour des questions sur les produits — jusqu'à 17 h, heure de l'Est. Les préoccupations cliniques restent avec votre NSWOC ou chirurgien.",
-                    "cta": "Parlez à un pharmacien"
-                },
-                "closing": {
-                    "heading": "Un endroit doux pour atterrir",
-                    "body": "Nouveau dans le parcours, c'est la permission d'apprendre lentement — avec des listes de vérification, des réponses bienveillantes, et des fournitures qui arrivent quand vous en avez besoin."
-                },
-                "governance": {
-                    "disclaimer": "Il s'agit d'informations générales, non de conseils médicaux, et ce n'est pas un substitut à l'évaluation par votre NSWOC, chirurgien ou médecin. Le choix de la taille, de la peau et du produit dépend de votre corps et de votre chirurgie — parlez à votre équipe de soins avant de changer quoi que ce soit."
-                }
-            },
-            "get-to-know-your-stoma": {
-                "categoriesIntro": {
-                    "body": "Un système de poche est un barrière cutanée (gaufrette/flasque) plus une poche. La compatibilité et la santé de la peau guident le confort plus que tout autre chose.",
-                    "eyebrow": "Comprendre sans surcharge",
-                    "heading": "Connaître votre configuration"
-                },
-                "categories": {
-                    "1": {
-                        "items": {
-                            "1": "La stomie, l’ileostomie et l’urostomie influencent chacune la sortie et les soins quotidiens de façon légèrement différente.",
-                            "2": "Une stomie peut être temporaire ou permanente — votre équipe de soins décide avec vous.",
-                            "3": "Une peau péristomiale saine doit ressembler à la peau de l’autre côté de votre abdomen."
-                        },
-                        "title": "Bases de la stomie",
-                        "group": "Commencez ici"
-                    },
-                    "2": {
-                        "title": "Un seul morceau vs deux morceaux",
-                        "items": {
-                            "1": "Un seul morceau : la barrière et le sac sont reliés — simple et discret.",
-                            "2": "Deux morceaux : la barrière reste en place pendant que vous changez le sac — flexible pour un vidage fréquent.",
-                            "3": "Votre NSWOC ou pharmacien peut vous aider à trouver ce qui scelle le mieux pour votre corps"
-                        }
-                    },
-                    "3": {
-                        "title": "Confort de la peau",
-                        "items": {
-                            "1": "Nettoyez avec de l’eau tiède ; évitez les huiles, parfums et lotions sous la barrière.",
-                            "2": "Séchez complètement — une peau sèche scelle mieux qu’une peau humide.",
-                            "3": "Poudre, pâte, anneaux et lingettes sont des outils pour le scellement et le confort — n’ajoutez que ce dont vous avez besoin."
-                        }
-                    },
-                    "4": {
-                        "title": "Sortie & motifs",
-                        "items": {
-                            "1": "Videz les sacs drainables lorsqu’ils sont environ aux deux tiers ou à moitié pleins.",
-                            "2": "Les sacs fermés sont remplacés selon les besoins tout au long de la journée.",
-                            "3": "Les changements complets du système se font souvent tous les quelques jours — ou plus tôt si vous ressentez une sensation de brûlure, de démangeaison ou une fuite."
-                        }
-                    },
-                    "5": {
-                        "title": "Changements d’ajustement",
-                        "items": {
-                            "1": "Mesurez durant les premiers mois — la taille de la stomie peut changer à mesure que le gonflement se résorbe.",
-                            "2": "Une ouverture trop grande expose la peau ; trop petite peut blesser la stomie.",
-                            "3": "Visez un ajustement serré autour du bord de la stomie pour que la sortie tombe dans le sac, et non sur la peau."
-                        }
-                    },
-                    "6": {
-                        "title": "Quand demander de l’aide",
-                        "note": "Étape suivante douce : parcourez Shop Ostomy Essentials pour les barrières, sacs et accessoires.",
-                        "items": {
-                            "1": "Fuites persistantes, rougeurs, douleur ou peau qui ne guérit pas.",
-                            "2": "Changements soudains dans la sortie, enflure ou usure de la barrière.",
-                            "3": "Votre NSWOC est le guide clinique ; les pharmaciens de l’Ontario peuvent vous aider pour les questions de produits quotidiens en chat."
-                        }
-                    },
-                    "7": {
-                        "title": "Fuites et durée courte de port",
-                        "group": "Quand quelque chose ne va pas.",
-                        "sections": {
-                            "1": {
-                                "heading": "Ce qui aide souvent",
-                                "items": {
-                                    "1": "Re-mesurez. La taille de la stomie change pendant plusieurs mois après la chirurgie, et une ouverture taillée à la taille du mois dernier est la cause la plus courante d’une fuite.",
-                                    "2": "Vérifiez d’où commence la fuite — sous la barrière ou au bord. Elles indiquent des problèmes différents.",
-                                    "3": "Assurez-vous que la peau est complètement sèche avant d’appliquer la barrière, et maintenez-la en place pour que la chaleur corporelle fixe le sceau."
-                                }
-                            },
-                            "2": {
-                                "heading": "Quand appeler votre NSWOC",
-                                "note": "Les fuites répétées signifient généralement que l’ajustement est incorrect, pas que vous faites quelque chose de mal. La convexité, les anneaux et les pâtes peuvent tous aider — mais le choix dépend de votre abdomen et de votre stomie, c’est une évaluation plutôt qu’un achat. Une convexité inappropriée peut causer une blessure par pression.",
-                                "items": {
-                                    "1": "Fuites plus que occasionnelles, ou un motif inexplicable.",
-                                    "2": "Peau qui ne guérit pas complètement entre les changements."
-                                }
-                            }
-                        }
-                    },
-                    "8": {
-                        "title": "Empilement de sortie (pancaking).",
-                        "group": "Quand quelque chose ne va pas.",
-                        "sections": {
-                            "1": {
-                                "heading": "Ce qui se passe.",
-                                "items": {
-                                    "1": "Le film du sac colle à lui-même, empêchant la sortie de descendre de la stomie et la pousse sous la barrière à la place.",
-                                    "2": "C’est plus fréquent avec une sortie plus épaisse et avec des filtres qui aspirent rapidement l’air."
-                                }
-                            },
-                            "2": {
-                                "heading": "Ce qui aide souvent.",
-                                "note": "Si cela est constant, ou si votre sortie est devenue nettement plus épaisse qu’auparavant, mentionnez-le — cela vaut la peine d’y regarder plutôt que de faire avec.",
-                                "items": {
-                                    "1": "Une bouffée d’air dans le sac avant de le fermer.",
-                                    "2": "Un déodorant lubrifiant, qui aide la sortie à glisser vers le bas."
-                                }
-                            }
-                        }
-                    },
-                    "9": {
-                        "sections": {
-                            "1": {
-                                "items": {
-                                    "1": "Les filtres se mouillent et cessent de fonctionner — c’est normal plutôt qu’un défaut.",
-                                    "2": "Les schémas de gaz ont souvent tendance à se stabiliser au cours des premiers mois, à mesure que votre intestin s’ajuste.",
-                                    "3": "Manger et boire plus lentement signifie avaler moins d’air."
-                                },
-                                "heading": "Ce qui aide souvent."
-                            },
-                            "2": {
-                                "heading": "Quand appeler votre NSWOC",
-                                "note": "La nourriture influence le gaz différemment pour chacun, et les conseils après une chirurgie varient selon le type d’ostomie — il s’agit donc d’une conversation avec votre équipe ou un diététiste plutôt que d’une liste à suivre.",
-                                "items": {
-                                    "1": "Un changement soudain dans le gaz accompagné de douleur, ou une sortie qui s’arrête."
-                                }
-                            }
-                        },
-                        "title": "Ballonnement et gaz.",
-                        "group": "Quand quelque chose ne va pas."
-                    },
-                    "10": {
-                        "title": "Peau douloureuse, qui démange ou qui suinte.",
-                        "group": "Quand quelque chose ne va pas.",
-                        "sections": {
-                            "1": {
-                                "heading": "Veuillez ne pas faire de diagnostic par vous-même pour celui-ci.",
-                                "items": {
-                                    "1": "L’irritation causée par la sortie, une éruption fongique, une allergie de contact, et quelques autres conditions moins courantes se ressemblent presque à l’œil.",
-                                    "2": "Elles ont des traitements opposés — le mauvais peut aggraver plusieurs d’entre elles."
-                                }
-                            },
-                            "2": {
-                                "heading": "Ce qui est sécuritaire à faire en attendant.",
-                                "note": "Toute peau qui est cassée, qui suinte, saigne ou qui n’est pas encore cicatrisée lors du prochain changement nécessite l’avis d’un NSWOC — pas une recommandation de produit sur Internet.",
-                                "items": {
-                                    "1": "Garder la zone propre avec de l’eau tiède seulement — pas d’huiles, de lotions ou de produits parfumés sous la barrière.",
-                                    "2": "Vérifiez que l’ouverture n’est pas coupée plus grande que la stomie, ce qui expose la peau à la sortie.",
-                                    "3": "Prenez une photo avant votre rendez-vous, car la peau peut changer entre les changements."
-                                }
-                            }
-                        }
-                    },
-                    "11": {
-                        "title": "Une sortie qui change.",
-                        "group": "Quand quelque chose ne va pas.",
-                        "sections": {
-                            "1": {
-                                "heading": "Pourquoi cela est-il plus important avec une iléostomie.",
-                                "items": {
-                                    "1": "Une iléostomie libère plus de liquide et de sel, ce qui peut entraîner une déshydratation plus rapidement et de façon moins évidente que ce que l’on pense.",
-                                    "2": "La soif n’est pas un signe fiable précocement — une urine foncée, des maux de tête et une sensation de faiblesse surviennent souvent en premier."
-                                }
-                            },
-                            "2": {
-                                "heading": "Quand appeler.",
-                                "note": "Une sortie élevée est la principale raison pour laquelle les gens sont réadmis après une chirurgie d’ostomie. Il vaut mieux téléphoner tôt plutôt que d’attendre de voir.",
-                                "items": {
-                                    "1": "Une augmentation soutenue de la sortie durant plus d’une journée.",
-                                    "2": "Une sortie aqueuse, en grande quantité, qui ne se stabilise pas.",
-                                    "3": "Se sentir étourdi, confus ou anormalement faible en même temps."
-                                }
-                            }
-                        }
-                    },
-                    "12": {
-                        "title": "Une bosse autour de la stomie.",
-                        "group": "Quand quelque chose ne va pas.",
-                        "sections": {
-                            "1": {
-                                "heading": "Ce que cela est habituellement.",
-                                "items": {
-                                    "1": "Une hernie parastomale — un affaiblissement de la paroi abdominale autour de la stomie. C’est courant et ce n’est pas quelque chose que vous avez causé.",
-                                    "2": "Elle modifie souvent la position de votre barrière, ce qui peut entraîner des fuites en même temps."
-                                }
-                            },
-                            "2": {
-                                "heading": "Quand appeler votre NSWOC.",
-                                "note": "Les vêtements de soutien aident beaucoup de personnes, mais ils doivent être adaptés à la taille et au type de hernie — acheter un sans évaluation peut aggraver l’ajustement plutôt que de l’améliorer.",
-                                "items": {
-                                    "1": "Toute nouvelle bosse ou changement de forme dans la zone autour de votre stomie."
-                                }
-                            }
-                        }
-                    },
-                    "13": {
-                        "title": "Vêtements & Confiance.",
-                        "group": "Corps et vie.",
-                        "items": {
-                            "1": "Les styles à taille haute et les couches souples peuvent maintenir une poche en place et discrète.",
-                            "2": "Ceintures ou bandages de soutien pour les journées actives où vous souhaitez un maintien supplémentaire.",
-                            "3": "Vous n’avez pas besoin de cacher votre poche — le confort et la préférence passent en premier."
-                        }
-                    },
-                    "14": {
-                        "title": "Voyage & journées de travail.",
-                        "group": "Corps et vie.",
-                        "items": {
-                            "1": "Videz lorsque la poche est à environ un tiers à la moitié pleine pour réduire le risque de fuite.",
-                            "2": "Rangez les fournitures dans votre bagage à main — jamais seulement dans les bagages en soute.",
-                            "3": "Planifiez vos pauses toilettes comme vous planifiez votre café : tôt et sans excuses."
-                        }
-                    },
-                    "15": {
-                        "title": "Intimité & aisance sociale.",
-                        "group": "Corps et vie.",
-                        "items": {
-                            "1": "Parlez de ce qui vous aide à vous sentir en sécurité — le moment, les vêtements ou un bandage de soutien.",
-                            "2": "La confiance grandit avec une routine qui a déjà fonctionné à la maison.",
-                            "3": "Votre rythme est le bon rythme."
-                        }
-                    },
-                    "16": {
-                        "title": "Repos & routine.",
-                        "group": "Corps et vie.",
-                        "items": {
-                            "1": "Beaucoup de gens préfèrent faire leurs changements le matin, lorsque la production est souvent plus faible.",
-                            "2": "Préparez vos fournitures comme une station avant de commencer.",
-                            "3": "Rafraîchissez votre stock avant de manquer — la régularité évite le stress de dernière minute."
-                        }
-                    }
-                },
-                "urgent": {
-                    "heading": "Certaines choses ne relèvent pas d’un site web.",
-                    "intro": "La plupart des préoccupations concernant la stomie peuvent attendre votre prochain rendez-vous avec votre NSWOC. Ce qui ne peut pas attendre, c’est une urgence médicale. Consultez immédiatement si vous remarquez :",
-                    "action": "Allez au service d’urgence le plus proche ou appelez le 911. N’attendez pas un rappel, et ne tentez pas de résoudre un stomie violacée à la maison.",
-                    "signs": {
-                        "1": "Une stomie qui devient sombre, violacée ou qui se sent froide au toucher",
-                        "2": "Douleur abdominale sévère, ou vomissements avec aucune sortie depuis plusieurs heures — cela peut indiquer une obstruction",
-                        "3": "Saignement abondant ou continu provenant de la stomie elle-même, pas seulement une tache lors du nettoyage",
-                        "4": "Fièvre, ou peau autour de la stomie qui est chaude, rougeâtre, et douloureuse",
-                        "5": "Confusion, étourdissements sévères, ou urine très foncée accompagnée d’un débit élevé — signes de déshydratation importante"
-                    }
-                },
-                "citations": {
-                    "1": {
-                        "label": "RNAO — Soutenir les adultes qui anticipent ou vivent avec une ostomie (guide de bonnes pratiques)"
-                    },
-                    "2": {
-                        "label": "NSWOCC — Guides gratuits pour les patients selon le type d’ostomie"
-                    },
-                    "3": {
-                        "label": "Wounds Canada — Prendre soin d’une personne avec une ostomie"
-                    }
-                },
-                "pharmacist": {
-                    "eyebrow": "Disponible en Ontario",
-                    "heading": "Demandez sans gêne",
-                    "body": "Vous n’êtes pas sûr si vous avez besoin d’un convexe, d’un anneau, ou d’un autre tampon? Discutez avec un pharmacien en Ontario durant les heures d’ouverture — jusqu’à 17 h, heure de l’Est. Pour des préoccupations cliniques concernant la stomie, votre NSWOC reste votre ressource principale.",
-                    "cta": "Parlez à un pharmacien"
-                },
-                "closing": {
-                    "heading": "Le confort est une compétence que vous développez",
-                    "body": "Savoir si votre stomie fonctionne n’est pas un test — c’est une relation plus discrète avec l’ajustement, la peau, et les produits qui méritent leur place sur votre étagère."
-                },
-                "governance": {
-                    "disclaimer": "Ceci est une information générale, pas un avis médical, et ce n’est pas un substitut à l’évaluation par votre NSWOC, chirurgien ou médecin. L’ajustement, la peau, et les choix de produits dépendent de votre corps et de votre chirurgie — parlez à votre équipe de soins avant de modifier quoi que ce soit."
-                },
-                "title": "Faites connaissance avec votre stomie",
-                "heroBody": "Une éducation claire et bienveillante sur votre stomie — comment elle fonctionne, ce qui change, et quoi faire si quelque chose ne va pas.",
-                "focus": "Votre type de stomie, confort de la peau, habitudes de sortie, ajustements, fuites, pancaking, peau irritée, sortie élevée, hernie ; et les questions sur les vêtements, les voyages, l'intimité et la routine qui accompagnent la vie avec votre corps.",
-                "vibe": "Clair, bienveillant, et démystifiant — une éducation sans surcharge.",
-                "nextLabel": "Everyday Liivving →"
-            },
             "everyday-liivving": {
                 "categories": {
                     "1": {
@@ -2159,6 +1790,498 @@
                     "disclaimer": "Ceci est une information générale, pas un avis médical, et ce n’est pas un substitut à une évaluation par votre NSWOC, chirurgien, médecin ou diététiste agréé. La tolérance alimentaire varie énormément d’une personne à l’autre, et les recommandations diffèrent selon le type d’ostomie et la durée depuis la chirurgie — consultez votre équipe de soins avant d’apporter des changements, surtout si vous avez eu une occlusion ou un débit élevé persistant."
                 },
                 "nextLabel": "Vivre au quotidien avec Liivv →"
+            },
+            "new-to-the-journey": {
+                "title": "Nouveau dans le parcours",
+                "categories": {
+                    "1": {
+                        "title": "On vient de vous dire que vous en avez besoin d’une",
+                        "group": "Avant la chirurgie",
+                        "items": {
+                            "1": "Se sentir effrayé, en colère ou engourdi est une réaction ordinaire à cette nouvelle, pas un signe que vous gérez mal la situation",
+                            "2": "L’attente est difficile, et la récupération comporte ses propres défis — apprendre la routine prend la plupart des gens des mois plutôt que des semaines",
+                            "3": "Les personnes avec des stomies travaillent, voyagent, nagent, sortent, ont des enfants, et pratiquent des sports. C’est le résultat ordinaire, pas exceptionnel — la majorité de cela revient une fois que vous avez guéri, ce qui prend généralement des mois plutôt que des semaines"
+                        },
+                        "note": "Ça devient plus facile. Si ce n’est pas le cas, ou si vous avez du mal à passer la journée, parlez-en à votre NSWOC ou à votre médecin plutôt que d’attendre — la déprime après cette chirurgie est courante et traitable. Si vous souhaitez parler à quelqu’un qui a vécu cela, Ostomy Canada forme des visiteurs pairs : demandez à votre chirurgien ou à votre NSWOC une recommandation, ou contactez votre chapitre local vous-même. Voir Everyday Liivving."
+                    },
+                    "2": {
+                        "title": "Demandez la localisation du stomie — celle-ci est la plus importante",
+                        "group": "Avant la chirurgie",
+                        "items": {
+                            "1": "La localisation consiste en ce qu’un NSWOC ou votre chirurgien marque le meilleur endroit sur votre abdomen avant votre opération, pendant que vous êtes éveillé. Votre chirurgien prend la décision finale lors de la chirurgie, donc parfois plus d’un endroit est marqué.",
+                            "2": "Ils vérifient l’endroit pendant que vous êtes assis, debout, et en pliant, et le maintiennent dégagé de votre ceinture, des plis de peau, des cicatrices, et de votre ligne de ceinture.",
+                            "3": "Le placement influence l’étanchéité de chaque appareil que vous portez, et les personnes dont la localisation a été marquée avant la chirurgie ont tendance à avoir moins de fuites. Si des fuites surviennent, elles sont généralement réparables avec un appareil différent ou un joint supplémentaire, peu importe la forme de votre abdomen."
+                        },
+                        "note": "C’est la chose que les gens ne savent souvent pas demander, et il est beaucoup plus difficile de la corriger après. Si personne n’a mentionné la localisation, demandez. Cela inclut la chirurgie d’urgence — les directives canadiennes recommandent que les patients en urgence soient aussi marqués avant l’anesthésie si possible, et cela est encore plus important dans ces cas."
+                    },
+                    "3": {
+                        "title": "Questions à poser avant d’y aller",
+                        "group": "Avant la chirurgie",
+                        "items": {
+                            "1": "Quel type de stomie, et est-ce censé être permanent ou réversible ? Si réversible, à peu près quand cela pourrait-il être envisagé ?",
+                            "2": "Serai-je vu par un NSWOC avant la chirurgie pour la localisation, et qui m’apprendra après ?",
+                            "3": "À quoi ressemblera mon output, et à quoi dois-je m’attendre dans les premières semaines ?",
+                            "4": "Qui dois-je contacter à mon retour à la maison, et qu’est-ce qui est considéré comme urgent ?"
+                        },
+                        "note": "Notez-les et emportez la liste avec vous. Il est tout à fait normal d’oublier chaque question dès qu’une personne en blouse entre dans la pièce."
+                    },
+                    "4": {
+                        "title": "Ce qu’il faut emporter, et ce qu’il faut organiser",
+                        "group": "Avant la chirurgie",
+                        "items": {
+                            "1": "Vêtements amples à taille haute pour le retour à la maison — rien qui appuie sur l’endroit où sera la stomie",
+                            "2": "Votre liste de médicaments habituels, que le service souhaitera de toute façon, et qui est importante plus tard pour l’absorption",
+                            "3": "Organisez de l’aide pour la première semaine ou deux si possible. La levée de poids est limitée par la suite, y compris pour faire les courses et la lessive."
+                        }
+                    },
+                    "5": {
+                        "title": "Si vous soutenez quelqu’un",
+                        "group": "Avant la chirurgie",
+                        "items": {
+                            "1": "Vous n’avez pas besoin d’apprendre à changer le sac à moins qu’ils ne veuillent que vous le fassiez — beaucoup préfèrent garder cela privé, et il vaut mieux demander plutôt que supposer.",
+                            "2": "L’aide pratique est mieux accueillie que la simple reassurance au début : conduire, cuisiner, et prendre en charge le levage qu’ils ne sont pas autorisés à faire.",
+                            "3": "Votre propre réaction peut être compliquée. Les groupes de soutien entre pairs accueillent généralement aussi les partenaires et la famille."
+                        }
+                    },
+                    "6": {
+                        "title": "Bases de la première semaine",
+                        "items": {
+                            "1": "La fatigue est normale — le repos fait partie de la récupération",
+                            "2": "Votre équipe de soins vous enverra à la maison avec un kit de départ ; apprendre demande de la pratique, pas la perfection",
+                            "3": "Beaucoup de gens se sentent plus confiants entre quatre et huit semaines"
+                        }
+                    },
+                    "7": {
+                        "title": "Débuter la routine de changement",
+                        "items": {
+                            "1": "Rassemblez d’abord les fournitures : nouveau système, guide de mesure, ciseaux si nécessaire, eau tiède, chiffon doux, sac d’élimination",
+                            "2": "Retirez doucement — ne déchirez jamais ; humidifiez un chiffon pour aider à libérer l’adhésif si besoin",
+                            "3": "Nettoyez, séchez, mesurez, appliquez, et maintenez la barrière pour que la chaleur corporelle active le joint"
+                        }
+                    },
+                    "8": {
+                        "title": "Listes de fournitures de départ",
+                        "note": "Essayez le kit The Fresh Start — personnalisez les quantités avant de payer.",
+                        "items": {
+                            "1": "Sacs et barrières qui correspondent à votre système (monobloc ou à deux pièces)",
+                            "2": "Lingette protectrice pour la peau, poudre si recommandée, sacs d’élimination",
+                            "3": "Un sac d’urgence pour les sorties dès le premier jour"
+                        }
+                    },
+                    "9": {
+                        "title": "Sacs d'urgence & sauvegarde",
+                        "items": {
+                            "1": "Barrière de rechange et pochette, lingettes douces, sacs d’élimination",
+                            "2": "Détachant adhésif et protecteur cutané si vous les utilisez",
+                            "3": "Sous-vêtement ou doublure de rechange pour votre tranquillité d’esprit hors de la maison"
+                        },
+                        "note": "Explorez les kits de sacs d’urgence sélectionnés dans Shop Ostomy Essentials."
+                    },
+                    "10": {
+                        "title": "À qui demander",
+                        "items": {
+                            "1": "NSWOC — une infirmière spécialisée en soins des plaies, stomies et continence. Ajustement, peau, et dépannage clinique",
+                            "2": "Chirurgien ou clinique — récupération et préoccupations médicales",
+                            "3": "Chat avec un pharmacien de l’Ontario — questions sur les produits quotidiens et le réapprovisionnement durant les heures d’ouverture"
+                        }
+                    },
+                    "11": {
+                        "title": "Prochaines étapes en douceur",
+                        "items": {
+                            "1": "Réintroduire les aliments progressivement ; mâcher soigneusement ; noter les habitudes",
+                            "2": "La marche légère est souvent la première étape ; reprendre les activités selon l’autorisation de votre équipe de soins",
+                            "3": "Ouvrez Everyday Liivving quand vous êtes prêt à trouver un groupe de pairs ou à découvrir ce que couvre votre province"
+                        }
+                    }
+                },
+                "heroBody": "Je vous ai dit que vous auriez besoin d'une chirurgie, ou simplement de rester à la maison avec une nouvelle stomie — des réponses rassurantes pour les deux, plus la chose à demander avant d'y aller.",
+                "programsBand": {
+                    "heading": "Une carte douce pour le premier mois",
+                    "cards": {
+                        "1": {
+                            "heading": "Semaines 1–2",
+                            "body": "Concentrez-vous sur la cicatrisation, l’hydratation et une routine de changement simple. Aliments doux et faibles en fibres, selon les conseils de votre équipe."
+                        },
+                        "2": {
+                            "heading": "Semaines 3–4",
+                            "body": "Ajoutez les aliments un par un. Mesurez la stomie à mesure que le gonflement diminue. Gardez des extras en stock."
+                        },
+                        "3": {
+                            "heading": "Semaines 5–8",
+                            "body": "La confiance se développe généralement ici — plans sociaux, journées de travail, et un sac de voyage qui vous accompagne partout."
+                        }
+                    }
+                },
+                "citations": {
+                    "1": {
+                        "label": "NSWOCC — Trouvez une NSWOC"
+                    },
+                    "2": {
+                        "label": "NSWOCC — guides gratuits pour les patients (en anglais et en français)"
+                    },
+                    "3": {
+                        "label": "RNAO — Préparer une chirurgie de stomie ( fiche d’information pour le patient)"
+                    }
+                },
+                "pharmacist": {
+                    "eyebrow": "Disponible en Ontario",
+                    "heading": "Vous n’avez pas à gérer seul le rayon",
+                    "body": "Commencer peut ressembler à apprendre une nouvelle langue. Discutez avec un pharmacien de l’Ontario durant les heures d’ouverture pour des questions sur les produits — jusqu’à 17 h, heure de l’Est. Les préoccupations cliniques doivent toujours être abordées avec votre NSWOC ou chirurgien.",
+                    "cta": "Parlez à un pharmacien"
+                },
+                "closing": {
+                    "heading": "Un endroit doux pour atterrir",
+                    "body": "Nouvellement dans le parcours, c’est la permission d’apprendre à votre rythme — avec des listes de vérification, des réponses bienveillantes, et des fournitures qui arrivent quand vous en avez besoin."
+                },
+                "governance": {
+                    "disclaimer": "Ceci est une information générale, pas un avis médical, et ne remplace pas l’évaluation par votre NSWOC, chirurgien ou médecin. L’ajustement, la peau, et les choix de produits dépendent de votre corps et de votre chirurgie — parlez à votre équipe de soins avant de modifier quoi que ce soit."
+                },
+                "focus": "Avant la chirurgie : à quoi s'attendre, la localisation du stomie, les questions à poser, et soutenir quelqu’un. Après la chirurgie : premières semaines, changements de routine, fournitures de départ, à qui demander, et étapes douces suivantes.",
+                "vibe": "Soutenant et démystifiant — un endroit rassurant.",
+                "nextLabel": "Faites connaissance avec votre stomie →",
+                "categoriesIntro": {
+                    "eyebrow": "Premiers chapitres",
+                    "heading": "Vous n’êtes pas censé tout savoir encore",
+                    "body": "Ce chapitre couvre les deux côtés de l’opération. Si la chirurgie est encore à venir, commencez par le haut. Si vous êtes déjà à la maison, passez directement aux Bases de la première semaine — rien d’autre ci-dessus ne sera une surprise."
+                }
+            },
+            "get-to-know-your-stoma": {
+                "categories": {
+                    "1": {
+                        "title": "Bases de la stomie",
+                        "group": "Commencez ici",
+                        "items": {
+                            "1": "Colostomie, iléostomie, et urostomie façonnent chacune la sortie et les soins quotidiens un peu différemment",
+                            "2": "Une stomie peut être temporaire ou permanente — votre équipe de soins décide avec vous",
+                            "3": "Une peau péri-stomale saine doit ressembler à la peau de l’autre côté de votre abdomen"
+                        }
+                    },
+                    "2": {
+                        "sections": {
+                            "1": {
+                                "heading": "Autres stomies dont vous pourriez entendre parler",
+                                "items": {
+                                    "1": "Jéjunostomie — formée plus haut dans l’intestin grêle qu’une iléostomie. La sortie est plus abondante et plus liquide, nécessitant un suivi spécialisé plus rapproché pour les fluides, sels et nutriments.",
+                                    "2": "Conduit iléal — la forme la plus courante d’urostomie, où l’urine est détournée par un petit segment d’intestin vers une stomie",
+                                    "3": "Néphrostomie — un tube qui draine l’urine directement du rein. Il sort par la peau du dos plutôt que par une stomie sur l’abdomen, et se vide dans un sac généralement fixé à la cuisse sous les vêtements. Souvent temporaire."
+                                }
+                            },
+                            "2": {
+                                "items": {
+                                    "1": "Une poche iléo-anale (souvent appelée poche en J) est conçue pour ne pas laisser de stomie à long terme — un réservoir interne est relié à l’anus, vous passez donc les selles de la façon habituelle. Cela nécessite généralement deux ou trois opérations, et la plupart des gens ont une iléostomie temporaire pendant quelques mois entre les deux. Une fois en place, les selles sont plus molles et vous allez plus souvent, généralement cinq à dix fois par jour, en s’ajustant avec le temps.",
+                                    "2": "Une iléostomie continentale, comme une poche de Kock, possède une petite stomie de rinçage et un réservoir interne fait du petit intestin. Il n’y a pas de poche à porter — vous la videz avec un cathéter, généralement deux à quatre fois par jour, et vous couvrez la stomie avec un bouchon ou une gaze entre les vidages.",
+                                    "3": "Une Mitrofanoff est une opération différente, pour l’urine plutôt que pour les selles. Un canal étroit, généralement formé à partir de l’appendice, relie votre vessie à une petite stomie, et vous insérez un cathéter pour la vider."
+                                },
+                                "heading": "Dérivations continentales, qui fonctionnent différemment",
+                                "note": "Les détournements de continent sont pris en charge de façon très différente d’un stomie conventionnelle. Les conseils concernant les pochettes, barrières et flanges ne s’appliquent pas à vous — mais ceux concernant l’alimentation, bien mâcher, liquides et sel restent pertinents. Une chose que ce site ne couvre pas : si votre cathéter ne passe pas, arrêtez plutôt que de persister, reposez-vous une heure puis essayez à nouveau, et consultez un professionnel de la santé le jour même si vous ne pouvez toujours pas drainer. Votre équipe chirurgicale et NSWOC sont les bonnes sources."
+                            }
+                        },
+                        "title": "Les dérivations moins courantes",
+                        "group": "Commencez ici",
+                        "note": "NSWOCC publie gratuitement des guides pour plusieurs de ces situations, notamment la jejunostomie et la gastrostomie, en anglais et en français. Ils sont accessibles via Everyday Liivving."
+                    },
+                    "3": {
+                        "title": "Mots que vous entendrez",
+                        "group": "Commencez ici",
+                        "sections": {
+                            "1": {
+                                "heading": "Votre équipement",
+                                "items": {
+                                    "1": "Appareil ou système de poche — l’ensemble complet : la barrière plus la poche",
+                                    "2": "Barrière, wafer ou plaque de base — la partie qui adhère à votre peau. Beaucoup de gens disent flange aussi, mais dans certains systèmes à deux pièces, flange désigne l’anneau en plastique qui clipse la poche. Si vous commandez, vérifiez ce que votre marque signifie.",
+                                    "3": "Convexité — une barrière qui se courbe vers l’extérieur, vers votre peau, au lieu de rester plate, pour faire ressortir une stomie plate ou rétractée ou pour lisser un pli. Elle existe en versions souples et fermes, avec différentes profondeurs. Utile pour certains abdomen, nuisible pour d’autres, c’est une évaluation plutôt qu’un achat."
+                                }
+                            },
+                            "2": {
+                                "heading": "Votre corps",
+                                "items": {
+                                    "1": "Peau péri-stomale — la peau autour de la stomie. Elle commence là où la stomie rencontre votre peau et absorbe tout ce que touche votre barrière, votre ruban ou votre ceinture.",
+                                    "2": "Sortie — ce qui sort de la stomie. Vous l’entendrez utilisé bien plus souvent que vous ne le pensez.",
+                                    "3": "Jonction muco-cutanée — l’endroit où la stomie rencontre votre peau."
+                                }
+                            },
+                            "3": {
+                                "heading": "Vos personnes",
+                                "items": {
+                                    "1": "NSWOC — Infirmière spécialisée en plaies, stomies et continence. La spécialiste canadienne en soins de stomie, et le terme utilisé à l’échelle nationale.",
+                                    "2": "Infirmière en thérapie stomiale ou infirmière en ostomie — le terme plus ancien pour le même rôle. Il apparaît encore dans certains documents officiels, y compris les règles du programme SAIL de la Saskatchewan.",
+                                    "3": "Société WOCN — l’organisation américaine, que vous rencontrerez dans le matériel publié aux États-Unis. Là-bas, l’infirmière est une WOC nurse, et une certifiée est une CWOCN."
+                                }
+                            }
+                        }
+                    },
+                    "4": {
+                        "title": "À pièce unique vs à deux pièces",
+                        "items": {
+                            "1": "À pièce unique : barrière et poche intégrées — simple et discret.",
+                            "2": "À deux pièces : la barrière reste en place pendant que vous changez la poche — flexible pour un vidage fréquent.",
+                            "3": "Votre NSWOC ou pharmacien peut vous aider à trouver la meilleure étanchéité pour votre corps."
+                        }
+                    },
+                    "5": {
+                        "title": "Confort de la peau",
+                        "items": {
+                            "1": "Nettoyez avec de l’eau tiède ; évitez les huiles, parfums et lotions sous la barrière.",
+                            "2": "Séchez complètement — une peau sèche adhère mieux qu’une peau humide.",
+                            "3": "Poudre, pâte, anneaux et lingettes sont des outils pour l’étanchéité et le confort — n’ajoutez que ce dont vous avez besoin."
+                        }
+                    },
+                    "6": {
+                        "title": "Sortie & motifs",
+                        "items": {
+                            "1": "Videz les pochettes drainables lorsqu’elles sont environ aux deux tiers ou à moitié pleines.",
+                            "2": "Les pochettes fermées sont remplacées selon les besoins tout au long de la journée.",
+                            "3": "Les changements complets du système se font souvent tous les quelques jours — ou plus tôt si vous ressentez une brûlure, des démangeaisons ou une fuite."
+                        }
+                    },
+                    "7": {
+                        "title": "Changements d’ajustement",
+                        "items": {
+                            "1": "Mesurez durant les premiers mois — la taille de la stomie peut changer à mesure que le gonflement se résorbe.",
+                            "2": "Une ouverture trop grande expose la peau ; trop petite peut blesser la stomie.",
+                            "3": "Visez un ajustement serré autour du bord de la stomie pour que la sortie tombe dans la poche, et non sur la peau."
+                        }
+                    },
+                    "8": {
+                        "title": "Quand demander de l’aide",
+                        "note": "Étape douce : parcourez Shop Ostomy Essentials pour barrières, pochettes et accessoires.",
+                        "items": {
+                            "1": "Fuites persistantes, rougeurs, douleurs ou peau qui ne guérit pas",
+                            "2": "Changements soudains dans la sortie, enflure ou usure de la barrière",
+                            "3": "Votre NSWOC est le guide clinique ; les pharmaciens en Ontario peuvent vous aider pour les questions de produits quotidiens via chat."
+                        }
+                    },
+                    "9": {
+                        "title": "Fuites et durée courte d’utilisation",
+                        "group": "Quand quelque chose ne va pas",
+                        "sections": {
+                            "1": {
+                                "heading": "Ce qui aide souvent",
+                                "items": {
+                                    "1": "Re-mesurez. La taille de la stomie change pendant plusieurs mois après la chirurgie, et une ouverture taillée pour la taille du mois dernier est une des causes les plus courantes de fuite.",
+                                    "2": "Vérifiez d’où commence la fuite — sous la barrière ou au bord. Elles indiquent des problèmes différents.",
+                                    "3": "Assurez-vous que la peau est complètement sèche avant de poser la barrière, et maintenez-la en place pour que la chaleur corporelle fixe le joint."
+                                }
+                            },
+                            "2": {
+                                "heading": "Quand appeler votre NSWOC",
+                                "note": "Fuites répétées ou pattern inexpliqué",
+                                "items": {
+                                    "1": "Peau qui n’a pas complètement guéri entre les changements",
+                                    "2": "Peau qui n’a pas complètement guéri entre les changements"
+                                }
+                            }
+                        }
+                    },
+                    "10": {
+                        "title": "Pancaking",
+                        "group": "Lorsque quelque chose ne va pas",
+                        "sections": {
+                            "1": {
+                                "heading": "Ce qui se passe",
+                                "items": {
+                                    "1": "Le film du sac adhère à lui-même, donc la sortie ne peut pas tomber du stomie et pousse sous la barrière à la place",
+                                    "2": "C'est plus fréquent avec un output plus épais et avec des filtres qui évacuent rapidement l'air"
+                                }
+                            },
+                            "2": {
+                                "heading": "Ce qui aide souvent",
+                                "note": "Si cela est constant, ou si votre output est devenu sensiblement plus épais qu'avant, mentionnez-le — cela vaut la peine d'y regarder plutôt que de contourner le problème.",
+                                "items": {
+                                    "1": "Une bouffée d'air dans le sac avant de le fermer",
+                                    "2": "Un déodorant lubrifiant, qui aide l'output à glisser vers le fond"
+                                }
+                            }
+                        }
+                    },
+                    "11": {
+                        "title": "Ballonnement et gaz",
+                        "group": "Lorsque quelque chose ne va pas",
+                        "sections": {
+                            "1": {
+                                "heading": "Ce qui aide souvent",
+                                "items": {
+                                    "1": "Les filtres se mouillent et cessent de fonctionner — c'est normal plutôt qu'une défaillance",
+                                    "2": "Les schémas de gaz se stabilisent souvent durant les premiers mois pendant que votre intestin s'ajuste",
+                                    "3": "Manger et boire plus lentement permet d'avaler moins d'air"
+                                }
+                            },
+                            "2": {
+                                "heading": "Quand appeler votre NSWOC",
+                                "note": "La nourriture influence le gaz différemment pour chacun, et les conseils post-chirurgie varient selon le type d'ostomie — c'est donc une conversation avec votre équipe ou un diététiste plutôt qu'une liste à suivre.",
+                                "items": {
+                                    "1": "Un changement soudain de gaz accompagné de douleur, ou une sortie qui s'arrête"
+                                }
+                            }
+                        }
+                    },
+                    "12": {
+                        "title": "Peau douloureuse, qui démange ou qui suinte",
+                        "group": "Lorsque quelque chose ne va pas",
+                        "sections": {
+                            "1": {
+                                "heading": "Veuillez ne pas faire d'autodiagnostic pour celui-ci",
+                                "items": {
+                                    "1": "L'irritation causée par l'output, une éruption fongique, une allergie de contact, et quelques conditions moins courantes se ressemblent presque à l'œil",
+                                    "2": "Ils ont des traitements opposés — le mauvais peut aggraver plusieurs d'entre eux"
+                                }
+                            },
+                            "2": {
+                                "heading": "Ce qui est sécuritaire à faire en attendant",
+                                "note": "Toute peau cassée, qui suinte, saigne, ou qui n'est pas encore guérie lors du prochain changement nécessite qu'un NSWOC l'examine — pas une recommandation de produit sur Internet.",
+                                "items": {
+                                    "1": "Garder la zone propre avec de l'eau tiède seulement — pas d'huiles, de lotions ou de produits parfumés sous la barrière",
+                                    "2": "Vérifier que l'ouverture n'est pas découpée plus grande que la stomie, ce qui expose la peau à l'output",
+                                    "3": "Prendre une photo avant votre rendez-vous, car la peau change entre les changements"
+                                }
+                            }
+                        }
+                    },
+                    "13": {
+                        "title": "Un output qui change",
+                        "group": "Lorsque quelque chose ne va pas",
+                        "sections": {
+                            "1": {
+                                "heading": "Pourquoi cela est plus important avec une iléostomie",
+                                "items": {
+                                    "1": "Une iléostomie libère plus de liquide et de sel, donc la déshydratation s'installe plus rapidement et de façon moins évidente que ce que l'on pense",
+                                    "2": "La soif n'est pas un signe fiable précocement — une urine foncée, des maux de tête, et une sensation de faiblesse viennent souvent en premier"
+                                }
+                            },
+                            "2": {
+                                "heading": "Quand appeler",
+                                "note": "Un output élevé est la principale raison pour laquelle les gens sont réadmis après une chirurgie d'ostomie. Il vaut la peine d'appeler tôt plutôt que d'attendre de voir.",
+                                "items": {
+                                    "1": "Une augmentation soutenue de l'output durant plus d'une journée",
+                                    "2": "Un output aqueux, en grande quantité, qui ne se stabilise pas",
+                                    "3": "Se sentir étourdi, confus, ou exceptionnellement faible en même temps"
+                                }
+                            }
+                        }
+                    },
+                    "14": {
+                        "title": "Une bosse autour de la stomie",
+                        "group": "Lorsque quelque chose ne va pas",
+                        "sections": {
+                            "1": {
+                                "heading": "Ce que c'est habituellement",
+                                "items": {
+                                    "1": "Une hernie parastomiale — le relâchement de la paroi abdominale autour de la stomie. C'est courant et ce n'est pas quelque chose que vous avez causé",
+                                    "2": "Elle modifie souvent la position de votre barrière, ce qui peut entraîner des fuites en même temps"
+                                }
+                            },
+                            "2": {
+                                "heading": "Quand appeler votre NSWOC",
+                                "note": "Les vêtements de soutien aident beaucoup de personnes, mais ils doivent être adaptés à la taille et à la hernie spécifique — en acheter un sans évaluation peut aggraver l'ajustement plutôt que de l'améliorer.",
+                                "items": {
+                                    "1": "Toute nouvelle bosse, ou un changement de forme de la zone autour de votre stomie"
+                                }
+                            }
+                        }
+                    },
+                    "15": {
+                        "title": "Vêtements & Confiance",
+                        "group": "Corps et vie",
+                        "items": {
+                            "1": "Les styles taille haute et les couches souples peuvent maintenir un sac en place et discret",
+                            "2": "Ceintures ou bandes de soutien pour les journées actives où vous souhaitez un maintien supplémentaire",
+                            "3": "Vous n'avez pas besoin de cacher votre poche — le confort et la préférence passent en premier"
+                        }
+                    },
+                    "16": {
+                        "title": "Voyage & Jours de travail",
+                        "group": "Corps et vie",
+                        "items": {
+                            "1": "Vide lorsque la poche est environ un tiers à la moitié pleine pour réduire le risque de fuite",
+                            "2": "Rangez les fournitures dans votre bagage à main — jamais seulement dans les valises enregistrées",
+                            "3": "Planifiez vos pauses toilette comme vous planifiez votre café : tôt et sans excuses"
+                        }
+                    },
+                    "17": {
+                        "title": "Intimité & aisance sociale",
+                        "group": "Corps et vie",
+                        "items": {
+                            "1": "Parlez de ce qui vous aide à vous sentir en sécurité — le moment, les vêtements ou un support de maintien",
+                            "2": "La confiance grandit avec une routine qui a déjà fonctionné à la maison",
+                            "3": "Votre rythme est le bon rythme"
+                        }
+                    },
+                    "18": {
+                        "title": "Repos & Routine",
+                        "group": "Corps et vie",
+                        "items": {
+                            "1": "Beaucoup préfèrent changer le matin, quand la production est souvent plus faible",
+                            "2": "Préparez vos fournitures comme une station avant de commencer",
+                            "3": "Ravitaillez avant d'être à court — la routine régulière évite le stress de dernière minute"
+                        }
+                    },
+                    "19": {
+                        "title": "Hernies, levage et votre centre",
+                        "group": "Corps et vie",
+                        "items": {
+                            "1": "Une hernie parastomale est une bosse à côté de la stomie, où la paroi abdominale s'est affaiblie et ce qui se trouve en dessous pousse à travers. C'est courant, et plus probable avec le temps. La vie quotidienne ordinaire ne la cause pas, mais ne pas fumer, maintenir un poids santé et éviter de forcer réduisent le risque.",
+                            "2": "Suivez les conseils de levage donnés par votre équipe chirurgicale, et demandez-leur de vous montrer comment soulever plutôt que seulement ce qu'il faut éviter. La paroi abdominale guérit encore dans les premières semaines, alors progressez doucement — la technique est plus importante qu'une limite de poids fixe.",
+                            "3": "Des exercices doux pour le centre et la respiration commencent généralement dans les premiers jours, et vous progressez à partir de là. Ce qui vous convient dépend autant de votre forme physique que de votre chirurgie — un physiothérapeute peut ajuster le rythme avec vous."
+                        },
+                        "note": "Beaucoup trouvent qu'un vêtement de soutien est confortable et rassurant, surtout si une hernie est déjà présente. Il est utile de savoir que le port de soutien n'a pas été prouvé pour prévenir une hernie — il sert au confort et à la confiance. Si vous en avez une, demandez à votre NSWOC de vous mesurer et de vous ajuster, car un vêtement trop serré peut limiter vos mouvements et votre respiration."
+                    },
+                    "20": {
+                        "title": "Reprendre une activité",
+                        "group": "Corps et vie",
+                        "items": {
+                            "1": "La marche commence généralement en premier et débute tôt. Tout ce qui dépasse nécessite une discussion sur le timing avec votre équipe chirurgicale",
+                            "2": "La natation est acceptable une fois que vos plaies sont complètement cicatrisées — votre poche est résistante à l'eau et, bien ajustée, conçue pour ne pas fuir. Changez-la bien avant de nager plutôt qu'à la dernière minute pour que l'adhésif puisse se fixer, et couvrez le filtre avec l'autocollant fourni",
+                            "3": "Les sports de contact méritent d'être mentionnés, car un protège-stomie protège contre un coup direct. La levée de poids lourds est une question séparée — un protège ne sert pas dans ce cas. La technique, la respiration lors de l'effort et une progression graduelle sont efficaces, et la plupart des gens reprennent ce qu'ils faisaient avant"
+                        },
+                        "note": "Ostomy Canada et les programmes de soutien du fabricant proposent tous deux des ressources d'activité, et de nombreux ostomates reprennent la course, la natation, la musculation et les sports d'équipe."
+                    }
+                },
+                "urgent": {
+                    "heading": "Certaines choses ne relèvent pas d'une question sur le site web",
+                    "intro": "La plupart des inquiétudes concernant la stomie peuvent attendre votre prochain rendez-vous avec votre NSWOC. Mais celles-ci ne peuvent pas. Consultez immédiatement un médecin si vous remarquez :",
+                    "action": "Allez au service d'urgence le plus proche ou appelez le 911. N'attendez pas un rappel, et ne tentez pas de diagnostiquer une stomie bleutée à la maison.",
+                    "signs": {
+                        "1": "Une stomie qui devient sombre, bleutée, violette ou qui est froide au toucher",
+                        "2": "Douleur abdominale sévère, ou vomissements sans sortie depuis plusieurs heures — cela peut indiquer une obstruction",
+                        "3": "Saignement abondant ou continu provenant de la stomie elle-même, pas seulement une petite tache lors du nettoyage",
+                        "4": "Fièvre, ou peau autour de la stomie chaude, rougeâtre, douloureuse et qui s'étend",
+                        "5": "Confusion, vertiges importants ou urine très foncée en même temps qu'une production élevée — signes de déshydratation importante"
+                    }
+                },
+                "citations": {
+                    "1": {
+                        "label": "RNAO — Soutenir les adultes qui anticipent ou vivent avec une ostomie (guide de bonnes pratiques)"
+                    },
+                    "2": {
+                        "label": "NSWOCC — guides gratuits pour les patients selon le type d'ostomie"
+                    },
+                    "3": {
+                        "label": "Wounds Canada — Prendre soin d'une personne avec une ostomie"
+                    }
+                },
+                "pharmacist": {
+                    "eyebrow": "Disponible en Ontario",
+                    "heading": "Demandez sans gêne",
+                    "body": "Vous n'êtes pas sûr si vous avez besoin d'un convex, d'un anneau ou d'un autre tampon ? Discutez avec un pharmacien en Ontario pendant les heures d'ouverture — jusqu'à 17 h, heure de l'Est. Pour des préoccupations cliniques concernant la stomie, votre NSWOC reste votre ressource principale.",
+                    "cta": "Parlez à un pharmacien"
+                },
+                "closing": {
+                    "heading": "Le confort est une compétence que vous développez",
+                    "body": "Savoir que votre stomie n'est pas un test — c'est une relation plus discrète avec l'ajustement, la peau et les produits qui méritent leur place sur votre étagère."
+                },
+                "governance": {
+                    "disclaimer": "Ceci est une information générale, pas un avis médical, et ne remplace pas une évaluation par votre NSWOC, chirurgien ou médecin. L'ajustement, la peau et le choix des produits dépendent de votre corps et de votre chirurgie — parlez à votre équipe de soins avant de modifier quoi que ce soit."
+                },
+                "title": "Faites connaissance avec votre stomie",
+                "heroBody": "Une éducation claire et bienveillante sur votre stomie — comment elle fonctionne, quels changements, et quoi faire si quelque chose ne va pas.",
+                "focus": "Le type de votre stomie, y compris les dérivations moins courantes, les termes que vous entendrez, le confort cutané, les modèles de sortie et les changements d’ajustement ; que faire en cas de fuite, pancaking, peau irritée, sortie élevée, hernie ; et les questions sur les vêtements, les voyages, l’intimité, l’activité et la routine qui accompagnent la vie avec votre corps.",
+                "vibe": "Clair, bienveillant, et démystifiant — une éducation sans surcharge.",
+                "nextLabel": "Alimentation & Digestion →",
+                "categoriesIntro": {
+                    "eyebrow": "Comprendre sans surcharge",
+                    "heading": "Connaître votre configuration",
+                    "body": "Un système de poche est une barrière cutanée (gaufrette/jupe) plus une poche. La compatibilité et la santé de la peau influencent plus le confort que tout le reste."
+                }
             }
         },
         "funding": {
