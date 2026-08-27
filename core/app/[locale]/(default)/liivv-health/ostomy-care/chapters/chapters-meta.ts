@@ -96,9 +96,32 @@ export const CHAPTER_META: ChapterMeta[] = [
     ],
   },
   {
-    slug: 'food-and-digestion',
+    slug: 'finding-your-fit',
     num: '03',
     chapterWord: 'three',
+    heroImage: `${IMG}/door-shop.png`,
+    accent: '#7c8ba1',
+    categoryImages: [
+      `${IMG}/care-chat-desk.png`,
+      `${IMG}/door-shop.png`,
+      `${IMG}/door-care.png`,
+      `${IMG}/door-chapters.png`,
+      `${IMG}/care-chat-main.png`,
+      `${IMG}/care-chat-moment.png`,
+    ],
+    pharmacistImage: `${IMG}/care-chat-main.png`,
+    pharmacistHref: PHARMACIST_HREF,
+    resourceLinks: [],
+    citationHrefs: [
+      'https://www.nswoc.ca/guides',
+      'https://rnao.ca/bpg/guidelines/ostomy',
+      'https://www.ostomycanada.ca/',
+    ],
+  },
+  {
+    slug: 'food-and-digestion',
+    num: '04',
+    chapterWord: 'four',
     heroImage: `${IMG}/door-care.png`,
     accent: '#b08968',
     categoryImages: [
@@ -122,8 +145,8 @@ export const CHAPTER_META: ChapterMeta[] = [
   },
   {
     slug: 'everyday-liivving',
-    num: '04',
-    chapterWord: 'four',
+    num: '05',
+    chapterWord: 'five',
     heroImage: `${IMG}/chapter-everyday.png`,
     accent: '#8ea78b',
     categoryImages: [

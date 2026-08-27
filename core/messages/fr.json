@@ -2282,6 +2282,149 @@
                     "heading": "Connaître votre configuration",
                     "body": "Un système de poche est une barrière cutanée (gaufrette/jupe) plus une poche. La compatibilité et la santé de la peau influencent plus le confort que tout le reste."
                 }
+            },
+            "finding-your-fit": {
+                "title": "Trouver votre ajustement",
+                "heroBody": "Comment mesurer, comment choisir entre les systèmes, et — surtout — quels accessoires valent la peine d’être achetés et lesquels ne régleront pas ce que vous essayez de corriger.",
+                "focus": "Mesurer, un seul morceau versus deux morceaux, plat versus convexe, et pourquoi ce n’est pas une décision auto-sélective, ce que chaque accessoire fait réellement, obtenir des échantillons gratuits avant de vous engager, et quand demander une évaluation.",
+                "vibe": "Simple et légèrement protecteur — le chapitre qui vous indique ce qu’il ne faut pas acheter.",
+                "categoriesIntro": {
+                    "eyebrow": "Avant de commander quoi que ce soit",
+                    "heading": "Presque tous les problèmes d’ajustement sont la barrière, pas les accessoires",
+                    "body": "Les gens arrivent ici ayant acheté des anneaux, des pâtes et des sprays pour résoudre une fuite qui était en réalité due à une ouverture trop grande. Commencez par la mesure et le système, et ajoutez des accessoires seulement une fois que ceux-ci sont corrects."
+                },
+                "categories": {
+                    "1": {
+                        "title": "Mesurez avant de commander",
+                        "group": "Commencez ici",
+                        "items": {
+                            "1": "Utilisez le guide de mesure fourni dans la boîte — tenez-le au-dessus du stomie et choisissez la forme et la taille les plus proches.",
+                            "2": "Coupez de façon à ce que l’ouverture soit proche du bord du stomie. Trop grande expose la peau à la sortie ; trop petite peut frotter ou blesser le stomie.",
+                            "3": "Tous les stomies ne sont pas rondes. Beaucoup sont ovales, et une barrière à découper pour s’adapter peut être façonnée pour correspondre."
+                        },
+                        "note": "Re-mesurez régulièrement durant les premiers mois, et à nouveau après tout changement de poids ou une hernie. Une barrière découpée à une taille datant de deux mois est l’une des raisons les plus courantes pour lesquelles un système qui fonctionnait auparavant ne fonctionne plus soudainement."
+                    },
+                    "2": {
+                        "title": "Un seul morceau ou deux morceaux",
+                        "group": "Choisir un système",
+                        "sections": {
+                            "1": {
+                                "heading": "Ce qui tend à convenir à un système à un seul morceau",
+                                "items": {
+                                    "1": "Vous souhaitez le profil le plus discret sous les vêtements, et la routine la plus simple",
+                                    "2": "Votre peau est stable et vous ne changez pas la poche plus souvent que la barrière"
+                                }
+                            },
+                            "2": {
+                                "heading": "Ce qui tend à convenir à un système à deux morceaux",
+                                "items": {
+                                    "1": "Vous videz ou changez souvent la poche et préférez ne pas déranger la barrière à chaque fois",
+                                    "2": "Vous souhaitez alterner entre une poche fermée pour sortir et une poche drainable à la maison",
+                                    "3": "La reaching ou la dextérité est difficile, et faire les deux étapes séparément est plus facile"
+                                },
+                                "note": "Aucun n’est meilleur. Beaucoup de gens utilisent les deux — un à deux morceaux pour les jours de travail et un seul pour la natation, par exemple."
+                            }
+                        }
+                    },
+                    "3": {
+                        "title": "Plat ou convexe — veuillez demander avant de changer",
+                        "group": "Choisir un système",
+                        "items": {
+                            "1": "Une barrière plate convient à un stomie qui dépasse sur une peau raisonnablement plane, ce qui est le cas de la majorité des personnes.",
+                            "2": "La convexité se courbe vers votre peau pour aider un stomie plat ou rétracté à ressortir, ou pour lisser une dépression ou un pli que la sortie suit.",
+                            "3": "Elle existe en versions souples et fermes, avec différentes profondeurs, et la bonne dépend de votre abdomen, de votre stomie, et de la façon dont votre peau réagit sous pression."
+                        },
+                        "note": "C’est la seule décision de produit sur tout le site que nous préférerions que vous ne preniez pas seul. La convexité appliquée au mauvais abdomen peut causer une blessure de pression, et c’est une cause fréquente de dommages cutanés que vous n’aviez pas auparavant. Demandez à votre NSWOC de vous évaluer — la plupart vous laisseront essayer un avant d’acheter une boîte."
+                    },
+                    "4": {
+                        "title": "Ce que font réellement les accessoires",
+                        "group": "Accessoires",
+                        "sections": {
+                            "1": {
+                                "heading": "Pour l’étanchéité et la peau",
+                                "items": {
+                                    "1": "Anneaux et joints de barrière — malléables, ils comblent les petites dépressions et ajoutent une petite protection juste au bord du stomie.",
+                                    "2": "Pâte — pas de colle. C’est un remplissage pour les plis et la peau inégale. La plupart contiennent de l’alcool, donc cela peut piquer sur une peau abîmée.",
+                                    "3": "Poudre pour stomie — uniquement pour la peau qui saigne ou est abîmée, saupoudrée dessus et l’excès brossé. Elle ne doit pas être placée sous une barrière intacte sur une peau saine.",
+                                    "4": "Film ou lingettes protectrices — une fine couche protectrice entre l’adhésif et la peau, utile si le retrait irrite votre peau."
+                                }
+                            },
+                            "2": {
+                                "heading": "Pour le confort et la confiance",
+                                "items": {
+                                    "1": "Détachant pour adhésif — réduit la traction sur votre peau lors du retrait, ce qui est plus important plus vous changez souvent.",
+                                    "2": "Ceintures — ajoutent de la sécurité et sont parfois recommandées avec la convexité. Elles nécessitent une taille appropriée.",
+                                    "3": "Déodorant lubrifiant — aide la sortie à tomber au fond de la poche et contrôle l’odeur, ce qui aide aussi à éviter le pancaking."
+                                },
+                                "note": "Ce que aucun d’eux ne fait, c’est sauver une barrière de la mauvaise taille ou de la mauvaise forme pour vous. Si vous devez utiliser deux ou trois accessoires pour que un système reste en place, c’est que le système a un problème — c’est une évaluation d’ajustement, pas une liste d’achats."
+                            }
+                        }
+                    },
+                    "5": {
+                        "title": "Essayez-le avant d’acheter une boîte",
+                        "group": "Accessoires",
+                        "items": {
+                            "1": "Hollister, Coloplast et Convatec envoient tous des échantillons gratuits au Canada, que vous achetiez ou non chez eux, et peu importe la marque que vous utilisez actuellement.",
+                            "2": "Demandez un échantillon de tout ce que vous envisagez de changer — barrières, anneaux, produits convexes, ceintures.",
+                            "3": "Donnez à un nouveau produit quelques essais avant de décider. La première impression concerne souvent la familiarité plutôt que l’ajustement."
+                        },
+                        "note": "Leurs coordonnées se trouvent dans Everyday Liivving. Il n’y a aucune obligation, et c’est une façon beaucoup moins coûteuse de trouver ce qui fonctionne que d’acheter des boîtes complètes."
+                    },
+                    "6": {
+                        "title": "Quand demander une évaluation d’ajustement",
+                        "group": "Continuez à vérifier",
+                        "items": {
+                            "1": "Fuites qui ont commencé à apparaître alors qu’elles ne le faisaient pas auparavant",
+                            "2": "Changement de poids dans un sens ou dans l'autre, ce qui modifie la forme de la zone autour de votre stomie",
+                            "3": "Une nouvelle bosse, ou la peau autour de la stomie qui change de forme",
+                            "4": "Peau qui n’est pas complètement cicatrisée lors du prochain changement",
+                            "5": "Grossesse, ou toute chirurgie abdominale supplémentaire"
+                        },
+                        "note": "Une revue de l’ajustement fait partie normale des soins de stomie, et non une admission qu’il y a eu un problème. Les corps changent, et le système qui vous convenait l’année dernière pourrait simplement ne plus être adapté maintenant."
+                    }
+                },
+                "programsBand": {
+                    "heading": "L’ordre de travailler dessus",
+                    "cards": {
+                        "1": {
+                            "heading": "Mesurer d’abord",
+                            "body": "La plupart des fuites proviennent de l’ouverture plutôt que du produit. Re-mesurez avant de changer quoi que ce soit d’autre."
+                        },
+                        "2": {
+                            "heading": "Ensuite, le système",
+                            "body": "Pièce unique ou à deux pièces, plat ou convexe. C’est la décision qui détermine réellement si ça reste en place."
+                        },
+                        "3": {
+                            "heading": "Les accessoires durent plus longtemps",
+                            "body": "Ils améliorent un ajustement qui fonctionne déjà. Ils ne créent pas un ajustement, et en acheter plus ne règle que rarement une fuite."
+                        }
+                    }
+                },
+                "citations": {
+                    "1": {
+                        "label": "NSWOCC — guides pour vivre avec une stomie"
+                    },
+                    "2": {
+                        "label": "RNAO — Soutenir les adultes qui anticipent ou vivent avec une stomie"
+                    },
+                    "3": {
+                        "label": "Ostomy Canada Society — trouver un NSWOC et un soutien local"
+                    }
+                },
+                "pharmacist": {
+                    "eyebrow": "Disponible en Ontario",
+                    "heading": "Demandez avant d’acheter, pas après",
+                    "body": "Un pharmacien en Ontario peut vous aider à comprendre à quoi sert un produit, ce qui est disponible, et comment le commander, durant les heures d’ouverture jusqu’à 17 h, heure de l’Est. Si un certain barrière ou convexité convient à votre corps, c’est une évaluation, et cela appartient à votre NSWOC.",
+                    "cta": "Parlez à un pharmacien"
+                },
+                "closing": {
+                    "heading": "Un ajustement confortable est discret",
+                    "body": "Quand le système est bien adapté, vous n’y pensez plus, et c’est tout l’objectif. Y arriver demande généralement une conversation et quelques échantillons plutôt qu’une grande étagère de produits."
+                },
+                "governance": {
+                    "disclaimer": "Ceci est une information générale, pas un avis médical, et ce n’est pas un substitut à une évaluation par votre NSWOC. Le choix du produit — en particulier la convexité — dépend de votre abdomen, de votre stomie, et de la réaction de votre peau, et un mauvais choix peut causer des dommages. Parlez à votre équipe de soins avant de changer de système."
+                },
+                "nextLabel": "Alimentation & Digestion →"
             }
         },
         "funding": {

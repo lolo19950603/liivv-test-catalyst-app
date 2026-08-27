@@ -1580,7 +1580,7 @@
         "heroBody": "Clear, kind education about your stoma — how it works, what changes, and what to do when something is not right.",
         "focus": "Your stoma type including the less common diversions, the words you will hear, skin comfort, output patterns and fit changes; what to do when something is not right — leaks, pancaking, sore skin, high output, a hernia; and the clothing, travel, intimacy, activity and routine questions that come with living in your body.",
         "vibe": "Clear, kind, and demystifying — education without overwhelm.",
-        "nextLabel": "Food & Digestion →",
+        "nextLabel": "Finding Your Fit →",
         "categoriesIntro": {
           "eyebrow": "Understanding without overwhelm",
           "heading": "Know your setup",
@@ -1912,6 +1912,149 @@
         "governance": {
           "disclaimer": "This is general information, not medical advice, and it is not a substitute for assessment by your NSWOC, surgeon, or physician. Fit, skin, and product choices depend on your body and your surgery — talk to your care team before changing anything."
         }
+      },
+      "finding-your-fit": {
+        "title": "Finding Your Fit",
+        "heroBody": "How to measure, how to choose between systems, and — mostly — which accessories are worth buying and which will not fix what you are trying to fix.",
+        "focus": "Measuring, one-piece versus two-piece, flat versus convex and why that one is not a self-select decision, what each accessory actually does, getting free samples before you commit, and when to ask for a review.",
+        "vibe": "Plain and slightly protective — the chapter that tells you what not to buy.",
+        "categoriesIntro": {
+          "eyebrow": "Before you order anything",
+          "heading": "Almost every fit problem is the barrier, not the extras",
+          "body": "People arrive here having bought rings, pastes and sprays to solve a leak that was really about the opening being cut too big. Start with the measurement and the system, and add accessories only once those are right."
+        },
+        "categories": {
+          "1": {
+            "title": "Measure before you order",
+            "group": "Start here",
+            "items": {
+              "1": "Use the measuring guide that comes in the box — hold it over the stoma and pick the closest shape and size",
+              "2": "Cut so the opening sits close to the edge of the stoma. Too large exposes skin to output; too small can rub or injure the stoma",
+              "3": "Not all stomas are round. Many are oval, and a cut-to-fit barrier can be shaped to match"
+            },
+            "note": "Re-measure regularly for the first few months, and again after any weight change or a hernia. A barrier cut to a size from two months ago is one of the most common reasons a system that used to work suddenly does not."
+          },
+          "2": {
+            "title": "One-piece or two-piece",
+            "group": "Choosing a system",
+            "sections": {
+              "1": {
+                "heading": "What tends to suit a one-piece",
+                "items": {
+                  "1": "You want the lowest profile under clothes, and the simplest routine",
+                  "2": "Your skin is settled and you are not changing the pouch more often than the barrier"
+                }
+              },
+              "2": {
+                "heading": "What tends to suit a two-piece",
+                "items": {
+                  "1": "You empty or swap pouches often and would rather not disturb the barrier each time",
+                  "2": "You want to alternate between a closed pouch for going out and a drainable one at home",
+                  "3": "Reaching or dexterity is difficult, and doing the two steps separately is easier"
+                },
+                "note": "Neither is better. Plenty of people use both — a two-piece for workdays and a one-piece for swimming, for instance."
+              }
+            }
+          },
+          "3": {
+            "title": "Flat or convex — please ask before you switch",
+            "group": "Choosing a system",
+            "items": {
+              "1": "A flat barrier suits a stoma that protrudes onto reasonably even skin, which is most people",
+              "2": "Convexity curves toward your skin to help a flat or retracted stoma stand out, or to smooth a dip or crease that output keeps tracking into",
+              "3": "It comes in soft and firm versions and different depths, and the right one depends on your abdomen, your stoma, and how your skin behaves under pressure"
+            },
+            "note": "This is the one product decision on the whole site that we would rather you did not make alone. Convexity applied to the wrong abdomen can cause a pressure injury, and it is a common reason people end up with skin damage they did not have before. Ask your NSWOC to assess you — most will let you try one before you buy a box."
+          },
+          "4": {
+            "title": "What accessories actually do",
+            "group": "Accessories",
+            "sections": {
+              "1": {
+                "heading": "For sealing and skin",
+                "items": {
+                  "1": "Barrier rings and seals — mouldable, they fill small dips and add a little protection right at the stoma edge",
+                  "2": "Paste — not glue. It is a filler for creases and uneven skin. Most contain alcohol, so it can sting on broken skin",
+                  "3": "Stoma powder — for weepy, broken skin only, dusted on and the excess brushed off. It does not belong under an intact barrier on healthy skin",
+                  "4": "Barrier film or wipes — a thin protective layer between adhesive and skin, useful if removal is irritating your skin"
+                }
+              },
+              "2": {
+                "heading": "For comfort and confidence",
+                "items": {
+                  "1": "Adhesive remover — reduces the pulling on your skin at removal, which matters more the more often you change",
+                  "2": "Belts — add security and are sometimes recommended alongside convexity. They need sizing",
+                  "3": "Lubricating deodorant — helps output drop to the bottom of the pouch and controls odour, which also helps with pancaking"
+                },
+                "note": "What none of them do is rescue a barrier that is the wrong size or the wrong shape for you. If you are reaching for two or three accessories to make one system stay on, the system is the problem — that is a fit review, not a shopping list."
+              }
+            }
+          },
+          "5": {
+            "title": "Try it before you buy a box",
+            "group": "Accessories",
+            "items": {
+              "1": "Hollister, Coloplast and Convatec all send free samples in Canada, whether or not you buy from them, and regardless of which brand you currently use",
+              "2": "Ask for a sample of anything you are considering switching to — barriers, rings, convex products, belts",
+              "3": "Give a new product a few changes before deciding. First impressions are often about unfamiliarity rather than fit"
+            },
+            "note": "Their contact details are in Everyday Liivving. There is no obligation attached, and it is a much cheaper way to find what works than buying full boxes."
+          },
+          "6": {
+            "title": "When to ask for a fit review",
+            "group": "Keep checking",
+            "items": {
+              "1": "Leaks that have started happening when they were not before",
+              "2": "Weight change in either direction, which alters the shape of the area around your stoma",
+              "3": "A new bulge, or the skin around the stoma changing shape",
+              "4": "Skin that is not fully healed by the next change",
+              "5": "Pregnancy, or any further abdominal surgery"
+            },
+            "note": "A fit review is a normal part of ostomy care, not an admission that something has gone wrong. Bodies change, and the system that suited you last year may simply not be the right one now."
+          }
+        },
+        "programsBand": {
+          "heading": "The order to work through it",
+          "cards": {
+            "1": {
+              "heading": "Measure first",
+              "body": "Most leaks trace back to the opening rather than the product. Re-measure before you change anything else."
+            },
+            "2": {
+              "heading": "Then the system",
+              "body": "One-piece or two-piece, flat or convex. This is the decision that actually determines whether things stay on."
+            },
+            "3": {
+              "heading": "Accessories last",
+              "body": "They refine a fit that already works. They do not create one, and buying more of them rarely fixes a leak."
+            }
+          }
+        },
+        "citations": {
+          "1": {
+            "label": "NSWOCC — patient guides for living with an ostomy"
+          },
+          "2": {
+            "label": "RNAO — Supporting Adults Who Anticipate or Live with an Ostomy"
+          },
+          "3": {
+            "label": "Ostomy Canada Society — finding an NSWOC and local support"
+          }
+        },
+        "pharmacist": {
+          "eyebrow": "Available in Ontario",
+          "heading": "Ask before you buy, not after",
+          "body": "An Ontario pharmacist can help with what a product is for, what is available, and how to order it, during business hours until 5 p.m. Eastern. Whether a particular barrier or convexity suits your body is an assessment, and that belongs with your NSWOC.",
+          "cta": "Talk to a Pharmacist"
+        },
+        "closing": {
+          "heading": "A good fit is quiet",
+          "body": "When the system is right you stop thinking about it, and that is the whole goal. Getting there is usually a conversation and a couple of samples rather than a bigger shelf of products."
+        },
+        "governance": {
+          "disclaimer": "This is general information, not medical advice, and it is not a substitute for assessment by your NSWOC. Product choice — particularly convexity — depends on your abdomen, your stoma, and how your skin responds, and the wrong choice can cause harm. Talk to your care team before switching systems."
+        },
+        "nextLabel": "Food & Digestion →"
       },
       "food-and-digestion": {
         "title": "Food & Digestion",
@@ -2437,7 +2580,7 @@
         "resourcesHeading": "Where to go from here",
         "resourcesIntro": "These are run by patient organizations, specialist nurses, and government programs — not by Liivv. We link out because they do this better than a shop could.",
         "pathEyebrow": "Path",
-        "allChapters": "All four chapters",
+        "allChapters": "All five chapters",
         "keepGoing": "Keep going",
         "backToLanding": "Back to Ostomy Care page",
         "chapterNav": "Chapter navigation"

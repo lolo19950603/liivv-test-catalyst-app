@@ -115,6 +115,10 @@ const OSTOMY_CHAPTER_LINKS = [
     href: `${OSTOMY_CARE_PATH}/chapters/get-to-know-your-stoma`,
   },
   {
+    label: 'Finding Your Fit',
+    href: `${OSTOMY_CARE_PATH}/chapters/finding-your-fit`,
+  },
+  {
     label: 'Food & Digestion',
     href: `${OSTOMY_CARE_PATH}/chapters/food-and-digestion`,
   },
@@ -168,7 +172,15 @@ const OSTOMY_CARE_NAV: LiivvArchiveNavLink[] = [
     label: 'Ostomy Essentials',
     href: SHOP_OSTOMY_CARE_PATH,
   },
-  ...OSTOMY_CHAPTER_LINKS,
+  {
+    label: 'Chapters',
+    href: `${OSTOMY_CARE_PATH}#where-are-you`,
+    columns: [
+      {
+        links: [...OSTOMY_CHAPTER_LINKS],
+      },
+    ],
+  },
   {
     label: 'Funding & Coverage',
     href: OSTOMY_FUNDING_PATH,

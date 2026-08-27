@@ -634,7 +634,7 @@ export function OstomyCarePage({
         <div className="oc-wrap">
           <header className="oc-chapters-head">
             <span className="oc-eyebrow">Life chapters</span>
-            <h2>Four stories. Open the one that fits.</h2>
+            <h2>Five stories. Open the one that fits.</h2>
             <p>
               New to this, learning your stoma, working out food, or looking for support and
               funding — pick the chapter that feels like today. Already know the aisle?{' '}
