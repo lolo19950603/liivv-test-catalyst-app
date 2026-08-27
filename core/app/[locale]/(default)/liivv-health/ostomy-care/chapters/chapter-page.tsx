@@ -3,7 +3,7 @@
 import { useMessages, useTranslations } from 'next-intl';
 import type { CSSProperties } from 'react';
 
-import { DiscoveryBand, GovernanceBlock } from '../_components/page-furniture';
+import { DiscoveryBand, GovernanceBlock, HelpBand } from '../_components/page-furniture';
 
 import {
   buildChapters,
@@ -305,6 +305,8 @@ export function ChapterPage({ slug }: { slug: string }) {
           ) : null}
         </div>
       </section>
+
+      <HelpBand />
 
       <DiscoveryBand />
 

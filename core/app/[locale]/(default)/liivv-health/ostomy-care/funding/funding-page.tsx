@@ -15,7 +15,7 @@
 import { useMessages, useTranslations } from 'next-intl';
 import type { CSSProperties } from 'react';
 
-import { DiscoveryBand, GovernanceBlock } from '../_components/page-furniture';
+import { DiscoveryBand, GovernanceBlock, HelpBand } from '../_components/page-furniture';
 import { chapterHref, CLINICAL_REVIEWER, LANDING_HREF } from '../chapters/chapters-data';
 
 import { FundingChecker } from './funding-checker';
@@ -254,6 +254,8 @@ export function FundingPage() {
           </div>
         </div>
       </section>
+
+      <HelpBand />
 
       <DiscoveryBand />
 

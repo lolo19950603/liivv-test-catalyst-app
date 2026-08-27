@@ -901,3 +901,89 @@
   line-height: 1.6;
   color: color-mix(in srgb, var(--ink) 72%, var(--cream));
 }
+
+/*
+ * Persistent help band. Sits above the discovery band on every page — two of the
+ * three cards point away from Liivv on purpose.
+ */
+
+#oc-chapter .oc-ch-help {
+  padding: 2.75rem 0 calc(var(--ch-overlap) + 2.75rem);
+  background: color-mix(in srgb, var(--sand) 32%, var(--paper));
+}
+
+#oc-chapter .oc-ch-help h2 {
+  margin: 0.4rem 0 0.5rem;
+  font-family: var(--font-heading);
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+}
+
+#oc-chapter .oc-ch-help-lead {
+  margin: 0 0 1.4rem;
+  max-width: 62ch;
+  color: color-mix(in srgb, var(--ink) 78%, var(--cream));
+}
+
+#oc-chapter .oc-ch-help-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 0.9rem;
+}
+
+#oc-chapter .oc-ch-help-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  height: 100%;
+  padding: 1.15rem 1.25rem 1.25rem;
+  border-radius: 18px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+#oc-chapter .oc-ch-help-card:hover,
+#oc-chapter .oc-ch-help-card:focus-visible {
+  border-color: var(--sage-deep);
+  transform: translateY(-2px);
+}
+
+#oc-chapter .oc-ch-help-card:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 3px;
+}
+
+#oc-chapter .oc-ch-help-org {
+  font-size: 0.7rem;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sage-deep);
+}
+
+#oc-chapter .oc-ch-help-title {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+
+#oc-chapter .oc-ch-help-body {
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--ink) 74%, var(--cream));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #oc-chapter .oc-ch-help-card {
+    transition: none;
+  }
+
+  #oc-chapter .oc-ch-help-card:hover,
+  #oc-chapter .oc-ch-help-card:focus-visible {
+    transform: none;
+  }
+}

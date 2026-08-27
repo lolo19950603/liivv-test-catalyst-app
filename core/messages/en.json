@@ -2763,6 +2763,20 @@
         "closingHeading": "Money should not be the reason you ration supplies",
         "closingBody": "If the numbers are not working, that is worth saying out loud to your care team. There are usually more routes than people realise.",
         "closingCta": "Everyday Liivving →"
+      },
+      "help": {
+        "eyebrow": "Wherever you are in this",
+        "heading": "Two people worth finding",
+        "lead": "Most of what helps most is not a product. These are free, they are not run by us, and they are the two contacts people most often wish they had found sooner.",
+        "nswocTitle": "Find an NSWOC near you",
+        "nswocOrg": "NSWOCC",
+        "nswocBody": "The nurse specialists for stoma care in Canada. Many hospitals have one, and many see outpatients for life — fit, skin, and anything about the stoma itself belongs with them.",
+        "groupTitle": "Find a support group near you",
+        "groupOrg": "Ostomy Canada Society",
+        "groupBody": "Chapters and peer support across the country, searchable by distance from where you live. They also train peer visitors who have an ostomy themselves.",
+        "talkTitle": "Ask us an ordinary question",
+        "talkOrg": "Liivv",
+        "talkBody": "Ontario pharmacist chat for product and restock questions during business hours. Not a substitute for your NSWOC on anything clinical."
       }
     }
   }

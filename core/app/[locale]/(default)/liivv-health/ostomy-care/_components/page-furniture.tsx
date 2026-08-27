@@ -32,6 +32,74 @@ function formatReviewDate(iso: string) {
   });
 }
 
+const NSWOC_DIRECTORY = 'https://www.nswoc.ca/';
+const CHAPTER_FINDER = 'https://www.ostomycanada.ca/find-a-chapter-peer-support-group/';
+const PHARMACIST_HREF = '/account/virtual-care';
+
+/*
+ * Persistent utility, on every page rather than buried in one chapter.
+ *
+ * Research put finding an NSWOC and finding a local group as the two things
+ * people most often wish they had found sooner, and both were reachable only
+ * from deep inside Everyday Liivving. Two of the three cards deliberately send
+ * the reader somewhere that is not us.
+ */
+export function HelpBand() {
+  const t = useTranslations('OstomyCare.ui.help');
+
+  const cards = [
+    {
+      id: 'nswoc',
+      title: t('nswocTitle'),
+      org: t('nswocOrg'),
+      body: t('nswocBody'),
+      href: NSWOC_DIRECTORY,
+      external: true,
+    },
+    {
+      id: 'group',
+      title: t('groupTitle'),
+      org: t('groupOrg'),
+      body: t('groupBody'),
+      href: CHAPTER_FINDER,
+      external: true,
+    },
+    {
+      id: 'talk',
+      title: t('talkTitle'),
+      org: t('talkOrg'),
+      body: t('talkBody'),
+      href: PHARMACIST_HREF,
+      external: false,
+    },
+  ];
+
+  return (
+    <section className="oc-ch-help rounded-top">
+      <div className="oc-ch-wrap">
+        <span className="oc-ch-eyebrow">{t('eyebrow')}</span>
+        <h2>{t('heading')}</h2>
+        <p className="oc-ch-help-lead">{t('lead')}</p>
+        <ul className="oc-ch-help-grid">
+          {cards.map((c) => (
+            <li key={c.id}>
+              <a
+                className="oc-ch-help-card"
+                href={c.href}
+                {...(c.external ? { rel: 'noopener noreferrer', target: '_blank' } : {})}
+              >
+                <span className="oc-ch-help-org">{c.org}</span>
+                <span className="oc-ch-help-title">{c.title}</span>
+                <span className="oc-ch-help-body">{c.body}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 /*
  * The way out of the microsite. Someone who has read this far has already got
  * value, so this is the honest moment to mention Liivv covers more than one thing.

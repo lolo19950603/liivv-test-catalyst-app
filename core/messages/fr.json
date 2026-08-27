@@ -2763,6 +2763,20 @@
                 "lastReviewed": "Dernière révision {date}",
                 "sourcesHeading": "Origine de cette information",
                 "machineTranslated": "Cette page a été traduite automatiquement à partir de l’anglais. Si un passage semble étrange, ou si vous prenez une décision en vous y fiant, consultez la version anglaise ou parlez-en à votre infirmière ou infirmier stomothérapeute (NSWOC)."
+            },
+            "help": {
+                "eyebrow": "Où que vous soyez dans ceci",
+                "heading": "Deux personnes qu'il vaut la peine de connaître",
+                "lead": "La plupart de ce qui aide le plus n'est pas un produit. Ce sont gratuits, ils ne sont pas gérés par nous, et ce sont les deux contacts que les gens souhaitent le plus avoir trouvés plus tôt.",
+                "nswocTitle": "Trouver un NSWOC près de chez vous",
+                "nswocOrg": "NSWOCC",
+                "nswocBody": "Les infirmières spécialistes en soins de stomie au Canada. Plusieurs hôpitaux en ont une, et plusieurs voient des patients externes à vie — tout ce qui concerne la pose, la peau, et la stomie elle-même leur appartient.",
+                "groupTitle": "Trouver un groupe de soutien près de chez vous",
+                "groupOrg": "Ostomy Canada Society",
+                "groupBody": "Chapitres et soutien par les pairs à travers le pays, consultables selon la distance de votre lieu de résidence. Ils forment aussi des visiteurs par les pairs qui ont eux-mêmes une stomie.",
+                "talkOrg": "Liivv",
+                "talkBody": "Chat avec un pharmacien de l’Ontario pour des questions sur les produits et le réapprovisionnement pendant les heures d’ouverture. Ce n’est pas un substitut à votre NSWOC pour tout ce qui est clinique.",
+                "talkTitle": "Posez-nous une question ordinaire"
             }
         }
     }
