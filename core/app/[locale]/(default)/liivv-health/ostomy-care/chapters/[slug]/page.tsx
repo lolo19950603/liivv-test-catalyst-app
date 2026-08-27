@@ -54,7 +54,15 @@ function buildChapterSchema(
   locale: string,
 ): WithContext<MedicalWebPage> {
   const { governance } = chapter;
-  const reviewed = Boolean(governance.reviewedBy) && Boolean(governance.reviewedOn);
+
+  // Gated identically to the visible byline, including the English-only rule.
+  // This asserts clinical review machine-readably and indexably, so it must
+  // never outlive or overreach what the page itself says.
+  const reviewed =
+    Boolean(governance.name) &&
+    Boolean(governance.reviewedOn) &&
+    Boolean(governance.disclosure) &&
+    locale === 'en';
 
   return {
     '@context': 'https://schema.org',
@@ -79,7 +87,7 @@ function buildChapterSchema(
       lastReviewed: governance.reviewedOn,
       reviewedBy: {
         '@type': 'Person',
-        name: governance.reviewedBy,
+        name: governance.name,
         ...(governance.credential && { honorificSuffix: governance.credential }),
       },
     }),

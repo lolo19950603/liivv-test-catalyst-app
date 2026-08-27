@@ -987,3 +987,17 @@
     transform: none;
   }
 }
+
+/*
+ * Commercial disclosure. Same weight as the byline, directly beneath it —
+ * deliberately not footer small print.
+ */
+
+#oc-chapter .oc-ch-disclosure {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: color-mix(in srgb, var(--ink) 82%, var(--cream));
+  padding-left: 0.9rem;
+  border-left: 3px solid var(--sand);
+}

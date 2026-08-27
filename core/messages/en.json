@@ -2668,7 +2668,9 @@
         "reviewedBy": "Clinically reviewed by",
         "lastReviewed": "Last reviewed {date}",
         "sourcesHeading": "Where this comes from",
-        "machineTranslated": "This page was translated automatically from English. If anything reads oddly or you are making a decision based on it, check the English version or ask your NSWOC."
+        "machineTranslated": "This page was translated automatically from English. If anything reads oddly or you are making a decision based on it, check the English version or ask your NSWOC.",
+        "registration": "CNO registration #{number}",
+        "reviewedEnglishOnly": "The English version of this page was clinically reviewed by {name} on {date}. This French version is machine translated and has not been reviewed."
       },
       "checker": {
         "formLabel": "Find what your province covers",

@@ -636,8 +636,8 @@ export function OstomyCarePage({
             <span className="oc-eyebrow">Life chapters</span>
             <h2>Five stories. Open the one that fits.</h2>
             <p>
-              New to this, learning your stoma, working out food, or looking for support and
-              funding — pick the chapter that feels like today. Already know the aisle?{' '}
+              New to this, learning your stoma, working out food, or looking for support and funding
+              — pick the chapter that feels like today. Already know the aisle?{' '}
               <a href="#shop-ostomy-care">Skip to the shelf</a>.
             </p>
           </header>

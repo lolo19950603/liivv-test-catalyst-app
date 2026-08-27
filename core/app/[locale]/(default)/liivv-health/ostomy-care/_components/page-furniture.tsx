@@ -145,10 +145,27 @@ export function GovernanceBlock({
   const t = useTranslations('OstomyCare.ui.governance');
   const locale = useLocale();
 
-  // Byline is suppressed unless a named reviewer AND a valid date both exist, so
-  // an unreviewed page can never imply clinical sign-off it has not had.
+  /*
+   * Three gates, all of which must pass before a clinical byline appears.
+   *
+   * 1. A named reviewer and a valid review date — an unreviewed page must never
+   *    imply sign-off it has not had.
+   * 2. The commercial disclosure. A review credit on a page published by a
+   *    company that sells the products is a commercial relationship, so the
+   *    credit and the disclosure ship together or not at all.
+   * 3. English only. The reviewer reads the English; the French is machine
+   *    translated. Carrying her name across to text she has not read would
+   *    assert professional review of copy no reviewer has seen — the French
+   *    pages say the English version was reviewed instead.
+   */
   const reviewedOn = governance.reviewedOn ? formatReviewDate(governance.reviewedOn) : null;
-  const showByline = Boolean(governance.reviewedBy) && Boolean(reviewedOn);
+  const hasReviewer = Boolean(governance.name) && Boolean(reviewedOn);
+  const showByline = hasReviewer && Boolean(governance.disclosure) && locale === 'en';
+  const showTranslatedNote = hasReviewer && Boolean(governance.disclosure) && locale !== 'en';
+
+  const reviewerName = governance.credential
+    ? `${governance.name}, ${governance.credential}`
+    : governance.name;
 
   return (
     <section className="oc-ch-governance rounded-top">
@@ -158,14 +175,32 @@ export function GovernanceBlock({
             <p className="oc-ch-review">
               {t('reviewedBy')}{' '}
               <strong>
-                {governance.reviewedBy}
-                {governance.credential ? `, ${governance.credential}` : ''}
-              </strong>{' '}
+                {governance.registryUrl ? (
+                  <a href={governance.registryUrl} rel="noopener noreferrer" target="_blank">
+                    {reviewerName}
+                  </a>
+                ) : (
+                  reviewerName
+                )}
+              </strong>
+              {governance.registration
+                ? ` · ${t('registration', { number: governance.registration })}`
+                : ''}{' '}
               · {t('lastReviewed', { date: reviewedOn ?? '' })}
             </p>
           ) : null}
 
+          {showTranslatedNote ? (
+            <p className="oc-ch-review">
+              {t('reviewedEnglishOnly', { name: reviewerName, date: reviewedOn ?? '' })}
+            </p>
+          ) : null}
+
           {locale === 'en' ? null : <p className="oc-ch-machine">{t('machineTranslated')}</p>}
+
+          {governance.disclosure ? (
+            <p className="oc-ch-disclosure">{governance.disclosure}</p>
+          ) : null}
 
           <p className="oc-ch-disclaimer">{governance.disclaimer}</p>
 

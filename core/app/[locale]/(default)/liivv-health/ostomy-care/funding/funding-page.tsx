@@ -16,7 +16,12 @@ import { useMessages, useTranslations } from 'next-intl';
 import type { CSSProperties } from 'react';
 
 import { DiscoveryBand, GovernanceBlock, HelpBand } from '../_components/page-furniture';
-import { chapterHref, CLINICAL_REVIEWER, LANDING_HREF } from '../chapters/chapters-data';
+import {
+  chapterHref,
+  CLINICAL_REVIEWER,
+  COMMERCIAL_DISCLOSURE,
+  LANDING_HREF,
+} from '../chapters/chapters-data';
 
 import { FundingChecker } from './funding-checker';
 import { FEDERAL_LINKS } from './funding-data';
@@ -264,6 +269,7 @@ export function FundingPage() {
         governance={{
           ...CLINICAL_REVIEWER,
           reviewedOn: '',
+          disclosure: COMMERCIAL_DISCLOSURE,
           disclaimer: messages.OstomyCare.funding.governance.disclaimer,
         }}
       />

@@ -78,10 +78,17 @@ export interface UrgentCallout {
  * display a reviewer it does not have.
  */
 export interface Governance {
-  reviewedBy: string;
+  /** Register-exact name. Empty suppresses the byline entirely. */
+  name: string;
+  /** Only credentials actually held and documentable. */
   credential: string;
+  /** CNO registration number, shown so the byline is verifiable. */
+  registration: string;
+  registryUrl: string;
   /** ISO date (YYYY-MM-DD). */
   reviewedOn: string;
+  /** Commercial relationship. Rendered with the byline, never without it. */
+  disclosure: string;
   disclaimer: string;
 }
 
@@ -114,11 +121,40 @@ export interface Chapter {
   nextLabel: string;
 }
 
-/** Fill these in once, before publishing. Empty values suppress the byline. */
+/*
+ * The named clinical reviewer.
+ *
+ * Every field starts empty on purpose, including the credential. An earlier
+ * version shipped `credential: 'RN, NSWOC'` before anyone had been named, which
+ * is backwards: inappropriate use of a title is an enumerated act of
+ * professional misconduct in Ontario (O. Reg. 799/93 s.1 para 16), and NSWOC is
+ * a specific credential requiring graduation from a WCET-recognized program. It
+ * is not an adjective for "ostomy nurse". Publish only what the person holds and
+ * can document.
+ *
+ * `name` must match the College's public register exactly — no shortened first
+ * name, no invented seniority label. `registration` links the byline to Find a
+ * Nurse so the claim is verifiable rather than asserted.
+ *
+ * `disclosure` is required alongside the name: the byline does not render
+ * without it. A clinical-review credit on a page published by a company that
+ * sells the products is a commercial relationship, and the College's framing is
+ * avoidance and transparency rather than disclose-and-proceed.
+ */
 export const CLINICAL_REVIEWER = {
-  reviewedBy: '',
-  credential: 'RN, NSWOC',
+  name: '',
+  credential: '',
+  registration: '',
+  registryUrl: '',
 } as const;
+
+/*
+ * Fixed wording, deliberately not a free-text field. The second sentence —
+ * review is not endorsement — is the one a later copy edit would be most likely
+ * to soften, so it lives in code rather than in the message tree.
+ */
+export const COMMERCIAL_DISCLOSURE =
+  'Liivv sells ostomy supplies. Clinical review means the information on this page was checked for accuracy against published sources. It is not an endorsement of any product Liivv sells, and it is not a recommendation to buy from Liivv.';
 
 const LANDING = '/liivv-health/ostomy-care';
 
@@ -271,6 +307,7 @@ function composeChapter(meta: ChapterMeta, messages: ChapterMessages): Chapter {
     governance: {
       ...CLINICAL_REVIEWER,
       reviewedOn: '',
+      disclosure: COMMERCIAL_DISCLOSURE,
       disclaimer: messages.governance.disclaimer,
     },
     pharmacist: {
