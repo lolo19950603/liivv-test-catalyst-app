@@ -1421,211 +1421,6 @@
     },
     "OstomyCare": {
         "chapters": {
-            "everyday-liivving": {
-                "categories": {
-                    "1": {
-                        "title": "Le soutien entre pairs est une forme de soin à part entière",
-                        "group": "Commencez ici",
-                        "note": "Un visiteur pair n’est pas un substitut à votre NSWOC. La plupart des gens trouvent qu’ils veulent les deux.",
-                        "items": {
-                            "1": "Ostomy Canada Society gère des chapitres et groupes de soutien entre pairs à travers le pays, consultables selon la distance de votre lieu de résidence",
-                            "2": "Leur programme de visiteurs forme des personnes ayant une ostomie à parler avec celles qui en ont une tout juste créée — expérience vécue, pas conseil clinique",
-                            "3": "Si vous avez entre environ 20 et 40 ans, renseignez-vous sur les clubs sociaux Gutsy Gang — ils existent à Vancouver, Calgary, Saskatoon, Winnipeg, Hamilton, Toronto, et Niagara"
-                        }
-                    },
-                    "2": {
-                        "title": "Ce que la couverture ressemble réellement au Canada",
-                        "group": "Argent",
-                        "note": "Nous avons vérifié chaque province et territoire selon leur page gouvernementale — consultez Financement & Couverture pour voir ce que votre région paie, qui doit signer, et les dates qui peuvent poser problème.",
-                        "items": {
-                            "1": "Il n’y a pas de programme national pour l’ostomie. Le montant, le modèle, et qui l’approuve changent à la frontière provinciale.",
-                            "2": "Changer de province réinitialise tout — y compris les formulaires à remplir et qui doit les signer",
-                            "3": "Dans la plupart des provinces, une évaluation par un NSWOC est la porte d’entrée. Certaines, comme la Saskatchewan, n’acceptent pas du tout une auto-demande."
-                        }
-                    },
-                    "3": {
-                        "title": "Programmes qui ne vous coûtent rien",
-                        "group": "Argent",
-                        "items": {
-                            "1": "Les trois principaux fabricants proposent tous des programmes de soutien gratuits — échantillons, lignes téléphoniques, et accès à des infirmiers spécialisés en ostomie",
-                            "2": "Vous n’avez pas besoin d’acheter chez nous, ou chez eux, pour utiliser ces services",
-                            "3": "Ils vous aideront aussi à comprendre ce que votre province couvre, ce qui est souvent la façon la plus rapide d’obtenir une réponse"
-                        }
-                    },
-                    "4": {
-                        "items": {
-                            "1": "La Journée mondiale de l’ostomie a lieu tous les trois ans, pas chaque année — la dernière était le 4 octobre 2025, et la prochaine en 2028",
-                            "2": "Dans les années entre, le Canada marque toujours le premier samedi d’octobre, avec la campagne Step Up for Ostomy d’Ostomy Canada",
-                            "3": "Les chapitres organisent généralement des événements locaux — le localisateur de chapitres est le moyen le plus rapide de voir ce qui se passe près de chez vous"
-                        },
-                        "title": "Sensibilisation, sur le calendrier canadien",
-                        "group": "Communauté"
-                    },
-                    "5": {
-                        "title": "Histoires de personnes qui en ont une",
-                        "group": "Communauté",
-                        "items": {
-                            "1": "Lire quelqu’un décrire son premier mois vaut plus que n’importe quelle liste de vérification que nous pourrions rédiger",
-                            "2": "Nous recueillons des histoires de Canadiens ayant une ostomie — chirurgie, travail, voyage, rencontres, sport, tout cela",
-                            "3": "Si vous souhaitez partager la vôtre, informez l’équipe de soins et nous vous contacterons pour vous expliquer comment cela fonctionne"
-                        }
-                    }
-                },
-                "programsBand": {
-                    "heading": "Quatre façons dont les provinces paient — connaître la vôtre vous fait économiser de l’argent",
-                    "cards": {
-                        "1": {
-                            "heading": "Une subvention forfaitaire, versée directement à vous",
-                            "body": "L’Ontario et le Québec envoient un montant fixe chaque année et vous achetez vos fournitures. Si vous utilisez plus que ce que la subvention couvre, le dépassement vous appartient — et peut être déduit comme dépense médicale."
-                        },
-                        "2": {
-                            "heading": "Une participation en pourcentage",
-                            "body": "Colombie-Britannique, Alberta, Saskatchewan et Terre-Neuve couvrent une part, et vous payez le reste, souvent jusqu’à un plafond annuel. Les faibles revenus peuvent réduire votre part à rien."
-                        },
-                        "3": {
-                            "heading": "Fournitures remises à vous",
-                            "body": "Manitoba ne rembourse pas — le programme envoie les fournitures. Vous êtes inscrit via un NSWOC après la chirurgie plutôt que de faire la demande vous-même."
-                        },
-                        "4": {
-                            "heading": "Seulement si vous êtes admissible",
-                            "body": "Île-du-Prince-Édouard est basé sur le revenu. La Nouvelle-Écosse et le Nouveau-Brunswick classent par catégorie — aînés, assistance sociale ou programmes spécifiques — il n’y a donc pas de couverture générale à demander."
-                        }
-                    }
-                },
-                "resources": {
-                    "1": {
-                        "eyebrow": "Trouvez votre communauté",
-                        "heading": "Soutien déjà existant",
-                        "body": "Ce sont des organisations de patients et des infirmiers spécialistes, pas par nous. Ils sont gratuits, et ils sont meilleurs que n’importe quel détaillant.",
-                        "links": {
-                            "1": {
-                                "title": "Trouvez un chapitre ou un groupe de soutien par pairs",
-                                "org": "Ostomy Canada Society",
-                                "body": "Recherche par distance à partir de votre code postal, de 10 km jusqu’à 500 km. Liste aussi les clubs sociaux Gutsy Gang pour les jeunes adultes."
-                            },
-                            "2": {
-                                "title": "Programme pour visiteurs",
-                                "org": "Ostomy Canada Society",
-                                "body": "Visiteurs par pairs formés, eux-mêmes ostomisés. Demandé via votre chapitre local, généralement après une référence de votre chirurgien ou NSWOC."
-                            },
-                            "3": {
-                                "title": "Trouvez un NSWOC près de chez vous",
-                                "org": "NSWOCC",
-                                "body": "Infirmiers spécialisés en soins de plaies, ostomies et continence — les spécialistes cliniques pour les soins de stomie au Canada. Plusieurs hôpitaux en ont un; certains voient des patients externes à vie."
-                            },
-                            "4": {
-                                "title": "Camp pour jeunes",
-                                "org": "Ostomy Canada Society",
-                                "body": "Une semaine au Camp Horizon à Bragg Creek, Alberta, pour enfants et adolescents avec ostomies. Un financement partiel ou complet est disponible — demandez, ne supposez pas que le tarif est un obstacle."
-                            }
-                        }
-                    },
-                    "2": {
-                        "eyebrow": "Programmes gratuits",
-                        "heading": "Soutien des fabricants, en toute simplicité",
-                        "body": "Les trois sont gratuits et aucun ne vous oblige à acheter chez nous. Nous avons listé ce que chaque programme offre — pas pour dire quels produits sont meilleurs, ce qui ne nous regarde pas.",
-                        "links": {
-                            "1": {
-                                "title": "Secure Start",
-                                "org": "Hollister",
-                                "body": "Soutien personnalisé gratuit, peu importe la marque que vous utilisez, y compris l’aide pour naviguer dans la couverture. Ligne canadienne : 1-800-263-7421."
-                            },
-                            "2": {
-                                "title": "Coloplast Care",
-                                "org": "Coloplast",
-                                "body": "Soutien éducatif continu, accès téléphonique, échantillons, et l’application MyOstomy pour suivre les changements et la sortie. Soutien aux consommateurs : 1-866-293-6349."
-                            },
-                            "3": {
-                                "title": "me+",
-                                "org": "Convatec",
-                                "body": "Structuré selon le parcours — avant la chirurgie, juste après, et vivre avec une ostomie. Inclut des rendez-vous vidéo avec une infirmière ostomisée certifiée. 1-800-465-6302."
-                            }
-                        }
-                    },
-                    "3": {
-                        "eyebrow": "Argent",
-                        "heading": "Aide pour la couverture et les impôts",
-                        "body": "Montants et règles changent, et varient selon la province. Vérifiez toujours auprès de la source officielle avant de planifier en fonction d’un chiffre.",
-                        "links": {
-                            "1": {
-                                "title": "Programmes gouvernementaux provinciaux",
-                                "org": "Ostomy Canada Society",
-                                "body": "Le meilleur résumé public de ce que couvre chaque province et territoire, avec des liens vers les pages officielles des programmes."
-                            },
-                            "2": {
-                                "title": "Crédit d’impôt pour personnes handicapées (formulaire T2201)",
-                                "org": "Agence du revenu du Canada",
-                                "body": "De nombreux ostomates se qualifient dans la catégorie « éliminant ». L’approbation peut aussi débloquer le RDSP et d’autres crédits, alors cela vaut la peine de faire la paperasse."
-                            },
-                            "3": {
-                                "title": "Prestations de santé non assurées (NIHB)",
-                                "org": "Services aux Autochtones Canada",
-                                "body": "Couverture complète sans plafond annuel pour les Premières Nations enregistrées et Inuit reconnus. Cela remplace la voie provinciale plutôt que de la compléter."
-                            }
-                        }
-                    },
-                    "4": {
-                        "eyebrow": "En savoir plus",
-                        "heading": "Guides à télécharger",
-                        "body": "Rédigés par des infirmiers et organisations de patients, gratuits, et plus complets que tout ce qui se trouve sur cette page.",
-                        "links": {
-                            "1": {
-                                "title": "Vivre avec une iléostomie, une colostomie ou un conduit iléal",
-                                "org": "NSWOCC",
-                                "body": "Guides pour les patients rédigés par des cliniciens, un par type d’ostomie, y compris ceux moins couramment couverts — jéjunostomie, gastrostomie et gastro-jéjunostomie.",
-                                "note": "Anglais et français"
-                            },
-                            "2": {
-                                "title": "Nouveau Guide pour les Patients avec Ostomie",
-                                "org": "Associations d’Ostomie des États-Unis",
-                                "body": "Américain, donc les sections de financement ne s’appliquent pas ici — mais le contenu clinique et pratique est excellent et accessible gratuitement."
-                            },
-                            "3": {
-                                "title": "S’engager pour l’Ostomie",
-                                "org": "Société d’Ostomie du Canada",
-                                "body": "La campagne nationale de sensibilisation et de collecte de fonds qui se tient le premier samedi d’octobre au Canada."
-                            }
-                        }
-                    }
-                },
-                "title": "Vivre au quotidien avec Liivv",
-                "heroBody": "Les personnes, programmes, et aides financières qui existent au Canada — rassemblés en un seul endroit, pour que vous ne cherchiez pas seul.",
-                "focus": "Soutien entre pairs et groupes près de chez vous, ce que la couverture ressemble réellement province par province, programmes gratuits des fabricants, communauté pour les jeunes et jeunes adultes, et dates de sensibilisation.",
-                "vibe": "Pratique et connectée — la carte de tout ce qui se trouve en dehors de ce site web.",
-                "nextLabel": "Retour à Soins de l’ostomie →",
-                "categoriesIntro": {
-                    "eyebrow": "Vous n’êtes pas seul dans cette démarche",
-                    "heading": "Ce qui existe, et pour qui c’est destiné",
-                    "body": "Il existe beaucoup d’aide au Canada. Presque rien n’est regroupé en un seul endroit. Ce chapitre est la carte — la plupart des liens mènent ailleurs, car ces organisations le font mieux que nous."
-                },
-                "citations": {
-                    "1": {
-                        "label": "Société d’Ostomie du Canada — programmes gouvernementaux provinciaux"
-                    },
-                    "2": {
-                        "label": "Société d’Ostomie du Canada — subvention ADP en Ontario et pourquoi 975 $ par année ne suffisent pas"
-                    },
-                    "3": {
-                        "label": "Agence du revenu du Canada — Crédit d’impôt pour personnes handicapées, suppression de la catégorie"
-                    },
-                    "4": {
-                        "label": "Associations d’Ostomie des États-Unis — Journée mondiale de l’ostomie"
-                    }
-                },
-                "pharmacist": {
-                    "eyebrow": "Disponible en Ontario",
-                    "heading": "Questions d’ajustement qui ne nécessitent pas de salle d’attente",
-                    "body": "Questions sur l’ajustement, la réapprovisionnement et les préoccupations quotidiennes — discutez avec un pharmacien en Ontario pendant les heures d’ouverture (jusqu’à 17 h, heure de l’Est). Olivia aide pour le magasinage à tout moment; elle ne donne pas de conseils médicaux.",
-                    "cta": "Parlez à un pharmacien"
-                },
-                "closing": {
-                    "heading": "Vivre, pas gérer",
-                    "body": "L’aide existe. La plupart des gens ne découvrent tout simplement jamais qu’elle est là — c’est la seule raison pour laquelle cette page a été créée."
-                },
-                "governance": {
-                    "disclaimer": "Il s’agit d’informations générales, non de conseils médicaux, et cela ne remplace pas une évaluation par votre NSWOC, chirurgien ou médecin. Le choix de l’ajustement, de la peau et du produit dépend de votre corps et de votre chirurgie — parlez à votre équipe de soins avant de changer quoi que ce soit."
-                }
-            },
             "food-and-digestion": {
                 "title": "Alimentation & Digestion",
                 "categories": {
@@ -2425,6 +2220,283 @@
                     "disclaimer": "Ceci est une information générale, pas un avis médical, et ce n’est pas un substitut à une évaluation par votre NSWOC. Le choix du produit — en particulier la convexité — dépend de votre abdomen, de votre stomie, et de la réaction de votre peau, et un mauvais choix peut causer des dommages. Parlez à votre équipe de soins avant de changer de système."
                 },
                 "nextLabel": "Alimentation & Digestion →"
+            },
+            "everyday-liivving": {
+                "title": "Liivv au quotidien",
+                "categories": {
+                    "1": {
+                        "title": "Le soutien par les pairs est une forme de soin à part entière",
+                        "group": "Commencez ici",
+                        "note": "Un visiteur par les pairs ne remplace pas votre NSWOC. La plupart des gens souhaitent avoir les deux.",
+                        "items": {
+                            "1": "Ostomy Canada Society gère des chapitres et groupes de soutien par les pairs à travers le pays, consultables selon la distance de votre lieu de résidence",
+                            "2": "Leur Programme de Visiteurs forme des personnes ayant une ostomie pour parler avec celles qui viennent de subir une opération — expérience vécue, pas conseils cliniques",
+                            "3": "Si vous avez entre environ 20 et 40 ans, renseignez-vous sur les clubs sociaux Gutsy Gang — ils sont à Vancouver, Calgary, Saskatoon, Winnipeg, Hamilton, Toronto, et Niagara"
+                        }
+                    },
+                    "2": {
+                        "title": "Ce à quoi ressemble réellement la couverture en Canada",
+                        "group": "Argent",
+                        "note": "Nous avons vérifié chaque province et territoire selon leur page gouvernementale — voir Financement & Couverture pour connaître ce que votre région paie, qui doit signer, et les dates qui peuvent vous faire faux bond.",
+                        "items": {
+                            "1": "Il n’existe pas de programme national pour l’ostomie. Le montant, le modèle, et qui l’approuve changent à la frontière provinciale.",
+                            "2": "Changer de province réinitialise tout — y compris les formulaires à remplir et les signatures requises",
+                            "3": "Dans la plupart des provinces, une évaluation par un NSWOC est la porte d’entrée. Certaines, comme la Saskatchewan, n’acceptent pas du tout une auto-demande."
+                        }
+                    },
+                    "3": {
+                        "title": "Programmes qui ne vous coûtent rien",
+                        "group": "Argent",
+                        "items": {
+                            "1": "Les trois principaux fabricants proposent tous des programmes de soutien gratuits — échantillons, lignes téléphoniques, et accès à des infirmiers spécialisés en ostomie",
+                            "2": "Vous n’avez pas besoin d’acheter chez nous, ni chez eux, pour utiliser ces services",
+                            "3": "Ils vous aideront aussi à comprendre ce que votre province couvre, ce qui est souvent la façon la plus rapide d’obtenir une réponse"
+                        }
+                    },
+                    "4": {
+                        "title": "Sensibilisation, sur le calendrier canadien",
+                        "group": "Communauté",
+                        "items": {
+                            "1": "La Journée mondiale de l’ostomie a lieu tous les trois ans, pas chaque année — la dernière était le 4 octobre 2025, et la prochaine en 2028",
+                            "2": "Entre-temps, le Canada marque toujours le premier samedi d’octobre, avec la campagne Step Up for Ostomy d’Ostomy Canada",
+                            "3": "Les chapitres organisent généralement des événements locaux — le localisateur de chapitres est le moyen le plus rapide de voir ce qui se passe près de chez vous"
+                        }
+                    },
+                    "5": {
+                        "title": "Histoires de personnes qui en ont une",
+                        "group": "Communauté",
+                        "items": {
+                            "1": "Lire la première expérience de quelqu’un vaut plus qu’une liste de contrôle que nous pourrions écrire",
+                            "2": "Nous recueillons des histoires de Canadiens avec ostomie — chirurgie, travail, voyage, rencontres, sport, tout cela",
+                            "3": "Si vous souhaitez partager la vôtre, informez l’équipe de soins et nous vous contacterons pour vous expliquer comment cela fonctionne"
+                        }
+                    },
+                    "6": {
+                        "sections": {
+                            "1": {
+                                "heading": "Emballage",
+                                "items": {
+                                    "1": "Rangez vos fournitures dans votre bagage à main. La CATSA autorise les fournitures pour ostomie dans les bagages à main et en soute, alors divisez-les — suffisamment dans la cabine pour couvrir tout le voyage et un retard, et une réserve dans la soute. Ne laissez jamais la seule trousse dans la soute.",
+                                    "2": "Prenez environ le double de ce que vous pensez avoir besoin pour le voyage",
+                                    "3": "Coupez vos barrières à la taille avant de partir, pour qu’elles soient prêtes si vous devez changer en vol. Les ciseaux ne sont pas la raison — au Canada, les lames de 6 cm ou moins sont autorisées en cabine. La pré-coupe évite simplement de couper une barrière sur une table d’appoint, et les règles concernant les ciseaux sont plus strictes dans certains autres pays."
+                                }
+                            },
+                            "2": {
+                                "heading": "Sécurité",
+                                "items": {
+                                    "1": "La CATSA autorise les fournitures pour ostomie dans les bagages à main et en soute, vous ne devriez donc pas être refoulé pour les transporter — toutefois, la décision finale revient à l’agent de sécurité.",
+                                    "2": "Le fait d’être des fournitures médicales ne constitue pas une exemption automatique de la règle des liquides. Cette exemption couvre les médicaments sur ordonnance et essentiels non sur ordonnance, et la CATSA indique que les tubes de pâte pour ostomie doivent contenir 100 mL ou moins et voyager dans votre sac transparent d’1 L. Traitez de la même façon le dissolvant pour adhésif, le spray de barrière et le déodorant lubrifiant, ou emballez des formats complets en soute.",
+                                    "3": "Vous pouvez demander l’intimité. La CATSA indique que vous pouvez demander une salle de contrôle privée, et si une fouille physique ou un prélèvement est nécessaire, vous pouvez demander que cela soit effectué là. Il est utile d’informer l’agent que vous avez une poche d’ostomie, et où elle se trouve, avant le début du contrôle.",
+                                    "4": "Ostomy Canada publie une carte de communication pour voyageurs à imprimer, et Coloplast Care offre un certificat de voyage aux personnes inscrites à son programme. La carte de Convatec est conçue pour la sécurité aux États-Unis et son laissez-passer est un document britannique, vérifiez donc la version que vous recevez. Aucun de ces documents n’est une autorisation officielle — la carte sert simplement à éviter d’avoir à tout expliquer."
+                                },
+                                "note": "Les règles de contrôle changent et varient selon le pays. Vérifiez les consignes actuelles de la CATSA avant de prendre l’avion, et notez qu’elles concernent les vols au départ du Canada — pour le retour, vérifiez les règles du pays où vous décollez. Ce que la CATSA autorise dans votre bagage à main en quittant Toronto n’est pas garanti à votre retour."
+                            },
+                            "3": {
+                                "items": {
+                                    "1": "La pression en cabine diminue en vol, donc le gaz déjà dans la poche se dilate un peu. En pratique, l’effet est minime et une poche filtrée évacue la majorité de cette expansion — Ostomy Canada précise que la poche ne gonflera pas de façon dangereuse.",
+                                    "2": "Si votre poche gonfle lors d’un vol, la cause est généralement l’air avalé, les boissons gazeuses, les aliments qui produisent des gaz ou rester immobile pendant des heures. Ventilez-la ou videz-la et continuez votre chemin.",
+                                    "3": "Vide avant l'embarquement et à nouveau pendant le vol plutôt qu'attendre que cela devienne nécessaire. Une place côté couloir rend cela discret plutôt qu'un événement."
+                                },
+                                "heading": "En vol"
+                            }
+                        },
+                        "title": "Voyager avec des fournitures",
+                        "group": "Se déplacer au Canada"
+                    },
+                    "7": {
+                        "title": "Hiver, et pourquoi les choses cessent de coller.",
+                        "group": "Se déplacer au Canada.",
+                        "items": {
+                            "1": "L'adhésif fonctionne moins bien quand il fait froid. Une barrière qui a été dans une voiture froide ou sur un porche non chauffé ne collera pas aussi facilement.",
+                            "2": "Chauffez la barrière avant de l'appliquer — tenez-la entre vos paumes pendant une minute, ou glissez-la sous vos vêtements contre votre corps — puis pressez-la en place pendant une ou deux minutes. Utilisez uniquement la chaleur corporelle : pas un sèche-cheveux, un radiateur ou un micro-ondes. Trop de chaleur endommage l'adhésif, et comme la stomie n'a pas de terminaisons nerveuses, elle ne peut pas vous avertir si quelque chose est trop chaud.",
+                            "3": "Si votre durée de port diminue chaque hiver, commencez par la température de vos fournitures plutôt que votre peau — un barrier stockée ou transportée froide est une explication plus probable."
+                        },
+                        "note": "Rangez les fournitures de rechange à température ambiante — Ostomy Canada recommande environ 15 à 30°C — plutôt que dans un garage, un cabanon ou le coffre d'une voiture. Les instructions d'utilisation de Coloplast indiquent que le produit ne doit pas être stocké dans des conditions de gel. La chaleur pose aussi problème, donc évitez ces endroits autant en juillet qu'en janvier."
+                    },
+                    "8": {
+                        "title": "Chalet, camping et voyage en région isolée.",
+                        "group": "Se déplacer au Canada.",
+                        "items": {
+                            "1": "Trouvez la pharmacie la plus proche et combien de temps il faut pour y arriver — mais considérez-la comme une solution de secours, pas un plan. Les pharmacies ont une gamme limitée et il est peu probable qu'elles aient votre barrière et votre poche exactes.",
+                            "2": "Prenez au moins le double de ce dont vous avez besoin. Il n'y a pas de voyage où manquer de fournitures est un petit inconvénient.",
+                            "3": "Prévoyez l’élimination, et gardez le contenu et la poche séparés dans votre esprit. Le contenu va dans des toilettes si possible ; en pleine nature, traitez-les comme tout déchet humain — un cathole de 15 à 20 cm de profondeur, à au moins 60 m de l’eau, des sentiers et du camp, ou emportez-le avec vous si c’est la règle. La poche ne doit jamais aller dans une toilette : cela bloque la canalisation, et un système septique ou une fosse septique est beaucoup moins indulgent qu’un réseau municipal."
+                        },
+                        "note": "Si vous irriguez, réfléchissez bien avant de le faire dans un endroit sans eau courante. Une routine nécessite environ 500 à 1 000 mL d’eau tiède propre à boire, environ une heure à une toilette, et un endroit pour évacuer — et cela doit être répété tous les deux jours. L’eau froide cause des crampes, plus difficiles à gérer loin d’un robinet. Si vous ne boiriez pas l’eau, n’irriguez pas avec."
+                    },
+                    "9": {
+                        "title": "Commander au-delà des frontières provinciales.",
+                        "group": "Canada pratique.",
+                        "items": {
+                            "1": "Votre droit est déterminé par la province où vous vivez — vous êtes éligible via votre couverture provinciale, pas via la boutique. Cela ne signifie pas que vous pouvez acheter partout.",
+                            "2": "L’Ontario et le Québec versent un montant fixe chaque année, et c’est à vous de choisir le détaillant. La Saskatchewan remboursera les produits achetés dans une autre province si vous envoyez un reçu payé montrant ce que vous avez acheté.",
+                            "3": "L’Alberta fonctionne différemment : AADL exige que vous achetiez chez un fournisseur agréé en Alberta, ne finance pas les boutiques en ligne uniquement, et ne rembourse pas ceux qui achètent par eux-mêmes. Au Manitoba, vous n’achetez pas directement — les fournitures sont commandées via le programme provincial et expédiées de Winnipeg. En Colombie-Britannique, tout achat en ligne doit provenir d’un fournisseur autorisé par PharmaCare."
+                        },
+                        "note": "Vérifiez les règles de votre propre programme avant de commander hors province — y compris chez nous. Déménager dans une autre province est une situation totalement différente et réinitialise votre couverture ; voir la section Funding & Coverage."
+                    },
+                    "10": {
+                        "title": "Fournitures proposées par d’autres",
+                        "group": "Canada pratique.",
+                        "items": {
+                            "1": "Il existe des échanges de fournitures, notamment via des groupes Facebook comme Ostomy Supplies Exchange Canada, et certains trouvent ce dont ils ont besoin de cette façon. Ostomy Canada recommande aussi la prudence : une barrière adaptée à la stomie de quelqu’un d’autre, ou stockée de façon inadéquate, peut fuir ou endommager votre peau.",
+                            "2": "Vérifiez la date d’expiration, que l’emballage est intact et non ouvert, et que la taille correspond à ce que vous utilisez. Demandez aussi comment les fournitures ont été stockées — la chaleur et l’humidité raccourcissent la durée de vie d’une barrière adhésive bien avant sa date d’expiration imprimée.",
+                            "3": "N’acceptez rien dont l’emballage intérieur a été ouvert. La plupart des pochettes et barrières sont fournies non stériles, donc la raison est moins la stérilité que l’adhésif : une fois le sceau brisé, vous ne pouvez pas savoir combien de temps il a été exposé à l’air."
+                        },
+                        "note": "Les sections locales et groupes de soutien récupèrent souvent des surplus de fournitures et les distribuent aux membres qui en ont besoin. Friends of Ostomates Worldwide Canada collecte aussi des surplus, mais les expédie à des organisations partenaires à l’étranger plutôt qu’aux particuliers ici — ils indiquent ne pas pouvoir répondre aux demandes individuelles. Si vous faites un don, ils demandent que les articles restent dans leur emballage."
+                    }
+                },
+                "programsBand": {
+                    "heading": "Quatre modes de paiement selon la province — connaître le vôtre vous fait économiser de l’argent.",
+                    "cards": {
+                        "1": {
+                            "heading": "Une subvention forfaitaire, versée directement à vous.",
+                            "body": "L’Ontario et le Québec versent un montant fixe chaque année, et vous achetez vos fournitures. Si vous dépensez plus que la subvention, le surplus vous revient — et peut être déduit comme dépense médicale."
+                        },
+                        "2": {
+                            "heading": "Une participation au coût en pourcentage.",
+                            "body": "Colombie-Britannique, Alberta, Saskatchewan et Terre-Neuve couvrent une part, et vous payez le reste, souvent jusqu’à un plafond annuel. Les faibles revenus peuvent réduire votre part à zéro."
+                        },
+                        "3": {
+                            "heading": "Fournitures qui vous sont délivrées.",
+                            "body": "Le Manitoba ne rembourse pas — le programme envoie les fournitures. Vous êtes inscrit via un NSWOC après la chirurgie, plutôt que de faire la demande vous-même."
+                        },
+                        "4": {
+                            "heading": "Seulement si vous êtes éligible.",
+                            "body": "Île-du-Prince-Édouard a un système basé sur le revenu. La Nouvelle-Écosse et le Nouveau-Brunswick classent par catégorie — aînés, assistance sociale ou programmes spécifiques — il n’y a donc pas de couverture générale à demander."
+                        }
+                    }
+                },
+                "resources": {
+                    "1": {
+                        "eyebrow": "Trouvez vos ressources.",
+                        "heading": "Soutien déjà existant.",
+                        "body": "Ce sont des organisations de patients et des infirmiers spécialistes, pas nous. Ils sont gratuits, et ils sont mieux que n’importe quel détaillant pour cela.",
+                        "links": {
+                            "1": {
+                                "title": "Trouvez une section ou un groupe de soutien par pairs.",
+                                "org": "Ostomy Canada Society.",
+                                "body": "Cherchez par distance à partir de votre code postal, de 10 km jusqu’à 500 km. La liste inclut aussi les clubs sociaux Gutsy Gang pour les jeunes adultes."
+                            },
+                            "2": {
+                                "title": "Programme pour visiteurs.",
+                                "org": "Ostomy Canada Society.",
+                                "body": "Des bénévoles formés, eux-mêmes ostomisés. Demandé via votre section locale, généralement après une recommandation de votre chirurgien ou NSWOC."
+                            },
+                            "3": {
+                                "title": "Trouvez un NSWOC près de chez vous.",
+                                "org": "NSWOCC.",
+                                "body": "Infirmiers spécialisés en plaies, stomies et continence — les spécialistes cliniques pour les soins de la stomie au Canada. Beaucoup d’hôpitaux en ont un ; certains voient des patients en consultation externe à vie."
+                            },
+                            "4": {
+                                "org": "Ostomy Canada Society.",
+                                "body": "Une semaine au Camp Horizon à Bragg Creek, Alberta, pour enfants et adolescents avec une stomie. Un financement partiel ou complet est disponible — demandez, ne supposez pas que le coût est un obstacle.",
+                                "title": "Camp de jeunesse"
+                            }
+                        }
+                    },
+                    "2": {
+                        "heading": "Support du fabricant, simplement comparé",
+                        "eyebrow": "Programmes gratuits",
+                        "body": "Les trois sont gratuits et aucun d’eux ne nécessite que vous achetiez chez nous. Nous avons indiqué ce que chaque programme offre — pas qui a les meilleurs produits, ce qui ne nous appartient pas de juger.",
+                        "links": {
+                            "1": {
+                                "title": "Démarrage sécurisé",
+                                "org": "Hollister",
+                                "body": "Soutien personnalisé gratuit, peu importe la marque que vous utilisez, y compris l’aide pour naviguer la couverture. Ligne canadienne : 1-800-263-7421."
+                            },
+                            "2": {
+                                "title": "Coloplast Care",
+                                "org": "Coloplast",
+                                "body": "Soutien éducatif continu, accès téléphonique, échantillons, et l’application MyOstomy pour suivre les changements et la production. Soutien aux consommateurs : 1-866-293-6349."
+                            },
+                            "3": {
+                                "title": "me+",
+                                "org": "Convatec",
+                                "body": "Structuré selon le parcours — avant la chirurgie, juste après, et en vivant avec une. Inclut des rendez-vous vidéo avec une infirmière certifiée en stomie. 1-800-465-6302."
+                            }
+                        }
+                    },
+                    "3": {
+                        "eyebrow": "Argent",
+                        "heading": "Aide pour la couverture et la fiscalité",
+                        "body": "Les montants et les règles changent, et varient selon la province. Vérifiez toujours auprès de la source officielle avant de planifier autour d’un chiffre.",
+                        "links": {
+                            "1": {
+                                "title": "Programmes gouvernementaux provinciaux",
+                                "org": "Société Ostomy Canada",
+                                "body": "Le meilleur résumé public de ce que couvre chaque province et territoire, avec des liens vers les pages officielles des programmes."
+                            },
+                            "2": {
+                                "title": "Crédit d’impôt pour personnes handicapées (formulaire T2201)",
+                                "org": "Agence du revenu du Canada",
+                                "body": "Plusieurs ostomates sont admissibles sous la catégorie « élimination ». L’approbation peut aussi débloquer le RSDP et d’autres crédits, donc cela vaut la peine de faire la paperasse."
+                            },
+                            "3": {
+                                "title": "Prestations de santé non assurées (NIHB)",
+                                "org": "Services aux Autochtones Canada",
+                                "body": "Couverture complète sans plafond annuel pour les Premières Nations enregistrées et Inuit reconnus. Cela remplace la voie provinciale plutôt que de la compléter."
+                            }
+                        }
+                    },
+                    "4": {
+                        "eyebrow": "En savoir plus",
+                        "heading": "Guides à télécharger",
+                        "body": "Rédigés par des infirmiers et des organismes de patients, gratuits, et plus complets que tout ce qui se trouve sur cette page.",
+                        "links": {
+                            "1": {
+                                "title": "Vivre avec une iléostomie, une colostomie ou un conduit iléal",
+                                "org": "NSWOCC",
+                                "body": "Guides pour patients rédigés par des cliniciens, un par type de stomie, y compris ceux moins couramment couverts — jéjunostomie, gastrostomie, et gastro-jéjunostomie.",
+                                "note": "Anglais et français"
+                            },
+                            "2": {
+                                "title": "Nouveau Guide pour les Patients en Ostomie",
+                                "org": "Associations d’Ostomy des États-Unis",
+                                "body": "Américain, donc les sections de financement ne s’appliquent pas ici — mais le contenu clinique et pratique est excellent et accessible gratuitement."
+                            },
+                            "3": {
+                                "title": "Soutenir l’ostomie",
+                                "org": "Société Ostomy Canada",
+                                "body": "La campagne nationale de sensibilisation et de collecte de fonds qui se tient le premier samedi d’octobre au Canada."
+                            }
+                        }
+                    }
+                },
+                "heroBody": "Les personnes, programmes et aides financières disponibles au Canada — rassemblés en un seul endroit, pour que vous ne cherchiez pas seul.",
+                "focus": "Soutien par les pairs et chapitres près de chez vous, à quoi ressemble réellement la couverture selon la province, programmes gratuits des fabricants, communauté de jeunes et jeunes adultes, dates de sensibilisation, et questions pratiques canadiennes — vol, hiver, télétravail, et commandes interprovinciales.",
+                "vibe": "Pratique et connecté — la carte vers tout ce qui se trouve en dehors de ce site web.",
+                "nextLabel": "Retour aux Soins d'ostomie →",
+                "categoriesIntro": {
+                    "eyebrow": "Vous n'êtes pas seul dans cette démarche",
+                    "heading": "Ce qui existe, et pour qui c'est destiné",
+                    "body": "Beaucoup d’aide de qualité existe au Canada. Presque aucune n’est regroupée en un seul endroit. Ce chapitre est la carte — la plupart des liens mènent ailleurs, car ces organisations le font mieux que nous."
+                },
+                "citations": {
+                    "1": {
+                        "label": "Société Ostomy Canada — programmes provinciaux"
+                    },
+                    "2": {
+                        "label": "Société Ostomy Canada — subvention ADP en Ontario et pourquoi 975 $ par année ne suffisent pas"
+                    },
+                    "3": {
+                        "label": "Agence du revenu du Canada — Crédit d’impôt pour personnes handicapées, catégorie élimination"
+                    },
+                    "4": {
+                        "label": "Associations d’Ostomy des États-Unis — Journée mondiale de l’ostomie"
+                    }
+                },
+                "pharmacist": {
+                    "eyebrow": "Disponible en Ontario",
+                    "heading": "Questions d’ajustement qui ne nécessitent pas de salle d’attente",
+                    "body": "Questions d’ajustement du produit, de réapprovisionnement, et préoccupations quotidiennes — discutez avec un pharmacien en Ontario pendant les heures d’ouverture (jusqu’à 17 h, heure de l’Est). Olivia aide pour le magasinage à tout moment ; elle ne donne pas de conseils médicaux.",
+                    "cta": "Parlez à un pharmacien"
+                },
+                "closing": {
+                    "heading": "Vivre, pas gérer",
+                    "body": "L’aide existe. La plupart des gens ne découvrent tout simplement jamais qu’elle est là — c’est la seule raison pour laquelle cette page a été créée."
+                },
+                "governance": {
+                    "disclaimer": "Ceci est une information générale, pas un avis médical, et ne remplace pas une évaluation par votre NSWOC, chirurgien ou médecin. Le choix du produit, de la peau, et de l’ajustement dépend de votre corps et de votre chirurgie — parlez à votre équipe de soins avant de changer quoi que ce soit."
+                }
             }
         },
         "funding": {

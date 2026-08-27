@@ -2224,7 +2224,7 @@
       "everyday-liivving": {
         "title": "Everyday Liivving",
         "heroBody": "The people, programs, and money help that exist in Canada — gathered in one place, so you are not searching alone.",
-        "focus": "Peer support and chapters near you, what coverage actually looks like province by province, free manufacturer programs, youth and young adult community, and awareness dates.",
+        "focus": "Peer support and chapters near you, what coverage actually looks like province by province, free manufacturer programs, youth and young adult community, awareness dates, and the practical Canadian questions — flying, winter, going remote, and ordering across provincial lines.",
         "vibe": "Practical and connecting — the map to everything outside this website.",
         "nextLabel": "Back to Ostomy Care →",
         "categoriesIntro": {
@@ -2279,6 +2279,78 @@
               "2": "We are collecting stories from Canadians with ostomies — surgery, work, travel, dating, sport, all of it",
               "3": "If you would like to share yours, tell the care team and we will be in touch about how it works"
             }
+          },
+          "6": {
+            "title": "Flying with supplies",
+            "group": "Getting around Canada",
+            "sections": {
+              "1": {
+                "heading": "Packing",
+                "items": {
+                  "1": "Pack your supplies in your carry-on. CATSA permits ostomy supplies in both carry-on and checked baggage, so split them — enough in the carry-on to cover the whole journey and a delay, and a backup set in the checked bag. Never let the only set be the one in the hold",
+                  "2": "Take roughly twice what you expect to need for the trip",
+                  "3": "Cut your barriers to size before you leave, so they are ready if you need to change on the plane. Scissors are not the reason — in Canada, blades of 6 cm or less are allowed in carry-on. Pre-cutting simply spares you cutting a barrier on a tray table, and scissors rules are tighter in some other countries"
+                }
+              },
+              "2": {
+                "heading": "Security",
+                "items": {
+                  "1": "CATSA permits ostomy supplies in both carry-on and checked baggage, so you should not be turned back for carrying them — though the final decision on any item rests with the screening officer",
+                  "2": "Being medical supplies is not a blanket exemption from the liquids rule. That exemption covers prescription and essential non-prescription medication, and CATSA states that ostomy paste tubes must be 100 mL or less and travel in your clear 1 L bag. Treat adhesive remover, barrier spray and lubricating deodorant the same way, or pack full sizes in checked baggage",
+                  "3": "You can ask for privacy. CATSA says you can request a private screening room, and if a physical search or a swab is needed you can ask for that to be done there. It helps to tell the officer you have an ostomy pouch, and roughly where it is, before screening starts",
+                  "4": "Ostomy Canada publishes a printable Traveller’s Communication Card, and Coloplast Care offers a travel certificate to people enrolled in its program. Convatec’s card is written for US screening and its travel pass is a UK document, so check which version you are getting. None of these is an official pass and CATSA does not require documentation — the card simply saves explaining"
+                },
+                "note": "Screening rules change and vary by country. Check CATSA’s current guidance before you fly, and note that it covers flights leaving Canada — for the return leg, check the rules where you are flying out of. What CATSA allows in your carry-on leaving Toronto is not a guarantee coming back."
+              },
+              "3": {
+                "heading": "In the air",
+                "items": {
+                  "1": "Cabin pressure falls in flight, so gas already in the pouch expands a little. In practice the effect is small and a filtered pouch vents most of it — Ostomy Canada is explicit that the pouch will not blow up",
+                  "2": "If your pouch does balloon on a flight, the cause is usually swallowed air, fizzy drinks, gassy food, or sitting still for hours. Vent or empty it and carry on",
+                  "3": "Empty before boarding and again during the flight rather than waiting for it to feel necessary. An aisle seat makes that discreet rather than an event"
+                }
+              }
+            }
+          },
+          "7": {
+            "title": "Winter, and why things stop sticking",
+            "group": "Getting around Canada",
+            "items": {
+              "1": "Adhesive works less well when it is cold. A barrier that has been in a cold car or an unheated porch will not bond as readily",
+              "2": "Warm the barrier before applying — hold it between your palms for a minute, or tuck it under your clothing against your body — then press it in place for a full minute or two. Use body heat only: not a hairdryer, radiator or microwave. Too much heat damages the adhesive, and because the stoma has no nerve endings it cannot warn you when something is too hot",
+              "3": "If your wear time drops every winter, start with the temperature of your supplies rather than your skin — a barrier stored or carried cold is the more likely explanation"
+            },
+            "note": "Store spare supplies somewhere room temperature — Ostomy Canada suggests roughly 15 to 30°C — rather than a garage, shed, or the trunk of a car. Coloplast’s instructions for use state the product must not be stored under freezing conditions. Heat is a problem too, so those same spots are worth avoiding in July as much as in January."
+          },
+          "8": {
+            "title": "Cottage, camping and going remote",
+            "group": "Getting around Canada",
+            "items": {
+              "1": "Find out where the nearest pharmacy is and how long it would take to reach — but treat it as a backup, not a plan. Pharmacies carry a limited range and are unlikely to stock your exact barrier and pouch",
+              "2": "Take at least double what you need. There is no version of this trip where running out is a minor inconvenience",
+              "3": "Plan disposal, and keep the contents and the pouch separate in your head. Contents go into a toilet where there is one; in the backcountry treat them as any human waste — a cathole 15 to 20 cm deep, at least 60 m from water, trails and camp, or packed out where that is the rule. The pouch itself never goes down a toilet: it blocks the line, and a septic system or holding tank is far less forgiving than a municipal one"
+            },
+            "note": "If you irrigate, think it through carefully before committing to somewhere without running water. A routine needs roughly 500 to 1,000 mL of lukewarm water clean enough to drink, about an hour at a toilet, and somewhere for the output to go — and it repeats every day or two. Cold water causes cramping, which is harder to manage away from a tap. If you would not drink the water, do not irrigate with it."
+          },
+          "9": {
+            "title": "Ordering across provincial lines",
+            "group": "Practical Canada",
+            "items": {
+              "1": "Your entitlement is set by the province you live in — you qualify through your provincial coverage, not through the store. That does not mean you can buy anywhere",
+              "2": "Ontario and Quebec pay a set amount and leave the choice of retailer to you. Saskatchewan will reimburse products bought in another province if you send a paid receipt showing what you purchased",
+              "3": "Alberta works differently: AADL requires you to buy from an approved Alberta vendor, does not fund online-only shops, and does not reimburse people who buy on their own. In Manitoba you do not buy at all — supplies are ordered through the provincial program and shipped from Winnipeg. In British Columbia, anything ordered online has to come from a PharmaCare-authorized provider"
+            },
+            "note": "Check your own program’s vendor rules before you order from out of province — including from us. Moving provinces is a different situation entirely and resets your coverage; that is in Funding & Coverage."
+          },
+          "10": {
+            "title": "Supplies people offer you",
+            "group": "Practical Canada",
+            "items": {
+              "1": "Supply exchanges exist, including Facebook groups such as Ostomy Supplies Exchange Canada, and some people do find what they need this way. Ostomy Canada also advises caution: a barrier that suited someone else’s stoma, or one stored badly, can leak or damage your skin",
+              "2": "Check the expiry date, that packaging is intact and unopened, and that the size matches what you use. Ask how the supplies were stored too — heat and damp shorten the life of an adhesive barrier well before its printed expiry",
+              "3": "Do not accept anything whose inner packaging has been opened. Most pouches and barriers are supplied non-sterile, so the reason is less about sterility than the adhesive: once the seal is broken you cannot tell how long it has been exposed to air"
+            },
+            "note": "Local chapters and support groups often take in surplus supplies and pass them to members who need them. Friends of Ostomates Worldwide Canada also collects surplus, but ships it to partner organizations overseas rather than to individuals here — it states it cannot support individual requests. If you are donating, it asks that items stay in their packaging."
           }
         },
         "programsBand": {
