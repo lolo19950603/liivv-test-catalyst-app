@@ -180,7 +180,7 @@ export const CHAPTERS: Chapter[] = [
         title: 'Who to Ask',
         image: `${IMG}/care-chat-main.png`,
         items: [
-          'WOC / NSWOC nurse — fit, skin, and clinical troubleshooting',
+          'NSWOC — a nurse specialized in wound, ostomy and continence care. Fit, skin, and clinical troubleshooting',
           'Surgeon or clinic — recovery and medical concerns',
           'Ontario pharmacist chat — everyday product and restock questions during business hours',
         ],
@@ -215,7 +215,7 @@ export const CHAPTERS: Chapter[] = [
     pharmacist: {
       eyebrow: 'Available in Ontario',
       heading: 'You do not have to figure the aisle alone',
-      body: 'Starting out can feel like a new language. Chat with an Ontario pharmacist during business hours for product questions — until 5 p.m. Eastern. Clinical concerns still belong with your WOC nurse or surgeon.',
+      body: 'Starting out can feel like a new language. Chat with an Ontario pharmacist during business hours for product questions — until 5 p.m. Eastern. Clinical concerns still belong with your NSWOC or surgeon.',
       cta: 'Talk to a Pharmacist',
       href: PHARMACIST_HREF,
       image: `${IMG}/care-chat-main.png`,
@@ -253,7 +253,7 @@ export const CHAPTERS: Chapter[] = [
     heroBody:
       'Clear, kind education about your stoma — how it works, what changes, and what to do when something is not right.',
     focus:
-      'Your stoma type, skin comfort, output patterns, fit changes, when to ask for help, and the clothing, travel, intimacy, and routine questions that come with living in your body.',
+      'Your stoma type, skin comfort, output patterns and fit changes; what to do when something is not right — leaks, pancaking, sore skin, high output, a hernia; and the clothing, travel, intimacy and routine questions that come with living in your body.',
     vibe: 'Clear, kind, and demystifying — education without overwhelm.',
     heroImage: `${IMG}/chapter-stoma.png`,
     accent: '#f3c7be',
@@ -279,7 +279,7 @@ export const CHAPTERS: Chapter[] = [
         items: [
           'One-piece: barrier and pouch are joined — simple and low-profile',
           'Two-piece: barrier stays while you change pouches — flexible for frequent emptying',
-          'Your WOC nurse or pharmacist can help you find what seals best for your body',
+          'Your NSWOC or pharmacist can help you find what seals best for your body',
         ],
       },
       {
@@ -315,9 +315,139 @@ export const CHAPTERS: Chapter[] = [
         items: [
           'Persistent leaks, redness, pain, or skin that will not heal',
           'Sudden changes in output, swelling, or how your barrier wears',
-          'Your WOC nurse is the clinical guide; Ontario pharmacists can help with everyday product questions in chat',
+          'Your NSWOC is the clinical guide; Ontario pharmacists can help with everyday product questions in chat',
         ],
         note: 'Soft next step: browse Shop Ostomy Essentials for barriers, pouches, and accessories.',
+      },
+      {
+        title: 'Leaks and short wear time',
+        image: `${IMG}/door-care.png`,
+        group: 'When something is not right',
+        sections: [
+          {
+            heading: 'What often helps',
+            items: [
+              'Re-measure. Stoma size changes for months after surgery, and an opening cut to last month’s size is the most common cause of a leak',
+              'Check where the leak starts — from under the barrier, or from the edge. They point at different problems',
+              'Make sure skin is completely dry before the barrier goes on, and hold it in place so body heat can set the seal',
+            ],
+          },
+          {
+            heading: 'When to call your NSWOC',
+            items: [
+              'Leaks more than occasionally, or a pattern you cannot explain',
+              'Skin that has not fully healed between changes',
+            ],
+            note: 'Repeated leaking usually means the fit is wrong, not that you are doing it wrong. Convexity, rings and pastes can all help — but which one depends on your abdomen and your stoma, so that is an assessment rather than a shopping decision. The wrong convexity can cause a pressure injury.',
+          },
+        ],
+      },
+      {
+        title: 'Pancaking',
+        image: `${IMG}/door-chapters.png`,
+        group: 'When something is not right',
+        sections: [
+          {
+            heading: 'What is happening',
+            items: [
+              'The pouch film sticks to itself, so output cannot drop away from the stoma and pushes up under the barrier instead',
+              'It is more common with thicker output and with filters that pull the air out quickly',
+            ],
+          },
+          {
+            heading: 'What often helps',
+            items: [
+              'A puff of air in the pouch before you close it',
+              'A lubricating deodorant, which helps output slide to the bottom',
+            ],
+            note: 'If it is constant, or your output has become noticeably thicker than it used to be, mention it — that is worth looking at rather than working around.',
+          },
+        ],
+      },
+      {
+        title: 'Ballooning and gas',
+        image: `${IMG}/door-shop.png`,
+        group: 'When something is not right',
+        sections: [
+          {
+            heading: 'What often helps',
+            items: [
+              'Filters do wet out and stop working — that is normal rather than a fault',
+              'Gas patterns often settle over the first months as your gut adjusts',
+              'Eating and drinking more slowly means swallowing less air',
+            ],
+          },
+          {
+            heading: 'When to call your NSWOC',
+            items: ['A sudden change in gas alongside pain, or output that stops'],
+            note: 'Food affects gas differently for everyone, and post-surgery advice differs by ostomy type — so this is a conversation with your team or a dietitian rather than a list to follow.',
+          },
+        ],
+      },
+      {
+        title: 'Sore, itchy, or weeping skin',
+        image: `${IMG}/care-chat-desk.png`,
+        group: 'When something is not right',
+        sections: [
+          {
+            heading: 'Please do not self-diagnose this one',
+            items: [
+              'Irritation from output, a fungal rash, a contact allergy, and a few less common conditions look almost identical to the eye',
+              'They have opposite treatments — the wrong one makes several of them worse',
+            ],
+          },
+          {
+            heading: 'What is safe to do meanwhile',
+            items: [
+              'Keep the area clean with warm water only — no oils, lotions, or fragranced products under the barrier',
+              'Check the opening is not cut larger than the stoma, which leaves skin exposed to output',
+              'Photograph it before your appointment, since skin changes between changes',
+            ],
+            note: 'Any skin that is broken, weeping, bleeding, or still not healed by the next change needs an NSWOC to look at it — not a product recommendation from the internet.',
+          },
+        ],
+      },
+      {
+        title: 'Output that changes',
+        image: `${IMG}/care-chat-moment.png`,
+        group: 'When something is not right',
+        sections: [
+          {
+            heading: 'Why it matters more with an ileostomy',
+            items: [
+              'An ileostomy puts out more fluid and more salt, so dehydration builds faster and less obviously than people expect',
+              'Thirst is not a reliable early sign — dark urine, headache, and feeling washed out often come first',
+            ],
+          },
+          {
+            heading: 'When to call',
+            items: [
+              'A sustained jump in output lasting more than a day',
+              'Watery, high-volume output that is not settling',
+              'Feeling dizzy, confused, or unusually weak alongside it',
+            ],
+            note: 'High output is the leading reason people are readmitted after ostomy surgery. It is worth phoning about early rather than waiting to see.',
+          },
+        ],
+      },
+      {
+        title: 'A bulge around the stoma',
+        image: `${IMG}/door-care.png`,
+        group: 'When something is not right',
+        sections: [
+          {
+            heading: 'What it usually is',
+            items: [
+              'A parastomal hernia — the abdominal wall weakening around the stoma. It is common and it is not something you caused',
+              'It often changes how your barrier sits, so leaks can start at the same time',
+            ],
+          },
+          {
+            heading: 'When to call your NSWOC',
+            items: ['Any new bulge, or a change in the shape of the area around your stoma'],
+            note: 'Support garments help many people, but they have to be sized and chosen for the specific hernia — buying one without an assessment can make the fit worse rather than better.',
+          },
+        ],
       },
       {
         title: 'Clothing & Confidence',
@@ -363,7 +493,7 @@ export const CHAPTERS: Chapter[] = [
     pharmacist: {
       eyebrow: 'Available in Ontario',
       heading: 'Ask without the awkward',
-      body: 'Not sure if you need convex, a ring, or a different wipe? Chat with an Ontario pharmacist during business hours — until 5 p.m. Eastern. For clinical stoma concerns, your WOC nurse remains your primary resource.',
+      body: 'Not sure if you need convex, a ring, or a different wipe? Chat with an Ontario pharmacist during business hours — until 5 p.m. Eastern. For clinical stoma concerns, your NSWOC remains your primary resource.',
       cta: 'Talk to a Pharmacist',
       href: PHARMACIST_HREF,
       image: `${IMG}/care-chat-main.png`,

@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type TransitionEvent } from 'react';
+import { type TransitionEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { HeroLoopVideo, RotatingHeroWord } from '~/components/health-hero';
+import { KitFlowDemo } from '~/components/kit-flow-demo/kit-flow-demo';
 import { OliviaHelpBand } from '~/components/olivia/olivia-help-band';
 import { GuestCategoryQuiz } from '~/components/onboarding/guest-category-quiz';
-import { KitFlowDemo } from '~/components/kit-flow-demo/kit-flow-demo';
 import { SpecializedSubscribe } from '~/components/specialized-subscribe/specialized-subscribe';
 
-import { CHAPTERS as CHAPTER_PAGES, SHOP_OSTOMY_HREF, chapterHref } from './chapters/chapters-data';
+import { CHAPTERS as CHAPTER_PAGES, chapterHref, SHOP_OSTOMY_HREF } from './chapters/chapters-data';
 import type { OcCatalog, OcCatalogItem } from './get-oc-catalog';
 import { NEW_JOURNEY_STARTER_KIT_ID } from './oc-ids';
 
@@ -62,11 +62,17 @@ const PATH_LINKS = [
   {
     num: '03',
     title: 'The chapters',
-    body: 'New to the journey, stoma basics, or the help that exists in Canada — open the story that fits today.',
+    body: 'New to the journey, stoma basics, or everyday living — open the story that fits today.',
     href: '#where-are-you',
   },
   {
     num: '04',
+    title: 'What is covered',
+    body: 'What your province pays toward supplies, who signs off, and the tax credits worth claiming.',
+    href: '/liivv-health/ostomy-care/funding',
+  },
+  {
+    num: '05',
     title: 'A kind answer',
     body: 'Ontario pharmacist chat for everyday product questions during business hours.',
     href: '#care',
@@ -94,7 +100,12 @@ const SHOP_ROOMS = [
 type ShopRoomId = (typeof SHOP_ROOMS)[number]['id'];
 
 const PREFERRED_BRANDS = ['Coloplast', 'Hollister', 'Convatec'] as const;
-const BRAND_POINTS = ['Pouches & barriers', 'Skin comfort', 'Belts, rings & paste', 'Discreet restock'];
+const BRAND_POINTS = [
+  'Pouches & barriers',
+  'Skin comfort',
+  'Belts, rings & paste',
+  'Discreet restock',
+];
 
 const KIT_FLOW_SEARCH_FALLBACKS = [
   'Barrier rings',
@@ -122,7 +133,8 @@ const VOICES = [
   {
     name: 'Casey',
     meta: 'Ottawa · ileostomy · restocker',
-    quote: 'My usuals show up like clockwork. Running-out panic feels like someone else’s story now.',
+    quote:
+      'My usuals show up like clockwork. Running-out panic feels like someone else’s story now.',
     image: `${IMG}/voice-2.png`,
   },
   {
@@ -134,7 +146,8 @@ const VOICES = [
   {
     name: 'Avery',
     meta: 'Mississauga · Liivv Ostomy regular',
-    quote: 'Skin was angry until the seal was right. Powder, ring, pharmacist chat — then quieter days.',
+    quote:
+      'Skin was angry until the seal was right. Powder, ring, pharmacist chat — then quieter days.',
     image: `${IMG}/voice-4.png`,
   },
 ] as const;
@@ -142,17 +155,25 @@ const VOICES = [
 function roomForProduct(product: OcCatalogItem): Exclude<ShopRoomId, 'all' | 'kits'> {
   const n = product.name.toLowerCase();
 
-  if (/1-piece|one-piece|1 piece|premier one-piece|pouchkins newborn|pouchkins drainable pediatric one|activelife/.test(n)) {
+  if (
+    /1-piece|one-piece|1 piece|premier one-piece|pouchkins newborn|pouchkins drainable pediatric one|activelife/.test(
+      n,
+    )
+  ) {
     return 'onePiece';
   }
 
-  if (/2-piece|two-piece|2 piece|new image two|sensura mio click|sensura click|natura 2|sur-fit/.test(n)) {
+  if (
+    /2-piece|two-piece|2 piece|new image two|sensura mio click|sensura click|natura 2|sur-fit/.test(
+      n,
+    )
+  ) {
     return 'twoPiece';
   }
 
   if (
     /barrier|flange|wafer|ring|paste|powder|flextend|flexwear|ceraplus|stomahesive|eakin/.test(n) &&
-    !/pouch/.test(n)
+    !n.includes('pouch')
   ) {
     return 'barriers';
   }
@@ -161,8 +182,10 @@ function roomForProduct(product: OcCatalogItem): Exclude<ShopRoomId, 'all' | 'ki
     return 'accessories';
   }
 
-  if (/pouch/.test(n)) {
-    return /1-piece|one-piece|premier one|assura 1|sensura 1|sensura light 1|activelife|pouchkins/.test(n)
+  if (n.includes('pouch')) {
+    return /1-piece|one-piece|premier one|assura 1|sensura 1|sensura light 1|activelife|pouchkins/.test(
+      n,
+    )
       ? 'onePiece'
       : 'twoPiece';
   }
@@ -174,16 +197,12 @@ function hasDisplayPrice(priceLabel?: string) {
   return Boolean(priceLabel && !/(\$|CA\$)?\s*0([.,]0+)?\b/i.test(priceLabel));
 }
 
-function KitsCarousel({
-  kits,
-  initialId,
-}: {
-  kits: OcCatalogItem[];
-  initialId?: number | null;
-}) {
+function KitsCarousel({ kits, initialId }: { kits: OcCatalogItem[]; initialId?: number | null }) {
   const startIndex = useMemo(() => {
     if (!initialId) return 0;
+
     const index = kits.findIndex((kit) => kit.entityId === initialId);
+
     return index >= 0 ? index : 0;
   }, [kits, initialId]);
 
@@ -204,13 +223,17 @@ function KitsCarousel({
 
   useLayoutEffect(() => {
     const viewport = viewportRef.current;
+
     if (!viewport) return;
 
     const measure = () => setViewportW(viewport.clientWidth);
+
     measure();
 
     const observer = new ResizeObserver(measure);
+
     observer.observe(viewport);
+
     return () => observer.disconnect();
   }, [count]);
 
@@ -234,6 +257,7 @@ function KitsCarousel({
     if (shift === 0) return;
 
     const dir = shift;
+
     setInstant(true);
     setActive((index) => (index + dir + count) % count);
     setShift(0);
@@ -286,7 +310,9 @@ function KitsCarousel({
               Customize this kit
             </a>
           ) : (
-            <span className="oc-btn oc-btn-solid oc-pack-feature-cta-ghost">Customize this kit</span>
+            <span className="oc-btn oc-btn-solid oc-pack-feature-cta-ghost">
+              Customize this kit
+            </span>
           )}
         </div>
       </>
@@ -309,8 +335,8 @@ function KitsCarousel({
       <button
         aria-hidden={Math.abs(offset) > 1 || undefined}
         aria-label={`Show ${kit.name}`}
-        className={`oc-pack-feature oc-kits-carousel-slide${isCenter ? ' is-center' : ' is-side'}${
-          offset < shift ? ' is-prev' : offset > shift ? ' is-next' : ''
+        className={`oc-pack-feature oc-kits-carousel-slide${isCenter ? 'is-center' : 'is-side'}${
+          offset < shift ? 'is-prev' : offset > shift ? 'is-next' : ''
         }`}
         disabled={shift !== 0}
         key={`${kit.entityId}-${offset}`}
@@ -348,7 +374,7 @@ function KitsCarousel({
           ref={viewportRef}
         >
           <div
-            className={`oc-kits-carousel-track${instant ? ' is-instant' : ''}`}
+            className={`oc-kits-carousel-track${instant ? 'is-instant' : ''}`}
             onTransitionEnd={handleTransitionEnd}
             style={{
               gap,
@@ -398,13 +424,11 @@ export function OstomyCarePage({
   const filteredShop = useMemo(() => {
     if (shopRoom === 'kits') return allKits.slice(0, 12);
     if (shopRoom === 'all') return shopProducts.slice(0, 12);
+
     return shopProducts.filter((p) => roomForProduct(p) === shopRoom).slice(0, 12);
   }, [allKits, shopProducts, shopRoom]);
 
-  const kitSearchPool = useMemo(
-    () => shopProducts.map((product) => product.name),
-    [shopProducts],
-  );
+  const kitSearchPool = useMemo(() => shopProducts.map((product) => product.name), [shopProducts]);
 
   return (
     <div id="ostomy-care">
@@ -424,7 +448,8 @@ export function OstomyCarePage({
               Care that stays <RotatingHeroWord className="oc-hero-word" words={HERO_WORDS} />
             </h1>
             <p>
-              Supplies, everyday living support, and kind guidance — so your routine feels like yours again.
+              Supplies, everyday living support, and kind guidance — so your routine feels like
+              yours again.
             </p>
             <div className="oc-hero-actions">
               <a className="oc-hero-cta" href="#where-are-you">
@@ -449,7 +474,7 @@ export function OstomyCarePage({
 
       <section
         aria-label="Why Liivv Ostomy Care"
-        className={`oc-trust${showGuestQuiz ? ' oc-trust--quiz' : ''}`}
+        className={`oc-trust${showGuestQuiz ? 'oc-trust--quiz' : ''}`}
       >
         <div className="oc-trust-track">
           {TRUST_ITEMS.map((item) => (
@@ -468,7 +493,7 @@ export function OstomyCarePage({
 
       <section
         aria-label="Ways into Ostomy Care"
-        className={`oc-path${showGuestQuiz ? ' rounded-top' : ''}`}
+        className={`oc-path${showGuestQuiz ? 'rounded-top' : ''}`}
         id="doors"
       >
         <div className="oc-wrap">
@@ -492,14 +517,18 @@ export function OstomyCarePage({
       </section>
 
       {hasKits ? (
-        <section aria-label="Ostomy curated kits" className="oc-packs rounded-top" id="build-your-kit">
+        <section
+          aria-label="Ostomy curated kits"
+          className="oc-packs rounded-top"
+          id="build-your-kit"
+        >
           <div className="oc-wrap">
             <header className="oc-packs-head">
               <span className="oc-eyebrow">Curated kits</span>
               <h2>Start curated. Finish as yours.</h2>
               <p>
-                Official kits from the Liivv Ostomy edit — open one, tune quantities, add what was missing, and
-                save it — or subscribe so the quiet restock keeps arriving.
+                Official kits from the Liivv Ostomy edit — open one, tune quantities, add what was
+                missing, and save it — or subscribe so the quiet restock keeps arriving.
               </p>
             </header>
 
@@ -520,7 +549,11 @@ export function OstomyCarePage({
       ) : null}
 
       {hasShop ? (
-        <section aria-label="Ostomy Essentials" className="oc-shop rounded-top" id="shop-ostomy-care">
+        <section
+          aria-label="Ostomy Essentials"
+          className="oc-shop rounded-top"
+          id="shop-ostomy-care"
+        >
           <div className="oc-wrap">
             <div className="oc-shop-head">
               <div>
@@ -537,7 +570,7 @@ export function OstomyCarePage({
               {SHOP_ROOMS.map((room) => (
                 <button
                   aria-selected={shopRoom === room.id}
-                  className={`oc-filter${shopRoom === room.id ? ' is-active' : ''}`}
+                  className={`oc-filter${shopRoom === room.id ? 'is-active' : ''}`}
                   key={room.id}
                   onClick={() => setShopRoom(room.id)}
                   role="tab"
@@ -559,7 +592,9 @@ export function OstomyCarePage({
                     )}
                   </div>
                   <div className="oc-product-meta">
-                    {product.isKit ? <span className="oc-product-badge">Customizable kit</span> : null}
+                    {product.isKit ? (
+                      <span className="oc-product-badge">Customizable kit</span>
+                    ) : null}
                     <h3>{product.name}</h3>
                     {hasDisplayPrice(product.priceLabel) ? (
                       <p className="oc-product-price">{product.priceLabel}</p>
@@ -597,8 +632,8 @@ export function OstomyCarePage({
             <span className="oc-eyebrow">Life chapters</span>
             <h2>Three stories. Open the one that fits.</h2>
             <p>
-              New to this, learning your stoma, or looking for support and funding — pick the chapter that feels like today.
-              Already know the aisle?{' '}
+              New to this, learning your stoma, or looking for support and funding — pick the
+              chapter that feels like today. Already know the aisle?{' '}
               <a href="#shop-ostomy-care">Skip to the shelf</a>.
             </p>
           </header>
@@ -630,8 +665,9 @@ export function OstomyCarePage({
               <span className="oc-eyebrow">Available in Ontario</span>
               <h2>Fit questions that do not need a waiting room.</h2>
               <p>
-                Everyday product and restock questions — chat with an Ontario pharmacist during business hours
-                until 5 p.m. Eastern. Clinical concerns still belong with your WOC nurse or care team.
+                Everyday product and restock questions — chat with an Ontario pharmacist during
+                business hours until 5 p.m. Eastern. Clinical concerns still belong with your NSWOC
+                or care team.
               </p>
               <a className="oc-btn oc-btn-soft" href={PHARMACIST_HREF}>
                 Talk to a Pharmacist
@@ -653,8 +689,8 @@ export function OstomyCarePage({
             <span className="oc-eyebrow">Shop context</span>
             <h2>Names you already know.</h2>
             <p>
-              Listed so familiar systems are easy to find — not a clinical endorsement. Your WOC nurse remains
-              the guide for fit.
+              Listed so familiar systems are easy to find — not a clinical endorsement. Your NSWOC
+              remains the guide for fit.
             </p>
             <div className="oc-brand-row">
               {PREFERRED_BRANDS.map((brand) => (
@@ -680,7 +716,7 @@ export function OstomyCarePage({
           </header>
           <div className="oc-voice-stack">
             {VOICES.map((voice) => (
-              <article className={`oc-voice${voice.lead ? ' is-lead' : ''}`} key={voice.name}>
+              <article className={`oc-voice${voice.lead ? 'is-lead' : ''}`} key={voice.name}>
                 <img alt="" className="oc-voice-avatar" src={voice.image} />
                 <div>
                   <blockquote>&ldquo;{voice.quote}&rdquo;</blockquote>
@@ -701,40 +737,45 @@ export function OstomyCarePage({
             <h2>Quiet questions. Honest answers.</h2>
             <p>Practical notes — not medical advice.</p>
             <details open>
-              <summary>How often should I empty or change my pouch?</summary>
+              <summary>How often should I empty or change my ostomy pouch?</summary>
               <p>
-                Empty drainable pouches around one-third to one-half full. Full system changes are often every
-                few days — or sooner if you feel burning, itching, or a leak. Your WOC nurse can help you find a
-                wear time that fits.
+                Empty drainable pouches at around one-third to one-half full. Full system changes
+                are often every few days, or sooner if you feel burning, itching, or a leak. Your
+                NSWOC can help you find a wear time that suits your body — wear time varies a great
+                deal between people and is not something to judge yourself against.
               </p>
             </details>
             <details>
-              <summary>Can I customize a kit?</summary>
+              <summary>Can I customize an ostomy kit?</summary>
               <p>
-                Yes. Start curated, adjust quantities, add items, and save your version — or subscribe so the
-                restock keeps arriving.
+                Yes. Start from a curated kit, adjust the quantities, add anything that was missing,
+                and save your version — or subscribe so the restock keeps arriving on your own
+                schedule.
               </p>
             </details>
             <details>
-              <summary>How do subscriptions work?</summary>
+              <summary>How do ostomy supply subscriptions work?</summary>
               <p>
-                On a product page, choose Subscribe &amp; save, pick a frequency that matches your wear time,
-                then check out like any order. Skip a delivery when you still have extras — no charge, nothing
-                ships. Manage pause, skip, or cancel under Account → Subscriptions.
+                On a product page, choose Subscribe &amp; save, pick a frequency that matches your
+                wear time, then check out like any order. Skip a delivery when you still have extras
+                — no charge, nothing ships. Manage pause, skip, or cancel under Account →
+                Subscriptions.
               </p>
             </details>
             <details>
-              <summary>What belongs in a go-bag?</summary>
+              <summary>What belongs in an ostomy go-bag?</summary>
               <p>
-                Spare barrier and pouch, soft wipes, disposal bags, and any skin protectant or remover you use —
-                plus a spare underwear or liner if it helps you feel ready.
+                A spare barrier and pouch, soft wipes, disposal bags, and any skin protectant or
+                adhesive remover you use — plus spare underwear or a liner if that helps you feel
+                ready to be out.
               </p>
             </details>
             <details>
-              <summary>What can I chat with a pharmacist about?</summary>
+              <summary>What can I ask a pharmacist about my ostomy?</summary>
               <p>
-                Everyday product questions in Ontario during business hours (until 5 p.m. Eastern). Olivia helps
-                with shopping anytime — she does not give medical advice.
+                Everyday product and restock questions, in Ontario during business hours until 5pm
+                Eastern. Clinical concerns — fit, skin, and anything about the stoma itself — belong
+                with your NSWOC or surgeon rather than a pharmacist.
               </p>
             </details>
           </div>
@@ -749,20 +790,32 @@ export function OstomyCarePage({
           <span className="oc-eyebrow">The Liivv promise</span>
           <h2>No awkward aisle. Just everyday Liivving.</h2>
           <p>
-            Supplies that show up on time, guidance without overwhelm, and room for the rest of your life — at
-            your pace.
+            Supplies that show up on time, guidance without overwhelm, and room for the rest of your
+            life — at your pace.
           </p>
           <div className="oc-close-cta">
             <a className="oc-btn oc-btn-soft" href={SHOP_HREF}>
               Ostomy Essentials
             </a>
-            <a className="oc-btn oc-btn-ghost" href="#subscriptions" style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff' }}>
+            <a
+              className="oc-btn oc-btn-ghost"
+              href="#subscriptions"
+              style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff' }}
+            >
               Subscribe &amp; save
             </a>
-            <a className="oc-btn oc-btn-ghost" href="#build-your-kit" style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff' }}>
+            <a
+              className="oc-btn oc-btn-ghost"
+              href="#build-your-kit"
+              style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff' }}
+            >
               Browse curated kits
             </a>
-            <a className="oc-btn oc-btn-ghost" href="#where-are-you" style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff' }}>
+            <a
+              className="oc-btn oc-btn-ghost"
+              href="#where-are-you"
+              style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff' }}
+            >
               Open a chapter
             </a>
           </div>
