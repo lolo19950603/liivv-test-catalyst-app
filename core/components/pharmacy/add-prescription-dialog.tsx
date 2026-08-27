@@ -37,7 +37,7 @@ export function AddPrescriptionDialog({
   userFullName: string;
   supabaseReady: boolean;
 }) {
-  const [method, setMethod] = useState<'transfer' | 'fax' | 'photo'>('transfer');
+  const [method, setMethod] = useState<'transfer' | 'fax'>('transfer');
   const [transferType, setTransferType] = useState<'all' | 'specific'>('all');
   const [pharmacyName, setPharmacyName] = useState('');
   const [pharmacyPhone, setPharmacyPhone] = useState('');
@@ -158,7 +158,7 @@ export function AddPrescriptionDialog({
               Add prescription
             </h2>
             <p className="mt-1 text-sm text-[#6b6560]">
-              Transfer from your pharmacy, request a doctor fax, or upload a photo.
+              Transfer from your pharmacy or request a doctor fax.
             </p>
           </div>
           <button
@@ -184,7 +184,7 @@ export function AddPrescriptionDialog({
         ) : null}
 
         <div className="mt-4 inline-flex rounded-xl border border-[#ddd4c8] bg-[#f7f4ef] p-1 text-sm">
-          {(['transfer', 'fax', 'photo'] as const).map((id) => (
+          {(['transfer', 'fax'] as const).map((id) => (
             <button
               className={
                 method === id
@@ -195,7 +195,7 @@ export function AddPrescriptionDialog({
               onClick={() => setMethod(id)}
               type="button"
             >
-              {id === 'transfer' ? 'Transfer' : id === 'fax' ? 'Doctor fax' : 'Photo'}
+              {id === 'transfer' ? 'Transfer' : 'Doctor fax'}
             </button>
           ))}
         </div>
@@ -306,33 +306,6 @@ export function AddPrescriptionDialog({
           </div>
         ) : null}
 
-        {method === 'photo' ? (
-          <form action={formAction} className="mt-4 space-y-3">
-            <input name="intent" type="hidden" value="upload_prescription_photo" />
-            <label className="block text-sm">
-              <span className="font-medium text-[#2c2a26]">Prescription photo</span>
-              <span className="mt-1 block rounded-xl border border-dashed border-[#ddd4c8] bg-[#faf8f5] p-4">
-                <input
-                  accept="image/*"
-                  className="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-[#eef4ee] file:px-3 file:py-2 file:text-sm file:font-medium file:text-[#2d4a2d]"
-                  name="photo"
-                  required
-                  type="file"
-                />
-                <span className="mt-2 block text-xs text-[#8a8176]">
-                  JPG or PNG, up to 5 MB. Include the full prescription label.
-                </span>
-              </span>
-            </label>
-            <button
-              className="liivv-btn-primary inline-flex px-4 py-2.5 text-sm disabled:opacity-50"
-              disabled={isPending || !supabaseReady}
-              type="submit"
-            >
-              {isPending ? 'Uploading…' : 'Upload for review'}
-            </button>
-          </form>
-        ) : null}
       </div>
     </div>
   );

@@ -244,7 +244,7 @@ function StaffPrescriptionsSection({
   formAction,
 }: {
   profileId: string;
-  prescriptions: (PrescriptionRow & { photoDisplayUrl?: string | null })[];
+  prescriptions: PrescriptionRow[];
   formAction: (formData: FormData) => void;
 }) {
   return (
@@ -275,13 +275,6 @@ function StaffPrescriptionsSection({
                     {formatStaffStatusLabel(statusValue)}
                   </span>
                 </div>
-                {rx.photoDisplayUrl ? (
-                  <img
-                    alt=""
-                    className="mt-2 h-24 rounded border border-[#efe9e0] object-contain"
-                    src={rx.photoDisplayUrl}
-                  />
-                ) : null}
                 <form action={formAction} className="mt-2">
                   <input name="intent" type="hidden" value="prescription_set_status" />
                   <input name="profileId" type="hidden" value={profileId} />

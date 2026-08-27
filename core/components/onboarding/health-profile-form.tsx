@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link } from '~/components/link';
+import { OliviaCategoryMark } from './olivia-category-mark';
 import { OnboardingSubmitOverlay } from './onboarding-submit-overlay';
 import { OnboardingSectionHeader } from './onboarding-section-header';
 import { validateHealthProfileComplete } from '~/lib/onboarding/health-profile-form-validation';
@@ -827,9 +828,7 @@ export function HealthProfileForm({
                         {priority ?? '+'}
                       </span>
                       <div className="flex min-w-0 items-start gap-3">
-                        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#e8f0e4] text-xl">
-                          {option.imageEmoji ?? '💚'}
-                        </span>
+                        <OliviaCategoryMark categoryId={option.id} label="" size={40} />
                         <div>
                           <p className="text-sm font-medium text-[#2c2a26]">{option.label}</p>
                           {priority ? (
@@ -854,9 +853,7 @@ export function HealthProfileForm({
               */}
               <div className="space-y-6 px-5 py-6 sm:px-8 sm:py-7">
                 <div className="flex items-start gap-4">
-                  <div className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#e8f0e4] text-3xl">
-                    {currentCategoryDef.imageEmoji ?? '💚'}
-                  </div>
+                  <OliviaCategoryMark categoryId={currentCategoryDef.id} label="" size={56} />
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">
                       Category micro-step {microPageIdx} of {selectedCategories.length}

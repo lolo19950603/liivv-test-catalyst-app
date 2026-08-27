@@ -357,8 +357,7 @@ export function PharmacyDashboard({
             <div className="rounded-2xl border border-[#d8e4d8] bg-[#eef4ee] p-6 text-center sm:p-8">
               <p className="text-lg font-semibold text-[#2d4a2d]">No prescriptions yet</p>
               <p className="mx-auto mt-2 max-w-md text-sm text-[#5c564c]">
-                Transfer from any pharmacy in Canada, request a doctor fax, or upload a photo of your
-                prescription label.
+                Transfer from any pharmacy in Canada, or request a doctor fax.
               </p>
               <button
                 className="liivv-btn-primary mt-5 inline-flex items-center justify-center px-4 py-2.5 text-sm"
@@ -374,8 +373,7 @@ export function PharmacyDashboard({
                 <div>
                   <p className="font-medium text-[#2d4a2d]">Transfer your prescription</p>
                   <p className="mt-1 text-sm text-[#5c564c]">
-                    Transfer from any pharmacy in Canada, request a doctor fax, or upload a photo of
-                    your prescription label.
+                    Transfer from any pharmacy in Canada, or request a doctor fax.
                   </p>
                 </div>
                 <button
@@ -418,22 +416,7 @@ export function PharmacyDashboard({
 
                 return (
                   <article className={cardClass} key={rx.id}>
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-                      {rx.photoDisplayUrl ? (
-                        <img
-                          alt={`Prescription photo for ${rx.medicationName}`}
-                          className="h-28 w-full rounded-lg border border-[#efe9df] bg-[#faf8f5] object-contain sm:h-24 sm:w-28"
-                          src={rx.photoDisplayUrl}
-                        />
-                      ) : (
-                        <div
-                          aria-hidden
-                          className="flex h-28 w-full items-center justify-center rounded-lg border border-dashed border-[#ddd4c8] bg-[#faf8f5] text-xs text-[#9a928a] sm:h-24 sm:w-28"
-                        >
-                          No photo
-                        </div>
-                      )}
-                      <div className="min-w-0 flex-1">
+                    <div className="min-w-0">
                         <div className="flex flex-wrap items-start justify-between gap-2">
                           <h3 className="text-base font-bold text-[#2c2a26]">{rx.medicationName}</h3>
                           <span
@@ -460,7 +443,6 @@ export function PharmacyDashboard({
                             Start CarePack
                           </button>
                         ) : null}
-                      </div>
                     </div>
                   </article>
                 );

@@ -20,7 +20,6 @@ export type PrescriptionWritable = {
   status: string | null;
   approval_status: string | null;
   submission_method: string | null;
-  photo_url?: string | null;
   notes: string | null;
 };
 
@@ -43,7 +42,6 @@ export type PrescriptionRow = {
   status: string | null;
   approval_status: string | null;
   submission_method: string | null;
-  photo_url: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
@@ -459,18 +457,4 @@ export async function updateRefillRequestStatus(args: {
   }
 
   return { ok: true };
-}
-
-export async function listPrescriptionsByProfileIdWithSignedPhotos(
-  profileId: string,
-): Promise<(PrescriptionRow & { photoDisplayUrl: string | null })[]> {
-  const { getPrescriptionPhotoSignedUrl } = await import('~/lib/supabase/prescription-storage');
-  const rows = await listPrescriptionsByProfileId(profileId);
-
-  return Promise.all(
-    rows.map(async (row) => ({
-      ...row,
-      photoDisplayUrl: await getPrescriptionPhotoSignedUrl(row.photo_url),
-    })),
-  );
 }

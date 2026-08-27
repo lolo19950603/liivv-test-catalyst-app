@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 
-import { getStaffPortalData } from '~/app/staff/page-data';
+import { getStaffPortalData } from '~/app/bc-app/page-data';
 import { StaffPortalClient } from '~/components/staff/staff-portal-client';
 import {
   getBcAppAuthCallbackUrl,
@@ -88,7 +88,6 @@ export default async function BcAppPage({ searchParams }: Props) {
 
   const params = await searchParams;
   const data = await getStaffPortalData(params);
-  const embeddedUserEmail = access.kind === 'bc-app' ? access.userEmail : undefined;
 
   return (
     <Suspense fallback={<p className="p-8 text-sm text-[#6b6560]">Loading Liivv Staff…</p>}>
@@ -96,7 +95,7 @@ export default async function BcAppPage({ searchParams }: Props) {
         basePath="/bc-app"
         data={data}
         embedded
-        embeddedUserEmail={embeddedUserEmail}
+        embeddedUserEmail={access.userEmail}
       />
     </Suspense>
   );

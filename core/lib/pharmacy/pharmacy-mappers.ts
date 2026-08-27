@@ -13,7 +13,6 @@ export type PharmacyPrescription = {
   pharmacyName?: string | null;
   prescribingDoctor?: string | null;
   bucket: RxBucket;
-  photoDisplayUrl?: string | null;
 };
 
 export type PharmacyRefillRequest = {
@@ -76,10 +75,7 @@ export function normalizeBucket(row: PrescriptionRow): RxBucket {
   return 'pending';
 }
 
-export function mapPrescriptionRow(
-  row: PrescriptionRow,
-  photoDisplayUrl: string | null = null,
-): PharmacyPrescription {
+export function mapPrescriptionRow(row: PrescriptionRow): PharmacyPrescription {
   return {
     id: row.id,
     medicationName: row.medication_name,
@@ -91,7 +87,6 @@ export function mapPrescriptionRow(
     pharmacyName: row.pharmacy_name,
     prescribingDoctor: row.prescribing_doctor,
     bucket: normalizeBucket(row),
-    photoDisplayUrl,
   };
 }
 

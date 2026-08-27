@@ -28,6 +28,8 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - admin (admin panel)
+     * - staff (removed password portal; returns 404)
+     * - bc-app (BigCommerce embedded staff app)
      * - sitemap.xml (sitemap route)
      * - xmlsitemap.php (legacy sitemap route)
      * - robots.txt (robots route)

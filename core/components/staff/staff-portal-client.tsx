@@ -8,9 +8,8 @@ import {
   loadOlderStaffChatMessagesAction,
   staffPortalAction,
   type StaffActionState,
-} from '~/app/staff/_actions/staff-portal-actions';
-import { staffLogoutAction } from '~/app/staff/_actions/staff-auth-actions';
-import type { StaffPortalData } from '~/app/staff/page-data';
+} from '~/app/bc-app/_actions/staff-portal-actions';
+import type { StaffPortalData } from '~/app/bc-app/page-data';
 import { StaffCustomerDetail } from '~/components/staff/staff-customer-detail';
 import { formatStaffStatusLabel, staffStatusBadgeClass } from '~/components/staff/staff-status';
 import { ChatMessageBody } from '~/components/virtual-care/chat-message-body';
@@ -53,7 +52,7 @@ function portalHref(basePath: string, params: Record<string, string | undefined>
 
 export function StaffPortalClient({
   data,
-  basePath = '/staff',
+  basePath = '/bc-app',
   embedded = false,
   embeddedUserEmail,
 }: {
@@ -92,17 +91,10 @@ export function StaffPortalClient({
             <h1 className="text-xl font-semibold" style={{ color: forest }}>
               Pharmacy & care portal
             </h1>
-            {embedded && embeddedUserEmail ? (
+            {embeddedUserEmail ? (
               <p className="mt-1 text-sm text-[#6b6560]">Signed in as {embeddedUserEmail}</p>
             ) : null}
           </div>
-          {!embedded ? (
-            <form action={staffLogoutAction}>
-              <button className="text-sm font-medium text-[#6b6560] hover:underline" type="submit">
-                Sign out
-              </button>
-            </form>
-          ) : null}
         </div>
         <nav className="mx-auto flex max-w-7xl gap-2 px-4 pb-3">
           {(

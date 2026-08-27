@@ -22,7 +22,6 @@ import {
   listPrescriptionsByProfileId,
   listRefillRequestsByProfileId,
 } from '~/lib/supabase/prescriptions';
-import { getPrescriptionPhotoSignedUrl } from '~/lib/supabase/prescription-storage';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
 import { isVirtualCareBotEnabled } from '~/lib/virtual-care-bot/config';
 
@@ -71,11 +70,7 @@ export const getPharmacyPageData = cache(async (): Promise<PharmacyPageData | nu
   }
 
   const rows = await listPrescriptionsByProfileId(ensured.profile.id);
-  const prescriptions = await Promise.all(
-    rows.map(async (row) =>
-      mapPrescriptionRow(row, await getPrescriptionPhotoSignedUrl(row.photo_url)),
-    ),
-  );
+  const prescriptions = rows.map((row) => mapPrescriptionRow(row));
   const refillRows = await listRefillRequestsByProfileId(ensured.profile.id);
   const carepackRows = await listCarePackRequestsByProfileId(ensured.profile.id);
 

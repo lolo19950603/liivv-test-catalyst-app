@@ -36,7 +36,7 @@ Liivv is a **headless e-commerce + virtual care** application:
 flowchart LR
   subgraph Clients
     C[Customer Browser]
-    S[Staff /staff]
+    S[Staff /bc-app]
     B[BC Control Panel iframe /bc-app]
   end
 
@@ -101,7 +101,7 @@ flowchart LR
 | Orders                           | BigCommerce         | Created via Admin REST after Stripe success           |
 | Payment methods & subscriptions  | Stripe              | Renewals create BC orders on `invoice.paid`           |
 | Health profile, insurance        | Supabase            | Not modeled in BC                                     |
-| Prescriptions, CarePack, refills | Supabase            | Staff queue in /staff or /bc-app                      |
+| Prescriptions, CarePack, refills | Supabase            | Staff queue in /bc-app (BigCommerce embedded app)     |
 | Live chat messages               | Supabase            | Optional OpenAI bot replies                           |
 | Marketing page content           | Makeswift           | Hosted via Catalyst Makeswift integration             |
 
@@ -221,11 +221,10 @@ sequenceDiagram
 | --------------- | ------------------------------------------------- | -------------------------------- | -------------------------------------------------- | ------------------- |
 | Customer        | NextAuth → BC GraphQL login or Customer Login JWT | Auth.js session JWT              | `AUTH_SECRET`                                      | Site-wide           |
 | Anonymous cart  | Signed JWT containing `cartId`                    | `authjs.anonymous-session-token` | `AUTH_SECRET`                                      | 7 days              |
-| Staff password  | Shared password + HMAC                            | `liiv_staff`                     | `ADMIN_DASHBOARD_PASSWORD`, `ADMIN_SESSION_SECRET` | `/staff`, 7 days    |
-| BC embedded app | OAuth install + signed load                       | `liivv_bc_app`                   | `BIGCOMMERCE_APP_CLIENT_SECRET`                    | `/bc-app`, 12 hours |
+| Staff (BC app)  | OAuth install + signed load                       | `liivv_bc_app`                   | `BIGCOMMERCE_APP_CLIENT_SECRET`                    | `/bc-app`, 12 hours |
 
 
-Staff features are available if **either** password session **or** valid BC app session for the configured store is present.
+Staff features require a valid BC app session for the configured store. Former `/staff` URLs return 404.
 
 **Webhooks**
 
@@ -288,7 +287,6 @@ flowchart TB
 | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET`       | Payments                       |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`                | **Public** — Stripe.js only    |
 | `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`        | DB + Storage (bypasses RLS)    |
-| `ADMIN_DASHBOARD_PASSWORD` / `ADMIN_SESSION_SECRET` | Staff portal                   |
 | `OPENAI_API_KEY`                                    | Virtual care bot               |
 | `MAKESWIFT_SITE_API_KEY`                            | CMS                            |
 
@@ -304,7 +302,7 @@ flowchart TB
 | --- | --------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------- |
 | S1  | Supabase uses **service role only**; shipped SQL has **no RLS** | High | Enable RLS + restricted roles, or formally accept app-layer auth; lock network to Vercel egress if possible |
 | S2  | Health / Rx / chat / Rx photos in Supabase                      | High | Confirm region, encryption, retention, BAAs; verify private bucket + short-lived signed URLs                |
-| S3  | Shared staff password (`ADMIN_DASHBOARD_PASSWORD`)              | Med  | Prefer BC-app-only or SSO; rotate; consider IP allowlist                                                    |
+| S3  | Shared staff password (`ADMIN_DASHBOARD_PASSWORD`)              | Med  | **Closed** — `/staff` removed; staff use `/bc-app` via BigCommerce only                                      |
 | S4  | OpenAI may process chat when bot enabled                        | Med  | Keep flag off until DPA/BAA; redact PHI; escalate clinical to human                                         |
 | S5  | Many high-value env secrets                                     | Med  | Encrypted env per environment; rotate on personnel change; never commit `.env`                              |
 | S6  | Makeswift / BC iframe need `SameSite=None; Secure` cookies      | Med  | Review CSP allowlists; HTTPS only                                                                           |
@@ -318,7 +316,6 @@ flowchart TB
 
 - Privileged work in Server Components / server actions (not client-held tokens)
 - Stripe & BC webhook verification
-- Timing-safe staff password compare + HMAC cookies
 - BC app session bound to store hash
 - Cart ID inside signed JWT
 - Virtual care bot disabled unless `VIRTUAL_CARE_BOT_ENABLED=true`
@@ -344,7 +341,7 @@ flowchart TB
 2. Are vendor BAAs required for Supabase, Stripe, OpenAI, Vercel, BigCommerce?
 3. Logging policy: ensure request logs do not print Rx images or chat bodies.
 4. Backup / RPO for Supabase Storage (`prescription-photos`).
-5. Staff access: shared password acceptable for UAT only, or production blocker?
+5. Staff access is BigCommerce Control Panel → `/bc-app` only (shared `/staff` password removed).
 
 ---
 
@@ -373,14 +370,13 @@ core/auth/index.ts
 core/lib/supabase/client.ts
 core/lib/supabase/onboarding-schema.sql
 core/lib/supabase/pharmacy-schema.sql
-core/lib/admin-auth.ts
 core/lib/bc-app-session.ts
+core/lib/staff-access.ts
 core/lib/stripe/webhook-handlers.ts
 core/lib/virtual-care-bot/
 core/app/api/stripe/webhook/route.ts
 core/app/api/bigcommerce/webhook/route.ts
 core/app/api/bigcommerce/app/{auth,load,uninstall}/route.ts
-core/app/staff/
 core/app/bc-app/
 ```
 
