@@ -20,6 +20,7 @@ import {
   chapterHref,
   CLINICAL_REVIEWER,
   COMMERCIAL_DISCLOSURE,
+  CONTENT_AUTHOR,
   LANDING_HREF,
 } from '../chapters/chapters-data';
 
@@ -267,7 +268,8 @@ export function FundingPage() {
       <GovernanceBlock
         citations={CITATIONS}
         governance={{
-          ...CLINICAL_REVIEWER,
+          author: CONTENT_AUTHOR,
+          reviewer: CLINICAL_REVIEWER,
           reviewedOn: '',
           disclosure: COMMERCIAL_DISCLOSURE,
           disclaimer: messages.OstomyCare.funding.governance.disclaimer,

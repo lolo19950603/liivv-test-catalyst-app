@@ -58,11 +58,9 @@ function buildChapterSchema(
   // Gated identically to the visible byline, including the English-only rule.
   // This asserts clinical review machine-readably and indexably, so it must
   // never outlive or overreach what the page itself says.
-  const reviewed =
-    Boolean(governance.name) &&
-    Boolean(governance.reviewedOn) &&
-    Boolean(governance.disclosure) &&
-    locale === 'en';
+  const disclosed = Boolean(governance.disclosure) && locale === 'en';
+  const authored = disclosed && Boolean(governance.author.name);
+  const reviewed = disclosed && Boolean(governance.reviewer.name) && Boolean(governance.reviewedOn);
 
   return {
     '@context': 'https://schema.org',
@@ -83,12 +81,21 @@ function buildChapterSchema(
       '@type': 'Organization',
       name: 'Liivv',
     },
+    ...(authored && {
+      author: {
+        '@type': 'Person',
+        name: governance.author.name,
+        ...(governance.author.credential && { honorificSuffix: governance.author.credential }),
+      },
+    }),
     ...(reviewed && {
       lastReviewed: governance.reviewedOn,
       reviewedBy: {
         '@type': 'Person',
-        name: governance.name,
-        ...(governance.credential && { honorificSuffix: governance.credential }),
+        name: governance.reviewer.name,
+        ...(governance.reviewer.credential && {
+          honorificSuffix: governance.reviewer.credential,
+        }),
       },
     }),
   };

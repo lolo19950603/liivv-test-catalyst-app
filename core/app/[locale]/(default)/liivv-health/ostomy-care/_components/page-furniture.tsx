@@ -15,7 +15,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 
 import { HEALTH_HUB_DOORS } from '../../health-hub-data';
-import type { Citation, Governance } from '../chapters/chapters-data';
+import type { Citation, Governance, GovernancePerson } from '../chapters/chapters-data';
 
 const OSTOMY_DOOR_ID = 'ostomy_care_everyday';
 
@@ -146,45 +146,66 @@ export function GovernanceBlock({
   const locale = useLocale();
 
   /*
-   * Three gates, all of which must pass before a clinical byline appears.
+   * Author and reviewer gate independently.
    *
-   * 1. A named reviewer and a valid review date — an unreviewed page must never
-   *    imply sign-off it has not had.
-   * 2. The commercial disclosure. A review credit on a page published by a
-   *    company that sells the products is a commercial relationship, so the
-   *    credit and the disclosure ship together or not at all.
-   * 3. English only. The reviewer reads the English; the French is machine
-   *    translated. Carrying her name across to text she has not read would
-   *    assert professional review of copy no reviewer has seen — the French
-   *    pages say the English version was reviewed instead.
+   * The author is the RN who writes the content; the reviewer is an NSWOC who
+   * checks it before publication. A page can legitimately carry a written-by
+   * line while still awaiting review, but it must never carry a review line it
+   * has not earned — so the review line additionally requires a date.
+   *
+   * Both are English-only. The reviewer reads the English; the French is
+   * machine translated, and carrying a name across to text nobody has read
+   * would assert professional review of copy no reviewer has seen. French
+   * pages say the English version was reviewed instead.
+   *
+   * Neither renders without the commercial disclosure. A credit on a page
+   * published by a company that sells the products is a commercial
+   * relationship, so the credit and the disclosure ship together or not at all.
    */
   const reviewedOn = governance.reviewedOn ? formatReviewDate(governance.reviewedOn) : null;
-  const hasReviewer = Boolean(governance.name) && Boolean(reviewedOn);
-  const showByline = hasReviewer && Boolean(governance.disclosure) && locale === 'en';
-  const showTranslatedNote = hasReviewer && Boolean(governance.disclosure) && locale !== 'en';
+  const disclosed = Boolean(governance.disclosure);
+  const isEnglish = locale === 'en';
 
-  const reviewerName = governance.credential
-    ? `${governance.name}, ${governance.credential}`
-    : governance.name;
+  const hasAuthor = Boolean(governance.author.name);
+  const hasReview = Boolean(governance.reviewer.name) && Boolean(reviewedOn);
+
+  const withCredential = (p: GovernancePerson) =>
+    p.credential ? `${p.name}, ${p.credential}` : p.name;
+
+  const authorName = withCredential(governance.author);
+  const reviewerName = withCredential(governance.reviewer);
+
+  const showAuthor = hasAuthor && disclosed && isEnglish;
+  const showReview = hasReview && disclosed && isEnglish;
+  const showTranslatedNote = (hasAuthor || hasReview) && disclosed && !isEnglish;
+
+  const nameNode = (p: GovernancePerson, label: string) =>
+    p.registryUrl ? (
+      <a href={p.registryUrl} rel="noopener noreferrer" target="_blank">
+        {label}
+      </a>
+    ) : (
+      label
+    );
 
   return (
     <section className="oc-ch-governance rounded-top">
       <div className="oc-ch-wrap">
         <div className="oc-ch-governance-inner">
-          {showByline ? (
+          {showAuthor ? (
             <p className="oc-ch-review">
-              {t('reviewedBy')}{' '}
-              <strong>
-                {governance.registryUrl ? (
-                  <a href={governance.registryUrl} rel="noopener noreferrer" target="_blank">
-                    {reviewerName}
-                  </a>
-                ) : (
-                  reviewerName
-                )}
-              </strong>
-              {governance.registration
-                ? ` · ${t('registration', { number: governance.registration })}`
+              {t('writtenBy')} <strong>{nameNode(governance.author, authorName)}</strong>
+              {governance.author.registration
+                ? ` · ${t('registration', { number: governance.author.registration })}`
+                : ''}
+            </p>
+          ) : null}
+
+          {showReview ? (
+            <p className="oc-ch-review">
+              {t('reviewedBy')} <strong>{nameNode(governance.reviewer, reviewerName)}</strong>
+              {governance.reviewer.registration
+                ? ` · ${t('registration', { number: governance.reviewer.registration })}`
                 : ''}{' '}
               · {t('lastReviewed', { date: reviewedOn ?? '' })}
             </p>
@@ -192,7 +213,7 @@ export function GovernanceBlock({
 
           {showTranslatedNote ? (
             <p className="oc-ch-review">
-              {t('reviewedEnglishOnly', { name: reviewerName, date: reviewedOn ?? '' })}
+              {t('reviewedEnglishOnly', { name: hasReview ? reviewerName : authorName })}
             </p>
           ) : null}
 

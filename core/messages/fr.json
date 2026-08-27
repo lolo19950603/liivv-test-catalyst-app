@@ -2764,7 +2764,8 @@
         "sourcesHeading": "Origine de cette information",
         "machineTranslated": "Cette page a été traduite automatiquement à partir de l’anglais. Si un passage semble étrange, ou si vous prenez une décision en vous y fiant, consultez la version anglaise ou parlez-en à votre infirmière ou infirmier stomothérapeute (NSWOC).",
         "registration": "Nº d’inscription à l’OIIO {number}",
-        "reviewedEnglishOnly": "La version anglaise de cette page a fait l’objet d’une révision clinique par {name} le {date}. Cette version française est une traduction automatique et n’a pas été révisée."
+        "reviewedEnglishOnly": "La version anglaise de cette page a été rédigée et révisée sur le plan clinique par {name}. Cette version française est une traduction automatique et n’a pas été révisée.",
+        "writtenBy": "Rédigé par"
       },
       "help": {
         "eyebrow": "Où que vous soyez dans ceci",
