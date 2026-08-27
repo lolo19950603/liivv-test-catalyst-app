@@ -1531,7 +1531,7 @@
         "heroBody": "Clear, kind education about your stoma — how it works, what changes, and what to do when something is not right.",
         "focus": "Your stoma type, skin comfort, output patterns and fit changes; what to do when something is not right — leaks, pancaking, sore skin, high output, a hernia; and the clothing, travel, intimacy and routine questions that come with living in your body.",
         "vibe": "Clear, kind, and demystifying — education without overwhelm.",
-        "nextLabel": "Everyday Liivving →",
+        "nextLabel": "Food & Digestion →",
         "categoriesIntro": {
           "eyebrow": "Understanding without overwhelm",
           "heading": "Know your setup",
@@ -1789,6 +1789,171 @@
         "governance": {
           "disclaimer": "This is general information, not medical advice, and it is not a substitute for assessment by your NSWOC, surgeon, or physician. Fit, skin, and product choices depend on your body and your surgery — talk to your care team before changing anything."
         }
+      },
+      "food-and-digestion": {
+        "title": "Food & Digestion",
+        "heroBody": "What changed inside, what to expect from food now, and why the answer is so different depending on which ostomy you have.",
+        "focus": "How your digestion works now, the first weeks of eating, reintroducing foods, hydration and electrolytes, gas and odour, output consistency, blockage prevention, and the medication question almost nobody is told about.",
+        "vibe": "Curious and unhurried — the chapter that explains why, not just what.",
+        "categoriesIntro": {
+          "eyebrow": "Start with the why",
+          "heading": "Your gut still works — it just finishes earlier",
+          "body": "Almost every food question makes more sense once you know which part of the journey your surgery changed. That is why this chapter starts with plumbing rather than a list of foods."
+        },
+        "categories": {
+          "1": {
+            "title": "What your surgery actually changed",
+            "group": "How it works now",
+            "items": {
+              "1": "Food is broken down in the stomach and small intestine, and that part is usually unchanged — this is why you still absorb your nutrition",
+              "2": "The colon’s main job is reclaiming water and salt from what is left, and forming stool. A colostomy leaves most of that intact; an ileostomy bypasses it almost entirely",
+              "3": "A urostomy does not change digestion at all — it diverts urine, so the food questions on this page mostly do not apply to you"
+            },
+            "note": "This is the single most useful thing to understand: an ileostomy is not \"a colostomy higher up\". The missing colon is why output is looser, why fluid and salt matter more, and why the advice differs."
+          },
+          "2": {
+            "title": "The first few weeks",
+            "group": "How it works now",
+            "items": {
+              "1": "Most teams suggest a lower-fibre period straight after surgery. It is temporary, and it is about swelling at the stoma rather than about fibre being bad for you",
+              "2": "Your stoma is swollen at first and shrinks over the following weeks, so the opening it can pass comfortably gets bigger too",
+              "3": "Appetite is often poor early on. Small, frequent meals tend to sit better than three large ones"
+            },
+            "note": "How long this lasts is your surgical team’s call, not a fixed rule — it varies by surgery and by person. Ask when you should be moving on rather than assuming."
+          },
+          "3": {
+            "title": "Adding foods back",
+            "group": "Eating again",
+            "items": {
+              "1": "One new food at a time, in a small amount, with a couple of days before the next one — otherwise you cannot tell what caused what",
+              "2": "Chew far more than feels necessary. With an ileostomy especially, chewing is doing work your colon used to do",
+              "3": "Keep a rough note for a few weeks. Patterns show up quickly and then you can stop writing things down"
+            },
+            "note": "Tolerance is genuinely individual. Two people with the same surgery often land on completely different lists, so treat anyone else’s \"foods to avoid\" list — including one you find online — as a starting hypothesis rather than a rule."
+          },
+          "4": {
+            "title": "Foods people often find need care",
+            "group": "Eating again",
+            "sections": {
+              "1": {
+                "heading": "Commonly reported as harder to pass",
+                "items": {
+                  "1": "Fibrous or stringy foods — celery, corn, mushrooms, coconut, pineapple, dried fruit",
+                  "2": "Skins, pips and casings — apple peel, sweetcorn, nuts, popcorn, sausage skins"
+                }
+              },
+              "2": {
+                "heading": "How to approach them rather than avoid them forever",
+                "items": {
+                  "1": "Cut small, cook well, chew thoroughly, and try a small amount on a day when you are not out",
+                  "2": "Plenty of people go back to all of these. The point is caution, not a permanent ban"
+                },
+                "note": "If you have an ileostomy and have had a blockage before, talk to your NSWOC or a dietitian before reintroducing this group. That is a different conversation from a first attempt."
+              }
+            }
+          },
+          "5": {
+            "title": "Fluid and salt",
+            "group": "The two that matter most",
+            "items": {
+              "1": "With an ileostomy you lose more water and more sodium than you did before, and you lose it steadily rather than noticeably",
+              "2": "Thirst is a late signal. Darker urine, headache, cramps, and feeling flat often arrive first",
+              "3": "Plain water alone can sometimes make high output worse — an oral rehydration solution replaces salt as well as fluid"
+            },
+            "note": "Ask your NSWOC or pharmacist what to keep at home before you need it. Rehydration solutions are cheap, keep well, and are far more useful bought in advance than at 2am."
+          },
+          "6": {
+            "title": "Gas, odour and noise",
+            "group": "Everyday effects",
+            "items": {
+              "1": "Gas usually settles over the first months as your gut adapts — early gas is not a sign of how things will stay",
+              "2": "Swallowed air is a bigger contributor than most people expect: eating quickly, straws, chewing gum, fizzy drinks",
+              "3": "Filters wet out and stop working. That is the filter doing its job and reaching the end of it, not a defect"
+            }
+          },
+          "7": {
+            "title": "Thicker or looser output",
+            "group": "Everyday effects",
+            "sections": {
+              "1": {
+                "heading": "Often reported as thickening",
+                "items": {
+                  "1": "Starchy foods — white rice, pasta, bread, potato without skin, banana, smooth peanut butter, marshmallows"
+                }
+              },
+              "2": {
+                "heading": "Often reported as loosening",
+                "items": {
+                  "1": "Very sugary drinks, alcohol, caffeine, spicy food, and large amounts of fruit"
+                },
+                "note": "These are patterns many people notice, not instructions. If you are using food to manage persistent high output rather than an occasional day, that needs an NSWOC or dietitian rather than a longer list of foods."
+              }
+            }
+          },
+          "8": {
+            "title": "The medication question",
+            "group": "Ask about this one",
+            "items": {
+              "1": "Extended-release, slow-release and enteric-coated tablets are designed to dissolve over a long stretch of gut — with an ileostomy they can pass straight through, intact and unabsorbed",
+              "2": "People sometimes see whole tablets in the pouch. That is worth reporting rather than ignoring",
+              "3": "This can quietly affect anything that matters — blood pressure, thyroid, mental health medication, contraception"
+            },
+            "note": "Bring your full medication list to a pharmacist and say you have an ileostomy. There is often an immediate-release or liquid alternative. Do not stop or change anything yourself."
+          }
+        },
+        "programsBand": {
+          "heading": "If you take one thing from this chapter",
+          "cards": {
+            "1": {
+              "heading": "Chew more than feels necessary",
+              "body": "It is the single habit that prevents the most trouble, and it costs nothing. With an ileostomy your mouth is doing work your colon used to do."
+            },
+            "2": {
+              "heading": "Replace salt, not just water",
+              "body": "Steady losses are easy to miss until you feel unwell. An oral rehydration solution in the cupboard is worth more than any food list."
+            },
+            "3": {
+              "heading": "Ask about your tablets",
+              "body": "Slow-release medication and an ileostomy is a known problem and almost nobody is warned about it. One pharmacist conversation settles it."
+            }
+          }
+        },
+        "urgent": {
+          "heading": "Food-related things that need care today",
+          "intro": "Most food questions can wait. These cannot — and two of them are the most common reasons ostomates end up back in hospital.",
+          "signs": {
+            "1": "No output at all for several hours together with cramping, a swollen abdomen, or vomiting — this can be a blockage",
+            "2": "Output that has become watery and high-volume and is not settling over a day",
+            "3": "Feeling dizzy, confused, unusually weak, or passing very little urine — signs of significant dehydration",
+            "4": "Severe abdominal pain, or a stoma that looks dark, dusky or swollen alongside any of the above"
+          },
+          "action": "Go to your nearest emergency department or call 911. Do not try to clear a suspected blockage at home, and do not wait to see whether high output settles overnight."
+        },
+        "citations": {
+          "1": {
+            "label": "NSWOCC — living with an ileostomy, colostomy or ileal conduit (patient guides)"
+          },
+          "2": {
+            "label": "United Ostomy Associations of America — eating well after ostomy surgery"
+          },
+          "3": {
+            "label": "RNAO — Supporting Adults Who Anticipate or Live with an Ostomy"
+          }
+        },
+        "pharmacist": {
+          "eyebrow": "Available in Ontario",
+          "heading": "Bring your medication list",
+          "body": "An Ontario pharmacist can check whether anything you take is a slow-release or enteric-coated form, and whether an alternative exists. Chat during business hours until 5 p.m. Eastern. Diet planning and persistent output problems belong with your NSWOC or a dietitian.",
+          "cta": "Talk to a Pharmacist"
+        },
+        "closing": {
+          "heading": "Food is supposed to be a pleasure again",
+          "body": "Almost everyone ends up eating a far wider range than they expected in the first weeks. Start cautiously, add slowly, and let your own patterns replace anyone else’s list."
+        },
+        "governance": {
+          "disclaimer": "This is general information, not medical advice, and it is not a substitute for assessment by your NSWOC, surgeon, physician, or a registered dietitian. Food tolerance varies enormously between people, and guidance differs by ostomy type and by how long ago you had surgery — talk to your care team before making changes, particularly if you have had a blockage or ongoing high output."
+        },
+        "nextLabel": "Everyday Liivving →"
       },
       "everyday-liivving": {
         "title": "Everyday Liivving",
@@ -2149,7 +2314,7 @@
         "resourcesHeading": "Where to go from here",
         "resourcesIntro": "These are run by patient organisations, specialist nurses, and government programs — not by Liivv. We link out because they do this better than a shop could.",
         "pathEyebrow": "Path",
-        "allChapters": "All three chapters",
+        "allChapters": "All four chapters",
         "keepGoing": "Keep going",
         "backToLanding": "Back to Ostomy Care page",
         "chapterNav": "Chapter navigation"

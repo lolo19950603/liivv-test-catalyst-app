@@ -115,6 +115,10 @@ const OSTOMY_CHAPTER_LINKS = [
     href: `${OSTOMY_CARE_PATH}/chapters/get-to-know-your-stoma`,
   },
   {
+    label: 'Food & Digestion',
+    href: `${OSTOMY_CARE_PATH}/chapters/food-and-digestion`,
+  },
+  {
     label: 'Everyday Liivving',
     href: `${OSTOMY_CARE_PATH}/chapters/everyday-liivving`,
   },

@@ -634,10 +634,10 @@ export function OstomyCarePage({
         <div className="oc-wrap">
           <header className="oc-chapters-head">
             <span className="oc-eyebrow">Life chapters</span>
-            <h2>Three stories. Open the one that fits.</h2>
+            <h2>Four stories. Open the one that fits.</h2>
             <p>
-              New to this, learning your stoma, or looking for support and funding — pick the
-              chapter that feels like today. Already know the aisle?{' '}
+              New to this, learning your stoma, working out food, or looking for support and
+              funding — pick the chapter that feels like today. Already know the aisle?{' '}
               <a href="#shop-ostomy-care">Skip to the shelf</a>.
             </p>
           </header>
