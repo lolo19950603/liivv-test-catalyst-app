@@ -15,6 +15,7 @@ export const DIABETES_CARE_PATH = '/liivv-health/diabetes-care';
 export const SHOP_DIABETES_CARE_PATH = '/liivv-health/diabetes-care/shop-diabetes-care';
 export const OSTOMY_CARE_PATH = '/liivv-health/ostomy-care';
 export const SHOP_OSTOMY_CARE_PATH = '/liivv-health/ostomy-care/shop-ostomy-care';
+export const OSTOMY_FUNDING_PATH = '/liivv-health/ostomy-care/funding';
 
 const CHAPTER_IMG = '/archive/womens-health';
 
@@ -164,6 +165,10 @@ const OSTOMY_CARE_NAV: LiivvArchiveNavLink[] = [
     href: SHOP_OSTOMY_CARE_PATH,
   },
   ...OSTOMY_CHAPTER_LINKS,
+  {
+    label: 'Funding & Coverage',
+    href: OSTOMY_FUNDING_PATH,
+  },
 ];
 
 const DIABETES_CARE_NAV: LiivvArchiveNavLink[] = [
@@ -223,9 +228,7 @@ function isExactCarePath(pathname: string, path: string): boolean {
 }
 
 /** Back link shown on care-vertical subpages after the landing item was removed from nav. */
-export function getCareSectionBackLink(
-  pathname: string,
-): { href: string; label: string } | null {
+export function getCareSectionBackLink(pathname: string): { href: string; label: string } | null {
   if (shouldShowWomensHealthNav(pathname) && !isExactCarePath(pathname, WOMENS_HEALTH_PATH)) {
     return { href: WOMENS_HEALTH_PATH, label: "Back to Women's Health page" };
   }

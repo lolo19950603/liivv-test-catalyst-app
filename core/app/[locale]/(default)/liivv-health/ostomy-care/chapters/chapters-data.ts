@@ -446,7 +446,7 @@ export const CHAPTERS: Chapter[] = [
           'Moving provinces resets everything — including which forms you file and who has to sign them',
           'In most provinces an NSWOC assessment is the gate. Some, like Saskatchewan, will not accept a self-application at all',
         ],
-        note: 'A full province-by-province breakdown with current amounts is in progress. Until it lands, Ostomy Canada maintains the best public summary — linked below.',
+        note: 'We have checked every province and territory against its own government page — see Funding & Coverage for what yours pays, who has to sign off, and the dates that catch people out.',
       },
       {
         title: 'Programs that cost you nothing',

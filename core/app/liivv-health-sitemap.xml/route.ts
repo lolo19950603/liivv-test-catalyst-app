@@ -25,6 +25,9 @@ const LANDING_PATHS = [
   '/liivv-health/womens-health',
 ];
 
+/** Standalone sections that sit alongside the chapters. */
+const SECTION_PATHS = ['/liivv-health/ostomy-care/funding'];
+
 function escapeXml(value: string) {
   return value
     .replace(/&/g, '&amp;')
@@ -37,6 +40,7 @@ function escapeXml(value: string) {
 export const GET = async () => {
   const paths = [
     ...LANDING_PATHS,
+    ...SECTION_PATHS,
     ...CHAPTER_SLUGS.map((slug) => `/liivv-health/ostomy-care/chapters/${slug}`),
   ];
 

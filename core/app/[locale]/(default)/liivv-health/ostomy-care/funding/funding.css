@@ -1,0 +1,265 @@
+/*
+ * Funding section — layered on top of chapter-page.css, which supplies the
+ * palette, spacing tokens, buttons and `.rounded-top`. Only the pieces unique to
+ * this page live here: the coverage-model grid and the checker.
+ */
+
+#oc-chapter .oc-fund-hero {
+  min-height: auto;
+  padding: clamp(3.5rem, 9vw, 6rem) 0 calc(var(--ch-overlap) + 3rem);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--sage) 70%, var(--ink)) 0%,
+    color-mix(in srgb, var(--sage) 45%, var(--ink)) 100%
+  );
+  color: #f4f7f3;
+}
+
+#oc-chapter .oc-fund-hero .oc-ch-hero-lead {
+  max-width: 58ch;
+}
+
+/* ---------- four coverage models ---------- */
+
+#oc-chapter .oc-fund-models {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+#oc-chapter .oc-fund-model {
+  padding: 1.35rem 1.4rem 1.5rem;
+  border-radius: 18px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+#oc-chapter .oc-fund-model-index {
+  font-family: var(--font-mono, var(--font-body));
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  color: var(--sage-deep);
+}
+
+#oc-chapter .oc-fund-model h3 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.12rem;
+  line-height: 1.25;
+}
+
+#oc-chapter .oc-fund-model p {
+  margin: 0;
+  font-size: 0.94rem;
+  color: color-mix(in srgb, var(--ink) 76%, var(--cream));
+}
+
+/* ---------- the checker ---------- */
+
+#oc-chapter .oc-fund-tool {
+  padding: 3rem 0 calc(var(--ch-overlap) + 3rem);
+  background: var(--sage-soft);
+}
+
+#oc-chapter .oc-fund-checker {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 1.5rem;
+  align-items: start;
+  margin-top: 1.75rem;
+}
+
+@media (max-width: 860px) {
+  #oc-chapter .oc-fund-checker {
+    grid-template-columns: 1fr;
+  }
+}
+
+#oc-chapter .oc-fund-form {
+  position: sticky;
+  top: 1.5rem;
+  padding: 1.5rem;
+  border-radius: 18px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+}
+
+@media (max-width: 860px) {
+  #oc-chapter .oc-fund-form {
+    position: static;
+  }
+}
+
+#oc-chapter .oc-fund-field {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+#oc-chapter .oc-fund-field legend,
+#oc-chapter .oc-fund-field > label {
+  display: block;
+  padding: 0;
+  font-family: var(--font-heading);
+  font-size: 1.02rem;
+  line-height: 1.3;
+  margin-bottom: 0.3rem;
+}
+
+#oc-chapter .oc-fund-hint {
+  margin: 0 0 0.6rem;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--ink) 62%, var(--cream));
+}
+
+#oc-chapter .oc-fund-field select {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid var(--sand);
+  background: var(--cream);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+#oc-chapter .oc-fund-field select:focus-visible,
+#oc-chapter .oc-fund-choice input:focus-visible + span {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 2px;
+}
+
+#oc-chapter .oc-fund-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+#oc-chapter .oc-fund-choice {
+  cursor: pointer;
+}
+
+#oc-chapter .oc-fund-choice input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+#oc-chapter .oc-fund-choice span {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--sand);
+  background: var(--cream);
+  font-size: 0.88rem;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+#oc-chapter .oc-fund-choice.is-on span {
+  background: color-mix(in srgb, var(--sage) 40%, var(--paper));
+  border-color: var(--sage-deep);
+  font-weight: 500;
+}
+
+#oc-chapter .oc-fund-reset {
+  align-self: flex-start;
+  padding: 0.35rem 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-body);
+  font-size: 0.86rem;
+  color: var(--sage-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* ---------- results ---------- */
+
+#oc-chapter .oc-fund-results {
+  min-height: 200px;
+}
+
+#oc-chapter .oc-fund-empty {
+  margin: 0;
+  padding: 1.5rem;
+  border-radius: 18px;
+  border: 1px dashed color-mix(in srgb, var(--sage-deep) 45%, transparent);
+  color: color-mix(in srgb, var(--ink) 70%, var(--cream));
+  font-size: 0.95rem;
+}
+
+#oc-chapter .oc-fund-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+#oc-chapter .oc-fund-card {
+  padding: 1.15rem 1.3rem 1.25rem;
+  border-radius: 18px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--sage);
+}
+
+#oc-chapter .oc-fund-card.is-supporting {
+  border-left-color: var(--sand);
+}
+
+#oc-chapter .oc-fund-card.is-caution {
+  border-left-color: var(--urgent, #9a3b2c);
+  background: color-mix(in srgb, var(--blush) 22%, var(--paper));
+}
+
+#oc-chapter .oc-fund-card h3 {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  line-height: 1.28;
+}
+
+#oc-chapter .oc-fund-card p {
+  margin: 0 0 0.6rem;
+  font-size: 0.94rem;
+  color: color-mix(in srgb, var(--ink) 78%, var(--cream));
+}
+
+#oc-chapter .oc-fund-card a {
+  font-size: 0.9rem;
+  color: var(--sage-deep);
+  text-underline-offset: 2px;
+}
+
+#oc-chapter .oc-fund-verified {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  color: color-mix(in srgb, var(--ink) 55%, var(--cream));
+}
+
+#oc-chapter .oc-fund-caveat {
+  margin: 1.1rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--ink) 64%, var(--cream));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #oc-chapter .oc-fund-choice span {
+    transition: none;
+  }
+}
