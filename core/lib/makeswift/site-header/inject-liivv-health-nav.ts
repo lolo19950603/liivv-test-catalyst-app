@@ -111,20 +111,16 @@ const OSTOMY_CHAPTER_LINKS = [
     href: `${OSTOMY_CARE_PATH}/chapters/new-to-the-journey`,
   },
   {
-    label: 'Get to Know Your Stoma',
+    label: 'Your Stoma, and Your Fit',
     href: `${OSTOMY_CARE_PATH}/chapters/get-to-know-your-stoma`,
-  },
-  {
-    label: 'Finding Your Fit',
-    href: `${OSTOMY_CARE_PATH}/chapters/finding-your-fit`,
-  },
-  {
-    label: 'Food & Digestion',
-    href: `${OSTOMY_CARE_PATH}/chapters/food-and-digestion`,
   },
   {
     label: 'Everyday Liivving',
     href: `${OSTOMY_CARE_PATH}/chapters/everyday-liivving`,
+  },
+  {
+    label: 'This Might Be You',
+    href: `${OSTOMY_CARE_PATH}/chapters/this-might-be-you`,
   },
 ] as const;
 

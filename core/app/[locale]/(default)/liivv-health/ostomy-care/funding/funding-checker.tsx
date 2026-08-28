@@ -8,6 +8,7 @@ import {
   buildProvinceOptions,
   buildResults,
   type CheckerInput,
+  checkerProgress,
   isCheckerReady,
   type ProvinceCode,
   type YesNoUnsure,
@@ -111,9 +112,14 @@ export function FundingChecker() {
     expensesTitle: r('expensesTitle'),
     expensesBody: r('expensesBody'),
     expensesLink: r('expensesLink'),
+    provisionalTitle: r('provisionalTitle'),
+    provisionalBody: r('provisionalBody'),
+    seniorTitle: r('seniorTitle'),
+    permanenceTitle: r('permanenceTitle'),
   });
 
   const ready = isCheckerReady(input);
+  const progress = checkerProgress(input);
 
   return (
     <div className="oc-fund-checker">
@@ -186,6 +192,21 @@ export function FundingChecker() {
       </form>
 
       <div aria-live="polite" className="oc-fund-results">
+        {ready ? (
+          <div className="oc-fund-progress">
+            <span className="oc-fund-progress-bar">
+              <span style={{ width: `${(progress.answered / progress.total) * 100}%` }} />
+            </span>
+            <span className="oc-fund-progress-text">
+              {t('progress', {
+                answered: String(progress.answered),
+                total: String(progress.total),
+              })}
+              {progress.outstanding.length ? ` · ${t('narrowing')}` : ` · ${t('complete')}`}
+            </span>
+          </div>
+        ) : null}
+
         {ready ? (
           <ul className="oc-fund-cards">
             {results.map((card) => (

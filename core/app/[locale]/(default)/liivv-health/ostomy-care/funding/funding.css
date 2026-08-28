@@ -263,3 +263,46 @@
     transition: none;
   }
 }
+
+/*
+ * Narrowing indicator.
+ *
+ * The checker shows an answer as soon as it has a province, which is right —
+ * but it used to show it above four untouched questions, so the answer looked
+ * final when it was not. This says how much of the picture the reader has
+ * filled in, and it moves as they answer.
+ */
+.oc-fund-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.85rem;
+  flex-wrap: wrap;
+}
+.oc-fund-progress-bar {
+  flex: 1 1 90px;
+  height: 3px;
+  min-width: 70px;
+  border-radius: 999px;
+  background: var(--line, rgba(49, 47, 47, 0.14));
+  overflow: hidden;
+}
+.oc-fund-progress-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--sage-deep, #5d7460);
+  transition: width 220ms ease;
+}
+.oc-fund-progress-text {
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  color: rgba(49, 47, 47, 0.6);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oc-fund-progress-bar > span {
+    transition: none;
+  }
+}

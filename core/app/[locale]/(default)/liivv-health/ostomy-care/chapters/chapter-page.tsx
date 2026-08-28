@@ -1,11 +1,14 @@
 'use client';
 
-import { useMessages, useTranslations } from 'next-intl';
-import type { CSSProperties } from 'react';
+import { useLocale, useMessages, useTranslations } from 'next-intl';
+import { type CSSProperties, useMemo, useState } from 'react';
+
+import type { OcCatalogItem } from '../get-oc-catalog';
 
 import { DiscoveryBand, GovernanceBlock, HelpBand } from '../_components/page-furniture';
 
 import {
+  type AskRole,
   buildChapters,
   type CategoryCard,
   chapterHref,
@@ -21,11 +24,102 @@ import './chapter-page.css';
  * Ostomy chapter page — soft journal / path layout (not Women's Health chapter chrome).
  */
 
-function CategoryRow({ card, index }: { card: CategoryCard; index: number }) {
+/*
+ * The referral chip.
+ *
+ * Every bullet in this microsite was written to end on a named person to ask —
+ * that is the rule that keeps clinical copy referral-shaped rather than
+ * instructional, and it is why the content survived its fact-checks. The rule
+ * was invisible, buried in the last clause of a sentence. This surfaces it.
+ *
+ * 'assessment' and 'urgent' render in the warning tone: those two are not
+ * "someone you could ask", they are "do not act on this page alone".
+ */
+function AskChip({ role }: { role: AskRole }) {
+  const t = useTranslations('OstomyCare.ui.chapter.ask');
+  const loud = role === 'assessment' || role === 'urgent';
+
+  return <span className={loud ? 'oc-ch-ask is-loud' : 'oc-ch-ask'}>{t(role)}</span>;
+}
+
+/*
+ * Commerce, in its own band.
+ *
+ * Placement is declared in chapters-meta.ts, not decided here — thirteen of the
+ * sixty-one cards carry ids, and the ones that do not are documented next to
+ * the blocklist. Three cases are deliberately empty because the copy on those
+ * cards argues against buying something: convexity needs an assessment, support
+ * garments have not been shown to prevent hernia, and the pediatric card says a
+ * failing seal is a call to the child's nurse rather than a stronger product.
+ *
+ * The band sits after the ask chip so the referral is the last clinical thing
+ * said, and it carries its own disclosure rather than borrowing the page's.
+ */
+function ProductBand({
+  ids,
+  products,
+}: {
+  ids: number[];
+  products: Record<number, OcCatalogItem>;
+}) {
+  const t = useTranslations('OstomyCare.ui.chapter');
+  const items = ids
+    .map((id) => products[id])
+    .filter((item): item is OcCatalogItem => Boolean(item));
+
+  if (!items.length) return null;
+
   return (
-    <article className="oc-ch-row">
-      <span aria-hidden className="oc-ch-row-index">
-        {String(index + 1).padStart(2, '0')}
+    <aside className="oc-ch-shop">
+      <span className="oc-ch-shop-label">{t('productsLabel')}</span>
+      <ul className="oc-ch-shop-list">
+        {items.map((item) => (
+          <li key={item.entityId}>
+            <a className="oc-ch-shop-card" href={item.path}>
+              {item.image ? (
+                <img alt="" loading="lazy" src={item.image.src} />
+              ) : (
+                <span className="oc-ch-shop-blank" />
+              )}
+              <span className="oc-ch-shop-name">{item.name}</span>
+              {item.priceLabel ? <span className="oc-ch-shop-price">{item.priceLabel}</span> : null}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p className="oc-ch-shop-note">{t('productsNote')}</p>
+    </aside>
+  );
+}
+
+function CategoryRow({
+  card,
+  index,
+  openByDefault,
+  products,
+}: {
+  card: CategoryCard;
+  index: number;
+  openByDefault: boolean;
+  products: Record<number, OcCatalogItem>;
+}) {
+  const t = useTranslations('OstomyCare.ui.chapter');
+  const [open, setOpen] = useState(openByDefault);
+
+  /*
+   * The first bullet becomes the lede and stays visible; the rest collapse.
+   * A card built from sections has no single lede, so it collapses whole.
+   */
+  const lede = card.items?.[0];
+  const rest = card.items?.slice(1) ?? [];
+  const hidden = rest.length + (card.sections?.length ?? 0);
+  const collapsible = hidden > 0;
+
+  return (
+    <article className={open ? 'oc-ch-row is-open' : 'oc-ch-row'}>
+      <span aria-hidden className="oc-ch-row-thumb">
+        <img alt="" loading="lazy" src={card.image} />
+        <b>{String(index + 1).padStart(2, '0')}</b>
       </span>
       <div>
         {card.group ? <span className="oc-ch-group">{card.group}</span> : null}
@@ -33,25 +127,43 @@ function CategoryRow({ card, index }: { card: CategoryCard; index: number }) {
           {card.title}
           {card.badge ? ` · ${card.badge}` : ''}
         </h3>
-        {card.items ? (
-          <ul>
-            {card.items.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        ) : null}
-        {card.sections?.map((section) => (
-          <div className="oc-ch-subsection" key={section.heading}>
-            <h4>{section.heading}</h4>
+
+        {lede ? <p className="oc-ch-lede">{lede}</p> : null}
+
+        <div className="oc-ch-row-more" hidden={!open}>
+          {rest.length ? (
             <ul>
-              {section.items.map((item) => (
+              {rest.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
-            {section.note ? <p className="oc-ch-row-note">{section.note}</p> : null}
-          </div>
-        ))}
-        {card.note ? <p className="oc-ch-row-note">{card.note}</p> : null}
+          ) : null}
+          {card.sections?.map((section) => (
+            <div className="oc-ch-subsection" key={section.heading}>
+              <h4>{section.heading}</h4>
+              <ul>
+                {section.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+              {section.note ? <p className="oc-ch-row-note">{section.note}</p> : null}
+            </div>
+          ))}
+          {card.note ? <p className="oc-ch-row-note">{card.note}</p> : null}
+        </div>
+
+        <div className="oc-ch-row-foot">
+          {collapsible ? (
+            <button className="oc-ch-toggle" onClick={() => setOpen(!open)} type="button">
+              {open ? t('showLess') : t('showMore', { count: String(hidden) })}
+            </button>
+          ) : null}
+          {card.ask ? <AskChip role={card.ask} /> : null}
+        </div>
+
+        {card.productIds && (open || !collapsible) ? (
+          <ProductBand ids={card.productIds} products={products} />
+        ) : null}
       </div>
     </article>
   );
@@ -122,12 +234,100 @@ function ResourceGroupBlock({ group }: { group: ResourceGroup }) {
   );
 }
 
-export function ChapterPage({ slug }: { slug: string }) {
+/*
+ * Second-level navigation, built from the `group` labels the categories were
+ * already authored with. This is what makes a twenty-row chapter browsable, and
+ * what makes consolidating back to four chapters possible.
+ *
+ * Filtering rather than scroll-spying: on a phone a sticky spy rail and the
+ * thumb-scroll fight each other, and filtering gives the same answer with less
+ * machinery. Rows are hidden, never unmounted — search must still see them all.
+ */
+function GroupRail({
+  categories,
+  products,
+}: {
+  categories: CategoryCard[];
+  products: Record<number, OcCatalogItem>;
+}) {
+  const t = useTranslations('OstomyCare.ui.chapter');
+  const [active, setActive] = useState('');
+
+  const groups = useMemo(() => {
+    const counts = categories.reduce<Map<string, number>>((acc, card) => {
+      if (card.group) acc.set(card.group, (acc.get(card.group) ?? 0) + 1);
+
+      return acc;
+    }, new Map());
+
+    return [...counts.entries()].map(([label, count]) => ({ label, count }));
+  }, [categories]);
+
+  // One group, or none, is not a navigation problem worth a control.
+  const railed = groups.length > 1;
+  const seenGroups = new Set<string>();
+
+  return (
+    <>
+      {railed ? (
+        <div aria-label={t('groupNav')} className="oc-ch-rail" role="group">
+          <button aria-pressed={active === ''} onClick={() => setActive('')} type="button">
+            {t('allGroups')}
+            <span className="oc-ch-rail-count">{categories.length}</span>
+          </button>
+          {groups.map((group) => (
+            <button
+              aria-pressed={active === group.label}
+              key={group.label}
+              onClick={() => setActive(group.label)}
+              type="button"
+            >
+              {group.label}
+              <span className="oc-ch-rail-count">{group.count}</span>
+            </button>
+          ))}
+        </div>
+      ) : null}
+
+      <div className="oc-ch-rows">
+        {categories.map((card, index) => {
+          const lead = Boolean(card.group) && !seenGroups.has(card.group ?? '');
+
+          if (card.group) seenGroups.add(card.group);
+
+          return (
+            <div hidden={active !== '' && card.group !== active} key={card.title}>
+              <CategoryRow
+                card={card}
+                index={index}
+                openByDefault={lead || !card.group}
+                products={products}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+export function ChapterPage({
+  slug,
+  products = {},
+}: {
+  slug: string;
+  products?: Record<number, OcCatalogItem>;
+}) {
   // Copy comes from the message tree so it can be translated; the structure it
   // is composed with lives in chapters-meta.ts.
   const messages = useMessages();
+  const locale = useLocale();
   const t = useTranslations('OstomyCare.ui.chapter');
-  const chapters = buildChapters(messages.OstomyCare.chapters);
+  const chapters = buildChapters(
+    messages.OstomyCare.chapters,
+    locale,
+    messages.OstomyCare.ui.chapter.groups,
+  );
   const { prev, next, chapter } = getChapterNeighbors(chapters, slug);
 
   // The route already 404s on an unknown slug, so this only guards against a
@@ -135,6 +335,8 @@ export function ChapterPage({ slug }: { slug: string }) {
   if (!chapter) return null;
 
   const nextHref = next ? chapterHref(next.slug) : `${LANDING_HREF}#where-are-you`;
+  // Derived, not authored — see chapters-data.ts.
+  const nextLabel = next ? `${next.title} →` : t('backToChapters');
   const chapterIndex = chapters.findIndex((item) => item.slug === chapter.slug);
 
   // CSS custom property, typed without an assertion.
@@ -194,11 +396,7 @@ export function ChapterPage({ slug }: { slug: string }) {
             <h2>{chapter.categoriesIntro.heading}</h2>
             <p>{chapter.categoriesIntro.body}</p>
           </header>
-          <div className="oc-ch-rows">
-            {chapter.categories.map((card, index) => (
-              <CategoryRow card={card} index={index} key={card.title} />
-            ))}
-          </div>
+          <GroupRail categories={chapter.categories} products={products} />
         </div>
       </section>
 
@@ -295,7 +493,7 @@ export function ChapterPage({ slug }: { slug: string }) {
               {t('backToLanding')}
             </a>
             <a className="oc-ch-btn oc-ch-btn-ghost-light" href={nextHref}>
-              {chapter.nextLabel}
+              {nextLabel}
             </a>
           </div>
           {prev ? (

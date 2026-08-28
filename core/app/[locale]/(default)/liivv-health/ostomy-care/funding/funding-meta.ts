@@ -27,6 +27,18 @@ export interface ProgramMeta {
   officialUrl: string;
   verifiedOn: string;
   hasAmount: boolean;
+  /*
+   * What changes at 65, and what changes for a temporary ostomy.
+   *
+   * Both start empty everywhere and must stay empty until the rule has been
+   * read off the jurisdiction's own page and dated, exactly like `amount`.
+   * The checker asks about age and permanence; until these are filled it says
+   * so rather than pretending the answer did not matter. Never infer either
+   * from the prose in the message tree — that prose was written to be read by
+   * a person, not parsed.
+   */
+  seniorRule?: string;
+  permanenceRule?: string;
 }
 
 export const PROGRAM_META: Record<ProvinceCode, ProgramMeta> = {

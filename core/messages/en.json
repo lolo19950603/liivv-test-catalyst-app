@@ -1426,7 +1426,6 @@
         "heroBody": "Told you need surgery, or just home with a new stoma — calm answers for both, plus the one thing to ask for before you go in.",
         "focus": "Before surgery: what to expect, stoma siting, questions to ask, and supporting someone. After surgery: first weeks, change routines, starter supplies, who to ask, and soft next steps.",
         "vibe": "Supportive and demystifying — a soft place to land.",
-        "nextLabel": "Get to Know Your Stoma →",
         "categoriesIntro": {
           "eyebrow": "First chapters",
           "heading": "You are not supposed to know everything yet",
@@ -1435,7 +1434,6 @@
         "categories": {
           "1": {
             "title": "You have just been told you need one",
-            "group": "Before surgery",
             "items": {
               "1": "Feeling frightened, angry, or numb is an ordinary reaction to this news, not a sign you are handling it badly",
               "2": "The waiting is hard, and recovery has its own hard parts — learning the routine takes most people months rather than weeks",
@@ -1445,7 +1443,6 @@
           },
           "2": {
             "title": "Ask for stoma siting — this one matters most",
-            "group": "Before surgery",
             "items": {
               "1": "Siting means an NSWOC or your surgeon marks the best spot on your abdomen before your operation, while you are awake. Your surgeon makes the final call during surgery, so sometimes more than one spot is marked",
               "2": "They check the spot while you sit, stand, and bend, and keep it clear of your waistband, skin folds, scars, and your beltline",
@@ -1455,7 +1452,6 @@
           },
           "3": {
             "title": "Questions worth asking before you go in",
-            "group": "Before surgery",
             "items": {
               "1": "Which type of ostomy, and is it expected to be permanent or reversible? If reversible, roughly when might that be considered?",
               "2": "Will I be seen by an NSWOC before surgery for siting, and who will teach me afterwards?",
@@ -1466,7 +1462,6 @@
           },
           "4": {
             "title": "What to pack, and what to arrange",
-            "group": "Before surgery",
             "items": {
               "1": "Loose, high-waisted clothing for going home — nothing that sits across where the stoma will be",
               "2": "Your usual medications list, which the ward will want anyway and which matters later for absorption",
@@ -1475,7 +1470,6 @@
           },
           "5": {
             "title": "If you are supporting someone",
-            "group": "Before surgery",
             "items": {
               "1": "You do not need to learn the pouch change unless they want you to — many people prefer to keep that private, and that is worth asking rather than assuming",
               "2": "Practical help lands better than reassurance early on: driving, cooking, and taking over the lifting they are not allowed to do",
@@ -1550,17 +1544,6 @@
             }
           }
         },
-        "citations": {
-          "1": {
-            "label": "NSWOCC — Find an NSWOC"
-          },
-          "2": {
-            "label": "NSWOCC — free patient guides (English and French)"
-          },
-          "3": {
-            "label": "RNAO — Getting ready for ostomy surgery (patient fact sheet)"
-          }
-        },
         "pharmacist": {
           "eyebrow": "Available in Ontario",
           "heading": "You do not have to figure the aisle alone",
@@ -1576,11 +1559,10 @@
         }
       },
       "get-to-know-your-stoma": {
-        "title": "Get to Know Your Stoma",
+        "title": "Your Stoma, and Your Fit",
         "heroBody": "Clear, kind education about your stoma — how it works, what changes, and what to do when something is not right.",
         "focus": "Your stoma type including the less common diversions, the words you will hear, skin comfort, output patterns and fit changes; what to do when something is not right — leaks, pancaking, sore skin, high output, a hernia; and the clothing, travel, intimacy, activity and routine questions that come with living in your body.",
         "vibe": "Clear, kind, and demystifying — education without overwhelm.",
-        "nextLabel": "Finding Your Fit →",
         "categoriesIntro": {
           "eyebrow": "Understanding without overwhelm",
           "heading": "Know your setup",
@@ -1589,7 +1571,6 @@
         "categories": {
           "1": {
             "title": "Stoma Basics",
-            "group": "Start here",
             "items": {
               "1": "Colostomy, ileostomy, and urostomy each shape output and daily care a little differently",
               "2": "A stoma can be temporary or permanent — your care team decides with you",
@@ -1598,7 +1579,6 @@
           },
           "2": {
             "title": "The less common diversions",
-            "group": "Start here",
             "sections": {
               "1": {
                 "heading": "Other stomas you may hear about",
@@ -1622,7 +1602,6 @@
           },
           "3": {
             "title": "Words you will hear",
-            "group": "Start here",
             "sections": {
               "1": {
                 "heading": "Your equipment",
@@ -1692,241 +1671,7 @@
             }
           },
           "9": {
-            "title": "Leaks and short wear time",
-            "group": "When something is not right",
-            "sections": {
-              "1": {
-                "heading": "What often helps",
-                "items": {
-                  "1": "Re-measure. Stoma size changes for months after surgery, and an opening cut to last month’s size is one of the most common causes of a leak",
-                  "2": "Check where the leak starts — from under the barrier, or from the edge. They point at different problems",
-                  "3": "Make sure skin is completely dry before the barrier goes on, and hold it in place so body heat can set the seal"
-                }
-              },
-              "2": {
-                "heading": "When to call your NSWOC",
-                "note": "Repeated leaking usually means the fit is wrong, not that you are doing it wrong. Convexity, rings and pastes can all help — but which one depends on your abdomen and your stoma, so that is an assessment rather than a shopping decision. The wrong convexity can cause a pressure injury.",
-                "items": {
-                  "1": "Leaks more than occasionally, or a pattern you cannot explain",
-                  "2": "Skin that has not fully healed between changes"
-                }
-              }
-            }
-          },
-          "10": {
-            "title": "Pancaking",
-            "group": "When something is not right",
-            "sections": {
-              "1": {
-                "heading": "What is happening",
-                "items": {
-                  "1": "The pouch film sticks to itself, so output cannot drop away from the stoma and pushes up under the barrier instead",
-                  "2": "It is more common with thicker output and with filters that pull the air out quickly"
-                }
-              },
-              "2": {
-                "heading": "What often helps",
-                "note": "If it is constant, or your output has become noticeably thicker than it used to be, mention it — that is worth looking at rather than working around.",
-                "items": {
-                  "1": "A puff of air in the pouch before you close it",
-                  "2": "A lubricating deodorant, which helps output slide to the bottom"
-                }
-              }
-            }
-          },
-          "11": {
-            "title": "Ballooning and gas",
-            "group": "When something is not right",
-            "sections": {
-              "1": {
-                "heading": "What often helps",
-                "items": {
-                  "1": "Filters do wet out and stop working — that is normal rather than a fault",
-                  "2": "Gas patterns often settle over the first months as your gut adjusts",
-                  "3": "Eating and drinking more slowly means swallowing less air"
-                }
-              },
-              "2": {
-                "heading": "When to call your NSWOC",
-                "note": "Food affects gas differently for everyone, and post-surgery advice differs by ostomy type — so this is a conversation with your team or a dietitian rather than a list to follow.",
-                "items": {
-                  "1": "A sudden change in gas alongside pain, or output that stops"
-                }
-              }
-            }
-          },
-          "12": {
-            "title": "Sore, itchy, or weeping skin",
-            "group": "When something is not right",
-            "sections": {
-              "1": {
-                "heading": "Please do not self-diagnose this one",
-                "items": {
-                  "1": "Irritation from output, a fungal rash, a contact allergy, and a few less common conditions look almost identical to the eye",
-                  "2": "They have opposite treatments — the wrong one makes several of them worse"
-                }
-              },
-              "2": {
-                "heading": "What is safe to do meanwhile",
-                "note": "Any skin that is broken, weeping, bleeding, or still not healed by the next change needs an NSWOC to look at it — not a product recommendation from the internet.",
-                "items": {
-                  "1": "Keep the area clean with warm water only — no oils, lotions, or fragranced products under the barrier",
-                  "2": "Check the opening is not cut larger than the stoma, which leaves skin exposed to output",
-                  "3": "Photograph it before your appointment, since skin changes between changes"
-                }
-              }
-            }
-          },
-          "13": {
-            "title": "Output that changes",
-            "group": "When something is not right",
-            "sections": {
-              "1": {
-                "heading": "Why it matters more with an ileostomy",
-                "items": {
-                  "1": "An ileostomy puts out more fluid and more salt, so dehydration builds faster and less obviously than people expect",
-                  "2": "Thirst is not a reliable early sign — dark urine, headache, and feeling washed out often come first"
-                }
-              },
-              "2": {
-                "heading": "When to call",
-                "note": "High output is the leading reason people are readmitted after ostomy surgery. It is worth phoning about early rather than waiting to see.",
-                "items": {
-                  "1": "A sustained jump in output lasting more than a day",
-                  "2": "Watery, high-volume output that is not settling",
-                  "3": "Feeling dizzy, confused, or unusually weak alongside it"
-                }
-              }
-            }
-          },
-          "14": {
-            "title": "A bulge around the stoma",
-            "group": "When something is not right",
-            "sections": {
-              "1": {
-                "heading": "What it usually is",
-                "items": {
-                  "1": "A parastomal hernia — the abdominal wall weakening around the stoma. It is common and it is not something you caused",
-                  "2": "It often changes how your barrier sits, so leaks can start at the same time"
-                }
-              },
-              "2": {
-                "heading": "When to call your NSWOC",
-                "note": "Support garments help many people, but they have to be sized and chosen for the specific hernia — buying one without an assessment can make the fit worse rather than better.",
-                "items": {
-                  "1": "Any new bulge, or a change in the shape of the area around your stoma"
-                }
-              }
-            }
-          },
-          "15": {
-            "title": "Clothing & Confidence",
-            "group": "Body and life",
-            "items": {
-              "1": "High-waisted styles and soft layers can keep a pouch secure and low-profile",
-              "2": "Support belts or wraps for active days when you want extra hold",
-              "3": "You do not have to hide your pouch — comfort and preference come first"
-            }
-          },
-          "16": {
-            "title": "Travel & Workdays",
-            "group": "Body and life",
-            "items": {
-              "1": "Empty when the pouch is about one-third to one-half full to reduce leak risk",
-              "2": "Pack supplies in your carry-on — never only in checked bags",
-              "3": "Plan bathroom stops the way you plan coffee: early and without apology"
-            }
-          },
-          "17": {
-            "title": "Intimacy & Social Ease",
-            "group": "Body and life",
-            "items": {
-              "1": "Talk about what helps you feel secure — timing, clothing, or a support wrap",
-              "2": "Confidence grows with a routine that has already worked at home",
-              "3": "Your pace is the right pace"
-            }
-          },
-          "18": {
-            "title": "Rest & Routine",
-            "group": "Body and life",
-            "items": {
-              "1": "Many people prefer morning changes when output is often lower",
-              "2": "Lay out supplies like a station before you start",
-              "3": "Restock before you run low — clockwork beats last-minute stress"
-            }
-          },
-          "19": {
-            "title": "Hernias, lifting and your core",
-            "group": "Body and life",
-            "items": {
-              "1": "A parastomal hernia is a bulge beside the stoma, where the abdominal wall has weakened and what is underneath pushes through. It is common, and more likely the longer you have a stoma. Ordinary daily life does not cause it, though not smoking, keeping to a healthy weight and avoiding straining all lower the risk",
-              "2": "Follow the lifting advice your surgical team gives you, and ask them to show you how to lift rather than only what to avoid. Your abdominal wall is still healing in the early weeks, so build up gradually — technique matters more than a fixed weight limit",
-              "3": "Gentle core and breathing exercises usually start within the first few days, and you build from there. What is right for you depends on your fitness as much as your surgery — a physiotherapist can set the pace with you"
-            },
-            "note": "Many people find a support garment comfortable and reassuring, particularly if a hernia is already there. It is worth knowing that support wear has not been shown to prevent a hernia — it is for comfort and confidence. If you have one, ask your NSWOC to measure and fit you, since a garment that is too tight can restrict your movement and breathing."
-          },
-          "20": {
-            "title": "Getting back to activity",
-            "group": "Body and life",
-            "items": {
-              "1": "Walking usually comes first and starts early. Everything beyond that is a conversation about timing with your surgical team",
-              "2": "Swimming is fine once your wounds are fully healed — your pouch is water-resistant and, fitted well, designed not to leak. Change it well before you swim rather than just beforehand so the adhesive can settle, and cover the filter with the sticker provided",
-              "3": "Contact sports are worth raising, since a stoma guard protects against a direct blow. Heavy lifting is a separate question — a guard does not help there. Technique, breathing out on the effort and building up gradually do, and most people get back to what they did before"
-            },
-            "note": "Ostomy Canada and the manufacturer support programs both run activity resources, and plenty of ostomates return to running, swimming, weights, and team sport."
-          }
-        },
-        "urgent": {
-          "heading": "Some things are not a website question",
-          "intro": "Most stoma worries can wait for your next NSWOC appointment. These cannot. Seek urgent medical care if you notice:",
-          "action": "Go to your nearest emergency department or call 911. Do not wait for a callback, and do not troubleshoot a dusky stoma at home.",
-          "signs": {
-            "1": "A stoma that turns dark, dusky, purple, or feels cold to the touch",
-            "2": "Severe abdominal pain, or vomiting with no output for several hours — this can mean a blockage",
-            "3": "Heavy or continuous bleeding from the stoma itself, not just a spot from cleaning",
-            "4": "Fever, or skin around the stoma that is hot, spreading red, and painful",
-            "5": "Confusion, severe dizziness, or very dark urine alongside high output — signs of significant dehydration"
-          }
-        },
-        "citations": {
-          "1": {
-            "label": "RNAO — Supporting Adults Who Anticipate or Live with an Ostomy (best practice guideline)"
-          },
-          "2": {
-            "label": "NSWOCC — free patient guides by ostomy type"
-          },
-          "3": {
-            "label": "Wounds Canada — Caring for a Person with an Ostomy"
-          }
-        },
-        "pharmacist": {
-          "eyebrow": "Available in Ontario",
-          "heading": "Ask without the awkward",
-          "body": "Not sure if you need convex, a ring, or a different wipe? Chat with an Ontario pharmacist during business hours — until 5 p.m. Eastern. For clinical stoma concerns, your NSWOC remains your primary resource.",
-          "cta": "Talk to a Pharmacist"
-        },
-        "closing": {
-          "heading": "Comfort is a skill you build",
-          "body": "Knowing your stoma is not a test — it is a quieter relationship with fit, skin, and the products that earn their place on your shelf."
-        },
-        "governance": {
-          "disclaimer": "This is general information, not medical advice, and it is not a substitute for assessment by your NSWOC, surgeon, or physician. Fit, skin, and product choices depend on your body and your surgery — talk to your care team before changing anything."
-        }
-      },
-      "finding-your-fit": {
-        "title": "Finding Your Fit",
-        "heroBody": "How to measure, how to choose between systems, and — mostly — which accessories are worth buying and which will not fix what you are trying to fix.",
-        "focus": "Measuring, one-piece versus two-piece, flat versus convex and why that one is not a self-select decision, what each accessory actually does, getting free samples before you commit, and when to ask for a review.",
-        "vibe": "Plain and slightly protective — the chapter that tells you what not to buy.",
-        "categoriesIntro": {
-          "eyebrow": "Before you order anything",
-          "heading": "Almost every fit problem is the barrier, not the extras",
-          "body": "People arrive here having bought rings, pastes and sprays to solve a leak that was really about the opening being cut too big. Start with the measurement and the system, and add accessories only once those are right."
-        },
-        "categories": {
-          "1": {
             "title": "Measure before you order",
-            "group": "Start here",
             "items": {
               "1": "Use the measuring guide that comes in the box — hold it over the stoma and pick the closest shape and size",
               "2": "Cut so the opening sits close to the edge of the stoma. Too large exposes skin to output; too small can rub or injure the stoma",
@@ -1934,9 +1679,8 @@
             },
             "note": "Re-measure regularly for the first few months, and again after any weight change or a hernia. A barrier cut to a size from two months ago is one of the most common reasons a system that used to work suddenly does not."
           },
-          "2": {
+          "10": {
             "title": "One-piece or two-piece",
-            "group": "Choosing a system",
             "sections": {
               "1": {
                 "heading": "What tends to suit a one-piece",
@@ -1956,9 +1700,8 @@
               }
             }
           },
-          "3": {
+          "11": {
             "title": "Flat or convex — please ask before you switch",
-            "group": "Choosing a system",
             "items": {
               "1": "A flat barrier suits a stoma that protrudes onto reasonably even skin, which is most people",
               "2": "Convexity curves toward your skin to help a flat or retracted stoma stand out, or to smooth a dip or crease that output keeps tracking into",
@@ -1966,9 +1709,8 @@
             },
             "note": "This is the one product decision on the whole site that we would rather you did not make alone. Convexity applied to the wrong abdomen can cause a pressure injury, and it is a common reason people end up with skin damage they did not have before. Ask your NSWOC to assess you — most will let you try one before you buy a box."
           },
-          "4": {
+          "12": {
             "title": "What accessories actually do",
-            "group": "Accessories",
             "sections": {
               "1": {
                 "heading": "For sealing and skin",
@@ -1990,9 +1732,8 @@
               }
             }
           },
-          "5": {
+          "13": {
             "title": "Try it before you buy a box",
-            "group": "Accessories",
             "items": {
               "1": "Hollister, Coloplast and Convatec all send free samples in Canada, whether or not you buy from them, and regardless of which brand you currently use",
               "2": "Ask for a sample of anything you are considering switching to — barriers, rings, convex products, belts",
@@ -2000,9 +1741,8 @@
             },
             "note": "Their contact details are in Everyday Liivving. There is no obligation attached, and it is a much cheaper way to find what works than buying full boxes."
           },
-          "6": {
+          "14": {
             "title": "When to ask for a fit review",
-            "group": "Keep checking",
             "items": {
               "1": "Leaks that have started happening when they were not before",
               "2": "Weight change in either direction, which alters the shape of the area around your stoma",
@@ -2011,65 +1751,228 @@
               "5": "Pregnancy, or any further abdominal surgery"
             },
             "note": "A fit review is a normal part of ostomy care, not an admission that something has gone wrong. Bodies change, and the system that suited you last year may simply not be the right one now."
-          }
-        },
-        "programsBand": {
-          "heading": "The order to work through it",
-          "cards": {
-            "1": {
-              "heading": "Measure first",
-              "body": "Most leaks trace back to the opening rather than the product. Re-measure before you change anything else."
-            },
-            "2": {
-              "heading": "Then the system",
-              "body": "One-piece or two-piece, flat or convex. This is the decision that actually determines whether things stay on."
-            },
-            "3": {
-              "heading": "Accessories last",
-              "body": "They refine a fit that already works. They do not create one, and buying more of them rarely fixes a leak."
+          },
+          "15": {
+            "title": "Leaks and short wear time",
+            "sections": {
+              "1": {
+                "heading": "What often helps",
+                "items": {
+                  "1": "Re-measure. Stoma size changes for months after surgery, and an opening cut to last month’s size is one of the most common causes of a leak",
+                  "2": "Check where the leak starts — from under the barrier, or from the edge. They point at different problems",
+                  "3": "Make sure skin is completely dry before the barrier goes on, and hold it in place so body heat can set the seal"
+                }
+              },
+              "2": {
+                "heading": "When to call your NSWOC",
+                "note": "Repeated leaking usually means the fit is wrong, not that you are doing it wrong. Convexity, rings and pastes can all help — but which one depends on your abdomen and your stoma, so that is an assessment rather than a shopping decision. The wrong convexity can cause a pressure injury.",
+                "items": {
+                  "1": "Leaks more than occasionally, or a pattern you cannot explain",
+                  "2": "Skin that has not fully healed between changes"
+                }
+              }
             }
+          },
+          "16": {
+            "title": "Pancaking",
+            "sections": {
+              "1": {
+                "heading": "What is happening",
+                "items": {
+                  "1": "The pouch film sticks to itself, so output cannot drop away from the stoma and pushes up under the barrier instead",
+                  "2": "It is more common with thicker output and with filters that pull the air out quickly"
+                }
+              },
+              "2": {
+                "heading": "What often helps",
+                "note": "If it is constant, or your output has become noticeably thicker than it used to be, mention it — that is worth looking at rather than working around.",
+                "items": {
+                  "1": "A puff of air in the pouch before you close it",
+                  "2": "A lubricating deodorant, which helps output slide to the bottom"
+                }
+              }
+            }
+          },
+          "17": {
+            "title": "Ballooning and gas",
+            "sections": {
+              "1": {
+                "heading": "What often helps",
+                "items": {
+                  "1": "Filters do wet out and stop working — that is normal rather than a fault",
+                  "2": "Gas patterns often settle over the first months as your gut adjusts",
+                  "3": "Eating and drinking more slowly means swallowing less air"
+                }
+              },
+              "2": {
+                "heading": "When to call your NSWOC",
+                "note": "Food affects gas differently for everyone, and post-surgery advice differs by ostomy type — so this is a conversation with your team or a dietitian rather than a list to follow.",
+                "items": {
+                  "1": "A sudden change in gas alongside pain, or output that stops"
+                }
+              }
+            }
+          },
+          "18": {
+            "title": "Sore, itchy, or weeping skin",
+            "sections": {
+              "1": {
+                "heading": "Please do not self-diagnose this one",
+                "items": {
+                  "1": "Irritation from output, a fungal rash, a contact allergy, and a few less common conditions look almost identical to the eye",
+                  "2": "They have opposite treatments — the wrong one makes several of them worse"
+                }
+              },
+              "2": {
+                "heading": "What is safe to do meanwhile",
+                "note": "Any skin that is broken, weeping, bleeding, or still not healed by the next change needs an NSWOC to look at it — not a product recommendation from the internet.",
+                "items": {
+                  "1": "Keep the area clean with warm water only — no oils, lotions, or fragranced products under the barrier",
+                  "2": "Check the opening is not cut larger than the stoma, which leaves skin exposed to output",
+                  "3": "Photograph it before your appointment, since skin changes between changes"
+                }
+              }
+            }
+          },
+          "19": {
+            "title": "Output that changes",
+            "sections": {
+              "1": {
+                "heading": "Why it matters more with an ileostomy",
+                "items": {
+                  "1": "An ileostomy puts out more fluid and more salt, so dehydration builds faster and less obviously than people expect",
+                  "2": "Thirst is not a reliable early sign — dark urine, headache, and feeling washed out often come first"
+                }
+              },
+              "2": {
+                "heading": "When to call",
+                "note": "High output is the leading reason people are readmitted after ostomy surgery. It is worth phoning about early rather than waiting to see.",
+                "items": {
+                  "1": "A sustained jump in output lasting more than a day",
+                  "2": "Watery, high-volume output that is not settling",
+                  "3": "Feeling dizzy, confused, or unusually weak alongside it"
+                }
+              }
+            }
+          },
+          "20": {
+            "title": "A bulge around the stoma",
+            "sections": {
+              "1": {
+                "heading": "What it usually is",
+                "items": {
+                  "1": "A parastomal hernia — the abdominal wall weakening around the stoma. It is common and it is not something you caused",
+                  "2": "It often changes how your barrier sits, so leaks can start at the same time"
+                }
+              },
+              "2": {
+                "heading": "When to call your NSWOC",
+                "note": "Support garments help many people, but they have to be sized and chosen for the specific hernia — buying one without an assessment can make the fit worse rather than better.",
+                "items": {
+                  "1": "Any new bulge, or a change in the shape of the area around your stoma"
+                }
+              }
+            }
+          },
+          "21": {
+            "title": "Clothing & Confidence",
+            "items": {
+              "1": "High-waisted styles and soft layers can keep a pouch secure and low-profile",
+              "2": "Support belts or wraps for active days when you want extra hold",
+              "3": "You do not have to hide your pouch — comfort and preference come first"
+            }
+          },
+          "22": {
+            "title": "Travel & Workdays",
+            "items": {
+              "1": "Empty when the pouch is about one-third to one-half full to reduce leak risk",
+              "2": "Pack supplies in your carry-on — never only in checked bags",
+              "3": "Plan bathroom stops the way you plan coffee: early and without apology"
+            }
+          },
+          "23": {
+            "title": "Intimacy & Social Ease",
+            "items": {
+              "1": "Talk about what helps you feel secure — timing, clothing, or a support wrap",
+              "2": "Confidence grows with a routine that has already worked at home",
+              "3": "Your pace is the right pace"
+            }
+          },
+          "24": {
+            "title": "Rest & Routine",
+            "items": {
+              "1": "Many people prefer morning changes when output is often lower",
+              "2": "Lay out supplies like a station before you start",
+              "3": "Restock before you run low — clockwork beats last-minute stress"
+            }
+          },
+          "25": {
+            "title": "Hernias, lifting and your core",
+            "items": {
+              "1": "A parastomal hernia is a bulge beside the stoma, where the abdominal wall has weakened and what is underneath pushes through. It is common, and more likely the longer you have a stoma. Ordinary daily life does not cause it, though not smoking, keeping to a healthy weight and avoiding straining all lower the risk",
+              "2": "Follow the lifting advice your surgical team gives you, and ask them to show you how to lift rather than only what to avoid. Your abdominal wall is still healing in the early weeks, so build up gradually — technique matters more than a fixed weight limit",
+              "3": "Gentle core and breathing exercises usually start within the first few days, and you build from there. What is right for you depends on your fitness as much as your surgery — a physiotherapist can set the pace with you"
+            },
+            "note": "Many people find a support garment comfortable and reassuring, particularly if a hernia is already there. It is worth knowing that support wear has not been shown to prevent a hernia — it is for comfort and confidence. If you have one, ask your NSWOC to measure and fit you, since a garment that is too tight can restrict your movement and breathing."
+          },
+          "26": {
+            "title": "Getting back to activity",
+            "items": {
+              "1": "Walking usually comes first and starts early. Everything beyond that is a conversation about timing with your surgical team",
+              "2": "Swimming is fine once your wounds are fully healed — your pouch is water-resistant and, fitted well, designed not to leak. Change it well before you swim rather than just beforehand so the adhesive can settle, and cover the filter with the sticker provided",
+              "3": "Contact sports are worth raising, since a stoma guard protects against a direct blow. Heavy lifting is a separate question — a guard does not help there. Technique, breathing out on the effort and building up gradually do, and most people get back to what they did before"
+            },
+            "note": "Ostomy Canada and the manufacturer support programs both run activity resources, and plenty of ostomates return to running, swimming, weights, and team sport."
           }
         },
-        "citations": {
-          "1": {
-            "label": "NSWOCC — patient guides for living with an ostomy"
-          },
-          "2": {
-            "label": "RNAO — Supporting Adults Who Anticipate or Live with an Ostomy"
-          },
-          "3": {
-            "label": "Ostomy Canada Society — finding an NSWOC and local support"
+        "urgent": {
+          "heading": "Some things are not a website question",
+          "intro": "Most stoma worries can wait for your next NSWOC appointment. These cannot. Seek urgent medical care if you notice:",
+          "action": "Go to your nearest emergency department or call 911. Do not wait for a callback, and do not troubleshoot a dusky stoma at home.",
+          "signs": {
+            "1": "A stoma that turns dark, dusky, purple, or feels cold to the touch",
+            "2": "Severe abdominal pain, or vomiting with no output for several hours — this can mean a blockage",
+            "3": "Heavy or continuous bleeding from the stoma itself, not just a spot from cleaning",
+            "4": "Fever, or skin around the stoma that is hot, spreading red, and painful",
+            "5": "Confusion, severe dizziness, or very dark urine alongside high output — signs of significant dehydration"
           }
         },
         "pharmacist": {
           "eyebrow": "Available in Ontario",
-          "heading": "Ask before you buy, not after",
-          "body": "An Ontario pharmacist can help with what a product is for, what is available, and how to order it, during business hours until 5 p.m. Eastern. Whether a particular barrier or convexity suits your body is an assessment, and that belongs with your NSWOC.",
+          "heading": "Ask without the awkward",
+          "body": "Not sure if you need convex, a ring, or a different wipe? Chat with an Ontario pharmacist during business hours — until 5 p.m. Eastern. For clinical stoma concerns, your NSWOC remains your primary resource.",
           "cta": "Talk to a Pharmacist"
         },
         "closing": {
-          "heading": "A good fit is quiet",
-          "body": "When the system is right you stop thinking about it, and that is the whole goal. Getting there is usually a conversation and a couple of samples rather than a bigger shelf of products."
+          "heading": "Comfort is a skill you build",
+          "body": "Knowing your stoma is not a test — it is a quieter relationship with fit, skin, and the products that earn their place on your shelf."
         },
         "governance": {
-          "disclaimer": "This is general information, not medical advice, and it is not a substitute for assessment by your NSWOC. Product choice — particularly convexity — depends on your abdomen, your stoma, and how your skin responds, and the wrong choice can cause harm. Talk to your care team before switching systems."
-        },
-        "nextLabel": "Food & Digestion →"
+          "disclaimer": "This is general information, not medical advice, and it is not a substitute for assessment by your NSWOC, surgeon, or physician. Fit, skin, and product choices depend on your body and your surgery — talk to your care team before changing anything."
+        }
       },
-      "food-and-digestion": {
-        "title": "Food & Digestion",
-        "heroBody": "What changed inside, what to expect from food now, and why the answer is so different depending on which ostomy you have.",
-        "focus": "How your digestion works now, the first weeks of eating, reintroducing foods, hydration and electrolytes, gas and odour, output consistency, blockage prevention, and the medication question almost nobody is told about.",
-        "vibe": "Curious and unhurried — the chapter that explains why, not just what.",
+      "everyday-liivving": {
+        "title": "Everyday Liivving",
+        "heroBody": "The people, programs, and money help that exist in Canada — gathered in one place, so you are not searching alone.",
+        "focus": "Peer support and chapters near you, what coverage actually looks like province by province, free manufacturer programs, youth and young adult community, awareness dates, and the practical Canadian questions — flying, winter, going remote, and ordering across provincial lines.",
+        "vibe": "Practical and connecting — the map to everything outside this website.",
         "categoriesIntro": {
-          "eyebrow": "Start with the why",
-          "heading": "Your gut still works — it just finishes earlier",
-          "body": "Almost every food question makes more sense once you know which part of the journey your surgery changed. That is why this chapter starts with plumbing rather than a list of foods."
+          "eyebrow": "You are not doing this alone",
+          "heading": "What exists, and who it is for",
+          "body": "A lot of good help exists in Canada. Almost none of it is in one place. This chapter is the map — most of it links out, because these organizations do it better than we could."
         },
         "categories": {
           "1": {
+            "title": "Peer support is its own kind of care",
+            "note": "A peer visitor is not a substitute for your NSWOC. Most people find they want both.",
+            "items": {
+              "1": "Ostomy Canada Society runs chapters and peer support groups across the country, searchable by distance from where you live",
+              "2": "Their Visitor Program trains people who have an ostomy to talk with people who have just had one — lived experience, not clinical advice",
+              "3": "If you are between roughly 20 and 40, ask about Gutsy Gang social clubs — they run in Vancouver, Calgary, Saskatoon, Winnipeg, Hamilton, Toronto, and Niagara"
+            }
+          },
+          "2": {
             "title": "What your surgery actually changed",
-            "group": "How it works now",
             "items": {
               "1": "Food is broken down in the stomach and small intestine, and that part is usually unchanged — this is why you still absorb your nutrition",
               "2": "The colon’s main job is reclaiming water and salt from what is left, and forming stool. A colostomy leaves most of that intact; an ileostomy bypasses it almost entirely",
@@ -2077,9 +1980,8 @@
             },
             "note": "This is the single most useful thing to understand: an ileostomy is not \"a colostomy higher up\". The missing colon is why output is looser, why fluid and salt matter more, and why the advice differs."
           },
-          "2": {
+          "3": {
             "title": "The first few weeks",
-            "group": "How it works now",
             "items": {
               "1": "Most teams suggest a lower-fibre period straight after surgery. It is temporary, and it is about swelling at the stoma rather than about fibre being bad for you",
               "2": "Your stoma is swollen at first and shrinks over the following weeks, so the opening it can pass comfortably gets bigger too",
@@ -2087,9 +1989,8 @@
             },
             "note": "How long this lasts is your surgical team’s call, not a fixed rule — it varies by surgery and by person. Ask when you should be moving on rather than assuming."
           },
-          "3": {
+          "4": {
             "title": "Adding foods back",
-            "group": "Eating again",
             "items": {
               "1": "One new food at a time, in a small amount, with a couple of days before the next one — otherwise you cannot tell what caused what",
               "2": "Chew far more than feels necessary. With an ileostomy especially, chewing is doing work your colon used to do",
@@ -2097,9 +1998,8 @@
             },
             "note": "Tolerance is genuinely individual. Two people with the same surgery often land on completely different lists, so treat anyone else’s \"foods to avoid\" list — including one you find online — as a starting hypothesis rather than a rule."
           },
-          "4": {
+          "5": {
             "title": "Foods people often find need care",
-            "group": "Eating again",
             "sections": {
               "1": {
                 "heading": "Commonly reported as harder to pass",
@@ -2118,9 +2018,8 @@
               }
             }
           },
-          "5": {
+          "6": {
             "title": "Fluid and salt",
-            "group": "The two that matter most",
             "items": {
               "1": "With an ileostomy you lose more water and more sodium than you did before, and you lose it steadily rather than noticeably",
               "2": "Thirst is a late signal. Darker urine, headache, cramps, and feeling flat often arrive first",
@@ -2128,18 +2027,16 @@
             },
             "note": "Ask your NSWOC or pharmacist what to keep at home before you need it. Rehydration solutions are cheap, keep well, and are far more useful bought in advance than at 2am."
           },
-          "6": {
+          "7": {
             "title": "Gas, odour and noise",
-            "group": "Everyday effects",
             "items": {
               "1": "Gas usually settles over the first months as your gut adapts — early gas is not a sign of how things will stay",
               "2": "Swallowed air is a bigger contributor than most people expect: eating quickly, straws, chewing gum, fizzy drinks",
               "3": "Filters wet out and stop working. That is the filter doing its job and reaching the end of it, not a defect"
             }
           },
-          "7": {
+          "8": {
             "title": "Thicker or looser output",
-            "group": "Everyday effects",
             "sections": {
               "1": {
                 "heading": "Often reported as thickening",
@@ -2156,133 +2053,17 @@
               }
             }
           },
-          "8": {
+          "9": {
             "title": "The medication question",
-            "group": "Ask about this one",
             "items": {
               "1": "Extended-release, slow-release and enteric-coated tablets are designed to dissolve over a long stretch of gut — with an ileostomy they can pass straight through, intact and unabsorbed",
               "2": "People sometimes see whole tablets in the pouch. That is worth reporting rather than ignoring",
               "3": "This can quietly affect anything that matters — blood pressure, thyroid, mental health medication, contraception"
             },
             "note": "Bring your full medication list to a pharmacist and say you have an ileostomy. There is often an immediate-release or liquid alternative. Do not stop or change anything yourself."
-          }
-        },
-        "programsBand": {
-          "heading": "If you take one thing from this chapter",
-          "cards": {
-            "1": {
-              "heading": "Chew more than feels necessary",
-              "body": "It is the single habit that prevents the most trouble, and it costs nothing. With an ileostomy your mouth is doing work your colon used to do."
-            },
-            "2": {
-              "heading": "Replace salt, not just water",
-              "body": "Steady losses are easy to miss until you feel unwell. An oral rehydration solution in the cupboard is worth more than any food list."
-            },
-            "3": {
-              "heading": "Ask about your tablets",
-              "body": "Slow-release medication and an ileostomy is a known problem and almost nobody is warned about it. One pharmacist conversation settles it."
-            }
-          }
-        },
-        "urgent": {
-          "heading": "Food-related things that need care today",
-          "intro": "Most food questions can wait. These cannot — and two of them are the most common reasons ostomates end up back in hospital.",
-          "signs": {
-            "1": "No output at all for several hours together with cramping, a swollen abdomen, or vomiting — this can be a blockage",
-            "2": "Output that has become watery and high-volume and is not settling over a day",
-            "3": "Feeling dizzy, confused, unusually weak, or passing very little urine — signs of significant dehydration",
-            "4": "Severe abdominal pain, or a stoma that looks dark, dusky or swollen alongside any of the above"
           },
-          "action": "Go to your nearest emergency department or call 911. Do not try to clear a suspected blockage at home, and do not wait to see whether high output settles overnight."
-        },
-        "citations": {
-          "1": {
-            "label": "NSWOCC — living with an ileostomy, colostomy or ileal conduit (patient guides)"
-          },
-          "2": {
-            "label": "United Ostomy Associations of America — eating well after ostomy surgery"
-          },
-          "3": {
-            "label": "RNAO — Supporting Adults Who Anticipate or Live with an Ostomy"
-          }
-        },
-        "pharmacist": {
-          "eyebrow": "Available in Ontario",
-          "heading": "Bring your medication list",
-          "body": "An Ontario pharmacist can check whether anything you take is a slow-release or enteric-coated form, and whether an alternative exists. Chat during business hours until 5 p.m. Eastern. Diet planning and persistent output problems belong with your NSWOC or a dietitian.",
-          "cta": "Talk to a Pharmacist"
-        },
-        "closing": {
-          "heading": "Food is supposed to be a pleasure again",
-          "body": "Almost everyone ends up eating a far wider range than they expected in the first weeks. Start cautiously, add slowly, and let your own patterns replace anyone else’s list."
-        },
-        "governance": {
-          "disclaimer": "This is general information, not medical advice, and it is not a substitute for assessment by your NSWOC, surgeon, physician, or a registered dietitian. Food tolerance varies enormously between people, and guidance differs by ostomy type and by how long ago you had surgery — talk to your care team before making changes, particularly if you have had a blockage or ongoing high output."
-        },
-        "nextLabel": "Everyday Liivving →"
-      },
-      "everyday-liivving": {
-        "title": "Everyday Liivving",
-        "heroBody": "The people, programs, and money help that exist in Canada — gathered in one place, so you are not searching alone.",
-        "focus": "Peer support and chapters near you, what coverage actually looks like province by province, free manufacturer programs, youth and young adult community, awareness dates, and the practical Canadian questions — flying, winter, going remote, and ordering across provincial lines.",
-        "vibe": "Practical and connecting — the map to everything outside this website.",
-        "nextLabel": "Back to Ostomy Care →",
-        "categoriesIntro": {
-          "eyebrow": "You are not doing this alone",
-          "heading": "What exists, and who it is for",
-          "body": "A lot of good help exists in Canada. Almost none of it is in one place. This chapter is the map — most of it links out, because these organizations do it better than we could."
-        },
-        "categories": {
-          "1": {
-            "title": "Peer support is its own kind of care",
-            "group": "Start here",
-            "note": "A peer visitor is not a substitute for your NSWOC. Most people find they want both.",
-            "items": {
-              "1": "Ostomy Canada Society runs chapters and peer support groups across the country, searchable by distance from where you live",
-              "2": "Their Visitor Program trains people who have an ostomy to talk with people who have just had one — lived experience, not clinical advice",
-              "3": "If you are between roughly 20 and 40, ask about Gutsy Gang social clubs — they run in Vancouver, Calgary, Saskatoon, Winnipeg, Hamilton, Toronto, and Niagara"
-            }
-          },
-          "2": {
-            "title": "What coverage actually looks like in Canada",
-            "group": "Money",
-            "note": "We have checked every province and territory against its own government page — see Funding & Coverage for what yours pays, who has to sign off, and the dates that catch people out.",
-            "items": {
-              "1": "There is no national ostomy program. The amount, the model, and who approves it all change at the provincial border",
-              "2": "Moving provinces resets everything — including which forms you file and who has to sign them",
-              "3": "In most provinces an NSWOC assessment is the gate. Some, like Saskatchewan, will not accept a self-application at all"
-            }
-          },
-          "3": {
-            "title": "Programs that cost you nothing",
-            "group": "Money",
-            "items": {
-              "1": "All three major manufacturers run free support programs — samples, phone lines, and access to ostomy nurses",
-              "2": "You do not have to buy from us, or from them, to use these",
-              "3": "They will also help you work out what your province covers, which is often the fastest way to get an answer"
-            }
-          },
-          "4": {
-            "title": "Awareness, on Canada’s calendar",
-            "group": "Community",
-            "items": {
-              "1": "World Ostomy Day runs every three years, not every year — the last was 4 October 2025, and the next falls in 2028",
-              "2": "In the years between, Canada still marks the first Saturday of October, anchored by Ostomy Canada’s Step Up for Ostomy campaign",
-              "3": "Chapters usually run local events — the chapter finder is the fastest way to see what is happening near you"
-            }
-          },
-          "5": {
-            "title": "Stories from people who have one",
-            "group": "Community",
-            "items": {
-              "1": "Reading someone describe their first month is worth more than any checklist we could write",
-              "2": "We are collecting stories from Canadians with ostomies — surgery, work, travel, dating, sport, all of it",
-              "3": "If you would like to share yours, tell the care team and we will be in touch about how it works"
-            }
-          },
-          "6": {
+          "10": {
             "title": "Flying with supplies",
-            "group": "Getting around Canada",
             "sections": {
               "1": {
                 "heading": "Packing",
@@ -2312,9 +2093,8 @@
               }
             }
           },
-          "7": {
+          "11": {
             "title": "Winter, and why things stop sticking",
-            "group": "Getting around Canada",
             "items": {
               "1": "Adhesive works less well when it is cold. A barrier that has been in a cold car or an unheated porch will not bond as readily",
               "2": "Warm the barrier before applying — hold it between your palms for a minute, or tuck it under your clothing against your body — then press it in place for a full minute or two. Use body heat only: not a hairdryer, radiator or microwave. Too much heat damages the adhesive, and because the stoma has no nerve endings it cannot warn you when something is too hot",
@@ -2322,9 +2102,8 @@
             },
             "note": "Store spare supplies somewhere room temperature — Ostomy Canada suggests roughly 15 to 30°C — rather than a garage, shed, or the trunk of a car. Coloplast’s instructions for use state the product must not be stored under freezing conditions. Heat is a problem too, so those same spots are worth avoiding in July as much as in January."
           },
-          "8": {
+          "12": {
             "title": "Cottage, camping and going remote",
-            "group": "Getting around Canada",
             "items": {
               "1": "Find out where the nearest pharmacy is and how long it would take to reach — but treat it as a backup, not a plan. Pharmacies carry a limited range and are unlikely to stock your exact barrier and pouch",
               "2": "Take at least double what you need. There is no version of this trip where running out is a minor inconvenience",
@@ -2332,9 +2111,8 @@
             },
             "note": "If you irrigate, think it through carefully before committing to somewhere without running water. A routine needs roughly 500 to 1,000 mL of lukewarm water clean enough to drink, about an hour at a toilet, and somewhere for the output to go — and it repeats every day or two. Cold water causes cramping, which is harder to manage away from a tap. If you would not drink the water, do not irrigate with it."
           },
-          "9": {
+          "13": {
             "title": "Ordering across provincial lines",
-            "group": "Practical Canada",
             "items": {
               "1": "Your entitlement is set by the province you live in — you qualify through your provincial coverage, not through the store. That does not mean you can buy anywhere",
               "2": "Ontario and Quebec pay a set amount and leave the choice of retailer to you. Saskatchewan will reimburse products bought in another province if you send a paid receipt showing what you purchased",
@@ -2342,15 +2120,47 @@
             },
             "note": "Check your own program’s vendor rules before you order from out of province — including from us. Moving provinces is a different situation entirely and resets your coverage; that is in Funding & Coverage."
           },
-          "10": {
+          "14": {
             "title": "Supplies people offer you",
-            "group": "Practical Canada",
             "items": {
               "1": "Supply exchanges exist, including Facebook groups such as Ostomy Supplies Exchange Canada, and some people do find what they need this way. Ostomy Canada also advises caution: a barrier that suited someone else’s stoma, or one stored badly, can leak or damage your skin",
               "2": "Check the expiry date, that packaging is intact and unopened, and that the size matches what you use. Ask how the supplies were stored too — heat and damp shorten the life of an adhesive barrier well before its printed expiry",
               "3": "Do not accept anything whose inner packaging has been opened. Most pouches and barriers are supplied non-sterile, so the reason is less about sterility than the adhesive: once the seal is broken you cannot tell how long it has been exposed to air"
             },
             "note": "Local chapters and support groups often take in surplus supplies and pass them to members who need them. Friends of Ostomates Worldwide Canada also collects surplus, but ships it to partner organizations overseas rather than to individuals here — it states it cannot support individual requests. If you are donating, it asks that items stay in their packaging."
+          },
+          "15": {
+            "title": "What coverage actually looks like in Canada",
+            "note": "We have checked every province and territory against its own government page — see Funding & Coverage for what yours pays, who has to sign off, and the dates that catch people out.",
+            "items": {
+              "1": "There is no national ostomy program. The amount, the model, and who approves it all change at the provincial border",
+              "2": "Moving provinces resets everything — including which forms you file and who has to sign them",
+              "3": "In most provinces an NSWOC assessment is the gate. Some, like Saskatchewan, will not accept a self-application at all"
+            }
+          },
+          "16": {
+            "title": "Programs that cost you nothing",
+            "items": {
+              "1": "All three major manufacturers run free support programs — samples, phone lines, and access to ostomy nurses",
+              "2": "You do not have to buy from us, or from them, to use these",
+              "3": "They will also help you work out what your province covers, which is often the fastest way to get an answer"
+            }
+          },
+          "17": {
+            "title": "Awareness, on Canada’s calendar",
+            "items": {
+              "1": "World Ostomy Day runs every three years, not every year — the last was 4 October 2025, and the next falls in 2028",
+              "2": "In the years between, Canada still marks the first Saturday of October, anchored by Ostomy Canada’s Step Up for Ostomy campaign",
+              "3": "Chapters usually run local events — the chapter finder is the fastest way to see what is happening near you"
+            }
+          },
+          "18": {
+            "title": "Stories from people who have one",
+            "items": {
+              "1": "Reading someone describe their first month is worth more than any checklist we could write",
+              "2": "We are collecting stories from Canadians with ostomies — surgery, work, travel, dating, sport, all of it",
+              "3": "If you would like to share yours, tell the care team and we will be in touch about how it works"
+            }
           }
         },
         "programsBand": {
@@ -2470,20 +2280,6 @@
             }
           }
         },
-        "citations": {
-          "1": {
-            "label": "Ostomy Canada Society — provincial government programs"
-          },
-          "2": {
-            "label": "Ostomy Canada Society — Ontario ADP grant and why $975 a year is not enough"
-          },
-          "3": {
-            "label": "Canada Revenue Agency — Disability Tax Credit, eliminating category"
-          },
-          "4": {
-            "label": "United Ostomy Associations of America — World Ostomy Day"
-          }
-        },
         "pharmacist": {
           "eyebrow": "Available in Ontario",
           "heading": "Fit questions that do not need a waiting room",
@@ -2496,6 +2292,184 @@
         },
         "governance": {
           "disclaimer": "This is general information, not medical advice, and it is not a substitute for assessment by your NSWOC, surgeon, or physician. Fit, skin, and product choices depend on your body and your surgery — talk to your care team before changing anything."
+        }
+      },
+      "this-might-be-you": {
+        "title": "This Might Be You",
+        "heroBody": "What is genuinely different if you are a child’s parent, in your twenties, thinking about pregnancy, or managing this alongside other things in later life.",
+        "focus": "Children and the people raising them, young adults, pregnancy and parenthood, and older adults — what changes for each, and who to ask rather than guess.",
+        "vibe": "Specific, and quick to refer — short on advice, clear on who actually knows.",
+        "categoriesIntro": {
+          "eyebrow": "Not everyone the same",
+          "heading": "The general advice is not wrong, it is just not enough",
+          "body": "Most ostomy information is written for an average adult who does not exist. These are the situations where the differences are big enough to matter, and where the right move is usually a specific referral rather than a longer article."
+        },
+        "categories": {
+          "1": {
+            "title": "Children, and the people raising them",
+            "sections": {
+              "1": {
+                "heading": "The one that matters most",
+                "items": {
+                  "1": "A small body has very little fluid in reserve, so a child — especially a baby with an ileostomy — can get dehydrated far faster than an adult losing the same amount. Steady salt loss can also show up as poor weight gain long before anything looks like dehydration, which is why your team may weigh your baby often",
+                  "2": "Ask what your child’s normal output is and what counts as too much for their size. Call the same day for output that suddenly rises or turns watery, fewer wet diapers, no tears, a sunken soft spot, unusual sleepiness, or weight that stalls or drops — that is a call to your team, not something to manage with extra fluids at home"
+                }
+              },
+              "2": {
+                "heading": "Products and skin",
+                "items": {
+                  "1": "A child’s stoma is not a smaller version of an adult one. They grow, so sizes change constantly — re-measuring is routine rather than occasional",
+                  "2": "Pediatric products are a real category rather than repackaged adult stock, shaped smaller and more flexibly for a small abdomen. The adhesive is the part that gets overstated: it is largely the same material as the adult ranges. A baby born at term starts with skin barrier function much like an adult’s, so the extra caution about fragile skin is really for babies born early or at low birth weight, and children who are unwell",
+                  "3": "When a pouch keeps lifting, the answer is usually to change it more often rather than to make it stick harder — pediatric barriers are thinner, so they hold up to output for less time. Adhesive removers, barrier films, skin cement and benzoin are generally avoided in infants and young children, because more of any chemical is absorbed through their skin and a stronger bond can tear it on removal. A seal that keeps failing is a call to your child’s ostomy nurse, not a trip for stronger products"
+                }
+              },
+              "3": {
+                "heading": "Two things worth knowing before they happen",
+                "items": {
+                  "1": "A child’s stoma can prolapse — telescope outward and look alarmingly long. It is more common in children than in adults and usually not an emergency, but colour matters more than length: call urgently if it darkens or goes dusky, if your child is in pain, or if output stops",
+                  "2": "In a child with an ileostomy, high-fibre foods can cause a blockage, so new foods go in one at a time. Ask your team what each of these looks like for your child, and which number to call after hours"
+                }
+              },
+              "4": {
+                "heading": "School, and afterwards",
+                "items": {
+                  "1": "School needs a written plan rather than a conversation in September: who knows and who backs them up on days they are away, where a spare kit and a full change of clothes live, private washroom access without having to ask in front of the class, and a number the school can call",
+                  "2": "Most Canadian schools have no nurse on site, so ask who owns the plan — usually the principal, sometimes a public health nurse — and make sure supply teachers get it. Most schools have never been asked before, so expect to be the one explaining",
+                  "3": "Ask the children’s hospital about transition planning a year or two before it happens, and about who the adult service will be. The handoff around seventeen or eighteen is the point at which families most often fall out of specialist care altogether, and it goes better when it is arranged rather than arrived at"
+                }
+              }
+            },
+            "note": "Pediatric ostomy care belongs with a children’s hospital team — the service that created the stoma, working with a nurse who practises in pediatrics. One practical note: “pediatric NSWOC” describes where a nurse works rather than a credential you can search for, and the NSWOCC directory filters by city and by wound, ostomy or continence, with no pediatric option. So the hospital team is the first call, and the one who can point you to the right nurse near you. Coverage for children differs from the adult rules — see Funding & Coverage."
+          },
+          "2": {
+            "title": "Being in your twenties with one",
+            "sections": {
+              "1": {
+                "heading": "Telling people",
+                "items": {
+                  "1": "There is no rule about when to tell a partner, and no version of it you owe anyone. Some people say it early so it is out of the way; others wait until someone knows them a bit first",
+                  "2": "It often goes fine. It sometimes does not — and if someone decides they cannot be with you because of your stoma, that is information about them rather than a sign you handled it wrong",
+                  "3": "Practise it once out loud, with a friend or a peer visitor, before it matters. It is easier the second time"
+                }
+              },
+              "2": {
+                "heading": "Studying and going out",
+                "items": {
+                  "1": "University accommodations are real and not a favour, but they usually run through two offices: exam arrangements through accessibility services, residence through campus housing, on a separate application. Both want documentation from your care team and both have deadlines that can fall months before term, so ask early — and what is on offer varies, since a private washroom is not something every campus provides",
+                  "2": "Alcohol changes output for a lot of people, but the bigger issue is fluid. It is a diuretic, and with an ileostomy you are already losing more water and salt than you used to — dehydration is the most common reason people end up back in hospital after ileostomy surgery. A long night out is still worth planning around rather than avoiding, and if your output is already high, ask your NSWOC or dietitian what your fluid plan should look like first",
+                  "3": "Ostomy Canada runs Gutsy Gang social clubs for roughly the 20 to 40 age group, in several cities. Some chapters run the same group under another name, so it is worth asking locally rather than searching only for that one"
+                },
+                "note": "Being the only person you know with one is the hardest part for most people this age, and it is the part a peer group fixes fastest."
+              }
+            }
+          },
+          "3": {
+            "title": "Pregnancy and becoming a parent",
+            "sections": {
+              "1": {
+                "heading": "Before you try",
+                "items": {
+                  "1": "If your ostomy is because of IBD, the biggest thing you can influence is where your disease sits when you conceive. Going in while it is quiet is associated with outcomes close to anyone else’s, and conceiving during a flare makes preterm birth and low birth weight more likely",
+                  "2": "Start that conversation with your gastroenterologist before you start trying to conceive, rather than after. Some medication decisions take months to settle, and stopping treatment on your own is the thing most likely to go wrong",
+                  "3": "Getting pregnant may take longer if you have had pelvic surgery. Pouch surgery in particular is linked to reduced fertility — people with a pelvic pouch are around three times more likely to use IVF — though once they do, their chance of a live birth is the same as anyone else’s. Worth raising early, so that a slow start does not read as an answer"
+                }
+              },
+              "2": {
+                "heading": "While you are pregnant",
+                "items": {
+                  "1": "People with ostomies do have healthy pregnancies, and a stoma is not a reason not to. It does mean being followed more closely than usual: stoma problems in pregnancy are common rather than rare — blockage and a drop in output are the ones that come up most, and prolapse and parastomal hernia are also reported — and preterm birth is somewhat more likely. Almost all of it is manageable when your team knows to watch for it",
+                  "2": "Your abdomen changes shape substantially, so the stoma does too — expect to re-measure often and to change products more than once along the way",
+                  "3": "Settle one thing in advance: what counts as an emergency. Blockage is the most common stoma problem in pregnancy, so ask your surgeon or NSWOC now what should make you phone or come in. Get your own threshold and your own number before you need them"
+                },
+                "note": "Most of what is known here comes from bowel stomas, so if you have a urostomy or ileal conduit, ask your urologist what is different for you."
+              },
+              "3": {
+                "heading": "Delivery",
+                "items": {
+                  "1": "How you deliver is a discussion between you, your obstetric team, your surgical team, and — if your ostomy is because of IBD — your gastroenterologist. Having a stoma does not decide it on its own, but some histories do push toward a planned caesarean, and in practice caesarean rates in people with a stoma run well above average. Ask early which of that applies to you",
+                  "2": "If you have an ileal pouch or a continent diversion, say so explicitly. A pouch is not a stoma, and guidelines lean toward a planned caesarean after pouch surgery to protect the sphincter and the pouch’s long-term function. The evidence behind that is not strong and teams do disagree, which is exactly why it belongs in a conversation months ahead rather than one in labour"
+                }
+              },
+              "4": {
+                "heading": "Afterwards",
+                "items": {
+                  "1": "The stoma usually settles back toward its pre-pregnancy size over the following weeks, so there is another round of re-measuring and probably another product change on the far side",
+                  "2": "Ask about lifting before you are home with a toddler to pick up. Parastomal hernia is the risk being managed, and the advice is specific to your surgery rather than general",
+                  "3": "Medication while breastfeeding is a gastroenterologist question if your ostomy is because of IBD. Stopping treatment unilaterally is the common mistake, and it is a phone call to avoid it"
+                }
+              }
+            },
+            "note": "If you are planning a pregnancy, start before you conceive — your gastroenterologist or surgeon, and an NSWOC. If you are already pregnant, tell your obstetric team about your ostomy at the first appointment and ask for an NSWOC to be involved early rather than when something goes wrong."
+          },
+          "4": {
+            "title": "Later life, and managing more than one thing",
+            "sections": {
+              "1": {
+                "heading": "What tends to get harder",
+                "items": {
+                  "1": "Dexterity and eyesight. Moldable barriers you shape with your fingers instead of cutting, larger tabs and simpler closures all exist for exactly this. Pre-cut works if your stoma is round and its size has settled; one-piece has fewer steps, while two-piece can be easier to line up by feel. There is no single right answer, so ask an NSWOC to trial a few with you rather than struggling with what you have",
+                  "2": "Skin gets thinner and tears more easily with age, and it usually shows up on removal — peel low and slow, pressing the skin away from the barrier rather than pulling the barrier off. Fit still matters just as much, because a barrier that leaks puts output onto skin that is slower to recover. Worth having an NSWOC watch you do a full change",
+                  "3": "Managing several conditions at once means more medication, and how much of a pill you absorb depends on your ostomy: with an ileostomy, extended-release and enteric-coated forms can pass through before they have finished working, while a colostomy is closer to normal. Ask a pharmacist to go through the whole list, including anything you buy over the counter"
+                }
+              },
+              "2": {
+                "heading": "What is worth arranging",
+                "items": {
+                  "1": "Home care and community nursing can help with changes — ask your care team what your province provides rather than assuming there is nothing. Most provinces also fund a pharmacist medication review, and in some, including Ontario, a pharmacist can come to you",
+                  "2": "If someone helps you, have them taught by an NSWOC directly — doing a change themselves with the nurse there, not just watching one. Book again if your stoma, your skin, or your products change",
+                  "3": "If a move to a retirement residence or long-term care is coming, raise the ostomy before the move rather than after. Staff frequently have no ostomy experience, and the route your supplies arrive by usually changes with the address"
+                },
+                "note": "Several provincial programs cover more for seniors, and some are seniors-only — see Funding & Coverage."
+              }
+            }
+          },
+          "5": {
+            "title": "If you are the one helping",
+            "items": {
+              "1": "Ask what kind of help is wanted before offering it. Plenty of people want company and logistics, not hands-on care, and being asked is better than being managed",
+              "2": "If you are doing hands-on care, ask an NSWOC to teach you directly — secondhand instructions are how skin problems start",
+              "3": "Caring for someone is tiring in a way people underestimate. Most support groups welcome family and partners, and that is not an imposition on the group"
+            }
+          },
+          "6": {
+            "title": "Where to bring the weight of it",
+            "items": {
+              "1": "Ostomy Canada’s Visitor Program puts you in touch with a trained peer visitor who has one themselves. It is support in its own right, not only a way to rehearse a difficult conversation, and it is free",
+              "2": "A local chapter or peer support group is the other standing door, and several run online rather than only in person — worth knowing if you are rural, newly post-operative, or not ready to walk into a room. Listings do go stale, so if the one near you looks dead, Ostomy Canada’s national line is 1-888-969-9698",
+              "3": "Low mood and anxiety are common after ostomy surgery, and they tend to rise in the months afterwards rather than settle. If it is not lifting, that is a reason to say so to your family doctor or surgical team — there is no ostomy-specific counselling service in Canada, so the route runs through your usual primary care and your province’s mental health services"
+            },
+            "note": "Nothing here is a substitute for urgent help. If you are thinking about harming yourself, call or text 9-8-8, Canada’s Suicide Crisis Helpline, any time."
+          }
+        },
+        "programsBand": {
+          "heading": "The referral that fits each one",
+          "cards": {
+            "1": {
+              "heading": "A child",
+              "body": "Your child’s hospital team first — they hold the referral to a nurse who works in pediatrics. Ask about Youth Camp early; funding exists and places are limited."
+            },
+            "2": {
+              "heading": "Pregnancy",
+              "body": "Before you conceive if you can: your gastroenterologist or surgeon, then your obstetric team from the first appointment, with an NSWOC involved early rather than reactively."
+            },
+            "3": {
+              "heading": "Later life",
+              "body": "Your NSWOC for fit as dexterity changes, a pharmacist for a full medication review, and your province’s home care program."
+            }
+          }
+        },
+        "pharmacist": {
+          "eyebrow": "Available in Ontario",
+          "heading": "Product and restock questions, whoever you are",
+          "body": "An Ontario pharmacist can help with what products exist in smaller sizes, what is easier to handle, and how a medication list looks alongside an ostomy — during business hours until 5 p.m. Eastern. Anything about a child, a pregnancy, or a change in someone’s ability to manage belongs with an NSWOC or the treating team.",
+          "cta": "Talk to a Pharmacist"
+        },
+        "closing": {
+          "heading": "Most of this is a conversation, not an article",
+          "body": "The four situations here are the ones where general advice runs out fastest. Knowing that, and knowing who to ask, is genuinely most of the work."
+        },
+        "governance": {
+          "disclaimer": "This is general information, not medical advice. Care for children, during pregnancy, and for people managing several conditions differs in ways this page does not attempt to cover — it is here to tell you what changes and who to ask. Speak to an NSWOC and the treating team rather than relying on general ostomy guidance, including ours."
         }
       }
     },
@@ -2652,10 +2626,47 @@
         "resourcesHeading": "Where to go from here",
         "resourcesIntro": "These are run by patient organizations, specialist nurses, and government programs — not by Liivv. We link out because they do this better than a shop could.",
         "pathEyebrow": "Path",
-        "allChapters": "All five chapters",
+        "allChapters": "All four chapters",
         "keepGoing": "Keep going",
         "backToLanding": "Back to Ostomy Care page",
-        "chapterNav": "Chapter navigation"
+        "chapterNav": "Chapter navigation",
+        "groupNav": "Filter by section",
+        "allGroups": "All",
+        "showMore": "{count} more",
+        "showLess": "Less",
+        "ask": {
+          "nswoc": "Ask your NSWOC",
+          "team": "Ask your care team",
+          "pharmacist": "Ask a pharmacist",
+          "dietitian": "Ask a dietitian",
+          "gi": "Ask your gastroenterologist",
+          "peer": "Ask someone who has one",
+          "assessment": "Needs an assessment first",
+          "urgent": "Call, do not wait"
+        },
+        "productsLabel": "Products for this",
+        "productsNote": "Liivv sells these. They are here because this section is about equipment — nothing on this page is a recommendation to buy from us.",
+        "groups": {
+          "beforeSurgery": "Before surgery",
+          "afterSurgery": "After surgery",
+          "startHere": "Start here",
+          "theBasics": "The basics",
+          "whenSomethingIsNotRight": "When something is not right",
+          "bodyAndLife": "Body and life",
+          "choosingASystem": "Choosing a system",
+          "accessories": "Accessories",
+          "keepChecking": "Keep checking",
+          "eatingAgain": "Eating again",
+          "everydayEffects": "Everyday effects",
+          "money": "Money",
+          "community": "Community",
+          "gettingAroundCanada": "Getting around Canada",
+          "practicalCanada": "Practical Canada",
+          "growingUp": "Growing up",
+          "bodiesThatChange": "Bodies that change",
+          "thePeopleAroundIt": "The people around it"
+        },
+        "backToChapters": "Back to Ostomy Care →"
       },
       "discovery": {
         "eyebrow": "Also from Liivv",
@@ -2693,7 +2704,10 @@
         "startOver": "Start over",
         "empty": "Choose where you live and we will show the routes worth pursuing, with a link to the official page for each one.",
         "verifiedOn": "Checked against the official page on {date}",
-        "caveat": "This is a starting point, not a decision. Programs change their amounts and rules every year — always confirm on the official page before you plan around a number, and your NSWOC can often tell you what actually gets approved locally."
+        "caveat": "This is a starting point, not a decision. Programs change their amounts and rules every year — always confirm on the official page before you plan around a number, and your NSWOC can often tell you what actually gets approved locally.",
+        "progress": "{answered} of {total} answered",
+        "narrowing": "Answer the rest to narrow this",
+        "complete": "All answered"
       },
       "results": {
         "nihbTitle": "Non-Insured Health Benefits comes first",
@@ -2709,7 +2723,11 @@
         "dtcLink": "CRA — eliminating (bowel or bladder)",
         "expensesTitle": "Claim what you paid out of pocket — no approval needed",
         "expensesBody": "This one has no gate. Ostomy pads and supplies are listed eligible medical expenses, so whatever your province does not cover may be claimable on your return whether or not you have the Disability Tax Credit. Keep every receipt, including shipping where it is not covered.",
-        "expensesLink": "CRA — eligible medical expenses"
+        "expensesLink": "CRA — eligible medical expenses",
+        "seniorTitle": "What changes at 65 in your province",
+        "permanenceTitle": "Temporary ostomies are treated differently here",
+        "provisionalTitle": "Two answers we are not using yet",
+        "provisionalBody": "You told us about age and whether your ostomy is permanent. Both genuinely change what some provinces fund, but we have not yet verified those rules against each government page — so we are not guessing. Check the official link above for your own situation, and ask the program directly."
       },
       "fundingPage": {
         "kicker": "Ostomy Care · Money",

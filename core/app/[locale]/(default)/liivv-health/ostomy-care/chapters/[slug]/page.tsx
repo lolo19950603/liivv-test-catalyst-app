@@ -6,6 +6,7 @@ import { MedicalWebPage, WithContext } from 'schema-dts';
 import { locales } from '~/i18n/locales';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
 
+import { getOcCatalog, type OcCatalogItem } from '../../get-oc-catalog';
 import { ChapterPage } from '../chapter-page';
 import { buildChapters, type Chapter, CHAPTER_SLUGS } from '../chapters-data';
 
@@ -21,7 +22,9 @@ function chapterPath(slug: string) {
 async function getLocalizedChapter(locale: string, slug: string): Promise<Chapter | undefined> {
   const messages = await getMessages({ locale });
 
-  return buildChapters(messages.OstomyCare.chapters).find((chapter) => chapter.slug === slug);
+  return buildChapters(messages.OstomyCare.chapters, locale).find(
+    (chapter) => chapter.slug === slug,
+  );
 }
 
 export function generateStaticParams() {
@@ -122,6 +125,23 @@ export default async function Page({ params }: Props) {
     includeAlternates: false,
   });
 
+  /*
+   * Only the ids this chapter actually places. getOcCatalog is cache()d for the
+   * request, so this is the same fetch the landing page already made.
+   */
+  const wanted = new Set(chapter.categories.flatMap((card) => card.productIds ?? []));
+  const products: Record<number, OcCatalogItem> = {};
+
+  if (wanted.size) {
+    const catalog = await getOcCatalog(locale);
+
+    [...catalog.kits, ...catalog.products]
+      .filter((item) => wanted.has(item.entityId))
+      .forEach((item) => {
+        products[item.entityId] = item;
+      });
+  }
+
   return (
     <>
       <script
@@ -130,7 +150,7 @@ export default async function Page({ params }: Props) {
         }}
         type="application/ld+json"
       />
-      <ChapterPage slug={slug} />
+      <ChapterPage products={products} slug={slug} />
     </>
   );
 }

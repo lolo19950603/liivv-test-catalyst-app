@@ -16,7 +16,7 @@
  * =============================================================================
  */
 
-import { CHAPTER_META, type ChapterMeta } from './chapters-meta';
+import { type CategoryMeta, CHAPTER_META, type ChapterMeta } from './chapters-meta';
 
 export interface CategorySection {
   heading: string;
@@ -24,9 +24,15 @@ export interface CategorySection {
   note?: string;
 }
 
+export type AskRole = NonNullable<CategoryMeta['ask']>;
+
 export interface CategoryCard {
   title: string;
   image: string;
+  /** Who this card refers you to. Structural — never comes from the message tree. */
+  ask?: AskRole;
+  /** BigCommerce product ids to show beneath the card, in their own band. */
+  productIds?: number[];
   items?: string[];
   sections?: CategorySection[];
   note?: string;
@@ -116,7 +122,6 @@ export interface Chapter {
     image: string;
   };
   closing: { heading: string; body: string };
-  nextLabel: string;
 }
 
 /*
@@ -192,7 +197,6 @@ type Numbered<T> = Record<string, T>;
 
 interface CategoryMessages {
   title: string;
-  group?: string;
   badge?: string;
   note?: string;
   items?: Numbered<string>;
@@ -204,7 +208,6 @@ interface ChapterMessages {
   heroBody: string;
   focus: string;
   vibe: string;
-  nextLabel: string;
   categoriesIntro: { eyebrow: string; heading: string; body: string };
   categories: Numbered<CategoryMessages>;
   programsBand?: { heading?: string; cards: Numbered<{ heading: string; body: string }> };
@@ -215,7 +218,6 @@ interface ChapterMessages {
     links: Numbered<{ title: string; org: string; body: string; note?: string }>;
   }>;
   urgent?: { heading: string; intro: string; action: string; signs: Numbered<string> };
-  citations?: Numbered<{ label: string }>;
   pharmacist: { eyebrow: string; heading: string; body: string; cta: string };
   closing: { heading: string; body: string };
   governance: { disclaimer: string };
@@ -239,24 +241,37 @@ function ordered<T>(node: Numbered<T> | undefined): T[] {
  * URL is dropped rather than rendered as a dead card, and a missing category
  * image falls back to the chapter hero rather than rendering `undefined`.
  */
-function composeChapter(meta: ChapterMeta, messages: ChapterMessages): Chapter {
-  const categories: CategoryCard[] = ordered(messages.categories).map((card, index) => ({
-    title: card.title,
-    image: meta.categoryImages[index] ?? meta.heroImage,
-    ...(card.group === undefined ? {} : { group: card.group }),
-    ...(card.badge === undefined ? {} : { badge: card.badge }),
-    ...(card.note === undefined ? {} : { note: card.note }),
-    ...(card.items === undefined ? {} : { items: ordered(card.items) }),
-    ...(card.sections === undefined
-      ? {}
-      : {
-          sections: ordered(card.sections).map((section) => ({
-            heading: section.heading,
-            items: ordered(section.items),
-            ...(section.note === undefined ? {} : { note: section.note }),
-          })),
-        }),
-  }));
+function composeChapter(
+  meta: ChapterMeta,
+  messages: ChapterMessages,
+  locale: string,
+  groupLabels: Record<string, string>,
+): Chapter {
+  const categories: CategoryCard[] = ordered(messages.categories).map((card, index) => {
+    const structure = meta.categories[index];
+
+    return {
+      title: card.title,
+      image: structure?.image ?? meta.heroImage,
+      ...(structure?.ask === undefined ? {} : { ask: structure.ask }),
+      ...(structure?.products === undefined ? {} : { productIds: structure.products }),
+      ...(structure?.group === undefined
+        ? {}
+        : { group: groupLabels[structure.group] ?? structure.group }),
+      ...(card.badge === undefined ? {} : { badge: card.badge }),
+      ...(card.note === undefined ? {} : { note: card.note }),
+      ...(card.items === undefined ? {} : { items: ordered(card.items) }),
+      ...(card.sections === undefined
+        ? {}
+        : {
+            sections: ordered(card.sections).map((section) => ({
+              heading: section.heading,
+              items: ordered(section.items),
+              ...(section.note === undefined ? {} : { note: section.note }),
+            })),
+          }),
+    };
+  });
 
   const resources = messages.resources
     ? ordered(messages.resources).map((group, groupIndex) => ({
@@ -275,13 +290,17 @@ function composeChapter(meta: ChapterMeta, messages: ChapterMessages): Chapter {
       }))
     : undefined;
 
-  const citations = messages.citations
-    ? ordered(messages.citations)
-        .map((citation, index) => ({
-          label: citation.label,
-          href: meta.citationHrefs[index] ?? '',
-        }))
-        .filter((citation) => citation.href !== '')
+  /*
+   * Citations come from the meta rather than the messages, so a translation
+   * pass cannot rename a published document. A French title is used only
+   * where the publisher issues one; otherwise the English title stands in
+   * both locales, which matches the page the link actually opens.
+   */
+  const citations = meta.citations.length
+    ? meta.citations.map((citation) => ({
+        label: locale === 'fr' && citation.labelFr ? citation.labelFr : citation.label,
+        href: locale === 'fr' && citation.hrefFr ? citation.hrefFr : citation.href,
+      }))
     : undefined;
 
   return {
@@ -294,7 +313,6 @@ function composeChapter(meta: ChapterMeta, messages: ChapterMessages): Chapter {
     heroBody: messages.heroBody,
     focus: messages.focus,
     vibe: messages.vibe,
-    nextLabel: messages.nextLabel,
     categoriesIntro: messages.categoriesIntro,
     categories,
     ...(messages.programsBand === undefined
@@ -343,11 +361,19 @@ function composeChapter(meta: ChapterMeta, messages: ChapterMessages): Chapter {
  * A chapter listed in the meta but missing from the messages is skipped rather
  * than rendered half-empty.
  */
-export function buildChapters(raw: Numbered<ChapterMessages>): Chapter[] {
+/*
+ * Pass `messages.OstomyCare.chapters` and `messages.OstomyCare.ui.chapter.groups`.
+ * Group labels are resolved here so every card in a cluster shows the same name.
+ */
+export function buildChapters(
+  raw: Numbered<ChapterMessages>,
+  locale = 'en',
+  groupLabels: Record<string, string> = {},
+): Chapter[] {
   return CHAPTER_META.flatMap((meta) => {
     const messages = raw[meta.slug];
 
-    return messages ? [composeChapter(meta, messages)] : [];
+    return messages ? [composeChapter(meta, messages, locale, groupLabels)] : [];
   });
 }
 

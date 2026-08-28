@@ -94,6 +94,33 @@ export default async (): Promise<NextConfig> => {
     // eslint-disable-next-line @typescript-eslint/require-await
     async redirects() {
       return [
+        /*
+         * Finding Your Fit and Food & Digestion were folded into their
+         * neighbours. Both URLs were live and indexed and every card survived
+         * the merge, so they move rather than disappear.
+         */
+        {
+          source: '/liivv-health/ostomy-care/chapters/finding-your-fit',
+          destination: '/liivv-health/ostomy-care/chapters/get-to-know-your-stoma',
+          permanent: true,
+        },
+        {
+          source: '/liivv-health/ostomy-care/chapters/food-and-digestion',
+          destination: '/liivv-health/ostomy-care/chapters/everyday-liivving',
+          permanent: true,
+        },
+        // next-intl prefixes non-default locales, and the matcher is literal,
+        // so the prefixed forms need their own entries.
+        {
+          source: '/:locale(en|fr)/liivv-health/ostomy-care/chapters/finding-your-fit',
+          destination: '/:locale/liivv-health/ostomy-care/chapters/get-to-know-your-stoma',
+          permanent: true,
+        },
+        {
+          source: '/:locale(en|fr)/liivv-health/ostomy-care/chapters/food-and-digestion',
+          destination: '/:locale/liivv-health/ostomy-care/chapters/everyday-liivving',
+          permanent: true,
+        },
         {
           source: '/liivv-health/womens-health-demo',
           destination: '/liivv-health/womens-health',

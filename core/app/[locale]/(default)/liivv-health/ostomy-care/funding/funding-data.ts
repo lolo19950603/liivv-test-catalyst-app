@@ -159,6 +159,10 @@ export interface ResultCopy {
   expensesTitle: string;
   expensesBody: string;
   expensesLink: string;
+  provisionalTitle: string;
+  provisionalBody: string;
+  seniorTitle: string;
+  permanenceTitle: string;
 }
 
 /*
@@ -208,8 +212,32 @@ export function buildProvinceOptions(
 }
 
 /* True once there is enough input to say anything useful. */
+/*
+ * Province alone is enough to say something useful, so results appear then —
+ * but "ready" is not the same as "specific". `checkerProgress` reports what is
+ * still outstanding so the UI can say which answers would sharpen the result,
+ * rather than showing a confident card over four untouched questions.
+ */
 export function isCheckerReady(input: CheckerInput): boolean {
   return input.province !== '';
+}
+
+export const CHECKER_QUESTIONS = ['permanence', 'indigenous', 'senior', 'otherCoverage'] as const;
+
+export type CheckerQuestion = (typeof CHECKER_QUESTIONS)[number];
+
+export function checkerProgress(input: CheckerInput): {
+  answered: number;
+  total: number;
+  outstanding: CheckerQuestion[];
+} {
+  const outstanding = CHECKER_QUESTIONS.filter((question) => input[question] === '');
+
+  return {
+    answered: CHECKER_QUESTIONS.length - outstanding.length,
+    total: CHECKER_QUESTIONS.length,
+    outstanding,
+  };
 }
 
 /*
@@ -276,6 +304,38 @@ export function buildResults(
       });
     }
 
+    /*
+     * Age and permanence. Both questions were being collected and thrown away.
+     * They now render whenever the jurisdiction has a documented rule — and
+     * when it does not, the provisional card below says which answers are not
+     * yet being used, rather than leaving the reader to assume they were.
+     */
+    const meta = PROGRAM_META[input.province];
+
+    if (input.senior === 'yes' && meta.seniorRule) {
+      cards.push({
+        id: 'senior',
+        title: copy.seniorTitle,
+        body: meta.seniorRule,
+        linkLabel: program.officialLabel,
+        linkUrl: program.officialUrl,
+        verifiedOn: program.verifiedOn,
+        tone: 'supporting',
+      });
+    }
+
+    if (input.permanence === 'temporary' && meta.permanenceRule) {
+      cards.push({
+        id: 'permanence',
+        title: copy.permanenceTitle,
+        body: meta.permanenceRule,
+        linkLabel: program.officialLabel,
+        linkUrl: program.officialUrl,
+        verifiedOn: program.verifiedOn,
+        tone: 'caution',
+      });
+    }
+
     if (input.otherCoverage === 'yes' && PAYER_OF_LAST_RESORT.includes(input.province)) {
       cards.push({
         id: 'last-resort',
@@ -284,6 +344,25 @@ export function buildResults(
         linkLabel: program.officialLabel,
         linkUrl: program.officialUrl,
         tone: 'caution',
+      });
+    }
+
+    const usedSenior = input.senior === 'yes' && Boolean(meta.seniorRule);
+    const usedPermanence = input.permanence === 'temporary' && Boolean(meta.permanenceRule);
+    const answeredEither = input.senior !== '' || input.permanence !== '';
+
+    /*
+     * The reader answered, and we could not use it. Saying so is the whole
+     * point — the previous version discarded both answers silently.
+     */
+    if (answeredEither && !usedSenior && !usedPermanence) {
+      cards.push({
+        id: 'provisional',
+        title: copy.provisionalTitle,
+        body: copy.provisionalBody,
+        linkLabel: program.officialLabel,
+        linkUrl: program.officialUrl,
+        tone: 'supporting',
       });
     }
   }

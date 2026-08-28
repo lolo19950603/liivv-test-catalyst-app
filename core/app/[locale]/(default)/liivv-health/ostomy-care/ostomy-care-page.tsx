@@ -1,6 +1,6 @@
 'use client';
 
-import { useMessages } from 'next-intl';
+import { useLocale, useMessages } from 'next-intl';
 import { type TransitionEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { HeroLoopVideo, RotatingHeroWord } from '~/components/health-hero';
@@ -404,7 +404,12 @@ export function OstomyCarePage({
   // Chapter copy is translated, so the card list is built per render rather
   // than frozen at module scope.
   const messages = useMessages();
-  const lifeChapters = buildChapters(messages.OstomyCare.chapters).map((chapter) => ({
+  const locale = useLocale();
+  const lifeChapters = buildChapters(
+    messages.OstomyCare.chapters,
+    locale,
+    messages.OstomyCare.ui.chapter.groups,
+  ).map((chapter) => ({
     num: chapter.num,
     word: chapter.chapterWord,
     title: chapter.title,
@@ -634,7 +639,7 @@ export function OstomyCarePage({
         <div className="oc-wrap">
           <header className="oc-chapters-head">
             <span className="oc-eyebrow">Life chapters</span>
-            <h2>Five stories. Open the one that fits.</h2>
+            <h2>Four stories. Open the one that fits.</h2>
             <p>
               New to this, learning your stoma, working out food, or looking for support and funding
               — pick the chapter that feels like today. Already know the aisle?{' '}
