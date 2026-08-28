@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Liivv — How it works and IT architecture</title>
+  <style>
+  @page { size: letter; margin: 0.65in 0.7in; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Calibri, Helvetica, Arial, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.42;
+    color: #1a1a1a;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 20pt; font-weight: 650; margin: 0 0 10pt; letter-spacing: -0.02em; }
+  h2 { font-size: 13.5pt; font-weight: 650; margin: 20pt 0 8pt; page-break-after: avoid; }
+  h3 { font-size: 11.5pt; font-weight: 650; margin: 14pt 0 6pt; page-break-after: avoid; }
+  p, ul, ol { margin: 0 0 8pt; }
+  li { margin-bottom: 2pt; }
+  hr { border: 0; border-top: 1px solid #d0d0d0; margin: 14pt 0; }
+  table { width: 100%; border-collapse: collapse; margin: 8pt 0 12pt; font-size: 9pt; page-break-inside: auto; }
+  th, td { text-align: left; vertical-align: top; padding: 5pt 6pt; border-bottom: 1px solid #e2e2e2; }
+  th { font-weight: 650; border-bottom: 1.5px solid #1a1a1a; }
+  strong { font-weight: 650; }
+  code { font-family: Consolas, "Courier New", monospace; font-size: 9pt; }
+  pre.code { background: #f6f5f2; padding: 8pt 10pt; overflow: hidden; font-size: 8pt; }
+  .mermaid { margin: 10pt 0 14pt; page-break-inside: avoid; }
+  svg { max-width: 100%; }
+  figure.diagram { margin: 10pt 0 14pt; page-break-inside: avoid; }
+  figure.diagram svg { width: 100%; height: auto; display: block; }
+  figcaption { font-size: 9pt; color: #555; margin-top: 4pt; }
+</style>
+</head>
+<body>
+<h1>Liivv — How it works and IT architecture</h1>
+<p><strong>Audience:</strong> Managers and IT (security / infrastructure review)  </p>
+<p><strong>App:</strong> BigCommerce Catalyst storefront (<code>core/</code>) + Liivv health and pharmacy extensions  </p>
+<p><strong>Date:</strong> August 2026  </p>
+<p><strong>Status:</strong> Single source of truth (replaces the former How-Liivv-Works and IT-Architecture packs)  </p>
+<p><strong>PDF:</strong> <a href="./Liivv-Architecture.pdf">Liivv-Architecture.pdf</a> (same content, for email / print)</p>
+<p>How to use this file:</p>
+<ul>
+<li><strong>Managers:</strong> read <strong>§1–§3</strong>. That is the story of why shopping and health data are split.</li>
+<li><strong>IT:</strong> read the whole document. <strong>§9</strong> is the pre-launch security checklist (S1–S8).</li>
+</ul>
+<hr />
+<h2>1. The one-sentence version</h2>
+<p>Liivv is a health storefront with <strong>two separate engines</strong>:</p>
+<ul>
+<li><strong>BigCommerce</strong> runs the shop (the same kind of product as Shopify).</li>
+<li><strong>Supabase</strong> holds health records in a <strong>Canadian</strong> Postgres project.</li>
+</ul>
+<p>Orders never live in the health locker. Health records never live in the shop. The customer only sees Liivv. Behind the website, shopping and health information take different doors on purpose.</p>
+<figure class="diagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" width="720" height="220" role="img" aria-labelledby="title desc">
+  <title id="title">How a visit splits</title>
+  <desc id="desc">The customer shops on Liivv. The website is one front door. Shopping goes to BigCommerce. Health records go to Supabase.</desc>
+  <rect x="0" y="0" width="720" height="220" fill="#ffffff"/>
+
+  <rect x="12" y="78" width="140" height="64" rx="6" fill="#f3f3f3" stroke="#1a1a1a"/>
+  <text x="82" y="104" text-anchor="middle" fill="#1a1a1a" font-size="13" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">Customer</text>
+  <text x="82" y="122" text-anchor="middle" fill="#555555" font-size="11" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">shops on Liivv</text>
+
+  <line x1="152" y1="110" x2="214" y2="110" stroke="#888888" stroke-width="1.5"/>
+
+  <rect x="214" y="70" width="168" height="80" rx="6" fill="#1a1a1a"/>
+  <text x="298" y="102" text-anchor="middle" fill="#ffffff" font-size="13" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">Liivv website</text>
+  <text x="298" y="120" text-anchor="middle" fill="#d8d8d8" font-size="11" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">one front door</text>
+
+  <line x1="382" y1="90" x2="448" y2="44" stroke="#888888" stroke-width="1.5"/>
+  <line x1="382" y1="130" x2="448" y2="176" stroke="#888888" stroke-width="1.5"/>
+
+  <rect x="448" y="12" width="260" height="72" rx="6" fill="#f3f3f3" stroke="#1a1a1a"/>
+  <text x="578" y="40" text-anchor="middle" fill="#1a1a1a" font-size="13" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">BigCommerce</text>
+  <text x="578" y="58" text-anchor="middle" fill="#555555" font-size="11" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">the store engine — products, cart, orders</text>
+
+  <rect x="448" y="136" width="260" height="72" rx="6" fill="#f3f3f3" stroke="#1a1a1a"/>
+  <text x="578" y="164" text-anchor="middle" fill="#1a1a1a" font-size="13" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">Supabase</text>
+  <text x="578" y="182" text-anchor="middle" fill="#555555" font-size="11" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">the health locker — Canadian vault</text>
+</svg>
+<figcaption>How a visit splits: customer shops on Liivv, then shopping goes to BigCommerce and health records go to Supabase</figcaption></figure>
+<table><thead><tr><th>Job</th><th>Who does it</th><th>Simple analogy</th></tr></thead><tbody><tr><td>Show products, take the cart, create the order</td><td>BigCommerce</td><td>The shop floor and the till</td></tr>
+<tr><td>Remember health needs, insurance, prescriptions, care chat</td><td>Supabase</td><td>A locked filing cabinet in Canada</td></tr>
+<tr><td>Charge the card, including repeating subscriptions</td><td>Stripe</td><td>The bank — we never see the card number</td></tr></tbody></table>
+<p>A store is built to sell products. A clinic-style locker is built to keep sensitive health information. Using one system for both would be like keeping medical files in a cash register.</p>
+<p><strong>Design principle (technical):</strong> browsers never receive service-role, admin, or payment secrets. <strong>Next.js on Vercel is the trust boundary.</strong></p>
+<hr />
+<h2>2. What each system is for</h2>
+<h3>BigCommerce is the only store engine</h3>
+<p>Liivv does not invent a second checkout. We do not process orders ourselves.</p>
+<p><strong>What BigCommerce handles</strong></p>
+<ul>
+<li>Product catalog, prices, and categories</li>
+<li>Cart and checkout path</li>
+<li>Customer accounts used to sign in</li>
+<li>The official order after payment succeeds</li>
+<li>Most <strong>customer email</strong> (password reset, order mail) — branding and DNS live in the BC control panel</li>
+</ul>
+<p><strong>What it is not used for</strong></p>
+<ul>
+<li>Health questionnaires or care needs</li>
+<li>Insurance details</li>
+<li>Prescriptions, refills, or CarePack requests</li>
+<li>Conversations with the care team</li>
+</ul>
+<p><strong>Recurring orders:</strong> Stripe handles the repeating charge. When a renewal succeeds, Liivv still creates the order in BigCommerce. Stripe is the billing engine. BigCommerce remains the only order engine.</p>
+<h3>What Supabase is</h3>
+<p>A professionally run Postgres database (plus optional Storage). In plain language: a secure place where Liivv keeps records a shop is not meant to hold.</p>
+<ul>
+<li><strong>A filing cabinet.</strong> Health profile, insurance, prescriptions, refill/CarePack requests, care chat.</li>
+<li><strong>Not a second store.</strong> It does not take payments or create orders.</li>
+<li>The customer never talks to Supabase directly. Liivv’s server holds the service-role key.</li>
+</ul>
+<p>This project’s Supabase region is <strong>Canada (Central) / <code>ca-central-1</code></strong>.</p>
+<p><strong>Patients do not upload prescription photos.</strong> Adding a prescription is <strong>transfer from another pharmacy</strong> or <strong>doctor fax</strong>. Staff work the queue in the BigCommerce embedded app (<code>/bc-app</code>).</p>
+<h3>Stripe, Makeswift, OpenAI, Health Canada</h3>
+<table><thead><tr><th>Layer</th><th>Technology</th><th>Role</th></tr></thead><tbody><tr><td>Storefront</td><td><strong>Next.js 16</strong> (App Router) on <strong>Vercel</strong></td><td>Only app that holds secrets; UI; server actions; webhooks</td></tr>
+<tr><td>CMS</td><td><strong>Makeswift</strong></td><td>Marketing / content pages</td></tr>
+<tr><td>AI assistant</td><td><strong>OpenAI</strong> (optional, feature-flagged)</td><td>Store assistant in account chat — <strong>off</strong> until Legal decides on a DPA</td></tr>
+<tr><td>Drug reference</td><td><strong>Health Canada DPD</strong></td><td>Medication search (server proxy, rate-limited)</td></tr>
+<tr><td>Ephemeral cache</td><td><strong>Upstash Redis</strong> (optional) or Vercel runtime cache</td><td>Checkout snapshots, BC app install token, stronger rate limits</td></tr></tbody></table>
+<p>Upstash Redis is <strong>not required</strong> for launch if Supabase is configured. It is cheap insurance for checkout/webhooks, the staff-app install token, and site-wide medication rate limits.</p>
+<h3>Chat assistant</h3>
+<p>Care conversations live in Supabase. An on-site assistant (Olivia) can help with products, orders, and account how-tos <strong>when we turn it on</strong>. It is not a clinician.</p>
+<p>If <code>VIRTUAL_CARE_BOT_ENABLED=true</code> and an API key is set, <strong>customer message text is sent to OpenAI</strong> even when the bot refuses clinical advice and points people to a pharmacist. That flag stays <strong>false</strong> until the team decides whether to buy an OpenAI arrangement that includes a <strong>DPA</strong> (Data Processing Agreement — a contract that says OpenAI may process this data for us and how they must protect it).</p>
+<p>Human care-team chat in <code>/bc-app</code> still stays in Supabase either way.</p>
+<hr />
+<h2>3. PHI and the “medical server” idea</h2>
+<p><strong>PHI</strong> means protected health information — anything that could identify a person and say something about their health.</p>
+<p>A stronger production posture is a <strong>paid Canadian Supabase project</strong> with healthcare-oriented extras (contract, backups, network locks). HIPAA is a <strong>US</strong> law; Canada’s conversation is <strong>PIPEDA</strong> (and <strong>PHIPA</strong> in Ontario). Supabase’s healthcare add-on is still the practical “vault grade” package they sell — not a claim that US law is the Canadian statute.</p>
+<p>The vault is only as good as how we use it. Liivv still decides staff access, retention, and that chat is not copied into tools that are not covered.</p>
+<table><thead><tr><th>Data class</th><th>Examples</th><th>Storage</th></tr></thead><tbody><tr><td>PII</td><td>Name, email, address, BC customer id</td><td>BigCommerce + Supabase <code>profiles</code></td></tr>
+<tr><td>PHI / PHI-adjacent</td><td>Health categories, insurance, Rx, CarePack, chat</td><td>Supabase</td></tr>
+<tr><td>Payment card data</td><td>PAN / CVC</td><td><strong>Never stored</strong> — Stripe Elements</td></tr>
+<tr><td>Commerce</td><td>Orders, SKUs, prices</td><td>BigCommerce (+ Stripe for billing)</td></tr></tbody></table>
+<hr />
+<h2>4. System context (IT)</h2>
+<div class="mermaid">flowchart LR
+  subgraph Clients
+    C[Customer Browser]
+    S[Staff /bc-app]
+    B[BC Control Panel iframe /bc-app]
+  end
+
+  subgraph Hub["Next.js 16 - Catalyst on Vercel"]
+    N[App Router / Server Actions / API Routes]
+  end
+
+  subgraph Commerce
+    BCG[BC Storefront GraphQL]
+    BCA[BC Admin REST]
+    BCO[BC App OAuth]
+  end
+
+  subgraph Data
+    SB[(Supabase Postgres)]
+    KV[(KV / Redis optional)]
+  end
+
+  subgraph Payments
+    STK[Stripe API]
+    STW[Stripe Webhooks]
+  end
+
+  subgraph Other
+    MS[Makeswift]
+    AI[OpenAI]
+    DPD[Health Canada DPD]
+  end
+
+  C --> N
+  S --> N
+  B --> N
+  N --> BCG
+  N --> BCA
+  N --> BCO
+  N --> SB
+  N --> KV
+  N --> STK
+  N --> MS
+  N --> AI
+  N --> DPD
+  STW --> N
+  BCG -.->|product webhooks| N</div>
+<hr />
+<h2>5. System of record</h2>
+<table><thead><tr><th>Domain</th><th>System of record</th><th>Notes</th></tr></thead><tbody><tr><td>Products, categories, prices</td><td>BigCommerce</td><td>Synced to Stripe prices via BC webhooks</td></tr>
+<tr><td>Customers (login identity)</td><td>BigCommerce</td><td>Linked in Supabase <code>profiles.bigcommerce_customer_id</code></td></tr>
+<tr><td>Cart / checkout cart</td><td>BigCommerce GraphQL</td><td>Cart ID stored in signed Auth.js / anonymous JWT</td></tr>
+<tr><td>Orders</td><td>BigCommerce</td><td>Created via Admin REST after Stripe success</td></tr>
+<tr><td>Payment methods &amp; subscriptions</td><td>Stripe</td><td>Renewals create BC orders on <code>invoice.paid</code></td></tr>
+<tr><td>Health profile, insurance</td><td>Supabase</td><td>Not modeled in BC</td></tr>
+<tr><td>Prescriptions, CarePack, refills</td><td>Supabase</td><td>Staff queue in <code>/bc-app</code></td></tr>
+<tr><td>Live chat messages</td><td>Supabase</td><td>Optional OpenAI bot replies (flagged off)</td></tr>
+<tr><td>Marketing page content</td><td>Makeswift</td><td>Catalyst Makeswift integration</td></tr></tbody></table>
+<hr />
+<h2>6. Data flow — commerce</h2>
+<div class="mermaid">sequenceDiagram
+  participant U as Browser
+  participant N as Next.js
+  participant BC as BigCommerce
+  participant KV as KV/Redis
+  participant ST as Stripe
+  participant SB as Supabase
+
+  U->>N: Browse / PDP
+  N->>BC: Storefront GraphQL
+  BC-->>N: Product data
+  N-->>U: RSC HTML
+
+  U->>N: Add to cart / update
+  N->>BC: Cart mutations
+  opt Subscription line
+    N->>SB: cart_subscription_lines
+  end
+
+  U->>N: Start checkout
+  N->>KV: Store checkout snapshot
+  N->>ST: Create Payment/Setup Intent
+  N-->>U: Client secret
+  U->>ST: Confirm (Stripe.js)
+
+  ST->>N: Webhook payment_intent.succeeded
+  N->>BC: Admin REST create order
+  N->>BC: Clear cart
+  opt Recurring items
+    N->>ST: Create subscriptions
+  end</div>
+<hr />
+<h2>7. Data flow — onboarding and pharmacy</h2>
+<div class="mermaid">sequenceDiagram
+  participant U as Logged-in customer
+  participant N as Next.js server actions
+  participant BC as BigCommerce Admin
+  participant SB as Supabase
+  participant DPD as Health Canada DPD
+
+  U->>N: Complete profile / health / insurance
+  N->>SB: upsert profiles, health_profiles, insurance_info
+  N->>BC: Optional name/phone sync
+
+  U->>N: Search medication
+  N->>DPD: GET drug API (rate-limited)
+  DPD-->>N: Brand / ingredients
+  N-->>U: Results
+
+  U->>N: Transfer Rx / fax template / refill / CarePack
+  N->>SB: prescriptions / refill_requests / carepack_requests
+
+  participant Staff as Staff /bc-app
+  Staff->>N: Approve / update status
+  N->>SB: Update pharmacy rows</div>
+<hr />
+<h2>8. Data flow — virtual care chat</h2>
+<div class="mermaid">sequenceDiagram
+  participant U as Customer widget
+  participant N as Next.js
+  participant SB as Supabase
+  participant AI as OpenAI
+  participant Staff as Staff UI
+
+  U->>N: Send message
+  N->>SB: append chat_messages
+  alt Bot enabled and care team not active
+    N->>AI: Chat Completions + tools
+    AI-->>N: Reply or escalate
+    N->>SB: bot message, maybe escalate flag
+  end
+  Staff->>N: Join / reply / close
+  N->>SB: staff messages, pause bot while staff active
+  Note over U,N: UI polls for new messages (not Realtime yet)</div>
+<hr />
+<h2>9. Security review (S1–S8) — controls in place</h2>
+<p>This section is a pre-launch checklist. Each item is a control we put in place (or a Legal gate we are holding) so shopping, health data, staff access, and third-party APIs stay inside the intended boundaries. <strong>In place</strong> means engineering is done. <strong>Held</strong> means we are keeping the feature off until Legal signs off.</p>
+<table><thead><tr><th>ID</th><th>Topic</th><th>If left unchecked</th><th>Status</th><th>Control</th></tr></thead><tbody><tr><td><strong>S1</strong></td><td>Who can query Supabase</td><td>High</td><td><strong>In place</strong></td><td><strong>Row Level Security</strong> is on for public tables, with <strong>no anon/authenticated policies</strong> (deny by default). Browsers never receive a database key. Next.js uses the <strong>service role</strong> on the server only; that role bypasses RLS by design. Optional later: network allowlist to Vercel.</td></tr>
+<tr><td><strong>S2</strong></td><td>Where health data lives</td><td>High</td><td><strong>In place</strong> (Legal residual)</td><td>Health profile, insurance, prescriptions, CarePack, and chat live in <strong>Canadian</strong> Supabase (<code>ca-central-1</code>) — not in BigCommerce. Patients add prescriptions by <strong>transfer or doctor fax only</strong>; we do not collect Rx photos. Residual for Legal: vendor <strong>DPA/BAA</strong> and retention.</td></tr>
+<tr><td><strong>S3</strong></td><td>Staff access</td><td>Med</td><td><strong>In place</strong></td><td>Staff work inside <strong>BigCommerce → Apps → Liivv Staff (<code>/bc-app</code>)</strong>, using the store’s BC app session. There is no shared dashboard password. <code>/staff</code> is not a product surface (404).</td></tr>
+<tr><td><strong>S4</strong></td><td>AI chat assistant</td><td>Med</td><td><strong>Held</strong> (Legal)</td><td>The assistant stays <strong>off</strong> (<code>VIRTUAL_CARE_BOT_ENABLED=false</code>) until the team decides on a <strong>paid OpenAI arrangement that includes a DPA</strong>. If the bot were on, customer message text would go to OpenAI even when the reply is “talk to a pharmacist.” Human care-team chat in <code>/bc-app</code> stays in Supabase either way.</td></tr>
+<tr><td><strong>S5</strong></td><td>Environment secrets</td><td>Med</td><td><strong>In place</strong> (documented next step)</td><td>Secrets live in Vercel (encrypted) and in gitignored <code>.env.local</code>. Nothing privileged is committed. Rotate on personnel change. Next step, not a launch blocker: separate Preview vs Production keys (they currently match).</td></tr>
+<tr><td><strong>S6</strong></td><td>Embedded app / CMS frames</td><td>Med</td><td><strong>In place</strong></td><td>Cookies used in iframes are <code>SameSite=None; Secure</code> (partitioned where needed). CSP <code>frame-ancestors</code> allowlists <strong>Makeswift and BigCommerce only</strong>. Verified in those embeds.</td></tr>
+<tr><td><strong>S7</strong></td><td>Customer email</td><td>Low</td><td><strong>In place</strong> (ops confirm)</td><td>Password reset and most transactional mail are <strong>BigCommerce’s</strong>. The storefront only triggers reset via GraphQL. Ops: confirm branding + SPF/DKIM in the BC control panel. Pharmacy notification email is not in scope yet.</td></tr>
+<tr><td><strong>S8</strong></td><td>Medication search (Health Canada DPD)</td><td>Low</td><td><strong>In place</strong></td><td>Search is a <strong>server proxy</strong>, rate-limited at <strong>60 requests / IP / minute</strong>. That protects Liivv from being used as an open relay to Health Canada (cost / blocking). It is not a patient-data path. Stronger still if Upstash Redis is configured.</td></tr></tbody></table>
+<h3>Additional controls</h3>
+<ul>
+<li>Privileged work runs in Server Components / server actions (tokens never held in the browser)</li>
+<li>Stripe and BigCommerce webhooks are verified</li>
+<li>BC app session is bound to the store hash</li>
+<li>Cart ID is inside a signed JWT</li>
+</ul>
+<hr />
+<h2>10. Authentication boundaries</h2>
+<table><thead><tr><th>Plane</th><th>Mechanism</th><th>Cookie</th><th>Secret</th><th>Path / lifetime</th></tr></thead><tbody><tr><td>Customer</td><td>NextAuth → BC GraphQL login or Customer Login JWT</td><td>Auth.js session JWT</td><td><code>AUTH_SECRET</code></td><td>Site-wide</td></tr>
+<tr><td>Anonymous cart</td><td>Signed JWT containing <code>cartId</code></td><td><code>authjs.anonymous-session-token</code></td><td><code>AUTH_SECRET</code></td><td>7 days</td></tr>
+<tr><td>Staff (BC app)</td><td>OAuth install + signed load</td><td><code>liivv_bc_app</code></td><td><code>BIGCOMMERCE_APP_CLIENT_SECRET</code></td><td><code>/bc-app</code>, 12 hours</td></tr></tbody></table>
+<p><code>ENABLE_ADMIN_ROUTE</code> only redirects <code>/admin</code> to the BigCommerce control panel. It is <strong>not</strong> the pharmacy staff portal.</p>
+<p><strong>Webhooks</strong></p>
+<ul>
+<li>Stripe: <code>stripe.webhooks.constructEvent</code> + <code>STRIPE_WEBHOOK_SECRET</code></li>
+<li>BigCommerce: <code>Authorization: Bearer</code> + <code>BIGCOMMERCE_WEBHOOK_SECRET</code></li>
+</ul>
+<hr />
+<h2>11. Network and trust boundary</h2>
+<div class="mermaid">flowchart TB
+  subgraph Public["Public internet"]
+    Browser
+    StripeWH[Stripe webhook callers]
+    BCWH[BC webhook callers]
+  end
+
+  subgraph Edge["Vercel edge / Node runtime"]
+    Next[Next.js - sole secret holder]
+  end
+
+  subgraph SaaS["Third-party SaaS"]
+    BC[BigCommerce APIs]
+    SB[Supabase]
+    ST[Stripe]
+    AI[OpenAI]
+    MS[Makeswift]
+    DPD[Health Canada]
+  end
+
+  Browser -->|HTTPS HTML/JS - no service keys| Next
+  StripeWH -->|Signed payload| Next
+  BCWH -->|Bearer secret| Next
+  Next -->|TLS + API tokens| BC
+  Next -->|Service role key| SB
+  Next -->|Secret key| ST
+  Next -->|API key if bot on| AI
+  Next --> MS
+  Next --> DPD</div>
+<h3>Secrets inventory (server-only unless noted)</h3>
+<table><thead><tr><th>Secret</th><th>Purpose</th></tr></thead><tbody><tr><td><code>AUTH_SECRET</code></td><td>Auth.js + anonymous cart JWT</td></tr>
+<tr><td><code>BIGCOMMERCE_STOREFRONT_TOKEN</code></td><td>Storefront GraphQL</td></tr>
+<tr><td><code>BIGCOMMERCE_ACCESS_TOKEN</code></td><td>Admin REST (orders, customers)</td></tr>
+<tr><td><code>BIGCOMMERCE_CLIENT_ID</code> / <code>CLIENT_SECRET</code></td><td>Customer Login API JWT</td></tr>
+<tr><td><code>BIGCOMMERCE_WEBHOOK_SECRET</code></td><td>Product → Stripe sync</td></tr>
+<tr><td><code>BIGCOMMERCE_APP_CLIENT_ID</code> / <code>SECRET</code></td><td>Embedded staff app</td></tr>
+<tr><td><code>STRIPE_SECRET_KEY</code> / <code>STRIPE_WEBHOOK_SECRET</code></td><td>Payments</td></tr>
+<tr><td><code>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</code></td><td><strong>Public</strong> — Stripe.js only</td></tr>
+<tr><td><code>SUPABASE_URL</code> / <code>SUPABASE_SERVICE_ROLE_KEY</code></td><td>DB (bypasses RLS)</td></tr>
+<tr><td><code>OPENAI_API_KEY</code></td><td>Virtual care bot (unused while flag is off)</td></tr>
+<tr><td><code>MAKESWIFT_SITE_API_KEY</code></td><td>CMS</td></tr></tbody></table>
+<hr />
+<h2>12. Still for IT / Legal (not blockers for the engineering pass)</h2>
+<ol>
+<li>Vendor <strong>DPAs / BAAs</strong> as required: Supabase, Stripe, Vercel, BigCommerce; OpenAI only if the bot is turned on.</li>
+<li>Logging policy: do not print chat bodies in request logs.</li>
+<li>Backup / RPO for Supabase Postgres (health and pharmacy rows).</li>
+<li>Optional: Supabase network restriction to Vercel egress; separate Preview vs Production secrets; Upstash Redis if we want stronger KV and rate limits.</li>
+</ol>
+<hr />
+<h2>13. Suggested meeting agenda</h2>
+<ol>
+<li>How it works (§1–§3) — manager + IT together  </li>
+<li>System context and systems of record (§4–§5)  </li>
+<li>Pharmacy and chat paths (§7–§8)  </li>
+<li>Auth and staff via BigCommerce (§10)  </li>
+<li>Security checklist S1–S8 (§9) — confirm controls; assign <strong>S4</strong> (OpenAI DPA)  </li>
+<li>Sign-off criteria for production  </li>
+</ol>
+<hr />
+<h2>14. Key evidence paths (code)</h2>
+<pre class="code"><code>core/package.json
+.env.example
+core/auth/index.ts
+core/lib/supabase/client.ts
+core/lib/supabase/onboarding-schema.sql
+core/lib/supabase/pharmacy-schema.sql
+core/lib/bc-app-session.ts
+core/lib/staff-access.ts
+core/lib/content-security-policy.ts
+core/lib/pharmacy/medication-rate-limit.ts
+core/lib/stripe/webhook-handlers.ts
+core/lib/virtual-care-bot/
+core/app/api/medications/
+core/app/api/stripe/webhook/route.ts
+core/app/api/bigcommerce/webhook/route.ts
+core/app/api/bigcommerce/app/{auth,load,uninstall}/route.ts
+core/app/bc-app/</code></pre>
+<hr />
+<p>*This document is the combined pack for IT-01 / IT-02. Companion interactive walkthrough (if used):* <code>liivv-it-architecture.canvas.tsx</code>.</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'strict' });
+  try {
+    await mermaid.run({ querySelector: '.mermaid' });
+  } catch (error) {
+    console.error(error);
+  }
+  window.__mermaidDone = true;
+</script>
+</body>
+</html>

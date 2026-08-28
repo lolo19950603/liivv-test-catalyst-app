@@ -68,7 +68,7 @@ Environment variables have a single home:
 
 Do not add a second `core/.env.local`. `pnpm dev` / `pnpm build` load the root file.
 
-See [docs/How-Liivv-Works.md](docs/How-Liivv-Works.md) and [docs/IT-Architecture.md](docs/IT-Architecture.md).
+See [docs/Liivv-Architecture.md](docs/Liivv-Architecture.md) (how it works + IT review + security checklist S1–S8) or the printable [docs/Liivv-Architecture.pdf](docs/Liivv-Architecture.pdf).
 
 ## Resources
 

@@ -1,8 +1,16 @@
 import { NextResponse } from 'next/server';
 
+import { medicationRateLimitResponse } from '~/lib/pharmacy/medication-rate-limit';
+
 type RouteContext = { params: Promise<{ drugCode: string }> };
 
-export async function GET(_request: Request, context: RouteContext) {
+export async function GET(request: Request, context: RouteContext) {
+  const limited = await medicationRateLimitResponse(request);
+
+  if (limited) {
+    return limited;
+  }
+
   const { drugCode: raw } = await context.params;
   const drugCode = Number.parseInt(raw, 10);
 
