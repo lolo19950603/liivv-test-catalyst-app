@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
-import { setRequestLocale } from 'next-intl/server';
-import { FAQPage, WithContext } from 'schema-dts';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 
 import { locales } from '~/i18n/locales';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
@@ -13,9 +12,20 @@ interface Props {
 
 const PATH = '/liivv-health/ostomy-care/funding';
 
-const TITLE = 'Ostomy funding in Canada — what your province covers | Liivv';
-const DESCRIPTION =
-  'What each province and territory pays toward ostomy supplies, how to apply, who has to sign off, and the federal tax credits worth claiming. Every figure links to its official source.';
+/*
+ * This page used to emit FAQPage JSON-LD. It has been removed rather than
+ * translated, for two reasons.
+ *
+ * Google restricted FAQ rich results to government and health-authority sites
+ * in August 2023, so a commercial site wins nothing from it. And the three
+ * questions were hardcoded English with inLanguage 'en-CA' regardless of route,
+ * so the French page was declaring English Q&A content — while the answers
+ * existed on the page only in paraphrase, which is not the visible-content
+ * match the format requires.
+ *
+ * If the accordion is wanted for readers, render it from messages/*.json so the
+ * French is true as well, and add the schema back then.
+ */
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -24,50 +34,13 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
 
+  const t = await getTranslations({ locale, namespace: 'OstomyCare.ui.fundingPage' });
+
   return {
-    title: TITLE,
-    description: DESCRIPTION,
+    title: t('metaTitle'),
+    description: t('metaDescription'),
     // French is populated, so the alternate is truthful.
     alternates: await getMetadataAlternates({ path: PATH, locale }),
-  };
-}
-
-/*
- * FAQPage rather than MedicalWebPage: this is money and process, not clinical
- * content, and these are the questions people actually type into a search box.
- */
-function buildFaqSchema(url: string): WithContext<FAQPage> {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    url,
-    inLanguage: 'en-CA',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: 'Does Canada have a national ostomy funding program?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'No. Coverage for ostomy supplies is set province by province, and the amount, the model, and who approves it all change at the provincial border. Moving provinces resets your coverage entirely. Federal programs exist for specific groups — NIHB for registered First Nations and recognized Inuit — and the Disability Tax Credit is available nationally.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'Do ostomates qualify for the Disability Tax Credit?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Not automatically. Having an ostomy does not qualify you on its own, and a well-managed routine is often refused. The test is that you are unable to manage bowel or bladder function, or that it takes roughly three times longer than for someone of similar age without the impairment, at least 90% of the time, for a continuous 12 months — assessed with your appliances and routine already in place. Applications go through the eliminating category rather than life-sustaining therapy, and only a medical doctor or nurse practitioner can certify form T2201. It is still worth applying, because approval can be backdated and unlocks the RDSP and the Canada Disability Benefit. If refused, ostomy supplies remain claimable as medical expenses with no approval needed.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'What happens if my ostomy funding runs out before the year does?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Ask an NSWOC first — a better fit often means fewer changes and less waste, which can be worth more than extra funding. The free manufacturer support programs from Hollister, Coloplast, and Convatec provide samples and nurse access regardless of where you buy. Provincial disability and social assistance programs sometimes top up coverage, and local Ostomy Canada chapters know the regional landscape.',
-        },
-      },
-    ],
   };
 }
 
@@ -76,19 +49,5 @@ export default async function Page({ params }: Props) {
 
   setRequestLocale(locale);
 
-  const { canonical } = await getMetadataAlternates({
-    path: PATH,
-    locale,
-    includeAlternates: false,
-  });
-
-  return (
-    <>
-      <script
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildFaqSchema(canonical)) }}
-        type="application/ld+json"
-      />
-      <FundingPage />
-    </>
-  );
+  return <FundingPage />;
 }

@@ -1926,7 +1926,7 @@
                         "5": "Confusion, vertiges importants ou urine très foncée en même temps qu'une production élevée — signes de déshydratation importante",
                         "6": "Un cathéter qui ne passe pas, si vous videz une dérivation du continent ou un Mitrofanoff de cette façon — un réservoir qui ne peut pas être drainé n’attendra pas."
                     },
-                    "action": "Allez au service d’urgence le plus proche ou composez le 911. Ne pas attendre un rappel, et ne pas tenter de résoudre le problème d’une stomie bleutée à la maison."
+                    "action": "Allez au service d’urgence le plus proche ou composez le 911. N’attendez pas un rappel, et ne tentez pas de régler vous-même le problème d’une stomie bleutée à la maison."
                 },
                 "pharmacist": {
                     "eyebrow": "Disponible en Ontario",
@@ -2748,7 +2748,9 @@
                 "closingHeading": "L’argent ne devrait pas être la raison pour laquelle vous rationnez vos fournitures",
                 "closingBody": "Si les chiffres ne fonctionnent pas, il vaut la peine d’en parler à votre équipe de soins. Il y a généralement plus de solutions que ce que l’on pense.",
                 "closingCta": "Vivre au quotidien avec Liivv →",
-                "ranOut4Body": "Les sections d'Ostomy Canada connaissent bien le contexte local, et certaines détiennent des fournitures don- nées. Traitez les produits d'occasion avec précaution — vérifiez la date d’expiration, que l’emballage intérieur est non ouvert, que la taille correspond à ce que vous utilisez, et renseignez-vous sur la façon dont il a été entreposé."
+                "ranOut4Body": "Les sections d'Ostomy Canada connaissent bien le contexte local, et certaines détiennent des fournitures don- nées. Traitez les produits d'occasion avec précaution — vérifiez la date d’expiration, que l’emballage intérieur est non ouvert, que la taille correspond à ce que vous utilisez, et renseignez-vous sur la façon dont il a été entreposé.",
+                "metaTitle": "Financement pour l'ostomie au Canada — ce que votre province couvre | Liivv",
+                "metaDescription": "Ce que chaque province et territoire paie pour les fournitures d'ostomie, comment faire la demande, qui doit approuver, et les crédits d'impôt fédéraux à réclamer. Chaque chiffre est lié à sa source officielle."
             },
             "checker": {
                 "yes": "Oui",
