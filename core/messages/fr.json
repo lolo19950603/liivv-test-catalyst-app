@@ -1519,7 +1519,6 @@
                         }
                     }
                 },
-                "heroBody": "Je vous ai dit que vous auriez besoin d'une chirurgie, ou simplement de rester à la maison avec une nouvelle stomie — des réponses rassurantes pour les deux, plus la chose à demander avant d'y aller.",
                 "programsBand": {
                     "heading": "Une carte douce pour le premier mois",
                     "cards": {
@@ -1556,7 +1555,8 @@
                     "eyebrow": "Premiers chapitres",
                     "heading": "Vous n’êtes pas censé tout savoir encore",
                     "body": "Ce chapitre couvre les deux côtés de l’opération. Si la chirurgie est encore à venir, commencez par le haut. Si vous êtes déjà à la maison, passez directement aux Bases de la première semaine — rien d’autre ci-dessus ne sera une surprise."
-                }
+                },
+                "heroBody": "On vient de vous dire que vous avez besoin d'une chirurgie, ou que vous rentrez à la maison avec une nouvelle stomie — des réponses rassurantes pour les deux situations, ainsi que la chose à demander avant votre admission."
             },
             "get-to-know-your-stoma": {
                 "categories": {
@@ -1585,7 +1585,7 @@
                                     "3": "Une Mitrofanoff est une opération différente, pour l’urine plutôt que pour les selles. Un canal étroit, généralement formé à partir de l’appendice, relie votre vessie à une petite stomie, et vous insérez un cathéter pour la vider."
                                 },
                                 "heading": "Dérivations continentales, qui fonctionnent différemment",
-                                "note": "Les détournements de continent sont pris en charge de façon très différente d’un stomie conventionnelle. Les conseils concernant les pochettes, barrières et flanges ne s’appliquent pas à vous — mais ceux concernant l’alimentation, bien mâcher, liquides et sel restent pertinents. Une chose que ce site ne couvre pas : si votre cathéter ne passe pas, arrêtez plutôt que de persister, reposez-vous une heure puis essayez à nouveau, et consultez un professionnel de la santé le jour même si vous ne pouvez toujours pas drainer. Votre équipe chirurgicale et NSWOC sont les bonnes sources."
+                                "note": "Les dérivations du continent sont prises en charge de façon très différente d’une stomie conventionnelle. Les conseils concernant les pochettes, barrières et flasques ne s’appliquent pas à vous — mais ceux concernant l’alimentation, les liquides et le sel restent pertinents. Deux choses que ce site ne couvre pas : Avec un réservoir intestinal comme une poche de Kock, si le cathéter ne passe pas, arrêtez plutôt que de persister, reposez-vous une heure puis essayez à nouveau, et consultez un professionnel le jour même si vous ne pouvez toujours pas drainer. Avec un Mitrofanoff, qui draine l’urine, ne continuez pas d’essayer — une vessie non vidée nécessite une visite aux urgences le jour même. Votre équipe chirurgicale et votre NSWOC sont les bonnes sources pour les deux situations."
                             }
                         },
                         "title": "Les dérivations moins courantes",
@@ -1755,9 +1755,9 @@
                             },
                             "2": {
                                 "heading": "Quand appeler votre NSWOC",
-                                "note": "Fuites répétées ou pattern inexpliqué",
+                                "note": "Les fuites répétées signifient généralement que l’ajustement est incorrect, pas que vous faites erreur. La convexité, les anneaux et les pâtes peuvent tous aider — mais le choix dépend de votre abdomen et de votre stomie, il s’agit donc d’une évaluation plutôt que d’un achat. Une convexité inappropriée peut causer une blessure par pression.",
                                 "items": {
-                                    "1": "Peau qui n’a pas complètement guéri entre les changements",
+                                    "1": "Fuites plus qu’occasionnelles, ou un motif inexplicable",
                                     "2": "Peau qui n’a pas complètement guéri entre les changements"
                                 }
                             }
@@ -1918,14 +1918,15 @@
                 "urgent": {
                     "heading": "Certaines choses ne relèvent pas d'une question sur le site web",
                     "intro": "La plupart des inquiétudes concernant la stomie peuvent attendre votre prochain rendez-vous avec votre NSWOC. Mais celles-ci ne peuvent pas. Consultez immédiatement un médecin si vous remarquez :",
-                    "action": "Allez au service d'urgence le plus proche ou appelez le 911. N'attendez pas un rappel, et ne tentez pas de diagnostiquer une stomie bleutée à la maison.",
                     "signs": {
                         "1": "Une stomie qui devient sombre, bleutée, violette ou qui est froide au toucher",
                         "2": "Douleur abdominale sévère, ou vomissements sans sortie depuis plusieurs heures — cela peut indiquer une obstruction",
                         "3": "Saignement abondant ou continu provenant de la stomie elle-même, pas seulement une petite tache lors du nettoyage",
-                        "4": "Fièvre, ou peau autour de la stomie chaude, rougeâtre, douloureuse et qui s'étend",
-                        "5": "Confusion, vertiges importants ou urine très foncée en même temps qu'une production élevée — signes de déshydratation importante"
-                    }
+                        "4": "Fièvre, ou peau autour de la stomie qui est chaude, rouge qui s’étend, et douloureuse",
+                        "5": "Confusion, vertiges importants ou urine très foncée en même temps qu'une production élevée — signes de déshydratation importante",
+                        "6": "Un cathéter qui ne passe pas, si vous videz une dérivation du continent ou un Mitrofanoff de cette façon — un réservoir qui ne peut pas être drainé n’attendra pas."
+                    },
+                    "action": "Allez au service d’urgence le plus proche ou composez le 911. Ne pas attendre un rappel, et ne pas tenter de résoudre le problème d’une stomie bleutée à la maison."
                 },
                 "pharmacist": {
                     "eyebrow": "Disponible en Ontario",
@@ -1964,12 +1965,12 @@
                     },
                     "2": {
                         "title": "Ce que votre chirurgie a réellement changé",
+                        "note": "Voici la chose la plus utile à comprendre : une iléostomie n’est pas « une colostomie plus haut ». L’absence de côlon explique pourquoi les selles sont plus liquides, pourquoi le liquide et le sel sont plus importants, et pourquoi les conseils diffèrent.",
                         "items": {
-                            "1": "La nourriture est décomposée dans l’estomac et l’intestin grêle, et cette partie reste généralement inchangée — c’est pourquoi vous continuez d’absorber vos nutriments.",
-                            "2": "Le rôle principal du côlon est de récupérer l’eau et le sel de ce qui reste, et de former les selles. Une colostomie laisse la plupart de cela intact ; une iléostomie la contourne presque entièrement.",
-                            "3": "Une urostomie ne modifie pas du tout la digestion — elle détourne l’urine, donc les questions alimentaires sur cette page ne s’appliquent généralement pas à vous."
-                        },
-                        "note": "Voici la chose la plus utile à comprendre : une iléostomie n’est pas « une colostomie plus haut ». L’absence de côlon explique pourquoi les selles sont plus liquides, pourquoi le liquide et le sel sont plus importants, et pourquoi les conseils diffèrent."
+                            "1": "Les aliments sont décomposés dans l’estomac et l’intestin grêle, et cette partie reste généralement inchangée — c’est pourquoi vous absorbez toujours votre nutrition.",
+                            "2": "Le rôle principal du côlon est de récupérer l’eau et le sel restants, et de former les selles. Une colostomie laisse la plupart de ces fonctions intactes ; une iléostomie la contourne presque entièrement.",
+                            "3": "Une urostomie ne modifie pas la digestion des aliments — elle détourne l’urine avant que les reins n’atteignent la vessie, donc la plupart des questions alimentaires ici ne vous concernent pas. La gestion des liquides, c’est le contraire : vous avez besoin de plus d’eau qu’avant, régulièrement tout au long de la journée, car un système bien évacué protège contre les infections et les calculs. Demandez à votre urologue ou à votre NSWOC quel est votre objectif quotidien."
+                        }
                     },
                     "3": {
                         "title": "Les premières semaines",
@@ -2238,7 +2239,7 @@
                             "2": {
                                 "title": "Crédit d’impôt pour personnes handicapées (formulaire T2201)",
                                 "org": "Agence du revenu du Canada",
-                                "body": "Plusieurs ostomates sont admissibles sous la catégorie « élimination ». L’approbation peut aussi débloquer le RSDP et d’autres crédits, donc cela vaut la peine de faire la paperasse."
+                                "body": "Demandée dans la catégorie « élimination », mais avoir une ostomie ne vous qualifie pas seul — la section du financement explique le test que l’ARC applique réellement. L’approbation peut débloquer le RDSP et d’autres crédits, il vaut donc la peine de lire avant de commencer la paperasse."
                             },
                             "3": {
                                 "title": "Prestations de santé non assurées (NIHB)",
@@ -2491,11 +2492,11 @@
             "programs": {
                 "ON": {
                     "name": "Ontario",
-                    "amount": "Vous recevez 975 $ par ostomie par année, payé en deux versements. Ce montant augmente à 1 300 $ si vous vivez en résidence de soins de longue durée ou si vous recevez une aide sociale.",
-                    "howToApply": "Un médecin ou une infirmière praticienne vous examine et confirme l’ostomie, vous remplissez tous deux le formulaire 014-1945-67, et il est envoyé au Programme d’aide aux dispositifs d’assistance. L’argent vous est versé directement, pas à un fournisseur, afin que vous puissiez acheter des fournitures où vous le souhaitez.",
                     "gatekeeper": "Un médecin ou une infirmière praticienne — une signature NSWOC n’est pas requise ici, ce qui diffère de plusieurs autres provinces.",
-                    "deadlines": "Renouveler tous les deux ans; le PAD envoie la paperasse environ trois mois avant l’expiration. Les évaluations prennent jusqu’à huit semaines, avec le premier paiement dans les 30 jours suivant l’approbation.",
-                    "notes": "Une ostomie temporaire ne qualifie que si elle est nécessaire pendant plus de six mois. Si vous recevez ODSP, la prestation NÉCESSITÉS SPÉCIALES OBLIGATOIRES peut couvrir les coûts supérieurs à la subvention — mais seulement une fois la subvention du PAD épuisée."
+                    "notes": "Une ostomie temporaire ne qualifie que si elle est nécessaire pendant plus de six mois. Si vous recevez ODSP, la prestation NÉCESSITÉS SPÉCIALES OBLIGATOIRES peut couvrir les coûts supérieurs à la subvention — mais seulement une fois la subvention du PAD épuisée.",
+                    "amount": "Vous recevez 975 $ par ostomie par année, versés en deux versements. Ce montant augmente à 1 300 $ si vous vivez en résidence de soins de longue durée ou si vous recevez une aide sociale.",
+                    "howToApply": "Un médecin ou une infirmière praticienne vous examine et confirme la stomie, vous remplissez tous deux le formulaire 014-1945-67, et il est envoyé au Programme des dispositifs d’assistance. L’argent vous est versé directement, pas à un fournisseur, vous pouvez donc acheter des fournitures où vous le souhaitez.",
+                    "deadlines": "Renouvelez tous les deux ans ; l’ADP envoie la paperasse environ trois mois avant l’expiration. Les évaluations prennent jusqu’à huit semaines, avec le premier paiement dans les 30 jours suivant l’approbation."
                 },
                 "BC": {
                     "name": "Colombie-Britannique",
@@ -2538,8 +2539,8 @@
                 "NB": {
                     "name": "Nouveau-Brunswick",
                     "howToApply": "Il n’y a pas de programme général pour ostomie au Nouveau-Brunswick. Si vous êtes client du Développement social avec une carte d’assurance maladie admissible, les fournitures éligibles ne vous coûtent rien et le programme paie directement les pharmacies et fournisseurs. Sinon, cette option est fermée et les options fédérales et fiscales ci-dessous sont à considérer.",
-                    "gatekeeper": "Votre carte de santé du Développement social est la clé — elle doit afficher le code d’éligibilité supplémentaire ou d’ostomie approprié.",
-                    "notes": "La couverture est plafonnée par quantités mensuelles par produit plutôt que par dollars — par exemple un nombre défini de galettes et de pochettes chaque mois."
+                    "notes": "La couverture est plafonnée par quantités mensuelles par produit plutôt que par dollars — par exemple un nombre défini de galettes et de pochettes chaque mois.",
+                    "gatekeeper": "Votre carte de santé du Développement social est la clé — elle doit afficher le bon code d’éligibilité supplémentaire ou pour ostomie."
                 },
                 "NS": {
                     "name": "Nouvelle-Écosse",
@@ -2736,7 +2737,6 @@
                 "ranOut3Heading": "Vérifiez les aides sociales et les programmes d'invalidité",
                 "ranOut3Body": "Les programmes provinciaux d'invalidité et d'aide sociale complètent parfois la couverture de l'ostomie au-delà de la subvention standard. Cela vaut la peine de demander directement.",
                 "ranOut4Heading": "Parlez à votre section locale",
-                "ranOut4Body": "Les sections d'Ostomy Canada connaissent le paysage local, et certaines disposent de fournitures donées. Traitez les produits d'occasion avec précaution — vérifiez la stérilité, la date d'expiration et qu'ils soient de la bonne taille pour vous.",
                 "movingEyebrow": "Déménagement",
                 "movingHeading": "Si vous changez de province",
                 "movingIntro": "Personne ne note cela, et cela peut surprendre. Déménager réinitialise complètement votre couverture — modèle différent, montant différent, formulaires différents, et souvent une personne différente doit les signer.",
@@ -2747,7 +2747,8 @@
                 "arrive3": "Préparez-vous à une période d’attente, et budgétez-la.",
                 "closingHeading": "L’argent ne devrait pas être la raison pour laquelle vous rationnez vos fournitures",
                 "closingBody": "Si les chiffres ne fonctionnent pas, il vaut la peine d’en parler à votre équipe de soins. Il y a généralement plus de solutions que ce que l’on pense.",
-                "closingCta": "Vivre au quotidien avec Liivv →"
+                "closingCta": "Vivre au quotidien avec Liivv →",
+                "ranOut4Body": "Les sections d'Ostomy Canada connaissent bien le contexte local, et certaines détiennent des fournitures don- nées. Traitez les produits d'occasion avec précaution — vérifiez la date d’expiration, que l’emballage intérieur est non ouvert, que la taille correspond à ce que vous utilisez, et renseignez-vous sur la façon dont il a été entreposé."
             },
             "checker": {
                 "yes": "Oui",
@@ -2764,15 +2765,15 @@
                 "permanent": " Permanente",
                 "temporary": " Temporaire",
                 "notSure": "Je ne suis pas sûr",
-                "indigenousLegend": "Êtes-vous Autochtone ou Inuk ?",
-                "indigenousHint": "Les Autochtones et Inuits sont couverts au niveau fédéral par NIHB plutôt que par le programme provincial.",
                 "seniorLegend": "Avez-vous 65 ans ou plus ?",
                 "seniorHint": "Plusieurs programmes sont réservés aux aînés, ou offrent plus d'avantages après 65 ans.",
                 "otherCoverageLegend": "Avez-vous une assurance privée ou d'entreprise ?",
                 "otherCoverageHint": "Certains programmes ne paieront pas tant que la couverture privée n'a pas été utilisée — et quelques-uns vous excluent complètement.",
                 "progress": "{answered} sur {total} répondu",
                 "narrowing": "Répondez au reste pour affiner cela",
-                "complete": "Tous répondu"
+                "complete": "Tous répondu",
+                "indigenousLegend": "Êtes-vous une Première Nation ou Inuk?",
+                "indigenousHint": "Les Premières Nations et Inuits sont couverts au niveau fédéral par NIHB plutôt que par le programme provincial."
             },
             "discovery": {
                 "eyebrow": "Également de Liivv",

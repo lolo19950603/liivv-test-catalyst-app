@@ -1046,7 +1046,7 @@
   font: inherit;
   font-size: 0.82rem;
   font-weight: 500;
-  color: color-mix(in srgb, var(--ink) 68%, transparent);
+  color: color-mix(in srgb, var(--ink) 85%, transparent);
   background: transparent;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -1067,8 +1067,7 @@
   color: var(--paper);
 }
 #oc-chapter .oc-ch-rail-count {
-  font-size: 0.76em;
-  opacity: 0.7;
+  font-size: 0.72em;
   margin-left: 0.35rem;
   font-variant-numeric: tabular-nums;
 }
@@ -1189,7 +1188,7 @@
   font-size: 0.7rem;
   letter-spacing: 0.11em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--ink) 52%, transparent);
+  color: color-mix(in srgb, var(--ink) 74%, transparent);
 }
 #oc-chapter .oc-ch-shop-list {
   display: grid;
@@ -1235,7 +1234,7 @@
 }
 #oc-chapter .oc-ch-shop-note {
   margin: 0.65rem 0 0;
-  font-size: 0.74rem;
+  font-size: 0.8rem;
   line-height: 1.5;
-  color: color-mix(in srgb, var(--ink) 55%, transparent);
+  color: color-mix(in srgb, var(--ink) 74%, transparent);
 }

@@ -23,7 +23,7 @@
  * or program year.
  */
 
-import { PROGRAM_META } from './funding-meta';
+import { PROGRAM_META, type ProgramMeta } from './funding-meta';
 
 export type ProvinceCode =
   | 'BC'
@@ -246,6 +246,18 @@ export function checkerProgress(input: CheckerInput): {
  * note that core has no test script today, so turbo run test skips this package
  * entirely (the diabetes checker data.test.ts next door has never run either).
  */
+/*
+ * Did the reader answer age or permanence without this jurisdiction having
+ * anything to say about it — neither a rule we can state, nor a rule its own
+ * published copy already covers?
+ */
+function hasUnusedAnswer(input: CheckerInput, meta: ProgramMeta): boolean {
+  const seniorGap = input.senior !== '' && !meta.coversSenior && !meta.seniorRule;
+  const permanenceGap = input.permanence !== '' && !meta.coversPermanence && !meta.permanenceRule;
+
+  return seniorGap || permanenceGap;
+}
+
 export function buildResults(
   input: CheckerInput,
   programs: Partial<Record<ProvinceCode, ProgramFacts>>,
@@ -347,15 +359,14 @@ export function buildResults(
       });
     }
 
-    const usedSenior = input.senior === 'yes' && Boolean(meta.seniorRule);
-    const usedPermanence = input.permanence === 'temporary' && Boolean(meta.permanenceRule);
-    const answeredEither = input.senior !== '' || input.permanence !== '';
-
     /*
      * The reader answered, and we could not use it. Saying so is the whole
-     * point — the previous version discarded both answers silently.
+     * point — the previous version discarded both answers silently. But only
+     * apologise for what this jurisdiction genuinely does not answer: seven
+     * entries already state their own age or permanence rule in the copy above,
+     * and claiming otherwise three cards later contradicted the panel.
      */
-    if (answeredEither && !usedSenior && !usedPermanence) {
+    if (hasUnusedAnswer(input, meta)) {
       cards.push({
         id: 'provisional',
         title: copy.provisionalTitle,

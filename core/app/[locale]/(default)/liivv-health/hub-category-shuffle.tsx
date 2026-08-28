@@ -75,11 +75,17 @@ export function HubCategoryShuffle({ reduceMotion }: { reduceMotion: boolean }) 
     return () => window.clearInterval(id);
   }, [firstWord, reduceMotion, words]);
 
+  /*
+   * Decoration, not a status update. With aria-live the interval re-announced
+   * this to a screen reader indefinitely, which is WCAG 2.2.2 with no pause
+   * mechanism. The first word is exposed once as stable text instead.
+   */
   return (
     <span className="lh-cat-shuffle">
-      <span aria-live="polite" className="lh-cat-shuffle-word" key={word}>
+      <span aria-hidden className="lh-cat-shuffle-word" key={word}>
         {word}
       </span>
+      <span className="sr-only">{firstWord}</span>
     </span>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale, useMessages, useTranslations } from 'next-intl';
-import { type CSSProperties, useMemo, useState } from 'react';
+import { type CSSProperties, useId, useMemo, useState } from 'react';
 
 import type { OcCatalogItem } from '../get-oc-catalog';
 
@@ -115,6 +115,7 @@ function CategoryRow({
 }) {
   const t = useTranslations('OstomyCare.ui.chapter');
   const [open, setOpen] = useState(openByDefault);
+  const moreId = useId();
 
   /*
    * The first bullet becomes the lede and stays visible; the rest collapse.
@@ -140,11 +141,11 @@ function CategoryRow({
 
         {lede ? <p className="oc-ch-lede">{lede}</p> : null}
 
-        <div className="oc-ch-row-more" hidden={!open}>
+        <div className="oc-ch-row-more" hidden={!open} id={moreId}>
           {rest.length ? (
             <ul>
-              {rest.map((item) => (
-                <li key={item}>{item}</li>
+              {rest.map((item, i) => (
+                <li key={`${i}-${item}`}>{item}</li>
               ))}
             </ul>
           ) : null}
@@ -152,8 +153,8 @@ function CategoryRow({
             <div className="oc-ch-subsection" key={section.heading}>
               <h4>{section.heading}</h4>
               <ul>
-                {section.items.map((item) => (
-                  <li key={item}>{item}</li>
+                {section.items.map((item, i) => (
+                  <li key={`${i}-${item}`}>{item}</li>
                 ))}
               </ul>
               {section.note ? <p className="oc-ch-row-note">{section.note}</p> : null}
@@ -164,15 +165,24 @@ function CategoryRow({
 
         <div className="oc-ch-row-foot">
           {collapsible ? (
-            <button className="oc-ch-toggle" onClick={() => setOpen(!open)} type="button">
+            <button
+              aria-controls={moreId}
+              aria-expanded={open}
+              aria-label={`${open ? t('showLess') : t('showMore', { count: String(hidden) })} — ${card.title}`}
+              className="oc-ch-toggle"
+              onClick={() => setOpen(!open)}
+              type="button"
+            >
               {open ? t('showLess') : t('showMore', { count: String(hidden) })}
             </button>
           ) : null}
           {card.ask ? <AskChip role={card.ask} /> : null}
         </div>
 
-        {card.productIds && (open || !collapsible) ? (
-          <ProductBand ids={card.productIds} products={products} />
+        {card.productIds ? (
+          <div hidden={!(open || !collapsible)}>
+            <ProductBand ids={card.productIds} products={products} />
+          </div>
         ) : null}
       </div>
     </article>
@@ -196,8 +206,8 @@ function UrgentBlock({ urgent }: { urgent: UrgentCallout }) {
             <h2 id="oc-ch-urgent-heading">{urgent.heading}</h2>
             <p className="oc-ch-urgent-intro">{urgent.intro}</p>
             <ul>
-              {urgent.signs.map((sign) => (
-                <li key={sign}>{sign}</li>
+              {urgent.signs.map((sign, i) => (
+                <li key={`${i}-${sign}`}>{sign}</li>
               ))}
             </ul>
             <p className="oc-ch-urgent-action">{urgent.action}</p>

@@ -39,6 +39,19 @@ export interface ProgramMeta {
    */
   seniorRule?: string;
   permanenceRule?: string;
+  /*
+   * Whether this entry's own published copy — the amount, howToApply or
+   * deadlines fields — already tells the reader what changes at 65, or what
+   * changes for a temporary ostomy.
+   *
+   * Not the same thing as seniorRule / permanenceRule, which hold a verified
+   * rule we state ourselves. These two only stop the checker apologising for
+   * not knowing something the same panel is already showing: Ontario prints the
+   * six-month temporary threshold and Yukon prints the Seniors Pharmacare
+   * switch, so telling those readers "we are not using your answer" was false.
+   */
+  coversSenior?: boolean;
+  coversPermanence?: boolean;
 }
 
 export const PROGRAM_META: Record<ProvinceCode, ProgramMeta> = {
@@ -49,6 +62,7 @@ export const PROGRAM_META: Record<ProvinceCode, ProgramMeta> = {
     model: 'flat-grant',
     officialUrl: 'https://www.ontario.ca/page/enteral-feeding-and-ostomy',
     verifiedOn: '2026-08-27',
+    coversPermanence: true,
     hasAmount: true,
   },
   BC: {
@@ -96,6 +110,7 @@ export const PROGRAM_META: Record<ProvinceCode, ProgramMeta> = {
     model: 'flat-grant',
     officialUrl: 'https://www.ramq.gouv.qc.ca/en/citizens/aid-programs/appliances-ostomates',
     verifiedOn: '2026-08-27',
+    coversPermanence: true,
     hasAmount: true,
   },
   NB: {
@@ -115,6 +130,7 @@ export const PROGRAM_META: Record<ProvinceCode, ProgramMeta> = {
     model: 'cost-share',
     officialUrl: 'https://novascotia.ca/dhw/pharmacare/',
     verifiedOn: '2026-08-27',
+    coversSenior: true,
     hasAmount: true,
   },
   PE: {
@@ -134,6 +150,7 @@ export const PROGRAM_META: Record<ProvinceCode, ProgramMeta> = {
     model: 'cost-share',
     officialUrl: 'https://www.gov.nl.ca/hcs/prescription/nlpdp-plan-overview/',
     verifiedOn: '2026-08-27',
+    coversSenior: true,
     hasAmount: true,
   },
   YT: {
@@ -144,6 +161,7 @@ export const PROGRAM_META: Record<ProvinceCode, ProgramMeta> = {
     officialUrl:
       'https://yukon.ca/en/health-and-wellness/care-services/get-help-costs-if-you-have-chronic-disease-or-disability',
     verifiedOn: '2026-08-27',
+    coversSenior: true,
     hasAmount: false,
   },
   NT: {
@@ -153,6 +171,7 @@ export const PROGRAM_META: Record<ProvinceCode, ProgramMeta> = {
     model: 'cost-share',
     officialUrl: 'https://www.hss.gov.nt.ca/en/services/extended-health-benefits',
     verifiedOn: '2026-08-27',
+    coversSenior: true,
     hasAmount: true,
   },
   NU: {
@@ -163,6 +182,7 @@ export const PROGRAM_META: Record<ProvinceCode, ProgramMeta> = {
     officialUrl:
       'https://www.gov.nu.ca/en/health/extended-health-benefits-ehb-specified-conditions',
     verifiedOn: '2026-08-27',
+    coversSenior: true,
     hasAmount: false,
   },
 };

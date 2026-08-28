@@ -161,11 +161,17 @@
   height: 0;
 }
 
+/*
+ * The unselected border sat on --sand, which does not clear 3:1 on white as a
+ * non-text indicator. Selection also relied on colour plus a 350->500 weight
+ * delta, and weight is the only one of those that survives forced-colors — so
+ * the selected chip now carries a check as well.
+ */
 #oc-chapter .oc-fund-choice span {
   display: inline-block;
   padding: 0.4rem 0.8rem;
   border-radius: 999px;
-  border: 1px solid var(--sand);
+  border: 1px solid rgba(49, 47, 47, 0.42);
   background: var(--cream);
   font-size: 0.88rem;
   transition:
@@ -177,6 +183,10 @@
   background: color-mix(in srgb, var(--sage) 40%, var(--paper));
   border-color: var(--sage-deep);
   font-weight: 500;
+}
+
+#oc-chapter .oc-fund-choice.is-on span::before {
+  content: '✓ ';
 }
 
 #oc-chapter .oc-fund-reset {

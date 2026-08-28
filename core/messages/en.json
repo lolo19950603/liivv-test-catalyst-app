@@ -1423,7 +1423,7 @@
     "chapters": {
       "new-to-the-journey": {
         "title": "New to the Journey",
-        "heroBody": "Told you need surgery, or just home with a new stoma — calm answers for both, plus the one thing to ask for before you go in.",
+        "heroBody": "Just been told you need surgery, or just home with a new stoma — calm answers for both, plus the one thing to ask for before you go in.",
         "focus": "Before surgery: what to expect, stoma siting, questions to ask, and supporting someone. After surgery: first weeks, change routines, starter supplies, who to ask, and soft next steps.",
         "vibe": "Supportive and demystifying — a soft place to land.",
         "categoriesIntro": {
@@ -1595,7 +1595,7 @@
                   "2": "A continent ileostomy, such as a Kock pouch, has a small flush stoma and an internal reservoir made from small bowel. There is no pouch to wear — you drain it with a catheter, usually two to four times a day, and cover the stoma with a cap or gauze in between",
                   "3": "A Mitrofanoff is a different operation, for urine rather than stool. A narrow channel, usually made from the appendix, runs from your own bladder to a small stoma, and you pass a catheter through it to empty"
                 },
-                "note": "Continent diversions are cared for quite differently from a conventional stoma. Advice about pouches, barriers and flanges will not apply to you — advice about diet, chewing well, fluids and salt still does. One thing this site does not cover: if your catheter will not pass, stop rather than persisting, rest an hour and try again, and get medical advice that day if you still cannot drain. Your surgical team and NSWOC are the right source."
+                "note": "Continent diversions are cared for quite differently from a conventional stoma. Advice about pouches, barriers and flanges will not apply to you — advice about diet, fluids and salt still does. Two things this site does not cover. With a bowel reservoir such as a Kock pouch, if the catheter will not pass, stop rather than persisting, rest an hour and try again, and get advice that day if you still cannot drain. With a Mitrofanoff, which drains urine, do not keep trying — an unemptied bladder needs an emergency department the same day. Your surgical team and NSWOC are the right source for both."
               }
             },
             "note": "NSWOCC publishes free patient guides for several of these, including jejunostomy and gastrostomy, in English and French. They are linked from Everyday Liivving."
@@ -1933,7 +1933,8 @@
             "2": "Severe abdominal pain, or vomiting with no output for several hours — this can mean a blockage",
             "3": "Heavy or continuous bleeding from the stoma itself, not just a spot from cleaning",
             "4": "Fever, or skin around the stoma that is hot, spreading red, and painful",
-            "5": "Confusion, severe dizziness, or very dark urine alongside high output — signs of significant dehydration"
+            "5": "Confusion, severe dizziness, or very dark urine alongside high output — signs of significant dehydration",
+            "6": "A catheter that will not pass, if you empty a continent diversion or a Mitrofanoff that way — a reservoir that cannot be drained will not wait"
           }
         },
         "pharmacist": {
@@ -1975,7 +1976,7 @@
             "items": {
               "1": "Food is broken down in the stomach and small intestine, and that part is usually unchanged — this is why you still absorb your nutrition",
               "2": "The colon’s main job is reclaiming water and salt from what is left, and forming stool. A colostomy leaves most of that intact; an ileostomy bypasses it almost entirely",
-              "3": "A urostomy does not change digestion at all — it diverts urine, so the food questions on this page mostly do not apply to you"
+              "3": "A urostomy does not change how food is digested — it diverts urine before the kidneys reach the bladder, so most of the food questions here are not yours. Fluid is the opposite: you need more of it than before, steadily through the day, because a well-flushed system is what protects against infection and stones. Ask your urologist or NSWOC what daily target fits you"
             },
             "note": "This is the single most useful thing to understand: an ileostomy is not \"a colostomy higher up\". The missing colon is why output is looser, why fluid and salt matter more, and why the advice differs."
           },
@@ -2246,7 +2247,7 @@
               "2": {
                 "title": "Disability Tax Credit (form T2201)",
                 "org": "Canada Revenue Agency",
-                "body": "Many ostomates qualify under the \"eliminating\" category. Approval can also unlock the RDSP and other credits, so it is worth the paperwork."
+                "body": "Applied for under the “eliminating” category, but having an ostomy does not qualify you on its own — the funding section walks through the test the CRA actually applies. Approval can unlock the RDSP and other credits, so it is worth reading before you start the paperwork."
               },
               "3": {
                 "title": "Non-Insured Health Benefits (NIHB)",
@@ -2774,7 +2775,7 @@
         "ranOut3Heading": "Check social assistance and disability routes",
         "ranOut3Body": "Provincial disability and social assistance programs sometimes top up ostomy coverage above the standard grant. This is worth asking about directly.",
         "ranOut4Heading": "Talk to your local chapter",
-        "ranOut4Body": "Ostomy Canada chapters know the local landscape, and some hold donated supplies. Treat second-hand product carefully — check sterility, expiry, and that it is the right size for you.",
+        "ranOut4Body": "Ostomy Canada chapters know the local landscape, and some hold donated supplies. Treat second-hand product carefully — check the expiry date, that the inner packaging is unopened, that the size matches what you use, and ask how it was stored.",
         "movingEyebrow": "Moving",
         "movingHeading": "If you change provinces",
         "movingIntro": "Nobody writes this down, and it catches people out. Moving resets your coverage entirely — different model, different amount, different forms, and often a different person who has to sign them.",
