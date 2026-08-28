@@ -113,13 +113,26 @@ const KIT_FLOW_TRAY = [
   { name: 'Stoma powder', note: 'Skin comfort', qty: 1 },
 ] as const;
 
+/*
+ * Illustrative, not testimonials. These are design personas — see
+ * public/archive/ostomy-care-sections/SECTIONS.md — so nothing here may make a
+ * clinical claim or describe an outcome.
+ *
+ * Two of them used to. Morgan had a convexity question answered by our own
+ * pharmacist chat, and Avery had damaged peristomal skin resolved by powder, a
+ * ring and that same chat. The site says the opposite in both cases: convexity
+ * is "the one product decision on the whole site that we would rather you did
+ * not make alone", and broken skin "needs an NSWOC to look at it — not a
+ * product recommendation from the internet". An invented patient must not
+ * settle a question the clinical copy sends to a nurse.
+ */
 const VOICES = [
   {
     lead: true,
     name: 'Morgan',
     meta: 'Toronto · colostomy · busy parent',
     quote:
-      'I finally asked about convex vs flat without feeling silly. Kind answer on my lunch break — no waiting room.',
+      'I asked my question on a lunch break and got a kind answer, without feeling silly for asking.',
     image: `${IMG}/voice-1.png`,
   },
   {
@@ -139,7 +152,7 @@ const VOICES = [
     name: 'Avery',
     meta: 'Mississauga · Liivv Ostomy regular',
     quote:
-      'Skin was angry until the seal was right. Powder, ring, pharmacist chat — then quieter days.',
+      'Someone walked me through what was actually in the box before I ordered. That was the part I had been dreading.',
     image: `${IMG}/voice-4.png`,
   },
 ] as const;

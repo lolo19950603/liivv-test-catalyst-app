@@ -45,12 +45,22 @@ function AskChip({ role }: { role: AskRole }) {
 /*
  * Commerce, in its own band.
  *
- * Placement is declared in chapters-meta.ts, not decided here — thirteen of the
- * sixty-one cards carry ids, and the ones that do not are documented next to
- * the blocklist. Three cases are deliberately empty because the copy on those
- * cards argues against buying something: convexity needs an assessment, support
- * garments have not been shown to prevent hernia, and the pediatric card says a
- * failing seal is a call to the child's nurse rather than a stronger product.
+ * Placement is declared in chapters-meta.ts, not decided here. The test a card
+ * has to pass is about its COPY, not its topic: does anything on this card
+ * argue against buying something?
+ *
+ * An earlier version asked the topic question instead, and put a $234 kit named
+ * "Peristomal Skin Health & Infection Prevention" under the card that says
+ * broken skin "needs an NSWOC to look at it — not a product recommendation from
+ * the internet". Six cards are deliberately empty:
+ *
+ *   Flat or convex                convexity is prescribed after an assessment
+ *   Leaks and short wear time     its own note calls rings and pastes an
+ *                                 assessment rather than a shopping decision
+ *   Sore, itchy, or weeping skin  broken skin needs an NSWOC, not a product
+ *   A bulge around the stoma      symptom card
+ *   Hernias, lifting and core     belts have not been shown to prevent hernia
+ *   Children                      a failing seal is a call to the nurse
  *
  * The band sits after the ask chip so the referral is the last clinical thing
  * said, and it carries its own disclosure rather than borrowing the page's.
@@ -335,6 +345,14 @@ export function ChapterPage({
   if (!chapter) return null;
 
   const nextHref = next ? chapterHref(next.slug) : `${LANDING_HREF}#where-are-you`;
+
+  /*
+   * The ordinal is structural ('one'..'four' in chapters-meta.ts) but has to
+   * read in the page language, or the French kicker says 'Chapitre three'. Read
+   * from the message object rather than t(), which cannot type a dynamic key.
+   */
+  const words: Record<string, string> = messages.OstomyCare.ui.chapter.words;
+  const chapterWord = words[chapter.chapterWord] ?? chapter.chapterWord;
   // Derived, not authored — see chapters-data.ts.
   const nextLabel = next ? `${next.title} →` : t('backToChapters');
   const chapterIndex = chapters.findIndex((item) => item.slug === chapter.slug);
@@ -352,7 +370,7 @@ export function ChapterPage({
         </div>
         <div aria-hidden className="oc-ch-hero-veil" />
         <div className="oc-ch-hero-inner">
-          <span className="oc-ch-kicker">{t('kicker', { word: chapter.chapterWord })}</span>
+          <span className="oc-ch-kicker">{t('kicker', { word: chapterWord })}</span>
           <p aria-hidden className="oc-ch-num">
             {chapter.num}
           </p>

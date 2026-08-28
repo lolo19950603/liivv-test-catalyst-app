@@ -244,7 +244,6 @@ export const CHAPTER_META: ChapterMeta[] = [
         image: `${IMG}/door-care.png`,
         group: 'whenSomethingIsNotRight',
         ask: 'nswoc',
-        products: [4560, 5067, 4598],
       },
       {
         image: `${IMG}/door-chapters.png`,
@@ -261,7 +260,6 @@ export const CHAPTER_META: ChapterMeta[] = [
         image: `${IMG}/care-chat-desk.png`,
         group: 'whenSomethingIsNotRight',
         ask: 'nswoc',
-        products: [8042, 4610, 4890],
       },
       {
         image: `${IMG}/care-chat-moment.png`,

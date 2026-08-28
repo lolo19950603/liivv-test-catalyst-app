@@ -72,7 +72,7 @@
   font-weight: 650;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--sage-deep);
+  color: var(--sage-text);
 }
 
 #oc-chapter .oc-ch-btn {
@@ -85,7 +85,9 @@
   text-decoration: none;
   font-weight: 550;
   font-size: 0.92rem;
-  transition: transform 0.28s ease, background 0.2s ease;
+  transition:
+    transform 0.28s ease,
+    background 0.2s ease;
 }
 
 #oc-chapter .oc-ch-btn:hover {
@@ -107,10 +109,16 @@
   background: transparent;
 }
 
+/*
+ * The ghost button sits low in the hero, where the light bottom-up wash brings
+ * the photograph back up. A fully transparent ghost put white text at 3.4:1
+ * there, so it carries its own dark backdrop rather than trusting whichever
+ * photo is behind it — the four chapter images have different bright regions.
+ */
 #oc-chapter .oc-ch-btn-ghost-light {
-  border-color: rgba(255, 255, 255, 0.45);
+  border-color: rgba(255, 255, 255, 0.72);
   color: #fff;
-  background: transparent;
+  background: rgba(30, 38, 32, 0.42);
 }
 
 /* Back chip */
@@ -127,7 +135,9 @@
   font-size: 0.84rem;
   font-weight: 550;
   backdrop-filter: blur(8px);
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  transition:
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
 }
 
 #oc-chapter .oc-ch-back.is-scrolled {
@@ -162,8 +172,13 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(115deg, rgba(42, 50, 44, 0.78), rgba(79, 101, 84, 0.42) 55%, rgba(42, 50, 44, 0.25)),
-    linear-gradient(to top, rgba(238, 242, 234, 0.88), transparent 45%);
+    linear-gradient(
+      115deg,
+      rgba(42, 50, 44, 0.9),
+      rgba(52, 66, 56, 0.82) 55%,
+      rgba(42, 50, 44, 0.8)
+    ),
+    linear-gradient(to top, rgba(238, 242, 234, 0.72), transparent 30%);
 }
 
 #oc-chapter .oc-ch-hero-inner {
@@ -176,7 +191,6 @@
 #oc-chapter .oc-ch-kicker {
   display: block;
   margin-bottom: 0.75rem;
-  opacity: 0.85;
   font-size: 0.8rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -390,7 +404,7 @@
   font-size: 0.75rem;
   letter-spacing: 0.12em;
   font-weight: 650;
-  color: var(--sage-deep);
+  color: var(--sage-text);
 }
 
 #oc-chapter .oc-ch-program h3 {
@@ -495,7 +509,7 @@
 
 #oc-chapter .oc-ch-map-num {
   font-family: var(--font-heading);
-  color: var(--sage-deep);
+  color: var(--sage-text);
 }
 
 /* Closing */
@@ -570,7 +584,6 @@
     --ch-overlap: 32px;
   }
 }
-
 
 /* =========================================================================
  * Urgent / red-flag callout
@@ -699,7 +712,9 @@
   border: 1px solid var(--line);
   text-decoration: none;
   color: inherit;
-  transition: border-color 160ms ease, transform 160ms ease;
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease;
 }
 
 #oc-chapter .oc-ch-res-card:hover,
@@ -718,7 +733,7 @@
   font-weight: 650;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--sage-deep);
+  color: var(--sage-text);
 }
 
 #oc-chapter .oc-ch-res-title {
@@ -745,7 +760,7 @@
   padding-top: 0.5rem;
   font-size: 0.76rem;
   letter-spacing: 0.04em;
-  color: var(--sage-deep);
+  color: var(--sage-text);
 }
 
 /* =========================================================================
@@ -785,7 +800,9 @@
   border: 1px solid rgba(111, 138, 114, 0.22);
   text-decoration: none;
   color: inherit;
-  transition: transform 160ms ease, border-color 160ms ease;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease;
 }
 
 #oc-chapter .oc-ch-discover-card:hover,
@@ -852,7 +869,7 @@
   font-weight: 650;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--sage-deep);
+  color: var(--sage-text);
 }
 
 #oc-chapter .oc-ch-sources ul {
@@ -871,7 +888,7 @@
 
 #oc-chapter .oc-ch-sources a:hover,
 #oc-chapter .oc-ch-sources a:focus-visible {
-  color: var(--sage-deep);
+  color: var(--sage-text);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -946,7 +963,9 @@
   border: 1px solid var(--line);
   text-decoration: none;
   color: inherit;
-  transition: border-color 160ms ease, transform 160ms ease;
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease;
 }
 
 #oc-chapter .oc-ch-help-card:hover,
@@ -1034,7 +1053,10 @@
   padding: 0.42rem 0.9rem;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
+  transition:
+    background 140ms ease,
+    color 140ms ease,
+    border-color 140ms ease;
 }
 #oc-chapter .oc-ch-rail button:hover {
   border-color: var(--chapter-accent);

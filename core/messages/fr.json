@@ -1639,7 +1639,7 @@
                     "6": {
                         "title": "Sortie & motifs",
                         "items": {
-                            "1": "Videz les pochettes drainables lorsqu’elles sont environ aux deux tiers ou à moitié pleines.",
+                            "1": "Videz les pochettes drainables lorsqu’elles sont environ au tiers ou à la moitié pleines.",
                             "2": "Les pochettes fermées sont remplacées selon les besoins tout au long de la journée.",
                             "3": "Les changements complets du système se font souvent tous les quelques jours — ou plus tôt si vous ressentez une brûlure, des démangeaisons ou une fuite."
                         }
@@ -1654,7 +1654,6 @@
                     },
                     "8": {
                         "title": "Quand demander de l’aide",
-                        "note": "Étape douce : parcourez Shop Ostomy Essentials pour barrières, pochettes et accessoires.",
                         "items": {
                             "1": "Fuites persistantes, rougeurs, douleurs ou peau qui ne guérit pas",
                             "2": "Changements soudains dans la sortie, enflure ou usure de la barrière",
@@ -2127,7 +2126,7 @@
                         "items": {
                             "1": "Il n’existe pas de programme national pour l’ostomie. Le montant, le modèle, et qui l’approuve changent à la frontière provinciale.",
                             "2": "Changer de province réinitialise tout — y compris les formulaires à remplir et les signatures requises",
-                            "3": "Dans la plupart des provinces, une évaluation par un NSWOC est la porte d’entrée. Certaines, comme la Saskatchewan, n’acceptent pas du tout une auto-demande."
+                            "3": "Qui approuve les modifications à la frontière : un médecin ou une infirmière praticienne en Ontario et en Nouvelle-Écosse, personne dans un contexte clinique au Québec ou en Colombie-Britannique, et une infirmière autorisée — généralement une NSWOC — en Alberta, en Saskatchewan et au Manitoba. La Saskatchewan n'acceptera pas du tout une auto-demande."
                         }
                     },
                     "16": {
@@ -2502,7 +2501,7 @@
                     "name": "Colombie-Britannique",
                     "amount": "Après une déductible familiale basée sur le revenu, PharmaCare paie 70 % des coûts admissibles — 75 % si un membre de la famille est né avant 1940 — puis 100 % une fois que vous atteignez le maximum familial.",
                     "howToApply": "Il n’y a pas de demande pour ostomie. La étape importante est l’inscription à Fair PharmaCare, qui fixe votre déductible. Inscrivez-vous sur gov.bc.ca ou au 1-800-663-7100, puis la couverture s’applique automatiquement à la caisse via un fournisseur autorisé.",
-                    "gatekeeper": "Une inscription clinique — l’enregistrement et la vérification du revenu CRA sont la porte d’entrée. La véritable porte d’entrée pratique est un fournisseur qui peut facturer sous un code de produit listé.",
+                    "gatekeeper": "Aucun intervenant clinique — l’inscription et la vérification du revenu par l’ARC sont la porte d’entrée. La véritable porte d’entrée pratique est un fournisseur qui peut facturer sous un code de produit listé.",
                     "deadlines": "Retournez le formulaire de consentement par courrier dans les 30 jours, sinon l’inscription ne sera pas complétée. Les déductibles sont calculés selon l’année civile.",
                     "notes": "Si vous ne vous inscrivez pas à Fair PharmaCare, un déductible de 10 000 $ vous est attribué par défaut, ce qui signifie que vous payez tout vous-même. L’inscription est la chose la plus précieuse que peut faire un résident de la Colombie-Britannique. Notez que les barrières cutanées, protecteurs, déodorants et nettoyants ne sont pas couverts — on suppose souvent qu’ils le sont."
                 },
@@ -2666,7 +2665,13 @@
                     "thePeopleAroundIt": "Les gens autour"
                 },
                 "allChapters": "Les quatre chapitres",
-                "backToChapters": "Retour à Soins d'ostomie →"
+                "backToChapters": "Retour à Soins d'ostomie →",
+                "words": {
+                    "one": "un",
+                    "two": "deux",
+                    "three": "trois",
+                    "four": "quatre"
+                }
             },
             "results": {
                 "dtcBody": "Avoir une ostomie ne vous qualifie pas seul, et une routine bien gérée est souvent refusée. Le test consiste à déterminer si vous êtes incapable de gérer la fonction intestinale ou vésicale, ou si cela vous prend environ trois fois plus de temps que pour une personne du même âge sans l impairment, au moins 90 % du temps, sur une période continue de 12 mois — évalué même avec vos appareils et votre routine en place. Cela signifie que les complications, les fuites et la charge de temps sont ce que le formulaire doit démontrer. Seul un médecin ou une infirmière praticienne peut le certifier.",

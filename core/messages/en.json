@@ -1663,7 +1663,6 @@
           },
           "8": {
             "title": "When to Ask",
-            "note": "Soft next step: browse Shop Ostomy Essentials for barriers, pouches, and accessories.",
             "items": {
               "1": "Persistent leaks, redness, pain, or skin that will not heal",
               "2": "Sudden changes in output, swelling, or how your barrier wears",
@@ -2135,7 +2134,7 @@
             "items": {
               "1": "There is no national ostomy program. The amount, the model, and who approves it all change at the provincial border",
               "2": "Moving provinces resets everything — including which forms you file and who has to sign them",
-              "3": "In most provinces an NSWOC assessment is the gate. Some, like Saskatchewan, will not accept a self-application at all"
+              "3": "Who signs off changes at the border: a physician or nurse practitioner in Ontario and Nova Scotia, nobody clinical in Quebec or British Columbia, and a registered nurse — usually an NSWOC — in Alberta, Saskatchewan and Manitoba. Saskatchewan will not accept a self-application at all"
             }
           },
           "16": {
@@ -2666,7 +2665,13 @@
           "bodiesThatChange": "Bodies that change",
           "thePeopleAroundIt": "The people around it"
         },
-        "backToChapters": "Back to Ostomy Care →"
+        "backToChapters": "Back to Ostomy Care →",
+        "words": {
+          "one": "one",
+          "two": "two",
+          "three": "three",
+          "four": "four"
+        }
       },
       "discovery": {
         "eyebrow": "Also from Liivv",

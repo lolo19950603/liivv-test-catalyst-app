@@ -1,3 +1,8 @@
+/* Text weight of the sage hue. --sage-deep is tuned for white only. */
+:root {
+  --sage-text: #494e47;
+}
+
 /*
  * Funding section — layered on top of chapter-page.css, which supplies the
  * palette, spacing tokens, buttons and `.rounded-top`. Only the pieces unique to
@@ -163,7 +168,9 @@
   border: 1px solid var(--sand);
   background: var(--cream);
   font-size: 0.88rem;
-  transition: background 150ms ease, border-color 150ms ease;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease;
 }
 
 #oc-chapter .oc-fund-choice.is-on span {
@@ -241,7 +248,7 @@
 
 #oc-chapter .oc-fund-card a {
   font-size: 0.9rem;
-  color: var(--sage-deep);
+  color: var(--sage-text);
   text-underline-offset: 2px;
 }
 
