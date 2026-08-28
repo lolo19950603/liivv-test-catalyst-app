@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" width="720" height="220" role="img" aria-labelledby="title desc">
   <title id="title">How a visit splits</title>
-  <desc id="desc">The customer shops on Liivv. The website is one front door. Shopping goes to BigCommerce. Health records go to Supabase.</desc>
+  <desc id="desc">The customer shops on Liivv. Commerce goes to BigCommerce. Health records go to Supabase.</desc>
   <rect x="0" y="0" width="720" height="220" fill="#ffffff"/>
 
   <rect x="12" y="78" width="140" height="64" rx="6" fill="#f3f3f3" stroke="#1a1a1a"/>
@@ -11,16 +11,16 @@
 
   <rect x="214" y="70" width="168" height="80" rx="6" fill="#1a1a1a"/>
   <text x="298" y="102" text-anchor="middle" fill="#ffffff" font-size="13" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">Liivv website</text>
-  <text x="298" y="120" text-anchor="middle" fill="#d8d8d8" font-size="11" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">one front door</text>
+  <text x="298" y="120" text-anchor="middle" fill="#d8d8d8" font-size="11" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">storefront</text>
 
   <line x1="382" y1="90" x2="448" y2="44" stroke="#888888" stroke-width="1.5"/>
   <line x1="382" y1="130" x2="448" y2="176" stroke="#888888" stroke-width="1.5"/>
 
   <rect x="448" y="12" width="260" height="72" rx="6" fill="#f3f3f3" stroke="#1a1a1a"/>
   <text x="578" y="40" text-anchor="middle" fill="#1a1a1a" font-size="13" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">BigCommerce</text>
-  <text x="578" y="58" text-anchor="middle" fill="#555555" font-size="11" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">the store engine — products, cart, orders</text>
+  <text x="578" y="58" text-anchor="middle" fill="#555555" font-size="11" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">catalog, cart, orders</text>
 
   <rect x="448" y="136" width="260" height="72" rx="6" fill="#f3f3f3" stroke="#1a1a1a"/>
   <text x="578" y="164" text-anchor="middle" fill="#1a1a1a" font-size="13" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">Supabase</text>
-  <text x="578" y="182" text-anchor="middle" fill="#555555" font-size="11" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">the health locker — Canadian vault</text>
+  <text x="578" y="182" text-anchor="middle" fill="#555555" font-size="11" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">Canadian Postgres — health records</text>
 </svg>

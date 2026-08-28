@@ -1,38 +1,40 @@
-# Liivv — How it works and IT architecture
+# Liivv — Architecture
 
-**Audience:** Managers and IT (security / infrastructure review)  
+**Audience:** Architecture and security review  
 **App:** BigCommerce Catalyst storefront (`core/`) + Liivv health and pharmacy extensions  
 **Date:** August 2026  
-**Status:** Single source of truth (replaces the former How-Liivv-Works and IT-Architecture packs)  
+**Status:** Current  
 **PDF:** [Liivv-Architecture.pdf](./Liivv-Architecture.pdf) (same content, for email / print)
 
-How to use this file:
+Reading map:
 
-- **Managers:** read **§1–§3**. That is the story of why shopping and health data are split.
-- **IT:** read the whole document. **§9** is the pre-launch security checklist (S1–S8).
+- **§1–§3** — commerce vs health-data split, systems of record, PHI posture  
+- **§4–§8** — system context and data flows  
+- **§9** — pre-launch security checklist (S1–S8)  
+- **§10–§14** — auth, trust boundary, remaining Legal/ops items, evidence paths  
 
 ---
 
-## 1. The one-sentence version
+## 1. Overview
 
 Liivv is a health storefront with **two separate engines**:
 
-- **BigCommerce** runs the shop (the same kind of product as Shopify).
+- **BigCommerce** runs the shop (catalog, cart, checkout, orders).
 - **Supabase** holds health records in a **Canadian** Postgres project.
 
-Orders never live in the health locker. Health records never live in the shop. The customer only sees Liivv. Behind the website, shopping and health information take different doors on purpose.
+Orders are not stored in Supabase. Health records are not stored in BigCommerce. The customer only sees Liivv. Behind the storefront, commerce and health data use different systems of record.
 
 ![How a visit splits: customer shops on Liivv, then shopping goes to BigCommerce and health records go to Supabase](how-liivv-works-diagram.svg)
 
-| Job | Who does it | Simple analogy |
+| Function | System | Boundary |
 | --- | --- | --- |
-| Show products, take the cart, create the order | BigCommerce | The shop floor and the till |
-| Remember health needs, insurance, prescriptions, care chat | Supabase | A locked filing cabinet in Canada |
-| Charge the card, including repeating subscriptions | Stripe | The bank — we never see the card number |
+| Catalog, cart, checkout, order of record | BigCommerce | Commerce platform — not health records |
+| Health profile, insurance, prescriptions, care chat | Supabase | Canadian Postgres — not the shop |
+| Card charges and subscriptions | Stripe | Payment processor — PAN / CVC never stored |
 
-A store is built to sell products. A clinic-style locker is built to keep sensitive health information. Using one system for both would be like keeping medical files in a cash register.
+Commerce platforms are built to sell products. Health records need a dedicated store with Canadian residency and access control. Combining them would put PHI in a system that is not designed to hold it.
 
-**Design principle (technical):** browsers never receive service-role, admin, or payment secrets. **Next.js on Vercel is the trust boundary.**
+**Design principle:** browsers never receive service-role, admin, or payment secrets. **Next.js on Vercel is the trust boundary.**
 
 ---
 
@@ -61,11 +63,11 @@ Liivv does not invent a second checkout. We do not process orders ourselves.
 
 ### What Supabase is
 
-A professionally run Postgres database (plus optional Storage). In plain language: a secure place where Liivv keeps records a shop is not meant to hold.
+A professionally run Postgres database (plus optional Storage) for records that do not belong in the commerce platform.
 
-- **A filing cabinet.** Health profile, insurance, prescriptions, refill/CarePack requests, care chat.
-- **Not a second store.** It does not take payments or create orders.
-- The customer never talks to Supabase directly. Liivv’s server holds the service-role key.
+- **Holds:** health profile, insurance, prescriptions, refill/CarePack requests, care chat.
+- **Does not:** take payments or create orders.
+- Clients never talk to Supabase directly. Liivv’s server holds the service-role key.
 
 This project’s Supabase region is **Canada (Central) / `ca-central-1`**.
 
@@ -81,25 +83,25 @@ This project’s Supabase region is **Canada (Central) / `ca-central-1`**.
 | Drug reference | **Health Canada DPD** | Medication search (server proxy, rate-limited) |
 | Ephemeral cache | **Upstash Redis** (optional) or Vercel runtime cache | Checkout snapshots, BC app install token, stronger rate limits |
 
-Upstash Redis is **not required** for launch if Supabase is configured. It is cheap insurance for checkout/webhooks, the staff-app install token, and site-wide medication rate limits.
+Upstash Redis is **not required** for launch if Supabase is configured. It is optional hardening for checkout/webhooks, the staff-app install token, and site-wide medication rate limits.
 
 ### Chat assistant
 
-Care conversations live in Supabase. An on-site assistant (Olivia) can help with products, orders, and account how-tos **when we turn it on**. It is not a clinician.
+Care conversations live in Supabase. An on-site assistant (Olivia) can help with products, orders, and account questions **when we turn it on**. It is not a clinician.
 
-If `VIRTUAL_CARE_BOT_ENABLED=true` and an API key is set, **customer message text is sent to OpenAI** even when the bot refuses clinical advice and points people to a pharmacist. That flag stays **false** until the team decides whether to buy an OpenAI arrangement that includes a **DPA** (Data Processing Agreement — a contract that says OpenAI may process this data for us and how they must protect it).
+If `VIRTUAL_CARE_BOT_ENABLED=true` and an API key is set, **customer message text is sent to OpenAI** even when the bot refuses clinical advice and points people to a pharmacist. That flag stays **false** until the team decides whether to buy an OpenAI arrangement that includes a **DPA** (Data Processing Agreement).
 
 Human care-team chat in `/bc-app` still stays in Supabase either way.
 
 ---
 
-## 3. PHI and the “medical server” idea
+## 3. PHI residency and data classes
 
-**PHI** means protected health information — anything that could identify a person and say something about their health.
+**PHI** is protected health information: data that identifies a person and says something about their health.
 
-A stronger production posture is a **paid Canadian Supabase project** with healthcare-oriented extras (contract, backups, network locks). HIPAA is a **US** law; Canada’s conversation is **PIPEDA** (and **PHIPA** in Ontario). Supabase’s healthcare add-on is still the practical “vault grade” package they sell — not a claim that US law is the Canadian statute.
+Production intent is a **paid Canadian Supabase project** with healthcare-oriented extras (contract, backups, network controls). HIPAA is a **US** statute; the Canadian frame is **PIPEDA** (and **PHIPA** in Ontario). Supabase’s healthcare add-on is the vendor’s commercially available elevated-compliance package — not a claim that US law is the Canadian statute.
 
-The vault is only as good as how we use it. Liivv still decides staff access, retention, and that chat is not copied into tools that are not covered.
+Controls only hold if we use them: staff access, retention, and keeping chat out of tools that are not covered remain Liivv’s responsibility.
 
 | Data class | Examples | Storage |
 | --- | --- | --- |
@@ -110,7 +112,7 @@ The vault is only as good as how we use it. Liivv still decides staff access, re
 
 ---
 
-## 4. System context (IT)
+## 4. System context
 
 ```mermaid
 flowchart LR
@@ -364,7 +366,7 @@ flowchart TB
 
 ---
 
-## 12. Still for IT / Legal (not blockers for the engineering pass)
+## 12. Remaining Legal and operations items
 
 1. Vendor **DPAs / BAAs** as required: Supabase, Stripe, Vercel, BigCommerce; OpenAI only if the bot is turned on.
 2. Logging policy: do not print chat bodies in request logs.
@@ -375,7 +377,7 @@ flowchart TB
 
 ## 13. Suggested meeting agenda
 
-1. How it works (§1–§3) — manager + IT together  
+1. Overview — commerce vs health-data split (§1–§3)  
 2. System context and systems of record (§4–§5)  
 3. Pharmacy and chat paths (§7–§8)  
 4. Auth and staff via BigCommerce (§10)  
@@ -408,4 +410,4 @@ core/app/bc-app/
 
 ---
 
-*This document is the combined pack for IT-01 / IT-02. Companion interactive walkthrough (if used):* `liivv-it-architecture.canvas.tsx`.
+*Companion walkthrough (if used):* `liivv-it-architecture.canvas.tsx`.

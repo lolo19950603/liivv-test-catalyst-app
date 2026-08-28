@@ -237,7 +237,7 @@ const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Liivv — How it works and IT architecture</title>
+  <title>Liivv — Architecture</title>
   <style>${css}</style>
 </head>
 <body>
