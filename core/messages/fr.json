@@ -2272,13 +2272,10 @@
                         }
                     }
                 },
-                "heroBody": "Les personnes, programmes et aides financières disponibles au Canada — rassemblés en un seul endroit, pour que vous ne cherchiez pas seul.",
-                "focus": "Soutien par les pairs et chapitres près de chez vous, à quoi ressemble réellement la couverture selon la province, programmes gratuits des fabricants, communauté de jeunes et jeunes adultes, dates de sensibilisation, et questions pratiques canadiennes — vol, hiver, télétravail, et commandes interprovinciales.",
-                "vibe": "Pratique et connecté — la carte vers tout ce qui se trouve en dehors de ce site web.",
                 "categoriesIntro": {
                     "eyebrow": "Vous n'êtes pas seul dans cette démarche",
                     "heading": "Ce qui existe, et pour qui c'est destiné",
-                    "body": "Beaucoup d’aide de qualité existe au Canada. Presque aucune n’est regroupée en un seul endroit. Ce chapitre est la carte — la plupart des liens mènent ailleurs, car ces organisations le font mieux que nous."
+                    "body": "Deux parties. La première est votre propre corps qui s’adapte à une routine — ce que vous mangez, ce qui sort, et ce qui change. La seconde concerne tout ce qui l’entoure : l’argent, les déplacements, et l’aide qui existe au Canada mais qui est presque jamais réunie en un seul endroit. La plupart de cette moitié renvoie vers d’autres ressources, car ces organisations le font mieux que nous."
                 },
                 "pharmacist": {
                     "eyebrow": "Disponible en Ontario",
@@ -2288,11 +2285,14 @@
                 },
                 "closing": {
                     "heading": "Vivre, pas gérer",
-                    "body": "L’aide existe. La plupart des gens ne découvrent tout simplement jamais qu’elle est là — c’est la seule raison pour laquelle cette page a été créée."
+                    "body": "La plupart de cela cesse d’être une question en quelques mois. La partie qui ne l’est pas — l’argent, et trouver des personnes qui en ont — est la partie que la majorité des gens ne découvrent jamais, ce qui est la seule raison pour laquelle cette page a été écrite."
                 },
                 "governance": {
                     "disclaimer": "Ceci est une information générale, pas un avis médical, et ne remplace pas une évaluation par votre NSWOC, chirurgien ou médecin. Le choix du produit, de la peau, et de l’ajustement dépend de votre corps et de votre chirurgie — parlez à votre équipe de soins avant de changer quoi que ce soit."
-                }
+                },
+                "heroBody": "Manger à nouveau, et tout ce qui entoure une journée — voyage, hiver, argent, et les personnes et programmes qui existent au Canada.",
+                "focus": "Ajouter des aliments et ce à quoi faire attention, liquide et sel, gaz et odeur, la question des médicaments, puis les aspects pratiques canadiens — vol, adhérence en hiver, télétravail, commande interprovinciale, à quoi ressemble réellement la couverture selon la province, et comment trouver des personnes près de chez vous.",
+                "vibe": "Pratique et connecté — comment une journée fonctionne maintenant, et la carte de tout ce qui se trouve en dehors de ce site web."
             },
             "this-might-be-you": {
                 "title": "C'est peut-être vous",
