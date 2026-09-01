@@ -46,40 +46,11 @@ function memoryConsume(key: string): RateLimitResult {
   };
 }
 
-async function redisConsume(key: string): Promise<RateLimitResult | null> {
-  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
-    return null;
-  }
-
-  const { Redis } = await import('@upstash/redis');
-  const redis = Redis.fromEnv();
-  const count = await redis.incr(key);
-
-  if (count === 1) {
-    await redis.expire(key, WINDOW_SEC);
-  }
-
-  const ttl = await redis.ttl(key);
-
-  return {
-    allowed: count <= MAX_REQUESTS,
-    remaining: Math.max(0, MAX_REQUESTS - count),
-    retryAfterSec: ttl > 0 ? ttl : WINDOW_SEC,
-  };
-}
-
 export async function medicationRateLimitResponse(request: Request): Promise<NextResponse | null> {
   const ip = getClientIp(request);
   const windowId = Math.floor(Date.now() / (WINDOW_SEC * 1000));
   const key = `rl:medications:${ip}:${windowId}`;
-
-  let result: RateLimitResult;
-
-  try {
-    result = (await redisConsume(key)) ?? memoryConsume(key);
-  } catch {
-    result = memoryConsume(key);
-  }
+  const result = memoryConsume(key);
 
   if (result.allowed) {
     return null;

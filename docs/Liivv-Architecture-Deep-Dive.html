@@ -58,12 +58,12 @@
 <tr><td>Payment methods &amp; subscriptions</td><td>Stripe</td><td>Renewals create BC orders on <code>invoice.paid</code></td></tr>
 <tr><td>Health profile, insurance</td><td>Supabase</td><td>Not modeled in BC</td></tr>
 <tr><td>Prescriptions, CarePack, refills</td><td>Supabase</td><td>Staff queue in <code>/bc-app</code></td></tr>
-<tr><td>Live chat messages</td><td>Supabase</td><td>Optional OpenAI bot replies (flagged off)</td></tr>
-<tr><td>Marketing page content</td><td>Makeswift</td><td>Catalyst Makeswift integration</td></tr></tbody></table>
+<tr><td>Live chat messages</td><td>Supabase</td><td>Optional OpenAI bot replies (flagged off)</td></tr></tbody></table>
 <p><strong>Recurring orders:</strong> Stripe handles the repeating charge. When a renewal succeeds, Liivv still creates the order in BigCommerce. Stripe is the billing engine. BigCommerce remains the only order engine.</p>
 <p><strong>Chat assistant:</strong> Care conversations live in Supabase. If <code>VIRTUAL_CARE_BOT_ENABLED=true</code> and an API key is set, <strong>customer message text is sent to OpenAI</strong> even when the bot refuses clinical advice and points people to a pharmacist. That flag stays <strong>false</strong> until the team decides whether to buy an OpenAI arrangement that includes a <strong>DPA</strong>. Human care-team chat in <code>/bc-app</code> still stays in Supabase either way.</p>
 <p><strong>Patients do not upload prescription photos.</strong> Adding a prescription is <strong>transfer from another pharmacy</strong> or <strong>doctor fax</strong>. Staff work the queue in the BigCommerce embedded app (<code>/bc-app</code>).</p>
-<p><strong>Upstash Redis</strong> is not required for launch if Supabase is configured. It is optional hardening for checkout/webhooks, the staff-app install token, and site-wide medication rate limits.</p>
+<p><strong>Health Canada DPD:</strong> the Drug Product Database is Health Canada’s <strong>free public API</strong> (open government data — no key, no paid contract). Liivv proxies it so customers can search licensed Canadian drugs by brand name and add the selected product to a prescription. The <strong>prescription is stored in Supabase</strong>. Search queries go to Health Canada; patient records do not. The proxy is rate-limited at 60 requests / IP / minute so Liivv is not used as an open relay.</p>
+<p><strong>Hosting:</strong> the Catalyst app (<code>core/</code>) runs on <strong>Vercel</strong> (production and preview). Next.js on Vercel is the only process that holds service-role, admin, and payment secrets. Secrets live in the Vercel project (encrypted) plus gitignored <code>.env.local</code> for local work. Preview and Production currently share the same keys; splitting them is a documented next step, not a launch blocker. Checkout snapshots and the staff-app install token use <strong>Vercel’s runtime cache</strong> (in-memory locally).</p>
 <hr />
 <h2>2. System context</h2>
 <div class="mermaid">flowchart LR
@@ -85,7 +85,7 @@
 
   subgraph Data
     SB[(Supabase Postgres)]
-    KV[(KV / Redis optional)]
+    KV[(Vercel runtime cache)]
   end
 
   subgraph Payments
@@ -94,7 +94,6 @@
   end
 
   subgraph Other
-    MS[Makeswift]
     AI[OpenAI]
     DPD[Health Canada DPD]
   end
@@ -108,7 +107,6 @@
   N --> SB
   N --> KV
   N --> STK
-  N --> MS
   N --> AI
   N --> DPD
   STW --> N
@@ -119,7 +117,7 @@
   participant U as Browser
   participant N as Next.js
   participant BC as BigCommerce
-  participant KV as KV/Redis
+  participant KV as Runtime cache
   participant ST as Stripe
   participant SB as Supabase
 
@@ -159,10 +157,12 @@
   N->>SB: upsert profiles, health_profiles, insurance_info
   N->>BC: Optional name/phone sync
 
-  U->>N: Search medication
-  N->>DPD: GET drug API (rate-limited)
-  DPD-->>N: Brand / ingredients
+  U->>N: Search medication (brand name)
+  N->>DPD: GET public drug API (rate-limited)
+  DPD-->>N: Brand / DIN / ingredients
   N-->>U: Results
+  U->>N: Add selected drug to prescription
+  N->>SB: prescriptions
 
   U->>N: Transfer Rx / fax template / refill / CarePack
   N->>SB: prescriptions / refill_requests / carepack_requests
@@ -197,9 +197,9 @@
 <tr><td><strong>S3</strong></td><td>Staff access</td><td>Med</td><td><strong>In place</strong></td><td>Staff work inside <strong>BigCommerce → Apps → Liivv Staff (<code>/bc-app</code>)</strong>, using the store’s BC app session. There is no shared dashboard password. <code>/staff</code> is not a product surface (404).</td></tr>
 <tr><td><strong>S4</strong></td><td>AI chat assistant</td><td>Med</td><td><strong>Held</strong> (Legal)</td><td>The assistant stays <strong>off</strong> (<code>VIRTUAL_CARE_BOT_ENABLED=false</code>) until the team decides on a <strong>paid OpenAI arrangement that includes a DPA</strong>. If the bot were on, customer message text would go to OpenAI even when the reply is “talk to a pharmacist.” Human care-team chat in <code>/bc-app</code> stays in Supabase either way.</td></tr>
 <tr><td><strong>S5</strong></td><td>Environment secrets</td><td>Med</td><td><strong>In place</strong> (documented next step)</td><td>Secrets live in Vercel (encrypted) and in gitignored <code>.env.local</code>. Nothing privileged is committed. Rotate on personnel change. Next step, not a launch blocker: separate Preview vs Production keys (they currently match).</td></tr>
-<tr><td><strong>S6</strong></td><td>Embedded app / CMS frames</td><td>Med</td><td><strong>In place</strong></td><td>Cookies used in iframes are <code>SameSite=None; Secure</code> (partitioned where needed). CSP <code>frame-ancestors</code> allowlists <strong>Makeswift and BigCommerce only</strong>. Verified in those embeds.</td></tr>
+<tr><td><strong>S6</strong></td><td>Embedded staff app frames</td><td>Med</td><td><strong>In place</strong></td><td>Staff work inside a BigCommerce control-panel iframe (<code>/bc-app</code>). Cookies used in that iframe are <code>SameSite=None; Secure</code> (partitioned where needed). CSP <code>frame-ancestors</code> is allowlisted, not open.</td></tr>
 <tr><td><strong>S7</strong></td><td>Customer email</td><td>Low</td><td><strong>In place</strong> (ops confirm)</td><td>Password reset and most transactional mail are <strong>BigCommerce’s</strong>. The storefront only triggers reset via GraphQL. Ops: confirm branding + SPF/DKIM in the BC control panel. Pharmacy notification email is not in scope yet.</td></tr>
-<tr><td><strong>S8</strong></td><td>Medication search (Health Canada DPD)</td><td>Low</td><td><strong>In place</strong></td><td>Search is a <strong>server proxy</strong>, rate-limited at <strong>60 requests / IP / minute</strong>. That protects Liivv from being used as an open relay to Health Canada (cost / blocking). It is not a patient-data path. Stronger still if Upstash Redis is configured.</td></tr></tbody></table>
+<tr><td><strong>S8</strong></td><td>Medication search (Health Canada DPD)</td><td>Low</td><td><strong>In place</strong></td><td>Customers look up licensed Canadian drugs through Health Canada’s <strong>free public DPD API</strong> so they can add the right product to a prescription. Search is a <strong>server proxy</strong>, rate-limited at <strong>60 requests / IP / minute</strong>, so Liivv is not an open relay to Health Canada. The selected medication is saved on the <strong>prescription in Supabase</strong>. Queries to DPD are catalog lookups — not a patient-data path.</td></tr></tbody></table>
 <h3>Additional controls</h3>
 <ul>
 <li>Privileged work runs in Server Components / server actions (tokens never held in the browser)</li>
@@ -236,7 +236,6 @@
     SB[Supabase]
     ST[Stripe]
     AI[OpenAI]
-    MS[Makeswift]
     DPD[Health Canada]
   end
 
@@ -247,7 +246,6 @@
   Next -->|Service role key| SB
   Next -->|Secret key| ST
   Next -->|API key if bot on| AI
-  Next --> MS
   Next --> DPD</div>
 <h3>Secrets inventory (server-only unless noted)</h3>
 <table><thead><tr><th>Secret</th><th>Purpose</th></tr></thead><tbody><tr><td><code>AUTH_SECRET</code></td><td>Auth.js + anonymous cart JWT</td></tr>
@@ -259,15 +257,14 @@
 <tr><td><code>STRIPE_SECRET_KEY</code> / <code>STRIPE_WEBHOOK_SECRET</code></td><td>Payments</td></tr>
 <tr><td><code>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</code></td><td><strong>Public</strong> — Stripe.js only</td></tr>
 <tr><td><code>SUPABASE_URL</code> / <code>SUPABASE_SERVICE_ROLE_KEY</code></td><td>DB (bypasses RLS)</td></tr>
-<tr><td><code>OPENAI_API_KEY</code></td><td>Virtual care bot (unused while flag is off)</td></tr>
-<tr><td><code>MAKESWIFT_SITE_API_KEY</code></td><td>CMS</td></tr></tbody></table>
+<tr><td><code>OPENAI_API_KEY</code></td><td>Virtual care bot (unused while flag is off)</td></tr></tbody></table>
 <hr />
 <h2>9. Remaining Legal and operations items</h2>
 <ol>
 <li>Vendor <strong>DPAs / BAAs</strong> as required: Supabase, Stripe, Vercel, BigCommerce; OpenAI only if the bot is turned on.</li>
 <li>Logging policy: do not print chat bodies in request logs.</li>
 <li>Backup / RPO for Supabase Postgres (health and pharmacy rows).</li>
-<li>Optional: Supabase network restriction to Vercel egress; separate Preview vs Production secrets; Upstash Redis if we want stronger KV and rate limits.</li>
+<li>Optional: Supabase network restriction to Vercel egress; separate Preview vs Production secrets.</li>
 </ol>
 <hr />
 <h2>10. Suggested meeting agenda</h2>

@@ -58,15 +58,25 @@ This project’s Supabase region is **Canada (Central) / `ca-central-1`**.
 
 Patients add prescriptions by **transfer from another pharmacy** or **doctor fax** — not by uploading photos. Staff work the queue in a BigCommerce embedded app (`/bc-app`).
 
+### Vercel — where the app runs
+
+The storefront is **Next.js 16** (App Router), deployed on **Vercel**. That is the hosting platform: production and preview deploys, environment secrets, and the Node runtime that talks to BigCommerce, Supabase, and Stripe.
+
+Vercel is not a system of record. Orders stay in BigCommerce. Health rows stay in Supabase. Vercel holds the running app and the secrets it needs.
+
 ### Everything else, in one pass
 
 | Layer | Technology | Role |
 | --- | --- | --- |
-| Storefront | **Next.js 16** (App Router) on **Vercel** | Only app that holds secrets; UI; server actions; webhooks |
-| CMS | **Makeswift** | Marketing / content pages |
+| Storefront / hosting | **Next.js 16** on **Vercel** | Only app that holds secrets; UI; server actions; webhooks |
 | AI assistant | **OpenAI** (optional, feature-flagged) | Store assistant — **off** until Legal decides on a DPA |
-| Drug reference | **Health Canada DPD** | Medication search (server proxy, rate-limited) |
-| Ephemeral cache | **Upstash Redis** (optional) | Checkout snapshots, install token, stronger rate limits |
+| Drug reference | **Health Canada DPD** | Free public drug catalog — customer medication search |
+
+### Health Canada DPD — medication lookup
+
+The **Drug Product Database (DPD)** is Health Canada’s **free public API** for licensed drugs in Canada — open government data, no API key, and no paid contract. Liivv uses it so customers can search by brand name and pick the right product when they add a prescription, instead of typing a DIN from memory.
+
+The browser never talks to Health Canada. Next.js proxies the search and rate-limits it. What the customer selects is saved on their **prescription in Supabase**. DPD is a lookup catalog only; it does not hold patient records.
 
 Care conversations live in Supabase. An on-site assistant (Olivia) can help with products, orders, and account questions **when we turn it on**. It is not a clinician. Human care-team chat in `/bc-app` stays in Supabase either way.
 
@@ -91,7 +101,7 @@ Production intent is a **paid Canadian Supabase project**. HIPAA is a US statute
 
 **Shopping.** The browser talks only to Next.js. Next.js reads the catalog and cart from BigCommerce GraphQL, then returns HTML. At checkout, Next.js creates a Stripe Payment Intent; the customer confirms with Stripe.js. After Stripe says the charge succeeded (webhook), Next.js creates the order in BigCommerce Admin REST and clears the cart. Recurring lines become Stripe subscriptions; later renewals still land as BigCommerce orders.
 
-**Health and pharmacy.** A logged-in customer completes profile, health, and insurance on the storefront. Next.js writes those rows to Supabase and may sync name/phone back to BigCommerce. Medication search goes through a rate-limited server proxy to Health Canada DPD. Transfer / fax / refill / CarePack requests are Supabase rows. Staff approve and update them from `/bc-app`.
+**Health and pharmacy.** A logged-in customer completes profile, health, and insurance on the storefront. Next.js writes those rows to Supabase and may sync name/phone back to BigCommerce. To add a prescription, they search **Health Canada DPD** (free public drug API) for the brand, pick the product, and Liivv saves that medication on their prescription in **Supabase**. Transfer / fax / refill / CarePack requests are also Supabase rows. Staff approve and update them from `/bc-app`.
 
 **Care chat.** Customer messages are stored in Supabase. Staff join and reply from the same staff app. The optional OpenAI bot is **off** until Legal signs a DPA; if it were on, message text would go to OpenAI even when the reply is “talk to a pharmacist.”
 
@@ -119,7 +129,7 @@ Engineering treats Next.js as the only place secrets live. A few controls that m
 - The **OpenAI assistant stays off** until a DPA is in place.
 - Secrets live in Vercel and gitignored `.env.local` — nothing privileged is committed.
 - Stripe and BigCommerce **webhooks are verified**.
-- Medication search is a **server proxy**, not an open relay to Health Canada.
+- Medication search is a **server proxy** to Health Canada’s free public DPD API, not an open relay. Chosen medications are stored on the prescription in Supabase.
 
 The numbered pre-launch checklist (**S1–S8**), cookie names, secrets inventory, and code evidence paths live in the [deep dive](./Liivv-Architecture-Deep-Dive.md).
 
@@ -130,7 +140,7 @@ The numbered pre-launch checklist (**S1–S8**), cookie names, secrets inventory
 1. Vendor **DPAs / BAAs** as required (Supabase, Stripe, Vercel, BigCommerce; OpenAI only if the bot is turned on).
 2. Logging policy: do not print chat bodies in request logs.
 3. Backup / RPO for Supabase Postgres.
-4. Optional hardening: network restriction to Vercel, separate Preview vs Production secrets, Upstash Redis.
+4. Optional hardening: network restriction to Vercel; separate Preview vs Production secrets.
 
 ---
 

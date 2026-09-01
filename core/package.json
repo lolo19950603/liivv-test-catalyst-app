@@ -48,7 +48,6 @@
     "@stripe/stripe-js": "^5.10.0",
     "@supabase/supabase-js": "^2.108.2",
     "@t3-oss/env-core": "^0.13.6",
-    "@upstash/redis": "^1.35.0",
     "@vercel/analytics": "^1.5.0",
     "@vercel/functions": "^2.2.12",
     "@vercel/otel": "^2.1.0",

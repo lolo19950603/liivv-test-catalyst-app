@@ -122,10 +122,12 @@ const getFooterContextValue = cache(async () => {
               },
             ]
           : []),
-        ...removeEdgesAndNodes(sectionsData.content.pages).map((page) => ({
-          label: page.name,
-          href: page.__typename === 'ExternalLinkPage' ? page.link : page.path,
-        })),
+        ...removeEdgesAndNodes(sectionsData.content.pages)
+          .filter((page) => page.__typename !== 'BlogIndexPage')
+          .map((page) => ({
+            label: page.name,
+            href: page.__typename === 'ExternalLinkPage' ? page.link : page.path,
+          })),
       ],
     },
   ];

@@ -2,7 +2,7 @@
 
 import { ChevronDown, ChevronLeft, ChevronRight, Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { getMiniCartSnapshot } from '~/app/[locale]/(default)/cart/_actions/get-mini-cart';
@@ -22,115 +22,32 @@ const storeMuted = 'text-[var(--store-secondary-text,#66605c)]';
 const storeBorder = 'border-[var(--store-border,rgba(49,47,47,0.18))]';
 const storeFont = 'font-[family-name:var(--liivv-archive-sans-font,var(--font-family-body))]';
 
-const PANEL_TRANSITION_MS = 450;
-const DIM_TRANSITION_MS = 360;
-const DRAWER_EASE = 'cubic-bezier(0.32, 0.72, 0, 1)';
+const PANEL_ANIMATION_MS = 450;
 
-const MINI_CART_LAYER_CSS = `
-#liivv-mini-cart-dialog {
+const HTML_OVERLAY_STYLE_ID = 'liivv-mini-cart-html-overlay';
+const HTML_OVERLAY_CSS = `
+html.liivv-mini-cart-open::before {
+  content: "" !important;
   position: fixed !important;
   inset: 0 !important;
-  width: 100% !important;
-  max-width: none !important;
-  height: 100% !important;
-  max-height: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  overflow: hidden !important;
-}
-#liivv-mini-cart-dialog::backdrop {
-  background: transparent !important;
-  opacity: 0 !important;
-}
-#liivv-mini-cart-scrim {
-  position: absolute !important;
-  inset: 0 !important;
-  z-index: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  margin: 0 !important;
-  border: 0 !important;
-  padding: 0 !important;
+  z-index: 2147483000 !important;
+  display: block !important;
+  width: 100vw !important;
+  height: 100vh !important;
   background: rgba(0, 0, 0, 0.5) !important;
-  background-color: rgba(0, 0, 0, 0.5) !important;
-  opacity: 0;
-  cursor: pointer !important;
-  pointer-events: none;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 450ms cubic-bezier(0.32, 0.72, 0, 1) !important;
 }
-#liivv-mini-cart-dialog.is-open #liivv-mini-cart-scrim {
-  pointer-events: auto;
+html.liivv-mini-cart-open.liivv-mini-cart-entered::before {
+  opacity: 1 !important;
 }
-#liivv-mini-cart-panel {
-  position: absolute !important;
-  top: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  left: auto !important;
-  box-sizing: border-box !important;
-  display: flex !important;
-  width: 424px !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-  height: 100% !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-  background: #fff !important;
-  z-index: 1 !important;
-  border-radius: 1.5rem 0 0 1.5rem !important;
-  box-shadow: -12px 0 40px rgba(49, 47, 47, 0.12);
-  transform: translate3d(100%, 0, 0);
-}
-`;
-
-function prefersReducedMotion() {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
-function stopAnimations(element: HTMLElement) {
-  for (const animation of element.getAnimations()) {
-    try {
-      animation.commitStyles();
-    } catch {
-      // Element may already be detached.
-    }
-
-    animation.cancel();
+@media (prefers-reduced-motion: reduce) {
+  html.liivv-mini-cart-open::before {
+    transition: none !important;
   }
 }
-
-function playDrawerAnimation(panel: HTMLElement, scrim: HTMLElement, direction: 'in' | 'out') {
-  const reduceMotion = prefersReducedMotion();
-
-  stopAnimations(panel);
-  stopAnimations(scrim);
-
-  const panelAnimation = panel.animate(
-    [
-      { transform: direction === 'in' ? 'translate3d(100%, 0, 0)' : 'translate3d(0, 0, 0)' },
-      { transform: direction === 'in' ? 'translate3d(0, 0, 0)' : 'translate3d(100%, 0, 0)' },
-    ],
-    {
-      duration: reduceMotion ? 0 : PANEL_TRANSITION_MS,
-      easing: DRAWER_EASE,
-      fill: 'forwards',
-    },
-  );
-  const scrimAnimation = scrim.animate(
-    [{ opacity: direction === 'in' ? 0 : 1 }, { opacity: direction === 'in' ? 1 : 0 }],
-    {
-      duration: reduceMotion ? 0 : DIM_TRANSITION_MS,
-      easing: 'ease',
-      fill: 'forwards',
-    },
-  );
-
-  return Promise.all([panelAnimation.finished, scrimAnimation.finished]).then(
-    () => undefined,
-    () => undefined,
-  );
-}
+`;
 
 export function MiniCartDrawer({
   open,
@@ -146,24 +63,12 @@ export function MiniCartDrawer({
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [recIndex, setRecIndex] = useState(0);
   const titleId = useId();
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const panelRef = useRef<HTMLElement>(null);
-  const scrimRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const [present, setPresent] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-
-    const existing = document.getElementById('liivv-mini-cart-layer-css');
-    const style = existing instanceof HTMLStyleElement ? existing : document.createElement('style');
-
-    style.id = 'liivv-mini-cart-layer-css';
-    style.textContent = MINI_CART_LAYER_CSS;
-
-    if (!existing) {
-      document.head.appendChild(style);
-    }
+    document.getElementById('liivv-mini-cart-layer-css')?.remove();
   }, []);
 
   useEffect(() => {
@@ -171,6 +76,68 @@ export function MiniCartDrawer({
       setPresent(true);
     }
   }, [open]);
+
+  useEffect(() => {
+    if (!present) {
+      document.documentElement.classList.remove('liivv-mini-cart-open');
+      document.documentElement.classList.remove('liivv-mini-cart-entered');
+
+      return undefined;
+    }
+
+    let style = document.getElementById(HTML_OVERLAY_STYLE_ID);
+
+    if (!(style instanceof HTMLStyleElement)) {
+      style = document.createElement('style');
+      style.id = HTML_OVERLAY_STYLE_ID;
+      document.head.appendChild(style);
+    }
+
+    style.textContent = HTML_OVERLAY_CSS;
+    document.documentElement.classList.add('liivv-mini-cart-open');
+
+    if (!open) {
+      document.documentElement.classList.remove('liivv-mini-cart-entered');
+
+      return undefined;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      document.documentElement.classList.add('liivv-mini-cart-entered');
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [open, present]);
+
+  useEffect(() => {
+    if (!present || !open) {
+      return undefined;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onOpenChange(false);
+      }
+    };
+
+    const onPointerDown = (event: PointerEvent) => {
+      const panel = document.getElementById('liivv-mini-cart-panel');
+
+      if (panel?.contains(event.target as Node)) {
+        return;
+      }
+
+      onOpenChange(false);
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    document.addEventListener('pointerdown', onPointerDown, true);
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('pointerdown', onPointerDown, true);
+    };
+  }, [open, onOpenChange, present]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -184,57 +151,28 @@ export function MiniCartDrawer({
     }
   }, []);
 
-  useLayoutEffect(() => {
-    const dialog = dialogRef.current;
-    const panel = panelRef.current;
-    const scrim = scrimRef.current;
-
-    if (!present || !dialog || !panel || !scrim) {
-      return undefined;
-    }
-
-    if (open) {
-      if (!dialog.open) {
-        dialog.showModal();
-      }
-
-      dialog.classList.add('is-open');
-      void playDrawerAnimation(panel, scrim, 'in');
-
-      return () => {
-        stopAnimations(panel);
-        stopAnimations(scrim);
-      };
-    }
-
-    dialog.classList.remove('is-open');
-
-    let cancelled = false;
-
-    void playDrawerAnimation(panel, scrim, 'out').then(() => {
-      if (cancelled) {
-        return;
-      }
-
-      if (dialog.open) {
-        dialog.close();
-      }
-
-      setPresent(false);
-    });
-
-    return () => {
-      cancelled = true;
-      stopAnimations(panel);
-      stopAnimations(scrim);
-    };
-  }, [open, present]);
-
   useEffect(() => {
     if (open) {
       void load();
     }
   }, [open, load]);
+
+  const finishClose = useCallback(() => {
+    if (!open) {
+      setPresent(false);
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!present || open) {
+      return undefined;
+    }
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const timeout = window.setTimeout(finishClose, reduceMotion ? 0 : PANEL_ANIMATION_MS);
+
+    return () => window.clearTimeout(timeout);
+  }, [finishClose, open, present]);
 
   const updateLine = useCallback(
     async ({
@@ -270,61 +208,47 @@ export function MiniCartDrawer({
   }
 
   return createPortal(
-    <dialog
-      aria-labelledby={titleId}
-      id="liivv-mini-cart-dialog"
-      onCancel={(event) => {
-        event.preventDefault();
-        onOpenChange(false);
-      }}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) {
-          onOpenChange(false);
-        }
-      }}
-      ref={dialogRef}
+    <div
+      data-state={open ? 'open' : 'closed'}
+      id="liivv-mini-cart-root"
     >
       <div
-        aria-hidden
         id="liivv-mini-cart-scrim"
         onClick={() => onOpenChange(false)}
-        ref={scrimRef}
         style={{
-          position: 'absolute',
+          position: 'fixed',
           top: 0,
           right: 0,
           bottom: 0,
           left: 0,
+          zIndex: 2147483000,
+          width: '100%',
+          height: '100%',
           margin: 0,
           border: 0,
           padding: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
           cursor: 'pointer',
+          pointerEvents: 'auto',
         }}
       />
       <aside
+        aria-labelledby={titleId}
+        aria-modal="true"
         className={`liivv-store liivv-mini-cart ${storeFont} ${storeText}`}
         id="liivv-mini-cart-panel"
-        onClick={(event) => event.stopPropagation()}
-        ref={panelRef}
-        style={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 'auto',
-          zIndex: 1,
-          display: 'flex',
-          width: 424,
-          maxWidth: '100%',
-          minWidth: 0,
-          height: '100%',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          backgroundColor: '#ffffff',
-          borderRadius: '1.5rem 0 0 1.5rem',
+        onAnimationEnd={(event) => {
+          if (event.target !== event.currentTarget) {
+            return;
+          }
+
+          if (event.animationName === 'liivv-mini-cart-slide-out') {
+            finishClose();
+          }
         }}
+        onClick={(event) => event.stopPropagation()}
+        role="dialog"
       >
+        <div id="liivv-mini-cart-panel-inner">
           <div className={`flex items-center justify-between gap-3 border-b px-5 py-4 ${storeBorder}`}>
             <h2 className="text-lg font-semibold tracking-tight" id={titleId}>
               {t('title')}
@@ -488,8 +412,9 @@ export function MiniCartDrawer({
               {t('checkout', { total: snapshot?.total ?? '' })}
             </ButtonLink>
           </div>
+        </div>
       </aside>
-    </dialog>,
+    </div>,
     document.body,
   );
 }

@@ -65,7 +65,7 @@ export function useHeaderPinAfterSlideshow(
     let frame = 0;
 
     const update = () => {
-      if (document.getElementById('liivv-mini-cart-dialog')?.hasAttribute('open')) {
+      if (document.getElementById('liivv-mini-cart-root')) {
         return;
       }
 

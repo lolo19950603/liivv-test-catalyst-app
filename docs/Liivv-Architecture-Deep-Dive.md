@@ -30,7 +30,6 @@ Assumes the [overview](./Liivv-Architecture.md): two engines (BigCommerce shop v
 | Health profile, insurance | Supabase | Not modeled in BC |
 | Prescriptions, CarePack, refills | Supabase | Staff queue in `/bc-app` |
 | Live chat messages | Supabase | Optional OpenAI bot replies (flagged off) |
-| Marketing page content | Makeswift | Catalyst Makeswift integration |
 
 **Recurring orders:** Stripe handles the repeating charge. When a renewal succeeds, Liivv still creates the order in BigCommerce. Stripe is the billing engine. BigCommerce remains the only order engine.
 
@@ -38,7 +37,9 @@ Assumes the [overview](./Liivv-Architecture.md): two engines (BigCommerce shop v
 
 **Patients do not upload prescription photos.** Adding a prescription is **transfer from another pharmacy** or **doctor fax**. Staff work the queue in the BigCommerce embedded app (`/bc-app`).
 
-**Upstash Redis** is not required for launch if Supabase is configured. It is optional hardening for checkout/webhooks, the staff-app install token, and site-wide medication rate limits.
+**Health Canada DPD:** the Drug Product Database is Health Canada’s **free public API** (open government data — no key, no paid contract). Liivv proxies it so customers can search licensed Canadian drugs by brand name and add the selected product to a prescription. The **prescription is stored in Supabase**. Search queries go to Health Canada; patient records do not. The proxy is rate-limited at 60 requests / IP / minute so Liivv is not used as an open relay.
+
+**Hosting:** the Catalyst app (`core/`) runs on **Vercel** (production and preview). Next.js on Vercel is the only process that holds service-role, admin, and payment secrets. Secrets live in the Vercel project (encrypted) plus gitignored `.env.local` for local work. Preview and Production currently share the same keys; splitting them is a documented next step, not a launch blocker. Checkout snapshots and the staff-app install token use **Vercel’s runtime cache** (in-memory locally).
 
 ---
 
@@ -64,7 +65,7 @@ flowchart LR
 
   subgraph Data
     SB[(Supabase Postgres)]
-    KV[(KV / Redis optional)]
+    KV[(Vercel runtime cache)]
   end
 
   subgraph Payments
@@ -73,7 +74,6 @@ flowchart LR
   end
 
   subgraph Other
-    MS[Makeswift]
     AI[OpenAI]
     DPD[Health Canada DPD]
   end
@@ -87,7 +87,6 @@ flowchart LR
   N --> SB
   N --> KV
   N --> STK
-  N --> MS
   N --> AI
   N --> DPD
   STW --> N
@@ -103,7 +102,7 @@ sequenceDiagram
   participant U as Browser
   participant N as Next.js
   participant BC as BigCommerce
-  participant KV as KV/Redis
+  participant KV as Runtime cache
   participant ST as Stripe
   participant SB as Supabase
 
@@ -148,10 +147,12 @@ sequenceDiagram
   N->>SB: upsert profiles, health_profiles, insurance_info
   N->>BC: Optional name/phone sync
 
-  U->>N: Search medication
-  N->>DPD: GET drug API (rate-limited)
-  DPD-->>N: Brand / ingredients
+  U->>N: Search medication (brand name)
+  N->>DPD: GET public drug API (rate-limited)
+  DPD-->>N: Brand / DIN / ingredients
   N-->>U: Results
+  U->>N: Add selected drug to prescription
+  N->>SB: prescriptions
 
   U->>N: Transfer Rx / fax template / refill / CarePack
   N->>SB: prescriptions / refill_requests / carepack_requests
@@ -198,9 +199,9 @@ This section is a pre-launch checklist. Each item is a control we put in place (
 | **S3** | Staff access | Med | **In place** | Staff work inside **BigCommerce → Apps → Liivv Staff (`/bc-app`)**, using the store’s BC app session. There is no shared dashboard password. `/staff` is not a product surface (404). |
 | **S4** | AI chat assistant | Med | **Held** (Legal) | The assistant stays **off** (`VIRTUAL_CARE_BOT_ENABLED=false`) until the team decides on a **paid OpenAI arrangement that includes a DPA**. If the bot were on, customer message text would go to OpenAI even when the reply is “talk to a pharmacist.” Human care-team chat in `/bc-app` stays in Supabase either way. |
 | **S5** | Environment secrets | Med | **In place** (documented next step) | Secrets live in Vercel (encrypted) and in gitignored `.env.local`. Nothing privileged is committed. Rotate on personnel change. Next step, not a launch blocker: separate Preview vs Production keys (they currently match). |
-| **S6** | Embedded app / CMS frames | Med | **In place** | Cookies used in iframes are `SameSite=None; Secure` (partitioned where needed). CSP `frame-ancestors` allowlists **Makeswift and BigCommerce only**. Verified in those embeds. |
+| **S6** | Embedded staff app frames | Med | **In place** | Staff work inside a BigCommerce control-panel iframe (`/bc-app`). Cookies used in that iframe are `SameSite=None; Secure` (partitioned where needed). CSP `frame-ancestors` is allowlisted, not open. |
 | **S7** | Customer email | Low | **In place** (ops confirm) | Password reset and most transactional mail are **BigCommerce’s**. The storefront only triggers reset via GraphQL. Ops: confirm branding + SPF/DKIM in the BC control panel. Pharmacy notification email is not in scope yet. |
-| **S8** | Medication search (Health Canada DPD) | Low | **In place** | Search is a **server proxy**, rate-limited at **60 requests / IP / minute**. That protects Liivv from being used as an open relay to Health Canada (cost / blocking). It is not a patient-data path. Stronger still if Upstash Redis is configured. |
+| **S8** | Medication search (Health Canada DPD) | Low | **In place** | Customers look up licensed Canadian drugs through Health Canada’s **free public DPD API** so they can add the right product to a prescription. Search is a **server proxy**, rate-limited at **60 requests / IP / minute**, so Liivv is not an open relay to Health Canada. The selected medication is saved on the **prescription in Supabase**. Queries to DPD are catalog lookups — not a patient-data path. |
 
 ### Additional controls
 
@@ -247,7 +248,6 @@ flowchart TB
     SB[Supabase]
     ST[Stripe]
     AI[OpenAI]
-    MS[Makeswift]
     DPD[Health Canada]
   end
 
@@ -258,7 +258,6 @@ flowchart TB
   Next -->|Service role key| SB
   Next -->|Secret key| ST
   Next -->|API key if bot on| AI
-  Next --> MS
   Next --> DPD
 ```
 
@@ -276,7 +275,6 @@ flowchart TB
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | **Public** — Stripe.js only |
 | `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | DB (bypasses RLS) |
 | `OPENAI_API_KEY` | Virtual care bot (unused while flag is off) |
-| `MAKESWIFT_SITE_API_KEY` | CMS |
 
 ---
 
@@ -285,7 +283,7 @@ flowchart TB
 1. Vendor **DPAs / BAAs** as required: Supabase, Stripe, Vercel, BigCommerce; OpenAI only if the bot is turned on.
 2. Logging policy: do not print chat bodies in request logs.
 3. Backup / RPO for Supabase Postgres (health and pharmacy rows).
-4. Optional: Supabase network restriction to Vercel egress; separate Preview vs Production secrets; Upstash Redis if we want stronger KV and rate limits.
+4. Optional: Supabase network restriction to Vercel egress; separate Preview vs Production secrets.
 
 ---
 
