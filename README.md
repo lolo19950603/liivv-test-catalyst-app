@@ -68,7 +68,10 @@ Environment variables have a single home:
 
 Do not add a second `core/.env.local`. `pnpm dev` / `pnpm build` load the root file.
 
-See [docs/Liivv-Architecture.md](docs/Liivv-Architecture.md) (architecture and security review, including checklist S1–S8) or the printable [docs/Liivv-Architecture.pdf](docs/Liivv-Architecture.pdf).
+Architecture:
+
+- [Overview](docs/Liivv-Architecture.md) — how the shop and health data split ([PDF](docs/Liivv-Architecture.pdf))
+- [Deep dive](docs/Liivv-Architecture-Deep-Dive.md) — data flows, auth, secrets, security checklist S1–S8 ([PDF](docs/Liivv-Architecture-Deep-Dive.pdf))
 
 ## Resources
 

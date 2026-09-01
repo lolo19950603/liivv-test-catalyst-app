@@ -1,26 +1,30 @@
 /**
- * Build docs/Liivv-Architecture.html and docs/Liivv-Architecture.pdf
- * from docs/Liivv-Architecture.md.
+ * Build HTML and PDF for architecture docs from their Markdown sources.
+ *
+ *   docs/Liivv-Architecture.md            → overview
+ *   docs/Liivv-Architecture-Deep-Dive.md  → nitty-gritty
  */
-import { createRequire } from 'node:module';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { createRequire } from 'node:module';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const playwrightDir = join(
-  root,
-  'node_modules',
-  '.pnpm',
-  'playwright@1.52.0',
-  'node_modules',
-  'playwright',
-);
-const require = createRequire(join(playwrightDir, 'package.json'));
-const { chromium } = require(playwrightDir);
-const mdPath = join(root, 'docs', 'Liivv-Architecture.md');
-const htmlPath = join(root, 'docs', 'Liivv-Architecture.html');
-const pdfPath = join(root, 'docs', 'Liivv-Architecture.pdf');
+
+const documents = [
+  {
+    md: 'Liivv-Architecture.md',
+    html: 'Liivv-Architecture.html',
+    pdf: 'Liivv-Architecture.pdf',
+    title: 'Liivv — Architecture Overview',
+  },
+  {
+    md: 'Liivv-Architecture-Deep-Dive.md',
+    html: 'Liivv-Architecture-Deep-Dive.html',
+    pdf: 'Liivv-Architecture-Deep-Dive.pdf',
+    title: 'Liivv — Architecture Deep Dive',
+  },
+];
 
 function escapeHtml(text) {
   return text
@@ -231,13 +235,12 @@ const css = `
   figcaption { font-size: 9pt; color: #555; margin-top: 4pt; }
 `;
 
-const md = readFileSync(mdPath, 'utf8');
-const body = markdownToBody(md);
-const html = `<!DOCTYPE html>
+function buildHtml(title, body) {
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Liivv — Architecture</title>
+  <title>${escapeHtml(title)}</title>
   <style>${css}</style>
 </head>
 <body>
@@ -255,32 +258,66 @@ ${body}
 </body>
 </html>
 `;
+}
 
-writeFileSync(htmlPath, html, 'utf8');
+const built = documents.map((doc) => {
+  const mdPath = join(root, 'docs', doc.md);
+  const htmlPath = join(root, 'docs', doc.html);
+  const pdfPath = join(root, 'docs', doc.pdf);
+  const md = readFileSync(mdPath, 'utf8');
+  const html = buildHtml(doc.title, markdownToBody(md));
+
+  writeFileSync(htmlPath, html, 'utf8');
+  process.stdout.write(`Wrote ${htmlPath}\n`);
+
+  return { htmlPath, pdfPath };
+});
+
+const playwrightDir = join(
+  root,
+  'node_modules',
+  '.pnpm',
+  'playwright@1.52.0',
+  'node_modules',
+  'playwright',
+);
+
+if (!existsSync(join(playwrightDir, 'package.json'))) {
+  process.stderr.write('Playwright not found; skipped PDF generation.\n');
+  process.exit(0);
+}
+
+const require = createRequire(join(playwrightDir, 'package.json'));
+const { chromium } = require(playwrightDir);
 
 const browser = await chromium.launch({ channel: 'msedge' });
-const page = await browser.newPage();
-page.setDefaultTimeout(60_000);
-await page.goto(pathToFileURL(htmlPath).href, { waitUntil: 'networkidle' });
-await page.waitForFunction(() => window.__mermaidDone === true);
-await page.evaluate(async () => {
-  await Promise.all(
-    [...document.images].map((image) =>
-      image.complete
-        ? Promise.resolve()
-        : new Promise((resolve) => {
-            image.addEventListener('load', resolve, { once: true });
-            image.addEventListener('error', resolve, { once: true });
-          }),
-    ),
-  );
-});
-await page.pdf({
-  path: pdfPath,
-  format: 'Letter',
-  printBackground: true,
-  margin: { top: '0.55in', bottom: '0.55in', left: '0.6in', right: '0.6in' },
-});
-await browser.close();
 
-process.stdout.write(`Wrote ${htmlPath}\nWrote ${pdfPath}\n`);
+for (const doc of built) {
+  const page = await browser.newPage();
+  page.setDefaultTimeout(60_000);
+  await page.goto(pathToFileURL(doc.htmlPath).href, { waitUntil: 'networkidle' });
+  await page.waitForFunction(() => window.__mermaidDone === true);
+  await page.evaluate(async () => {
+    await Promise.all(
+      [...document.images].map((image) =>
+        image.complete
+          ? Promise.resolve()
+          : new Promise((resolve) => {
+              image.addEventListener('load', resolve, { once: true });
+              image.addEventListener('error', resolve, { once: true });
+            }),
+      ),
+    );
+  });
+  await page.pdf({
+    path: doc.pdfPath,
+    format: 'Letter',
+    printBackground: true,
+    margin: { top: '0.55in', bottom: '0.55in', left: '0.6in', right: '0.6in' },
+  });
+  await page.close();
+
+  process.stdout.write(`Wrote ${doc.pdfPath}\n`);
+}
+
+await browser.close();

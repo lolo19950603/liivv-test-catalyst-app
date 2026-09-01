@@ -1,7 +1,6 @@
 'use server';
 
 import { BigCommerceGQLError } from '@bigcommerce/catalyst-client';
-import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
 
@@ -9,10 +8,18 @@ import { addToOrCreateCart } from '~/lib/cart';
 import { MissingCartError } from '~/lib/cart/error';
 import { appendKitToSession, generateKitId } from '~/lib/kit';
 import { kitItemSchema } from '~/lib/kit/kit-item-schema';
-import { serverToast } from '~/lib/server-toast';
 
 const addKitSchema = z.object({
   kitName: z.string().optional(),
+  kitHref: z.string().optional(),
+  kitImage: z
+    .object({
+      src: z.string().min(1),
+      alt: z.string(),
+    })
+    .optional(),
+  /** Number of complete kits to add. Item quantities stay per-kit (recipe). */
+  quantity: z.number().int().positive().optional(),
   items: z.array(kitItemSchema).min(1),
 });
 
@@ -37,13 +44,14 @@ export async function addKitToCart(input: AddKitToCartInput): Promise<AddKitToCa
   }
 
   const kitId = generateKitId();
-  const { items, kitName } = parsed.data;
+  const { items, kitName, kitHref, kitImage } = parsed.data;
+  const kitQuantity = parsed.data.quantity && parsed.data.quantity > 0 ? parsed.data.quantity : 1;
 
   try {
     const result = await addToOrCreateCart({
       lineItems: items.map((item) => ({
         productEntityId: item.productEntityId,
-        quantity: item.quantity,
+        quantity: item.quantity * kitQuantity,
         ...(item.variantEntityId ? { variantEntityId: item.variantEntityId } : {}),
         ...(item.selectedOptions ? { selectedOptions: item.selectedOptions } : {}),
       })),
@@ -51,7 +59,10 @@ export async function addKitToCart(input: AddKitToCartInput): Promise<AddKitToCa
 
     await appendKitToSession(result.cartId, {
       kitId,
+      quantity: kitQuantity,
       ...(kitName ? { name: kitName } : {}),
+      ...(kitHref ? { href: kitHref } : {}),
+      ...(kitImage ? { image: kitImage } : {}),
       items: items.map((item) => ({
         productEntityId: item.productEntityId,
         quantity: item.quantity,
@@ -72,9 +83,6 @@ export async function addKitToCart(input: AddKitToCartInput): Promise<AddKitToCa
 
     return { status: 'error', message: t('Errors.unexpected') };
   }
-
-  await serverToast.success(t('successMessage', { kitId }));
-  redirect('/cart');
 
   return { status: 'success' };
 }

@@ -771,6 +771,10 @@
   gap: 1rem;
 }
 
+.liivv-product-page-feel .liivv-kit-customizer__qty-row {
+  align-items: center;
+}
+
 .liivv-product-page-feel .liivv-kit-customizer__total-label {
   font-family: var(--product-detail-subtitle-font-family, var(--font-family-mono));
   font-size: 0.6875rem;

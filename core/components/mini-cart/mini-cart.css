@@ -1,0 +1,81 @@
+#liivv-mini-cart-dialog {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: 100% !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  overflow: hidden !important;
+}
+
+#liivv-mini-cart-dialog::backdrop {
+  background: transparent !important;
+  opacity: 0 !important;
+}
+
+#liivv-mini-cart-scrim {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  border: 0 !important;
+  padding: 0 !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  opacity: 0;
+  cursor: pointer !important;
+  pointer-events: none;
+}
+
+#liivv-mini-cart-dialog.is-open #liivv-mini-cart-scrim {
+  pointer-events: auto;
+}
+
+#liivv-mini-cart-panel {
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: auto !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  width: 424px !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  background: #fff !important;
+  z-index: 1 !important;
+  border-radius: 1.5rem 0 0 1.5rem !important;
+  box-shadow: -12px 0 40px rgba(49, 47, 47, 0.12);
+  transform: translate3d(100%, 0, 0);
+}
+
+#liivv-mini-cart-panel.liivv-store.liivv-mini-cart {
+  --store-primary-text: #312f2f;
+  --store-secondary-text: #66605c;
+  --store-border: rgba(49, 47, 47, 0.18);
+  --liivv-archive-sans-font: var(--font-product-family, var(--font-body-family, Poppins, sans-serif));
+  --color-button-background: var(--color-base-button, 49 47 47);
+  --color-button-text: var(--color-base-button-text, 255 255 255);
+  --color-highlight: var(--color-base-highlight, 142 165 141);
+  color: var(--store-primary-text);
+  font-family: var(--liivv-archive-sans-font);
+}
+
+#liivv-mini-cart-panel .mini-cart-free-shipping {
+  background-color: rgb(var(--color-highlight, 142 165 141));
+  color: #fff;
+}
+
+#liivv-mini-cart-panel .mini-cart-checkout.button {
+  width: 100%;
+  justify-content: center;
+}

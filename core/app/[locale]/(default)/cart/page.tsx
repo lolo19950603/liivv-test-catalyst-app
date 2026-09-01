@@ -21,7 +21,7 @@ import {
   findSubscriptionLineByKey,
   reconcileSubscriptionLinesWithCart,
 } from '~/lib/checkout/subscription-lines';
-import { assignKitIdsToCartLines, getKitSession } from '~/lib/kit';
+import { assignKitIdsToCartLines, getKitSession, kitShipQuantity, resolveKitStorefront } from '~/lib/kit';
 import type { SubscriptionBillingInterval } from '~/lib/stripe/subscription-interval';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { Slot } from '~/lib/makeswift/slot';
@@ -136,7 +136,7 @@ export default async function Cart({ params }: Props) {
   const productLineItems = lineItems.filter((item) => item.__typename !== 'CartGiftCertificate');
   const subscriptionLines = await reconcileSubscriptionLinesWithCart(cartId, productLineItems);
   const kitSession = await getKitSession(cartId);
-  const kits = kitSession?.kits ?? [];
+  const kits = await Promise.all((kitSession?.kits ?? []).map(resolveKitStorefront));
 
   const formattedGiftCertificates: CartGiftCertificateLineItem[] = lineItems
     .filter((item) => item.__typename === 'CartGiftCertificate')
@@ -217,6 +217,9 @@ export default async function Cart({ params }: Props) {
           style: 'currency',
           currency: item.salePrice.currencyCode,
         }),
+        priceAmount: item.listPrice.value,
+        salePriceAmount: item.salePrice.value,
+        currencyCode: item.listPrice.currencyCode,
         subtitle: item.selectedOptions
           .map((option) => {
             switch (option.__typename) {
@@ -288,6 +291,7 @@ export default async function Cart({ params }: Props) {
       .filter((line): line is typeof line & { kitId: string } => Boolean(line.kitId))
       .map((line) => [line.id, line.kitId]),
   );
+  const kitById = new Map(kits.map((kit) => [kit.kitId, kit]));
   const kitNameById = new Map(
     kits
       .filter((kit): kit is typeof kit & { name: string } => Boolean(kit.name))
@@ -301,10 +305,22 @@ export default async function Cart({ params }: Props) {
       return product;
     }
 
+    const kit = kitById.get(kitId);
+    const kitQuantity = kit ? kitShipQuantity(kit) : 1;
+    const recipeQuantity = kit?.items.find(
+      (item) => item.productEntityId === product.productEntityId,
+    )?.quantity;
+    const kitUnitQuantity =
+      recipeQuantity ?? Math.max(1, Math.round(product.quantity / kitQuantity));
+
     return {
       ...product,
       kitId,
       kitName: kitNameById.get(kitId),
+      kitQuantity,
+      kitUnitQuantity,
+      kitHref: kit?.href,
+      kitImage: kit?.image,
     };
   });
 

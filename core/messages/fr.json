@@ -196,6 +196,9 @@
             "removedSubtitle": "Ajoutez-en un si vous changez d’avis.",
             "addBack": "Ajouter à nouveau",
             "runningTotal": "Total du kit",
+            "kitQuantity": "Quantité du kit",
+            "incrementKit": "Augmenter la quantité du kit",
+            "decrementKit": "Diminuer la quantité du kit",
             "addKitToCart": "Ajouter le kit au panier",
             "saveForLater": "Enregistrer le kit pour plus tard",
             "saveSuccess": "« {name} » a été enregistré dans votre compte",
@@ -831,6 +834,21 @@
     "Cart": {
         "title": "Panier",
         "heading": "Votre panier",
+        "MiniCart": {
+            "title": "Votre panier",
+            "viewCart": "Voir le panier",
+            "close": "Fermer le panier",
+            "description": "Articles actuellement dans votre panier",
+            "freeShippingRemaining": "Ajoutez {amount} pour la livraison gratuite!",
+            "freeShippingUnlocked": "La livraison gratuite est débloquée!",
+            "youMayAlsoLike": "Vous aimerez aussi...",
+            "previousRecommendation": "Recommandation précédente",
+            "nextRecommendation": "Recommandation suivante",
+            "chooseOptions": "Choisir les options",
+            "viewProduct": "Voir",
+            "checkoutDisclaimer": "Taxes, rabais et livraison calculés au paiement",
+            "checkout": "Payer — {total}"
+        },
         "proceedToCheckout": "Passer à la caisse",
         "increment": "Augmenter la quantité",
         "decrement": "Diminuer la quantité",
@@ -904,7 +922,11 @@
             "fallbackName": "Kit {kitId}",
             "itemCount": "{count, plural, =1 {1 article} other {# articles}}",
             "expand": "Afficher les articles du kit",
-            "collapse": "Masquer les articles du kit"
+            "collapse": "Masquer les articles du kit",
+            "viewKit": "Voir {name}",
+            "increment": "Augmenter la quantité du kit",
+            "decrement": "Diminuer la quantité du kit",
+            "remove": "Retirer le kit"
         },
         "subscription": {
             "badge": "Abonnement",

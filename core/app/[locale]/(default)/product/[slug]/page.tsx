@@ -892,6 +892,15 @@ export default async function Product({ params, searchParams }: Props) {
                       }
                     >
                       <CuratedKitCustomizer
+                        kitHref={baseProduct.path}
+                        kitImage={
+                          baseProduct.defaultImage
+                            ? {
+                                src: baseProduct.defaultImage.url,
+                                alt: baseProduct.defaultImage.altText,
+                              }
+                            : undefined
+                        }
                         kitName={baseProduct.name}
                         products={kitProducts}
                         suggestedProducts={suggestedProducts}

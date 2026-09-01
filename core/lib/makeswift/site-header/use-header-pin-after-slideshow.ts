@@ -65,6 +65,10 @@ export function useHeaderPinAfterSlideshow(
     let frame = 0;
 
     const update = () => {
+      if (document.getElementById('liivv-mini-cart-dialog')?.hasAttribute('open')) {
+        return;
+      }
+
       const slideshow = document.querySelector(SLIDESHOW_SELECTOR);
       const shouldPin = resolveShouldPin(slideshow, section, pinned);
 

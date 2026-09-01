@@ -244,6 +244,9 @@
       "removedSubtitle": "Add any of these back if you change your mind.",
       "addBack": "Add back",
       "runningTotal": "Kit total",
+      "kitQuantity": "Kit quantity",
+      "incrementKit": "Increase kit quantity",
+      "decrementKit": "Decrease kit quantity",
       "addKitToCart": "Add kit to cart",
       "saveForLater": "Save kit for later",
       "saveSuccess": "Saved “{name}” to your account",
@@ -977,13 +980,32 @@
   "Cart": {
     "title": "Cart",
     "heading": "Your cart",
+    "MiniCart": {
+      "title": "Your cart",
+      "viewCart": "View cart",
+      "close": "Close cart",
+      "description": "Items currently in your cart",
+      "freeShippingRemaining": "Spend {amount} more for free shipping!",
+      "freeShippingUnlocked": "You've unlocked free shipping!",
+      "youMayAlsoLike": "You may also like...",
+      "previousRecommendation": "Previous recommendation",
+      "nextRecommendation": "Next recommendation",
+      "chooseOptions": "Choose options",
+      "viewProduct": "View",
+      "checkoutDisclaimer": "Taxes, discounts and shipping calculated at checkout",
+      "checkout": "Checkout — {total}"
+    },
     "partOfKit": "Part of kit {kitId}",
     "kitSection": {
       "eyebrow": "Curated kit",
       "fallbackName": "Kit {kitId}",
       "itemCount": "{count, plural, =1 {1 item} other {# items}}",
       "expand": "Show kit items",
-      "collapse": "Hide kit items"
+      "collapse": "Hide kit items",
+      "viewKit": "View {name}",
+      "increment": "Increase kit quantity",
+      "decrement": "Decrease kit quantity",
+      "remove": "Remove kit"
     },
     "subscription": {
       "badge": "Subscription",

@@ -42,7 +42,7 @@ export function CartSkeleton({
   summaryPlaceholderCount = 3,
 }: CartSkeletonProps) {
   return (
-    <section className="group/cart w-full text-[var(--cart-text,hsl(var(--foreground)))]">
+    <section className="group/cart w-full text-[var(--cart-text,hsl(var(--foreground)))] @container">
       <div className="mx-auto w-full max-w-screen-2xl px-4 py-10 @xl:px-8 @xl:py-14">
         <div className="grid w-full items-start gap-10 @lg:grid-cols-[minmax(0,1fr)_minmax(280px,380px)] @lg:gap-16">
           <div className="min-w-0">
@@ -50,23 +50,25 @@ export function CartSkeleton({
               {title}
             </h1>
             <div className="group-has-[[data-pending]]/cart:animate-pulse">
-              <ul className="flex flex-col gap-5" data-pending>
+              <ul className="flex flex-col gap-3" data-pending>
                 {Array.from({ length: placeholderCount }).map((_, index) => (
                   <li
-                    className="flex flex-col items-start gap-x-5 gap-y-4 @container @sm:flex-row"
+                    className="rounded-2xl border border-[var(--skeleton,hsl(var(--contrast-300)/15%))] bg-white p-4 shadow-[0_1px_2px_rgba(49,47,47,0.04)] sm:p-5"
                     key={index}
                   >
-                    <Skeleton.Box className="aspect-square w-full max-w-24 rounded-xl" />
-                    <div className="flex grow flex-col flex-wrap justify-between gap-y-2 @xl:flex-row">
-                      <div className="flex w-full flex-1 flex-col @xl:w-1/2 @xl:pr-4">
-                        <Skeleton.Text characterCount={15} className="rounded-md" />
-                        <Skeleton.Text characterCount={10} className="rounded-md" />
-                      </div>
-                      <div>
-                        <div className="flex w-full flex-wrap items-center gap-x-5 gap-y-2">
-                          <Skeleton.Text characterCount={5} className="rounded-md" />
-                          <Skeleton.Box className="h-[44px] w-[118px] rounded-lg" />
-                          <Skeleton.Box className="-ml-1 h-8 w-8 rounded-full" />
+                    <div className="flex items-start gap-4">
+                      <Skeleton.Box className="size-20 shrink-0 rounded-xl @sm:size-24" />
+                      <div className="flex min-w-0 flex-1 flex-col gap-3">
+                        <div className="flex min-w-0 flex-col gap-2">
+                          <Skeleton.Text characterCount={18} className="rounded-md" />
+                          <Skeleton.Text characterCount={10} className="rounded-md" />
+                        </div>
+                        <div className="flex flex-col items-start gap-2">
+                          <Skeleton.Text characterCount={6} className="rounded-md" />
+                          <div className="flex items-center gap-1.5">
+                            <Skeleton.Box className="h-9 w-[6.5rem] rounded-full" />
+                            <Skeleton.Box className="size-9 rounded-full" />
+                          </div>
                         </div>
                       </div>
                     </div>

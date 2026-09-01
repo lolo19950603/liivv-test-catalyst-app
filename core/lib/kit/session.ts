@@ -32,16 +32,92 @@ export async function getKitSession(cartId: string): Promise<KitSession | null> 
   return kv.get<KitSession>(kitSessionKey(cartId));
 }
 
-export async function appendKitToSession(cartId: string, kit: KitRecord): Promise<void> {
-  const existing = (await getKitSession(cartId)) ?? { kits: [] };
-  const next: KitSession = {
-    kits: [...existing.kits, kit],
-  };
-
+async function persistKitSession(cartId: string, next: KitSession): Promise<void> {
   await kv.set(kitSessionKey(cartId), next);
   await setKitSessionCookie(cartId, next);
 
   if (isSupabaseConfigured()) {
     await setCartKitSessionInSupabase(cartId, next);
   }
+}
+
+export async function appendKitToSession(cartId: string, kit: KitRecord): Promise<void> {
+  const existing = (await getKitSession(cartId)) ?? { kits: [] };
+
+  await persistKitSession(cartId, {
+    kits: [...existing.kits, kit],
+  });
+}
+
+export async function updateKitShipQuantity(
+  cartId: string,
+  kitId: string,
+  quantity: number,
+): Promise<void> {
+  const existing = (await getKitSession(cartId)) ?? { kits: [] };
+
+  if (quantity <= 0) {
+    await persistKitSession(cartId, {
+      kits: existing.kits.filter((kit) => kit.kitId !== kitId),
+    });
+
+    return;
+  }
+
+  await persistKitSession(cartId, {
+    kits: existing.kits.map((kit) => (kit.kitId === kitId ? { ...kit, quantity } : kit)),
+  });
+}
+
+export async function updateKitItemQuantity(
+  cartId: string,
+  kitId: string,
+  productEntityId: number,
+  quantity: number,
+): Promise<void> {
+  if (quantity <= 0) {
+    await removeKitItemFromSession(cartId, kitId, productEntityId);
+
+    return;
+  }
+
+  const existing = (await getKitSession(cartId)) ?? { kits: [] };
+
+  await persistKitSession(cartId, {
+    kits: existing.kits.map((kit) => {
+      if (kit.kitId !== kitId) {
+        return kit;
+      }
+
+      return {
+        ...kit,
+        items: kit.items.map((item) =>
+          item.productEntityId === productEntityId ? { ...item, quantity } : item,
+        ),
+      };
+    }),
+  });
+}
+
+export async function removeKitItemFromSession(
+  cartId: string,
+  kitId: string,
+  productEntityId: number,
+): Promise<void> {
+  const existing = (await getKitSession(cartId)) ?? { kits: [] };
+
+  await persistKitSession(cartId, {
+    kits: existing.kits
+      .map((kit) => {
+        if (kit.kitId !== kitId) {
+          return kit;
+        }
+
+        return {
+          ...kit,
+          items: kit.items.filter((item) => item.productEntityId !== productEntityId),
+        };
+      })
+      .filter((kit) => kit.items.length > 0),
+  });
 }

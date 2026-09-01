@@ -1,4 +1,4 @@
-import type { KitRecord } from './types';
+import { kitShipQuantity, type KitRecord } from './types';
 
 /**
  * Best-effort: stamp cart lines with a kitId when product + remaining qty
@@ -12,8 +12,10 @@ export function assignKitIdsToCartLines<T extends { productEntityId: number; qua
   const kitIds: Array<string | undefined> = lines.map(() => undefined);
 
   for (const kit of kits) {
+    const shipQuantity = kitShipQuantity(kit);
+
     for (const item of kit.items) {
-      let need = item.quantity;
+      let need = item.quantity * shipQuantity;
 
       for (let i = 0; i < lines.length && need > 0; i += 1) {
         const line = lines[i];
@@ -53,17 +55,20 @@ export function formatKitPackingStaffNotes(kits: KitRecord[]): string {
 
   return kits
     .map((kit) => {
+      const shipQuantity = kitShipQuantity(kit);
       const lines = kit.items.map((item) => {
         const skuPart = item.sku ? ` (${item.sku})` : '';
 
         return `- ${item.name}${skuPart} × ${item.quantity}`;
       });
+      const heading = kit.name
+        ? `KIT PACKING — ${kit.kitId} (${kit.name})`
+        : `KIT PACKING — ${kit.kitId}`;
 
       return [
-        kit.name
-          ? `KIT PACKING — ${kit.kitId} (${kit.name})`
-          : `KIT PACKING — ${kit.kitId}`,
-        'Pack these into the kit box first:',
+        heading,
+        ...(shipQuantity > 1 ? [`Ship ${shipQuantity} complete kits.`] : []),
+        'Pack these into the kit box first (quantities below are per kit):',
         ...lines,
         'Then place the kit box with any other items into the shipping box.',
       ].join('\n');

@@ -13,6 +13,7 @@ import { Modal } from '@/vibes/soul/primitives/modal';
 import { toast } from '@/vibes/soul/primitives/toaster';
 import { Image } from '~/components/image';
 import { Link } from '~/components/link';
+import { useMiniCart } from '~/components/mini-cart';
 import { addKitToCart } from '~/lib/kit/add-kit-to-cart';
 import { getKitAddOnProduct } from '~/lib/kit/get-kit-addon-product';
 import { saveKitToAccount } from '~/lib/kit/save-kit-to-account';
@@ -72,6 +73,8 @@ interface SelectedItem {
 
 interface Props {
   kitName: string;
+  kitHref?: string;
+  kitImage?: { src: string; alt: string };
   products: CuratedKitProduct[];
   suggestedProducts?: CuratedKitSuggestedProduct[];
 }
@@ -129,18 +132,21 @@ function KitQuantityStepper({
   incrementLabel,
   onDecrement,
   onIncrement,
+  min = 0,
 }: {
   quantity: number;
   decrementLabel: string;
   incrementLabel: string;
   onDecrement: () => void;
   onIncrement: () => void;
+  min?: number;
 }) {
   return (
     <div className="quantity relative inline-flex w-fit shrink-0">
       <button
         aria-label={decrementLabel}
         className="quantity__button"
+        disabled={quantity <= min}
         onClick={onDecrement}
         type="button"
       >
@@ -171,6 +177,8 @@ function KitQuantityStepper({
  */
 export function CuratedKitCustomizer({
   kitName,
+  kitHref,
+  kitImage,
   products: initialProducts,
   suggestedProducts = [],
 }: Props) {
@@ -180,6 +188,7 @@ export function CuratedKitCustomizer({
   };
   const format = useFormatter();
   const router = useRouter();
+  const { openMiniCart } = useMiniCart();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -200,6 +209,7 @@ export function CuratedKitCustomizer({
   >([]);
   const [isSearching, startSearchTransition] = useTransition();
   const [addingProductId, setAddingProductId] = useState<number | null>(null);
+  const [kitQuantity, setKitQuantity] = useState(1);
 
   const productById = useMemo(() => {
     return new Map(catalog.map((product) => [product.productEntityId, product]));
@@ -227,7 +237,7 @@ export function CuratedKitCustomizer({
     [included, productById],
   );
 
-  const currencyCode = catalog[0]?.currencyCode ?? 'USD';
+  const checkoutTotal = runningTotal * kitQuantity;
 
   const visibleSuggestions = useMemo(() => {
     const includedIds = new Set(included.map((item) => item.productEntityId));
@@ -365,12 +375,19 @@ export function CuratedKitCustomizer({
     startTransition(async () => {
       const result = await addKitToCart({
         kitName,
+        kitHref,
+        kitImage,
+        quantity: kitQuantity,
         items: buildKitItemsPayload(included, productById),
       });
 
       if (result?.status === 'error') {
         toast.error(result.message);
+
+        return;
       }
+
+      openMiniCart();
     });
   }
 
@@ -758,10 +775,21 @@ export function CuratedKitCustomizer({
       </button>
 
       <div className="liivv-kit-customizer__checkout">
+        <div className="liivv-kit-customizer__total-row liivv-kit-customizer__qty-row">
+          <span className="liivv-kit-customizer__total-label">{t('kitQuantity')}</span>
+          <KitQuantityStepper
+            decrementLabel={t('decrementKit')}
+            incrementLabel={t('incrementKit')}
+            min={1}
+            onDecrement={() => setKitQuantity((current) => Math.max(1, current - 1))}
+            onIncrement={() => setKitQuantity((current) => current + 1)}
+            quantity={kitQuantity}
+          />
+        </div>
         <div className="liivv-kit-customizer__total-row">
           <span className="liivv-kit-customizer__total-label">{t('runningTotal')}</span>
           <span className="liivv-kit-customizer__total-value">
-            {format.number(runningTotal, { style: 'currency', currency: currencyCode })}
+            {format.number(checkoutTotal, { style: 'currency', currency: currencyCode })}
           </span>
         </div>
         <div className="liivv-kit-customizer__checkout-actions">
