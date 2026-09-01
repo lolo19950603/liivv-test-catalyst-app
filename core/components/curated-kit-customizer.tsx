@@ -238,6 +238,12 @@ export function CuratedKitCustomizer({
   );
 
   const checkoutTotal = runningTotal * kitQuantity;
+  const currencyCode =
+    included
+      .map((item) => productById.get(item.productEntityId)?.currencyCode)
+      .find((code) => Boolean(code)) ??
+    catalog[0]?.currencyCode ??
+    'USD';
 
   const visibleSuggestions = useMemo(() => {
     const includedIds = new Set(included.map((item) => item.productEntityId));
@@ -615,7 +621,7 @@ export function CuratedKitCustomizer({
                       <p className="liivv-kit-item__line-total">
                         {format.number(lineTotal, {
                           style: 'currency',
-                          currency: currencyCode,
+                          currency: product.currencyCode || currencyCode,
                         })}
                       </p>
                     </div>

@@ -282,10 +282,10 @@ export function MiniCartDrawer({
                       amount: snapshot.freeShipping.remainingFormatted,
                     })}
               </p>
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-black/15">
+              <div className="mini-cart-free-shipping-track mt-2 h-1.5 overflow-hidden rounded-full">
                 <div
-                  className="h-full rounded-full bg-[rgb(var(--color-button-text))] transition-[width] duration-300"
-                  style={{ width: `${snapshot.freeShipping.progress}%` }}
+                  className="mini-cart-free-shipping-fill h-full rounded-full transition-[width] duration-300"
+                  style={{ width: `${String(snapshot.freeShipping.progress)}%` }}
                 />
               </div>
             </div>
@@ -502,7 +502,7 @@ function MiniCartKitBlock({
         </button>
       </div>
       {open ? (
-        <ul className={`mt-3 divide-y border-t pl-2 ${storeBorder}`}>
+        <ul className={`mt-3 divide-y border-t pl-16 ${storeBorder}`}>
           {kit.items.map((item) => (
             <li className="py-3" key={item.id}>
               <MiniCartLineRow

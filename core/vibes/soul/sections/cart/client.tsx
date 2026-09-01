@@ -710,7 +710,7 @@ function CartKitSection({
 
       {open ? (
         <ul
-          className="divide-y divide-[var(--cart-border,hsl(var(--contrast-100)))] border-t border-[var(--cart-border,hsl(var(--contrast-100)))] px-4 py-1 sm:px-5"
+          className="divide-y divide-[var(--cart-border,hsl(var(--contrast-100)))] border-t border-[var(--cart-border,hsl(var(--contrast-100)))] py-1 pl-16 pr-4 sm:pr-5"
           id={`cart-kit-${kitId}`}
         >
           {lineItems.map((lineItem) => (

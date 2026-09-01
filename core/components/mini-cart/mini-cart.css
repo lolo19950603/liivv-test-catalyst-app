@@ -111,6 +111,14 @@
   color: #fff;
 }
 
+#liivv-mini-cart-panel .mini-cart-free-shipping-track {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+#liivv-mini-cart-panel .mini-cart-free-shipping-fill {
+  background: #fff;
+}
+
 #liivv-mini-cart-panel .mini-cart-checkout.button {
   width: 100%;
   justify-content: center;
