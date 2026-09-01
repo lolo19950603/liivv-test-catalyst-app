@@ -97,7 +97,17 @@
 <li>Clients never talk to Supabase directly. Liivv’s server holds the service-role key.</li>
 </ul>
 <p>This project’s Supabase region is <strong>Canada (Central) / <code>ca-central-1</code></strong>.</p>
-<p>Patients add prescriptions by <strong>transfer from another pharmacy</strong> or <strong>doctor fax</strong> — not by uploading photos. Staff work the queue in a BigCommerce embedded app (<code>/bc-app</code>).</p>
+<p>Patients add prescriptions by <strong>transfer from another pharmacy</strong> or <strong>doctor fax</strong> — not by uploading photos. Staff work those requests in <strong><code>/bc-app</code></strong> (below).</p>
+<h3><code>/bc-app</code> — Liivv Staff</h3>
+<p><code>/bc-app</code> is the <strong>staff portal</strong>. Customers never see it. Staff are already signed in to BigCommerce; the portal uses that <strong>signed-in token</strong> (store app session), not a separate Liivv login.</p>
+<p><strong>Who opens it.</strong> Pharmacy and care-team staff sign in to the <strong>BigCommerce control panel</strong> (the store’s admin), then <strong>Apps → My apps → Liivv Staff</strong>. BigCommerce loads our app in an iframe with the signed load token. <code>/staff</code> is not a product surface (404). <code>/admin</code> only redirects to the BigCommerce control panel — it is not this portal.</p>
+<p><strong>What they do.</strong> The portal reads and updates <strong>Supabase</strong> health rows, not BigCommerce orders:</p>
+<ul>
+<li><strong>Pharmacy</strong> — queues for prescriptions, refills, and CarePack; staff approve or change status</li>
+<li><strong>Customers</strong> — look up the linked customer’s pharmacy / profile detail</li>
+<li><strong>Chat</strong> — join care-team conversations (the same threads customers see in their account dashboard)</li>
+</ul>
+<p>Auth for this iframe is the BigCommerce signed-in token, stored as a session cookie on <code>/bc-app</code> only. Details are in the <a href="./Liivv-Architecture-Deep-Dive.md">deep dive</a> (§7, S3, S6).</p>
 <h3>Vercel — where the app runs</h3>
 <p>The storefront is <strong>Next.js 16</strong> (App Router), deployed on <strong>Vercel</strong>. That is the hosting platform: production and preview deploys, environment secrets, and the Node runtime that talks to BigCommerce, Supabase, and Stripe.</p>
 <p>Vercel is not a system of record. Orders stay in BigCommerce. Health rows stay in Supabase. Vercel holds the running app and the secrets it needs.</p>
@@ -120,35 +130,26 @@
 <hr />
 <h2>4. How a visit works</h2>
 <p><strong>Shopping.</strong> The browser talks only to Next.js. Next.js reads the catalog and cart from BigCommerce GraphQL, then returns HTML. At checkout, Next.js creates a Stripe Payment Intent; the customer confirms with Stripe.js. After Stripe says the charge succeeded (webhook), Next.js creates the order in BigCommerce Admin REST and clears the cart. Recurring lines become Stripe subscriptions; later renewals still land as BigCommerce orders.</p>
-<p><strong>Health and pharmacy.</strong> A logged-in customer completes profile, health, and insurance on the storefront. Next.js writes those rows to Supabase and may sync name/phone back to BigCommerce. To add a prescription, they search <strong>Health Canada DPD</strong> (free public drug API) for the brand, pick the product, and Liivv saves that medication on their prescription in <strong>Supabase</strong>. Transfer / fax / refill / CarePack requests are also Supabase rows. Staff approve and update them from <code>/bc-app</code>.</p>
-<p><strong>Care chat.</strong> Customer messages are stored in Supabase. Staff join and reply from the same staff app. The optional OpenAI bot is <strong>off</strong> until Legal signs a DPA; if it were on, message text would go to OpenAI even when the reply is “talk to a pharmacist.”</p>
+<p><strong>Health and pharmacy.</strong> After login, the customer works in their <strong>account dashboard</strong> (<code>/account/...</code>) — not on the homepage or other public shop pages. There they complete profile, health, and insurance. Next.js writes those rows to Supabase and may sync name/phone back to BigCommerce. To add a prescription (Pharmacy in the same dashboard), they search <strong>Health Canada DPD</strong> (free public drug API) for the brand, pick the product, and Liivv saves that medication on their prescription in <strong>Supabase</strong>. Transfer / fax / refill / CarePack requests are also Supabase rows. Staff approve and update them from <code>/bc-app</code>.</p>
+<p><strong>Care chat.</strong> In the same account dashboard, customer messages are stored in Supabase. Staff join and reply from <code>/bc-app</code>. The optional OpenAI bot is <strong>off</strong> until Legal signs a DPA; if it were on, message text would go to OpenAI even when the reply is “talk to a pharmacist.”</p>
 <hr />
 <h2>5. Who can do what</h2>
-<table><thead><tr><th>Who</th><th>How they get in</th><th>What they see</th></tr></thead><tbody><tr><td>Customer</td><td>BigCommerce login (Auth.js session)</td><td>Storefront, their own health forms, their own chat</td></tr>
+<table><thead><tr><th>Who</th><th>How they get in</th><th>What they see</th></tr></thead><tbody><tr><td>Customer</td><td>BigCommerce login (Auth.js session)</td><td>Public shop pages; after login, account dashboard (health, insurance, pharmacy, chat)</td></tr>
 <tr><td>Anonymous shopper</td><td>Signed cart cookie</td><td>Catalog and cart only</td></tr>
 <tr><td>Staff</td><td>BigCommerce app session inside the control panel</td><td>Pharmacy queue and care chat in <code>/bc-app</code></td></tr></tbody></table>
-<p>There is no shared staff dashboard password. <code>/staff</code> is not a product surface. <code>/admin</code> only redirects to the BigCommerce control panel.</p>
 <hr />
 <h2>6. Security posture (high level)</h2>
 <p>Engineering treats Next.js as the only place secrets live. A few controls that matter in conversation:</p>
 <ul>
 <li><strong>Row Level Security</strong> is on in Supabase, with no browser-facing database key. The server uses the service role.</li>
 <li>Health data stays in <strong>Canadian</strong> Supabase, not in BigCommerce.</li>
-<li>Staff access is the <strong>store’s BC app session</strong>, not a Liivv password.</li>
+<li>Staff access uses the <strong>BigCommerce signed-in token</strong> (app session in the control panel).</li>
 <li>The <strong>OpenAI assistant stays off</strong> until a DPA is in place.</li>
 <li>Secrets live in Vercel and gitignored <code>.env.local</code> — nothing privileged is committed.</li>
 <li>Stripe and BigCommerce <strong>webhooks are verified</strong>.</li>
 <li>Medication search is a <strong>server proxy</strong> to Health Canada’s free public DPD API, not an open relay. Chosen medications are stored on the prescription in Supabase.</li>
 </ul>
-<p>The numbered pre-launch checklist (<strong>S1–S8</strong>), cookie names, secrets inventory, and code evidence paths live in the <a href="./Liivv-Architecture-Deep-Dive.md">deep dive</a>.</p>
-<hr />
-<h2>7. Still with Legal and ops</h2>
-<ol>
-<li>Vendor <strong>DPAs / BAAs</strong> as required (Supabase, Stripe, Vercel, BigCommerce; OpenAI only if the bot is turned on).</li>
-<li>Logging policy: do not print chat bodies in request logs.</li>
-<li>Backup / RPO for Supabase Postgres.</li>
-<li>Optional hardening: network restriction to Vercel; separate Preview vs Production secrets.</li>
-</ol>
+<p>The numbered checklist (<strong>S1–S8</strong>), cookie names, secrets inventory, and code evidence paths live in the <a href="./Liivv-Architecture-Deep-Dive.md">deep dive</a>.</p>
 <hr />
 <p>*For sequence diagrams, systems of record, auth cookies, the S1–S8 table, and file paths, see <a href="./Liivv-Architecture-Deep-Dive.md">Liivv-Architecture-Deep-Dive.md</a>.*</p>
 <script type="module">

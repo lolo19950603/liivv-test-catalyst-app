@@ -35,7 +35,7 @@
 </head>
 <body>
 <h1>Liivv — Architecture Deep Dive</h1>
-<p><strong>Audience:</strong> Architecture and security review  </p>
+<p><strong>Audience:</strong> Product, ops, and engineering  </p>
 <p><strong>App:</strong> BigCommerce Catalyst storefront (<code>core/</code>) + Liivv health and pharmacy extensions  </p>
 <p><strong>Date:</strong> August 2026  </p>
 <p><strong>Status:</strong> Current  </p>
@@ -43,10 +43,10 @@
 <p><strong>PDF:</strong> <a href="./Liivv-Architecture-Deep-Dive.pdf">Liivv-Architecture-Deep-Dive.pdf</a> (same content, for email / print)</p>
 <p>Reading map:</p>
 <ul>
-<li><strong>§1–§2</strong> — systems of record, system context  </li>
+<li><strong>§1–§2</strong> — systems of record, <code>/bc-app</code>, system context  </li>
 <li><strong>§3–§5</strong> — data flows (commerce, onboarding/pharmacy, care chat)  </li>
-<li><strong>§6</strong> — pre-launch security checklist (S1–S8)  </li>
-<li><strong>§7–§11</strong> — auth, trust boundary, secrets, remaining Legal/ops items, evidence paths  </li>
+<li><strong>§6</strong> — security controls (S1–S8)  </li>
+<li><strong>§7–§9</strong> — auth, trust boundary, secrets, evidence paths  </li>
 </ul>
 <p>Assumes the <a href="./Liivv-Architecture.md">overview</a>: two engines (BigCommerce shop vs Canadian Supabase health records), Next.js on Vercel as the trust boundary, Stripe for cards, no Rx photo uploads.</p>
 <hr />
@@ -61,9 +61,10 @@
 <tr><td>Live chat messages</td><td>Supabase</td><td>Optional OpenAI bot replies (flagged off)</td></tr></tbody></table>
 <p><strong>Recurring orders:</strong> Stripe handles the repeating charge. When a renewal succeeds, Liivv still creates the order in BigCommerce. Stripe is the billing engine. BigCommerce remains the only order engine.</p>
 <p><strong>Chat assistant:</strong> Care conversations live in Supabase. If <code>VIRTUAL_CARE_BOT_ENABLED=true</code> and an API key is set, <strong>customer message text is sent to OpenAI</strong> even when the bot refuses clinical advice and points people to a pharmacist. That flag stays <strong>false</strong> until the team decides whether to buy an OpenAI arrangement that includes a <strong>DPA</strong>. Human care-team chat in <code>/bc-app</code> still stays in Supabase either way.</p>
-<p><strong>Patients do not upload prescription photos.</strong> Adding a prescription is <strong>transfer from another pharmacy</strong> or <strong>doctor fax</strong>. Staff work the queue in the BigCommerce embedded app (<code>/bc-app</code>).</p>
+<p><strong>Patients do not upload prescription photos.</strong> Adding a prescription is <strong>transfer from another pharmacy</strong> or <strong>doctor fax</strong>. Staff work the queue in <strong><code>/bc-app</code></strong> (Liivv Staff).</p>
+<p><strong><code>/bc-app</code> (Liivv Staff):</strong> pharmacy and care-team staff open it from the <strong>BigCommerce control panel</strong> → <strong>Apps → My apps → Liivv Staff</strong>. BigCommerce loads the app in an iframe using the <strong>signed-in load token</strong>. Tabs: <strong>pharmacy</strong> (prescription / refill / CarePack queues), <strong>customers</strong>, <strong>chat</strong>. Session cookie <code>liivv_bc_app</code> is scoped to <code>/bc-app</code> for 12 hours and bound to the store hash. <code>/staff</code> is 404. <code>/admin</code> only redirects to the BC control panel. Product-shaped summary: <a href="./Liivv-Architecture.md">overview §2</a>.</p>
 <p><strong>Health Canada DPD:</strong> the Drug Product Database is Health Canada’s <strong>free public API</strong> (open government data — no key, no paid contract). Liivv proxies it so customers can search licensed Canadian drugs by brand name and add the selected product to a prescription. The <strong>prescription is stored in Supabase</strong>. Search queries go to Health Canada; patient records do not. The proxy is rate-limited at 60 requests / IP / minute so Liivv is not used as an open relay.</p>
-<p><strong>Hosting:</strong> the Catalyst app (<code>core/</code>) runs on <strong>Vercel</strong> (production and preview). Next.js on Vercel is the only process that holds service-role, admin, and payment secrets. Secrets live in the Vercel project (encrypted) plus gitignored <code>.env.local</code> for local work. Preview and Production currently share the same keys; splitting them is a documented next step, not a launch blocker. Checkout snapshots and the staff-app install token use <strong>Vercel’s runtime cache</strong> (in-memory locally).</p>
+<p><strong>Hosting:</strong> the Catalyst app (<code>core/</code>) runs on <strong>Vercel</strong> (production and preview). Next.js on Vercel is the only process that holds service-role, admin, and payment secrets. Secrets live in the Vercel project (encrypted) plus gitignored <code>.env.local</code> for local work. Checkout snapshots and the staff-app install token use <strong>Vercel’s runtime cache</strong> (in-memory locally).</p>
 <hr />
 <h2>2. System context</h2>
 <div class="mermaid">flowchart LR
@@ -147,13 +148,13 @@
 <hr />
 <h2>4. Data flow — onboarding and pharmacy</h2>
 <div class="mermaid">sequenceDiagram
-  participant U as Logged-in customer
+  participant U as Logged-in customer (account dashboard)
   participant N as Next.js server actions
   participant BC as BigCommerce Admin
   participant SB as Supabase
   participant DPD as Health Canada DPD
 
-  U->>N: Complete profile / health / insurance
+  U->>N: Complete profile / health / insurance (account, not public pages)
   N->>SB: upsert profiles, health_profiles, insurance_info
   N->>BC: Optional name/phone sync
 
@@ -190,15 +191,15 @@
   N->>SB: staff messages, pause bot while staff active
   Note over U,N: UI polls for new messages (not Realtime yet)</div>
 <hr />
-<h2>6. Security review (S1–S8) — controls in place</h2>
-<p>This section is a pre-launch checklist. Each item is a control we put in place (or a Legal gate we are holding) so shopping, health data, staff access, and third-party APIs stay inside the intended boundaries. <strong>In place</strong> means engineering is done. <strong>Held</strong> means we are keeping the feature off until Legal signs off.</p>
-<table><thead><tr><th>ID</th><th>Topic</th><th>If left unchecked</th><th>Status</th><th>Control</th></tr></thead><tbody><tr><td><strong>S1</strong></td><td>Who can query Supabase</td><td>High</td><td><strong>In place</strong></td><td><strong>Row Level Security</strong> is on for public tables, with <strong>no anon/authenticated policies</strong> (deny by default). Browsers never receive a database key. Next.js uses the <strong>service role</strong> on the server only; that role bypasses RLS by design. Optional later: network allowlist to Vercel.</td></tr>
-<tr><td><strong>S2</strong></td><td>Where health data lives</td><td>High</td><td><strong>In place</strong> (Legal residual)</td><td>Health profile, insurance, prescriptions, CarePack, and chat live in <strong>Canadian</strong> Supabase (<code>ca-central-1</code>) — not in BigCommerce. Patients add prescriptions by <strong>transfer or doctor fax only</strong>; we do not collect Rx photos. Residual for Legal: vendor <strong>DPA/BAA</strong> and retention.</td></tr>
-<tr><td><strong>S3</strong></td><td>Staff access</td><td>Med</td><td><strong>In place</strong></td><td>Staff work inside <strong>BigCommerce → Apps → Liivv Staff (<code>/bc-app</code>)</strong>, using the store’s BC app session. There is no shared dashboard password. <code>/staff</code> is not a product surface (404).</td></tr>
-<tr><td><strong>S4</strong></td><td>AI chat assistant</td><td>Med</td><td><strong>Held</strong> (Legal)</td><td>The assistant stays <strong>off</strong> (<code>VIRTUAL_CARE_BOT_ENABLED=false</code>) until the team decides on a <strong>paid OpenAI arrangement that includes a DPA</strong>. If the bot were on, customer message text would go to OpenAI even when the reply is “talk to a pharmacist.” Human care-team chat in <code>/bc-app</code> stays in Supabase either way.</td></tr>
-<tr><td><strong>S5</strong></td><td>Environment secrets</td><td>Med</td><td><strong>In place</strong> (documented next step)</td><td>Secrets live in Vercel (encrypted) and in gitignored <code>.env.local</code>. Nothing privileged is committed. Rotate on personnel change. Next step, not a launch blocker: separate Preview vs Production keys (they currently match).</td></tr>
+<h2>6. Security controls (S1–S8)</h2>
+<p>Each item is a control so shopping, health data, staff access, and third-party APIs stay inside the intended boundaries.</p>
+<table><thead><tr><th>ID</th><th>Topic</th><th>If left unchecked</th><th>Status</th><th>Control</th></tr></thead><tbody><tr><td><strong>S1</strong></td><td>Who can query Supabase</td><td>High</td><td><strong>In place</strong></td><td><strong>Row Level Security</strong> is on for public tables, with <strong>no anon/authenticated policies</strong> (deny by default). Browsers never receive a database key. Next.js uses the <strong>service role</strong> on the server only; that role bypasses RLS by design.</td></tr>
+<tr><td><strong>S2</strong></td><td>Where health data lives</td><td>High</td><td><strong>In place</strong></td><td>Health profile, insurance, prescriptions, CarePack, and chat live in <strong>Canadian</strong> Supabase (<code>ca-central-1</code>) — not in BigCommerce. Patients add prescriptions by <strong>transfer or doctor fax only</strong>; we do not collect Rx photos.</td></tr>
+<tr><td><strong>S3</strong></td><td>Staff access</td><td>Med</td><td><strong>In place</strong></td><td>Staff work inside <strong>BigCommerce → Apps → Liivv Staff (<code>/bc-app</code>)</strong>, using the store’s <strong>signed-in load token</strong> (BC app session). <code>/staff</code> is not a product surface (404).</td></tr>
+<tr><td><strong>S4</strong></td><td>AI chat assistant</td><td>Med</td><td><strong>Off</strong></td><td>The assistant is <strong>off</strong> (<code>VIRTUAL_CARE_BOT_ENABLED=false</code>). If it were on, customer message text would go to OpenAI even when the reply is “talk to a pharmacist.” Human care-team chat in <code>/bc-app</code> stays in Supabase either way.</td></tr>
+<tr><td><strong>S5</strong></td><td>Environment secrets</td><td>Med</td><td><strong>In place</strong></td><td>Secrets live in Vercel (encrypted) and in gitignored <code>.env.local</code>. Nothing privileged is committed. Rotate on personnel change.</td></tr>
 <tr><td><strong>S6</strong></td><td>Embedded staff app frames</td><td>Med</td><td><strong>In place</strong></td><td>Staff work inside a BigCommerce control-panel iframe (<code>/bc-app</code>). Cookies used in that iframe are <code>SameSite=None; Secure</code> (partitioned where needed). CSP <code>frame-ancestors</code> is allowlisted, not open.</td></tr>
-<tr><td><strong>S7</strong></td><td>Customer email</td><td>Low</td><td><strong>In place</strong> (ops confirm)</td><td>Password reset and most transactional mail are <strong>BigCommerce’s</strong>. The storefront only triggers reset via GraphQL. Ops: confirm branding + SPF/DKIM in the BC control panel. Pharmacy notification email is not in scope yet.</td></tr>
+<tr><td><strong>S7</strong></td><td>Customer email</td><td>Low</td><td><strong>In place</strong></td><td>Password reset and most transactional mail are <strong>BigCommerce’s</strong>. The storefront only triggers reset via GraphQL.</td></tr>
 <tr><td><strong>S8</strong></td><td>Medication search (Health Canada DPD)</td><td>Low</td><td><strong>In place</strong></td><td>Customers look up licensed Canadian drugs through Health Canada’s <strong>free public DPD API</strong> so they can add the right product to a prescription. Search is a <strong>server proxy</strong>, rate-limited at <strong>60 requests / IP / minute</strong>, so Liivv is not an open relay to Health Canada. The selected medication is saved on the <strong>prescription in Supabase</strong>. Queries to DPD are catalog lookups — not a patient-data path.</td></tr></tbody></table>
 <h3>Additional controls</h3>
 <ul>
@@ -259,25 +260,7 @@
 <tr><td><code>SUPABASE_URL</code> / <code>SUPABASE_SERVICE_ROLE_KEY</code></td><td>DB (bypasses RLS)</td></tr>
 <tr><td><code>OPENAI_API_KEY</code></td><td>Virtual care bot (unused while flag is off)</td></tr></tbody></table>
 <hr />
-<h2>9. Remaining Legal and operations items</h2>
-<ol>
-<li>Vendor <strong>DPAs / BAAs</strong> as required: Supabase, Stripe, Vercel, BigCommerce; OpenAI only if the bot is turned on.</li>
-<li>Logging policy: do not print chat bodies in request logs.</li>
-<li>Backup / RPO for Supabase Postgres (health and pharmacy rows).</li>
-<li>Optional: Supabase network restriction to Vercel egress; separate Preview vs Production secrets.</li>
-</ol>
-<hr />
-<h2>10. Suggested meeting agenda</h2>
-<ol>
-<li>Overview — commerce vs health-data split (<a href="./Liivv-Architecture.md">overview</a> §1–§3)</li>
-<li>System context and systems of record (§1–§2)</li>
-<li>Pharmacy and chat paths (§4–§5)</li>
-<li>Auth and staff via BigCommerce (§7)</li>
-<li>Security checklist S1–S8 (§6) — confirm controls; assign <strong>S4</strong> (OpenAI DPA)</li>
-<li>Sign-off criteria for production</li>
-</ol>
-<hr />
-<h2>11. Key evidence paths (code)</h2>
+<h2>9. Key evidence paths (code)</h2>
 <pre class="code"><code>core/package.json
 .env.example
 core/auth/index.ts
