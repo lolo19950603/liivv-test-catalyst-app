@@ -51,8 +51,7 @@ Assumes the [overview](./Liivv-Architecture.md): two engines (BigCommerce shop v
 flowchart LR
   subgraph Clients
     C[Customer Browser]
-    S[Staff /bc-app]
-    B[BC Control Panel iframe /bc-app]
+    S["Staff (BC control panel → /bc-app)"]
   end
 
   subgraph Hub["Next.js 16 - Catalyst on Vercel"]
@@ -82,7 +81,6 @@ flowchart LR
 
   C --> N
   S --> N
-  B --> N
   N --> BCG
   N --> BCA
   N --> BCO
@@ -159,7 +157,7 @@ sequenceDiagram
   U->>N: Transfer Rx / fax template / refill / CarePack
   N->>SB: prescriptions / refill_requests / carepack_requests
 
-  participant Staff as Staff /bc-app
+  participant Staff as Staff (BC control panel)
   Staff->>N: Approve / update status
   N->>SB: Update pharmacy rows
 ```
@@ -174,7 +172,7 @@ sequenceDiagram
   participant N as Next.js
   participant SB as Supabase
   participant AI as OpenAI
-  participant Staff as Staff UI
+  participant Staff as Staff (BC control panel)
 
   U->>N: Send message
   N->>SB: append chat_messages
