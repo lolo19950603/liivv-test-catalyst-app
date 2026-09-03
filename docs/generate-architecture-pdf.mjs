@@ -1,8 +1,6 @@
 /**
- * Build HTML and PDF for architecture docs from their Markdown sources.
- *
- *   docs/Liivv-Architecture.md            → overview
- *   docs/Liivv-Architecture-Deep-Dive.md  → nitty-gritty
+ * Build docs/Liivv-Architecture.html and docs/Liivv-Architecture.pdf
+ * from docs/Liivv-Architecture.md (single IT pack).
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -16,13 +14,7 @@ const documents = [
     md: 'Liivv-Architecture.md',
     html: 'Liivv-Architecture.html',
     pdf: 'Liivv-Architecture.pdf',
-    title: 'Liivv — Architecture Overview',
-  },
-  {
-    md: 'Liivv-Architecture-Deep-Dive.md',
-    html: 'Liivv-Architecture-Deep-Dive.html',
-    pdf: 'Liivv-Architecture-Deep-Dive.pdf',
-    title: 'Liivv — Architecture Deep Dive',
+    title: 'Liivv — Architecture (IT)',
   },
 ];
 
@@ -309,15 +301,31 @@ for (const doc of built) {
       ),
     );
   });
-  await page.pdf({
-    path: doc.pdfPath,
-    format: 'Letter',
-    printBackground: true,
-    margin: { top: '0.55in', bottom: '0.55in', left: '0.6in', right: '0.6in' },
-  });
+  let pdfPath = doc.pdfPath;
+  try {
+    await page.pdf({
+      path: pdfPath,
+      format: 'Letter',
+      printBackground: true,
+      margin: { top: '0.55in', bottom: '0.55in', left: '0.6in', right: '0.6in' },
+    });
+  } catch (error) {
+    if (error && error.code === 'EBUSY') {
+      pdfPath = doc.pdfPath.replace(/\.pdf$/i, '-refresh.pdf');
+      await page.pdf({
+        path: pdfPath,
+        format: 'Letter',
+        printBackground: true,
+        margin: { top: '0.55in', bottom: '0.55in', left: '0.6in', right: '0.6in' },
+      });
+      process.stderr.write(`Locked ${doc.pdfPath}; wrote ${pdfPath} instead. Close the PDF and replace the original.\n`);
+    } else {
+      throw error;
+    }
+  }
   await page.close();
 
-  process.stdout.write(`Wrote ${doc.pdfPath}\n`);
+  process.stdout.write(`Wrote ${pdfPath}\n`);
 }
 
 await browser.close();

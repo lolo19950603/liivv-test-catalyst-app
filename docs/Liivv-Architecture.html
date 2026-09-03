@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Liivv — Architecture Overview</title>
+  <title>Liivv — Architecture (IT)</title>
   <style>
   @page { size: letter; margin: 0.65in 0.7in; }
   * { box-sizing: border-box; }
@@ -34,124 +34,403 @@
 </style>
 </head>
 <body>
-<h1>Liivv — Architecture Overview</h1>
-<p><strong>Audience:</strong> Product, ops, and anyone who needs the shape of the app  </p>
-<p><strong>App:</strong> BigCommerce Catalyst storefront (<code>core/</code>) + Liivv health and pharmacy extensions  </p>
-<p><strong>Date:</strong> August 2026  </p>
-<p><strong>Status:</strong> Current  </p>
-<p><strong>Companion:</strong> <a href="./Liivv-Architecture-Deep-Dive.md">Deep dive</a> — data flows, auth, secrets, security checklist S1–S8, evidence paths  </p>
+<h1>Liivv — Architecture</h1>
+<p><strong>Audience:</strong> IT / security review of the <strong>application</strong> (current stack)  </p>
+<p><strong>App:</strong> Next.js 16 storefront (<code>core/</code>) + Liivv health and pharmacy extensions  </p>
+<p><strong>Date:</strong> September 2026  </p>
+<p><strong>Status:</strong> Current — Vercel + BigCommerce + Canadian Supabase + Stripe  </p>
 <p><strong>PDF:</strong> <a href="./Liivv-Architecture.pdf">Liivv-Architecture.pdf</a></p>
+<p>This is <strong>one</strong> pack for the IT meeting. It describes <strong>today’s</strong> app. It does not describe a future move onto Azure. Spark’s slide is used only as a <strong>vocabulary map</strong>. Where Spark has a box we do not have, that is listed under <strong>not in place</strong> — we do not claim Entra, Key Vault, or Veracode.</p>
 <hr />
-<h2>1. What Liivv is</h2>
-<p>Liivv is a health storefront. Shoppers see one site. Behind it, <strong>commerce and health data use different systems of record</strong>.</p>
+<h2>1. What we are asking you to review</h2>
+<p>Liivv is a <strong>Next.js 16</strong> app (App Router) on <strong>Vercel</strong>. Shoppers see one site. The <strong>browser is not the database client</strong>. Next.js is the only process that holds service-role, admin, and payment secrets.</p>
+<p>You are scoring whether <strong>this application</strong> would be a leak or jump-off point: can a shopper or random caller read PHI, fake a payment, or walk into a database with a key from the page?</p>
+<p>Liivv is <strong>not</strong> Spark. Spark is an Azure web app → API gateway → microservices → SQL <strong>in the same estate</strong>. Liivv is one Node runtime that calls <strong>vendors</strong> (BigCommerce, Supabase, Stripe) over TLS. Same *idea* as Spark’s “only the API talks to SQL.” Different *platform*. The Spark-shaped <strong>block diagram</strong> is in <strong>§2</strong>.</p>
+<p><strong>Residual (true of Spark too):</strong> if someone steals the <strong>server</strong> secret (Supabase service role, BC admin token, Stripe secret), row rules on the database do not stop them. Mitigation is secret hygiene and never putting those keys in the browser — not “the database cannot be hacked.”</p>
+<hr />
+<h2>2. Spark slide → Liivv today</h2>
+<p>Spark’s diagram is <strong>layers</strong>: people → web app → gateway → services → SQL, plus identity, vault, CI/CD, and scans on the side. Liivv uses the <strong>same layers</strong>. The picture below is that slide drawn for <strong>this</strong> app. Boxes on the right labeled <strong>not in this app</strong> are Spark controls we do <strong>not</strong> have.</p>
+<div class="mermaid">flowchart TB
+  subgraph people [People]
+    Shoppers[Shoppers]
+    Staff[Staff]
+  end
+
+  subgraph cicd [CI/CD]
+    GH[GitHub]
+    Lint[Lint and typecheck]
+    VercelDeploy[Vercel preview and production]
+    GH --> Lint
+    Lint --> VercelDeploy
+  end
+
+  subgraph app [Hosting - Next.js is web app and API]
+    Next[Next.js 16 on Vercel]
+    UI[Public shop]
+    Account[Account dashboard]
+    StaffApp["/bc-app in BC iframe"]
+    Routes["Server actions and /api"]
+    Next --- UI
+    Next --- Account
+    Next --- StaffApp
+    Next --- Routes
+  end
+
+  subgraph identity [Identity]
+    BCCust[BigCommerce customer login]
+    BCStaffTok[BigCommerce signed-in staff token]
+  end
+
+  subgraph vault [Secrets]
+    VercelEnv[Vercel encrypted env vars]
+  end
+
+  subgraph observe [Logging]
+    VercelLogs[Vercel logs Analytics Speed Insights]
+  end
+
+  subgraph stores [Persistent data]
+    BC[(BigCommerce catalog cart orders)]
+    SB[(Supabase Canada PHI)]
+    Stripe[(Stripe - no PAN in Liivv)]
+    DPD[Health Canada DPD catalog only]
+  end
+
+  subgraph missing [Not in this app - Spark has these]
+    Entra[Entra SSO and MFA]
+    KeyVault[Azure Key Vault]
+    APIM[Azure API Management]
+    SAST[Veracode Sonar CrowdStrike]
+  end
+
+  Shoppers --> UI
+  Shoppers --> Account
+  Staff --> StaffApp
+  BCCust --> Shoppers
+  BCStaffTok --> Staff
+  VercelDeploy --> Next
+  VercelEnv --> Next
+  VercelLogs --> Next
+  Routes --> BC
+  Routes --> SB
+  Routes --> Stripe
+  Routes --> DPD
+
+  classDef actor fill:#DBEAFE,stroke:#1D4ED8,color:#1E3A8A
+  classDef pipeline fill:#DCFCE7,stroke:#15803D,color:#14532D
+  classDef runtime fill:#CCFBF1,stroke:#0F766E,color:#134E4A
+  classDef id fill:#EDE9FE,stroke:#6D28D9,color:#4C1D95
+  classDef secret fill:#FEF3C7,stroke:#B45309,color:#78350F
+  classDef logs fill:#E2E8F0,stroke:#475569,color:#1E293B
+  classDef data fill:#FFEDD5,stroke:#C2410C,color:#7C2D12
+  classDef gap fill:#FEE2E2,stroke:#B91C1C,color:#7F1D1D,stroke-dasharray: 5 4
+
+  class Shoppers,Staff actor
+  class GH,Lint,VercelDeploy pipeline
+  class Next,UI,Account,StaffApp,Routes runtime
+  class BCCust,BCStaffTok id
+  class VercelEnv secret
+  class VercelLogs logs
+  class BC,SB,Stripe,DPD data
+  class Entra,KeyVault,APIM,SAST gap
+
+  style people fill:#EFF6FF,stroke:#1D4ED8,color:#1E3A8A
+  style cicd fill:#F0FDF4,stroke:#15803D,color:#14532D
+  style app fill:#F0FDFA,stroke:#0F766E,color:#134E4A
+  style identity fill:#F5F3FF,stroke:#6D28D9,color:#4C1D95
+  style vault fill:#FFFBEB,stroke:#B45309,color:#78350F
+  style observe fill:#F8FAFC,stroke:#475569,color:#1E293B
+  style stores fill:#FFF7ED,stroke:#C2410C,color:#7C2D12
+  style missing fill:#FEF2F2,stroke:#B91C1C,color:#7F1D1D,stroke-dasharray: 6 4</div>
+<p><strong>Color:</strong> blue = people · green = CI/CD · teal = Next.js app · purple = identity · amber = secrets · gray = logging · orange = data · red dashed = Spark boxes we do <strong>not</strong> have.</p>
+<p><strong>How to read it vs Spark:</strong> Spark splits <strong>web app</strong>, <strong>API gateway</strong>, and <strong>backend services</strong>. Liivv is <strong>one</strong> Next.js process: the page, the API, and the only talker to SQL/vendors. Spark’s SQL sits <strong>inside Azure</strong>. Ours sits at <strong>vendors</strong> (Supabase, BigCommerce, Stripe). Identity is <strong>BigCommerce</strong>, not Entra.</p>
+<table><thead><tr><th>Spark box</th><th>Liivv today</th><th>Status</th></tr></thead><tbody><tr><td>Web app</td><td>Next.js 16 on <strong>Vercel</strong> (HTML, account dashboard, <code>/bc-app</code>)</td><td><strong>Have</strong></td></tr>
+<tr><td>API gateway</td><td><strong>No Azure APIM.</strong> Next.js server actions and <code>/api/*</code> are the public API (auth, rate limit, webhook verify)</td><td><strong>Equivalent (app layer)</strong> — not a dedicated gateway product</td></tr>
+<tr><td>Backend microservices</td><td><strong>One</strong> Node runtime, not a mesh of services</td><td><strong>Have (simpler)</strong></td></tr>
+<tr><td>SQL in the estate</td><td><strong>Canadian Supabase Postgres</strong> (PHI). Shop data in <strong>BigCommerce</strong>. Not Azure SQL next to the app</td><td><strong>Have (vendor DB)</strong> — not in-estate SQL</td></tr>
+<tr><td>Identity / SSO / MFA</td><td><strong>BigCommerce</strong> customer login and BC control-panel login for staff. <strong>No Entra</strong> on Liivv</td><td><strong>Not in place</strong> (Entra). MFA = BC store setting (ops confirm)</td></tr>
+<tr><td>Key Vault</td><td><strong>Vercel encrypted env vars</strong>. Not Azure Key Vault</td><td><strong>Not in place</strong> (Key Vault)</td></tr>
+<tr><td>Rate limiting</td><td>DPD search: 60 req / IP / min <strong>per serverless instance</strong></td><td><strong>Partial</strong> — see to address</td></tr>
+<tr><td>Webhook auth</td><td>Stripe signature; BC Bearer secret</td><td><strong>Have</strong></td></tr>
+<tr><td>CI/CD</td><td>GitHub → <strong>Vercel</strong> preview/production. Lint/typecheck in Catalyst workflows</td><td><strong>Have (Vercel)</strong> — not Spark’s GitHub Enterprise + DACPAC</td></tr>
+<tr><td>SAST (Veracode, Sonar, CrowdStrike)</td><td><strong>Not in this pipeline</strong></td><td><strong>Not in place</strong></td></tr>
+<tr><td>Logging / App Insights</td><td><strong>Vercel</strong> logs, Analytics, Speed Insights, OpenTelemetry hook. Not Azure Monitor</td><td><strong>Have (Vercel)</strong> — not App Insights</td></tr>
+<tr><td>Email microservice</td><td><strong>BigCommerce</strong> transactional mail</td><td><strong>Have (vendor)</strong></td></tr></tbody></table>
+<hr />
+<h2>3. Systems of record</h2>
+<p>Shoppers see one site. <strong>Commerce and health data use different systems of record.</strong></p>
 <ul>
-<li><strong>BigCommerce</strong> runs the shop: catalog, cart, checkout, orders, customer login.</li>
-<li><strong>Supabase</strong> holds health records in a <strong>Canadian</strong> Postgres project: profile, insurance, prescriptions, CarePack, care chat.</li>
-<li><strong>Stripe</strong> takes card charges and subscriptions. Card numbers never sit in Liivv.</li>
+<li><strong>BigCommerce</strong> — catalog, cart, checkout, orders, customer login, most customer email.</li>
+<li><strong>Supabase</strong> — Canadian Postgres (<code>ca-central-1</code>): profile, insurance, prescriptions, CarePack, care chat.</li>
+<li><strong>Stripe</strong> — card charges and subscriptions. PAN / CVC <strong>never</strong> stored in Liivv.</li>
 </ul>
 <p>Orders are not stored in Supabase. Health records are not stored in BigCommerce.</p>
-<figure class="diagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 220" width="720" height="220" role="img" aria-labelledby="title desc">
-  <title id="title">How a visit splits</title>
-  <desc id="desc">The customer shops on Liivv. Commerce goes to BigCommerce. Health records go to Supabase.</desc>
-  <rect x="0" y="0" width="720" height="220" fill="#ffffff"/>
-
-  <rect x="12" y="78" width="140" height="64" rx="6" fill="#f3f3f3" stroke="#1a1a1a"/>
-  <text x="82" y="104" text-anchor="middle" fill="#1a1a1a" font-size="13" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">Customer</text>
-  <text x="82" y="122" text-anchor="middle" fill="#555555" font-size="11" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">shops on Liivv</text>
-
-  <line x1="152" y1="110" x2="214" y2="110" stroke="#888888" stroke-width="1.5"/>
-
-  <rect x="214" y="70" width="168" height="80" rx="6" fill="#1a1a1a"/>
-  <text x="298" y="102" text-anchor="middle" fill="#ffffff" font-size="13" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">Liivv website</text>
-  <text x="298" y="120" text-anchor="middle" fill="#d8d8d8" font-size="11" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">storefront</text>
-
-  <line x1="382" y1="90" x2="448" y2="44" stroke="#888888" stroke-width="1.5"/>
-  <line x1="382" y1="130" x2="448" y2="176" stroke="#888888" stroke-width="1.5"/>
-
-  <rect x="448" y="12" width="260" height="72" rx="6" fill="#f3f3f3" stroke="#1a1a1a"/>
-  <text x="578" y="40" text-anchor="middle" fill="#1a1a1a" font-size="13" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">BigCommerce</text>
-  <text x="578" y="58" text-anchor="middle" fill="#555555" font-size="11" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">catalog, cart, orders</text>
-
-  <rect x="448" y="136" width="260" height="72" rx="6" fill="#f3f3f3" stroke="#1a1a1a"/>
-  <text x="578" y="164" text-anchor="middle" fill="#1a1a1a" font-size="13" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">Supabase</text>
-  <text x="578" y="182" text-anchor="middle" fill="#555555" font-size="11" font-family="Segoe UI, Calibri, Helvetica, Arial, sans-serif">Canadian Postgres — health records</text>
-</svg>
-<figcaption>How a visit splits: customer shops on Liivv, then shopping goes to BigCommerce and health records go to Supabase</figcaption></figure>
-<table><thead><tr><th>Function</th><th>System</th><th>Boundary</th></tr></thead><tbody><tr><td>Catalog, cart, checkout, order of record</td><td>BigCommerce</td><td>Commerce platform — not health records</td></tr>
+<figure class="diagram"><p><strong>Diagram:</strong> How a visit splits: customer shops on Liivv, then shopping goes to BigCommerce and health records go to Supabase</p></figure>
+<table><thead><tr><th>Function</th><th>System</th><th>Boundary</th></tr></thead><tbody><tr><td>Catalog, cart, checkout, order of record</td><td>BigCommerce</td><td>Shop engine — not health records</td></tr>
 <tr><td>Health profile, insurance, prescriptions, care chat</td><td>Supabase</td><td>Canadian Postgres — not the shop</td></tr>
 <tr><td>Card charges and subscriptions</td><td>Stripe</td><td>Payment processor — PAN / CVC never stored</td></tr></tbody></table>
-<p>Commerce platforms are built to sell products. Health records need a dedicated store with Canadian residency and access control. Combining them would put PHI in a system that is not designed to hold it.</p>
-<p><strong>Design principle:</strong> browsers never receive service-role, admin, or payment secrets. <strong>Next.js on Vercel is the trust boundary.</strong></p>
+<table><thead><tr><th>Domain</th><th>System of record</th><th>Notes</th></tr></thead><tbody><tr><td>Storefront hosting</td><td>Vercel</td><td>Next.js 16 — not a data store of record</td></tr>
+<tr><td>Products, categories, prices</td><td>BigCommerce</td><td>Synced to Stripe prices via BC webhooks</td></tr>
+<tr><td>Customers (login identity)</td><td>BigCommerce</td><td>Linked in Supabase <code>profiles.bigcommerce_customer_id</code></td></tr>
+<tr><td>Cart / checkout cart</td><td>BigCommerce GraphQL</td><td>Cart ID in signed Auth.js / anonymous JWT</td></tr>
+<tr><td>Orders</td><td>BigCommerce</td><td>Admin REST after Stripe success</td></tr>
+<tr><td>Payment methods &amp; subscriptions</td><td>Stripe</td><td>Renewals create BC orders on <code>invoice.paid</code></td></tr>
+<tr><td>Health profile, insurance, Rx, CarePack, chat</td><td>Supabase</td><td>Not modeled in BC; staff queue in <code>/bc-app</code></td></tr></tbody></table>
+<p><strong>PII</strong> (personally identifiable information) is who they are: name, email, address, BC customer id — BigCommerce + Supabase <code>profiles</code>.  </p>
+<p><strong>PHI</strong> is who they are <strong>plus</strong> health: insurance, Rx, CarePack, chat — Supabase only.</p>
+<p>Canadian privacy frame is <strong>PIPEDA</strong> (and <strong>PHIPA</strong> in Ontario). HIPAA is a US statute; we do not claim HIPAA because we listed a Canadian region.</p>
 <hr />
-<h2>2. What each system is for</h2>
-<h3>BigCommerce — the only store engine</h3>
-<p>Liivv does not invent a second checkout or process orders itself.</p>
-<p><strong>Handles:</strong> product catalog and prices, cart and checkout, customer accounts used to sign in, the official order after payment, and most customer email (password reset, order mail).</p>
-<p><strong>Does not handle:</strong> health questionnaires, insurance, prescriptions, refills, CarePack requests, or care-team conversations.</p>
-<p><strong>Recurring orders:</strong> Stripe handles the repeating charge. When a renewal succeeds, Liivv still creates the order in BigCommerce. Stripe is the billing engine. BigCommerce remains the only order engine.</p>
-<h3>Supabase — health records only</h3>
-<p>A professionally run Postgres database (plus optional Storage) for records that do not belong in the commerce platform.</p>
-<ul>
-<li><strong>Holds:</strong> health profile, insurance, prescriptions, refill/CarePack requests, care chat.</li>
-<li><strong>Does not:</strong> take payments or create orders.</li>
-<li>Clients never talk to Supabase directly. Liivv’s server holds the service-role key.</li>
-</ul>
-<p>This project’s Supabase region is <strong>Canada (Central) / <code>ca-central-1</code></strong>.</p>
-<p>Patients add prescriptions by <strong>transfer from another pharmacy</strong> or <strong>doctor fax</strong> — not by uploading photos. Staff work those requests in <strong><code>/bc-app</code></strong> (below).</p>
-<h3><code>/bc-app</code> — Liivv Staff</h3>
-<p><code>/bc-app</code> is the <strong>staff portal</strong>. Customers never see it. Staff are already signed in to BigCommerce; the portal uses that <strong>signed-in token</strong> (store app session), not a separate Liivv login.</p>
-<p><strong>Who opens it.</strong> Pharmacy and care-team staff sign in to the <strong>BigCommerce control panel</strong> (the store’s admin), then <strong>Apps → My apps → Liivv Staff</strong>. BigCommerce loads our app in an iframe with the signed load token. <code>/staff</code> is not a product surface (404). <code>/admin</code> only redirects to the BigCommerce control panel — it is not this portal.</p>
-<p><strong>What they do.</strong> The portal reads and updates <strong>Supabase</strong> health rows, not BigCommerce orders:</p>
-<ul>
-<li><strong>Pharmacy</strong> — queues for prescriptions, refills, and CarePack; staff approve or change status</li>
-<li><strong>Customers</strong> — look up the linked customer’s pharmacy / profile detail</li>
-<li><strong>Chat</strong> — join care-team conversations (the same threads customers see in their account dashboard)</li>
-</ul>
-<p>Auth for this iframe is the BigCommerce signed-in token, stored as a session cookie on <code>/bc-app</code> only. Details are in the <a href="./Liivv-Architecture-Deep-Dive.md">deep dive</a> (§7, S3, S6).</p>
-<h3>Vercel — where the app runs</h3>
-<p>The storefront is <strong>Next.js 16</strong> (App Router), deployed on <strong>Vercel</strong>. That is the hosting platform: production and preview deploys, environment secrets, and the Node runtime that talks to BigCommerce, Supabase, and Stripe.</p>
-<p>Vercel is not a system of record. Orders stay in BigCommerce. Health rows stay in Supabase. Vercel holds the running app and the secrets it needs.</p>
-<h3>Everything else, in one pass</h3>
-<table><thead><tr><th>Layer</th><th>Technology</th><th>Role</th></tr></thead><tbody><tr><td>Storefront / hosting</td><td><strong>Next.js 16</strong> on <strong>Vercel</strong></td><td>Only app that holds secrets; UI; server actions; webhooks</td></tr>
-<tr><td>AI assistant</td><td><strong>OpenAI</strong> (optional, feature-flagged)</td><td>Store assistant — <strong>off</strong> until Legal decides on a DPA</td></tr>
-<tr><td>Drug reference</td><td><strong>Health Canada DPD</strong></td><td>Free public drug catalog — customer medication search</td></tr></tbody></table>
-<h3>Health Canada DPD — medication lookup</h3>
-<p>The <strong>Drug Product Database (DPD)</strong> is Health Canada’s <strong>free public API</strong> for licensed drugs in Canada — open government data, no API key, and no paid contract. Liivv uses it so customers can search by brand name and pick the right product when they add a prescription, instead of typing a DIN from memory.</p>
-<p>The browser never talks to Health Canada. Next.js proxies the search and rate-limits it. What the customer selects is saved on their <strong>prescription in Supabase</strong>. DPD is a lookup catalog only; it does not hold patient records.</p>
-<p>Care conversations live in Supabase. An on-site assistant (Olivia) can help with products, orders, and account questions <strong>when we turn it on</strong>. It is not a clinician. Human care-team chat in <code>/bc-app</code> stays in Supabase either way.</p>
+<h2>4. Trust boundary</h2>
+<p>The browser never receives service keys. Next.js on Vercel is the only secret holder.</p>
+<div class="mermaid">flowchart TB
+  subgraph Public["Public internet"]
+    Browser
+    StripeWH[Stripe webhook callers]
+    BCWH[BC webhook callers]
+  end
+
+  subgraph Edge["Vercel edge / Node runtime"]
+    Next[Next.js - sole secret holder]
+  end
+
+  subgraph SaaS["Third-party SaaS"]
+    BC[BigCommerce APIs]
+    SB[Supabase]
+    ST[Stripe]
+    AI[OpenAI]
+    DPD[Health Canada]
+  end
+
+  Browser -->|HTTPS HTML/JS - no service keys| Next
+  StripeWH -->|Signed payload| Next
+  BCWH -->|Bearer secret| Next
+  Next -->|TLS + API tokens| BC
+  Next -->|Service role key| SB
+  Next -->|Secret key| ST
+  Next -->|API key if bot on| AI
+  Next --> DPD</div>
+<p>Vercel is <strong>hosting</strong>, not a system of record. Secrets live in the Vercel project (encrypted) and gitignored <code>.env.local</code>.</p>
 <hr />
-<h2>3. What is health data vs shop data</h2>
-<p><strong>PHI</strong> is protected health information: data that identifies a person and says something about their health.</p>
-<p>Production intent is a <strong>paid Canadian Supabase project</strong>. HIPAA is a US statute; the Canadian frame is <strong>PIPEDA</strong> (and <strong>PHIPA</strong> in Ontario). Vendor extras help; staff access, retention, and keeping chat out of uncovered tools remain Liivv’s responsibility.</p>
-<table><thead><tr><th>Data class</th><th>Examples</th><th>Storage</th></tr></thead><tbody><tr><td>PII</td><td>Name, email, address, BC customer id</td><td>BigCommerce + Supabase <code>profiles</code></td></tr>
-<tr><td>PHI / PHI-adjacent</td><td>Health categories, insurance, Rx, CarePack, chat</td><td>Supabase</td></tr>
-<tr><td>Payment card data</td><td>PAN / CVC</td><td><strong>Never stored</strong> — Stripe Elements</td></tr>
-<tr><td>Commerce</td><td>Orders, SKUs, prices</td><td>BigCommerce (+ Stripe for billing)</td></tr></tbody></table>
+<h2>5. How the app talks to the database</h2>
+<p>The browser <strong>never</strong> opens Supabase.</p>
+<ol>
+<li>Customer or staff hits Next.js (public shop, <strong><code>/account/...</code> dashboard</strong>, or <code>/bc-app</code>).</li>
+<li>Next.js checks the session (Auth.js / BigCommerce customer, or BC signed load token for staff).</li>
+<li><strong>Only then</strong> the server uses <code>SUPABASE_URL</code> + <strong>service role</strong> (<a href="../core/lib/supabase/client.ts"><code>core/lib/supabase/client.ts</code></a> is <code>server-only</code>).</li>
+<li>Table access is server modules (profiles, health, insurance, prescriptions, chat) — not a connection string in JavaScript shipped to the shopper.</li>
+</ol>
+<p><strong>Row Level Security (RLS)</strong> is <strong>on</strong>, with <strong>no</strong> anon/authenticated policies (deny by default). That stops a stolen <strong>browser/anon</strong> path from reading tables. The <strong>service role bypasses RLS</strong> — same as Spark’s API using a privileged SQL login. RLS is not “Supabase cannot be hacked.”</p>
+<p>PHI forms are <strong>not</strong> on the homepage. Profile, health, insurance, pharmacy, and care chat are in the <strong>logged-in account dashboard</strong>.</p>
 <hr />
-<h2>4. How a visit works</h2>
-<p><strong>Shopping.</strong> The browser talks only to Next.js. Next.js reads the catalog and cart from BigCommerce GraphQL, then returns HTML. At checkout, Next.js creates a Stripe Payment Intent; the customer confirms with Stripe.js. After Stripe says the charge succeeded (webhook), Next.js creates the order in BigCommerce Admin REST and clears the cart. Recurring lines become Stripe subscriptions; later renewals still land as BigCommerce orders.</p>
-<p><strong>Health and pharmacy.</strong> After login, the customer works in their <strong>account dashboard</strong> (<code>/account/...</code>) — not on the homepage or other public shop pages. There they complete profile, health, and insurance. Next.js writes those rows to Supabase and may sync name/phone back to BigCommerce. To add a prescription (Pharmacy in the same dashboard), they search <strong>Health Canada DPD</strong> (free public drug API) for the brand, pick the product, and Liivv saves that medication on their prescription in <strong>Supabase</strong>. Transfer / fax / refill / CarePack requests are also Supabase rows. Staff approve and update them from <code>/bc-app</code>.</p>
-<p><strong>Care chat.</strong> In the same account dashboard, customer messages are stored in Supabase. Staff join and reply from <code>/bc-app</code>. The optional OpenAI bot is <strong>off</strong> until Legal signs a DPA; if it were on, message text would go to OpenAI even when the reply is “talk to a pharmacist.”</p>
-<hr />
-<h2>5. Who can do what</h2>
-<table><thead><tr><th>Who</th><th>How they get in</th><th>What they see</th></tr></thead><tbody><tr><td>Customer</td><td>BigCommerce login (Auth.js session)</td><td>Public shop pages; after login, account dashboard (health, insurance, pharmacy, chat)</td></tr>
+<h2>6. Identity and <code>/bc-app</code></h2>
+<table><thead><tr><th>Who</th><th>How they get in</th><th>What they see</th></tr></thead><tbody><tr><td>Customer</td><td>BigCommerce login (Auth.js session)</td><td>Public shop; after login, account dashboard</td></tr>
 <tr><td>Anonymous shopper</td><td>Signed cart cookie</td><td>Catalog and cart only</td></tr>
-<tr><td>Staff</td><td>BigCommerce app session inside the control panel</td><td>Pharmacy queue and care chat in <code>/bc-app</code></td></tr></tbody></table>
+<tr><td>Staff</td><td>BigCommerce control panel → <strong>Apps → My apps → Liivv Staff</strong></td><td>Pharmacy queue, customers, chat in <code>/bc-app</code></td></tr></tbody></table>
+<p><code>/bc-app</code> is <strong>one</strong> staff portal, loaded in the BC admin <strong>iframe</strong> with the <strong>signed-in load token</strong>. There is no separate Liivv staff password. <code>/staff</code> is 404. <code>/admin</code> only redirects to the BigCommerce control panel.</p>
+<p>Staff read and update <strong>Supabase</strong> (prescription / refill / CarePack queues, customer pharmacy detail, care chat) — not BigCommerce orders.</p>
+<p><strong>Entra SSO is not wired.</strong> Staff MFA, if any, is whatever the <strong>BigCommerce store</strong> has enabled (ops must confirm in the BC control panel).</p>
 <hr />
-<h2>6. Security posture (high level)</h2>
-<p>Engineering treats Next.js as the only place secrets live. A few controls that matter in conversation:</p>
-<ul>
-<li><strong>Row Level Security</strong> is on in Supabase, with no browser-facing database key. The server uses the service role.</li>
-<li>Health data stays in <strong>Canadian</strong> Supabase, not in BigCommerce.</li>
-<li>Staff access uses the <strong>BigCommerce signed-in token</strong> (app session in the control panel).</li>
-<li>The <strong>OpenAI assistant stays off</strong> until a DPA is in place.</li>
-<li>Secrets live in Vercel and gitignored <code>.env.local</code> — nothing privileged is committed.</li>
-<li>Stripe and BigCommerce <strong>webhooks are verified</strong>.</li>
-<li>Medication search is a <strong>server proxy</strong> to Health Canada’s free public DPD API, not an open relay. Chosen medications are stored on the prescription in Supabase.</li>
-</ul>
-<p>The numbered checklist (<strong>S1–S8</strong>), cookie names, secrets inventory, and code evidence paths live in the <a href="./Liivv-Architecture-Deep-Dive.md">deep dive</a>.</p>
+<h2>7. Health Canada DPD</h2>
+<p>The <strong>Drug Product Database</strong> is Health Canada’s <strong>free public API</strong> (open government data — no key, no paid contract). Customers search by brand when adding a prescription in the account dashboard. Next.js <strong>proxies</strong> the call (browser never talks to Health Canada). The <strong>prescription is stored in Supabase</strong>. DPD is a catalog only.</p>
+<p>Rate limit: <strong>60 requests / IP / minute</strong>, in memory <strong>per Vercel instance</strong> (not a global counter). See to address.</p>
 <hr />
-<p>*For sequence diagrams, systems of record, auth cookies, the S1–S8 table, and file paths, see <a href="./Liivv-Architecture-Deep-Dive.md">Liivv-Architecture-Deep-Dive.md</a>.*</p>
+<h2>8. Risks IT asked about</h2>
+<h3>In place — the app is designed against this</h3>
+<table><thead><tr><th>Concern</th><th>What the app does today</th></tr></thead><tbody><tr><td>Shopper or leaked page key reads everyone’s PHI</td><td>No database key in the browser. RLS deny-by-default. Server talks to Supabase only after a session check.</td></tr>
+<tr><td>Fake “payment succeeded” creates an order</td><td>Stripe webhook verified with <code>STRIPE_WEBHOOK_SECRET</code>.</td></tr>
+<tr><td>Fake BigCommerce product webhook</td><td><code>Authorization: Bearer</code> + <code>BIGCOMMERCE_WEBHOOK_SECRET</code>.</td></tr>
+<tr><td>Site used as an open pipe to Health Canada</td><td>Server proxy; 60/IP/min per instance.</td></tr>
+<tr><td>Staff portal is a public app with a shared password</td><td><code>/bc-app</code> + BC signed-in token. <code>/staff</code> is 404.</td></tr>
+<tr><td>Card numbers in our database</td><td>Stripe Elements. PAN / CVC never stored.</td></tr>
+<tr><td>PHI stored in BigCommerce</td><td>Health rows only in Canadian Supabase.</td></tr>
+<tr><td>Rx photo uploads as a dump of images</td><td>Not collected. Transfer or doctor fax only.</td></tr></tbody></table>
+<h3>Not in place — list so we can address (we do not have these)</h3>
+<table><thead><tr><th>ID</th><th>Gap</th><th>Today</th><th>Owner</th></tr></thead><tbody><tr><td>G1</td><td><strong>Entra SSO / MFA on Liivv</strong></td><td>BigCommerce identity only</td><td>Engineering (if required) + <strong>BC store admin</strong> to confirm store MFA</td></tr>
+<tr><td>G2</td><td><strong>Azure Key Vault</strong></td><td>Vercel env vars</td><td>Engineering / ops</td></tr>
+<tr><td>G3</td><td><strong>Separate Preview vs Production secrets</strong></td><td>Historically the <strong>same</strong> keys</td><td>Engineering / ops</td></tr>
+<tr><td>G4</td><td><strong>Azure API Management / dedicated WAF</strong></td><td>Vercel edge + Next.js routes</td><td>Engineering / IT if hosting standard requires APIM</td></tr>
+<tr><td>G5</td><td><strong>Veracode / Sonar / CrowdStrike</strong></td><td>Not in this repo’s pipeline</td><td>Engineering / IT</td></tr>
+<tr><td>G6</td><td><strong>Supabase network allowlist</strong> (Vercel egress only)</td><td><strong>Not configured.</strong> We rely on no browser key + RLS</td><td>Engineering</td></tr>
+<tr><td>G7</td><td><strong>Global DPD rate limit</strong></td><td>Per-instance memory, not one shared counter</td><td>Engineering</td></tr>
+<tr><td>G8</td><td><strong>Vendor DPAs / BAAs</strong></td><td>Not asserted here</td><td><strong>Legal</strong></td></tr>
+<tr><td>G9</td><td><strong>Backup / RPO</strong> for Supabase</td><td>No Liivv runbook in this pack</td><td><strong>Ops</strong> / Legal</td></tr>
+<tr><td>G10</td><td><strong>Chat-body logging policy</strong></td><td>Not claimed as enforced in code</td><td>Engineering + ops</td></tr>
+<tr><td>G11</td><td><strong>OpenAI assistant</strong></td><td>Flag <strong>off</strong>. Turning it on sends message text to OpenAI. Needs a <strong>DPA</strong> first</td><td>Product + Legal</td></tr>
+<tr><td>G12</td><td><strong>Makeswift</strong></td><td>Still in the codebase. CSP allowlists Makeswift <strong>only if</strong> <code>MAKESWIFT_SITE_API_KEY</code> is set</td><td>Engineering</td></tr></tbody></table>
+<hr />
+<h2>9. Other systems (short)</h2>
+<p><strong>BigCommerce</strong> is the only store engine: catalog, cart, checkout, official order, customer login, most email. Recurring: Stripe bills; Liivv still creates the order in BigCommerce.</p>
+<p><strong>OpenAI</strong> (Olivia) is <strong>off</strong> (<code>VIRTUAL_CARE_BOT_ENABLED</code>). Human care chat stays in Supabase via <code>/bc-app</code>.</p>
+<hr />
+<h2>10. System context</h2>
+<div class="mermaid">flowchart LR
+  subgraph Clients
+    C[Customer Browser]
+    S["Staff (BC control panel to /bc-app)"]
+  end
+
+  subgraph Hub["Next.js 16 - Catalyst on Vercel"]
+    N[App Router / Server Actions / API Routes]
+  end
+
+  subgraph Commerce
+    BCG[BC Storefront GraphQL]
+    BCA[BC Admin REST]
+    BCO[BC App OAuth]
+  end
+
+  subgraph Data
+    SB[(Supabase Postgres)]
+    KV[(Vercel runtime cache)]
+  end
+
+  subgraph Payments
+    STK[Stripe API]
+    STW[Stripe Webhooks]
+  end
+
+  subgraph Other
+    AI[OpenAI]
+    DPD[Health Canada DPD]
+  end
+
+  C --> N
+  S --> N
+  N --> BCG
+  N --> BCA
+  N --> BCO
+  N --> SB
+  N --> KV
+  N --> STK
+  N --> AI
+  N --> DPD
+  STW --> N
+  BCG -.->|product webhooks| N</div>
+<hr />
+<h2>11. Data flows</h2>
+<h3>Commerce</h3>
+<div class="mermaid">sequenceDiagram
+  participant U as Browser
+  participant N as Next.js
+  participant BC as BigCommerce
+  participant KV as Runtime cache
+  participant ST as Stripe
+  participant SB as Supabase
+
+  U->>N: Browse / PDP
+  N->>BC: Storefront GraphQL
+  BC-->>N: Product data
+  N-->>U: RSC HTML
+
+  U->>N: Add to cart / update
+  N->>BC: Cart mutations
+  opt Subscription line
+    N->>SB: cart_subscription_lines
+  end
+
+  U->>N: Start checkout
+  N->>KV: Store checkout snapshot
+  N->>ST: Create Payment/Setup Intent
+  N-->>U: Client secret
+  U->>ST: Confirm (Stripe.js)
+
+  ST->>N: Webhook payment_intent.succeeded
+  N->>BC: Admin REST create order
+  N->>BC: Clear cart
+  opt Recurring items
+    N->>ST: Create subscriptions
+  end</div>
+<h3>Account dashboard — onboarding and pharmacy</h3>
+<div class="mermaid">sequenceDiagram
+  participant U as Logged-in customer (account dashboard)
+  participant N as Next.js server actions
+  participant BC as BigCommerce Admin
+  participant SB as Supabase
+  participant DPD as Health Canada DPD
+
+  U->>N: Complete profile / health / insurance (account, not public pages)
+  N->>SB: upsert profiles, health_profiles, insurance_info
+  N->>BC: Optional name/phone sync
+
+  U->>N: Search medication (brand name)
+  N->>DPD: GET public drug API (rate-limited)
+  DPD-->>N: Brand / DIN / ingredients
+  N-->>U: Results
+  U->>N: Add selected drug to prescription
+  N->>SB: prescriptions
+
+  U->>N: Transfer Rx / fax template / refill / CarePack
+  N->>SB: prescriptions / refill_requests / carepack_requests
+
+  participant Staff as Staff (BC control panel)
+  Staff->>N: Approve / update status
+  N->>SB: Update pharmacy rows</div>
+<h3>Care chat</h3>
+<div class="mermaid">sequenceDiagram
+  participant U as Customer widget
+  participant N as Next.js
+  participant SB as Supabase
+  participant AI as OpenAI
+  participant Staff as Staff (BC control panel)
+
+  U->>N: Send message
+  N->>SB: append chat_messages
+  alt Bot enabled and care team not active
+    N->>AI: Chat Completions + tools
+    AI-->>N: Reply or escalate
+    N->>SB: bot message, maybe escalate flag
+  end
+  Staff->>N: Join / reply / close
+  N->>SB: staff messages, pause bot while staff active
+  Note over U,N: UI polls for new messages (not Realtime yet)</div>
+<hr />
+<h2>12. Controls S1–S8</h2>
+<p>Gaps Spark has and we do not are in <strong>§8</strong>, not dressed as “in place.”</p>
+<table><thead><tr><th>ID</th><th>Topic</th><th>If left unchecked</th><th>Status</th><th>Control</th></tr></thead><tbody><tr><td><strong>S1</strong></td><td>Who can query Supabase</td><td>High</td><td><strong>In place</strong></td><td>RLS on; <strong>no</strong> anon/authenticated policies. No DB key in the browser. Service role on the server bypasses RLS by design. Network allowlist is <strong>G6</strong>.</td></tr>
+<tr><td><strong>S2</strong></td><td>Where health data lives</td><td>High</td><td><strong>In place</strong></td><td>PHI in <strong>Canadian</strong> Supabase. Transfer or fax only. DPA/BAA is <strong>G8</strong>.</td></tr>
+<tr><td><strong>S3</strong></td><td>Staff access</td><td>Med</td><td><strong>In place</strong></td><td><code>/bc-app</code> + signed-in load token. <code>/staff</code> is 404. Entra is <strong>G1</strong>.</td></tr>
+<tr><td><strong>S4</strong></td><td>AI chat assistant</td><td>Med</td><td><strong>Off</strong></td><td><code>VIRTUAL_CARE_BOT_ENABLED=false</code>. DPA before on is <strong>G11</strong>.</td></tr>
+<tr><td><strong>S5</strong></td><td>Environment secrets</td><td>Med</td><td><strong>Partial</strong></td><td>Vercel env + gitignored <code>.env.local</code>. Not Key Vault (<strong>G2</strong>). Preview/Production keys historically matched (<strong>G3</strong>).</td></tr>
+<tr><td><strong>S6</strong></td><td>Embedded staff app frames</td><td>Med</td><td><strong>In place</strong></td><td>iframe cookies <code>SameSite=None; Secure</code>. CSP allowlisted. Makeswift only if API key set (<strong>G12</strong>).</td></tr>
+<tr><td><strong>S7</strong></td><td>Customer email</td><td>Low</td><td><strong>In place</strong></td><td>BigCommerce transactional mail.</td></tr>
+<tr><td><strong>S8</strong></td><td>Medication search (DPD)</td><td>Low</td><td><strong>Partial</strong></td><td>Server proxy. 60/IP/min <strong>per instance</strong> (<strong>G7</strong>).</td></tr></tbody></table>
+<p>Also: webhooks verified; BC app session bound to store hash; cart ID in a signed JWT.</p>
+<hr />
+<h2>13. Auth cookies and secrets</h2>
+<table><thead><tr><th>Plane</th><th>Mechanism</th><th>Cookie</th><th>Secret</th><th>Path / lifetime</th></tr></thead><tbody><tr><td>Customer</td><td>NextAuth → BC GraphQL login or Customer Login JWT</td><td>Auth.js session JWT</td><td><code>AUTH_SECRET</code></td><td>Site-wide</td></tr>
+<tr><td>Anonymous cart</td><td>Signed JWT containing <code>cartId</code></td><td><code>authjs.anonymous-session-token</code></td><td><code>AUTH_SECRET</code></td><td>7 days</td></tr>
+<tr><td>Staff (BC app)</td><td>OAuth install + signed load</td><td><code>liivv_bc_app</code></td><td><code>BIGCOMMERCE_APP_CLIENT_SECRET</code></td><td><code>/bc-app</code>, 12 hours</td></tr></tbody></table>
+<p><strong>Webhooks:</strong> Stripe <code>constructEvent</code> + <code>STRIPE_WEBHOOK_SECRET</code>. BigCommerce <code>Authorization: Bearer</code> + <code>BIGCOMMERCE_WEBHOOK_SECRET</code>.</p>
+<table><thead><tr><th>Secret</th><th>Purpose</th></tr></thead><tbody><tr><td><code>AUTH_SECRET</code></td><td>Auth.js + anonymous cart JWT</td></tr>
+<tr><td><code>BIGCOMMERCE_STOREFRONT_TOKEN</code></td><td>Storefront GraphQL</td></tr>
+<tr><td><code>BIGCOMMERCE_ACCESS_TOKEN</code></td><td>Admin REST (orders, customers)</td></tr>
+<tr><td><code>BIGCOMMERCE_CLIENT_ID</code> / <code>CLIENT_SECRET</code></td><td>Customer Login API JWT</td></tr>
+<tr><td><code>BIGCOMMERCE_WEBHOOK_SECRET</code></td><td>Product → Stripe sync</td></tr>
+<tr><td><code>BIGCOMMERCE_APP_CLIENT_ID</code> / <code>SECRET</code></td><td>Embedded staff app</td></tr>
+<tr><td><code>STRIPE_SECRET_KEY</code> / <code>STRIPE_WEBHOOK_SECRET</code></td><td>Payments</td></tr>
+<tr><td><code>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</code></td><td><strong>Public</strong> — Stripe.js only</td></tr>
+<tr><td><code>SUPABASE_URL</code> / <code>SUPABASE_SERVICE_ROLE_KEY</code></td><td>DB (bypasses RLS)</td></tr>
+<tr><td><code>OPENAI_API_KEY</code></td><td>Bot unused while flag is off</td></tr>
+<tr><td><code>MAKESWIFT_SITE_API_KEY</code></td><td>Leftover — if set, CSP allowlists Makeswift</td></tr></tbody></table>
+<hr />
+<h2>14. Evidence paths (code)</h2>
+<pre class="code"><code>core/package.json
+.env.example
+core/auth/index.ts
+core/lib/supabase/client.ts
+core/lib/supabase/onboarding-schema.sql
+core/lib/supabase/pharmacy-schema.sql
+core/lib/bc-app-session.ts
+core/lib/staff-access.ts
+core/lib/content-security-policy.ts
+core/lib/pharmacy/medication-rate-limit.ts
+core/lib/stripe/webhook-handlers.ts
+core/lib/virtual-care-bot/
+core/app/api/medications/
+core/app/api/stripe/webhook/route.ts
+core/app/api/bigcommerce/webhook/route.ts
+core/app/api/bigcommerce/app/{auth,load,uninstall}/route.ts
+core/app/bc-app/</code></pre>
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
   mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'strict' });
