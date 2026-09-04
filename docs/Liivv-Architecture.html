@@ -103,18 +103,18 @@
     SAST[Veracode Sonar CrowdStrike]
   end
 
-  Shoppers --> UI
-  Shoppers --> Account
-  Staff --> StaffApp
-  BCCust --> Shoppers
-  BCStaffTok --> Staff
-  VercelDeploy --> Next
-  VercelEnv --> Next
-  VercelLogs --> Next
-  Routes --> BC
-  Routes --> SB
-  Routes --> Stripe
-  Routes --> DPD
+  Shoppers -->|HTTPS - no DB keys in browser| UI
+  Shoppers -->|HTTPS + BC login session| Account
+  Staff -->|HTTPS iframe + signed load token| StaffApp
+  BCCust -->|BC customer session cookie| Shoppers
+  BCStaffTok -->|signed-in staff token - not a shared password| Staff
+  VercelDeploy -->|GitHub to Vercel deploy| Next
+  VercelEnv -->|encrypted env - server only| Next
+  VercelLogs -.->|ops logs - not a data path| Next
+  Routes -->|TLS + API tokens - server only| BC
+  Routes -->|TLS + service role - server only| SB
+  Routes -->|TLS + secret - PAN never stored| Stripe
+  Routes -->|TLS public catalog - no PHI sent| DPD
 
   classDef actor fill:#DBEAFE,stroke:#1D4ED8,color:#1E3A8A
   classDef pipeline fill:#DCFCE7,stroke:#15803D,color:#14532D
@@ -143,6 +143,7 @@
   style stores fill:#FFF7ED,stroke:#C2410C,color:#7C2D12
   style missing fill:#FEF2F2,stroke:#B91C1C,color:#7F1D1D,stroke-dasharray: 6 4</div>
 <p><strong>Color:</strong> blue = people · green = CI/CD · teal = Next.js app · purple = identity · amber = secrets · gray = logging · orange = data · red dashed = Spark boxes we do <strong>not</strong> have.</p>
+<p><strong>Arrows:</strong> the text on each hop is how that path is protected (HTTPS/TLS, login or load token, server-only secrets). The browser never holds the database or payment secret.</p>
 <p><strong>How to read it vs Spark:</strong> Spark splits <strong>web app</strong>, <strong>API gateway</strong>, and <strong>backend services</strong>. Liivv is <strong>one</strong> Next.js process: the page, the API, and the only talker to SQL/vendors. Spark’s SQL sits <strong>inside Azure</strong>. Ours sits at <strong>vendors</strong> (Supabase, BigCommerce, Stripe). Identity is <strong>BigCommerce</strong>, not Entra.</p>
 <table><thead><tr><th>Spark box</th><th>Liivv today</th><th>Status</th></tr></thead><tbody><tr><td>Web app</td><td>Next.js 16 on <strong>Vercel</strong> (HTML, account dashboard, <code>/bc-app</code>)</td><td><strong>Have</strong></td></tr>
 <tr><td>API gateway</td><td><strong>No Azure APIM.</strong> Next.js server actions and <code>/api/*</code> are the public API (auth, rate limit, webhook verify)</td><td><strong>Equivalent (app layer)</strong> — not a dedicated gateway product</td></tr>
@@ -197,7 +198,6 @@
     BC[BigCommerce APIs]
     SB[Supabase]
     ST[Stripe]
-    AI[OpenAI]
     DPD[Health Canada]
   end
 
@@ -207,7 +207,6 @@
   Next -->|TLS + API tokens| BC
   Next -->|Service role key| SB
   Next -->|Secret key| ST
-  Next -->|API key if bot on| AI
   Next --> DPD</div>
 <p>Vercel is <strong>hosting</strong>, not a system of record. Secrets live in the Vercel project (encrypted) and gitignored <code>.env.local</code>.</p>
 <hr />
@@ -255,12 +254,12 @@
 <tr><td>G8</td><td><strong>Vendor DPAs / BAAs</strong></td><td>Not asserted here</td><td><strong>Legal</strong></td></tr>
 <tr><td>G9</td><td><strong>Backup / RPO</strong> for Supabase</td><td>No Liivv runbook in this pack</td><td><strong>Ops</strong> / Legal</td></tr>
 <tr><td>G10</td><td><strong>Chat-body logging policy</strong></td><td>Not claimed as enforced in code</td><td>Engineering + ops</td></tr>
-<tr><td>G11</td><td><strong>OpenAI assistant</strong></td><td>Flag <strong>off</strong>. Turning it on sends message text to OpenAI. Needs a <strong>DPA</strong> first</td><td>Product + Legal</td></tr>
+<tr><td>G11</td><td><strong>AI chat assistant</strong></td><td>Flag <strong>off</strong>. Not active in production</td><td>Product + Legal</td></tr>
 <tr><td>G12</td><td><strong>Makeswift</strong></td><td>Still in the codebase. CSP allowlists Makeswift <strong>only if</strong> <code>MAKESWIFT_SITE_API_KEY</code> is set</td><td>Engineering</td></tr></tbody></table>
 <hr />
 <h2>9. Other systems (short)</h2>
 <p><strong>BigCommerce</strong> is the only store engine: catalog, cart, checkout, official order, customer login, most email. Recurring: Stripe bills; Liivv still creates the order in BigCommerce.</p>
-<p><strong>OpenAI</strong> (Olivia) is <strong>off</strong> (<code>VIRTUAL_CARE_BOT_ENABLED</code>). Human care chat stays in Supabase via <code>/bc-app</code>.</p>
+<p><strong>AI chat assistant</strong> (Olivia) is <strong>off</strong> (<code>VIRTUAL_CARE_BOT_ENABLED</code>). Human care chat stays in Supabase via <code>/bc-app</code>.</p>
 <hr />
 <h2>10. System context</h2>
 <div class="mermaid">flowchart LR
@@ -290,7 +289,6 @@
   end
 
   subgraph Other
-    AI[OpenAI]
     DPD[Health Canada DPD]
   end
 
@@ -302,7 +300,6 @@
   N --> SB
   N --> KV
   N --> STK
-  N --> AI
   N --> DPD
   STW --> N
   BCG -.->|product webhooks| N</div>
@@ -370,18 +367,12 @@
   participant U as Customer widget
   participant N as Next.js
   participant SB as Supabase
-  participant AI as OpenAI
   participant Staff as Staff (BC control panel)
 
   U->>N: Send message
   N->>SB: append chat_messages
-  alt Bot enabled and care team not active
-    N->>AI: Chat Completions + tools
-    AI-->>N: Reply or escalate
-    N->>SB: bot message, maybe escalate flag
-  end
   Staff->>N: Join / reply / close
-  N->>SB: staff messages, pause bot while staff active
+  N->>SB: staff messages
   Note over U,N: UI polls for new messages (not Realtime yet)</div>
 <hr />
 <h2>12. Controls S1–S8</h2>
@@ -389,7 +380,7 @@
 <table><thead><tr><th>ID</th><th>Topic</th><th>If left unchecked</th><th>Status</th><th>Control</th></tr></thead><tbody><tr><td><strong>S1</strong></td><td>Who can query Supabase</td><td>High</td><td><strong>In place</strong></td><td>RLS on; <strong>no</strong> anon/authenticated policies. No DB key in the browser. Service role on the server bypasses RLS by design. Network allowlist is <strong>G6</strong>.</td></tr>
 <tr><td><strong>S2</strong></td><td>Where health data lives</td><td>High</td><td><strong>In place</strong></td><td>PHI in <strong>Canadian</strong> Supabase. Transfer or fax only. DPA/BAA is <strong>G8</strong>.</td></tr>
 <tr><td><strong>S3</strong></td><td>Staff access</td><td>Med</td><td><strong>In place</strong></td><td><code>/bc-app</code> + signed-in load token. <code>/staff</code> is 404. Entra is <strong>G1</strong>.</td></tr>
-<tr><td><strong>S4</strong></td><td>AI chat assistant</td><td>Med</td><td><strong>Off</strong></td><td><code>VIRTUAL_CARE_BOT_ENABLED=false</code>. DPA before on is <strong>G11</strong>.</td></tr>
+<tr><td><strong>S4</strong></td><td>AI chat assistant</td><td>Med</td><td><strong>Off</strong></td><td><code>VIRTUAL_CARE_BOT_ENABLED=false</code>. Not active in production.</td></tr>
 <tr><td><strong>S5</strong></td><td>Environment secrets</td><td>Med</td><td><strong>Partial</strong></td><td>Vercel env + gitignored <code>.env.local</code>. Not Key Vault (<strong>G2</strong>). Preview/Production keys historically matched (<strong>G3</strong>).</td></tr>
 <tr><td><strong>S6</strong></td><td>Embedded staff app frames</td><td>Med</td><td><strong>In place</strong></td><td>iframe cookies <code>SameSite=None; Secure</code>. CSP allowlisted. Makeswift only if API key set (<strong>G12</strong>).</td></tr>
 <tr><td><strong>S7</strong></td><td>Customer email</td><td>Low</td><td><strong>In place</strong></td><td>BigCommerce transactional mail.</td></tr>
@@ -410,7 +401,6 @@
 <tr><td><code>STRIPE_SECRET_KEY</code> / <code>STRIPE_WEBHOOK_SECRET</code></td><td>Payments</td></tr>
 <tr><td><code>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</code></td><td><strong>Public</strong> — Stripe.js only</td></tr>
 <tr><td><code>SUPABASE_URL</code> / <code>SUPABASE_SERVICE_ROLE_KEY</code></td><td>DB (bypasses RLS)</td></tr>
-<tr><td><code>OPENAI_API_KEY</code></td><td>Bot unused while flag is off</td></tr>
 <tr><td><code>MAKESWIFT_SITE_API_KEY</code></td><td>Leftover — if set, CSP allowlists Makeswift</td></tr></tbody></table>
 <hr />
 <h2>14. Evidence paths (code)</h2>

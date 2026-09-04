@@ -81,18 +81,18 @@ flowchart TB
     SAST[Veracode Sonar CrowdStrike]
   end
 
-  Shoppers --> UI
-  Shoppers --> Account
-  Staff --> StaffApp
-  BCCust --> Shoppers
-  BCStaffTok --> Staff
-  VercelDeploy --> Next
-  VercelEnv --> Next
-  VercelLogs --> Next
-  Routes --> BC
-  Routes --> SB
-  Routes --> Stripe
-  Routes --> DPD
+  Shoppers -->|HTTPS - no DB keys in browser| UI
+  Shoppers -->|HTTPS + BC login session| Account
+  Staff -->|HTTPS iframe + signed load token| StaffApp
+  BCCust -->|BC customer session cookie| Shoppers
+  BCStaffTok -->|signed-in staff token - not a shared password| Staff
+  VercelDeploy -->|GitHub to Vercel deploy| Next
+  VercelEnv -->|encrypted env - server only| Next
+  VercelLogs -.->|ops logs - not a data path| Next
+  Routes -->|TLS + API tokens - server only| BC
+  Routes -->|TLS + service role - server only| SB
+  Routes -->|TLS + secret - PAN never stored| Stripe
+  Routes -->|TLS public catalog - no PHI sent| DPD
 
   classDef actor fill:#DBEAFE,stroke:#1D4ED8,color:#1E3A8A
   classDef pipeline fill:#DCFCE7,stroke:#15803D,color:#14532D
@@ -123,6 +123,8 @@ flowchart TB
 ```
 
 **Color:** blue = people · green = CI/CD · teal = Next.js app · purple = identity · amber = secrets · gray = logging · orange = data · red dashed = Spark boxes we do **not** have.
+
+**Arrows:** the text on each hop is how that path is protected (HTTPS/TLS, login or load token, server-only secrets). The browser never holds the database or payment secret.
 
 **How to read it vs Spark:** Spark splits **web app**, **API gateway**, and **backend services**. Liivv is **one** Next.js process: the page, the API, and the only talker to SQL/vendors. Spark’s SQL sits **inside Azure**. Ours sits at **vendors** (Supabase, BigCommerce, Stripe). Identity is **BigCommerce**, not Entra.
 
@@ -198,7 +200,6 @@ flowchart TB
     BC[BigCommerce APIs]
     SB[Supabase]
     ST[Stripe]
-    AI[OpenAI]
     DPD[Health Canada]
   end
 
@@ -208,7 +209,6 @@ flowchart TB
   Next -->|TLS + API tokens| BC
   Next -->|Service role key| SB
   Next -->|Secret key| ST
-  Next -->|API key if bot on| AI
   Next --> DPD
 ```
 
@@ -284,7 +284,7 @@ Rate limit: **60 requests / IP / minute**, in memory **per Vercel instance** (no
 | G8 | **Vendor DPAs / BAAs** | Not asserted here | **Legal** |
 | G9 | **Backup / RPO** for Supabase | No Liivv runbook in this pack | **Ops** / Legal |
 | G10 | **Chat-body logging policy** | Not claimed as enforced in code | Engineering + ops |
-| G11 | **OpenAI assistant** | Flag **off**. Turning it on sends message text to OpenAI. Needs a **DPA** first | Product + Legal |
+| G11 | **AI chat assistant** | Flag **off**. Not active in production | Product + Legal |
 | G12 | **Makeswift** | Still in the codebase. CSP allowlists Makeswift **only if** `MAKESWIFT_SITE_API_KEY` is set | Engineering |
 
 ---
@@ -293,7 +293,7 @@ Rate limit: **60 requests / IP / minute**, in memory **per Vercel instance** (no
 
 **BigCommerce** is the only store engine: catalog, cart, checkout, official order, customer login, most email. Recurring: Stripe bills; Liivv still creates the order in BigCommerce.
 
-**OpenAI** (Olivia) is **off** (`VIRTUAL_CARE_BOT_ENABLED`). Human care chat stays in Supabase via `/bc-app`.
+**AI chat assistant** (Olivia) is **off** (`VIRTUAL_CARE_BOT_ENABLED`). Human care chat stays in Supabase via `/bc-app`.
 
 ---
 
@@ -327,7 +327,6 @@ flowchart LR
   end
 
   subgraph Other
-    AI[OpenAI]
     DPD[Health Canada DPD]
   end
 
@@ -339,7 +338,6 @@ flowchart LR
   N --> SB
   N --> KV
   N --> STK
-  N --> AI
   N --> DPD
   STW --> N
   BCG -.->|product webhooks| N
@@ -421,18 +419,12 @@ sequenceDiagram
   participant U as Customer widget
   participant N as Next.js
   participant SB as Supabase
-  participant AI as OpenAI
   participant Staff as Staff (BC control panel)
 
   U->>N: Send message
   N->>SB: append chat_messages
-  alt Bot enabled and care team not active
-    N->>AI: Chat Completions + tools
-    AI-->>N: Reply or escalate
-    N->>SB: bot message, maybe escalate flag
-  end
   Staff->>N: Join / reply / close
-  N->>SB: staff messages, pause bot while staff active
+  N->>SB: staff messages
   Note over U,N: UI polls for new messages (not Realtime yet)
 ```
 
@@ -447,7 +439,7 @@ Gaps Spark has and we do not are in **§8**, not dressed as “in place.”
 | **S1** | Who can query Supabase | High | **In place** | RLS on; **no** anon/authenticated policies. No DB key in the browser. Service role on the server bypasses RLS by design. Network allowlist is **G6**. |
 | **S2** | Where health data lives | High | **In place** | PHI in **Canadian** Supabase. Transfer or fax only. DPA/BAA is **G8**. |
 | **S3** | Staff access | Med | **In place** | `/bc-app` + signed-in load token. `/staff` is 404. Entra is **G1**. |
-| **S4** | AI chat assistant | Med | **Off** | `VIRTUAL_CARE_BOT_ENABLED=false`. DPA before on is **G11**. |
+| **S4** | AI chat assistant | Med | **Off** | `VIRTUAL_CARE_BOT_ENABLED=false`. Not active in production. |
 | **S5** | Environment secrets | Med | **Partial** | Vercel env + gitignored `.env.local`. Not Key Vault (**G2**). Preview/Production keys historically matched (**G3**). |
 | **S6** | Embedded staff app frames | Med | **In place** | iframe cookies `SameSite=None; Secure`. CSP allowlisted. Makeswift only if API key set (**G12**). |
 | **S7** | Customer email | Low | **In place** | BigCommerce transactional mail. |
@@ -478,7 +470,6 @@ Also: webhooks verified; BC app session bound to store hash; cart ID in a signed
 | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | Payments |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | **Public** — Stripe.js only |
 | `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | DB (bypasses RLS) |
-| `OPENAI_API_KEY` | Bot unused while flag is off |
 | `MAKESWIFT_SITE_API_KEY` | Leftover — if set, CSP allowlists Makeswift |
 
 ---
