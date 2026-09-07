@@ -169,59 +169,59 @@ export const CHAPTER_META: ChapterMeta[] = [
     categories: [
       {
         image: `${IMG}/chapter-stoma.png`,
-        group: 'startHere',
+        group: 'stomaTypes',
         ask: 'nswoc',
       },
       {
         image: `${IMG}/door-chapters.png`,
-        group: 'startHere',
+        group: 'stomaTypes',
         ask: 'team',
       },
       {
         image: `${IMG}/care-chat-desk.png`,
-        group: 'startHere',
+        group: 'theWords',
       },
       {
         image: `${IMG}/door-shop.png`,
-        group: 'theBasics',
+        group: 'pouchingSystem',
         ask: 'nswoc',
         products: [4441, 4691, 4583],
       },
       {
         image: `${IMG}/door-care.png`,
-        group: 'theBasics',
+        group: 'skinFit',
         ask: 'nswoc',
         products: [4610, 4531, 4890],
       },
       {
         image: `${IMG}/door-chapters.png`,
-        group: 'theBasics',
+        group: 'skinFit',
         ask: 'nswoc',
       },
       {
         image: `${IMG}/care-chat-desk.png`,
-        group: 'theBasics',
+        group: 'skinFit',
         ask: 'nswoc',
       },
       {
         image: `${IMG}/care-chat-moment.png`,
-        group: 'theBasics',
+        group: 'skinFit',
         ask: 'nswoc',
       },
       {
         image: `${IMG}/care-chat-desk.png`,
-        group: 'theBasics',
+        group: 'skinFit',
         ask: 'nswoc',
       },
       {
         image: `${IMG}/door-shop.png`,
-        group: 'choosingASystem',
+        group: 'pouchingSystem',
         ask: 'nswoc',
         products: [4441, 4891, 4361],
       },
       {
         image: `${IMG}/door-care.png`,
-        group: 'choosingASystem',
+        group: 'convexity',
         ask: 'assessment',
       },
       {
@@ -237,7 +237,7 @@ export const CHAPTER_META: ChapterMeta[] = [
       },
       {
         image: `${IMG}/care-chat-moment.png`,
-        group: 'keepChecking',
+        group: 'whenSomethingIsNotRight',
         ask: 'nswoc',
       },
       {

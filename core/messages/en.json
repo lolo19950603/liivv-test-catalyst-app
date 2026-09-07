@@ -1429,7 +1429,7 @@
         "categoriesIntro": {
           "eyebrow": "First chapters",
           "heading": "You are not supposed to know everything yet",
-          "body": "This chapter covers both sides of the operation. If surgery is still ahead of you, start at the top. If you are already home, skip to First Week Basics — nothing above it will be news."
+          "body": "This chapter covers both sides of the operation. Pictures and a short practice sit in each half. If surgery is still ahead, start at the top. If you are already home, skip to After surgery."
         },
         "categories": {
           "1": {
@@ -1566,7 +1566,7 @@
         "categoriesIntro": {
           "eyebrow": "Understanding without overwhelm",
           "heading": "Know your setup",
-          "body": "A pouching system is a skin barrier (wafer/flange) plus a pouch. Fit and skin health drive comfort more than anything else."
+          "body": "Pictures first, then a few bullets, then a small practice if you want it. Start with the lesson that matches today — the rest will wait."
         },
         "categories": {
           "1": {
@@ -1959,7 +1959,7 @@
         "categoriesIntro": {
           "eyebrow": "You are not doing this alone",
           "heading": "What exists, and who it is for",
-          "body": "Two halves. The first is your own body settling into a routine — what you eat, what comes out, and what changes. The second is everything around it: the money, the travel, and the help that exists in Canada but is almost never in one place. Most of that half links out, because those organizations do it better than we could."
+          "body": "Two halves. The first is your own body settling into a routine — what you eat, what comes out, and what changes. The second is everything around it in Canada. Pictures and a couple of packing games sit in the practical half. Most of that half also links out, because those organizations do it better than we could."
         },
         "categories": {
           "1": {
@@ -2302,7 +2302,7 @@
         "categoriesIntro": {
           "eyebrow": "Not everyone the same",
           "heading": "The general advice is not wrong, it is just not enough",
-          "body": "Most ostomy information is written for an average adult who does not exist. These are the situations where the differences are big enough to matter, and where the right move is usually a specific referral rather than a longer article."
+          "body": "Most ostomy information is written for an average adult who does not exist. Pick the doorway that is yours. These are the situations where the differences are big enough to matter, and where the right move is usually a specific referral rather than a longer article."
         },
         "categories": {
           "1": {
@@ -2664,7 +2664,186 @@
           "practicalCanada": "Practical Canada",
           "growingUp": "Growing up",
           "bodiesThatChange": "Bodies that change",
-          "thePeopleAroundIt": "The people around it"
+          "thePeopleAroundIt": "The people around it",
+          "stomaTypes": "What kind of stoma",
+          "theWords": "Words you will hear",
+          "pouchingSystem": "How a system works",
+          "skinFit": "Skin, measuring, output",
+          "convexity": "Flat or convex"
+        },
+        "learn": {
+          "pathLabel": "Jump to a lesson",
+          "thirtySeconds": "The 30-second version",
+          "wantDetail": "Want the detail",
+          "hideDetail": "Hide the extra detail",
+          "practice": "This is practice, not medical advice.",
+          "skip": "Skip for now",
+          "skipped": "Skipped — the reading above is the whole lesson.",
+          "playAnyway": "Play this",
+          "playAgain": "Play again",
+          "almost": "Almost — look at the picture again.",
+          "done": "Nice. You can keep reading.",
+          "nextRound": "Next",
+          "finish": "That's it",
+          "putHere": "Put it here",
+          "pickOneFirst": "Pick one above first",
+          "keepGoing": "Add the rest of the usuals",
+          "allLessons": "This chapter"
+        },
+        "games": {
+          "beforeAfter": {
+            "title": "Try this",
+            "prompt": "Does this belong before surgery, or after you are home?",
+            "before": "Before surgery",
+            "after": "After surgery",
+            "items": {
+              "siting": "Ask for stoma siting",
+              "questions": "Write down questions to take in",
+              "pack": "Pack loose, high-waisted clothes",
+              "fatigue": "Fatigue is part of recovery",
+              "measure": "Re-measure as swelling changes",
+              "gobag": "Pack a go-bag for outings"
+            }
+          },
+          "goBag": {
+            "title": "Pack a go-bag",
+            "prompt": "Tap what belongs in a day-one go-bag.",
+            "bag": "In the bag",
+            "items": {
+              "barrier": "Spare barrier",
+              "pouch": "Spare pouch",
+              "wipes": "Soft wipes",
+              "disposal": "Disposal bags",
+              "underwear": "Spare underwear or liner",
+              "dryer": "Hair dryer",
+              "lotion": "Fragranced lotion"
+            },
+            "oops": {
+              "dryer": "Skip the hair dryer — extra heat can damage adhesive, and the stoma cannot warn you.",
+              "lotion": "Oils and lotion belong nowhere under a barrier."
+            }
+          },
+          "whichStoma": {
+            "title": "Which stoma?",
+            "prompt": "Match the description to the picture you just saw.",
+            "rounds": {
+              "thicker": "Usually thicker output, more like stool.",
+              "fluid": "Looser output — fluid and salt matter more.",
+              "urine": "This one diverts urine, not stool."
+            },
+            "options": {
+              "colostomy": "Colostomy",
+              "ileostomy": "Ileostomy",
+              "urostomy": "Urostomy"
+            }
+          },
+          "wordMatch": {
+            "title": "The words",
+            "prompt": "Flip two cards. Match the word to what it means.",
+            "barrierA": "Barrier",
+            "barrierB": "The part that sticks",
+            "pouchA": "Pouch",
+            "pouchB": "Where output lands",
+            "outputA": "Output",
+            "outputB": "What comes out",
+            "nswocA": "NSWOC",
+            "nswocB": "The specialist nurse"
+          },
+          "buildSystem": {
+            "title": "Build the system",
+            "prompt": "A pouching system is only a few parts. Tap the one that fits.",
+            "rounds": {
+              "skin": "Which part sticks to your skin?",
+              "lands": "Where does output land?",
+              "twoPiece": "On a two-piece, what stays put while you change the pouch?",
+              "onePiece": "What is true of a one-piece?"
+            },
+            "options": {
+              "barrier": "The barrier",
+              "pouch": "The pouch",
+              "filter": "The filter",
+              "stays": "The barrier stays",
+              "bothGo": "Both come off every time",
+              "pouchStays": "Only the pouch stays",
+              "joined": "Barrier and pouch are joined",
+              "clicks": "The pouch clicks onto a ring",
+              "noBarrier": "There is no barrier"
+            }
+          },
+          "measureFit": {
+            "title": "Too big, too small, just right",
+            "prompt": "The opening should sit close to the stoma edge.",
+            "rounds": {
+              "protect": "Which opening protects the skin around the stoma?",
+              "when": "When should you re-measure?"
+            },
+            "options": {
+              "large": "A larger opening, for comfort",
+              "close": "Close to the edge",
+              "small": "Smaller than the stoma",
+              "once": "Once, in hospital",
+              "months": "For the first months, and after weight change",
+              "never": "Never — the first size is the size"
+            }
+          },
+          "accessoryJobs": {
+            "title": "What does this actually do?",
+            "prompt": "Each accessory has a job. None of them fix the wrong size.",
+            "rounds": {
+              "dip": "What fills a small dip right at the stoma edge?",
+              "weepy": "What is only for weepy, broken skin?",
+              "peel": "What makes removal kinder on your skin?"
+            },
+            "options": {
+              "ring": "A barrier ring",
+              "powder": "Stoma powder",
+              "dryer": "A hair dryer",
+              "lotion": "Lotion",
+              "paste": "Paste",
+              "remover": "Adhesive remover"
+            }
+          },
+          "carryOnOrHold": {
+            "title": "Carry-on or hold?",
+            "prompt": "Never let the only set of supplies be the one in the hold.",
+            "carry": "Carry-on",
+            "hold": "Checked bag",
+            "items": {
+              "daysupply": "Enough supplies for the whole journey and a delay",
+              "certificate": "A traveller card or certificate",
+              "precut": "Barriers already cut to size",
+              "backup": "A backup box of barriers",
+              "fullpaste": "A full-size paste tube over 100 mL"
+            }
+          },
+          "whyStoppedSticking": {
+            "title": "Why did it stop sticking?",
+            "prompt": "Wear time often drops in winter. What is the usual first culprit?",
+            "rounds": {
+              "winter": "Your barrier will not bond the way it did in July."
+            },
+            "options": {
+              "skinfail": "Your skin suddenly changed",
+              "coldcar": "The barrier sat in a cold car or porch",
+              "wrongbrand": "You need a different brand"
+            }
+          },
+          "whoDoIAsk": {
+            "title": "Who do I ask?",
+            "prompt": "The last line of every card is a person. Practice that.",
+            "rounds": {
+              "leaks": "Leaks that keep happening.",
+              "wipe": "Which wipe for everyday removal.",
+              "foods": "Adding foods back after surgery.",
+              "talk": "You want to talk to someone who has one."
+            },
+            "options": {
+              "nswoc": "Your NSWOC",
+              "pharmacist": "A pharmacist",
+              "peer": "A peer visitor",
+              "dietitian": "A dietitian"
+            }
+          }
         },
         "backToChapters": "Back to Ostomy Care →",
         "words": {

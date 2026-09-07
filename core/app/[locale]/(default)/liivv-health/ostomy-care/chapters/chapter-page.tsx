@@ -7,6 +7,8 @@ import type { OcCatalogItem } from '../get-oc-catalog';
 
 import { DiscoveryBand, GovernanceBlock, HelpBand } from '../_components/page-furniture';
 
+import { ChapterGame } from './chapter-games';
+import { ChapterVisual } from './chapter-visuals';
 import {
   type AskRole,
   buildChapters,
@@ -17,6 +19,7 @@ import {
   type ResourceGroup,
   type UrgentCallout,
 } from './chapters-data';
+import { LESSON_GUIDES } from './lessons-meta';
 
 import './chapter-page.css';
 
@@ -104,42 +107,50 @@ function ProductBand({
 
 function CategoryRow({
   card,
-  index,
-  openByDefault,
   products,
 }: {
   card: CategoryCard;
-  index: number;
-  openByDefault: boolean;
   products: Record<number, OcCatalogItem>;
 }) {
-  const t = useTranslations('OstomyCare.ui.chapter');
-  const [open, setOpen] = useState(openByDefault);
+  const learn = useTranslations('OstomyCare.ui.chapter.learn');
+  const [open, setOpen] = useState(false);
   const moreId = useId();
 
-  /*
-   * The first bullet becomes the lede and stays visible; the rest collapse.
-   * A card built from sections has no single lede, so it collapses whole.
-   */
-  const lede = card.items?.[0];
-  const rest = card.items?.slice(1) ?? [];
-  const hidden = rest.length + (card.sections?.length ?? 0);
+  const items = card.items ?? [];
+  const preview = items.slice(0, 4);
+  const rest = items.slice(4);
+  const extraSections = items.length ? (card.sections ?? []) : (card.sections?.slice(1) ?? []);
+  const firstSection = !items.length ? card.sections?.[0] : undefined;
+  const hidden = rest.length + extraSections.length;
   const collapsible = hidden > 0;
 
   return (
     <article className={open ? 'oc-ch-row is-open' : 'oc-ch-row'}>
-      <span aria-hidden className="oc-ch-row-thumb">
-        <img alt="" loading="lazy" src={card.image} />
-        <b>{String(index + 1).padStart(2, '0')}</b>
-      </span>
       <div>
-        {card.group ? <span className="oc-ch-group">{card.group}</span> : null}
         <h3>
           {card.title}
           {card.badge ? ` · ${card.badge}` : ''}
         </h3>
 
-        {lede ? <p className="oc-ch-lede">{lede}</p> : null}
+        {preview.length ? (
+          <ul className="oc-ch-lede-list">
+            {preview.map((item, i) => (
+              <li key={`${i}-${item}`}>{item}</li>
+            ))}
+          </ul>
+        ) : null}
+
+        {firstSection ? (
+          <div className="oc-ch-subsection">
+            <h4>{firstSection.heading}</h4>
+            <ul>
+              {firstSection.items.map((item, i) => (
+                <li key={`${i}-${item}`}>{item}</li>
+              ))}
+            </ul>
+            {firstSection.note ? <p className="oc-ch-row-note">{firstSection.note}</p> : null}
+          </div>
+        ) : null}
 
         <div className="oc-ch-row-more" hidden={!open} id={moreId}>
           {rest.length ? (
@@ -149,7 +160,7 @@ function CategoryRow({
               ))}
             </ul>
           ) : null}
-          {card.sections?.map((section) => (
+          {extraSections.map((section) => (
             <div className="oc-ch-subsection" key={section.heading}>
               <h4>{section.heading}</h4>
               <ul>
@@ -160,30 +171,27 @@ function CategoryRow({
               {section.note ? <p className="oc-ch-row-note">{section.note}</p> : null}
             </div>
           ))}
-          {card.note ? <p className="oc-ch-row-note">{card.note}</p> : null}
         </div>
+
+        {card.note ? <p className="oc-ch-row-note">{card.note}</p> : null}
 
         <div className="oc-ch-row-foot">
           {collapsible ? (
             <button
               aria-controls={moreId}
               aria-expanded={open}
-              aria-label={`${open ? t('showLess') : t('showMore', { count: String(hidden) })} — ${card.title}`}
+              aria-label={`${open ? learn('hideDetail') : learn('wantDetail')} — ${card.title}`}
               className="oc-ch-toggle"
               onClick={() => setOpen(!open)}
               type="button"
             >
-              {open ? t('showLess') : t('showMore', { count: String(hidden) })}
+              {open ? learn('hideDetail') : learn('wantDetail')}
             </button>
           ) : null}
           {card.ask ? <AskChip role={card.ask} /> : null}
         </div>
 
-        {card.productIds ? (
-          <div hidden={!(open || !collapsible)}>
-            <ProductBand ids={card.productIds} products={products} />
-          </div>
-        ) : null}
+        {card.productIds ? <ProductBand ids={card.productIds} products={products} /> : null}
       </div>
     </article>
   );
@@ -255,78 +263,80 @@ function ResourceGroupBlock({ group }: { group: ResourceGroup }) {
 }
 
 /*
- * Second-level navigation, built from the `group` labels the categories were
- * already authored with. This is what makes a twenty-row chapter browsable, and
- * what makes consolidating back to four chapters possible.
- *
- * Filtering rather than scroll-spying: on a phone a sticky spy rail and the
- * thumb-scroll fight each other, and filtering gives the same answer with less
- * machinery. Rows are hidden, never unmounted — search must still see them all.
+ * Lesson path: a sticky jump-nav, then one illustrated lesson at a time.
+ * Cards stay mounted so search still sees the full chapter.
  */
-function GroupRail({
+function LessonPath({
+  slug,
   categories,
   products,
 }: {
+  slug: string;
   categories: CategoryCard[];
   products: Record<number, OcCatalogItem>;
 }) {
-  const t = useTranslations('OstomyCare.ui.chapter');
-  const [active, setActive] = useState('');
+  const learn = useTranslations('OstomyCare.ui.chapter.learn');
 
-  const groups = useMemo(() => {
-    const counts = categories.reduce<Map<string, number>>((acc, card) => {
-      if (card.group) acc.set(card.group, (acc.get(card.group) ?? 0) + 1);
+  const lessons = useMemo(() => {
+    const guides = LESSON_GUIDES[slug] ?? {};
+    const keys = categories.reduce<string[]>((acc, card) => {
+      if (card.groupKey && !acc.includes(card.groupKey)) {
+        return [...acc, card.groupKey];
+      }
 
       return acc;
-    }, new Map());
+    }, []);
 
-    return [...counts.entries()].map(([label, count]) => ({ label, count }));
-  }, [categories]);
+    if (!keys.length) {
+      return [
+        {
+          key: 'all',
+          label: learn('allLessons'),
+          cards: categories,
+          guide: undefined,
+        },
+      ];
+    }
 
-  // One group, or none, is not a navigation problem worth a control.
-  const railed = groups.length > 1;
-  const seenGroups = new Set<string>();
+    return keys.map((key) => ({
+      key,
+      label: categories.find((card) => card.groupKey === key)?.group ?? key,
+      cards: categories.filter((card) => card.groupKey === key),
+      guide: guides[key],
+    }));
+  }, [categories, learn, slug]);
 
   return (
     <>
-      {railed ? (
-        <div aria-label={t('groupNav')} className="oc-ch-rail" role="group">
-          <button aria-pressed={active === ''} onClick={() => setActive('')} type="button">
-            {t('allGroups')}
-            <span className="oc-ch-rail-count">{categories.length}</span>
-          </button>
-          {groups.map((group) => (
-            <button
-              aria-pressed={active === group.label}
-              key={group.label}
-              onClick={() => setActive(group.label)}
-              type="button"
-            >
-              {group.label}
-              <span className="oc-ch-rail-count">{group.count}</span>
-            </button>
+      {lessons.length > 1 ? (
+        <nav aria-label={learn('pathLabel')} className="oc-ch-lesson-nav">
+          {lessons.map((lesson, index) => (
+            <a href={`#lesson-${lesson.key}`} key={lesson.key}>
+              <span className="oc-ch-lesson-num">{String(index + 1).padStart(2, '0')}</span>
+              <span>{lesson.label}</span>
+              <span className="oc-ch-rail-count">{lesson.cards.length}</span>
+            </a>
           ))}
-        </div>
+        </nav>
       ) : null}
 
-      <div className="oc-ch-rows">
-        {categories.map((card, index) => {
-          const lead = Boolean(card.group) && !seenGroups.has(card.group ?? '');
-
-          if (card.group) seenGroups.add(card.group);
-
-          return (
-            <div hidden={active !== '' && card.group !== active} key={card.title}>
-              <CategoryRow
-                card={card}
-                index={index}
-                openByDefault={lead || !card.group}
-                products={products}
-              />
-            </div>
-          );
-        })}
-      </div>
+      {lessons.map((lesson) => (
+        <section className="oc-ch-lesson" id={`lesson-${lesson.key}`} key={lesson.key}>
+          <header className="oc-ch-lesson-head">
+            <span className="oc-ch-eyebrow">{learn('thirtySeconds')}</span>
+            <h3>{lesson.label}</h3>
+          </header>
+          {lesson.guide?.visual ? <ChapterVisual id={lesson.guide.visual} /> : null}
+          <div className="oc-ch-rows">
+            {lesson.cards.map((card) => (
+              <CategoryRow card={card} key={card.title} products={products} />
+            ))}
+          </div>
+          {lesson.guide?.games?.map((gameId) => (
+            <ChapterGame id={gameId} key={gameId} />
+          ))}
+        </section>
+      ))}
     </>
   );
 }
@@ -424,7 +434,7 @@ export function ChapterPage({
             <h2>{chapter.categoriesIntro.heading}</h2>
             <p>{chapter.categoriesIntro.body}</p>
           </header>
-          <GroupRail categories={chapter.categories} products={products} />
+          <LessonPath categories={chapter.categories} products={products} slug={chapter.slug} />
         </div>
       </section>
 

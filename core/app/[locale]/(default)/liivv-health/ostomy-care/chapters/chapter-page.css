@@ -1238,3 +1238,299 @@
   line-height: 1.5;
   color: color-mix(in srgb, var(--ink) 74%, transparent);
 }
+
+/* ---------------------------------------------------------------------------
+ * Lesson path — pictures first, bullets, then a skippable game.
+ * ------------------------------------------------------------------------- */
+
+#oc-chapter .oc-ch-lesson-nav {
+  position: sticky;
+  top: 5.4rem;
+  z-index: 6;
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding: 0.55rem 0 0.85rem;
+  margin: 0 -0.2rem 0.65rem;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+  background: color-mix(in srgb, var(--sand) 88%, var(--paper));
+}
+
+#oc-chapter .oc-ch-lesson-nav a {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  text-decoration: none;
+  font-size: 0.84rem;
+  white-space: nowrap;
+}
+
+#oc-chapter .oc-ch-lesson-nav a:hover,
+#oc-chapter .oc-ch-lesson-nav a:focus-visible {
+  border-color: var(--chapter-accent);
+}
+
+#oc-chapter .oc-ch-lesson-num {
+  font-family: var(--font-heading);
+  color: var(--sage-text);
+  font-size: 0.82rem;
+}
+
+#oc-chapter .oc-ch-lesson {
+  scroll-margin-top: 6.5rem;
+  margin-top: 1.75rem;
+  padding-top: 0.35rem;
+}
+
+#oc-chapter .oc-ch-lesson-head {
+  margin-bottom: 0.85rem;
+  max-width: 40rem;
+}
+
+#oc-chapter .oc-ch-lesson-head h3 {
+  margin-top: 0.3rem;
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+}
+
+#oc-chapter .oc-ch-visual {
+  margin: 0 0 1rem;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: var(--cream);
+}
+
+#oc-chapter .oc-ch-visual svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+#oc-chapter .oc-ch-row {
+  display: block;
+  padding: 1.2rem 1.25rem 1.3rem;
+}
+
+#oc-chapter .oc-ch-lede-list {
+  margin: 0.45rem 0 0;
+  padding-left: 1.15rem;
+  display: grid;
+  gap: 0.4rem;
+  color: color-mix(in srgb, var(--ink) 80%, transparent);
+  font-size: 0.97rem;
+}
+
+#oc-chapter .oc-ch-game {
+  margin-top: 1.1rem;
+  padding: 1.15rem 1.2rem 1.25rem;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--sage) 22%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--sage) 35%, transparent);
+}
+
+#oc-chapter .oc-ch-game.is-skipped {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+#oc-chapter .oc-ch-game-host {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 0.85rem;
+  align-items: center;
+  margin-bottom: 0.9rem;
+}
+
+#oc-chapter .oc-ch-game-olivia {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+#oc-chapter .oc-ch-game-kicker {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-ch-game-prompt {
+  margin: 0.2rem 0 0.25rem;
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+
+#oc-chapter .oc-ch-game-practice {
+  margin: 0;
+  font-size: 0.82rem;
+  color: color-mix(in srgb, var(--ink) 68%, transparent);
+}
+
+#oc-chapter .oc-ch-game-pool,
+#oc-chapter .oc-ch-game-shelf,
+#oc-chapter .oc-ch-game-options,
+#oc-chapter .oc-ch-game-memory {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+#oc-chapter .oc-ch-game-chip,
+#oc-chapter .oc-ch-game-option,
+#oc-chapter .oc-ch-game-card,
+#oc-chapter .oc-ch-game-drop,
+#oc-chapter .oc-ch-game-next {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  padding: 0.5rem 0.85rem;
+  color: inherit;
+}
+
+#oc-chapter .oc-ch-game-option,
+#oc-chapter .oc-ch-game-card {
+  border-radius: 14px;
+  flex: 1 1 140px;
+  text-align: left;
+}
+
+#oc-chapter .oc-ch-game-card {
+  min-height: 4.2rem;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-family: var(--font-heading);
+}
+
+#oc-chapter .oc-ch-game-chip.is-active,
+#oc-chapter .oc-ch-game-card.is-open,
+#oc-chapter .oc-ch-game-option.is-right,
+#oc-chapter .oc-ch-game-card.is-matched {
+  border-color: var(--sage-deep);
+  background: color-mix(in srgb, var(--sage) 28%, var(--paper));
+}
+
+#oc-chapter .oc-ch-game-chip.is-wrong,
+#oc-chapter .oc-ch-game-option.is-wrong {
+  border-color: var(--urgent);
+  background: var(--urgent-wash);
+}
+
+#oc-chapter .oc-ch-game-buckets,
+#oc-chapter .oc-ch-game-pack {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 0.8rem;
+}
+
+@media (min-width: 700px) {
+  #oc-chapter .oc-ch-game-buckets,
+  #oc-chapter .oc-ch-game-pack {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+#oc-chapter .oc-ch-game-bucket,
+#oc-chapter .oc-ch-game-bag {
+  padding: 0.85rem;
+  border-radius: 16px;
+  background: var(--paper);
+  border: 1px dashed color-mix(in srgb, var(--sage) 45%, transparent);
+}
+
+#oc-chapter .oc-ch-game-bucket p,
+#oc-chapter .oc-ch-game-bag p {
+  margin: 0 0 0.4rem;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+#oc-chapter .oc-ch-game-bucket ul,
+#oc-chapter .oc-ch-game-bag ul {
+  margin: 0 0 0.6rem;
+  padding-left: 1.1rem;
+  min-height: 2.5rem;
+  font-size: 0.9rem;
+}
+
+#oc-chapter .oc-ch-game-drop {
+  width: 100%;
+}
+
+#oc-chapter .oc-ch-game-drop:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+#oc-chapter .oc-ch-game-round {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 0.7rem;
+  font-size: 1rem;
+}
+
+#oc-chapter .oc-ch-game-round span {
+  font-variant-numeric: tabular-nums;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-ch-game-hint {
+  margin: 0.65rem 0 0;
+  font-size: 0.88rem;
+  color: var(--urgent);
+}
+
+#oc-chapter .oc-ch-game-next {
+  margin-top: 0.75rem;
+  background: var(--sage-deep);
+  color: var(--paper);
+  border-color: var(--sage-deep);
+}
+
+#oc-chapter .oc-ch-game-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+}
+
+#oc-chapter .oc-ch-game-done {
+  margin: 0;
+  font-weight: 600;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-ch-game-textbtn {
+  font: inherit;
+  font-size: 0.82rem;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--sage-deep);
+  border-bottom: 1px solid currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #oc-chapter .oc-ch-game-chip,
+  #oc-chapter .oc-ch-game-option,
+  #oc-chapter .oc-ch-game-card {
+    transition: none;
+  }
+}
+

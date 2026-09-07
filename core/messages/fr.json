@@ -2663,7 +2663,186 @@
                     "practicalCanada": "Canada pratique",
                     "growingUp": "Grandir",
                     "bodiesThatChange": "Corps qui changent",
-                    "thePeopleAroundIt": "Les gens autour"
+                    "thePeopleAroundIt": "Les gens autour",
+                    "stomaTypes": "Quel type de stomie",
+                    "theWords": "Les mots que vous entendrez",
+                    "pouchingSystem": "Comment un système fonctionne",
+                    "skinFit": "Peau, mesure, débit",
+                    "convexity": "Plat ou convexe"
+                },
+                "learn": {
+                    "pathLabel": "Aller à une leçon",
+                    "thirtySeconds": "La version 30 secondes",
+                    "wantDetail": "Voir le détail",
+                    "hideDetail": "Masquer le détail",
+                    "practice": "Ceci est un exercice, pas un avis médical.",
+                    "skip": "Passer pour l’instant",
+                    "skipped": "Passé — la lecture ci-dessus est toute la leçon.",
+                    "playAnyway": "Jouer",
+                    "playAgain": "Rejouer",
+                    "almost": "Presque — regardez l’image à nouveau.",
+                    "done": "Très bien. Vous pouvez continuer.",
+                    "nextRound": "Suivant",
+                    "finish": "C’est ça",
+                    "putHere": "Mettre ici",
+                    "pickOneFirst": "Choisissez d’abord ci-dessus",
+                    "keepGoing": "Ajoutez le reste des essentiels",
+                    "allLessons": "Ce chapitre"
+                },
+                "games": {
+                    "beforeAfter": {
+                        "title": "Essayez ceci",
+                        "prompt": "Cela se passe avant la chirurgie, ou une fois rentré chez vous ?",
+                        "before": "Avant la chirurgie",
+                        "after": "Après la chirurgie",
+                        "items": {
+                            "siting": "Demander le marquage de la stomie",
+                            "questions": "Noter les questions à apporter",
+                            "pack": "Préparer des vêtements amples, taille haute",
+                            "fatigue": "La fatigue fait partie du rétablissement",
+                            "measure": "Remesurer à mesure que l’enflure change",
+                            "gobag": "Préparer un sac de sortie"
+                        }
+                    },
+                    "goBag": {
+                        "title": "Préparer un sac de sortie",
+                        "prompt": "Touchez ce qui va dans un sac dès le premier jour.",
+                        "bag": "Dans le sac",
+                        "items": {
+                            "barrier": "Barrière de rechange",
+                            "pouch": "Poche de rechange",
+                            "wipes": "Lingettes douces",
+                            "disposal": "Sacs de jet",
+                            "underwear": "Sous-vêtement ou protège-slip de rechange",
+                            "dryer": "Sèche-cheveux",
+                            "lotion": "Lotion parfumée"
+                        },
+                        "oops": {
+                            "dryer": "Pas de sèche-cheveux — la chaleur peut abîmer l’adhésif, et la stomie ne peut pas vous avertir.",
+                            "lotion": "Huiles et lotions n’ont pas leur place sous une barrière."
+                        }
+                    },
+                    "whichStoma": {
+                        "title": "Quelle stomie ?",
+                        "prompt": "Associez la description à l’image que vous venez de voir.",
+                        "rounds": {
+                            "thicker": "Un débit habituellement plus épais, plus comme des selles.",
+                            "fluid": "Un débit plus liquide — fluide et sel comptent davantage.",
+                            "urine": "Celle-ci détourne l’urine, pas les selles."
+                        },
+                        "options": {
+                            "colostomy": "Colostomie",
+                            "ileostomy": "Iléostomie",
+                            "urostomy": "Urostomie"
+                        }
+                    },
+                    "wordMatch": {
+                        "title": "Les mots",
+                        "prompt": "Retournez deux cartes. Associez le mot à ce qu’il veut dire.",
+                        "barrierA": "Barrière",
+                        "barrierB": "La partie qui colle",
+                        "pouchA": "Poche",
+                        "pouchB": "Où arrive le débit",
+                        "outputA": "Débit",
+                        "outputB": "Ce qui sort",
+                        "nswocA": "NSWOC",
+                        "nswocB": "L’infirmière spécialisée"
+                    },
+                    "buildSystem": {
+                        "title": "Monter le système",
+                        "prompt": "Un système de poche n’a que quelques pièces. Touchez celle qui convient.",
+                        "rounds": {
+                            "skin": "Quelle partie colle à votre peau ?",
+                            "lands": "Où arrive le débit ?",
+                            "twoPiece": "Sur un deux-pièces, qu’est-ce qui reste en place quand vous changez la poche ?",
+                            "onePiece": "Qu’est-ce qui est vrai d’un une-pièce ?"
+                        },
+                        "options": {
+                            "barrier": "La barrière",
+                            "pouch": "La poche",
+                            "filter": "Le filtre",
+                            "stays": "La barrière reste",
+                            "bothGo": "Les deux se retirent à chaque fois",
+                            "pouchStays": "Seule la poche reste",
+                            "joined": "Barrière et poche sont unies",
+                            "clicks": "La poche s’enclenche sur un anneau",
+                            "noBarrier": "Il n’y a pas de barrière"
+                        }
+                    },
+                    "measureFit": {
+                        "title": "Trop grand, trop petit, juste",
+                        "prompt": "L’ouverture doit arriver près du bord de la stomie.",
+                        "rounds": {
+                            "protect": "Quelle ouverture protège la peau autour de la stomie ?",
+                            "when": "Quand faut-il remesurer ?"
+                        },
+                        "options": {
+                            "large": "Une ouverture plus grande, pour le confort",
+                            "close": "Près du bord",
+                            "small": "Plus petite que la stomie",
+                            "once": "Une fois, à l’hôpital",
+                            "months": "Pendant les premiers mois, et après un changement de poids",
+                            "never": "Jamais — la première taille reste la taille"
+                        }
+                    },
+                    "accessoryJobs": {
+                        "title": "À quoi ça sert vraiment ?",
+                        "prompt": "Chaque accessoire a un rôle. Aucun ne corrige une mauvaise taille.",
+                        "rounds": {
+                            "dip": "Qu’est-ce qui comble un petit creux juste au bord de la stomie ?",
+                            "weepy": "Qu’est-ce qui est seulement pour la peau humide et abîmée ?",
+                            "peel": "Qu’est-ce qui rend le retrait plus doux pour la peau ?"
+                        },
+                        "options": {
+                            "ring": "Un anneau de barrière",
+                            "powder": "Poudre pour stomie",
+                            "dryer": "Un sèche-cheveux",
+                            "lotion": "Une lotion",
+                            "paste": "Pâte",
+                            "remover": "Dissolvant d’adhésif"
+                        }
+                    },
+                    "carryOnOrHold": {
+                        "title": "Cabine ou soute ?",
+                        "prompt": "Ne laissez jamais le seul jeu de fournitures dans la soute.",
+                        "carry": "Bagage de cabine",
+                        "hold": "Bagage enregistré",
+                        "items": {
+                            "daysupply": "Assez de fournitures pour tout le trajet et un retard",
+                            "certificate": "Une carte ou un certificat de voyageur",
+                            "precut": "Barrières déjà découpées",
+                            "backup": "Une boîte de barrières de secours",
+                            "fullpaste": "Un tube de pâte de plus de 100 mL"
+                        }
+                    },
+                    "whyStoppedSticking": {
+                        "title": "Pourquoi ça ne colle plus ?",
+                        "prompt": "Le temps de port baisse souvent l’hiver. Quel est le premier suspect ?",
+                        "rounds": {
+                            "winter": "Votre barrière n’adhère plus comme en juillet."
+                        },
+                        "options": {
+                            "skinfail": "Votre peau a soudain changé",
+                            "coldcar": "La barrière est restée dans une voiture ou un porche froid",
+                            "wrongbrand": "Il vous faut une autre marque"
+                        }
+                    },
+                    "whoDoIAsk": {
+                        "title": "À qui demander ?",
+                        "prompt": "La dernière ligne de chaque carte est une personne. Entraînez-vous.",
+                        "rounds": {
+                            "leaks": "Des fuites qui recommencent.",
+                            "wipe": "Quelle lingette pour un retrait quotidien.",
+                            "foods": "Réintroduire les aliments après la chirurgie.",
+                            "talk": "Vous voulez parler à quelqu’un qui en a une."
+                        },
+                        "options": {
+                            "nswoc": "Votre NSWOC",
+                            "pharmacist": "Un pharmacien",
+                            "peer": "Un visiteur pair",
+                            "dietitian": "Un diététiste"
+                        }
+                    }
                 },
                 "allChapters": "Les quatre chapitres",
                 "backToChapters": "Retour à Soins d'ostomie →",

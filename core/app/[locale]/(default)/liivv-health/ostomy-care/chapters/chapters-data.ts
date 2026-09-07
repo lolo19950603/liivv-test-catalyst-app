@@ -36,6 +36,8 @@ export interface CategoryCard {
   items?: string[];
   sections?: CategorySection[];
   note?: string;
+  /** Stable group id from chapters-meta — used to attach pictures and games. */
+  groupKey?: string;
   group?: string;
   badge?: string;
 }
@@ -257,7 +259,10 @@ function composeChapter(
       ...(structure?.products === undefined ? {} : { productIds: structure.products }),
       ...(structure?.group === undefined
         ? {}
-        : { group: groupLabels[structure.group] ?? structure.group }),
+        : {
+            groupKey: structure.group,
+            group: groupLabels[structure.group] ?? structure.group,
+          }),
       ...(card.badge === undefined ? {} : { badge: card.badge }),
       ...(card.note === undefined ? {} : { note: card.note }),
       ...(card.items === undefined ? {} : { items: ordered(card.items) }),
