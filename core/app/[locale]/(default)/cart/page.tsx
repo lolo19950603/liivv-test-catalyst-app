@@ -34,6 +34,8 @@ import { updateShippingInfo } from './_actions/update-shipping-info';
 import { CartViewed } from './_components/cart-viewed';
 import { CheckoutPreconnect } from './_components/checkout-preconnect';
 import { getCart, getShippingCountries } from './page-data';
+import { VendorOutageNotice } from '~/components/vendor-outage-notice';
+import { isVendorOutageError, withVendorFallback } from '~/lib/vendor-outage';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -108,7 +110,17 @@ export default async function Cart({ params }: Props) {
   }
 
   const currencyCode = await getPreferredCurrencyCode();
-  const data = await getCart({ cartId, currencyCode });
+  let data;
+
+  try {
+    data = await getCart({ cartId, currencyCode });
+  } catch (error) {
+    if (isVendorOutageError(error)) {
+      return <VendorOutageNotice layout="page" vendor="bigcommerce" />;
+    }
+
+    throw error;
+  }
 
   const cart = data.site.cart;
   const checkout = data.site.checkout;
@@ -134,7 +146,9 @@ export default async function Cart({ params }: Props) {
   ].filter((item) => !('parentEntityId' in item) || !item.parentEntityId);
 
   const productLineItems = lineItems.filter((item) => item.__typename !== 'CartGiftCertificate');
-  const subscriptionLines = await reconcileSubscriptionLinesWithCart(cartId, productLineItems);
+  const subscriptionLines = await withVendorFallback('supabase', [], () =>
+    reconcileSubscriptionLinesWithCart(cartId, productLineItems),
+  );
   const kitSession = await getKitSession(cartId);
   const kits = await Promise.all((kitSession?.kits ?? []).map(resolveKitStorefront));
 

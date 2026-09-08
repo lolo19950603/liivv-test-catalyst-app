@@ -2,10 +2,38 @@ import 'server-only';
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
+import {
+  isGatewayStatus,
+  isNetworkFailure,
+  VendorOutageError,
+} from '~/lib/vendor-outage';
+
 let supabaseClient: SupabaseClient | null = null;
 
 export function isSupabaseConfigured(): boolean {
   return Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+}
+
+async function supabaseFetch(url: RequestInfo | URL, options?: RequestInit): Promise<Response> {
+  try {
+    const response = await fetch(url, { ...options, cache: 'no-store' });
+
+    if (isGatewayStatus(response.status)) {
+      throw new VendorOutageError('supabase');
+    }
+
+    return response;
+  } catch (error) {
+    if (error instanceof VendorOutageError) {
+      throw error;
+    }
+
+    if (isNetworkFailure(error)) {
+      throw new VendorOutageError('supabase', error);
+    }
+
+    throw error;
+  }
 }
 
 export function getSupabaseClient(): SupabaseClient {
@@ -23,7 +51,7 @@ export function getSupabaseClient(): SupabaseClient {
           persistSession: false,
         },
         global: {
-          fetch: (url, options) => fetch(url, { ...options, cache: 'no-store' }),
+          fetch: supabaseFetch,
         },
       },
     );

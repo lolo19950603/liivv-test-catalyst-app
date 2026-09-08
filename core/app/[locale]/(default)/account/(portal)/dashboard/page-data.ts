@@ -5,7 +5,7 @@ import { client } from '~/client';
 import { graphql } from '~/client/graphql';
 import { TAGS } from '~/client/tags';
 import { findStripeCustomerIdByEmail, resolveStripeCustomerId } from '~/lib/stripe/customers';
-import { isStripeConfigured } from '~/lib/stripe/client';
+import { areSubscriptionsAvailable } from '~/lib/subscriptions/availability';
 import {
   getCustomerSubscriptions,
   type CustomerSubscription,
@@ -41,7 +41,7 @@ export const getDashboardCustomer = cache(async () => {
 /** One Stripe subscriptions.list (+ product lookups) per dashboard request. */
 export const getDashboardStripeSubscriptions = cache(
   async (): Promise<CustomerSubscription[]> => {
-    if (!isStripeConfigured()) {
+    if (!(await areSubscriptionsAvailable())) {
       return [];
     }
 
@@ -61,7 +61,13 @@ export const getDashboardStripeSubscriptions = cache(
       return [];
     }
 
-    return getCustomerSubscriptions(stripeCustomerId);
+    try {
+      return await getCustomerSubscriptions(stripeCustomerId);
+    } catch (error) {
+      console.error('[stripe] dashboard subscriptions unavailable', error);
+
+      return [];
+    }
   },
 );
 

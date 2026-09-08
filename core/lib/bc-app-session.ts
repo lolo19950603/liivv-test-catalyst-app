@@ -4,8 +4,8 @@ import { cookies } from 'next/headers';
 
 import type { BcAppUser } from '~/lib/bigcommerce/app-oauth';
 
-const COOKIE_NAME = 'liivv_bc_app';
-const COOKIE_PATH = '/bc-app';
+const COOKIE_NAME = 'liivv_pharmacy_admin';
+const COOKIE_PATH = '/pharmacy-admin';
 const SESSION_MS = 12 * 60 * 60 * 1000;
 
 export type BcAppSession = {

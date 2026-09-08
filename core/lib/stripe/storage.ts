@@ -23,6 +23,38 @@ function subscriptionOrderKey(referenceId: string): string {
   return `stripe:bc-order:${referenceId}`;
 }
 
+export type SubscriptionOrderClaimState =
+  | { kind: 'empty' }
+  | { kind: 'pending' }
+  | { kind: 'complete' }
+  | { kind: 'created'; orderId: number };
+
+export async function getSubscriptionOrderClaimState(
+  referenceId: string,
+): Promise<SubscriptionOrderClaimState> {
+  const existing = await kv.get<string>(subscriptionOrderKey(referenceId));
+
+  if (!existing || existing === '') {
+    return { kind: 'empty' };
+  }
+
+  if (existing === 'pending') {
+    return { kind: 'pending' };
+  }
+
+  if (existing === 'complete') {
+    return { kind: 'complete' };
+  }
+
+  const orderId = Number(existing);
+
+  if (Number.isFinite(orderId) && orderId > 0) {
+    return { kind: 'created', orderId };
+  }
+
+  return { kind: 'complete' };
+}
+
 export async function releaseSubscriptionOrderCreation(referenceId: string): Promise<void> {
   const key = subscriptionOrderKey(referenceId);
   const existing = await kv.get<string>(key);
@@ -39,6 +71,8 @@ export async function claimSubscriptionOrderCreation(referenceId: string): Promi
   // Reject when another caller already claimed ('pending'), finished (order id),
   // or marked complete. Treating 'pending' as claimable caused duplicate BC orders
   // when the Stripe webhook and checkout success page raced.
+  // Invoice.paid retries must not treat this false as "done": they peek with
+  // getSubscriptionOrderClaimState and re-attempt placement while pending.
   if (existing === 'pending' || (existing && existing !== '')) {
     return false;
   }

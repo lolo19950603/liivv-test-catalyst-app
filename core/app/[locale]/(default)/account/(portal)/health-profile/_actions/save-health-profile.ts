@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 
-import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
+import { runCustomerAction } from '~/lib/action-gateway/session';
 import { validateHealthProfileComplete } from '~/lib/onboarding/health-profile-form-validation';
 import {
   encodeRankedCareInterest,
@@ -119,12 +119,7 @@ export async function saveHealthProfileStep(
   _prevState: HealthProfileActionState,
   formData: FormData,
 ): Promise<HealthProfileActionState> {
-  const customer = await getOnboardingCustomer();
-
-  if (!customer) {
-    return { error: 'Please sign in to continue.' };
-  }
-
+  return runCustomerAction({ result: { error: 'Please sign in to continue.' } }, async (customer) => {
   if (!isSupabaseConfigured()) {
     return { error: 'Supabase is not configured.' };
   }
@@ -191,4 +186,5 @@ export async function saveHealthProfileStep(
   const celebrate = Boolean(status?.insurance_info_completed_at);
 
   redirect(celebrate ? '/account/dashboard/?oliviaCelebrate=1' : '/account/dashboard/');
+  });
 }

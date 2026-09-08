@@ -1,16 +1,12 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-
-import { Error as ErrorSection } from '@/vibes/soul/sections/error';
+import { VendorOutageErrorView } from '~/components/vendor-outage-error-view';
 
 interface Props {
   error: Error & { digest?: string };
   reset: () => void;
 }
 
-export default function Error({ reset }: Props) {
-  const t = useTranslations('Error');
-
-  return <ErrorSection ctaAction={reset} subtitle={t('subtitle')} title={t('title')} />;
+export default function Error({ error, reset }: Props) {
+  return <VendorOutageErrorView error={error} reset={reset} />;
 }

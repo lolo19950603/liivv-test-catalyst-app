@@ -42,17 +42,29 @@ export const getHealthProfileStepData = cache(async () => {
     };
   }
 
-  const profile = ensured.profile;
-  const healthProfile = await getHealthProfileByProfileId(profile.id);
+  try {
+    const profile = ensured.profile;
+    const healthProfile = await getHealthProfileByProfileId(profile.id);
 
-  return {
-    customer,
-    supabaseReady: true,
-    isOntario,
-    initialCategories: resolveInitialHealthCategoriesWithRank(profile.care_interests).map(
-      (row) => row.id,
-    ),
-    initialHealthProfile: healthProfile,
-    profileId: profile.id,
-  };
+    return {
+      customer,
+      supabaseReady: true,
+      isOntario,
+      initialCategories: resolveInitialHealthCategoriesWithRank(profile.care_interests).map(
+        (row) => row.id,
+      ),
+      initialHealthProfile: healthProfile,
+      profileId: profile.id,
+    };
+  } catch (error) {
+    console.error('[supabase] health profile unavailable', error);
+
+    return {
+      customer,
+      supabaseReady: false,
+      isOntario,
+      initialCategories: [],
+      initialHealthProfile: null,
+    };
+  }
 });

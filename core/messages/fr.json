@@ -228,7 +228,8 @@
                 "unexpected": "Une erreur est survenue. Veuillez réessayer.",
                 "productsUnavailable": "Les produits de ce kit ne peuvent pas être chargés pour le moment. Veuillez réessayer plus tard.",
                 "saveFailed": "Impossible d’enregistrer votre kit. Veuillez réessayer.",
-                "saveUnavailable": "L’enregistrement des kits est temporairement indisponible."
+                "saveUnavailable": "L’enregistrement des kits est temporairement indisponible.",
+                "cartUnavailable": "Les kits sont temporairement indisponibles. Veuillez réessayer dans quelques minutes."
             }
         }
     },
@@ -684,6 +685,7 @@
             },
             "errors": {
                 "notConfigured": "Les abonnements ne sont pas encore configurés.",
+                "unavailable": "Les abonnements sont temporairement indisponibles. Veuillez réessayer dans quelques minutes.",
                 "customerNotFound": "Nous n’avons pas pu trouver votre compte.",
                 "noStripeCustomer": "Aucun profil de facturation trouvé. Veuillez d'abord compléter une commande d'abonnement."
             }
@@ -1054,6 +1056,7 @@
         },
         "errors": {
             "notConfigured": "Les abonnements ne sont pas encore configurés.",
+            "unavailable": "Les abonnements sont temporairement indisponibles. Veuillez réessayer dans quelques minutes.",
             "invalidPlan": "Ce produit n'est pas disponible pour l'abonnement.",
             "customerNotFound": "Nous n'avons pas pu trouver votre compte."
         }
@@ -1330,7 +1333,9 @@
             "shippingRequired": "Sélectionnez une méthode de livraison pour chaque section de la commande avant de continuer au paiement.",
             "addPaymentMethod": "Ajouter une nouvelle méthode de paiement",
             "expires": "Expire {date}",
-            "default": "Par défaut"
+            "default": "Par défaut",
+            "unavailable": "Les paiements sont temporairement indisponibles. Votre panier est conservé — réessayez sous peu.",
+            "unavailableSubscriptions": "Les abonnements sont temporairement indisponibles. Retirez les articles d'abonnement de votre panier ou réessayez sous peu. Votre panier est conservé."
         },
         "summary": {
             "orderSummary": "Résumé de la commande",
@@ -1381,6 +1386,7 @@
         },
         "errors": {
             "notConfigured": "Les abonnements ne sont pas encore configurés.",
+            "unavailable": "Les abonnements sont temporairement indisponibles. Veuillez réessayer dans quelques minutes.",
             "invalidPlan": "Veuillez sélectionner un plan d'abonnement valide.",
             "unavailablePrice": "Ce produit ne possède pas de prix valide pour l'abonnement.",
             "priceConsentRequired": "Veuillez confirmer que vous comprenez que les prix d'abonnement peuvent changer avant de continuer.",

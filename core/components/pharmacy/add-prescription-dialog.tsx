@@ -173,7 +173,7 @@ export function AddPrescriptionDialog({
 
         {!supabaseReady ? (
           <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            Connect Supabase to save prescriptions.
+            Health tools are temporarily unavailable. Prescriptions cannot be saved right now.
           </p>
         ) : null}
 

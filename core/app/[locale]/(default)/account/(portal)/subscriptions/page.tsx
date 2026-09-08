@@ -56,6 +56,12 @@ export default async function SubscriptionsPage({ params }: Props) {
     );
   }
 
+  if (data.kind === 'unavailable') {
+    return (
+      <SubscriptionList message={t('errors.unavailable')} subscriptions={[]} title={t('title')} />
+    );
+  }
+
   if (data.kind === 'customer-not-found') {
     return (
       <SubscriptionList

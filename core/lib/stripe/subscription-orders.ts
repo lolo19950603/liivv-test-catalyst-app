@@ -15,9 +15,25 @@ import {
 } from './subscription-order-batch';
 import {
   claimSubscriptionOrderCreation,
+  getSubscriptionOrderClaimState,
   markSubscriptionOrderCreated,
   releaseSubscriptionOrderCreation,
 } from './storage';
+
+export class SubscriptionShopOrderPlacementError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'SubscriptionShopOrderPlacementError';
+  }
+}
+
+function isPermanentSubscriptionOrderSkip(reason: string): boolean {
+  return (
+    reason === 'BigCommerce admin API not configured on server' ||
+    reason === 'missing bigcommerce_customer_id in subscription metadata' ||
+    reason === 'subscription order already handled for this Stripe reference'
+  );
+}
 
 function getBigCommerceCustomerId(metadata: Stripe.Metadata | null | undefined): number | null {
   const value = metadata?.bigcommerce_customer_id;
@@ -159,7 +175,15 @@ async function createOrderFromSubscription({
   const claimed = await claimSubscriptionOrderCreation(stripeReferenceId);
 
   if (!claimed) {
-    return { reason: 'subscription order already handled for this Stripe reference' };
+    const claimState = await getSubscriptionOrderClaimState(stripeReferenceId);
+
+    if (claimState.kind === 'created') {
+      return { orderId: claimState.orderId };
+    }
+
+    if (claimState.kind !== 'pending') {
+      return { reason: 'subscription order already handled for this Stripe reference' };
+    }
   }
 
   try {
@@ -288,6 +312,10 @@ export async function createBigCommerceOrderFromInvoice(
       };
     }
 
+    if (queued.existingOrderId) {
+      return { status: 'created', orderId: queued.existingOrderId };
+    }
+
     return {
       status: 'queued',
       customerId: queued.customerId,
@@ -308,6 +336,10 @@ export async function createBigCommerceOrderFromInvoice(
 
   if ('orderId' in orderResult) {
     return { status: 'created', orderId: orderResult.orderId };
+  }
+
+  if (!isPermanentSubscriptionOrderSkip(orderResult.reason)) {
+    throw new SubscriptionShopOrderPlacementError(orderResult.reason);
   }
 
   return {

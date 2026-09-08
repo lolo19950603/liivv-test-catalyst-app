@@ -130,23 +130,33 @@ export const getStaffPortalData = cache(
       return base;
     }
 
-    if (adminTab === 'customers') {
-      if (customerQuery.length >= 2) {
-        const s = await searchMergedCustomersForAdmin(customerQuery);
+    try {
+      if (adminTab === 'customers') {
+        if (customerQuery.length >= 2) {
+          const s = await searchMergedCustomersForAdmin(customerQuery);
 
-        if (!s.ok) {
-          base.customerSearchError = s.message;
-        } else {
-          base.customerSearchRows = s.rows;
-          base.bigcommerceSearchWarning = s.bigcommerceSearchError;
+          if (!s.ok) {
+            base.customerSearchError = s.message;
+          } else {
+            base.customerSearchRows = s.rows;
+            base.bigcommerceSearchWarning = s.bigcommerceSearchError;
+          }
         }
-      }
 
-      if (selectedProfileIdRaw) {
-        if (!UUID_RE.test(selectedProfileIdRaw)) {
-          base.customerDetailError = 'Invalid customer id.';
-        } else {
-          const d = await getAdminCustomerDetail(selectedProfileIdRaw);
+        if (selectedProfileIdRaw) {
+          if (!UUID_RE.test(selectedProfileIdRaw)) {
+            base.customerDetailError = 'Invalid customer id.';
+          } else {
+            const d = await getAdminCustomerDetail(selectedProfileIdRaw);
+
+            if (!d.ok) {
+              base.customerDetailError = d.message;
+            } else {
+              base.customerDetail = d.detail;
+            }
+          }
+        } else if (selectedBigCommerceIdRaw) {
+          const d = await getAdminCustomerDetailByBigCommerceId(selectedBigCommerceIdRaw);
 
           if (!d.ok) {
             base.customerDetailError = d.message;
@@ -154,103 +164,101 @@ export const getStaffPortalData = cache(
             base.customerDetail = d.detail;
           }
         }
-      } else if (selectedBigCommerceIdRaw) {
-        const d = await getAdminCustomerDetailByBigCommerceId(selectedBigCommerceIdRaw);
+      }
 
-        if (!d.ok) {
-          base.customerDetailError = d.message;
+      if (adminTab === 'pharmacy') {
+        try {
+          const [prescriptionQueue, refillQueue, carePackQueue] = await Promise.all([
+            listAdminPrescriptionQueue(300),
+            listAdminRefillQueue(300),
+            listAdminCarePackQueue(300),
+          ]);
+
+          base.prescriptionQueue = prescriptionQueue;
+          base.refillQueue = refillQueue;
+          base.carePackQueue = carePackQueue;
+
+          let selectedProfileId: string | null = null;
+
+          if (selectedRequestIdRaw && UUID_RE.test(selectedRequestIdRaw)) {
+            if (selectedRequestType === 'refill') {
+              selectedProfileId =
+                refillQueue.find((row) => row.id === selectedRequestIdRaw)?.profile_id ?? null;
+            } else if (selectedRequestType === 'carepack') {
+              selectedProfileId =
+                carePackQueue.find((row) => row.id === selectedRequestIdRaw)?.profile_id ?? null;
+            } else {
+              selectedProfileId =
+                prescriptionQueue.find((row) => row.id === selectedRequestIdRaw)?.profile_id ?? null;
+            }
+          }
+
+          if (selectedProfileId && UUID_RE.test(selectedProfileId)) {
+            const detail = await getAdminCustomerDetail(selectedProfileId);
+
+            if (detail.ok) {
+              base.pharmacyCustomerDetail = detail.detail;
+            } else {
+              base.pharmacyCustomerDetailError = detail.message;
+            }
+          }
+        } catch {
+          base.pharmacyQueueError = 'Could not load pharmacy queue right now.';
+        }
+      }
+
+      if (adminTab === 'chat') {
+        const listed = await listConversationsForAdmin();
+
+        if (!listed.ok) {
+          base.listError = listed.message;
         } else {
-          base.customerDetail = d.detail;
+          base.conversations = listed.rows;
         }
-      }
-    }
 
-    if (adminTab === 'pharmacy') {
-      try {
-        const [prescriptionQueue, refillQueue, carePackQueue] = await Promise.all([
-          listAdminPrescriptionQueue(300),
-          listAdminRefillQueue(300),
-          listAdminCarePackQueue(300),
-        ]);
+        let selectedId = get('c').trim() || null;
+        const profileFromQuery = get('profile').trim() || null;
 
-        base.prescriptionQueue = prescriptionQueue;
-        base.refillQueue = refillQueue;
-        base.carePackQueue = carePackQueue;
+        if (!selectedId && profileFromQuery && UUID_RE.test(profileFromQuery)) {
+          const conv = await getOrCreateConversation(profileFromQuery);
 
-        let selectedProfileId: string | null = null;
+          if (conv.ok) {
+            selectedId = conv.conversationId;
+            const refreshed = await listConversationsForAdmin();
 
-        if (selectedRequestIdRaw && UUID_RE.test(selectedRequestIdRaw)) {
-          if (selectedRequestType === 'refill') {
-            selectedProfileId =
-              refillQueue.find((row) => row.id === selectedRequestIdRaw)?.profile_id ?? null;
-          } else if (selectedRequestType === 'carepack') {
-            selectedProfileId =
-              carePackQueue.find((row) => row.id === selectedRequestIdRaw)?.profile_id ?? null;
+            if (refreshed.ok) {
+              base.conversations = refreshed.rows;
+            }
+          }
+        }
+
+        if (
+          selectedId &&
+          (!UUID_RE.test(selectedId) ||
+            !base.conversations.some((row) => row.conversationId === selectedId))
+        ) {
+          selectedId = null;
+        }
+
+        base.selectedConversationId = selectedId;
+
+        if (selectedId) {
+          const msg = await listRecentMessagesForConversation(selectedId);
+
+          if (!msg.ok) {
+            base.messagesError = msg.message;
           } else {
-            selectedProfileId =
-              prescriptionQueue.find((row) => row.id === selectedRequestIdRaw)?.profile_id ?? null;
-          }
-        }
-
-        if (selectedProfileId && UUID_RE.test(selectedProfileId)) {
-          const detail = await getAdminCustomerDetail(selectedProfileId);
-
-          if (detail.ok) {
-            base.pharmacyCustomerDetail = detail.detail;
-          } else {
-            base.pharmacyCustomerDetailError = detail.message;
-          }
-        }
-      } catch {
-        base.pharmacyQueueError = 'Could not load pharmacy queue right now.';
-      }
-    }
-
-    if (adminTab === 'chat') {
-      const listed = await listConversationsForAdmin();
-
-      if (!listed.ok) {
-        base.listError = listed.message;
-      } else {
-        base.conversations = listed.rows;
-      }
-
-      let selectedId = get('c').trim() || null;
-      const profileFromQuery = get('profile').trim() || null;
-
-      if (!selectedId && profileFromQuery && UUID_RE.test(profileFromQuery)) {
-        const conv = await getOrCreateConversation(profileFromQuery);
-
-        if (conv.ok) {
-          selectedId = conv.conversationId;
-          const refreshed = await listConversationsForAdmin();
-
-          if (refreshed.ok) {
-            base.conversations = refreshed.rows;
+            base.messages = msg.messages;
+            base.hasMoreOlder = msg.hasMoreOlder;
           }
         }
       }
-
-      if (
-        selectedId &&
-        (!UUID_RE.test(selectedId) ||
-          !base.conversations.some((row) => row.conversationId === selectedId))
-      ) {
-        selectedId = null;
-      }
-
-      base.selectedConversationId = selectedId;
-
-      if (selectedId) {
-        const msg = await listRecentMessagesForConversation(selectedId);
-
-        if (!msg.ok) {
-          base.messagesError = msg.message;
-        } else {
-          base.messages = msg.messages;
-          base.hasMoreOlder = msg.hasMoreOlder;
-        }
-      }
+    } catch (error) {
+      console.error('[supabase] pharmacist admin unavailable', error);
+      base.supabaseReady = false;
+      base.pharmacyQueueError = base.pharmacyQueueError ?? 'Health records are temporarily unavailable.';
+      base.listError = base.listError ?? 'Health records are temporarily unavailable.';
+      base.customerSearchError = base.customerSearchError ?? 'Health records are temporarily unavailable.';
     }
 
     return base;

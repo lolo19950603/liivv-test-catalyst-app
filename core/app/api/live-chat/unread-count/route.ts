@@ -14,30 +14,36 @@ import { ensureCustomerProfile } from '~/lib/supabase/profile';
  * Server Actions re-fetch the current RSC page; an API route does not.
  */
 export async function GET() {
-  const customer = await getOnboardingCustomer();
+  try {
+    const customer = await getOnboardingCustomer();
 
-  if (!customer || !isSupabaseConfigured()) {
+    if (!customer || !isSupabaseConfigured()) {
+      return NextResponse.json({ count: 0 });
+    }
+
+    const ensured = await ensureCustomerProfile(customer);
+
+    if (ensured.status !== 'ok') {
+      return NextResponse.json({ count: 0 });
+    }
+
+    const conversation = await getConversationByProfileId(ensured.profile.id);
+
+    if (!conversation.ok || !conversation.conversationId) {
+      return NextResponse.json({ count: 0 });
+    }
+
+    const lastSeen = await getLiveChatLastSeen();
+    const unread = await countUnreadStaffMessages(conversation.conversationId, lastSeen);
+
+    if (!unread.ok) {
+      return NextResponse.json({ count: 0 });
+    }
+
+    return NextResponse.json({ count: unread.count });
+  } catch (error) {
+    console.error('[supabase] live-chat unread-count unavailable', error);
+
     return NextResponse.json({ count: 0 });
   }
-
-  const ensured = await ensureCustomerProfile(customer);
-
-  if (ensured.status !== 'ok') {
-    return NextResponse.json({ count: 0 });
-  }
-
-  const conversation = await getConversationByProfileId(ensured.profile.id);
-
-  if (!conversation.ok || !conversation.conversationId) {
-    return NextResponse.json({ count: 0 });
-  }
-
-  const lastSeen = await getLiveChatLastSeen();
-  const unread = await countUnreadStaffMessages(conversation.conversationId, lastSeen);
-
-  if (!unread.ok) {
-    return NextResponse.json({ count: 0 });
-  }
-
-  return NextResponse.json({ count: unread.count });
 }

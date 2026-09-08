@@ -10,7 +10,7 @@ const fallbackLocale = 'en';
 export default getRequestConfig(async ({ requestLocale }) => {
   const locale = await requestLocale;
 
-  // `/bc-app` and `/admin` sit outside `[locale]` and bypass the intl proxy.
+  // `/pharmacy-admin` and `/admin` sit outside `[locale]` and bypass the intl proxy.
   if (locale != null && !locales.includes(locale)) {
     notFound();
   }

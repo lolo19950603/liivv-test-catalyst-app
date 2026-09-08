@@ -299,7 +299,8 @@ export function PharmacyDashboard({
 
       {!supabaseReady ? (
         <p className="rounded-2xl border border-[#e8dcc4] bg-[#fdf8ee] px-4 py-3 text-sm text-[#7a5c20]">
-          Connect Supabase in your environment to load and save prescriptions.
+          Health tools are temporarily unavailable. You can still shop; prescriptions cannot load
+          until this service is back.
         </p>
       ) : null}
 

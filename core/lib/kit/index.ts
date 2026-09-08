@@ -1,4 +1,5 @@
 export { generateKitId } from './generate-kit-id';
+export { areCartKitsAvailable } from './availability';
 export { formatYourCustomKitName } from './custom-kit-name';
 export { kitCompositionFingerprint } from './kit-fingerprint';
 export { assignKitIdsToCartLines, formatKitPackingStaffNotes } from './match-lines';

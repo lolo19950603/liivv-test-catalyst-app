@@ -9,6 +9,8 @@ import {
 } from '~/lib/supabase/chat-messages';
 import { isCareTeamChatActive } from '~/lib/chat/session';
 
+import { logChatOperationalError } from '~/lib/chat/logging-policy';
+
 import {
   classifyCustomerMessage,
   PHARMACIST_ESCALATION_REPLY,
@@ -80,7 +82,7 @@ export async function processCustomerMessageForBot({
 
     return appendBotMessage(conversationId, reply);
   } catch (error) {
-    console.error('[virtual-care-bot]', error);
+    logChatOperationalError('[virtual-care-bot]', error);
 
     return appendBotMessage(conversationId, BOT_FAILURE_REPLY);
   }

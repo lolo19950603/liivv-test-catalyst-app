@@ -1,6 +1,5 @@
 /**
- * Build docs/Liivv-Architecture.html and docs/Liivv-Architecture.pdf
- * from docs/Liivv-Architecture.md (single IT pack).
+ * Build HTML + PDF for the IT architecture pack and the meeting glossary.
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -15,6 +14,12 @@ const documents = [
     html: 'Liivv-Architecture.html',
     pdf: 'Liivv-Architecture.pdf',
     title: 'Liivv — Architecture (IT)',
+  },
+  {
+    md: 'Liivv-Architecture-Glossary.md',
+    html: 'Liivv-Architecture-Glossary.html',
+    pdf: 'Liivv-Architecture-Glossary.pdf',
+    title: 'Liivv — IT meeting glossary',
   },
 ];
 
@@ -31,6 +36,14 @@ function inlineFormat(text) {
   out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
   return out;
+}
+
+function headingId(text) {
+  return text
+    .replace(/[→–—]/g, ' ')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 function parseTable(rows) {
@@ -143,14 +156,16 @@ function markdownToBody(md) {
 
     if (line.startsWith('## ')) {
       closeList();
-      html.push(`<h2>${inlineFormat(line.slice(3))}</h2>`);
+      const title = line.slice(3);
+      html.push(`<h2 id="${escapeHtml(headingId(title))}">${inlineFormat(title)}</h2>`);
       i += 1;
       continue;
     }
 
     if (line.startsWith('### ')) {
       closeList();
-      html.push(`<h3>${inlineFormat(line.slice(4))}</h3>`);
+      const title = line.slice(4);
+      html.push(`<h3 id="${escapeHtml(headingId(title))}">${inlineFormat(title)}</h3>`);
       i += 1;
       continue;
     }
@@ -205,12 +220,13 @@ const css = `
     font-size: 10.5pt;
     line-height: 1.42;
     color: #1a1a1a;
-    max-width: 760px;
+    max-width: 920px;
     margin: 0 auto;
   }
   h1 { font-size: 20pt; font-weight: 650; margin: 0 0 10pt; letter-spacing: -0.02em; }
   h2 { font-size: 13.5pt; font-weight: 650; margin: 20pt 0 8pt; page-break-after: avoid; }
   h3 { font-size: 11.5pt; font-weight: 650; margin: 14pt 0 6pt; page-break-after: avoid; }
+  a { color: #0b57d0; text-decoration: none; }
   p, ul, ol { margin: 0 0 8pt; }
   li { margin-bottom: 2pt; }
   hr { border: 0; border-top: 1px solid #d0d0d0; margin: 14pt 0; }
@@ -220,7 +236,11 @@ const css = `
   strong { font-weight: 650; }
   code { font-family: Consolas, "Courier New", monospace; font-size: 9pt; }
   pre.code { background: #f6f5f2; padding: 8pt 10pt; overflow: hidden; font-size: 8pt; }
-  .mermaid { margin: 10pt 0 14pt; page-break-inside: avoid; }
+  .mermaid { margin: 12pt 0 16pt; page-break-inside: avoid; overflow: visible; }
+  .mermaid svg { max-width: 100%; height: auto; display: block; }
+  .mermaid .nodeLabel, .mermaid .edgeLabel, .mermaid .cluster-label {
+    font-size: 13px;
+  }
   svg { max-width: 100%; }
   figure.diagram { margin: 10pt 0 14pt; page-break-inside: avoid; }
   figure.diagram svg { width: 100%; height: auto; display: block; }
@@ -239,7 +259,23 @@ function buildHtml(title, body) {
 ${body}
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-  mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'strict' });
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'base',
+    securityLevel: 'strict',
+    themeVariables: {
+      fontFamily: 'Segoe UI, Calibri, Helvetica, Arial, sans-serif',
+      fontSize: '16px',
+    },
+    flowchart: {
+      htmlLabels: true,
+      nodeSpacing: 28,
+      rankSpacing: 48,
+      padding: 16,
+      wrappingWidth: 140,
+      useMaxWidth: true,
+    },
+  });
   try {
     await mermaid.run({ querySelector: '.mermaid' });
   } catch (error) {

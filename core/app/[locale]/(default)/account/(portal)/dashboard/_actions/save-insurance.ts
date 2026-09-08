@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 
-import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
+import { runCustomerAction } from '~/lib/action-gateway/session';
 import { completeOnboardingStep3, getOnboardingStatus } from '~/lib/supabase/onboarding';
 import { replaceInsuranceInfo } from '~/lib/supabase/insurance';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
@@ -25,12 +25,7 @@ export async function saveInsuranceStep(
   _prevState: InsuranceActionState,
   formData: FormData,
 ): Promise<InsuranceActionState> {
-  const customer = await getOnboardingCustomer();
-
-  if (!customer) {
-    return { error: 'Please sign in to continue.' };
-  }
-
+  return runCustomerAction({ result: { error: 'Please sign in to continue.' } }, async (customer) => {
   if (!isSupabaseConfigured()) {
     return { error: 'Supabase is not configured.' };
   }
@@ -97,6 +92,7 @@ export async function saveInsuranceStep(
   }
 
   return redirectAfterInsurance(customer.entityId);
+  });
 }
 
 async function redirectAfterInsurance(entityId: number): Promise<never> {

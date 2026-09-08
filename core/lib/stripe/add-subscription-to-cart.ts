@@ -20,7 +20,7 @@ import { subscriptionLineIdentityKey } from '~/lib/checkout/subscription-line-ke
 import { addToOrCreateCart } from '~/lib/cart';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 
-import { isStripeConfigured } from './client';
+import { areSubscriptionsAvailable } from '~/lib/subscriptions/availability';
 
 const ProductSubscriptionCartQuery = graphql(
   `
@@ -50,8 +50,8 @@ const ProductSubscriptionCartQuery = graphql(
 export async function addSubscriptionProductToCart(formData: FormData): Promise<void> {
   const t = await getTranslations('Subscribe');
 
-  if (!isStripeConfigured()) {
-    throw new Error(t('errors.notConfigured'));
+  if (!(await areSubscriptionsAvailable())) {
+    throw new Error(t('errors.unavailable'));
   }
 
   const customerAccessToken = await getSessionCustomerAccessToken();

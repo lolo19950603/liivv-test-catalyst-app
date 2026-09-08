@@ -12,6 +12,7 @@ import { getShippingCountries } from '~/app/[locale]/(default)/cart/page-data';
 import { mapCustomerAddressesToSaved } from '~/lib/account/saved-shipping-addresses';
 import type { SavedShippingAddress } from '~/lib/account/saved-shipping-addresses';
 import { isStripeConfigured } from '~/lib/stripe/client';
+import { areSubscriptionsAvailable } from '~/lib/subscriptions/availability';
 import {
   findStripeCustomerIdByEmail,
   resolveStripeCustomerId,
@@ -52,12 +53,17 @@ export type SubscriptionsPageResult =
       defaultCountryCode: string;
     }
   | { kind: 'not-configured' }
+  | { kind: 'unavailable' }
   | { kind: 'customer-not-found' }
   | { kind: 'no-stripe-customer' };
 
 export const getSubscriptionsPageData = cache(async (): Promise<SubscriptionsPageResult> => {
   if (!isStripeConfigured()) {
     return { kind: 'not-configured' };
+  }
+
+  if (!(await areSubscriptionsAvailable())) {
+    return { kind: 'unavailable' };
   }
 
   const customerAccessToken = await getSessionCustomerAccessToken();

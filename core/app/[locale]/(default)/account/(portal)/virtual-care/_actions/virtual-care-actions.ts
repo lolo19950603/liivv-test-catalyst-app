@@ -1,11 +1,10 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 
 import { getVirtualCareChatData } from '~/app/[locale]/(default)/account/(portal)/pharmacy/page-data';
-import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
+import { runCustomerAction } from '~/lib/action-gateway/session';
 import {
   getLiveChatLastSeen,
   getLiveChatLastSeenCookieOptions,
@@ -22,6 +21,7 @@ import {
 } from '~/lib/supabase/chat-messages';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
+import { logChatOperationalError } from '~/lib/chat/logging-policy';
 import { isVirtualCareVoiceEnabled } from '~/lib/virtual-care-bot/config';
 import { processCustomerMessageForBot } from '~/lib/virtual-care-bot/process-customer-message';
 import { synthesizeChatSpeech, transcribeChatAudio } from '~/lib/virtual-care-bot/voice';
@@ -42,12 +42,10 @@ export async function getLiveChatSessionAction(): Promise<{
   isLoggedIn: boolean;
   data: LiveChatSessionPayload | null;
 }> {
-  const customer = await getOnboardingCustomer();
-
-  if (!customer) {
-    return { isLoggedIn: false, data: null };
-  }
-
+  return runCustomerAction({ result: { isLoggedIn: false, data: null } }, async (): Promise<{
+    isLoggedIn: boolean;
+    data: LiveChatSessionPayload | null;
+  }> => {
   const chat = await getVirtualCareChatData();
 
   if (!chat) {
@@ -68,15 +66,15 @@ export async function getLiveChatSessionAction(): Promise<{
       hasMoreOlder: chat.hasMoreOlder,
     },
   };
+  });
 }
 
 export async function loadOlderLiveChatMessagesAction(beforeCreatedAt: string): Promise<
   | { ok: true; messages: ChatMessageRow[]; hasMoreOlder: boolean }
   | { ok: false; error: string }
 > {
-  const customer = await getOnboardingCustomer();
-
-  if (!customer || !isSupabaseConfigured()) {
+  return runCustomerAction({ result: { ok: false, error: 'Chat is not available.' } }, async (customer) => {
+  if (!isSupabaseConfigured()) {
     return { ok: false, error: 'Chat is not available.' };
   }
 
@@ -105,12 +103,12 @@ export async function loadOlderLiveChatMessagesAction(beforeCreatedAt: string): 
   }
 
   return { ok: true, messages: listed.messages, hasMoreOlder: listed.hasMoreOlder };
+  });
 }
 
 export async function getLiveChatUnreadStaffCountAction(): Promise<{ count: number }> {
-  const customer = await getOnboardingCustomer();
-
-  if (!customer || !isSupabaseConfigured()) {
+  return runCustomerAction({ result: { count: 0 } }, async (customer) => {
+  if (!isSupabaseConfigured()) {
     return { count: 0 };
   }
 
@@ -134,15 +132,11 @@ export async function getLiveChatUnreadStaffCountAction(): Promise<{ count: numb
   }
 
   return { count: unread.count };
+  });
 }
 
 export async function markLiveChatReadAction(): Promise<{ ok: true }> {
-  const customer = await getOnboardingCustomer();
-
-  if (!customer) {
-    return { ok: true };
-  }
-
+  return runCustomerAction({ result: { ok: true } }, async () => {
   const cookieStore = await cookies();
 
   cookieStore.set(
@@ -152,6 +146,7 @@ export async function markLiveChatReadAction(): Promise<{ ok: true }> {
   );
 
   return { ok: true };
+  });
 }
 
 export type VirtualCareChatActionState = { ok?: boolean; error?: string } | null;
@@ -160,12 +155,7 @@ export async function virtualCareChatAction(
   _prevState: VirtualCareChatActionState,
   formData: FormData,
 ): Promise<VirtualCareChatActionState> {
-  const customer = await getOnboardingCustomer();
-
-  if (!customer) {
-    redirect('/login?redirectTo=/?chat=open');
-  }
-
+  return runCustomerAction({ redirectTo: '/login?redirectTo=/?chat=open' }, async (customer) => {
   if (!isSupabaseConfigured()) {
     return { ok: false, error: 'Chat storage is not configured.' };
   }
@@ -225,10 +215,11 @@ export async function virtualCareChatAction(
   });
 
   if (!botResult.ok) {
-    console.error('[virtual-care-bot]', botResult.message);
+    logChatOperationalError('[virtual-care-bot]', botResult.message);
   }
 
   return { ok: true };
+  });
 }
 
 export type TranscribeChatVoiceResult =
@@ -238,12 +229,9 @@ export type TranscribeChatVoiceResult =
 export async function transcribeChatVoiceAction(
   formData: FormData,
 ): Promise<TranscribeChatVoiceResult> {
-  const customer = await getOnboardingCustomer();
-
-  if (!customer) {
-    return { ok: false, error: 'Please sign in to use voice chat.' };
-  }
-
+  return runCustomerAction(
+    { result: { ok: false, error: 'Please sign in to use voice chat.' } },
+    async () => {
   if (!isVirtualCareVoiceEnabled()) {
     return { ok: false, error: 'Voice chat is not available right now.' };
   }
@@ -274,13 +262,15 @@ export async function transcribeChatVoiceAction(
 
     return { ok: true, text };
   } catch (error) {
-    console.error('[virtual-care-voice] transcribe', error);
+    logChatOperationalError('[virtual-care-voice] transcribe', error);
 
     return {
       ok: false,
       error: error instanceof Error ? error.message : 'Could not transcribe that recording.',
     };
   }
+    },
+  );
 }
 
 export type SynthesizeChatVoiceResult =
@@ -290,12 +280,9 @@ export type SynthesizeChatVoiceResult =
 export async function synthesizeChatVoiceAction(
   text: string,
 ): Promise<SynthesizeChatVoiceResult> {
-  const customer = await getOnboardingCustomer();
-
-  if (!customer) {
-    return { ok: false, error: 'Please sign in to use voice replies.' };
-  }
-
+  return runCustomerAction(
+    { result: { ok: false, error: 'Please sign in to use voice replies.' } },
+    async () => {
   if (!isVirtualCareVoiceEnabled()) {
     return { ok: false, error: 'Voice replies are not available right now.' };
   }
@@ -309,13 +296,15 @@ export async function synthesizeChatVoiceAction(
       mimeType,
     };
   } catch (error) {
-    console.error('[virtual-care-voice] synthesize', error);
+    logChatOperationalError('[virtual-care-voice] synthesize', error);
 
     return {
       ok: false,
       error: error instanceof Error ? error.message : 'Could not generate speech.',
     };
   }
+    },
+  );
 }
 
 export type VirtualCareAppointmentActionState = { ok?: boolean; error?: string } | null;
@@ -324,12 +313,9 @@ export async function virtualCareAppointmentAction(
   _prevState: VirtualCareAppointmentActionState,
   formData: FormData,
 ): Promise<VirtualCareAppointmentActionState> {
-  const customer = await getOnboardingCustomer();
-
-  if (!customer) {
-    redirect('/login?redirectTo=/account/virtual-care/appointment');
-  }
-
+  return runCustomerAction(
+    { redirectTo: '/login?redirectTo=/account/virtual-care/appointment' },
+    async (customer) => {
   const details = String(formData.get('details') ?? '').trim();
   const preferredDate = String(formData.get('preferredDate') ?? '').trim();
   const preferredTime = String(formData.get('preferredTime') ?? '').trim();
@@ -343,17 +329,16 @@ export async function virtualCareAppointmentAction(
   }
 
   // Manual booking flow — staff follow up by email. Microsoft Graph integration can be added later.
-  const displayName = [customer.firstName, customer.lastName].filter(Boolean).join(' ') || 'Customer';
-
+  // Do not log `details` (free-text; may contain PHI). See chat logging policy (G10).
   console.info('[virtual-care appointment request]', {
     customerId: customer.entityId,
-    email: customer.email,
-    displayName,
     preferredDate,
     preferredTime,
-    details,
+    detailsLength: details.length,
   });
 
   revalidatePath('/account/virtual-care/appointment');
   return { ok: true };
+    },
+  );
 }

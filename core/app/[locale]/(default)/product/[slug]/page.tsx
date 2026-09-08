@@ -20,6 +20,7 @@ import {
 } from '~/components/curated-kit-customizer';
 import { getFeaturedProducts } from '~/client/queries/get-products';
 import {
+  areCartKitsAvailable,
   isCuratedKitFromProductConnection,
   KIT_TYPE_FIELD,
   KIT_VARIANTS_FIELD,
@@ -31,7 +32,7 @@ import { ProductDetail } from '~/lib/makeswift/components/product-detail';
 import { Slot } from '~/lib/makeswift/slot';
 import { getRecaptchaSiteKey } from '~/lib/recaptcha';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
-import { isStripeConfigured } from '~/lib/stripe';
+import { areSubscriptionsAvailable } from '~/lib/subscriptions/availability';
 import {
   formatSubscriptionIntervalKey,
   getSubscriptionBillingIntervals,
@@ -794,7 +795,9 @@ export default async function Product({ params, searchParams }: Props) {
     return { email: session?.user?.email ?? '', name: obfuscatedName };
   });
 
-  const showPurchaseOptions = isStripeConfigured();
+  const showPurchaseOptions = await areSubscriptionsAvailable();
+  const cartKitsAvailable = await areCartKitsAvailable();
+  const curatedKitT = await getTranslations('Faceted.CuratedKit');
   const resolvedSearchParams = await searchParams;
   const defaultPurchaseType: 'one-time' | 'subscription' =
     resolvedSearchParams.purchaseType === 'subscription' ? 'subscription' : 'one-time';
@@ -879,35 +882,41 @@ export default async function Product({ params, searchParams }: Props) {
             purchaseOptions={isCuratedKit ? undefined : purchaseOptions}
             purchaseSlot={
               isCuratedKit ? (
-                <Stream
-                  fallback={
-                    <div className="py-8 text-sm text-[var(--contrast-500)]">Loading kit…</div>
-                  }
-                  value={Streamable.all([streamableKitProducts, streamableSuggestedKitProducts])}
-                >
-                  {([kitProducts, suggestedProducts]) => (
-                    <Suspense
-                      fallback={
-                        <div className="py-8 text-sm text-[var(--contrast-500)]">Loading kit…</div>
-                      }
-                    >
-                      <CuratedKitCustomizer
-                        kitHref={baseProduct.path}
-                        kitImage={
-                          baseProduct.defaultImage
-                            ? {
-                                src: baseProduct.defaultImage.url,
-                                alt: baseProduct.defaultImage.altText,
-                              }
-                            : undefined
+                cartKitsAvailable ? (
+                  <Stream
+                    fallback={
+                      <div className="py-8 text-sm text-[var(--contrast-500)]">Loading kit…</div>
+                    }
+                    value={Streamable.all([streamableKitProducts, streamableSuggestedKitProducts])}
+                  >
+                    {([kitProducts, suggestedProducts]) => (
+                      <Suspense
+                        fallback={
+                          <div className="py-8 text-sm text-[var(--contrast-500)]">Loading kit…</div>
                         }
-                        kitName={baseProduct.name}
-                        products={kitProducts}
-                        suggestedProducts={suggestedProducts}
-                      />
-                    </Suspense>
-                  )}
-                </Stream>
+                      >
+                        <CuratedKitCustomizer
+                          kitHref={baseProduct.path}
+                          kitImage={
+                            baseProduct.defaultImage
+                              ? {
+                                  src: baseProduct.defaultImage.url,
+                                  alt: baseProduct.defaultImage.altText,
+                                }
+                              : undefined
+                          }
+                          kitName={baseProduct.name}
+                          products={kitProducts}
+                          suggestedProducts={suggestedProducts}
+                        />
+                      </Suspense>
+                    )}
+                  </Stream>
+                ) : (
+                  <div className="rounded-lg border border-[#e8dcc4] bg-[#fdf8ee] px-4 py-6 text-sm text-[#7a5c20]">
+                    <p className="font-medium">{curatedKitT('Errors.cartUnavailable')}</p>
+                  </div>
+                )
               ) : undefined
             }
             quantityLabel={t('ProductDetails.quantity')}

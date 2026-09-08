@@ -54,6 +54,6 @@ export async function GET(request: Request) {
   return bcAppHtmlResponse(
     'Liivv Staff installed',
     '<p>Authorization successful. Opening the pharmacy and care portal…</p>',
-    appUrl ? `${appUrl}/bc-app` : undefined,
+    appUrl ? `${appUrl}/pharmacy-admin` : undefined,
   );
 }

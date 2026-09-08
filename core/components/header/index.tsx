@@ -21,6 +21,9 @@ import { resolveAccountHref } from '~/lib/makeswift/site-header/resolve-account-
 import { mapCategoryTreeFromStore } from '~/lib/makeswift/site-header/map-category-tree';
 import { stripLocaleFromPathname } from '~/lib/makeswift/site-header/should-hide-store-header';
 
+import { VendorOutageNotice } from '~/components/vendor-outage-notice';
+import { isVendorOutageError, withVendorFallback } from '~/lib/vendor-outage';
+
 import { CurrencyCode, HeaderFragment, HeaderLinksFragment } from './fragment';
 
 const GetCartCountQuery = graphql(`
@@ -37,40 +40,46 @@ const GetCartCountQuery = graphql(`
 `);
 
 const getCartCount = cache(async (cartId: string, customerAccessToken?: string) => {
-  const response = await client.fetch({
-    document: GetCartCountQuery,
-    variables: { cartId },
-    customerAccessToken,
-    fetchOptions: {
-      cache: 'no-store',
-      next: {
-        tags: [TAGS.cart],
+  return withVendorFallback('bigcommerce', null, async () => {
+    const response = await client.fetch({
+      document: GetCartCountQuery,
+      variables: { cartId },
+      customerAccessToken,
+      fetchOptions: {
+        cache: 'no-store',
+        next: {
+          tags: [TAGS.cart],
+        },
       },
-    },
-  });
+    });
 
-  return response.data.site.cart?.lineItems.totalQuantity ?? null;
+    return response.data.site.cart?.lineItems.totalQuantity ?? null;
+  });
 });
 
 const getHeaderLinks = cache(async (customerAccessToken?: string, currencyCode?: CurrencyCode) => {
-  const { data: response } = await client.fetch({
-    document: GetLinksAndSectionsQuery,
-    customerAccessToken,
-    variables: { currencyCode },
-    validateCustomerAccessToken: false,
-    fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate } },
-  });
+  return withVendorFallback('bigcommerce', null, async () => {
+    const { data: response } = await client.fetch({
+      document: GetLinksAndSectionsQuery,
+      customerAccessToken,
+      variables: { currencyCode },
+      validateCustomerAccessToken: false,
+      fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate } },
+    });
 
-  return readFragment(HeaderLinksFragment, response).site;
+    return readFragment(HeaderLinksFragment, response).site;
+  });
 });
 
 const getHeaderData = cache(async () => {
-  const { data: response } = await client.fetch({
-    document: LayoutQuery,
-    fetchOptions: { next: { revalidate } },
-  });
+  return withVendorFallback('bigcommerce', null, async () => {
+    const { data: response } = await client.fetch({
+      document: LayoutQuery,
+      fetchOptions: { next: { revalidate } },
+    });
 
-  return readFragment(HeaderFragment, response).site;
+    return readFragment(HeaderFragment, response).site;
+  });
 });
 
 export const Header = async () => {
@@ -84,10 +93,11 @@ export const Header = async () => {
     headers(),
   ]);
 
-  const logo = data.settings ? logoTransformer(data.settings) : '';
+  const logo = data?.settings ? logoTransformer(data.settings) : '';
   const requestPathname = stripLocaleFromPathname(requestHeaders.get('x-pathname') ?? '/');
   const accountHref = resolveAccountHref(loggedIn);
   const accountMenuLinks = loggedIn ? buildAccountMenuLinks((key) => tAccount(key)) : undefined;
+  const storefrontUnavailable = data == null;
 
   const streamableCategoryTree = Streamable.from(async () => {
     const [customerAccessToken, currencyCode] = await Promise.all([
@@ -95,9 +105,9 @@ export const Header = async () => {
       getPreferredCurrencyCode(),
     ]);
 
-    const { categoryTree } = await getHeaderLinks(customerAccessToken, currencyCode);
+    const links = await getHeaderLinks(customerAccessToken, currencyCode);
 
-    return mapCategoryTreeFromStore(categoryTree);
+    return mapCategoryTreeFromStore(links?.categoryTree ?? []);
   });
 
   const streamableCartCount = Streamable.from(async () => {
@@ -116,16 +126,24 @@ export const Header = async () => {
       return undefined;
     }
 
-    const customer = await getDashboardCustomer();
+    try {
+      const customer = await getDashboardCustomer();
 
-    if (!customer) {
-      return undefined;
+      if (!customer) {
+        return undefined;
+      }
+
+      const firstName = customer.firstName.trim();
+      const lastName = customer.lastName.trim();
+
+      return [firstName, lastName].filter(Boolean).join(' ') || tDashboard('guestName');
+    } catch (error) {
+      if (isVendorOutageError(error)) {
+        return undefined;
+      }
+
+      throw error;
     }
-
-    const firstName = customer.firstName.trim();
-    const lastName = customer.lastName.trim();
-
-    return [firstName, lastName].filter(Boolean).join(' ') || tDashboard('guestName');
   });
 
   const streamableNotifications = Streamable.from(async (): Promise<SiteHeaderNotifications | null> => {
@@ -155,18 +173,21 @@ export const Header = async () => {
   });
 
   return (
-    <SiteHeader
-      accountCustomerName={streamableAccountCustomerName}
-      accountHref={accountHref}
-      accountLabel={loggedIn ? tDashboard('myAccount') : undefined}
-      accountMenuLinks={accountMenuLinks}
-      cartCount={streamableCartCount}
-      categoryTree={streamableCategoryTree}
-      initialPathname={requestPathname}
-      notifications={streamableNotifications}
-      storeLogo={logo}
-      storeLogoLabel={t('home')}
-      searchPlaceholder={t('Search.inputPlaceholder')}
-    />
+    <>
+      {storefrontUnavailable ? <VendorOutageNotice vendor="bigcommerce" /> : null}
+      <SiteHeader
+        accountCustomerName={streamableAccountCustomerName}
+        accountHref={accountHref}
+        accountLabel={loggedIn ? tDashboard('myAccount') : undefined}
+        accountMenuLinks={accountMenuLinks}
+        cartCount={streamableCartCount}
+        categoryTree={streamableCategoryTree}
+        initialPathname={requestPathname}
+        notifications={streamableNotifications}
+        storeLogo={logo}
+        storeLogoLabel={t('home')}
+        searchPlaceholder={t('Search.inputPlaceholder')}
+      />
+    </>
   );
 };

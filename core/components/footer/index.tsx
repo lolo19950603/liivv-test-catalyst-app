@@ -20,6 +20,7 @@ import { getPreferredCurrencyCode } from '~/lib/currency';
 import { SiteFooter } from '~/lib/makeswift/components/site-footer';
 import { SiteFooterBottomBar } from '~/lib/makeswift/components/site-footer-bottom-bar';
 import { PropsContextProvider } from '~/lib/makeswift/components/site-footer/client';
+import { withVendorFallback } from '~/lib/vendor-outage';
 
 import { FooterFragment, FooterSectionsFragment } from './fragment';
 import { AmazonIcon } from './payment-icons/amazon';
@@ -49,43 +50,47 @@ const socialIcons: Record<string, { icon: JSX.Element }> = {
 
 const getFooterSections = cache(
   async (customerAccessToken?: string, currencyCode?: CurrencyCode) => {
-    const { data: response } = await client.fetch({
-      document: GetLinksAndSectionsQuery,
-      customerAccessToken,
-      variables: { currencyCode },
-      validateCustomerAccessToken: false,
-      fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate } },
-    });
+    return withVendorFallback('bigcommerce', null, async () => {
+      const { data: response } = await client.fetch({
+        document: GetLinksAndSectionsQuery,
+        customerAccessToken,
+        variables: { currencyCode },
+        validateCustomerAccessToken: false,
+        fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate } },
+      });
 
-    return readFragment(FooterSectionsFragment, response).site;
+      return readFragment(FooterSectionsFragment, response).site;
+    });
   },
 );
 
 const getFooterData = cache(async () => {
-  const { data: response } = await client.fetch({
-    document: LayoutQuery,
-    fetchOptions: { next: { revalidate } },
-  });
+  return withVendorFallback('bigcommerce', null, async () => {
+    const { data: response } = await client.fetch({
+      document: LayoutQuery,
+      fetchOptions: { next: { revalidate } },
+    });
 
-  return readFragment(FooterFragment, response).site;
+    return readFragment(FooterFragment, response).site;
+  });
 });
 
 const getFooterContextValue = cache(async () => {
   const t = await getTranslations('Components.Footer');
   const data = await getFooterData();
 
-  const logo = data.settings ? logoTransformer(data.settings) : '';
+  const logo = data?.settings ? logoTransformer(data.settings) : '';
 
-  const copyright = `© ${new Date().getFullYear()} ${data.settings?.storeName} – Powered by BigCommerce`;
+  const copyright = `© ${new Date().getFullYear()} ${data?.settings?.storeName ?? 'Liivv'}`;
 
-  const contactInformation = data.settings?.contact
+  const contactInformation = data?.settings?.contact
     ? {
         address: data.settings.contact.address,
         phone: data.settings.contact.phone,
       }
     : undefined;
 
-  const socialMediaLinks = data.settings?.socialMediaLinks
+  const socialMediaLinks = (data?.settings?.socialMediaLinks ?? [])
     .filter((socialMediaLink) => Boolean(socialIcons[socialMediaLink.name]))
     .map((socialMediaLink) => ({
       href: socialMediaLink.url,
@@ -99,22 +104,24 @@ const getFooterContextValue = cache(async () => {
   const sections = [
     {
       title: t('categories'),
-      links: sectionsData.categoryTree.map((category) => ({
+      links: (sectionsData?.categoryTree ?? []).map((category) => ({
         label: category.name,
         href: category.path,
       })),
     },
     {
       title: t('brands'),
-      links: removeEdgesAndNodes(sectionsData.brands).map((brand) => ({
-        label: brand.name,
-        href: brand.path,
-      })),
+      links: sectionsData
+        ? removeEdgesAndNodes(sectionsData.brands).map((brand) => ({
+            label: brand.name,
+            href: brand.path,
+          }))
+        : [],
     },
     {
       title: t('navigate'),
       links: [
-        ...(sectionsData.settings?.giftCertificates?.isEnabled
+        ...(sectionsData?.settings?.giftCertificates?.isEnabled
           ? [
               {
                 label: t('giftCertificates'),
@@ -122,12 +129,14 @@ const getFooterContextValue = cache(async () => {
               },
             ]
           : []),
-        ...removeEdgesAndNodes(sectionsData.content.pages)
-          .filter((page) => page.__typename !== 'BlogIndexPage')
-          .map((page) => ({
-            label: page.name,
-            href: page.__typename === 'ExternalLinkPage' ? page.link : page.path,
-          })),
+        ...(sectionsData
+          ? removeEdgesAndNodes(sectionsData.content.pages)
+              .filter((page) => page.__typename !== 'BlogIndexPage')
+              .map((page) => ({
+                label: page.name,
+                href: page.__typename === 'ExternalLinkPage' ? page.link : page.path,
+              }))
+          : []),
       ],
     },
   ];

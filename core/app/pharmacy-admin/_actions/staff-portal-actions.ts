@@ -2,7 +2,8 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { hasStaffAccess, revalidateStaffPortalPaths } from '~/lib/staff-access';
+import { runStaffAction } from '~/lib/action-gateway/session';
+import { revalidateStaffPortalPaths } from '~/lib/staff-access';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import {
   appendStaffMessage,
@@ -23,26 +24,15 @@ const UUID_RE =
 
 export type StaffActionState = { ok?: boolean; error?: string } | null;
 
-async function requireStaffSession(): Promise<{ ok: true } | { ok: false; error: string }> {
-  if (!(await hasStaffAccess())) {
-    return { ok: false, error: 'Unauthorized.' };
-  }
-
-  if (!isSupabaseConfigured()) {
-    return { ok: false, error: 'Supabase is not configured.' };
-  }
-
-  return { ok: true };
-}
+const STAFF_UNAUTHORIZED = { ok: false, error: 'Unauthorized.' } as const;
 
 export async function staffPortalAction(
   _prevState: StaffActionState,
   formData: FormData,
 ): Promise<StaffActionState> {
-  const auth = await requireStaffSession();
-
-  if (!auth.ok) {
-    return auth;
+  return runStaffAction(STAFF_UNAUTHORIZED, async (): Promise<StaffActionState> => {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: 'Supabase is not configured.' };
   }
 
   const intent = String(formData.get('intent') ?? '').trim();
@@ -242,6 +232,7 @@ export async function staffPortalAction(
   }
 
   return { ok: false, error: 'Invalid request.' };
+  });
 }
 
 export async function loadOlderStaffChatMessagesAction(
@@ -251,10 +242,9 @@ export async function loadOlderStaffChatMessagesAction(
   | { ok: true; messages: ChatMessageRow[]; hasMoreOlder: boolean }
   | { ok: false; error: string }
 > {
-  const auth = await requireStaffSession();
-
-  if (!auth.ok) {
-    return auth;
+  return runStaffAction({ ok: false, error: 'Unauthorized.' }, async () => {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: 'Supabase is not configured.' };
   }
 
   const id = conversationId.trim();
@@ -285,4 +275,5 @@ export async function loadOlderStaffChatMessagesAction(
   }
 
   return { ok: true, messages: listed.messages, hasMoreOlder: listed.hasMoreOlder };
+  });
 }

@@ -276,7 +276,8 @@
         "unexpected": "Something went wrong. Please try again.",
         "productsUnavailable": "The products in this kit could not be loaded right now. Please try again later.",
         "saveFailed": "We couldn’t save your kit. Please try again.",
-        "saveUnavailable": "Saving kits is temporarily unavailable."
+        "saveUnavailable": "Saving kits is temporarily unavailable.",
+        "cartUnavailable": "Kits are temporarily unavailable. Please try again in a few minutes."
       }
     }
   },
@@ -638,6 +639,7 @@
       },
       "errors": {
         "notConfigured": "Subscriptions are not configured yet.",
+        "unavailable": "Subscriptions are temporarily unavailable. Please try again in a few minutes.",
         "customerNotFound": "We could not find your account.",
         "noStripeCustomer": "No billing profile found. Complete a subscription checkout first."
       }
@@ -950,7 +952,9 @@
       "shippingRequired": "Select a shipping method for each order section before continuing to payment.",
       "addPaymentMethod": "Add a new payment method",
       "expires": "Expires {date}",
-      "default": "Default"
+      "default": "Default",
+      "unavailable": "Payments are temporarily unavailable. You can keep your cart and try checkout again shortly.",
+      "unavailableSubscriptions": "Subscriptions are temporarily unavailable. Remove subscription items from your cart or try again shortly. Your cart is saved."
     },
     "summary": {
       "orderSummary": "Order summary",
@@ -1135,6 +1139,7 @@
     },
     "errors": {
       "notConfigured": "Subscriptions are not configured yet.",
+      "unavailable": "Subscriptions are temporarily unavailable. Please try again in a few minutes.",
       "invalidPlan": "Please select a valid subscription plan.",
       "unavailablePrice": "This product does not have a valid price for subscription.",
       "priceConsentRequired": "Please confirm you understand subscription prices may change before continuing.",
@@ -1236,6 +1241,7 @@
     },
     "errors": {
       "notConfigured": "Subscriptions are not configured yet.",
+      "unavailable": "Subscriptions are temporarily unavailable. Please try again in a few minutes.",
       "invalidPlan": "This product is not available for subscription.",
       "customerNotFound": "We could not find your account."
     }
@@ -1268,8 +1274,8 @@
     "contactUs": "You can contact us at:"
   },
   "Error": {
-    "title": "There was a server error!",
-    "subtitle": "Please try again later.",
+    "title": "Something went wrong",
+    "subtitle": "Please try again. If shopping still will not load, the store may be temporarily unavailable.",
     "cta": "Try again"
   },
   "NotFound": {

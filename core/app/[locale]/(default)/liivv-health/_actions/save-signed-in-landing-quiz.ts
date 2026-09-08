@@ -1,6 +1,6 @@
 'use server';
 
-import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
+import { runCustomerAction } from '~/lib/action-gateway/session';
 import { saveLandingCategoryAnswers } from '~/lib/onboarding/apply-pending-guest-health-profile';
 import {
   isLandingHealthCategoryId,
@@ -13,6 +13,9 @@ export async function saveSignedInLandingQuiz(input: {
   categoryId: string;
   responses: CategoryResponses;
 }): Promise<{ ok: true } | { ok: false; error: string }> {
+  return runCustomerAction(
+    { result: { ok: false, error: 'Please sign in to save this to your health profile.' } },
+    async (customer) => {
   if (!isLandingHealthCategoryId(input.categoryId)) {
     return { ok: false, error: 'This health category is not available yet.' };
   }
@@ -21,12 +24,6 @@ export async function saveSignedInLandingQuiz(input: {
 
   if (!validateCategoryResponses(input.categoryId, responses)) {
     return { ok: false, error: 'Please answer every question before continuing.' };
-  }
-
-  const customer = await getOnboardingCustomer();
-
-  if (!customer) {
-    return { ok: false, error: 'Please sign in to save this to your health profile.' };
   }
 
   try {
@@ -44,4 +41,6 @@ export async function saveSignedInLandingQuiz(input: {
   }
 
   return { ok: true };
+    },
+  );
 }

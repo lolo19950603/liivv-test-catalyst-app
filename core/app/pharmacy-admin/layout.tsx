@@ -10,6 +10,6 @@ export async function headers() {
   };
 }
 
-export default function BcAppLayout({ children }: { children: ReactNode }) {
-  return <div className="liivv-staff-portal liivv-bc-app-portal">{children}</div>;
+export default function PharmacyAdminLayout({ children }: { children: ReactNode }) {
+  return <div className="liivv-staff-portal liivv-pharmacy-admin-portal">{children}</div>;
 }

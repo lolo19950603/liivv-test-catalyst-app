@@ -1,9 +1,9 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 
-import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
+import { type OnboardingCustomer } from '~/lib/account/get-session-customer';
+import { runCustomerAction } from '~/lib/action-gateway/session';
 import { isTabletDosageForm, normalizeBucket } from '~/lib/pharmacy/pharmacy-mappers';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import {
@@ -41,31 +41,26 @@ function normalizeRefillStatus(status: string): string {
   return String(status ?? '').trim().toLowerCase();
 }
 
-async function requirePharmacyProfile() {
-  const customer = await getOnboardingCustomer();
-
-  if (!customer) {
-    redirect('/login?redirectTo=/account/pharmacy');
-  }
-
+async function loadPharmacyProfile(customer: OnboardingCustomer) {
   if (!isSupabaseConfigured()) {
-    return { customer, profile: null as null };
+    return { profile: null as null };
   }
 
   const ensured = await ensureCustomerProfile(customer);
 
   if (ensured.status !== 'ok') {
-    return { customer, profile: null as null };
+    return { profile: null as null };
   }
 
-  return { customer, profile: ensured.profile };
+  return { profile: ensured.profile };
 }
 
 export async function pharmacyAction(
   _prevState: PharmacyActionState,
   formData: FormData,
 ): Promise<PharmacyActionState> {
-  const { profile } = await requirePharmacyProfile();
+  return runCustomerAction({ redirectTo: '/login?redirectTo=/account/pharmacy' }, async (customer) => {
+  const { profile } = await loadPharmacyProfile(customer);
 
   if (!profile) {
     return { ok: false, error: 'Pharmacy storage is not configured.' };
@@ -362,4 +357,5 @@ export async function pharmacyAction(
   }
 
   return { ok: false, error: 'Invalid request.' };
+  });
 }

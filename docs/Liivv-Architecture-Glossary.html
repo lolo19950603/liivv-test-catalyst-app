@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Liivv — IT meeting glossary</title>
+  <style>
+  @page { size: letter; margin: 0.65in 0.7in; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Calibri, Helvetica, Arial, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.42;
+    color: #1a1a1a;
+    max-width: 920px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 20pt; font-weight: 650; margin: 0 0 10pt; letter-spacing: -0.02em; }
+  h2 { font-size: 13.5pt; font-weight: 650; margin: 20pt 0 8pt; page-break-after: avoid; }
+  h3 { font-size: 11.5pt; font-weight: 650; margin: 14pt 0 6pt; page-break-after: avoid; }
+  a { color: #0b57d0; text-decoration: none; }
+  p, ul, ol { margin: 0 0 8pt; }
+  li { margin-bottom: 2pt; }
+  hr { border: 0; border-top: 1px solid #d0d0d0; margin: 14pt 0; }
+  table { width: 100%; border-collapse: collapse; margin: 8pt 0 12pt; font-size: 9pt; page-break-inside: auto; }
+  th, td { text-align: left; vertical-align: top; padding: 5pt 6pt; border-bottom: 1px solid #e2e2e2; }
+  th { font-weight: 650; border-bottom: 1.5px solid #1a1a1a; }
+  strong { font-weight: 650; }
+  code { font-family: Consolas, "Courier New", monospace; font-size: 9pt; }
+  pre.code { background: #f6f5f2; padding: 8pt 10pt; overflow: hidden; font-size: 8pt; }
+  .mermaid { margin: 12pt 0 16pt; page-break-inside: avoid; overflow: visible; }
+  .mermaid svg { max-width: 100%; height: auto; display: block; }
+  .mermaid .nodeLabel, .mermaid .edgeLabel, .mermaid .cluster-label {
+    font-size: 13px;
+  }
+  svg { max-width: 100%; }
+  figure.diagram { margin: 10pt 0 14pt; page-break-inside: avoid; }
+  figure.diagram svg { width: 100%; height: auto; display: block; }
+  figcaption { font-size: 9pt; color: #555; margin-top: 4pt; }
+</style>
+</head>
+<body>
+<h1>Liivv — IT meeting glossary</h1>
+<p><strong>Who this is for:</strong> you, before the next architecture / security meeting  </p>
+<p><strong>In the room:</strong> <strong>We</strong> = Liivv (you: the app and the BigCommerce store). <strong>IT</strong> = the team reviewing it. The pack does not split Engineering / Ops / Legal.</p>
+<p><strong>What this is not:</strong> the IT pack. The IT pack is <a href="./Liivv-Architecture.md">Liivv-Architecture.md</a> / <a href="./Liivv-Architecture.pdf">PDF</a>. This sheet only explains the <strong>words</strong>.</p>
+<p><strong>Contents</strong></p>
+<table><thead><tr><th>§</th><th>Section</th><th>Job</th></tr></thead><tbody><tr><td>1</td><td><a href="#1-the-whole-architecture-in-plain-english">The whole architecture in plain English</a></td><td>The picture, out loud, once</td></tr>
+<tr><td>2</td><td><a href="#2-sentences-to-have-ready">Sentences to have ready</a></td><td>What to say when they ask</td></tr>
+<tr><td>3</td><td><a href="#3-must-know-first-learn-these">Must-know first</a></td><td>Words to learn before the meeting</td></tr>
+<tr><td>4</td><td><a href="#4-full-glossary-a-z">Full glossary (A–Z)</a></td><td>Lookup during the meeting</td></tr>
+<tr><td>5</td><td><a href="#5-it-requirement-liivv-one-line-each">IT requirement → Liivv</a></td><td>Their box → our box, one line</td></tr>
+<tr><td>6</td><td><a href="#6-gaps-in-spoken-english">Gaps in spoken English</a></td><td>How to admit G1 / G5 without rambling</td></tr>
+<tr><td>7</td><td><a href="#7-words-they-may-throw-that-are-not-in-the-pack">Words they may throw that are not in the pack</a></td><td>Do not invent a control for these</td></tr>
+<tr><td>8</td><td><a href="#8-10-minute-drill-night-before">10-minute drill</a></td><td>Night-before practice</td></tr></tbody></table>
+<p>If you only remember five things: <strong>browser has no database key</strong>, <strong>Next.js is the only talker</strong>, <strong>PHI is in Canadian Supabase</strong>, <strong>shop is BigCommerce</strong>, <strong>secrets are Vercel encrypted env vars</strong>.</p>
+<hr />
+<h2 id="1-the-whole-architecture-in-plain-english">1. The whole architecture in plain English</h2>
+<p>IT’s usual picture: people use a website, the website talks to a <strong>gateway</strong>, the gateway talks to <strong>small services</strong>, those services talk to a <strong>SQL database inside Azure</strong>. On the side: company login (<strong>Entra</strong>), a password locker (<strong>Key Vault</strong>), build pipeline (<strong>CI/CD</strong>), and security scanners (<strong>Veracode / Sonar / CrowdStrike</strong>). Those are <strong>IT requirements</strong>. Liivv is the <strong>same idea</strong>, different house:</p>
+<ul>
+<li>Shoppers and staff use a website.</li>
+<li>That website <strong>is</strong> the app and the API (one Next.js program on <strong>Vercel</strong>).</li>
+<li>There is <strong>no</strong> Azure gateway product and <strong>no</strong> mesh of microservices.</li>
+<li>Data does <strong>not</strong> sit in Azure SQL next to the app. Shop data is <strong>BigCommerce</strong>. Health data is <strong>Canadian Supabase</strong>. Cards are <strong>Stripe</strong> (we never keep the card number).</li>
+<li>Login is <strong>BigCommerce</strong> for shoppers. Pharmacists: <strong>BC admin iframe</strong> + <strong>shared password</strong> (Vercel encrypted env). Entra needs IT to provide a connection.</li>
+<li>Secrets sit in <strong>Vercel encrypted env vars</strong> — required to host on Vercel. That is our vault.</li>
+<li>We do <strong>not</strong> run Veracode / Sonar / CrowdStrike in this pipeline.</li>
+</ul>
+<p><strong>The sentence IT cares about:</strong> the shopper’s browser is not allowed to talk to the database. Only the server is. If someone steals the <strong>server</strong> secret, row rules will not save you — that is also true when an Azure API uses a privileged SQL login. That leftover risk is called <strong>residual</strong>.</p>
+<hr />
+<h2 id="2-sentences-to-have-ready">2. Sentences to have ready</h2>
+<p>Say these in your own words. Do not invent extra controls.</p>
+<table><thead><tr><th>If they say…</th><th>You can say…</th></tr></thead><tbody><tr><td>“Does the browser talk to the database?”</td><td>“No. The browser talks to Next.js on Vercel. Next.js is the only process that holds the database and payment secrets.”</td></tr>
+<tr><td>“Where is PHI?”</td><td>“Canadian Supabase. Not BigCommerce. Not Vercel as a database. Cards are Stripe — we never store PAN.”</td></tr>
+<tr><td>“Where is the shop data?”</td><td>“BigCommerce is the system of record for catalog, cart, checkout, orders, and customer login.”</td></tr>
+<tr><td>“Do you have Entra / SSO / MFA?”</td><td>“Entra needs IT to approve and give us a connection — that’s G1. Until then shoppers use BigCommerce login. Pharmacists open Liivv Staff inside BC admin, then a shared username/password in Vercel encrypted env.”</td></tr>
+<tr><td>“Where is Key Vault?”</td><td>“In place on this host: Vercel encrypted env vars. We have to put secrets there to host. That closed G2.”</td></tr>
+<tr><td>“Where is the API gateway / APIM / WAF?”</td><td>“In place: Liivv API gateway on every <code>/api</code> call, plus Liivv action gateway (<code>runCustomerAction</code> / <code>runStaffAction</code>) for PHI form posts. That closed G4.”</td></tr>
+<tr><td>“How do you scan the code?”</td><td>“Lint and typecheck in CI. We do not have Veracode, Sonar, or CrowdStrike in this pipeline. That’s gap G5.”</td></tr>
+<tr><td>“What if someone fakes a Stripe webhook?”</td><td>“We verify the Stripe signature with the webhook secret. Same idea for BigCommerce — Bearer secret.”</td></tr>
+<tr><td>“Can a shopper read everyone’s health records?”</td><td>“There is no database key in the page. RLS is on with no anon policies. The server uses the service role only after a login check.”</td></tr>
+<tr><td>“What if Stripe / Supabase / BigCommerce is down?”</td><td>“We do not fail over. That is not backup/RPO (G9). BigCommerce down: store unavailable; Stripe still charges renewals and we retry the shop order on <code>invoice.paid</code> for about three days. Stripe down: shop and cart stay up, new checkout cannot pay, cart is kept; <strong>Subscribe is hidden</strong>; Stripe still bills existing cards when they are back. Supabase down: shop and one-time checkout stay up; <strong>subscriptions and curated cart kits are disabled</strong> (<code>cart_subscription_lines</code> / <code>cart_kit_sessions</code>); health/pharmacy/chat show a notice. Vercel down: whole site down; Stripe still charges and retries the webhook when we are back.”</td></tr></tbody></table>
+<p><strong>Do not volunteer:</strong> a future move to Azure. If they ask about the AI assistant: it <strong>remains off</strong> (<strong>S4</strong>); we can use IT resources later if we decide to implement it. If they ask about gaps, point at remaining open items (<strong>G1</strong>, <strong>G5</strong>). Closed: <strong>G2</strong>, <strong>G3</strong>, <strong>G4</strong>, <strong>G6</strong>, <strong>G7</strong>, <strong>G8</strong>, <strong>G9</strong>, <strong>G10</strong>.</p>
+<hr />
+<h2 id="3-must-know-first-learn-these">3. Must-know first (learn these)</h2>
+<h3 id="app-and-hosting">App and hosting</h3>
+<table><thead><tr><th>Word</th><th>In English</th><th>Liivv</th></tr></thead><tbody><tr><td><strong>Next.js</strong></td><td>The website program (React pages + server).</td><td>Our whole app. Version 16. Lives in <code>core/</code>.</td></tr>
+<tr><td><strong>Vercel</strong></td><td>The company that <strong>hosts</strong> the Next.js app (like Azure App Service, but not Azure).</td><td>Hosting only — <strong>not</strong> where we store shop or health records.</td></tr>
+<tr><td><strong>Node / runtime</strong></td><td>The engine that runs the server JavaScript.</td><td>One Node process: page + API together.</td></tr>
+<tr><td><strong>Serverless instance</strong></td><td>A small copy of the app that Vercel starts to handle traffic. There can be many at once.</td><td><code>/api</code> rate limit is <strong>one shared counter</strong> (Vercel Runtime Cache), not per copy.</td></tr>
+<tr><td><strong>Preview vs Production</strong></td><td>Production = the live Vercel site. Local preview = Cursor / <code>.env.local</code>.</td><td><strong>Only production keys</strong> on Vercel. We do <strong>not</strong> use Vercel Preview (closed <strong>G3</strong>).</td></tr>
+<tr><td><strong>Env vars / secrets</strong></td><td>Passwords and API keys stored as settings, not in the public code.</td><td><strong>Vercel encrypted env</strong> + gitignored <code>.env.local</code>. Required to host on Vercel.</td></tr>
+<tr><td><strong><code>NEXT_PUBLIC_…</code></strong></td><td>A key that <strong>is</strong> allowed in the browser.</td><td>Only Stripe’s <strong>publishable</strong> key. Database keys must never be <code>NEXT_PUBLIC</code>.</td></tr></tbody></table>
+<h3 id="the-three-data-houses">The three data houses</h3>
+<table><thead><tr><th>Word</th><th>In English</th><th>Liivv</th></tr></thead><tbody><tr><td><strong>System of record</strong></td><td>The official owner of that kind of data. Other systems may copy it; this one is the source.</td><td>Shop → BigCommerce. Health → Supabase. Cards → Stripe.</td></tr>
+<tr><td><strong>BigCommerce (BC)</strong></td><td>The store engine: products, cart, checkout, orders, customer login, most email.</td><td>Shoppers log in here. Pharmacists open Liivv Staff <strong>inside BC admin</strong> (iframe), then shared password.</td></tr>
+<tr><td><strong>Supabase</strong></td><td>Hosted <strong>Postgres</strong> database (SQL) with extra tools. Ours is in <strong>Canada</strong> (<code>ca-central-1</code>).</td><td>PHI: profile, insurance, prescriptions, CarePack, care chat.</td></tr>
+<tr><td><strong>Stripe</strong></td><td>Card payments and subscriptions.</td><td>PAN / CVC <strong>never</strong> stored in Liivv. We use <strong>Stripe Elements</strong> (their form, not ours).</td></tr>
+<tr><td><strong>Vendor / SaaS</strong></td><td>Someone else’s cloud product we call over the internet, not a server in our Azure subscription.</td><td>BC, Supabase, Stripe, Vercel. An Azure SQL next to the app would be <strong>in-estate</strong>. Ours is vendor.</td></tr></tbody></table>
+<h3 id="identity-and-access">Identity and access</h3>
+<table><thead><tr><th>Word</th><th>In English</th><th>Liivv</th></tr></thead><tbody><tr><td><strong>Identity</strong></td><td>How we know who you are.</td><td>Customers: BC login. Pharmacists: BC iframe load + shared username/password at <code>/pharmacy-admin/login</code>.</td></tr>
+<tr><td><strong>SSO</strong></td><td>Single sign-on: one company login unlocks many apps.</td><td>Entra needs <strong>IT</strong> to connect it. Liivv today: BC shopper login + shared pharmacist login.</td></tr>
+<tr><td><strong>MFA</strong></td><td>Extra step besides password (app, SMS, hardware key).</td><td>Not Entra (<strong>G1</strong>). Not on the pharmacist login. Not shoppers.</td></tr>
+<tr><td><strong>Entra (Microsoft Entra ID)</strong></td><td>Microsoft’s work identity (old name: Azure AD).</td><td>Needs <strong>IT</strong> to approve and provide a connection. <strong>G1</strong>.</td></tr>
+<tr><td><strong>Session</strong></td><td>Proof you already logged in (usually a cookie).</td><td>Auth.js for customers. Pharmacists: <code>liivv_pharmacy_admin</code> + <code>liivv_pharmacist</code>.</td></tr>
+<tr><td><strong>JWT</strong></td><td>A signed blob of claims (who you are, cart id, expiry). Tampering breaks the signature.</td><td>Customer session, anonymous cart, some BC login flows.</td></tr>
+<tr><td><strong>OAuth</strong></td><td>A standard “this app is allowed to act for this store / user” handshake.</td><td>How the Liivv Staff app is <strong>installed</strong> on the store.</td></tr>
+<tr><td><strong>Load token / signed payload</strong></td><td>BC JWT when the control panel opens the embedded app.</td><td>Verified on <code>/api/bigcommerce/app/load</code>; sets <code>liivv_pharmacy_admin</code>. Then shared pharmacist login.</td></tr>
+<tr><td><strong>iframe</strong></td><td>A page inside another page.</td><td>Pharmacist admin runs <strong>inside</strong> BC admin as an iframe (<code>/pharmacy-admin</code>).</td></tr></tbody></table>
+<h3 id="protection-on-the-wire-and-at-the-api">Protection on the wire and at the API</h3>
+<table><thead><tr><th>Word</th><th>In English</th><th>Liivv</th></tr></thead><tbody><tr><td><strong>HTTPS / TLS</strong></td><td>Encrypted pipe on the internet. HTTPS is HTTP over TLS.</td><td>Browser → Vercel, and Vercel → vendors.</td></tr>
+<tr><td><strong>API</strong></td><td>A machine interface: “do this / give me that,” not a human webpage.</td><td>Next.js <code>/api/*</code> and <strong>server actions</strong>. Also BC, Stripe, Supabase APIs.</td></tr>
+<tr><td><strong>API gateway / APIM</strong></td><td>A dedicated front door that checks auth, rate limits, and routes to many services. Azure’s product is <strong>API Management</strong>.</td><td><strong>Liivv API gateway</strong> — <strong>Azure APIM equivalent</strong> in this app. Every <code>/api/*</code> hits it first. PHI form posts use the <strong>Liivv action gateway</strong> (<code>runCustomerAction</code> / <code>runStaffAction</code>), not <code>/api</code>.</td></tr>
+<tr><td><strong>WAF</strong></td><td>Web application firewall: filters hostile HTTP traffic.</td><td>No separate WAF product. Vercel edge + our gateway routes.</td></tr>
+<tr><td><strong>Trust boundary</strong></td><td>The line between “untrusted internet” and “code that holds secrets.”</td><td>Browser and webhook callers are untrusted. Next.js is the secret holder.</td></tr>
+<tr><td><strong>Service role</strong></td><td>The <strong>god key</strong> for Supabase. It <strong>bypasses RLS</strong>.</td><td>Server only. Never in the browser. Same idea as a privileged SQL login on an API.</td></tr>
+<tr><td><strong>RLS</strong></td><td>Row Level Security: SQL rules that hide other people’s rows.</td><td><strong>On</strong>, with <strong>no</strong> anon/authenticated policies (deny by default). Does <strong>not</strong> stop the service role.</td></tr>
+<tr><td><strong>Webhook</strong></td><td>They call <strong>us</strong> when something happened (payment succeeded, product changed).</td><td>Must <strong>verify</strong> Stripe signature / BC Bearer secret or anyone could fake it. Stripe retries ~3 days on 5xx. We retry placing the BC order on those <code>invoice.paid</code> retries (<strong>§4</strong>).</td></tr>
+<tr><td><strong>Bearer token</strong></td><td>“Authorization: Bearer \&lt;secret\&gt;” — possession of the string is the proof.</td><td>BC product webhooks.</td></tr>
+<tr><td><strong>Rate limit</strong></td><td>Cap how often one IP can call something.</td><td>Every <code>/api</code>: 120/IP/min <strong>shared counter</strong>. DPD also 60.</td></tr>
+<tr><td><strong>Proxy</strong></td><td>Our server fetches an external API so the browser never talks to it directly.</td><td>Medication search → Health Canada DPD.</td></tr>
+<tr><td><strong>CSP</strong></td><td>Content Security Policy: browser rules for which scripts/frames are allowed.</td><td><code>/pharmacy-admin</code> allows BigCommerce to frame it.</td></tr></tbody></table>
+<h3 id="data-words-it-will-use">Data words IT will use</h3>
+<table><thead><tr><th>Word</th><th>In English</th><th>Liivv</th></tr></thead><tbody><tr><td><strong>PHI</strong></td><td>Protected / personal <strong>health</strong> information: health + who they are.</td><td>Insurance, Rx, CarePack, care chat — <strong>Supabase only</strong>.</td></tr>
+<tr><td><strong>PII</strong></td><td>Who they are: name, email, address, customer id.</td><td>BigCommerce + Supabase <code>profiles</code>.</td></tr>
+<tr><td><strong>PAN / CVC</strong></td><td>Card number / security code.</td><td><strong>Never stored.</strong> Stripe handles the card.</td></tr>
+<tr><td><strong>SQL / Postgres</strong></td><td>The database language / the database engine Supabase uses.</td><td>Canadian Postgres. Not Azure SQL.</td></tr>
+<tr><td><strong>Catalog</strong></td><td>Product list (and for DPD, the drug list).</td><td>Shop catalog = BC. Drug catalog = Health Canada DPD (not PHI).</td></tr>
+<tr><td><strong>GraphQL vs REST</strong></td><td>Two API styles. GraphQL = one query shape. REST = URLs + HTTP verbs.</td><td>Storefront <strong>GraphQL</strong> for the shop. <strong>Admin REST</strong> to create orders after Stripe.</td></tr>
+<tr><td><strong>PIPEDA / PHIPA</strong></td><td>Canadian privacy (federal) / Ontario health privacy.</td><td>The privacy frame we cite.</td></tr>
+<tr><td><strong>HIPAA</strong></td><td>US health privacy law.</td><td><strong>Do not claim HIPAA.</strong> We listed a Canadian region.</td></tr>
+<tr><td><strong>DPA / BAA</strong></td><td>Contracts with vendors about personal / health data.</td><td><strong>In place</strong> (closed <strong>G8</strong>).</td></tr>
+<tr><td><strong>RPO</strong></td><td>Recovery Point Objective: how much data you can afford to lose in a restore.</td><td>Supabase daily backups + restore steps in <strong>§4</strong> (S2 notes). Closed <strong>G9</strong>.</td></tr>
+<tr><td><strong>RTO / degraded mode</strong></td><td>How fast the *service* is usable again; or keep working with a subset.</td><td><strong>In place on the storefront:</strong> notice instead of a 500; remaining vendors still work. Supabase down also disables <strong>subscriptions</strong> and <strong>curated cart kits</strong>. No second-site failover. Full per-system behavior (shopper + renewals) is <strong>§4</strong>. Not G9.</td></tr></tbody></table>
+<h3 id="it-requirement-side-boxes-mostly-gaps">IT requirement side boxes (mostly gaps)</h3>
+<table><thead><tr><th>Word</th><th>In English</th><th>Liivv</th></tr></thead><tbody><tr><td><strong>Key Vault</strong></td><td>Azure’s locker for secrets, with access logs and rotation.</td><td>On Vercel: <strong>encrypted env vars</strong>. That is how this host stores secrets.</td></tr>
+<tr><td><strong>CI/CD</strong></td><td>Continuous Integration / Delivery: git push → tests → deploy.</td><td>GitHub → Vercel <strong>production</strong>. Local preview in Cursor. Lint + typecheck.</td></tr>
+<tr><td><strong>SAST</strong></td><td>Static Application Security Testing: scanners that read source for bugs (e.g. Sonar, Veracode static).</td><td>Not the same as CrowdStrike (endpoint). All three named tools: <strong>not in this pipeline</strong> — <strong>G5</strong>.</td></tr>
+<tr><td><strong>App Insights / OpenTelemetry</strong></td><td>Azure (or standard) telemetry: traces, metrics, logs.</td><td>Vercel logs, Analytics, Speed Insights, an OpenTelemetry <strong>hook</strong> — not Azure Monitor.</td></tr>
+<tr><td><strong>Microservices</strong></td><td>Many small services instead of one app.</td><td>We have <strong>one</strong> Node runtime. Simpler, not a mesh.</td></tr>
+<tr><td><strong>In the estate</strong></td><td>Inside the company’s own cloud subscription (typically Azure).</td><td>Liivv data is at <strong>vendors</strong>, reached over TLS.</td></tr>
+<tr><td><strong>Residual (risk)</strong></td><td>The risk left after controls.</td><td>Stolen <strong>server</strong> secrets. Say this; don’t claim zero risk.</td></tr></tbody></table>
+<hr />
+<h2 id="4-full-glossary-a-z">4. Full glossary (A–Z)</h2>
+<p><strong>Admin REST</strong> — BigCommerce’s staff/admin HTTP API. Used <strong>after</strong> Stripe succeeds to create the official order. Needs <code>BIGCOMMERCE_ACCESS_TOKEN</code> (server only).</p>
+<p><strong>Allowlist (network)</strong> — “Only these IPs may connect to <strong>Postgres / pooler</strong>.” Supabase can do that. Liivv’s app path is <strong>HTTPS</strong> (PostgREST), which those restrictions <strong>do not</strong> cover. We rely on no browser key + RLS for the real path. Closed <strong>G6</strong> (see <strong>§4</strong> S1 notes).</p>
+<p><strong>Anon / anonymous</strong> — Not logged in. Anonymous cart uses a <strong>signed JWT</strong> with the cart id, not a database key. RLS has <strong>no</strong> anon policies, so a stolen browser path should not read tables.</p>
+<p><strong>App Router</strong> — Next.js’s current way of organizing pages and server code (<code>core/app/...</code>).</p>
+<p><strong>App Insights</strong> — Azure’s application monitoring product. An IT requirement we do not have. We have Vercel’s logging stack instead.</p>
+<p><strong>Auth.js (NextAuth)</strong> — The login library. For customers it talks to BigCommerce and sets a session cookie.</p>
+<p><strong>Azure</strong> — Microsoft’s cloud. Liivv <strong>today</strong> does not run there. Do not describe a future Azure move unless that is the meeting’s topic.</p>
+<p><strong><code>/pharmacy-admin</code></strong> — Pharmacist admin <strong>inside</strong> the BigCommerce control panel (iframe). Load sets <code>liivv_pharmacy_admin</code>; then <code>/pharmacy-admin/login</code> for the shared password.</p>
+<p><strong>Bearer</strong> — See Bearer token in §3.</p>
+<p><strong>Bypass (RLS)</strong> — The service role ignores row rules. By design. That is why the key must never ship to the browser.</p>
+<p><strong>ca-central-1</strong> — AWS region name for Canada (Central). Where our Supabase project lives.</p>
+<p><strong>CarePack</strong> — A Liivv pharmacy/care request type stored in Supabase, worked by pharmacists in <code>/pharmacy-admin</code>.</p>
+<p><strong>Catalyst</strong> — BigCommerce’s Next.js storefront starter. This repo is a Catalyst app plus Liivv health/pharmacy.</p>
+<p><strong>CI/CD</strong> — See §3.</p>
+<p><strong>Client secret (Stripe)</strong> — A short-lived token the <strong>browser</strong> uses with Stripe.js to confirm a payment. Not our database key. Different from <code>STRIPE_SECRET_KEY</code> (server).</p>
+<p><strong>Connection string</strong> — The full database URL + password. Must not appear in JavaScript sent to the shopper.</p>
+<p><strong>ConstructEvent</strong> — Stripe’s method that checks the webhook signature. If it fails, we must not create an order.</p>
+<p><strong>Control panel</strong> — BigCommerce’s admin UI. Pharmacist admin is a <strong>separate Liivv page</strong>, not an app inside that panel.</p>
+<p><strong>Cookie</strong> — Small data the browser stores and sends back. Ours include the customer session, anonymous cart, pharmacist <code>liivv_pharmacy_admin</code> + <code>liivv_pharmacist</code>.</p>
+<p><strong>CrowdStrike</strong> — Endpoint / runtime security (EDR). <strong>Not</strong> a SAST code scanner. We do <strong>not</strong> have it in this repo’s pipeline (<strong>G5</strong>).</p>
+<p><strong>CSP</strong> — See §3.</p>
+<p><strong>CVC</strong> — Card security code. Never stored.</p>
+<p><strong>DACPAC</strong> — Azure SQL database deployment package. Typical Azure pipeline. We don’t deploy SQL that way; schema lives in Supabase SQL files.</p>
+<p><strong>Deny by default</strong> — If no RLS policy allows a row, the query gets nothing. Our anon/authenticated roles have <strong>no</strong> policies.</p>
+<p><strong>DIN</strong> — Drug Identification Number (Health Canada). Comes from DPD. Stored with the prescription in Supabase after the customer picks it.</p>
+<p><strong>DPA</strong> — Data Processing Agreement with a vendor. <strong>In place</strong> (closed <strong>G8</strong>).</p>
+<p><strong>DPD</strong> — Health Canada Drug Product Database. <strong>Free public</strong> drug catalog API. No PHI. We <strong>proxy</strong> it. Prescription <strong>copy</strong> is saved in Supabase.</p>
+<p><strong>Edge</strong> — Servers close to the user. “Vercel edge” = their front network, not our database.</p>
+<p><strong>Egress</strong> — Outbound IP of our hosting when we call vendors. Optional Postgres allowlist needs <strong>Vercel Static IPs</strong> first (see <strong>§4</strong> S1 notes / closed <strong>G6</strong>).</p>
+<p><strong>Elements (Stripe)</strong> — Stripe’s card input widget. Card data goes to Stripe, not our server disk.</p>
+<p><strong>Encryption at rest</strong> — Disks encrypted in the vendor’s cloud. We do <strong>not</strong> spell this as a Liivv-owned control in the pack; don’t claim it unless a vendor contract says so.</p>
+<p><strong>Env / environment variable</strong> — See §3.</p>
+<p><strong>Estate</strong> — The company’s owned cloud. Azure SQL next to the app would be in-estate. Ours is not.</p>
+<p><strong>Fax / transfer</strong> — How Rx images are handled: <strong>not</strong> uploaded as a photo dump into Liivv. Transfer or doctor fax only.</p>
+<p><strong>Gateway</strong> — See API gateway.</p>
+<p><strong>GitHub</strong> — Where the source code lives. Push → Vercel deploy.</p>
+<p><strong>Gitignore</strong> — Files Git will not commit. <code>.env.local</code> must stay gitignored.</p>
+<p><strong>GraphQL</strong> — See §3.</p>
+<p><strong>Health Canada</strong> — Public DPD API. Catalog only.</p>
+<p><strong>Hosting</strong> — Where the <strong>program</strong> runs (Vercel). Different from <strong>system of record</strong> (where <strong>data</strong> lives).</p>
+<p><strong>HTML / JS</strong> — The page and scripts the browser gets. Must not contain service keys.</p>
+<p><strong>IdP (identity provider)</strong> — The system that authenticates people. IT requirement: Entra. Liivv: BigCommerce for shoppers; shared pharmacist login for Rx/chat admin.</p>
+<p><strong>iframe</strong> — See §3.</p>
+<p><strong>In place / not in place</strong> — Honest status in the pack. “Have” or “equivalent” vs listed <strong>gaps</strong>.</p>
+<p><strong>Instance</strong> — See serverless instance.</p>
+<p><strong>JWT</strong> — See §3.</p>
+<p><strong>Key Vault</strong> — See §3.</p>
+<p><strong>Least privilege</strong> — Each secret/role can do only what it must. Service role is <strong>not</strong> least privilege on the database (it bypasses RLS). We limit <strong>who can call</strong> it (server after session), not what the key can do.</p>
+<p><strong>Lint / typecheck</strong> — Automatic checks (style and TypeScript types) before/during deploy. Not the same as Veracode.</p>
+<p><strong>Load token</strong> — See §3.</p>
+<p><strong>Logging / observability</strong> — Seeing errors and traffic. Vercel logs + Analytics + Speed Insights. Care-chat <strong>message bodies are not</strong> written to those logs (closed <strong>G10</strong>; pack <strong>§4</strong>).</p>
+<p><strong>Makeswift</strong> — Visual CMS from Catalyst. <strong>Not used</strong> on Liivv today (maybe later). Do not treat it as part of the live security story.</p>
+<p><strong>Microservices</strong> — See §3.</p>
+<p><strong>MFA</strong> — See §3.</p>
+<p><strong>Mitigation</strong> — What reduces a risk. For residual server-secret theft: secret hygiene, rotation, production-only keys on Vercel — <strong>not</strong> “RLS makes us safe.”</p>
+<p><strong>Next.js</strong> — See §3.</p>
+<p><strong>Node</strong> — See §3.</p>
+<p><strong>OAuth</strong> — See §3.</p>
+<p><strong>Olivia</strong> — The in-app care assistant <strong>flag</strong>. It is <strong>off</strong> (<code>VIRTUAL_CARE_BOT_ENABLED</code>) and <strong>remains off</strong> (<strong>S4</strong>). We can use IT resources later if we decide to implement it. Human chat still lives in Supabase via <code>/pharmacy-admin</code>.</p>
+<p><strong>OpenTelemetry</strong> — A standard for traces/metrics. There is a <strong>hook</strong> in the stack, not Azure App Insights.</p>
+<p><strong>Order of record</strong> — The official order. <strong>BigCommerce</strong>, created after Stripe says payment succeeded.</p>
+<p><strong>PAN</strong> — Primary Account Number (the card number). Never stored in Liivv.</p>
+<p><strong>Payload</strong> — The body of a webhook or API call.</p>
+<p><strong>PCI</strong> — Card-industry security standard. We keep PAN out by using Stripe. Don’t claim a PCI audit unless we have one.</p>
+<p><strong>PHI / PII / PHIPA / PIPEDA</strong> — See §3.</p>
+<p><strong>Postgres</strong> — See §3.</p>
+<p><strong>Preview</strong> — See Preview vs Production.</p>
+<p><strong>Privileged SQL login</strong> — A powerful database user used by an API. Our equivalent is the Supabase <strong>service role</strong>.</p>
+<p><strong>Production</strong> — The live site.</p>
+<p><strong>Proxy</strong> — See §3.</p>
+<p><strong>Publishable key</strong> — Stripe key that <strong>may</strong> be in the browser. Still not a database key.</p>
+<p><strong>Rate limit</strong> — See §3.</p>
+<p><strong>Residual</strong> — See §3.</p>
+<p><strong>REST</strong> — See GraphQL vs REST.</p>
+<p><strong>RLS</strong> — See §3.</p>
+<p><strong>RPO</strong> — See §3.</p>
+<p><strong>RSC</strong> — React Server Components: HTML built on the server. Shopper gets HTML, not the service role.</p>
+<p><strong>Runtime cache</strong> — Short-lived memory on Vercel during checkout (snapshot), not the system of record.</p>
+<p><strong>SAST</strong> — See §3.</p>
+<p><strong>Secret hygiene</strong> — Don’t commit keys, don’t put them in the browser, only upload production keys to Vercel, rotate if leaked.</p>
+<p><strong>Server action</strong> — Next.js function that runs <strong>on the server</strong> when the UI submits something (profile, Rx). Not a public URL you casually call, but still server-side.</p>
+<p><strong>Server-only</strong> — A module that Next.js will not bundle into browser JavaScript. Our Supabase client is <code>server-only</code>.</p>
+<p><strong>Service role</strong> — See §3.</p>
+<p><strong>Session</strong> — See §3.</p>
+<p><strong>Signed</strong> — Cryptographically sealed so tampering is detectable (JWT, Stripe webhook).</p>
+<p><strong>Sonar (SonarQube)</strong> — Code-quality / security scanner. Not in our pipeline. <strong>G5</strong>.</p>
+<p><strong>SQL</strong> — Database language. “Walk into a database with a key from the page” = the failure mode we are scoring.</p>
+<p><strong>SSO</strong> — See §3.</p>
+<p><strong>Store hash</strong> — BC identifier for <strong>this</strong> store. Staff app session is bound to it so another store’s token should not work.</p>
+<p><strong>Storefront API / Storefront GraphQL</strong> — The shop-facing BC API (catalog, cart) using the storefront token — still <strong>server-side</strong> in our app.</p>
+<p><strong>Stripe.js</strong> — Stripe’s browser library. Confirms the payment; we never see PAN.</p>
+<p><strong>Supabase</strong> — See §3.</p>
+<p><strong>TLS</strong> — See HTTPS / TLS.</p>
+<p><strong>Transactional email</strong> — Order/account mail. Sent by <strong>BigCommerce</strong>, not a custom Azure mail microservice.</p>
+<p><strong>Trust boundary</strong> — See §3.</p>
+<p><strong>Typecheck</strong> — TypeScript compiler check in CI.</p>
+<p><strong>Vault</strong> — Generic word for a secrets locker. On this host = Vercel encrypted env.</p>
+<p><strong>Vendor DB</strong> — Database we don’t host ourselves (Supabase). Contrast: in-estate SQL.</p>
+<p><strong>Veracode</strong> — Commercial AppSec platform (includes SAST and more). An IT requirement we don’t have. <strong>G5</strong>.</p>
+<p><strong>Vercel</strong> — See §3.</p>
+<p><strong>WAF</strong> — See §3.</p>
+<p><strong>Webhook</strong> — See §3.</p>
+<p><strong><code>.env.local</code></strong> — Local secret file on a developer machine. Gitignored. Production secrets are Vercel encrypted env.</p>
+<hr />
+<h2 id="5-it-requirement-liivv-one-line-each">5. IT requirement → Liivv (one line each)</h2>
+<p>Use this when they walk the checklist.</p>
+<table><thead><tr><th>IT requirement</th><th>One-line Liivv</th></tr></thead><tbody><tr><td>Web app</td><td>Next.js 16 on Vercel (shop, account dashboard, pharmacist admin).</td></tr>
+<tr><td>API gateway</td><td><strong>In place.</strong> Liivv API gateway on every <code>/api/*</code> plus action gateway for PHI posts (closed <strong>G4</strong>).</td></tr>
+<tr><td>Microservices</td><td>One Node runtime.</td></tr>
+<tr><td>SQL in the estate</td><td>Canadian Supabase + BigCommerce + Stripe. Vendor, not Azure SQL.</td></tr>
+<tr><td>Entra SSO / MFA</td><td>Shopper login is BigCommerce. Pharmacist admin is BC iframe + shared password in Vercel env. Entra needs IT approval (<strong>G1</strong>).</td></tr>
+<tr><td>Secrets / vault</td><td><strong>In place.</strong> Vercel encrypted env vars (closed <strong>G2</strong>).</td></tr>
+<tr><td>Rate limiting</td><td><strong>In place.</strong> Every <code>/api</code> 120/IP/min shared counter; DPD also 60 (closed <strong>G7</strong>).</td></tr>
+<tr><td>Webhook auth</td><td>Stripe signature; BC Bearer.</td></tr>
+<tr><td>CI/CD</td><td>GitHub → Vercel. Not GitHub Enterprise + DACPAC.</td></tr>
+<tr><td>Veracode / Sonar / CrowdStrike</td><td><strong>Not in this pipeline</strong> (<strong>G5</strong>).</td></tr>
+<tr><td>App Insights</td><td>Vercel logs / Analytics — not Azure Monitor.</td></tr>
+<tr><td>Email microservice</td><td>BigCommerce mail.</td></tr></tbody></table>
+<hr />
+<h2 id="6-gaps-in-spoken-english">6. Gaps in spoken English</h2>
+<p>These are <strong>ours to address</strong>, not embarrassments to hide. <strong>G2</strong>, <strong>G3</strong>, <strong>G4</strong>, <strong>G6</strong>, <strong>G7</strong>, <strong>G8</strong>, <strong>G9</strong>, and <strong>G10</strong> are <strong>in place</strong> — do not list them as missing.</p>
+<table><thead><tr><th>ID</th><th>Say it like this</th></tr></thead><tbody><tr><td><strong>G1</strong></td><td>Entra needs IT approval. We cannot turn it on ourselves. Shoppers: BigCommerce. Pharmacists: BC iframe + shared password in Vercel encrypted env.</td></tr>
+<tr><td><strong>G2</strong></td><td><strong>In place.</strong> Vercel encrypted env vars are the vault on this host.</td></tr>
+<tr><td><strong>G3</strong></td><td><strong>In place.</strong> Only production keys on Vercel. No Vercel Preview — we preview locally in Cursor.</td></tr>
+<tr><td><strong>G4</strong></td><td><strong>In place.</strong> Liivv API gateway on every <code>/api/*</code> plus Liivv action gateway for PHI / staff form posts.</td></tr>
+<tr><td><strong>G5</strong></td><td>No Veracode, Sonar, or CrowdStrike in this repo’s pipeline. IT: say if those scanners are required.</td></tr>
+<tr><td><strong>G6</strong></td><td><strong>In place.</strong> App uses HTTPS to Supabase — Postgres IP allowlist does not cover that path. No browser key + RLS protect the real path (<strong>§4</strong> S1 notes).</td></tr>
+<tr><td><strong>G7</strong></td><td><strong>In place.</strong> <code>/api</code> rate limit is one shared counter in Vercel Runtime Cache (120/IP/min; DPD also 60).</td></tr>
+<tr><td><strong>G8</strong></td><td><strong>In place.</strong> Vendor DPAs/BAAs are taken care of.</td></tr>
+<tr><td><strong>G9</strong></td><td><strong>In place.</strong> Supabase daily backups + restore steps (<strong>§4</strong> S2 notes). That is restore after data loss, not “keep the store up if a vendor is down.”</td></tr>
+<tr><td><strong>G10</strong></td><td><strong>In place.</strong> We do not log care-chat bodies (or appointment free-text) to Vercel logs (<strong>§4</strong>).</td></tr></tbody></table>
+<p><strong>How the pack sections fit:</strong> <strong>§2</strong> = map. <strong>§3</strong> = open gaps (<strong>G1</strong>, <strong>G5</strong>). <strong>§4</strong> = already defended. Then systems / flows. Closed gap IDs: <strong>G2</strong>, <strong>G3</strong>, <strong>G4</strong>, <strong>G6</strong>, <strong>G7</strong>, <strong>G8</strong>, <strong>G9</strong>, <strong>G10</strong>. <strong>S4</strong> (AI) is <strong>Off</strong>, not a G gap.</p>
+<hr />
+<h2 id="7-words-they-may-throw-that-are-not-in-the-pack">7. Words they may throw that are <strong>not</strong> in the pack</h2>
+<p>If they use these, don’t fake a Liivv control. Ask what they need, or park it as a follow-up.</p>
+<table><thead><tr><th>They say</th><th>Plain English</th><th>Safe response</th></tr></thead><tbody><tr><td><strong>Attack surface</strong></td><td>All the ways someone can try to get in.</td><td>“Public surface is Next.js on Vercel plus verified webhooks. Database is not exposed to the browser.”</td></tr>
+<tr><td><strong>Zero trust</strong></td><td>Don’t trust the network; prove every hop.</td><td>“We don’t claim a zero-trust product. Browser is untrusted; server holds secrets.”</td></tr>
+<tr><td><strong>Encryption in transit / at rest</strong></td><td>TLS on the wire / encrypted disks.</td><td>“In transit: HTTPS/TLS to Vercel and vendors. At rest: vendor-side — we don’t assert extra Liivv crypto in the pack.”</td></tr>
+<tr><td><strong>PIM / PAM / JIT access</strong></td><td>Extra approval to use admin secrets.</td><td>“Not in this app pack. Secrets are Vercel encrypted env.”</td></tr>
+<tr><td><strong>Pen test / DAST</strong></td><td>Humans or tools attacking the running site.</td><td>“Not claimed. Veracode / Sonar / CrowdStrike are <strong>G5</strong>. We can take a testing requirement as a follow-up.”</td></tr>
+<tr><td><strong>SIEM / SOC</strong></td><td>Central security log dump / 24h team.</td><td>“We have Vercel logs. Not Azure Sentinel / a SOC in this pack.”</td></tr>
+<tr><td><strong>Data residency / sovereignty</strong></td><td>Data stays in-country.</td><td>“PHI is Canadian Supabase (<code>ca-central-1</code>). Shop data is BigCommerce (their regions). Don’t over-claim BC residency unless we have that in writing.”</td></tr>
+<tr><td><strong>PCI-DSS</strong></td><td>Card-data rules.</td><td>“PAN never stored; Stripe Elements. Don’t claim a PCI certification unless we have one.”</td></tr>
+<tr><td><strong>Penetration of the supply chain</strong></td><td>Attack via npm/GitHub.</td><td>“CI is GitHub → Vercel. Veracode / Sonar / CrowdStrike not in this pipeline (<strong>G5</strong>).”</td></tr>
+<tr><td><strong>IdP-initiated SSO</strong></td><td>Login starts at Entra, then into the app.</td><td>“Not wired (<strong>G1</strong>).”</td></tr></tbody></table>
+<hr />
+<h2 id="8-10-minute-drill-night-before">8. 10-minute drill (night before)</h2>
+<p>Cover the page. Answer out loud.</p>
+<ol>
+<li>What is the only process that holds the Supabase service role?  </li>
+<li>Where does PHI live? Where do orders live? Where do card numbers live?  </li>
+<li>What is Entra, and do we have it?  </li>
+<li>What is Key Vault, and what do we use instead?  </li>
+<li>What is an API gateway, and what is our equivalent?  </li>
+<li>What does RLS <strong>not</strong> stop?  </li>
+<li>How do we know a Stripe “payment succeeded” call is really Stripe?  </li>
+<li>How do pharmacists get into pharmacist admin?  </li>
+<li>Name open gaps you will admit without being pushed.  </li>
+<li>What is residual risk in one sentence?</li>
+</ol>
+<p><strong>Answers:</strong> (1) Next.js on Vercel. (2) Canadian Supabase; BigCommerce; nowhere in Liivv — Stripe. (3) Microsoft work login; needs IT to connect — <strong>G1</strong>. (4) Azure secret locker; we use Vercel encrypted env — <strong>in place</strong> (closed <strong>G2</strong>). (5) Liivv API gateway on every <code>/api/*</code>, plus action gateway on PHI form posts — <strong>in place</strong> (closed <strong>G4</strong>). (6) A caller using the service role. (7) Signature + <code>STRIPE_WEBHOOK_SECRET</code>. (8) Open Liivv Staff from BigCommerce admin (iframe), then shared username/password at <code>/pharmacy-admin/login</code>. (9) <strong>G5</strong> (scanners) or <strong>G1</strong> (Entra) are fine; G6/G9/G10 are closed. (10) If the <strong>server</strong> secret is stolen, database row rules won’t stop that caller.</p>
+<hr />
+<p><strong>PDF of the IT pack:</strong> <a href="./Liivv-Architecture.pdf">Liivv-Architecture.pdf</a>  </p>
+<p><strong>This glossary PDF:</strong> <a href="./Liivv-Architecture-Glossary.pdf">Liivv-Architecture-Glossary.pdf</a></p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'base',
+    securityLevel: 'strict',
+    themeVariables: {
+      fontFamily: 'Segoe UI, Calibri, Helvetica, Arial, sans-serif',
+      fontSize: '16px',
+    },
+    flowchart: {
+      htmlLabels: true,
+      nodeSpacing: 28,
+      rankSpacing: 48,
+      padding: 16,
+      wrappingWidth: 140,
+      useMaxWidth: true,
+    },
+  });
+  try {
+    await mermaid.run({ querySelector: '.mermaid' });
+  } catch (error) {
+    console.error(error);
+  }
+  window.__mermaidDone = true;
+</script>
+</body>
+</html>

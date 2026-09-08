@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { addToOrCreateCart } from '~/lib/cart';
 import { MissingCartError } from '~/lib/cart/error';
+import { areCartKitsAvailable } from '~/lib/kit/availability';
 import { appendKitToSession, generateKitId } from '~/lib/kit';
 import { kitItemSchema } from '~/lib/kit/kit-item-schema';
 
@@ -30,13 +31,25 @@ export type AddKitToCartResult =
   | { status: 'error'; message: string };
 
 type KitMessages = {
-  (key: 'Errors.emptyKit' | 'Errors.missingCart' | 'Errors.addFailed' | 'Errors.unexpected'): string;
+  (
+    key:
+      | 'Errors.emptyKit'
+      | 'Errors.missingCart'
+      | 'Errors.addFailed'
+      | 'Errors.unexpected'
+      | 'Errors.cartUnavailable',
+  ): string;
   (key: 'successMessage', values: { kitId: string }): string;
 };
 
 export async function addKitToCart(input: AddKitToCartInput): Promise<AddKitToCartResult> {
   // Namespace typing hits TS depth limits on this large messages tree; cast is intentional.
   const t = (await getTranslations('Faceted.CuratedKit')) as unknown as KitMessages;
+
+  if (!(await areCartKitsAvailable())) {
+    return { status: 'error', message: t('Errors.cartUnavailable') };
+  }
+
   const parsed = addKitSchema.safeParse(input);
 
   if (!parsed.success) {

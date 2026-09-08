@@ -3,6 +3,7 @@ import 'server-only';
 import { cache } from 'react';
 import { revalidatePath } from 'next/cache';
 
+import { runCustomerAction } from '~/lib/action-gateway/session';
 import {
   encodeRankedCareInterest,
   resolveInitialHealthCategoriesWithRank,
@@ -216,30 +217,33 @@ export async function saveLandingCategoryAnswers(
 
 /**
  * Reads the guest landing-page quiz cookie and writes it into the signed-in
- * customer's health profile. Deduped per request via React cache().
+ * customer's health profile. Session is checked here — callers cannot pass a
+ * customer. Deduped per request via React cache().
  */
-export const applyPendingGuestHealthProfile = cache(async (customer: ApplyCustomer) => {
-  try {
-    if (!isSupabaseConfigured()) {
+export const applyPendingGuestHealthProfile = cache(async () => {
+  return runCustomerAction({ result: { applied: false as const } }, async (customer) => {
+    try {
+      if (!isSupabaseConfigured()) {
+        return { applied: false as const };
+      }
+
+      const pending = await getPendingGuestHealthProfile();
+
+      if (!pending) {
+        return { applied: false as const };
+      }
+
+      const saved = await saveLandingCategoryAnswers(customer, {
+        categoryId: pending.categoryId,
+        responses: pending.responses,
+        placement: 'primary',
+      });
+
+      return { applied: Boolean(saved) };
+    } catch {
       return { applied: false as const };
+    } finally {
+      await clearPendingGuestHealthProfile();
     }
-
-    const pending = await getPendingGuestHealthProfile();
-
-    if (!pending) {
-      return { applied: false as const };
-    }
-
-    const saved = await saveLandingCategoryAnswers(customer, {
-      categoryId: pending.categoryId,
-      responses: pending.responses,
-      placement: 'primary',
-    });
-
-    return { applied: Boolean(saved) };
-  } catch {
-    return { applied: false as const };
-  } finally {
-    await clearPendingGuestHealthProfile();
-  }
+  });
 });

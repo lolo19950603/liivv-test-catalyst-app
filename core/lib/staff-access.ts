@@ -1,33 +1,41 @@
 import 'server-only';
 
 import { getBcAppSession } from '~/lib/bc-app-session';
-import { assertAllowedStoreHash } from '~/lib/bigcommerce/app-oauth';
+import { getPharmacistSession } from '~/lib/pharmacist-session';
 
 export type StaffAccessContext = {
-  kind: 'bc-app';
+  kind: 'pharmacist';
+  username: string;
   storeHash: string;
-  userEmail: string;
+  bcUserEmail: string;
 };
 
+/**
+ * Pharmacist admin requires both:
+ * 1. BigCommerce iframe load session (`liivv_pharmacy_admin`)
+ * 2. Shared pharmacist username/password session (`liivv_pharmacist`)
+ */
 export async function getStaffAccessContext(): Promise<StaffAccessContext | null> {
-  const bcSession = await getBcAppSession();
+  const bc = await getBcAppSession();
+  const pharmacist = await getPharmacistSession();
 
-  if (bcSession && assertAllowedStoreHash(bcSession.storeHash)) {
-    return {
-      kind: 'bc-app',
-      storeHash: bcSession.storeHash,
-      userEmail: bcSession.user.email,
-    };
+  if (!bc || !pharmacist) {
+    return null;
   }
 
-  return null;
+  return {
+    kind: 'pharmacist',
+    username: pharmacist.username,
+    storeHash: bc.storeHash,
+    bcUserEmail: bc.user.email,
+  };
 }
 
 export async function hasStaffAccess(): Promise<boolean> {
   return (await getStaffAccessContext()) != null;
 }
 
-export const STAFF_PORTAL_PATHS = ['/bc-app'] as const;
+export const STAFF_PORTAL_PATHS = ['/pharmacy-admin'] as const;
 
 export function revalidateStaffPortalPaths(revalidatePath: (path: string) => void): void {
   for (const path of STAFF_PORTAL_PATHS) {

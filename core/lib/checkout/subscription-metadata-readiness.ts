@@ -22,9 +22,15 @@ async function getMetadataUpdatedAt(cartId: string): Promise<string | null> {
     return null;
   }
 
-  const record = await getCartSubscriptionLinesRecordFromSupabase(cartId);
+  try {
+    const record = await getCartSubscriptionLinesRecordFromSupabase(cartId);
 
-  return record.updatedAt;
+    return record.updatedAt;
+  } catch (error) {
+    console.error('[supabase] checkout subscription metadata unavailable', error);
+
+    return null;
+  }
 }
 
 function isMetadataRecordSettled(updatedAt: string | null): boolean {

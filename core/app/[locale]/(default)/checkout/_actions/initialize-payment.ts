@@ -12,6 +12,8 @@ import { resolveStateOrProvinceCode } from '~/lib/checkout/resolve-state-or-prov
 import type { CheckoutAddressSnapshot } from '~/lib/checkout/types';
 import { getCartId } from '~/lib/cart';
 import { isStripeConfigured } from '~/lib/stripe/client';
+import { isStripeOutage } from '~/lib/stripe/availability';
+import { VendorOutageError } from '~/lib/vendor-outage';
 
 const CheckoutCustomerQuery = graphql(`
   query CheckoutCustomerQuery {
@@ -125,6 +127,10 @@ async function getCheckoutCustomerContext() {
     redirect({ href: '/cart/', locale });
   }
 
+  if (!cartId) {
+    throw new Error('Cart not found');
+  }
+
   const customerResponse = await client.fetch({
     document: CheckoutCustomerQuery,
     customerAccessToken,
@@ -141,10 +147,20 @@ async function getCheckoutCustomerContext() {
 }
 
 export async function initializePayment(formData: FormData) {
-  const { customer } = await getCheckoutCustomerContext();
-  const billingAddress = await parseBillingAddressFromFormData(formData, customer.email);
+  try {
+    const { customer } = await getCheckoutCustomerContext();
+    const billingAddress = await parseBillingAddressFromFormData(formData, customer.email);
 
-  return initializeFromBillingAddress(billingAddress);
+    return initializeFromBillingAddress(billingAddress);
+  } catch (error) {
+    if (isStripeOutage(error) || (error instanceof VendorOutageError && error.vendor === 'stripe')) {
+      throw new Error(
+        'Payments are temporarily unavailable. Your cart is saved — please try again shortly.',
+      );
+    }
+
+    throw error;
+  }
 }
 
 export async function prepareOrderConfirmation(formData: FormData, stripeSessionId: string) {

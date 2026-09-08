@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { stashGuestHealthAnswers } from '~/app/[locale]/(default)/liivv-health/_actions/stash-guest-health-answers';
 import { saveSignedInLandingQuiz } from '~/app/[locale]/(default)/liivv-health/_actions/save-signed-in-landing-quiz';
 import { Image } from '~/components/image';
-import { useRouter } from '~/i18n/routing';
+import { Link, useRouter } from '~/i18n/routing';
 import {
   getLandingCategoryMeta,
   isQuestionAnswered,
@@ -349,6 +349,16 @@ export function GuestCategoryQuiz({
             </div>
 
             {error ? <p className="guest-category-quiz-error">{error}</p> : null}
+            {!isSignedIn ? (
+              <p className="guest-category-quiz-login">
+                Already have an account?{' '}
+                <Link className="guest-category-quiz-login-link" href="/login">
+                  Log in first
+                </Link>
+                {' '}
+                — then only quizzes you have not saved will show.
+              </p>
+            ) : null}
           </div>
         </div>
       </div>

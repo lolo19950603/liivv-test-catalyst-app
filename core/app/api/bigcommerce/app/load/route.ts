@@ -8,6 +8,7 @@ import {
 } from '~/lib/bigcommerce/app-oauth';
 import { withBcAppCspHeaders } from '~/lib/content-security-policy';
 import { bcAppHtmlResponse } from '~/lib/bigcommerce/app-html';
+import { PHARMACIST_PORTAL_PATH } from '~/lib/pharmacist-session';
 
 export const runtime = 'nodejs';
 
@@ -47,7 +48,9 @@ export async function GET(request: Request) {
   });
 
   const appUrl = getBcAppPublicUrl();
-  const destination = appUrl ? `${appUrl}/bc-app` : new URL('/bc-app', url.origin).toString();
+  const destination = appUrl
+    ? `${appUrl}${PHARMACIST_PORTAL_PATH}`
+    : new URL(PHARMACIST_PORTAL_PATH, url.origin).toString();
 
   const response = NextResponse.redirect(destination);
 

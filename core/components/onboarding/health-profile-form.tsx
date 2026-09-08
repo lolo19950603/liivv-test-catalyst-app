@@ -746,8 +746,8 @@ export function HealthProfileForm({
         <div className="rounded-2xl border border-[#e8e2d8] bg-white p-8 shadow-sm">
           <h1 className="text-2xl font-semibold text-[#2c2a26]">Health profile</h1>
           <p className="mt-4 text-sm text-[#6b6560]">
-            Connect Supabase (`SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`) and run
-            `core/lib/supabase/onboarding-schema.sql` to enable this step.
+            Health tools are temporarily unavailable. You can still shop; this profile cannot be
+            saved until the service is back.
           </p>
         </div>
       </div>

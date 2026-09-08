@@ -25,6 +25,7 @@ import {
 } from './subscription-shipment-grouping';
 import {
   claimSubscriptionOrderCreation,
+  getSubscriptionOrderClaimState,
   releaseSubscriptionOrderCreation,
 } from './storage';
 
@@ -225,6 +226,7 @@ function getSubscriptionLineTotals(
 export interface QueuedSubscriptionInvoiceBatch {
   customerId: number;
   batchStorageKey: string;
+  existingOrderId?: number;
 }
 
 export async function queuePaidInvoiceForSubscriptionOrderBatch({
@@ -254,12 +256,6 @@ export async function queuePaidInvoiceForSubscriptionOrderBatch({
   }
 
   const invoiceReferenceId = `invoice:${invoice.id}`;
-  const claimed = await claimSubscriptionOrderCreation(invoiceReferenceId);
-
-  if (!claimed) {
-    return null;
-  }
-
   const dayKey = getShipmentCalendarDayKey(
     getSubscriptionInvoiceShipmentTimestamp(invoice, subscription),
   );
@@ -270,6 +266,44 @@ export async function queuePaidInvoiceForSubscriptionOrderBatch({
     dayKey,
     shippingAddressKey,
   });
+
+  const claimState = await getSubscriptionOrderClaimState(invoiceReferenceId);
+
+  if (claimState.kind === 'created') {
+    return {
+      customerId,
+      batchStorageKey,
+      existingOrderId: claimState.orderId,
+    };
+  }
+
+  if (claimState.kind === 'complete') {
+    return null;
+  }
+
+  let claimedThisAttempt = false;
+
+  if (claimState.kind === 'empty') {
+    const claimed = await claimSubscriptionOrderCreation(invoiceReferenceId);
+
+    if (!claimed) {
+      const raced = await getSubscriptionOrderClaimState(invoiceReferenceId);
+
+      if (raced.kind === 'created') {
+        return {
+          customerId,
+          batchStorageKey,
+          existingOrderId: raced.orderId,
+        };
+      }
+
+      if (raced.kind !== 'pending') {
+        return null;
+      }
+    } else {
+      claimedThisAttempt = true;
+    }
+  }
 
   const { quantity, unitAmountExTax } = getSubscriptionLineTotals(
     subscription,
@@ -315,7 +349,10 @@ export async function queuePaidInvoiceForSubscriptionOrderBatch({
 
     return { customerId, batchStorageKey };
   } catch (error) {
-    await releaseSubscriptionOrderCreation(invoiceReferenceId);
+    if (claimedThisAttempt) {
+      await releaseSubscriptionOrderCreation(invoiceReferenceId);
+    }
+
     throw error;
   }
 }

@@ -289,6 +289,8 @@ interface CheckoutFulfillmentSectionProps {
   shippingMethodRequiredMessage?: string;
   shippingRequiredMessage?: string;
   savedPaymentMethods?: SavedPaymentMethod[];
+  paymentsUnavailable?: boolean;
+  paymentsUnavailableMessage?: string;
 }
 
 function Chevron({ open }: { open: boolean }) {
@@ -388,6 +390,8 @@ export function CheckoutFulfillmentSection({
   shippingMethodRequiredMessage,
   shippingRequiredMessage,
   savedPaymentMethods = [],
+  paymentsUnavailable = false,
+  paymentsUnavailableMessage,
 }: CheckoutFulfillmentSectionProps) {
   const router = useRouter();
   const billingRef = useRef<HTMLFormElement>(null);
@@ -593,6 +597,7 @@ export function CheckoutFulfillmentSection({
     <CheckoutPaymentProvider
       billingFormId={billingFormId}
       initializePaymentAction={initializePaymentAction}
+      paymentsUnavailable={paymentsUnavailable}
       prepareOrderConfirmationAction={prepareOrderConfirmationAction}
       returnUrl={returnUrl}
       shippingReady={paymentShippingReady}
@@ -628,6 +633,8 @@ export function CheckoutFulfillmentSection({
         shippingErrors={shippingErrors}
         shippingReady={paymentShippingReady}
         shippingRequiredMessage={paymentBlockedMessage}
+        paymentsUnavailable={paymentsUnavailable}
+        paymentsUnavailableMessage={paymentsUnavailableMessage}
         states={states}
         submitLabel={submitLabel}
         syncBillingFromShipping={syncBillingFromShipping}
@@ -668,6 +675,8 @@ function CheckoutFulfillmentContent({
   shippingErrors,
   shippingReady,
   shippingRequiredMessage,
+  paymentsUnavailable = false,
+  paymentsUnavailableMessage,
   states,
   submitLabel,
   syncBillingFromShipping,
@@ -705,6 +714,8 @@ function CheckoutFulfillmentContent({
   shippingErrors: string[];
   shippingReady: boolean;
   shippingRequiredMessage?: string;
+  paymentsUnavailable?: boolean;
+  paymentsUnavailableMessage?: string;
   states: StateOption[];
   submitLabel: string;
   syncBillingFromShipping: () => void;
@@ -884,7 +895,11 @@ function CheckoutFulfillmentContent({
               </p>
             </div>
             <div className="rounded-lg border border-[var(--contrast-200,hsl(var(--contrast-200)))] p-4">
-              {!shippingReady ? (
+              {paymentsUnavailable ? (
+                <p className="text-sm text-[var(--contrast-500,hsl(var(--contrast-500)))]">
+                  {paymentsUnavailableMessage}
+                </p>
+              ) : !shippingReady ? (
                 <p className="text-sm text-[var(--contrast-500,hsl(var(--contrast-500)))]">
                   {isApplyingAddress
                     ? labels.shippingMethodUpdating
@@ -931,7 +946,9 @@ function CheckoutFulfillmentContent({
             </div>
 
             <CheckoutCompleteOrderButtonPlaceholder
-              disabledMessage={shippingRequiredMessage}
+              disabledMessage={
+                paymentsUnavailable ? paymentsUnavailableMessage : shippingRequiredMessage
+              }
               submitLabel={submitLabel}
             />
           </section>
