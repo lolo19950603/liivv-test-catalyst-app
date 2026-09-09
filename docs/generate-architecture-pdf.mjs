@@ -1,5 +1,5 @@
 /**
- * Build HTML + PDF for the IT architecture pack and the meeting glossary.
+ * Build HTML + PDF for the IT architecture pack, meeting glossary, and Supabase inventory.
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -20,6 +20,12 @@ const documents = [
     html: 'Liivv-Architecture-Glossary.html',
     pdf: 'Liivv-Architecture-Glossary.pdf',
     title: 'Liivv — IT meeting glossary',
+  },
+  {
+    md: 'Supabase-Inventory.md',
+    html: 'Supabase-Inventory.html',
+    pdf: 'Supabase-Inventory.pdf',
+    title: 'Liivv — Supabase inventory (IT)',
   },
 ];
 
