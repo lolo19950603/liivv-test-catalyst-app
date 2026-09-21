@@ -1,7 +1,7 @@
 # Ostomy microsite — content review
 **Prepared for:** Liivv management and clinical review  
 **Covers:** every page of `/liivv-health/ostomy-care`, in English and French  
-**Generated:** 2026-09-21 from commit `3bb9de31`
+**Generated:** 2026-09-21 from commit `7e63aee8`
 
 > **These files are generated from the site's own sources.** Do not edit them. Mark corrections against the reference beside each line — the change is made in the source, and the files are generated again. That way the text you approve is the text that ships, and the two cannot drift apart.
 
@@ -17,7 +17,7 @@
 
 **This was a ship blocker on the last pack, and it is fixed.** With JavaScript disabled or blocked, a reader now gets the page: the heading, every card, the walk-through steps, Chapter 02’s emergency red-flag list with all of its signs, and the 9-8-8 crisis line on Chapter 01. That was checked page by page, in a browser with scripts switched off, on every page in this pack in both languages.
 
-What changed: one file, `core/app/[locale]/(default)/loading.tsx`, wrapped every route in this part of the store in a Suspense boundary, so the body of each page arrived in the HTML inside a `<div hidden>` that only an inline script moved into view. That file has been removed. Measured the same way as before — stripping scripts and styles from the served HTML and comparing the text inside those containers against the text outside them — the share of each page that sits inside them has gone from between 84% and 95% to between 4% and 13%. What is left inside is the site header and the footer, which this pack does not cover; see "What is not in these files". Every word this review covers is now outside.
+What changed: one file, `core/app/[locale]/(default)/loading.tsx`, wrapped every route in this part of the store in a Suspense boundary, so the body of each page arrived in the HTML inside a `<div hidden>` that only an inline script moved into view. That file has been removed. Measured the same way as before — stripping scripts and styles from the served HTML and comparing the text inside those containers against the text outside them — the share of each page that sits inside them has gone from between 84% and 95% to between 3.8% and 14.7%. What is left inside is the site header and the footer, which this pack does not cover; see "What is not in these files". That is the same block of words on every page, so it is a larger share of a short page than of a long chapter — 14.7% on the landing page, 3.8% on the longest French chapters. Every word this review covers is now outside.
 
 **The second copy of the emergency wording is gone, and that is the point.** Chapter 02’s emergency list and the 9-8-8 crisis sentence used to be rendered a second time inside a `<noscript>` on every `/liivv-health/ostomy-care/**` page, because they were the two things a reader could not afford to lose while the rest of the page stayed hidden. They are in the page itself now, so that duplicate has been removed rather than left to show twice; the one sentence it owned — "This page needs JavaScript to show its content…" — is gone from the site and from these files. Every page in this pack except Funding & Coverage also carries its own link to Chapter 02’s red-flag list, and those are plain links that work with scripts off.
 
