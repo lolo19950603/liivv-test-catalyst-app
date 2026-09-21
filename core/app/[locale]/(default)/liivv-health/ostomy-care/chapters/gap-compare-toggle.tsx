@@ -14,13 +14,13 @@
  * round drawings, which is what the card's own sentence calls the common case
  * before it says many stomas are oval.
  *
- * That is a statement about this figure's markup, and it stops there. With
- * JavaScript off the reader gets none of the page: every route in the (default)
- * group is streamed inside the Suspense boundary that
- * `app/[locale]/(default)/loading.tsx` opens, so the body arrives in a
- * `<div hidden>` that only an inline script moves into the document, and a
- * reader without scripting is left on the spinner. Site-wide, not this figure's,
- * and not fixable from here — recorded as residual #12.
+ * That is a statement about this figure's markup, and with JavaScript off it is
+ * now what the reader gets. The `loading.tsx` at `app/[locale]/(default)` used to
+ * wrap every route in the group in a Suspense boundary, so the body arrived in a
+ * `<div hidden>` that only an inline script moved into the document and a reader
+ * without scripting was left on the spinner. It has been removed. The toggle is
+ * still an enhancement: without it the round drawings stand, which is the case
+ * the card's own sentence names first.
  *
  * The toggle changes the drawn shape and nothing else: no panel is selected,
  * ranked or marked correct, no caption changes, and nothing is stored, put in

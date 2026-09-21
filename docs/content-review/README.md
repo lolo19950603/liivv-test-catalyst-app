@@ -1,7 +1,7 @@
 # Ostomy microsite — content review
 **Prepared for:** Liivv management and clinical review  
 **Covers:** every page of `/liivv-health/ostomy-care`, in English and French  
-**Generated:** 2026-09-21 from commit `40c4e8de`
+**Generated:** 2026-09-21 from commit `3bb9de31`
 
 > **These files are generated from the site's own sources.** Do not edit them. Mark corrections against the reference beside each line — the change is made in the source, and the files are generated again. That way the text you approve is the text that ships, and the two cannot drift apart.
 
@@ -13,28 +13,30 @@
 3. Check the **Referral chip** and **Products shown** lines under each card as well as the text. A product beside a card is a claim too.
 4. Funding figures change. Check each against its official source and note the date you checked.
 
-## Nothing on these pages renders without JavaScript
+## These pages render without JavaScript
 
-**This is a ship blocker, and it is not something this review can fix.** With JavaScript disabled or blocked, a reader gets no page at all: not a heading, not a card, not a walk-through step, not Chapter 02’s emergency red-flag list, and not the 9-8-8 crisis line on Chapter 01. What they see is the loading message, "Olivia is fetching that…", and nothing else.
+**This was a ship blocker on the last pack, and it is fixed.** With JavaScript disabled or blocked, a reader now gets the page: the heading, every card, the walk-through steps, Chapter 02’s emergency red-flag list with all of its signs, and the 9-8-8 crisis line on Chapter 01. That was checked page by page, in a browser with scripts switched off, on every page in this pack in both languages.
 
-Why, in one sentence: every route in this part of the store is streamed inside a Suspense boundary that `core/app/[locale]/(default)/loading.tsx` opens, so the body of the page arrives in the HTML inside a `<div hidden>` that only an inline script moves into view. Stripping scripts and styles from the served HTML and measuring the text inside those containers against the text outside them puts 81% to 95% of each page inside, depending on the page. It is not something these pages introduced — the untouched store home page behaves the same way — and it is being tracked separately.
+What changed: one file, `core/app/[locale]/(default)/loading.tsx`, wrapped every route in this part of the store in a Suspense boundary, so the body of each page arrived in the HTML inside a `<div hidden>` that only an inline script moved into view. That file has been removed. Measured the same way as before — stripping scripts and styles from the served HTML and comparing the text inside those containers against the text outside them — the share of each page that sits inside them has gone from between 84% and 95% to between 4% and 13%. What is left inside is the site header and the footer, which this pack does not cover; see "What is not in these files". Every word this review covers is now outside.
 
-**One thing does not wait for JavaScript.** Chapter 02’s emergency list — its heading, its intro, all of its signs and the "go to your nearest emergency department" line — and the 9-8-8 crisis sentence are rendered a second time, outside that boundary, inside a `<noscript>` on every `/liivv-health/ostomy-care/**` page in both locales. A reader with scripts off gets those and a sentence saying the page needs JavaScript, and nothing else. It is the same wording, read out of the same message keys, so there is no second copy for anyone to review or to let drift; it is in `_components/no-script-emergency.tsx`. It is a stopgap for two pieces of content, not a fix for the page.
+**The second copy of the emergency wording is gone, and that is the point.** Chapter 02’s emergency list and the 9-8-8 crisis sentence used to be rendered a second time inside a `<noscript>` on every `/liivv-health/ostomy-care/**` page, because they were the two things a reader could not afford to lose while the rest of the page stayed hidden. They are in the page itself now, so that duplicate has been removed rather than left to show twice; the one sentence it owned — "This page needs JavaScript to show its content…" — is gone from the site and from these files. Every page in this pack except Funding & Coverage also carries its own link to Chapter 02’s red-flag list, and those are plain links that work with scripts off.
 
-What that means for this review. Where these files say a figure is "the same server HTML" or describe what is drawn "before any control is touched", that is about the figure, not about a reader with JavaScript off: it means the words are in the page rather than built by a script, so nothing can rewrite them and no control is needed to read them. It does **not** mean the page is readable without JavaScript. Please review the words on that basis, and read this section as a statement about the whole microsite.
+**Not fixed everywhere.** Outside this microsite, the category listings, the product pages and the cart still deliver their main content inside a streaming boundary, and still show little or nothing with scripts off. None of those pages is in this pack, and they are tracked separately.
+
+What that means for this review. Where these files say a figure is "the same server HTML" or describe what is drawn "before any control is touched", it means the words are in the page rather than built by a script, so nothing can rewrite them and no control is needed to read them — and a reader with JavaScript off now sees them too.
 
 ## Files
 
 | File | Page | Words (EN) |
 |---|---|---|
-| [00-shared.md](en/00-shared.md) · [FR](fr/00-shared.md) | Shared interface text | 1,093 |
+| [00-shared.md](en/00-shared.md) · [FR](fr/00-shared.md) | Shared interface text | 1,069 |
 | [01-new-to-the-journey.md](en/01-new-to-the-journey.md) · [FR](fr/01-new-to-the-journey.md) | Chapter 01 — New to the Journey | 2,643 |
 | [02-get-to-know-your-stoma.md](en/02-get-to-know-your-stoma.md) · [FR](fr/02-get-to-know-your-stoma.md) | Chapter 02 — Your Stoma, and Your Fit | 3,565 |
 | [03-everyday-liivving.md](en/03-everyday-liivving.md) · [FR](fr/03-everyday-liivving.md) | Chapter 03 — Everyday Liivving | 3,565 |
 | [04-this-might-be-you.md](en/04-this-might-be-you.md) · [FR](fr/04-this-might-be-you.md) | Chapter 04 — This Might Be You | 2,674 |
 | [05-funding.md](en/05-funding.md) · [FR](fr/05-funding.md) | Funding & Coverage | 3,297 |
 | [06-landing.md](en/06-landing.md) · [FR](fr/06-landing.md) | Landing page | 922 |
-| | **Total** | **17,759** |
+| | **Total** | **17,735** |
 
 ## What is not in these files
 
@@ -71,4 +73,4 @@ Both lists below are read out of `chapters-meta.ts` and `review-gates.ts` each t
 node --env-file-if-exists=.env.local core/scripts/export-content-review.mjs
 ```
 
-Coverage check on this run: **1222 of 1222** English strings under `OstomyCare` appear in these files.
+Coverage check on this run: **1221 of 1221** English strings under `OstomyCare` appear in these files.

@@ -4,13 +4,18 @@
  * =============================================================================
  * FRAGMENT LANDING — re-apply the URL fragment once the page is in the document
  * =============================================================================
- * Every page in this route group is streamed inside the Suspense boundary that
- * `(default)/loading.tsx` opens. The document the browser first receives holds
- * a spinner where this page's body will go; the body arrives afterwards inside
- * a `<div hidden>` that an inline script moves into place. By then the browser
- * has already looked for the fragment — `#red-flags`, `#card-6`, `#recovery-map`
- * — found nothing, and given up. The reader lands at the top of the chapter
- * instead of on the thing the link named.
+ * This was written for a boundary that no longer exists. Every page in this
+ * route group used to be streamed inside the Suspense boundary that
+ * `(default)/loading.tsx` opened: the document the browser first received held a
+ * spinner where the page's body would go, the body arrived afterwards inside a
+ * `<div hidden>` that an inline script moved into place, and by then the browser
+ * had already looked for the fragment — `#red-flags`, `#card-6`,
+ * `#recovery-map` — found nothing, and given up. That file has been removed and
+ * the body is in the first flush of the HTML, so the browser resolves the
+ * fragment itself. This now guards nothing in the common case and could be
+ * retired; it is left in place because it is inert once the browser has scrolled
+ * (see the `scrollY` guard below), and removing it belongs with a check of every
+ * fragment link rather than with the boundary change.
  *
  * The situation doors are what made this visible. Four of the six point at a
  * fragment on a chapter page, and the urgent one promises "Emergency signs
@@ -31,8 +36,8 @@
  * - only a target that exists and can be scrolled to — a row the group rail has
  *   filtered away is hidden, and `scrollIntoView` on it does nothing.
  *
- * This is a workaround for the boundary, not a fix for it. With JavaScript off
- * the body is never moved into the document and no fragment resolves at all.
+ * With JavaScript off none of this runs — and it no longer needs to: the body is
+ * in the served HTML, so the browser resolves the fragment on its own.
  * =============================================================================
  */
 

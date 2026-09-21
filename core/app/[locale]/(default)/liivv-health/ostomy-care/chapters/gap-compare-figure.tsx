@@ -20,12 +20,12 @@
  * loaded after hydration. Both shapes are drawn here and the stylesheet shows
  * one of them, so the island only flips a class and can never change a word.
  *
- * That describes this figure's markup, and stops there. A reader with
- * JavaScript off gets none of the page: every route in the (default) group is
- * streamed inside the Suspense boundary that
- * `app/[locale]/(default)/loading.tsx` opens, so the body arrives in a
- * `<div hidden>` that only an inline script moves into the document. Site-wide,
- * not this figure's, and not fixable from here — recorded as residual #12.
+ * That describes this figure's markup, and a reader with JavaScript off now gets
+ * it. The `loading.tsx` at `app/[locale]/(default)` used to wrap every route in
+ * the group in a Suspense boundary, so the body arrived in a `<div hidden>` that
+ * only an inline script moved into the document. It has been removed: this
+ * figure, its captions and the signpost to the emergency list are all in the
+ * first flush of the HTML, with or without scripting.
  *
  * The drawings are aria-hidden: the captions beside them are the content, and
  * they never repeat a word of the card's own sentences.

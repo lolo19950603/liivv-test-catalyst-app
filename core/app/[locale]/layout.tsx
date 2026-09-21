@@ -5,7 +5,6 @@ import { getMessages, setRequestLocale } from 'next-intl/server';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { cache, PropsWithChildren } from 'react';
 
-import { NoScriptEmergency } from '~/app/[locale]/(default)/liivv-health/ostomy-care/_components/no-script-emergency';
 import { withoutHeldMessages } from '~/app/[locale]/(default)/liivv-health/ostomy-care/chapters/held-messages';
 import { CookieNotifications } from '~/app/notifications';
 import { Providers } from '~/app/providers';
@@ -170,16 +169,6 @@ export default async function RootLayout({ params, children }: Props) {
                 {toastNotificationCookieData && (
                   <CookieNotifications {...toastNotificationCookieData} />
                 )}
-                {/*
-                  Above `children`, deliberately: everything below this point —
-                  the (default) layout and every page under it — is streamed
-                  inside the Suspense boundary `(default)/loading.tsx` opens, so
-                  with JavaScript off it arrives in a `<div hidden>` and is never
-                  revealed. This is outside that boundary, which is why the
-                  ostomy routes' emergency list and crisis line can be reached
-                  from here and nowhere else. See the component.
-                */}
-                <NoScriptEmergency />
                 {children}
               </Providers>
             </AnalyticsProvider>

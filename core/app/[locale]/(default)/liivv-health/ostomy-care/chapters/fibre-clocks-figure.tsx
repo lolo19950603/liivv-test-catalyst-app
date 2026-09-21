@@ -31,15 +31,14 @@
  * finished, and there is no control at all: every word of this figure is in the
  * server HTML and no script adds, changes or reveals any of it.
  *
- * Which is not the same as saying a reader with JavaScript off sees it. They do
- * not see the page: every route in the (default) group is streamed inside the
- * Suspense boundary that `app/[locale]/(default)/loading.tsx` opens, so the body
- * arrives in a `<div hidden>` that only an inline script moves into the
- * document. Site-wide, not this figure's, and not fixable from here — recorded
- * as residual #12, named as a ship blocker in that file's own comment and in
- * `docs/content-review/README.md`. The only thing rescued from it is the
- * emergency list and the crisis line, which ride outside the boundary from the
- * root layout (`_components/no-script-emergency.tsx`). This figure is not.
+ * A reader with JavaScript off sees it too, now. The `loading.tsx` that used to
+ * sit at `app/[locale]/(default)` wrapped every route in the group in a Suspense
+ * boundary, so the body arrived in a `<div hidden>` that only an inline script
+ * moved into the document — which is why the emergency list and the crisis line
+ * once had to ride outside it, in a `<noscript>` rendered from the root layout.
+ * That gate is gone and so is the `<noscript>`, which would now show the same
+ * wording twice. See "These pages render without JavaScript" in
+ * `docs/content-review/README.md`.
  *
  * There is no urostomy row. No Canadian source gives a lower-fibre period after
  * urostomy surgery, and a third bar drawn for symmetry would invent one.

@@ -12,12 +12,11 @@
  * and no script touches any of it; the only thing that can change is which file
  * the browser picks out of the srcset.
  *
- * Which is not the same as saying a reader with JavaScript off sees it. They do
- * not see the page: every route in the (default) group is streamed inside the
- * Suspense boundary that `app/[locale]/(default)/loading.tsx` opens, so the body
- * arrives in a `<div hidden>` that only an inline script moves into the
- * document. Site-wide, not this figure's, and not fixable from here — recorded
- * as residual #12.
+ * A reader with JavaScript off sees it too, now. The `loading.tsx` that used to
+ * sit at `app/[locale]/(default)` wrapped every route in the group in a Suspense
+ * boundary, so the body arrived in a `<div hidden>` that only an inline script
+ * moved into the document. It has been removed, and the page's own markup — this
+ * figure included — is in the first flush of the HTML.
  *
  * THE PICTURE CARRIES NO WORDS. Every label is HTML, so it translates, reflows,
  * scales with the reader's font size, can be selected, and is read aloud. The
