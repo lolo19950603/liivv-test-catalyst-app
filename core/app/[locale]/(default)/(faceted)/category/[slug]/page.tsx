@@ -9,11 +9,18 @@ import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { createCompareLoader } from '@/vibes/soul/primitives/compare-drawer/loader';
 import { ProductsListSection } from '@/vibes/soul/sections/products-list-section';
 import { getFilterParsers } from '@/vibes/soul/sections/products-list-section/filter-parsers';
+import {
+  isOstomyCategoryId,
+  isOstomyKit,
+} from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
 import { getSessionCustomerAccessToken } from '~/auth';
+import { DenyAdSignals } from '~/components/analytics/deny-ad-signals';
 import { facetsTransformer } from '~/data-transformers/facets-transformer';
 import { logoTransformer } from '~/data-transformers/logo-transformer';
 import { numberedPaginationTransformer } from '~/data-transformers/numbered-pagination-transformer';
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
+import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-ids';
+import { categoryLineageIds, isSensitiveProduct } from '~/lib/analytics/sensitive-products';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { resolveStoreLogo } from '~/lib/makeswift/site-header/resolve-store-logo';
@@ -133,10 +140,21 @@ export default async function Category(props: Props) {
     return notFound();
   }
 
-  const breadcrumbs = removeEdgesAndNodes(category.breadcrumbs).map(({ name, path }) => ({
+  const categoryTrail = removeEdgesAndNodes(category.breadcrumbs);
+
+  const breadcrumbs = categoryTrail.map(({ name, path }) => ({
     label: name,
     href: path ?? '#',
   }));
+
+  /*
+   * The ids that decide whether this shelf is health-revealing: its own and
+   * every ancestor above it. A shelf under "Ostomy Care" is an ostomy shelf
+   * whether or not its id was written down months ago, so the answer is the
+   * same one on the server (the ad-signal flag below) and in the browser (the
+   * view_item_list event).
+   */
+  const analyticsCategoryIds = categoryLineageIds(category.entityId, categoryTrail);
 
   const showRating = Boolean(settings?.reviews.enabled && settings.display.showProductRating);
 
@@ -166,7 +184,54 @@ export default async function Category(props: Props) {
       customerAccessToken,
     );
 
-    return search;
+    /*
+     * =========================================================================
+     * WITHHELD OSTOMY KITS ARE NOT SHOWN ON AN OSTOMY SHELF EITHER
+     * =========================================================================
+     * Every curated ostomy kit is held back from Ostomy Care surfaces until K1
+     * rebuilds it (oc-ids.ts): three carry drugs or natural health products,
+     * and several make claims — "Infection Prevention", "Dehydration Rescue",
+     * "Leak-Free" — that nothing on file substantiates.
+     *
+     * getOcCatalog gates the landing, the hub and the chapter bands, but this
+     * route reads BigCommerce directly, and /liivv-health/ostomy-care/shop-
+     * ostomy-care (category 1150) is where every "Open full shop" and "Ostomy
+     * Essentials" link on the microsite lands. Without this filter the withhold
+     * was one click deep.
+     *
+     * Residual, recorded rather than papered over: the facet counts, the total
+     * and the pagination below all come from BigCommerce and still count the
+     * kits, so a filtered page can show fewer cards than its own count claims.
+     * Closing that is the owner's step — take 8041–8048 out of category 1150,
+     * or set is_visible = false — and then this filter simply never matches.
+     * =========================================================================
+     */
+    if (!isOstomyCategoryId(categoryId)) {
+      return search;
+    }
+
+    const items = search.products.items.filter((product) => !isOstomyKit(product.entityId));
+
+    if (items.length === search.products.items.length) {
+      return search;
+    }
+
+    return { ...search, products: { ...search.products, items } };
+  });
+
+  /*
+   * A product can be an ostomy item by a category this shelf is not: a skin
+   * barrier wipe sits in wound care and in ostomy skin care at once, and its
+   * own page already refuses to name it. The product cards on a shelf carry no
+   * categories, so the answer comes from the catalogue by id — the same
+   * id-only lookup the cart, compare and wishlist pages make — rather than
+   * from a heavier card fragment every category page would pay for.
+   */
+  const streamableSensitiveProductIds = Streamable.from(async () => {
+    const search = await streamableFacetedSearch;
+    const sensitive = await getSensitiveProductIds(search.products.items.map((p) => p.entityId));
+
+    return [...sensitive];
   });
 
   const streamableProducts = Streamable.from(async () => {
@@ -273,6 +338,12 @@ export default async function Category(props: Props) {
 
   return (
     <>
+      {/*
+        An ostomy shelf — /liivv-health/ostomy-care/shop-ostomy-care, or any of
+        the Heal + Manage ostomy categories — says what the person browsing it
+        is dealing with. The advertising signals go off (~/lib/analytics/ad-signals).
+      */}
+      {isSensitiveProduct({ categoryIds: analyticsCategoryIds }) && <DenyAdSignals />}
       <Slot
         label={`${category.name} top content`}
         snapshotId={`category-${categoryId}-top-content`}
@@ -333,8 +404,15 @@ export default async function Category(props: Props) {
         label={`${category.name} bottom content`}
         snapshotId={`category-${categoryId}-bottom-content`}
       />
-      <Stream value={streamableFacetedSearch}>
-        {(search) => <CategoryViewed category={category} products={search.products.items} />}
+      <Stream value={Streamable.all([streamableFacetedSearch, streamableSensitiveProductIds])}>
+        {([search, sensitiveProductIds]) => (
+          <CategoryViewed
+            category={category}
+            categoryIds={analyticsCategoryIds}
+            products={search.products.items}
+            sensitiveProductIds={sensitiveProductIds}
+          />
+        )}
       </Stream>
     </>
   );

@@ -1,10 +1,12 @@
 'use client';
 
+import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
 import { useEffect, useRef } from 'react';
 
 import { PricingFragment } from '~/client/fragments/pricing';
 import { FragmentOf } from '~/client/graphql';
 import { useAnalytics } from '~/lib/analytics/react';
+import { isSensitiveProduct } from '~/lib/analytics/sensitive-products';
 
 import { ProductViewedFragment } from './fragment';
 
@@ -23,6 +25,8 @@ export const ProductViewed = ({ product }: Props) => {
 
     isMounted.current = true;
 
+    const categoryIds = removeEdgesAndNodes(product.categories).map(({ entityId }) => entityId);
+
     analytics?.navigation.productViewed({
       value: product.prices?.price.value ?? 0,
       currency: product.prices?.price.currencyCode ?? 'USD',
@@ -33,6 +37,7 @@ export const ProductViewed = ({ product }: Props) => {
           brand: product.brand?.name,
           sku: product.sku,
           price: product.prices?.salePrice?.value,
+          sensitive: isSensitiveProduct({ entityId: product.entityId, categoryIds }),
         },
       ],
     });

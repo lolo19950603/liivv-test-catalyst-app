@@ -8,10 +8,13 @@ import { Suspense } from 'react';
 
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { FeaturedProductCarousel } from '@/vibes/soul/sections/featured-product-carousel';
+import { isOstomyKit } from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
 import { auth, getSessionCustomerAccessToken } from '~/auth';
+import { DenyAdSignals } from '~/components/analytics/deny-ad-signals';
 import { pricesTransformer } from '~/data-transformers/prices-transformer';
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { productOptionsTransformer } from '~/data-transformers/product-options-transformer';
+import { isSensitiveProduct } from '~/lib/analytics/sensitive-products';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import {
   CuratedKitCustomizer,
@@ -142,6 +145,21 @@ export default async function Product({ params, searchParams }: Props) {
   if (!baseProduct) {
     return notFound();
   }
+
+  /*
+   * Whether this page's own title and URL are a health fact — a pouch, a
+   * barrier, a stoma powder — answered from the query the page has already
+   * awaited, so the answer is in the shell rather than behind a Suspense
+   * boundary. It has to be: the analytics provider reads the flag while it
+   * writes the tag's first consent command, and gtag('config') then sends an
+   * automatic page_view carrying page_location and page_title. A flag that
+   * arrives two BigCommerce round trips later can lose that race, and a
+   * page_view already sent cannot be taken back.
+   */
+  const baseProductIsSensitive = isSensitiveProduct({
+    entityId: baseProduct.entityId,
+    categoryIds: removeEdgesAndNodes(baseProduct.categories).map(({ entityId }) => entityId),
+  });
 
   const streamableProduct = Streamable.from(async () => {
     const options = await searchParams;
@@ -703,6 +721,21 @@ export default async function Product({ params, searchParams }: Props) {
             sku: component.sku,
             defaultQuantity: 1,
             options,
+            /*
+             * The kit named this component's variant AND that variant's option
+             * values came back, so the page can state the choice as fixed text.
+             *
+             * Gated on the resolved selection, not on the override's existence.
+             * A BigCommerce variant can carry no option_values at all (#4235,
+             * #5065, #4975 and #5070 are live examples), and then
+             * `selectedOptions` below falls back to the component's own default
+             * — or, where nothing is marked default, its first value. Locking on
+             * the override alone would print that fallback as the kit's fixed
+             * size with the Select removed: a size the kit never resolved, and
+             * one the customer has no way to correct. Without the lock the
+             * editable Select is shown instead, which is the honest failure.
+             */
+            ...(overrideSelection?.selectedOptions ? { lockedByKit: true } : {}),
             ...(overrideSelection?.variantEntityId
               ? { variantEntityId: overrideSelection.variantEntityId }
               : {}),
@@ -717,7 +750,8 @@ export default async function Product({ params, searchParams }: Props) {
 
   const streamableSuggestedKitProducts = Streamable.from(
     async (): Promise<CuratedKitSuggestedProduct[]> => {
-      if (!isCuratedKit) {
+      // Sitewide featured products are never an add-on to an ostomy kit: see oc-ids.ts.
+      if (!isCuratedKit || isOstomyKit(baseProduct.entityId)) {
         return [];
       }
 
@@ -769,6 +803,10 @@ export default async function Product({ params, searchParams }: Props) {
       streamableProductPricingAndRelatedProducts,
     ]);
 
+    const categoryIds = removeEdgesAndNodes(extendedProduct.categories).map(
+      ({ entityId }) => entityId,
+    );
+
     return {
       id: extendedProduct.entityId,
       name: extendedProduct.name,
@@ -776,6 +814,9 @@ export default async function Product({ params, searchParams }: Props) {
       brand: extendedProduct.brand?.name ?? '',
       price: pricingProduct?.prices?.price.value ?? 0,
       currency: pricingProduct?.prices?.price.currencyCode ?? '',
+      // An ostomy product's name is a health fact: the add_to_cart event
+      // leaves it out rather than sending it (~/lib/analytics/sensitive-products).
+      sensitive: isSensitiveProduct({ entityId: extendedProduct.entityId, categoryIds }),
     };
   });
 
@@ -832,6 +873,14 @@ export default async function Product({ params, searchParams }: Props) {
 
   return (
     <>
+      {/*
+        An ostomy product's page says what the person reading it is dealing
+        with, so the advertising signals go off (~/lib/analytics/ad-signals).
+        In the shell, ahead of everything, because the tag's first consent
+        command reads it.
+      */}
+      {baseProductIsSensitive && <DenyAdSignals />}
+
       <Slot label="Product (all products) — top" snapshotId="product-page-top-content" />
 
       <div className="liivv-product-page-feel">
@@ -958,6 +1007,20 @@ export default async function Product({ params, searchParams }: Props) {
       )}
 
       <Slot label="Product (all products) — bottom" snapshotId="product-page-bottom-content" />
+
+      {/*
+        The widening case, and only that: the shell above has already answered
+        for this product from its own id and categories. This catches a product
+        whose streamed record says something the base query did not — a
+        different shelf once options are applied, a category list longer than
+        the 25 asked for. It renders nothing when the shell already did, so a
+        sensitive page carries exactly one flag.
+      */}
+      {!baseProductIsSensitive && (
+        <Stream fallback={null} value={streamableAnalyticsData}>
+          {(analyticsData) => (analyticsData.sensitive ? <DenyAdSignals /> : null)}
+        </Stream>
+      )}
 
       <Stream
         fallback={null}

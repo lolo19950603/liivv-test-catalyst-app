@@ -8,11 +8,18 @@ import {
   validateCategoryResponses,
   type CategoryResponses,
 } from '~/lib/onboarding/category-questionnaires';
+import {
+  buildHealthAnswersConsent,
+  HEALTH_ANSWERS_CONSENT_REQUIRED_CODE,
+  HEALTH_ANSWERS_CONSENT_REQUIRED_MESSAGE,
+} from '~/lib/onboarding/health-profile-consent';
 
 export async function saveSignedInLandingQuiz(input: {
   categoryId: string;
   responses: CategoryResponses;
-}): Promise<{ ok: true } | { ok: false; error: string }> {
+  consentGranted: boolean;
+  locale?: string;
+}): Promise<{ ok: true } | { ok: false; error: string; code?: string }> {
   if (!isLandingHealthCategoryId(input.categoryId)) {
     return { ok: false, error: 'This health category is not available yet.' };
   }
@@ -21,6 +28,15 @@ export async function saveSignedInLandingQuiz(input: {
 
   if (!validateCategoryResponses(input.categoryId, responses)) {
     return { ok: false, error: 'Please answer every question before continuing.' };
+  }
+
+  // Same rule as the health-profile form: no tick, nothing written.
+  if (!input.consentGranted) {
+    return {
+      ok: false,
+      code: HEALTH_ANSWERS_CONSENT_REQUIRED_CODE,
+      error: HEALTH_ANSWERS_CONSENT_REQUIRED_MESSAGE,
+    };
   }
 
   const customer = await getOnboardingCustomer();
@@ -34,6 +50,13 @@ export async function saveSignedInLandingQuiz(input: {
       categoryId: input.categoryId,
       responses,
       placement: 'append',
+      // The tick on this page covers the answers on this page. Anything already
+      // on the profile keeps the consent it was given, or none.
+      consent: buildHealthAnswersConsent({
+        source: 'landing_quiz',
+        locale: input.locale,
+        covers: Object.keys(responses),
+      }),
     });
 
     if (!saved) {

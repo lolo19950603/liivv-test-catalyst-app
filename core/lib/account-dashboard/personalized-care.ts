@@ -1,8 +1,9 @@
 import { HEALTH_HUB_DOORS } from '~/app/[locale]/(default)/liivv-health/health-hub-data';
 import {
-  formatHealthProfileAnswer,
-  getRawCategoryResponses,
-} from '~/lib/onboarding/health-profile-display';
+  consentedCategoryResponses,
+  healthAnswersSafetyReferralApplies,
+} from '~/lib/onboarding/health-profile-consent';
+import { formatHealthProfileAnswer } from '~/lib/onboarding/health-profile-display';
 import {
   getPrimaryCategoryDisplay,
   resolveInitialHealthCategoriesWithRank,
@@ -28,6 +29,8 @@ export type CareNextStep = {
   label: string;
   hint: string;
   href: string;
+  /** Set when `href` leaves Liivv, so the canvas renders a plain anchor. */
+  external?: boolean;
 };
 
 export type PersonalizedCareLane = {
@@ -50,6 +53,33 @@ export type PersonalizedCareLane = {
 };
 
 type CategoryResponses = Record<string, string | string[] | boolean | null>;
+
+interface LaneCopy {
+  headline: string;
+  lead: string;
+  oliviaLines: string[];
+  tip: { title: string; body: string };
+  nextSteps: CareNextStep[];
+  // Set by a lane when the answers behind it must not be met with a shop door.
+  // A change in fit or skin is a clinical question, so the ostomy body_change
+  // stage sends people to their NSWOC instead of to the shelf.
+  suppressShop?: boolean;
+}
+
+/*
+ * What a lane must do for someone whether or not they consented to Liivv using
+ * their answers. These are protections, not personalization: every one of them
+ * only ever takes a commercial nudge away and puts a clinician in its place, so
+ * reading the answer to decide it is safe when a tick is missing, and failing
+ * the other way — restoring the nudge for someone who told us their body has
+ * changed — is not. See `protectionsFromAnswers`.
+ */
+interface LaneProtections {
+  ostomyFitReferral: boolean;
+}
+
+/* NSWOCC's own directory of nurses, named in the link text (D1). */
+const NSWOC_DIRECTORY_HREF = 'https://membersnswoc.ca/find.phtml';
 
 const CATEGORY_RESPONSE_KEYS: Record<LiivPrimaryCategoryId, string[]> = {
   diabetes_care_everyday: ['diabetes_path', 'diabetes_journey_stage', 'diabetes_management'],
@@ -312,7 +342,11 @@ function diabetesLane(responses: CategoryResponses, now: Date) {
   };
 }
 
-function ostomyLane(responses: CategoryResponses, now: Date) {
+function ostomyLane(
+  responses: CategoryResponses,
+  now: Date,
+  protections: LaneProtections,
+): LaneCopy {
   const type = asString(responses.ostomy_type);
   const stage = asString(responses.ostomy_journey_stage);
   const brand = asString(responses.ostomy_preferred_brand);
@@ -322,22 +356,26 @@ function ostomyLane(responses: CategoryResponses, now: Date) {
 
   let headline = 'Ostomy care for everyday Liivving';
   let lead = 'Pouching, skin, and restock — kept kind, practical, and close at hand.';
-  let oliviaFocus = 'Ostomy corner, reporting for duty. Leak-free confidence is the vibe.';
+  let oliviaFocus = 'Ostomy corner. Questions about fit or skin go to your NSWOC.';
   let storyHref = '/liivv-health/ostomy-care';
   let storyLabel = 'Open Ostomy Care';
 
-  if (stage === 'starting_out') {
+  // The referral comes first because it is the one branch that does not depend
+  // on consent: it is set from the stored answer either way, so it cannot be
+  // undercut by a later branch reading the consented copy of the same answer.
+  if (protections.ostomyFitReferral) {
+    headline = 'When the fit changes, start with your NSWOC';
+    lead =
+      'A change in your body can change how your pouching system fits. Your NSWOC can check it with you.';
+    oliviaFocus = 'Fit issues are information, not failure. I saved the useful chapter.';
+    storyHref = '/liivv-health/ostomy-care/chapters/get-to-know-your-stoma';
+    storyLabel = 'Open stoma and fit guidance';
+  } else if (stage === 'starting_out') {
     headline = 'New ostomy journey — we will go slowly';
     lead = 'Fit, skin, and first supplies without the overwhelm. A starter path, then the restock habit.';
     oliviaFocus = 'Starting out is a lot of new verbs. I will keep the list short.';
     storyHref = '/liivv-health/ostomy-care/chapters/new-to-the-journey';
     storyLabel = 'Start the new-to-the-journey chapter';
-  } else if (stage === 'body_change') {
-    headline = 'When the fit changes, so does the kit';
-    lead = 'Body shifts are allowed. We will look at barriers, rings, and a calmer way to recast your setup.';
-    oliviaFocus = 'Fit issues are information, not failure. I saved the useful chapter.';
-    storyHref = '/liivv-health/ostomy-care/chapters/get-to-know-your-stoma';
-    storyLabel = 'Open stoma and fit guidance';
   } else if (stage === 'restocking') {
     headline = brandLabel
       ? `Restocking ${brandLabel} — stay ahead of empty`
@@ -373,22 +411,30 @@ function ostomyLane(responses: CategoryResponses, now: Date) {
     now,
   );
 
-  return {
-    headline,
-    lead,
-    oliviaLines: oliviaVoice(oliviaFocus, [
-      'Ostomy corner, reporting for duty. Leak-free confidence is the vibe.',
-      'Hey — I am Olivia. Skin care and a backup pouch, same thought.',
-      'Uneventful is the goal. I am surprisingly good at uneventful.',
-    ]),
-    tip,
-    nextSteps: [
-      {
-        id: 'story',
-        label: storyLabel,
-        hint: 'Guidance for this exact season',
-        href: storyHref,
-      },
+  // A fit or skin change belongs with an NSWOC, so this stage keeps the chapter
+  // and drops every step that would answer it with a product or a pharmacist.
+  const fitReferral = protections.ostomyFitReferral;
+  const nextSteps: CareNextStep[] = [
+    {
+      id: 'story',
+      label: storyLabel,
+      hint: 'Guidance for this exact season',
+      href: storyHref,
+    },
+  ];
+
+  if (fitReferral) {
+    // The lane's own words say to start with an NSWOC, so it has to give a way
+    // to reach one. NSWOCC's directory is the same one the chapters use.
+    nextSteps.push({
+      id: 'nswoc',
+      label: 'Find an NSWOC',
+      hint: 'NSWOCC directory of nurses — opens membersnswoc.ca',
+      href: NSWOC_DIRECTORY_HREF,
+      external: true,
+    });
+  } else {
+    nextSteps.push(
       {
         id: 'shop',
         label: 'Shop ostomy essentials',
@@ -401,7 +447,19 @@ function ostomyLane(responses: CategoryResponses, now: Date) {
         hint: 'Ontario, during care hours',
         href: '/account/virtual-care',
       },
-    ] satisfies CareNextStep[],
+    );
+  }
+
+  return {
+    headline,
+    lead,
+    oliviaLines: oliviaVoice(oliviaFocus, [
+      'Hey — I am Olivia. Skin care and a backup pouch, same thought.',
+      'Uneventful is the goal. I am surprisingly good at uneventful.',
+    ]),
+    tip,
+    nextSteps,
+    suppressShop: fitReferral,
   };
 }
 
@@ -507,17 +565,7 @@ function womensLane(responses: CategoryResponses, now: Date) {
   };
 }
 
-function genericLane(
-  categoryId: LiivPrimaryCategoryId,
-  label: string,
-  now: Date,
-): {
-  headline: string;
-  lead: string;
-  oliviaLines: string[];
-  tip: { title: string; body: string };
-  nextSteps: CareNextStep[];
-} {
+function genericLane(categoryId: LiivPrimaryCategoryId, label: string, now: Date): LaneCopy {
   const catalog: Partial<
     Record<
       LiivPrimaryCategoryId,
@@ -746,13 +794,14 @@ function resolveLaneCopy(
   label: string,
   responses: CategoryResponses,
   now: Date,
-) {
+  protections: LaneProtections,
+): LaneCopy {
   if (categoryId === 'diabetes_care_everyday') {
     return diabetesLane(responses, now);
   }
 
   if (categoryId === 'ostomy_care_everyday') {
-    return ostomyLane(responses, now);
+    return ostomyLane(responses, now, protections);
   }
 
   if (categoryId === 'womens_health_wellness') {
@@ -762,6 +811,48 @@ function resolveLaneCopy(
   return genericLane(categoryId, label, now);
 }
 
+/*
+ * An answer shapes a lane only when the person gave express consent for Liivv
+ * to use that answer. Consent is per answer, not per row: a tick given on one
+ * landing quiz covers the answers on that page, so answers from some earlier
+ * visit that no tick covers are left out here even though they are still on
+ * file. Without any covered answer the lane is still built — from the category
+ * they chose — but it says nothing back to them about their own answers, and
+ * the snapshot chips stay empty. Consent is read from the same notes field the
+ * answers live in, so no caller can pass one without the other.
+ */
+function responsesForLanes(notes: string | null | undefined): CategoryResponses {
+  return consentedCategoryResponses(notes);
+}
+
+/*
+ * Read from the stored answers without asking whether consent covers them,
+ * which is deliberate and is the one place in this file that does it.
+ *
+ * D16 takes "Shop this path", "Ask a pharmacist" and "Shop ostomy essentials"
+ * away from someone who told us their body or their fit has recently changed,
+ * and sends them to an NSWOC instead. Hanging that on a consent record would
+ * fail the wrong way: every profile stored before the consent box existed
+ * carries no tick, and those are exactly the people who would get the shop
+ * steering back. A protection that only ever removes a commercial nudge is not
+ * a use of the answer that needs permission — refusing to sell to someone is
+ * not personalization — so it is read from the raw answers and fails safe.
+ * Withdrawing consent does not switch it off either, for the same reason.
+ *
+ * Nothing else may be read this way. Anything that speaks a person's answers
+ * back to them, or that adds a door rather than removing one, goes through
+ * `responsesForLanes` and stays behind consent.
+ *
+ * The test itself lives in the consent module, beside the consent it is the
+ * exception to, so the staff page that has to describe this carve-out and the
+ * dashboard that applies it cannot drift apart.
+ */
+function protectionsFromAnswers(notes: string | null | undefined): LaneProtections {
+  return {
+    ostomyFitReferral: healthAnswersSafetyReferralApplies(notes),
+  };
+}
+
 export function buildPersonalizedCareLanes(options: {
   careInterests: string[];
   healthProfileNotes: string | null | undefined;
@@ -769,14 +860,17 @@ export function buildPersonalizedCareLanes(options: {
 }): PersonalizedCareLane[] {
   const now = options.now ?? new Date();
   const ranked = resolveInitialHealthCategoriesWithRank(options.careInterests);
-  const responses = getRawCategoryResponses(options.healthProfileNotes);
+  const responses = responsesForLanes(options.healthProfileNotes);
+  const protections = protectionsFromAnswers(options.healthProfileNotes);
 
   return ranked.map(({ id }) => {
     const display = getPrimaryCategoryDisplay(id);
     const door = HEALTH_HUB_DOORS.find((entry) => entry.id === id);
-    const copy = resolveLaneCopy(id, display.shortLabel, responses, now);
+    const copy = resolveLaneCopy(id, display.shortLabel, responses, now, protections);
     const href = HUB_BY_CATEGORY[id] ?? door?.href ?? null;
-    const shopHref = SHOP_BY_CATEGORY[id] ?? null;
+    // No shop door — and so no 'Shop this path' action — when the lane's own
+    // answers call for a clinician rather than a product.
+    const shopHref = copy.suppressShop ? null : (SHOP_BY_CATEGORY[id] ?? null);
     const story = copy.nextSteps.find((step) => step.id === 'story');
     const exploreHref = story?.href ?? href;
     const live = Boolean(href);

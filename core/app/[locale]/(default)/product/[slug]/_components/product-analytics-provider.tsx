@@ -14,6 +14,8 @@ interface AddToCartContext {
   sku?: string;
   currency: string;
   price: number;
+  /** Naming this product would reveal something about a person's health. */
+  sensitive?: boolean;
 }
 
 const AddToCartSchema = z.object({
@@ -35,7 +37,7 @@ function ProductAnalyticsProviderResolved({
   data,
 }: PropsWithChildren<{ data: Streamable<AddToCartContext> }>) {
   const analytics = useAnalytics();
-  const { id, name, brand, sku, currency, price } = useStreamable(data);
+  const { id, name, brand, sku, currency, price, sensitive } = useStreamable(data);
 
   const onAddToCart = (payload?: FormData) => {
     const parsedPayload = AddToCartSchema.safeParse(Object.fromEntries(payload?.entries() ?? []));
@@ -54,6 +56,7 @@ function ProductAnalyticsProviderResolved({
             sku,
             price,
             quantity,
+            sensitive,
           },
         ],
       });

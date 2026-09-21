@@ -65,6 +65,44 @@ export type UpsertHealthProfilePayload = {
   notes: string | null;
 };
 
+/*
+ * The stored row as an upsert payload, so a caller that only means to change
+ * one field writes every other column back exactly as it found it.
+ */
+export function healthProfileRowToUpsertPayload(
+  row: HealthProfileRow,
+): UpsertHealthProfilePayload {
+  return {
+    profile_id: row.profile_id,
+    diabetes_type: row.diabetes_type,
+    diagnosis_year: row.diagnosis_year,
+    current_medications: row.current_medications,
+    allergies: row.allergies,
+    insulin_pump_user: Boolean(row.insulin_pump_user),
+    cgm_user: Boolean(row.cgm_user),
+    preferred_cgm_brand: row.preferred_cgm_brand,
+    preferred_pump_brand: row.preferred_pump_brand,
+    ostomy_type: row.ostomy_type,
+    ostomy_tenure: row.ostomy_tenure,
+    ostomy_preferred_brand: row.ostomy_preferred_brand,
+    ostomy_product_type: row.ostomy_product_type,
+    wants_ostomy_specialist: Boolean(row.wants_ostomy_specialist),
+    catheter_type: row.catheter_type,
+    catheter_length: row.catheter_length,
+    catheter_preferred_brand: row.catheter_preferred_brand,
+    catheter_french_size: row.catheter_french_size,
+    wound_care_type: row.wound_care_type,
+    wound_care_preferred_brand: row.wound_care_preferred_brand,
+    respiratory_type: row.respiratory_type,
+    respiratory_preferred_brand: row.respiratory_preferred_brand,
+    doctor_name: row.doctor_name,
+    doctor_phone: row.doctor_phone,
+    pharmacy_name: row.pharmacy_name,
+    pharmacy_phone: row.pharmacy_phone,
+    notes: row.notes,
+  };
+}
+
 export async function getHealthProfileByProfileId(
   profileId: string,
 ): Promise<HealthProfileRow | null> {

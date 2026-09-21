@@ -11,6 +11,8 @@ import type {
   CartLineItem,
 } from '@/vibes/soul/sections/cart/client';
 import { CartAnalyticsProvider } from '~/app/[locale]/(default)/cart/_components/cart-analytics-provider';
+import { DenyAdSignals } from '~/components/analytics/deny-ad-signals';
+import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-ids';
 import { getCartId } from '~/lib/cart';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import {
@@ -66,6 +68,12 @@ const getAnalyticsData = async (cartId: string) => {
     (item) => !item.parentEntityId, // Only include top-level items
   );
 
+  // A cart line carries no categories, so which of these products may be named
+  // in an analytics event is a question for the catalogue.
+  const sensitiveProductIds = await getSensitiveProductIds(
+    lineItems.map((item) => item.productEntityId),
+  );
+
   return lineItems.map((item) => {
     return {
       entityId: item.entityId,
@@ -76,6 +84,7 @@ const getAnalyticsData = async (cartId: string) => {
       price: item.listPrice.value,
       quantity: item.quantity,
       currency: item.listPrice.currencyCode,
+      sensitive: sensitiveProductIds.has(item.productEntityId),
     };
   });
 };
@@ -134,9 +143,31 @@ export default async function Cart({ params }: Props) {
   ].filter((item) => !('parentEntityId' in item) || !item.parentEntityId);
 
   const productLineItems = lineItems.filter((item) => item.__typename !== 'CartGiftCertificate');
+
+  /*
+   * Which of these products an analytics event may not name. The same answer
+   * says whether this cart holds ostomy items at all — the set is non-empty
+   * exactly when it does — which is what the ad-signal guard needs.
+   * Deliberately not written to a cookie or to storage: "this cart holds
+   * ostomy supplies" is itself a health signal, readable by any script on the
+   * origin.
+   *
+   * Asked for here and awaited below, so the catalogue round trip runs
+   * alongside the subscription and kit lookups rather than after them. It is
+   * awaited in the shell rather than streamed on purpose: the ad-signal flag
+   * it gates has to be in the first response, because the tag reads it while
+   * it is writing its very first consent command. A flag that arrives with a
+   * later chunk arrives after the automatic page_view has gone. React's
+   * `cache()` means this is the same one fetch the analytics payload makes.
+   */
+  const sensitiveCartProductIdsRequest = getSensitiveProductIds(
+    productLineItems.map((item) => item.productEntityId),
+  );
+
   const subscriptionLines = await reconcileSubscriptionLinesWithCart(cartId, productLineItems);
   const kitSession = await getKitSession(cartId);
   const kits = kitSession?.kits ?? [];
+  const sensitiveCartProductIds = await sensitiveCartProductIdsRequest;
 
   const formattedGiftCertificates: CartGiftCertificateLineItem[] = lineItems
     .filter((item) => item.__typename === 'CartGiftCertificate')
@@ -495,9 +526,18 @@ export default async function Cart({ params }: Props) {
         />
       </CartAnalyticsProvider>
       <Slot label="Cart bottom content" snapshotId="cart-bottom-content" />
+      {/*
+        This cart holds ostomy supplies, which the URL /cart does not say and
+        the server is the only side that knows. It marks the page, and the
+        advertising signals go off for the rest of the session — see
+        ~/lib/analytics/ad-signals. Nothing is written to a cookie or to
+        storage: this fact must not outlive the page it is true on.
+      */}
+      {sensitiveCartProductIds.size > 0 && <DenyAdSignals />}
       <CartViewed
         currencyCode={cart.currencyCode}
         lineItems={lineItems}
+        sensitiveProductIds={[...sensitiveCartProductIds]}
         subtotal={checkout?.subtotal?.value}
       />
     </>

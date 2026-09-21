@@ -2668,6 +2668,14 @@ body.adc-portal-active main{
   #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-care-steps__grid{
     grid-template-columns:repeat(3,minmax(0,1fr));
   }
+  /* A lane with fewer than three steps spreads them, rather than leaving the
+     rest of the row empty beside a lone card. */
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-care-steps__grid[data-count="1"]{
+    grid-template-columns:minmax(0,1fr);
+  }
+  #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-care-steps__grid[data-count="2"]{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
 }
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-care-step{
   display:flex;

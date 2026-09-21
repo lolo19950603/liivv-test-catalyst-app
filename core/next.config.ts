@@ -69,6 +69,29 @@ export default async (): Promise<NextConfig> => {
 
   let nextConfig: NextConfig = {
     reactStrictMode: true,
+    /*
+     * The French review gates (ostomy-care/chapters/review-gates.ts) open on a
+     * Vercel PREVIEW so the francophone reviewer can read the draft French in
+     * context, and stay shut in production. That switch reads
+     * NEXT_PUBLIC_VERCEL_ENV rather than VERCEL_ENV because the chapters are
+     * composed on the server and again in the browser, and only a public
+     * variable is inlined into the client bundle — reading the private one
+     * would open the gates in the server HTML and shut them on hydration.
+     *
+     * Vercel only publishes the NEXT_PUBLIC_ twin when "Automatically expose
+     * System Environment Variables" happens to be on in the project, which
+     * nothing in this repo can guarantee. VERCEL_ENV itself is always there, so
+     * the public name is derived from it here. Without this the gates were
+     * silently shut on the one deployment built for the reviewer to read, and
+     * nothing looked wrong: a preview with every gate closed is
+     * indistinguishable from correct production behaviour.
+     *
+     * Empty string off Vercel, where NODE_ENV === 'development' opens the gates
+     * instead.
+     */
+    env: {
+      NEXT_PUBLIC_VERCEL_ENV: process.env.VERCEL_ENV ?? '',
+    },
     experimental: {
       optimizePackageImports: ['@icons-pack/react-simple-icons'],
     },

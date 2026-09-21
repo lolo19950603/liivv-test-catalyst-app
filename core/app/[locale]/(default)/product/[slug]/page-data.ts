@@ -189,6 +189,21 @@ const ProductQuery = graphql(
           brand {
             name
           }
+          # Which shelves this product sits on, which is how the page knows
+          # whether naming it would reveal a health fact
+          # (~/lib/analytics/sensitive-products). Asked for here, in the query
+          # the page already awaits before it renders anything, so the answer
+          # is in the first byte rather than arriving with the streamed data:
+          # the advertising signals have to be off before gtag('config') sends
+          # its automatic page_view, and that page_view carries this page's URL
+          # and title.
+          categories(first: 25) {
+            edges {
+              node {
+                entityId
+              }
+            }
+          }
           reviewSummary {
             averageRating
             numberOfReviews

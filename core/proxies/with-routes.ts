@@ -6,6 +6,7 @@ import { graphql } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
 import { getVisitIdCookie, getVisitorIdCookie } from '~/lib/analytics/bigcommerce';
 import { sendProductViewedEvent } from '~/lib/analytics/bigcommerce/data-events';
+import { isSensitiveProduct } from '~/lib/analytics/sensitive-products';
 import { kvKey, STORE_STATUS_KEY } from '~/lib/kv/keys';
 
 import { kv } from '../lib/kv';
@@ -48,6 +49,13 @@ const GetRouteQuery = graphql(`
           id
           ... on Product {
             entityId
+            categories(first: 25) {
+              edges {
+                node {
+                  entityId
+                }
+              }
+            }
           }
           ... on Category {
             entityId
@@ -158,7 +166,23 @@ const RedirectSchema = z.object({
 });
 
 const NodeSchema = z.union([
-  z.object({ __typename: z.literal('Product'), entityId: z.number() }),
+  z.object({
+    __typename: z.literal('Product'),
+    entityId: z.number(),
+    /*
+     * Which shelves this product sits on, so the Product case below can tell
+     * whether recording the visit would record a health fact. Optional, and
+     * that is load-bearing: this schema also parses route entries already in
+     * the KV cache, which were written before this field was selected and have
+     * a 30-minute life. `undefined` therefore means "not known", not "none" —
+     * see the Product case, which treats the two differently.
+     */
+    categories: z
+      .object({
+        edges: z.nullable(z.array(z.object({ node: z.object({ entityId: z.number() }) }))),
+      })
+      .optional(),
+  }),
   z.object({ __typename: z.literal('Category'), entityId: z.number() }),
   z.object({ __typename: z.literal('Brand'), entityId: z.number() }),
   z.object({ __typename: z.literal('ContactPage'), id: z.string() }),
@@ -372,7 +396,29 @@ export const withRoutes: ProxyFactory = () => {
         const isPrefetch = request.headers.get('Next-Router-Prefetch') === '1';
         const isRSC = request.headers.get('RSC') === '1';
 
-        if (!isPrefetch && !isRSC) {
+        /*
+         * The second telemetry pipe. GA4 is not the only party told what was
+         * viewed: this posts "visitor X viewed product N", plus the URL, the
+         * referer and the user agent, to BigCommerce's data-events API, keyed
+         * on a visitor id that lives for 400 days (~/lib/analytics/bigcommerce).
+         * It runs server-side, so nothing about gtag consent reaches it.
+         *
+         * A pouch, a barrier or a curated ostomy kit is a health fact about the
+         * person viewing it (~/lib/analytics/sensitive-products), so the visit
+         * is simply not recorded. The categories come from the route query this
+         * proxy already runs — no extra round trip to answer the question.
+         *
+         * Fail closed, like the catalogue lookup the pages use: a route served
+         * from a KV entry written before this field existed knows no categories
+         * at all, and an unchecked product is not reported. That window is the
+         * cache's 30 minutes and it closes itself.
+         */
+        const knowsCategories = node.categories != null;
+        const categoryIds = node.categories?.edges?.map((edge) => edge.node.entityId) ?? [];
+        const mayRecord =
+          knowsCategories && !isSensitiveProduct({ entityId: node.entityId, categoryIds });
+
+        if (!isPrefetch && !isRSC && mayRecord) {
           event.waitUntil(recordProductVisit(request, node.entityId));
         }
 

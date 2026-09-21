@@ -7,9 +7,11 @@ import { Streamable } from '@/vibes/soul/lib/streamable';
 import { CursorPaginationInfo } from '@/vibes/soul/primitives/cursor-pagination';
 import { Wishlist, WishlistDetails } from '@/vibes/soul/sections/wishlist-details';
 import { ExistingResultType } from '~/client/util';
+import { DenyAdSignals } from '~/components/analytics/deny-ad-signals';
 import { defaultPageInfo, pageInfoTransformer } from '~/data-transformers/page-info-transformer';
 import { wishlistDetailsTransformer } from '~/data-transformers/wishlists-transformer';
 import { redirect } from '~/i18n/routing';
+import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-ids';
 import { isMobileUser } from '~/lib/user-agent';
 
 import { removeWishlistItem } from '../../../wishlists/_actions/remove-wishlist-item';
@@ -60,19 +62,25 @@ const getAnalyticsData = async (id: string, searchParamsPromise: Promise<SearchP
     return [];
   }
 
-  return removeEdgesAndNodes(wishlist.items)
+  const products = removeEdgesAndNodes(wishlist.items)
     .map(({ product }) => product)
-    .filter((product) => product !== null)
-    .map((product) => {
-      return {
-        id: product.entityId,
-        name: product.name,
-        sku: product.sku,
-        brand: product.brand?.name ?? '',
-        price: product.prices?.price.value ?? 0,
-        currency: product.prices?.price.currencyCode ?? '',
-      };
-    });
+    .filter((product) => product !== null);
+
+  // A saved list of ostomy supplies is health information: which of these may
+  // be named in an analytics event is a question for the catalogue.
+  const sensitiveProductIds = await getSensitiveProductIds(products.map((p) => p.entityId));
+
+  return products.map((product) => {
+    return {
+      id: product.entityId,
+      name: product.name,
+      sku: product.sku,
+      brand: product.brand?.name ?? '',
+      price: product.prices?.price.value ?? 0,
+      currency: product.prices?.price.currencyCode ?? '',
+      sensitive: sensitiveProductIds.has(product.entityId),
+    };
+  });
 };
 
 async function getPaginationInfo(
@@ -125,8 +133,24 @@ export default async function WishlistPage({ params, searchParams }: Props) {
     );
   };
 
+  const streamableAnalyticsData = Streamable.from(() => getAnalyticsData(id, searchParams));
+
+  /*
+   * A wishlist of ostomy supplies is a health fact, and the page_view that goes
+   * out with it carries this URL whatever the ecommerce event does or does not
+   * name. The advertising signals go off, the same as on an ostomy shelf or an
+   * ostomy product's own page (~/lib/analytics/ad-signals). Awaited in the
+   * shell, not streamed: the first consent command runs as the page loads, so
+   * a flag that arrives with streamed content arrives too late to cover the
+   * page_view. Both lookups are React-cached, so the catalogue is asked once.
+   */
+  const denyAdSignals = (await getAnalyticsData(id, searchParams)).some(
+    (product) => product.sensitive,
+  );
+
   return (
-    <WishlistAnalyticsProvider data={Streamable.from(() => getAnalyticsData(id, searchParams))}>
+    <WishlistAnalyticsProvider data={streamableAnalyticsData}>
+      {denyAdSignals && <DenyAdSignals />}
       <WishlistDetails
         action={addWishlistItemToCart}
         emptyStateText={t('emptyWishlist')}

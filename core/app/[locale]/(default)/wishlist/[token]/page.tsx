@@ -13,12 +13,14 @@ import { Wishlist, WishlistDetails } from '@/vibes/soul/sections/wishlist-detail
 import { addWishlistItemToCart } from '~/app/[locale]/(default)/account/wishlists/[id]/_actions/add-to-cart';
 import { WishlistAnalyticsProvider } from '~/app/[locale]/(default)/account/wishlists/[id]/_components/wishlist-analytics-provider';
 import { ExistingResultType } from '~/client/util';
+import { DenyAdSignals } from '~/components/analytics/deny-ad-signals';
 import {
   WishlistShareButton,
   WishlistShareButtonSkeleton,
 } from '~/components/wishlist/share-button';
 import { defaultPageInfo, pageInfoTransformer } from '~/data-transformers/page-info-transformer';
 import { publicWishlistDetailsTransformer } from '~/data-transformers/wishlists-transformer';
+import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-ids';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
 import { isMobileUser } from '~/lib/user-agent';
 
@@ -86,19 +88,25 @@ const getAnalyticsData = async (token: string, searchParamsPromise: Promise<Sear
     return [];
   }
 
-  return removeEdgesAndNodes(wishlist.items)
+  const products = removeEdgesAndNodes(wishlist.items)
     .map(({ product }) => product)
-    .filter((product) => product !== null)
-    .map((product) => {
-      return {
-        id: product.entityId,
-        name: product.name,
-        sku: product.sku,
-        brand: product.brand?.name ?? '',
-        price: product.prices?.price.value ?? 0,
-        currency: product.prices?.price.currencyCode ?? '',
-      };
-    });
+    .filter((product) => product !== null);
+
+  // A shared list of ostomy supplies is health information: which of these may
+  // be named in an analytics event is a question for the catalogue.
+  const sensitiveProductIds = await getSensitiveProductIds(products.map((p) => p.entityId));
+
+  return products.map((product) => {
+    return {
+      id: product.entityId,
+      name: product.name,
+      sku: product.sku,
+      brand: product.brand?.name ?? '',
+      price: product.prices?.price.value ?? 0,
+      currency: product.prices?.price.currencyCode ?? '',
+      sensitive: sensitiveProductIds.has(product.entityId),
+    };
+  });
 };
 
 async function getBreadcrumbs(
@@ -158,8 +166,24 @@ export default async function PublicWishlist({ params, searchParams }: Props) {
     );
   };
 
+  const streamableAnalyticsData = Streamable.from(() => getAnalyticsData(token, searchParams));
+
+  /*
+   * A shared list of ostomy supplies is a health fact about whoever made it,
+   * and the page_view carries this URL whatever the ecommerce event names. The
+   * advertising signals go off, the same as on an ostomy shelf or an ostomy
+   * product's own page (~/lib/analytics/ad-signals). Awaited in the shell, not
+   * streamed: the first consent command runs as the page loads, so a flag that
+   * arrives with streamed content arrives too late to cover the page_view.
+   * Both lookups are React-cached, so the catalogue is asked once.
+   */
+  const denyAdSignals = (await getAnalyticsData(token, searchParams)).some(
+    (product) => product.sensitive,
+  );
+
   return (
-    <WishlistAnalyticsProvider data={Streamable.from(() => getAnalyticsData(token, searchParams))}>
+    <WishlistAnalyticsProvider data={streamableAnalyticsData}>
+      {denyAdSignals && <DenyAdSignals />}
       <SectionLayout>
         <Breadcrumbs breadcrumbs={Streamable.from(() => getBreadcrumbs(token, searchParams))} />
 

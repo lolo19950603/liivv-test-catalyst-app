@@ -1,9 +1,19 @@
 'use client';
 
+import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link } from '~/components/link';
 import { OnboardingSubmitOverlay } from './onboarding-submit-overlay';
 import { OnboardingSectionHeader } from './onboarding-section-header';
+import {
+  HEALTH_ANSWERS_CONSENT_FIELD,
+  HEALTH_ANSWERS_CONSENT_LOCALE_FIELD,
+  HEALTH_ANSWERS_CONSENT_REQUIRED_CODE,
+  HEALTH_ANSWERS_CONSENT_VALUE,
+  HEALTH_ANSWERS_CONSENT_WITHDRAWN_CODE,
+  isHealthAnswersWithdrawn,
+  readHealthAnswersConsent,
+} from '~/lib/onboarding/health-profile-consent';
 import { validateHealthProfileComplete } from '~/lib/onboarding/health-profile-form-validation';
 import {
   LIIV_PRIMARY_HEALTH_CATEGORIES,
@@ -19,7 +29,7 @@ export type HealthProfileFormProps = {
     initialHealthProfile: HealthProfileRow | null;
     supabaseReady: boolean;
   };
-  actionData?: { error?: string } | null;
+  actionData?: { error?: string; notice?: string; code?: string } | null;
   isSubmitting?: boolean;
   formAction: (formData: FormData) => void;
   embedded?: boolean;
@@ -41,8 +51,29 @@ export function HealthProfileForm({
     supabaseReady,
   } = data;
 
+  const t = useTranslations('Account.HealthProfile.consent');
+  const locale = useLocale();
+
   const [clientError, setClientError] = useState<string | null>(null);
   const [missingRequiredKeys, setMissingRequiredKeys] = useState<string[]>([]);
+  /**
+   * Express consent, and deliberately unticked on every visit. It is a fresh
+   * decision each time answers are written, so a previous tick never carries
+   * one submission over into the next.
+   */
+  const [consentGranted, setConsentGranted] = useState(false);
+
+  /*
+   * Withdrawal. A tick already on file makes an unticked save mean something
+   * rather than nothing: the action records the withdrawal and stops every
+   * personalized use of the answers, which stay on the profile. So the client
+   * must let that submission through, and the block above the box has to say
+   * plainly what saving unticked will do before the person does it.
+   */
+  const storedNotes = initialHealthProfile?.notes ?? null;
+  const withdrawnNow = actionData?.code === HEALTH_ANSWERS_CONSENT_WITHDRAWN_CODE;
+  const consentWithdrawn = withdrawnNow || isHealthAnswersWithdrawn(storedNotes);
+  const consentOnFile = !consentWithdrawn && readHealthAnswersConsent(storedNotes) !== null;
 
   const [selectedCategories, setSelectedCategories] = useState<LiivPrimaryCategoryId[]>(
     () => initialCategories,
@@ -81,6 +112,17 @@ export function HealthProfileForm({
       if (!v.ok) {
         e.preventDefault();
         setClientError(v.message);
+        return;
+      }
+
+      // The same rule the server applies, so nothing leaves the page without
+      // the tick. The server checks again; this is only the kinder message.
+      // The one submission that may go through unticked is a withdrawal, which
+      // is a decision the person is entitled to make and the server records.
+      if (!consentGranted && !consentOnFile) {
+        e.preventDefault();
+        setClientError(t('error'));
+
         return;
       }
     }
@@ -739,6 +781,26 @@ export function HealthProfileForm({
     return 'Please answer the required questions.';
   };
 
+  // The action returns a code for the refusals that have wording of their own,
+  // so the banner can show them in the reader's language.
+  const readServerError = (): string | null => {
+    if (!actionData) {
+      return null;
+    }
+
+    if (actionData.code === HEALTH_ANSWERS_CONSENT_REQUIRED_CODE) {
+      return t('error');
+    }
+
+    return actionData.error ?? null;
+  };
+
+  const shownError = clientError ?? readServerError();
+  // A withdrawal is not a failure — the person asked for it and it was written
+  // down — so it is confirmed, not shown in the red band.
+  const shownNotice = withdrawnNow ? t('withdraw.done') : null;
+  const showSaveButton = !(selectedCategories.length > 0 && microPageIdx < selectedCategories.length);
+
   if (!supabaseReady) {
     return (
       <div className="w-full">
@@ -771,14 +833,25 @@ export function HealthProfileForm({
           />
         )}
 
-        {clientError || (actionData && 'error' in actionData && actionData.error) ? (
+        {shownError ? (
           <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-            {clientError ?? (actionData && 'error' in actionData ? actionData.error : null)}
+            {shownError}
+          </div>
+        ) : null}
+
+        {shownNotice ? (
+          <div
+            className="rounded-lg border border-[#d7cfc2] bg-[#f6f2ea] px-3 py-2 text-sm text-[#2c2a26]"
+            role="status"
+          >
+            {shownNotice}
           </div>
         ) : null}
 
         <form action={formAction} className="onboarding-health-form w-full max-w-none space-y-8" onSubmit={handleFormSubmit}>
           <input name="zoneCode" type="hidden" value={data.isOntario ? 'ON' : ''} />
+          {/* Records which language the consent wording was read in. */}
+          <input name={HEALTH_ANSWERS_CONSENT_LOCALE_FIELD} type="hidden" value={locale} />
 
           {selectedCategories.map((id) => (
             <input key={`care-interest-input-${id}`} type="hidden" name="care_interests" value={id} />
@@ -881,6 +954,62 @@ export function HealthProfileForm({
                   : 'Complete required fields, then save to return to your account.'}
               </p>
             </div>
+
+            {/*
+              Express consent. It sits with the Save button because that is the
+              moment the answers would be written, and it starts unticked every
+              time. Nothing here is saved while it is unticked — the action
+              refuses the submission, so the box is not decoration.
+            */}
+            {showSaveButton ? (
+              <div
+                aria-labelledby="health-answers-consent-heading"
+                className="mb-5 rounded-xl border border-[#e0d9ce] bg-[#fcfaf7] p-4 sm:p-5"
+                role="group"
+              >
+                <h2
+                  className="text-sm font-semibold text-[#2c2a26]"
+                  id="health-answers-consent-heading"
+                >
+                  {t('heading')}
+                </h2>
+                <div className="mt-2 space-y-2 text-xs leading-relaxed text-[#6b6560]">
+                  <p>{t('body.1')}</p>
+                  <p>{t('body.2')}</p>
+                  <p>{t('body.3')}</p>
+                  <p>{t('body.4')}</p>
+                  <p>{t('withdraw.safety')}</p>
+                  <p>
+                    {t('body.5')}{' '}
+                    <Link className="underline" href="/contact-us">
+                      {t('contactLabel')}
+                    </Link>
+                  </p>
+                  {consentOnFile ? (
+                    <p className="font-medium text-[#2c2a26]">{t('withdraw.onFile')}</p>
+                  ) : null}
+                  {consentWithdrawn ? (
+                    <p className="font-medium text-[#2c2a26]">{t('withdraw.state')}</p>
+                  ) : null}
+                </div>
+                {/* 44px minimum target, like every other checkbox row on the site. */}
+                <label className="mt-3 flex min-h-11 cursor-pointer items-center gap-3 py-1 text-sm text-[#2c2a26]">
+                  <input
+                    checked={consentGranted}
+                    className="h-4 w-4 shrink-0"
+                    name={HEALTH_ANSWERS_CONSENT_FIELD}
+                    onChange={(event) => {
+                      setConsentGranted(event.target.checked);
+                      setClientError(null);
+                    }}
+                    type="checkbox"
+                    value={HEALTH_ANSWERS_CONSENT_VALUE}
+                  />
+                  <span>{t('label')}</span>
+                </label>
+              </div>
+            ) : null}
+
             <div className="flex flex-row flex-wrap items-center gap-3">
               {embedded ? null : (
                 <Link

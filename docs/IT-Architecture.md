@@ -323,6 +323,33 @@ flowchart TB
 - Cart ID inside signed JWT
 - Virtual care bot disabled unless `VIRTUAL_CARE_BOT_ENABLED=true`
 
+### Third-party measurement on health pages
+
+On `/liivv-health/ostomy-care/**` the URL itself is the health fact, and an
+ostomy product's slug is its name (`/stay-hydrated-high-output-dehydration-rescue/`).
+Three measurement pipes could carry that to a third party, and each is handled
+differently:
+
+| Pipe | Control | Where |
+| --- | --- | --- |
+| GA4 (gtag) | `ad_storage`, `ad_user_data`, `ad_personalization` denied; `ads_data_redaction` on; `page_location`/`page_title` replaced with `<origin>/redacted` on both hard load and client navigation. Sticky for the document. | `core/lib/analytics/ad-signals.ts`, `core/lib/analytics/providers/google-analytics/index.ts`, `core/components/analytics/provider.tsx` |
+| BigCommerce data events | Suppressed on sensitive routes | `core/proxies/with-routes.ts` |
+| Vercel Web Analytics + Speed Insights | Events dropped in `beforeSend` when the event's URL is an ostomy route or the page carries the `<DenyAdSignals/>` flag (ostomy PDP, ostomy shelf, cart holding ostomy supplies, a search that finds one) | `core/components/analytics/vercel-measurement.tsx` |
+
+`DISABLE_VERCEL_ANALYTICS` and `DISABLE_VERCEL_SPEED_INSIGHTS` remain the
+sitewide off switch, set in the Vercel project (both default to ON when unset —
+they are opt-OUT). Nothing in the code has ever enforced them, which is why the
+filter above does not depend on them; set them to `'true'` on any channel that
+should send Vercel nothing at all. Both are listed in `.env.example`.
+
+Related owner setting: the ostomy chapters' French review gates open on a Vercel
+**preview** so a francophone reviewer can read the draft French in context, and
+stay shut in production. They read `NEXT_PUBLIC_VERCEL_ENV`, which
+`core/next.config.ts` now derives from `VERCEL_ENV` — Vercel publishes the
+`NEXT_PUBLIC_` twin only when "Automatically expose System Environment
+Variables" is on in the project, and a preview with every gate shut looks
+exactly like correct production behaviour.
+
 ---
 
 

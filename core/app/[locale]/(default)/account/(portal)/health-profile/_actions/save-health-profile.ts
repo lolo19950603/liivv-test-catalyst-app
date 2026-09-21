@@ -4,6 +4,21 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 
 import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
+import {
+  buildHealthAnswersConsent,
+  buildHealthAnswersNotes,
+  buildHealthAnswersWithdrawal,
+  buildHealthAnswersWithdrawalNotes,
+  HEALTH_ANSWERS_CONSENT_LOCALE_FIELD,
+  HEALTH_ANSWERS_CONSENT_REQUIRED_CODE,
+  HEALTH_ANSWERS_CONSENT_REQUIRED_MESSAGE,
+  HEALTH_ANSWERS_CONSENT_WITHDRAWN_CODE,
+  HEALTH_ANSWERS_CONSENT_WITHDRAWN_MESSAGE,
+  type HealthAnswersConsent,
+  isHealthAnswersConsentTicked,
+  isHealthAnswersWithdrawn,
+  readHealthAnswersConsent,
+} from '~/lib/onboarding/health-profile-consent';
 import { validateHealthProfileComplete } from '~/lib/onboarding/health-profile-form-validation';
 import {
   encodeRankedCareInterest,
@@ -13,11 +28,27 @@ import {
   type LiivPrimaryCategoryId,
 } from '~/lib/onboarding/liiv-primary-health-category';
 import { completeOnboardingStep2, getOnboardingStatus } from '~/lib/supabase/onboarding';
-import { upsertHealthProfile, type UpsertHealthProfilePayload } from '~/lib/supabase/health-profile';
+import {
+  getHealthProfileByProfileId,
+  type HealthProfileRow,
+  healthProfileRowToUpsertPayload,
+  upsertHealthProfile,
+  type UpsertHealthProfilePayload,
+} from '~/lib/supabase/health-profile';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 
-export type HealthProfileActionState = { error?: string } | null;
+/**
+ * `code` names an outcome the client can put into the reader's own language.
+ * `error` stays an English sentence so nothing has to know the codes, and
+ * `notice` carries an outcome that is not a failure — withdrawing consent is
+ * something the person asked for, so it is not shown as an error.
+ */
+export type HealthProfileActionState = {
+  error?: string;
+  notice?: string;
+  code?: string;
+} | null;
 
 function str(formData: FormData, key: string): string {
   return String(formData.get(key) ?? '').trim();
@@ -81,9 +112,13 @@ function buildCategoryResponses(formData: FormData): Record<string, string | str
   return out;
 }
 
-function buildHealthPayload(profileId: string, formData: FormData): UpsertHealthProfilePayload {
-  const categoryResponses = buildCategoryResponses(formData);
-
+function buildHealthPayload(
+  profileId: string,
+  formData: FormData,
+  categoryResponses: Record<string, string | string[]>,
+  consent: HealthAnswersConsent,
+  existingNotes: string | null,
+): UpsertHealthProfilePayload {
   return {
     profile_id: profileId,
     diabetes_type: null,
@@ -111,7 +146,67 @@ function buildHealthPayload(profileId: string, formData: FormData): UpsertHealth
     doctor_phone: null,
     pharmacy_name: null,
     pharmacy_phone: null,
-    notes: JSON.stringify({ category_responses: categoryResponses }),
+    // The consent record rides in the same JSON as the answers it covers, so
+    // the two can never be stored apart. No new column, no migration. This form
+    // rebuilds the whole answer set from the submission, hence `replace`: a
+    // category the person removed leaves the row instead of being merged back
+    // in. Everything else the row already carried — an earlier tick from the
+    // landing quiz, its history, a recorded withdrawal — is written back by
+    // buildHealthAnswersNotes rather than flattened away.
+    notes: buildHealthAnswersNotes({
+      existingNotes,
+      newResponses: categoryResponses,
+      consent,
+      answers: 'replace',
+    }),
+  };
+}
+
+/*
+ * What an unticked save means.
+ *
+ * With a tick already on file it is a withdrawal, and a real one: the
+ * withdrawal is written down, and from that moment nothing personalizes from
+ * these answers. The answers themselves are left exactly where they are — this
+ * action deletes nothing, and the wording on the form says so — and no part of
+ * the submission is saved, because the person did not agree to it.
+ *
+ * With nothing to withdraw it is still a refusal: there is no consent, so
+ * there is nothing to write, and the message tells them so.
+ */
+async function withdrawOrRefuse(
+  existing: HealthProfileRow | null,
+  locale: string,
+): Promise<HealthProfileActionState> {
+  const refusal = {
+    code: HEALTH_ANSWERS_CONSENT_REQUIRED_CODE,
+    error: HEALTH_ANSWERS_CONSENT_REQUIRED_MESSAGE,
+  };
+
+  if (!existing || !readHealthAnswersConsent(existing.notes)) {
+    return refusal;
+  }
+
+  if (isHealthAnswersWithdrawn(existing.notes)) {
+    return refusal;
+  }
+
+  const withdrawal = buildHealthAnswersWithdrawal({ source: 'health_profile_form', locale });
+  const up = await upsertHealthProfile({
+    ...healthProfileRowToUpsertPayload(existing),
+    notes: buildHealthAnswersWithdrawalNotes({ existingNotes: existing.notes, withdrawal }),
+  });
+
+  if (!up.ok) {
+    return { error: up.message };
+  }
+
+  revalidatePath('/account/dashboard');
+  revalidatePath('/account/health-profile');
+
+  return {
+    code: HEALTH_ANSWERS_CONSENT_WITHDRAWN_CODE,
+    notice: HEALTH_ANSWERS_CONSENT_WITHDRAWN_MESSAGE,
   };
 }
 
@@ -165,13 +260,39 @@ export async function saveHealthProfileStep(
     }
   }
 
+  const existing = await getHealthProfileByProfileId(ensured.profile.id);
+  const consentLocale = str(formData, HEALTH_ANSWERS_CONSENT_LOCALE_FIELD);
+
+  // Health answers are only written once the person has ticked the express
+  // consent box on this submission. Nothing new is saved without it — not the
+  // answers, not the completed-step timestamp. This runs before the form
+  // validation below on purpose: taking consent back writes none of the
+  // submission, so it must not be blocked by a question left unanswered.
+  if (!isHealthAnswersConsentTicked(formData)) {
+    return withdrawOrRefuse(existing, consentLocale);
+  }
+
   const validation = validateHealthProfileComplete(formData);
 
   if (!validation.ok) {
     return { error: validation.message };
   }
 
-  const payload = buildHealthPayload(ensured.profile.id, formData);
+  const categoryResponses = buildCategoryResponses(formData);
+  const consent = buildHealthAnswersConsent({
+    source: 'health_profile_form',
+    locale: consentLocale,
+    // Every answer written here came from this submission, so the person read
+    // each one back to us before ticking.
+    covers: Object.keys(categoryResponses),
+  });
+  const payload = buildHealthPayload(
+    ensured.profile.id,
+    formData,
+    categoryResponses,
+    consent,
+    existing?.notes ?? null,
+  );
   const up = await upsertHealthProfile(payload);
 
   if (!up.ok) {

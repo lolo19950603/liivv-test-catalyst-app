@@ -24,6 +24,15 @@ declare namespace Analytics {
     price?: number;
     quantity?: number;
     variant_id?: number;
+    /**
+     * Naming this product would reveal something about a person's health.
+     *
+     * Set by the emitter, which is the only place that knows what the product
+     * is (see ~/lib/analytics/sensitive-products). Providers must leave such
+     * an item out of the event entirely; a missing flag means nothing was
+     * checked, not that the product is safe to name.
+     */
+    sensitive?: boolean;
   }
 
   namespace Navigation {
@@ -38,6 +47,8 @@ declare namespace Analytics {
       name: string;
       currency: string;
       items: Product[];
+      /** The list itself reveals something: its name and id must not be sent. */
+      sensitive?: boolean;
     }
 
     interface ProviderEvents {

@@ -11,6 +11,15 @@ export const ProductViewedFragment = graphql(`
     description
     plainTextDescription(characterLimit: 1200)
     path
+    # Which shelves this product sits on. Read only to decide whether an
+    # analytics event may name it (~/lib/analytics/sensitive-products).
+    categories(first: 25) {
+      edges {
+        node {
+          entityId
+        }
+      }
+    }
     variants {
       edges {
         node {

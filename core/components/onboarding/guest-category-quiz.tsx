@@ -1,10 +1,12 @@
 'use client';
 
+import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 import { stashGuestHealthAnswers } from '~/app/[locale]/(default)/liivv-health/_actions/stash-guest-health-answers';
 import { saveSignedInLandingQuiz } from '~/app/[locale]/(default)/liivv-health/_actions/save-signed-in-landing-quiz';
 import { Image } from '~/components/image';
+import { Link } from '~/components/link';
 import { useRouter } from '~/i18n/routing';
 import {
   getLandingCategoryMeta,
@@ -13,6 +15,7 @@ import {
   type CategoryResponses,
   type LandingHealthCategoryId,
 } from '~/lib/onboarding/category-questionnaires';
+import { HEALTH_ANSWERS_CONSENT_REQUIRED_CODE } from '~/lib/onboarding/health-profile-consent';
 
 import oliviaDiabetesIdle from './olivia-variants/diabetes.png';
 import oliviaDiabetesBlink from './olivia-variants/diabetes-blink.png';
@@ -157,12 +160,16 @@ export function GuestCategoryQuiz({
   isSignedIn = false,
 }: GuestCategoryQuizProps) {
   const router = useRouter();
+  const t = useTranslations('Account.HealthProfile.consent');
+  const locale = useLocale();
   const questions = LANDING_CATEGORY_QUESTIONNAIRES[categoryId];
   const meta = getLandingCategoryMeta(categoryId);
   const welcome = WELCOME[categoryId];
   const [step, setStep] = useState(0);
   const [responses, setResponses] = useState<CategoryResponses>({});
   const [submitting, setSubmitting] = useState(false);
+  // Express consent for keeping these answers. Unticked until the person says so.
+  const [consentGranted, setConsentGranted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reactToken, setReactToken] = useState(0);
   const [saved, setSaved] = useState(false);
@@ -206,15 +213,23 @@ export function GuestCategoryQuiz({
       return;
     }
 
+    // Nothing is sent until the consent box is ticked. The actions refuse it
+    // as well; this only keeps the refusal from needing a round trip.
+    if (!consentGranted) {
+      setError(t('error'));
+
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
 
     const result = isSignedIn
-      ? await saveSignedInLandingQuiz({ categoryId, responses })
-      : await stashGuestHealthAnswers({ categoryId, responses });
+      ? await saveSignedInLandingQuiz({ categoryId, responses, consentGranted, locale })
+      : await stashGuestHealthAnswers({ categoryId, responses, consentGranted, locale });
 
     if (!result.ok) {
-      setError(result.error);
+      setError(result.code === HEALTH_ANSWERS_CONSENT_REQUIRED_CODE ? t('error') : result.error);
       setSubmitting(false);
       return;
     }
@@ -317,6 +332,56 @@ export function GuestCategoryQuiz({
               })}
             </div>
 
+            {isLast ? (
+              <div
+                aria-labelledby="guest-quiz-consent-heading"
+                className="guest-category-quiz-consent"
+                role="group"
+              >
+                <p className="guest-category-quiz-consent-heading" id="guest-quiz-consent-heading">
+                  {t('heading')}
+                </p>
+                <p>{t('body.1')}</p>
+                <p>{t('body.2')}</p>
+                <p>{t('body.3')}</p>
+                {isSignedIn ? null : <p>{t('guestNote')}</p>}
+                {/*
+                  Withdrawal happens on the health profile page in the account,
+                  not here: this quiz has no save to leave unticked, so it says
+                  where the switch is rather than borrowing that page's wording.
+
+                  `elsewhere` ends on "we stop using them to decide what you
+                  see", which is not true of the one answer this very quiz
+                  collects: a reported recent body or fit change still steers
+                  the dashboard to an NSWOC whatever the box says. So the
+                  carve-out follows it here exactly as it follows the same
+                  sentence on the health profile form. Only this quiz asks that
+                  question, and the sentence names a pouching system, so the
+                  other categories would be reading about a device they do not
+                  have.
+                */}
+                <p>{t('withdraw.elsewhere')}</p>
+                {categoryId === 'ostomy_care_everyday' ? <p>{t('withdraw.safety')}</p> : null}
+                <p>
+                  {t('body.5')}{' '}
+                  <Link className="guest-category-quiz-consent-link" href="/contact-us">
+                    {t('contactLabel')}
+                  </Link>
+                </p>
+                <label className="guest-category-quiz-consent-label">
+                  <input
+                    checked={consentGranted}
+                    onChange={(event) => {
+                      setConsentGranted(event.target.checked);
+                      setError(null);
+                    }}
+                    type="checkbox"
+                  />
+                  <span>{t('label')}</span>
+                </label>
+              </div>
+            ) : null}
+
             <div className="guest-category-quiz-actions">
               {step > 0 ? (
                 <button
@@ -332,7 +397,7 @@ export function GuestCategoryQuiz({
               ) : null}
               <button
                 className="guest-category-quiz-next"
-                disabled={!answered || submitting}
+                disabled={!answered || submitting || (isLast && !consentGranted)}
                 onClick={() => {
                   void goNext();
                 }}

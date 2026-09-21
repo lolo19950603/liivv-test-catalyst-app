@@ -619,6 +619,30 @@
   max-width: 16rem;
 }
 
+/* An option the kit locked to one variant: shown, not offered. */
+.liivv-product-page-feel .liivv-kit-item__option-fixed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.375rem;
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.liivv-product-page-feel .liivv-kit-item__option-name {
+  font-family: var(--product-detail-subtitle-font-family, var(--font-family-mono));
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--product-detail-secondary-text, #66605c);
+}
+
+.liivv-product-page-feel .liivv-kit-item__option-value {
+  color: var(--product-detail-primary-text, #312f2f);
+}
+
 .liivv-product-page-feel .liivv-kit-item__actions {
   display: flex;
   flex-wrap: wrap;

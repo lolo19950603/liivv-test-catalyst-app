@@ -3,14 +3,17 @@ import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/serve
 import { createLoader, SearchParams } from 'nuqs/server';
 import { cache } from 'react';
 
-import { Streamable } from '@/vibes/soul/lib/streamable';
+import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { createCompareLoader } from '@/vibes/soul/primitives/compare-drawer/loader';
 import { ProductsListSection } from '@/vibes/soul/sections/products-list-section';
 import { getFilterParsers } from '@/vibes/soul/sections/products-list-section/filter-parsers';
+import { isOstomyKit } from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
 import { getSessionCustomerAccessToken } from '~/auth';
+import { DenyAdSignals } from '~/components/analytics/deny-ad-signals';
 import { facetsTransformer } from '~/data-transformers/facets-transformer';
 import { numberedPaginationTransformer } from '~/data-transformers/numbered-pagination-transformer';
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
+import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-ids';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 
@@ -109,7 +112,54 @@ export default async function Search(props: Props) {
       customerAccessToken,
     );
 
-    return search;
+    /*
+     * =======================================================================
+     * THE CURATED OSTOMY KITS ARE WITHHELD FROM SEARCH TOO
+     * =======================================================================
+     * Same withhold as the ostomy category shelf (`isOstomyKit` in
+     * `category/[slug]/page.tsx`), for the same reason: under D11 every kit in
+     * 8041–8048 is off every Ostomy Care surface until the K1 rebuilds land,
+     * and five of them are withheld further for names that make a claim — "Skin
+     * Shield (Peristomal Skin Health & Infection Prevention)", "Stay Hydrated
+     * (High-Output & Dehydration Rescue)". A store search for "ostomy" listed
+     * all eight as full product cards, with those exact names, which is the
+     * thing the withhold exists to prevent.
+     *
+     * Unconditional here, unlike the category route. A result set has no
+     * category to test — the reader's own term is the only context — so there
+     * is no ostomy/not-ostomy question to ask, and a kit that must not be shown
+     * on an ostomy shelf must not be shown in a search either.
+     *
+     * Residual, recorded rather than papered over, exactly as on the category
+     * route: the facet counts, the total and the pagination come from
+     * BigCommerce and still count the kits, so a page can show fewer cards than
+     * its own count claims. The owner's step closes both — take 8041–8048 out
+     * of the ostomy categories, or set is_visible = false — and then this
+     * filter simply never matches. The kits' own product pages also stay live.
+     * =======================================================================
+     */
+    const items = search.products.items.filter((product) => !isOstomyKit(product.entityId));
+
+    if (items.length === search.products.items.length) {
+      return search;
+    }
+
+    return { ...search, products: { ...search.products, items } };
+  });
+
+  /*
+   * A search term is not a category, so the path and the id list are the only
+   * things that can say this page is a health context — and `?term=ostomy` is
+   * itself the health fact, carried in page_location. When the result set holds
+   * a sensitive product the advertising signals go off for the page session,
+   * the same way they do on an ostomy shelf. `getSensitiveProductIds` fails
+   * closed, so a lookup that could not answer counts as sensitive.
+   */
+  const streamableDenyAdSignals = Streamable.from(async () => {
+    const search = await streamableFacetedSearch;
+    const sensitive = await getSensitiveProductIds(search.products.items.map((p) => p.entityId));
+
+    return sensitive.size > 0;
   });
 
   const streamableProducts = Streamable.from(async () => {
@@ -238,51 +288,56 @@ export default async function Search(props: Props) {
   });
 
   return (
-    <ProductsListSection
-      breadcrumbs={[
-        { label: t('Search.Breadcrumbs.home'), href: '/' },
-        { label: t('Search.Breadcrumbs.search'), href: `#` },
-      ]}
-      compareLabel={t('Compare.compare')}
-      compareProducts={streamableCompareProducts}
-      emptyStateSubtitle={t('Search.Empty.subtitle')}
-      emptyStateTitle={streamableEmptyStateTitle}
-      filterLabel={t('FacetedSearch.filters')}
-      filters={streamableFilters}
-      filtersPanelTitle={t('FacetedSearch.filters')}
-      maxCompareLimitMessage={t('Compare.maxCompareLimit')}
-      maxItems={MAX_COMPARE_LIMIT}
-      pageSizeDefaultValue={DEFAULT_FACETED_PAGE_SIZE}
-      pageSizeLabel={t('PageSize.show')}
-      pageSizeOptions={getFacetedPageSizeOptions((count) =>
-        t('PageSize.perPage', { count: String(count) }),
-      )}
-      paginationInfo={streamablePagination}
-      paginationLabel={t('Pagination.label')}
-      paginationNextLabel={t('Pagination.next')}
-      products={streamableProducts}
-      quickActions={quickActions}
-      rangeFilterApplyLabel={t('FacetedSearch.Range.apply')}
-      removeLabel={t('Compare.remove')}
-      resetFiltersLabel={t('FacetedSearch.resetFilters')}
-      showCompare={productComparisonsEnabled}
-      showRating={showRating}
-      sortDefaultValue="featured"
-      sortLabel={t('SortBy.sortBy')}
-      sortOptions={[
-        { value: 'featured', label: t('SortBy.featuredItems') },
-        { value: 'newest', label: t('SortBy.newestItems') },
-        { value: 'best_selling', label: t('SortBy.bestSellingItems') },
-        { value: 'a_to_z', label: t('SortBy.aToZ') },
-        { value: 'z_to_a', label: t('SortBy.zToA') },
-        { value: 'best_reviewed', label: t('SortBy.byReview') },
-        { value: 'lowest_price', label: t('SortBy.priceAscending') },
-        { value: 'highest_price', label: t('SortBy.priceDescending') },
-        { value: 'relevance', label: t('SortBy.relevance') },
-      ]}
-      sortParamName="sort"
-      title={streamableTitle}
-      totalCount={streamableTotalCount}
-    />
+    <>
+      <Stream fallback={null} value={streamableDenyAdSignals}>
+        {(sensitive) => (sensitive ? <DenyAdSignals /> : null)}
+      </Stream>
+      <ProductsListSection
+        breadcrumbs={[
+          { label: t('Search.Breadcrumbs.home'), href: '/' },
+          { label: t('Search.Breadcrumbs.search'), href: `#` },
+        ]}
+        compareLabel={t('Compare.compare')}
+        compareProducts={streamableCompareProducts}
+        emptyStateSubtitle={t('Search.Empty.subtitle')}
+        emptyStateTitle={streamableEmptyStateTitle}
+        filterLabel={t('FacetedSearch.filters')}
+        filters={streamableFilters}
+        filtersPanelTitle={t('FacetedSearch.filters')}
+        maxCompareLimitMessage={t('Compare.maxCompareLimit')}
+        maxItems={MAX_COMPARE_LIMIT}
+        pageSizeDefaultValue={DEFAULT_FACETED_PAGE_SIZE}
+        pageSizeLabel={t('PageSize.show')}
+        pageSizeOptions={getFacetedPageSizeOptions((count) =>
+          t('PageSize.perPage', { count: String(count) }),
+        )}
+        paginationInfo={streamablePagination}
+        paginationLabel={t('Pagination.label')}
+        paginationNextLabel={t('Pagination.next')}
+        products={streamableProducts}
+        quickActions={quickActions}
+        rangeFilterApplyLabel={t('FacetedSearch.Range.apply')}
+        removeLabel={t('Compare.remove')}
+        resetFiltersLabel={t('FacetedSearch.resetFilters')}
+        showCompare={productComparisonsEnabled}
+        showRating={showRating}
+        sortDefaultValue="featured"
+        sortLabel={t('SortBy.sortBy')}
+        sortOptions={[
+          { value: 'featured', label: t('SortBy.featuredItems') },
+          { value: 'newest', label: t('SortBy.newestItems') },
+          { value: 'best_selling', label: t('SortBy.bestSellingItems') },
+          { value: 'a_to_z', label: t('SortBy.aToZ') },
+          { value: 'z_to_a', label: t('SortBy.zToA') },
+          { value: 'best_reviewed', label: t('SortBy.byReview') },
+          { value: 'lowest_price', label: t('SortBy.priceAscending') },
+          { value: 'highest_price', label: t('SortBy.priceDescending') },
+          { value: 'relevance', label: t('SortBy.relevance') },
+        ]}
+        sortParamName="sort"
+        title={streamableTitle}
+        totalCount={streamableTotalCount}
+      />
+    </>
   );
 }

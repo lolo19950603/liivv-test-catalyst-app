@@ -1,5 +1,3 @@
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider } from 'next-intl';
@@ -7,6 +5,8 @@ import { getMessages, setRequestLocale } from 'next-intl/server';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { cache, PropsWithChildren } from 'react';
 
+import { NoScriptEmergency } from '~/app/[locale]/(default)/liivv-health/ostomy-care/_components/no-script-emergency';
+import { withoutHeldMessages } from '~/app/[locale]/(default)/liivv-health/ostomy-care/chapters/held-messages';
 import { CookieNotifications } from '~/app/notifications';
 import { Providers } from '~/app/providers';
 import { client } from '~/client';
@@ -14,6 +14,7 @@ import { graphql } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
 import { WebAnalyticsFragment } from '~/components/analytics/fragment';
 import { AnalyticsProvider } from '~/components/analytics/provider';
+import { VercelMeasurement } from '~/components/analytics/vercel-measurement';
 import { ConsentManager } from '~/components/consent-manager';
 import { ScriptsFragment } from '~/components/consent-manager/scripts-fragment';
 import { ContainerQueryPolyfill } from '~/components/polyfills/container-query';
@@ -99,16 +100,22 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+/*
+ * The env vars stay the sitewide off switch and are read here, on the server,
+ * because only NEXT_PUBLIC_* reaches the browser. Which pages the two
+ * components may actually report is decided in the browser, at event time — see
+ * ~/components/analytics/vercel-measurement.
+ */
 const VercelComponents = () => {
   if (process.env.VERCEL !== '1') {
     return null;
   }
 
   return (
-    <>
-      {process.env.DISABLE_VERCEL_ANALYTICS !== 'true' && <Analytics />}
-      {process.env.DISABLE_VERCEL_SPEED_INSIGHTS !== 'true' && <SpeedInsights />}
-    </>
+    <VercelMeasurement
+      analytics={process.env.DISABLE_VERCEL_ANALYTICS !== 'true'}
+      speedInsights={process.env.DISABLE_VERCEL_SPEED_INSIGHTS !== 'true'}
+    />
   );
 };
 
@@ -139,7 +146,15 @@ export default async function RootLayout({ params, children }: Props) {
 
   return (
     <>
-      <NextIntlClientProvider locale={locale} messages={messages}>
+      {/*
+        `withoutHeldMessages` takes the copy a HELD figure owns out of what the
+        browser is given. D22 deferred scoping this payload with `pick()`, and
+        the whole message tree still ships on every route — but a hold is a
+        promise that nobody outside the review has seen that wording yet, and a
+        render switch alone left it retrievable from the HTML of /cart and every
+        product page. See the module.
+      */}
+      <NextIntlClientProvider locale={locale} messages={withoutHeldMessages(messages)}>
         <ConsentManager
           isCookieConsentEnabled={isCookieConsentEnabled}
           privacyPolicyUrl={privacyPolicyUrl}
@@ -155,6 +170,16 @@ export default async function RootLayout({ params, children }: Props) {
                 {toastNotificationCookieData && (
                   <CookieNotifications {...toastNotificationCookieData} />
                 )}
+                {/*
+                  Above `children`, deliberately: everything below this point —
+                  the (default) layout and every page under it — is streamed
+                  inside the Suspense boundary `(default)/loading.tsx` opens, so
+                  with JavaScript off it arrives in a `<div hidden>` and is never
+                  revealed. This is outside that boundary, which is why the
+                  ostomy routes' emergency list and crisis line can be reached
+                  from here and nowhere else. See the component.
+                */}
+                <NoScriptEmergency />
                 {children}
               </Providers>
             </AnalyticsProvider>

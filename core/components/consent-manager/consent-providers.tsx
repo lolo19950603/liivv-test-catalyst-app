@@ -4,6 +4,8 @@ import type { ComponentProps, PropsWithChildren } from 'react';
 
 import { CONSENT_COOKIE_NAME } from '~/lib/consent-manager/cookies/constants';
 
+import { SensitiveScriptsProvider } from './sensitive-scripts-provider';
+
 export type C15tScripts = NonNullable<ComponentProps<typeof ClientSideOptionsProvider>['scripts']>;
 
 interface ConsentManagerProviderProps extends PropsWithChildren {
@@ -29,7 +31,8 @@ export function ConsentManagerProvider({
         enabled: isCookieConsentEnabled,
       }}
     >
-      <ClientSideOptionsProvider scripts={scripts}>{children}</ClientSideOptionsProvider>
+      {/* Store scripts, minus the advertising ones on ostomy routes. */}
+      <SensitiveScriptsProvider scripts={scripts}>{children}</SensitiveScriptsProvider>
     </C15TConsentManagerProvider>
   );
 }

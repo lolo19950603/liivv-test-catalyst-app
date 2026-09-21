@@ -2,11 +2,21 @@
 
 import type { ReactNode } from 'react';
 
+import { formatStaffStatusLabel, staffStatusBadgeClass } from '~/components/staff/staff-status';
+import {
+  consentedAnswerKeys,
+  healthAnswersSafetyReferralApplies,
+  isHealthAnswersWithdrawn,
+  readHealthAnswersConsent,
+  readHealthAnswersWithdrawalRecord,
+} from '~/lib/onboarding/health-profile-consent';
+import {
+  formatHealthProfileFieldLabel,
+  getRawCategoryResponses,
+  parseHealthProfileCategoryResponses,
+} from '~/lib/onboarding/health-profile-display';
 import type { AdminCustomerDetail } from '~/lib/supabase/admin-customers';
 import type { CarePackRequestRow, PrescriptionRow, RefillRequestRow } from '~/lib/supabase/prescriptions';
-import { parseHealthProfileCategoryResponses } from '~/lib/onboarding/health-profile-display';
-
-import { formatStaffStatusLabel, staffStatusBadgeClass } from '~/components/staff/staff-status';
 
 type CarePackRequestIntake = {
   frequentDoseChangeMeds?: string;
@@ -172,9 +182,113 @@ export function StaffCustomerDetail({
   );
 }
 
+function consentDate(grantedAt: string): string {
+  const when = grantedAt ? new Date(grantedAt) : null;
+
+  if (!when || Number.isNaN(when.getTime())) {
+    return 'unknown date';
+  }
+
+  return when.toISOString().slice(0, 10);
+}
+
+function answerLabels(keys: string[]): string {
+  return keys.map((key) => formatHealthProfileFieldLabel(key)).join(', ');
+}
+
+function consentSource(source: 'health_profile_form' | 'landing_quiz'): string {
+  return source === 'landing_quiz' ? 'landing quiz' : 'health profile';
+}
+
+/* The sentence that has to be true of every answer no tick covers. */
+const UNCOVERED_NOTE =
+  'Answers no tick covers are not used for personalization: they shape nothing on the customer’s dashboard. They stay on file and you can read them here.';
+
+/*
+ * The one exception, spelled out only on the profiles where it is in force.
+ *
+ * `healthAnswersSafetyReferralApplies` is read whatever the tick says, because
+ * all it does is take the shop and pharmacist steps off the dashboard and put
+ * an NSWOC there instead. Staff reading "shapes nothing" on such a profile
+ * would be wrong about the one thing they are most likely to be asked, so the
+ * carve-out is named here rather than left to the reader.
+ */
+const SAFETY_RULE_NOTE =
+  'One exception: this customer told us their body or the fit of their pouching system changed recently, so their dashboard keeps pointing them to an NSWOC instead of to products. That safety rule reads the answer whatever the consent says, and it only ever removes a shopping step.';
+
+function uncoveredNote(notes: unknown, uncoveredKeys: string[]): string {
+  const safetyApplies =
+    healthAnswersSafetyReferralApplies(notes) && uncoveredKeys.includes('ostomy_journey_stage');
+
+  return safetyApplies ? `${UNCOVERED_NOTE} ${SAFETY_RULE_NOTE}` : UNCOVERED_NOTE;
+}
+
+/*
+ * Plain-language state of the express consent stored with these answers.
+ *
+ * Three things have to be said exactly, because staff act on this line. What
+ * the latest tick covers; that anything it does not cover is not used for
+ * personalization (never "not used" flat — this page shows those answers, and
+ * the pharmacy team may act on them in a conversation); and whether the
+ * customer has since taken their consent back, which stops personalization for
+ * every answer at once while leaving all of them on file — apart from the one
+ * safety rule that never depended on the tick, which is named whenever it is
+ * actually in force so the line matches the dashboard staff would see.
+ */
+function consentLine(notes: unknown): string {
+  const consent = readHealthAnswersConsent(notes);
+  const withdrawal = readHealthAnswersWithdrawalRecord(notes);
+  const stored = Object.keys(getRawCategoryResponses(notes));
+
+  if (isHealthAnswersWithdrawn(notes) && withdrawal) {
+    const given = consent
+      ? ` Consent before that was given ${consentDate(consent.grantedAt)} (${consentSource(consent.source)}, ${consent.version}).`
+      : '';
+    const unused = healthAnswersSafetyReferralApplies(notes)
+      ? `No answer is used for personalization. ${SAFETY_RULE_NOTE}`
+      : 'No answer is used for personalization.';
+
+    return `Withdrawn ${consentDate(withdrawal.withdrawnAt)} (${consentSource(withdrawal.source)}).${given} ${unused} Every answer stays on file and is listed below; nothing was deleted.`;
+  }
+
+  if (!consent) {
+    return `Not recorded — answers predate the consent box, or it was never ticked. ${uncoveredNote(notes, stored)}`;
+  }
+
+  const covered = consentedAnswerKeys(notes);
+  const uncovered = stored.filter((key) => !covered.includes(key));
+  const head = `Latest given ${consentDate(consent.grantedAt)} (${consentSource(consent.source)}, ${consent.version}). Covers: ${covered.length > 0 ? answerLabels(covered) : 'no answers'}.`;
+
+  if (uncovered.length === 0) {
+    return head;
+  }
+
+  return `${head} Not covered: ${answerLabels(uncovered)}. ${uncoveredNote(notes, uncovered)}`;
+}
+
+interface StaffAnswerRow {
+  key: string | null;
+  label: string;
+  value: string;
+}
+
+/*
+ * The answer key behind each typed column, where there is one. The same answer
+ * is stored twice — once in `notes.category_responses` and once in its own
+ * column — so the copy in the column has to carry the same consent marker as
+ * the copy in the list, or the page would contradict itself.
+ */
+const COLUMN_ANSWER_KEYS: Record<string, string> = {
+  'Ostomy type': 'ostomy_type',
+  'Ostomy journey': 'ostomy_journey_stage',
+  'Ostomy brand': 'ostomy_preferred_brand',
+  'Wound care': 'wound_support_type',
+  Breathing: 'breathing_routine',
+};
+
 function StaffHealthProfileRows({ health }: { health: NonNullable<AdminCustomerDetail['health']> }) {
   const { rows: categoryRows, freeTextNotes } = parseHealthProfileCategoryResponses(health.notes);
-  const structured: Array<{ label: string; value: string }> = [
+  const structured: StaffAnswerRow[] = [
     health.doctor_name ? { label: 'Doctor', value: health.doctor_name } : null,
     health.doctor_phone ? { label: 'Doctor phone', value: health.doctor_phone } : null,
     health.pharmacy_name ? { label: 'Pharmacy', value: health.pharmacy_name } : null,
@@ -186,9 +300,29 @@ function StaffHealthProfileRows({ health }: { health: NonNullable<AdminCustomerD
       : null,
     health.wound_care_type ? { label: 'Wound care', value: health.wound_care_type } : null,
     health.respiratory_type ? { label: 'Breathing', value: health.respiratory_type } : null,
-  ].filter((row): row is { label: string; value: string } => row != null);
+  ]
+    .filter((row): row is { label: string; value: string } => row != null)
+    .map((row) => ({ ...row, key: COLUMN_ANSWER_KEYS[row.label] ?? null }));
 
-  const answerRows = categoryRows;
+  const answerRows: StaffAnswerRow[] = categoryRows;
+  const covered = new Set(consentedAnswerKeys(health.notes));
+  const safetyReferral = healthAnswersSafetyReferralApplies(health.notes);
+  // An answer with no consent key of its own — a doctor or pharmacy name —
+  // is contact detail the customer typed for staff to use, not an answer that
+  // personalizes anything, so it carries no marker either way. The journey
+  // answer is the one exception to the "not used" marker: while it reads
+  // body_change it still steers the dashboard to an NSWOC, tick or no tick.
+  const answerLabel = (row: StaffAnswerRow) => {
+    if (!row.key || covered.has(row.key)) {
+      return row.label;
+    }
+
+    if (safetyReferral && row.key === 'ostomy_journey_stage') {
+      return `${row.label} — not used for personalization, except the NSWOC safety rule`;
+    }
+
+    return `${row.label} — not used for personalization`;
+  };
   const hasContent = structured.length > 0 || answerRows.length > 0 || Boolean(freeTextNotes);
 
   if (!hasContent) {
@@ -197,11 +331,14 @@ function StaffHealthProfileRows({ health }: { health: NonNullable<AdminCustomerD
 
   return (
     <dl className="grid gap-3 sm:grid-cols-2">
+      <div className="min-w-0 sm:col-span-2">
+        <Field label="Consent to use health answers" value={consentLine(health.notes)} />
+      </div>
       {structured.map((row) => (
-        <Field key={row.label} label={row.label} value={row.value} />
+        <Field key={row.label} label={answerLabel(row)} value={row.value} />
       ))}
       {answerRows.map((row) => (
-        <Field key={row.label} label={row.label} value={row.value} />
+        <Field key={row.label} label={answerLabel(row)} value={row.value} />
       ))}
       {freeTextNotes ? (
         <div className="min-w-0 sm:col-span-2">

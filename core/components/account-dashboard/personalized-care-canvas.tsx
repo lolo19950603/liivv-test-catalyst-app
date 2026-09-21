@@ -6,6 +6,40 @@ import type { ReactNode } from 'react';
 
 import { IconChevronRight } from './icons';
 
+/*
+ * One next step. A step that leaves Liivv — the NSWOCC nurse directory the
+ * fit-change lane offers — is a plain anchor: the locale-aware Link prefetches
+ * its href through the app router, which has nothing to say about another site.
+ * It opens in the same tab, and its own text names where it goes (D1).
+ */
+function CareStep({ step }: { step: PersonalizedCareLane['nextSteps'][number] }) {
+  const body = (
+    <>
+      <span className="mhd-care-step__text">
+        <span className="mhd-care-step__label">{step.label}</span>
+        <span className="mhd-care-step__hint">{step.hint}</span>
+      </span>
+      <span aria-hidden className="mhd-care-step__chevron">
+        <IconChevronRight />
+      </span>
+    </>
+  );
+
+  if (step.external) {
+    return (
+      <a className="mhd-care-step" href={step.href} rel="noreferrer">
+        {body}
+      </a>
+    );
+  }
+
+  return (
+    <Link className="mhd-care-step" href={step.href}>
+      {body}
+    </Link>
+  );
+}
+
 type CareLabels = {
   switcherLabel: string;
   todayFocus: string;
@@ -124,17 +158,13 @@ export function PersonalizedCareCanvas({
       {activeLane.nextSteps.length > 0 ? (
         <div className="mhd-care-steps">
           <p className="mhd-care-steps__title">{labels.nextSteps}</p>
-          <div className="mhd-care-steps__grid">
+          {/*
+            The count drives the column rule: a lane that offers one or two
+            steps fills the row instead of leaving empty columns beside them.
+          */}
+          <div className="mhd-care-steps__grid" data-count={activeLane.nextSteps.length}>
             {activeLane.nextSteps.map((step) => (
-              <Link className="mhd-care-step" href={step.href} key={step.id}>
-                <span className="mhd-care-step__text">
-                  <span className="mhd-care-step__label">{step.label}</span>
-                  <span className="mhd-care-step__hint">{step.hint}</span>
-                </span>
-                <span aria-hidden className="mhd-care-step__chevron">
-                  <IconChevronRight />
-                </span>
-              </Link>
+              <CareStep key={step.id} step={step} />
             ))}
           </div>
         </div>

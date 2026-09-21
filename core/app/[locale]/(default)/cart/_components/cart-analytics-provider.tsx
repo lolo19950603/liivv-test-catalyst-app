@@ -15,6 +15,8 @@ interface AddToCartContext {
   sku?: string;
   currency: string;
   price: number;
+  /** Naming this product would reveal something about a person's health. */
+  sensitive?: boolean;
 }
 
 const AddToCartSchema = z.object({
@@ -48,7 +50,7 @@ function CartAnalyticsProviderResolved({
       const product = products.find(({ entityId }) => entityId === id);
 
       if (product) {
-        const { id: productId, name, brand, sku, price, currency } = product;
+        const { id: productId, name, brand, sku, price, currency, sensitive } = product;
 
         analytics?.cart.productAdded({
           currency,
@@ -61,6 +63,7 @@ function CartAnalyticsProviderResolved({
               sku,
               price,
               quantity,
+              sensitive,
             },
           ],
         });
@@ -77,7 +80,7 @@ function CartAnalyticsProviderResolved({
       const product = products.find(({ entityId }) => entityId === id);
 
       if (product) {
-        const { id: productId, name, brand, sku, price, currency } = product;
+        const { id: productId, name, brand, sku, price, currency, sensitive } = product;
 
         analytics?.cart.productRemoved({
           currency,
@@ -90,6 +93,7 @@ function CartAnalyticsProviderResolved({
               sku,
               price,
               quantity,
+              sensitive,
             },
           ],
         });

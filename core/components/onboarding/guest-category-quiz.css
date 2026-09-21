@@ -373,6 +373,56 @@
   color: #b42318;
 }
 
+/* Express consent for keeping the answers. Shown on the last step only. */
+.guest-category-quiz-consent {
+  margin-top: 1.4rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(49, 47, 47, 0.14);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.guest-category-quiz-consent p {
+  margin: 0 0 0.5rem;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--gcq-ink-soft, #5d5954);
+}
+
+.guest-category-quiz-consent-heading {
+  font-size: 0.9rem !important;
+  font-weight: 600;
+  color: var(--gcq-ink);
+}
+
+.guest-category-quiz-consent-link {
+  text-decoration: underline;
+}
+
+/*
+ * 44px minimum target, the floor this project applies to its own checkbox
+ * rows. The label is the target, so the row gets the height rather than the
+ * 16px box inside it.
+ */
+.guest-category-quiz-consent-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  padding: 0.25rem 0;
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--gcq-ink);
+  cursor: pointer;
+}
+
+.guest-category-quiz-consent-label input {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
 @media (max-width: 899px) {
   .guest-category-quiz-host {
     flex-direction: row;

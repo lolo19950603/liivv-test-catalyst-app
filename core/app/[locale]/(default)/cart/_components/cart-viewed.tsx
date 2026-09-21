@@ -20,9 +20,19 @@ interface Props {
   subtotal?: number;
   currencyCode: string;
   lineItems: LineItem[];
+  /**
+   * Product ids in this cart that an analytics event may not name. Worked out
+   * on the server, because a cart line item carries no categories.
+   *
+   * Required, like the category page's: a mount that left it out would quietly
+   * name every line in the cart, and the compiler is a better guard against
+   * that than a reviewer. `getSensitiveProductIds` already fails closed, so a
+   * lookup that could not be answered arrives here as every id in the cart.
+   */
+  sensitiveProductIds: readonly number[];
 }
 
-export const CartViewed = ({ subtotal, currencyCode, lineItems }: Props) => {
+export const CartViewed = ({ subtotal, currencyCode, lineItems, sensitiveProductIds }: Props) => {
   const isMounted = useRef(false);
   const analytics = useAnalytics();
 
@@ -32,6 +42,8 @@ export const CartViewed = ({ subtotal, currencyCode, lineItems }: Props) => {
     }
 
     isMounted.current = true;
+
+    const sensitive = new Set(sensitiveProductIds);
 
     analytics?.cart.cartViewed({
       currency: currencyCode,
@@ -54,10 +66,11 @@ export const CartViewed = ({ subtotal, currencyCode, lineItems }: Props) => {
           price: lineItem.listPrice.value,
           variant_id: lineItem.variantEntityId ?? undefined,
           quantity: lineItem.quantity,
+          sensitive: sensitive.has(lineItem.productEntityId),
         };
       }),
     });
-  }, [analytics, currencyCode, lineItems, subtotal]);
+  }, [analytics, currencyCode, lineItems, sensitiveProductIds, subtotal]);
 
   return null;
 };

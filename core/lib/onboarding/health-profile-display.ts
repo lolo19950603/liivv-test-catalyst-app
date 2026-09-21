@@ -147,12 +147,30 @@ export function formatHealthProfileAnswer(
 }
 
 export type HealthProfileDisplayRow = {
+  /** The answer key, so a caller can say whether consent covers this row. */
+  key: string;
   label: string;
   value: string;
 };
 
-type CategoryResponsesPayload = {
+/* The plain label for one answer key, for places that list keys on their own. */
+export function formatHealthProfileFieldLabel(key: string): string {
+  return FIELD_LABELS[key] ?? humanizeSlug(key);
+}
+
+/**
+ * The JSON object stored in `health_profiles.notes`. It has always held the
+ * category answers; `consent` is the most recent express-consent record,
+ * `consent_history` the earlier ones, each naming the answers it covers, and
+ * `consent_withdrawn` a tick the person later took back. Rows written before
+ * consent existed simply have none of those keys. The records' own shape lives
+ * in `health-profile-consent.ts`.
+ */
+export type HealthProfileNotesPayload = {
   category_responses?: Record<string, string | string[] | boolean | null>;
+  consent?: unknown;
+  consent_history?: unknown;
+  consent_withdrawn?: unknown;
 };
 
 function rowsFromCategoryResponses(
@@ -168,6 +186,7 @@ function rowsFromCategoryResponses(
     }
 
     rows.push({
+      key,
       label: FIELD_LABELS[key] ?? humanizeSlug(key),
       value: formatted,
     });
@@ -195,13 +214,13 @@ function tryParseJsonObject(raw: string): unknown | null {
   }
 }
 
-function normalizeNotesPayload(notes: unknown): CategoryResponsesPayload | null {
+function normalizeNotesPayload(notes: unknown): HealthProfileNotesPayload | null {
   if (notes == null) {
     return null;
   }
 
   if (typeof notes === 'object' && !Array.isArray(notes)) {
-    return notes as CategoryResponsesPayload;
+    return notes as HealthProfileNotesPayload;
   }
 
   if (typeof notes !== 'string') {
@@ -225,7 +244,16 @@ function normalizeNotesPayload(notes: unknown): CategoryResponsesPayload | null 
     return null;
   }
 
-  return parsed as CategoryResponsesPayload;
+  return parsed as HealthProfileNotesPayload;
+}
+
+/*
+ * The parsed contents of `health_profiles.notes`, or null when there is
+ * nothing readable there. Exported so the consent reader shares this parser
+ * instead of repeating its tolerance for double-encoded rows.
+ */
+export function parseHealthProfileNotes(notes: unknown): HealthProfileNotesPayload | null {
+  return normalizeNotesPayload(notes);
 }
 
 export function getRawCategoryResponses(

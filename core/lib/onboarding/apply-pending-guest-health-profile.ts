@@ -4,6 +4,13 @@ import { cache } from 'react';
 import { revalidatePath } from 'next/cache';
 
 import {
+  buildHealthAnswersNotes,
+  consentedAnswerKeys,
+  type HealthAnswersConsent,
+  isHealthAnswersConsentGranted,
+  isHealthAnswersWithdrawn,
+} from '~/lib/onboarding/health-profile-consent';
+import {
   encodeRankedCareInterest,
   resolveInitialHealthCategoriesWithRank,
   type LiivPrimaryCategoryId,
@@ -15,8 +22,8 @@ import {
 import { completeOnboardingStep2 } from '~/lib/supabase/onboarding';
 import {
   getHealthProfileByProfileId,
+  healthProfileRowToUpsertPayload,
   upsertHealthProfile,
-  type HealthProfileRow,
   type UpsertHealthProfilePayload,
 } from '~/lib/supabase/health-profile';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
@@ -90,38 +97,6 @@ function emptyPayload(profileId: string): UpsertHealthProfilePayload {
   };
 }
 
-function rowToPayload(row: HealthProfileRow): UpsertHealthProfilePayload {
-  return {
-    profile_id: row.profile_id,
-    diabetes_type: row.diabetes_type,
-    diagnosis_year: row.diagnosis_year,
-    current_medications: row.current_medications,
-    allergies: row.allergies,
-    insulin_pump_user: Boolean(row.insulin_pump_user),
-    cgm_user: Boolean(row.cgm_user),
-    preferred_cgm_brand: row.preferred_cgm_brand,
-    preferred_pump_brand: row.preferred_pump_brand,
-    ostomy_type: row.ostomy_type,
-    ostomy_tenure: row.ostomy_tenure,
-    ostomy_preferred_brand: row.ostomy_preferred_brand,
-    ostomy_product_type: row.ostomy_product_type,
-    wants_ostomy_specialist: Boolean(row.wants_ostomy_specialist),
-    catheter_type: row.catheter_type,
-    catheter_length: row.catheter_length,
-    catheter_preferred_brand: row.catheter_preferred_brand,
-    catheter_french_size: row.catheter_french_size,
-    wound_care_type: row.wound_care_type,
-    wound_care_preferred_brand: row.wound_care_preferred_brand,
-    respiratory_type: row.respiratory_type,
-    respiratory_preferred_brand: row.respiratory_preferred_brand,
-    doctor_name: row.doctor_name,
-    doctor_phone: row.doctor_phone,
-    pharmacy_name: row.pharmacy_name,
-    pharmacy_phone: row.pharmacy_phone,
-    notes: row.notes,
-  };
-}
-
 function optStr(value: string | string[] | undefined): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
@@ -154,8 +129,18 @@ export async function saveLandingCategoryAnswers(
     categoryId: LiivPrimaryCategoryId;
     responses: CategoryResponses;
     placement?: 'primary' | 'append';
+    /**
+     * The express consent that covers these answers. Required, so no caller
+     * can reach this function without having asked. Null or withdrawn means
+     * nothing is written at all.
+     */
+    consent: HealthAnswersConsent | null;
   },
 ): Promise<boolean> {
+  if (!isHealthAnswersConsentGranted(input.consent)) {
+    return false;
+  }
+
   if (!isSupabaseConfigured()) {
     return false;
   }
@@ -171,13 +156,25 @@ export async function saveLandingCategoryAnswers(
   const alreadyHasCategory = resolveInitialHealthCategoriesWithRank(
     ensured.profile.care_interests,
   ).some((row) => row.id === input.categoryId);
+  const alreadyConsented = consentedAnswerKeys(existing?.notes);
+  // Skip the write only when there is nothing left to record: the same answers
+  // are on file, under this category, and a tick already covers them. A tick
+  // for answers that are on file but uncovered still has to be written down,
+  // and so does one given after a withdrawal — that is how someone turns
+  // personalization back on.
+  const nothingToRecord =
+    alreadyHasCategory &&
+    !isHealthAnswersWithdrawn(existing?.notes) &&
+    responsesAlreadyPresent(storedResponses, input.responses) &&
+    Object.keys(input.responses).every((key) => alreadyConsented.includes(key));
 
-  if (alreadyHasCategory && responsesAlreadyPresent(storedResponses, input.responses)) {
+  if (nothingToRecord) {
     return true;
   }
 
-  const base = existing ? rowToPayload(existing) : emptyPayload(ensured.profile.id);
-  const mergedResponses = { ...storedResponses, ...input.responses };
+  const base = existing
+    ? healthProfileRowToUpsertPayload(existing)
+    : emptyPayload(ensured.profile.id);
   const payload: UpsertHealthProfilePayload = {
     ...base,
     profile_id: ensured.profile.id,
@@ -185,7 +182,15 @@ export async function saveLandingCategoryAnswers(
     ostomy_tenure: optStr(input.responses.ostomy_journey_stage) ?? base.ostomy_tenure,
     ostomy_preferred_brand:
       optStr(input.responses.ostomy_preferred_brand) ?? base.ostomy_preferred_brand,
-    notes: JSON.stringify({ category_responses: mergedResponses }),
+    // Consent travels with the answers it covers, in the JSON that is already
+    // stored in `notes`. The tick this quiz collected covers the answers on
+    // this page and nothing else: answers already on file keep the consent they
+    // came with — or none — and earlier ticks are preserved beside it.
+    notes: buildHealthAnswersNotes({
+      existingNotes: existing?.notes,
+      newResponses: input.responses,
+      consent: input.consent,
+    }),
   };
 
   const up = await upsertHealthProfile(payload);
@@ -217,6 +222,10 @@ export async function saveLandingCategoryAnswers(
 /**
  * Reads the guest landing-page quiz cookie and writes it into the signed-in
  * customer's health profile. Deduped per request via React cache().
+ *
+ * Answers stashed before the guest ticked the consent box carry no consent
+ * record, so they are dropped here rather than written. The cookie is cleared
+ * either way.
  */
 export const applyPendingGuestHealthProfile = cache(async (customer: ApplyCustomer) => {
   try {
@@ -234,6 +243,7 @@ export const applyPendingGuestHealthProfile = cache(async (customer: ApplyCustom
       categoryId: pending.categoryId,
       responses: pending.responses,
       placement: 'primary',
+      consent: pending.consent,
     });
 
     return { applied: Boolean(saved) };

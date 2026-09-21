@@ -6,7 +6,9 @@ import * as z from 'zod';
 import { Streamable } from '@/vibes/soul/lib/streamable';
 import { CompareSection } from '@/vibes/soul/sections/compare-section';
 import { getSessionCustomerAccessToken } from '~/auth';
+import { DenyAdSignals } from '~/components/analytics/deny-ad-signals';
 import { pricesTransformer } from '~/data-transformers/prices-transformer';
+import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-ids';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
@@ -102,6 +104,10 @@ export default async function Compare(props: Props) {
 
     const products = await getComparedProducts(productIds, currencyCode, customerAccessToken);
 
+    // Comparing two pouches is as revealing as viewing one: which of these may
+    // be named in an analytics event is a question for the catalogue.
+    const sensitiveProductIds = await getSensitiveProductIds(products.map((p) => p.entityId));
+
     return products.map((product) => {
       return {
         id: product.entityId,
@@ -110,12 +116,38 @@ export default async function Compare(props: Props) {
         brand: product.brand?.name ?? '',
         price: product.prices?.price.value ?? 0,
         currency: product.prices?.price.currencyCode ?? '',
+        sensitive: sensitiveProductIds.has(product.entityId),
       };
     });
   });
 
+  /*
+   * /compare?ids=4441,4560 puts two ostomy product ids in the URL, and the
+   * automatic page_view carries that URL. Suppressing the items from the
+   * ecommerce event does not touch it, so the advertising signals go off here
+   * the same way they do on an ostomy shelf or an ostomy product's own page
+   * (~/lib/analytics/ad-signals).
+   *
+   * Awaited in the shell rather than streamed: the first consent command runs
+   * as the page loads, so a flag that arrives with streamed content arrives
+   * after the page_view it was meant to cover. Both lookups are React-cached
+   * and the analytics payload asks for them anyway, so this costs no extra
+   * catalogue request.
+   */
+  const denyAdSignals = await (async () => {
+    const customerAccessToken = await getSessionCustomerAccessToken();
+    const currencyCode = await getPreferredCurrencyCode();
+    const parsed = CompareParamsSchema.parse(await props.searchParams);
+    const productIds = parsed.ids?.filter((id) => !Number.isNaN(id));
+    const products = await getComparedProducts(productIds, currencyCode, customerAccessToken);
+    const sensitiveProductIds = await getSensitiveProductIds(products.map((p) => p.entityId));
+
+    return products.some((product) => sensitiveProductIds.has(product.entityId));
+  })();
+
   return (
     <CompareAnalyticsProvider data={streamableAnalyticsData}>
+      {denyAdSignals && <DenyAdSignals />}
       <CompareSection
         addToCartAction={addToCart}
         addToCartLabel={t('addToCart')}

@@ -14,6 +14,8 @@ interface AddToCartContext {
   sku?: string;
   currency: string;
   price: number;
+  /** Naming this product would reveal something about a person's health. */
+  sensitive?: boolean;
 }
 
 const AddToCartSchema = z.object({
@@ -46,7 +48,7 @@ function CompareAnalyticsProviderResolved({
       const product = products.find(({ id }) => id === productId);
 
       if (product) {
-        const { id, name, brand, sku, price, currency } = product;
+        const { id, name, brand, sku, price, currency, sensitive } = product;
 
         analytics?.cart.productAdded({
           currency,
@@ -59,6 +61,7 @@ function CompareAnalyticsProviderResolved({
               sku,
               price,
               quantity,
+              sensitive,
             },
           ],
         });
