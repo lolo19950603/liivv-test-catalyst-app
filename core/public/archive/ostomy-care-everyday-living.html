@@ -355,22 +355,6 @@
   .chapter p { max-width: 48ch; margin-bottom: 0; }
   .chapter .btn { margin-top: 28px; }
 
-  .voices { background: var(--sage); color: #fff; padding: 110px 24px; }
-  .voices h2 { font-size: clamp(36px, 5vw, 64px); text-align: center; margin-bottom: 70px; }
-  .voices h2 em { font-style: italic; }
-  .voice-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px; }
-  .voice {
-    background: var(--soft-cream);
-    color: var(--charcoal);
-    border-radius: 26px;
-    padding: 36px 32px;
-  }
-  .voice:nth-child(2) { transform: translateY(34px); }
-  .voice blockquote { font-family: var(--font-heading); font-size: 21px; line-height: 1.4; }
-  .voice .who { margin-top: 22px; display: flex; align-items: center; gap: 12px; font-size: 14px; }
-  .voice .who .ph { width: 44px; height: 44px; border-radius: 50%; font-size: 0; flex: none; }
-  .voice .who span { display: block; color: rgba(49, 47, 47, 0.6); font-size: 12.5px; }
-
   .faq { background: var(--cream); padding: 110px 24px; }
   .faq h2 { font-size: clamp(34px, 4.5vw, 56px); text-align: center; }
   .faq .intro { text-align: center; margin: 14px auto 54px; max-width: 52ch; }
@@ -413,7 +397,6 @@
   @media (max-width: 840px) {
     .images-text-grid, .story-grid, .chapter, .timeline-slide { grid-template-columns: 1fr; }
     .chapter .ph { height: 40vh; }
-    .voice:nth-child(2) { transform: none; }
     .timeline-dots { grid-template-columns: 1fr; }
     .timeline-slide .ph { min-height: 220px; }
   }
@@ -603,7 +586,16 @@
       <span class="eyebrow">A little wisdom for the week</span>
       <h2>Tips that meet you where you are</h2>
       <p>Ostomy care isn't one routine — it's small habits that keep loud days manageable and quiet ones easy.</p>
-      <p>Stock essentials before you need them. Notice fit changes early. Keep a go-bag ready. And when something feels off, chat with an Ontario pharmacist during business hours — until 5 p.m. Eastern.</p>
+      <!--
+        Was: "Notice fit changes early. Keep a go-bag ready. And when something
+        feels off, chat with an Ontario pharmacist during business hours." Read
+        in order, that sent a fit change — a clinical assessment — to a
+        pharmacist, which is the opposite of what the live site tells readers to
+        do, and it is the same defect the FAQ further down this file was already
+        corrected for. Corrected the same way: the pharmacist keeps the everyday
+        product and restock questions, a fit change goes to an NSWOC.
+      -->
+      <p>Stock essentials before you need them. Notice fit changes early and take those to your NSWOC. Keep a go-bag ready. And for everyday product and restock questions, chat with an Ontario pharmacist during business hours — until 5 p.m. Eastern.</p>
       <p>Small adjustments, real ease. That's the Liivv Ostomy way.</p>
       <a class="btn btn-dark" href="ostomy-essentials.html">Explore Ostomy Essentials</a>
     </div>
@@ -688,42 +680,13 @@
   </div>
 </section>
 
-<section class="voices rounded-top">
-  <span class="ms-badge">10 · Testimonials — archive-reveal-testimonials</span>
-  <div class="container">
-    <h2>What people <em>are saying</em></h2>
-    <div class="voice-cards">
-      <div class="voice">
-        <blockquote>"I finally asked a fit question I'd been too shy to ask. Kind answer on my lunch break — no waiting room, no judgment."</blockquote>
-        <div class="who">
-          <div class="ph"></div>
-          <div>Morgan<span>Toronto · colostomy · busy parent</span></div>
-        </div>
-      </div>
-      <div class="voice">
-        <blockquote>"My usuals show up like clockwork. I stopped panic-ordering when I was down to two pouches."</blockquote>
-        <div class="who">
-          <div class="ph"></div>
-          <div>Casey<span>Ottawa · ileostomy · veteran restocker</span></div>
-        </div>
-      </div>
-      <div class="voice">
-        <blockquote>"New to this and overwhelmed — New to the Journey made the first weeks feel doable."</blockquote>
-        <div class="who">
-          <div class="ph"></div>
-          <div>Avery<span>Hamilton · just starting out</span></div>
-        </div>
-      </div>
-      <div class="voice">
-        <blockquote>"Everyday living tips and brand restock in one place. Discreet boxes every time."</blockquote>
-        <div class="who">
-          <div class="ph"></div>
-          <div>Quinn<span>Mississauga · Liivv Ostomy regular</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<!--
+  Section 10 (Testimonials — archive-reveal-testimonials) removed. It held four
+  invented ostomates with cities and ostomy types, presented as "What people are
+  saying". One of them had a fit question settled by our own pharmacist chat,
+  which is the opposite of what the live site tells readers to do. This file is
+  publicly served, so the personas were removed rather than left in an archive.
+-->
 
 <section class="faq rounded-top">
   <span class="ms-badge">11 · FAQ — diabetes-care-faq-first</span>
@@ -732,7 +695,7 @@
 
   <details open>
     <summary>Do you carry my preferred brand?</summary>
-    <p>We stock popular options including Coloplast, Hollister, and Convatec — and we're happy to help if you're not sure yet. Browse <a href="ostomy-essentials.html">Ostomy Essentials</a> or ask Olivia for product help anytime.</p>
+    <p>We stock popular options including Coloplast, Hollister, and Convatec — and we're happy to help if you're not sure yet. Browse <a href="ostomy-essentials.html">Ostomy Essentials</a>.</p>
   </details>
   <details>
     <summary>I'm new — where should I start?</summary>
@@ -748,7 +711,14 @@
   </details>
   <details>
     <summary>What can I actually chat with a pharmacist about?</summary>
-    <p>Everyday stuff — fit questions, skin comfort, "is this normal?" moments. In Ontario, our pharmacists can assess and help with 19+ everyday concerns in chat during business hours (until 5 p.m. Eastern). Olivia is available anytime for orders, products, and account help — she does not give medical advice.</p>
+    <!--
+      Was: "Everyday stuff — fit questions, skin comfort, 'is this normal?'
+      moments." That sent clinical questions to a pharmacist, which is the
+      opposite of what the live site tells readers to do, and the same reason
+      the personas above were removed from this publicly served file. Replaced
+      with the live landing's own answer.
+    -->
+    <p>Everyday product and restock questions, in Ontario during business hours until 5 p.m. Eastern. Clinical concerns — fit, skin, and anything about the stoma itself — belong with your NSWOC or surgeon rather than a pharmacist.</p>
   </details>
   <details>
     <summary>What's a CarePack?</summary>

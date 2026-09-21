@@ -20,7 +20,7 @@ No new components are needed — everything below already exists in the picker.
 
 Chapter copy + Makeswift notes: [`STAGES.md`](STAGES.md).
 
-## Page content order (13 sections)
+## Page content order (12 sections; 10 was removed)
 
 | # | Makeswift component (picker location) | Section |
 |---|----------------------------------------|---------|
@@ -34,7 +34,7 @@ Chapter copy + Makeswift notes: [`STAGES.md`](STAGES.md).
 | 7 | `health-images-with-text` — Health page / 02 (suffix `tips`) | Everyday tips |
 | 8 | `diabetes-care-reveal-image-text` — Specialized page / 05 Reveal + story | Preferred brands feature |
 | 9 | `health-scrolling-banner` — Health page / 03 Scrolling banner (sticky stack) | Four chapters → Learn more |
-| 10 | `archive-reveal-testimonials` — Home page / 03 Testimonials | Voices |
+| 10 | ~~`archive-reveal-testimonials` — Home page / 03 Testimonials~~ | **Removed — do not build** (see section 10) |
 | 11 | `diabetes-care-faq-first` — Specialized page / 09 FAQ (first) | FAQ |
 | 12 | `diabetes-care-image-text-overlay` — Specialized page / 14 Image with text overlay | Closing banner |
 
@@ -146,7 +146,14 @@ Body HTML:
 
 ```html
 <p>Ostomy care isn't one routine — it's small habits that keep loud days manageable and quiet ones easy.</p>
-<p>Stock essentials before you need them. Notice fit changes early. Keep a go-bag ready. And when something feels off, chat with an Ontario pharmacist during business hours — until 5 p.m. Eastern.</p>
+<!--
+  Was: "Notice fit changes early. Keep a go-bag ready. And when something feels
+  off, chat with an Ontario pharmacist during business hours." That sent a fit
+  change — a clinical assessment — to a pharmacist, which is the opposite of
+  what the live site tells readers to do. Corrected here and in
+  ostomy-care-everyday-living.html, to match that file's already-corrected FAQ.
+-->
+<p>Stock essentials before you need them. Notice fit changes early and take those to your NSWOC. Keep a go-bag ready. And for everyday product and restock questions, chat with an Ontario pharmacist during business hours — until 5 p.m. Eastern.</p>
 <p>Small adjustments, real ease. That's the Liivv Ostomy way.</p>
 ```
 
@@ -192,16 +199,15 @@ Set **Instance suffix** to `ostomy`. **Four** sticky panels.
 | New to the Journey | Just starting out, first supplies | Supportive, demystifying |
 | Ostomy Essentials | Pouches, barriers, brands, restock | Practical, discreet, clockwork |
 
-## 10 — Testimonials (`archive-reveal-testimonials`)
+## 10 — Testimonials (`archive-reveal-testimonials`) — REMOVED, do not build
 
-Split heading: `What people` / `are saying`.
-
-| Quote theme | Author | Role |
-|-------------|--------|------|
-| Fit question / pharmacist | `Morgan` | `Toronto · colostomy · busy parent` |
-| Usuals clockwork | `Casey` | `Ottawa · ileostomy · veteran restocker` |
-| New to journey | `Avery` | `Hamilton · just starting out` |
-| Everyday + discreet | `Quinn` | `Mississauga · Liivv Ostomy regular` |
+This section is gone from the reference HTML and is not to be built. It held
+four invented ostomates with cities and ostomy types, presented as "What people
+are saying", and one of them had a fit question settled by our own pharmacist
+chat — the opposite of what the live site tells readers to do. This spec is
+publicly served, so the personas were removed here too rather than left in a
+build note. Section numbering below is unchanged, so the numbers still match the
+badges in the HTML.
 
 ## 11 — FAQ (`diabetes-care-faq-first`)
 
@@ -237,7 +243,7 @@ Split heading: `What people` / `are saying`.
 
 ## Copy guardrails
 
-- This page is an **Ostomy Care destination** — supplies, everyday living, chapters, pharmacist care.
+- This page is an **Ostomy Care destination** — supplies, everyday living, chapters, and an Ontario pharmacist for everyday product and restock questions. Fit, skin and anything about the stoma itself goes to an NSWOC or the surgeon, never to the pharmacist.
 - Brands = shop context only, not clinical endorsement.
 - Never use: symptoms as diagnosis, treatment claims, patients, invented medical claims.
 - Lean on: ease, fit, restock, discreet, comfort, routine, usuals, confidence.

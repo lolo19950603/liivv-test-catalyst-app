@@ -312,6 +312,29 @@
         "notFound": "That saved kit could not be found."
       }
     },
+    "HealthProfile": {
+      "consent": {
+        "heading": "Before you save this",
+        "label": "Yes — Liivv may keep and use my health answers.",
+        "body": {
+          "1": "The answers on this page are health information about you.",
+          "2": "If you tick the box, Liivv keeps them on your health profile and uses them to decide which guidance, chapters and reminders you see in your account, and so our pharmacy team can answer your questions with your situation in front of them.",
+          "3": "Ticking it is optional. You can shop and use your Liivv account without it. Leave it unticked and we will not save these answers.",
+          "4": "You can change your mind later. Save this page with the box unticked and we record that you have withdrawn: your answers stay on your health profile, where you and our pharmacy team can still read them, and we stop using them to decide what you see.",
+          "5": "Nothing here deletes your answers. To ask about them, including having them removed:"
+        },
+        "guestNote": "Until you create your account, these answers stay in a cookie on this device for one hour, so they can be added to your profile when you sign up. If you do not sign up, they are not kept.",
+        "withdraw": {
+          "onFile": "You ticked this box on an earlier save, so your answers are in use now. Save with the box unticked and we record that you have withdrawn.",
+          "state": "You withdrew your consent. Your answers are still on your health profile, and we no longer use them to decide what you see, apart from that one safety rule. Tick the box and save to let us use them again.",
+          "safety": "One thing does not depend on this box. If you told us your body or the fit of your pouching system has changed recently, we keep pointing you to your NSWOC — an ostomy nurse — instead of to products.",
+          "elsewhere": "You can change your mind later. In your account, the health profile page lets you save with this box unticked: we record that you have withdrawn, your answers stay on file, and we stop using them to decide what you see.",
+          "done": "Consent withdrawn. Your answers stay on your health profile, and we have stopped using them to personalize what you see. One safety rule still applies: if you told us your body or the fit of your pouching system has changed recently, we keep pointing you to your NSWOC instead of to products. Nothing else on this page was saved."
+        },
+        "contactLabel": "Contact us",
+        "error": "Please tick the box that lets Liivv keep and use your health answers. Nothing is saved until you do."
+      }
+    },
     "Dashboard": {
       "metaTitle": "My Health Dashboard",
       "loading": "Loading your dashboard…",
@@ -1436,10 +1459,28 @@
             "title": "You have just been told you need one",
             "items": {
               "1": "Feeling frightened, angry, or numb is an ordinary reaction to this news, not a sign you are handling it badly",
-              "2": "The waiting is hard, and recovery has its own hard parts — learning the routine takes most people months rather than weeks",
-              "3": "People with ostomies work, travel, swim, date, have children, and play sport. That is the ordinary outcome, not the exceptional one — most of it comes back once you have healed, which usually takes months rather than weeks"
+              "2": "The waiting is hard, and recovery has its own hard parts. Hospitals aim to teach you the pouch change before you go home, and it gets easier with practice; adjusting takes time",
+              "3": "People with ostomies work, travel, swim, date, have children, and play sport. That is the ordinary outcome, not the exceptional one — most of it comes back as you recover. How long that takes varies, and your surgeon sets the pace for lifting, work and exercise"
             },
-            "note": "It does get easier. If it is not easing, or you are struggling to get through the day, tell your NSWOC or doctor rather than waiting it out — low mood after this surgery is common and treatable. If you want to talk to someone who has been through it, Ostomy Canada trains peer visitors: ask your surgeon or NSWOC for a referral, or contact your local chapter yourself. See Everyday Liivving."
+            "note": "It does get easier. If it is not easing, or you are struggling to get through the day, tell your NSWOC or doctor rather than waiting it out — low mood after this surgery is common and treatable. If you want to talk to someone who has been through it, Ostomy Canada trains peer visitors: ask your surgeon or NSWOC for a referral, or contact your local chapter yourself. See Everyday Liivving.",
+            "figure": {
+              "routes": {
+                "1": {
+                  "prompt": "If it is not easing, or you are struggling to get through the day",
+                  "chips": {
+                    "1": "Tell your NSWOC",
+                    "2": "Tell your doctor"
+                  }
+                },
+                "2": {
+                  "prompt": "If you want to talk to someone who has been through it",
+                  "chips": {
+                    "1": "Ostomy Canada peer visitor"
+                  },
+                  "detail": "Ask your surgeon or NSWOC for a referral, or contact your local chapter yourself."
+                }
+              }
+            }
           },
           "2": {
             "title": "Ask for stoma siting — this one matters most",
@@ -1448,7 +1489,22 @@
               "2": "They check the spot while you sit, stand, and bend, and keep it clear of your waistband, skin folds, scars, and your beltline",
               "3": "Placement affects how well every appliance you ever wear will seal, and people marked before surgery tend to have fewer leaks. If leaks do happen they are usually fixable with a different appliance or an added seal, whatever the shape of your abdomen"
             },
-            "note": "This is the thing people most often do not know to ask for, and it is much harder to fix afterwards. If nobody has mentioned siting, ask. That includes emergency surgery — Canadian guidance says emergency patients should still be marked before the anesthetic wherever possible, and it matters more then, not less."
+            "note": "This is the thing people most often do not know to ask for, and it is much harder to fix afterwards. If nobody has mentioned siting, ask. That includes emergency surgery — Canadian guidance says emergency patients should still be marked before the anesthetic wherever possible, and it matters more then, not less.",
+            "figure": {
+              "heading": "Checked while you sit, stand, and bend",
+              "items": {
+                "1": "Waistband",
+                "2": "Skin folds",
+                "3": "Scars",
+                "4": "Beltline"
+              },
+              "more": "And other things your NSWOC checks",
+              "captions": {
+                "1": "Marked while you are awake",
+                "2": "by an NSWOC or your surgeon",
+                "3": "your surgeon makes the final call"
+              }
+            }
           },
           "3": {
             "title": "Questions worth asking before you go in",
@@ -1465,7 +1521,17 @@
             "items": {
               "1": "Loose, high-waisted clothing for going home — nothing that sits across where the stoma will be",
               "2": "Your usual medications list, which the ward will want anyway and which matters later for absorption",
-              "3": "Arrange help for the first week or two if you can. Lifting is restricted afterwards, and that includes shopping and laundry"
+              "3": "Arrange help for the first six weeks or so if you can. Lifting is usually limited for at least four to six weeks, and that includes shopping and laundry"
+            },
+            "figure": {
+              "containers": {
+                "1": {
+                  "label": "In the bag"
+                },
+                "2": {
+                  "label": "Arrange at home"
+                }
+              }
             }
           },
           "5": {
@@ -1474,6 +1540,16 @@
               "1": "You do not need to learn the pouch change unless they want you to — many people prefer to keep that private, and that is worth asking rather than assuming",
               "2": "Practical help lands better than reassurance early on: driving, cooking, and taking over the lifting they are not allowed to do",
               "3": "Your own reaction is allowed to be complicated. Peer support groups usually welcome partners and family too"
+            },
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Helps early on"
+                },
+                "2": {
+                  "heading": "Ask, don’t assume"
+                }
+              }
             }
           },
           "6": {
@@ -1481,7 +1557,7 @@
             "items": {
               "1": "Fatigue is normal — rest is part of recovery",
               "2": "Your care team will send you home with a starter setup; learning takes practice, not perfection",
-              "3": "Many people feel more confident within four to eight weeks"
+              "3": "Confidence grows with each change you manage, and adjusting takes time. If it is not getting easier, tell your NSWOC or doctor"
             }
           },
           "7": {
@@ -1490,24 +1566,161 @@
               "1": "Gather supplies first: new system, measuring guide, scissors if needed, warm water, soft cloth, disposal bag",
               "2": "Remove gently — never rip; wet a cloth to help release adhesive if needed",
               "3": "Clean, dry, measure, apply, and hold the barrier so body heat activates the seal"
+            },
+            "figure": {
+              "framing": {
+                "1": "This is a reminder of what your nurse teaches. Their instructions come first.",
+                "2": "If no one has shown you how to change your pouch yet, ask your hospital team, home care nurse or NSWOC before you try.",
+                "3": "If tubes (stents) come out of your stoma, or a rod or bridge sits under it, this walk-through doesn’t cover your change. Your nurse will show you how."
+              },
+              "steps": {
+                "1": {
+                  "title": "Get ready",
+                  "items": {
+                    "1": "Pick a time when your stoma is quiet — often the morning, before eating or drinking.",
+                    "2": "Urostomy: have gauze or a cotton roll ready to soak up urine. Never push it into the stoma.",
+                    "3": "Have ready anything your nurse added to your list.",
+                    "4": "Wash your hands with soap and water and dry them before you start."
+                  }
+                },
+                "2": {
+                  "title": "Empty the pouch first",
+                  "items": {
+                    "1": "A drainable or urostomy pouch is easier to change when it’s empty.",
+                    "2": "A closed pouch comes off whole and goes in the garbage.",
+                    "3": "Your nurse will tell you whether to empty it first."
+                  }
+                },
+                "3": {
+                  "title": "Remove gently",
+                  "items": {
+                    "1": "Press the skin down with one hand while you lift the barrier with the other.",
+                    "2": "If your nurse suggested an adhesive remover, rinse it off afterwards."
+                  }
+                },
+                "4": {
+                  "title": "Throw it away",
+                  "items": {
+                    "1": "Put the used system in a bag, then in your household garbage. Don’t flush it."
+                  }
+                },
+                "5": {
+                  "title": "Clean and dry",
+                  "items": {
+                    "1": "Use warm water and a soft cloth. You don’t need soap.",
+                    "2": "No creams, oils or moisturising wipes — they stop the barrier from sticking.",
+                    "3": "Pat the skin completely dry. The stoma itself doesn’t need drying."
+                  }
+                },
+                "6": {
+                  "title": "Look while it’s off",
+                  "items": {
+                    "1": "A stoma is usually moist and pinkish-red, and has no feeling.",
+                    "2": "A little bleeding when you wipe it, that stops with gentle pressure, is normal.",
+                    "3": "If you see stitches, leave them in.",
+                    "4": "The skin around it should look like the rest of your belly, not red or darker than usual.",
+                    "5": "If something looks different, see the two lists under this walk-through."
+                  }
+                },
+                "7": {
+                  "title": "Measure and cut to fit",
+                  "items": {
+                    "1": "Measure at every change while your stoma shrinks over the first six to eight weeks.",
+                    "2": "Cut the opening a little larger than the stoma, never touching it. Your nurse tells you how much. Canadian guides range from 1–2 mm to about 3 mm.",
+                    "3": "Mouldable barriers are stretched to size by hand instead of cut.",
+                    "4": "Pre-cut barriers usually come later, once the size settles at around eight weeks.",
+                    "5": "Your NSWOC may set a different size."
+                  }
+                },
+                "8": {
+                  "title": "Put it on and hold",
+                  "items": {
+                    "1": "Smooth the skin, centre the barrier over the stoma, and press around the inner edge.",
+                    "2": "One-piece: the barrier and pouch go on together.",
+                    "3": "Two-piece: attach the pouch to the barrier.",
+                    "4": "Drainable pouch: close the outlet.",
+                    "5": "Urostomy pouch: close the tap.",
+                    "6": "Hold your hand over it. Canadian guides range from about 30 seconds to 2 minutes, so hold it for as long as your nurse taught you. Warmth helps some barriers set.",
+                    "7": "Wash your hands again when you have finished."
+                  }
+                },
+                "9": {
+                  "title": "How often",
+                  "items": {
+                    "1": "There’s no single number. Canadian guides range from once or twice a week to every 3 to 7 days, and more often in the first weeks while you’re measuring.",
+                    "2": "Change it right away if it leaks.",
+                    "3": "Your nurse will set your schedule."
+                  }
+                }
+              },
+              "gapLink": "See how the gap works",
+              "tell": {
+                "heading": "Tell your NSWOC (not urgent) if:",
+                "items": {
+                  "1": "leaks keep happening",
+                  "2": "the skin around your stoma stays red, itchy or sore",
+                  "3": "you need to change much more often than usual"
+                }
+              }
             }
           },
           "8": {
             "title": "Starter Supply Lists",
-            "note": "Try The Fresh Start kit — customize quantities before checkout.",
             "items": {
               "1": "Pouches and barriers that match your system (one-piece or two-piece)",
               "2": "Skin protectant wipe, powder if recommended, disposal bags",
               "3": "A go-bag for outings from day one"
+            },
+            "figure": {
+              "intro": "Start from the list your NSWOC gave you.",
+              "systemLegend": "Your system",
+              "starterHeading": "Starter supplies",
+              "supplies": {
+                "1": {
+                  "label": "Pouches and barriers that match your system",
+                  "labelOne": "One-piece pouches (barrier built in)",
+                  "labelTwo": "Two-piece barriers and matching pouches"
+                },
+                "2": {
+                  "label": "Disposal bags"
+                },
+                "3": {
+                  "label": "Skin protectant wipe",
+                  "condition": "only if your NSWOC recommended one, or you already use one"
+                },
+                "4": {
+                  "label": "Powder: only if your NSWOC or doctor recommended it."
+                }
+              },
+              "alsoGoBag": "also for your go-bag",
+              "goBagHeading": "Go-bag, for outings from day one",
+              "goBagItems": {
+                "1": {
+                  "label": "Spare barrier and pouch"
+                },
+                "2": {
+                  "label": "Dry wipes or a soft cloth",
+                  "condition": "unless your NSWOC suggests otherwise — moisturising wipes can stop the barrier sticking"
+                },
+                "3": {
+                  "label": "Adhesive remover",
+                  "condition": "if you already use it"
+                },
+                "4": {
+                  "label": "Spare underwear or liner"
+                }
+              }
             }
           },
           "9": {
             "title": "Go-Bags & Backup",
-            "note": "Explore curated go-bag kits in Shop Ostomy Essentials.",
             "items": {
               "1": "Spare barrier and pouch, soft wipes, disposal bags",
               "2": "Adhesive remover and skin protectant if you use them",
               "3": "A spare underwear or liner for peace of mind away from home"
+            },
+            "figure": {
+              "goBagLink": "The go-bag items are on My supply list, above"
             }
           },
           "10": {
@@ -1516,6 +1729,45 @@
               "1": "NSWOC — a nurse specialized in wound, ostomy and continence care. Fit, skin, and clinical troubleshooting",
               "2": "Surgeon or clinic — recovery and medical concerns",
               "3": "Ontario pharmacist chat — everyday product and restock questions during business hours"
+            },
+            "figure": {
+              "legend": "What's your question about?",
+              "topics": {
+                "1": {
+                  "label": "The stoma, fit or skin"
+                },
+                "2": {
+                  "label": "Recovery or a medical concern"
+                },
+                "3": {
+                  "label": "Talking to someone who has one"
+                },
+                "4": {
+                  "label": "A product or restock question"
+                }
+              },
+              "fits": "Fits what you ticked",
+              "statusFitsOne": "{count} place fits what you ticked. Everyone stays listed.",
+              "statusFitsMany": "{count} places fit what you ticked. Everyone stays listed.",
+              "statusNone": "Nothing ticked. Everyone stays listed.",
+              "lanes": {
+                "1": {
+                  "label": "Your NSWOC",
+                  "linkLabel": "Find an NSWOC (non-urgent directory, opens their site)"
+                },
+                "2": {
+                  "label": "Surgeon or clinic"
+                },
+                "3": {
+                  "label": "Liivv pharmacist chat",
+                  "scope": "A Liivv service · Ontario · business hours"
+                },
+                "4": {
+                  "label": "Someone who has one",
+                  "body": "A peer visitor or local chapter.",
+                  "linkLabel": "Ostomy Canada chapter and peer finder (opens their site)"
+                }
+              }
             }
           },
           "11": {
@@ -1524,23 +1776,217 @@
               "1": "Reintroduce foods gradually; chew thoroughly; notice patterns",
               "2": "Light walking often comes first; return to activity as cleared by your care team",
               "3": "Open Everyday Liivving when you are ready to find a peer group or work out what your province covers"
+            },
+            "figure": {
+              "doors": {
+                "1": {
+                  "label": "Food"
+                },
+                "2": {
+                  "label": "Activity"
+                },
+                "3": {
+                  "label": "People and coverage"
+                }
+              }
             }
           }
         },
         "programsBand": {
-          "heading": "A gentle first-month map",
+          "heading": "A gentle map of the first eight weeks, and after",
           "cards": {
             "1": {
-              "heading": "Weeks 1–2",
-              "body": "Focus on healing, hydration, and one solid change routine. Soft, low-fiber foods as advised by your team."
+              "heading": "Weeks 1 to 2 after surgery",
+              "body": "Focus on healing, fluids and one solid change routine. Measure the stoma at every change while it shrinks. Softer foods may be easier at first, and with an ileostomy your team usually asks for lower fibre as well."
             },
             "2": {
-              "heading": "Weeks 3–4",
-              "body": "Add foods one at a time. Measure the stoma as swelling changes. Keep extras stocked."
+              "heading": "Weeks 3 to 5",
+              "body": "Keep measuring at every change. With a colostomy, many people are adding foods back slowly; with an ileostomy, the lower-fibre stretch usually lasts about six to eight weeks. Lifting limits still apply."
             },
             "3": {
-              "heading": "Weeks 5–8",
-              "body": "Confidence usually grows here — social plans, workdays, and a go-bag that travels with you."
+              "heading": "Weeks 6 to 8",
+              "body": "The stoma is usually close to its settled size by about eight weeks. Ask your surgeon about work and heavier activity, and your NSWOC when a fit check makes sense."
+            }
+          }
+        },
+        "recoveryMap": {
+          "heading": "A gentle map of the first eight weeks, and after",
+          "intro": "Weeks are counted from your surgery. Different things settle on different clocks, and most dates belong to your team.",
+          "stages": {
+            "1": {
+              "heading": "Before you go home",
+              "lanes": {
+                "1": {
+                  "items": {
+                    "1": "Hospitals aim to teach you the pouch change before you leave. Many people keep learning at home with a home care nurse."
+                  }
+                },
+                "2": {
+                  "items": {
+                    "1": "Your NSWOC gives you a detailed supply list before you go home."
+                  }
+                }
+              }
+            },
+            "2": {
+              "heading": "Weeks 1 to 2",
+              "qualifier": "after surgery",
+              "lanes": {
+                "1": {
+                  "items": {
+                    "1": "Your stoma is swollen and will shrink. Measure it at every change."
+                  }
+                },
+                "2": {
+                  "items": {
+                    "1": "Softer foods may be easier at first. Fibre is okay; add it slowly.",
+                    "2": "Soft, lower-fibre foods.",
+                    "3": "Drink steadily. Tell your NSWOC or surgeon if your output is over about 1,200 ml a day."
+                  }
+                },
+                "3": {
+                  "items": {
+                    "2": "Lifting is limited for at least the first 4 to 6 weeks. The limit varies, so ask what yours is."
+                  }
+                }
+              }
+            },
+            "3": {
+              "heading": "Weeks 3 to 5",
+              "lanes": {
+                "1": {
+                  "items": {
+                    "1": "Keep measuring at every change."
+                  }
+                },
+                "2": {
+                  "items": {
+                    "1": "Keep adding foods back slowly, one at a time.",
+                    "2": "The lower-fibre stretch continues."
+                  }
+                },
+                "3": {
+                  "items": {
+                    "1": "The lifting limit still applies."
+                  }
+                }
+              }
+            },
+            "4": {
+              "heading": "Weeks 6 to 8",
+              "lanes": {
+                "1": {
+                  "items": {
+                    "1": "Its size is usually close to settled by about eight weeks. Pre-cut barriers become an option when your nurse says so."
+                  }
+                },
+                "2": {
+                  "items": {
+                    "1": "Add higher-fibre foods gradually, one at a time, and chew well. Signs of a blockage are in the Chapter 02 red flags."
+                  }
+                },
+                "3": {
+                  "items": {
+                    "1": "Ask your surgeon before you go back to heavier work or sport. Core exercise waits longer."
+                  }
+                }
+              }
+            },
+            "5": {
+              "heading": "About three months and later",
+              "lanes": {
+                "1": {
+                  "items": {
+                    "1": "Hard core exercise: not before about three months, and only when your surgeon says so. (One Ontario hospital’s guidance.)",
+                    "2": "Heavy lifting: ask your surgeon when. Limits can last longer if your muscles are weak."
+                  }
+                }
+              }
+            },
+            "6": {
+              "heading": "Not on a calendar",
+              "qualifier": "these depend on you and your team",
+              "lanes": {
+                "1": {
+                  "items": {
+                    "1": "Once you’re off opioid pain medicine and your team agrees."
+                  }
+                },
+                "2": {
+                  "items": {
+                    "1": "Your surgeon decides."
+                  }
+                },
+                "3": {
+                  "items": {
+                    "1": "An NSWOC fit check is encouraged. Ask when yours should be."
+                  }
+                },
+                "4": {
+                  "items": {
+                    "1": "It takes time. If it isn’t getting easier, tell your NSWOC or doctor, or ask about an Ostomy Canada peer visitor."
+                  }
+                }
+              }
+            },
+            "7": {
+              "heading": "After you go home",
+              "qualifier": "counted from when you leave hospital",
+              "lanes": {
+                "1": {
+                  "items": {
+                    "1": "Ask who will check on you at home, and when.",
+                    "2": "One Ontario hospital books a surgeon visit about 4 to 6 weeks after you go home. Ask when yours is.",
+                    "3": "A Canadian position statement recommends NSWOC follow-up soon after you go home, then over the following weeks and months. Ask what your plan is."
+                  }
+                },
+                "2": {
+                  "items": {
+                    "1": "A weight loss of about 5 to 15 kg is common in the three months after you go home, so your fit may need rechecking."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "shelf": {
+          "heading": "Where Canadian nurses send people",
+          "groups": {
+            "1": {
+              "heading": "Guides",
+              "links": {
+                "1": {
+                  "title": "NSWOCC patient guides: colostomy, ileostomy, ileal conduit",
+                  "body": "English and French editions · some sections credited to manufacturers"
+                }
+              }
+            },
+            "2": {
+              "heading": "Videos in French",
+              "links": {
+                "1": {
+                  "title": "Santé Québec Laurentides teaching videos",
+                  "body": "The page also links to a manufacturer-hosted library."
+                }
+              }
+            },
+            "3": {
+              "heading": "Find a nurse",
+              "links": {
+                "1": {
+                  "title": "Find an NSWOC",
+                  "body": "For non-urgent questions"
+                }
+              }
+            },
+            "4": {
+              "heading": "Find people",
+              "links": {
+                "1": {
+                  "title": "Ostomy Canada chapters and peer support",
+                  "body": "Link only. Volunteer contacts are never copied."
+                }
+              }
             }
           }
         },
@@ -1556,6 +2002,21 @@
         },
         "governance": {
           "disclaimer": "This is general information, not medical advice, and it is not a substitute for assessment by your NSWOC, surgeon, or physician. Fit, skin, and product choices depend on your body and your surgery — talk to your care team before changing anything."
+        },
+        "startHere": {
+          "segments": {
+            "1": {
+              "label": "If your surgery is planned"
+            },
+            "2": {
+              "label": "After surgery"
+            }
+          },
+          "pivot": "Surgery"
+        },
+        "urgentExit": {
+          "lead": "Signs that need emergency care for adults with a bowel stoma are in",
+          "link": "Chapter 02 — Some things are not a website question"
         }
       },
       "get-to-know-your-stoma": {
@@ -1627,6 +2088,26 @@
                   "3": "WOCN Society — the American organization, which you will meet in US-published material. There the nurse is a WOC nurse, and a certified one is a CWOCN"
                 }
               }
+            },
+            "figure": {
+              "terms": {
+                "1": {
+                  "term": "Appliance or pouching system",
+                  "def": "The whole setup: the barrier plus the pouch."
+                },
+                "2": {
+                  "term": "Barrier, wafer or baseplate",
+                  "def": "The part that sticks to your skin. Guides also call it a flange."
+                },
+                "3": {
+                  "term": "Pouch",
+                  "def": "Where output collects. A drainable pouch is emptied and closed again, a closed pouch is thrown away after use, and a urostomy pouch has a tap for draining urine."
+                },
+                "4": {
+                  "term": "Where they join",
+                  "def": "On a two-piece, the pouch attaches to the barrier. On a one-piece, the barrier and pouch are joined permanently."
+                }
+              }
             }
           },
           "4": {
@@ -1656,7 +2137,7 @@
           "7": {
             "title": "Fit Changes",
             "items": {
-              "1": "Measure during the first months — stoma size can change as swelling settles",
+              "1": "Measure at every change for the first six to eight weeks after surgery, and again after a weight change — stoma size can change as swelling settles",
               "2": "An opening that is too large exposes skin; too small can injure the stoma",
               "3": "Aim for a close fit around the stoma edge so output lands in the pouch, not on skin"
             }
@@ -1676,7 +2157,25 @@
               "2": "Cut so the opening sits close to the edge of the stoma. Too large exposes skin to output; too small can rub or injure the stoma",
               "3": "Not all stomas are round. Many are oval, and a cut-to-fit barrier can be shaped to match"
             },
-            "note": "Re-measure regularly for the first few months, and again after any weight change or a hernia. A barrier cut to a size from two months ago is one of the most common reasons a system that used to work suddenly does not."
+            "note": "Re-measure at every change for the first six to eight weeks after surgery, and again after any weight change or a hernia. A barrier cut to a size from before your last weight change is one of the most common reasons a system that used to work suddenly does not.",
+            "figure": {
+              "notToScale": "Not to scale. Your nurse will tell you how much gap is right for you.",
+              "panels": {
+                "1": {
+                  "title": "Touching the stoma",
+                  "body": "An opening that sits on the stoma can rub or injure it."
+                },
+                "2": {
+                  "title": "A small gap",
+                  "body": "A little larger than the stoma, as your nurse sets it."
+                },
+                "3": {
+                  "title": "A large gap",
+                  "body": "The exposed skin sits in the path of output."
+                }
+              },
+              "mouldable": "Mouldable barriers are stretched to size by hand instead of cut. Measure at every change for the first six to eight weeks after surgery, and again after weight change."
+            }
           },
           "10": {
             "title": "One-piece or two-piece",
@@ -1757,7 +2256,7 @@
               "1": {
                 "heading": "What often helps",
                 "items": {
-                  "1": "Re-measure. Stoma size changes for months after surgery, and an opening cut to last month’s size is one of the most common causes of a leak",
+                  "1": "Re-measure. Stoma size changes over the first six to eight weeks after surgery, and again after a weight change — an opening cut to last month’s size is one of the most common causes of a leak",
                   "2": "Check where the leak starts — from under the barrier, or from the edge. They point at different problems",
                   "3": "Make sure skin is completely dry before the barrier goes on, and hold it in place so body heat can set the seal"
                 }
@@ -1934,7 +2433,7 @@
             "3": "Heavy or continuous bleeding from the stoma itself, not just a spot from cleaning",
             "4": "Fever, or skin around the stoma that is hot, spreading red, and painful",
             "5": "Confusion, severe dizziness, or very dark urine alongside high output — signs of significant dehydration",
-            "6": "A catheter that will not pass, if you empty a continent diversion or a Mitrofanoff that way — a reservoir that cannot be drained will not wait"
+            "6": "A Mitrofanoff you cannot pass a catheter through — an unemptied bladder will not wait. A bowel reservoir such as a Kock pouch is different: see “The less common diversions” in Chapter 02 for what to try first"
           }
         },
         "pharmacist": {
@@ -1949,6 +2448,10 @@
         },
         "governance": {
           "disclaimer": "This is general information, not medical advice, and it is not a substitute for assessment by your NSWOC, surgeon, or physician. Fit, skin, and product choices depend on your body and your surgery — talk to your care team before changing anything."
+        },
+        "urgentExit": {
+          "lead": "Signs that need emergency care are further up this page, under",
+          "link": "Some things are not a website question"
         }
       },
       "everyday-liivving": {
@@ -1976,7 +2479,7 @@
             "items": {
               "1": "Food is broken down in the stomach and small intestine, and that part is usually unchanged — this is why you still absorb your nutrition",
               "2": "The colon’s main job is reclaiming water and salt from what is left, and forming stool. A colostomy leaves most of that intact; an ileostomy bypasses it almost entirely",
-              "3": "A urostomy does not change how food is digested — it diverts urine before the kidneys reach the bladder, so most of the food questions here are not yours. Fluid is the opposite: you need more of it than before, steadily through the day, because a well-flushed system is what protects against infection and stones. Ask your urologist or NSWOC what daily target fits you"
+              "3": "A urostomy does not change how food is digested. It carries urine from the kidneys out through the stoma, so it no longer reaches the bladder, and most of the food questions here are not yours. Fluid is the opposite: you need more of it than before, steadily through the day, because a well-flushed system is what protects against infection and stones. Ask your urologist or NSWOC what daily target fits you"
             },
             "note": "This is the single most useful thing to understand: an ileostomy is not \"a colostomy higher up\". The missing colon is why output is looser, why fluid and salt matter more, and why the advice differs."
           },
@@ -1987,7 +2490,21 @@
               "2": "Your stoma is swollen at first and shrinks over the following weeks, so the opening it can pass comfortably gets bigger too",
               "3": "Appetite is often poor early on. Small, frequent meals tend to sit better than three large ones"
             },
-            "note": "How long this lasts is your surgical team’s call, not a fixed rule — it varies by surgery and by person. Ask when you should be moving on rather than assuming."
+            "note": "How long this lasts is your surgical team’s call, not a fixed rule — it varies by surgery and by person. Ask when you should be moving on rather than assuming.",
+            "figure": {
+              "clocks": {
+                "1": {
+                  "body": "Softer foods may be easier in about the first 2 to 4 weeks. Fibre is okay after surgery; higher-fibre foods are added slowly."
+                },
+                "2": {
+                  "body": "Soft, lower-fibre foods for about the first 6 to 8 weeks while the stoma is swollen. Then higher-fibre foods are added gradually, one at a time, and chewed well."
+                }
+              },
+              "axis": {
+                "start": "Surgery",
+                "end": "about 3 months"
+              }
+            }
           },
           "4": {
             "title": "Adding foods back",
@@ -2215,7 +2732,7 @@
           "2": {
             "eyebrow": "Free programs",
             "heading": "Manufacturer support, compared plainly",
-            "body": "All three are free and none of them require you to buy from us. We have listed what each program offers — not whose products are better, which is not our call to make.",
+            "body": "All three are free and none of them require you to buy from us. We have listed what each program offers — not whose products are better, which is not our call to make. All three are run by companies that sell ostomy supplies. Read how each one uses your information before you enrol.",
             "links": {
               "1": {
                 "title": "Secure Start",
@@ -2292,6 +2809,10 @@
         },
         "governance": {
           "disclaimer": "This is general information, not medical advice, and it is not a substitute for assessment by your NSWOC, surgeon, or physician. Fit, skin, and product choices depend on your body and your surgery — talk to your care team before changing anything."
+        },
+        "urgentExit": {
+          "lead": "High-roughage foods can cause a blockage. The signs are in",
+          "link": "Chapter 02 — Some things are not a website question"
         }
       },
       "this-might-be-you": {
@@ -2326,7 +2847,7 @@
               "3": {
                 "heading": "Two things worth knowing before they happen",
                 "items": {
-                  "1": "A child’s stoma can prolapse — telescope outward and look alarmingly long. It is more common in children than in adults and usually not an emergency, but colour matters more than length: call urgently if it darkens or goes dusky, if your child is in pain, or if output stops",
+                  "1": "A child’s stoma can prolapse — telescope outward and look alarmingly long. It is more common in children than in adults and usually not an emergency, but colour matters more than length: a stoma that darkens or goes dusky needs an emergency department rather than a phone call, and so does pain, or output that stops",
                   "2": "In a child with an ileostomy, high-fibre foods can cause a blockage, so new foods go in one at a time. Ask your team what each of these looks like for your child, and which number to call after hours"
                 }
               },
@@ -2446,7 +2967,15 @@
           "cards": {
             "1": {
               "heading": "A child",
-              "body": "Your child’s hospital team first — they hold the referral to a nurse who works in pediatrics. Ask about Youth Camp early; funding exists and places are limited."
+              "body": "Your child’s hospital team first — they hold the referral to a nurse who works in pediatrics. Ask about Youth Camp early; funding exists and places are limited.",
+              "links": {
+                "1": {
+                  "label": "Ostomy care instructions for children — AboutKidsHealth, SickKids"
+                },
+                "2": {
+                  "label": "Stomie — AboutKidsHealth (French overview, last updated in 2013)"
+                }
+              }
             },
             "2": {
               "heading": "Pregnancy",
@@ -2470,6 +2999,10 @@
         },
         "governance": {
           "disclaimer": "This is general information, not medical advice. Care for children, during pregnancy, and for people managing several conditions differs in ways this page does not attempt to cover — it is here to tell you what changes and who to ask. Speak to an NSWOC and the treating team rather than relying on general ostomy guidance, including ours."
+        },
+        "urgentExit": {
+          "lead": "Signs that need emergency care for adults with a bowel stoma are in",
+          "link": "Chapter 02 — Some things are not a website question"
         }
       }
     },
@@ -2642,7 +3175,8 @@
           "gi": "Ask your gastroenterologist",
           "peer": "Ask someone who has one",
           "assessment": "Needs an assessment first",
-          "urgent": "Call, do not wait"
+          "urgent": "Call, do not wait",
+          "primaryCare": "Ask your doctor"
         },
         "productsLabel": "Products for this",
         "productsNote": "Liivv sells these. They are here because this section is about equipment — nothing on this page is a recommendation to buy from us.",
@@ -2672,6 +3206,161 @@
           "two": "two",
           "three": "three",
           "four": "four"
+        },
+        "crisis": {
+          "body": "Nothing here is a substitute for urgent help. If you are thinking about harming yourself, call or text 9-8-8, Canada’s Suicide Crisis Helpline, any time.",
+          "call": "Call 9-8-8",
+          "text": "Text 9-8-8"
+        },
+        "bothNotEither": "Both, not either",
+        "takeIn": {
+          "print": "Print this list",
+          "notesHint": "The printed list has space to write down answers."
+        },
+        "frDraft": "Draft — French review to come",
+        "changeRoutine": {
+          "walkThrough": "Walk through it",
+          "orReadAll": "Or read the whole list below.",
+          "stepOf": "Step {n} of {total}",
+          "previous": "Previous",
+          "next": "Next",
+          "showAll": "Show the full list",
+          "systemLegend": "Which system did your nurse give you?",
+          "filterStatus": "Showing the sentences for {systems}. All steps stay.",
+          "filterNone": "Showing only the sentences for everyone. All steps stay.",
+          "findNswoc": "Find an NSWOC — a directory for non-urgent questions (NSWOCC, opens their site)",
+          "systems": {
+            "one": "One-piece",
+            "two": "Two-piece",
+            "drain": "Drainable pouch",
+            "closed": "Closed pouch",
+            "uro": "Urostomy pouch"
+          }
+        },
+        "gap": {
+          "legend": "Stoma shape",
+          "round": "Round",
+          "oval": "Oval",
+          "statusRound": "All three drawings now show a round stoma.",
+          "statusOval": "All three drawings now show an oval stoma."
+        },
+        "parts": {
+          "systemLegend": "System",
+          "pouchLegend": "Pouch",
+          "onePiece": "One-piece",
+          "twoPiece": "Two-piece",
+          "drainable": "Drainable",
+          "closed": "Closed",
+          "urostomy": "Urostomy",
+          "statusOnePiece": "Now showing a one-piece system.",
+          "statusTwoPiece": "Now showing a two-piece system.",
+          "statusDrainable": "Now showing a drainable pouch.",
+          "statusClosed": "Now showing a closed pouch.",
+          "statusUrostomy": "Now showing a urostomy pouch."
+        },
+        "anatomy": {
+          "alt": "A drawing of the small and large intestine seen from the front, with no stoma and no pouch. The small intestine coils in the middle; the large intestine frames it, running up one side, across the top, down the other side and into a short tube at the bottom. Each number on the drawing is named in the list beside it.",
+          "partsHeading": "What each number points to",
+          "parts": {
+            "jejunum": "Jejunum",
+            "ileum": "Ileum",
+            "caecum": "Caecum",
+            "ascending": "Ascending colon",
+            "transverse": "Transverse colon",
+            "descending": "Descending colon",
+            "sigmoid": "Sigmoid colon",
+            "rectum": "Rectum"
+          },
+          "orientation": "Seen from the front: the right side of the body is on your left.",
+          "caption": "Where a stoma is made, and whether any bowel is removed or left in place, depends on your surgery. A colostomy can be made at different points along the colon; with an ileostomy the colon may be removed or left in place. Ask your surgeon what yours means.",
+          "credit": {
+            "modification": "Recoloured for this page, with some structures hidden.",
+            "purpose": "For education, not diagnosis.",
+            "courtesyGloss": "Courtesy of the U.S. National Library of Medicine — the sentence the NLM asks for, in its own words."
+          }
+        },
+        "noScript": {
+          "body": "This page needs JavaScript to show its content, and JavaScript is switched off in this browser. The part that should never wait is below."
+        },
+        "supplyList": {
+          "toolLabel": "Shop · a Liivv shopping tool, not a clinical recommendation",
+          "heading": "My supply list",
+          "askSystem": "Ask your NSWOC which system is yours",
+          "productNumber": "My product number",
+          "productNumberHint": "Kept in this browser only. Never searched or sent.",
+          "print": "Print my list",
+          "copy": "Copy as text",
+          "copied": "Copied as plain text.",
+          "copyFailed": "Copying is blocked in this view. Print works instead.",
+          "share": "Share as text",
+          "remember": "Remember on this device",
+          "remembering": "Your list will be remembered on this device. Clear removes it.",
+          "forgotten": "No longer remembered on this device.",
+          "clear": "Clear",
+          "cleared": "Cleared.",
+          "restored": "Restored your saved list from this device.",
+          "sellsOptions": "Liivv sells some options for this",
+          "shopHeading": "Shop the items Liivv carries (optional)",
+          "shopEmpty": "Tick items above to see which ones Liivv carries.",
+          "chooseOnProductPage": "Choose on the product page",
+          "addToCart": "Add to cart",
+          "added": "Added to your cart",
+          "addError": "That did not add. Open the product page to try there.",
+          "kitsIntro": "Kits, if your NSWOC gave you this type:",
+          "systems": {
+            "one": "One-piece",
+            "two": "Two-piece",
+            "notSure": "Not sure yet"
+          },
+          "kits": {
+            "one": "One-piece starter",
+            "two": "Two-piece starter",
+            "goBag": "Go-bag"
+          }
+        },
+        "recoveryMap": {
+          "legend": "My ostomy",
+          "filterStatus": "Showing items for {types}, plus the items for everyone.",
+          "filterNone": "Showing only the items for everyone.",
+          "empty": "Nothing specific to this ostomy type here.",
+          "sources": "Sources for this stage",
+          "inOtherLanguage": "(in French)",
+          "types": {
+            "colo": "Colostomy",
+            "ileo": "Ileostomy",
+            "uro": "Urostomy"
+          },
+          "lanes": {
+            "routine": "Routine",
+            "supplies": "Supplies",
+            "fit": "Stoma and fit",
+            "food": "Food and fluids",
+            "activity": "Activity",
+            "driving": "Driving",
+            "work": "Work",
+            "fitCheck": "Fit check",
+            "settling": "Settling in",
+            "followUp": "Follow-up",
+            "homeFit": "Fit"
+          }
+        },
+        "shelf": {
+          "inFrench": "(in French)",
+          "inEnglish": "(in English)"
+        },
+        "startHere": {
+          "nav": "Chapter map",
+          "mostly": "Mostly {role}",
+          "also": "also {roles}"
+        },
+        "roleNames": {
+          "nswoc": "your NSWOC",
+          "team": "your care team",
+          "peer": "someone who has one",
+          "pharmacist": "a pharmacist",
+          "dietitian": "a dietitian",
+          "gi": "your gastroenterologist",
+          "primaryCare": "your doctor"
         }
       },
       "discovery": {
@@ -2685,10 +3374,16 @@
         "reviewedBy": "Clinically reviewed by",
         "lastReviewed": "Last reviewed {date}",
         "sourcesHeading": "Where this comes from",
+        "stageSources": "Sources for each stage of the soft map",
         "machineTranslated": "This page was translated automatically from English. If anything reads oddly or you are making a decision based on it, check the English version or ask your NSWOC.",
         "registration": "CNO registration #{number}",
         "reviewedEnglishOnly": "The English version of this page was written and clinically reviewed by {name}. This French version is machine translated and has not been reviewed.",
-        "writtenBy": "Written by"
+        "writtenBy": "Written by",
+        "disclosure": {
+          "sells": "Liivv sells ostomy supplies.",
+          "reviewMeaning": "Clinical review means the information on this page was checked for accuracy against published sources. It is not an endorsement of any product Liivv sells, and it is not a recommendation to buy from Liivv.",
+          "notEndorsement": "Nothing on this page is an endorsement of any product Liivv sells, and nothing on it is a recommendation to buy from Liivv."
+        }
       },
       "checker": {
         "formLabel": "Find what your province covers",
@@ -2734,6 +3429,210 @@
         "permanenceTitle": "Temporary ostomies are treated differently here",
         "provisionalTitle": "Two answers we are not using yet",
         "provisionalBody": "You told us about age and whether your ostomy is permanent. Both genuinely change what some provinces fund, but we have not yet verified those rules against each government page — so we are not guessing. Check the official link above for your own situation, and ask the program directly."
+      },
+      "landingPage": {
+        "doors": {
+          "heading": "Where are you right now?",
+          "items": {
+            "1": {
+              "label": "Surgery is ahead",
+              "body": "What to ask, what to pack, and why stoma siting matters."
+            },
+            "2": {
+              "label": "Just home",
+              "body": "The first weeks: rest, changes, supplies, who to ask."
+            },
+            "3": {
+              "label": "Something doesn’t seem right",
+              "body": "Emergency signs first, then who to ask.",
+              "secondary": "Not an emergency? Chapter 01 — Who to Ask"
+            },
+            "4": {
+              "label": "Money and coverage",
+              "body": "What your province covers, and who signs off."
+            },
+            "5": {
+              "label": "I’m helping someone",
+              "body": "How to support without taking over."
+            }
+          }
+        },
+        "hero": {
+          "label": "Ostomy Care hero",
+          "kicker": "Ostomy Care",
+          "headingLead": "Care that stays",
+          "words": {
+            "1": "discreet",
+            "2": "private",
+            "3": "quiet",
+            "4": "personal",
+            "5": "kind"
+          },
+          "body": "Supplies, everyday living support, and kind guidance — so your routine feels like yours again.",
+          "cta": "Find your pace",
+          "kitsCta": "Browse curated kits"
+        },
+        "trust": {
+          "label": "Why Liivv Ostomy Care",
+          "items": {
+            "1": "Ontario pharmacist chat",
+            "2": "Discreet delivery",
+            "3": "Subscribe & save restocks",
+            "4": "Kind, private, yours"
+          }
+        },
+        "ways": {
+          "label": "Ways into Ostomy Care",
+          "eyebrow": "A quiet path in",
+          "heading": "What would help today?",
+          "go": "Continue →",
+          "items": {
+            "kits": {
+              "title": "Curated kits",
+              "body": "Starter kits you can tune — then save for the next quiet restock."
+            },
+            "shelf": {
+              "title": "The shelf",
+              "body": "Pouches, barriers, and accessories — subscribe so restock stays quiet, not a scramble."
+            },
+            "chapters": {
+              "title": "The chapters",
+              "body": "New to the journey, stoma basics, or everyday living — open the story that fits today."
+            },
+            "funding": {
+              "title": "What is covered",
+              "body": "What your province pays toward supplies, who signs off, and the tax credits worth claiming."
+            },
+            "care": {
+              "title": "A kind answer",
+              "body": "Ontario pharmacist chat for everyday product questions during business hours."
+            }
+          }
+        },
+        "kits": {
+          "label": "Ostomy curated kits",
+          "eyebrow": "Curated kits",
+          "heading": "Start curated. Finish as yours.",
+          "body": "Official kits from the Liivv Ostomy edit — open one, tune quantities, add what was missing, and save it — or subscribe so the quiet restock keeps arriving.",
+          "count": "{active} / {count} kits",
+          "carouselLabel": "Ostomy Care kits carousel",
+          "previous": "Previous kit",
+          "next": "Next kit",
+          "show": "Show {name}",
+          "featuredBadge": "Featured kit",
+          "customBadge": "Customizable kit",
+          "featuredBody": "A calm Fresh Start edit — open it to tune quantities, add what was missing, and save your version.",
+          "cardBody": "Open it to tune quantities, add what was missing, and save your version.",
+          "cta": "Customize this kit"
+        },
+        "shop": {
+          "label": "Ostomy Essentials",
+          "eyebrow": "The shelf",
+          "heading": "Ostomy Essentials",
+          "body": "Live catalog, sorted into quiet rooms so restocking does not feel loud.",
+          "openShop": "Open full shop",
+          "filtersLabel": "Shop filters",
+          "kitBadge": "Customizable kit",
+          "empty": "Nothing in this room yet — try All or another filter.",
+          "rooms": {
+            "all": "All",
+            "kits": "Curated kits",
+            "onePiece": "One-piece",
+            "twoPiece": "Two-piece",
+            "barriers": "Barriers",
+            "accessories": "Accessories"
+          }
+        },
+        "subscribe": {
+          "eyebrow": "Subscribe & save",
+          "title": "Pouches and barriers that arrive before you need them",
+          "lead": "Ostomy supplies are not optional — and running out should not be part of the routine. Subscribe to your usuals so restock stays quiet, discreet, and on time.",
+          "shopLabel": "Shop to subscribe",
+          "demoName": "Ostomy Essentials",
+          "demoBlurb": "Pouches, barriers, and skin care — restocked before you run out.",
+          "features": {
+            "1": {
+              "title": "Your usuals, on your wear time",
+              "body": "Pouches, barriers, rings, and skin care — restocked before the last box is empty."
+            },
+            "2": {
+              "title": "Skip when you have extras",
+              "body": "Travel stash or a slower week? Skip a cycle with no charge and nothing ships."
+            },
+            "3": {
+              "title": "Plain packaging. Quiet checkout.",
+              "body": "Same discreet delivery as a one-time order. Pause, skip, or cancel in Account."
+            }
+          }
+        },
+        "chapters": {
+          "label": "Life chapters",
+          "eyebrow": "Life chapters",
+          "heading": "Four stories. Open the one that fits.",
+          "body": "New to this, learning your stoma, working out food, or looking for support and funding — pick the chapter that feels like today.",
+          "skipPrompt": "Already know the aisle?",
+          "skipLink": "Skip to the shelf",
+          "chapterWord": "Chapter {word}",
+          "open": "Open chapter →"
+        },
+        "care": {
+          "label": "Pharmacist care",
+          "eyebrow": "Available in Ontario",
+          "heading": "Fit questions that do not need a waiting room.",
+          "body": "Everyday product and restock questions — chat with an Ontario pharmacist during business hours until 5 p.m. Eastern. Clinical concerns still belong with your NSWOC or care team.",
+          "cta": "Talk to a Pharmacist",
+          "oliviaTitle": "Olivia can fetch the everyday bits.",
+          "oliviaBody": "Need a restock or help with an order? Olivia is the little sprout in the corner. She does not give medical advice, and fit and skin questions belong with your NSWOC."
+        },
+        "brands": {
+          "label": "Preferred brands",
+          "eyebrow": "Shop context",
+          "heading": "Names you already know.",
+          "body": "Listed so familiar systems are easy to find — not a clinical endorsement. Your NSWOC remains the guide for fit.",
+          "points": {
+            "1": "Pouches & barriers",
+            "2": "Skin comfort",
+            "3": "Belts, rings & paste",
+            "4": "Discreet restock"
+          }
+        },
+        "faq": {
+          "label": "Frequently asked questions",
+          "heading": "Quiet questions. Honest answers.",
+          "note": "Practical notes — not medical advice.",
+          "items": {
+            "1": {
+              "q": "How often should I empty or change my ostomy pouch?",
+              "a": "Empty drainable pouches at around one-third to one-half full. Full system changes are often every few days, or sooner if you feel burning, itching, or a leak. Your NSWOC can help you find a wear time that suits your body — wear time varies a great deal between people and is not something to judge yourself against."
+            },
+            "2": {
+              "q": "Can I customize an ostomy kit?",
+              "a": "Yes. Start from a curated kit, adjust the quantities, add anything that was missing, and save your version — or subscribe so the restock keeps arriving on your own schedule."
+            },
+            "3": {
+              "q": "How do ostomy supply subscriptions work?",
+              "a": "On a product page, choose Subscribe & save, pick a frequency that matches your wear time, then check out like any order. Skip a delivery when you still have extras — no charge, nothing ships. Manage pause, skip, or cancel under Account → Subscriptions."
+            },
+            "4": {
+              "q": "What belongs in an ostomy go-bag?",
+              "a": "A spare barrier and pouch, soft wipes, disposal bags, and any skin protectant or adhesive remover you use — plus spare underwear or a liner if that helps you feel ready to be out."
+            },
+            "5": {
+              "q": "What can I ask a pharmacist about my ostomy?",
+              "a": "Everyday product and restock questions, in Ontario during business hours until 5 p.m. Eastern. Clinical concerns — fit, skin, and anything about the stoma itself — belong with your NSWOC or surgeon rather than a pharmacist."
+            }
+          }
+        },
+        "closing": {
+          "label": "Closing",
+          "eyebrow": "The Liivv promise",
+          "heading": "No awkward aisle. Just everyday Liivving.",
+          "body": "Supplies that show up on time, guidance without overwhelm, and room for the rest of your life — at your pace.",
+          "shop": "Ostomy Essentials",
+          "subscribe": "Subscribe & save",
+          "kits": "Browse curated kits",
+          "chapter": "Open a chapter"
+        }
       },
       "fundingPage": {
         "kicker": "Ostomy Care · Money",

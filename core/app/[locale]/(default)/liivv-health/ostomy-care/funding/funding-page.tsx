@@ -12,16 +12,17 @@
  * tokens and `.rounded-top` behaviour rather than defining a second design system.
  */
 
-import { useMessages, useTranslations } from 'next-intl';
+import { useLocale, useMessages, useTranslations } from 'next-intl';
 import type { CSSProperties } from 'react';
 
 import { DiscoveryBand, GovernanceBlock, HelpBand } from '../_components/page-furniture';
 import {
   chapterHref,
   CLINICAL_REVIEWER,
-  COMMERCIAL_DISCLOSURE,
   CONTENT_AUTHOR,
+  DISCLOSES_COMMERCIAL_RELATIONSHIP,
   LANDING_HREF,
+  localeHref,
 } from '../chapters/chapters-data';
 
 import { FundingChecker } from './funding-checker';
@@ -59,6 +60,8 @@ const CITATIONS = [
 
 export function FundingPage() {
   const messages = useMessages();
+  /* These are plain <a>, so the /fr prefix has to be put on by hand — chapters-data.ts. */
+  const locale = useLocale();
   const t = useTranslations('OstomyCare.ui.fundingPage');
   const chrome = useTranslations('OstomyCare.ui.chapter');
   const models = messages.OstomyCare.funding.models;
@@ -251,10 +254,10 @@ export function FundingPage() {
           <h2>{t('closingHeading')}</h2>
           <p>{t('closingBody')}</p>
           <div className="oc-ch-close-cta">
-            <a className="oc-ch-btn oc-ch-btn-soft" href={LANDING_HREF}>
+            <a className="oc-ch-btn oc-ch-btn-soft" href={localeHref(LANDING_HREF, locale)}>
               {chrome('backToLanding')}
             </a>
-            <a className="oc-ch-btn oc-ch-btn-ghost-light" href={chapterHref('everyday-liivving')}>
+            <a className="oc-ch-btn oc-ch-btn-ghost-light" href={localeHref(chapterHref('everyday-liivving'), locale)}>
               {t('closingCta')}
             </a>
           </div>
@@ -271,7 +274,7 @@ export function FundingPage() {
           author: CONTENT_AUTHOR,
           reviewer: CLINICAL_REVIEWER,
           reviewedOn: '',
-          disclosure: COMMERCIAL_DISCLOSURE,
+          disclosure: DISCLOSES_COMMERCIAL_RELATIONSHIP,
           disclaimer: messages.OstomyCare.funding.governance.disclaimer,
         }}
       />

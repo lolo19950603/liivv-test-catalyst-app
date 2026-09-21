@@ -418,6 +418,297 @@
   color: rgba(42, 50, 44, 0.78);
 }
 
+/*
+ * C12's plain links under a band card. A short list, not buttons: nothing here
+ * is a product or a call to action, and nothing frames the page it opens. Each
+ * row is at least 44px tall — WCAG 2.2 target size, the same floor as the
+ * resources shelf — and the language note stays inside the underline because it
+ * is part of the link text.
+ */
+#oc-chapter .oc-ch-program-links {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0.7rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter .oc-ch-program-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--sage) 70%, transparent);
+  text-underline-offset: 3px;
+}
+
+#oc-chapter .oc-ch-program-links a:hover,
+#oc-chapter .oc-ch-program-links a:focus-visible {
+  text-decoration-color: var(--sage-deep);
+}
+
+/*
+ * The French draft marker above those links is a badge, not body copy: without
+ * this the band card's own paragraph rule would resize and recolour it, and sit
+ * it flush against the sentence above. Seen only on development and preview.
+ */
+#oc-chapter .oc-ch-program .oc-fig-draft {
+  margin-top: 0.7rem;
+  font-size: 0.8rem;
+  color: inherit;
+}
+
+/*
+ * Recovery map (C03). It takes the programs band's slot on chapter 01, on the
+ * same ground, so the page keeps its rhythm.
+ *
+ * The rail down the side is a spine, not a progress bar: no fill, no marker,
+ * no "you are here". The "My ostomy" filter hides lines with
+ * hidden="until-found", never display:none, so find-in-page still reaches
+ * them — nothing here may set display on a [hidden] node.
+ */
+#oc-chapter .oc-ch-recovery {
+  padding: 2rem 0 calc(var(--ch-overlap) + 3.5rem);
+  background: color-mix(in srgb, var(--sage) 40%, var(--cream));
+}
+
+#oc-chapter .oc-ch-recovery .oc-fig-exit {
+  margin-bottom: 1rem;
+}
+
+#oc-chapter .oc-ch-recovery-controls {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: 1.1rem;
+}
+
+#oc-chapter .oc-ch-recovery-filter {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+#oc-chapter .oc-ch-recovery-filter legend {
+  padding: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+#oc-chapter .oc-ch-recovery-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.1rem;
+}
+
+#oc-chapter .oc-ch-recovery-checks label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+#oc-chapter .oc-ch-recovery-checks input {
+  flex: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  accent-color: var(--sage-text);
+}
+
+#oc-chapter .oc-ch-recovery-checks input:focus-visible,
+#oc-chapter .oc-ch-recovery-sources summary:focus-visible,
+#oc-chapter .oc-ch-recovery-sources a:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 3px;
+}
+
+#oc-chapter .oc-ch-recovery-status {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-ch-recovery-stages {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter .oc-ch-recovery-stages::before {
+  content: '';
+  position: absolute;
+  left: 0.34rem;
+  top: 1rem;
+  bottom: 1rem;
+  width: 2px;
+  background: var(--sage-deep);
+  opacity: 0.35;
+}
+
+#oc-chapter .oc-ch-recovery-stage {
+  position: relative;
+  margin: 0 0 0.6rem 1.5rem;
+  padding: 0.85rem 1rem 0.3rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+}
+
+#oc-chapter .oc-ch-recovery-stage::before {
+  content: '';
+  position: absolute;
+  left: -1.43rem;
+  top: 1.05rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--sage-deep);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sage) 40%, var(--cream));
+}
+
+/* Stages that count from something other than surgery are drawn open, not filled. */
+#oc-chapter .oc-ch-recovery-stage.is-none::before,
+#oc-chapter .oc-ch-recovery-stage.is-discharge::before {
+  background: var(--cream);
+  border: 2px dashed var(--sage-deep);
+}
+
+#oc-chapter .oc-ch-recovery-stage.is-discharge {
+  border-style: dashed;
+}
+
+#oc-chapter .oc-ch-recovery-stage h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+#oc-chapter .oc-ch-recovery-stage h3 small {
+  display: block;
+  margin-top: 0.15rem;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: color-mix(in srgb, var(--ink) 70%, transparent);
+}
+
+#oc-chapter .oc-ch-recovery-lanes {
+  margin: 0.65rem 0 0;
+}
+
+#oc-chapter .oc-ch-recovery-lane {
+  margin-top: 0.55rem;
+}
+
+#oc-chapter .oc-ch-recovery-lane:first-child {
+  margin-top: 0;
+}
+
+#oc-chapter .oc-ch-recovery-lanes dt {
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-ch-recovery-lanes dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.95rem;
+  color: rgba(42, 50, 44, 0.85);
+}
+
+#oc-chapter .oc-ch-recovery-type {
+  display: inline-block;
+  margin-right: 0.35rem;
+  padding: 0 0.35rem;
+  border-radius: 5px;
+  background: var(--sage-soft);
+  color: var(--sage-text);
+  font-size: 0.74rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* A hidden line keeps no space of its own: content-visibility leaves its box in flow. */
+#oc-chapter .oc-ch-recovery-lane[hidden='until-found'],
+#oc-chapter .oc-ch-recovery-lanes dd[hidden='until-found'] {
+  margin: 0;
+}
+
+#oc-chapter .oc-ch-recovery-empty {
+  margin: 0.6rem 0 0;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: color-mix(in srgb, var(--ink) 70%, transparent);
+}
+
+#oc-chapter .oc-ch-recovery-sources {
+  margin-top: 0.3rem;
+}
+
+/* The site's list reset takes the disclosure triangle off summary; put it back. */
+#oc-chapter .oc-ch-recovery-sources summary {
+  display: list-item;
+  min-height: 44px;
+  padding: 0.75rem 0 0.4rem;
+  font-size: 0.85rem;
+  color: var(--sage-text);
+  cursor: pointer;
+  list-style: disclosure-closed inside;
+}
+
+#oc-chapter .oc-ch-recovery-sources[open] > summary {
+  list-style-type: disclosure-open;
+}
+
+#oc-chapter .oc-ch-recovery-sources ul {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0 0 0.6rem;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
+}
+
+#oc-chapter .oc-ch-recovery-sources a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+#oc-chapter .oc-ch-recovery-foot {
+  margin-top: 1rem;
+}
+
+@media (min-width: 700px) {
+  #oc-chapter .oc-ch-recovery-lane {
+    display: grid;
+    grid-template-columns: minmax(7rem, 9rem) minmax(0, 1fr);
+    column-gap: 1rem;
+  }
+
+  #oc-chapter .oc-ch-recovery-lanes dt {
+    grid-column: 1;
+    padding-top: 0.15rem;
+  }
+
+  #oc-chapter .oc-ch-recovery-lanes dd {
+    grid-column: 2;
+    margin-top: 0;
+  }
+
+  #oc-chapter .oc-ch-recovery-lanes dd + dd {
+    margin-top: 0.25rem;
+  }
+}
+
 /* Pharmacist */
 #oc-chapter .oc-ch-care-cta {
   padding: 2rem 0 calc(var(--ch-overlap) + 3.5rem);
@@ -764,6 +1055,116 @@
 }
 
 /* =========================================================================
+ * Resources shelf (C14) — outward links, grouped by the kind of help
+ *
+ * Deliberately plain: four small cards, a symbol and a short list each. It is
+ * not a product grid and must never read like one, so there are no images, no
+ * hover lift and no call-to-action buttons. Every link leaves Liivv, and the
+ * line under each one says whose site it is.
+ * ========================================================================= */
+
+#oc-chapter .oc-ch-shelf {
+  padding: 2rem 0 calc(var(--ch-overlap) + 3.5rem);
+  background: var(--paper);
+}
+
+#oc-chapter .oc-ch-shelf .oc-ch-care-head {
+  max-width: 62ch;
+  margin-bottom: 1.5rem;
+}
+
+#oc-chapter .oc-ch-shelf .oc-ch-care-head h2 {
+  margin: 0.4rem 0 0;
+  font-size: clamp(1.5rem, 3.2vw, 2rem);
+}
+
+#oc-chapter .oc-ch-shelf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 0.75rem;
+}
+
+#oc-chapter .oc-ch-shelf-group {
+  padding: 1rem 1.1rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--cream);
+}
+
+#oc-chapter .oc-ch-shelf-group h3 {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-ch-shelf-group ul {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+/*
+ * Each shelf link is the whole of its own line inside a list item, so the
+ * inline exception to WCAG 2.2 target size does not apply: it carries the same
+ * 44px floor as every other link added with it (.oc-fig-lane-link a,
+ * .oc-fig-steps-find a, .oc-fig-supply-golink a). A one-line title would
+ * otherwise be about 22px tall, and a title only clears the floor by the
+ * accident of wrapping onto a second line.
+ */
+#oc-chapter .oc-ch-shelf-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--font-heading);
+  font-size: 1.02rem;
+  line-height: 1.25;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--sage) 70%, transparent);
+  text-underline-offset: 3px;
+}
+
+#oc-chapter .oc-ch-shelf-link:hover,
+#oc-chapter .oc-ch-shelf-link:focus-visible {
+  text-decoration-color: var(--sage-deep);
+}
+
+/* The language note is part of the link text, so it stays inside the underline. */
+#oc-chapter .oc-ch-shelf-lang {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+}
+
+#oc-chapter .oc-ch-shelf-org {
+  margin: 0.25rem 0 0;
+  font-size: 0.7rem;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-ch-shelf-body {
+  margin: 0.3rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--ink) 74%, var(--cream));
+}
+
+#oc-chapter .oc-ch-shelf-note {
+  color: color-mix(in srgb, var(--ink) 60%, var(--cream));
+}
+
+/* =========================================================================
  * Cross-vertical discovery — the way out of the microsite
  * ========================================================================= */
 
@@ -878,6 +1279,15 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  font-size: 0.86rem;
+}
+
+/* Back to the per-stage disclosures in the soft map. A 44px row, like them. */
+#oc-chapter .oc-ch-sources-back {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  margin: 0;
   font-size: 0.86rem;
 }
 
@@ -1110,6 +1520,31 @@
   color: color-mix(in srgb, var(--ink) 76%, transparent);
 }
 
+/*
+ * Deep-link targets land below the sticky site header rather than under it:
+ * cards (#card-N), the red flags, and the module anchors other pages and
+ * modules link to (recovery map, resource shelf, supply list, change steps).
+ *
+ * The header is `.liivv-archive-header`: the site chrome (140px) plus the
+ * "Back to Ostomy Care page" bar (45px), sticky at top 0 and the same 185px at
+ * every width. 6.5rem left a card's group label, title and first sentence
+ * behind it — the gap link from Chapter 01's walk-through landed on a card 9
+ * whose title a reader could not see. 12rem clears the bar with a little room.
+ */
+#oc-chapter .oc-ch-row,
+#oc-chapter #red-flags,
+#oc-chapter #recovery-map,
+#oc-chapter #chapter-shelf,
+#oc-chapter #oc-supply-list,
+#oc-chapter [id^='step-'] {
+  scroll-margin-top: 12rem;
+}
+
+/*
+ * Do not copy this [hidden] { display: none } pattern onto nodes that use
+ * hidden="until-found". It overrides the browser's content-visibility hiding,
+ * so find-in-page can no longer reveal the text and beforematch never fires.
+ */
 #oc-chapter .oc-ch-row-more[hidden] {
   display: none;
 }
@@ -1237,4 +1672,1884 @@
   font-size: 0.8rem;
   line-height: 1.5;
   color: color-mix(in srgb, var(--ink) 74%, transparent);
+}
+
+/* ---------------------------------------------------------------------------
+ * Chapter figures — approved on the Chapter 01 visual review, 2026-09-15.
+ *
+ * Tone rules, measured rather than eyeballed: clay text only on the urgent wash
+ * or on paper, never on sand; sage-deep never carries text; symbols always sit
+ * beside a text label. No animation anywhere in this block.
+ * ------------------------------------------------------------------------- */
+
+#oc-chapter .oc-fig-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+#oc-chapter .oc-fig-glyph {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#oc-chapter .oc-fig-heading {
+  font-family: var(--font-heading);
+  font-size: 1.12rem;
+  line-height: 1.25;
+  margin: 0;
+}
+
+#oc-chapter .oc-fig-detail {
+  margin: 0.45rem 0 0;
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--ink) 78%, transparent);
+}
+
+#oc-chapter .oc-fig-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.24rem 0.7rem 0.24rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+#oc-chapter .oc-fig-chip .oc-fig-glyph {
+  width: 18px;
+  height: 18px;
+  color: var(--sage-text);
+}
+
+/* Start-here map */
+
+#oc-chapter .oc-ch-starthere {
+  width: min(100%, var(--max));
+  margin: 0 auto 1rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+#oc-chapter .oc-fig-sline {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.6rem;
+}
+
+@media (min-width: 640px) {
+  #oc-chapter .oc-fig-sline {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: stretch;
+  }
+}
+
+#oc-chapter .oc-fig-seg {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 0.9rem 1rem;
+}
+
+#oc-chapter .oc-fig-seg-label {
+  margin: 0;
+  font-weight: 600;
+}
+
+#oc-chapter .oc-fig-seg ol {
+  margin: 0.5rem 0 0;
+  padding-left: 1.2rem;
+}
+
+#oc-chapter .oc-fig-seg li {
+  margin: 0.2rem 0;
+}
+
+#oc-chapter .oc-fig-seg a {
+  text-decoration: underline;
+  text-decoration-color: var(--sage);
+  text-underline-offset: 3px;
+}
+
+#oc-chapter .oc-fig-seg-ref {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-fig-pivot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#oc-chapter .oc-fig-pivot span {
+  font-family: var(--font-heading);
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: var(--sage-text);
+  color: var(--paper);
+}
+
+@media (min-width: 640px) {
+  #oc-chapter .oc-fig-pivot {
+    flex-direction: column;
+  }
+
+  #oc-chapter .oc-fig-pivot::before,
+  #oc-chapter .oc-fig-pivot::after {
+    content: '';
+    width: 2px;
+    flex: 1;
+    background: var(--sage-text);
+    opacity: 0.4;
+  }
+}
+
+#oc-chapter .oc-fig-caption {
+  margin: 0;
+  font-size: 0.92rem;
+  color: color-mix(in srgb, var(--ink) 78%, transparent);
+}
+
+/* Urgent signpost and crisis line */
+
+#oc-chapter .oc-fig-exit {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  background: var(--urgent-wash);
+  color: var(--urgent);
+  font-weight: 500;
+}
+
+#oc-chapter .oc-fig-exit a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+#oc-chapter .oc-fig-crisis {
+  margin-top: 0.8rem;
+  padding: 0.8rem 0.95rem;
+  border-left: 4px solid var(--urgent);
+  border-radius: 8px;
+  background: var(--urgent-wash);
+}
+
+#oc-chapter .oc-fig-crisis p {
+  margin: 0;
+}
+
+#oc-chapter .oc-fig-crisis-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+}
+
+#oc-chapter .oc-fig-crisis-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.4rem 0.95rem;
+  border-radius: 999px;
+  background: var(--urgent);
+  color: var(--paper);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Routes */
+
+#oc-chapter .oc-fig-routes {
+  margin-top: 0.9rem;
+}
+
+#oc-chapter .oc-fig-bracket {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-fig-both {
+  display: grid;
+  grid-template-columns: 5px minmax(0, 1fr);
+  gap: 0 0.75rem;
+  margin-top: 0.45rem;
+}
+
+#oc-chapter .oc-fig-bar {
+  border-radius: 3px;
+  background: var(--sage-text);
+  opacity: 0.45;
+}
+
+#oc-chapter .oc-fig-both ul {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter .oc-fig-route {
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--cream);
+}
+
+#oc-chapter .oc-fig-route > p:first-child {
+  margin: 0 0 0.45rem;
+}
+
+#oc-chapter .oc-fig-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* Criteria */
+
+#oc-chapter .oc-fig-criteria {
+  margin: 0.9rem 0 0;
+}
+
+#oc-chapter .oc-fig-criteria ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7.5rem), 1fr));
+  gap: 0.5rem;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter .oc-fig-criteria li {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  padding: 0.65rem 0.45rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--cream);
+  text-align: center;
+  font-size: 0.88rem;
+}
+
+#oc-chapter .oc-fig-criteria li .oc-fig-glyph {
+  width: 28px;
+  height: 28px;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-fig-criteria li.is-more {
+  border-style: dashed;
+}
+
+#oc-chapter .oc-fig-caprow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.9rem;
+  margin: 0.6rem 0 0;
+  font-size: 0.86rem;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-fig-caprow span + span::before {
+  content: '\00B7\00A0';
+}
+
+/* Take-in card */
+
+#oc-chapter .oc-fig-takein {
+  position: relative;
+  margin-top: 0.8rem;
+  padding: 1rem 1.1rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 10px 22px 10px 10px;
+  background: var(--cream);
+}
+
+#oc-chapter .oc-fig-takein::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 22px;
+  height: 22px;
+  border-radius: 0 22px 0 6px;
+  background: linear-gradient(225deg, var(--paper) 50%, var(--sand) 50%);
+}
+
+#oc-chapter .oc-fig-takein ol {
+  margin: 0.7rem 0 0;
+  padding-left: 1.25rem;
+}
+
+#oc-chapter .oc-fig-takein li {
+  margin-bottom: 0.65rem;
+}
+
+#oc-chapter .oc-fig-ruled {
+  display: block;
+  height: 1.4rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+}
+
+#oc-chapter .oc-fig-print {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  margin-top: 0.75rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--ink) 40%, transparent);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Columns, containers, lanes, doors */
+
+#oc-chapter .oc-fig-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}
+
+#oc-chapter .oc-fig-grid > section {
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--cream);
+}
+
+#oc-chapter .oc-fig-grid ul {
+  margin: 0.45rem 0 0;
+  padding-left: 1.05rem;
+}
+
+#oc-chapter .oc-fig-colhead,
+#oc-chapter .oc-fig-box-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+#oc-chapter .oc-fig-grid > section.oc-fig-box {
+  border: 1.5px solid color-mix(in srgb, var(--ink) 45%, transparent);
+}
+
+#oc-chapter .oc-fig-grid > section.oc-fig-box ul {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter .oc-fig-box li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+#oc-chapter .oc-fig-box li .oc-fig-glyph,
+#oc-chapter .oc-fig-box-label .oc-fig-glyph {
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-fig-neutral {
+  margin: 0.6rem 0 0;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px;
+  background: var(--sage-soft);
+}
+
+#oc-chapter .oc-fig-lanes-wrap {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}
+
+#oc-chapter .oc-fig-lanes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter .oc-fig-lane {
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--cream);
+}
+
+#oc-chapter .oc-fig-lane > p {
+  margin: 0.5rem 0 0;
+}
+
+/*
+ * Liivv's own service sits in a list of its own after the clinical lanes. The
+ * extra space and the rule above it are what say so on screen, beside the
+ * dashed border and the lane's own "A Liivv service" line — so the separation
+ * does not depend on the reader noticing a border style.
+ */
+#oc-chapter .oc-fig-lanes.is-service-row {
+  margin-top: 0.35rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+
+#oc-chapter .oc-fig-lane.is-service {
+  border-style: dashed;
+  background: transparent;
+}
+
+/*
+ * Who to ask — the optional topic filter (C09).
+ *
+ * Ticking a topic only marks the lanes that fit: the outline and the badge are
+ * the whole effect, and the badge carries a symbol and its own words so a mark
+ * is never colour alone. The badge is hidden with the `hidden` attribute, so
+ * its `display` is set on `:not([hidden])` — an author `display` on a hidden
+ * node would override the browser's own rule and show it.
+ */
+
+#oc-chapter .oc-fig-topics-wrap {
+  display: grid;
+  gap: 0.45rem;
+}
+
+#oc-chapter .oc-fig-topics {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+#oc-chapter .oc-fig-topics legend {
+  padding: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+#oc-chapter .oc-fig-topics-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.1rem;
+}
+
+#oc-chapter .oc-fig-topics-checks label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+#oc-chapter .oc-fig-topics-checks input {
+  flex: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  accent-color: var(--sage-text);
+}
+
+#oc-chapter .oc-fig-topics-checks input:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 3px;
+}
+
+#oc-chapter .oc-fig-topics-status {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-fig-lane.is-match {
+  border: 2px solid var(--sage-text);
+  padding: calc(0.75rem - 1px) calc(0.85rem - 1px);
+}
+
+#oc-chapter .oc-fig-fits {
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: 0.4rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--sage-text);
+  color: var(--paper);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+#oc-chapter .oc-fig-fits:not([hidden]) {
+  display: inline-flex;
+}
+
+#oc-chapter .oc-fig-fits .oc-fig-glyph {
+  width: 0.9rem;
+  height: 0.9rem;
+  color: inherit;
+}
+
+#oc-chapter .oc-fig-lane-link {
+  margin: 0.45rem 0 0;
+  font-size: 0.88rem;
+}
+
+#oc-chapter .oc-fig-lane-link a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+#oc-chapter .oc-fig-scope {
+  font-size: 0.82rem;
+  color: color-mix(in srgb, var(--ink) 72%, transparent);
+}
+
+#oc-chapter .oc-fig-doors {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.8rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter .oc-fig-doors a {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--cream);
+  color: inherit;
+  text-decoration: none;
+}
+
+#oc-chapter .oc-fig-doors a:hover {
+  border-color: var(--chapter-accent);
+}
+
+#oc-chapter .oc-fig-doors a .oc-fig-glyph {
+  color: var(--sage-text);
+  margin-top: 2px;
+}
+
+#oc-chapter .oc-fig-doors b {
+  font-weight: 600;
+}
+
+/*
+ * Opening gap comparison (C07).
+ *
+ * The drawings carry every colour here rather than in the markup, so one place
+ * sets them and none of the three panels can be given a different treatment
+ * from the others. Nothing is highlighted and no panel is marked correct: all
+ * three use the same fills, the same strokes and the same box.
+ *
+ * Both stoma shapes are in the server HTML. The oval set is hidden until the
+ * toggle island puts `.is-oval` on the wrapper, so with no JavaScript the
+ * round drawings are what shows.
+ */
+
+#oc-chapter .oc-fig-gap-wrap {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 0.8rem;
+}
+
+#oc-chapter .oc-fig-gap-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+}
+
+#oc-chapter .oc-fig-gap-note {
+  flex: 1 1 14rem;
+  margin: 0;
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--ink) 80%, transparent);
+}
+
+#oc-chapter .oc-fig-gap-controls {
+  display: grid;
+  justify-items: start;
+  gap: 0.25rem;
+}
+
+#oc-chapter .oc-fig-gap-seg {
+  display: inline-flex;
+  border: 1.5px solid var(--sage-deep);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+#oc-chapter .oc-fig-gap-btn {
+  min-height: 44px;
+  padding: 0.35rem 1.1rem;
+  border: 0;
+  background: var(--paper);
+  color: var(--sage-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#oc-chapter .oc-fig-gap-btn[aria-pressed='true'] {
+  background: var(--sage-deep);
+  color: var(--paper);
+}
+
+#oc-chapter .oc-fig-gap-btn:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: -4px;
+}
+
+/*
+ * The pressed button is filled with --sage-deep, so a --sage-deep ring drawn on
+ * it is the same colour as its own background and there is no indicator at all
+ * — and "Round" is pressed from the start, so it is the first tab stop in the
+ * group. The offset has to stay negative, because .oc-fig-gap-seg clips with
+ * `overflow: hidden`, so the ring goes white on the filled button instead:
+ * 4.65:1 against --sage-deep, well over the 3:1 floor. WCAG 2.1 SC 2.4.7.
+ */
+#oc-chapter .oc-fig-gap-btn[aria-pressed='true']:focus-visible {
+  outline-color: var(--paper);
+}
+
+#oc-chapter .oc-fig-gap-status {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-fig-gap-panels {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter .oc-fig-gap-panels > li {
+  margin: 0;
+  padding: 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+}
+
+#oc-chapter .oc-fig-gap-panels b {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+#oc-chapter .oc-fig-gap-panels p {
+  margin: 0.2rem 0 0;
+  font-size: 0.88rem;
+}
+
+#oc-chapter .oc-fig-gap-more {
+  margin: 0;
+  font-size: 0.88rem;
+  color: color-mix(in srgb, var(--ink) 80%, transparent);
+}
+
+#oc-chapter .oc-fig-gap-svg {
+  display: block;
+  width: 100%;
+  max-height: 190px;
+  height: auto;
+}
+
+#oc-chapter .oc-fig-gap-bg {
+  fill: var(--cream);
+}
+
+#oc-chapter .oc-fig-gap-skin-bg {
+  fill: color-mix(in srgb, var(--sand) 55%, var(--paper));
+}
+
+/* Dark enough that the exposed-skin hatch itself clears 3:1 on its own ground. */
+#oc-chapter .oc-fig-gap-skin-line {
+  stroke: color-mix(in srgb, var(--taupe) 55%, var(--ink));
+  stroke-width: 2;
+}
+
+#oc-chapter .oc-fig-gap-stoma {
+  fill: color-mix(in srgb, var(--sage) 22%, var(--paper));
+  stroke: var(--sage-deep);
+  stroke-width: 2.5;
+}
+
+#oc-chapter .oc-fig-gap-barrier {
+  fill: var(--paper);
+  stroke: color-mix(in srgb, var(--ink) 58%, var(--paper));
+  stroke-width: 1.5;
+}
+
+/* Where the barrier covers the stoma's edge, the edge still shows. */
+#oc-chapter .oc-fig-gap-under {
+  fill: none;
+  stroke: var(--sage-deep);
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+}
+
+#oc-chapter .oc-fig-gap-shape-oval {
+  display: none;
+}
+
+#oc-chapter .oc-fig-gap-wrap.is-oval .oc-fig-gap-shape-oval {
+  display: inline;
+}
+
+#oc-chapter .oc-fig-gap-wrap.is-oval .oc-fig-gap-shape-round {
+  display: none;
+}
+
+/*
+ * Parts of a pouching system (C08). HELD — see chapters-meta.ts; nothing below
+ * renders until the written ruling lifts the hold.
+ *
+ * Both systems and all three pouch outlines are in the server HTML. The
+ * two-piece drainable pair is what shows with no JavaScript; the view segments
+ * put `.is-one`, `.is-closed` or `.is-uro` on the wrapper and the rules below
+ * swap which outlines are drawn. Nothing here carries information on its own:
+ * the terms list beside the drawing says everything, so a printer that drops
+ * backgrounds, or a browser with no CSS, loses nothing.
+ *
+ * Every colour is set here rather than in the markup, so the barrier and the
+ * pouch cannot be given different treatments from one another, and no part can
+ * be made to stand out as the one to buy.
+ */
+
+#oc-chapter .oc-fig-parts-wrap {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 0.8rem;
+}
+
+#oc-chapter .oc-fig-parts-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.8rem;
+}
+
+#oc-chapter .oc-fig-parts-seg {
+  display: inline-flex;
+  border: 1.5px solid var(--sage-deep);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+#oc-chapter .oc-fig-parts-btn {
+  min-height: 44px;
+  padding: 0.35rem 1rem;
+  border: 0;
+  background: var(--paper);
+  color: var(--sage-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#oc-chapter .oc-fig-parts-btn[aria-pressed='true'] {
+  background: var(--sage-deep);
+  color: var(--paper);
+}
+
+#oc-chapter .oc-fig-parts-btn:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: -4px;
+}
+
+/* Same as the gap toggle above, and for the same reason. C08 is held today, so
+ * this is here to stop the bug shipping the moment the hold lifts. */
+#oc-chapter .oc-fig-parts-btn[aria-pressed='true']:focus-visible {
+  outline-color: var(--paper);
+}
+
+#oc-chapter .oc-fig-parts-status {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-fig-parts {
+  display: grid;
+  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+  align-items: start;
+  gap: 0.75rem 1rem;
+}
+
+#oc-chapter .oc-fig-parts-svg {
+  display: block;
+  width: 100%;
+  max-height: 200px;
+  height: auto;
+  padding: 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--cream);
+}
+
+#oc-chapter .oc-fig-parts-terms {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+#oc-chapter .oc-fig-parts-terms dt {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+#oc-chapter .oc-fig-parts-terms dd {
+  margin: 0.1rem 0 0;
+  font-size: 0.88rem;
+  color: color-mix(in srgb, var(--ink) 85%, transparent);
+}
+
+#oc-chapter .oc-fig-parts-barrier,
+#oc-chapter .oc-fig-parts-pouch,
+#oc-chapter .oc-fig-parts-tap {
+  fill: var(--paper);
+  stroke: color-mix(in srgb, var(--ink) 58%, var(--paper));
+  stroke-width: 2;
+}
+
+#oc-chapter .oc-fig-parts-tap {
+  stroke-width: 1.5;
+}
+
+#oc-chapter .oc-fig-parts-stoma {
+  fill: color-mix(in srgb, var(--sage) 22%, var(--paper));
+  stroke: var(--sage-deep);
+  stroke-width: 2;
+}
+
+/* Where the two parts meet, as an outline and nothing else: no ring, no tab. */
+#oc-chapter .oc-fig-parts-seam {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ink) 58%, var(--paper));
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+
+#oc-chapter .oc-fig-parts-arrow {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ink) 58%, var(--paper));
+  stroke-width: 1.5;
+}
+
+#oc-chapter .oc-fig-parts-arrowhead {
+  fill: color-mix(in srgb, var(--ink) 58%, var(--paper));
+}
+
+/* Two-piece and drainable are what the server HTML shows. */
+#oc-chapter .oc-fig-parts-sys-one,
+#oc-chapter .oc-fig-parts-pouch-closed,
+#oc-chapter .oc-fig-parts-tap {
+  display: none;
+}
+
+#oc-chapter .oc-fig-parts-wrap.is-one .oc-fig-parts-sys-one {
+  display: inline;
+}
+
+#oc-chapter .oc-fig-parts-wrap.is-one .oc-fig-parts-sys-two {
+  display: none;
+}
+
+#oc-chapter .oc-fig-parts-wrap.is-closed .oc-fig-parts-pouch-closed {
+  display: inline;
+}
+
+#oc-chapter .oc-fig-parts-wrap.is-closed .oc-fig-parts-pouch-open {
+  display: none;
+}
+
+#oc-chapter .oc-fig-parts-wrap.is-uro .oc-fig-parts-sys .oc-fig-parts-tap {
+  display: inline;
+}
+
+/*
+ * Bowel reference still (C04).
+ *
+ * The picture and the list of part names sit side by side from 640px and stack
+ * below it, so the numbered markers on the picture never share a line with the
+ * names they point at — at 320px the picture is above the list, full width,
+ * and nothing overlaps. The markers are positioned from percentages measured
+ * off the render (anatomy-meta.ts), so they hold at every width the picture is
+ * served at and need no recalculation here.
+ *
+ * Nothing in this block is load-bearing. The marker numbers are `aria-hidden`
+ * pointers into an <ol> whose own numbering says the same thing, so a printer
+ * that drops backgrounds, or a browser with no CSS, loses nothing but the
+ * pointing.
+ */
+
+#oc-chapter .oc-fig-anatomy {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0.8rem 0 0;
+  break-inside: avoid;
+}
+
+#oc-chapter .oc-fig-anatomy-body {
+  display: grid;
+  gap: 0.9rem;
+  align-items: start;
+}
+
+/*
+ * The picture takes 18rem, but never more than half the row.
+ *
+ * `18rem` scales with the reader's font size while the row does not, so a bare
+ * `minmax(0, 18rem)` asks for 576px at a 200% root — and at 640px wide that
+ * starves the names track to nothing. The eight organ names are the whole
+ * payload of this figure (the numbers on the picture only point at them), and
+ * they were being clipped, not scrolled, by an ancestor with `overflow-x:
+ * clip`. WCAG 2.1 SC 1.4.4. The cap costs nothing at a normal root size, where
+ * half the row is wider than 18rem at every width this query applies to.
+ */
+@media (min-width: 640px) {
+  #oc-chapter .oc-fig-anatomy-body {
+    grid-template-columns: minmax(0, min(18rem, 50%)) minmax(0, 1fr);
+  }
+}
+
+/*
+ * The positioning context for the markers. `max-width` is the upper bound that
+ * `sizes` in bowel-reference-figure.tsx promises the browser, so the two have to
+ * move together: a wider box here would have phones downloading a file for a box
+ * they never draw. The 50% cap in the track above only ever makes the drawn box
+ * narrower than this, so it cannot break that promise.
+ */
+#oc-chapter .oc-fig-anatomy-frame {
+  position: relative;
+  width: 100%;
+  max-width: 18rem;
+  margin-inline: auto;
+}
+
+#oc-chapter .oc-fig-anatomy-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+#oc-chapter .oc-fig-anatomy-marks {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/*
+ * One marker. The ring in the page's own background colour lifts it off the
+ * drawing whatever it lands on, and the number is cream on ink, which clears
+ * 4.5:1 at this size — the markers are small, but they are the thing that ties
+ * the picture to the list and are not decoration to a sighted reader.
+ */
+#oc-chapter .oc-fig-anatomy-mark {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.2rem;
+  border: 2px solid var(--paper);
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--cream);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+#oc-chapter .oc-fig-anatomy-names {
+  display: grid;
+  gap: 0.45rem;
+}
+
+#oc-chapter .oc-fig-anatomy-parts-h {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--sage-deep);
+}
+
+#oc-chapter .oc-fig-anatomy-parts {
+  margin: 0;
+  padding-left: 1.4rem;
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.95rem;
+}
+
+#oc-chapter .oc-fig-anatomy-orient {
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--ink) 78%, transparent);
+}
+
+#oc-chapter .oc-fig-anatomy-caption {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+#oc-chapter .oc-fig-anatomy-caption p {
+  margin: 0;
+}
+
+/*
+ * The credit. Small, because it is not what the reader came for, but never
+ * faint: it is an attribution the licence requires, so it keeps a text colour
+ * that clears 4.5:1 on the card's white rather than dropping to `--taupe`.
+ */
+#oc-chapter .oc-fig-anatomy-credit {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--ink) 78%, transparent);
+}
+
+/*
+ * The licence link inside that credit. It is the one link in the figure and the
+ * one the licence asks for, so it cannot look like the words around it: the
+ * page's own `#oc-chapter a { color: inherit }` and Tailwind's preflight
+ * (`a { text-decoration: inherit }`) between them leave it with no cue at all,
+ * and colour alone would not be one either (WCAG 2.1 SC 1.4.1). The underline
+ * is the cue; the full-strength ink lifts it off the 78% text around it. Same
+ * treatment as `.oc-ch-program-links a` and `.oc-ch-shelf-link`, at the 2px
+ * offset this smaller type wants.
+ */
+#oc-chapter .oc-fig-anatomy-credit a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--sage) 70%, transparent);
+  text-underline-offset: 2px;
+}
+
+#oc-chapter .oc-fig-anatomy-credit a:hover,
+#oc-chapter .oc-fig-anatomy-credit a:focus-visible {
+  text-decoration-color: var(--sage-deep);
+}
+
+/*
+ * Lower-fibre clocks (C11).
+ *
+ * The bar's track and its rounded ends are here rather than in the drawing, so
+ * the SVG stretches to any row width without distorting them. The drawing
+ * carries only the fade, in `currentColor` from the row, so both bars can never
+ * be given different treatments — they exist to be compared.
+ *
+ * Nothing here is load-bearing: each row's weeks are in its sentence in words,
+ * so a printer that drops backgrounds, or a browser with no CSS, loses no
+ * information.
+ */
+
+#oc-chapter .oc-fig-clocks-wrap {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 0.8rem;
+}
+
+#oc-chapter .oc-fig-clocks-note {
+  margin: 0;
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--sand);
+  font-size: 0.92rem;
+}
+
+#oc-chapter .oc-fig-clocks {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter .oc-fig-clocks > li {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--sage-deep);
+  break-inside: avoid;
+}
+
+#oc-chapter .oc-fig-clocks b {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+#oc-chapter .oc-fig-clocks p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+#oc-chapter .oc-fig-clock-bar {
+  width: 100%;
+  height: 0.85rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sand) 55%, var(--cream));
+}
+
+/*
+ * The scale under the bar. It is hidden from assistive technology with the bar
+ * it labels, but it is the only thing that tells a sighted reader what the
+ * bars are measured against, so it is not decoration and has to clear 4.5:1 at
+ * this size: the file's muted-text mix on `--paper` (about 5.4:1), never
+ * `--taupe`, which is 2.7:1 on white.
+ */
+#oc-chapter .oc-fig-clock-axis {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--ink) 72%, transparent);
+}
+
+/*
+ * Pouch change walk-through (C01).
+ *
+ * The controls hide text with hidden="until-found", never display:none, so
+ * find-in-page still reaches it: nothing here may set display on a [hidden]
+ * node. `.oc-ch-row ul` is a grid, which would keep a gap for every hidden
+ * sentence, so the step lists go back to block layout. No transitions.
+ */
+
+#oc-chapter .oc-fig-steps-wrap {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.8rem;
+}
+
+#oc-chapter .oc-fig-draft {
+  justify-self: start;
+  margin: 0;
+  padding: 0.2rem 0.65rem;
+  border: 1px dashed color-mix(in srgb, var(--ink) 45%, transparent);
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+#oc-chapter .oc-fig-steps-framing {
+  display: grid;
+  gap: 0.4rem;
+}
+
+#oc-chapter .oc-fig-steps-framing p {
+  margin: 0;
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--sand);
+  font-size: 0.92rem;
+}
+
+#oc-chapter .oc-fig-steps-controls {
+  display: grid;
+  gap: 0.45rem;
+}
+
+#oc-chapter .oc-fig-steps-filter {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+#oc-chapter .oc-fig-steps-filter legend {
+  padding: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+#oc-chapter .oc-fig-steps-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.1rem;
+}
+
+#oc-chapter .oc-fig-steps-checks label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+#oc-chapter .oc-fig-steps-checks input {
+  flex: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  accent-color: var(--sage-text);
+}
+
+#oc-chapter .oc-fig-steps-status {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-fig-steps-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.8rem;
+}
+
+#oc-chapter .oc-fig-steps-hint {
+  font-size: 0.88rem;
+  color: color-mix(in srgb, var(--ink) 78%, transparent);
+}
+
+/* The same 44px button as .oc-fig-print. */
+#oc-chapter .oc-fig-steps-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--ink) 40%, transparent);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#oc-chapter .oc-fig-steps-btn.is-solid {
+  border-color: var(--sage-text);
+  background: var(--sage-text);
+  color: var(--paper);
+}
+
+#oc-chapter .oc-fig-steps-btn[aria-pressed='true'] {
+  border: 2px solid var(--sage-text);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+#oc-chapter .oc-fig-steps-btn:focus-visible,
+#oc-chapter .oc-fig-steps-checks input:focus-visible,
+#oc-chapter .oc-fig-steps h4:focus-visible,
+#oc-chapter .oc-fig-steps-find a:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 3px;
+}
+
+#oc-chapter .oc-fig-steps {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter .oc-fig-steps > li {
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--cream);
+}
+
+#oc-chapter .oc-fig-steps h4 {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
+#oc-chapter .oc-fig-steps-n {
+  color: var(--sage-text);
+  font-variant-numeric: tabular-nums;
+}
+
+#oc-chapter .oc-fig-steps-lead {
+  margin: 0.4rem 0 0;
+  font-weight: 500;
+}
+
+#oc-chapter .oc-fig-steps-body ul {
+  display: block;
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+}
+
+#oc-chapter .oc-fig-steps-body li {
+  margin-top: 0.25rem;
+}
+
+#oc-chapter .oc-fig-steps-body li[hidden='until-found'] {
+  margin-top: 0;
+}
+
+#oc-chapter .oc-fig-steps.is-walking > li:not(.is-current) {
+  padding-block: 0.4rem;
+  background: transparent;
+}
+
+#oc-chapter .oc-fig-steps.is-walking > li:not(.is-current) h4 {
+  font-weight: 500;
+  color: color-mix(in srgb, var(--ink) 78%, transparent);
+}
+
+#oc-chapter .oc-fig-steps.is-walking > li.is-current {
+  border: 2px solid var(--sage-text);
+  background: var(--paper);
+}
+
+#oc-chapter .oc-fig-steps-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--line);
+}
+
+#oc-chapter .oc-fig-steps-find {
+  margin: 0;
+}
+
+#oc-chapter .oc-fig-steps-find a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+#oc-chapter .oc-fig-steps-tell {
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--cream);
+}
+
+#oc-chapter .oc-fig-steps-tell-head {
+  margin: 0;
+  font-weight: 600;
+}
+
+#oc-chapter .oc-fig-steps-tell ul {
+  margin-top: 0.3rem;
+}
+
+/* ---------------------------------------------------------------------------
+ * My supply list (C02) — inside the shop band, never on the card's paper.
+ *
+ * It sits on the band ground like the product band it replaced, so a reader
+ * skimming can still tell the shop from the chapter without reading a word.
+ * Every row is at least 44px, every condition sits inside its own label, and
+ * no row has room for a price, an image or a brand.
+ * ------------------------------------------------------------------------- */
+
+#oc-chapter .oc-fig-supply {
+  margin: 0.7rem 0 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+
+#oc-chapter .oc-fig-supply-head {
+  padding: 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+#oc-chapter .oc-fig-supply-intro {
+  margin: 0.3rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--ink) 80%, transparent);
+}
+
+#oc-chapter .oc-fig-supply-group {
+  margin: 0.8rem 0 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+
+#oc-chapter .oc-fig-supply-group > legend {
+  padding: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 72%, transparent);
+}
+
+#oc-chapter .oc-fig-supply-systems {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1rem;
+  margin-top: 0.35rem;
+}
+
+#oc-chapter .oc-fig-supply-systems label,
+#oc-chapter .oc-fig-supply-check,
+#oc-chapter .oc-fig-supply-remember {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+#oc-chapter .oc-fig-supply-check {
+  align-items: flex-start;
+  padding-block: 0.35rem;
+}
+
+/*
+ * The same control as the other three filters on this chapter. The tick box a
+ * reader is meant to fill in was the only one left at the browser's default
+ * size and blue accent, which read as a different kind of thing.
+ */
+#oc-chapter .oc-fig-supply-check input,
+#oc-chapter .oc-fig-supply-systems input,
+#oc-chapter .oc-fig-supply-remember input {
+  flex: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  accent-color: var(--sage-text);
+}
+
+/* The rows here can run to two lines, so this one sits with the first. */
+#oc-chapter .oc-fig-supply-check input {
+  margin-top: 0.2rem;
+}
+
+#oc-chapter .oc-fig-supply-check small {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.8rem;
+  color: color-mix(in srgb, var(--ink) 74%, transparent);
+}
+
+/*
+ * The powder line. Normal contrast, not a whisper: it is the same kind of
+ * instruction as the rows above it, and only its lack of a tick box says that
+ * this one is not a thing to shop for.
+ */
+#oc-chapter .oc-fig-supply-plain {
+  margin: 0.45rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+#oc-chapter .oc-fig-supply-ask {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.2rem 0 0;
+  font-size: 0.84rem;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-fig-supply-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.9rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+}
+
+#oc-chapter .oc-fig-supply-item:last-of-type {
+  border-bottom: 0;
+}
+
+/* Quiet, and outside the label, so a tick target never doubles as a shop link. */
+#oc-chapter .oc-fig-supply-carry,
+#oc-chapter .oc-fig-supply-golink a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 0.82rem;
+  color: var(--sage-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+#oc-chapter .oc-fig-supply-golink {
+  margin: 0.3rem 0 0;
+}
+
+#oc-chapter .oc-fig-supply-field {
+  margin-top: 0.9rem;
+}
+
+#oc-chapter .oc-fig-supply-field label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+#oc-chapter .oc-fig-supply-field small {
+  display: block;
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: color-mix(in srgb, var(--ink) 74%, transparent);
+}
+
+#oc-chapter .oc-fig-supply-field input {
+  width: 100%;
+  max-width: 22rem;
+  min-height: 44px;
+  margin-top: 0.3rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--ink) 35%, transparent);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+
+/* Ruled space to write on. Paper only — see the print rules below. */
+#oc-chapter .oc-fig-supply-lines {
+  display: none;
+}
+
+#oc-chapter .oc-fig-supply-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.8rem;
+  margin-top: 0.9rem;
+}
+
+/* The same 44px button as .oc-fig-print. */
+#oc-chapter .oc-fig-supply-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--ink) 40%, transparent);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#oc-chapter .oc-fig-supply-status {
+  margin: 0.4rem 0 0;
+  font-size: 0.84rem;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-fig-supply-shop {
+  margin-top: 0.9rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--line);
+}
+
+#oc-chapter .oc-fig-supply-shop > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+
+/* Space kept for the catalogue answer, so the band does not jump when it lands. */
+#oc-chapter .oc-fig-supply-reserve {
+  min-height: 3.5rem;
+}
+
+#oc-chapter .oc-fig-supply-offers {
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter .oc-fig-supply-offers > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.8rem;
+  padding-block: 0.4rem;
+  font-size: 0.88rem;
+}
+
+#oc-chapter .oc-fig-supply-empty,
+#oc-chapter .oc-fig-supply-kits {
+  margin: 0.4rem 0 0;
+  font-size: 0.84rem;
+  color: color-mix(in srgb, var(--ink) 76%, transparent);
+}
+
+#oc-chapter .oc-fig-supply-kits ul {
+  margin: 0.2rem 0 0;
+  padding-left: 1.1rem;
+}
+
+#oc-chapter .oc-fig-supply-btn:focus-visible,
+#oc-chapter .oc-fig-supply input:focus-visible,
+#oc-chapter .oc-fig-supply a:focus-visible,
+#oc-chapter .oc-fig-supply-shop > summary:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 3px;
+}
+
+/* Print only the take-in card, or the supply list */
+
+@media print {
+  html.oc-printing body * {
+    visibility: hidden;
+  }
+
+  html.oc-printing [data-oc-printing],
+  html.oc-printing [data-oc-printing] * {
+    visibility: visible;
+  }
+
+  html.oc-printing [data-oc-printing] {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    border: 0;
+  }
+
+  /*
+   * Controls print as nothing: a paper list has no buttons, no shop section
+   * and no "Liivv sells some options for this". What is left is the list.
+   */
+  html.oc-printing .oc-fig-print,
+  html.oc-printing .oc-fig-supply-controls,
+  html.oc-printing .oc-fig-supply-shop,
+  html.oc-printing .oc-fig-supply-carry {
+    display: none;
+  }
+
+  html.oc-printing #oc-chapter .oc-fig-supply-lines {
+    display: block;
+    margin-top: 0.8rem;
+  }
+
+  html.oc-printing #oc-chapter .oc-fig-supply-lines span {
+    display: block;
+    height: 1.6rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+  }
+}
+
+/* The walk-through prints whole, whatever its controls were showing. */
+@media print {
+  #oc-chapter .oc-fig-steps [hidden='until-found'] {
+    display: block !important;
+    content-visibility: visible !important;
+  }
+
+  #oc-chapter .oc-fig-steps li li[hidden='until-found'] {
+    display: list-item !important;
+  }
+
+  #oc-chapter .oc-fig-steps-controls,
+  #oc-chapter .oc-fig-steps-nav {
+    display: none !important;
+  }
+}
+
+/* The lanes print as themselves: no tick boxes, and no marks from them. */
+@media print {
+  #oc-chapter .oc-fig-topics-wrap {
+    display: none !important;
+  }
+
+  #oc-chapter .oc-fig-lane.is-match {
+    border-width: 1px;
+  }
+}
+
+/* The recovery map prints whole, whatever the filter was showing. */
+@media print {
+  /*
+   * `display` is set as well as `content-visibility` because a browser without
+   * `hidden="until-found"` treats the attribute as a plain `hidden` and takes
+   * the element out with `display: none`.
+   */
+  #oc-chapter .oc-ch-recovery dd[hidden='until-found'] {
+    display: block !important;
+    content-visibility: visible !important;
+  }
+
+  #oc-chapter .oc-ch-recovery .oc-ch-recovery-lane[hidden='until-found'] {
+    display: block !important;
+    content-visibility: visible !important;
+  }
+
+  #oc-chapter .oc-ch-recovery-controls {
+    display: none !important;
+  }
+}
+
+/*
+ * …and a revealed lane keeps the two columns the lanes beside it print in.
+ * The rule above has to name `display` for the fallback, which would otherwise
+ * beat the grid rule this width sets.
+ */
+@media print and (min-width: 700px) {
+  #oc-chapter .oc-ch-recovery .oc-ch-recovery-lane[hidden='until-found'] {
+    display: grid !important;
+  }
+}
+
+/* The gap panels print with whichever shape is showing, and without the pair. */
+@media print {
+  #oc-chapter .oc-fig-gap-controls {
+    display: none !important;
+  }
+}
+
+/*
+ * Phones: one column. The 46px thumbnail beside every card left figures about
+ * 233px at 375px wide, which stacked the lanes and criteria into single tiles.
+ * The thumbnail moves above the card at a smaller size so figures get the full
+ * card width (about 300px).
+ */
+@media (max-width: 599px) {
+  #oc-chapter .oc-ch-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.6rem;
+    padding: 1rem;
+  }
+
+  #oc-chapter .oc-ch-row-thumb {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  /* Walk-through: one system per row, and step buttons that share the width. */
+  #oc-chapter .oc-fig-steps-checks {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #oc-chapter .oc-fig-steps > li {
+    padding: 0.65rem 0.75rem;
+  }
+
+  #oc-chapter .oc-fig-steps-nav .oc-fig-steps-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  /* Who to ask: one topic per row. */
+  #oc-chapter .oc-fig-topics-checks {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Recovery map: one ostomy type per row, and stage cards with less padding. */
+  #oc-chapter .oc-ch-recovery-checks {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Supply list: one system per row, and the shop link under its own item. */
+  #oc-chapter .oc-fig-supply-systems {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #oc-chapter .oc-fig-supply-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #oc-chapter .oc-fig-supply-carry {
+    padding-bottom: 0.3rem;
+  }
+
+  #oc-chapter .oc-ch-recovery-stage {
+    padding: 0.7rem 0.8rem 0.3rem;
+  }
+
+  /* Gap comparison: the three panels stack, so each drawing keeps its size. */
+  #oc-chapter .oc-fig-gap-panels {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #oc-chapter .oc-fig-gap-svg {
+    max-height: 210px;
+  }
+
+  /* Parts of a pouching system: the drawing sits above the terms, not beside. */
+  #oc-chapter .oc-fig-parts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #oc-chapter .oc-fig-parts-seg {
+    flex: 1 1 auto;
+  }
+
+  #oc-chapter .oc-fig-parts-btn {
+    flex: 1 1 auto;
+  }
 }

@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Bowel reference render</title>
+    <!--
+      Pinned exactly: three@0.170.0 from jsDelivr. The render has to be
+      reproducible, so nothing here resolves to "latest".
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+        }
+      }
+    </script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: transparent;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      /*
+       * Renders the two HRA reference-organ GLBs to one flat, transparent,
+       * orthographic front view, and measures where each named part sits in the
+       * frame so the page can put an HTML marker there.
+       *
+       * Nothing is drawn by hand and nothing is added: the geometry is the
+       * published model, recoloured, with three structures hidden. No stoma, no
+       * exit, no "this part is removed" shading — see the script header.
+       *
+       * The only words on the page are the ones the browser needs to load this
+       * file. The image itself carries no text at all: every label is HTML.
+       */
+      import * as THREE from 'three';
+      import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+      const P = new URLSearchParams(location.search);
+      const W = Number(P.get('w') || 1280);
+      const H = Number(P.get('h') || 1600);
+
+      /* Empty margin around the model, as a share of its own height. */
+      const PAD = 0.06;
+
+      /*
+       * The glTF node names each labelled part is made of. A part is one or
+       * more nodes: the ileum includes its terminal segment, and each colon
+       * limb includes the flexure at its far end, because a reader looking for
+       * "ascending colon" is looking at the whole limb and not at where the
+       * anatomists divide it.
+       */
+      const PARTS = {
+        jejunum: ['VH_M_jejunum'],
+        ileum: ['VH_M_ileum', 'VH_M_ileum_terminal'],
+        caecum: ['VH_M_caecum'],
+        ascending: ['VH_M_ascending_colon', 'VH_M_hepatic_flexure_of_colon'],
+        transverse: ['VH_M_transverse_colon'],
+        descending: ['VH_M_descending_colon', 'VH_M_splenic_flexure_of_colon'],
+        sigmoid: ['VH_M_sigmoid_colon'],
+        rectum: ['VH_M_rectum'],
+      };
+
+      const HIDE = new Set((P.get('hide') || '').split(',').filter(Boolean));
+
+      try {
+        const loader = new GLTFLoader();
+        const [large, small] = await Promise.all(
+          ['large', 'small'].map((k) => loader.loadAsync(`/glb/${k}.glb`)),
+        );
+        const scene = new THREE.Scene();
+        const group = new THREE.Group();
+
+        group.add(large.scene, small.scene);
+        scene.add(group);
+
+        /*
+         * Two flat, low-saturation tones, one per organ. Not tissue colours and
+         * not a colour code: nothing in the figure means anything by its colour,
+         * and every part is named in HTML beside it.
+         */
+        const meshes = [];
+        const tone = { large: 0xc9b29c, small: 0xa9b8a3 };
+
+        for (const [key, gltf] of [
+          ['large', large],
+          ['small', small],
+        ]) {
+          gltf.scene.traverse((o) => {
+            if (!o.isMesh) return;
+
+            let node = o;
+            let hidden = false;
+
+            while (node) {
+              if (HIDE.has(node.name)) hidden = true;
+              node = node.parent;
+            }
+
+            if (hidden) {
+              o.visible = false;
+
+              return;
+            }
+
+            o.material = new THREE.MeshStandardMaterial({
+              color: tone[key],
+              roughness: 0.65,
+              metalness: 0,
+            });
+            meshes.push(o);
+          });
+        }
+
+        group.updateMatrixWorld(true);
+
+        const box = new THREE.Box3();
+
+        meshes.forEach((m) => box.expandByObject(m));
+
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
+
+        /*
+         * Orthographic front view: the camera sits on +z (anterior) looking
+         * toward -z with +y up, which is glTF's own convention and what the two
+         * files were authored in. The body's left (+x) therefore lands on the
+         * image's right, as in any anterior view — which is what the caption
+         * beside the figure tells the reader.
+         *
+         * Orthographic rather than perspective so nothing nearer the camera is
+         * drawn larger: a perspective view would make the transverse colon look
+         * bigger than the descending colon for no anatomical reason.
+         */
+        const aspect = W / H;
+        let halfH = (size.y / 2) * (1 + PAD * 2);
+        let halfW = halfH * aspect;
+
+        if (halfW < (size.x / 2) * (1 + PAD * 2)) {
+          halfW = (size.x / 2) * (1 + PAD * 2);
+          halfH = halfW / aspect;
+        }
+
+        const camera = new THREE.OrthographicCamera(-halfW, halfW, halfH, -halfH, 0.001, 10);
+
+        camera.position.set(center.x, center.y, center.z + 2);
+        camera.lookAt(center);
+        scene.add(new THREE.HemisphereLight(0xffffff, 0xb9ad9f, 2.0));
+
+        const key = new THREE.DirectionalLight(0xffffff, 1.6);
+
+        key.position.set(0.4, 0.8, 1.0);
+        camera.add(key);
+        scene.add(camera);
+
+        const renderer = new THREE.WebGLRenderer({
+          antialias: true,
+          alpha: true,
+          preserveDrawingBuffer: true,
+        });
+
+        renderer.setPixelRatio(1);
+        renderer.setSize(W, H, false);
+        renderer.setClearColor(0x000000, 0);
+        document.body.appendChild(renderer.domElement);
+        renderer.render(scene, camera);
+
+        const png = renderer.domElement.toDataURL('image/png');
+
+        /*
+         * Marker pass. Every mesh is repainted a flat id colour and the frame is
+         * read back, so each part's marker sits on a pixel that part actually
+         * occupies — rather than on a centroid that can fall in the hole in the
+         * middle of a loop of bowel.
+         *
+         * three r170 converts hex colours from sRGB, so the id colours are built
+         * in linear space or the readback will not match what was written.
+         */
+        const ids = Object.keys(PARTS);
+
+        meshes.forEach((m) => {
+          let idx = -1;
+          let node = m;
+
+          while (node && idx < 0) {
+            const name = node.name;
+
+            idx = ids.findIndex((id) => PARTS[id].includes(name));
+            node = node.parent;
+          }
+
+          const colour = new THREE.Color().setRGB(
+            idx < 0 ? 1 : ((idx + 1) * 16) / 255,
+            idx < 0 ? 1 : 0,
+            idx < 0 ? 1 : 0,
+            THREE.LinearSRGBColorSpace,
+          );
+
+          m.material = new THREE.MeshBasicMaterial({ color: colour });
+        });
+
+        const target = new THREE.WebGLRenderTarget(W, H);
+
+        renderer.setRenderTarget(target);
+        renderer.setClearColor(0x000000, 1);
+        renderer.render(scene, camera);
+
+        const buf = new Uint8Array(W * H * 4);
+
+        renderer.readRenderTargetPixels(target, 0, 0, W, H, buf);
+        renderer.setRenderTarget(null);
+
+        const acc = ids.map(() => ({ sx: 0, sy: 0, n: 0, pts: [] }));
+
+        /* readRenderTargetPixels hands back rows bottom-up; `top` flips them. */
+        for (let y = 0; y < H; y++) {
+          for (let x = 0; x < W; x++) {
+            const i = (y * W + x) * 4;
+            const r = buf[i];
+
+            if (!r || buf[i + 1] || buf[i + 2] || r % 16) continue;
+
+            const k = r / 16 - 1;
+
+            if (k < 0 || k >= ids.length) continue;
+
+            const top = H - 1 - y;
+            const a = acc[k];
+
+            a.sx += x;
+            a.sy += top;
+            a.n++;
+
+            /* Every seventh pixel: enough to find a good anchor, small enough to hold. */
+            if ((x + top) % 7 === 0) a.pts.push([x, top]);
+          }
+        }
+
+        const markers = {};
+
+        ids.forEach((id, k) => {
+          const a = acc[k];
+
+          if (!a.n) {
+            markers[id] = null;
+
+            return;
+          }
+
+          const cx = a.sx / a.n;
+          const cy = a.sy / a.n;
+          let best = a.pts[0];
+          let bd = Infinity;
+
+          for (const p of a.pts) {
+            const d = (p[0] - cx) ** 2 + (p[1] - cy) ** 2;
+
+            if (d < bd) {
+              bd = d;
+              best = p;
+            }
+          }
+
+          markers[id] = {
+            x: +((best[0] / W) * 100).toFixed(1),
+            y: +((best[1] / H) * 100).toFixed(1),
+            visiblePx: a.n,
+          };
+        });
+
+        const gl = renderer.getContext();
+
+        /*
+         * The unmasked renderer, so the log can say whether this actually ran on
+         * SwiftShader. Without the debug extension every browser reports the
+         * same generic "WebKit WebGL", which would hide a GPU render — and a GPU
+         * render is the one thing that stops two machines agreeing.
+         */
+        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+
+        window.__result = {
+          png,
+          markers,
+          W,
+          H,
+          bboxMeters: size.toArray().map((v) => +v.toFixed(3)),
+          gl: gl.getParameter(gl.VERSION),
+          renderer: debugInfo
+            ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+            : gl.getParameter(gl.RENDERER),
+        };
+      } catch (e) {
+        window.__result = { error: String((e && e.stack) || e) };
+      }
+    </script>
+  </body>
+</html>

@@ -16,6 +16,9 @@ import { resolveBcCdnImageUrl } from '~/lib/resolve-bc-cdn-image-url';
 import {
   HERO_FLOAT_BARRIER_ID,
   HERO_FLOAT_POUCH_ID,
+  isListedOstomyKit,
+  isOstomyKit,
+  isWithheldOstomyId,
   NEW_JOURNEY_STARTER_KIT_ID,
   SHOP_OSTOMY_CARE_CATEGORY_ID,
 } from './oc-ids';
@@ -259,7 +262,29 @@ export const getOcCatalog = cache(async (locale?: string): Promise<OcCatalog> =>
       after = productConnection.pageInfo.endCursor;
     }
 
-    const all = [...byId.values()];
+    /*
+     * The one gate every Ostomy Care surface passes through. A curated kit is
+     * shown only if oc-ids.ts lists it, and a withheld id never appears even if
+     * the store stops marking it as a kit. Doing it here rather than at each
+     * call site is deliberate: the landing carousel, the featured kit, the shop
+     * rooms, the Liivv Health hub and the chapter product bands all read this
+     * one catalogue, so there is no second place to forget.
+     */
+    const all = [...byId.values()].filter((item) => {
+      if (isWithheldOstomyId(item.entityId)) return false;
+
+      /*
+       * By id first, then by the store's flag. `isKit` is read from the
+       * BigCommerce `kit_type` custom field, which is edited in an admin this
+       * repo does not control — so 8041, 8046 and 8048, which are not in the
+       * withheld list, would flow onto the shelf as ordinary products the day
+       * that field was dropped. Asking oc-ids.ts first makes the comment above
+       * true for all eight, not five.
+       */
+      if (isOstomyKit(item.entityId)) return isListedOstomyKit(item.entityId);
+
+      return item.isKit ? isListedOstomyKit(item.entityId) : true;
+    });
     const kits = all.filter((item) => item.isKit);
     const products = all.filter((item) => !item.isKit);
 

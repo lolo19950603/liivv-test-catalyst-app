@@ -36,6 +36,30 @@ function stripTailwindCollidingUtilities(css) {
   return css.slice(0, start) + css.slice(end + UTILITY_STRIP_END.length);
 }
 
+/*
+ * The Dawn export also carries a global `div:empty,p:empty{display:none}`. This
+ * stylesheet is loaded site-wide, and every decorative scrim in the app is an
+ * empty div with a class — the ostomy hero and closing veils among them — so the
+ * rule deleted all of them and left hero text at 1.1:1 over photographs.
+ *
+ * Scoping to unclassed elements keeps what the rule was for (stray empty nodes
+ * in the exported markup) without removing elements that exist to be painted.
+ *
+ * This has to happen here, not in the output file: `npm run generate` runs on
+ * every dev start and every build, including on Vercel, so a hand edit to
+ * diabetes-care-sections.css is silently overwritten before it ever deploys.
+ */
+const EMPTY_RULE = 'div:empty,p:empty{display:none}';
+const EMPTY_RULE_SCOPED = 'div:empty:not([class]),p:empty:not([class]){display:none}';
+
+/**
+ * @param {string} css
+ * @returns {string}
+ */
+function scopeEmptyElementRule(css) {
+  return css.split(EMPTY_RULE).join(EMPTY_RULE_SCOPED);
+}
+
 /**
  * @param {string} block
  * @param {number} index
@@ -93,7 +117,7 @@ for (let i = 0; i < blocks.length; i += 1) {
   }
 }
 
-const out = kept.join('\n\n');
+const out = scopeEmptyElementRule(kept.join('\n\n'));
 
 if (existsSync(outputPath) && readFileSync(outputPath, 'utf-8') === out) {
   process.stdout.write(

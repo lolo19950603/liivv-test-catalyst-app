@@ -95,5 +95,12 @@ export default async function Page({ params }: Props) {
     ),
   ].slice(0, 4);
 
-  return <LiivvHealthPage featuredKits={featuredKits} />;
+  /*
+   * Ostomy Care's kits are allowlisted and the list is empty while they are
+   * rebuilt, so its landing has no #build-your-kit section to link to.
+   */
+  const ostomyKitsHref =
+    ocCatalog.kits.length > 0 ? '/liivv-health/ostomy-care#build-your-kit' : null;
+
+  return <LiivvHealthPage featuredKits={featuredKits} ostomyKitsHref={ostomyKitsHref} />;
 }

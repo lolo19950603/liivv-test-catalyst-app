@@ -50,6 +50,13 @@ export interface CuratedKitProduct {
       optionValueEntityId: number;
     }>;
   };
+  /**
+   * True when the kit's own `kit_variants` named the variant for this
+   * component, rather than the storefront falling back to a default option
+   * value. A locked component's options are shown, not offered: see the
+   * fixed-text branch below.
+   */
+  lockedByKit?: boolean;
   variantEntityId?: number;
 }
 
@@ -612,6 +619,36 @@ export function CuratedKitCustomizer({
                             )?.optionValueEntityId ??
                             option.values.find((value) => value.isDefault)?.entityId ??
                             option.values[0]?.entityId;
+
+                          /*
+                           * The kit locked this component to one real variant,
+                           * so its options are read-only. Each option renders
+                           * its own Select, and a barrier sold as Size × Colour
+                           * lets a customer pick 57 mm with the 70 mm colour —
+                           * a combination that is not a variant, and on ostomy
+                           * supplies a size that will not couple. Show what the
+                           * kit chose instead of offering a choice that breaks
+                           * it; the component's own product page still sells
+                           * every variant.
+                           */
+                          if (product.lockedByKit) {
+                            const currentLabel = option.values.find(
+                              (value) => value.entityId === currentValue,
+                            )?.label;
+
+                            if (currentLabel == null) {
+                              return null;
+                            }
+
+                            return (
+                              <p className="liivv-kit-item__option-fixed" key={option.entityId}>
+                                <span className="liivv-kit-item__option-name">
+                                  {option.displayName}
+                                </span>
+                                <span className="liivv-kit-item__option-value">{currentLabel}</span>
+                              </p>
+                            );
+                          }
 
                           return (
                             <Select

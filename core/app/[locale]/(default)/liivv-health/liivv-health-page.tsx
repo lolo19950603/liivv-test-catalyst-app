@@ -21,6 +21,14 @@ const WH_IMG = '/archive/womens-health';
 
 type Props = {
   featuredKits: HealthHubKitCard[];
+  /**
+   * Where "Ostomy kits" should go, or null when Ostomy Care is showing no kits.
+   * Its kits are allowlisted (ostomy-care/oc-ids.ts) and the list is empty while
+   * they are rebuilt, which takes the landing's #build-your-kit section with it.
+   * The hub then drops the link rather than sending a reader to an anchor that
+   * is not on the page, under a word the page no longer says.
+   */
+  ostomyKitsHref?: string | null;
 };
 
 function DoorCard({
@@ -64,7 +72,10 @@ function DoorCard({
   );
 }
 
-export function LiivvHealthPage({ featuredKits }: Props) {
+export function LiivvHealthPage({
+  featuredKits,
+  ostomyKitsHref = '/liivv-health/ostomy-care#build-your-kit',
+}: Props) {
   const { reduceMotion, rootClassName } = useWhMotion('liivv-health');
   const marqueeItems = [...HEALTH_HUB_MARQUEE, ...HEALTH_HUB_MARQUEE];
   const hasKits = featuredKits.length > 0;
@@ -175,8 +186,10 @@ export function LiivvHealthPage({ featuredKits }: Props) {
           <div data-reveal>
             <span className="eyebrow">Curated kits</span>
             <h2>Start curated. Finish as yours.</h2>
+            {/* Not "each live micro-site": Ostomy Care lists no kits while
+                they are withheld (ostomy-care/oc-ids.ts). */}
             <p className="lh-hub-lead">
-              Each live micro-site carries kits tuned to that care journey — customize on the kit page
+              Where kits are ready, they are tuned to that care journey — customize on the kit page
               and save for later. More verticals, more kits, as we open doors.
             </p>
           </div>
@@ -208,7 +221,7 @@ export function LiivvHealthPage({ featuredKits }: Props) {
               <p>Explore kits inside the live micro-sites while we load the latest edits.</p>
               <div className="lh-hub-story-links">
                 <a href="/liivv-health/womens-health#build-your-kit">Women&apos;s Health kits</a>
-                <a href="/liivv-health/ostomy-care#build-your-kit">Ostomy Care kits</a>
+                {ostomyKitsHref ? <a href={ostomyKitsHref}>Ostomy Care kits</a> : null}
                 <a href="/liivv-health/diabetes-care#shop-diabetes-care">Diabetes Care shop</a>
               </div>
             </div>
@@ -217,9 +230,11 @@ export function LiivvHealthPage({ featuredKits }: Props) {
             <a className="btn btn-outline" href="/liivv-health/womens-health#build-your-kit">
               Women&apos;s kits
             </a>
-            <a className="btn btn-outline" href="/liivv-health/ostomy-care#build-your-kit">
-              Ostomy kits
-            </a>
+            {ostomyKitsHref ? (
+              <a className="btn btn-outline" href={ostomyKitsHref}>
+                Ostomy kits
+              </a>
+            ) : null}
             <a className="btn btn-outline" href="/liivv-health/diabetes-care#shop-diabetes-care">
               Diabetes shop
             </a>

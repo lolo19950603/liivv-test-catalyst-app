@@ -1,15 +1,27 @@
 'use client';
 
-import { useLocale, useMessages } from 'next-intl';
-import { type TransitionEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useLocale, useMessages, useTranslations } from 'next-intl';
+import {
+  type ReactNode,
+  type TransitionEvent,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { HeroLoopVideo, RotatingHeroWord } from '~/components/health-hero';
-import { KitFlowDemo } from '~/components/kit-flow-demo/kit-flow-demo';
 import { OliviaHelpBand } from '~/components/olivia/olivia-help-band';
-import { GuestCategoryQuiz } from '~/components/onboarding/guest-category-quiz';
 import { SpecializedSubscribe } from '~/components/specialized-subscribe/specialized-subscribe';
 
-import { buildChapters, chapterHref, SHOP_OSTOMY_HREF } from './chapters/chapters-data';
+import { HashTargetScroll } from './_components/hash-target-scroll';
+import {
+  buildChapters,
+  chapterHref,
+  localeHref,
+  SHOP_OSTOMY_HREF,
+} from './chapters/chapters-data';
 import type { OcCatalog, OcCatalogItem } from './get-oc-catalog';
 import { NEW_JOURNEY_STARTER_KIT_ID } from './oc-ids';
 
@@ -18,144 +30,80 @@ import './ostomy-care.css';
 /*
  * Ostomy Care landing — Quiet Shelf / Everyday Ritual
  * Distinct from Women's Health (no doors / float chips) — kits carousel matches WH.
+ *
+ * =============================================================================
+ * EVERY WORD ON THIS PAGE IS IN THE MESSAGE TREE
+ * =============================================================================
+ * It was not. Until this pass the only translated thing on the whole landing
+ * page was the five situation doors, and that section is behind a French review
+ * gate which is closed in production — so /fr/liivv-health/ostomy-care, the
+ * entry point of the French microsite, would have shipped with no French on it
+ * at all. Nine of its ten headings were English, including the hero, the
+ * subscriptions band and every FAQ answer. An /fr entry page in English is
+ * worse than none, because every door out of it lands the reader mid-site.
+ *
+ * So the prose lives in `OstomyCare.ui.landingPage.*` in en.json and fr.json,
+ * the way chapter-page.tsx and funding-page.tsx already work, and what is left
+ * in this file is structure: ids, hrefs, image paths, and the order things come
+ * in. The ids below are what the page filters and keys on and are never
+ * rendered; their words are looked up beside them.
+ * =============================================================================
  */
 
 const SHOP_HREF = SHOP_OSTOMY_HREF;
 const PHARMACIST_HREF = '/account/virtual-care';
 const IMG = '/archive/ostomy-care';
-const HERO_WORDS = ['discreet', 'private', 'quiet', 'personal', 'kind'] as const;
 
-const TRUST_ITEMS = [
-  'Ontario pharmacist chat',
-  'Discreet delivery',
-  'Subscribe & save restocks',
-  'Kind, private, yours',
-] as const;
+/* The rotating word after "Care that stays". Keys into `hero.words`. */
+const HERO_WORD_KEYS = ['1', '2', '3', '4', '5'] as const;
 
-const SUBSCRIBE_FEATURES = [
-  {
-    title: 'Your usuals, on your wear time',
-    body: 'Pouches, barriers, rings, and skin care — restocked before the last box is empty.',
-  },
-  {
-    title: 'Skip when you have extras',
-    body: 'Travel stash or a slower week? Skip a cycle with no charge and nothing ships.',
-  },
-  {
-    title: 'Plain packaging. Quiet checkout.',
-    body: 'Same discreet delivery as a one-time order. Pause, skip, or cancel in Account.',
-  },
-] as const;
+/* The four claims on the trust strip. Keys into `trust.items`. */
+const TRUST_ITEM_KEYS = ['1', '2', '3', '4'] as const;
 
-const PATH_LINKS = [
-  {
-    num: '01',
-    title: 'Curated kits',
-    body: 'Starter kits you can tune — then save for the next quiet restock.',
-    href: '#build-your-kit',
-  },
-  {
-    num: '02',
-    title: 'The shelf',
-    body: 'Pouches, barriers, and accessories — subscribe so restock stays quiet, not a scramble.',
-    href: '#shop-ostomy-care',
-  },
-  {
-    num: '03',
-    title: 'The chapters',
-    body: 'New to the journey, stoma basics, or everyday living — open the story that fits today.',
-    href: '#where-are-you',
-  },
-  {
-    num: '04',
-    title: 'What is covered',
-    body: 'What your province pays toward supplies, who signs off, and the tax credits worth claiming.',
-    href: '/liivv-health/ostomy-care/funding',
-  },
-  {
-    num: '05',
-    title: 'A kind answer',
-    body: 'Ontario pharmacist chat for everyday product questions during business hours.',
-    href: '#care',
-  },
-] as const;
+/* The subscription band's three features. Keys into `subscribe.features`. */
+const SUBSCRIBE_FEATURE_KEYS = ['1', '2', '3'] as const;
 
-const SHOP_ROOMS = [
-  { id: 'all', label: 'All' },
-  { id: 'kits', label: 'Curated kits' },
-  { id: 'onePiece', label: 'One-piece' },
-  { id: 'twoPiece', label: 'Two-piece' },
-  { id: 'barriers', label: 'Barriers' },
-  { id: 'accessories', label: 'Accessories' },
-] as const;
-
-type ShopRoomId = (typeof SHOP_ROOMS)[number]['id'];
-
-const PREFERRED_BRANDS = ['Coloplast', 'Hollister', 'Convatec'] as const;
-const BRAND_POINTS = [
-  'Pouches & barriers',
-  'Skin comfort',
-  'Belts, rings & paste',
-  'Discreet restock',
-];
-
-const KIT_FLOW_SEARCH_FALLBACKS = [
-  'Barrier rings',
-  'Adhesive remover wipes',
-  'Skin barrier powder',
-  'Ostomy belt',
-  'Lubricating deodorant',
-] as const;
-
-const KIT_FLOW_TRAY = [
-  { name: 'Drainable pouch', note: 'Daily staple', qty: 2, isQtyTarget: true },
-  { name: 'Skin barrier wafer', note: 'Secure seal', qty: 1 },
-  { name: 'Stoma powder', note: 'Skin comfort', qty: 1 },
-] as const;
+/* The four lines under the brand row. Keys into `brands.points`. */
+const BRAND_POINT_KEYS = ['1', '2', '3', '4'] as const;
 
 /*
- * Illustrative, not testimonials. These are design personas — see
- * public/archive/ostomy-care-sections/SECTIONS.md — so nothing here may make a
- * clinical claim or describe an outcome.
- *
- * Two of them used to. Morgan had a convexity question answered by our own
- * pharmacist chat, and Avery had damaged peristomal skin resolved by powder, a
- * ring and that same chat. The site says the opposite in both cases: convexity
- * is "the one product decision on the whole site that we would rather you did
- * not make alone", and broken skin "needs an NSWOC to look at it — not a
- * product recommendation from the internet". An invented patient must not
- * settle a question the clinical copy sends to a nurse.
+ * The ways in, in order. The number is drawn from the rendered position rather
+ * than written down, because the kits door only exists when there is a kit to
+ * show (see oc-ids.ts) and a list that jumps from 01 to 03 would be a bug on
+ * the page. `id` is what the page filters on and what its words are looked up
+ * by; nothing renders it.
  */
-const VOICES = [
-  {
-    lead: true,
-    name: 'Morgan',
-    meta: 'Toronto · colostomy · busy parent',
-    quote:
-      'I asked my question on a lunch break and got a kind answer, without feeling silly for asking.',
-    image: `${IMG}/voice-1.png`,
-  },
-  {
-    name: 'Casey',
-    meta: 'Ottawa · ileostomy · restocker',
-    quote:
-      'My usuals show up like clockwork. Running-out panic feels like someone else’s story now.',
-    image: `${IMG}/voice-2.png`,
-  },
-  {
-    name: 'Jordan',
-    meta: 'Hamilton · new to the journey',
-    quote: 'The go-bag idea changed travel for me. Extra pouch, wipes, done.',
-    image: `${IMG}/voice-3.png`,
-  },
-  {
-    name: 'Avery',
-    meta: 'Mississauga · Liivv Ostomy regular',
-    quote:
-      'Someone walked me through what was actually in the box before I ordered. That was the part I had been dreading.',
-    image: `${IMG}/voice-4.png`,
-  },
+const PATH_LINKS = [
+  { id: 'kits', href: '#build-your-kit' },
+  { id: 'shelf', href: '#shop-ostomy-care' },
+  { id: 'chapters', href: '#where-are-you' },
+  { id: 'funding', href: '/liivv-health/ostomy-care/funding' },
+  { id: 'care', href: '#care' },
 ] as const;
+
+const SHOP_ROOMS = ['all', 'kits', 'onePiece', 'twoPiece', 'barriers', 'accessories'] as const;
+
+type ShopRoomId = (typeof SHOP_ROOMS)[number];
+
+/* Manufacturer names: not copy, and never translated. */
+const PREFERRED_BRANDS = ['Coloplast', 'Hollister', 'Convatec'] as const;
+
+/*
+ * The questions, in order. Question 2 is about customizing a kit, so it is
+ * gated on `hasKits` with the rest of the kit surfaces.
+ */
+const FAQ_KEYS = ['1', '2', '3', '4', '5'] as const;
+const FAQ_KITS_KEY = '2';
+
+/*
+ * There is no "Notes from the shelf" section here any more. It carried four
+ * design personas (Morgan, Casey, Jordan, Avery) presented as quoted readers,
+ * with photographs, a city, an ostomy type and a first-person quote each. Even
+ * labelled as illustrative in the source, nothing on the rendered page told a
+ * reader they were invented, and two of them answered — in a patient's voice —
+ * questions this site sends to a nurse. Removed rather than rewritten: an
+ * invented ostomate is not a safe way to say anything on a health page.
+ */
 
 function roomForProduct(product: OcCatalogItem): Exclude<ShopRoomId, 'all' | 'kits'> {
   const n = product.name.toLowerCase();
@@ -202,7 +150,23 @@ function hasDisplayPrice(priceLabel?: string) {
   return Boolean(priceLabel && !/(\$|CA\$)?\s*0([.,]0+)?\b/i.test(priceLabel));
 }
 
+/*
+ * className separators here are the space before each `${`, never a space
+ * inside the interpolated string: prettier-plugin-tailwindcss normalises class
+ * strings and strips a leading space inside one. That is how commit 6d42e4a0
+ * turned these into 'oc-kits-carousel-slideis-side', 'oc-filteris-active' and
+ * 'oc-kits-carousel-trackis-instant', which silently killed the carousel side
+ * slides and the shop filter's active state.
+ */
+function slideDirectionClass(offset: number, shift: number) {
+  if (offset < shift) return 'is-prev';
+  if (offset > shift) return 'is-next';
+
+  return '';
+}
+
 function KitsCarousel({ kits, initialId }: { kits: OcCatalogItem[]; initialId?: number | null }) {
+  const t = useTranslations('OstomyCare.ui.landingPage.kits');
   const startIndex = useMemo(() => {
     if (!initialId) return 0;
 
@@ -298,26 +262,22 @@ function KitsCarousel({ kits, initialId }: { kits: OcCatalogItem[]; initialId?: 
           )}
         </div>
         <div className="oc-pack-feature-copy">
-          <span className="oc-pack-badge">{isFeatured ? 'Featured kit' : 'Customizable kit'}</span>
+          <span className="oc-pack-badge">
+            {isFeatured ? t('featuredBadge') : t('customBadge')}
+          </span>
           <h3>{kit.name}</h3>
           {hasDisplayPrice(kit.priceLabel) ? (
             <p className="oc-pack-price">{kit.priceLabel}</p>
           ) : (
             <p className="oc-pack-price oc-pack-price--spacer">&nbsp;</p>
           )}
-          <p>
-            {isFeatured
-              ? 'A calm Fresh Start edit — open it to tune quantities, add what was missing, and save your version.'
-              : 'Open it to tune quantities, add what was missing, and save your version.'}
-          </p>
+          <p>{isFeatured ? t('featuredBody') : t('cardBody')}</p>
           {isCenter && shift === 0 ? (
             <a className="oc-btn oc-btn-solid" href={kit.path}>
-              Customize this kit
+              {t('cta')}
             </a>
           ) : (
-            <span className="oc-btn oc-btn-solid oc-pack-feature-cta-ghost">
-              Customize this kit
-            </span>
+            <span className="oc-btn oc-btn-solid oc-pack-feature-cta-ghost">{t('cta')}</span>
           )}
         </div>
       </>
@@ -339,10 +299,10 @@ function KitsCarousel({ kits, initialId }: { kits: OcCatalogItem[]; initialId?: 
     return (
       <button
         aria-hidden={Math.abs(offset) > 1 || undefined}
-        aria-label={`Show ${kit.name}`}
-        className={`oc-pack-feature oc-kits-carousel-slide${isCenter ? 'is-center' : 'is-side'}${
-          offset < shift ? 'is-prev' : offset > shift ? 'is-next' : ''
-        }`}
+        aria-label={t('show', { name: kit.name })}
+        className={`oc-pack-feature oc-kits-carousel-slide ${
+          isCenter ? 'is-center' : 'is-side'
+        } ${slideDirectionClass(offset, shift)}`}
         disabled={shift !== 0}
         key={`${kit.entityId}-${offset}`}
         onClick={() => go(offset < 0 ? -1 : 1)}
@@ -357,13 +317,13 @@ function KitsCarousel({ kits, initialId }: { kits: OcCatalogItem[]; initialId?: 
   return (
     <div className="oc-kits-carousel">
       <p className="oc-kits-carousel-count">
-        {active + 1} / {count} kits
+        {t('count', { active: String(active + 1), count: String(count) })}
       </p>
 
       <div className="oc-kits-carousel-frame">
         {count > 1 ? (
           <button
-            aria-label="Previous kit"
+            aria-label={t('previous')}
             className="oc-kits-carousel-btn is-prev"
             onClick={() => go(-1)}
             type="button"
@@ -373,13 +333,13 @@ function KitsCarousel({ kits, initialId }: { kits: OcCatalogItem[]; initialId?: 
         ) : null}
 
         <div
-          aria-label="Ostomy Care kits carousel"
+          aria-label={t('carouselLabel')}
           aria-roledescription="carousel"
           className="oc-kits-carousel-viewport"
           ref={viewportRef}
         >
           <div
-            className={`oc-kits-carousel-track${instant ? 'is-instant' : ''}`}
+            className={`oc-kits-carousel-track ${instant ? 'is-instant' : ''}`}
             onTransitionEnd={handleTransitionEnd}
             style={{
               gap,
@@ -392,7 +352,7 @@ function KitsCarousel({ kits, initialId }: { kits: OcCatalogItem[]; initialId?: 
 
         {count > 1 ? (
           <button
-            aria-label="Next kit"
+            aria-label={t('next')}
             className="oc-kits-carousel-btn is-next"
             onClick={() => go(1)}
             type="button"
@@ -405,19 +365,18 @@ function KitsCarousel({ kits, initialId }: { kits: OcCatalogItem[]; initialId?: 
   );
 }
 
-export function OstomyCarePage({
-  catalog,
-  showGuestQuiz = false,
-  isSignedIn = false,
-}: {
-  catalog?: OcCatalog;
-  showGuestQuiz?: boolean;
-  isSignedIn?: boolean;
-}) {
+/*
+ * `doors` is C13, rendered on the server by page.tsx and passed in as a slot.
+ * It sits where the guest quiz and the kit flow demo used to, above every shop
+ * surface on the page — see situation-doors.tsx for why it is not imported
+ * here.
+ */
+export function OstomyCarePage({ catalog, doors }: { catalog?: OcCatalog; doors?: ReactNode }) {
   // Chapter copy is translated, so the card list is built per render rather
   // than frozen at module scope.
   const messages = useMessages();
   const locale = useLocale();
+  const t = useTranslations('OstomyCare.ui.landingPage');
   const lifeChapters = buildChapters(
     messages.OstomyCare.chapters,
     locale,
@@ -427,9 +386,11 @@ export function OstomyCarePage({
     word: chapter.chapterWord,
     title: chapter.title,
     blurb: chapter.vibe,
-    href: chapterHref(chapter.slug),
+    // A plain <a>, so the /fr prefix has to be put on by hand — chapters-data.ts.
+    href: localeHref(chapterHref(chapter.slug), locale),
     image: chapter.heroImage,
   }));
+  const shopHref = localeHref(SHOP_HREF, locale);
 
   const [shopRoom, setShopRoom] = useState<ShopRoomId>('all');
 
@@ -440,8 +401,26 @@ export function OstomyCarePage({
     allKits[0] ??
     null;
   const shopProducts = catalog?.products ?? [];
+  /*
+   * Kits are allowlisted in oc-ids.ts and the list is empty today, so this page
+   * has to read well with none. Everything that points at #build-your-kit goes
+   * with the section: the door in "What would help today?", the hero's second
+   * button, the "Curated kits" shop room and the closing link. A heading with
+   * nothing under it, or a link to an anchor that is not on the page, would be
+   * worse than no kits at all.
+   */
   const hasKits = allKits.length > 0;
   const hasShop = shopProducts.length > 0 || allKits.length > 0;
+  const pathLinks = hasKits ? PATH_LINKS : PATH_LINKS.filter((item) => item.id !== 'kits');
+  const shopRooms = hasKits ? SHOP_ROOMS : SHOP_ROOMS.filter((room) => room !== 'kits');
+  const faqKeys = hasKits ? FAQ_KEYS : FAQ_KEYS.filter((key) => key !== FAQ_KITS_KEY);
+  /*
+   * The numbered lists are read off the messages object rather than through
+   * `t()`: a numbered key built at runtime is not a literal, and every one of
+   * these is a plain sentence with nothing to interpolate. `t()` is used
+   * wherever the key is fixed, and wherever there is a value to put in.
+   */
+  const copy = messages.OstomyCare.ui.landingPage;
 
   const filteredShop = useMemo(() => {
     if (shopRoom === 'kits') return allKits.slice(0, 12);
@@ -450,11 +429,11 @@ export function OstomyCarePage({
     return shopProducts.filter((p) => roomForProduct(p) === shopRoom).slice(0, 12);
   }, [allKits, shopProducts, shopRoom]);
 
-  const kitSearchPool = useMemo(() => shopProducts.map((product) => product.name), [shopProducts]);
-
   return (
     <div id="ostomy-care">
-      <section aria-label="Ostomy Care hero" className="oc-hero">
+      {/* Chapters link back here by fragment; see the file. */}
+      <HashTargetScroll />
+      <section aria-label={t('hero.label')} className="oc-hero">
         <div className="oc-hero-stage">
           <div aria-hidden className="oc-hero-glow">
             <span />
@@ -464,22 +443,25 @@ export function OstomyCarePage({
           <div className="oc-hero-copy">
             <span className="oc-hero-kicker">
               <i />
-              Ostomy Care
+              {t('hero.kicker')}
             </span>
             <h1>
-              Care that stays <RotatingHeroWord className="oc-hero-word" words={HERO_WORDS} />
+              {t('hero.headingLead')}{' '}
+              <RotatingHeroWord
+                className="oc-hero-word"
+                words={HERO_WORD_KEYS.map((key) => copy.hero.words[key])}
+              />
             </h1>
-            <p>
-              Supplies, everyday living support, and kind guidance — so your routine feels like
-              yours again.
-            </p>
+            <p>{t('hero.body')}</p>
             <div className="oc-hero-actions">
               <a className="oc-hero-cta" href="#where-are-you">
-                Find your pace
+                {t('hero.cta')}
               </a>
-              <a className="oc-hero-cta-ghost" href="#build-your-kit">
-                Browse curated kits
-              </a>
+              {hasKits ? (
+                <a className="oc-hero-cta-ghost" href="#build-your-kit">
+                  {t('hero.kitsCta')}
+                </a>
+              ) : null}
             </div>
           </div>
 
@@ -494,44 +476,31 @@ export function OstomyCarePage({
         </div>
       </section>
 
-      <section
-        aria-label="Why Liivv Ostomy Care"
-        className={`oc-trust${showGuestQuiz ? 'oc-trust--quiz' : ''}`}
-      >
+      <section aria-label={t('trust.label')} className="oc-trust">
         <div className="oc-trust-track">
-          {TRUST_ITEMS.map((item) => (
-            <span key={item}>{item}</span>
+          {TRUST_ITEM_KEYS.map((key) => (
+            <span key={key}>{copy.trust.items[key]}</span>
           ))}
         </div>
       </section>
 
-      {showGuestQuiz ? (
-        <GuestCategoryQuiz
-          categoryId="ostomy_care_everyday"
-          className="rounded-top"
-          isSignedIn={isSignedIn}
-        />
-      ) : null}
+      {doors}
 
-      <section
-        aria-label="Ways into Ostomy Care"
-        className={`oc-path${showGuestQuiz ? 'rounded-top' : ''}`}
-        id="doors"
-      >
+      <section aria-label={t('ways.label')} className="oc-path" id="doors">
         <div className="oc-wrap">
           <header className="oc-path-head">
-            <span className="oc-eyebrow">A quiet path in</span>
-            <h2>What would help today?</h2>
+            <span className="oc-eyebrow">{t('ways.eyebrow')}</span>
+            <h2>{t('ways.heading')}</h2>
           </header>
           <div className="oc-path-list">
-            {PATH_LINKS.map((item) => (
-              <a className="oc-path-item" href={item.href} key={item.num}>
-                <span className="oc-path-num">{item.num}</span>
+            {pathLinks.map((item, index) => (
+              <a className="oc-path-item" href={localeHref(item.href, locale)} key={item.id}>
+                <span className="oc-path-num">{String(index + 1).padStart(2, '0')}</span>
                 <div className="oc-path-copy">
-                  <h3>{item.title}</h3>
-                  <p>{item.body}</p>
+                  <h3>{copy.ways.items[item.id].title}</h3>
+                  <p>{copy.ways.items[item.id].body}</p>
                 </div>
-                <span className="oc-path-go">Continue →</span>
+                <span className="oc-path-go">{t('ways.go')}</span>
               </a>
             ))}
           </div>
@@ -540,30 +509,16 @@ export function OstomyCarePage({
 
       {hasKits ? (
         <section
-          aria-label="Ostomy curated kits"
+          aria-label={t('kits.label')}
           className="oc-packs rounded-top"
           id="build-your-kit"
         >
           <div className="oc-wrap">
             <header className="oc-packs-head">
-              <span className="oc-eyebrow">Curated kits</span>
-              <h2>Start curated. Finish as yours.</h2>
-              <p>
-                Official kits from the Liivv Ostomy edit — open one, tune quantities, add what was
-                missing, and save it — or subscribe so the quiet restock keeps arriving.
-              </p>
+              <span className="oc-eyebrow">{t('kits.eyebrow')}</span>
+              <h2>{t('kits.heading')}</h2>
+              <p>{t('kits.body')}</p>
             </header>
-
-            <KitFlowDemo
-              description="A calm Fresh Start edit — customize quantities, add what was missing, then save or checkout."
-              fallbackImageSrc={`${IMG}/door-shop.png`}
-              kitHref={featuredKit?.path}
-              kitImage={featuredKit?.image}
-              kitName={featuredKit?.name}
-              searchFallbacks={KIT_FLOW_SEARCH_FALLBACKS}
-              searchPool={kitSearchPool}
-              trayLines={[...KIT_FLOW_TRAY]}
-            />
 
             <KitsCarousel initialId={featuredKit?.entityId} kits={allKits} />
           </div>
@@ -572,33 +527,33 @@ export function OstomyCarePage({
 
       {hasShop ? (
         <section
-          aria-label="Ostomy Essentials"
+          aria-label={t('shop.label')}
           className="oc-shop rounded-top"
           id="shop-ostomy-care"
         >
           <div className="oc-wrap">
             <div className="oc-shop-head">
               <div>
-                <span className="oc-eyebrow">The shelf</span>
-                <h2>Ostomy Essentials</h2>
-                <p>Live catalog, sorted into quiet rooms so restocking does not feel loud.</p>
+                <span className="oc-eyebrow">{t('shop.eyebrow')}</span>
+                <h2>{t('shop.heading')}</h2>
+                <p>{t('shop.body')}</p>
               </div>
-              <a className="oc-btn oc-btn-solid" href={SHOP_HREF}>
-                Open full shop
+              <a className="oc-btn oc-btn-solid" href={shopHref}>
+                {t('shop.openShop')}
               </a>
             </div>
 
-            <div aria-label="Shop filters" className="oc-filters" role="tablist">
-              {SHOP_ROOMS.map((room) => (
+            <div aria-label={t('shop.filtersLabel')} className="oc-filters" role="tablist">
+              {shopRooms.map((room) => (
                 <button
-                  aria-selected={shopRoom === room.id}
-                  className={`oc-filter${shopRoom === room.id ? 'is-active' : ''}`}
-                  key={room.id}
-                  onClick={() => setShopRoom(room.id)}
+                  aria-selected={shopRoom === room}
+                  className={`oc-filter ${shopRoom === room ? 'is-active' : ''}`}
+                  key={room}
+                  onClick={() => setShopRoom(room)}
                   role="tab"
                   type="button"
                 >
-                  {room.label}
+                  {copy.shop.rooms[room]}
                 </button>
               ))}
             </div>
@@ -615,7 +570,7 @@ export function OstomyCarePage({
                   </div>
                   <div className="oc-product-meta">
                     {product.isKit ? (
-                      <span className="oc-product-badge">Customizable kit</span>
+                      <span className="oc-product-badge">{t('shop.kitBadge')}</span>
                     ) : null}
                     <h3>{product.name}</h3>
                     {hasDisplayPrice(product.priceLabel) ? (
@@ -627,7 +582,7 @@ export function OstomyCarePage({
             </div>
 
             {filteredShop.length === 0 ? (
-              <p className="oc-shop-empty">Nothing in this room yet — try All or another filter.</p>
+              <p className="oc-shop-empty">{t('shop.empty')}</p>
             ) : null}
           </div>
         </section>
@@ -635,28 +590,32 @@ export function OstomyCarePage({
 
       <SpecializedSubscribe
         className="oc-subs rounded-top"
-        demoProductBlurb="Pouches, barriers, and skin care — restocked before you run out."
-        demoProductName="Ostomy Essentials"
+        demoProductBlurb={t('subscribe.demoBlurb')}
+        demoProductName={t('subscribe.demoName')}
         demoProductPath="liivv.ca/product/ostomy-essentials"
-        features={SUBSCRIBE_FEATURES}
-        lead="Ostomy supplies are not optional — and running out should not be part of the routine. Subscribe to your usuals so restock stays quiet, discreet, and on time."
+        eyebrow={t('subscribe.eyebrow')}
+        features={SUBSCRIBE_FEATURE_KEYS.map((key) => copy.subscribe.features[key])}
+        lead={t('subscribe.lead')}
         primaryCtaClass="oc-btn oc-btn-solid"
         secondaryCtaClass="oc-btn oc-btn-ghost"
-        shopHref={SHOP_HREF}
-        shopLabel="Shop to subscribe"
-        title="Pouches and barriers that arrive before you need them"
+        shopHref={shopHref}
+        shopLabel={t('subscribe.shopLabel')}
+        title={t('subscribe.title')}
         wrapClassName="oc-wrap"
       />
 
-      <section aria-label="Life chapters" className="oc-chapters rounded-top" id="where-are-you">
+      <section
+        aria-label={t('chapters.label')}
+        className="oc-chapters rounded-top"
+        id="where-are-you"
+      >
         <div className="oc-wrap">
           <header className="oc-chapters-head">
-            <span className="oc-eyebrow">Life chapters</span>
-            <h2>Four stories. Open the one that fits.</h2>
+            <span className="oc-eyebrow">{t('chapters.eyebrow')}</span>
+            <h2>{t('chapters.heading')}</h2>
             <p>
-              New to this, learning your stoma, working out food, or looking for support and funding
-              — pick the chapter that feels like today. Already know the aisle?{' '}
-              <a href="#shop-ostomy-care">Skip to the shelf</a>.
+              {t('chapters.body')} {t('chapters.skipPrompt')}{' '}
+              <a href="#shop-ostomy-care">{t('chapters.skipLink')}</a>.
             </p>
           </header>
           <div className="oc-chapters-grid">
@@ -664,12 +623,14 @@ export function OstomyCarePage({
               <a className="oc-chapter-card" href={item.href} key={item.num}>
                 <div className="oc-chapter-media">
                   <img alt="" src={item.image} />
-                  <span className="oc-chapter-word">Chapter {item.word}</span>
+                  <span className="oc-chapter-word">
+                    {t('chapters.chapterWord', { word: item.word })}
+                  </span>
                 </div>
                 <div className="oc-chapter-body">
                   <h3>{item.title}</h3>
                   <p>{item.blurb}</p>
-                  <span className="oc-chapter-go">Open chapter →</span>
+                  <span className="oc-chapter-go">{t('chapters.open')}</span>
                 </div>
               </a>
             ))}
@@ -677,43 +638,39 @@ export function OstomyCarePage({
         </div>
       </section>
 
-      <section aria-label="Pharmacist care" className="oc-care rounded-top" id="care">
+      <section aria-label={t('care.label')} className="oc-care rounded-top" id="care">
         <div className="oc-wrap">
           <div className="oc-care-panel">
             <div className="oc-care-visual">
               <img alt="" src={`${IMG}/care-chat-main.png`} />
             </div>
             <div className="oc-care-copy">
-              <span className="oc-eyebrow">Available in Ontario</span>
-              <h2>Fit questions that do not need a waiting room.</h2>
-              <p>
-                Everyday product and restock questions — chat with an Ontario pharmacist during
-                business hours until 5 p.m. Eastern. Clinical concerns still belong with your NSWOC
-                or care team.
-              </p>
-              <a className="oc-btn oc-btn-soft" href={PHARMACIST_HREF}>
-                Talk to a Pharmacist
+              <span className="oc-eyebrow">{t('care.eyebrow')}</span>
+              <h2>{t('care.heading')}</h2>
+              <p>{t('care.body')}</p>
+              <a className="oc-btn oc-btn-soft" href={localeHref(PHARMACIST_HREF, locale)}>
+                {t('care.cta')}
               </a>
             </div>
           </div>
           <div className="oc-olivia-band">
-            <OliviaHelpBand
-              body="Need a restock, a product match, or help with an order? Olivia is the little sprout in the corner. She does not give medical advice."
-              title="Olivia can fetch the everyday bits."
-            />
+            {/*
+             * No "product match" here. Olivia is a chat assistant that can
+             * search the catalogue, and matching a product to a body is a fit
+             * question — the one thing this page repeatedly sends to an NSWOC.
+             * She helps with restocks and orders.
+             */}
+            <OliviaHelpBand body={t('care.oliviaBody')} title={t('care.oliviaTitle')} />
           </div>
         </div>
       </section>
 
-      <section aria-label="Preferred brands" className="oc-brands rounded-top" id="brands">
+      <section aria-label={t('brands.label')} className="oc-brands rounded-top" id="brands">
         <div className="oc-wrap">
           <div className="oc-brands-inner">
-            <span className="oc-eyebrow">Shop context</span>
-            <h2>Names you already know.</h2>
-            <p>
-              Listed so familiar systems are easy to find — not a clinical endorsement. Your NSWOC
-              remains the guide for fit.
-            </p>
+            <span className="oc-eyebrow">{t('brands.eyebrow')}</span>
+            <h2>{t('brands.heading')}</h2>
+            <p>{t('brands.body')}</p>
             <div className="oc-brand-row">
               {PREFERRED_BRANDS.map((brand) => (
                 <span className="oc-brand-pill" key={brand}>
@@ -722,123 +679,71 @@ export function OstomyCarePage({
               ))}
             </div>
             <ul className="oc-brand-points">
-              {BRAND_POINTS.map((point) => (
-                <li key={point}>{point}</li>
+              {BRAND_POINT_KEYS.map((key) => (
+                <li key={key}>{copy.brands.points[key]}</li>
               ))}
             </ul>
           </div>
         </div>
       </section>
 
-      <section aria-label="Community voices" className="oc-voices rounded-top" id="voices">
+      <section aria-label={t('faq.label')} className="oc-faq rounded-top">
         <div className="oc-wrap">
-          <header className="oc-voices-head">
-            <span className="oc-eyebrow">Beyond the aisle</span>
-            <h2>Notes from the shelf.</h2>
-          </header>
-          <div className="oc-voice-stack">
-            {VOICES.map((voice) => (
-              <article className={`oc-voice${voice.lead ? 'is-lead' : ''}`} key={voice.name}>
-                <img alt="" className="oc-voice-avatar" src={voice.image} />
-                <div>
-                  <blockquote>&ldquo;{voice.quote}&rdquo;</blockquote>
-                  <div className="oc-voice-who">
-                    <strong>{voice.name}</strong>
-                    {voice.meta}
-                  </div>
-                </div>
-              </article>
+          <div className="oc-faq-panel">
+            <h2>{t('faq.heading')}</h2>
+            <p>{t('faq.note')}</p>
+            {/*
+              The first question is open; the rest are closed. Question 2 is
+              about customizing a kit and is gated with the hero's ghost CTA
+              and the kits room: with every curated kit withheld (oc-ids.ts) it
+              would send a reader off to look for kits the rest of the page has
+              deliberately taken down — and they are still listed in the store.
+              It comes back on its own when the allowlist is repopulated.
+            */}
+            {faqKeys.map((key, index) => (
+              <details key={key} open={index === 0}>
+                <summary>{copy.faq.items[key].q}</summary>
+                <p>{copy.faq.items[key].a}</p>
+              </details>
             ))}
           </div>
         </div>
       </section>
 
-      <section aria-label="Frequently asked questions" className="oc-faq rounded-top">
-        <div className="oc-wrap">
-          <div className="oc-faq-panel">
-            <h2>Quiet questions. Honest answers.</h2>
-            <p>Practical notes — not medical advice.</p>
-            <details open>
-              <summary>How often should I empty or change my ostomy pouch?</summary>
-              <p>
-                Empty drainable pouches at around one-third to one-half full. Full system changes
-                are often every few days, or sooner if you feel burning, itching, or a leak. Your
-                NSWOC can help you find a wear time that suits your body — wear time varies a great
-                deal between people and is not something to judge yourself against.
-              </p>
-            </details>
-            <details>
-              <summary>Can I customize an ostomy kit?</summary>
-              <p>
-                Yes. Start from a curated kit, adjust the quantities, add anything that was missing,
-                and save your version — or subscribe so the restock keeps arriving on your own
-                schedule.
-              </p>
-            </details>
-            <details>
-              <summary>How do ostomy supply subscriptions work?</summary>
-              <p>
-                On a product page, choose Subscribe &amp; save, pick a frequency that matches your
-                wear time, then check out like any order. Skip a delivery when you still have extras
-                — no charge, nothing ships. Manage pause, skip, or cancel under Account →
-                Subscriptions.
-              </p>
-            </details>
-            <details>
-              <summary>What belongs in an ostomy go-bag?</summary>
-              <p>
-                A spare barrier and pouch, soft wipes, disposal bags, and any skin protectant or
-                adhesive remover you use — plus spare underwear or a liner if that helps you feel
-                ready to be out.
-              </p>
-            </details>
-            <details>
-              <summary>What can I ask a pharmacist about my ostomy?</summary>
-              <p>
-                Everyday product and restock questions, in Ontario during business hours until 5pm
-                Eastern. Clinical concerns — fit, skin, and anything about the stoma itself — belong
-                with your NSWOC or surgeon rather than a pharmacist.
-              </p>
-            </details>
-          </div>
-        </div>
-      </section>
-
-      <section aria-label="Closing" className="oc-close rounded-top" id="manifesto">
+      <section aria-label={t('closing.label')} className="oc-close rounded-top" id="manifesto">
         <div aria-hidden className="oc-close-bg">
           <img alt="" decoding="async" src={`${IMG}/closing.png`} />
         </div>
         <div className="oc-close-inner">
-          <span className="oc-eyebrow">The Liivv promise</span>
-          <h2>No awkward aisle. Just everyday Liivving.</h2>
-          <p>
-            Supplies that show up on time, guidance without overwhelm, and room for the rest of your
-            life — at your pace.
-          </p>
+          <span className="oc-eyebrow">{t('closing.eyebrow')}</span>
+          <h2>{t('closing.heading')}</h2>
+          <p>{t('closing.body')}</p>
           <div className="oc-close-cta">
-            <a className="oc-btn oc-btn-soft" href={SHOP_HREF}>
-              Ostomy Essentials
+            <a className="oc-btn oc-btn-soft" href={shopHref}>
+              {t('closing.shop')}
             </a>
             <a
               className="oc-btn oc-btn-ghost"
               href="#subscriptions"
               style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff' }}
             >
-              Subscribe &amp; save
+              {t('closing.subscribe')}
             </a>
-            <a
-              className="oc-btn oc-btn-ghost"
-              href="#build-your-kit"
-              style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff' }}
-            >
-              Browse curated kits
-            </a>
+            {hasKits ? (
+              <a
+                className="oc-btn oc-btn-ghost"
+                href="#build-your-kit"
+                style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff' }}
+              >
+                {t('closing.kits')}
+              </a>
+            ) : null}
             <a
               className="oc-btn oc-btn-ghost"
               href="#where-are-you"
               style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#fff' }}
             >
-              Open a chapter
+              {t('closing.chapter')}
             </a>
           </div>
         </div>

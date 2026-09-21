@@ -9,6 +9,9 @@ import { getMetadataAlternates } from '~/lib/seo/canonical';
 import { getOcCatalog, type OcCatalogItem } from '../../get-oc-catalog';
 import { ChapterPage } from '../chapter-page';
 import { buildChapters, type Chapter, CHAPTER_SLUGS } from '../chapters-data';
+import { CHAPTER_META } from '../chapters-meta';
+import { getSupplyItems } from '../get-supply-items';
+import { SUPPLY_CART_ALLOWLIST } from '../supply-list-merchandising';
 
 interface Props {
   params: Promise<{ locale: string; slug: string }>;
@@ -142,6 +145,28 @@ export default async function Page({ params }: Props) {
       });
   }
 
+  /*
+   * The supply list's optional shop section, started here and deliberately not
+   * awaited: the chapter is the page, and the catalogue answer arrives behind
+   * its own Suspense boundary.
+   *
+   * Which chapter carries the list is read from the meta that declares the
+   * figure rather than written out again as a slug, so moving the card can
+   * never leave the list rendering with its shop section quietly absent. And
+   * while the cart allowlist is empty there is nothing to ask BigCommerce for:
+   * the promise is withheld, and SupplyList then drops the shop disclosure
+   * instead of opening it on an empty list.
+   */
+  const carriesSupplyList = Boolean(
+    CHAPTER_META.find((meta) => meta.slug === slug)?.categories.some((category) =>
+      category.figures?.some((figure) => figure.kind === 'supplyList'),
+    ),
+  );
+  const supplyItems =
+    carriesSupplyList && SUPPLY_CART_ALLOWLIST.size
+      ? getSupplyItems([...SUPPLY_CART_ALLOWLIST], locale)
+      : undefined;
+
   return (
     <>
       <script
@@ -150,7 +175,7 @@ export default async function Page({ params }: Props) {
         }}
         type="application/ld+json"
       />
-      <ChapterPage products={products} slug={slug} />
+      <ChapterPage products={products} slug={slug} supplyItems={supplyItems} />
     </>
   );
 }

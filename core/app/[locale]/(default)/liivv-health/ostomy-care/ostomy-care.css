@@ -449,17 +449,133 @@
   opacity: 0.45;
 }
 
-#ostomy-care .oc-trust--quiz {
-  z-index: 1;
-  padding-bottom: calc(var(--oc-overlap) + 18px);
+/* ---------- SITUATION DOORS (C13) ---------- */
+/*
+ * Five plain links above every shop surface, in the slot the guest quiz and the
+ * kit flow demo used to hold. A grid rather than the numbered path list below
+ * it: these are situations a reader is already in, and numbering them would
+ * suggest an order to arrive in.
+ *
+ * The clay is the same #9a3b2c the chapters use for the emergency list
+ * (chapter-page.css), so one tone means one thing across the site.
+ */
+#ostomy-care .oc-situation {
+  --oc-urgent: #9a3b2c;
+  --oc-urgent-wash: color-mix(in srgb, var(--blush) 34%, var(--paper));
+
+  padding: 3.25rem 0 3.5rem;
+  background: var(--cream);
 }
 
-#ostomy-care .guest-category-quiz {
-  padding: clamp(2.1rem, 5vw, 3.5rem) 0 calc(var(--oc-overlap) + clamp(2rem, 4.5vw, 3.25rem));
+#ostomy-care .oc-situation h2 {
+  margin: 0 0 1.35rem;
+  font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+  max-width: 18ch;
 }
 
-#ostomy-care .guest-category-quiz-inner {
-  width: min(100% - (var(--pad) * 2), var(--max));
+#ostomy-care .oc-situation-draft {
+  justify-self: start;
+  margin: 0 0 0.9rem;
+  padding: 0.2rem 0.65rem;
+  border: 1px dashed color-mix(in srgb, var(--ink) 45%, transparent);
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+/* 12rem is what puts all five on one row at the 1120px wrap and reflows below it. */
+#ostomy-care .oc-situation-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  align-items: start;
+}
+
+#ostomy-care .oc-situation-item {
+  display: grid;
+  align-content: start;
+  gap: 0.45rem;
+}
+
+#ostomy-care .oc-situation-door {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  min-height: 44px;
+  padding: 0.95rem 1.05rem 1.05rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  text-decoration: none;
+  transition:
+    border-color 0.25s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#ostomy-care .oc-situation-door:hover {
+  border-color: var(--sage-deep);
+  transform: translateY(-2px);
+}
+
+#ostomy-care .oc-situation-door b {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: 1.12rem;
+  line-height: 1.2;
+}
+
+#ostomy-care .oc-situation-door span {
+  font-size: 0.9rem;
+  color: rgba(49, 47, 47, 0.76);
+}
+
+#ostomy-care .oc-situation-glyph {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: var(--sage-deep);
+}
+
+/*
+ * The urgent door is third, where the approved review page puts it, so it
+ * cannot be told apart by position — and it must not be told apart by colour
+ * alone either. Three things say it without colour: the warning triangle, the
+ * heavier rule down its side, and the second line of text below it that no
+ * other door has.
+ */
+#ostomy-care .oc-situation-item.is-urgent .oc-situation-door {
+  border-color: color-mix(in srgb, var(--oc-urgent) 30%, transparent);
+  border-left: 4px solid var(--oc-urgent);
+  background: var(--oc-urgent-wash);
+}
+
+#ostomy-care .oc-situation-item.is-urgent .oc-situation-door b,
+#ostomy-care .oc-situation-item.is-urgent .oc-situation-glyph {
+  color: var(--oc-urgent);
+}
+
+#ostomy-care .oc-situation-item.is-urgent .oc-situation-door:hover {
+  border-color: var(--oc-urgent);
+}
+
+/* Underlined, not just tinted: a link in running text is never colour alone. */
+#ostomy-care .oc-situation-secondary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.15rem;
+  font-size: 0.88rem;
+  font-weight: 550;
+  color: var(--sage-deep);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
 /* ---------- PATH (ways in) ---------- */
@@ -858,6 +974,8 @@
 }
 
 #ostomy-care .oc-filter {
+  /* A 44px target: these are the shop's own filters, and thumbs use them. */
+  min-height: 44px;
   padding: 0.55rem 0.9rem;
   border-radius: 12px;
   border: 1px solid var(--line);
@@ -943,15 +1061,6 @@
 
 #ostomy-care .oc-shop-cta {
   margin-top: 1.5rem;
-}
-
-#ostomy-care .oc-packs .kit-flow-demo {
-  margin-top: 0.5rem;
-  margin-bottom: 2rem;
-}
-
-#ostomy-care .oc-packs .kit-flow-demo .kf-flow {
-  margin-bottom: 0;
 }
 
 #ostomy-care .oc-chapters {
@@ -1216,90 +1325,6 @@
   content: '·';
   margin-right: 0.55rem;
   color: var(--sage);
-}
-
-/* ---------- VOICES ---------- */
-#ostomy-care .oc-voices {
-  padding: 2rem 0 calc(var(--oc-overlap) + 4rem);
-  background: var(--sage);
-  color: var(--ink);
-}
-
-#ostomy-care .oc-voices-head {
-  margin-bottom: 1.75rem;
-}
-
-#ostomy-care .oc-voices-head h2 {
-  margin-top: 0.45rem;
-  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
-}
-
-#ostomy-care .oc-voice-stack {
-  display: grid;
-  gap: 0.85rem;
-}
-
-#ostomy-care .oc-voice {
-  display: grid;
-  grid-template-columns: 4.25rem 1fr;
-  gap: 1rem;
-  padding: 1.15rem 1.2rem;
-  border-radius: var(--radius);
-  background: var(--paper);
-  border: 1px solid var(--line);
-}
-
-#ostomy-care .oc-voice.is-lead {
-  background: linear-gradient(135deg, rgba(197, 212, 196, 0.45), var(--paper) 55%);
-  border-color: rgba(111, 138, 114, 0.28);
-}
-
-#ostomy-care .oc-voice-avatar {
-  width: 4.25rem;
-  height: 4.25rem;
-  border-radius: 16px;
-  object-fit: cover;
-}
-
-#ostomy-care .oc-voice blockquote {
-  margin: 0;
-  font-family: var(--font-heading);
-  font-size: 1.15rem;
-  line-height: 1.35;
-}
-
-#ostomy-care .oc-voice-who {
-  margin-top: 0.55rem;
-  font-size: 0.86rem;
-  color: rgba(42, 50, 44, 0.68);
-}
-
-#ostomy-care .oc-voice-who strong {
-  display: block;
-  color: var(--ink);
-  font-weight: 600;
-}
-
-@media (min-width: 900px) {
-  #ostomy-care .oc-voice-stack {
-    grid-template-columns: 1.2fr 1fr;
-  }
-
-  #ostomy-care .oc-voice.is-lead {
-    grid-row: span 3;
-    grid-template-columns: 1fr;
-    align-content: start;
-    padding: 1.6rem;
-  }
-
-  #ostomy-care .oc-voice.is-lead .oc-voice-avatar {
-    width: 5.5rem;
-    height: 5.5rem;
-  }
-
-  #ostomy-care .oc-voice.is-lead blockquote {
-    font-size: 1.55rem;
-  }
 }
 
 /* ---------- FAQ ---------- */
