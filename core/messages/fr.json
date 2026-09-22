@@ -244,6 +244,9 @@
       "removedSubtitle": "Ajoutez-en un si vous changez d’avis.",
       "addBack": "Ajouter à nouveau",
       "runningTotal": "Total du kit",
+      "kitQuantity": "Quantité du kit",
+      "incrementKit": "Augmenter la quantité du kit",
+      "decrementKit": "Diminuer la quantité du kit",
       "addKitToCart": "Ajouter le kit au panier",
       "saveForLater": "Enregistrer le kit pour plus tard",
       "saveSuccess": "« {name} » a été enregistré dans votre compte",
@@ -273,7 +276,8 @@
         "unexpected": "Une erreur est survenue. Veuillez réessayer.",
         "productsUnavailable": "Les produits de ce kit ne peuvent pas être chargés pour le moment. Veuillez réessayer plus tard.",
         "saveFailed": "Impossible d’enregistrer votre kit. Veuillez réessayer.",
-        "saveUnavailable": "L’enregistrement des kits est temporairement indisponible."
+        "saveUnavailable": "L’enregistrement des kits est temporairement indisponible.",
+        "cartUnavailable": "Les kits sont temporairement indisponibles. Veuillez réessayer dans quelques minutes."
       }
     }
   },
@@ -752,6 +756,7 @@
       },
       "errors": {
         "notConfigured": "Les abonnements ne sont pas encore configurés.",
+        "unavailable": "Les abonnements sont temporairement indisponibles. Veuillez réessayer dans quelques minutes.",
         "customerNotFound": "Nous n’avons pas pu trouver votre compte.",
         "noStripeCustomer": "Aucun profil de facturation trouvé. Veuillez d'abord compléter une commande d'abonnement."
       }
@@ -902,6 +907,21 @@
   "Cart": {
     "title": "Panier",
     "heading": "Votre panier",
+    "MiniCart": {
+      "title": "Votre panier",
+      "viewCart": "Voir le panier",
+      "close": "Fermer le panier",
+      "description": "Articles actuellement dans votre panier",
+      "freeShippingRemaining": "Ajoutez {amount} pour la livraison gratuite!",
+      "freeShippingUnlocked": "La livraison gratuite est débloquée!",
+      "youMayAlsoLike": "Vous aimerez aussi...",
+      "previousRecommendation": "Recommandation précédente",
+      "nextRecommendation": "Recommandation suivante",
+      "chooseOptions": "Choisir les options",
+      "viewProduct": "Voir",
+      "checkoutDisclaimer": "Taxes, rabais et livraison calculés au paiement",
+      "checkout": "Payer — {total}"
+    },
     "proceedToCheckout": "Passer à la caisse",
     "increment": "Augmenter la quantité",
     "decrement": "Diminuer la quantité",
@@ -975,7 +995,11 @@
       "fallbackName": "Kit {kitId}",
       "itemCount": "{count, plural, =1 {1 article} other {# articles}}",
       "expand": "Afficher les articles du kit",
-      "collapse": "Masquer les articles du kit"
+      "collapse": "Masquer les articles du kit",
+      "viewKit": "Voir {name}",
+      "increment": "Augmenter la quantité du kit",
+      "decrement": "Diminuer la quantité du kit",
+      "remove": "Retirer le kit"
     },
     "subscription": {
       "badge": "Abonnement",
@@ -1103,6 +1127,7 @@
     },
     "errors": {
       "notConfigured": "Les abonnements ne sont pas encore configurés.",
+      "unavailable": "Les abonnements sont temporairement indisponibles. Veuillez réessayer dans quelques minutes.",
       "invalidPlan": "Ce produit n'est pas disponible pour l'abonnement.",
       "customerNotFound": "Nous n'avons pas pu trouver votre compte."
     }
@@ -1379,7 +1404,9 @@
       "shippingRequired": "Sélectionnez une méthode de livraison pour chaque section de la commande avant de continuer au paiement.",
       "addPaymentMethod": "Ajouter une nouvelle méthode de paiement",
       "expires": "Expire {date}",
-      "default": "Par défaut"
+      "default": "Par défaut",
+      "unavailable": "Les paiements sont temporairement indisponibles. Votre panier est conservé — réessayez sous peu.",
+      "unavailableSubscriptions": "Les abonnements sont temporairement indisponibles. Retirez les articles d'abonnement de votre panier ou réessayez sous peu. Votre panier est conservé."
     },
     "summary": {
       "orderSummary": "Résumé de la commande",
@@ -1430,6 +1457,7 @@
     },
     "errors": {
       "notConfigured": "Les abonnements ne sont pas encore configurés.",
+      "unavailable": "Les abonnements sont temporairement indisponibles. Veuillez réessayer dans quelques minutes.",
       "invalidPlan": "Veuillez sélectionner un plan d'abonnement valide.",
       "unavailablePrice": "Ce produit ne possède pas de prix valide pour l'abonnement.",
       "priceConsentRequired": "Veuillez confirmer que vous comprenez que les prix d'abonnement peuvent changer avant de continuer.",

@@ -1,0 +1,215 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 856" role="img" aria-label="Liivv architecture: people, Next.js on Vercel, session wrapper and API gateway inside hosting, vendor data, with color legend">
+  <style>
+    .t { font-family: "Segoe UI", Calibri, Helvetica, Arial, sans-serif; }
+    .h { font-size: 13px; font-weight: 700; }
+    .b { font-size: 12px; font-weight: 650; }
+    .s { font-size: 11px; font-weight: 600; }
+    .l { font-size: 10.5px; font-weight: 650; fill: #111827; }
+    .line { fill: none; stroke: #475569; stroke-width: 1.7; marker-end: url(#head); }
+    .stem { fill: none; stroke: #475569; stroke-width: 1.7; }
+    .dot { stroke-dasharray: 5 4; }
+  </style>
+  <defs>
+    <marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <!-- One frame -->
+  <rect x="8" y="8" width="1064" height="732" rx="14" fill="#F8FAFC" stroke="#64748B"/>
+  <text class="t h" x="540" y="32" text-anchor="middle" fill="#0F172A">Liivv today</text>
+  <text class="t s" x="540" y="50" text-anchor="middle" fill="#334155">People  -  Next.js on Vercel (web + API in one process)  -  vendor data</text>
+
+  <!-- Column headers -->
+  <text class="t h" x="98" y="78" text-anchor="middle" fill="#1E3A8A">People / identity</text>
+  <text class="t h" x="398" y="78" text-anchor="middle" fill="#134E4A">Hosting - Next.js 16 on Vercel</text>
+  <text class="t h" x="860" y="78" text-anchor="middle" fill="#7C2D12">Persistent data</text>
+
+  <!-- People column -->
+  <rect x="20" y="88" width="156" height="430" rx="10" fill="#EFF6FF" stroke="#1D4ED8"/>
+  <rect x="36" y="104" width="124" height="196" rx="6" fill="#DBEAFE" stroke="#1D4ED8"/>
+  <text class="t b" x="98" y="132" text-anchor="middle" fill="#1E3A8A">Shoppers</text>
+  <text class="t s" x="98" y="150" text-anchor="middle" fill="#1E3A8A">browser</text>
+  <text class="t s" x="98" y="168" text-anchor="middle" fill="#1E3A8A">no DB keys</text>
+  <rect x="44" y="184" width="108" height="36" rx="4" fill="#EDE9FE" stroke="#6D28D9"/>
+  <text class="t s" x="98" y="206" text-anchor="middle" fill="#4C1D95">BC customer login</text>
+
+  <rect x="36" y="316" width="124" height="72" rx="6" fill="#DBEAFE" stroke="#1D4ED8"/>
+  <text class="t b" x="98" y="340" text-anchor="middle" fill="#1E3A8A">Pharmacists</text>
+  <rect x="44" y="348" width="108" height="28" rx="4" fill="#EDE9FE" stroke="#6D28D9"/>
+  <text class="t s" x="98" y="367" text-anchor="middle" fill="#4C1D95">BC iframe + shared login</text>
+
+  <rect x="36" y="404" width="124" height="96" rx="6" fill="#DBEAFE" stroke="#1D4ED8"/>
+  <text class="t b" x="98" y="430" text-anchor="middle" fill="#1E3A8A">Callers</text>
+  <text class="t s" x="98" y="448" text-anchor="middle" fill="#1E3A8A">browser / Stripe / BC</text>
+  <text class="t s" x="98" y="466" text-anchor="middle" fill="#1E3A8A">HTTPS /api</text>
+  <text class="t s" x="98" y="484" text-anchor="middle" fill="#1E3A8A">gateway first</text>
+
+  <!-- Hosting column -->
+  <rect x="280" y="88" width="236" height="430" rx="10" fill="#F0FDFA" stroke="#0F766E"/>
+  <rect x="296" y="104" width="204" height="52" rx="6" fill="#CCFBF1" stroke="#0F766E"/>
+  <text class="t b" x="398" y="126" text-anchor="middle" fill="#134E4A">Public shop</text>
+  <text class="t s" x="398" y="144" text-anchor="middle" fill="#134E4A">no login needed</text>
+
+  <rect x="296" y="168" width="204" height="52" rx="6" fill="#CCFBF1" stroke="#0F766E"/>
+  <text class="t b" x="398" y="190" text-anchor="middle" fill="#134E4A">Checkout</text>
+  <text class="t s" x="398" y="208" text-anchor="middle" fill="#134E4A">BC login required</text>
+
+  <rect x="296" y="232" width="100" height="52" rx="6" fill="#CCFBF1" stroke="#0F766E"/>
+  <text class="t b" x="346" y="254" text-anchor="middle" fill="#134E4A">Account</text>
+  <text class="t s" x="346" y="272" text-anchor="middle" fill="#134E4A">dashboard</text>
+
+  <rect x="296" y="316" width="100" height="72" rx="6" fill="#CCFBF1" stroke="#0F766E"/>
+  <text class="t b" x="346" y="342" text-anchor="middle" fill="#134E4A">Pharmacist</text>
+  <text class="t s" x="346" y="360" text-anchor="middle" fill="#134E4A">admin</text>
+  <text class="t s" x="346" y="376" text-anchor="middle" fill="#134E4A">BC iframe + login</text>
+
+  <rect x="424" y="232" width="76" height="156" rx="8" fill="#FEF9C3" stroke="#A16207"/>
+  <text class="t b" x="462" y="268" text-anchor="middle" fill="#713F12">Session</text>
+  <text class="t b" x="462" y="286" text-anchor="middle" fill="#713F12">wrapper</text>
+  <text class="t s" x="462" y="312" text-anchor="middle" fill="#713F12">login first</text>
+  <text class="t s" x="462" y="330" text-anchor="middle" fill="#713F12">no session</text>
+  <text class="t s" x="462" y="348" text-anchor="middle" fill="#713F12">= no write</text>
+
+  <rect x="296" y="404" width="204" height="96" rx="8" fill="#FEF9C3" stroke="#A16207"/>
+  <text class="t b" x="398" y="432" text-anchor="middle" fill="#713F12">Liivv API gateway</text>
+  <text class="t s" x="398" y="450" text-anchor="middle" fill="#713F12">Azure APIM equivalent</text>
+  <text class="t s" x="398" y="468" text-anchor="middle" fill="#713F12">every /api first · 404 unknown</text>
+  <text class="t s" x="398" y="486" text-anchor="middle" fill="#713F12">rate limit · policy / §4</text>
+
+  <!-- Data column -->
+  <rect x="640" y="88" width="416" height="430" rx="10" fill="#FFF7ED" stroke="#C2410C"/>
+  <rect x="656" y="104" width="192" height="52" rx="8" fill="#FFEDD5" stroke="#C2410C"/>
+  <text class="t b" x="752" y="126" text-anchor="middle" fill="#7C2D12">BigCommerce</text>
+  <text class="t s" x="752" y="144" text-anchor="middle" fill="#7C2D12">catalog, cart, orders</text>
+
+  <rect x="656" y="168" width="192" height="52" rx="8" fill="#FFEDD5" stroke="#C2410C"/>
+  <text class="t b" x="752" y="190" text-anchor="middle" fill="#7C2D12">Stripe</text>
+  <text class="t s" x="752" y="208" text-anchor="middle" fill="#7C2D12">no PAN in Liivv</text>
+
+  <rect x="656" y="232" width="192" height="156" rx="8" fill="#FFEDD5" stroke="#C2410C"/>
+  <text class="t b" x="752" y="268" text-anchor="middle" fill="#7C2D12">Supabase PHI</text>
+  <text class="t s" x="752" y="286" text-anchor="middle" fill="#7C2D12">Canada Postgres</text>
+  <text class="t s" x="752" y="304" text-anchor="middle" fill="#7C2D12">profile, insurance,</text>
+  <text class="t s" x="752" y="320" text-anchor="middle" fill="#7C2D12">Rx, CarePack, chat</text>
+  <text class="t s" x="752" y="346" text-anchor="middle" fill="#7C2D12">service role on server</text>
+  <text class="t s" x="752" y="364" text-anchor="middle" fill="#7C2D12">not in the browser</text>
+
+  <rect x="656" y="404" width="192" height="96" rx="8" fill="#FFEDD5" stroke="#C2410C"/>
+  <text class="t b" x="752" y="438" text-anchor="middle" fill="#7C2D12">Health Canada DPD</text>
+  <text class="t s" x="752" y="456" text-anchor="middle" fill="#7C2D12">medication catalog</text>
+  <text class="t s" x="752" y="474" text-anchor="middle" fill="#7C2D12">tighter 60/IP/min</text>
+
+  <!-- Lane 1: public shop cart -->
+  <path class="line" d="M176 130 H280"/>
+  <rect x="184" y="108" width="88" height="36" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="t l" x="228" y="123" text-anchor="middle">HTTPS</text>
+  <text class="t l" x="228" y="137" text-anchor="middle">no DB keys</text>
+  <path class="line" d="M516 130 H656"/>
+  <rect x="528" y="108" width="116" height="36" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="t l" x="586" y="123" text-anchor="middle">cart, no login</text>
+  <text class="t l" x="586" y="137" text-anchor="middle">to BigCommerce</text>
+
+  <!-- Lane 2: checkout -->
+  <path class="line" d="M176 194 H280"/>
+  <rect x="184" y="172" width="88" height="36" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="t l" x="228" y="187" text-anchor="middle">HTTPS</text>
+  <text class="t l" x="228" y="201" text-anchor="middle">+ BC login</text>
+  <path class="line" d="M516 194 H656"/>
+  <rect x="528" y="172" width="116" height="36" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="t l" x="586" y="187" text-anchor="middle">TLS pay</text>
+  <text class="t l" x="586" y="201" text-anchor="middle">no PAN stored</text>
+
+  <!-- Lane 3: shopper into account, then into session wrapper -->
+  <path class="line" d="M176 258 H280"/>
+  <rect x="184" y="236" width="88" height="36" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="t l" x="228" y="251" text-anchor="middle">HTTPS</text>
+  <text class="t l" x="228" y="265" text-anchor="middle">+ BC login</text>
+  <path class="line" d="M396 258 H424"/>
+
+  <!-- Lane 4: pharmacist into admin, then into session wrapper -->
+  <path class="line" d="M176 352 H280"/>
+  <rect x="184" y="330" width="88" height="36" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="t l" x="228" y="345" text-anchor="middle">HTTPS iframe</text>
+  <text class="t l" x="228" y="359" text-anchor="middle">+ shared login</text>
+  <path class="line" d="M396 352 H424"/>
+
+  <!-- Session wrapper out to Supabase PHI -->
+  <path class="line" d="M516 310 H656"/>
+  <rect x="528" y="292" width="116" height="36" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="t l" x="586" y="307" text-anchor="middle">session first</text>
+  <text class="t l" x="586" y="321" text-anchor="middle">then PHI write</text>
+
+  <!-- Lane 5: one /api trunk, then split to DPD vs around to other vendors -->
+  <path class="line" d="M176 452 H280"/>
+  <rect x="184" y="430" width="88" height="36" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="t l" x="228" y="445" text-anchor="middle">HTTPS /api</text>
+  <text class="t l" x="228" y="459" text-anchor="middle">gateway first</text>
+  <path class="stem" d="M516 452 H620"/>
+  <rect x="528" y="430" width="84" height="36" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="t l" x="570" y="445" text-anchor="middle">after policy</text>
+  <text class="t l" x="570" y="459" text-anchor="middle">then vendors</text>
+  <path class="line" d="M620 452 H656"/>
+  <path class="line" d="M620 452 V508 H980 V130 H848"/>
+  <rect x="888" y="112" width="150" height="36" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="t l" x="963" y="127" text-anchor="middle">/api catalog,</text>
+  <text class="t l" x="963" y="141" text-anchor="middle">cart count, webhooks</text>
+  <path class="line" d="M980 194 H848"/>
+  <rect x="888" y="176" width="150" height="36" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="t l" x="963" y="191" text-anchor="middle">/api Stripe</text>
+  <text class="t l" x="963" y="205" text-anchor="middle">webhook</text>
+  <path class="line" d="M980 348 H848"/>
+  <rect x="888" y="330" width="150" height="36" rx="4" fill="#ffffff" stroke="#cbd5e1"/>
+  <text class="t l" x="963" y="345" text-anchor="middle">/api chat count</text>
+  <text class="t l" x="963" y="359" text-anchor="middle">only (not PHI write)</text>
+
+  <!-- Footer -->
+  <rect x="20" y="584" width="334" height="140" rx="10" fill="#FFFBEB" stroke="#B45309"/>
+  <text class="t h" x="187" y="612" text-anchor="middle" fill="#78350F">Secrets</text>
+  <text class="t s" x="187" y="636" text-anchor="middle" fill="#78350F">Vercel encrypted env vars</text>
+  <text class="t s" x="187" y="654" text-anchor="middle" fill="#78350F">server only - required to host here</text>
+  <path class="line dot" d="M187 584 V518"/>
+  <text class="t l" x="212" y="548">server env</text>
+
+  <rect x="370" y="584" width="334" height="140" rx="10" fill="#F0FDF4" stroke="#15803D"/>
+  <text class="t h" x="537" y="612" text-anchor="middle" fill="#14532D">CI/CD</text>
+  <text class="t s" x="537" y="636" text-anchor="middle" fill="#14532D">GitHub - lint - Vercel</text>
+  <text class="t s" x="537" y="654" text-anchor="middle" fill="#14532D">production deploy</text>
+  <path class="line dot" d="M405 584 V518"/>
+  <text class="t l" x="412" y="548">deploy</text>
+
+  <rect x="720" y="584" width="336" height="140" rx="10" fill="#F8FAFC" stroke="#475569"/>
+  <text class="t h" x="888" y="612" text-anchor="middle" fill="#1E293B">Logging</text>
+  <text class="t s" x="888" y="636" text-anchor="middle" fill="#1E293B">Vercel logs / Analytics</text>
+  <text class="t s" x="888" y="654" text-anchor="middle" fill="#1E293B">not a PHI store</text>
+  <path class="line dot" d="M450 518 V548 H888 V584"/>
+  <text class="t l" x="760" y="542">app logs</text>
+
+  <!-- Legend under the picture -->
+  <rect x="8" y="752" width="1064" height="92" rx="10" fill="#FFFFFF" stroke="#64748B"/>
+  <text class="t h" x="28" y="774" fill="#0F172A">Legend</text>
+
+  <rect x="28" y="786" width="18" height="18" rx="3" fill="#EFF6FF" stroke="#1D4ED8"/>
+  <text class="t l" x="52" y="799">People</text>
+
+  <rect x="160" y="786" width="18" height="18" rx="3" fill="#EDE9FE" stroke="#6D28D9"/>
+  <text class="t l" x="184" y="799">Identity (login)</text>
+
+  <rect x="340" y="786" width="18" height="18" rx="3" fill="#CCFBF1" stroke="#0F766E"/>
+  <text class="t l" x="364" y="799">Next.js pages</text>
+
+  <rect x="520" y="786" width="18" height="18" rx="3" fill="#FEF9C3" stroke="#A16207"/>
+  <text class="t l" x="544" y="799">Session wrapper + API gateway</text>
+
+  <rect x="820" y="786" width="18" height="18" rx="3" fill="#FFEDD5" stroke="#C2410C"/>
+  <text class="t l" x="844" y="799">Where data lives</text>
+
+  <rect x="28" y="816" width="18" height="18" rx="3" fill="#FFFBEB" stroke="#B45309"/>
+  <text class="t l" x="52" y="829">Secrets</text>
+
+  <rect x="160" y="816" width="18" height="18" rx="3" fill="#F0FDF4" stroke="#15803D"/>
+  <text class="t l" x="184" y="829">CI/CD</text>
+
+  <rect x="340" y="816" width="18" height="18" rx="3" fill="#F8FAFC" stroke="#475569"/>
+  <text class="t l" x="364" y="829">Logging</text>
+</svg>

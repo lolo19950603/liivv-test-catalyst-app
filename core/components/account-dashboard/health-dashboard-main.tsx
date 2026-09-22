@@ -175,6 +175,12 @@ export function HealthDashboardMain({
 
   return (
     <div className="mhd-wellness">
+      {!healthProfileStepData.supabaseReady ? (
+        <p className="mb-4 rounded-2xl border border-[#e8dcc4] bg-[#fdf8ee] px-4 py-3 text-sm text-[#7a5c20]">
+          Health tools are temporarily unavailable. You can still shop; health profile, pharmacy, and
+          care chat will load when this service is back.
+        </p>
+      ) : null}
       <PersonalizedCareCanvas
         activeLaneId={activeLaneId}
         companion={

@@ -22,11 +22,15 @@ import {
 import type { SubscriptionBillingInterval } from '~/lib/stripe/subscription-interval';
 import {
   findSubscriptionLineByKey,
-  getSubscriptionLinesForCart,
   reconcileSubscriptionLinesWithCart,
 } from '~/lib/checkout/subscription-lines';
 import { buildAppUrl } from '~/lib/stripe/config';
 import { isStripeConfigured } from '~/lib/stripe/client';
+import { isStripeOutage, isStripeReachable } from '~/lib/stripe/availability';
+import { areSubscriptionsAvailable } from '~/lib/subscriptions/availability';
+import { isVendorOutageError, withVendorFallback } from '~/lib/vendor-outage';
+import { VendorOutageNotice } from '~/components/vendor-outage-notice';
+import { vendorOutageCopy } from '~/lib/vendor-outage/ui';
 import {
   findStripeCustomerIdByEmail,
   resolveStripeCustomerId,
@@ -100,14 +104,28 @@ export default async function CheckoutPage({ params }: Props) {
 
   if (!cartId) {
     redirect({ href: '/cart/', locale });
+
+    return;
   }
 
-  const data = await getCart({ cartId });
+  let data;
+
+  try {
+    data = await getCart({ cartId });
+  } catch (error) {
+    if (isVendorOutageError(error)) {
+      return <VendorOutageNotice layout="page" vendor="bigcommerce" />;
+    }
+
+    throw error;
+  }
   const cart = data.site.cart;
   let checkout = data.site.checkout;
 
   if (!cart || cart.lineItems.totalQuantity === 0) {
     redirect({ href: '/cart/', locale });
+
+    return;
   }
 
   const customerResponse = await client.fetch({
@@ -128,16 +146,15 @@ export default async function CheckoutPage({ params }: Props) {
       .map((item) => ({ item, isPhysical: false as const })),
   ];
 
-  const subscriptionLines = await reconcileSubscriptionLinesWithCart(
-    cartId,
-    physicalAndDigital.map(({ item }) => item),
+  const subscriptionLines = await withVendorFallback('supabase', [], () =>
+    reconcileSubscriptionLinesWithCart(cartId, physicalAndDigital.map(({ item }) => item)),
   );
   const formatInterval = ({ interval, intervalCount }: SubscriptionBillingInterval) => {
     if (intervalCount === 1) {
       return t(`intervals.${interval}` as 'intervals.month');
     }
 
-    return t(`intervals.${interval}Plural` as 'intervals.monthPlural', { count: intervalCount });
+    return t(`intervals.${interval}Plural` as 'intervals.monthPlural', { count: String(intervalCount) });
   };
 
   const buildCheckoutLinesForItems = (
@@ -415,13 +432,35 @@ export default async function CheckoutPage({ params }: Props) {
       })),
   }));
 
-  const stripeCustomerId = customer
-    ? (await resolveStripeCustomerId(customer.entityId)) ??
-      (customer.email ? await findStripeCustomerIdByEmail(customer.email) : null)
-    : null;
-  const savedPaymentMethods = stripeCustomerId
-    ? await getCustomerSavedPaymentMethods(stripeCustomerId)
-    : [];
+  const stripeReachable = await isStripeReachable();
+  const subscriptionsAvailable = await areSubscriptionsAvailable();
+  const hasSubscriptionItems = checkoutLines.some((line) => line.isSubscription);
+  let paymentsUnavailable =
+    !stripeReachable || (hasSubscriptionItems && !subscriptionsAvailable);
+  const paymentsUnavailableMessage =
+    hasSubscriptionItems && !subscriptionsAvailable && stripeReachable
+      ? t('payment.unavailableSubscriptions')
+      : vendorOutageCopy('stripe').body;
+  let savedPaymentMethods: Awaited<ReturnType<typeof getCustomerSavedPaymentMethods>> = [];
+
+  if (stripeReachable && customer) {
+    try {
+      const stripeCustomerId =
+        (await resolveStripeCustomerId(customer.entityId)) ??
+        (customer.email ? await findStripeCustomerIdByEmail(customer.email) : null);
+
+      if (stripeCustomerId) {
+        savedPaymentMethods = await getCustomerSavedPaymentMethods(stripeCustomerId);
+      }
+    } catch (error) {
+      if (!isStripeOutage(error)) {
+        throw error;
+      }
+
+      paymentsUnavailable = true;
+      savedPaymentMethods = [];
+    }
+  }
 
   const billingDefaults = {
     firstName: customer?.firstName ?? defaultSavedAddress?.firstName ?? '',
@@ -545,6 +584,8 @@ export default async function CheckoutPage({ params }: Props) {
             addressModalSave: t('address.save'),
           }}
           paymentTitle={t('payment.title')}
+          paymentsUnavailable={paymentsUnavailable}
+          paymentsUnavailableMessage={paymentsUnavailableMessage}
           requiresShipping={requiresShippingAddress}
           returnUrl={buildAppUrl('/checkout/success/', locale)}
           savedAddresses={savedAddresses}

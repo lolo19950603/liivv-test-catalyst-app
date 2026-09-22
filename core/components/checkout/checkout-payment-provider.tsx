@@ -50,6 +50,7 @@ interface CheckoutPaymentProviderProps {
   ) => Promise<{ snapshotId: string }>;
   returnUrl: string;
   shippingReady: boolean;
+  paymentsUnavailable?: boolean;
 }
 
 export function CheckoutPaymentProvider({
@@ -59,6 +60,7 @@ export function CheckoutPaymentProvider({
   prepareOrderConfirmationAction,
   returnUrl,
   shippingReady,
+  paymentsUnavailable = false,
 }: CheckoutPaymentProviderProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(
     () => paymentClientSecrets.get(billingFormId) ?? null,
@@ -112,7 +114,7 @@ export function CheckoutPaymentProvider({
   }, [billingFormId, commitClientSecret, initializePaymentAction]);
 
   useEffect(() => {
-    if (!shippingReady || clientSecret || initializationAttemptedRef.current) {
+    if (paymentsUnavailable || !shippingReady || clientSecret || initializationAttemptedRef.current) {
       return;
     }
 
@@ -127,7 +129,7 @@ export function CheckoutPaymentProvider({
         setErrorMessage(error instanceof Error ? error.message : 'Unable to load payment form');
       }
     });
-  }, [clientSecret, initializeFromBillingForm, shippingReady]);
+  }, [clientSecret, initializeFromBillingForm, paymentsUnavailable, shippingReady]);
 
   const refreshPaymentIntent = useCallback(async () => {
     try {
@@ -151,7 +153,7 @@ export function CheckoutPaymentProvider({
 
   useEffect(() => {
     const handlePageShow = (event: PageTransitionEvent) => {
-      if (!event.persisted || !shippingReady) {
+      if (!event.persisted || !shippingReady || paymentsUnavailable) {
         return;
       }
 
@@ -170,7 +172,7 @@ export function CheckoutPaymentProvider({
     return () => {
       window.removeEventListener('pageshow', handlePageShow);
     };
-  }, [refreshPaymentIntent, shippingReady]);
+  }, [paymentsUnavailable, refreshPaymentIntent, shippingReady]);
 
   const prepareOrderConfirmation = useCallback(async () => {
     if (!clientSecret) {

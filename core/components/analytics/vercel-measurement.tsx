@@ -57,7 +57,7 @@ import { hasAdSignalsFlag, isSensitiveOstomyPath } from '~/lib/analytics/ad-sign
  * express it through, so the event is dropped rather than redacted.
  *
  * The two env vars are still the sitewide off switch, and they are documented in
- * `.env.example` and `docs/IT-Architecture.md`. Nothing in the code has ever
+ * `.env.example` and `docs/Liivv-Architecture.md`. Nothing in the code has ever
  * enforced them, which is why this filter does not depend on them.
  * =============================================================================
  */

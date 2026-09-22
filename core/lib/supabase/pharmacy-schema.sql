@@ -19,7 +19,6 @@ CREATE TABLE IF NOT EXISTS public.prescriptions (
   status text,
   approval_status text,
   submission_method text,
-  photo_url text,
   notes text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()

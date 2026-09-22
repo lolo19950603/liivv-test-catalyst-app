@@ -97,6 +97,21 @@ class KV<Adapter extends KvAdapter> implements KvAdapter {
     return after === value;
   }
 
+  /**
+   * Shared increment that skips the in-process memory cache so every Vercel
+   * instance reads/writes the same Runtime Cache counter.
+   */
+  async increment(key: string, opts: { ex: number }): Promise<number> {
+    const kv = await this.getKv();
+    const [current] = await kv.mget<number>(key);
+    const next = (typeof current === 'number' && Number.isFinite(current) ? current : 0) + 1;
+
+    await kv.set(key, next, opts);
+    this.logger(`INCR - Key: ${key} - Value: ${next}`);
+
+    return next;
+  }
+
   private async getKv() {
     if (!this.kv) {
       this.kv = await this.createAdapter();
@@ -114,12 +129,6 @@ class KV<Adapter extends KvAdapter> implements KvAdapter {
 }
 
 async function createKVAdapter() {
-  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
-    const { UpstashKvAdapter } = await import('./adapters/upstash');
-
-    return new UpstashKvAdapter();
-  }
-
   if (process.env.VERCEL === '1') {
     const { RuntimeCacheAdapter } = await import('./adapters/vercel-runtime-cache');
 

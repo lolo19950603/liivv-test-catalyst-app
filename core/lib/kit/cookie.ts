@@ -13,6 +13,14 @@ const kitSessionCookieSchema = z.object({
     z.object({
       kitId: z.string().min(1),
       name: z.string().optional(),
+      href: z.string().optional(),
+      image: z
+        .object({
+          src: z.string().min(1),
+          alt: z.string(),
+        })
+        .optional(),
+      quantity: z.number().int().positive().optional(),
       items: z.array(
         z.object({
           productEntityId: z.number().int().positive(),

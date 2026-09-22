@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 
-import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
+import { runCustomerAction } from '~/lib/action-gateway/session';
 import {
   buildHealthAnswersConsent,
   buildHealthAnswersNotes,
@@ -214,102 +214,103 @@ export async function saveHealthProfileStep(
   _prevState: HealthProfileActionState,
   formData: FormData,
 ): Promise<HealthProfileActionState> {
-  const customer = await getOnboardingCustomer();
+  return runCustomerAction(
+    { result: { error: 'Please sign in to continue.' } },
+    async (customer) => {
+      if (!isSupabaseConfigured()) {
+        return { error: 'Supabase is not configured.' };
+      }
 
-  if (!customer) {
-    return { error: 'Please sign in to continue.' };
-  }
+      const intent = str(formData, 'intent');
+      const isOntario = isOntarioZoneCode(
+        str(formData, 'zoneCode') || str(formData, 'stateOrProvince'),
+      );
+      const ensured = await ensureCustomerProfile(customer);
 
-  if (!isSupabaseConfigured()) {
-    return { error: 'Supabase is not configured.' };
-  }
+      if (ensured.status !== 'ok') {
+        return { error: ensured.status === 'error' ? ensured.message : 'Profile not ready.' };
+      }
 
-  const intent = str(formData, 'intent');
-  const isOntario = isOntarioZoneCode(str(formData, 'zoneCode') || str(formData, 'stateOrProvince'));
-  const ensured = await ensureCustomerProfile(customer);
+      const rawCategoryIds = formData.getAll('care_interests').flatMap((value) => {
+        if (typeof value !== 'string') {
+          return [];
+        }
 
-  if (ensured.status !== 'ok') {
-    return { error: ensured.status === 'error' ? ensured.message : 'Profile not ready.' };
-  }
+        const normalized = value.trim().toLowerCase();
 
-  const rawCategoryIds = formData.getAll('care_interests').flatMap((value) => {
-    if (typeof value !== 'string') {
-      return [];
-    }
+        return normalized ? [normalized] : [];
+      });
+      const normalizedCare = [...new Set(rawCategoryIds)];
+      const normalizedCareWithRank = normalizedCare.map((id, index) =>
+        encodeRankedCareInterest(id as LiivPrimaryCategoryId, index + 1),
+      );
 
-    const normalized = value.trim().toLowerCase();
+      if (intent !== 'save') {
+        return { error: 'Unknown action.' };
+      }
 
-    return normalized ? [normalized] : [];
-  });
-  const normalizedCare = [...new Set(rawCategoryIds)];
-  const normalizedCareWithRank = normalizedCare.map((id, index) =>
-    encodeRankedCareInterest(id as LiivPrimaryCategoryId, index + 1),
+      for (const id of normalizedCare) {
+        if (!isLiivPrimaryCategoryId(id)) {
+          return { error: 'Invalid category selection.' };
+        }
+
+        if (!isPrimaryCategoryAllowedForCustomer(id, { isOntario })) {
+          return { error: 'One or more categories are not available for your province.' };
+        }
+      }
+
+      const existing = await getHealthProfileByProfileId(ensured.profile.id);
+      const consentLocale = str(formData, HEALTH_ANSWERS_CONSENT_LOCALE_FIELD);
+
+      // Health answers are only written once the person has ticked the express
+      // consent box on this submission. Nothing new is saved without it — not the
+      // answers, not the completed-step timestamp. This runs before the form
+      // validation below on purpose: taking consent back writes none of the
+      // submission, so it must not be blocked by a question left unanswered.
+      if (!isHealthAnswersConsentTicked(formData)) {
+        return withdrawOrRefuse(existing, consentLocale);
+      }
+
+      const validation = validateHealthProfileComplete(formData);
+
+      if (!validation.ok) {
+        return { error: validation.message };
+      }
+
+      const categoryResponses = buildCategoryResponses(formData);
+      const consent = buildHealthAnswersConsent({
+        source: 'health_profile_form',
+        locale: consentLocale,
+        // Every answer written here came from this submission, so the person read
+        // each one back to us before ticking.
+        covers: Object.keys(categoryResponses),
+      });
+      const payload = buildHealthPayload(
+        ensured.profile.id,
+        formData,
+        categoryResponses,
+        consent,
+        existing?.notes ?? null,
+      );
+      const up = await upsertHealthProfile(payload);
+
+      if (!up.ok) {
+        return { error: up.message };
+      }
+
+      const saved = await completeOnboardingStep2(customer, normalizedCareWithRank);
+
+      if (!saved) {
+        return { error: 'Could not save health profile.' };
+      }
+
+      revalidatePath('/account/dashboard');
+      revalidatePath('/account/health-profile');
+
+      const status = await getOnboardingStatus(String(customer.entityId));
+      const celebrate = Boolean(status?.insurance_info_completed_at);
+
+      redirect(celebrate ? '/account/dashboard/?oliviaCelebrate=1' : '/account/dashboard/');
+    },
   );
-
-  if (intent !== 'save') {
-    return { error: 'Unknown action.' };
-  }
-
-  for (const id of normalizedCare) {
-    if (!isLiivPrimaryCategoryId(id)) {
-      return { error: 'Invalid category selection.' };
-    }
-
-    if (!isPrimaryCategoryAllowedForCustomer(id, { isOntario })) {
-      return { error: 'One or more categories are not available for your province.' };
-    }
-  }
-
-  const existing = await getHealthProfileByProfileId(ensured.profile.id);
-  const consentLocale = str(formData, HEALTH_ANSWERS_CONSENT_LOCALE_FIELD);
-
-  // Health answers are only written once the person has ticked the express
-  // consent box on this submission. Nothing new is saved without it — not the
-  // answers, not the completed-step timestamp. This runs before the form
-  // validation below on purpose: taking consent back writes none of the
-  // submission, so it must not be blocked by a question left unanswered.
-  if (!isHealthAnswersConsentTicked(formData)) {
-    return withdrawOrRefuse(existing, consentLocale);
-  }
-
-  const validation = validateHealthProfileComplete(formData);
-
-  if (!validation.ok) {
-    return { error: validation.message };
-  }
-
-  const categoryResponses = buildCategoryResponses(formData);
-  const consent = buildHealthAnswersConsent({
-    source: 'health_profile_form',
-    locale: consentLocale,
-    // Every answer written here came from this submission, so the person read
-    // each one back to us before ticking.
-    covers: Object.keys(categoryResponses),
-  });
-  const payload = buildHealthPayload(
-    ensured.profile.id,
-    formData,
-    categoryResponses,
-    consent,
-    existing?.notes ?? null,
-  );
-  const up = await upsertHealthProfile(payload);
-
-  if (!up.ok) {
-    return { error: up.message };
-  }
-
-  const saved = await completeOnboardingStep2(customer, normalizedCareWithRank);
-
-  if (!saved) {
-    return { error: 'Could not save health profile.' };
-  }
-
-  revalidatePath('/account/dashboard');
-  revalidatePath('/account/health-profile');
-
-  const status = await getOnboardingStatus(String(customer.entityId));
-  const celebrate = Boolean(status?.insurance_info_completed_at);
-
-  redirect(celebrate ? '/account/dashboard/?oliviaCelebrate=1' : '/account/dashboard/');
 }

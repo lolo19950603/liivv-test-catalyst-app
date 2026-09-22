@@ -12,7 +12,7 @@ import { listInsuranceByProfileId, type InsuranceInfoRow } from '~/lib/supabase/
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import {
   listCarePackRequestsByProfileId,
-  listPrescriptionsByProfileIdWithSignedPhotos,
+  listPrescriptionsByProfileId,
   listRefillRequestsByProfileId,
   type CarePackRequestRow,
   type PrescriptionRow,
@@ -130,13 +130,11 @@ export async function searchMergedCustomersForAdmin(
   };
 }
 
-export type PrescriptionRowWithPhoto = PrescriptionRow & { photoDisplayUrl: string | null };
-
 export type AdminCustomerDetail = {
   profile: CustomerProfileRow | null;
   health: HealthProfileRow | null;
   insurances: InsuranceInfoRow[];
-  prescriptions: PrescriptionRowWithPhoto[];
+  prescriptions: PrescriptionRow[];
   refillRequests: RefillRequestRow[];
   carePackRequests: CarePackRequestRow[];
   bigcommerce: AdminBigCommerceCustomerSnapshot | null;
@@ -169,7 +167,7 @@ export async function getAdminCustomerDetail(
       await Promise.all([
         getHealthProfileByProfileId(profileId),
         listInsuranceByProfileId(profileId),
-        listPrescriptionsByProfileIdWithSignedPhotos(profileId),
+        listPrescriptionsByProfileId(profileId),
         listRefillRequestsByProfileId(profileId),
         listCarePackRequestsByProfileId(profileId),
         bcId && isBigCommerceAdminConfigured()

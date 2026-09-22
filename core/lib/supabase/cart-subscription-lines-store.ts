@@ -17,24 +17,33 @@ export async function getCartSubscriptionLinesRecordFromSupabase(
   }
 
   const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from('cart_subscription_lines')
-    .select('lines, updated_at')
-    .eq('cart_id', cartId)
-    .maybeSingle();
 
-  if (error) {
-    throw new Error(`Failed to load cart subscription lines: ${error.message}`);
-  }
+  try {
+    const { data, error } = await supabase
+      .from('cart_subscription_lines')
+      .select('lines, updated_at')
+      .eq('cart_id', cartId)
+      .maybeSingle();
 
-  if (!data) {
+    if (error) {
+      console.error('[supabase] cart subscription lines unavailable', error);
+
+      return { lines: [], updatedAt: null };
+    }
+
+    if (!data) {
+      return { lines: [], updatedAt: null };
+    }
+
+    return {
+      lines: (data.lines as SubscriptionLineMeta[]) ?? [],
+      updatedAt: data.updated_at ?? null,
+    };
+  } catch (error) {
+    console.error('[supabase] cart subscription lines unavailable', error);
+
     return { lines: [], updatedAt: null };
   }
-
-  return {
-    lines: (data.lines as SubscriptionLineMeta[]) ?? [],
-    updatedAt: data.updated_at ?? null,
-  };
 }
 
 export async function getCartSubscriptionLinesFromSupabase(

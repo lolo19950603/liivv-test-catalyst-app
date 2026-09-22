@@ -2,7 +2,7 @@ import { getTranslations } from 'next-intl/server';
 
 import type { ArchiveCatalogProductCardQuickActions } from '@/vibes/soul/primitives/product-card';
 import { isLoggedIn } from '~/auth';
-import { isStripeConfigured } from '~/lib/stripe';
+import { areSubscriptionsAvailable } from '~/lib/subscriptions/availability';
 
 import { addToCart } from './add-to-cart';
 import { getWishlistsForProduct } from './get-wishlists-for-product';
@@ -12,11 +12,12 @@ import {
 } from '../../product/[slug]/_actions/wishlist-action';
 
 export async function getFacetedProductCardQuickActions(): Promise<ArchiveCatalogProductCardQuickActions> {
-  const [compareT, productT, wishlistT, loggedIn] = await Promise.all([
+  const [compareT, productT, wishlistT, loggedIn, subscriptionsAvailable] = await Promise.all([
     getTranslations('Compare'),
     getTranslations('Product.ProductDetails'),
     getTranslations('Wishlist'),
     isLoggedIn(),
+    areSubscriptionsAvailable(),
   ]);
 
   return {
@@ -24,7 +25,7 @@ export async function getFacetedProductCardQuickActions(): Promise<ArchiveCatalo
     addToCartLabel: compareT('addToCart'),
     chooseOptionsLabel: 'Choose options',
     showWishlist: true,
-    showSubscribe: isStripeConfigured(),
+    showSubscribe: subscriptionsAvailable,
     isLoggedIn: loggedIn,
     subscribeLabel: productT('purchaseOptions.subscribeAndSave'),
     wishlistLabel: wishlistT('Button.label'),

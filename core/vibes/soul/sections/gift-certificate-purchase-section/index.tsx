@@ -9,9 +9,9 @@ import { DynamicForm, DynamicFormAction } from '@/vibes/soul/form/dynamic-form';
 import { Field, FieldGroup, FormErrorTranslationMap } from '@/vibes/soul/form/dynamic-form/schema';
 import { Streamable } from '@/vibes/soul/lib/streamable';
 import { GiftCertificateCard } from '@/vibes/soul/primitives/gift-certificate-card';
-import { toast } from '@/vibes/soul/primitives/toaster';
 import { Breadcrumb, Breadcrumbs } from '@/vibes/soul/sections/breadcrumbs';
 import { SectionLayout } from '@/vibes/soul/sections/section-layout';
+import { useMiniCart } from '~/components/mini-cart';
 
 interface Props {
   action: DynamicFormAction<Field>;
@@ -60,6 +60,7 @@ export function GiftCertificatePurchaseSection({
 }: Props) {
   const t = useTranslations('GiftCertificates.Purchase');
   const format = useFormatter();
+  const { openMiniCart } = useMiniCart();
   const [formattedAmount, setFormattedAmount] = useState<string | undefined>(undefined);
   const errorTranslations: FormErrorTranslationMap = {
     amount: {
@@ -124,9 +125,12 @@ export function GiftCertificatePurchaseSection({
     setFormattedAmount(formatted);
   };
 
-  const handleSuccess = useCallback((lastResult: SubmissionResult, successMessage: ReactNode) => {
-    toast.success(successMessage);
-  }, []);
+  const handleSuccess = useCallback(
+    (_lastResult: SubmissionResult, _successMessage: ReactNode) => {
+      openMiniCart();
+    },
+    [openMiniCart],
+  );
 
   return (
     <SectionLayout containerSize="xl">

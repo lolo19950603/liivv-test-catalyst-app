@@ -1,6 +1,7 @@
 import 'server-only';
 
 import type { KitRecord, KitSession } from '~/lib/kit/types';
+import { isVendorOutageError, logVendorOutage } from '~/lib/vendor-outage';
 
 import { getSupabaseClient, isSupabaseConfigured } from './client';
 
@@ -28,26 +29,36 @@ export async function getCartKitSessionFromSupabase(cartId: string): Promise<Kit
     return null;
   }
 
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from('cart_kit_sessions')
-    .select('kits')
-    .eq('cart_id', cartId)
-    .maybeSingle();
+  try {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase
+      .from('cart_kit_sessions')
+      .select('kits')
+      .eq('cart_id', cartId)
+      .maybeSingle();
 
-  if (error) {
-    logCartKitSessionError('load', error);
+    if (error) {
+      logCartKitSessionError('load', error);
+
+      return null;
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    const kits = (data.kits as KitRecord[]) ?? [];
+
+    return { kits };
+  } catch (error) {
+    if (isVendorOutageError(error)) {
+      logVendorOutage('supabase', error);
+    } else {
+      console.error('[supabase] cart kit session load failed', error);
+    }
 
     return null;
   }
-
-  if (!data) {
-    return null;
-  }
-
-  const kits = (data.kits as KitRecord[]) ?? [];
-
-  return { kits };
 }
 
 export async function setCartKitSessionInSupabase(
@@ -58,21 +69,31 @@ export async function setCartKitSessionInSupabase(
     return false;
   }
 
-  const supabase = getSupabaseClient();
-  const { error } = await supabase.from('cart_kit_sessions').upsert(
-    {
-      cart_id: cartId,
-      kits: session.kits,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'cart_id' },
-  );
+  try {
+    const supabase = getSupabaseClient();
+    const { error } = await supabase.from('cart_kit_sessions').upsert(
+      {
+        cart_id: cartId,
+        kits: session.kits,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'cart_id' },
+    );
 
-  if (error) {
-    logCartKitSessionError('save', error);
+    if (error) {
+      logCartKitSessionError('save', error);
+
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    if (isVendorOutageError(error)) {
+      logVendorOutage('supabase', error);
+    } else {
+      console.error('[supabase] cart kit session save failed', error);
+    }
 
     return false;
   }
-
-  return true;
 }

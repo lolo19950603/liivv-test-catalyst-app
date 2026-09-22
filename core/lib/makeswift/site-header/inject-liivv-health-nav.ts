@@ -20,7 +20,7 @@ export const OSTOMY_FUNDING_PATH = '/liivv-health/ostomy-care/funding';
 const CHAPTER_IMG = '/archive/womens-health';
 
 /**
- * Storefront top-level “Liivv Health” item — sits between Liivv Your Life and Blog.
+ * Storefront top-level “Liivv Health” item — sits after Liivv Your Life.
  * Keep labels in sync with the Liivv Health hub cards on production.
  */
 export function getStoreLiivvHealthNavItem(): LiivvArchiveNavLink {

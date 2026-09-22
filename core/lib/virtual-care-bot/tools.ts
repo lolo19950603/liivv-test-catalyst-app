@@ -17,7 +17,7 @@ import {
 import { addToOrCreateCart } from '~/lib/cart';
 import { customerAddressToSnapshot } from '~/lib/account/saved-shipping-addresses';
 import { formatShippingAddressLabel } from '~/lib/checkout/subscription-shipping-metadata';
-import { isStripeConfigured } from '~/lib/stripe/client';
+import { areSubscriptionsAvailable } from '~/lib/subscriptions/availability';
 import {
   cancelCustomerSubscription,
   getCustomerSubscriptions,
@@ -411,7 +411,7 @@ async function resolveOwnedSubscription(subscriptionId: string): Promise<
   | { ok: true; stripeCustomerId: string; subscription: CustomerSubscription }
   | { ok: false; message: string }
 > {
-  if (!isStripeConfigured()) {
+  if (!(await areSubscriptionsAvailable())) {
     return { ok: false, message: 'Subscriptions are not available right now.' };
   }
 
@@ -444,7 +444,7 @@ export async function toolListSubscriptions() {
   const subscriptionsUrl = subscriptionsPageUrl();
   const allowedFrequencies = getAllowedFrequencyOptions();
 
-  if (!isStripeConfigured()) {
+  if (!(await areSubscriptionsAvailable())) {
     return {
       ok: false,
       message: 'Subscriptions are not available right now.',

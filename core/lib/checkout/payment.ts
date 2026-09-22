@@ -11,6 +11,7 @@ import {
 import { kv } from '~/lib/kv';
 import { getStripe } from '~/lib/stripe/client';
 import { getOrCreateStripeCustomer } from '~/lib/stripe/customers';
+import { areSubscriptionsAvailable } from '~/lib/subscriptions/availability';
 import { createStripeProductForCheckoutLine } from '~/lib/stripe/subscription-products';
 import { getStripeSubscriptionBillingSchedule, resolveSubscriptionLineBillingAmounts } from '~/lib/stripe/subscription-pricing';
 import { resolveSubscriptionBillingQuote } from '~/lib/stripe/subscription-billing-quote';
@@ -308,6 +309,15 @@ export async function initializeCheckoutPayment({
     bigcommerceCustomerId,
     billingAddress,
   });
+
+  if (
+    snapshot.lineItems.some((line) => line.isSubscription) &&
+    !(await areSubscriptionsAvailable())
+  ) {
+    throw new Error(
+      'Subscriptions are temporarily unavailable. Your cart is saved — please try again shortly.',
+    );
+  }
 
   const stripeCustomerId = await getOrCreateStripeCustomer({
     bigcommerceCustomerId,

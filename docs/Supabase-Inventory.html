@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Liivv — Supabase inventory (IT)</title>
+  <style>
+  @page { size: letter; margin: 0.65in 0.7in; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Calibri, Helvetica, Arial, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.42;
+    color: #1a1a1a;
+    max-width: 920px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 20pt; font-weight: 650; margin: 0 0 10pt; letter-spacing: -0.02em; }
+  h2 { font-size: 13.5pt; font-weight: 650; margin: 20pt 0 8pt; page-break-after: avoid; }
+  h3 { font-size: 11.5pt; font-weight: 650; margin: 14pt 0 6pt; page-break-after: avoid; }
+  a { color: #0b57d0; text-decoration: none; }
+  p, ul, ol { margin: 0 0 8pt; }
+  li { margin-bottom: 2pt; }
+  hr { border: 0; border-top: 1px solid #d0d0d0; margin: 14pt 0; }
+  table { width: 100%; border-collapse: collapse; margin: 8pt 0 12pt; font-size: 9pt; page-break-inside: auto; }
+  th, td { text-align: left; vertical-align: top; padding: 5pt 6pt; border-bottom: 1px solid #e2e2e2; }
+  th { font-weight: 650; border-bottom: 1.5px solid #1a1a1a; }
+  strong { font-weight: 650; }
+  code { font-family: Consolas, "Courier New", monospace; font-size: 9pt; }
+  pre.code { background: #f6f5f2; padding: 8pt 10pt; overflow: hidden; font-size: 8pt; }
+  .mermaid { margin: 12pt 0 16pt; page-break-inside: avoid; overflow: visible; }
+  .mermaid svg { max-width: 100%; height: auto; display: block; }
+  .mermaid .nodeLabel, .mermaid .edgeLabel, .mermaid .cluster-label {
+    font-size: 13px;
+  }
+  svg { max-width: 100%; }
+  figure.diagram { margin: 10pt 0 14pt; page-break-inside: avoid; }
+  figure.diagram svg { width: 100%; height: auto; display: block; }
+  figcaption { font-size: 9pt; color: #555; margin-top: 4pt; }
+</style>
+</head>
+<body>
+<h1>Liivv — Supabase inventory</h1>
+<p><strong>For:</strong> IT / security  </p>
+<p><strong>From:</strong> Liivv  </p>
+<p><strong>Date:</strong> 9 September 2026  </p>
+<p><strong>Ask:</strong> “Please provide all the tables, backend / Edge Functions on Supabase.”  </p>
+<p><strong>PDF:</strong> <a href="./Supabase-Inventory.pdf">Supabase-Inventory.pdf</a></p>
+<hr />
+<h2 id="direct-answer">Direct answer</h2>
+<table><thead><tr><th>Item</th><th>What Liivv has</th></tr></thead><tbody><tr><td><strong>Tables</strong></td><td><strong>13</strong> Postgres tables in the <code>public</code> schema (listed below)</td></tr>
+<tr><td><strong>Supabase Edge Functions</strong></td><td><strong>None</strong></td></tr>
+<tr><td><strong>Supabase database functions / triggers / cron</strong></td><td><strong>None</strong> in the application schema</td></tr>
+<tr><td><strong>Supabase Auth / Storage / Realtime</strong></td><td><strong>Not used</strong> by the app</td></tr></tbody></table>
+<p>Supabase is used as a <strong>hosted Postgres database</strong> in <strong>Canada</strong> (<code>ca-central-1</code>). Application logic runs in the <strong>Next.js storefront on Vercel</strong>, not as serverless functions inside Supabase.</p>
+<div class="mermaid">flowchart LR
+  B[Shopper / pharmacist browser]
+  N[Next.js on Vercel]
+  S[(Supabase Postgres — 13 tables)]
+
+  B -->|HTTPS pages and forms| N
+  N -->|HTTPS + service role key| S</div>
+<p>The browser never holds a Supabase key and never calls Supabase directly.</p>
+<hr />
+<h2 id="what-backend-edge-functions-means-here">What “backend / Edge Functions” means here</h2>
+<p>In Supabase, <strong>Edge Functions</strong> are optional Deno serverless APIs you deploy *inside* the Supabase project (Dashboard → Edge Functions, or a <code>supabase/functions/</code> folder in git). Typical uses: webhooks, scheduled jobs, custom APIs.</p>
+<p>Liivv does <strong>not</strong> use that product.</p>
+<table><thead><tr><th>Kind of “backend”</th><th>Hosted where</th><th>Used by Liivv?</th></tr></thead><tbody><tr><td>Supabase Edge Functions</td><td>Supabase</td><td><strong>No — none deployed, none in the repo</strong></td></tr>
+<tr><td>Postgres stored procedures / triggers</td><td>Supabase SQL</td><td><strong>No</strong> for application tables</td></tr>
+<tr><td>Next.js server code (pages, server actions, <code>/api/*</code>)</td><td>Vercel</td><td><strong>Yes — this is the application backend</strong></td></tr></tbody></table>
+<p>Webhooks (Stripe, BigCommerce) hit <strong>Next.js routes on Vercel</strong>, for example <code>/api/stripe/webhook</code> and <code>/api/bigcommerce/webhook</code>. They do not hit Supabase functions.</p>
+<hr />
+<h2 id="how-the-app-connects">How the app connects</h2>
+<table><thead><tr><th>Fact</th><th>Detail</th></tr></thead><tbody><tr><td>Region</td><td>Canada Central (<code>ca-central-1</code>)</td></tr>
+<tr><td>Product used</td><td>Postgres + PostgREST HTTPS API</td></tr>
+<tr><td>Client</td><td>Server-only module <code>core/lib/supabase/client.ts</code></td></tr>
+<tr><td>Credentials</td><td><code>SUPABASE_URL</code> and <code>SUPABASE_SERVICE_ROLE_KEY</code> (Vercel env vars; never in the browser)</td></tr>
+<tr><td>Auth on tables</td><td>Documented control: <strong>Row Level Security on</strong>, with <strong>no</strong> anon/authenticated policies (deny by default). The service role <strong>bypasses</strong> RLS by design — same class of risk as a privileged SQL login on an API.</td></tr></tbody></table>
+<p>Schema source (run in the Supabase SQL editor):</p>
+<ol>
+<li><code>core/lib/supabase/schema.sql</code></li>
+<li><code>core/lib/supabase/onboarding-schema.sql</code></li>
+<li><code>core/lib/supabase/pharmacy-schema.sql</code></li>
+</ol>
+<hr />
+<h2 id="tables-complete-list">Tables (complete list)</h2>
+<h3 id="health-and-pharmacy-phi-pii">Health and pharmacy (PHI / PII)</h3>
+<table><thead><tr><th>Table</th><th>Purpose</th><th>Data class</th><th>Key fields</th></tr></thead><tbody><tr><td><code>profiles</code></td><td>One Liivv profile per BigCommerce customer</td><td>PII</td><td><code>id</code> (uuid), <code>bigcommerce_customer_id</code> (unique), name, email, phone, onboarding timestamps, <code>care_interests</code></td></tr>
+<tr><td><code>health_profiles</code></td><td>Care questionnaire (diabetes, ostomy, catheter, wound, respiratory, clinician contacts)</td><td>PHI</td><td><code>id</code>, <code>profile_id</code> → <code>profiles</code> (1:1), medications, allergies, device brands, <code>care_details</code> (jsonb)</td></tr>
+<tr><td><code>insurance_info</code></td><td>Insurance card details</td><td>PHI</td><td><code>id</code>, <code>profile_id</code> → <code>profiles</code>, provider, policy/group/member ids, <code>card_image_url</code> (column exists; app does not use Supabase Storage)</td></tr>
+<tr><td><code>prescriptions</code></td><td>Customer prescriptions</td><td>PHI</td><td><code>id</code>, <code>profile_id</code> → <code>profiles</code>, medication, DIN, dosage, dates, status, approval, notes</td></tr>
+<tr><td><code>refill_requests</code></td><td>Pharmacist refill queue</td><td>PHI</td><td><code>id</code>, <code>profile_id</code> → <code>profiles</code>, <code>prescription_ids</code> (uuid[]), status, notes</td></tr>
+<tr><td><code>carepack_requests</code></td><td>Pharmacist CarePack queue</td><td>PHI</td><td><code>id</code>, <code>profile_id</code> → <code>profiles</code>, <code>prescription_ids</code> (uuid[]), status, notes</td></tr>
+<tr><td><code>chat_conversations</code></td><td>One care-chat thread per profile</td><td>PHI (operational)</td><td><code>id</code>, <code>profile_id</code> → <code>profiles</code> (unique), staff join/close/escalate timestamps</td></tr>
+<tr><td><code>chat_messages</code></td><td>Care-chat messages</td><td>PHI</td><td><code>id</code>, <code>conversation_id</code> → <code>chat_conversations</code>, <code>sender_type</code> (<code>customer</code> / <code>staff</code> / <code>bot</code> / <code>system</code>), <code>body</code> (max 8000 chars)</td></tr></tbody></table>
+<p><code>profiles</code> is the parent. Deleting a profile <strong>cascades</strong> to health, insurance, prescriptions, refill/CarePack requests, and chat.</p>
+<h3 id="shop-subscription-operations-not-modeled-as-phi">Shop / subscription operations (not modeled as PHI)</h3>
+<table><thead><tr><th>Table</th><th>Purpose</th><th>Data class</th><th>Key fields</th></tr></thead><tbody><tr><td><code>cart_subscription_lines</code></td><td>Subscription line metadata on a cart (survives restarts)</td><td>Operational</td><td><code>cart_id</code> (pk), <code>lines</code> (jsonb)</td></tr>
+<tr><td><code>cart_kit_sessions</code></td><td>Build-your-own kit composition for packing notes</td><td>Operational</td><td><code>cart_id</code> (pk), <code>kits</code> (jsonb)</td></tr>
+<tr><td><code>saved_kits</code></td><td>Customer-saved custom kits</td><td>Operational</td><td><code>id</code>, <code>bigcommerce_customer_id</code>, name, <code>fingerprint</code>, <code>items</code> (jsonb)</td></tr>
+<tr><td><code>subscription_order_batches</code></td><td>Paid Stripe invoice lines waiting to combine into one BigCommerce order</td><td>Operational</td><td><code>storage_key</code> (pk), <code>customer_id</code>, shipment day/address, <code>items</code> (jsonb)</td></tr>
+<tr><td><code>finalized_shipment_records</code></td><td>Past subscription shipment history</td><td>Operational</td><td><code>storage_key</code> (pk), <code>customer_id</code>, outcome, <code>bigcommerce_order_id</code>, charged/skipped items (jsonb)</td></tr></tbody></table>
+<p>Orders, products, and shopper login identity live in <strong>BigCommerce</strong>, not these tables. Card numbers live in <strong>Stripe</strong>, never in Supabase.</p>
+<hr />
+<h2 id="relationships-health">Relationships (health)</h2>
+<div class="mermaid">flowchart TB
+  P[profiles]
+  H[health_profiles]
+  I[insurance_info]
+  RX[prescriptions]
+  RF[refill_requests]
+  CP[carepack_requests]
+  CC[chat_conversations]
+  CM[chat_messages]
+
+  P --> H
+  P --> I
+  P --> RX
+  P --> RF
+  P --> CP
+  P --> CC
+  CC --> CM</div>
+<p>Shop tables (<code>cart_*</code>, <code>saved_kits</code>, <code>subscription_order_batches</code>, <code>finalized_shipment_records</code>) are keyed by BigCommerce cart id or customer id. They do not foreign-key to <code>profiles</code>.</p>
+<hr />
+<h2 id="what-is-not-on-supabase">What is *not* on Supabase</h2>
+<table><thead><tr><th>Feature</th><th>Status</th></tr></thead><tbody><tr><td>Edge Functions</td><td>None</td></tr>
+<tr><td>Database functions / stored procedures</td><td>None in application schema</td></tr>
+<tr><td>Triggers</td><td>None in application schema</td></tr>
+<tr><td><code>pg_cron</code> / scheduled jobs</td><td>None</td></tr>
+<tr><td>Supabase Auth (user accounts)</td><td>Not used — shopper login is BigCommerce</td></tr>
+<tr><td>Storage buckets</td><td>Not used — <code>avatar_url</code> / <code>card_image_url</code> columns exist but files are not stored in Supabase Storage</td></tr>
+<tr><td>Realtime subscriptions</td><td>Not used</td></tr>
+<tr><td>Shop catalog, orders, payments</td><td>BigCommerce + Stripe</td></tr></tbody></table>
+<hr />
+<h2 id="confirm-in-the-supabase-dashboard">Confirm in the Supabase dashboard</h2>
+<p>This inventory is from the <strong>application schema in git</strong>. Please also confirm in the live project:</p>
+<ol>
+<li><strong>Database → Tables</strong> — the 13 tables above (no extras unexpected by Liivv)</li>
+<li><strong>Edge Functions</strong> — empty</li>
+<li><strong>Database → Functions / Triggers</strong> — no application functions</li>
+<li><strong>Authentication / Storage</strong> — unused by the storefront</li>
+<li><strong>RLS</strong> — enabled on these tables, with no policies for <code>anon</code> / <code>authenticated</code></li>
+</ol>
+<p>If the live project has extra tables or functions not listed here, they are not part of the Liivv storefront codebase.</p>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'base',
+    securityLevel: 'strict',
+    themeVariables: {
+      fontFamily: 'Segoe UI, Calibri, Helvetica, Arial, sans-serif',
+      fontSize: '16px',
+    },
+    flowchart: {
+      htmlLabels: true,
+      nodeSpacing: 28,
+      rankSpacing: 48,
+      padding: 16,
+      wrappingWidth: 140,
+      useMaxWidth: true,
+    },
+  });
+  try {
+    await mermaid.run({ querySelector: '.mermaid' });
+  } catch (error) {
+    console.error(error);
+  }
+  window.__mermaidDone = true;
+</script>
+</body>
+</html>

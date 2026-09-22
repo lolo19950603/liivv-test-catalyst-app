@@ -13,6 +13,18 @@ export const cartLineItemActionFormDataSchema = z.discriminatedUnion('intent', [
     intent: z.literal('delete'),
     id: z.string(),
   }),
+  z.object({
+    intent: z.literal('increment-kit'),
+    kitId: z.string(),
+  }),
+  z.object({
+    intent: z.literal('decrement-kit'),
+    kitId: z.string(),
+  }),
+  z.object({
+    intent: z.literal('delete-kit'),
+    kitId: z.string(),
+  }),
 ]);
 
 export const couponCodeActionFormDataSchema = ({

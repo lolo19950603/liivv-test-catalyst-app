@@ -28,31 +28,37 @@ export const getWellnessDashboardContext = cache(async () => {
     return empty;
   }
 
-  const ensured = await ensureCustomerProfile(customer);
-  const profile = ensured.status === 'ok' ? ensured.profile : null;
-  const ranked = resolveInitialHealthCategoriesWithRank(profile?.care_interests);
-  const primary = ranked[0] ? getPrimaryCategoryDisplay(ranked[0].id) : null;
-  const healthCategoryLabels = ranked.map((entry) => getPrimaryCategoryDisplay(entry.id).shortLabel);
+  try {
+    const ensured = await ensureCustomerProfile(customer);
+    const profile = ensured.status === 'ok' ? ensured.profile : null;
+    const ranked = resolveInitialHealthCategoriesWithRank(profile?.care_interests);
+    const primary = ranked[0] ? getPrimaryCategoryDisplay(ranked[0].id) : null;
+    const healthCategoryLabels = ranked.map((entry) => getPrimaryCategoryDisplay(entry.id).shortLabel);
 
-  const careInterests = profile?.care_interests ?? [];
+    const careInterests = profile?.care_interests ?? [];
 
-  let insuranceProviderName: string | null = null;
-  if (profile?.id) {
-    const rows = await listInsuranceByProfileId(profile.id);
-    const named = rows.find((row) => row.provider_name?.trim());
-    insuranceProviderName = named?.provider_name?.trim() ?? null;
+    let insuranceProviderName: string | null = null;
+    if (profile?.id) {
+      const rows = await listInsuranceByProfileId(profile.id);
+      const named = rows.find((row) => row.provider_name?.trim());
+      insuranceProviderName = named?.provider_name?.trim() ?? null;
+    }
+
+    return {
+      supabaseReady: profile != null,
+      primaryCategory: primary,
+      careInterests,
+      healthCategoryLabels,
+      healthProfileComplete:
+        Boolean(profile?.health_profile_completed_at) && ranked.length > 0,
+      insuranceComplete: Boolean(profile?.insurance_info_completed_at),
+      insuranceProviderName,
+      hasInsurance: profile?.has_insurance ?? null,
+      profileCreatedAt: profile?.created_at ?? null,
+    };
+  } catch (error) {
+    console.error('[supabase] wellness dashboard unavailable', error);
+
+    return empty;
   }
-
-  return {
-    supabaseReady: profile != null,
-    primaryCategory: primary,
-    careInterests,
-    healthCategoryLabels,
-    healthProfileComplete:
-      Boolean(profile?.health_profile_completed_at) && ranked.length > 0,
-    insuranceComplete: Boolean(profile?.insurance_info_completed_at),
-    insuranceProviderName,
-    hasInsurance: profile?.has_insurance ?? null,
-    profileCreatedAt: profile?.created_at ?? null,
-  };
 });

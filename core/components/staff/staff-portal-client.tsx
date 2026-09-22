@@ -8,9 +8,8 @@ import {
   loadOlderStaffChatMessagesAction,
   staffPortalAction,
   type StaffActionState,
-} from '~/app/staff/_actions/staff-portal-actions';
-import { staffLogoutAction } from '~/app/staff/_actions/staff-auth-actions';
-import type { StaffPortalData } from '~/app/staff/page-data';
+} from '~/app/pharmacy-admin/_actions/staff-portal-actions';
+import type { StaffPortalData } from '~/app/pharmacy-admin/page-data';
 import { StaffCustomerDetail } from '~/components/staff/staff-customer-detail';
 import { formatStaffStatusLabel, staffStatusBadgeClass } from '~/components/staff/staff-status';
 import { ChatMessageBody } from '~/components/virtual-care/chat-message-body';
@@ -53,14 +52,14 @@ function portalHref(basePath: string, params: Record<string, string | undefined>
 
 export function StaffPortalClient({
   data,
-  basePath = '/staff',
-  embedded = false,
-  embeddedUserEmail,
+  basePath = '/pharmacy-admin',
+  signedInAs,
+  signOutAction,
 }: {
   data: StaffPortalData;
   basePath?: string;
-  embedded?: boolean;
-  embeddedUserEmail?: string;
+  signedInAs?: string;
+  signOutAction?: () => Promise<void>;
 }) {
   const router = useRouter();
   const [actionState, formAction, isPending] = useActionState<StaffActionState, FormData>(
@@ -82,23 +81,25 @@ export function StaffPortalClient({
   }, [actionState?.ok, router, tab]);
 
   return (
-    <div className={embedded ? 'min-h-0 bg-[#faf8f5] text-[#2c2a26]' : 'min-h-screen bg-[#faf8f5] text-[#2c2a26]'}>
+    <div className="min-h-screen bg-[#faf8f5] text-[#2c2a26]">
       <header className="border-b border-[#ebe6df] bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">
-              {embedded ? 'Liivv Staff' : 'Liivv staff'}
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">Liivv</p>
             <h1 className="text-xl font-semibold" style={{ color: forest }}>
-              Pharmacy & care portal
+              Pharmacist admin
             </h1>
-            {embedded && embeddedUserEmail ? (
-              <p className="mt-1 text-sm text-[#6b6560]">Signed in as {embeddedUserEmail}</p>
-            ) : null}
+            <p className="mt-1 text-sm text-[#6b6560]">
+              Approve prescriptions and answer care chat
+              {signedInAs ? ` · signed in as ${signedInAs}` : ''}
+            </p>
           </div>
-          {!embedded ? (
-            <form action={staffLogoutAction}>
-              <button className="text-sm font-medium text-[#6b6560] hover:underline" type="submit">
+          {signOutAction ? (
+            <form action={signOutAction}>
+              <button
+                className="rounded-lg border border-[#e5dfd5] bg-white px-3 py-1.5 text-sm text-[#6b6560] hover:bg-[#f7f4ef]"
+                type="submit"
+              >
                 Sign out
               </button>
             </form>
@@ -136,7 +137,8 @@ export function StaffPortalClient({
 
         {!data.supabaseReady ? (
           <div className="rounded-xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-950">
-            Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.
+            Health records are temporarily unavailable. You can still sign in here; queues and chat
+            will load when the service is back. Shopping on the storefront is separate.
           </div>
         ) : null}
 

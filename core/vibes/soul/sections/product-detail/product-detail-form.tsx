@@ -37,8 +37,8 @@ import { Select } from '@/vibes/soul/form/select';
 import { SwatchRadioGroup } from '@/vibes/soul/form/swatch-radio-group';
 import { Textarea } from '@/vibes/soul/form/textarea';
 import { Button } from '@/vibes/soul/primitives/button';
-import { toast } from '@/vibes/soul/primitives/toaster';
 import { useEvents } from '~/components/analytics/events';
+import { useMiniCart } from '~/components/mini-cart';
 import { usePathname, useRouter } from '~/i18n/routing';
 
 import { revalidateCart } from './actions/revalidate-cart';
@@ -215,14 +215,15 @@ export function ProductDetailForm<F extends Field>({
     { quantity: minQuantity ?? 1 },
   );
 
-  const [{ lastResult, successMessage }, formAction] = useActionState(action, {
+  const [{ lastResult }, formAction] = useActionState(action, {
     fields,
     lastResult: null,
   });
+  const { openMiniCart } = useMiniCart();
 
   useEffect(() => {
     if (lastResult?.status === 'success') {
-      toast.success(successMessage);
+      openMiniCart();
 
       startTransition(async () => {
         // This is needed to refresh the Data Cache after the product has been added to the cart.
@@ -230,7 +231,7 @@ export function ProductDetailForm<F extends Field>({
         await revalidateCart();
       });
     }
-  }, [lastResult, successMessage, router]);
+  }, [lastResult, openMiniCart]);
 
   const [form, formFields] = useForm({
     id: `product-detail-form-${productId}`,

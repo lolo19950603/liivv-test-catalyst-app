@@ -110,7 +110,7 @@ export async function createCustomerAccount(
     const customer = await getOnboardingCustomer();
 
     if (customer) {
-      await applyPendingGuestHealthProfile(customer);
+      await applyPendingGuestHealthProfile();
     }
 
     return { ok: true };

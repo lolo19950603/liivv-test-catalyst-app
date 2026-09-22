@@ -35,6 +35,7 @@ import { Logo } from '@/vibes/soul/primitives/logo';
 import { Price } from '@/vibes/soul/primitives/price-label';
 import { ProductCard } from '@/vibes/soul/primitives/product-card';
 import { Link } from '~/components/link';
+import { isCartPathname, useMiniCart } from '~/components/mini-cart';
 import { usePathname, useRouter } from '~/i18n/routing';
 import { LiivvIconAccount, LiivvIconCart, LiivvIconSearch } from '~/lib/liivv/header-icons';
 import { useSearch } from '~/lib/search';
@@ -273,7 +274,6 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
   {
     className,
     isFloating = false,
-    cartHref,
     cartCount: streamableCartCount,
     accountHref,
     links: streamableLinks,
@@ -296,6 +296,7 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
     searchAction,
     searchInputPlaceholder,
     searchSubmitLabel,
+    cartHref = '/cart',
     cartLabel = 'Cart',
     accountLabel = 'Profile',
     openSearchPopupLabel = 'Open search popup',
@@ -319,8 +320,10 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isSearchOpen, setIsSearchOpen } = useSearch();
+  const { openMiniCart } = useMiniCart();
 
   const pathname = usePathname();
+  const onCartPage = isCartPathname(pathname);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -616,30 +619,58 @@ export const Navigation = forwardRef(function Navigation<S extends SearchResult>
               <User size={20} strokeWidth={1} />
             )}
           </Link>
-          <Link
-            aria-label={cartLabel}
-            className={clsx(utilityButtonClass, useLiivvIcons && 'cart-drawer-button')}
-            href={cartHref}
-          >
-            {useLiivvIcons ? (
-              <LiivvIconCart className="icon icon-cart icon-md" />
-            ) : (
-              <ShoppingBag size={20} strokeWidth={1} />
-            )}
-            <Stream
-              fallback={
-                <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 animate-pulse items-center justify-center rounded-full bg-contrast-100 text-xs text-background" />
-              }
-              value={streamableCartCount}
+          {onCartPage ? (
+            <Link
+              aria-label={cartLabel}
+              className={clsx(utilityButtonClass, useLiivvIcons && 'cart-drawer-button')}
+              href={cartHref}
             >
-              {(cartCount) =>
-                cartCount != null &&
-                cartCount > 0 && (
-                  <span className={cartCountClass}>{cartCount}</span>
-                )
-              }
-            </Stream>
-          </Link>
+              {useLiivvIcons ? (
+                <LiivvIconCart className="icon icon-cart icon-md" />
+              ) : (
+                <ShoppingBag size={20} strokeWidth={1} />
+              )}
+              <Stream
+                fallback={
+                  <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 animate-pulse items-center justify-center rounded-full bg-contrast-100 text-xs text-background" />
+                }
+                value={streamableCartCount}
+              >
+                {(cartCount) =>
+                  cartCount != null &&
+                  cartCount > 0 && (
+                    <span className={cartCountClass}>{cartCount}</span>
+                  )
+                }
+              </Stream>
+            </Link>
+          ) : (
+            <button
+              aria-label={cartLabel}
+              className={clsx(utilityButtonClass, useLiivvIcons && 'cart-drawer-button')}
+              onClick={() => openMiniCart()}
+              type="button"
+            >
+              {useLiivvIcons ? (
+                <LiivvIconCart className="icon icon-cart icon-md" />
+              ) : (
+                <ShoppingBag size={20} strokeWidth={1} />
+              )}
+              <Stream
+                fallback={
+                  <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 animate-pulse items-center justify-center rounded-full bg-contrast-100 text-xs text-background" />
+                }
+                value={streamableCartCount}
+              >
+                {(cartCount) =>
+                  cartCount != null &&
+                  cartCount > 0 && (
+                    <span className={cartCountClass}>{cartCount}</span>
+                  )
+                }
+              </Stream>
+            </button>
+          )}
 
           <Stream fallback={null} value={streamableGiftCertificatesEnabled}>
             {(giftCertificatesEnabled) =>

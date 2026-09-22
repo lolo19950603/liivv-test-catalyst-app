@@ -414,6 +414,16 @@ export function GuestCategoryQuiz({
             </div>
 
             {error ? <p className="guest-category-quiz-error">{error}</p> : null}
+            {!isSignedIn ? (
+              <p className="guest-category-quiz-login">
+                Already have an account?{' '}
+                <Link className="guest-category-quiz-login-link" href="/login">
+                  Log in first
+                </Link>
+                {' '}
+                — then only quizzes you have not saved will show.
+              </p>
+            ) : null}
           </div>
         </div>
       </div>

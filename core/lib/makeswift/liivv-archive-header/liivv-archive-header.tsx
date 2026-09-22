@@ -18,6 +18,7 @@ import {
 import { Link } from '~/components/link';
 import { AccountNotificationsBell } from '~/components/account-notifications';
 import { IconAccount, IconCart, IconChevronDown, IconSearch } from '~/components/account-dashboard/icons';
+import { isCartPathname, useMiniCart } from '~/components/mini-cart';
 import { initialsFromName } from '~/lib/account/customer-initials';
 import { usePathname } from '~/i18n/routing';
 import type { SiteHeaderNotifications } from '~/lib/account-notifications/header-notification-labels';
@@ -45,9 +46,9 @@ import type {
   LiivvArchiveNavSubLink,
 } from './types';
 
+import { CART_UPDATED_EVENT } from '~/lib/cart/cart-updated-event';
 import { ACCOUNT_LOGIN_PATH } from '~/lib/makeswift/site-header/resolve-account-href';
 
-const CART_PATH = '/cart';
 const SEARCH_ARIA_LABEL = 'Search';
 /** Ignore focus/layout scroll right after open; then close once the page moves down. */
 const SEARCH_SCROLL_CLOSE_DELAY_MS = 150;
@@ -865,6 +866,8 @@ export function LiivvArchiveHeader({
   const accountMenuPanelId = `liivv-archive-header-account-${safeId}`;
 
   const pathname = usePathname();
+  const { openMiniCart } = useMiniCart();
+  const onCartPage = isCartPathname(pathname);
   const isInBuilder = useIsInBuilderAfterMount();
   const internalSectionRef = useRef<HTMLDivElement>(null);
   const internalSpacerRef = useRef<HTMLDivElement>(null);
@@ -1000,10 +1003,12 @@ export function LiivvArchiveHeader({
 
     window.addEventListener('focus', refetch);
     document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener(CART_UPDATED_EVENT, refetch);
 
     return () => {
       window.removeEventListener('focus', refetch);
       document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener(CART_UPDATED_EVENT, refetch);
     };
   }, [pathname, refreshCartCount]);
 
@@ -1403,18 +1408,34 @@ export function LiivvArchiveHeader({
                     variant="storefront"
                   />
                 ) : null}
-                <Link
-                  aria-label={cartCountLabel}
-                  className="header-utility-icon-btn cart-drawer-button"
-                  href={CART_PATH}
-                >
-                  <IconCart />
-                  {cartLineCount != null && cartLineCount > 0 ? (
-                    <span className="header-utility-badge header-utility-badge--count" aria-hidden>
-                      {cartLineCount > 99 ? '99+' : cartLineCount}
-                    </span>
-                  ) : null}
-                </Link>
+                {onCartPage ? (
+                  <Link
+                    aria-label={cartCountLabel}
+                    className="header-utility-icon-btn cart-drawer-button"
+                    href="/cart"
+                  >
+                    <IconCart />
+                    {cartLineCount != null && cartLineCount > 0 ? (
+                      <span className="header-utility-badge header-utility-badge--count" aria-hidden>
+                        {cartLineCount > 99 ? '99+' : cartLineCount}
+                      </span>
+                    ) : null}
+                  </Link>
+                ) : (
+                  <button
+                    aria-label={cartCountLabel}
+                    className="header-utility-icon-btn cart-drawer-button"
+                    onClick={() => openMiniCart()}
+                    type="button"
+                  >
+                    <IconCart />
+                    {cartLineCount != null && cartLineCount > 0 ? (
+                      <span className="header-utility-badge header-utility-badge--count" aria-hidden>
+                        {cartLineCount > 99 ? '99+' : cartLineCount}
+                      </span>
+                    ) : null}
+                  </button>
+                )}
                 <HeaderAccountMenu
                   accountHref={accountHref}
                   accountLabel={accountLabel}

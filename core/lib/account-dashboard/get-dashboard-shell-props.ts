@@ -16,6 +16,7 @@ import { buildAccountMenuLinks } from '~/lib/account/account-menu-links';
 import { getAccountDashboardNotifications } from '~/lib/account-notifications/get-header-notifications';
 import { getCartId } from '~/lib/cart';
 import { getStoreLogoFallback } from '~/lib/store-theme/get-store-logo-fallback';
+import { withVendorFallback } from '~/lib/vendor-outage';
 
 import type { AccountMenuLink } from '~/lib/account/account-menu-links';
 import type { AccountDashboardLabels } from '~/components/account-dashboard/types';
@@ -90,7 +91,9 @@ export async function getAccountDashboardShellProps(
       getSessionCustomerAccessToken(),
     ]);
 
-  const cartCount = cartId ? await getCartCount(cartId, customerAccessToken) : null;
+  const cartCount = cartId
+    ? await withVendorFallback('bigcommerce', null, () => getCartCount(cartId, customerAccessToken))
+    : null;
 
   const firstName = customer.firstName.trim();
   const lastName = customer.lastName.trim();

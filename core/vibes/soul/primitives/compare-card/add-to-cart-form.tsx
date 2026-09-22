@@ -7,6 +7,7 @@ import { requestFormReset } from 'react-dom';
 import { Button } from '@/vibes/soul/primitives/button';
 import { toast } from '@/vibes/soul/primitives/toaster';
 import { useEvents } from '~/components/analytics/events';
+import { useMiniCart } from '~/components/mini-cart';
 import { useRouter } from '~/i18n/routing';
 
 type Action<S, P> = (state: Awaited<S>, payload: P) => S | Promise<S>;
@@ -37,8 +38,9 @@ export function AddToCartForm({
 }: Props) {
   const router = useRouter();
   const events = useEvents();
+  const { openMiniCart } = useMiniCart();
 
-  const [{ lastResult, successMessage }, formAction, pending] = useActionState(addToCartAction, {
+  const [{ lastResult }, formAction, pending] = useActionState(addToCartAction, {
     lastResult: null,
     successMessage: undefined,
   });
@@ -59,13 +61,13 @@ export function AddToCartForm({
 
   useEffect(() => {
     if (lastResult?.status === 'success') {
-      toast.success(successMessage);
+      openMiniCart();
 
       // This is needed to refresh the Data Cache after the product has been added to the cart.
       // The cart id is not picked up after the first time the cart is created/updated.
       router.refresh();
     }
-  }, [lastResult, successMessage, router]);
+  }, [lastResult, openMiniCart, router]);
 
   useEffect(() => {
     if (form.errors) {

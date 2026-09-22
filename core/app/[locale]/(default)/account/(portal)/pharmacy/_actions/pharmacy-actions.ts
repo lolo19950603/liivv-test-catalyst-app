@@ -1,9 +1,9 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 
-import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
+import { type OnboardingCustomer } from '~/lib/account/get-session-customer';
+import { runCustomerAction } from '~/lib/action-gateway/session';
 import { isTabletDosageForm, normalizeBucket } from '~/lib/pharmacy/pharmacy-mappers';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import {
@@ -15,7 +15,6 @@ import {
   listPrescriptionsByProfileId,
   updateRefillRequestPrescriptions,
 } from '~/lib/supabase/prescriptions';
-import { uploadPrescriptionPhoto } from '~/lib/supabase/prescription-storage';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
 
 export type PharmacyActionState = { ok?: boolean; error?: string } | null;
@@ -42,89 +41,32 @@ function normalizeRefillStatus(status: string): string {
   return String(status ?? '').trim().toLowerCase();
 }
 
-async function requirePharmacyProfile() {
-  const customer = await getOnboardingCustomer();
-
-  if (!customer) {
-    redirect('/login?redirectTo=/account/pharmacy');
-  }
-
+async function loadPharmacyProfile(customer: OnboardingCustomer) {
   if (!isSupabaseConfigured()) {
-    return { customer, profile: null as null };
+    return { profile: null as null };
   }
 
   const ensured = await ensureCustomerProfile(customer);
 
   if (ensured.status !== 'ok') {
-    return { customer, profile: null as null };
+    return { profile: null as null };
   }
 
-  return { customer, profile: ensured.profile };
+  return { profile: ensured.profile };
 }
 
 export async function pharmacyAction(
   _prevState: PharmacyActionState,
   formData: FormData,
 ): Promise<PharmacyActionState> {
-  const { profile } = await requirePharmacyProfile();
+  return runCustomerAction({ redirectTo: '/login?redirectTo=/account/pharmacy' }, async (customer) => {
+  const { profile } = await loadPharmacyProfile(customer);
 
   if (!profile) {
     return { ok: false, error: 'Pharmacy storage is not configured.' };
   }
 
   const intent = String(formData.get('intent') ?? '');
-
-  if (intent === 'upload_prescription_photo') {
-    const file = formData.get('photo');
-
-    if (!(file instanceof File) || file.size === 0) {
-      return { ok: false, error: 'Please choose a prescription photo to upload.' };
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      return { ok: false, error: 'Photo must be 5 MB or smaller.' };
-    }
-
-    const mime = file.type || 'image/jpeg';
-
-    if (!mime.startsWith('image/')) {
-      return { ok: false, error: 'Upload must be an image file.' };
-    }
-
-    const up = await uploadPrescriptionPhoto(profile.id, file);
-
-    if (!up.ok) {
-      return { ok: false, error: up.message };
-    }
-
-    const result = await createPrescription({
-      profile_id: profile.id,
-      medication_name: 'Pending Pharmacist Review',
-      din: null,
-      dosage: 'Pending',
-      dosage_form: null,
-      frequency: 'Pending',
-      quantity: null,
-      prescribing_doctor: null,
-      pharmacy_name: null,
-      rx_number: null,
-      refills_remaining: null,
-      last_filled_date: null,
-      next_refill_date: null,
-      status: 'active',
-      approval_status: 'pending_review',
-      submission_method: 'photo',
-      photo_url: up.path,
-      notes: null,
-    });
-
-    if (!result.ok) {
-      return { ok: false, error: result.message };
-    }
-
-    revalidatePath('/account/pharmacy');
-    return { ok: true };
-  }
 
   if (intent === 'transfer_prescriptions') {
     const raw = formData.get('payload');
@@ -415,4 +357,5 @@ export async function pharmacyAction(
   }
 
   return { ok: false, error: 'Invalid request.' };
+  });
 }

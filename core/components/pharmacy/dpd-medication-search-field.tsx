@@ -47,11 +47,13 @@ export function DpdMedicationSearchField({
   const [results, setResults] = useState<MedicationResult[]>([]);
   const [isFetching, setIsFetching] = useState(false);
   const [dpdUnavailable, setDpdUnavailable] = useState(false);
+  const [rateLimited, setRateLimited] = useState(false);
 
   useEffect(() => {
     if (query.length < 2) {
       setResults([]);
       setDpdUnavailable(false);
+      setRateLimited(false);
 
       return;
     }
@@ -66,15 +68,18 @@ export function DpdMedicationSearchField({
           if (!res.ok) {
             setResults([]);
             setDpdUnavailable(!Array.isArray(data) && data?.error === 'dpd_unavailable');
+            setRateLimited(!Array.isArray(data) && data?.error === 'rate_limited');
 
             return;
           }
 
           setDpdUnavailable(false);
+          setRateLimited(false);
           setResults(Array.isArray(data) ? data : []);
         } catch {
           setResults([]);
           setDpdUnavailable(true);
+          setRateLimited(false);
         } finally {
           setIsFetching(false);
         }
@@ -159,9 +164,11 @@ export function DpdMedicationSearchField({
       {showResults && query.length >= 2 && !isFetching && results.length === 0 ? (
         <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-md border border-[#e0d9ce] bg-white p-4 text-center shadow-lg">
           <p className="text-sm text-[#6b6560]">
-            {dpdUnavailable
-              ? 'Health Canada DPD is temporarily unavailable. Please try again later.'
-              : 'No medications found. Try another spelling or a shorter search.'}
+            {rateLimited
+              ? 'Too many searches. Please wait a minute and try again.'
+              : dpdUnavailable
+                ? 'Health Canada DPD is temporarily unavailable. Please try again later.'
+                : 'No medications found. Try another spelling or a shorter search.'}
           </p>
         </div>
       ) : null}

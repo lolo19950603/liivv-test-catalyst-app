@@ -48,12 +48,17 @@ export class RuntimeCacheAdapter implements KvAdapter {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async set<Data>(key: string, value: Data, _opts?: SetCommandOptions): Promise<Data | null> {
+  async set<Data>(key: string, value: Data, opts?: SetCommandOptions): Promise<Data | null> {
     this.logger(`SET - Key: ${key} - Setting in runtime cache`);
 
     try {
-      await this.cache.set(key, value);
+      const ttl = typeof opts?.ex === 'number' ? opts.ex : undefined;
+
+      if (ttl != null) {
+        await this.cache.set(key, value, { ttl });
+      } else {
+        await this.cache.set(key, value);
+      }
       this.logger(`RUNTIME_CACHE SET - Key: ${key} - Success`);
     } catch (error) {
       this.logger(

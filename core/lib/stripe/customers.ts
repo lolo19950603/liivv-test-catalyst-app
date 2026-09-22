@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { getStripe } from './client';
+import { isStripeOutage } from './availability';
 import { getStoredStripeCustomerId, storeStripeCustomerId } from './storage';
 
 interface CustomerIdentity {
@@ -64,13 +65,21 @@ export async function getOrCreateStripeCustomer({
 }
 
 export async function findStripeCustomerIdByEmail(email: string): Promise<string | null> {
-  const stripe = getStripe();
-  const customers = await stripe.customers.list({
-    email,
-    limit: 1,
-  });
+  try {
+    const stripe = getStripe();
+    const customers = await stripe.customers.list({
+      email,
+      limit: 1,
+    });
 
-  return customers.data[0]?.id ?? null;
+    return customers.data[0]?.id ?? null;
+  } catch (error) {
+    if (isStripeOutage(error)) {
+      return null;
+    }
+
+    throw error;
+  }
 }
 
 export async function resolveStripeCustomerId(

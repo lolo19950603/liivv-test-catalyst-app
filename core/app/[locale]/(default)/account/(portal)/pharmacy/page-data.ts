@@ -22,7 +22,6 @@ import {
   listPrescriptionsByProfileId,
   listRefillRequestsByProfileId,
 } from '~/lib/supabase/prescriptions';
-import { getPrescriptionPhotoSignedUrl } from '~/lib/supabase/prescription-storage';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
 import { isVirtualCareBotEnabled } from '~/lib/virtual-care-bot/config';
 
@@ -57,9 +56,36 @@ export const getPharmacyPageData = cache(async (): Promise<PharmacyPageData | nu
     };
   }
 
-  const ensured = await ensureCustomerProfile(customer);
+  try {
+    const ensured = await ensureCustomerProfile(customer);
 
-  if (ensured.status !== 'ok') {
+    if (ensured.status !== 'ok') {
+      return {
+        displayName,
+        supabaseReady: false,
+        prescriptions: [],
+        refillRequests: [],
+        carepackRequests: [],
+        activePrescriptionCount: 0,
+      };
+    }
+
+    const rows = await listPrescriptionsByProfileId(ensured.profile.id);
+    const prescriptions = rows.map((row) => mapPrescriptionRow(row));
+    const refillRows = await listRefillRequestsByProfileId(ensured.profile.id);
+    const carepackRows = await listCarePackRequestsByProfileId(ensured.profile.id);
+
+    return {
+      displayName,
+      supabaseReady: true,
+      prescriptions,
+      refillRequests: refillRows.map((row) => mapRefillRequestRow(row, prescriptions)),
+      carepackRequests: carepackRows.map((row) => mapCarePackRequestRow(row, prescriptions)),
+      activePrescriptionCount: prescriptions.filter((rx) => rx.bucket === 'active').length,
+    };
+  } catch (error) {
+    console.error('[supabase] pharmacy page unavailable', error);
+
     return {
       displayName,
       supabaseReady: false,
@@ -69,24 +95,6 @@ export const getPharmacyPageData = cache(async (): Promise<PharmacyPageData | nu
       activePrescriptionCount: 0,
     };
   }
-
-  const rows = await listPrescriptionsByProfileId(ensured.profile.id);
-  const prescriptions = await Promise.all(
-    rows.map(async (row) =>
-      mapPrescriptionRow(row, await getPrescriptionPhotoSignedUrl(row.photo_url)),
-    ),
-  );
-  const refillRows = await listRefillRequestsByProfileId(ensured.profile.id);
-  const carepackRows = await listCarePackRequestsByProfileId(ensured.profile.id);
-
-  return {
-    displayName,
-    supabaseReady: true,
-    prescriptions,
-    refillRequests: refillRows.map((row) => mapRefillRequestRow(row, prescriptions)),
-    carepackRequests: carepackRows.map((row) => mapCarePackRequestRow(row, prescriptions)),
-    activePrescriptionCount: prescriptions.filter((rx) => rx.bucket === 'active').length,
-  };
 });
 
 export const getVirtualCareSummary = cache(async () => {
@@ -152,60 +160,68 @@ export const getVirtualCareChatData = cache(async () => {
     };
   }
 
-  const ensured = await ensureCustomerProfile(customer);
+  const unavailable = {
+    supabaseReady: false as const,
+    botEnabled: isVirtualCareBotEnabled(),
+    careTeamActive: false,
+    messages: [],
+    hasMoreOlder: false,
+    conversationId: null,
+    customerLeftAt: null,
+    staffClosedAt: null,
+    staffJoinedAt: null,
+    escalatedToPharmacistAt: null,
+  };
 
-  if (ensured.status !== 'ok') {
-    return {
-      supabaseReady: false as const,
-      botEnabled: isVirtualCareBotEnabled(),
-      careTeamActive: false,
-      messages: [],
-      hasMoreOlder: false,
-      conversationId: null,
-      customerLeftAt: null,
-      staffClosedAt: null,
-      staffJoinedAt: null,
-      escalatedToPharmacistAt: null,
-    };
-  }
+  try {
+    const ensured = await ensureCustomerProfile(customer);
 
-  const conv = await getConversationByProfileId(ensured.profile.id);
+    if (ensured.status !== 'ok') {
+      return unavailable;
+    }
 
-  if (!conv.ok || !conv.conversationId) {
+    const conv = await getConversationByProfileId(ensured.profile.id);
+
+    if (!conv.ok || !conv.conversationId) {
+      return {
+        supabaseReady: true as const,
+        botEnabled: isVirtualCareBotEnabled(),
+        careTeamActive: false,
+        conversationId: null,
+        customerLeftAt: conv.ok ? conv.customerLeftAt : null,
+        staffClosedAt: conv.ok ? conv.staffClosedAt : null,
+        staffJoinedAt: conv.ok ? conv.staffJoinedAt : null,
+        escalatedToPharmacistAt: conv.ok ? conv.escalatedToPharmacistAt : null,
+        messages: [],
+        hasMoreOlder: false,
+      };
+    }
+
+    const { listRecentMessagesForConversation } = await import('~/lib/supabase/chat-messages');
+    const listed = await listRecentMessagesForConversation(conv.conversationId);
+    const messages = listed.ok ? listed.messages : [];
+    const hasMoreOlder = listed.ok ? listed.hasMoreOlder : false;
+
     return {
       supabaseReady: true as const,
       botEnabled: isVirtualCareBotEnabled(),
-      careTeamActive: false,
-      conversationId: null,
-      customerLeftAt: conv.ok ? conv.customerLeftAt : null,
-      staffClosedAt: conv.ok ? conv.staffClosedAt : null,
-      staffJoinedAt: conv.ok ? conv.staffJoinedAt : null,
-      escalatedToPharmacistAt: conv.ok ? conv.escalatedToPharmacistAt : null,
-      messages: [],
-      hasMoreOlder: false,
-    };
-  }
-
-  const { listRecentMessagesForConversation } = await import('~/lib/supabase/chat-messages');
-  const listed = await listRecentMessagesForConversation(conv.conversationId);
-  const messages = listed.ok ? listed.messages : [];
-  const hasMoreOlder = listed.ok ? listed.hasMoreOlder : false;
-
-  return {
-    supabaseReady: true as const,
-    botEnabled: isVirtualCareBotEnabled(),
-    careTeamActive: isCareTeamChatActive({
+      careTeamActive: isCareTeamChatActive({
+        staffJoinedAt: conv.staffJoinedAt,
+        staffClosedAt: conv.staffClosedAt,
+      }),
+      conversationId: conv.conversationId,
+      customerLeftAt: conv.customerLeftAt,
       staffJoinedAt: conv.staffJoinedAt,
       staffClosedAt: conv.staffClosedAt,
-    }),
-    conversationId: conv.conversationId,
-    customerLeftAt: conv.customerLeftAt,
-    staffJoinedAt: conv.staffJoinedAt,
-    staffClosedAt: conv.staffClosedAt,
-    escalatedToPharmacistAt: conv.escalatedToPharmacistAt,
-    messages,
-    hasMoreOlder,
-  };
+      escalatedToPharmacistAt: conv.escalatedToPharmacistAt,
+      messages,
+      hasMoreOlder,
+    };
+  } catch (error) {
+    console.error('[supabase] live chat unavailable', error);
+
+    return unavailable;
+  }
 });
 
 export const getCustomerProvince = cache(async () => {

@@ -9,6 +9,7 @@ import { revalidate } from '~/client/revalidate-target';
 import { StoreLogoFragment } from '~/components/store-logo/fragment';
 import { logoTransformer } from '~/data-transformers/logo-transformer';
 import { resolveStoreLogo } from '~/lib/makeswift/site-header/resolve-store-logo';
+import { logVendorOutage } from '~/lib/vendor-outage';
 
 const StoreLogoQuery = graphql(
   `
@@ -24,24 +25,30 @@ const StoreLogoQuery = graphql(
 );
 
 export const getStoreLogoFallback = cache(async (): Promise<ProductImageFallbackLogo | null> => {
-  const [{ data }, homeLabel] = await Promise.all([
-    client.fetch({
-      document: StoreLogoQuery,
-      fetchOptions: { next: { revalidate } },
-    }),
-    getTranslations('Components.Header').then((t) => t('home')),
-  ]);
+  try {
+    const [{ data }, homeLabel] = await Promise.all([
+      client.fetch({
+        document: StoreLogoQuery,
+        fetchOptions: { next: { revalidate } },
+      }),
+      getTranslations('Components.Header').then((t) => t('home')),
+    ]);
 
-  const logo = data.site.settings ? logoTransformer(data.site.settings) : '';
-  const resolved = resolveStoreLogo(logo, homeLabel);
+    const logo = data.site.settings ? logoTransformer(data.site.settings) : '';
+    const resolved = resolveStoreLogo(logo, homeLabel);
 
-  if (resolved == null) {
+    if (resolved == null) {
+      return null;
+    }
+
+    return {
+      alt: resolved.alt,
+      src: resolved.src,
+      text: resolved.text,
+    };
+  } catch (error) {
+    logVendorOutage('bigcommerce', error);
+
     return null;
   }
-
-  return {
-    alt: resolved.alt,
-    src: resolved.src,
-    text: resolved.text,
-  };
 });

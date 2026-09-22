@@ -186,6 +186,10 @@ const ProductQuery = graphql(
           name
           description
           path
+          defaultImage {
+            altText
+            url: urlTemplate(lossy: true)
+          }
           brand {
             name
           }

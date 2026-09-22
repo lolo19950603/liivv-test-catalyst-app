@@ -8,6 +8,7 @@ import { Button } from '@/vibes/soul/primitives/button';
 import { ButtonLink } from '@/vibes/soul/primitives/button-link';
 import { toast } from '@/vibes/soul/primitives/toaster';
 import { useEvents } from '~/components/analytics/events';
+import { useMiniCart } from '~/components/mini-cart';
 import { useRouter } from '~/i18n/routing';
 
 type Action<S, P> = (state: Awaited<S>, payload: P) => S | Promise<S>;
@@ -38,8 +39,9 @@ export function ProductCardQuickAdd({
 }: Props) {
   const router = useRouter();
   const events = useEvents();
+  const { openMiniCart } = useMiniCart();
 
-  const [{ lastResult, successMessage }, formAction, pending] = useActionState(addToCartAction, {
+  const [{ lastResult }, formAction, pending] = useActionState(addToCartAction, {
     lastResult: null,
     successMessage: undefined,
   });
@@ -60,10 +62,10 @@ export function ProductCardQuickAdd({
 
   useEffect(() => {
     if (lastResult?.status === 'success') {
-      toast.success(successMessage);
+      openMiniCart();
       router.refresh();
     }
-  }, [lastResult, successMessage, router]);
+  }, [lastResult, openMiniCart, router]);
 
   useEffect(() => {
     if (form.errors) {

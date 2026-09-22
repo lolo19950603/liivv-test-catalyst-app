@@ -250,7 +250,7 @@ export default async (): Promise<NextConfig> => {
 
       return [
         {
-          source: '/bc-app',
+          source: '/pharmacy-admin',
           headers: [
             {
               key: 'Content-Security-Policy',
@@ -260,7 +260,7 @@ export default async (): Promise<NextConfig> => {
           ],
         },
         {
-          source: '/bc-app/:path*',
+          source: '/pharmacy-admin/:path*',
           headers: [
             {
               key: 'Content-Security-Policy',
@@ -297,7 +297,7 @@ export default async (): Promise<NextConfig> => {
           ],
         },
         {
-          source: '/((?!bc-app|api/bigcommerce/app).*)',
+          source: '/((?!pharmacy-admin|api/bigcommerce/app).*)',
           headers: [
             {
               key: 'Content-Security-Policy',

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 
 import { Link } from '~/components/link';
 import { AccountNotificationsBell } from '~/components/account-notifications';
+import { isCartPathname, useMiniCart } from '~/components/mini-cart';
 import { initialsFromName } from '~/lib/account/customer-initials';
 import { useLocalizedPathname } from '~/i18n/use-localized-pathname';
 import { LocaleToggle } from '~/lib/makeswift/liivv-archive-header/locale-toggle';
@@ -67,6 +68,8 @@ export function AccountDashboardPortal({
   contactHref,
 }: AccountDashboardShellProps) {
   const pathname = useLocalizedPathname();
+  const { openMiniCart } = useMiniCart();
+  const onCartPage = isCartPathname(pathname);
   const [accountOpen, setAccountOpen] = useState(false);
   const [cartCount, setCartCount] = useState<number | null>(initialCartCount);
   const accountRef = useRef<HTMLDivElement>(null);
@@ -227,14 +230,30 @@ export function AccountDashboardPortal({
                     notifications={headerNotifications}
                     unreadCount={notificationsUnreadCount}
                   />
-                  <Link aria-label={cartAriaLabel} className="mhd-icon-btn" href={cartHref}>
-                    <IconCart />
-                    {cartCount != null && cartCount > 0 ? (
-                      <span aria-hidden className="mhd-icon-btn__badge">
-                        {cartCount > 99 ? '99+' : cartCount}
-                      </span>
-                    ) : null}
-                  </Link>
+                  {onCartPage ? (
+                    <Link aria-label={cartAriaLabel} className="mhd-icon-btn" href={cartHref}>
+                      <IconCart />
+                      {cartCount != null && cartCount > 0 ? (
+                        <span aria-hidden className="mhd-icon-btn__badge">
+                          {cartCount > 99 ? '99+' : cartCount}
+                        </span>
+                      ) : null}
+                    </Link>
+                  ) : (
+                    <button
+                      aria-label={cartAriaLabel}
+                      className="mhd-icon-btn"
+                      onClick={() => openMiniCart()}
+                      type="button"
+                    >
+                      <IconCart />
+                      {cartCount != null && cartCount > 0 ? (
+                        <span aria-hidden className="mhd-icon-btn__badge">
+                          {cartCount > 99 ? '99+' : cartCount}
+                        </span>
+                      ) : null}
+                    </button>
+                  )}
                   <div className="mhd-account-wrap" ref={accountRef}>
                     <button
                       aria-expanded={accountOpen}

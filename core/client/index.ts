@@ -1,4 +1,14 @@
-import { BigCommerceAuthError, createClient } from '@bigcommerce/catalyst-client';
+import {
+  BigCommerceAPIError,
+  BigCommerceAuthError,
+  createClient,
+} from '@bigcommerce/catalyst-client';
+
+import {
+  isGatewayStatus,
+  isNetworkFailure,
+  VendorOutageError,
+} from '../lib/vendor-outage';
 
 import { getChannelIdFromLocale } from '../channels.config';
 import { backendUserAgent } from '../user-agent';
@@ -33,7 +43,19 @@ const getLocale = async () => {
   }
 };
 
-export const client = createClient({
+function isBigCommerceOutage(error: unknown): boolean {
+  if (error instanceof VendorOutageError) {
+    return error.vendor === 'bigcommerce';
+  }
+
+  if (error instanceof BigCommerceAPIError && isGatewayStatus(error.status)) {
+    return true;
+  }
+
+  return isNetworkFailure(error);
+}
+
+const rawClient = createClient({
   storefrontToken: process.env.BIGCOMMERCE_STOREFRONT_TOKEN ?? '',
   storeHash: process.env.BIGCOMMERCE_STORE_HASH ?? '',
   channelId: process.env.BIGCOMMERCE_CHANNEL_ID,
@@ -78,3 +100,23 @@ export const client = createClient({
     }
   },
 });
+
+const originalFetch = rawClient.fetch.bind(rawClient);
+
+rawClient.fetch = (async (config: Parameters<typeof originalFetch>[0]) => {
+  try {
+    return await originalFetch(config);
+  } catch (error) {
+    if (error instanceof BigCommerceAuthError) {
+      throw error;
+    }
+
+    if (isBigCommerceOutage(error)) {
+      throw new VendorOutageError('bigcommerce', error);
+    }
+
+    throw error;
+  }
+}) as typeof rawClient.fetch;
+
+export const client = rawClient;

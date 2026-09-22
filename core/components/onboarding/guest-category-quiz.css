@@ -423,6 +423,20 @@
   flex-shrink: 0;
 }
 
+.guest-category-quiz-login {
+  margin: 0.85rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--gcq-muted);
+}
+
+.guest-category-quiz-login-link {
+  color: var(--gcq-sage-btn);
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
 @media (max-width: 899px) {
   .guest-category-quiz-host {
     flex-direction: row;

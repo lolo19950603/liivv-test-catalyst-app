@@ -3,6 +3,7 @@ import 'server-only';
 import { cache } from 'react';
 import { revalidatePath } from 'next/cache';
 
+import { runCustomerAction } from '~/lib/action-gateway/session';
 import {
   buildHealthAnswersNotes,
   consentedAnswerKeys,
@@ -221,35 +222,38 @@ export async function saveLandingCategoryAnswers(
 
 /**
  * Reads the guest landing-page quiz cookie and writes it into the signed-in
- * customer's health profile. Deduped per request via React cache().
+ * customer's health profile. Session is checked here — callers cannot pass a
+ * customer. Deduped per request via React cache().
  *
  * Answers stashed before the guest ticked the consent box carry no consent
  * record, so they are dropped here rather than written. The cookie is cleared
  * either way.
  */
-export const applyPendingGuestHealthProfile = cache(async (customer: ApplyCustomer) => {
-  try {
-    if (!isSupabaseConfigured()) {
+export const applyPendingGuestHealthProfile = cache(async () => {
+  return runCustomerAction({ result: { applied: false as const } }, async (customer) => {
+    try {
+      if (!isSupabaseConfigured()) {
+        return { applied: false as const };
+      }
+
+      const pending = await getPendingGuestHealthProfile();
+
+      if (!pending) {
+        return { applied: false as const };
+      }
+
+      const saved = await saveLandingCategoryAnswers(customer, {
+        categoryId: pending.categoryId,
+        responses: pending.responses,
+        placement: 'primary',
+        consent: pending.consent,
+      });
+
+      return { applied: Boolean(saved) };
+    } catch {
       return { applied: false as const };
+    } finally {
+      await clearPendingGuestHealthProfile();
     }
-
-    const pending = await getPendingGuestHealthProfile();
-
-    if (!pending) {
-      return { applied: false as const };
-    }
-
-    const saved = await saveLandingCategoryAnswers(customer, {
-      categoryId: pending.categoryId,
-      responses: pending.responses,
-      placement: 'primary',
-      consent: pending.consent,
-    });
-
-    return { applied: Boolean(saved) };
-  } catch {
-    return { applied: false as const };
-  } finally {
-    await clearPendingGuestHealthProfile();
-  }
+  });
 });

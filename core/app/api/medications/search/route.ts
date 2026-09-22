@@ -1,8 +1,15 @@
 import { NextResponse } from 'next/server';
 
 import { normalizeDrugProductPayload, parseDpdJsonBody } from '~/lib/pharmacy/dpd-api';
+import { medicationRateLimitResponse } from '~/lib/pharmacy/medication-rate-limit';
 
 export async function GET(request: Request) {
+  const limited = await medicationRateLimitResponse(request);
+
+  if (limited) {
+    return limited;
+  }
+
   const url = new URL(request.url);
   const q = (url.searchParams.get('q') ?? '').trim().toUpperCase();
 

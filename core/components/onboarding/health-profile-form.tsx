@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link } from '~/components/link';
+import { OliviaCategoryMark } from './olivia-category-mark';
 import { OnboardingSubmitOverlay } from './onboarding-submit-overlay';
 import { OnboardingSectionHeader } from './onboarding-section-header';
 import {
@@ -807,8 +808,8 @@ export function HealthProfileForm({
         <div className="rounded-2xl border border-[#e8e2d8] bg-white p-8 shadow-sm">
           <h1 className="text-2xl font-semibold text-[#2c2a26]">Health profile</h1>
           <p className="mt-4 text-sm text-[#6b6560]">
-            Connect Supabase (`SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`) and run
-            `core/lib/supabase/onboarding-schema.sql` to enable this step.
+            Health tools are temporarily unavailable. You can still shop; this profile cannot be
+            saved until the service is back.
           </p>
         </div>
       </div>
@@ -900,9 +901,7 @@ export function HealthProfileForm({
                         {priority ?? '+'}
                       </span>
                       <div className="flex min-w-0 items-start gap-3">
-                        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#e8f0e4] text-xl">
-                          {option.imageEmoji ?? '💚'}
-                        </span>
+                        <OliviaCategoryMark categoryId={option.id} label="" size={40} />
                         <div>
                           <p className="text-sm font-medium text-[#2c2a26]">{option.label}</p>
                           {priority ? (
@@ -927,9 +926,7 @@ export function HealthProfileForm({
               */}
               <div className="space-y-6 px-5 py-6 sm:px-8 sm:py-7">
                 <div className="flex items-start gap-4">
-                  <div className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#e8f0e4] text-3xl">
-                    {currentCategoryDef.imageEmoji ?? '💚'}
-                  </div>
+                  <OliviaCategoryMark categoryId={currentCategoryDef.id} label="" size={56} />
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">
                       Category micro-step {microPageIdx} of {selectedCategories.length}
