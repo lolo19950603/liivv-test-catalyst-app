@@ -10,15 +10,76 @@
  *   --retire-old  hide the earlier invented kits (8036-8040)
  *
  * =============================================================================
- * DRAFT — PENDING OWNER CONFIRMATION. DO NOT RUN WITHOUT IT.
+ * CONTENTS CONFIRMED BY THE OWNER. THE WRITE IS NOT YET AUTHORISED.
  * =============================================================================
  *
- * The contents below are a recommendation, not an approved kit list, and
- * OWNER_CONFIRMED is false. While it is false this script writes nothing: every
- * non-GET request is refused before it is sent, so the worst a mistaken run can
- * do is read the catalogue and print a plan. Confirming means the owner has read
- * the component list, the locked variants and the descriptions in KIT_META and
- * accepts them as the kits Liivv will sell.
+ * The components, locked variants and names for 8041 and 8048 below are the
+ * owner's decision, not a recommendation: option A for 8041 (barrier 4541
+ * locked to variant 702134, box of 5, 70 mm, plus drainable pouch 4691 locked
+ * to 702148, box of 10, 70 mm) and the proposed defaults for 8048 (SenSura
+ * one-piece drainable 4891 locked to 702524, transparent, chosen because a
+ * transparent pouch lets the stoma be watched in the weeks after surgery).
+ * 8046 is not rebuilt. The 'pending owner confirmation' marker that stood here
+ * is gone for those two kits.
+ *
+ * OWNER_CONFIRMED is nonetheless still false, and stays false until the owner
+ * approves the priced table, because the rebuild reprices both kits and empties
+ * out the bundles they are sold as today. It charges the sum of the locked
+ * variants, so 8041 goes from 115.27 to 73.36 and 8048 from 175.19 to 71.88;
+ * 8041 drops the paste, the skin-prep wipe and the belt (4703, 4341, 4226) and
+ * 8048 drops the barrier rings, the wipe, the belt and the clamp (4560, 4439,
+ * 4647, 4406). A price change and a contents change are the owner's to accept,
+ * so the switch is not flipped here. While it is false this script writes
+ * nothing: every non-GET
+ * request is refused before it is sent (see bc), so the worst a mistaken run
+ * can do is read the catalogue and print a plan.
+ *
+ * VERIFIED AGAINST THE LIVE CATALOGUE — GET only, 2026-09-22:
+ *
+ *   4541  New Image Flat FlexWear Skin Barrier (Tape) (Cut To Fit)
+ *         variant 702134 exists (id 5500): Box of 5 / 70 mm / Colour Match
+ *         Blue, calculated_price 35.05, purchasing_disabled false. The other
+ *         variant, 702133, is Box of 5 / 57 mm / Red at 34.35 — the 57 mm the
+ *         page lands on today. 'Flat', not convex: every convex New Image
+ *         barrier is a separate product (4204, 4512, 4613, 4806, 4856, 5034),
+ *         from a sweep of every product name in the catalogue for 'convex'.
+ *   4691  New Image Two-Piece Drainable Ostomy Pouch (Clamp Closure) (Opaque)
+ *         variant 702148 exists (id 5815) and is the only variant: Box of 10 /
+ *         70 mm / Blue, calculated_price 38.31, purchasing_disabled false. A
+ *         pouch, so convexity does not apply; nothing in its name or
+ *         description says convex.
+ *   4891  SenSura 1-Piece Drainable Pouch (Flat) (Transparent)
+ *         variant 702524 exists (id 6225) and is the only variant: Box of 10 /
+ *         Size 10 - 76 mm / Length 30 cm, calculated_price 71.88,
+ *         purchasing_disabled false. 'Flat', not convex.
+ *
+ * Stock: all three products are is_visible true and availability 'available',
+ * and each locked variant reports purchasing_disabled false. Read the variant
+ * for that answer, not the product: the v3 product payload leaves
+ * purchasing_disabled out entirely, even when it is asked for by name in
+ * include_fields, so a product-level reading of it would be reading an absent
+ * field as if it were false. And inventory_tracking is 'none' on all three, so
+ * inventory_level 0 means untracked, not sold out, and BigCommerce will sell
+ * them without limit. There is no real stock figure in the catalogue to check.
+ *
+ * The two clamp questions, answered only as far as the catalogue answers them:
+ *
+ *   - 4691 (in 8041). Its name is 'Clamp Closure', its description says 'To
+ *     close the pouch, use the curved, beige clamp', and 'Curved, beige pouch
+ *     clamp' is the first entry in its own feature list — so the clamp is
+ *     described as part of this product, and no separate clamp is added to
+ *     8041. What the catalogue does NOT say is how many clamps a box of 10
+ *     contains, or whether any ship at all. Not guessed here.
+ *   - 4891 (in 8048). The catalogue cannot answer this one. Its whole
+ *     description is two sentences about the adhesive being fixed to the pouch;
+ *     it says nothing about the outlet or the closure, it has no metafields and
+ *     no spec fields, and its name says only 'Flat' and 'Transparent'. So
+ *     whether it has an integrated closure is unknown, and clamp 4406 is NOT
+ *     added on a guess — 4406's own description ('to seal the bottom of a
+ *     drainable ostomy pouch that does not have an integrated closure', box of
+ *     20, 4.21) would decide the question if 4891's description named its
+ *     closure, and it does not. This is the one open question in the table, and
+ *     it needs Coloplast's own product page or the box, not the catalogue.
  *
  * What changed from the version that created these kits, and why:
  *
@@ -49,7 +110,7 @@
  *     Liivv imagines is buying it: 'The Fresh Start (New Ostomate Starter Kit)'
  *     and 'Newly Diagnosed: New Ostomy Starter Kit' become 'Two-Piece Starter
  *     Kit (Flat, Cut-to-Fit)' and 'One-Piece Starter Kit (Flat, Cut-to-Fit)'.
- *     A dry run prints each rename, so the owner sees it before confirming.
+ *     Both names are the owner's. A dry run prints each rename.
  *
  *   - Descriptions say what is in the box. No outcome claims (nothing is
  *     "leak-free", nothing "prevents" anything) and no clinician names.
@@ -57,20 +118,25 @@
  * Five kits are held and are not rebuilt here: 8042, 8043, 8044, 8045 and 8047.
  * Their names make claims Liivv cannot substantiate, and three of them carry
  * drugs or natural health products. They need renaming and a fresh contents
- * decision before any script touches them. 8046 is held too: a go-bag needs
- * disposal bags, dry wipes and a liner, and the catalogue stocks none of them.
+ * decision before any script touches them. 8046 is held too, and the owner has
+ * confirmed it stays that way: a go-bag needs disposal bags, dry wipes and a
+ * liner, and the catalogue stocks none of the three. It is left in KIT_META as
+ * a hold rather than deleted, so the reason travels with the id and the dry run
+ * keeps listing it; `hold` means the script skips it, so nothing is written to
+ * it either way.
  *
  * See core/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids.ts for the
  * allowlist that keeps all of them off the microsite in the meantime.
  *
  * =============================================================================
- * WHAT IS STILL WRONG IN THE STORE WHILE THIS IS UNCONFIRMED — OPEN OWNER ACTION
+ * WHAT IS STILL WRONG IN THE STORE UNTIL THIS RUNS — OPEN OWNER ACTION
  * =============================================================================
  *
  * Nothing in the repo can close the 8041 coupling defect. The storefront can
  * lock a kit component to one variant, but only by reading the `kit_variants`
  * custom field off the kit, and that field is empty on every live kit. Read on
- * 2026-09-16 with GET /v3/catalog/products/{id}?include=custom_fields:
+ * 2026-09-16 and unchanged when re-read on 2026-09-22, with
+ * GET /v3/catalog/products/{id}?include=custom_fields:
  *
  *   8041  kit_variants = {}   is_visible = true   price 115.27
  *   8046  kit_variants = {}   is_visible = true   price 74.86
@@ -83,16 +149,21 @@
  * live and the allowlist in oc-ids.ts does not cover it — that list only keeps
  * kits off the Ostomy Care surfaces.
  *
- * That defect closes when, and only when, an owner approves KIT_META, sets
- * OWNER_CONFIRMED = true and runs this script without --dry-run, which writes
- * kit_variants = {"4541":"702134","4691":"702148"} onto 8041. Until then the
- * storefront's lock has nothing to read and is inert.
+ * That defect closes when, and only when, an owner approves the priced table,
+ * sets OWNER_CONFIRMED = true and runs this script without --dry-run, which
+ * writes kit_variants = {"4541":"702134","4691":"702148"} onto 8041. The
+ * contents half of that approval is now in hand; the price half is not. Until
+ * then the storefront's lock has nothing to read and is inert.
  */
 const STORE_HASH = process.env.BIGCOMMERCE_STORE_HASH;
 const TOKEN = process.env.CATALYST_PRODUCT_EDIT_TOKEN || process.env.BIGCOMMERCE_ACCESS_TOKEN;
 const CHANNEL_ID = Number(process.env.BIGCOMMERCE_CHANNEL_ID || '1');
 
-/** Flip to true only when the owner has approved KIT_META as it stands. */
+/**
+ * Flip to true only when the owner has approved the priced table as it stands —
+ * both kits' contents AND their new prices and, for 8048, the four items it
+ * loses. The contents are confirmed; the price is not. See the header.
+ */
 const OWNER_CONFIRMED = false;
 
 /** Earlier invented kits to hide when --retire-old is passed. */
@@ -106,6 +177,7 @@ const OLD_AI_KIT_IDS = [8036, 8037, 8038, 8039, 8040];
  *   componentIds  related_products, in the order they should read
  *   kitVariants   component product id -> variant SKU, written to kit_variants
  *   gaps          what the kit still needs and the catalogue does not stock
+ *   open          questions the catalogue cannot answer, printed by a dry run
  *   hold          set when the kit is not to be rebuilt, and why
  */
 const KIT_META = {
@@ -115,11 +187,18 @@ const KIT_META = {
     // say what is in the box, so someone shopping for a system they were told
     // to use can recognise it without opening the kit.
     name: 'Two-Piece Starter Kit (Flat, Cut-to-Fit)',
+    // Option A, as the owner chose it. 702134 is Box of 5 / 70 mm / Blue at
+    // 35.05; 702148 is the pouch's only variant, Box of 10 / 70 mm / Blue at
+    // 38.31. Both flat. The lock is what makes the two pieces couple, and it is
+    // the whole reason this kit is being rewritten.
     componentIds: [4541, 4691],
     kitVariants: { 4541: '702134', 4691: '702148' },
     gaps: ['disposal bags — no product in the catalogue'],
+    open: [
+      "how many clamps a box of 10 of pouch 4691 contains, if any — the catalogue calls it 'Clamp Closure' and lists the clamp among the pouch's features, but never gives a count",
+    ],
     description:
-      '<p>A two-piece starter: a flat cut-to-fit skin barrier and a drainable pouch that couples to it. Both are locked to 70&nbsp;mm so the two pieces fit together.</p><ul><li>New Image flat cut-to-fit skin barrier (tape), 70&nbsp;mm</li><li>New Image two-piece drainable pouch, 70&nbsp;mm, clamp closure, opaque</li><li>Change the quantities, or remove an item, before checkout</li></ul><p>Which system and which size suit your stoma is a decision for your NSWOC or your clinic. This is one pairing the store stocks, not a recommendation.</p>',
+      '<p>A two-piece starter: a flat cut-to-fit skin barrier and a drainable pouch that couples to it. Both pieces are locked to 70&nbsp;mm, so they fit together.</p><ul><li>New Image flat cut-to-fit skin barrier with a tape border, 70&nbsp;mm &mdash; box of 5</li><li>New Image two-piece drainable pouch, 70&nbsp;mm, clamp closure, opaque &mdash; box of 10</li><li>Change the quantities, or remove an item, before checkout</li></ul><p>Which system and which size suit your stoma is a decision for your NSWOC or your clinic. This is one pairing the store stocks, not a recommendation.</p>',
   },
   'KIT-OSTOMY-NEWLY-DIAGNOSED': {
     id: 8048,
@@ -127,19 +206,31 @@ const KIT_META = {
     // people by their diagnosis instead of by the system they were given, and a
     // product name is not the place to tell someone how new they are.
     name: 'One-Piece Starter Kit (Flat, Cut-to-Fit)',
+    /*
+     * The transparent pouch, on the owner's default: early after surgery the
+     * stoma is watched, and an opaque pouch has to come off to be looked at.
+     * 702524 is 4891's only variant, Box of 10 / 10 - 76 mm / 30 cm at 71.88.
+     *
+     * Clamp 4406 is deliberately NOT here. The instruction was to add it only
+     * if this pouch has no integrated closure, and the catalogue does not say
+     * either way (see the header). Adding a box of 20 clamps to a starter kit
+     * on a guess is worse than leaving the question open, so the question is
+     * carried in `open` and the description claims no closure at all.
+     */
     componentIds: [4891],
     kitVariants: { 4891: '702524' },
-    gaps: [
-      'disposal bags — no product in the catalogue',
-      'whether this pouch has an integrated closure, which decides if a clamp belongs here',
+    gaps: ['disposal bags — no product in the catalogue'],
+    open: [
+      'whether pouch 4891 has an integrated closure, which decides whether clamp 4406 belongs here — the catalogue does not say, and it is not guessed',
     ],
     description:
-      '<p>A one-piece starter: a flat cut-to-fit drainable pouch with the skin barrier built in, cut to your own stoma size.</p><ul><li>SenSura one-piece drainable pouch, flat, transparent, cut to fit 10&ndash;76&nbsp;mm</li><li>Change the quantity, or remove the item, before checkout</li></ul><p>Which system and which size suit your stoma is a decision for your NSWOC or your clinic. This is one pouch the store stocks, not a recommendation.</p>',
+      '<p>A one-piece starter: a flat drainable pouch with the skin barrier built in, cut to your own stoma size. The pouch is transparent, so the stoma can be seen without taking the pouch off.</p><ul><li>SenSura one-piece drainable pouch, flat, transparent, cut to fit 10&ndash;76&nbsp;mm, 30&nbsp;cm long &mdash; box of 10</li><li>Change the quantity, or remove the item, before checkout</li></ul><p>Which system and which size suit your stoma is a decision for your NSWOC or your clinic. This is one pouch the store stocks, not a recommendation.</p>',
   },
   'KIT-OSTOMY-EVERYDAY-LIVING': {
     id: 8046,
     name: 'Everyday Living (Ostomy Daily Care & Disposal)',
-    hold: 'A go-bag needs disposal bags, a dry wipe without moisturisers and a spare liner. The catalogue stocks none of the three, and the kit as sold carries moisturising wipes and a belt instead.',
+    // Owner-confirmed: not rebuilt in this round, and stays off the microsite.
+    hold: 'Left out of the rebuild by the owner. A go-bag needs disposal bags, a dry wipe without moisturisers and a spare liner. The catalogue stocks none of the three, and the kit as sold carries moisturising wipes and a belt instead.',
   },
   'KIT-OSTOMY-SKIN-SHIELD': {
     id: 8042,
@@ -177,9 +268,11 @@ if (!STORE_HASH || !TOKEN) {
 
 if (!DRY_RUN && !OWNER_CONFIRMED) {
   console.error(
-    'Refusing to run: KIT_META is a draft and OWNER_CONFIRMED is false.\n' +
-      'Read the kit contents at the top of this file, get the owner to approve them,\n' +
-      'set OWNER_CONFIRMED = true, and run again. Use --dry-run to read the plan now.',
+    'Refusing to run: OWNER_CONFIRMED is false.\n' +
+      'The kit contents are confirmed, the new prices are not (8041 115.27 -> 73.36,\n' +
+      '8048 175.19 -> 71.88, and 8048 loses four items). Get the owner to approve the\n' +
+      'priced table, set OWNER_CONFIRMED = true, and run again. Use --dry-run to read\n' +
+      'the plan now.',
   );
   process.exit(1);
 }
@@ -376,7 +469,7 @@ async function ensureCustomFields(productId, existingFields, kitVariants) {
 }
 
 async function upsertKit({ sku, meta, categoryId }) {
-  const { name, description, componentIds, kitVariants, gaps } = meta;
+  const { name, description, componentIds, kitVariants, gaps, open } = meta;
 
   console.log(`\n=== ${name} (${sku}) ===`);
   console.log(`  components: ${componentIds.join(', ')}`);
@@ -412,6 +505,7 @@ async function upsertKit({ sku, meta, categoryId }) {
 
   for (const note of unlocked) console.log(`  UNLOCKED component ${note}`);
   for (const gap of gaps ?? []) console.log(`  STILL MISSING: ${gap}`);
+  for (const question of open ?? []) console.log(`  OPEN QUESTION: ${question}`);
 
   if (DRY_RUN) {
     console.log(`  DRY RUN — would ${existing ? 'update' : 'create'} product`);
@@ -565,7 +659,7 @@ async function main() {
 
   if (!OWNER_CONFIRMED) {
     console.log(
-      'KIT_META is still a draft (OWNER_CONFIRMED = false). Nothing was written, and nothing will be until the owner approves it.',
+      'OWNER_CONFIRMED is false: the kit contents are confirmed, the new prices are not. Nothing was written, and nothing will be until the owner approves the priced table.',
     );
   }
 }
