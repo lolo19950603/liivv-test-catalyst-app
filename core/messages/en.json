@@ -3607,7 +3607,12 @@
           "body": "Everyday product and restock questions — chat with an Ontario pharmacist during business hours until 5 p.m. Eastern. Clinical concerns still belong with your NSWOC or care team.",
           "cta": "Talk to a Pharmacist",
           "oliviaTitle": "Olivia can fetch the everyday bits.",
-          "oliviaBody": "Need a restock or help with an order? Olivia is the little sprout in the corner. She does not give medical advice, and fit and skin questions belong with your NSWOC."
+          "oliviaBody": "Need a restock or help with an order? Olivia is the little sprout in the corner. She does not give medical advice, and fit and skin questions belong with your NSWOC.",
+          "oliviaKicker": "Meet Olivia",
+          "oliviaCta": "Chat with Olivia",
+          "oliviaBubble": "Hi — I live in the corner.",
+          "oliviaMore": "What she can do →",
+          "oliviaNote": "Look for the bouncing sprout in the corner. Clinical questions still belong with a pharmacist."
         },
         "brands": {
           "label": "Preferred brands",

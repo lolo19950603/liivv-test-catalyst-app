@@ -1541,13 +1541,17 @@
 }
 
 /*
- * Do not copy this [hidden] { display: none } pattern onto nodes that use
- * hidden="until-found". It overrides the browser's content-visibility hiding,
- * so find-in-page can no longer reveal the text and beforematch never fires.
+ * .oc-ch-row-more deliberately has NO author display rule. It carries
+ * hidden="until-found" once the island hydrates, and an author
+ * [hidden] { display: none } overrides the browser's content-visibility
+ * hiding, so find-in-page could no longer reveal the text and beforematch
+ * would never fire. Hiding is left to globals.css, whose reset already reads
+ * [hidden]:where(:not([hidden='until-found'])) — which covers the plain
+ * boolean hidden of the server render and steps aside afterwards.
+ *
+ * Do not add `display` here, and do not copy that pattern onto any other node
+ * that uses hidden="until-found". See until-found.ts.
  */
-#oc-chapter .oc-ch-row-more[hidden] {
-  display: none;
-}
 #oc-chapter .oc-ch-row-more > ul {
   margin-top: 0.5rem;
 }

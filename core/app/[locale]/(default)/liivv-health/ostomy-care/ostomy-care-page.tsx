@@ -377,13 +377,21 @@ export function OstomyCarePage({ catalog, doors }: { catalog?: OcCatalog; doors?
   const messages = useMessages();
   const locale = useLocale();
   const t = useTranslations('OstomyCare.ui.landingPage');
+  /*
+   * The ordinal is structural ('one'..'four' in chapters-meta.ts) and has to be
+   * read in the page language before it reaches the message placeholder, or the
+   * French cards say 'Chapitre one'. Same lookup the chapter page does for its
+   * kicker (chapters/chapter-page.tsx); read from the message object rather
+   * than t(), which cannot type a dynamic key.
+   */
+  const chapterWords: Record<string, string> = messages.OstomyCare.ui.chapter.words;
   const lifeChapters = buildChapters(
     messages.OstomyCare.chapters,
     locale,
     messages.OstomyCare.ui.chapter.groups,
   ).map((chapter) => ({
     num: chapter.num,
-    word: chapter.chapterWord,
+    word: chapterWords[chapter.chapterWord] ?? chapter.chapterWord,
     title: chapter.title,
     blurb: chapter.vibe,
     // A plain <a>, so the /fr prefix has to be put on by hand — chapters-data.ts.
@@ -660,7 +668,20 @@ export function OstomyCarePage({ catalog, doors }: { catalog?: OcCatalog; doors?
              * question — the one thing this page repeatedly sends to an NSWOC.
              * She helps with restocks and orders.
              */}
-            <OliviaHelpBand body={t('care.oliviaBody')} title={t('care.oliviaTitle')} />
+            {/*
+             * Every string, not just the two: the kicker, the button, the
+             * bubble, the ghost link and the note used to fall back to the
+             * component's English defaults and published that way on /fr.
+             */}
+            <OliviaHelpBand
+              body={t('care.oliviaBody')}
+              bubble={t('care.oliviaBubble')}
+              ctaLabel={t('care.oliviaCta')}
+              kicker={t('care.oliviaKicker')}
+              moreLabel={t('care.oliviaMore')}
+              note={t('care.oliviaNote')}
+              title={t('care.oliviaTitle')}
+            />
           </div>
         </div>
       </section>

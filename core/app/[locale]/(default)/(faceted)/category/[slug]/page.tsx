@@ -37,6 +37,7 @@ import { fetchFacetedSearch } from '../../fetch-faceted-search';
 
 import { CategorySearchPanel } from './_components/category-search-panel';
 import { CategoryViewed } from './_components/category-viewed';
+import { OstomyShelfExit } from './_components/ostomy-shelf-exit';
 import { getCategoryPageData } from './page-data';
 import { getFacetedProductCardQuickActions } from '../../_actions/get-product-card-quick-actions';
 
@@ -344,6 +345,12 @@ export default async function Category(props: Props) {
         is dealing with. The advertising signals go off (~/lib/analytics/ad-signals).
       */}
       {isSensitiveProduct({ categoryIds: analyticsCategoryIds }) && <DenyAdSignals />}
+      {/*
+        The same shelves, for a different reason: an ostomy shelf was the only
+        ostomy URL with no route to Chapter 02's red-flag list. See
+        ./_components/ostomy-shelf-exit.
+      */}
+      {isOstomyCategoryId(categoryId) ? <OstomyShelfExit locale={locale} /> : null}
       <Slot
         label={`${category.name} top content`}
         snapshotId={`category-${categoryId}-top-content`}

@@ -13,10 +13,14 @@ interface Props {
   params: Promise<{ locale: string }>;
 }
 
+/*
+ * The description does not promise kits: a micro-site may list none, and
+ * Ostomy Care lists none today while they are withheld (ostomy-care/oc-ids.ts).
+ */
 export const metadata: Metadata = {
   title: 'Liivv Health | Specialized care micro-sites',
   description:
-    'Liivv Health is home to specialized micro-sites — storytelling, curated kits, Ask a pharmacist, and Health Profile onboarding for the seasons of care.',
+    'Liivv Health is home to specialized micro-sites — storytelling, chapters, Ask a pharmacist, and Health Profile onboarding for the seasons of care.',
 };
 
 export function generateStaticParams() {

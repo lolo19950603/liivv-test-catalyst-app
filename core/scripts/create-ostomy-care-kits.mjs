@@ -106,6 +106,17 @@
  *     exception is --retire-old, which only ever hides, and only the five ids in
  *     OLD_AI_KIT_IDS.
  *
+ *     It does, however, write two other things that decide where a kit shows up,
+ *     and they are listed here because they are easy to miss beside the
+ *     is_visible promise. A confirmed update PUTs
+ *     `categories: [...existing, <ostomy category>]`, so a kit the owner took
+ *     out of the ostomy category is put straight back in; and it PUTs a channel
+ *     assignment to BIGCOMMERCE_CHANNEL_ID, so a kit unassigned from the
+ *     storefront is re-assigned. Taking 8041-8048 out of the ostomy category is
+ *     exactly the owner step this repo recommends for closing the kit withhold
+ *     (oc-ids.ts), so a run that is not wanted can undo it. The dry run prints
+ *     both, per kit, in `would write:` — see printPlannedChanges.
+ *
  *   - The two starter kits are renamed to say what is in the box rather than who
  *     Liivv imagines is buying it: 'The Fresh Start (New Ostomate Starter Kit)'
  *     and 'Newly Diagnosed: New Ostomy Starter Kit' become 'Two-Piece Starter
@@ -468,6 +479,97 @@ async function ensureCustomFields(productId, existingFields, kitVariants) {
   }
 }
 
+function describeList(list) {
+  return list && list.length ? list.join(', ') : '(none)';
+}
+
+/* A description is HTML; the owner needs to recognise it, not read it here. */
+function firstLine(text) {
+  const flat = String(text ?? '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!flat) return '(empty)';
+
+  return flat.length > 150 ? `${flat.slice(0, 150)}…` : flat;
+}
+
+/*
+ * Everything a confirmed run would send, printed before the owner approves it.
+ *
+ * The dry run used to print the components, the kit_variants, the rename and a
+ * price sum, then "DRY RUN — would update product". The PUT behind that line
+ * also rewrites the description, REPLACES related_products outright, adds the
+ * kit back to the ostomy category, and assigns it to the storefront channel.
+ * None of that appeared anywhere in the output.
+ *
+ * The category line is the one that matters most. The owner's step for closing
+ * the kit withhold, recorded in oc-ids.ts and in the review pack, is to take
+ * 8041-8048 OUT of the ostomy category or set is_visible = false — and a
+ * confirmed run would quietly put them back in and re-assign the channel. An
+ * approval is only worth something if it is given against the whole change.
+ */
+function printPlannedChanges({
+  existing,
+  name,
+  price,
+  componentIds,
+  categoryId,
+  description,
+  kitVariants,
+}) {
+  const declaredVariants = kitVariants && Object.keys(kitVariants).length > 0;
+
+  console.log('  would write:');
+
+  if (!existing) {
+    console.log(`    name:             ${name}`);
+    console.log(`    price:            ${price}`);
+    console.log(`    related_products: ${describeList(componentIds)}`);
+    console.log(`    categories:       ${categoryId}`);
+    console.log('    channel:          assign to the storefront channel (BIGCOMMERCE_CHANNEL_ID)');
+    console.log(`    kit_variants:     ${JSON.stringify(kitVariants ?? {})}`);
+    console.log(`    description:      ${firstLine(description)}`);
+    console.log('    is_visible:       not sent (new product, BigCommerce default)');
+
+    return;
+  }
+
+  const currentCategories = existing.categories || [];
+  const nextCategories = Array.from(new Set([...currentCategories, categoryId]));
+  const addedCategories = nextCategories.filter((id) => !currentCategories.includes(id));
+  const currentVariants =
+    (existing.custom_fields || []).find((field) => field.name === 'kit_variants')?.value ??
+    '(unset)';
+
+  console.log(`    name:             ${existing.name}  ->  ${name}`);
+  console.log(`    price:            ${existing.price}  ->  ${price}`);
+  console.log(
+    `    related_products: ${describeList(existing.related_products)}  ->  ${describeList(componentIds)}   (replaced, not merged)`,
+  );
+  console.log(
+    `    categories:       ${describeList(currentCategories)}  ->  ${describeList(nextCategories)}`,
+  );
+
+  if (addedCategories.length) {
+    console.log(
+      `      ADDS CATEGORY ${addedCategories.join(', ')} — this undoes the owner step that closes the`,
+    );
+    console.log(
+      '      kit withhold (take 8041-8048 out of the ostomy category, or set is_visible = false).',
+    );
+  }
+
+  console.log(`    channel:          assign product ${existing.id} to the storefront channel (BIGCOMMERCE_CHANNEL_ID)`);
+  console.log(
+    `    kit_variants:     ${currentVariants}  ->  ${declaredVariants ? JSON.stringify(kitVariants) : '(unchanged — none declared)'}`,
+  );
+  console.log(`    description now:  ${firstLine(existing.description)}`);
+  console.log(`    description next: ${firstLine(description)}`);
+  console.log(`    is_visible:       not sent (currently ${existing.is_visible})`);
+}
+
 async function upsertKit({ sku, meta, categoryId }) {
   const { name, description, componentIds, kitVariants, gaps, open } = meta;
 
@@ -508,6 +610,15 @@ async function upsertKit({ sku, meta, categoryId }) {
   for (const question of open ?? []) console.log(`  OPEN QUESTION: ${question}`);
 
   if (DRY_RUN) {
+    printPlannedChanges({
+      existing,
+      name,
+      price,
+      componentIds,
+      categoryId,
+      description,
+      kitVariants,
+    });
     console.log(`  DRY RUN — would ${existing ? 'update' : 'create'} product`);
 
     return { id: existing?.id ?? null, sku, name, action: existing ? 'update' : 'create' };

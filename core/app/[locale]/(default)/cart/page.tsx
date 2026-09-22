@@ -43,6 +43,8 @@ interface Props {
   params: Promise<{ locale: string }>;
 }
 
+type CartLineWithProductEntityId = CartLineItem & { productEntityId: number };
+
 const CHECKOUT_URL = process.env.TRAILING_SLASH !== 'false' ? '/checkout/' : '/checkout';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -205,7 +207,15 @@ export default async function Cart({ params }: Props) {
       lineItemEntityId: item.entityId,
     }));
 
-  const formattedProducts: CartLineItem[] = expandGroupedCartLineItems({
+  /*
+   * `CartLineItem` does not declare `productEntityId`, but every row built
+   * below carries one and two later steps read it — assigning kit ids, and
+   * matching a line against its kit recipe. Annotating the local as plain
+   * `CartLineItem[]` hid the field and turned both reads into type errors.
+   * `MiniCartMappedLine` in cart/_actions/get-mini-cart.ts declares it the same
+   * way.
+   */
+  const formattedProducts: CartLineWithProductEntityId[] = expandGroupedCartLineItems({
     cartLineItems: productLineItems,
     subscriptionLines,
     buildBaseItem: (item, totalQuantity, lineItemEntityId) => {

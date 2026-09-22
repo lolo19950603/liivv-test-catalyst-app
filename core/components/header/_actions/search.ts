@@ -7,6 +7,7 @@ import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
 
 import { SearchResult } from '@/vibes/soul/primitives/navigation';
+import { isOstomyKit } from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
 import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
 import { graphql } from '~/client/graphql';
@@ -117,9 +118,33 @@ export async function search(
 
     const { products } = response.data.site.search.searchProducts;
 
+    /*
+     * =======================================================================
+     * THE CURATED OSTOMY KITS ARE WITHHELD FROM QUICK SEARCH TOO
+     * =======================================================================
+     * The same withhold the /search route and the ostomy category shelf apply
+     * (`isOstomyKit`), applied to the type-ahead that feeds them. Without it
+     * the withhold was only half built: every Ostomy Care surface renders a
+     * search box wired to this action, so all eight kits — the five held for
+     * names that make a claim, and #8041 with its live coupling defect — came
+     * back inside the microsite as product cards with names, images and
+     * prices, one keystroke from the chapters.
+     *
+     * Unconditional, as on the /search route: a result list has no category to
+     * test, so there is no ostomy/not-ostomy question to ask, and a kit that
+     * must not be shown on an ostomy shelf must not be shown in a search box
+     * either. The owner's step — take 8041–8048 out of the ostomy categories,
+     * or set is_visible = false — makes this filter stop matching. The kits'
+     * own product pages stay live either way.
+     * =======================================================================
+     */
+    const listedProducts = removeEdgesAndNodes(products).filter(
+      (product) => !isOstomyKit(product.entityId),
+    );
+
     return {
       lastResult: submission.reply(),
-      searchResults: await searchResultsTransformer(removeEdgesAndNodes(products), {
+      searchResults: await searchResultsTransformer(listedProducts, {
         productsOnly: categoryEntityId != null,
       }),
       emptyStateTitle,

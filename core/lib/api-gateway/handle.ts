@@ -8,6 +8,8 @@ import {
   API_RATE_LIMIT_WINDOW_SEC,
   DPD_RATE_LIMIT_MAX,
   DPD_RATE_LIMIT_WINDOW_SEC,
+  MAKESWIFT_RATE_LIMIT_MAX,
+  MAKESWIFT_RATE_LIMIT_WINDOW_SEC,
 } from './ip-rate-limit';
 import { API_GATEWAY_HEADER, matchApiGatewayRule } from './policies';
 
@@ -68,6 +70,22 @@ export async function handleApiGateway(
   }
 
   const { policy } = matched;
+
+  /*
+   * Makeswift is settled before the shared budget is touched, on its own
+   * counter: builder traffic must not be able to exhaust the storefront's
+   * 120/min, and the storefront must not be able to exhaust the builder's.
+   */
+  if (policy === 'makeswift') {
+    const makeswiftLimited = await rateLimitResponse(
+      request,
+      'rl:makeswift',
+      MAKESWIFT_RATE_LIMIT_MAX,
+      MAKESWIFT_RATE_LIMIT_WINDOW_SEC,
+    );
+
+    return makeswiftLimited ?? passThrough(request, policy);
+  }
 
   const limited = await rateLimitResponse(
     request,

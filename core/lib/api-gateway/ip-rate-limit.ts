@@ -88,3 +88,14 @@ export const API_RATE_LIMIT_WINDOW_SEC = 60;
 
 export const DPD_RATE_LIMIT_MAX = 60;
 export const DPD_RATE_LIMIT_WINDOW_SEC = 60;
+
+/*
+ * The Makeswift runtime handler gets its own budget instead of sharing the
+ * storefront's. An open builder session legitimately bursts well past 120
+ * requests a minute (manifest, fonts, translatable data, element trees), and
+ * spending the storefront budget on it would take the CMS offline to shed
+ * shop load — or the other way round. Still limited, because the handler is
+ * reachable without a session: it checks MAKESWIFT_SITE_API_KEY itself.
+ */
+export const MAKESWIFT_RATE_LIMIT_MAX = 600;
+export const MAKESWIFT_RATE_LIMIT_WINDOW_SEC = 60;

@@ -161,10 +161,12 @@ export function LiivvHealthPage({
           <div className="lh-hub-story-copy">
             <span className="eyebrow">Not just a shelf</span>
             <h2>Care journeys need a deeper story</h2>
+            {/* Not "and kits": a micro-site may list none — Ostomy Care lists
+                none today (ostomy-care/oc-ids.ts). */}
             <p>
               Liivv Your Life is shopping, pharmacy, and everyday essentials. Liivv Health is where we
-              go further — specialized micro-sites with guidance, chapters, and kits built for a
-              particular season of care.
+              go further — specialized micro-sites with guidance and chapters built for a particular
+              season of care.
             </p>
             <div className="lh-hub-story-links">
               {HEALTH_HUB_STORY_LINKS.map((link) => (

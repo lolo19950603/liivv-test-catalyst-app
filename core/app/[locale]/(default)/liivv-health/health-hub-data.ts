@@ -31,7 +31,9 @@ export const HEALTH_HUB_DOORS: HealthHubDoor[] = [
     id: 'ostomy_care_everyday',
     label: 'Live',
     title: 'Ostomy Care & Everyday "Liivving"',
-    body: 'Supplies, kits, and kind guidance for every day.',
+    /* Not "kits": Ostomy Care lists none while they are withheld
+       (ostomy-care/oc-ids.ts), so the door must not promise them. */
+    body: 'Supplies, chapters, and kind guidance for every day.',
     image: `${IMG}/corner-ostomy.png`,
     href: '/liivv-health/ostomy-care',
     status: 'live',

@@ -3560,7 +3560,12 @@
           "body": "Vos questions courantes sur les produits et le réapprovisionnement — clavardez avec un pharmacien de l’Ontario pendant les heures d’ouverture, jusqu’à 17 h (heure de l’Est). Les préoccupations cliniques reviennent toujours à votre NSWOC ou à votre équipe de soins.",
           "cta": "Parler à un pharmacien",
           "oliviaTitle": "Olivia peut aller chercher les petites choses du quotidien.",
-          "oliviaBody": "Besoin d’un réapprovisionnement ou d’aide avec une commande? Olivia est la petite pousse dans le coin. Elle ne donne pas de conseils médicaux, et les questions sur l’ajustement et la peau reviennent à votre NSWOC."
+          "oliviaBody": "Besoin d’un réapprovisionnement ou d’aide avec une commande? Olivia est la petite pousse dans le coin. Elle ne donne pas de conseils médicaux, et les questions sur l’ajustement et la peau reviennent à votre NSWOC.",
+          "oliviaKicker": "Rencontrez Olivia",
+          "oliviaCta": "Clavarder avec Olivia",
+          "oliviaBubble": "Bonjour — j’habite dans le coin.",
+          "oliviaMore": "Ce qu’elle peut faire →",
+          "oliviaNote": "Cherchez la petite pousse qui rebondit dans le coin. Les questions cliniques reviennent toujours au pharmacien."
         },
         "brands": {
           "label": "Marques offertes",

@@ -44,6 +44,15 @@ import {
 
 const CHAT_CLOSED_UNREAD_POLL_MS = 3000;
 const CHAT_GUEST_AUTH_POLL_MS = 3000;
+/*
+ * The closed-chat unread poll runs on every page, for every visitor, so a
+ * signed-out reader used to spend twenty requests a minute learning nothing.
+ * Once the endpoint has said there is no session, the badge has nothing to
+ * count and the poll drops to a slow keep-alive; window focus and tab
+ * visibility still refresh it at once, which is how a reader who signs in on
+ * another tab is picked up without waiting for the slow tick.
+ */
+const CHAT_GUEST_UNREAD_POLL_MS = 60000;
 
 export const LIVE_CHAT_OPEN_EVENT = 'liivv:open-live-chat';
 
@@ -466,6 +475,7 @@ export function LiveChatWidget() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [data, setData] = useState<LiveChatWidgetData | null>(null);
   const [unreadStaffCount, setUnreadStaffCount] = useState(0);
+  const [unreadPollSignedOut, setUnreadPollSignedOut] = useState(false);
   const [launcherHover, setLauncherHover] = useState(false);
   const [hintIndex, setHintIndex] = useState(0);
   const [showHint, setShowHint] = useState(false);
@@ -476,6 +486,12 @@ export function LiveChatWidget() {
     const session = await getLiveChatSessionAction();
 
     setIsLoggedIn(session.isLoggedIn);
+
+    /* Signing in inside the open chat clears the slow guest cadence, so the
+     * badge is live again the moment the panel closes. */
+    if (session.isLoggedIn) {
+      setUnreadPollSignedOut(false);
+    }
 
     if (session.data) {
       setData(session.data);
@@ -494,9 +510,16 @@ export function LiveChatWidget() {
         return;
       }
 
-      const data = (await response.json()) as { count?: number };
+      const data = (await response.json()) as { count?: number; signedIn?: boolean };
 
       setUnreadStaffCount(typeof data.count === 'number' ? data.count : 0);
+
+      /* Only an explicit `false` slows the poll down. An answer that says
+       * nothing about the session — an older deployment, or the route's own
+       * error path — leaves the cadence where it was. */
+      if (typeof data.signedIn === 'boolean') {
+        setUnreadPollSignedOut(!data.signedIn);
+      }
     } catch {
       setUnreadStaffCount(0);
     }
@@ -631,14 +654,26 @@ export function LiveChatWidget() {
 
     void refreshUnreadStaffCount();
 
-    const id = window.setInterval(() => {
+    const whenVisible = () => {
       if (document.visibilityState === 'visible') {
         void refreshUnreadStaffCount();
       }
-    }, CHAT_CLOSED_UNREAD_POLL_MS);
+    };
 
-    return () => window.clearInterval(id);
-  }, [open]);
+    const id = window.setInterval(
+      whenVisible,
+      unreadPollSignedOut ? CHAT_GUEST_UNREAD_POLL_MS : CHAT_CLOSED_UNREAD_POLL_MS,
+    );
+
+    window.addEventListener('focus', whenVisible);
+    document.addEventListener('visibilitychange', whenVisible);
+
+    return () => {
+      window.clearInterval(id);
+      window.removeEventListener('focus', whenVisible);
+      document.removeEventListener('visibilitychange', whenVisible);
+    };
+  }, [open, unreadPollSignedOut]);
 
   useEffect(() => {
     if (!open || !sessionReady) {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale, useMessages, useTranslations } from 'next-intl';
-import { type CSSProperties, useId, useMemo, useState } from 'react';
+import { type CSSProperties, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { HashTargetScroll } from '../_components/hash-target-scroll';
 import { DiscoveryBand, GovernanceBlock, HelpBand } from '../_components/page-furniture';
@@ -38,6 +38,7 @@ import type { SupplyItem } from './get-supply-items';
 import { RecoveryMap } from './recovery-map';
 import { ResourceShelf } from './resource-shelf';
 import { GoBagBand, SupplyList } from './supply-list';
+import { setUntilFound } from './until-found';
 
 import './chapter-page.css';
 
@@ -197,21 +198,59 @@ function rowLayout(card: CategoryCard) {
   };
 }
 
+/*
+ * The collapsed part of a card. It holds the bulk of a chapter's text — on
+ * Chapter 02 roughly a third of the page — so it is hidden the revealable way,
+ * `hidden="until-found"`, and find-in-page can still reach it.
+ *
+ * React serialises `hidden={true}` as the boolean `hidden=""`, which hides the
+ * text from find-in-page outright, so the server render collapses the row the
+ * boolean way (no flash of expanded cards) and this effect swaps the value the
+ * moment the island hydrates. React keeps managing the prop; because the prop
+ * does not change while the row stays shut, it never overwrites the swap, and
+ * opening the row removes the attribute as before.
+ *
+ * `beforematch` is what the browser fires when it reveals the row for a match:
+ * the button and `aria-expanded` would otherwise keep saying "3 more" over
+ * text the reader is looking at, so the row's own state is opened to match.
+ * See until-found.ts, and note chapter-page.css deliberately gives this node
+ * no author `display`.
+ */
 function RowMore({
   card,
   id,
   open,
   rest,
   noteInMore,
+  onReveal,
 }: {
   card: CategoryCard;
   id: string;
   open: boolean;
   rest: string[];
   noteInMore: boolean;
+  onReveal: (open: boolean) => void;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setUntilFound(ref.current, !open);
+  }, [open]);
+
+  useEffect(() => {
+    const el = ref.current;
+
+    if (!el) return;
+
+    const onMatch = () => onReveal(true);
+
+    el.addEventListener('beforematch', onMatch);
+
+    return () => el.removeEventListener('beforematch', onMatch);
+  }, [onReveal]);
+
   return (
-    <div className="oc-ch-row-more" hidden={!open} id={id}>
+    <div className="oc-ch-row-more" hidden={!open} id={id} ref={ref}>
       {rest.length ? (
         <ul>
           {rest.map((item, i) => (
@@ -282,7 +321,14 @@ function CategoryRow({
 
         {noteOutside ? <p className="oc-ch-row-note">{card.note}</p> : null}
 
-        <RowMore card={card} id={moreId} noteInMore={noteInMore} open={open} rest={rest} />
+        <RowMore
+          card={card}
+          id={moreId}
+          noteInMore={noteInMore}
+          onReveal={setOpen}
+          open={open}
+          rest={rest}
+        />
 
         <CardRoutes card={card} />
 

@@ -69,18 +69,49 @@ export async function SituationDoors() {
   const locale = await getLocale();
 
   /*
-   * French review gate `doors`. The rest of this page is hardcoded English, so
-   * on /fr in production the doors stay off entirely rather than stand as five
-   * French links on an English page. Development and preview open the gate so
-   * the francophone reviewer can read them in place, with the draft marker.
+   * French review gate `doors`. The doors' own French waits on review, so on
+   * /fr in production the five doors stay off. Development and preview open the
+   * gate so the francophone reviewer can read them in place, with the draft
+   * marker.
    *
-   * One of the five is the emergency door, and a gate must never be what takes
-   * an emergency signpost off a page (review-gates.ts). It does not here: this
-   * landing has never carried one in either language, and what /fr shows while
-   * the gate is closed is exactly what it shows today. Opening the gate is the
-   * fix, not shipping unreviewed French — so this is the first gate to open.
+   * What the gate must not do is take the emergency route off the page
+   * (review-gates.ts). One of the five doors is the only link the landing has
+   * to Chapter 02's red-flag list, so closing the gate used to leave the entry
+   * point of the French microsite with no route to it while /en kept one. The
+   * fallback below is that route: the same target as the urgent door, in the
+   * same place, wearing the same urgent styling.
+   *
+   * Its wording is not new. It is the approved urgentExit pair Chapter 01,
+   * Chapter 04 and the funding page already carry, reviewed in both locales, so
+   * nothing here waits on the `doors` review and the two cannot drift. Opening
+   * the gate is still the fix — and when the owner opens it this fallback
+   * disappears on its own, because the doors themselves come back.
    */
-  if (isFrGated('doors', locale)) return null;
+  if (isFrGated('doors', locale)) {
+    const exit = await getMessages({ locale });
+
+    return (
+      <section aria-labelledby="oc-situations-heading" className="oc-situation" id="situations">
+        <div className="oc-wrap">
+          <h2 id="oc-situations-heading">
+            {exit.OstomyCare.chapters['this-might-be-you'].urgentExit.lead}
+          </h2>
+
+          <ul className="oc-situation-list">
+            <li className="oc-situation-item is-urgent">
+              <a
+                className="oc-situation-door"
+                href={localeHref(anchored('get-to-know-your-stoma', 'red-flags'), locale)}
+              >
+                <DoorGlyph name="urgent" />
+                <b>{exit.OstomyCare.chapters['this-might-be-you'].urgentExit.link}</b>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </section>
+    );
+  }
 
   const t = await getTranslations({ locale, namespace: 'OstomyCare.ui.landingPage.doors' });
   const chapter = await getTranslations({ locale, namespace: 'OstomyCare.ui.chapter' });
