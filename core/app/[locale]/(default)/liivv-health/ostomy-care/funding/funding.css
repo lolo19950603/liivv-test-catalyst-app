@@ -323,3 +323,13 @@
     transition: none;
   }
 }
+
+/*
+ * The urgent signpost under the journal notes. Held to the same column as the
+ * notes above it; the line itself is styled by `.oc-fig-exit` in
+ * chapter-page.css, which this page already loads.
+ */
+#oc-chapter .oc-fund-exit {
+  width: min(100%, var(--max));
+  margin: 0.85rem auto 0;
+}

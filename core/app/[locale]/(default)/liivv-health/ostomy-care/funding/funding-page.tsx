@@ -24,6 +24,7 @@ import {
   LANDING_HREF,
   localeHref,
 } from '../chapters/chapters-data';
+import { FigureGlyphs, UrgentExit } from '../chapters/figures';
 
 import { FundingChecker } from './funding-checker';
 import { FEDERAL_LINKS } from './funding-data';
@@ -66,6 +67,30 @@ export function FundingPage() {
   const chrome = useTranslations('OstomyCare.ui.chapter');
   const models = messages.OstomyCare.funding.models;
 
+  /*
+   * The one urgent signpost this page carries.
+   *
+   * Until this branch a <noscript> block repeated Chapter 02's red-flag list
+   * and the 9-8-8 crisis line on every /liivv-health/ostomy-care/** page,
+   * because the store-wide loading gate meant a reader with scripts off saw
+   * nothing else at all. That gate is gone and these pages now render their own
+   * content, so the duplicate was removed rather than left to show twice. Every
+   * other page in the microsite signposts the emergency list itself; this one
+   * did not, so removing the duplicate would have left a reader here with no
+   * route to it in either direction. This is that route.
+   *
+   * The wording is read out of the message tree rather than written here: it is
+   * the same approved pair Chapter 01 and Chapter 04 carry, already reviewed in
+   * both locales, so there is no second wording for a clinical reviewer to
+   * approve and no way for the two to drift. It is a plain <a>, so it works
+   * with scripts off, and no review gate may hide it (review-gates.ts).
+   */
+  const urgentExit = {
+    lead: messages.OstomyCare.chapters['this-might-be-you'].urgentExit.lead,
+    link: messages.OstomyCare.chapters['this-might-be-you'].urgentExit.link,
+    href: localeHref(`${chapterHref('get-to-know-your-stoma')}#red-flags`, locale),
+  };
+
   return (
     <div id="oc-chapter" style={ACCENT_STYLE}>
       <section className="oc-ch-hero oc-fund-hero">
@@ -85,6 +110,8 @@ export function FundingPage() {
         </div>
       </section>
 
+      <FigureGlyphs />
+
       <section className="oc-ch-journal rounded-top">
         <div className="oc-ch-journal-grid">
           <article className="oc-ch-note">
@@ -95,6 +122,9 @@ export function FundingPage() {
             <span className="oc-ch-note-label">{chrome('theVibe')}</span>
             <p>{t('vibe')}</p>
           </article>
+        </div>
+        <div className="oc-fund-exit">
+          <UrgentExit exit={urgentExit} />
         </div>
       </section>
 
