@@ -29,6 +29,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useRef } from 'react';
 
 import { AskChip } from './ask-chip';
+import { ChapterReveal } from './chapter-reveal';
 import type {
   AskRole,
   Chapter,
@@ -126,9 +127,11 @@ export function RecoveryMap({ exit, map }: { exit?: Chapter['urgentExit']; map: 
       <div className="oc-ch-wrap" ref={rootRef}>
         {exit ? <UrgentExit exit={exit} /> : null}
         <FrDraftMarker gate="recoveryMap" />
-        <header className="oc-ch-care-head">
-          <span className="oc-ch-eyebrow">{t('softMap')}</span>
-          <h2 id="recovery-map-heading">{map.heading}</h2>
+        <header className="oc-ch-care-head oc-journey-meadow-head">
+          <ChapterReveal variant="clearing">
+            <span className="oc-ch-eyebrow">{t('softMap')}</span>
+            <h2 id="recovery-map-heading">{map.heading}</h2>
+          </ChapterReveal>
           <p>{map.intro}</p>
         </header>
 

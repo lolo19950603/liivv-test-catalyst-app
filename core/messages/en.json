@@ -3192,7 +3192,13 @@
         "backToLanding": "Back to Ostomy Care page",
         "chapterNav": "Chapter navigation",
         "groupNav": "Filter by section",
+        "groupJump": "Jump to a section",
+        "topicsInSection": "In this section",
+        "pathSpine": "Chapter path",
         "allGroups": "All",
+        "stripPrev": "Previous card",
+        "stripNext": "Next card",
+        "stripStatus": "Card {current} of {total}",
         "showMore": "{count} more",
         "showLess": "Less",
         "ask": {

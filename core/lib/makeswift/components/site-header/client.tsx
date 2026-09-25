@@ -28,7 +28,6 @@ import {
   mapMakeswiftAdditionalLinks,
   type MakeswiftAdditionalLinkInput,
 } from '~/lib/makeswift/site-header/map-makeswift-nav-links';
-import { Link } from '~/components/link';
 import {
   getCareSectionBackLink,
   getDiabetesCareNav,
@@ -291,6 +290,9 @@ export const MakeswiftHeader = forwardRef(
 
     const bannerNode = combinedBanner ? <Banner {...combinedBanner} /> : null;
     const careBack = getCareSectionBackLink(pathname);
+    const menuLinks = careBack
+      ? [{ label: `← ${careBack.label}`, href: careBack.href }, ...navLinks]
+      : navLinks;
 
     return (
       <LiivvArchiveHeader
@@ -313,28 +315,14 @@ export const MakeswiftHeader = forwardRef(
                 ? 'Diabetes Care'
                 : 'Store'
         }
-        navLinks={navLinks}
+        navLinks={menuLinks}
         notifications={notifications}
         searchPlaceholder={searchPlaceholder}
         sectionId={LIIVV_SITE_HEADER_SECTION_ID}
         showLogo={Boolean(desktopLogo?.src || desktopLogo?.text)}
         sticky
         withPinSpacer={false}
-      >
-        {careBack ? (
-          <nav
-            aria-label={careBack.label}
-            className="liivv-care-back-bar w-full border-t border-[rgb(49_47_47/0.08)] bg-white px-5 py-2.5 lg:px-8"
-          >
-            <Link
-              className="inline-flex items-center text-sm font-medium tracking-wide text-[#312f2f] no-underline hover:underline"
-              href={careBack.href}
-            >
-              ← {careBack.label}
-            </Link>
-          </nav>
-        ) : null}
-      </LiivvArchiveHeader>
+      />
     );
   },
 );

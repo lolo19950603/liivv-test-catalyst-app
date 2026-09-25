@@ -3191,7 +3191,13 @@
         "backToLanding": "Retour à la page Soins d'ostomie",
         "chapterNav": "Navigation par chapitre",
         "groupNav": "Filtrer par section",
+        "groupJump": "Aller à une section",
+        "topicsInSection": "Dans cette section",
+        "pathSpine": "Chemin du chapitre",
         "allGroups": "Tous",
+        "stripPrev": "Carte précédente",
+        "stripNext": "Carte suivante",
+        "stripStatus": "Carte {current} sur {total}",
         "showMore": "{count} de plus",
         "showLess": "Moins",
         "ask": {

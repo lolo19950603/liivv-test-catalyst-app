@@ -318,8 +318,10 @@ export interface Chapter {
     image: string;
   };
   closing: { heading: string; body: string };
-  /** Whether the group filter rail renders. */
+  /** Whether the group jump links render. Chapter 01 uses the start-here map instead. */
   rail: boolean;
+  /** Each group is a full page section with a large heading. Chapter 01 only. */
+  majorSections: boolean;
   /** A map of the chapter's groups, each listing its cards. */
   startHere?: {
     pivot: string;
@@ -1042,6 +1044,7 @@ function composeChapter(
     num: meta.num,
     chapterWord: meta.chapterWord,
     rail: meta.rail ?? true,
+    majorSections: meta.majorSections === true,
     ...(startHere === undefined ? {} : { startHere }),
     ...(urgentExit === undefined ? {} : { urgentExit }),
     heroImage: meta.heroImage,

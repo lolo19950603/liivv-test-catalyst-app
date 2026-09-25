@@ -33,8 +33,9 @@
  *   there on its own, a restored scroll position, or a reader who has started
  *   reading;
  * - only on the first mount, so a later hash change is left to the browser;
- * - only a target that exists and can be scrolled to — a row the group rail has
- *   filtered away is hidden, and `scrollIntoView` on it does nothing.
+ * - only a target that exists and can be scrolled to. A card inside a horizontal
+ *   group row is still in the document, so the browser scrolls that row sideways
+ *   as well as the page.
  *
  * With JavaScript off none of this runs — and it no longer needs to: the body is
  * in the served HTML, so the browser resolves the fragment on its own.

@@ -1,13 +1,22 @@
 'use client';
 
 import { useLocale, useMessages, useTranslations } from 'next-intl';
-import { type CSSProperties, useEffect, useId, useMemo, useRef, useState } from 'react';
+import {
+  type CSSProperties,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { HashTargetScroll } from '../_components/hash-target-scroll';
 import { DiscoveryBand, GovernanceBlock, HelpBand } from '../_components/page-furniture';
 import type { OcCatalogItem } from '../get-oc-catalog';
 
 import { AskChip } from './ask-chip';
+import { CardExit, CardShop, RowMore, rowLayout } from './chapter-disclosure';
 import {
   type BandLink,
   buildChapters,
@@ -27,18 +36,16 @@ import {
   CardRoutes,
   FigureGlyphs,
   isPinnedCard,
-  needsCardExit,
-  NOTE_CARRYING_KINDS,
-  restylesCard,
   showsChapterExit,
   StartHereLine,
   UrgentExit,
 } from './figures';
 import type { SupplyItem } from './get-supply-items';
+import { ChapterReveal } from './chapter-reveal';
+import { JourneyGrid } from './journey-layout';
+import { JourneyBandDots, JourneyPath } from './journey-path';
 import { RecoveryMap } from './recovery-map';
 import { ResourceShelf } from './resource-shelf';
-import { GoBagBand, SupplyList } from './supply-list';
-import { setUntilFound } from './until-found';
 
 import './chapter-page.css';
 
@@ -48,268 +55,31 @@ import './chapter-page.css';
  * The referral chip (AskChip) lives in ./ask-chip.tsx.
  */
 
-/*
- * Commerce, in its own band.
- *
- * Placement is declared in chapters-meta.ts, not decided here. The test a card
- * has to pass is about its COPY, not its topic: does anything on this card
- * argue against buying something?
- *
- * An earlier version asked the topic question instead, and put a $234 kit named
- * "Peristomal Skin Health & Infection Prevention" under the card that says
- * broken skin "needs an NSWOC to look at it — not a product recommendation from
- * the internet". Eight cards are deliberately empty:
- *
- *   Flat or convex                convexity is prescribed after an assessment
- *   Leaks and short wear time     its own note calls rings and pastes an
- *                                 assessment rather than a shopping decision
- *   Sore, itchy, or weeping skin  broken skin needs an NSWOC, not a product
- *   A bulge around the stoma      symptom card
- *   Hernias, lifting and core     belts have not been shown to prevent hernia
- *   Getting back to activity      it sits under that card, so a belt band here
- *                                 makes the recommendation that one withholds
- *   Children                      a failing seal is a call to the nurse
- *   Ballooning and gas            symptom card, and its first sentence says a
- *                                 wetted-out filter is normal rather than a
- *                                 fault — so a band of filtered pouches
- *                                 answered a sentence saying nothing needs an
- *                                 answer
- *
- * No card anywhere in the four chapters carries a product band today. The
- * second test, for a card that ever gets one back, is about the SHELF: three or
- * more manufacturers, or no band — see cards 4, 5, 10 and 17 in chapters-meta.ts.
- *
- * The band sits after the ask chip so the referral is the last clinical thing
- * said, and it carries its own disclosure rather than borrowing the page's.
- */
-function ProductBand({
-  ids,
-  products,
-}: {
-  ids: number[];
-  products: Record<number, OcCatalogItem>;
-}) {
-  const t = useTranslations('OstomyCare.ui.chapter');
-  const items = ids
-    .map((id) => products[id])
-    .filter((item): item is OcCatalogItem => Boolean(item));
-
-  if (!items.length) return null;
-
-  return (
-    <aside className="oc-ch-shop">
-      <span className="oc-ch-shop-label">{t('productsLabel')}</span>
-      <ul className="oc-ch-shop-list">
-        {items.map((item) => (
-          <li key={item.entityId}>
-            <a className="oc-ch-shop-card" href={item.path}>
-              {item.image ? (
-                <img alt="" loading="lazy" src={item.image.src} />
-              ) : (
-                <span className="oc-ch-shop-blank" />
-              )}
-              <span className="oc-ch-shop-name">{item.name}</span>
-              {item.priceLabel ? <span className="oc-ch-shop-price">{item.priceLabel}</span> : null}
-            </a>
-          </li>
-        ))}
-      </ul>
-      <p className="oc-ch-shop-note">{t('productsNote')}</p>
-    </aside>
-  );
-}
-
-/*
- * The shop band, whatever shape it takes on this card.
- *
- * Three kinds, and a card can only have one: the supply list (C02), the go-bag
- * card's link back to it, or the plain product band above. The band is always
- * an aside with its own label and its own disclosure, so a reader can tell the
- * shop from the chapter without reading a word of it.
- *
- * Only the product band hides with the card's disclosure: a card carrying the
- * supply list or the go-bag link is pinned open, so there is nothing to hide
- * behind.
- */
-function CardShop({
-  card,
-  products,
-  supplyItems,
-  visible,
-}: {
-  card: CategoryCard;
-  products: Record<number, OcCatalogItem>;
-  supplyItems?: Promise<SupplyItem[]>;
-  visible: boolean;
-}) {
-  const supply = card.figures?.find(
-    (figure): figure is Extract<FigureMeta, { kind: 'supplyList' }> => figure.kind === 'supplyList',
-  );
-
-  if (supply) return <SupplyList card={card} figure={supply} supplyItems={supplyItems} />;
-
-  if (card.figures?.some((figure) => figure.kind === 'goBag')) return <GoBagBand card={card} />;
-
-  if (!card.productIds) return null;
-
-  return (
-    <div hidden={!visible}>
-      <ProductBand ids={card.productIds} products={products} />
-    </div>
-  );
-}
-
-/*
- * The chapter's emergency signpost in a card's own body (needsCardExit in
- * figures.tsx). Two cards earn one: the supply-list card, whose band holds a
- * shopping tool, and a card whose signposting module this locale's review gate
- * dropped. Either way it sits above the foot — outside the shop band, never
- * beside something to buy, and where the module would have put it.
- */
-function CardExit({ card, exit }: { card: CategoryCard; exit?: Chapter['urgentExit'] }) {
-  if (!exit || !needsCardExit(card)) return null;
-
-  return <UrgentExit exit={exit} />;
-}
-
-/*
- * Where a card's words go.
- *
- * A figure that restyles the card carries the card's own item sentences, so the
- * plain list is not repeated and there is nothing left to collapse. Otherwise
- * the first bullet is the lede and the rest collapse; a card built from sections
- * has no single lede, so it collapses whole. The closing note sits outside the
- * collapsible region when the meta asks for it, or when a restyle figure has
- * taken the list — except where a figure carries the note itself (the take-in
- * card; see NOTE_CARRYING_KINDS).
- */
-function rowLayout(card: CategoryCard) {
-  const restyled = restylesCard(card.figures);
-  const carriesNote = Boolean(card.figures?.some((figure) => NOTE_CARRYING_KINDS.has(figure.kind)));
-  const rest = restyled ? [] : (card.items?.slice(1) ?? []);
-  const noteOutside = Boolean(card.note) && Boolean(card.noteVisible || (restyled && !carriesNote));
-
-  return {
-    lede: restyled ? undefined : card.items?.[0],
-    rest,
-    hidden: rest.length + (card.sections?.length ?? 0),
-    noteOutside,
-    noteInMore: Boolean(card.note) && !noteOutside && !carriesNote,
-  };
-}
-
-/*
- * The collapsed part of a card. It holds the bulk of a chapter's text — on
- * Chapter 02 roughly a third of the page — so it is hidden the revealable way,
- * `hidden="until-found"`, and find-in-page can still reach it.
- *
- * React serialises `hidden={true}` as the boolean `hidden=""`, which hides the
- * text from find-in-page outright, so the server render collapses the row the
- * boolean way (no flash of expanded cards) and this effect swaps the value the
- * moment the island hydrates. React keeps managing the prop; because the prop
- * does not change while the row stays shut, it never overwrites the swap, and
- * opening the row removes the attribute as before.
- *
- * `beforematch` is what the browser fires when it reveals the row for a match:
- * the button and `aria-expanded` would otherwise keep saying "3 more" over
- * text the reader is looking at, so the row's own state is opened to match.
- * See until-found.ts, and note chapter-page.css deliberately gives this node
- * no author `display`.
- */
-function RowMore({
-  card,
-  id,
-  open,
-  rest,
-  noteInMore,
-  onReveal,
-}: {
-  card: CategoryCard;
-  id: string;
-  open: boolean;
-  rest: string[];
-  noteInMore: boolean;
-  onReveal: (open: boolean) => void;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setUntilFound(ref.current, !open);
-  }, [open]);
-
-  useEffect(() => {
-    const el = ref.current;
-
-    if (!el) return;
-
-    const onMatch = () => onReveal(true);
-
-    el.addEventListener('beforematch', onMatch);
-
-    return () => el.removeEventListener('beforematch', onMatch);
-  }, [onReveal]);
-
-  return (
-    <div className="oc-ch-row-more" hidden={!open} id={id} ref={ref}>
-      {rest.length ? (
-        <ul>
-          {rest.map((item, i) => (
-            <li key={`${i}-${item}`}>{item}</li>
-          ))}
-        </ul>
-      ) : null}
-      {card.sections?.map((section) => (
-        <div className="oc-ch-subsection" key={section.heading}>
-          <h4>{section.heading}</h4>
-          <ul>
-            {section.items.map((item, i) => (
-              <li key={`${i}-${item}`}>{item}</li>
-            ))}
-          </ul>
-          {section.note ? <p className="oc-ch-row-note">{section.note}</p> : null}
-        </div>
-      ))}
-      {noteInMore ? <p className="oc-ch-row-note">{card.note}</p> : null}
-    </div>
-  );
-}
-
 function CategoryRow({
   card,
   index,
-  openByDefault,
   products,
   supplyItems,
   exit,
 }: {
   card: CategoryCard;
   index: number;
-  openByDefault: boolean;
+  /** Unused; kept so older call sites compile. Cards are always fully open. */
+  openByDefault?: boolean;
   products: Record<number, OcCatalogItem>;
   supplyItems?: Promise<SupplyItem[]>;
   exit?: Chapter['urgentExit'];
 }) {
-  const t = useTranslations('OstomyCare.ui.chapter');
-  /*
-   * A card carrying a same-day, emergency or crisis line, or an interactive
-   * module, is pinned open with no toggle. Collapsing rows by default once hid
-   * 9-8-8 on chapter 04.
-   */
-  const pinned = isPinnedCard(card);
-  const [open, setOpen] = useState(openByDefault || pinned);
   const moreId = useId();
-
-  const { lede, rest, hidden, noteOutside, noteInMore } = rowLayout(card);
-  const collapsible = hidden > 0 && !pinned;
+  const { lede, rest, noteOutside, noteInMore } = rowLayout(card);
 
   return (
-    <article className={open ? 'oc-ch-row is-open' : 'oc-ch-row'} id={`card-${card.number}`}>
+    <article className="oc-ch-row is-open" id={`card-${card.number}`}>
       <span aria-hidden className="oc-ch-row-thumb">
         <img alt="" loading="lazy" src={card.image} />
         <b>{String(index + 1).padStart(2, '0')}</b>
       </span>
       <div>
-        {card.group ? <span className="oc-ch-group">{card.group}</span> : null}
         <h3>
           {card.title}
           {card.badge ? ` · ${card.badge}` : ''}
@@ -321,41 +91,19 @@ function CategoryRow({
 
         {noteOutside ? <p className="oc-ch-row-note">{card.note}</p> : null}
 
-        <RowMore
-          card={card}
-          id={moreId}
-          noteInMore={noteInMore}
-          onReveal={setOpen}
-          open={open}
-          rest={rest}
-        />
+        <RowMore card={card} id={moreId} noteInMore={noteInMore} rest={rest} />
 
         <CardRoutes card={card} />
 
         <CardExit card={card} exit={exit} />
 
-        <div className="oc-ch-row-foot">
-          {collapsible ? (
-            <button
-              aria-controls={moreId}
-              aria-expanded={open}
-              aria-label={`${open ? t('showLess') : t('showMore', { count: String(hidden) })} — ${card.title}`}
-              className="oc-ch-toggle"
-              onClick={() => setOpen(!open)}
-              type="button"
-            >
-              {open ? t('showLess') : t('showMore', { count: String(hidden) })}
-            </button>
-          ) : null}
-          {card.ask ? <AskChip role={card.ask} /> : null}
-        </div>
+        {card.ask ? (
+          <div className="oc-ch-row-foot">
+            <AskChip role={card.ask} />
+          </div>
+        ) : null}
 
-        <CardShop
-          card={card}
-          products={products}
-          supplyItems={supplyItems}
-          visible={open || !collapsible}
-        />
+        <CardShop card={card} products={products} supplyItems={supplyItems} visible />
       </div>
     </article>
   );
@@ -479,9 +227,11 @@ function ProgramsBand({
       <div className="oc-ch-wrap">
         {exit ? <UrgentExit exit={exit} /> : null}
         {band.heading ? (
-          <header className="oc-ch-care-head">
-            <span className="oc-ch-eyebrow">{t('softMap')}</span>
-            <h2>{band.heading}</h2>
+          <header className="oc-ch-care-head oc-journey-meadow-head">
+            <ChapterReveal variant="clearing">
+              <span className="oc-ch-eyebrow">{t('softMap')}</span>
+              <h2>{band.heading}</h2>
+            </ChapterReveal>
           </header>
         ) : null}
         <div className="oc-ch-programs-grid">
@@ -550,13 +300,395 @@ function ChapterBandSlot({ chapter }: { chapter: Chapter }) {
 }
 
 /*
- * Second-level navigation, built from the `group` labels the categories were
- * already authored with. This is what makes a twenty-row chapter browsable, and
- * what makes consolidating back to four chapters possible.
+ * A card that has to occupy the full row, and that must not wait on a fade:
+ * an emergency or interactive module (pinned open), the crisis line, the
+ * who-to-ask lanes, or the bowel diagram, whose names sit beside the picture
+ * and were written for the full measure. Everything else in a group shares
+ * one horizontal row.
+ */
+const FULL_WIDTH_KINDS: ReadonlySet<FigureMeta['kind']> = new Set([
+  'bowelReference',
+  'crisis',
+  'lanes',
+]);
+
+function readsFullWidth(card: CategoryCard) {
+  return (
+    isPinnedCard(card) ||
+    Boolean(card.figures?.some((figure) => FULL_WIDTH_KINDS.has(figure.kind)))
+  );
+}
+
+type PlacedCard = { card: CategoryCard; index: number };
+
+function groupBands(categories: CategoryCard[]) {
+  const bands: { label: string; id: string; cards: PlacedCard[] }[] = [];
+
+  categories.forEach((card, index) => {
+    const label = card.group ?? '';
+    const last = bands[bands.length - 1];
+
+    if (last && last.label === label) {
+      last.cards.push({ card, index });
+
+      return;
+    }
+
+    bands.push({
+      label,
+      id: `oc-group-${bands.length + 1}`,
+      cards: [{ card, index }],
+    });
+  });
+
+  return bands;
+}
+
+/* Consecutive shelf cards become one strip. A full-width card breaks the strip. */
+function bandChunks(cards: PlacedCard[]) {
+  const chunks: { kind: 'full' | 'strip'; items: PlacedCard[] }[] = [];
+
+  cards.forEach((item) => {
+    const full = readsFullWidth(item.card);
+    const last = chunks[chunks.length - 1];
+
+    if (!full && last?.kind === 'strip') {
+      last.items.push(item);
+
+      return;
+    }
+
+    chunks.push({ kind: full ? 'full' : 'strip', items: [item] });
+  });
+
+  return chunks;
+}
+
+function CardStrip({
+  items,
+  products,
+  supplyItems,
+  exit,
+  label,
+}: {
+  items: PlacedCard[];
+  products: Record<number, OcCatalogItem>;
+  supplyItems?: Promise<SupplyItem[]>;
+  exit?: Chapter['urgentExit'];
+  label: string;
+}) {
+  const t = useTranslations('OstomyCare.ui.chapter');
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<number | null>(null);
+  const [index, setIndex] = useState(0);
+  const count = items.length;
+
+  const sync = useCallback(() => {
+    frameRef.current = null;
+    const viewport = viewportRef.current;
+
+    if (!viewport) return;
+
+    const left = viewport.getBoundingClientRect().left;
+    let nearest = 0;
+    let best = Infinity;
+
+    [...viewport.children].forEach((slide, i) => {
+      const distance = Math.abs(slide.getBoundingClientRect().left - left);
+
+      if (distance < best) {
+        best = distance;
+        nearest = i;
+      }
+    });
+
+    setIndex((current) => (current === nearest ? current : nearest));
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (frameRef.current != null) cancelAnimationFrame(frameRef.current);
+    },
+    [],
+  );
+
+  const go = (next: number) => {
+    const viewport = viewportRef.current;
+    const slide = viewport?.children[next];
+
+    if (!viewport || !(slide instanceof HTMLElement)) return;
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const delta = slide.getBoundingClientRect().left - viewport.getBoundingClientRect().left;
+
+    viewport.scrollBy({ left: delta, behavior: reduce ? 'auto' : 'smooth' });
+  };
+
+  if (count < 2) {
+    const only = items[0];
+
+    if (!only) return null;
+
+    return (
+      <ChapterReveal>
+        <CategoryRow
+          card={only.card}
+          exit={exit}
+          index={only.index}
+          openByDefault={false}
+          products={products}
+          supplyItems={supplyItems}
+        />
+      </ChapterReveal>
+    );
+  }
+
+  return (
+    <div className="oc-ch-strip">
+      <div className="oc-ch-strip-bar">
+        <button
+          aria-label={t('stripPrev')}
+          disabled={index === 0}
+          onClick={() => go(index - 1)}
+          type="button"
+        >
+          <span aria-hidden>←</span>
+        </button>
+        <p className="oc-ch-strip-status">
+          {t('stripStatus', { current: String(index + 1), total: String(count) })}
+        </p>
+        <button
+          aria-label={t('stripNext')}
+          disabled={index === count - 1}
+          onClick={() => go(index + 1)}
+          type="button"
+        >
+          <span aria-hidden>→</span>
+        </button>
+        <div className="oc-ch-strip-dots">
+          {items.map((item, dot) => (
+            <button
+              aria-current={dot === index ? 'true' : undefined}
+              aria-label={item.card.title}
+              key={item.card.title}
+              onClick={() => go(dot)}
+              type="button"
+            />
+          ))}
+        </div>
+      </div>
+      <div
+        aria-label={label || undefined}
+        className="oc-ch-strip-viewport"
+        onScroll={() => {
+          if (frameRef.current != null) return;
+
+          frameRef.current = requestAnimationFrame(sync);
+        }}
+        ref={viewportRef}
+      >
+        {items.map((item) => (
+          <div className="oc-ch-strip-slide" key={item.card.title}>
+            <ChapterReveal>
+              <CategoryRow
+                card={item.card}
+                exit={exit}
+                index={item.index}
+                openByDefault={false}
+                products={products}
+                supplyItems={supplyItems}
+              />
+            </ChapterReveal>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function BandCards({
+  band,
+  products,
+  supplyItems,
+  exit,
+  layout = 'strip',
+}: {
+  band: ReturnType<typeof groupBands>[number];
+  products: Record<number, OcCatalogItem>;
+  supplyItems?: Promise<SupplyItem[]>;
+  exit?: Chapter['urgentExit'];
+  layout?: 'strip' | 'journey';
+}) {
+  if (layout === 'journey') {
+    return (
+      <JourneyGrid
+        cards={band.cards}
+        exit={exit}
+        products={products}
+        supplyItems={supplyItems}
+      />
+    );
+  }
+
+  return (
+    <div className="oc-ch-rows">
+      {bandChunks(band.cards).map((chunk, chunkIndex) =>
+        chunk.kind === 'full' ? (
+          <div className="oc-ch-rows" key={`${band.id}-full-${chunkIndex}`}>
+            {chunk.items.map((item) => (
+              <CategoryRow
+                card={item.card}
+                exit={exit}
+                index={item.index}
+                key={item.card.title}
+                openByDefault={false}
+                products={products}
+                supplyItems={supplyItems}
+              />
+            ))}
+          </div>
+        ) : (
+          <CardStrip
+            exit={exit}
+            items={chunk.items}
+            key={`${band.id}-strip-${chunkIndex}`}
+            label={band.label}
+            products={products}
+            supplyItems={supplyItems}
+          />
+        ),
+      )}
+    </div>
+  );
+}
+
+/*
+ * Every chapter. Each group is a full section: sand, then cream, with the
+ * group label as the heading and the cards in the bento. Chapter 01's old
+ * intro heading stays unrendered. The other chapters keep that heading and
+ * its body in the first band's callout.
+ */
+function LinkedIntroBody({
+  body,
+  phrase,
+  href,
+}: {
+  body: string;
+  phrase?: string;
+  href?: string;
+}) {
+  if (!phrase || !href) return <p>{body}</p>;
+
+  const at = body.indexOf(phrase);
+
+  if (at < 0) return <p>{body}</p>;
+
+  return (
+    <p>
+      {body.slice(0, at)}
+      <a href={href}>{phrase}</a>
+      {body.slice(at + phrase.length)}
+    </p>
+  );
+}
+
+function MajorSections({
+  chapter,
+  products,
+  supplyItems,
+}: {
+  chapter: Chapter;
+  products: Record<number, OcCatalogItem>;
+  supplyItems?: Promise<SupplyItem[]>;
+}) {
+  const t = useTranslations('OstomyCare.ui.chapter');
+  const bands = useMemo(() => groupBands(chapter.categories), [chapter.categories]);
+  const labeled = bands.filter((band) => band.label);
+  const railed = chapter.rail && labeled.length > 1;
+  const showIntroHeading = chapter.slug !== 'new-to-the-journey';
+  /* Same card the landing door "just home" opens: First Week Basics. */
+  const firstWeek =
+    chapter.slug === 'new-to-the-journey'
+      ? chapter.categories.find((card) => card.number === 6)
+      : undefined;
+  const pathBands = labeled.map((band) => ({
+    id: band.id,
+    label: band.label,
+    cards: band.cards,
+  }));
+  const showPath =
+    pathBands.length > 1 || pathBands.some((band) => band.cards.length > 1);
+  /* Spine replaces the group rail when the editorial path is on. */
+  const showRail = railed && !showPath;
+
+  return (
+    <div className="oc-journey-shell">
+      {showPath ? <JourneyPath bands={pathBands} /> : null}
+      <div className="oc-journey-stream">
+        {bands.map((band, index) => (
+          <section
+            className={index % 2 === 0 ? 'oc-ch-major rounded-top' : 'oc-ch-major is-alt rounded-top'}
+            id={index === 0 ? 'chapter-care' : band.id}
+            key={band.id}
+          >
+            <div className="oc-ch-wrap">
+              {index === 0 && showRail ? (
+                <nav aria-label={t('groupJump')} className="oc-ch-rail">
+                  {labeled.map((item, itemIndex) => (
+                    <a href={itemIndex === 0 ? '#chapter-care' : `#${item.id}`} key={item.id}>
+                      {item.label}
+                      <span className="oc-ch-rail-count">{item.cards.length}</span>
+                    </a>
+                  ))}
+                </nav>
+              ) : null}
+              <header className="oc-ch-major-head oc-journey-gate oc-journey-clearing">
+                <ChapterReveal variant="clearing">
+                  <span aria-hidden className="oc-journey-clearing-wash" />
+                  <span className="oc-journey-gate-num" aria-hidden>
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <span className="oc-ch-eyebrow">{t('pathEyebrow')}</span>
+                  <h2>{band.label}</h2>
+                  {index === 0 ? (
+                    <div className="oc-journey-banner oc-journey-banner--wash">
+                      {showIntroHeading ? (
+                        <h3 className="oc-journey-banner-title">{chapter.categoriesIntro.heading}</h3>
+                      ) : null}
+                      <LinkedIntroBody
+                        body={chapter.categoriesIntro.body}
+                        href={firstWeek ? `#card-${firstWeek.number}` : undefined}
+                        phrase={firstWeek?.title}
+                      />
+                    </div>
+                  ) : null}
+                </ChapterReveal>
+                <JourneyBandDots cards={band.cards} label={band.label ?? ''} />
+              </header>
+              <BandCards
+                band={band}
+                exit={chapter.urgentExit}
+                layout="journey"
+                products={products}
+                supplyItems={supplyItems}
+              />
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/*
+ * Groups stay in the page, in order. Vertical scroll moves from one group to
+ * the next. Inside a group the shelf cards sit in a horizontal snap row, so a
+ * twenty-card chapter is eight short rows rather than one long document.
  *
- * Filtering rather than scroll-spying: on a phone a sticky spy rail and the
- * thumb-scroll fight each other, and filtering gives the same answer with less
- * machinery. Rows are hidden, never unmounted — search must still see them all.
+ * Nothing is filtered off. A deep link to #card-N still resolves, and
+ * find-in-page still reaches a collapsed row. The rail is a set of jump links,
+ * not a filter and not a sticky spy — a sticky rail fights thumb-scrolling.
+ * Emergency and interactive cards stay full width and outside the row.
  */
 function GroupRail({
   categories,
@@ -572,65 +704,38 @@ function GroupRail({
   exit?: Chapter['urgentExit'];
 }) {
   const t = useTranslations('OstomyCare.ui.chapter');
-  const [active, setActive] = useState('');
-
-  const groups = useMemo(() => {
-    const counts = categories.reduce<Map<string, number>>((acc, card) => {
-      if (card.group) acc.set(card.group, (acc.get(card.group) ?? 0) + 1);
-
-      return acc;
-    }, new Map());
-
-    return [...counts.entries()].map(([label, count]) => ({ label, count }));
-  }, [categories]);
-
-  // One group, or none, is not a navigation problem worth a control — and a
-  // chapter can switch the rail off where a start-here map does the job.
-  const railed = showRail && groups.length > 1;
-  const seenGroups = new Set<string>();
+  const bands = useMemo(() => groupBands(categories), [categories]);
+  const labeled = bands.filter((band) => band.label);
+  const railed = showRail && labeled.length > 1;
 
   return (
     <>
       {railed ? (
-        <div aria-label={t('groupNav')} className="oc-ch-rail" role="group">
-          <button aria-pressed={active === ''} onClick={() => setActive('')} type="button">
-            {t('allGroups')}
-            <span className="oc-ch-rail-count">{categories.length}</span>
-          </button>
-          {groups.map((group) => (
-            <button
-              aria-pressed={active === group.label}
-              key={group.label}
-              onClick={() => setActive(group.label)}
-              type="button"
-            >
-              {group.label}
-              <span className="oc-ch-rail-count">{group.count}</span>
-            </button>
+        <nav aria-label={t('groupJump')} className="oc-ch-rail">
+          {labeled.map((band) => (
+            <a href={`#${band.id}`} key={band.id}>
+              {band.label}
+              <span className="oc-ch-rail-count">{band.cards.length}</span>
+            </a>
           ))}
-        </div>
+        </nav>
       ) : null}
 
-      <div className="oc-ch-rows">
-        {categories.map((card, index) => {
-          const lead = Boolean(card.group) && !seenGroups.has(card.group ?? '');
-
-          if (card.group) seenGroups.add(card.group);
-
-          return (
-            <div hidden={active !== '' && card.group !== active} key={card.title}>
-              <CategoryRow
-                card={card}
-                exit={exit}
-                index={index}
-                openByDefault={lead || !card.group}
-                products={products}
-                supplyItems={supplyItems}
-              />
-            </div>
-          );
-        })}
-      </div>
+      {bands.map((band) => (
+        <section className="oc-ch-band" id={band.label ? band.id : undefined} key={band.id}>
+          {band.label ? (
+            <ChapterReveal>
+              <h3 className="oc-ch-band-heading">{band.label}</h3>
+            </ChapterReveal>
+          ) : null}
+          <BandCards
+            band={band}
+            exit={exit}
+            products={products}
+            supplyItems={supplyItems}
+          />
+        </section>
+      ))}
     </>
   );
 }
@@ -693,7 +798,7 @@ export function ChapterPage({
   };
 
   return (
-    <div id="oc-chapter" style={accentStyle}>
+    <div className="is-journey" id="oc-chapter" style={accentStyle}>
       {/* Every cross-page link into this chapter names a fragment; see the file. */}
       <HashTargetScroll />
       <section className="oc-ch-hero">
@@ -734,38 +839,38 @@ export function ChapterPage({
             {chapter.urgentExit ? <UrgentExit exit={chapter.urgentExit} /> : null}
           </div>
         ) : null}
-        <div className="oc-ch-journal-grid">
-          {chapter.startHere ? null : (
+        {chapter.startHere ? null : (
+          <div className="oc-ch-journal-grid">
             <article className="oc-ch-note">
               <span className="oc-ch-note-label">{t('theFocus')}</span>
               <p>{chapter.focus}</p>
             </article>
-          )}
-          <article className="oc-ch-note is-vibe">
-            <span className="oc-ch-note-label">{t('theVibe')}</span>
-            <p>{chapter.vibe}</p>
-          </article>
-        </div>
+          </div>
+        )}
       </section>
 
       {chapter.urgent ? <UrgentBlock urgent={chapter.urgent} /> : null}
 
-      <section className="oc-ch-care rounded-top" id="chapter-care">
-        <div className="oc-ch-wrap">
-          <header className="oc-ch-care-head">
-            <span className="oc-ch-eyebrow">{chapter.categoriesIntro.eyebrow}</span>
-            <h2>{chapter.categoriesIntro.heading}</h2>
-            <p>{chapter.categoriesIntro.body}</p>
-          </header>
-          <GroupRail
-            categories={chapter.categories}
-            exit={chapter.urgentExit}
-            products={products}
-            showRail={chapter.rail}
-            supplyItems={supplyItems}
-          />
-        </div>
-      </section>
+      {chapter.majorSections ? (
+        <MajorSections chapter={chapter} products={products} supplyItems={supplyItems} />
+      ) : (
+        <section className="oc-ch-care rounded-top" id="chapter-care">
+          <div className="oc-ch-wrap">
+            <header className="oc-ch-care-head">
+              <span className="oc-ch-eyebrow">{chapter.categoriesIntro.eyebrow}</span>
+              <h2>{chapter.categoriesIntro.heading}</h2>
+              <p>{chapter.categoriesIntro.body}</p>
+            </header>
+            <GroupRail
+              categories={chapter.categories}
+              exit={chapter.urgentExit}
+              products={products}
+              showRail={chapter.rail}
+              supplyItems={supplyItems}
+            />
+          </div>
+        </section>
+      )}
 
       <ChapterBandSlot chapter={chapter} />
 

@@ -259,7 +259,7 @@
 }
 
 @media (min-width: 760px) {
-  #oc-chapter .oc-ch-journal-grid {
+  #oc-chapter .oc-ch-journal-grid:has(> :nth-child(2)) {
     grid-template-columns: 1fr 1fr;
   }
 }
@@ -1448,10 +1448,13 @@
   overflow-x: auto;
   padding: 0 0 0.75rem;
   margin-bottom: 0.35rem;
-  scrollbar-width: thin;
+  scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
-#oc-chapter .oc-ch-rail button {
+#oc-chapter .oc-ch-rail::-webkit-scrollbar {
+  display: none;
+}
+#oc-chapter .oc-ch-rail a {
   flex: 0 0 auto;
   font: inherit;
   font-size: 0.82rem;
@@ -1463,18 +1466,14 @@
   padding: 0.42rem 0.9rem;
   cursor: pointer;
   white-space: nowrap;
+  text-decoration: none;
   transition:
     background 140ms ease,
     color 140ms ease,
     border-color 140ms ease;
 }
-#oc-chapter .oc-ch-rail button:hover {
+#oc-chapter .oc-ch-rail a:hover {
   border-color: var(--chapter-accent);
-}
-#oc-chapter .oc-ch-rail button[aria-pressed='true'] {
-  background: var(--sage-deep);
-  border-color: var(--sage-deep);
-  color: var(--paper);
 }
 #oc-chapter .oc-ch-rail-count {
   font-size: 0.72em;
@@ -1525,13 +1524,12 @@
  * cards (#card-N), the red flags, and the module anchors other pages and
  * modules link to (recovery map, resource shelf, supply list, change steps).
  *
- * The header is `.liivv-archive-header`: the site chrome (140px) plus the
- * "Back to Ostomy Care page" bar (45px), sticky at top 0 and the same 185px at
- * every width. 6.5rem left a card's group label, title and first sentence
- * behind it — the gap link from Chapter 01's walk-through landed on a card 9
- * whose title a reader could not see. 12rem clears the bar with a little room.
+ * The header is `.liivv-archive-header` site chrome (~140px), sticky at top 0.
+ * 12rem clears the bar with a little room for deep links into cards and modules.
  */
 #oc-chapter .oc-ch-row,
+#oc-chapter .oc-ch-band,
+#oc-chapter .oc-ch-major,
 #oc-chapter #red-flags,
 #oc-chapter #recovery-map,
 #oc-chapter #chapter-shelf,
@@ -1604,8 +1602,1200 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #oc-chapter .oc-ch-rail button {
+  #oc-chapter .oc-ch-rail a,
+  #oc-chapter .oc-ch-strip-bar button {
     transition: none;
+  }
+}
+
+/*
+ * A group is one vertical stop. Its shelf cards share a sideways row: the
+ * current card fills the row and the next one peeks. Scrolling the page never
+ * drives the row — the reader swipes it, or uses the arrows.
+ */
+#oc-chapter .oc-ch-band + .oc-ch-band {
+  margin-top: 2.25rem;
+}
+
+#oc-chapter .oc-ch-band-heading {
+  margin: 0 0 0.85rem;
+  font-size: clamp(1.45rem, 2.4vw, 1.9rem);
+}
+
+/* Chapter 01: Before surgery and After surgery are the two halves of the page. */
+#oc-chapter .oc-ch-major {
+  padding: 4.25rem 0 calc(var(--ch-overlap) + 4.5rem);
+  background: var(--sand);
+}
+
+/* Distinct panel wash so alt bands don’t vanish into the page cream. */
+#oc-chapter .oc-ch-major.is-alt {
+  background: color-mix(in srgb, var(--sage) 18%, var(--cream));
+}
+
+#oc-chapter .oc-ch-major-head {
+  margin-bottom: 2.25rem;
+}
+
+#oc-chapter .oc-ch-major-head h2 {
+  margin: 0.4rem 0 0;
+  font-size: clamp(2.8rem, 7vw, 4.75rem);
+  line-height: 0.96;
+  letter-spacing: -0.035em;
+}
+
+#oc-chapter .oc-ch-major-head p {
+  margin: 1.15rem 0 0;
+  max-width: 38rem;
+  color: rgba(42, 50, 44, 0.75);
+}
+
+/*
+ * The sentence that used to sit under its own heading. It stays under Before
+ * surgery, as a callout, so the two section titles are the only large headings.
+ */
+/*
+ * Living Trail — organic stream + sticky curved spine. Evolves the Editorial
+ * Path: clearings for gates, drifting shelf stones, meadow Soft Map arrival.
+ */
+#oc-chapter .oc-journey-shell {
+  position: relative;
+  /*
+   * Soft map / later .rounded-top bands use z-index: 2 and a −48px pull-up.
+   * isolation on the desktop shell traps the spine’s z-index inside — without
+   * a shell z-index above 2, those bands paint over the last timeline stops.
+   */
+  z-index: 3;
+}
+
+/*
+ * Soft map stays full-bleed. Shell padding clears the last spine stops;
+ * Soft map keeps the −48px scoop so its top corners round over the band above.
+ */
+#oc-chapter.is-journey .oc-journey-shell {
+  padding-bottom: calc(var(--ch-overlap) + 5.5rem);
+}
+
+#oc-chapter.is-journey .oc-journey-shell ~ .rounded-top {
+  margin-top: calc(-1 * var(--ch-overlap));
+  z-index: 1;
+  border-radius: var(--ch-overlap) var(--ch-overlap) 0 0;
+}
+
+#oc-chapter .oc-journey-stream {
+  min-width: 0;
+}
+
+#oc-chapter .oc-journey-path {
+  display: none;
+  position: relative;
+}
+
+/* —— Gate clearings —— */
+#oc-chapter .oc-journey-gate,
+#oc-chapter .oc-journey-clearing {
+  margin-bottom: clamp(3.5rem, 8vw, 5.5rem);
+  position: relative;
+  padding: 1.25rem 0 0.5rem;
+  min-height: min(52vh, 28rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+#oc-chapter .oc-journey-clearing-wash {
+  position: absolute;
+  inset: -1rem -4% -6% -4%;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(
+      ellipse 85% 70% at 8% 35%,
+      color-mix(in srgb, var(--sage) 38%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 60% 55% at 92% 15%,
+      color-mix(in srgb, var(--sage-soft) 70%, transparent),
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 40% 35% at 55% 90%,
+      color-mix(in srgb, var(--blush) 22%, transparent),
+      transparent 70%
+    );
+  opacity: 1;
+}
+
+#oc-chapter .oc-journey-clearing > .oc-ch-reveal--clearing {
+  position: relative;
+  z-index: 1;
+}
+
+#oc-chapter .oc-journey-gate-num {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: clamp(5.5rem, 18vw, 10.5rem);
+  line-height: 0.72;
+  letter-spacing: -0.06em;
+  color: color-mix(in srgb, var(--sage-deep) 18%, transparent);
+  margin: 0 0 -0.18em;
+  max-width: 100%;
+  overflow: hidden;
+  user-select: none;
+}
+
+#oc-chapter .oc-journey-gate .oc-ch-eyebrow {
+  display: block;
+  margin-top: 0.45rem;
+}
+
+#oc-chapter .oc-journey-gate h2 {
+  margin: 0.2rem 0 0;
+  font-size: clamp(3rem, 9vw, 5.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  max-width: 12ch;
+}
+
+#oc-chapter .oc-ch-major-head .oc-journey-banner {
+  max-width: 40rem;
+  margin-top: 1.75rem;
+  padding: 1.15rem 1.25rem;
+  border-radius: 18px;
+  background: var(--paper);
+  border-left: 3px solid var(--sage-deep);
+  color: rgba(42, 50, 44, 0.82);
+  box-shadow: 0 12px 32px rgba(49, 47, 47, 0.04);
+}
+
+#oc-chapter .oc-ch-major-head .oc-journey-banner--wash {
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--paper) 88%, var(--sage-soft)),
+      var(--paper) 48%
+    );
+  border-left: none;
+  border-radius: 2rem 2.75rem 1.75rem 2.5rem;
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--sage) 18%, transparent),
+    0 22px 48px rgba(49, 47, 47, 0.07);
+  padding: 1.5rem 1.65rem 1.55rem;
+  max-width: 36rem;
+  transform: rotate(-0.4deg);
+}
+
+#oc-chapter .oc-ch-major-head .oc-journey-banner p {
+  margin: 0;
+  max-width: none;
+  color: inherit;
+  font-size: 1.02rem;
+  line-height: 1.55;
+}
+
+#oc-chapter .oc-ch-major-head .oc-journey-banner a {
+  color: var(--sage-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+#oc-chapter .oc-ch-major-head .oc-journey-banner-title {
+  margin: 0 0 0.45rem;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+/* —— Mobile stepping stones —— */
+#oc-chapter .oc-journey-band-dots {
+  display: flex;
+  gap: 0.55rem;
+  margin-top: 1.5rem;
+  overflow-x: auto;
+  padding: 0.45rem 0.15rem 0.55rem;
+  scrollbar-width: none;
+}
+
+#oc-chapter .oc-journey-band-dots::-webkit-scrollbar {
+  display: none;
+}
+
+#oc-chapter .oc-journey-band-dots a {
+  flex: 0 0 auto;
+  width: 1.85rem;
+  height: 1.35rem;
+  border-radius: 999px 999px 70% 70%;
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+  background: color-mix(in srgb, var(--sand) 55%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+  transition:
+    transform 200ms ease,
+    background 200ms ease,
+    box-shadow 200ms ease;
+}
+
+#oc-chapter .oc-journey-band-dots a > span[aria-hidden] {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--ink) 28%, transparent);
+  transition:
+    background 200ms ease,
+    transform 200ms ease;
+}
+
+#oc-chapter .oc-journey-band-dots a:hover > span[aria-hidden],
+#oc-chapter .oc-journey-band-dots a:focus-visible > span[aria-hidden],
+#oc-chapter .oc-journey-band-dots a.is-active > span[aria-hidden] {
+  background: var(--sage-deep);
+  transform: scale(1.2);
+}
+
+#oc-chapter .oc-journey-band-dots a.is-active {
+  background: color-mix(in srgb, var(--sage-soft) 70%, var(--paper));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--sage) 22%, transparent);
+  transform: translateY(-2px);
+}
+
+#oc-chapter .oc-journey-band-dots .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* —— Soft Map meadow chrome —— */
+#oc-chapter .oc-journey-meadow-head {
+  position: relative;
+  padding-top: 0.75rem;
+}
+
+#oc-chapter .oc-journey-meadow-head::before {
+  content: '';
+  position: absolute;
+  inset: -1rem -6% auto auto;
+  width: min(14rem, 40%);
+  height: 10rem;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--sage-deep) 16%, transparent),
+    transparent 70%
+  );
+}
+
+#oc-chapter .oc-journey-meadow-head .oc-ch-reveal--clearing .oc-ch-eyebrow {
+  display: inline-block;
+}
+
+#oc-chapter .oc-journey-meadow-head h2 {
+  font-size: clamp(2.4rem, 6vw, 3.75rem);
+  max-width: 16ch;
+  letter-spacing: -0.035em;
+}
+
+#oc-chapter .oc-journey-stream-entries {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3.5rem, 8vw, 6.5rem);
+  padding-block: 0.5rem 1.5rem;
+}
+
+/* —— Shelf stones: floating leaves, not magazine cards —— */
+#oc-chapter .oc-journey-entry {
+  scroll-margin-top: 12rem;
+  border-radius: 28px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  box-shadow: 0 18px 48px rgba(49, 47, 47, 0.05);
+}
+
+#oc-chapter .oc-journey-entry.is-module {
+  padding: clamp(1.35rem, 3vw, 2.25rem);
+}
+
+#oc-chapter .oc-journey-entry.is-shelf {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+#oc-chapter .oc-journey-entry.is-stone {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+  border-radius: 0;
+  gap: 0;
+}
+
+#oc-chapter .oc-journey-entry.is-stone.is-drift-0 {
+  margin-inline: 0 0.75rem;
+}
+
+#oc-chapter .oc-journey-entry.is-stone.is-drift-1 {
+  margin-inline: 0.85rem 0;
+}
+
+#oc-chapter .oc-journey-entry.is-stone.is-drift-2 {
+  margin-inline: 0.35rem 1rem;
+}
+
+#oc-chapter .oc-journey-entry-media {
+  position: relative;
+  min-height: 14rem;
+  overflow: hidden;
+  background: var(--sage-soft);
+}
+
+#oc-chapter .oc-journey-entry.is-stone .oc-journey-entry-media {
+  border-radius: 2.5rem 3.25rem 2.25rem 3.5rem;
+  min-height: 16rem;
+  box-shadow: 0 28px 60px rgba(49, 47, 47, 0.12);
+}
+
+#oc-chapter .oc-journey-entry-media img {
+  width: 100%;
+  height: 100%;
+  min-height: 14rem;
+  max-height: 22rem;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.04);
+  transform-origin: center;
+}
+
+#oc-chapter .oc-journey-entry-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: clamp(1.35rem, 3vw, 2rem);
+}
+
+#oc-chapter .oc-journey-entry.is-stone .oc-journey-entry-copy {
+  margin-top: -2.25rem;
+  margin-inline: 0.65rem 0.35rem;
+  position: relative;
+  z-index: 2;
+  border-radius: 1.75rem 2.35rem 1.9rem 2.6rem;
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--paper) 92%, var(--sage-soft)),
+      var(--paper) 40%
+    );
+  border: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+  box-shadow: 0 22px 50px rgba(49, 47, 47, 0.1);
+  padding: clamp(1.5rem, 3.5vw, 2.15rem);
+}
+
+#oc-chapter .oc-journey-entry-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.85rem;
+}
+
+#oc-chapter .oc-journey-num {
+  flex: 0 0 auto;
+  font-family: var(--font-heading);
+  font-size: 1.65rem;
+  line-height: 1;
+  color: var(--sage-deep);
+}
+
+#oc-chapter .oc-journey-entry h3 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(1.55rem, 3.2vw, 2.05rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+#oc-chapter .oc-journey-entry .oc-ch-lede {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: rgba(42, 50, 44, 0.88);
+  max-width: 40rem;
+}
+
+#oc-chapter .oc-journey-entry .oc-ch-row-more > ul,
+#oc-chapter .oc-journey-entry .oc-ch-subsection ul {
+  margin: 0.2rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0;
+}
+
+#oc-chapter .oc-journey-entry .oc-ch-row-more li,
+#oc-chapter .oc-journey-entry .oc-ch-subsection li {
+  position: relative;
+  margin: 0;
+  padding: 0.75rem 0 0.75rem 1.05rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
+  color: rgba(42, 50, 44, 0.82);
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+
+#oc-chapter .oc-journey-entry .oc-ch-row-more li:last-child,
+#oc-chapter .oc-journey-entry .oc-ch-subsection li:last-child {
+  border-bottom: none;
+  padding-bottom: 0.1rem;
+}
+
+#oc-chapter .oc-journey-entry .oc-ch-row-more li::before,
+#oc-chapter .oc-journey-entry .oc-ch-subsection li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 1.2rem;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: var(--sage-deep);
+  opacity: 0.55;
+}
+
+#oc-chapter .oc-journey-foot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.35rem;
+  padding-top: 0.95rem;
+  border-top: 1px solid var(--line);
+}
+
+@media (min-width: 860px) {
+  #oc-chapter .oc-journey-entry.is-shelf:not(.is-stone) {
+    grid-template-columns: minmax(14rem, 0.95fr) minmax(0, 1.05fr);
+    align-items: stretch;
+    min-height: 0;
+  }
+
+  #oc-chapter .oc-journey-entry.is-shelf.is-flip:not(.is-stone) {
+    grid-template-columns: minmax(0, 1.05fr) minmax(14rem, 0.95fr);
+  }
+
+  #oc-chapter .oc-journey-entry.is-shelf.is-flip:not(.is-stone) > .oc-ch-reveal--media {
+    order: 2;
+  }
+
+  #oc-chapter .oc-journey-entry.is-shelf.is-flip:not(.is-stone) .oc-journey-entry-copy {
+    order: 1;
+  }
+
+  #oc-chapter .oc-journey-entry.is-shelf:not(.is-stone) > .oc-ch-reveal--media {
+    min-height: 100%;
+    display: flex;
+  }
+
+  /*
+   * Stones abandon the 2-col card: photo as a large organic leaf, copy as a
+   * overlapping paper leaf — alternating which side leads.
+   */
+  #oc-chapter .oc-journey-entry.is-stone.is-shelf {
+    grid-template-columns: 1fr;
+    position: relative;
+  }
+
+  #oc-chapter .oc-journey-entry.is-stone .oc-ch-reveal--media {
+    width: min(92%, 34rem);
+    justify-self: start;
+  }
+
+  #oc-chapter .oc-journey-entry.is-stone.is-flip .oc-ch-reveal--media {
+    justify-self: end;
+  }
+
+  #oc-chapter .oc-journey-entry.is-stone .oc-journey-entry-media {
+    min-height: 22rem;
+    border-radius: 3rem 4rem 2.75rem 4.5rem;
+  }
+
+  #oc-chapter .oc-journey-entry.is-stone.is-flip .oc-journey-entry-media {
+    border-radius: 4.5rem 3rem 4rem 2.75rem;
+  }
+
+  #oc-chapter .oc-journey-entry.is-stone .oc-journey-entry-copy {
+    width: min(88%, 30rem);
+    margin-top: -4.5rem;
+    margin-inline: auto 0.5rem;
+    justify-self: end;
+  }
+
+  #oc-chapter .oc-journey-entry.is-stone.is-flip .oc-journey-entry-copy {
+    margin-inline: 0.5rem auto;
+    justify-self: start;
+    transform: rotate(-0.6deg);
+  }
+
+  #oc-chapter .oc-journey-entry.is-stone.is-drift-0 {
+    transform: rotate(-1.1deg);
+    margin-inline: 0 2.5rem;
+  }
+
+  #oc-chapter .oc-journey-entry.is-stone.is-drift-1 {
+    transform: rotate(1.35deg);
+    margin-inline: 2.75rem 0;
+  }
+
+  #oc-chapter .oc-journey-entry.is-stone.is-drift-2 {
+    transform: rotate(-0.7deg);
+    margin-inline: 1rem 3rem;
+  }
+
+  #oc-chapter .oc-journey-entry-media {
+    flex: 1;
+    min-height: 18rem;
+    max-height: none;
+    height: auto;
+    align-self: stretch;
+    position: relative;
+  }
+
+  #oc-chapter .oc-journey-entry-media img {
+    min-height: 18rem;
+    max-height: none;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+  }
+
+  #oc-chapter .oc-journey-entry.is-stone .oc-journey-entry-media img {
+    min-height: 22rem;
+  }
+
+  #oc-chapter .oc-journey-entry-copy {
+    padding: 2.15rem 2.35rem;
+    justify-content: flex-start;
+  }
+}
+
+@media (min-width: 1024px) {
+  /*
+   * Two real columns — the spine never shares paint space with sand bands.
+   * (The earlier float+padding gutter let stream width:100% slide over labels.)
+   */
+  #oc-chapter .oc-journey-shell {
+    display: grid;
+    grid-template-columns: 16.5rem minmax(0, 1fr);
+    column-gap: 1.15rem;
+    align-items: start;
+    max-width: 1360px;
+    margin-inline: auto;
+    padding-inline: var(--pad);
+    /* Do not isolate — the spine needs its z-index to beat later full-bleed bands. */
+    z-index: 3;
+  }
+
+  #oc-chapter .oc-journey-path {
+    display: block;
+    grid-column: 1;
+    grid-row: 1;
+    position: sticky;
+    top: 8.75rem;
+    float: none;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    max-height: calc(100vh - 10rem);
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 0.85rem 0.75rem 1.5rem 0.15rem;
+    scrollbar-width: thin;
+    z-index: 50;
+    background: var(--cream);
+    border-radius: 20px;
+    /* Opaque plate so Soft map’s full-bleed scoop can’t show through under the spine. */
+    box-shadow: 0 4rem 0 0 var(--cream);
+  }
+
+  #oc-chapter .oc-journey-stream {
+    grid-column: 2;
+    grid-row: 1;
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+    width: auto;
+    max-width: 100%;
+    /* Do not clip .rounded-top — its −48px pull-up was squaring the corners. */
+    overflow: visible;
+  }
+
+  /* Global .rounded-top { z-index: 2 } was stacking sand over the spine. */
+  #oc-chapter .oc-journey-stream .rounded-top,
+  #oc-chapter .oc-journey-stream .oc-ch-major {
+    z-index: 0 !important;
+  }
+
+  /*
+   * Each path band is a floating rounded panel. overflow:hidden keeps the
+   * clearing wash + giant gate numeral inside the radius — otherwise the wash
+   * leaks left under the spine (stepped “tab”) and the watermark looks cut
+   * by a square edge.
+   */
+  #oc-chapter .oc-journey-stream > .oc-ch-major.rounded-top {
+    margin-top: 0;
+    border-radius: var(--ch-overlap);
+    overflow: hidden;
+  }
+
+  #oc-chapter .oc-journey-stream > .oc-ch-major + .oc-ch-major {
+    margin-top: 2.75rem;
+  }
+
+  #oc-chapter .oc-journey-stream .oc-ch-major .oc-ch-wrap {
+    max-width: none;
+    width: 100%;
+    padding-inline: 1.35rem 1.35rem;
+  }
+
+  #oc-chapter .oc-journey-stream .oc-ch-major {
+    margin-inline: 0;
+  }
+
+  #oc-chapter .oc-journey-band-dots {
+    display: none;
+  }
+}
+
+/* —— Curved spine track ——
+ * Wrapper sized by the stop list; SVG height:100% so the trail reaches every
+ * stop — not just the sticky viewport (~first two stops when height was auto).
+ */
+#oc-chapter .oc-journey-path-inner {
+  position: relative;
+}
+
+#oc-chapter .oc-journey-path-curve {
+  position: absolute;
+  left: 0;
+  top: 0.15rem;
+  width: 1.85rem;
+  height: calc(100% - 0.5rem);
+  pointer-events: none;
+  overflow: visible;
+  z-index: 0;
+}
+
+#oc-chapter .oc-journey-path-curve-base,
+#oc-chapter .oc-journey-path-curve-fill {
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+#oc-chapter .oc-journey-path-curve-base {
+  stroke: color-mix(in srgb, var(--taupe) 55%, var(--line));
+}
+
+#oc-chapter .oc-journey-path-curve-fill {
+  stroke: var(--sage-deep);
+  stroke-width: 3px;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset 0.55s cubic-bezier(0.3, 1, 0.3, 1);
+}
+
+/* Legacy straight track kept inert if markup remains elsewhere */
+#oc-chapter .oc-journey-path-track {
+  display: none;
+}
+
+#oc-chapter .oc-journey-path-list,
+#oc-chapter .oc-journey-path-group > ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#oc-chapter .oc-journey-path-list {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1.35rem;
+}
+
+#oc-chapter .oc-journey-path-group > ol {
+  display: grid;
+  gap: 0.15rem;
+  margin-top: 0.35rem;
+}
+
+#oc-chapter .oc-journey-path-band {
+  display: block;
+  padding-left: 1.35rem;
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 55%, transparent);
+  text-decoration: none;
+}
+
+#oc-chapter .oc-journey-path-band:hover {
+  color: var(--sage-deep);
+}
+
+#oc-chapter .oc-journey-path-group a:not(.oc-journey-path-band) {
+  display: grid;
+  grid-template-columns: 0.7rem minmax(0, 1.6rem) minmax(0, 1fr);
+  align-items: start;
+  gap: 0.35rem 0.45rem;
+  padding: 0.4rem 0.45rem 0.4rem 0.35rem;
+  text-decoration: none;
+  color: color-mix(in srgb, var(--ink) 72%, transparent);
+  border-radius: 12px;
+  transition:
+    background 160ms ease,
+    color 160ms ease;
+}
+
+#oc-chapter .oc-journey-path-group a:not(.oc-journey-path-band):hover,
+#oc-chapter .oc-journey-path-group a:not(.oc-journey-path-band).is-active {
+  color: var(--ink);
+  background: var(--paper);
+}
+
+#oc-chapter .oc-journey-path-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-top: 0.28rem;
+  border-radius: 99px;
+  background: var(--paper);
+  border: 2px solid color-mix(in srgb, var(--sage-deep) 45%, var(--line));
+  box-shadow: 0 0 0 3px var(--cream);
+  transition:
+    transform 220ms ease,
+    background 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+#oc-chapter .oc-journey-path-group a.is-active .oc-journey-path-dot {
+  background: var(--sage-deep);
+  border-color: var(--sage-deep);
+  transform: scale(1.35);
+  box-shadow:
+    0 0 0 3px var(--cream),
+    0 0 0 7px color-mix(in srgb, var(--sage) 32%, transparent);
+}
+
+#oc-chapter .oc-journey-path-num {
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  line-height: 1.3;
+  color: var(--sage-deep);
+}
+
+#oc-chapter .oc-journey-path-title {
+  font-size: 0.8rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #oc-chapter .oc-journey-path-group a.is-active .oc-journey-path-dot {
+    animation: oc-path-bloom 2.6s ease-in-out infinite;
+  }
+
+  #oc-chapter .oc-ch-reveal--entry:not(.is-shown),
+  #oc-chapter .oc-ch-reveal--gate:not(.is-shown),
+  #oc-chapter .oc-ch-reveal--clearing:not(.is-shown),
+  #oc-chapter .oc-ch-reveal--stone:not(.is-shown) {
+    opacity: 0;
+    transform: translateY(1.6rem);
+    filter: blur(4px);
+  }
+
+  /* Soft Map / programs meadow chrome stays readable; only the polish animates in. */
+  #oc-chapter .oc-journey-meadow-head .oc-ch-reveal--clearing:not(.is-shown) {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  #oc-chapter .oc-ch-reveal--stone:not(.is-shown) {
+    transform: translateY(2rem) rotate(0.4deg);
+  }
+
+  #oc-chapter .oc-ch-reveal--entry.is-shown,
+  #oc-chapter .oc-ch-reveal--gate.is-shown,
+  #oc-chapter .oc-ch-reveal--clearing.is-shown,
+  #oc-chapter .oc-ch-reveal--stone.is-shown {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition:
+      opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+      filter 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Clearing stagger: eyebrow → number → title → banner */
+  #oc-chapter .oc-ch-reveal--clearing.is-shown .oc-journey-gate-num {
+    animation: oc-clearing-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  #oc-chapter .oc-ch-reveal--clearing.is-shown .oc-ch-eyebrow {
+    animation: oc-clearing-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+  }
+
+  #oc-chapter .oc-ch-reveal--clearing.is-shown h2 {
+    animation: oc-clearing-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both;
+  }
+
+  #oc-chapter .oc-ch-reveal--clearing.is-shown .oc-journey-banner {
+    animation: oc-clearing-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both;
+  }
+
+  #oc-chapter .oc-ch-reveal--media:not(.is-shown) img {
+    transform: scale(1.1);
+    opacity: 0.55;
+    filter: blur(6px);
+  }
+
+  #oc-chapter .oc-ch-reveal--media.is-shown img {
+    transform: scale(1);
+    opacity: 1;
+    filter: none;
+    transition:
+      transform 1.25s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.9s ease,
+      filter 1s ease;
+  }
+
+  #oc-chapter .oc-ch-reveal--stone.is-shown .oc-journey-entry-copy {
+    animation: oc-stone-copy 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+  }
+
+  #oc-chapter .oc-ch-reveal--entry.is-shown .oc-ch-row-more li,
+  #oc-chapter .oc-ch-reveal--entry.is-shown .oc-ch-subsection li,
+  #oc-chapter .oc-ch-reveal--stone.is-shown .oc-ch-row-more li,
+  #oc-chapter .oc-ch-reveal--stone.is-shown .oc-ch-subsection li {
+    animation: oc-journey-li-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  #oc-chapter .oc-ch-reveal--entry.is-shown .oc-ch-row-more li:nth-child(1),
+  #oc-chapter .oc-ch-reveal--entry.is-shown .oc-ch-subsection li:nth-child(1),
+  #oc-chapter .oc-ch-reveal--stone.is-shown .oc-ch-row-more li:nth-child(1),
+  #oc-chapter .oc-ch-reveal--stone.is-shown .oc-ch-subsection li:nth-child(1) {
+    animation-delay: 0.05s;
+  }
+
+  #oc-chapter .oc-ch-reveal--entry.is-shown .oc-ch-row-more li:nth-child(2),
+  #oc-chapter .oc-ch-reveal--entry.is-shown .oc-ch-subsection li:nth-child(2),
+  #oc-chapter .oc-ch-reveal--stone.is-shown .oc-ch-row-more li:nth-child(2),
+  #oc-chapter .oc-ch-reveal--stone.is-shown .oc-ch-subsection li:nth-child(2) {
+    animation-delay: 0.11s;
+  }
+
+  #oc-chapter .oc-ch-reveal--entry.is-shown .oc-ch-row-more li:nth-child(3),
+  #oc-chapter .oc-ch-reveal--entry.is-shown .oc-ch-subsection li:nth-child(3),
+  #oc-chapter .oc-ch-reveal--stone.is-shown .oc-ch-row-more li:nth-child(3),
+  #oc-chapter .oc-ch-reveal--stone.is-shown .oc-ch-subsection li:nth-child(3) {
+    animation-delay: 0.17s;
+  }
+
+  #oc-chapter .oc-ch-reveal--entry.is-shown .oc-ch-row-more li:nth-child(4),
+  #oc-chapter .oc-ch-reveal--entry.is-shown .oc-ch-subsection li:nth-child(4),
+  #oc-chapter .oc-ch-reveal--stone.is-shown .oc-ch-row-more li:nth-child(4),
+  #oc-chapter .oc-ch-reveal--stone.is-shown .oc-ch-subsection li:nth-child(4) {
+    animation-delay: 0.23s;
+  }
+
+  #oc-chapter .oc-ch-reveal--entry.is-shown .oc-ch-row-more li:nth-child(5),
+  #oc-chapter .oc-ch-reveal--entry.is-shown .oc-ch-subsection li:nth-child(5),
+  #oc-chapter .oc-ch-reveal--stone.is-shown .oc-ch-row-more li:nth-child(5),
+  #oc-chapter .oc-ch-reveal--stone.is-shown .oc-ch-subsection li:nth-child(5) {
+    animation-delay: 0.29s;
+  }
+
+  #oc-chapter .oc-ch-reveal--entry.is-shown .oc-ch-row-more li:nth-child(n + 6),
+  #oc-chapter .oc-ch-reveal--entry.is-shown .oc-ch-subsection li:nth-child(n + 6),
+  #oc-chapter .oc-ch-reveal--stone.is-shown .oc-ch-row-more li:nth-child(n + 6),
+  #oc-chapter .oc-ch-reveal--stone.is-shown .oc-ch-subsection li:nth-child(n + 6) {
+    animation-delay: 0.35s;
+  }
+
+  #oc-chapter .oc-journey-entry.is-shelf:hover {
+    transform: translateY(-4px);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 24px 56px rgba(49, 47, 47, 0.09);
+  }
+
+  #oc-chapter .oc-journey-entry.is-stone.is-shelf:hover {
+    box-shadow: none;
+  }
+
+  #oc-chapter .oc-journey-entry.is-stone.is-drift-0:hover {
+    transform: translateY(-6px) rotate(-1.1deg);
+  }
+
+  #oc-chapter .oc-journey-entry.is-stone.is-drift-1:hover {
+    transform: translateY(-6px) rotate(1.35deg);
+  }
+
+  #oc-chapter .oc-journey-entry.is-stone.is-drift-2:hover {
+    transform: translateY(-6px) rotate(-0.7deg);
+  }
+
+  #oc-chapter .oc-journey-entry.is-stone:hover .oc-journey-entry-copy {
+    box-shadow: 0 28px 60px rgba(49, 47, 47, 0.14);
+  }
+}
+
+@keyframes oc-path-bloom {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 3px var(--cream),
+      0 0 0 7px color-mix(in srgb, var(--sage) 28%, transparent);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 3px var(--cream),
+      0 0 0 11px color-mix(in srgb, var(--sage) 18%, transparent);
+  }
+}
+
+@keyframes oc-clearing-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.85rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes oc-stone-copy {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes oc-journey-li-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.45rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce), (scripting: none) {
+  #oc-chapter .oc-journey-entry-media img {
+    transform: none;
+    filter: none;
+  }
+
+  #oc-chapter .oc-journey-path-curve-fill {
+    transition: none;
+  }
+
+  #oc-chapter .oc-journey-path-group a.is-active .oc-journey-path-dot {
+    animation: none;
+  }
+
+  #oc-chapter .oc-ch-reveal--entry,
+  #oc-chapter .oc-ch-reveal--gate,
+  #oc-chapter .oc-ch-reveal--clearing,
+  #oc-chapter .oc-ch-reveal--stone,
+  #oc-chapter .oc-ch-reveal--media {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  #oc-chapter .oc-ch-reveal--entry .oc-ch-row-more li,
+  #oc-chapter .oc-ch-reveal--entry .oc-ch-subsection li,
+  #oc-chapter .oc-ch-reveal--stone .oc-ch-row-more li,
+  #oc-chapter .oc-ch-reveal--stone .oc-ch-subsection li,
+  #oc-chapter .oc-ch-reveal--clearing .oc-journey-gate-num,
+  #oc-chapter .oc-ch-reveal--clearing .oc-ch-eyebrow,
+  #oc-chapter .oc-ch-reveal--clearing h2,
+  #oc-chapter .oc-ch-reveal--clearing .oc-journey-banner,
+  #oc-chapter .oc-ch-reveal--stone .oc-journey-entry-copy {
+    animation: none !important;
+  }
+
+  #oc-chapter .oc-journey-entry.is-stone.is-drift-0,
+  #oc-chapter .oc-journey-entry.is-stone.is-drift-1,
+  #oc-chapter .oc-journey-entry.is-stone.is-drift-2 {
+    transform: none;
+  }
+}
+
+@media print {
+  #oc-chapter .oc-journey-path,
+  #oc-chapter .oc-journey-band-dots,
+  #oc-chapter .oc-journey-clearing-wash {
+    display: none !important;
+  }
+
+  #oc-chapter .oc-journey-shell {
+    display: block;
+  }
+}
+
+#oc-chapter .oc-ch-strip-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.7rem;
+}
+
+#oc-chapter .oc-ch-strip-bar > button {
+  flex: 0 0 auto;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#oc-chapter .oc-ch-strip-bar > button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+#oc-chapter .oc-ch-strip-status {
+  margin: 0;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--ink) 72%, transparent);
+}
+
+#oc-chapter .oc-ch-strip-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
+#oc-chapter .oc-ch-strip-dots button {
+  width: 0.45rem;
+  height: 0.45rem;
+  padding: 0;
+  border: 0;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--ink) 28%, transparent);
+  cursor: pointer;
+}
+
+#oc-chapter .oc-ch-strip-dots button[aria-current='true'] {
+  width: 1.15rem;
+  background: var(--sage-deep);
+}
+
+#oc-chapter .oc-ch-strip-viewport {
+  display: flex;
+  gap: 0.85rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  padding-bottom: 0.15rem;
+}
+#oc-chapter .oc-ch-strip-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+#oc-chapter .oc-ch-strip-slide {
+  flex: 0 0 calc(100% - 3.25rem);
+  scroll-snap-align: start;
+  min-width: 0;
+  display: flex;
+}
+
+@media (min-width: 760px) {
+  #oc-chapter .oc-ch-strip-slide {
+    flex-basis: calc(100% - 8rem);
+  }
+}
+
+#oc-chapter .oc-ch-strip-slide > .oc-ch-reveal {
+  flex: 1;
+  min-width: 0;
+}
+
+#oc-chapter .oc-ch-strip-slide .oc-ch-row {
+  height: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #oc-chapter .oc-ch-reveal:not(.is-shown) {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+
+  #oc-chapter .oc-ch-reveal.is-shown {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.55s cubic-bezier(0.3, 1, 0.3, 1),
+      transform 0.55s cubic-bezier(0.3, 1, 0.3, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce), (scripting: none) {
+  #oc-chapter .oc-ch-reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media print {
+  #oc-chapter .oc-ch-strip-bar {
+    display: none;
+  }
+
+  #oc-chapter .oc-ch-strip-viewport {
+    display: block;
+    overflow: visible;
+  }
+
+  #oc-chapter .oc-ch-strip-slide {
+    width: 100%;
+    margin-bottom: 0.75rem;
+    break-inside: avoid;
+  }
+
+  #oc-chapter .oc-ch-reveal {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
@@ -2675,6 +3865,14 @@
   width: 100%;
   max-width: 18rem;
   margin-inline: auto;
+}
+
+/* Beside the names, the picture stays put while that column is read. */
+@media (min-width: 640px) {
+  #oc-chapter .oc-fig-anatomy-frame {
+    position: sticky;
+    top: 12rem;
+  }
 }
 
 #oc-chapter .oc-fig-anatomy-frame img {

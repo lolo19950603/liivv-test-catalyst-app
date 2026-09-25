@@ -620,6 +620,11 @@ export interface ChapterMeta {
    */
   rail?: boolean;
   /**
+   * Each group is its own page section, with a large heading, instead of a
+   * row inside one shared block. Chapter 01: Before surgery, then After surgery.
+   */
+  majorSections?: boolean;
+  /**
    * A start-here map built from the chapter's groups, in order. Labels come
    * from `chapters.<slug>.startHere`; each segment's referral line is
    * generated from the ask roles of the cards inside it.
@@ -659,6 +664,7 @@ export const CHAPTER_META: ChapterMeta[] = [
     accent: '#a89c94',
     /* Approved on the Chapter 01 visual review, 2026-09-15. */
     rail: false,
+    majorSections: true,
     startHere: { groups: ['beforeSurgery', 'afterSurgery'] },
     urgentExit: { chapter: 'get-to-know-your-stoma' },
     categories: [
@@ -1150,6 +1156,7 @@ export const CHAPTER_META: ChapterMeta[] = [
     chapterWord: 'two',
     heroImage: `${IMG}/chapter-stoma.png`,
     accent: '#f3c7be',
+    majorSections: true,
     /*
      * This chapter's own emergency list, one section up the same page. It is
      * here for the gap figure on card 9, which signposts it under the panels;
@@ -1415,6 +1422,7 @@ export const CHAPTER_META: ChapterMeta[] = [
     chapterWord: 'three',
     heroImage: `${IMG}/chapter-everyday.png`,
     accent: '#8ea78b',
+    majorSections: true,
     /*
      * Chapter 02's emergency list. This chapter has no red-flag section of its
      * own, and the fibre clocks on card 3 point at one: high-roughage foods can
@@ -1623,6 +1631,7 @@ export const CHAPTER_META: ChapterMeta[] = [
     chapterWord: 'four',
     heroImage: `${IMG}/care-chat-moment.png`,
     accent: '#9a7f9e',
+    majorSections: true,
     /*
      * This was the one chapter with no emergency signpost, and the only one
      * whose cards are read by someone caring for another person: a parent on
