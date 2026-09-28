@@ -219,22 +219,38 @@ function useReferralLine(cards: Array<{ ask?: AskRole }>) {
 
 function StartHereSegment({
   segment,
+  side,
 }: {
   segment: NonNullable<Chapter['startHere']>['segments'][number];
+  side: 'before' | 'after';
 }) {
+  const t = useTranslations('OstomyCare.ui.chapter');
   const referral = useReferralLine(segment.cards);
 
   return (
-    <div className="oc-fig-seg">
-      <p className="oc-fig-seg-label">{segment.label}</p>
+    <div className={`oc-fig-seg is-${side}`}>
+      <h3 className="oc-fig-seg-label">{segment.label}</h3>
       <ol>
-        {segment.cards.map((card) => (
+        {segment.cards.map((card, index) => (
           <li key={card.number}>
-            <a href={`#card-${card.number}`}>{card.title}</a>
+            <a href={`#card-${card.number}`}>
+              <span aria-hidden className="oc-fig-seg-num">
+                {index + 1}
+              </span>
+              <span className="oc-fig-seg-title">{card.title}</span>
+              <span aria-hidden className="oc-fig-seg-go">
+                →
+              </span>
+            </a>
           </li>
         ))}
       </ol>
-      {referral ? <p className="oc-fig-seg-ref">{referral}</p> : null}
+      {referral ? (
+        <p className="oc-fig-seg-ref">
+          <span className="oc-fig-seg-ref-label">{t('startHere.who')}</span>
+          {referral}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -249,11 +265,11 @@ export function StartHereLine({ startHere }: { startHere: NonNullable<Chapter['s
 
   return (
     <nav aria-label={t('startHere.nav')} className="oc-fig-sline">
-      {first ? <StartHereSegment segment={first} /> : null}
+      {first ? <StartHereSegment segment={first} side="before" /> : null}
       <div aria-hidden className="oc-fig-pivot">
         <span>{startHere.pivot}</span>
       </div>
-      {second ? <StartHereSegment segment={second} /> : null}
+      {second ? <StartHereSegment segment={second} side="after" /> : null}
     </nav>
   );
 }

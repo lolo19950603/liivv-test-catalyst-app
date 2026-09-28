@@ -43,7 +43,10 @@ import {
 import type { SupplyItem } from './get-supply-items';
 import { ChapterReveal } from './chapter-reveal';
 import { JourneyGrid } from './journey-layout';
+import { JourneyContinueChip, JourneyMemoryProvider } from './journey-memory-context';
+import { ChapterAudioProvider, ListenChapterButton, ListenStopButton } from './chapter-audio-player';
 import { JourneyBandDots, JourneyPath } from './journey-path';
+import { TextSizeControl } from './text-size-control';
 import { RecoveryMap } from './recovery-map';
 import { ResourceShelf } from './resource-shelf';
 
@@ -84,6 +87,7 @@ function CategoryRow({
           {card.title}
           {card.badge ? ` · ${card.badge}` : ''}
         </h3>
+        <ListenStopButton stop={card.number} title={card.title} />
 
         {lede ? <p className="oc-ch-lede">{lede}</p> : null}
 
@@ -622,34 +626,29 @@ function MajorSections({
   const showRail = railed && !showPath;
 
   return (
-    <div className="oc-journey-shell">
-      {showPath ? <JourneyPath bands={pathBands} /> : null}
-      <div className="oc-journey-stream">
-        {bands.map((band, index) => (
-          <section
-            className={index % 2 === 0 ? 'oc-ch-major rounded-top' : 'oc-ch-major is-alt rounded-top'}
-            id={index === 0 ? 'chapter-care' : band.id}
-            key={band.id}
-          >
-            <div className="oc-ch-wrap">
-              {index === 0 && showRail ? (
-                <nav aria-label={t('groupJump')} className="oc-ch-rail">
-                  {labeled.map((item, itemIndex) => (
-                    <a href={itemIndex === 0 ? '#chapter-care' : `#${item.id}`} key={item.id}>
-                      {item.label}
-                      <span className="oc-ch-rail-count">{item.cards.length}</span>
-                    </a>
-                  ))}
-                </nav>
-              ) : null}
-              <header className="oc-ch-major-head oc-journey-gate oc-journey-clearing">
+    <JourneyMemoryProvider slug={chapter.slug}>
+      <div className="oc-journey-shell is-cinema">
+        {showPath ? (
+          <div className="oc-journey-hud-slot">
+            <JourneyPath bands={pathBands} />
+          </div>
+        ) : null}
+        <div className="oc-journey-cinema">
+          {bands.map((band, index) => (
+            <section
+              className={index % 2 === 0 ? 'oc-journey-act' : 'oc-journey-act is-alt'}
+              id={index === 0 ? 'chapter-care' : band.id}
+              key={band.id}
+            >
+              <header className="oc-journey-act-title oc-journey-gate oc-journey-clearing">
+                <span aria-hidden className="oc-journey-clearing-wash" />
                 <ChapterReveal variant="clearing">
-                  <span aria-hidden className="oc-journey-clearing-wash" />
                   <span className="oc-journey-gate-num" aria-hidden>
                     {String(index + 1).padStart(2, '0')}
                   </span>
                   <span className="oc-ch-eyebrow">{t('pathEyebrow')}</span>
                   <h2>{band.label}</h2>
+                  {index === 0 ? <JourneyContinueChip /> : null}
                   {index === 0 ? (
                     <div className="oc-journey-banner oc-journey-banner--wash">
                       {showIntroHeading ? (
@@ -662,21 +661,34 @@ function MajorSections({
                       />
                     </div>
                   ) : null}
+                  {index === 0 ? <TextSizeControl /> : null}
                 </ChapterReveal>
                 <JourneyBandDots cards={band.cards} label={band.label ?? ''} />
               </header>
-              <BandCards
-                band={band}
-                exit={chapter.urgentExit}
-                layout="journey"
-                products={products}
-                supplyItems={supplyItems}
-              />
-            </div>
-          </section>
-        ))}
+              <div className="oc-journey-act-frames">
+                {index === 0 && showRail ? (
+                  <nav aria-label={t('groupJump')} className="oc-ch-rail">
+                    {labeled.map((item, itemIndex) => (
+                      <a href={itemIndex === 0 ? '#chapter-care' : `#${item.id}`} key={item.id}>
+                        {item.label}
+                        <span className="oc-ch-rail-count">{item.cards.length}</span>
+                      </a>
+                    ))}
+                  </nav>
+                ) : null}
+                <BandCards
+                  band={band}
+                  exit={chapter.urgentExit}
+                  layout="journey"
+                  products={products}
+                  supplyItems={supplyItems}
+                />
+              </div>
+            </section>
+          ))}
+        </div>
       </div>
-    </div>
+    </JourneyMemoryProvider>
   );
 }
 
@@ -744,8 +756,11 @@ export function ChapterPage({
   slug,
   products = {},
   supplyItems,
+  audioEnabled = false,
 }: {
   slug: string;
+  /** Whether the voice-over route is configured; without it no Listen buttons render. */
+  audioEnabled?: boolean;
   products?: Record<number, OcCatalogItem>;
   /*
    * What Liivv can actually add for the supply list, still in flight. The
@@ -797,8 +812,14 @@ export function ChapterPage({
     '--chapter-accent': chapter.accent,
   };
 
+  const audioStops = [
+    { stop: 0, title: chapter.title },
+    ...chapter.categories.map((card) => ({ stop: card.number, title: card.title })),
+  ];
+
   return (
     <div className="is-journey" id="oc-chapter" style={accentStyle}>
+      <ChapterAudioProvider enabled={audioEnabled} locale={locale} slug={chapter.slug} stops={audioStops}>
       {/* Every cross-page link into this chapter names a fragment; see the file. */}
       <HashTargetScroll />
       <section className="oc-ch-hero">
@@ -821,6 +842,8 @@ export function ChapterPage({
               {t('askPharmacist')}
             </a>
           </div>
+          <ListenChapterButton />
+          <TextSizeControl />
           <div aria-hidden className="oc-ch-progress">
             {chapters.map((item, index) => (
               <span className={index === chapterIndex ? 'is-current' : undefined} key={item.slug} />
@@ -834,8 +857,12 @@ export function ChapterPage({
       <section className="oc-ch-journal rounded-top" id="chapter-pulse">
         {chapter.startHere ? (
           <div className="oc-ch-starthere">
+            <header className="oc-ch-starthere-head">
+              <span className="oc-ch-eyebrow">{t('startHere.eyebrow')}</span>
+              <h2>{t('startHere.heading')}</h2>
+              <p className="oc-ch-starthere-lede">{chapter.focus}</p>
+            </header>
             <StartHereLine startHere={chapter.startHere} />
-            <p className="oc-fig-caption">{chapter.focus}</p>
             {chapter.urgentExit ? <UrgentExit exit={chapter.urgentExit} /> : null}
           </div>
         ) : null}
@@ -965,6 +992,7 @@ export function ChapterPage({
         governance={chapter.governance}
         stageSources={Boolean(chapter.recoveryMap)}
       />
+      </ChapterAudioProvider>
     </div>
   );
 }

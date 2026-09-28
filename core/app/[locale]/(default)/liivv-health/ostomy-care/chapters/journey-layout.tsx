@@ -1,20 +1,23 @@
 'use client';
 
 import { useId } from 'react';
+import { useTranslations } from 'next-intl';
 
 import type { OcCatalogItem } from '../get-oc-catalog';
 
 import { AskChip } from './ask-chip';
+import { ListenStopButton } from './chapter-audio-player';
 import { CardExit, CardShop, RowMore, rowLayout } from './chapter-disclosure';
 import { ChapterReveal } from './chapter-reveal';
 import type { CategoryCard, Chapter } from './chapters-data';
 import type { FigureMeta } from './chapters-meta';
 import { CardFigures, CardRoutes, isPinnedCard } from './figures';
 import type { SupplyItem } from './get-supply-items';
+import { useJourneyMemoryOptional } from './journey-memory-context';
 
 /*
- * Module entries stay figure-led and full-stage. Everything else is a Living
- * Trail shelf stone — photo band + paper leaf with organic drift.
+ * Module entries stay figure-led and full-stage. Shelf stops are cinematic
+ * frames: full-bleed media with a lower-third paper plate for copy.
  */
 const MODULE_KINDS: ReadonlySet<FigureMeta['kind']> = new Set([
   'bowelReference',
@@ -27,20 +30,36 @@ function isModuleEntry(card: CategoryCard) {
   return isPinnedCard(card) || Boolean(card.figures?.some((figure) => MODULE_KINDS.has(figure.kind)));
 }
 
+function SaveStopButton({ number }: { number: number }) {
+  const t = useTranslations('OstomyCare.ui.chapter');
+  const memory = useJourneyMemoryOptional();
+
+  if (!memory) return null;
+
+  const saved = memory.isSaved(number);
+
+  return (
+    <button
+      aria-pressed={saved}
+      className={saved ? 'oc-journey-save is-saved' : 'oc-journey-save'}
+      onClick={() => memory.toggleSave(number)}
+      type="button"
+    >
+      {saved ? t('stopSaved') : t('saveStop')}
+    </button>
+  );
+}
+
 function JourneyEntry({
   card,
   products,
   supplyItems,
   exit,
-  flip,
-  drift,
 }: {
   card: CategoryCard;
   products: Record<number, OcCatalogItem>;
   supplyItems?: Promise<SupplyItem[]>;
   exit?: Chapter['urgentExit'];
-  flip: boolean;
-  drift: number;
 }) {
   const moreId = useId();
   const { lede, rest, noteOutside, noteInMore } = rowLayout(card);
@@ -57,6 +76,10 @@ function JourneyEntry({
           {card.title}
           {card.badge ? ` · ${card.badge}` : ''}
         </h3>
+        <div className="oc-journey-entry-actions">
+          <ListenStopButton stop={card.number} title={card.title} />
+          <SaveStopButton number={card.number} />
+        </div>
       </header>
 
       {lede ? <p className="oc-ch-lede">{lede}</p> : null}
@@ -85,18 +108,14 @@ function JourneyEntry({
     <ChapterReveal variant="media">
       <div aria-hidden className="oc-journey-entry-media">
         <img alt="" loading="lazy" src={card.image} />
+        <span className="oc-journey-frame-veil" />
       </div>
     </ChapterReveal>
   ) : null;
 
   return (
     <article
-      className={[
-        'oc-journey-entry',
-        module ? 'is-module' : 'is-shelf is-stone',
-        flip ? 'is-flip' : '',
-        module ? '' : `is-drift-${drift}`,
-      ]
+      className={['oc-journey-entry', module ? 'is-module' : 'is-shelf is-frame', showMedia ? 'has-media' : '']
         .filter(Boolean)
         .join(' ')}
       id={`card-${card.number}`}
@@ -124,26 +143,13 @@ export function JourneyGrid({
   supplyItems?: Promise<SupplyItem[]>;
   exit?: Chapter['urgentExit'];
 }) {
-  let shelfIndex = 0;
-
   return (
     <div className="oc-journey-stream-entries">
       {cards.map((item) => {
         const module = isModuleEntry(item.card);
-        const flip = !module && shelfIndex % 2 === 1;
-        const drift = module ? 0 : shelfIndex % 3;
-
-        if (!module) shelfIndex += 1;
 
         const entry = (
-          <JourneyEntry
-            card={item.card}
-            drift={drift}
-            exit={exit}
-            flip={flip}
-            products={products}
-            supplyItems={supplyItems}
-          />
+          <JourneyEntry card={item.card} exit={exit} products={products} supplyItems={supplyItems} />
         );
 
         if (module) {

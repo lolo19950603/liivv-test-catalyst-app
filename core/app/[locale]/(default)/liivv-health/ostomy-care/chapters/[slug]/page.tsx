@@ -4,6 +4,7 @@ import { getMessages, setRequestLocale } from 'next-intl/server';
 import { MedicalWebPage, WithContext } from 'schema-dts';
 
 import { locales } from '~/i18n/locales';
+import { isChapterAudioEnabled } from '~/lib/chapter-audio/config';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
 
 import { getOcCatalog, type OcCatalogItem } from '../../get-oc-catalog';
@@ -12,6 +13,7 @@ import { buildChapters, type Chapter, CHAPTER_SLUGS } from '../chapters-data';
 import { CHAPTER_META } from '../chapters-meta';
 import { getSupplyItems } from '../get-supply-items';
 import { SUPPLY_CART_ALLOWLIST } from '../supply-list-merchandising';
+import { TEXT_SIZE_PRE_PAINT } from '../text-size';
 
 interface Props {
   params: Promise<{ locale: string; slug: string }>;
@@ -175,7 +177,13 @@ export default async function Page({ params }: Props) {
         }}
         type="application/ld+json"
       />
-      <ChapterPage products={products} slug={slug} supplyItems={supplyItems} />
+      <script dangerouslySetInnerHTML={{ __html: TEXT_SIZE_PRE_PAINT }} />
+      <ChapterPage
+        audioEnabled={isChapterAudioEnabled()}
+        products={products}
+        slug={slug}
+        supplyItems={supplyItems}
+      />
     </>
   );
 }

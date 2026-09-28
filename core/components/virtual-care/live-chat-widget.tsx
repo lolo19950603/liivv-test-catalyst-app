@@ -709,7 +709,7 @@ export function LiveChatWidget() {
   const showOuterHeader = !sessionReady || !isLoggedIn;
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[60] flex justify-end p-4 sm:p-5">
+    <div className="live-chat-dock pointer-events-none fixed inset-x-0 bottom-0 z-[60] flex justify-end p-4 sm:p-5">
       {open ? (
         <div
           aria-label="Live chat"

@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { formatOpenAiError, requestOpenAiSpeech, requireOpenAiKey } from '~/lib/openai/speech';
+
 import { toSpeechText } from './speech-text';
 
 const WHISPER_MODEL = 'whisper-1';
@@ -9,16 +11,6 @@ const MAX_TTS_CHARS = 2000;
 
 export function getVirtualCareTtsVoice(): string {
   return process.env.VIRTUAL_CARE_BOT_TTS_VOICE?.trim() || 'nova';
-}
-
-function requireOpenAiKey(): string {
-  const apiKey = process.env.OPENAI_API_KEY?.trim();
-
-  if (!apiKey) {
-    throw new Error('OPENAI_API_KEY is not configured.');
-  }
-
-  return apiKey;
 }
 
 /** OpenAI rejects filenames without a supported audio extension (e.g. bare "blob"). */
@@ -44,21 +36,6 @@ function resolveUploadFilename(file: File): { filename: string; mimeType: string
   }
 
   return { filename: 'voice.webm', mimeType: rawType || 'audio/webm' };
-}
-
-function formatOpenAiError(status: number, body: string, fallback: string): string {
-  try {
-    const parsed = JSON.parse(body) as { error?: { message?: string } };
-    const message = parsed.error?.message?.trim();
-
-    if (message) {
-      return `${fallback} (${status}): ${message}`;
-    }
-  } catch {
-    // ignore non-JSON bodies
-  }
-
-  return `${fallback} (${status}): ${body.slice(0, 300)}`;
 }
 
 export async function transcribeChatAudio(file: File): Promise<string> {
@@ -115,30 +92,12 @@ export async function synthesizeChatSpeech(rawText: string): Promise<{
     throw new Error('Nothing to speak.');
   }
 
-  const apiKey = requireOpenAiKey();
-
-  const response = await fetch('https://api.openai.com/v1/audio/speech', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
+  return {
+    audio: await requestOpenAiSpeech({
+      input: text,
       model: TTS_MODEL,
       voice: getVirtualCareTtsVoice(),
-      input: text,
-      response_format: 'mp3',
     }),
-  });
-
-  if (!response.ok) {
-    const textBody = await response.text();
-
-    throw new Error(formatOpenAiError(response.status, textBody, 'Speech synthesis failed'));
-  }
-
-  return {
-    audio: await response.arrayBuffer(),
     mimeType: 'audio/mpeg',
   };
 }

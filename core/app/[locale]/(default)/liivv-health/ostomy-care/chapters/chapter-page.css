@@ -8,7 +8,7 @@
   --sage: #8ea58d;
   --blush: #f3c7be;
   --mist: var(--cream);
-  --sage-deep: color-mix(in srgb, var(--sage) 62%, var(--ink));
+  --sage-deep: color-mix(in srgb, var(--sage) 50%, var(--ink));
   --sage-soft: color-mix(in srgb, var(--sage) 40%, var(--cream));
   /* Text weight of the same hue, for small type on the soft/cream washes. */
   --sage-text: color-mix(in srgb, var(--sage) 26%, var(--ink));
@@ -21,11 +21,22 @@
   --font-heading: var(--font-family-dm-serif-text), Georgia, serif;
   --font-body: var(--font-family-inter), system-ui, sans-serif;
 
-  color: var(--ink);
+  /* Solid reading colors (~7:1+ on cream and paper) — never fade text with transparency */
+  --ink-strong: #1f1d1d;
+  --ink-body: #2a2828;
+  --ink-muted: #474343;
+  --text-body: 1.125rem;
+  --text-lede: 1.3rem;
+  --text-small: 0.95rem;
+  --text-eyebrow: 0.95rem;
+  --measure: 65ch;
+
+  color: var(--ink-body);
   background: var(--cream);
   font-family: var(--font-body);
-  font-weight: 350;
-  line-height: 1.6;
+  font-size: var(--text-body);
+  font-weight: 400;
+  line-height: 1.7;
   overflow-x: clip;
 }
 
@@ -68,7 +79,7 @@
 
 #oc-chapter .oc-ch-eyebrow {
   display: inline-block;
-  font-size: 0.72rem;
+  font-size: var(--text-eyebrow);
   font-weight: 650;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -84,7 +95,7 @@
   border: 1.5px solid transparent;
   text-decoration: none;
   font-weight: 550;
-  font-size: 0.92rem;
+  font-size: var(--text-small);
   transition:
     transform 0.28s ease,
     background 0.2s ease;
@@ -132,7 +143,7 @@
   background: rgba(255, 252, 248, 0.92);
   border: 1px solid var(--line);
   text-decoration: none;
-  font-size: 0.84rem;
+  font-size: var(--text-small);
   font-weight: 550;
   backdrop-filter: blur(8px);
   transition:
@@ -181,6 +192,19 @@
     linear-gradient(to top, rgba(238, 242, 234, 0.72), transparent 30%);
 }
 
+/* Living Trail — deeper opening frame */
+#oc-chapter.is-journey .oc-ch-hero-veil {
+  background:
+    radial-gradient(ellipse 90% 80% at 50% 40%, transparent 35%, rgba(28, 34, 30, 0.45) 100%),
+    linear-gradient(
+      115deg,
+      rgba(32, 40, 34, 0.94),
+      rgba(48, 62, 52, 0.78) 52%,
+      rgba(36, 44, 38, 0.88)
+    ),
+    linear-gradient(to top, rgba(238, 242, 234, 0.78), transparent 34%);
+}
+
 #oc-chapter .oc-ch-hero-inner {
   position: relative;
   z-index: 1;
@@ -191,7 +215,7 @@
 #oc-chapter .oc-ch-kicker {
   display: block;
   margin-bottom: 0.75rem;
-  font-size: 0.8rem;
+  font-size: var(--text-eyebrow);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   font-weight: 600;
@@ -280,7 +304,7 @@
 #oc-chapter .oc-ch-note-label {
   display: block;
   margin-bottom: 0.45rem;
-  font-size: 0.72rem;
+  font-size: var(--text-eyebrow);
   font-weight: 650;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -310,7 +334,7 @@
 
 #oc-chapter .oc-ch-care-head p {
   margin-top: 0.6rem;
-  color: rgba(42, 50, 44, 0.75);
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-ch-rows {
@@ -343,7 +367,7 @@
 #oc-chapter .oc-ch-group {
   display: inline-block;
   margin-bottom: 0.35rem;
-  font-size: 0.7rem;
+  font-size: var(--text-eyebrow);
   font-weight: 650;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -355,13 +379,13 @@
   padding-left: 1.1rem;
   display: grid;
   gap: 0.35rem;
-  color: rgba(42, 50, 44, 0.8);
+  color: var(--ink-body);
   font-size: 0.95rem;
 }
 
 #oc-chapter .oc-ch-row-note {
   margin-top: 0.65rem;
-  font-size: 0.9rem;
+  font-size: var(--text-small);
   color: var(--sage-deep);
 }
 
@@ -370,8 +394,13 @@
 }
 
 #oc-chapter .oc-ch-subsection h4 {
-  font-size: 0.95rem;
-  margin-bottom: 0.35rem;
+  font-size: 1.3rem;
+  line-height: 1.3;
+  margin-bottom: 0.6rem;
+}
+
+#oc-chapter .oc-ch-subsection + .oc-ch-subsection {
+  margin-top: 1.5rem;
 }
 
 /* Programs */
@@ -401,7 +430,7 @@
 #oc-chapter .oc-ch-program-index {
   display: block;
   margin-bottom: 0.55rem;
-  font-size: 0.75rem;
+  font-size: var(--text-small);
   letter-spacing: 0.12em;
   font-weight: 650;
   color: var(--sage-text);
@@ -414,8 +443,8 @@
 
 #oc-chapter .oc-ch-program p {
   margin: 0;
-  font-size: 0.92rem;
-  color: rgba(42, 50, 44, 0.78);
+  font-size: var(--text-small);
+  color: var(--ink-muted);
 }
 
 /*
@@ -437,7 +466,7 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  font-size: 0.9rem;
+  font-size: var(--text-small);
   line-height: 1.35;
   color: var(--ink);
   text-decoration: underline;
@@ -457,7 +486,7 @@
  */
 #oc-chapter .oc-ch-program .oc-fig-draft {
   margin-top: 0.7rem;
-  font-size: 0.8rem;
+  font-size: var(--text-small);
   color: inherit;
 }
 
@@ -494,7 +523,7 @@
 
 #oc-chapter .oc-ch-recovery-filter legend {
   padding: 0;
-  font-size: 0.92rem;
+  font-size: var(--text-small);
   font-weight: 600;
 }
 
@@ -509,7 +538,7 @@
   align-items: center;
   gap: 0.5rem;
   min-height: 44px;
-  font-size: 0.92rem;
+  font-size: var(--text-small);
   cursor: pointer;
 }
 
@@ -530,7 +559,7 @@
 
 #oc-chapter .oc-ch-recovery-status {
   margin: 0;
-  font-size: 0.86rem;
+  font-size: var(--text-small);
   color: var(--sage-text);
 }
 
@@ -593,8 +622,8 @@
   display: block;
   margin-top: 0.15rem;
   font-family: var(--font-body);
-  font-size: 0.78rem;
-  color: color-mix(in srgb, var(--ink) 70%, transparent);
+  font-size: var(--text-small);
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-ch-recovery-lanes {
@@ -610,7 +639,7 @@
 }
 
 #oc-chapter .oc-ch-recovery-lanes dt {
-  font-size: 0.68rem;
+  font-size: var(--text-eyebrow);
   font-weight: 650;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -620,7 +649,7 @@
 #oc-chapter .oc-ch-recovery-lanes dd {
   margin: 0.2rem 0 0;
   font-size: 0.95rem;
-  color: rgba(42, 50, 44, 0.85);
+  color: var(--ink-body);
 }
 
 #oc-chapter .oc-ch-recovery-type {
@@ -630,7 +659,7 @@
   border-radius: 5px;
   background: var(--sage-soft);
   color: var(--sage-text);
-  font-size: 0.74rem;
+  font-size: var(--text-small);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -643,9 +672,9 @@
 
 #oc-chapter .oc-ch-recovery-empty {
   margin: 0.6rem 0 0;
-  font-size: 0.9rem;
+  font-size: var(--text-small);
   font-style: italic;
-  color: color-mix(in srgb, var(--ink) 70%, transparent);
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-ch-recovery-sources {
@@ -657,7 +686,7 @@
   display: list-item;
   min-height: 44px;
   padding: 0.75rem 0 0.4rem;
-  font-size: 0.85rem;
+  font-size: var(--text-small);
   color: var(--sage-text);
   cursor: pointer;
   list-style: disclosure-closed inside;
@@ -672,7 +701,7 @@
   gap: 0.1rem;
   margin: 0 0 0.6rem;
   padding-left: 1.1rem;
-  font-size: 0.85rem;
+  font-size: var(--text-small);
 }
 
 #oc-chapter .oc-ch-recovery-sources a {
@@ -746,7 +775,7 @@
 }
 
 #oc-chapter .oc-ch-care-copy .oc-ch-eyebrow {
-  color: rgba(244, 247, 243, 0.75);
+  color: #f4f7f3;
 }
 
 #oc-chapter .oc-ch-care-copy h2 {
@@ -755,7 +784,7 @@
 
 #oc-chapter .oc-ch-care-copy p {
   margin: 0;
-  color: rgba(244, 247, 243, 0.88);
+  color: #f4f7f3;
   max-width: 38ch;
 }
 
@@ -839,7 +868,7 @@
 }
 
 #oc-chapter .oc-ch-close-inner .oc-ch-eyebrow {
-  color: rgba(244, 247, 243, 0.75);
+  color: #f4f7f3;
 }
 
 #oc-chapter .oc-ch-close h2 {
@@ -849,7 +878,7 @@
 
 #oc-chapter .oc-ch-close p {
   margin-top: 0.85rem;
-  color: rgba(244, 247, 243, 0.88);
+  color: #f4f7f3;
 }
 
 #oc-chapter .oc-ch-close-cta {
@@ -862,11 +891,11 @@
 
 #oc-chapter .oc-ch-prev {
   margin-top: 1.1rem;
-  font-size: 0.9rem;
+  font-size: var(--text-small);
 }
 
 #oc-chapter .oc-ch-prev a {
-  color: rgba(244, 247, 243, 0.85);
+  color: #f4f7f3;
   text-decoration: none;
 }
 
@@ -964,7 +993,7 @@
 
 #oc-chapter .oc-ch-res-intro p {
   margin: 0;
-  color: color-mix(in srgb, var(--ink) 78%, var(--cream));
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-ch-res-group {
@@ -980,7 +1009,7 @@
 #oc-chapter .oc-ch-res-group .oc-ch-care-head p {
   margin: 0;
   max-width: 62ch;
-  color: color-mix(in srgb, var(--ink) 74%, var(--cream));
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-ch-res-list {
@@ -1020,7 +1049,7 @@
 }
 
 #oc-chapter .oc-ch-res-org {
-  font-size: 0.7rem;
+  font-size: var(--text-eyebrow);
   font-weight: 650;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -1035,21 +1064,21 @@
 
 #oc-chapter .oc-ch-res-note {
   font-family: var(--font-body);
-  font-size: 0.8rem;
+  font-size: var(--text-small);
   font-style: normal;
   font-weight: 400;
-  color: color-mix(in srgb, var(--ink) 60%, var(--cream));
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-ch-res-body {
-  font-size: 0.92rem;
-  color: color-mix(in srgb, var(--ink) 76%, var(--cream));
+  font-size: var(--text-small);
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-ch-res-go {
   margin-top: auto;
   padding-top: 0.5rem;
-  font-size: 0.76rem;
+  font-size: var(--text-small);
   letter-spacing: 0.04em;
   color: var(--sage-text);
 }
@@ -1097,7 +1126,7 @@
   align-items: center;
   margin: 0;
   font-family: var(--font-body);
-  font-size: 0.78rem;
+  font-size: var(--text-eyebrow);
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1141,12 +1170,12 @@
 /* The language note is part of the link text, so it stays inside the underline. */
 #oc-chapter .oc-ch-shelf-lang {
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: var(--text-small);
 }
 
 #oc-chapter .oc-ch-shelf-org {
   margin: 0.25rem 0 0;
-  font-size: 0.7rem;
+  font-size: var(--text-eyebrow);
   font-weight: 650;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1155,13 +1184,13 @@
 
 #oc-chapter .oc-ch-shelf-body {
   margin: 0.3rem 0 0;
-  font-size: 0.88rem;
+  font-size: var(--text-small);
   line-height: 1.45;
-  color: color-mix(in srgb, var(--ink) 74%, var(--cream));
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-ch-shelf-note {
-  color: color-mix(in srgb, var(--ink) 60%, var(--cream));
+  color: var(--ink-muted);
 }
 
 /* =========================================================================
@@ -1182,7 +1211,7 @@
 #oc-chapter .oc-ch-discover-lead {
   margin: 0 0 1.5rem;
   max-width: 58ch;
-  color: color-mix(in srgb, var(--ink) 80%, var(--cream));
+  color: var(--ink-body);
 }
 
 #oc-chapter .oc-ch-discover-grid {
@@ -1228,8 +1257,8 @@
 }
 
 #oc-chapter .oc-ch-discover-body {
-  font-size: 0.9rem;
-  color: color-mix(in srgb, var(--ink) 72%, var(--cream));
+  font-size: var(--text-small);
+  color: var(--ink-muted);
 }
 
 /* =========================================================================
@@ -1252,21 +1281,21 @@
 
 #oc-chapter .oc-ch-review {
   margin: 0;
-  font-size: 0.92rem;
-  color: color-mix(in srgb, var(--ink) 82%, var(--cream));
+  font-size: var(--text-small);
+  color: var(--ink-body);
 }
 
 #oc-chapter .oc-ch-disclaimer {
   margin: 0;
-  font-size: 0.88rem;
+  font-size: var(--text-small);
   line-height: 1.65;
-  color: color-mix(in srgb, var(--ink) 66%, var(--cream));
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-ch-sources h2 {
   margin: 0 0 0.5rem;
   font-family: var(--font-body);
-  font-size: 0.72rem;
+  font-size: var(--text-eyebrow);
   font-weight: 650;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -1279,7 +1308,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  font-size: 0.86rem;
+  font-size: var(--text-small);
 }
 
 /* Back to the per-stage disclosures in the soft map. A 44px row, like them. */
@@ -1288,11 +1317,11 @@
   align-items: center;
   min-height: 44px;
   margin: 0;
-  font-size: 0.86rem;
+  font-size: var(--text-small);
 }
 
 #oc-chapter .oc-ch-sources a {
-  color: color-mix(in srgb, var(--ink) 80%, var(--cream));
+  color: var(--ink-body);
   text-underline-offset: 2px;
 }
 
@@ -1326,9 +1355,9 @@
   border-radius: 10px;
   background: color-mix(in srgb, var(--sand) 40%, var(--paper));
   border: 1px solid var(--line);
-  font-size: 0.84rem;
+  font-size: var(--text-small);
   line-height: 1.6;
-  color: color-mix(in srgb, var(--ink) 72%, var(--cream));
+  color: var(--ink-muted);
 }
 
 /*
@@ -1350,7 +1379,7 @@
 #oc-chapter .oc-ch-help-lead {
   margin: 0 0 1.4rem;
   max-width: 62ch;
-  color: color-mix(in srgb, var(--ink) 78%, var(--cream));
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-ch-help-grid {
@@ -1390,7 +1419,7 @@
 }
 
 #oc-chapter .oc-ch-help-org {
-  font-size: 0.7rem;
+  font-size: var(--text-eyebrow);
   font-weight: 650;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -1404,8 +1433,8 @@
 }
 
 #oc-chapter .oc-ch-help-body {
-  font-size: 0.9rem;
-  color: color-mix(in srgb, var(--ink) 74%, var(--cream));
+  font-size: var(--text-small);
+  color: var(--ink-muted);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1426,9 +1455,9 @@
 
 #oc-chapter .oc-ch-disclosure {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: var(--text-small);
   line-height: 1.65;
-  color: color-mix(in srgb, var(--ink) 82%, var(--cream));
+  color: var(--ink-body);
   padding-left: 0.9rem;
   border-left: 3px solid var(--sand);
 }
@@ -1457,9 +1486,9 @@
 #oc-chapter .oc-ch-rail a {
   flex: 0 0 auto;
   font: inherit;
-  font-size: 0.82rem;
+  font-size: var(--text-small);
   font-weight: 500;
-  color: color-mix(in srgb, var(--ink) 85%, transparent);
+  color: var(--ink-body);
   background: transparent;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -1501,7 +1530,7 @@
   position: absolute;
   inset: auto 0 0 0;
   font-family: var(--font-heading);
-  font-size: 0.78rem;
+  font-size: var(--text-small);
   font-weight: 400;
   line-height: 1.5;
   text-align: center;
@@ -1516,7 +1545,7 @@
 
 #oc-chapter .oc-ch-lede {
   margin: 0.4rem 0 0;
-  color: color-mix(in srgb, var(--ink) 76%, transparent);
+  color: var(--ink-muted);
 }
 
 /*
@@ -1564,7 +1593,7 @@
 
 #oc-chapter .oc-ch-toggle {
   font: inherit;
-  font-size: 0.78rem;
+  font-size: var(--text-small);
   letter-spacing: 0.02em;
   background: none;
   border: none;
@@ -1582,7 +1611,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.755rem;
+  font-size: var(--text-small);
   font-weight: 500;
   padding: 0.24rem 0.66rem 0.24rem 0.55rem;
   border-radius: 999px;
@@ -1630,7 +1659,21 @@
 
 /* Distinct panel wash so alt bands don’t vanish into the page cream. */
 #oc-chapter .oc-ch-major.is-alt {
-  background: color-mix(in srgb, var(--sage) 18%, var(--cream));
+  background: color-mix(in srgb, var(--sage) 26%, var(--cream));
+}
+
+#oc-chapter.is-journey .oc-ch-major {
+  padding: 4.75rem 0 calc(var(--ch-overlap) + 5rem);
+}
+
+#oc-chapter.is-journey .oc-ch-major.is-alt {
+  background:
+    radial-gradient(
+      ellipse 80% 55% at 12% 18%,
+      color-mix(in srgb, var(--sage-soft) 55%, transparent),
+      transparent 70%
+    ),
+    color-mix(in srgb, var(--sage) 26%, var(--cream));
 }
 
 #oc-chapter .oc-ch-major-head {
@@ -1647,7 +1690,7 @@
 #oc-chapter .oc-ch-major-head p {
   margin: 1.15rem 0 0;
   max-width: 38rem;
-  color: rgba(42, 50, 44, 0.75);
+  color: var(--ink-muted);
 }
 
 /*
@@ -1682,6 +1725,12 @@
   border-radius: var(--ch-overlap) var(--ch-overlap) 0 0;
 }
 
+/* Cinema: Soft Map scoops over the floating HUD at the shell exit */
+#oc-chapter.is-journey .oc-journey-shell.is-cinema ~ .rounded-top {
+  position: relative;
+  z-index: 70;
+}
+
 #oc-chapter .oc-journey-stream {
   min-width: 0;
 }
@@ -1711,12 +1760,12 @@
   background:
     radial-gradient(
       ellipse 85% 70% at 8% 35%,
-      color-mix(in srgb, var(--sage) 38%, transparent),
+      color-mix(in srgb, var(--sage) 42%, transparent),
       transparent 72%
     ),
     radial-gradient(
       ellipse 60% 55% at 92% 15%,
-      color-mix(in srgb, var(--sage-soft) 70%, transparent),
+      color-mix(in srgb, var(--sage-soft) 75%, transparent),
       transparent 65%
     ),
     radial-gradient(
@@ -1724,7 +1773,9 @@
       color-mix(in srgb, var(--blush) 22%, transparent),
       transparent 70%
     );
-  opacity: 1;
+  opacity: 0.88;
+  transform: scale(0.97);
+  transform-origin: 30% 40%;
 }
 
 #oc-chapter .oc-journey-clearing > .oc-ch-reveal--clearing {
@@ -1735,10 +1786,10 @@
 #oc-chapter .oc-journey-gate-num {
   display: block;
   font-family: var(--font-heading);
-  font-size: clamp(5.5rem, 18vw, 10.5rem);
+  font-size: clamp(6rem, 20vw, 11.5rem);
   line-height: 0.72;
   letter-spacing: -0.06em;
-  color: color-mix(in srgb, var(--sage-deep) 18%, transparent);
+  color: color-mix(in srgb, var(--sage-deep) 22%, transparent);
   margin: 0 0 -0.18em;
   max-width: 100%;
   overflow: hidden;
@@ -1752,7 +1803,7 @@
 
 #oc-chapter .oc-journey-gate h2 {
   margin: 0.2rem 0 0;
-  font-size: clamp(3rem, 9vw, 5.5rem);
+  font-size: clamp(3.15rem, 9.5vw, 5.85rem);
   line-height: 0.92;
   letter-spacing: -0.04em;
   max-width: 12ch;
@@ -1765,7 +1816,7 @@
   border-radius: 18px;
   background: var(--paper);
   border-left: 3px solid var(--sage-deep);
-  color: rgba(42, 50, 44, 0.82);
+  color: var(--ink-body);
   box-shadow: 0 12px 32px rgba(49, 47, 47, 0.04);
 }
 
@@ -1959,7 +2010,9 @@
 #oc-chapter .oc-journey-entry.is-stone .oc-journey-entry-media {
   border-radius: 2.5rem 3.25rem 2.25rem 3.5rem;
   min-height: 16rem;
-  box-shadow: 0 28px 60px rgba(49, 47, 47, 0.12);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--cream) 70%, transparent),
+    0 32px 68px rgba(49, 47, 47, 0.14);
 }
 
 #oc-chapter .oc-journey-entry-media img {
@@ -1992,15 +2045,35 @@
       color-mix(in srgb, var(--paper) 92%, var(--sage-soft)),
       var(--paper) 40%
     );
-  border: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
-  box-shadow: 0 22px 50px rgba(49, 47, 47, 0.1);
+  border: 1px solid color-mix(in srgb, var(--cream) 65%, var(--line));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--paper) 80%, transparent),
+    0 26px 58px rgba(49, 47, 47, 0.12);
   padding: clamp(1.5rem, 3.5vw, 2.15rem);
+  transition:
+    filter 480ms ease,
+    box-shadow 480ms ease;
+}
+
+/* In-view stone feels slightly lit — reading focus without a new feature. */
+#oc-chapter .oc-ch-reveal--stone.is-shown .oc-journey-entry.is-stone .oc-journey-entry-copy {
+  filter: brightness(1.03);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--paper) 85%, transparent),
+    0 28px 64px rgba(49, 47, 47, 0.13),
+    0 0 40px color-mix(in srgb, var(--sage-soft) 35%, transparent);
 }
 
 #oc-chapter .oc-journey-entry-head {
   display: flex;
   align-items: baseline;
-  gap: 0.85rem;
+  flex-wrap: wrap;
+  gap: 0.55rem 0.85rem;
+}
+
+#oc-chapter .oc-journey-entry-head h3 {
+  flex: 1 1 12rem;
+  min-width: 0;
 }
 
 #oc-chapter .oc-journey-num {
@@ -2024,7 +2097,7 @@
   margin: 0;
   font-size: 1.05rem;
   line-height: 1.55;
-  color: rgba(42, 50, 44, 0.88);
+  color: var(--ink-body);
   max-width: 40rem;
 }
 
@@ -2043,7 +2116,7 @@
   margin: 0;
   padding: 0.75rem 0 0.75rem 1.05rem;
   border-bottom: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
-  color: rgba(42, 50, 44, 0.82);
+  color: var(--ink-body);
   font-size: 0.98rem;
   line-height: 1.5;
 }
@@ -2185,13 +2258,12 @@
 
 @media (min-width: 1024px) {
   /*
-   * Two real columns — the spine never shares paint space with sand bands.
-   * (The earlier float+padding gutter let stream width:100% slide over labels.)
+   * Two real columns — legacy Living Trail only (cinema uses floating HUD).
    */
-  #oc-chapter .oc-journey-shell {
+  #oc-chapter .oc-journey-shell:not(.is-cinema) {
     display: grid;
-    grid-template-columns: 16.5rem minmax(0, 1fr);
-    column-gap: 1.15rem;
+    grid-template-columns: 20rem minmax(0, 1fr);
+    column-gap: 1.35rem;
     align-items: start;
     max-width: 1360px;
     margin-inline: auto;
@@ -2200,26 +2272,33 @@
     z-index: 3;
   }
 
-  #oc-chapter .oc-journey-path {
+  #oc-chapter .oc-journey-shell:not(.is-cinema) .oc-journey-path {
     display: block;
     grid-column: 1;
     grid-row: 1;
     position: sticky;
-    top: 8.75rem;
+    /* Clear the sticky site header — was kissing the nav bottom edge. */
+    top: 9.75rem;
     float: none;
     width: auto;
     max-width: none;
-    margin: 0;
-    max-height: calc(100vh - 10rem);
-    overflow-x: hidden;
-    overflow-y: auto;
-    padding: 0.85rem 0.75rem 1.5rem 0.15rem;
-    scrollbar-width: thin;
+    margin: 0.85rem 0.5rem 0 0.35rem;
+    /* Full list — no nested scrollbar. Dense chapters scroll with the page. */
+    overflow: visible;
+    padding: 1.35rem 1.15rem 1.75rem 1.15rem;
     z-index: 50;
-    background: var(--cream);
-    border-radius: 20px;
+    background:
+      linear-gradient(
+        165deg,
+        color-mix(in srgb, var(--paper) 70%, var(--sage-soft)),
+        var(--cream) 42%
+      );
+    border: 1px solid color-mix(in srgb, var(--sage) 22%, var(--line));
+    border-radius: 22px;
     /* Opaque plate so Soft map’s full-bleed scoop can’t show through under the spine. */
-    box-shadow: 0 4rem 0 0 var(--cream);
+    box-shadow:
+      0 4rem 0 0 var(--cream),
+      0 18px 40px rgba(49, 47, 47, 0.05);
   }
 
   #oc-chapter .oc-journey-stream {
@@ -2248,12 +2327,14 @@
    */
   #oc-chapter .oc-journey-stream > .oc-ch-major.rounded-top {
     margin-top: 0;
-    border-radius: var(--ch-overlap);
+    border-radius: calc(var(--ch-overlap) + 0.35rem);
     overflow: hidden;
   }
 
   #oc-chapter .oc-journey-stream > .oc-ch-major + .oc-ch-major {
-    margin-top: 2.75rem;
+    margin-top: 3.25rem;
+    border-radius: calc(var(--ch-overlap) + 0.35rem);
+    overflow: hidden;
   }
 
   #oc-chapter .oc-journey-stream .oc-ch-major .oc-ch-wrap {
@@ -2279,11 +2360,27 @@
   position: relative;
 }
 
+#oc-chapter .oc-journey-path-heading {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 1rem;
+  padding-left: 0.35rem;
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--sage-deep);
+}
+
+#oc-chapter .oc-journey-path-body {
+  position: relative;
+}
+
 #oc-chapter .oc-journey-path-curve {
   position: absolute;
-  left: 0;
+  left: 0.15rem;
   top: 0.15rem;
-  width: 1.85rem;
+  width: 2.15rem;
   height: calc(100% - 0.5rem);
   pointer-events: none;
   overflow: visible;
@@ -2292,22 +2389,22 @@
 
 #oc-chapter .oc-journey-path-curve-base,
 #oc-chapter .oc-journey-path-curve-fill {
-  stroke-width: 2.5px;
+  stroke-width: 3.25px;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
 
 #oc-chapter .oc-journey-path-curve-base {
-  stroke: color-mix(in srgb, var(--taupe) 55%, var(--line));
+  stroke: color-mix(in srgb, var(--taupe) 48%, var(--line));
 }
 
 #oc-chapter .oc-journey-path-curve-fill {
   stroke: var(--sage-deep);
-  stroke-width: 3px;
+  stroke-width: 4px;
   stroke-dasharray: 100;
   stroke-dashoffset: 100;
-  transition: stroke-dashoffset 0.55s cubic-bezier(0.3, 1, 0.3, 1);
+  transition: stroke-dashoffset 0.95s cubic-bezier(0.33, 1, 0.32, 1);
 }
 
 /* Legacy straight track kept inert if markup remains elsewhere */
@@ -2316,7 +2413,7 @@
 }
 
 #oc-chapter .oc-journey-path-list,
-#oc-chapter .oc-journey-path-group > ol {
+#oc-chapter .oc-journey-path-group > .oc-journey-path-panel > ol {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -2326,39 +2423,124 @@
   position: relative;
   z-index: 1;
   display: grid;
-  gap: 1.35rem;
+  gap: 0.85rem;
 }
 
-#oc-chapter .oc-journey-path-group > ol {
+#oc-chapter .oc-journey-path-group {
+  transition: opacity 420ms ease;
+}
+
+#oc-chapter .oc-journey-path-group.is-collapsed {
+  opacity: 0.92;
+}
+
+#oc-chapter .oc-journey-path-group.is-open {
+  opacity: 1;
+}
+
+#oc-chapter .oc-journey-path-panel {
   display: grid;
-  gap: 0.15rem;
-  margin-top: 0.35rem;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transform: translateY(-0.45rem);
+  transition:
+    grid-template-rows 560ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 380ms ease,
+    transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#oc-chapter .oc-journey-path-group.is-open .oc-journey-path-panel {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transform: none;
+}
+
+#oc-chapter .oc-journey-path-panel > ol {
+  display: grid;
+  gap: 0.28rem;
+  margin-top: 0;
+  padding-top: 0.55rem;
+  overflow: hidden;
+  min-height: 0;
 }
 
 #oc-chapter .oc-journey-path-band {
-  display: block;
-  padding-left: 1.35rem;
-  font-size: 0.68rem;
-  font-weight: 650;
-  letter-spacing: 0.12em;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  padding: 0.2rem 0.45rem 0.35rem 1.55rem;
+  font-size: var(--text-eyebrow);
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--ink) 55%, transparent);
+  color: color-mix(in srgb, var(--sage-deep) 78%, var(--ink));
   text-decoration: none;
+  border-radius: 0;
+  background: transparent;
+  transition: color 200ms ease;
 }
 
 #oc-chapter .oc-journey-path-band:hover {
   color: var(--sage-deep);
+  background: transparent;
+}
+
+/* Section label only — no fill, so it doesn’t merge with the active stop pill. */
+#oc-chapter .oc-journey-path-band.is-current {
+  color: var(--sage-deep);
+  background: transparent;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  line-height: 1.2;
+  padding-top: 0.35rem;
+  padding-bottom: 0.15rem;
+  transition:
+    color 280ms ease,
+    font-size 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    letter-spacing 420ms ease,
+    padding 420ms ease;
+}
+
+#oc-chapter .oc-journey-path-band-label {
+  display: block;
+}
+
+#oc-chapter .oc-journey-path-band-meta {
+  display: block;
+  max-height: 1.8rem;
+  font-size: var(--text-small);
+  font-weight: 550;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--ink-muted);
+  overflow: hidden;
+  opacity: 1;
+  transition:
+    opacity 220ms ease,
+    max-height 320ms ease,
+    margin 320ms ease;
+}
+
+#oc-chapter .oc-journey-path-group.is-open .oc-journey-path-band-meta {
+  max-height: 0;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 #oc-chapter .oc-journey-path-group a:not(.oc-journey-path-band) {
   display: grid;
-  grid-template-columns: 0.7rem minmax(0, 1.6rem) minmax(0, 1fr);
+  grid-template-columns: 0.85rem minmax(0, 1.85rem) minmax(0, 1fr);
   align-items: start;
-  gap: 0.35rem 0.45rem;
-  padding: 0.4rem 0.45rem 0.4rem 0.35rem;
+  gap: 0.4rem 0.5rem;
+  padding: 0.5rem 0.55rem 0.5rem 0.4rem;
   text-decoration: none;
-  color: color-mix(in srgb, var(--ink) 72%, transparent);
-  border-radius: 12px;
+  color: var(--ink-muted);
+  border-radius: 14px;
   transition:
     background 160ms ease,
     color 160ms ease;
@@ -2370,13 +2552,19 @@
   background: var(--paper);
 }
 
+#oc-chapter .oc-journey-path-group a:not(.oc-journey-path-band).is-active {
+  box-shadow:
+    0 10px 28px rgba(49, 47, 47, 0.07),
+    0 1px 0 color-mix(in srgb, var(--sage) 12%, transparent);
+}
+
 #oc-chapter .oc-journey-path-dot {
-  width: 0.55rem;
-  height: 0.55rem;
-  margin-top: 0.28rem;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-top: 0.32rem;
   border-radius: 99px;
   background: var(--paper);
-  border: 2px solid color-mix(in srgb, var(--sage-deep) 45%, var(--line));
+  border: 2.5px solid color-mix(in srgb, var(--sage-deep) 55%, var(--line));
   box-shadow: 0 0 0 3px var(--cream);
   transition:
     transform 220ms ease,
@@ -2388,26 +2576,159 @@
 #oc-chapter .oc-journey-path-group a.is-active .oc-journey-path-dot {
   background: var(--sage-deep);
   border-color: var(--sage-deep);
-  transform: scale(1.35);
+  transform: scale(1.4);
   box-shadow:
     0 0 0 3px var(--cream),
-    0 0 0 7px color-mix(in srgb, var(--sage) 32%, transparent);
+    0 0 0 8px color-mix(in srgb, var(--sage) 38%, transparent);
 }
 
 #oc-chapter .oc-journey-path-num {
   font-family: var(--font-heading);
-  font-size: 0.85rem;
-  line-height: 1.3;
+  font-size: 1rem;
+  line-height: 1.25;
   color: var(--sage-deep);
 }
 
+#oc-chapter .oc-journey-path-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
 #oc-chapter .oc-journey-path-title {
-  font-size: 0.8rem;
+  font-size: var(--text-small);
   line-height: 1.35;
+  font-weight: 550;
   overflow-wrap: anywhere;
 }
 
+/* Warm amber so bookmarks stand apart from the sage path. */
+#oc-chapter .oc-journey-path-saved {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: fit-content;
+  margin-top: 0.3rem;
+  padding: 0.15rem 0.6rem 0.15rem 0.45rem;
+  border: 1px solid #e2b866;
+  border-radius: 999px;
+  background: #fcebc4;
+  color: #6b4208;
+  font-size: var(--text-small);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+#oc-chapter .oc-journey-path-saved::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 0.6em;
+  height: 0.85em;
+  background: #b7791f;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%);
+}
+
+#oc-chapter .oc-journey-path-group a.is-saved .oc-journey-path-dot {
+  background: var(--sage-deep);
+  border-color: var(--sage-deep);
+  box-shadow:
+    0 0 0 3px var(--cream),
+    0 0 0 6px color-mix(in srgb, var(--sage) 55%, transparent);
+}
+
+#oc-chapter .oc-journey-path-group a.is-saved:not(.is-active) .oc-journey-path-num {
+  color: var(--sage-deep);
+  font-weight: 700;
+}
+
+#oc-chapter .oc-journey-path-group a.is-saved:not(.is-active) .oc-journey-path-title {
+  color: color-mix(in srgb, var(--sage-deep) 72%, var(--ink));
+}
+
+#oc-chapter .oc-journey-band-dots a.is-saved {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--sage) 45%, transparent);
+}
+
+#oc-chapter .oc-journey-band-dots a.is-saved > span[aria-hidden] {
+  background: var(--sage-deep);
+  transform: scale(1.15);
+}
+
+#oc-chapter .oc-journey-continue {
+  margin: 0.85rem 0 0;
+  max-width: 36rem;
+}
+
+#oc-chapter .oc-journey-continue-link {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0.55rem 0.95rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--paper) 88%, var(--sage-soft));
+  border: 1px solid color-mix(in srgb, var(--sage) 28%, var(--line));
+  color: var(--sage-deep);
+  text-decoration: none;
+  font-size: var(--text-small);
+  font-weight: 550;
+  line-height: 1.35;
+  box-shadow: 0 8px 22px rgba(49, 47, 47, 0.05);
+}
+
+#oc-chapter .oc-journey-continue-link:hover,
+#oc-chapter .oc-journey-continue-link:focus-visible {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+#oc-chapter .oc-journey-save {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--line) 90%, var(--ink));
+  background: transparent;
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: var(--text-small);
+  font-weight: 550;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+#oc-chapter .oc-journey-save:hover,
+#oc-chapter .oc-journey-save:focus-visible {
+  color: var(--sage-deep);
+  border-color: color-mix(in srgb, var(--sage) 40%, var(--line));
+  background: color-mix(in srgb, var(--sage-soft) 35%, var(--paper));
+}
+
+#oc-chapter .oc-journey-save.is-saved {
+  color: var(--sage-deep);
+  border-color: color-mix(in srgb, var(--sage) 45%, var(--line));
+  background: color-mix(in srgb, var(--sage-soft) 45%, var(--paper));
+}
+
 @media (prefers-reduced-motion: no-preference) {
+  #oc-chapter.is-journey .oc-ch-hero-bg img {
+    animation: oc-hero-ken 22s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  #oc-chapter.is-journey .oc-ch-hero-inner {
+    animation: oc-hero-in 1.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  #oc-chapter .oc-journey-clearing:has(.oc-ch-reveal--clearing.is-shown) .oc-journey-clearing-wash {
+    animation: oc-wash-bloom 1.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
   #oc-chapter .oc-journey-path-group a.is-active .oc-journey-path-dot {
     animation: oc-path-bloom 2.6s ease-in-out infinite;
   }
@@ -2417,8 +2738,8 @@
   #oc-chapter .oc-ch-reveal--clearing:not(.is-shown),
   #oc-chapter .oc-ch-reveal--stone:not(.is-shown) {
     opacity: 0;
-    transform: translateY(1.6rem);
-    filter: blur(4px);
+    transform: translateY(1.85rem);
+    filter: blur(2px);
   }
 
   /* Soft Map / programs meadow chrome stays readable; only the polish animates in. */
@@ -2429,7 +2750,7 @@
   }
 
   #oc-chapter .oc-ch-reveal--stone:not(.is-shown) {
-    transform: translateY(2rem) rotate(0.4deg);
+    transform: translateY(2.15rem) rotate(0.35deg);
   }
 
   #oc-chapter .oc-ch-reveal--entry.is-shown,
@@ -2440,46 +2761,42 @@
     transform: none;
     filter: none;
     transition:
-      opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 0.75s cubic-bezier(0.22, 1, 0.36, 1),
-      filter 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+      opacity 1.05s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 1.05s cubic-bezier(0.22, 1, 0.36, 1),
+      filter 0.9s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   /* Clearing stagger: eyebrow → number → title → banner */
   #oc-chapter .oc-ch-reveal--clearing.is-shown .oc-journey-gate-num {
-    animation: oc-clearing-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: oc-clearing-in 1.05s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   #oc-chapter .oc-ch-reveal--clearing.is-shown .oc-ch-eyebrow {
-    animation: oc-clearing-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+    animation: oc-clearing-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
   }
 
   #oc-chapter .oc-ch-reveal--clearing.is-shown h2 {
-    animation: oc-clearing-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both;
+    animation: oc-clearing-in 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
   }
 
   #oc-chapter .oc-ch-reveal--clearing.is-shown .oc-journey-banner {
-    animation: oc-clearing-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both;
+    animation: oc-clearing-in 1s cubic-bezier(0.22, 1, 0.36, 1) 0.34s both;
   }
 
   #oc-chapter .oc-ch-reveal--media:not(.is-shown) img {
-    transform: scale(1.1);
-    opacity: 0.55;
-    filter: blur(6px);
+    transform: scale(1.08);
+    opacity: 0.6;
+    filter: blur(3px);
   }
 
   #oc-chapter .oc-ch-reveal--media.is-shown img {
-    transform: scale(1);
     opacity: 1;
     filter: none;
-    transition:
-      transform 1.25s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.9s ease,
-      filter 1s ease;
+    animation: oc-media-ken 16s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
   #oc-chapter .oc-ch-reveal--stone.is-shown .oc-journey-entry-copy {
-    animation: oc-stone-copy 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+    animation: oc-stone-copy 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.14s both;
   }
 
   #oc-chapter .oc-ch-reveal--entry.is-shown .oc-ch-row-more li,
@@ -2558,6 +2875,50 @@
   }
 }
 
+@keyframes oc-hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes oc-hero-ken {
+  from {
+    transform: scale(1.08);
+  }
+
+  to {
+    transform: scale(1.02);
+  }
+}
+
+@keyframes oc-media-ken {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.035);
+  }
+}
+
+@keyframes oc-wash-bloom {
+  from {
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @keyframes oc-path-bloom {
   0%,
   100% {
@@ -2613,10 +2974,36 @@
   #oc-chapter .oc-journey-entry-media img {
     transform: none;
     filter: none;
+    animation: none !important;
+  }
+
+  #oc-chapter.is-journey .oc-ch-hero-bg img,
+  #oc-chapter.is-journey .oc-ch-hero-inner {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  #oc-chapter .oc-journey-clearing-wash {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
   }
 
   #oc-chapter .oc-journey-path-curve-fill {
     transition: none;
+  }
+
+  #oc-chapter .oc-journey-path-group,
+  #oc-chapter .oc-journey-path-panel,
+  #oc-chapter .oc-journey-path-band,
+  #oc-chapter .oc-journey-path-band-meta,
+  #oc-chapter .oc-journey-path-band.is-current {
+    transition: none;
+  }
+
+  #oc-chapter .oc-journey-path-panel {
+    transform: none;
   }
 
   #oc-chapter .oc-journey-path-group a.is-active .oc-journey-path-dot {
@@ -2631,6 +3018,13 @@
     opacity: 1 !important;
     transform: none !important;
     filter: none !important;
+  }
+
+  #oc-chapter .oc-ch-reveal--media img {
+    animation: none !important;
+    transform: none !important;
+    filter: none !important;
+    opacity: 1 !important;
   }
 
   #oc-chapter .oc-ch-reveal--entry .oc-ch-row-more li,
@@ -2650,17 +3044,461 @@
   #oc-chapter .oc-journey-entry.is-stone.is-drift-2 {
     transform: none;
   }
+
+  #oc-chapter .oc-ch-reveal--stone.is-shown .oc-journey-entry.is-frame .oc-journey-entry-copy {
+    filter: none;
+  }
+}
+
+/* —— Cinema shell (full-bleed scenes + floating HUD) —— */
+#oc-chapter.is-journey .oc-ch-hero {
+  min-height: min(92vh, 880px);
+  padding: 8rem var(--pad) 4.5rem;
+  border-radius: 0;
+  margin: 0;
+}
+
+#oc-chapter.is-journey .oc-ch-journal {
+  z-index: 2;
+  min-height: min(52vh, 30rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(3.5rem, 10vh, 6rem) var(--pad);
+  background:
+    radial-gradient(
+      ellipse 70% 60% at 50% 40%,
+      color-mix(in srgb, var(--sage-soft) 40%, transparent),
+      transparent 72%
+    ),
+    var(--cream);
+  text-align: center;
+}
+
+#oc-chapter.is-journey .oc-ch-journal .oc-ch-journal-grid {
+  width: min(100%, 40rem);
+  margin-inline: auto;
+}
+
+#oc-chapter.is-journey .oc-ch-journal .oc-ch-note {
+  border: none;
+  border-left: none;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
+#oc-chapter.is-journey .oc-ch-journal .oc-ch-note-label {
+  font-family: var(--font-heading);
+  font-size: var(--text-small);
+  letter-spacing: 0.16em;
+  color: var(--sage-deep);
+}
+
+#oc-chapter.is-journey .oc-ch-journal .oc-ch-note p {
+  font-family: var(--font-heading);
+  font-size: clamp(1.45rem, 3.2vw, 2.1rem);
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  max-width: 28rem;
+  margin-inline: auto;
+}
+
+/*
+ * One set of gutters for HUD and content, so on wide screens the HUD sits
+ * in the left gutter instead of drifting over the stream.
+ */
+#oc-chapter.is-journey .oc-journey-shell.is-cinema {
+  --cinema-edge: var(--pad);
+  --cinema-hud: 0px;
+  --cinema-left: var(--pad);
+  --cinema-right: var(--pad);
+  display: block;
+  position: relative;
+  z-index: 3;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 1024px) {
+  /* HUD + frame are centred as one group so wide scenes stay balanced. */
+  #oc-chapter.is-journey .oc-journey-shell.is-cinema {
+    --cinema-hud: min(19rem, 30vw);
+    --cinema-gap: clamp(2rem, 4vw, 4rem);
+    --cinema-frame: 50rem;
+    --cinema-edge: max(
+      1rem,
+      calc((100vw - var(--cinema-hud) - var(--cinema-gap) - var(--cinema-frame)) / 2)
+    );
+    --cinema-left: calc(var(--cinema-edge) + var(--cinema-hud) + var(--cinema-gap));
+    --cinema-right: max(var(--pad), var(--cinema-edge));
+  }
+}
+
+#oc-chapter.is-journey .oc-journey-cinema {
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+#oc-chapter.is-journey .oc-journey-act {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  background: var(--cream);
+  overflow: clip;
+}
+
+#oc-chapter.is-journey .oc-journey-act.is-alt {
+  background:
+    radial-gradient(
+      ellipse 90% 70% at 18% 12%,
+      color-mix(in srgb, var(--sage-soft) 52%, transparent),
+      transparent 68%
+    ),
+    color-mix(in srgb, var(--sage) 22%, var(--cream));
+}
+
+#oc-chapter.is-journey .oc-journey-act-title {
+  position: relative;
+  min-height: min(92vh, 52rem);
+  margin: 0;
+  padding: clamp(5rem, 14vh, 8rem) var(--cinema-right) clamp(3rem, 8vh, 5rem) var(--cinema-left);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  max-width: none;
+}
+
+#oc-chapter.is-journey .oc-journey-act-title .oc-ch-reveal--clearing {
+  max-width: min(100%, 44rem);
+}
+
+/* Full-bleed scene wash; fades out at the foot so it melts into the frames */
+#oc-chapter.is-journey .oc-journey-act-title .oc-journey-clearing-wash {
+  inset: 0 -3%;
+  -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent);
+  mask-image: linear-gradient(to bottom, #000 60%, transparent);
+}
+
+#oc-chapter.is-journey .oc-journey-act-title .oc-journey-gate-num {
+  font-size: clamp(7rem, 24vw, 14rem);
+  color: color-mix(in srgb, var(--sage-deep) 16%, transparent);
+  margin-bottom: 0.08em;
+}
+
+#oc-chapter.is-journey .oc-journey-act-title .oc-journey-continue {
+  margin: 1.5rem 0 1.25rem;
+}
+
+#oc-chapter.is-journey .oc-journey-act-title h2 {
+  font-size: clamp(3.4rem, 11vw, 6.5rem);
+  max-width: 11ch;
+}
+
+#oc-chapter.is-journey .oc-journey-act-frames {
+  position: relative;
+  z-index: 1;
+  padding: 0;
+}
+
+/* Room for Soft Map's scoop to round over the last act */
+#oc-chapter.is-journey .oc-journey-act:last-child .oc-journey-act-frames {
+  padding-bottom: var(--ch-overlap);
+}
+
+#oc-chapter.is-journey .oc-journey-act-frames .oc-ch-rail {
+  width: auto;
+  max-width: 56rem;
+  margin: 0 var(--cinema-right) 1.5rem var(--cinema-left);
+  padding-inline: 0;
+}
+
+#oc-chapter.is-journey .oc-journey-stream-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Stop frames — full-bleed media + lower-third copy */
+#oc-chapter.is-journey .oc-journey-entry.is-frame {
+  position: relative;
+  min-height: min(92vh, 56rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  /* Keep a media letterbox above the paper plate */
+  padding-top: min(46vh, 24rem);
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: color-mix(in srgb, var(--sage-deep) 8%, var(--cream));
+  overflow: hidden;
+  box-shadow: none;
+  transform: none;
+}
+
+#oc-chapter.is-journey .oc-journey-entry.is-frame.has-media {
+  background: #1c221e;
+}
+
+#oc-chapter.is-journey .oc-journey-entry.is-frame > .oc-ch-reveal--media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  margin: 0;
+}
+
+#oc-chapter.is-journey .oc-journey-entry.is-frame .oc-journey-entry-media {
+  height: 100%;
+  min-height: 100%;
+  max-height: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+#oc-chapter.is-journey .oc-journey-entry.is-frame .oc-journey-entry-media img {
+  min-height: 100%;
+  max-height: none;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+#oc-chapter.is-journey .oc-journey-frame-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to top,
+      rgba(28, 34, 30, 0.78) 0%,
+      rgba(28, 34, 30, 0.35) 42%,
+      rgba(28, 34, 30, 0.12) 100%
+    );
+}
+
+#oc-chapter.is-journey .oc-journey-entry.is-frame:not(.has-media) .oc-journey-frame-veil {
+  display: none;
+}
+
+#oc-chapter.is-journey .oc-journey-entry.is-frame .oc-journey-entry-copy {
+  position: relative;
+  z-index: 2;
+  margin: 0 var(--cinema-right) clamp(2rem, 6vh, 3.5rem) var(--cinema-left);
+  max-width: var(--cinema-frame, 44rem);
+  padding: clamp(1.35rem, 3vw, 1.85rem) clamp(1.35rem, 3vw, 1.85rem);
+  border-radius: 1.35rem 1.75rem 1.45rem 1.9rem;
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--paper) 94%, var(--sage-soft)),
+      var(--paper) 45%
+    );
+  border: 1px solid color-mix(in srgb, var(--cream) 55%, var(--line));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--paper) 70%, transparent),
+    0 28px 60px rgba(20, 24, 22, 0.28);
+  transform: none;
+  filter: none;
+}
+
+#oc-chapter.is-journey .oc-ch-reveal--stone.is-shown .oc-journey-entry.is-frame .oc-journey-entry-copy {
+  filter: brightness(1.02);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--paper) 80%, transparent),
+    0 30px 68px rgba(20, 24, 22, 0.32),
+    0 0 48px color-mix(in srgb, var(--sage-soft) 28%, transparent);
+}
+
+#oc-chapter.is-journey .oc-journey-entry.is-module {
+  position: relative;
+  min-height: auto;
+  margin: clamp(2rem, 5vh, 3.5rem) var(--cinema-right) clamp(2rem, 5vh, 3.5rem) var(--cinema-left);
+  max-width: min(56rem, calc(100% - var(--cinema-left) - var(--cinema-right)));
+  border-radius: 1.75rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  box-shadow: 0 22px 50px rgba(49, 47, 47, 0.08);
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+#oc-chapter.is-journey .oc-journey-entry-wrap {
+  margin: 0;
+}
+
+/* Floating frosted path HUD — sticky within cinema shell only (not over hero) */
+#oc-chapter.is-journey .oc-journey-hud-slot {
+  display: none;
+}
+
+#oc-chapter.is-journey .oc-journey-hud {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  #oc-chapter.is-journey .oc-journey-shell.is-cinema {
+    display: block;
+    position: relative;
+    grid-template-columns: none;
+    column-gap: 0;
+    max-width: none;
+    padding-inline: 0;
+  }
+
+  #oc-chapter.is-journey .oc-journey-hud-slot {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    /* End before Soft Map’s −overlap scoop so the HUD doesn’t peek through */
+    bottom: calc(var(--ch-overlap) + 2rem);
+    width: 0;
+    z-index: 60;
+    pointer-events: none;
+  }
+
+  /* Scrolls itself to the active stop (journey-path.tsx); no visible bar */
+  #oc-chapter.is-journey .oc-journey-hud {
+    display: block;
+    position: sticky;
+    top: 9.5rem;
+    width: var(--cinema-hud);
+    max-height: calc(100vh - 11rem);
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    margin: 1rem 0 0 var(--cinema-edge);
+    padding: 1.35rem 1.1rem 1.4rem;
+    pointer-events: auto;
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--sage-soft) 38%, var(--paper)) 0,
+        var(--paper) 7rem
+      );
+    border: 1px solid color-mix(in srgb, var(--sage) 42%, var(--line));
+    border-top: 4px solid var(--sage-deep);
+    border-radius: 1.5rem;
+    box-shadow:
+      0 28px 64px rgba(28, 34, 30, 0.2),
+      0 2px 6px rgba(28, 34, 30, 0.06),
+      inset 0 1px 0 color-mix(in srgb, var(--paper) 80%, transparent);
+  }
+
+  #oc-chapter.is-journey .oc-journey-hud::-webkit-scrollbar {
+    display: none;
+  }
+
+  #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-band {
+    padding-left: 2.75rem;
+    font-size: var(--text-small);
+  }
+
+  #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-band.is-current .oc-journey-path-band-label {
+    font-size: 1.3rem;
+  }
+
+  #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-band-meta {
+    font-size: var(--text-small);
+  }
+
+  #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-heading {
+    font-size: 1.75rem;
+    margin-bottom: 0.9rem;
+    padding-left: 0.2rem;
+    color: var(--ink);
+  }
+
+  #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-group a:not(.oc-journey-path-band) {
+    grid-template-columns: 1rem minmax(0, 2.2rem) minmax(0, 1fr);
+    gap: 0.45rem 0.6rem;
+    padding: 0.65rem 0.7rem 0.65rem 0.45rem;
+  }
+
+  #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-group a.is-active {
+    background: var(--sage-deep);
+    color: var(--paper);
+    box-shadow: 0 12px 30px color-mix(in srgb, var(--sage-deep) 35%, transparent);
+  }
+
+  #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-group a.is-active .oc-journey-path-num,
+  #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-group a.is-active .oc-journey-path-saved {
+    color: #6b4208;
+  }
+
+  #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-group a.is-active .oc-journey-path-dot {
+    background: var(--paper);
+    border-color: var(--paper);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--paper) 35%, transparent);
+  }
+
+  #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-dot {
+    width: 0.85rem;
+    height: 0.85rem;
+    margin-top: 0.4rem;
+  }
+
+  #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-num {
+    font-size: 1.2rem;
+  }
+
+  #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-title {
+    font-size: 1.05rem;
+    line-height: 1.35;
+  }
+
+  #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-saved {
+    font-size: var(--text-small);
+  }
+
+  #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-curve {
+    width: 2.5rem;
+  }
+
+  #oc-chapter.is-journey .oc-journey-band-dots {
+    display: none;
+  }
+}
+
+@media (max-width: 1023px) {
+  #oc-chapter.is-journey .oc-journey-act-title {
+    padding-inline: var(--pad);
+  }
+
+  #oc-chapter.is-journey .oc-journey-entry.is-frame .oc-journey-entry-copy,
+  #oc-chapter.is-journey .oc-journey-entry.is-module {
+    margin-left: var(--pad);
+    margin-right: var(--pad);
+    max-width: none;
+  }
+
+  #oc-chapter.is-journey .oc-journey-band-dots {
+    display: flex;
+    margin: 1rem 0 0;
+  }
 }
 
 @media print {
   #oc-chapter .oc-journey-path,
+  #oc-chapter .oc-journey-hud,
   #oc-chapter .oc-journey-band-dots,
-  #oc-chapter .oc-journey-clearing-wash {
+  #oc-chapter .oc-journey-clearing-wash,
+  #oc-chapter .oc-journey-frame-veil {
     display: none !important;
   }
 
   #oc-chapter .oc-journey-shell {
     display: block;
+  }
+
+  #oc-chapter.is-journey .oc-journey-entry.is-frame .oc-journey-entry-copy,
+  #oc-chapter.is-journey .oc-journey-entry.is-module {
+    margin-left: 0;
+    max-width: none;
+    box-shadow: none;
   }
 }
 
@@ -2692,9 +3530,9 @@
 
 #oc-chapter .oc-ch-strip-status {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: var(--text-small);
   font-variant-numeric: tabular-nums;
-  color: color-mix(in srgb, var(--ink) 72%, transparent);
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-ch-strip-dots {
@@ -2814,10 +3652,10 @@
 }
 #oc-chapter .oc-ch-shop-label {
   display: block;
-  font-size: 0.7rem;
+  font-size: var(--text-eyebrow);
   letter-spacing: 0.11em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--ink) 74%, transparent);
+  color: var(--ink-muted);
 }
 #oc-chapter .oc-ch-shop-list {
   display: grid;
@@ -2853,19 +3691,19 @@
   display: block;
 }
 #oc-chapter .oc-ch-shop-name {
-  font-size: 0.79rem;
+  font-size: var(--text-small);
   line-height: 1.35;
 }
 #oc-chapter .oc-ch-shop-price {
-  font-size: 0.76rem;
+  font-size: var(--text-small);
   color: var(--sage-text);
   font-variant-numeric: tabular-nums;
 }
 #oc-chapter .oc-ch-shop-note {
   margin: 0.65rem 0 0;
-  font-size: 0.8rem;
+  font-size: var(--text-small);
   line-height: 1.5;
-  color: color-mix(in srgb, var(--ink) 74%, transparent);
+  color: var(--ink-muted);
 }
 
 /* ---------------------------------------------------------------------------
@@ -2903,8 +3741,8 @@
 
 #oc-chapter .oc-fig-detail {
   margin: 0.45rem 0 0;
-  font-size: 0.9rem;
-  color: color-mix(in srgb, var(--ink) 78%, transparent);
+  font-size: var(--text-small);
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-fig-chip {
@@ -2916,7 +3754,7 @@
   border: 1px solid var(--line);
   background: var(--paper);
   color: var(--ink);
-  font-size: 0.84rem;
+  font-size: var(--text-small);
   font-weight: 500;
 }
 
@@ -2929,91 +3767,221 @@
 /* Start-here map */
 
 #oc-chapter .oc-ch-starthere {
-  width: min(100%, var(--max));
-  margin: 0 auto 1rem;
+  width: min(100%, 68rem);
+  margin: 0 auto;
   display: grid;
+  gap: clamp(1.75rem, 4vw, 2.75rem);
+  text-align: left;
+}
+
+#oc-chapter .oc-ch-starthere-head {
+  display: grid;
+  justify-items: center;
   gap: 0.75rem;
+  text-align: center;
+}
+
+#oc-chapter .oc-ch-starthere-head h2 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(1.9rem, 3.6vw, 2.6rem);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--ink-strong);
+}
+
+#oc-chapter .oc-ch-starthere-lede {
+  margin: 0 auto;
+  max-width: 60ch;
+  font-size: var(--text-body);
+  line-height: 1.7;
+  color: var(--ink-body);
 }
 
 #oc-chapter .oc-fig-sline {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 0.6rem;
+  gap: 0.75rem;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 760px) {
   #oc-chapter .oc-fig-sline {
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    column-gap: clamp(1rem, 2.5vw, 2rem);
     align-items: stretch;
   }
 }
 
 #oc-chapter .oc-fig-seg {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.25rem, 2.5vw, 1.85rem);
   background: var(--paper);
   border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 0.9rem 1rem;
+  border-top: 5px solid var(--sage);
+  border-radius: 24px;
+  box-shadow: 0 18px 44px rgba(49, 47, 47, 0.07);
+}
+
+#oc-chapter .oc-fig-seg.is-after {
+  border-top-color: var(--sage-deep);
 }
 
 #oc-chapter .oc-fig-seg-label {
-  margin: 0;
-  font-weight: 600;
+  margin: 0 0 0.85rem;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--ink-strong);
 }
 
 #oc-chapter .oc-fig-seg ol {
-  margin: 0.5rem 0 0;
-  padding-left: 1.2rem;
+  flex: 1;
+  display: grid;
+  align-content: start;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 #oc-chapter .oc-fig-seg li {
-  margin: 0.2rem 0;
+  max-width: none;
+  margin: 0;
 }
 
 #oc-chapter .oc-fig-seg a {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.85rem;
+  min-height: 3.25rem;
+  margin-inline: -0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 14px;
+  color: var(--ink-strong);
+  font-weight: 500;
+  line-height: 1.4;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+#oc-chapter .oc-fig-seg a:hover {
+  background: color-mix(in srgb, var(--sage-soft) 55%, transparent);
+}
+
+#oc-chapter .oc-fig-seg a:hover .oc-fig-seg-title {
   text-decoration: underline;
-  text-decoration-color: var(--sage);
-  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--sage-deep);
+}
+
+#oc-chapter .oc-fig-seg a:focus-visible {
+  outline: 3px solid var(--sage-deep);
+  outline-offset: 2px;
+}
+
+#oc-chapter .oc-fig-seg-num {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--sage-soft) 70%, var(--paper));
+  color: var(--sage-deep);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+#oc-chapter .oc-fig-seg.is-after .oc-fig-seg-num {
+  background: var(--sage-deep);
+  color: var(--paper);
+}
+
+#oc-chapter .oc-fig-seg-go {
+  color: var(--sage-deep);
+  font-size: 1.2rem;
+  transition: transform 0.2s ease;
+}
+
+#oc-chapter .oc-fig-seg a:hover .oc-fig-seg-go {
+  transform: translateX(3px);
 }
 
 #oc-chapter .oc-fig-seg-ref {
-  margin: 0.6rem 0 0;
-  font-size: 0.85rem;
-  color: var(--sage-text);
+  display: grid;
+  gap: 0.2rem;
+  max-width: none;
+  margin: 1.1rem 0 0;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--sage-soft) 40%, var(--paper));
+  font-size: var(--text-small);
+  line-height: 1.5;
+  color: var(--ink-body);
+}
+
+#oc-chapter .oc-fig-seg-ref-label {
+  font-size: var(--text-eyebrow);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sage-deep);
 }
 
 #oc-chapter .oc-fig-pivot {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.75rem;
+}
+
+#oc-chapter .oc-fig-pivot::before,
+#oc-chapter .oc-fig-pivot::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: color-mix(in srgb, var(--sage-deep) 35%, transparent);
 }
 
 #oc-chapter .oc-fig-pivot span {
-  font-family: var(--font-heading);
-  padding: 0.35rem 0.85rem;
+  padding: 0.5rem 1.15rem;
   border-radius: 999px;
-  background: var(--sage-text);
+  background: var(--sage-deep);
+  box-shadow: 0 0 0 6px var(--cream);
   color: var(--paper);
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 760px) {
   #oc-chapter .oc-fig-pivot {
     flex-direction: column;
   }
 
   #oc-chapter .oc-fig-pivot::before,
   #oc-chapter .oc-fig-pivot::after {
-    content: '';
     width: 2px;
-    flex: 1;
-    background: var(--sage-text);
-    opacity: 0.4;
+    height: auto;
   }
 }
 
-#oc-chapter .oc-fig-caption {
-  margin: 0;
-  font-size: 0.92rem;
-  color: color-mix(in srgb, var(--ink) 78%, transparent);
+#oc-chapter .oc-ch-starthere .oc-fig-exit {
+  align-items: center;
+  gap: 0.75rem;
+  max-width: none;
+  padding: 1rem 1.25rem;
+  border-left: 5px solid var(--urgent);
+  border-radius: 16px;
+  font-size: var(--text-body);
+  line-height: 1.5;
+}
+
+#oc-chapter .oc-ch-starthere .oc-fig-exit .oc-fig-glyph {
+  flex: none;
+  width: 22px;
+  height: 22px;
 }
 
 /* Urgent signpost and crisis line */
@@ -3076,7 +4044,7 @@
 
 #oc-chapter .oc-fig-bracket {
   margin: 0;
-  font-size: 0.72rem;
+  font-size: var(--text-eyebrow);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--sage-text);
@@ -3144,7 +4112,7 @@
   border-radius: 12px;
   background: var(--cream);
   text-align: center;
-  font-size: 0.88rem;
+  font-size: var(--text-small);
 }
 
 #oc-chapter .oc-fig-criteria li .oc-fig-glyph {
@@ -3162,7 +4130,7 @@
   flex-wrap: wrap;
   gap: 0.25rem 0.9rem;
   margin: 0.6rem 0 0;
-  font-size: 0.86rem;
+  font-size: var(--text-small);
   color: var(--sage-text);
 }
 
@@ -3349,7 +4317,7 @@
 
 #oc-chapter .oc-fig-topics legend {
   padding: 0;
-  font-size: 0.92rem;
+  font-size: var(--text-small);
   font-weight: 600;
 }
 
@@ -3364,7 +4332,7 @@
   align-items: center;
   gap: 0.5rem;
   min-height: 44px;
-  font-size: 0.92rem;
+  font-size: var(--text-small);
   cursor: pointer;
 }
 
@@ -3383,7 +4351,7 @@
 
 #oc-chapter .oc-fig-topics-status {
   margin: 0;
-  font-size: 0.86rem;
+  font-size: var(--text-small);
   color: var(--sage-text);
 }
 
@@ -3400,7 +4368,7 @@
   border-radius: 999px;
   background: var(--sage-text);
   color: var(--paper);
-  font-size: 0.78rem;
+  font-size: var(--text-small);
   font-weight: 600;
 }
 
@@ -3416,7 +4384,7 @@
 
 #oc-chapter .oc-fig-lane-link {
   margin: 0.45rem 0 0;
-  font-size: 0.88rem;
+  font-size: var(--text-small);
 }
 
 #oc-chapter .oc-fig-lane-link a {
@@ -3428,8 +4396,8 @@
 }
 
 #oc-chapter .oc-fig-scope {
-  font-size: 0.82rem;
-  color: color-mix(in srgb, var(--ink) 72%, transparent);
+  font-size: var(--text-small);
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-fig-doors {
@@ -3495,8 +4463,8 @@
 #oc-chapter .oc-fig-gap-note {
   flex: 1 1 14rem;
   margin: 0;
-  font-size: 0.9rem;
-  color: color-mix(in srgb, var(--ink) 80%, transparent);
+  font-size: var(--text-small);
+  color: var(--ink-body);
 }
 
 #oc-chapter .oc-fig-gap-controls {
@@ -3547,7 +4515,7 @@
 
 #oc-chapter .oc-fig-gap-status {
   margin: 0;
-  font-size: 0.86rem;
+  font-size: var(--text-small);
   color: var(--sage-text);
 }
 
@@ -3571,19 +4539,19 @@
 #oc-chapter .oc-fig-gap-panels b {
   display: block;
   margin-top: 0.35rem;
-  font-size: 0.92rem;
+  font-size: var(--text-small);
   font-weight: 600;
 }
 
 #oc-chapter .oc-fig-gap-panels p {
   margin: 0.2rem 0 0;
-  font-size: 0.88rem;
+  font-size: var(--text-small);
 }
 
 #oc-chapter .oc-fig-gap-more {
   margin: 0;
-  font-size: 0.88rem;
-  color: color-mix(in srgb, var(--ink) 80%, transparent);
+  font-size: var(--text-small);
+  color: var(--ink-body);
 }
 
 #oc-chapter .oc-fig-gap-svg {
@@ -3705,7 +4673,7 @@
 #oc-chapter .oc-fig-parts-status {
   flex: 1 1 100%;
   margin: 0;
-  font-size: 0.86rem;
+  font-size: var(--text-small);
   color: var(--sage-text);
 }
 
@@ -3740,8 +4708,8 @@
 
 #oc-chapter .oc-fig-parts-terms dd {
   margin: 0.1rem 0 0;
-  font-size: 0.88rem;
-  color: color-mix(in srgb, var(--ink) 85%, transparent);
+  font-size: var(--text-small);
+  color: var(--ink-body);
 }
 
 #oc-chapter .oc-fig-parts-barrier,
@@ -3899,14 +4867,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 1.4rem;
-  height: 1.4rem;
-  padding: 0 0.2rem;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding: 0 0.3rem;
   border: 2px solid var(--paper);
   border-radius: 999px;
   background: var(--ink);
   color: var(--cream);
-  font-size: 0.72rem;
+  font-size: var(--text-small);
   font-weight: 600;
   line-height: 1;
 }
@@ -3918,7 +4886,7 @@
 
 #oc-chapter .oc-fig-anatomy-parts-h {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: var(--text-small);
   font-weight: 600;
   color: var(--sage-deep);
 }
@@ -3933,15 +4901,15 @@
 
 #oc-chapter .oc-fig-anatomy-orient {
   margin: 0.15rem 0 0;
-  font-size: 0.85rem;
-  color: color-mix(in srgb, var(--ink) 78%, transparent);
+  font-size: var(--text-small);
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-fig-anatomy-caption {
   display: grid;
   gap: 0.4rem;
   margin: 0;
-  font-size: 0.9rem;
+  font-size: var(--text-small);
 }
 
 #oc-chapter .oc-fig-anatomy-caption p {
@@ -3954,9 +4922,9 @@
  * that clears 4.5:1 on the card's white rather than dropping to `--taupe`.
  */
 #oc-chapter .oc-fig-anatomy-credit {
-  font-size: 0.78rem;
+  font-size: var(--text-small);
   line-height: 1.5;
-  color: color-mix(in srgb, var(--ink) 78%, transparent);
+  color: var(--ink-muted);
 }
 
 /*
@@ -4004,7 +4972,7 @@
   margin: 0;
   padding-left: 0.75rem;
   border-left: 3px solid var(--sand);
-  font-size: 0.92rem;
+  font-size: var(--text-small);
 }
 
 #oc-chapter .oc-fig-clocks {
@@ -4034,7 +5002,7 @@
 
 #oc-chapter .oc-fig-clocks p {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: var(--text-small);
   color: var(--ink);
 }
 
@@ -4056,8 +5024,8 @@
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  font-size: 0.75rem;
-  color: color-mix(in srgb, var(--ink) 72%, transparent);
+  font-size: var(--text-small);
+  color: var(--ink-muted);
 }
 
 /*
@@ -4081,7 +5049,7 @@
   padding: 0.2rem 0.65rem;
   border: 1px dashed color-mix(in srgb, var(--ink) 45%, transparent);
   border-radius: 999px;
-  font-size: 0.8rem;
+  font-size: var(--text-small);
 }
 
 #oc-chapter .oc-fig-steps-framing {
@@ -4093,7 +5061,7 @@
   margin: 0;
   padding-left: 0.75rem;
   border-left: 3px solid var(--sand);
-  font-size: 0.92rem;
+  font-size: var(--text-small);
 }
 
 #oc-chapter .oc-fig-steps-controls {
@@ -4110,7 +5078,7 @@
 
 #oc-chapter .oc-fig-steps-filter legend {
   padding: 0;
-  font-size: 0.92rem;
+  font-size: var(--text-small);
   font-weight: 600;
 }
 
@@ -4125,7 +5093,7 @@
   align-items: center;
   gap: 0.5rem;
   min-height: 44px;
-  font-size: 0.92rem;
+  font-size: var(--text-small);
   cursor: pointer;
 }
 
@@ -4139,7 +5107,7 @@
 
 #oc-chapter .oc-fig-steps-status {
   margin: 0;
-  font-size: 0.86rem;
+  font-size: var(--text-small);
   color: var(--sage-text);
 }
 
@@ -4151,8 +5119,8 @@
 }
 
 #oc-chapter .oc-fig-steps-hint {
-  font-size: 0.88rem;
-  color: color-mix(in srgb, var(--ink) 78%, transparent);
+  font-size: var(--text-small);
+  color: var(--ink-muted);
 }
 
 /* The same 44px button as .oc-fig-print. */
@@ -4246,7 +5214,7 @@
 
 #oc-chapter .oc-fig-steps.is-walking > li:not(.is-current) h4 {
   font-weight: 500;
-  color: color-mix(in srgb, var(--ink) 78%, transparent);
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-fig-steps.is-walking > li.is-current {
@@ -4317,9 +5285,9 @@
 
 #oc-chapter .oc-fig-supply-intro {
   margin: 0.3rem 0 0;
-  font-size: 0.86rem;
+  font-size: var(--text-small);
   line-height: 1.5;
-  color: color-mix(in srgb, var(--ink) 80%, transparent);
+  color: var(--ink-body);
 }
 
 #oc-chapter .oc-fig-supply-group {
@@ -4331,11 +5299,11 @@
 
 #oc-chapter .oc-fig-supply-group > legend {
   padding: 0;
-  font-size: 0.72rem;
+  font-size: var(--text-eyebrow);
   font-weight: 600;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--ink) 72%, transparent);
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-fig-supply-systems {
@@ -4353,7 +5321,7 @@
   gap: 0.5rem;
   min-height: 44px;
   cursor: pointer;
-  font-size: 0.88rem;
+  font-size: var(--text-small);
   line-height: 1.4;
 }
 
@@ -4385,8 +5353,8 @@
 #oc-chapter .oc-fig-supply-check small {
   display: block;
   margin-top: 0.1rem;
-  font-size: 0.8rem;
-  color: color-mix(in srgb, var(--ink) 74%, transparent);
+  font-size: var(--text-small);
+  color: var(--ink-muted);
 }
 
 /*
@@ -4396,7 +5364,7 @@
  */
 #oc-chapter .oc-fig-supply-plain {
   margin: 0.45rem 0 0;
-  font-size: 0.88rem;
+  font-size: var(--text-small);
   line-height: 1.5;
 }
 
@@ -4405,7 +5373,7 @@
   align-items: center;
   gap: 0.4rem;
   margin: 0.2rem 0 0;
-  font-size: 0.84rem;
+  font-size: var(--text-small);
   color: var(--sage-text);
 }
 
@@ -4427,7 +5395,7 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  font-size: 0.82rem;
+  font-size: var(--text-small);
   color: var(--sage-text);
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -4443,15 +5411,15 @@
 
 #oc-chapter .oc-fig-supply-field label {
   display: block;
-  font-size: 0.88rem;
+  font-size: var(--text-small);
   font-weight: 500;
 }
 
 #oc-chapter .oc-fig-supply-field small {
   display: block;
   font-weight: 400;
-  font-size: 0.8rem;
-  color: color-mix(in srgb, var(--ink) 74%, transparent);
+  font-size: var(--text-small);
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-fig-supply-field input {
@@ -4492,7 +5460,7 @@
   background: var(--paper);
   color: var(--ink);
   font: inherit;
-  font-size: 0.85rem;
+  font-size: var(--text-small);
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
@@ -4500,7 +5468,7 @@
 
 #oc-chapter .oc-fig-supply-status {
   margin: 0.4rem 0 0;
-  font-size: 0.84rem;
+  font-size: var(--text-small);
   color: var(--sage-text);
 }
 
@@ -4514,7 +5482,7 @@
   min-height: 44px;
   display: flex;
   align-items: center;
-  font-size: 0.86rem;
+  font-size: var(--text-small);
   cursor: pointer;
 }
 
@@ -4535,14 +5503,14 @@
   align-items: center;
   gap: 0.4rem 0.8rem;
   padding-block: 0.4rem;
-  font-size: 0.88rem;
+  font-size: var(--text-small);
 }
 
 #oc-chapter .oc-fig-supply-empty,
 #oc-chapter .oc-fig-supply-kits {
   margin: 0.4rem 0 0;
-  font-size: 0.84rem;
-  color: color-mix(in srgb, var(--ink) 76%, transparent);
+  font-size: var(--text-small);
+  color: var(--ink-muted);
 }
 
 #oc-chapter .oc-fig-supply-kits ul {
@@ -4753,5 +5721,648 @@
 
   #oc-chapter .oc-fig-parts-btn {
     flex: 1 1 auto;
+  }
+}
+
+/* —— Readability layer (older readers) —— */
+
+/* Scales the whole page like a browser text setting; sizes here are rem-based */
+html[data-oc-text='lg'] {
+  font-size: 115%;
+}
+
+html[data-oc-text='xl'] {
+  font-size: 130%;
+}
+
+/* The size belongs to the chapter; the site chrome keeps its own scale. */
+html[data-oc-text='lg'] #liivv-site-header,
+html[data-oc-text='lg'] .site-footer-reveal-footer {
+  zoom: calc(1 / 1.15);
+}
+
+html[data-oc-text='xl'] #liivv-site-header,
+html[data-oc-text='xl'] .site-footer-reveal-footer {
+  zoom: calc(1 / 1.3);
+}
+
+/* Larger text needs the column more than the frame needs its padding. */
+html[data-oc-text] #oc-chapter.is-journey .oc-journey-entry .oc-journey-entry-copy {
+  padding-inline: clamp(1rem, 2.4vw, 2.35rem);
+}
+
+#oc-chapter .oc-journey-banner .oc-journey-banner-title {
+  font-size: 1.35rem;
+  line-height: 1.25;
+}
+
+#oc-chapter p,
+#oc-chapter li,
+#oc-chapter dd,
+#oc-chapter figcaption {
+  font-weight: 400;
+  max-width: var(--measure);
+}
+
+#oc-chapter h1,
+#oc-chapter h2,
+#oc-chapter h3,
+#oc-chapter h4 {
+  color: var(--ink-strong);
+  letter-spacing: -0.01em;
+}
+
+#oc-chapter .oc-ch-hero h1,
+#oc-chapter .oc-ch-hero h2,
+#oc-chapter .oc-ch-close h2 {
+  color: inherit;
+}
+
+#oc-chapter .oc-ch-hero-lead {
+  max-width: 42ch;
+  font-size: var(--text-lede);
+  font-weight: 450;
+  line-height: 1.55;
+  color: #fff;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+}
+
+#oc-chapter .oc-ch-lede {
+  font-size: var(--text-lede);
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--ink-strong);
+}
+
+#oc-chapter .oc-ch-row-note,
+#oc-chapter .oc-fig-detail {
+  font-size: var(--text-body);
+  line-height: 1.7;
+  color: var(--ink-body);
+}
+
+/* Card lists: full-size text, clear bullets, no hairlines between items */
+#oc-chapter .oc-journey-entry .oc-ch-row-more > ul,
+#oc-chapter .oc-journey-entry .oc-ch-subsection ul {
+  gap: 0.9rem;
+  margin-top: 0.6rem;
+}
+
+#oc-chapter .oc-journey-entry .oc-ch-row-more li,
+#oc-chapter .oc-journey-entry .oc-ch-subsection li {
+  padding: 0 0 0 1.6rem;
+  border-bottom: none;
+  font-size: var(--text-body);
+  line-height: 1.7;
+  color: var(--ink-body);
+}
+
+#oc-chapter .oc-journey-entry .oc-ch-row-more li:last-child,
+#oc-chapter .oc-journey-entry .oc-ch-subsection li:last-child {
+  padding-bottom: 0;
+}
+
+#oc-chapter .oc-journey-entry .oc-ch-row-more li::before,
+#oc-chapter .oc-journey-entry .oc-ch-subsection li::before {
+  top: 0.62em;
+  width: 0.55rem;
+  height: 0.55rem;
+  background: var(--sage-deep);
+  opacity: 1;
+}
+
+#oc-chapter .oc-fig-route > p:first-child {
+  font-size: var(--text-body);
+  font-weight: 600;
+  color: var(--ink-strong);
+}
+
+#oc-chapter .oc-fig-crisis p {
+  font-weight: 500;
+  color: var(--ink-strong);
+}
+
+#oc-chapter .oc-ch-eyebrow,
+#oc-chapter .oc-fig-bracket {
+  font-size: var(--text-eyebrow);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+/* Links inside reading text are always underlined */
+#oc-chapter p a,
+#oc-chapter .oc-journey-entry-copy li a,
+#oc-chapter .oc-ch-row-more a {
+  color: var(--ink-strong);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--sage-deep);
+}
+
+/* Comfortable tap targets and legible labels */
+#oc-chapter .oc-ch-btn,
+#oc-chapter .oc-journey-save,
+#oc-chapter .oc-journey-continue-link,
+#oc-chapter .oc-ch-toggle {
+  min-height: 2.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+#oc-chapter .oc-journey-save,
+#oc-chapter .oc-journey-continue-link {
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 1rem;
+}
+
+#oc-chapter .oc-journey-save {
+  color: var(--ink-body);
+  border-color: color-mix(in srgb, var(--ink) 40%, var(--line));
+}
+
+#oc-chapter .oc-fig-chip,
+#oc-chapter .oc-ch-ask {
+  min-height: 2.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Text-size control */
+#oc-chapter .oc-text-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+#oc-chapter .oc-text-size-label {
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+#oc-chapter .oc-text-size-group {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 0.2rem;
+  gap: 0.2rem;
+  background: color-mix(in srgb, var(--paper) 88%, var(--sage-soft));
+  border: 1px solid color-mix(in srgb, var(--sage) 40%, var(--line));
+}
+
+#oc-chapter .oc-text-size button {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0 0.7rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-strong);
+  font-family: var(--font-heading);
+  line-height: 1;
+  cursor: pointer;
+}
+
+#oc-chapter .oc-text-size button:nth-child(1) {
+  font-size: 1rem;
+}
+
+#oc-chapter .oc-text-size button:nth-child(2) {
+  font-size: 1.25rem;
+}
+
+#oc-chapter .oc-text-size button:nth-child(3) {
+  font-size: 1.5rem;
+}
+
+#oc-chapter .oc-text-size button[aria-pressed='true'] {
+  background: var(--sage-deep);
+  color: var(--paper);
+}
+
+#oc-chapter .oc-text-size button:focus-visible {
+  outline: 3px solid var(--ink-strong);
+  outline-offset: 2px;
+}
+
+#oc-chapter .oc-ch-hero .oc-text-size {
+  margin-top: 1.25rem;
+}
+
+#oc-chapter .oc-ch-hero .oc-text-size-label {
+  color: #fff;
+}
+
+#oc-chapter .oc-journey-hud .oc-text-size {
+  margin: 0 0 1rem;
+}
+
+#oc-chapter .oc-journey-hud .oc-text-size-label {
+  display: none;
+}
+
+#oc-chapter .oc-journey-act-title .oc-text-size {
+  margin-top: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  #oc-chapter .oc-journey-act-title .oc-text-size {
+    display: none;
+  }
+}
+
+/* Voice-over: Listen buttons */
+#oc-chapter .oc-journey-entry-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+#oc-chapter .oc-journey-entry-actions .oc-journey-save {
+  margin-left: 0;
+}
+
+#oc-chapter .oc-audio-listen {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1rem 0 0.4rem;
+  border: 2px solid var(--sage-deep);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink-strong);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#oc-chapter .oc-audio-listen-icon {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--sage-deep);
+  color: var(--paper);
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+#oc-chapter .oc-audio-listen:hover,
+#oc-chapter .oc-audio-listen.is-current {
+  background: color-mix(in srgb, var(--sage-soft) 60%, var(--paper));
+}
+
+#oc-chapter .oc-audio-listen:focus-visible,
+#oc-chapter .oc-audio-bar button:focus-visible {
+  outline: 3px solid var(--ink-strong);
+  outline-offset: 2px;
+}
+
+#oc-chapter .oc-ch-row h3 + .oc-audio-listen {
+  margin: 0.25rem 0 0.75rem;
+}
+
+#oc-chapter .oc-audio-listen--hero {
+  display: flex;
+  width: fit-content;
+  margin-top: 1.5rem;
+  padding-right: 1.35rem;
+  border-color: #fff;
+  min-height: 3.25rem;
+  font-size: 1.1rem;
+}
+
+#oc-chapter .oc-audio-listen--hero .oc-audio-listen-icon {
+  width: 2.4rem;
+  height: 2.4rem;
+}
+
+/* The stop being read aloud */
+#oc-chapter .oc-journey-entry.is-frame.is-audio-current .oc-journey-entry-copy,
+#oc-chapter .oc-journey-entry.is-module.is-audio-current,
+#oc-chapter .oc-ch-row.is-audio-current {
+  outline: 4px solid var(--sage-deep);
+  outline-offset: 4px;
+}
+
+/* Voice-over: player bar */
+#oc-chapter .oc-audio-bar {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 70;
+  padding: 0.75rem var(--pad) calc(0.75rem + env(safe-area-inset-bottom));
+  background: var(--paper);
+  border-top: 4px solid var(--sage-deep);
+  box-shadow: 0 -12px 36px rgba(20, 24, 22, 0.18);
+}
+
+/* Room below the footer so the bar never hides the last lines. */
+body:has(#oc-chapter .oc-audio-bar) {
+  padding-bottom: var(--oc-audio-bar-h, 8rem);
+}
+
+body:has(#oc-chapter .oc-audio-bar) .live-chat-dock {
+  bottom: var(--oc-audio-bar-h, 6rem);
+}
+
+#oc-chapter .oc-audio-bar-inner {
+  width: min(100%, 60rem);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+}
+
+#oc-chapter .oc-audio-now {
+  flex: 1 1 16rem;
+  min-width: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
+#oc-chapter .oc-audio-status {
+  font-size: var(--text-eyebrow);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sage-deep);
+}
+
+#oc-chapter .oc-audio-title {
+  overflow: hidden;
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  line-height: 1.3;
+  color: var(--ink-strong);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#oc-chapter .oc-audio-progress {
+  display: block;
+  height: 6px;
+  margin-top: 0.3rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sage-soft) 70%, var(--paper));
+  overflow: hidden;
+}
+
+#oc-chapter .oc-audio-progress > span {
+  display: block;
+  height: 100%;
+  background: var(--sage-deep);
+  transition: width 0.3s linear;
+}
+
+#oc-chapter .oc-audio-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#oc-chapter .oc-audio-controls > button {
+  display: grid;
+  place-items: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border: 2px solid color-mix(in srgb, var(--ink) 35%, var(--line));
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink-strong);
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#oc-chapter .oc-audio-controls > button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+#oc-chapter .oc-audio-controls > .oc-audio-main {
+  min-width: 3.5rem;
+  min-height: 3.5rem;
+  border-color: var(--sage-deep);
+  background: var(--sage-deep);
+  color: var(--paper);
+  font-size: 1.2rem;
+}
+
+#oc-chapter .oc-audio-rates {
+  display: inline-flex;
+  gap: 0.2rem;
+  padding: 0.2rem;
+  border: 1px solid color-mix(in srgb, var(--sage) 40%, var(--line));
+  border-radius: 999px;
+}
+
+#oc-chapter .oc-audio-rates button {
+  min-width: 2.75rem;
+  min-height: 2.5rem;
+  padding: 0 0.6rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-strong);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#oc-chapter .oc-audio-rates button[aria-pressed='true'] {
+  background: var(--sage-deep);
+  color: var(--paper);
+}
+
+#oc-chapter .oc-audio-continue {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  margin-top: 0.2rem;
+  padding: 0 1.1rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--sage-deep);
+  color: var(--paper);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#oc-chapter .oc-audio-continue:hover {
+  background: color-mix(in srgb, var(--sage-deep) 85%, var(--ink));
+}
+
+#oc-chapter .oc-audio-controls > .oc-audio-auto {
+  display: inline-flex;
+  gap: 0.5rem;
+  padding: 0 0.85rem 0 0.5rem;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+#oc-chapter .oc-audio-auto-track {
+  position: relative;
+  width: 2.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 30%, var(--line));
+  transition: background-color 0.2s ease;
+}
+
+#oc-chapter .oc-audio-auto-track::after {
+  content: '';
+  position: absolute;
+  top: 0.2rem;
+  left: 0.2rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: var(--paper);
+  transition: transform 0.2s ease;
+}
+
+#oc-chapter .oc-audio-auto[aria-checked='true'] .oc-audio-auto-track {
+  background: var(--sage-deep);
+}
+
+#oc-chapter .oc-audio-auto[aria-checked='true'] .oc-audio-auto-track::after {
+  transform: translateX(1rem);
+}
+
+/* Phones: one row of controls so the bar stays a small slice of the screen. */
+@media (max-width: 599px) {
+  #oc-chapter .oc-audio-bar {
+    padding-top: 0.5rem;
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+  }
+
+  #oc-chapter .oc-audio-bar-inner {
+    position: relative;
+    gap: 0.4rem;
+  }
+
+  #oc-chapter .oc-audio-now {
+    flex-basis: 100%;
+    min-height: 2.75rem;
+    align-content: center;
+    padding-right: 3.5rem;
+  }
+
+  #oc-chapter .oc-audio-controls > .oc-audio-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  /* Still announced by the aria-live region; the title already says what is playing. */
+  #oc-chapter .oc-audio-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  #oc-chapter .oc-audio-title {
+    font-size: 1.05rem;
+  }
+
+  #oc-chapter .oc-audio-controls {
+    flex: 1 1 100%;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  #oc-chapter .oc-audio-controls > .oc-audio-main {
+    min-width: 3rem;
+    min-height: 3rem;
+  }
+
+  #oc-chapter .oc-audio-rates button {
+    padding: 0 0.3rem;
+  }
+}
+
+/* Read-along: the line the voice is on, like a highlighter pen on paper. */
+#oc-chapter .is-audio-line {
+  border-radius: 0.3em;
+  background-color: #fff0b3;
+  box-shadow: 0 0 0 0.3em #fff0b3;
+  color: var(--ink-strong);
+}
+
+/* White text on the hero photo: underline instead of a pale wash. */
+#oc-chapter .oc-ch-hero .is-audio-line {
+  background-color: transparent;
+  box-shadow: none;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: #f5c35b;
+  text-decoration-thickness: 0.14em;
+  text-underline-offset: 0.22em;
+}
+
+@keyframes oc-audio-line-in {
+  from {
+    background-color: transparent;
+    box-shadow: 0 0 0 0.3em transparent;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #oc-chapter .is-audio-line {
+    animation: oc-audio-line-in 0.3s ease;
+  }
+}
+
+@keyframes oc-audio-bar-in {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+@keyframes oc-audio-bar-out {
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #oc-chapter .oc-audio-bar {
+    animation: oc-audio-bar-in 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  #oc-chapter .oc-audio-bar.is-closing {
+    animation: oc-audio-bar-out 0.26s ease-in forwards;
+    pointer-events: none;
+  }
+
+  body:has(#oc-chapter) .live-chat-dock {
+    transition: bottom 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #oc-chapter .oc-audio-progress > span,
+  #oc-chapter .oc-audio-auto-track,
+  #oc-chapter .oc-audio-auto-track::after {
+    transition: none;
   }
 }

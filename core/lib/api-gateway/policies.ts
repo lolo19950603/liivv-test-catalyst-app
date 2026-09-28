@@ -97,7 +97,8 @@ const rules: readonly Rule[] = [
       pathname.startsWith('/api/categories/') ||
       pathname.startsWith('/api/cart/') ||
       pathname.startsWith('/api/customer/') ||
-      pathname.startsWith('/api/archive/'),
+      pathname.startsWith('/api/archive/') ||
+      pathname === '/api/chapter-audio',
   },
 ];
 
