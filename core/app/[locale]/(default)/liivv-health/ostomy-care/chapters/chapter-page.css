@@ -3076,16 +3076,19 @@
 }
 
 #oc-chapter.is-journey .oc-ch-journal .oc-ch-journal-grid {
-  width: min(100%, 40rem);
+  width: min(100%, 48rem);
   margin-inline: auto;
 }
 
+/* A paragraph, not a pull quote: a readable measure, left-aligned on a rule. */
 #oc-chapter.is-journey .oc-ch-journal .oc-ch-note {
   border: none;
-  border-left: none;
+  border-left: 4px solid var(--sage-deep);
+  border-radius: 0;
   background: transparent;
-  padding: 0;
+  padding: 0.25rem 0 0.25rem clamp(1.1rem, 3vw, 1.75rem);
   box-shadow: none;
+  text-align: left;
 }
 
 #oc-chapter.is-journey .oc-ch-journal .oc-ch-note-label {
@@ -3097,12 +3100,11 @@
 
 #oc-chapter.is-journey .oc-ch-journal .oc-ch-note p {
   font-family: var(--font-heading);
-  font-size: clamp(1.45rem, 3.2vw, 2.1rem);
-  line-height: 1.35;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.3rem, 2.2vw, 1.65rem);
+  line-height: 1.45;
+  letter-spacing: -0.01em;
   color: var(--ink);
-  max-width: 28rem;
-  margin-inline: auto;
+  max-width: 44rem;
 }
 
 /*
