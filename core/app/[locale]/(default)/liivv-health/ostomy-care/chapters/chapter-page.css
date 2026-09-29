@@ -2376,35 +2376,25 @@
   position: relative;
 }
 
-#oc-chapter .oc-journey-path-curve {
+/* One straight rail: a grey track with the green progress growing down it. */
+#oc-chapter .oc-journey-path-rail {
   position: absolute;
-  left: 0.15rem;
+  left: calc(0.875rem - 2px);
   top: 0.15rem;
-  width: 2.15rem;
+  width: 4px;
   height: calc(100% - 0.5rem);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--taupe) 48%, var(--line));
   pointer-events: none;
-  overflow: visible;
-  z-index: 0;
+  z-index: 1;
 }
 
-#oc-chapter .oc-journey-path-curve-base,
-#oc-chapter .oc-journey-path-curve-fill {
-  stroke-width: 3.25px;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-}
-
-#oc-chapter .oc-journey-path-curve-base {
-  stroke: color-mix(in srgb, var(--taupe) 48%, var(--line));
-}
-
-#oc-chapter .oc-journey-path-curve-fill {
-  stroke: var(--sage-deep);
-  stroke-width: 4px;
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  transition: stroke-dashoffset 0.95s cubic-bezier(0.33, 1, 0.32, 1);
+#oc-chapter .oc-journey-path-rail-fill {
+  display: block;
+  width: 100%;
+  border-radius: inherit;
+  background: var(--sage-deep);
+  transition: height 0.95s cubic-bezier(0.33, 1, 0.32, 1);
 }
 
 /* Legacy straight track kept inert if markup remains elsewhere */
@@ -2421,7 +2411,6 @@
 
 #oc-chapter .oc-journey-path-list {
   position: relative;
-  z-index: 1;
   display: grid;
   gap: 0.85rem;
 }
@@ -2510,8 +2499,11 @@
 }
 
 #oc-chapter .oc-journey-path-band-meta {
-  display: block;
-  max-height: 1.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.5rem;
+  max-height: 4.5rem;
   font-size: var(--text-small);
   font-weight: 550;
   letter-spacing: 0.02em;
@@ -2553,12 +2545,16 @@
 }
 
 #oc-chapter .oc-journey-path-group a:not(.oc-journey-path-band).is-active {
+  position: relative;
+  z-index: 3;
   box-shadow:
     0 10px 28px rgba(49, 47, 47, 0.07),
     0 1px 0 color-mix(in srgb, var(--sage) 12%, transparent);
 }
 
 #oc-chapter .oc-journey-path-dot {
+  position: relative;
+  z-index: 2;
   width: 0.7rem;
   height: 0.7rem;
   margin-top: 0.32rem;
@@ -2622,6 +2618,10 @@
   line-height: 1.2;
 }
 
+#oc-chapter .oc-journey-path-band-meta .oc-journey-path-saved {
+  margin-top: 0;
+}
+
 #oc-chapter .oc-journey-path-saved::before {
   content: '';
   flex: 0 0 auto;
@@ -2632,11 +2632,11 @@
 }
 
 #oc-chapter .oc-journey-path-group a.is-saved .oc-journey-path-dot {
-  background: var(--sage-deep);
-  border-color: var(--sage-deep);
+  background: #e0a526;
+  border-color: #b7791f;
   box-shadow:
     0 0 0 3px var(--cream),
-    0 0 0 6px color-mix(in srgb, var(--sage) 55%, transparent);
+    0 0 0 6px color-mix(in srgb, #f2b93b 55%, transparent);
 }
 
 #oc-chapter .oc-journey-path-group a.is-saved:not(.is-active) .oc-journey-path-num {
@@ -2649,11 +2649,11 @@
 }
 
 #oc-chapter .oc-journey-band-dots a.is-saved {
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--sage) 45%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, #f2b93b 50%, transparent);
 }
 
 #oc-chapter .oc-journey-band-dots a.is-saved > span[aria-hidden] {
-  background: var(--sage-deep);
+  background: #e0a526;
   transform: scale(1.15);
 }
 
@@ -2990,7 +2990,7 @@
     transform: none;
   }
 
-  #oc-chapter .oc-journey-path-curve-fill {
+  #oc-chapter .oc-journey-path-rail-fill {
     transition: none;
   }
 
@@ -3426,15 +3426,20 @@
     box-shadow: 0 12px 30px color-mix(in srgb, var(--sage-deep) 35%, transparent);
   }
 
-  #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-group a.is-active .oc-journey-path-num,
+  #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-group a.is-active .oc-journey-path-num {
+    color: color-mix(in srgb, var(--paper) 82%, transparent);
+  }
+
   #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-group a.is-active .oc-journey-path-saved {
     color: #6b4208;
   }
 
   #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-group a.is-active .oc-journey-path-dot {
     background: var(--paper);
-    border-color: var(--paper);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--paper) 35%, transparent);
+    border-color: var(--sage-deep);
+    transform: none;
+    animation: none;
+    box-shadow: 0 0 0 2px var(--paper);
   }
 
   #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-dot {
@@ -3454,10 +3459,6 @@
 
   #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-saved {
     font-size: var(--text-small);
-  }
-
-  #oc-chapter.is-journey .oc-journey-hud .oc-journey-path-curve {
-    width: 2.5rem;
   }
 
   #oc-chapter.is-journey .oc-journey-band-dots {

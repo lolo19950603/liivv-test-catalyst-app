@@ -114,12 +114,6 @@ export function JourneyPath({ bands }: { bands: PathBand[] }) {
     () => stops.find((stop) => stop.number === active)?.bandId ?? bands[0]?.id ?? '',
     [active, bands, stops],
   );
-  const activeBandStops = useMemo(() => {
-    const band = bands.find((item) => item.id === activeBandId);
-
-    return band?.cards.map(({ card }) => card.number) ?? [];
-  }, [activeBandId, bands]);
-
   useEffect(() => {
     if (!trackProgress || !rememberStop || !active) return;
 
@@ -156,15 +150,43 @@ export function JourneyPath({ bands }: { bands: PathBand[] }) {
     return () => window.cancelAnimationFrame(frame);
   }, [active, activeBandId]);
 
-  if (!stops.length) return null;
+  const railRef = useRef<HTMLSpanElement>(null);
+  const railFillRef = useRef<HTMLSpanElement>(null);
 
-  const bandActiveIndex = Math.max(
-    0,
-    activeBandStops.findIndex((number) => number === active),
-  );
-  const fill =
-    activeBandStops.length <= 1 ? 1 : (bandActiveIndex + 1) / activeBandStops.length;
-  const dashOffset = 100 * (1 - fill);
+  /*
+   * The green rail ends on the current dot. Stops are not evenly spaced (wrapped
+   * titles, bookmark tags, band headings), so it is measured rather than a share.
+   */
+  useEffect(() => {
+    const rail = railRef.current;
+    const railFill = railFillRef.current;
+    const body = rail?.parentElement;
+
+    if (!rail || !railFill || !body) return;
+
+    const measure = () => {
+      const dot = body.querySelector<HTMLElement>('a[aria-current="true"] .oc-journey-path-dot');
+
+      if (!dot) return;
+
+      const railTop = rail.getBoundingClientRect().top;
+      const dotRect = dot.getBoundingClientRect();
+
+      railFill.style.height = `${Math.max(0, dotRect.top + dotRect.height / 2 - railTop)}px`;
+    };
+    const observer = new ResizeObserver(measure);
+
+    measure();
+    observer.observe(body);
+    body.addEventListener('transitionend', measure);
+
+    return () => {
+      observer.disconnect();
+      body.removeEventListener('transitionend', measure);
+    };
+  }, [active, activeBandId]);
+
+  if (!stops.length) return null;
 
   return (
     <nav aria-label={t('pathSpine')} className="oc-journey-path oc-journey-hud" ref={navRef}>
@@ -172,21 +194,9 @@ export function JourneyPath({ bands }: { bands: PathBand[] }) {
         <p className="oc-journey-path-heading">{t('pathHeading')}</p>
         <TextSizeControl />
         <div className="oc-journey-path-body">
-          <svg aria-hidden className="oc-journey-path-curve" preserveAspectRatio="none" viewBox="0 0 32 100">
-            <path
-              className="oc-journey-path-curve-base"
-              d="M16 0 C 26 7, 6 14, 16 22 C 26 30, 6 38, 16 46 C 26 54, 6 62, 16 70 C 26 78, 6 86, 16 93 C 20 96, 16 98, 16 100"
-              fill="none"
-              pathLength={100}
-            />
-            <path
-              className="oc-journey-path-curve-fill"
-              d="M16 0 C 26 7, 6 14, 16 22 C 26 30, 6 38, 16 46 C 26 54, 6 62, 16 70 C 26 78, 6 86, 16 93 C 20 96, 16 98, 16 100"
-              fill="none"
-              pathLength={100}
-              style={{ strokeDashoffset: dashOffset }}
-            />
-          </svg>
+          <span aria-hidden className="oc-journey-path-rail" ref={railRef}>
+            <span className="oc-journey-path-rail-fill" ref={railFillRef} />
+          </span>
           <ol className="oc-journey-path-list">
             {bands.map((band) => {
               const isOpen = band.id === activeBandId || bands.length === 1;
@@ -205,7 +215,12 @@ export function JourneyPath({ bands }: { bands: PathBand[] }) {
                     <span className="oc-journey-path-band-label">{band.label}</span>
                     <span className="oc-journey-path-band-meta">
                       {t('pathBandCount', { count: band.cards.length })}
-                      {bandSaved > 0 ? ` · ${t('pathBandBookmarked', { count: bandSaved })}` : ''}
+                      {bandSaved > 0 ? (
+                        <span className="oc-journey-path-saved">
+                          <span className="sr-only">, </span>
+                          {t('pathBandBookmarked', { count: bandSaved })}
+                        </span>
+                      ) : null}
                     </span>
                   </a>
                   <div className="oc-journey-path-panel" inert={!isOpen ? true : undefined}>
