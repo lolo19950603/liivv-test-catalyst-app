@@ -1576,7 +1576,7 @@
             "title": "Bases de la première semaine",
             "items": {
               "1": "La fatigue est normale — le repos fait partie du rétablissement",
-              "2": "Votre équipe de soins vous enverra à la maison avec une trousse de départ; apprendre demande de la pratique, pas la perfection",
+              "2": "Votre équipe de soins vous enverra à la maison avec une trousse de départ. La trousse SenSura une pièce vidable (plate, transparente) est la boîte Liivv pour une première semaine en une pièce — ouvrez-la ci-dessous et ajustez-la avant de passer à la caisse.",
               "3": "La confiance grandit avec chaque changement de poche que vous effectuez, et l’adaptation prend du temps. Si cela ne devient pas plus facile, parlez-en à votre NSWOC ou à votre médecin"
             }
           },
@@ -1692,7 +1692,7 @@
               "3": "Une trousse de rechange pour les sorties dès le premier jour"
             },
             "figure": {
-              "intro": "Partez de la liste que votre NSWOC vous a remise.",
+              "intro": "Partez de la liste que votre NSWOC vous a remise. La trousse SenSura une pièce, et les trousses vidables deux pièces New Image et SenSura Click, sont les boîtes à ouvrir pour ces systèmes.",
               "systemLegend": "Votre système",
               "starterHeading": "Fournitures de départ",
               "supplies": {
@@ -1740,7 +1740,7 @@
               "3": "Sous-vêtement ou doublure de rechange pour votre tranquillité d’esprit hors de la maison"
             },
             "figure": {
-              "goBagLink": "Les articles de la trousse de rechange sont dans Ma liste de fournitures, ci-dessus"
+              "goBagLink": "Les articles de la trousse de rechange sont dans Ma liste de fournitures, ci-dessus."
             }
           },
           "10": {
@@ -2142,7 +2142,7 @@
             "items": {
               "1": "Nettoyez avec de l’eau tiède ; évitez les huiles, parfums et lotions sous la barrière.",
               "2": "Séchez complètement — une peau sèche adhère mieux qu’une peau humide.",
-              "3": "Poudre, pâte, anneaux et lingettes sont des outils pour l’étanchéité et le confort — n’ajoutez que ce dont vous avez besoin."
+              "3": "La poudre, la pâte, les anneaux et les lingettes sont des outils pour l’étanchéité et le confort. N’ajoutez que ce dont vous avez besoin, et demandez à votre NSWOC lesquels conviennent à votre peau."
             }
           },
           "6": {
@@ -2860,7 +2860,7 @@
                 "heading": "Produits et peau",
                 "items": {
                   "1": "La stomie d’un enfant n’est pas une version plus petite de celle d’un adulte. Les enfants grandissent, donc les tailles changent constamment — reprendre les mesures est une routine, pas quelque chose d’occasionnel.",
-                  "2": "Les produits pédiatriques constituent une véritable catégorie plutôt qu’un simple reconditionnement de produits pour adultes : plus petits et plus souples, conçus pour un petit abdomen. C’est l’adhésif dont on exagère les mérites : il s’agit en grande partie du même matériau que dans les gammes pour adultes. Un bébé né à terme a une fonction de barrière cutanée très semblable à celle d’un adulte, donc la prudence supplémentaire au sujet de la peau fragile vise surtout les bébés nés prématurément ou de faible poids à la naissance, ainsi que les enfants malades.",
+                  "2": "Les produits pédiatriques constituent une véritable catégorie plutôt qu’un simple reconditionnement de produits pour adultes : plus petits et plus souples, conçus pour un petit abdomen. C’est l’adhésif dont on exagère les mérites : il s’agit en grande partie du même matériau que dans les gammes pour adultes. Un bébé né à terme a une fonction de barrière cutanée très semblable à celle d’un adulte, donc la prudence supplémentaire au sujet de la peau fragile vise surtout les bébés nés prématurément ou de faible poids à la naissance, ainsi que les enfants malades. La trousse Pouchkins deux pièces (plate, 44 mm verte) est la boîte Liivv pour les fournitures deux pièces d’un enfant — ouvrez-la ci-dessous et ajustez-la avec l’infirmière ou l’infirmier en stomothérapie de votre enfant avant de passer à la caisse.",
                   "3": "Lorsque la poche se soulève constamment, la solution est généralement de la changer plus souvent plutôt que de la faire coller plus fort — les barrières cutanées pédiatriques sont plus minces, donc elles résistent moins longtemps au débit. Les dissolvants d’adhésif, les films protecteurs cutanés, la colle cutanée et le benjoin sont généralement évités chez les nourrissons et les jeunes enfants, car une plus grande partie de tout produit chimique est absorbée par leur peau et une adhérence plus forte peut la déchirer au retrait. Un scellement qui cède à répétition, c’est un appel à faire à l’infirmière ou à l’infirmier en stomothérapie de votre enfant, pas une raison d’acheter des produits plus forts."
                 }
               },
@@ -3243,7 +3243,7 @@
           "primaryCare": "Demandez à votre médecin"
         },
         "productsLabel": "Produits pour cela",
-        "productsNote": "Liivv vend ces produits. Ils sont ici parce que cette section concerne l’équipement — rien sur cette page ne constitue une recommandation d’achat chez nous.",
+        "productsNote": "Ce sont des trousses Liivv pour cette partie de la routine. Ouvrez-en une et ajustez-la avant de passer à la caisse.",
         "groups": {
           "beforeSurgery": "Avant la chirurgie",
           "afterSurgery": "Après la chirurgie",
@@ -3375,8 +3375,10 @@
             "notSure": "Je ne sais pas encore"
           },
           "kits": {
-            "one": "Trousse de départ une pièce",
-            "two": "Trousse de départ deux pièces",
+            "one": "SenSura une pièce, plate, transparente",
+            "twoNi57": "New Image vidable, 57 mm rouge",
+            "twoNi70": "New Image vidable, 70 mm bleu",
+            "twoClick": "SenSura Click vidable, 50 mm",
             "goBag": "Trousse de rechange"
           }
         },

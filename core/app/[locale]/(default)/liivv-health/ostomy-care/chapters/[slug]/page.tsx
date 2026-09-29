@@ -154,10 +154,10 @@ export default async function Page({ params }: Props) {
    *
    * Which chapter carries the list is read from the meta that declares the
    * figure rather than written out again as a slug, so moving the card can
-   * never leave the list rendering with its shop section quietly absent. And
-   * while the cart allowlist is empty there is nothing to ask BigCommerce for:
-   * the promise is withheld, and SupplyList then drops the shop disclosure
-   * instead of opening it on an empty list.
+   * never leave the list rendering with its shop section quietly absent. While
+   * the cart allowlist is empty there is nothing to ask BigCommerce for, so
+   * the promise is withheld. The starter kit links still open the shop
+   * disclosure on their own.
    */
   const carriesSupplyList = Boolean(
     CHAPTER_META.find((meta) => meta.slug === slug)?.categories.some((category) =>

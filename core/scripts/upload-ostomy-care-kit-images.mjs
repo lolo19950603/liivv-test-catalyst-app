@@ -86,6 +86,11 @@ async function uploadImage(productId, filePath, filename) {
 }
 
 async function main() {
+  console.error(
+    'Refusing to run: products 8041-8048 were deleted on 2026-09-29. These image files belong to that set.',
+  );
+  process.exit(1);
+
   const results = [];
   const errors = [];
 

@@ -424,6 +424,18 @@ const FR_AWAITING_REVIEW = new Set([
   'ui.chapter.opensOnTheirSite',
   'ui.chapter.ask.peer',
   'ui.chapter.roleNames.peer',
+  /*
+   * Chapter kit lines. These sentences now name a Liivv kit, and the French
+   * follows the English on the card itself, with no review gate in front of
+   * it. The supply-list intro and the go-bag link stay behind the supplyList
+   * gate, so they are not flagged here.
+   */
+  'ui.chapter.productsNote',
+  'chapters.get-to-know-your-stoma.categories.5.items.3',
+  'chapters.get-to-know-your-stoma.categories.15.sections.2.note',
+  'chapters.everyday-liivving.categories.6.note',
+  'chapters.everyday-liivving.categories.8.sections.2.note',
+  'chapters.this-might-be-you.categories.1.sections.2.items.2',
 ]);
 
 /*
@@ -1244,7 +1256,7 @@ function supplyRowNote(item, index, group, num, groupName) {
 
 function supplyListNotes(figure, num, locale) {
   const kits = SUPPLY_KIT_LINKS.length
-    ? SUPPLY_KIT_LINKS.map((kit) => `${kit.system} → ${productLabel(kit.productId)} <${kit.path}>`)
+    ? SUPPLY_KIT_LINKS.map((kit) => `${kit.system} → ${productLabel(kit.productId)} (\`${kit.path}\`)`)
         .join('; ')
     : 'none (K1 pending)';
 
@@ -1504,7 +1516,7 @@ function figureReviewNotes(structure, num, locale, card) {
     if (figure.kind === 'goBag') {
       lines.push(
         '',
-        `*The shop band on this card is one same-page link ${ref(`${num}.fig.goBagLink`)} to the supply list on card 8, which already holds the go-bag rows. There is one list, so a reader never keeps two.*`,
+        `*The shop band on this card is one same-page link ${ref(`${num}.fig.goBagLink`)} to the supply list on card 8, which already holds the go-bag rows. There is no go-bag kit: the catalogue has no disposal bags, dry wipe, or liner. There is one list, so a reader never keeps two.*`,
       );
     }
   });
@@ -1952,7 +1964,7 @@ function writeShared(locale) {
     ],
     ['chapter.supplyList', 'My supply list — labels and controls', 'supplyList'],
     ['chapter.supplyList.systems', 'My supply list — system choices', 'supplyList'],
-    ['chapter.supplyList.kits', 'My supply list — kit links (none listed yet)', 'supplyList'],
+    ['chapter.supplyList.kits', 'My supply list — kit links', 'supplyList'],
     ['chapter.recoveryMap', 'Recovery map — labels', 'recoveryMap'],
     ['chapter.recoveryMap.types', 'Recovery map — ostomy types', 'recoveryMap'],
     ['chapter.recoveryMap.lanes', 'Recovery map — lane labels', 'recoveryMap'],
@@ -1988,6 +2000,19 @@ function writeShared(locale) {
       out(`- ${ref(`${ns}.${key}`)} — ${w.text(`ui.${ns}.${key}`)}`);
     }
 
+    out('');
+  }
+
+  const sharedReviews = [...RE_REVIEWS_PENDING].filter(([path]) => path.startsWith('ui.'));
+
+  if (sharedReviews.length) {
+    out('## Corrections waiting on re-review', '');
+    out(
+      `*Marked ${RE_REVIEW_MARK} above. These shared lines were corrected in the source and are live now; they need the RN and the NSWOC to read them again and either keep or reword them.*`,
+      '',
+    );
+
+    sharedReviews.forEach(([path, was]) => out(`- \`${path}\` — ${was}`));
     out('');
   }
 
@@ -2128,7 +2153,7 @@ const LANDING_SECTIONS = [
   ['hero', 'Hero', 'The word after the heading rotates through the five in `hero.words`, one every 2.6 seconds, and stops moving for a reader who has asked for reduced motion. `hero.kitsCta` is a kit surface.'],
   ['trust', 'Trust strip', 'Four claims, scrolling. Each is a promise about the service, so each is a claim someone has to stand behind.'],
   ['ways', 'Ways in', 'Five doors down the page, numbered 01–05 by rendered position rather than by key — the "Curated kits" one is a kit surface, and a list that jumped from 01 to 03 would be a bug.'],
-  ['kits', 'Curated kits and the carousel', 'A kit surface in full: with no kit listed, none of this renders.'],
+  ['kits', 'Curated kits and the carousel', 'Renders the curated kits in the ostomy catalogue. All eight are shown.'],
   ['shop', 'The shelf', 'Live catalogue, filtered into rooms. "Curated kits" is a kit surface; the other five rooms render.'],
   ['subscribe', 'Subscriptions band', 'The shared subscribe band, with this page\'s own words. The demo inside it is a shared component and carries its own English — see the note under this table.'],
   ['chapters', 'Life chapters', 'The four chapter cards. Their titles and blurbs are the chapters\' own, reviewed on their own pages, so they are not repeated here.'],
@@ -3440,12 +3465,10 @@ function anatomyProblems() {
 /*
  * Curated kits placed by the microsite.
  *
- * Every Ostomy Care surface filters the catalogue through OSTOMY_LISTED_KIT_IDS
- * (get-oc-catalog.ts), and that list is empty today. So a kit id left in a card
- * band, in the supply list's kit links, or in the one-click add allowlist would
- * render nothing on the page while this pack told a reviewer it was there —
- * which is exactly the drift these documents exist to prevent. It is an error,
- * not a warning: the fix is to list the kit, or to stop placing it.
+ * A kit id in a card band, in the supply list's kit links, or in the one-click
+ * add allowlist has to be in OSTOMY_LISTED_KIT_IDS. Otherwise the page would
+ * render nothing while this pack told a reviewer the kit was there. It is an
+ * error, not a warning: the fix is to list the kit, or to stop placing it.
  */
 function kitProblems() {
   const listed = new Set(OSTOMY_LISTED_KIT_IDS);
@@ -3652,17 +3675,16 @@ function reReviewFlagProblems() {
           `RE_REVIEW_NOTES: '${path}' is not a correction — it is unchanged from content-review-baseline.en.json, or not in it at all`,
       ),
     /*
-     * "Corrections waiting on re-review" is printed per chapter file, so a
-     * correction outside `chapters.<slug>.` — a shared UI string, say — would be
-     * marked ✎ in the text and then listed in no file at all. That is the exact
-     * failure this whole mechanism replaced, so it is a check rather than a
-     * thing to remember.
+     * "Corrections waiting on re-review" is printed per chapter file, and for
+     * `ui.*` in 00-shared.md. A correction in neither place would be marked ✎
+     * and then listed in no file at all.
      */
     ...[...RE_REVIEWS_PENDING.keys()]
       .filter((path) => !CHAPTER_META.some((meta) => path.startsWith(`chapters.${meta.slug}.`)))
+      .filter((path) => !path.startsWith('ui.'))
       .map(
         (path) =>
-          `RE_REVIEWS_PENDING: '${path}' is not under a chapter, so it is marked ✎ but listed in no file`,
+          `RE_REVIEWS_PENDING: '${path}' is not under a chapter or ui.*, so it is marked ✎ but listed in no file`,
       ),
   ];
 }
@@ -4074,7 +4096,7 @@ const readme = [
   '',
   '- Product names, descriptions and prices, which come from BigCommerce.',
   '- The site header and navigation, managed separately.',
-  `- Kit contents. None of the ${OSTOMY_KIT_IDS.length} curated ostomy kits is shown on the landing page, the Liivv Health hub, any chapter, or the Shop Ostomy Care shelf at /liivv-health/ostomy-care/shop-ostomy-care, so no kit is described in these files. Each contradicts the guidance it would sit beside — a starter kit whose barrier and pouch do not couple, a go-bag of moisturising wipes, a pediatric kit carrying convex barrier rings and a lotion — and ${OSTOMY_WITHHELD_KIT_IDS.length} are held further for their names, three of them also for carrying drugs or natural health products. Two things the site cannot withhold from here, and both are owner steps in BigCommerce: the kits' own product pages stay live, and that shelf's facet counts, total and pagination still count the filtered kits. Removing 8041–8048 from category 1150, or setting is_visible = false, closes both. The rebuild that would make any of these kits safe to list is written as a draft in \`core/scripts/create-ostomy-care-kits.mjs\` — explicit components per SKU, a locked variant for every component sold in more than one size, and descriptions with no outcome claims — and it is pending owner approval. It has not been run: \`OWNER_CONFIRMED\` in that file is false, and while it is, the script refuses every request that is not a read. No kit in BigCommerce has been changed.`,
+  `- Kit contents. The eight matched-system kits (8061–8068) are shown on the Ostomy Care landing, the Liivv Health hub, the Shop Ostomy Care shelf, and search. Inside the chapters, First Week Basics shows 8065 (SenSura one-piece) and Children shows 8068 (Pouchkins). The Chapter 1 supply list links 8065 after one-piece and 8061, 8062, and 8064 after two-piece. Urostomy and closed kits stay on the shop shelf. Kits 8041–8048 were deleted on 2026-09-29. The priced table was written on 2026-09-29.`,
   '',
   '## Written, but not on a page yet',
   '',

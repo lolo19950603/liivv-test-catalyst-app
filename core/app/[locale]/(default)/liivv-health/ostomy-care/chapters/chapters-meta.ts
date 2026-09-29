@@ -721,6 +721,8 @@ export const CHAPTER_META: ChapterMeta[] = [
         image: `${IMG}/chapter-new.png`,
         group: 'afterSurgery',
         ask: 'nswoc',
+        // Card 6 "First Week Basics". The band is the SenSura one-piece kit (8065).
+        products: [8065],
       },
       {
         image: `${IMG}/door-care.png`,
@@ -1238,10 +1240,8 @@ export const CHAPTER_META: ChapterMeta[] = [
         image: `${IMG}/door-care.png`,
         group: 'theBasics',
         ask: 'nswoc',
-        // Card 5 "Skin Comfort". No band. Stomahesive powder came off this card
-        // (it is for weepy, broken skin, not for comfort), and what was left was
-        // two items from a single manufacturer beside advice about skin, so the
-        // whole band goes rather than a one-maker shelf.
+        // Card 5 "Skin Comfort". No band. Powder, paste, rings, and wipes are
+        // not part of a matched pouching system.
       },
       {
         image: `${IMG}/door-chapters.png`,
@@ -1317,6 +1317,8 @@ export const CHAPTER_META: ChapterMeta[] = [
         image: `${IMG}/door-care.png`,
         group: 'whenSomethingIsNotRight',
         ask: 'nswoc',
+        // Card 15 "Leaks and short wear time". No band. Convexity is an
+        // assessment, and this card is a symptom card.
       },
       {
         image: `${IMG}/door-chapters.png`,
@@ -1363,9 +1365,8 @@ export const CHAPTER_META: ChapterMeta[] = [
       {
         image: `${IMG}/door-shop.png`,
         group: 'bodyAndLife',
-        // No band. This card used to place kit #8046, whose wipes are
-        // moisturising — the opposite of what the card asks for. Every curated
-        // kit is withheld from ostomy surfaces until K1 rebuilds it (oc-ids.ts).
+        // No band. The catalogue has no disposal bags, dry wipe, or liner, so
+        // there is no go-bag kit to place here.
       },
       {
         image: `${IMG}/door-chapters.png`,
@@ -1521,6 +1522,7 @@ export const CHAPTER_META: ChapterMeta[] = [
         image: `${IMG}/care-chat-desk.png`,
         group: 'eatingAgain',
         ask: 'nswoc',
+        // Card 6 "Fluid and salt". No band. Rehydration is not a pouching kit.
       },
       {
         image: `${IMG}/care-chat-moment.png`,
@@ -1531,6 +1533,7 @@ export const CHAPTER_META: ChapterMeta[] = [
         image: `${IMG}/chapter-everyday.png`,
         group: 'everydayEffects',
         ask: 'dietitian',
+        // Card 8 "Thicker or looser output". No band. Food patterns are not a kit.
       },
       {
         image: `${IMG}/care-chat-main.png`,
@@ -1549,7 +1552,8 @@ export const CHAPTER_META: ChapterMeta[] = [
       {
         image: `${IMG}/chapter-everyday.png`,
         group: 'gettingAroundCanada',
-        // No band. Same kit, same reason as Chapter 02 card 22 (oc-ids.ts).
+        // No band. The catalogue has no disposal bags, dry wipe, or liner, so
+        // there is no go-bag kit to place here.
       },
       {
         image: `${IMG}/care-chat-desk.png`,
@@ -1653,6 +1657,9 @@ export const CHAPTER_META: ChapterMeta[] = [
         urgentContent: true,
         group: 'growingUp',
         ask: 'team',
+        // Card 1 "Children". The band is the Pouchkins two-piece kit (8068). The
+        // SickKids links stay on the referral band, not beside this kit.
+        products: [8068],
       },
       {
         image: `${IMG}/door-chapters.png`,

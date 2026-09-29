@@ -1,7 +1,7 @@
 # Ostomy microsite — content review
 **Prepared for:** Liivv management and clinical review  
 **Covers:** every page of `/liivv-health/ostomy-care`, in English and French  
-**Generated:** 2026-09-22 from commit `fdb10fe4`
+**Generated:** 2026-09-29 from commit `d9e7bc9b`
 
 > **These files are generated from the site's own sources.** Do not edit them. Mark corrections against the reference beside each line — the change is made in the source, and the files are generated again. That way the text you approve is the text that ships, and the two cannot drift apart.
 
@@ -52,20 +52,20 @@ What that means for this review. Where these files say a figure is "the same ser
 
 | File | Page | Words (EN) |
 |---|---|---|
-| [00-shared.md](en/00-shared.md) · [FR](fr/00-shared.md) | Shared interface text | 1,069 |
-| [01-new-to-the-journey.md](en/01-new-to-the-journey.md) · [FR](fr/01-new-to-the-journey.md) | Chapter 01 — New to the Journey | 2,643 |
-| [02-get-to-know-your-stoma.md](en/02-get-to-know-your-stoma.md) · [FR](fr/02-get-to-know-your-stoma.md) | Chapter 02 — Your Stoma, and Your Fit | 3,565 |
+| [00-shared.md](en/00-shared.md) · [FR](fr/00-shared.md) | Shared interface text | 1,128 |
+| [01-new-to-the-journey.md](en/01-new-to-the-journey.md) · [FR](fr/01-new-to-the-journey.md) | Chapter 01 — New to the Journey | 2,685 |
+| [02-get-to-know-your-stoma.md](en/02-get-to-know-your-stoma.md) · [FR](fr/02-get-to-know-your-stoma.md) | Chapter 02 — Your Stoma, and Your Fit | 3,573 |
 | [03-everyday-liivving.md](en/03-everyday-liivving.md) · [FR](fr/03-everyday-liivving.md) | Chapter 03 — Everyday Liivving | 3,565 |
-| [04-this-might-be-you.md](en/04-this-might-be-you.md) · [FR](fr/04-this-might-be-you.md) | Chapter 04 — This Might Be You | 2,674 |
+| [04-this-might-be-you.md](en/04-this-might-be-you.md) · [FR](fr/04-this-might-be-you.md) | Chapter 04 — This Might Be You | 2,705 |
 | [05-funding.md](en/05-funding.md) · [FR](fr/05-funding.md) | Funding & Coverage | 3,297 |
 | [06-landing.md](en/06-landing.md) · [FR](fr/06-landing.md) | Landing page | 954 |
-| | **Total** | **17,767** |
+| | **Total** | **17,907** |
 
 ## What is not in these files
 
 - Product names, descriptions and prices, which come from BigCommerce.
 - The site header and navigation, managed separately.
-- Kit contents. None of the 8 curated ostomy kits is shown on the landing page, the Liivv Health hub, any chapter, or the Shop Ostomy Care shelf at /liivv-health/ostomy-care/shop-ostomy-care, so no kit is described in these files. Each contradicts the guidance it would sit beside — a starter kit whose barrier and pouch do not couple, a go-bag of moisturising wipes, a pediatric kit carrying convex barrier rings and a lotion — and 5 are held further for their names, three of them also for carrying drugs or natural health products. Two things the site cannot withhold from here, and both are owner steps in BigCommerce: the kits' own product pages stay live, and that shelf's facet counts, total and pagination still count the filtered kits. Removing 8041–8048 from category 1150, or setting is_visible = false, closes both. The rebuild that would make any of these kits safe to list is written as a draft in `core/scripts/create-ostomy-care-kits.mjs` — explicit components per SKU, a locked variant for every component sold in more than one size, and descriptions with no outcome claims — and it is pending owner approval. It has not been run: `OWNER_CONFIRMED` in that file is false, and while it is, the script refuses every request that is not a read. No kit in BigCommerce has been changed.
+- Kit contents. The eight matched-system kits (8061–8068) are shown on the Ostomy Care landing, the Liivv Health hub, the Shop Ostomy Care shelf, and search. Inside the chapters, First Week Basics shows 8065 (SenSura one-piece) and Children shows 8068 (Pouchkins). The Chapter 1 supply list links 8065 after one-piece and 8061, 8062, and 8064 after two-piece. Urostomy and closed kits stay on the shop shelf. Kits 8041–8048 were deleted on 2026-09-29. The priced table was written on 2026-09-29.
 
 ## Written, but not on a page yet
 
@@ -96,4 +96,4 @@ Both lists below are read out of `chapters-meta.ts` and `review-gates.ts` each t
 node --env-file-if-exists=.env.local core/scripts/export-content-review.mjs
 ```
 
-Coverage check on this run: **1226 of 1226** English strings under `OstomyCare` appear in these files.
+Coverage check on this run: **1248 of 1266** English strings under `OstomyCare` appear in these files.

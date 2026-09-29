@@ -410,8 +410,8 @@ export function OstomyCarePage({ catalog, doors }: { catalog?: OcCatalog; doors?
     null;
   const shopProducts = catalog?.products ?? [];
   /*
-   * Kits are allowlisted in oc-ids.ts and the list is empty today, so this page
-   * has to read well with none. Everything that points at #build-your-kit goes
+   * Kits are allowlisted in oc-ids.ts. With none listed, this page has to read
+   * well anyway. Everything that points at #build-your-kit goes
    * with the section: the door in "What would help today?", the hero's second
    * button, the "Curated kits" shop room and the closing link. A heading with
    * nothing under it, or a link to an anchor that is not on the page, would be

@@ -9,10 +9,7 @@ import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { createCompareLoader } from '@/vibes/soul/primitives/compare-drawer/loader';
 import { ProductsListSection } from '@/vibes/soul/sections/products-list-section';
 import { getFilterParsers } from '@/vibes/soul/sections/products-list-section/filter-parsers';
-import {
-  isOstomyCategoryId,
-  isOstomyKit,
-} from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
+import { isOstomyCategoryId } from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
 import { getSessionCustomerAccessToken } from '~/auth';
 import { DenyAdSignals } from '~/components/analytics/deny-ad-signals';
 import { facetsTransformer } from '~/data-transformers/facets-transformer';
@@ -175,7 +172,7 @@ export default async function Category(props: Props) {
     );
     const parsedSearchParams = loadSearchParams?.(searchParams) ?? {};
 
-    const search = await fetchFacetedSearch(
+    return fetchFacetedSearch(
       {
         ...searchParams,
         ...parsedSearchParams,
@@ -184,40 +181,6 @@ export default async function Category(props: Props) {
       currencyCode,
       customerAccessToken,
     );
-
-    /*
-     * =========================================================================
-     * WITHHELD OSTOMY KITS ARE NOT SHOWN ON AN OSTOMY SHELF EITHER
-     * =========================================================================
-     * Every curated ostomy kit is held back from Ostomy Care surfaces until K1
-     * rebuilds it (oc-ids.ts): three carry drugs or natural health products,
-     * and several make claims — "Infection Prevention", "Dehydration Rescue",
-     * "Leak-Free" — that nothing on file substantiates.
-     *
-     * getOcCatalog gates the landing, the hub and the chapter bands, but this
-     * route reads BigCommerce directly, and /liivv-health/ostomy-care/shop-
-     * ostomy-care (category 1150) is where every "Open full shop" and "Ostomy
-     * Essentials" link on the microsite lands. Without this filter the withhold
-     * was one click deep.
-     *
-     * Residual, recorded rather than papered over: the facet counts, the total
-     * and the pagination below all come from BigCommerce and still count the
-     * kits, so a filtered page can show fewer cards than its own count claims.
-     * Closing that is the owner's step — take 8041–8048 out of category 1150,
-     * or set is_visible = false — and then this filter simply never matches.
-     * =========================================================================
-     */
-    if (!isOstomyCategoryId(categoryId)) {
-      return search;
-    }
-
-    const items = search.products.items.filter((product) => !isOstomyKit(product.entityId));
-
-    if (items.length === search.products.items.length) {
-      return search;
-    }
-
-    return { ...search, products: { ...search.products, items } };
   });
 
   /*

@@ -15,8 +15,6 @@
  * this file imports it. chapters-meta.ts must never import this file, or a
  * change to what Liivv stocks could change what the list says.
  *
- * Everything below is empty, and that is the honest state today:
- *
  *   SUPPLY_COLLECTIONS   No criterion category exists in the catalogue yet, so
  *                        no "Liivv sells some options for this" link renders
  *                        anywhere. A criterion earns an entry only once a real
@@ -30,8 +28,11 @@
  *                        add for a product with no options to choose and stock
  *                        on hand; no disposal bags are stocked today.
  *
- *   SUPPLY_KIT_LINKS     The three starter and go-bag kits wait on the K1
- *                        rebuild, so the list links to none of them.
+ *   SUPPLY_KIT_LINKS     The SenSura one-piece kit, and the three drainable
+ *                        two-piece kits (New Image 57 mm, New Image 70 mm,
+ *                        SenSura Click 50 mm). A kit shows only after the
+ *                        reader picks that system. Urostomy, closed, and
+ *                        Pouchkins stay on the shop shelf.
  * =============================================================================
  */
 
@@ -60,12 +61,39 @@ export const SUPPLY_COLLECTIONS: Record<CriterionKey, SupplyCollection | null> =
 export const SUPPLY_CART_PRODUCTS: Partial<Record<CriterionKey, number[]>> = {};
 
 export interface SupplyKitLink {
-  system: 'one' | 'two' | 'goBag';
+  system: 'one' | 'two';
+  /** Message key under ui.chapter.supplyList.kits. */
+  label: 'one' | 'twoNi57' | 'twoNi70' | 'twoClick';
   productId: number;
   path: string;
 }
 
-export const SUPPLY_KIT_LINKS: SupplyKitLink[] = [];
+export const SUPPLY_KIT_LINKS: SupplyKitLink[] = [
+  {
+    system: 'one',
+    label: 'one',
+    productId: 8065,
+    path: '/sensura-one-piece-drainable-kit-flat-transparent/',
+  },
+  {
+    system: 'two',
+    label: 'twoNi57',
+    productId: 8061,
+    path: '/new-image-two-piece-drainable-kit-flat-57-mm-red/',
+  },
+  {
+    system: 'two',
+    label: 'twoNi70',
+    productId: 8062,
+    path: '/new-image-two-piece-drainable-kit-flat-70-mm-blue/',
+  },
+  {
+    system: 'two',
+    label: 'twoClick',
+    productId: 8064,
+    path: '/sensura-click-two-piece-drainable-kit-flat-50-mm/',
+  },
+];
 
 /*
  * The only product ids the supply list's server action will ever add. Derived

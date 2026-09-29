@@ -1584,7 +1584,7 @@
             "title": "First Week Basics",
             "items": {
               "1": "Fatigue is normal — rest is part of recovery",
-              "2": "Your care team will send you home with a starter setup; learning takes practice, not perfection",
+              "2": "Your care team will send you home with a starter setup. The SenSura One-Piece Drainable Kit (Flat, Transparent) is the Liivv box for a one-piece first week — open it below and adjust it before checkout.",
               "3": "Confidence grows with each change you manage, and adjusting takes time. If it is not getting easier, tell your NSWOC or doctor"
             }
           },
@@ -1700,7 +1700,7 @@
               "3": "A go-bag for outings from day one"
             },
             "figure": {
-              "intro": "Start from the list your NSWOC gave you.",
+              "intro": "Start from the list your NSWOC gave you. The SenSura one-piece kit, and the New Image and SenSura Click drainable two-piece kits, are the boxes to open for those systems.",
               "systemLegend": "Your system",
               "starterHeading": "Starter supplies",
               "supplies": {
@@ -1748,7 +1748,7 @@
               "3": "A spare underwear or liner for peace of mind away from home"
             },
             "figure": {
-              "goBagLink": "The go-bag items are on My supply list, above"
+              "goBagLink": "The go-bag items are on My supply list, above."
             }
           },
           "10": {
@@ -2151,7 +2151,7 @@
             "items": {
               "1": "Clean with warm water; avoid oils, fragrances, and lotion under the barrier",
               "2": "Pat dry completely — dry skin seals better than damp skin",
-              "3": "Powder, paste, rings, and wipes are tools for seal and comfort — add only what you need"
+              "3": "Powder, paste, rings, and wipes are tools for seal and comfort. Add only what you need, and ask your NSWOC which ones fit your skin."
             }
           },
           "6": {
@@ -2868,7 +2868,7 @@
                 "heading": "Products and skin",
                 "items": {
                   "1": "A child’s stoma is not a smaller version of an adult one. They grow, so sizes change constantly — re-measuring is routine rather than occasional",
-                  "2": "Pediatric products are a real category rather than repackaged adult stock, shaped smaller and more flexibly for a small abdomen. The adhesive is the part that gets overstated: it is largely the same material as the adult ranges. A baby born at term starts with skin barrier function much like an adult’s, so the extra caution about fragile skin is really for babies born early or at low birth weight, and children who are unwell",
+                  "2": "Pediatric products are a real category rather than repackaged adult stock, shaped smaller and more flexibly for a small abdomen. The adhesive is the part that gets overstated: it is largely the same material as the adult ranges. A baby born at term starts with skin barrier function much like an adult’s, so the extra caution about fragile skin is really for babies born early or at low birth weight, and children who are unwell. The Pouchkins Two-Piece Kit (Flat, 44 mm Green) is the Liivv box for a child’s two-piece supplies — open it below and adjust it with your child’s ostomy nurse before checkout.",
                   "3": "When a pouch keeps lifting, the answer is usually to change it more often rather than to make it stick harder — pediatric barriers are thinner, so they hold up to output for less time. Adhesive removers, barrier films, skin cement and benzoin are generally avoided in infants and young children, because more of any chemical is absorbed through their skin and a stronger bond can tear it on removal. A seal that keeps failing is a call to your child’s ostomy nurse, not a trip for stronger products"
                 }
               },
@@ -3244,7 +3244,7 @@
           "primaryCare": "Ask your doctor"
         },
         "productsLabel": "Products for this",
-        "productsNote": "Liivv sells these. They are here because this section is about equipment — nothing on this page is a recommendation to buy from us.",
+        "productsNote": "These are Liivv kits for this part of the routine. Open one and adjust it before checkout.",
         "groups": {
           "beforeSurgery": "Before surgery",
           "afterSurgery": "After surgery",
@@ -3375,8 +3375,10 @@
             "notSure": "Not sure yet"
           },
           "kits": {
-            "one": "One-piece starter",
-            "two": "Two-piece starter",
+            "one": "SenSura one-piece, flat, transparent",
+            "twoNi57": "New Image drainable, 57 mm red",
+            "twoNi70": "New Image drainable, 70 mm blue",
+            "twoClick": "SenSura Click drainable, 50 mm",
             "goBag": "Go-bag"
           }
         },

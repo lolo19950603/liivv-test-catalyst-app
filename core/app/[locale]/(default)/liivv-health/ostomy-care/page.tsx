@@ -35,11 +35,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: 'Ostomy Care & Everyday "Liivving" | Liivv',
-    // No "curated kits" while every kit is withheld from ostomy surfaces
-    // (oc-ids.ts). A description is a promise about what the page holds, and
-    // the page holds none. Put it back with the allowlist.
     description:
-      'Ostomy supplies, everyday living support, and kind guidance — pouches, barriers, and Ontario pharmacist chat.',
+      'Ostomy supplies, starter kits, everyday living support, and kind guidance — pouches, barriers, and Ontario pharmacist chat.',
     // Still suppressed, unlike the chapters and the funding section. The chapter
     // cards on this page are translated, but the landing's own copy — hero, kits,
     // shop, subscribe, FAQ — is still hardcoded English in ostomy-care-page.tsx.

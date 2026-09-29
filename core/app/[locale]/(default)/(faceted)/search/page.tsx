@@ -7,7 +7,6 @@ import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { createCompareLoader } from '@/vibes/soul/primitives/compare-drawer/loader';
 import { ProductsListSection } from '@/vibes/soul/sections/products-list-section';
 import { getFilterParsers } from '@/vibes/soul/sections/products-list-section/filter-parsers';
-import { isOstomyKit } from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
 import { getSessionCustomerAccessToken } from '~/auth';
 import { DenyAdSignals } from '~/components/analytics/deny-ad-signals';
 import { facetsTransformer } from '~/data-transformers/facets-transformer';
@@ -103,7 +102,7 @@ export default async function Search(props: Props) {
     );
     const parsedSearchParams = loadSearchParams?.(searchParams) ?? {};
 
-    const search = await fetchFacetedSearch(
+    return fetchFacetedSearch(
       {
         ...searchParams,
         ...parsedSearchParams,
@@ -111,40 +110,6 @@ export default async function Search(props: Props) {
       currencyCode,
       customerAccessToken,
     );
-
-    /*
-     * =======================================================================
-     * THE CURATED OSTOMY KITS ARE WITHHELD FROM SEARCH TOO
-     * =======================================================================
-     * Same withhold as the ostomy category shelf (`isOstomyKit` in
-     * `category/[slug]/page.tsx`), for the same reason: under D11 every kit in
-     * 8041–8048 is off every Ostomy Care surface until the K1 rebuilds land,
-     * and five of them are withheld further for names that make a claim — "Skin
-     * Shield (Peristomal Skin Health & Infection Prevention)", "Stay Hydrated
-     * (High-Output & Dehydration Rescue)". A store search for "ostomy" listed
-     * all eight as full product cards, with those exact names, which is the
-     * thing the withhold exists to prevent.
-     *
-     * Unconditional here, unlike the category route. A result set has no
-     * category to test — the reader's own term is the only context — so there
-     * is no ostomy/not-ostomy question to ask, and a kit that must not be shown
-     * on an ostomy shelf must not be shown in a search either.
-     *
-     * Residual, recorded rather than papered over, exactly as on the category
-     * route: the facet counts, the total and the pagination come from
-     * BigCommerce and still count the kits, so a page can show fewer cards than
-     * its own count claims. The owner's step closes both — take 8041–8048 out
-     * of the ostomy categories, or set is_visible = false — and then this
-     * filter simply never matches. The kits' own product pages also stay live.
-     * =======================================================================
-     */
-    const items = search.products.items.filter((product) => !isOstomyKit(product.entityId));
-
-    if (items.length === search.products.items.length) {
-      return search;
-    }
-
-    return { ...search, products: { ...search.products, items } };
   });
 
   /*

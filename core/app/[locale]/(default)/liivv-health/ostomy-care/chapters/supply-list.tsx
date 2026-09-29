@@ -33,6 +33,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { Suspense, use, useActionState, useEffect, useId, useRef, useState } from 'react';
 
+import { defaultLocale } from '~/i18n/locales';
 import { useRouter } from '~/i18n/routing';
 
 import { addSupplyItemToCart, type SupplyAddState } from './_actions/add-supply-item';
@@ -426,22 +427,43 @@ function ShopList({ rows, supplyItems }: { rows: Row[]; supplyItems: Promise<Sup
 }
 
 /*
- * Kits, last and optional, and only once merchandising has rebuilt them to
- * match this list. The line names the reader's own nurse as the reason to
- * consider one, never a benefit of buying it.
+ * Kits, last. A starter link follows the system the reader picked. Everyday
+ * Living, the go-bag kit, shows with either pick. Every link is in the server
+ * HTML, so a reader without JavaScript still sees them. After hydration a
+ * starter that does not match the pick is hidden, and nothing shows until a
+ * system is chosen. "Not sure yet" is not a system, so it hides the block.
  */
-function KitLinks() {
+function kitHref(path: string, locale: string) {
+  if (locale === defaultLocale || !path.startsWith('/')) return path;
+
+  return `/${locale}${path}`;
+}
+
+function KitLinks({
+  hydrated,
+  locale,
+  system,
+}: {
+  hydrated: boolean;
+  locale: string;
+  system: SystemChoice;
+}) {
   const t = useTranslations('OstomyCare.ui.chapter.supplyList');
 
   if (!SUPPLY_KIT_LINKS.length) return null;
 
+  const waiting = hydrated && system !== 'one' && system !== 'two';
+
   return (
-    <div className="oc-fig-supply-kits">
+    <div className="oc-fig-supply-kits" hidden={waiting}>
       <p>{t('kitsIntro')}</p>
       <ul>
         {SUPPLY_KIT_LINKS.map((kit) => (
-          <li key={kit.productId}>
-            <a href={kit.path}>{t(`kits.${kit.system}`)}</a>
+          <li
+            hidden={hydrated && kit.system !== system}
+            key={kit.productId}
+          >
+            <a href={kitHref(kit.path, locale)}>{t(`kits.${kit.label}`)}</a>
           </li>
         ))}
       </ul>
@@ -701,10 +723,11 @@ export function SupplyList({
 
         {/*
          * The optional shop section exists only where Liivv actually
-         * merchandises something: the route withholds `supplyItems` while the
-         * cart allowlist is empty, and the kits wait on the K1 rebuild. With
-         * both empty the disclosure would open on a line telling the reader to
-         * tick items they have already ticked, so it does not render at all.
+         * merchandises something. The route withholds `supplyItems` while the
+         * cart allowlist is empty. The two starter kit links are enough on
+         * their own to open this disclosure. With both empty it would open on
+         * a line telling the reader to tick items they have already ticked,
+         * so it does not render at all.
          *
          * Before the first criterion earns an allowlisted product, `shopEmpty`
          * needs splitting in two — one line for nothing ticked yet and one for
@@ -719,7 +742,7 @@ export function SupplyList({
                 <ShopList rows={tickedRows} supplyItems={supplyItems} />
               </Suspense>
             )}
-            <KitLinks />
+            <KitLinks hydrated={hydrated} locale={locale} system={system} />
           </details>
         )}
       </fieldset>

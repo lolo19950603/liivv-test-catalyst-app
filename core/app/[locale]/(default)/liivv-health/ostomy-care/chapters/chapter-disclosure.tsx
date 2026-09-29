@@ -14,33 +14,11 @@ import { GoBagBand, SupplyList } from './supply-list';
 /*
  * Commerce, in its own band.
  *
- * Placement is declared in chapters-meta.ts, not decided here. The test a card
- * has to pass is about its COPY, not its topic: does anything on this card
- * argue against buying something?
- *
- * An earlier version asked the topic question instead, and put a $234 kit named
- * "Peristomal Skin Health & Infection Prevention" under the card that says
- * broken skin "needs an NSWOC to look at it — not a product recommendation from
- * the internet". Eight cards are deliberately empty:
- *
- *   Flat or convex                convexity is prescribed after an assessment
- *   Leaks and short wear time     its own note calls rings and pastes an
- *                                 assessment rather than a shopping decision
- *   Sore, itchy, or weeping skin  broken skin needs an NSWOC, not a product
- *   A bulge around the stoma      symptom card
- *   Hernias, lifting and core     belts have not been shown to prevent hernia
- *   Getting back to activity      it sits under that card, so a belt band here
- *                                 makes the recommendation that one withholds
- *   Children                      a failing seal is a call to the nurse
- *   Ballooning and gas            symptom card, and its first sentence says a
- *                                 wetted-out filter is normal rather than a
- *                                 fault — so a band of filtered pouches
- *                                 answered a sentence saying nothing needs an
- *                                 answer
- *
- * No card anywhere in the four chapters carries a product band today. The
- * second test, for a card that ever gets one back, is about the SHELF: three or
- * more manufacturers, or no band — see cards 4, 5, 10 and 17 in chapters-meta.ts.
+ * Placement is declared in chapters-meta.ts, not decided here. Two cards carry
+ * a kit: First Week Basics (8065, the SenSura one-piece) and Children (8068,
+ * the Pouchkins two-piece). The supply-list card and the go-bag card use their
+ * own shop area instead of this band. Emergency lines, 9-8-8, and the SickKids
+ * links stay free of products.
  *
  * The band sits after the ask chip so the referral is the last clinical thing
  * said, and it carries its own disclosure rather than borrowing the page's.
