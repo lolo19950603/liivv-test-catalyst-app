@@ -53,11 +53,13 @@ function SaveStopButton({ number }: { number: number }) {
 function JourneyEntry({
   card,
   products,
+  slug,
   supplyItems,
   exit,
 }: {
   card: CategoryCard;
   products: Record<number, OcCatalogItem>;
+  slug: string;
   supplyItems?: Promise<SupplyItem[]>;
   exit?: Chapter['urgentExit'];
 }) {
@@ -99,8 +101,6 @@ function JourneyEntry({
           <AskChip role={card.ask} />
         </div>
       ) : null}
-
-      <CardShop card={card} products={products} supplyItems={supplyItems} visible />
     </div>
   );
 
@@ -128,6 +128,7 @@ function JourneyEntry({
           {body}
         </>
       )}
+      <CardShop card={card} products={products} slug={slug} supplyItems={supplyItems} visible />
     </article>
   );
 }
@@ -135,11 +136,13 @@ function JourneyEntry({
 export function JourneyGrid({
   cards,
   products,
+  slug,
   supplyItems,
   exit,
 }: {
   cards: { card: CategoryCard }[];
   products: Record<number, OcCatalogItem>;
+  slug: string;
   supplyItems?: Promise<SupplyItem[]>;
   exit?: Chapter['urgentExit'];
 }) {
@@ -149,7 +152,13 @@ export function JourneyGrid({
         const module = isModuleEntry(item.card);
 
         const entry = (
-          <JourneyEntry card={item.card} exit={exit} products={products} supplyItems={supplyItems} />
+          <JourneyEntry
+            card={item.card}
+            exit={exit}
+            products={products}
+            slug={slug}
+            supplyItems={supplyItems}
+          />
         );
 
         if (module) {

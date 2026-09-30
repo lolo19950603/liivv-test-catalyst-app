@@ -16,7 +16,8 @@
  * What it will not do:
  *   - tick anything for the reader, or default a pouching system;
  *   - show a price, a brand, an image, a quantity, a total, an "add all", a
- *     progress bar or a word of praise;
+ *     progress bar or a word of praise on the checklist itself. The shop
+ *     disclosure under the list is where the kit and its products appear;
  *   - put a product beside the powder line, which is text only in every state,
  *     because broken skin is a question for an NSWOC and not a purchase;
  *   - send what the reader ticks anywhere. Choices stay in this component, and
@@ -31,24 +32,24 @@
  */
 
 import { useLocale, useTranslations } from 'next-intl';
-import { Suspense, use, useActionState, useEffect, useId, useRef, useState } from 'react';
+import { Suspense, use, useActionState, useEffect, useId, useState } from 'react';
 
-import { defaultLocale } from '~/i18n/locales';
 import { useRouter } from '~/i18n/routing';
 
+import type { OcCatalogItem } from '../get-oc-catalog';
+
 import { addSupplyItemToCart, type SupplyAddState } from './_actions/add-supply-item';
+import { shelfForCard } from './chapter-shop';
 import type { CategoryCard, FigureText, SupplyRowText } from './chapters-data';
 import type { CriterionKey, FigureMeta, SupplyItemKey, SupplyListItem } from './chapters-meta';
 import { FrDraftMarker, Glyph } from './figure-parts';
 import type { SupplyItem } from './get-supply-items';
+import { ShopStrip } from './shop-strip';
 import {
   SUPPLY_CART_PRODUCTS,
   SUPPLY_COLLECTIONS,
-  SUPPLY_KIT_LINKS,
   type SupplyCollection,
 } from './supply-list-merchandising';
-import { usePrintOnly } from './use-print-only';
-
 type SupplyFigure = Extract<FigureMeta, { kind: 'supplyList' }>;
 
 /* No default: a reader who has not been told which system they have picks none. */
@@ -287,17 +288,15 @@ function SystemPicker({
 }
 
 /* ------------------------------------------------------------------------- */
-/* Keep it: print, copy, share, remember                                      */
+/* Keep it: copy, share, remember                                             */
 /* ------------------------------------------------------------------------- */
 
 interface ControlProps {
   canCopy: boolean;
   canShare: boolean;
-  canPrint: boolean;
   hydrated: boolean;
   onClear: () => void;
   onCopy: () => void;
-  onPrint: () => void;
   onRemember: (checked: boolean) => void;
   onShare: () => void;
   remember: boolean;
@@ -305,12 +304,10 @@ interface ControlProps {
 
 function ListControls({
   canCopy,
-  canPrint,
   canShare,
   hydrated,
   onClear,
   onCopy,
-  onPrint,
   onRemember,
   onShare,
   remember,
@@ -319,12 +316,6 @@ function ListControls({
 
   return (
     <div className="oc-fig-supply-controls">
-      {canPrint ? (
-        <button className="oc-fig-supply-btn" onClick={onPrint} type="button">
-          <Glyph name="print" />
-          {t('print')}
-        </button>
-      ) : null}
       {canCopy ? (
         <button className="oc-fig-supply-btn" onClick={onCopy} type="button">
           {t('copy')}
@@ -427,46 +418,32 @@ function ShopList({ rows, supplyItems }: { rows: Row[]; supplyItems: Promise<Sup
 }
 
 /*
- * Kits, last. A starter link follows the system the reader picked. Everyday
- * Living, the go-bag kit, shows with either pick. Every link is in the server
- * HTML, so a reader without JavaScript still sees them. After hydration a
- * starter that does not match the pick is hidden, and nothing shows until a
+ * Kits and the products inside them, last. Every group is in the server HTML,
+ * so a reader without JavaScript still sees them. After hydration a group that
+ * does not match the picked system is dropped, and nothing shows until a
  * system is chosen. "Not sure yet" is not a system, so it hides the block.
  */
-function kitHref(path: string, locale: string) {
-  if (locale === defaultLocale || !path.startsWith('/')) return path;
-
-  return `/${locale}${path}`;
-}
-
-function KitLinks({
+function SupplyShop({
   hydrated,
-  locale,
+  products,
+  shelf,
   system,
 }: {
   hydrated: boolean;
-  locale: string;
+  products: Record<number, OcCatalogItem>;
+  shelf: ReturnType<typeof shelfForCard>;
   system: SystemChoice;
 }) {
-  const t = useTranslations('OstomyCare.ui.chapter.supplyList');
-
-  if (!SUPPLY_KIT_LINKS.length) return null;
+  if (!shelf) return null;
 
   const waiting = hydrated && system !== 'one' && system !== 'two';
+  const offers = shelf.offers.filter((offer) => !hydrated || offer.system === system);
+
+  if (!offers.length) return null;
 
   return (
     <div className="oc-fig-supply-kits" hidden={waiting}>
-      <p>{t('kitsIntro')}</p>
-      <ul>
-        {SUPPLY_KIT_LINKS.map((kit) => (
-          <li
-            hidden={hydrated && kit.system !== system}
-            key={kit.productId}
-          >
-            <a href={kitHref(kit.path, locale)}>{t(`kits.${kit.label}`)}</a>
-          </li>
-        ))}
-      </ul>
+      <ShopStrip nested products={products} shelf={{ ...shelf, offers }} />
     </div>
   );
 }
@@ -529,17 +506,20 @@ function forgetSaved() {
 export function SupplyList({
   card,
   figure,
+  products,
+  slug,
   supplyItems,
 }: {
   card: CategoryCard;
   figure: SupplyFigure;
+  products: Record<number, OcCatalogItem>;
+  slug: string;
   supplyItems?: Promise<SupplyItem[]>;
 }) {
   const t = useTranslations('OstomyCare.ui.chapter.supplyList');
   const locale = useLocale();
+  const shopShelf = shelfForCard(slug, card.number);
   const words = supplyWords(card.figureText);
-  const listRef = useRef<HTMLFieldSetElement>(null);
-  const { ready, print } = usePrintOnly(listRef);
   const systemName = useId();
   const noteId = useId();
 
@@ -548,6 +528,7 @@ export function SupplyList({
   const [note, setNote] = useState('');
   const [remember, setRemember] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [shopOpen, setShopOpen] = useState(false);
   const [canCopy, setCanCopy] = useState(false);
   const [canShare, setCanShare] = useState(false);
   const [statusKey, setStatusKey] = useState<StatusKey>('');
@@ -583,6 +564,12 @@ export function SupplyList({
   useEffect(() => {
     if (remember) writeSaved({ system, items: [...ticked], note });
   }, [remember, system, ticked, note]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+
+    setShopOpen(system === 'one' || system === 'two');
+  }, [hydrated, system]);
 
   /* Plain text: the rows the reader kept, their notes, and no Liivv links. */
   const listText = () => {
@@ -651,7 +638,7 @@ export function SupplyList({
     <aside className="oc-ch-shop">
       <span className="oc-ch-shop-label">{t('toolLabel')}</span>
       <FrDraftMarker gate="supplyList" />
-      <fieldset className="oc-fig-supply" id="oc-supply-list" ref={listRef}>
+      <fieldset className="oc-fig-supply" id="oc-supply-list">
         <legend className="oc-fig-supply-head">{t('heading')}</legend>
         {words.intro ? <p className="oc-fig-supply-intro">{words.intro}</p> : null}
 
@@ -707,12 +694,10 @@ export function SupplyList({
 
         <ListControls
           canCopy={canCopy}
-          canPrint={ready}
           canShare={canShare}
           hydrated={hydrated}
           onClear={onClear}
           onCopy={onCopy}
-          onPrint={print}
           onRemember={onRemember}
           onShare={onShare}
           remember={remember}
@@ -724,9 +709,9 @@ export function SupplyList({
         {/*
          * The optional shop section exists only where Liivv actually
          * merchandises something. The route withholds `supplyItems` while the
-         * cart allowlist is empty. The two starter kit links are enough on
-         * their own to open this disclosure. With both empty it would open on
-         * a line telling the reader to tick items they have already ticked,
+         * cart allowlist is empty. The kit-and-product strip is enough on its
+         * own to open this disclosure. With both empty it would open on a
+         * line telling the reader to tick items they have already ticked,
          * so it does not render at all.
          *
          * Before the first criterion earns an allowlisted product, `shopEmpty`
@@ -734,15 +719,21 @@ export function SupplyList({
          * "Liivv carries none of these" — because a reader who has ticked
          * cannot act on "tick items above".
          */}
-        {supplyItems === undefined && !SUPPLY_KIT_LINKS.length ? null : (
-          <details className="oc-fig-supply-shop">
+        {supplyItems === undefined && !shopShelf ? null : (
+          <details
+            className="oc-fig-supply-shop"
+            onToggle={(event) => {
+              if (event.currentTarget.open !== shopOpen) setShopOpen(event.currentTarget.open);
+            }}
+            open={shopOpen}
+          >
             <summary>{t('shopHeading')}</summary>
             {supplyItems === undefined ? null : (
               <Suspense fallback={<div className="oc-fig-supply-reserve" />}>
                 <ShopList rows={tickedRows} supplyItems={supplyItems} />
               </Suspense>
             )}
-            <KitLinks hydrated={hydrated} locale={locale} system={system} />
+            <SupplyShop hydrated={hydrated} products={products} shelf={shopShelf} system={system} />
           </details>
         )}
       </fieldset>

@@ -4096,7 +4096,7 @@ const readme = [
   '',
   '- Product names, descriptions and prices, which come from BigCommerce.',
   '- The site header and navigation, managed separately.',
-  `- Kit contents. The eight matched-system kits (8061–8068) are shown on the Ostomy Care landing, the Liivv Health hub, the Shop Ostomy Care shelf, and search. Inside the chapters, First Week Basics shows 8065 (SenSura one-piece) and Children shows 8068 (Pouchkins). The Chapter 1 supply list links 8065 after one-piece and 8061, 8062, and 8064 after two-piece. Urostomy and closed kits stay on the shop shelf. Kits 8041–8048 were deleted on 2026-09-29. The priced table was written on 2026-09-29.`,
+  `- Kit contents. The eight matched-system kits (8061–8068) are shown on the Ostomy Care landing, the Liivv Health hub, the Shop Ostomy Care shelf, and search. Inside the chapters, a card sells with one shelf: First Week Basics is the SenSura one-piece kit and pouch 4891; the change routine points back to that kit; the supply list shows the drainable systems after one is picked, with New Image 57 mm and 70 mm as two sizes of one system; the go-bag is a spare of those kits. Your Stoma shows the drainable systems, then the closed and urostomy kits, then the cut-to-fit barriers, and a spare of the drainable kits on Travel & Workdays. Everyday Liivving shows that spare on Flying with supplies. This Might Be You shows Pouchkins on Children, the adult drainable systems once on the young-adult card, and a line back to them on pregnancy and later life. Kits 8041–8048 were deleted on 2026-09-29. The priced table was written on 2026-09-29.`,
   '',
   '## Written, but not on a page yet',
   '',

@@ -1,64 +1,27 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-
 import type { OcCatalogItem } from '../get-oc-catalog';
 
+import { shelfForCard } from './chapter-shop';
 import type { CategoryCard, Chapter } from './chapters-data';
 import type { FigureMeta } from './chapters-meta';
 import { UrgentExit } from './figure-parts';
 import { needsCardExit, NOTE_CARRYING_KINDS, restylesCard } from './figures';
 import type { SupplyItem } from './get-supply-items';
+import { ShopStrip } from './shop-strip';
 import { GoBagBand, SupplyList } from './supply-list';
 
 /*
- * Commerce, in its own band.
+ * Commerce, in its own band under the teaching.
  *
- * Placement is declared in chapters-meta.ts, not decided here. Two cards carry
- * a kit: First Week Basics (8065, the SenSura one-piece) and Children (8068,
- * the Pouchkins two-piece). The supply-list card and the go-bag card use their
- * own shop area instead of this band. Emergency lines, 9-8-8, and the SickKids
- * links stay free of products.
+ * Which card sells what is declared in chapter-shop.ts. A shelf is one offer
+ * (or a collection of them), with the products inside it on a rail. A reprise
+ * is a line back to a shelf already shown. Emergency lines, 9-8-8, and the
+ * SickKids links stay free of products.
  *
  * The band sits after the ask chip so the referral is the last clinical thing
  * said, and it carries its own disclosure rather than borrowing the page's.
  */
-function ProductBand({
-  ids,
-  products,
-}: {
-  ids: number[];
-  products: Record<number, OcCatalogItem>;
-}) {
-  const t = useTranslations('OstomyCare.ui.chapter');
-  const items = ids
-    .map((id) => products[id])
-    .filter((item): item is OcCatalogItem => Boolean(item));
-
-  if (!items.length) return null;
-
-  return (
-    <aside className="oc-ch-shop">
-      <span className="oc-ch-shop-label">{t('productsLabel')}</span>
-      <ul className="oc-ch-shop-list">
-        {items.map((item) => (
-          <li key={item.entityId}>
-            <a className="oc-ch-shop-card" href={item.path}>
-              {item.image ? (
-                <img alt="" loading="lazy" src={item.image.src} />
-              ) : (
-                <span className="oc-ch-shop-blank" />
-              )}
-              <span className="oc-ch-shop-name">{item.name}</span>
-              {item.priceLabel ? <span className="oc-ch-shop-price">{item.priceLabel}</span> : null}
-            </a>
-          </li>
-        ))}
-      </ul>
-      <p className="oc-ch-shop-note">{t('productsNote')}</p>
-    </aside>
-  );
-}
 
 /*
  * The shop band, whatever shape it takes on this card.
@@ -75,11 +38,13 @@ function ProductBand({
 export function CardShop({
   card,
   products,
+  slug,
   supplyItems,
   visible,
 }: {
   card: CategoryCard;
   products: Record<number, OcCatalogItem>;
+  slug: string;
   supplyItems?: Promise<SupplyItem[]>;
   visible: boolean;
 }) {
@@ -87,15 +52,34 @@ export function CardShop({
     (figure): figure is Extract<FigureMeta, { kind: 'supplyList' }> => figure.kind === 'supplyList',
   );
 
-  if (supply) return <SupplyList card={card} figure={supply} supplyItems={supplyItems} />;
+  if (supply) {
+    return (
+      <div className="oc-merch-slot">
+        <SupplyList card={card} figure={supply} products={products} slug={slug} supplyItems={supplyItems} />
+      </div>
+    );
+  }
 
-  if (card.figures?.some((figure) => figure.kind === 'goBag')) return <GoBagBand card={card} />;
+  const shelf = shelfForCard(slug, card.number);
 
-  if (!card.productIds) return null;
+  if (card.figures?.some((figure) => figure.kind === 'goBag')) {
+    return (
+      <div className="oc-merch-slot">
+        <GoBagBand card={card} />
+        {shelf ? (
+          <div hidden={!visible}>
+            <ShopStrip products={products} shelf={shelf} />
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
+  if (!shelf) return null;
 
   return (
-    <div hidden={!visible}>
-      <ProductBand ids={card.productIds} products={products} />
+    <div className="oc-merch-slot" hidden={!visible}>
+      <ShopStrip products={products} shelf={shelf} />
     </div>
   );
 }

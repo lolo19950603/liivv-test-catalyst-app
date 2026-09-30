@@ -239,6 +239,7 @@
       "subtitle": "Customize what’s included, then add the kit to your cart.",
       "includedTitle": "Included in this kit",
       "includedCount": "{count, plural, =1 {1 item selected} other {# items selected}}",
+      "onePieceNote": "One pouch is the whole kit. The skin barrier is fixed to the pouch, and the outlet has its own closure.",
       "allRemoved": "You’ve removed every item. Add something back to continue.",
       "removedTitle": "Removed from kit",
       "removedSubtitle": "Add any of these back if you change your mind.",
@@ -3244,7 +3245,63 @@
           "primaryCare": "Ask your doctor"
         },
         "productsLabel": "Products for this",
+        "productsOr": "Or buy this on its own",
         "productsNote": "These are Liivv kits for this part of the routine. Open one and adjust it before checkout.",
+        "shop": {
+          "label": "Shop",
+          "openKit": "Open the kit",
+          "alsoSold": "Also sold on its own",
+          "sizesLabel": "Sizes",
+          "noteProducts": "Sold on their own. The opening is cut after the stoma is measured.",
+          "families": {
+            "newImage": "New Image drainable"
+          },
+          "occasions": {
+            "firstWeek": "The first box. One pouch, the barrier already on it.",
+            "sameKit": "The kit for these steps.",
+            "yourSystem": "The system you picked.",
+            "spare": "A spare of the same system.",
+            "systems": "Drainable systems you can start with.",
+            "output": "Closed, or a urostomy pouch.",
+            "measure": "Cut to fit, after the stoma is measured.",
+            "travelSpare": "A spare to pack.",
+            "child": "A barrier and a pouch, sized for a child.",
+            "adultSystems": "Adult drainable systems.",
+            "sameSystems": "The same adult systems."
+          },
+          "offers": {
+            "onePiece": "The barrier is already on the pouch.",
+            "newImage": "Two-piece. Two cut-to-fit sizes.",
+            "click": "Two-piece, with a click flange.",
+            "closed": "A closed pouch.",
+            "uroImage": "A urostomy pouch, New Image.",
+            "uroClick": "A urostomy pouch, SenSura Click."
+          },
+          "names": {
+            "8061": "New Image drainable, 57 mm",
+            "8062": "New Image drainable, 70 mm",
+            "8063": "New Image closed, 57 mm",
+            "8064": "SenSura Click drainable, 50 mm",
+            "8065": "SenSura one-piece kit",
+            "8066": "New Image urostomy, 70 mm",
+            "8067": "SenSura Click urostomy, 50 mm",
+            "8068": "Pouchkins kit, 44 mm",
+            "4891": "SenSura one-piece pouch",
+            "4541": "New Image barrier",
+            "4878": "New Image drainable pouch",
+            "4583": "SenSura Click flange",
+            "4438": "SenSura Click pouch",
+            "4571": "New Image closed pouch",
+            "4581": "New Image urostomy pouch",
+            "4365": "SenSura Click urostomy pouch",
+            "4899": "Pouchkins barrier",
+            "4968": "Pouchkins pouch"
+          },
+          "kitSizes": {
+            "8061": "57 mm",
+            "8062": "70 mm"
+          }
+        },
         "groups": {
           "beforeSurgery": "Before surgery",
           "afterSurgery": "After surgery",
@@ -3350,10 +3407,9 @@
           "askSystem": "Ask your NSWOC which system is yours",
           "productNumber": "My product number",
           "productNumberHint": "Kept in this browser only. Never searched or sent.",
-          "print": "Print my list",
           "copy": "Copy as text",
           "copied": "Copied as plain text.",
-          "copyFailed": "Copying is blocked in this view. Print works instead.",
+          "copyFailed": "Copying is blocked in this view.",
           "share": "Share as text",
           "remember": "Remember on this device",
           "remembering": "Your list will be remembered on this device. Clear removes it.",

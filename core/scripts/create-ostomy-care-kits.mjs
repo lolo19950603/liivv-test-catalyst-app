@@ -189,11 +189,8 @@ const KIT_META = {
     name: 'SenSura One-Piece Drainable Kit (Flat, Transparent)',
     componentIds: [4891],
     kitVariants: { 4891: '702524' },
-    open: [
-      'whether pouch 4891 has an integrated closure — the catalogue does not say, so clamp 4406 is not in this kit',
-    ],
     description:
-      '<p>A one-piece drainable kit: the skin barrier is built into the pouch, so there is no second piece to match. The pouch is flat and transparent, cut to fit 10&ndash;76&nbsp;mm.</p><ul><li>SenSura one-piece drainable pouch, flat, transparent, 30&nbsp;cm long &mdash; box of 10</li><li>Change the quantity, or remove the item, before checkout</li></ul><p>' +
+      '<p>This kit is one box of pouches. Each pouch already includes the skin barrier and its own outlet closure, so the kit is complete as that single product.</p><ul><li>SenSura one-piece drainable pouch, flat, transparent, cut to fit 10&ndash;76&nbsp;mm, 30&nbsp;cm long, with a built-in wide outlet closure &mdash; box of 10</li><li>Change the quantity, or remove the item, before checkout</li></ul><p>' +
       nurseLine +
       '</p>',
   },

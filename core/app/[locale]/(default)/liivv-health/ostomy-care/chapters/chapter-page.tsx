@@ -62,6 +62,7 @@ function CategoryRow({
   card,
   index,
   products,
+  slug,
   supplyItems,
   exit,
 }: {
@@ -70,6 +71,7 @@ function CategoryRow({
   /** Unused; kept so older call sites compile. Cards are always fully open. */
   openByDefault?: boolean;
   products: Record<number, OcCatalogItem>;
+  slug: string;
   supplyItems?: Promise<SupplyItem[]>;
   exit?: Chapter['urgentExit'];
 }) {
@@ -107,7 +109,7 @@ function CategoryRow({
           </div>
         ) : null}
 
-        <CardShop card={card} products={products} supplyItems={supplyItems} visible />
+        <CardShop card={card} products={products} slug={slug} supplyItems={supplyItems} visible />
       </div>
     </article>
   );
@@ -371,12 +373,14 @@ function bandChunks(cards: PlacedCard[]) {
 function CardStrip({
   items,
   products,
+  slug,
   supplyItems,
   exit,
   label,
 }: {
   items: PlacedCard[];
   products: Record<number, OcCatalogItem>;
+  slug: string;
   supplyItems?: Promise<SupplyItem[]>;
   exit?: Chapter['urgentExit'];
   label: string;
@@ -441,6 +445,7 @@ function CardStrip({
           index={only.index}
           openByDefault={false}
           products={products}
+          slug={slug}
           supplyItems={supplyItems}
         />
       </ChapterReveal>
@@ -500,6 +505,7 @@ function CardStrip({
                 index={item.index}
                 openByDefault={false}
                 products={products}
+                slug={slug}
                 supplyItems={supplyItems}
               />
             </ChapterReveal>
@@ -513,12 +519,14 @@ function CardStrip({
 function BandCards({
   band,
   products,
+  slug,
   supplyItems,
   exit,
   layout = 'strip',
 }: {
   band: ReturnType<typeof groupBands>[number];
   products: Record<number, OcCatalogItem>;
+  slug: string;
   supplyItems?: Promise<SupplyItem[]>;
   exit?: Chapter['urgentExit'];
   layout?: 'strip' | 'journey';
@@ -529,6 +537,7 @@ function BandCards({
         cards={band.cards}
         exit={exit}
         products={products}
+        slug={slug}
         supplyItems={supplyItems}
       />
     );
@@ -547,6 +556,7 @@ function BandCards({
                 key={item.card.title}
                 openByDefault={false}
                 products={products}
+                slug={slug}
                 supplyItems={supplyItems}
               />
             ))}
@@ -557,6 +567,7 @@ function BandCards({
             items={chunk.items}
             key={`${band.id}-strip-${chunkIndex}`}
             label={band.label}
+            slug={slug}
             products={products}
             supplyItems={supplyItems}
           />
@@ -681,6 +692,7 @@ function MajorSections({
                   exit={chapter.urgentExit}
                   layout="journey"
                   products={products}
+                  slug={chapter.slug}
                   supplyItems={supplyItems}
                 />
               </div>
@@ -706,12 +718,14 @@ function GroupRail({
   categories,
   products,
   showRail,
+  slug,
   supplyItems,
   exit,
 }: {
   categories: CategoryCard[];
   products: Record<number, OcCatalogItem>;
   showRail: boolean;
+  slug: string;
   supplyItems?: Promise<SupplyItem[]>;
   exit?: Chapter['urgentExit'];
 }) {
@@ -744,6 +758,7 @@ function GroupRail({
             band={band}
             exit={exit}
             products={products}
+            slug={slug}
             supplyItems={supplyItems}
           />
         </section>
@@ -893,6 +908,7 @@ export function ChapterPage({
               exit={chapter.urgentExit}
               products={products}
               showRail={chapter.rail}
+              slug={chapter.slug}
               supplyItems={supplyItems}
             />
           </div>

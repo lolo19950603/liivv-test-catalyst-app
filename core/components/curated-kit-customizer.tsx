@@ -84,6 +84,8 @@ interface Props {
   kitImage?: { src: string; alt: string };
   products: CuratedKitProduct[];
   suggestedProducts?: CuratedKitSuggestedProduct[];
+  /** Shown under the included list when one product is the whole kit. */
+  includedNote?: string;
 }
 
 const PENDING_SAVE_STORAGE_KEY = 'liivv:pending-kit-save';
@@ -188,6 +190,7 @@ export function CuratedKitCustomizer({
   kitImage,
   products: initialProducts,
   suggestedProducts = [],
+  includedNote,
 }: Props) {
   // Namespace typing can hit TS depth limits on this large messages tree.
   const t = useTranslations('Faceted.CuratedKit') as unknown as {
@@ -576,6 +579,7 @@ export function CuratedKitCustomizer({
             {t('includedCount', { count: included.length })}
           </span>
         </div>
+        {includedNote ? <p className="liivv-kit-customizer__included-note">{includedNote}</p> : null}
 
         {included.length === 0 ? (
           <p className="liivv-kit-customizer__empty">{t('allRemoved')}</p>

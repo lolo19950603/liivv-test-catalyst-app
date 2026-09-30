@@ -239,6 +239,7 @@
       "subtitle": "Personnalisez ce qui est inclus, puis ajoutez le kit à votre panier.",
       "includedTitle": "Inclus dans ce kit",
       "includedCount": "{count, plural, =1 {1 article sélectionné} other {# articles sélectionnés}}",
+      "onePieceNote": "Une seule poche constitue toute la trousse. La barrière cutanée est fixée à la poche, et l’ouverture a sa propre fermeture.",
       "allRemoved": "Vous avez retiré tous les articles. Ajoutez-en un pour continuer.",
       "removedTitle": "Retiré du kit",
       "removedSubtitle": "Ajoutez-en un si vous changez d’avis.",
@@ -3243,7 +3244,63 @@
           "primaryCare": "Demandez à votre médecin"
         },
         "productsLabel": "Produits pour cela",
+        "productsOr": "Ou achetez ceci seul",
         "productsNote": "Ce sont des trousses Liivv pour cette partie de la routine. Ouvrez-en une et ajustez-la avant de passer à la caisse.",
+        "shop": {
+          "label": "Boutique",
+          "openKit": "Ouvrir la trousse",
+          "alsoSold": "Aussi vendu seul",
+          "sizesLabel": "Tailles",
+          "noteProducts": "Vendus seuls. L’ouverture se découpe une fois la stomie mesurée.",
+          "families": {
+            "newImage": "New Image vidangeable"
+          },
+          "occasions": {
+            "firstWeek": "La première boîte. Une poche, la barrière déjà dessus.",
+            "sameKit": "La trousse pour ces étapes.",
+            "yourSystem": "Le système que vous avez choisi.",
+            "spare": "Une rechange du même système.",
+            "systems": "Des systèmes vidangeables pour commencer.",
+            "output": "Fermée, ou une poche d’urostomie.",
+            "measure": "À découper, une fois la stomie mesurée.",
+            "travelSpare": "Une rechange à emporter.",
+            "child": "Une barrière et une poche, à la taille d’un enfant.",
+            "adultSystems": "Systèmes vidangeables pour adultes.",
+            "sameSystems": "Les mêmes systèmes pour adultes."
+          },
+          "offers": {
+            "onePiece": "La barrière est déjà sur la poche.",
+            "newImage": "Deux pièces. Deux tailles à découper.",
+            "click": "Deux pièces, avec une bride à clic.",
+            "closed": "Une poche fermée.",
+            "uroImage": "Une poche d’urostomie, New Image.",
+            "uroClick": "Une poche d’urostomie, SenSura Click."
+          },
+          "names": {
+            "8061": "New Image vidangeable, 57 mm",
+            "8062": "New Image vidangeable, 70 mm",
+            "8063": "New Image fermée, 57 mm",
+            "8064": "SenSura Click vidangeable, 50 mm",
+            "8065": "Trousse SenSura une pièce",
+            "8066": "Urostomie New Image, 70 mm",
+            "8067": "Urostomie SenSura Click, 50 mm",
+            "8068": "Trousse Pouchkins, 44 mm",
+            "4891": "Poche SenSura une pièce",
+            "4541": "Barrière New Image",
+            "4878": "Poche vidangeable New Image",
+            "4583": "Bride SenSura Click",
+            "4438": "Poche SenSura Click",
+            "4571": "Poche fermée New Image",
+            "4581": "Poche d’urostomie New Image",
+            "4365": "Poche d’urostomie SenSura Click",
+            "4899": "Barrière Pouchkins",
+            "4968": "Poche Pouchkins"
+          },
+          "kitSizes": {
+            "8061": "57 mm",
+            "8062": "70 mm"
+          }
+        },
         "groups": {
           "beforeSurgery": "Avant la chirurgie",
           "afterSurgery": "Après la chirurgie",
@@ -3350,10 +3407,9 @@
           "askSystem": "Demandez à votre NSWOC quel système est le vôtre",
           "productNumber": "Mon numéro de produit",
           "productNumberHint": "Conservé seulement dans ce navigateur. Jamais recherché ni envoyé.",
-          "print": "Imprimer ma liste",
           "copy": "Copier en texte",
           "copied": "Liste copiée.",
-          "copyFailed": "La copie est bloquée dans cette vue. L’impression fonctionne.",
+          "copyFailed": "La copie est bloquée dans cette vue.",
           "share": "Partager",
           "remember": "Garder dans ce navigateur",
           "remembering": "Votre liste sera gardée dans ce navigateur. Effacer la supprime.",

@@ -721,8 +721,7 @@ export const CHAPTER_META: ChapterMeta[] = [
         image: `${IMG}/chapter-new.png`,
         group: 'afterSurgery',
         ask: 'nswoc',
-        // Card 6 "First Week Basics". The band is the SenSura one-piece kit (8065).
-        products: [8065],
+        // Card 6 "First Week Basics". The shop (kit 8065 and pouch 4891) is in chapter-shop.ts.
       },
       {
         image: `${IMG}/door-care.png`,
@@ -1657,9 +1656,8 @@ export const CHAPTER_META: ChapterMeta[] = [
         urgentContent: true,
         group: 'growingUp',
         ask: 'team',
-        // Card 1 "Children". The band is the Pouchkins two-piece kit (8068). The
-        // SickKids links stay on the referral band, not beside this kit.
-        products: [8068],
+        // Card 1 "Children". The shop (kit 8068 and its barrier and pouch) is in
+        // chapter-shop.ts. The SickKids links stay on the referral band, not beside this kit.
       },
       {
         image: `${IMG}/door-chapters.png`,
@@ -1676,12 +1674,9 @@ export const CHAPTER_META: ChapterMeta[] = [
         image: `${IMG}/care-chat-desk.png`,
         group: 'bodiesThatChange',
         ask: 'nswoc',
-        // Card 4 "Later life, and managing more than one thing". No band. Both
-        // flanges here were the same range from one manufacturer, and the card
-        // is about a body and a life that have changed, not about what to buy.
-        // The key is deleted, never set to [] — an empty array would still make
-        // chapters-data.ts emit productIds and chapter-page.tsx wrap an empty,
-        // hidden div around a band that renders nothing.
+        // Card 4 "Later life". The card body stays about a life that has changed.
+        // The shop under it (the adult drainable kits and their products) is in
+        // chapter-shop.ts, in its own band, not inside the teaching.
       },
       {
         image: `${IMG}/care-chat-main.png`,

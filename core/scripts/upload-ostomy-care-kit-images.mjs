@@ -13,18 +13,18 @@ const TOKEN = process.env.CATALYST_PRODUCT_EDIT_TOKEN || process.env.BIGCOMMERCE
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CURSOR_ASSETS =
-  'C:\\Users\\loren\\.cursor\\projects\\d-liivv-test-catalyst-app\\assets';
+  'C:\\Users\\loren\\.cursor\\projects\\c-Users-loren-OneDrive-Desktop-Bayshore-liivv-test-catalyst-app\\assets';
 const LOCAL_OUT = join(__dirname, '../public/archive/ostomy-care/kit-products');
 
 const KITS = [
-  { id: 8041, file: 'kit-ostomy-fresh-start.png', name: 'The Fresh Start (New Ostomate Starter Kit)' },
-  { id: 8042, file: 'kit-ostomy-skin-shield.png', name: 'Skin Shield' },
-  { id: 8043, file: 'kit-ostomy-inner-balance.png', name: 'Inner Balance' },
-  { id: 8044, file: 'kit-ostomy-stay-hydrated.png', name: 'Stay Hydrated' },
-  { id: 8045, file: 'kit-ostomy-leak-free.png', name: 'Leak-Free Confidence' },
-  { id: 8046, file: 'kit-ostomy-everyday-living.png', name: 'Everyday Living' },
-  { id: 8047, file: 'kit-ostomy-little-ostomate.png', name: 'Little Ostomate' },
-  { id: 8048, file: 'kit-ostomy-newly-diagnosed.png', name: 'Newly Diagnosed: New Ostomy Starter Kit' },
+  { id: 8061, file: 'kit-ni-drain-57.jpg', name: 'New Image Two-Piece Drainable Kit (Flat, 57 mm Red)' },
+  { id: 8062, file: 'kit-ni-drain-70.jpg', name: 'New Image Two-Piece Drainable Kit (Flat, 70 mm Blue)' },
+  { id: 8063, file: 'kit-ni-closed-57.jpg', name: 'New Image Two-Piece Closed Kit (Flat, 57 mm Red)' },
+  { id: 8064, file: 'kit-sc-drain-50.jpg', name: 'SenSura Click Two-Piece Drainable Kit (Flat, 50 mm)' },
+  { id: 8065, file: 'kit-sc-one-piece.jpg', name: 'SenSura One-Piece Drainable Kit (Flat, Transparent)' },
+  { id: 8066, file: 'kit-ni-uro-70.jpg', name: 'New Image Two-Piece Urostomy Kit (Flat, 70 mm Blue)' },
+  { id: 8067, file: 'kit-sc-uro-50.jpg', name: 'SenSura Click Two-Piece Urostomy Kit (Flat, 50 mm)' },
+  { id: 8068, file: 'kit-pouchkins-44.jpg', name: 'Pouchkins Two-Piece Kit (Flat, 44 mm Green)' },
 ];
 
 if (!STORE_HASH || !TOKEN) {
@@ -36,7 +36,8 @@ mkdirSync(LOCAL_OUT, { recursive: true });
 
 async function uploadImage(productId, filePath, filename) {
   const buf = readFileSync(filePath);
-  const blob = new Blob([buf], { type: 'image/png' });
+  const type = filename.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+  const blob = new Blob([buf], { type });
   const form = new FormData();
   form.append('image_file', blob, filename);
 
@@ -86,11 +87,6 @@ async function uploadImage(productId, filePath, filename) {
 }
 
 async function main() {
-  console.error(
-    'Refusing to run: products 8041-8048 were deleted on 2026-09-29. These image files belong to that set.',
-  );
-  process.exit(1);
-
   const results = [];
   const errors = [];
 

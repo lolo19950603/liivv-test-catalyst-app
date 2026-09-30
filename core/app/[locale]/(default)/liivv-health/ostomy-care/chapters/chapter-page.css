@@ -3660,53 +3660,397 @@
   text-transform: uppercase;
   color: var(--ink-muted);
 }
-#oc-chapter .oc-ch-shop-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
-  gap: 0.5rem;
-  list-style: none;
-  margin: 0.6rem 0 0;
-  padding: 0;
+
+#oc-chapter .oc-merch-slot > .oc-ch-shop {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
 }
-#oc-chapter .oc-ch-shop-card {
+
+#oc-chapter .oc-fig-supply-kits .oc-merch ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/*
+ * Commerce shelf.
+ *
+ * The same ground as the chapter, under the teaching, with a hairline and no
+ * second card. The kit photograph is flush. Products are photographs. A
+ * reprise is a line.
+ */
+#oc-chapter .oc-journey-entry.is-shelf > .oc-merch-slot {
+  grid-column: 1 / -1;
+  padding: 1.15rem 0 0.25rem;
+  background: transparent;
+  border-top: 1px solid var(--line);
+  box-shadow: none;
+}
+
+#oc-chapter .oc-journey-entry.is-module > .oc-merch-slot {
+  margin-top: 1.15rem;
+}
+
+#oc-chapter .oc-merch {
+  display: grid;
+  gap: 0.85rem;
+  min-width: 0;
+  color: var(--ink-body);
+  font-size: var(--text-body);
+}
+
+#oc-chapter .oc-merch-kicker {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  line-height: 1.2;
+  color: var(--ink-muted);
+}
+
+#oc-chapter .oc-merch-occasion {
+  margin: 0;
+  max-width: 34rem;
+  font-family: var(--font-heading);
+  font-size: clamp(1.45rem, 2.5vw, 1.9rem);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--ink-strong);
+}
+
+#oc-chapter .oc-merch-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: clamp(1rem, 3vw, 2rem);
+  align-items: center;
+}
+
+#oc-chapter .oc-merch-photo {
+  display: block;
+  border-radius: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+#oc-chapter .oc-merch-photo img,
+#oc-chapter .oc-merch-blank {
+  display: block;
+  width: 100%;
+  aspect-ratio: 5 / 4;
+  object-fit: contain;
+  background: transparent;
+}
+
+#oc-chapter .oc-merch-copy {
+  display: grid;
+  align-content: center;
+  gap: 0.45rem;
+}
+
+#oc-chapter .oc-merch-dek {
+  margin: 0.15rem 0 0;
+  max-width: 36ch;
+  font-size: 1.02rem;
+  line-height: 1.45;
+  color: var(--ink-body);
+}
+
+#oc-chapter .oc-merch-title {
+  margin: 0.2rem 0 0;
+  font-size: 1rem;
+  line-height: 1.35;
+  color: var(--ink-strong);
+}
+
+#oc-chapter .oc-merch-price {
+  margin: 0;
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-merch-cta {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.45rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink-strong);
+  font-size: 0.95rem;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+#oc-chapter .oc-merch-cta:hover {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+#oc-chapter .oc-merch-sizes {
   display: grid;
   gap: 0.4rem;
-  height: 100%;
-  padding: 0.6rem;
-  border: 1px solid var(--line);
-  border-radius: 13px;
-  background: var(--cream);
+  margin-top: 0.35rem;
+}
+
+#oc-chapter .oc-merch-sizes-label {
+  margin: 0;
+  font-size: var(--text-small);
+  color: var(--ink-muted);
+}
+
+#oc-chapter .oc-merch-size-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+#oc-chapter .oc-merch-size {
+  display: grid;
+  gap: 0.05rem;
+  min-width: 0;
+  padding: 0.35rem 0;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
   color: inherit;
   text-decoration: none;
+}
+
+#oc-chapter .oc-merch-size:hover {
+  border-bottom-color: var(--ink);
+}
+
+#oc-chapter .oc-merch-size strong {
+  font-weight: 600;
+  font-size: 0.98rem;
+}
+
+#oc-chapter .oc-merch-size span {
+  font-size: 0.85rem;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-merch-offers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 1.5rem 1.75rem;
+}
+
+#oc-chapter .oc-merch-offer {
+  display: grid;
   align-content: start;
-  transition: border-color 140ms ease;
+  gap: 0.55rem;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
 }
-#oc-chapter .oc-ch-shop-card:hover {
-  border-color: var(--chapter-accent);
+
+#oc-chapter .oc-merch-offer .oc-merch-photo {
+  border-radius: 0;
 }
-#oc-chapter .oc-ch-shop-card img,
-#oc-chapter .oc-ch-shop-blank {
+
+#oc-chapter .oc-merch-offer .oc-merch-photo img,
+#oc-chapter .oc-merch-offer .oc-merch-blank {
+  aspect-ratio: 4 / 3;
+}
+
+#oc-chapter .oc-merch-offer .oc-merch-dek {
+  font-size: 0.95rem;
+}
+
+#oc-chapter .oc-merch-rail {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.15rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--line);
+}
+
+#oc-chapter .oc-merch-offer .oc-merch-rail {
+  padding-top: 0.65rem;
+}
+
+#oc-chapter .oc-merch-offer .oc-merch-rail-label {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: var(--ink-muted);
+}
+
+#oc-chapter .oc-merch-offer .oc-merch-products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6.25rem, 1fr));
+  overflow: visible;
+}
+
+#oc-chapter .oc-merch-offer .oc-merch-products > li {
+  flex: none;
+}
+
+#oc-chapter .oc-merch-rail-label {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  line-height: 1.3;
+  color: var(--ink-muted);
+}
+
+#oc-chapter .oc-merch-products {
+  display: flex;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0 0 0.15rem;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+#oc-chapter .oc-merch-products > li {
+  flex: 0 0 9.5rem;
+  scroll-snap-align: start;
+}
+
+#oc-chapter .oc-merch-products a {
+  display: grid;
+  gap: 0.3rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+#oc-chapter .oc-merch-products img,
+#oc-chapter .oc-merch-products .oc-merch-blank {
+  display: block;
   width: 100%;
   aspect-ratio: 1;
   object-fit: contain;
-  border-radius: 9px;
-  background: var(--paper);
-  display: block;
+  border: none;
+  border-radius: 0;
+  background: transparent;
 }
-#oc-chapter .oc-ch-shop-name {
-  font-size: var(--text-small);
-  line-height: 1.35;
+
+#oc-chapter .oc-merch-name {
+  font-size: 0.92rem;
+  line-height: 1.3;
 }
-#oc-chapter .oc-ch-shop-price {
-  font-size: var(--text-small);
+
+#oc-chapter .oc-merch-products .oc-merch-price {
+  font-size: 0.9rem;
+}
+
+#oc-chapter .oc-merch-rail.is-featured {
+  border-top: none;
+  padding-top: 0;
+}
+
+#oc-chapter .oc-merch-rail.is-featured .oc-merch-products > li {
+  flex-basis: 11.5rem;
+}
+
+#oc-chapter .oc-merch.is-reprise {
+  gap: 0.35rem;
+}
+
+#oc-chapter .oc-merch.is-reprise .oc-merch-kicker {
+  display: none;
+}
+
+#oc-chapter .oc-merch.is-reprise .oc-merch-occasion {
+  max-width: none;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+#oc-chapter .oc-merch-lines {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter .oc-merch-line a {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.85rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--line);
+  color: inherit;
+  text-decoration: none;
+}
+
+#oc-chapter .oc-merch-line-name {
+  font-size: 1.02rem;
+}
+
+#oc-chapter .oc-merch-line a:hover .oc-merch-line-name {
+  text-decoration: underline;
+}
+
+#oc-chapter .oc-merch-line-cta {
+  margin-left: auto;
   color: var(--sage-text);
-  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem;
 }
-#oc-chapter .oc-ch-shop-note {
-  margin: 0.65rem 0 0;
+
+#oc-chapter .oc-merch-note {
+  margin: 0.15rem 0 0;
+  max-width: 62ch;
   font-size: var(--text-small);
-  line-height: 1.5;
+  line-height: 1.45;
   color: var(--ink-muted);
+}
+
+#oc-chapter .oc-merch.is-nested {
+  margin-top: 0.35rem;
+}
+
+#oc-chapter .oc-merch a:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 3px;
+}
+
+/* The shelf is the page ground under the teaching: full width, a hairline, no second card. */
+#oc-chapter.is-journey .oc-journey-entry.is-frame > .oc-merch-slot {
+  position: relative;
+  z-index: 2;
+  grid-column: auto;
+  margin: 0;
+  padding: 1.35rem var(--cinema-right) 1.6rem var(--cinema-left);
+  border: none;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--cream);
+  box-shadow: none;
+}
+
+#oc-chapter.is-journey .oc-journey-entry.is-frame:has(> .oc-merch-slot) .oc-journey-entry-copy {
+  margin-bottom: 0;
+}
+
+@media (max-width: 720px) {
+  #oc-chapter .oc-merch-hero {
+    grid-template-columns: 1fr;
+  }
+
+  #oc-chapter .oc-merch-offers {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.2rem;
+  }
+
+  #oc-chapter .oc-merch-offer {
+    flex: 0 0 min(82%, 18rem);
+    scroll-snap-align: start;
+  }
 }
 
 /* ---------------------------------------------------------------------------

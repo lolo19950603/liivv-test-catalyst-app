@@ -9,6 +9,7 @@ import { getMetadataAlternates } from '~/lib/seo/canonical';
 
 import { getOcCatalog, type OcCatalogItem } from '../../get-oc-catalog';
 import { ChapterPage } from '../chapter-page';
+import { shopIdsForChapter } from '../chapter-shop';
 import { buildChapters, type Chapter, CHAPTER_SLUGS } from '../chapters-data';
 import { CHAPTER_META } from '../chapters-meta';
 import { getSupplyItems } from '../get-supply-items';
@@ -134,7 +135,10 @@ export default async function Page({ params }: Props) {
    * Only the ids this chapter actually places. getOcCatalog is cache()d for the
    * request, so this is the same fetch the landing page already made.
    */
-  const wanted = new Set(chapter.categories.flatMap((card) => card.productIds ?? []));
+  const wanted = new Set([
+    ...chapter.categories.flatMap((card) => card.productIds ?? []),
+    ...shopIdsForChapter(slug),
+  ]);
   const products: Record<number, OcCatalogItem> = {};
 
   if (wanted.size) {

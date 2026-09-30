@@ -8,7 +8,10 @@ import { Suspense } from 'react';
 
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { FeaturedProductCarousel } from '@/vibes/soul/sections/featured-product-carousel';
-import { isOstomyKit } from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
+import {
+  FRESH_START_KIT_ID,
+  isOstomyKit,
+} from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
 import { auth, getSessionCustomerAccessToken } from '~/auth';
 import { DenyAdSignals } from '~/components/analytics/deny-ad-signals';
 import { pricesTransformer } from '~/data-transformers/prices-transformer';
@@ -895,6 +898,11 @@ export default async function Product({ params, searchParams }: Props) {
             kitImage={
               baseProduct.defaultImage
                 ? { src: baseProduct.defaultImage.url, alt: baseProduct.defaultImage.altText }
+                : undefined
+            }
+            includedNote={
+              baseProduct.entityId === FRESH_START_KIT_ID
+                ? curatedKitT('onePieceNote')
                 : undefined
             }
             kitName={baseProduct.name}

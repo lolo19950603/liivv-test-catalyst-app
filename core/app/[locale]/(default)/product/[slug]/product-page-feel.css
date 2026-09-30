@@ -478,6 +478,13 @@
   border-bottom: none;
 }
 
+.liivv-product-page-feel .liivv-kit-customizer__included-note {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--product-detail-secondary-text, #66605c);
+}
+
 .liivv-product-page-feel .liivv-kit-customizer__panel-title {
   margin: 0;
   font-size: 1rem;
