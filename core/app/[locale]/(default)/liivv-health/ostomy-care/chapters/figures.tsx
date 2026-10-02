@@ -35,6 +35,7 @@ import type { FigureMeta, LaneTopic } from './chapters-meta';
 import { FibreClocksFigure } from './fibre-clocks-figure';
 import { FrDraftMarker, Glyph, itemText, OutboundLabel, UrgentExit } from './figure-parts';
 import { GapCompareFigure } from './gap-compare-figure';
+import { MeasuringGuideFigure } from './measuring-guide-figure';
 import { GLYPH_PATHS } from './glyph-paths';
 import { PartsOfSystemFigure } from './parts-of-system-figure';
 import { isFrGated } from './review-gates';
@@ -664,6 +665,9 @@ export function CardFigures({ card, exit }: { card: CategoryCard; exit?: Chapter
 
       case 'gapCompare':
         return <GapCompareFigure card={card} exit={exit} key={key} />;
+
+      case 'measuringGuide':
+        return <MeasuringGuideFigure card={card} key={key} variant={figure.variant} />;
 
       /*
        * Held in chapters-meta.ts, so `gateFigures` never hands this case a

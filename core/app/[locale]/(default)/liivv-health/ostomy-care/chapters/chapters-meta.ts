@@ -296,6 +296,25 @@ type FigureKindMeta =
    */
   | { kind: 'gapCompare'; sources: SourceId[] }
   /*
+   * A paper measuring guide the reader prints and cuts. AUGMENTS the card.
+   *
+   * `panel` is the sheet's preview and the two actions, and it belongs on the
+   * measuring card only. The holes are not drawn at size here. On-screen
+   * millimetres would invite measuring a stoma against a display, which this
+   * chapter already refuses, and a browser will rescale HTML when it prints.
+   * The PDF (`render-stoma-measuring-guide.mjs`) is the only true-size copy.
+   * A phone gets the same file to save and take to a printer. There is no
+   * camera measure: a phone cannot hold the millimetre a nurse is setting.
+   *
+   * `link` is one line to that PDF, on the cards that already say to measure
+   * again. It does not repeat the sheet.
+   *
+   * `sources` backs the panel's instructions. Review only; it never renders.
+   * A link adds no measurement of its own, so it carries none.
+   */
+  | { kind: 'measuringGuide'; variant: 'panel'; sources: SourceId[] }
+  | { kind: 'measuringGuide'; variant: 'link' }
+  /*
    * The parts of a pouching system (C08) on Chapter 02 card 3: an abstract line
    * drawing beside a list of terms. AUGMENTS the card — its three sections of
    * reviewed sentences stay exactly as they are — and the drawing carries no
@@ -721,7 +740,7 @@ export const CHAPTER_META: ChapterMeta[] = [
         image: `${IMG}/chapter-new.png`,
         group: 'afterSurgery',
         ask: 'nswoc',
-        // Card 6 "First Week Basics". The shop (kit 8065 and pouch 4891) is in chapter-shop.ts.
+        // Card 6 "First Week Basics". The shop (pouch 4891) is in chapter-shop.ts.
       },
       {
         image: `${IMG}/door-care.png`,
@@ -1251,6 +1270,9 @@ export const CHAPTER_META: ChapterMeta[] = [
         image: `${IMG}/care-chat-desk.png`,
         group: 'theBasics',
         ask: 'nswoc',
+        // Card 7 "Fit changes". One line to the paper guide. The sheet itself
+        // is on card 9, with the gap figure.
+        figures: [{ kind: 'measuringGuide', variant: 'link' }],
       },
       {
         image: `${IMG}/care-chat-moment.png`,
@@ -1267,6 +1289,20 @@ export const CHAPTER_META: ChapterMeta[] = [
         figures: [
           {
             kind: 'gapCompare',
+            sources: [
+              'ocs-changing-your-pouching-system',
+              'nswocc-ileostomy-guide-2022',
+              'nswocc-colostomy-guide-2022',
+              'khsc-ileostomy-care-2020',
+              'nsh-one-piece-pouch-change-2023',
+              'clwk-one-piece-pouch-change-2026',
+              'wocn-basic-ostomy-skin-care-2024',
+              'ascn-stoma-care-guidelines-2016',
+            ],
+          },
+          {
+            kind: 'measuringGuide',
+            variant: 'panel',
             sources: [
               'ocs-changing-your-pouching-system',
               'nswocc-ileostomy-guide-2022',
@@ -1317,7 +1353,9 @@ export const CHAPTER_META: ChapterMeta[] = [
         group: 'whenSomethingIsNotRight',
         ask: 'nswoc',
         // Card 15 "Leaks and short wear time". No band. Convexity is an
-        // assessment, and this card is a symptom card.
+        // assessment, and this card is a symptom card. One line to the paper
+        // measuring guide, because the card already says to re-measure.
+        figures: [{ kind: 'measuringGuide', variant: 'link' }],
       },
       {
         image: `${IMG}/door-chapters.png`,
@@ -1656,7 +1694,7 @@ export const CHAPTER_META: ChapterMeta[] = [
         urgentContent: true,
         group: 'growingUp',
         ask: 'team',
-        // Card 1 "Children". The shop (kit 8068 and its barrier and pouch) is in
+        // Card 1 "Children". The shop (barrier 4899 and pouch 4968) is in
         // chapter-shop.ts. The SickKids links stay on the referral band, not beside this kit.
       },
       {

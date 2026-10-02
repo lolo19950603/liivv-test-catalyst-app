@@ -48,6 +48,11 @@ function figureLines(text: FigureText): string[] {
     ...text.steps.flatMap((step) => [step.title, ...step.items]),
     text.tell?.heading,
     ...(text.tell?.items ?? []),
+    text.guideHeading,
+    text.guidePreview,
+    text.guideBody,
+    text.guidePhone,
+    text.guideLink,
   ].filter((line): line is string => Boolean(line?.trim()));
 }
 

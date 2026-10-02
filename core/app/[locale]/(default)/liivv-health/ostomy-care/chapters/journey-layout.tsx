@@ -101,6 +101,8 @@ function JourneyEntry({
           <AskChip role={card.ask} />
         </div>
       ) : null}
+
+      <CardShop card={card} products={products} slug={slug} supplyItems={supplyItems} visible />
     </div>
   );
 
@@ -128,7 +130,6 @@ function JourneyEntry({
           {body}
         </>
       )}
-      <CardShop card={card} products={products} slug={slug} supplyItems={supplyItems} visible />
     </article>
   );
 }

@@ -150,7 +150,17 @@ export interface FigureText {
   /* Steps with the stable message key each meta step names, in key order. */
   steps: Array<{ key: number; title: string; items: string[] }>;
   gapLink?: string;
+  /** One line to the paper measuring guide, under the supplies step. */
+  guideLink?: string;
   tell?: { heading: string; items: string[] };
+  /*
+   * Paper measuring guide. The preview is not a measuring tool; the PDF is.
+   * `guideLink` above is the one-line form, on the cards that only point at it.
+   */
+  guideHeading?: string;
+  guidePreview?: string;
+  guideBody?: string;
+  guidePhone?: string;
 }
 
 /*
@@ -507,6 +517,11 @@ interface FigureMessages {
   framing?: Numbered<string>;
   steps?: Numbered<{ title: string; items?: Numbered<string> }>;
   gapLink?: string;
+  guideHeading?: string;
+  guidePreview?: string;
+  guideBody?: string;
+  guidePhone?: string;
+  guideLink?: string;
   tell?: { heading: string; items?: Numbered<string> };
 }
 
@@ -590,6 +605,11 @@ function composeFigureText(figure: FigureMessages | undefined): FigureText {
     framing: ordered(figure?.framing),
     steps: keyedSteps(figure?.steps),
     ...(figure?.gapLink === undefined ? {} : { gapLink: figure.gapLink }),
+    ...(figure?.guideLink === undefined ? {} : { guideLink: figure.guideLink }),
+    ...(figure?.guideHeading === undefined ? {} : { guideHeading: figure.guideHeading }),
+    ...(figure?.guidePreview === undefined ? {} : { guidePreview: figure.guidePreview }),
+    ...(figure?.guideBody === undefined ? {} : { guideBody: figure.guideBody }),
+    ...(figure?.guidePhone === undefined ? {} : { guidePhone: figure.guidePhone }),
     ...(figure?.tell === undefined
       ? {}
       : { tell: { heading: figure.tell.heading, items: ordered(figure.tell.items) } }),

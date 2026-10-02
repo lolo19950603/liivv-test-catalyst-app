@@ -1,10 +1,19 @@
 /** Shared Ostomy Care product IDs (safe for client + server). */
 
-/** Featured curated kit on the Ostomy Care landing — the SenSura one-piece. */
-export const FRESH_START_KIT_ID = 8065;
+/** Featured curated kit on the Ostomy Care landing — the starter accessory kit. */
+export const STARTER_ACCESSORY_KIT_ID = 8069;
 
-/** @deprecated Use FRESH_START_KIT_ID */
-export const NEW_JOURNEY_STARTER_KIT_ID = FRESH_START_KIT_ID;
+/** Barrier film and protective sheet. Fits any opening size. */
+export const SKIN_COMFORT_KIT_ID = 8038;
+
+/** Odour drops and lubricating deodorant. Fits any opening size. */
+export const POUCH_COMFORT_KIT_ID = 8070;
+
+/** @deprecated Use STARTER_ACCESSORY_KIT_ID */
+export const FRESH_START_KIT_ID = STARTER_ACCESSORY_KIT_ID;
+
+/** @deprecated Use STARTER_ACCESSORY_KIT_ID */
+export const NEW_JOURNEY_STARTER_KIT_ID = STARTER_ACCESSORY_KIT_ID;
 
 /** Featured pouch for hero float (SenSura 1-Piece Drainable Opaque). */
 export const HERO_FLOAT_POUCH_ID = 4441;
@@ -83,25 +92,19 @@ export function isOstomyCategoryIds(entityIds: readonly number[]): boolean {
  * Curated kits on Ostomy Care surfaces
  * =============================================================================
  *
- * Every curated kit in category 1150 is shown. The shop shelf, search, the
- * landing, and the hub do not drop a kit because of its id.
+ * The landing and the chapters place only the ids in OSTOMY_KIT_IDS. The shop
+ * shelf and search still list a kit product until it is deleted from the
+ * catalogue.
  *
- * The Chapter 1 supply list is narrower on purpose: it links the SenSura
- * one-piece kit only after the reader picks one-piece, and the three drainable
- * two-piece kits only after they pick two-piece. That is a match to the system
- * they named, not a hide of the other kits.
+ * The Chapter 1 supply list links the pouch and barrier for the system the
+ * reader picked. The starter accessory kit is shown with either system.
  */
 
-/** Every curated ostomy kit in category 1150, listed or not. */
+/** The accessory kits. Surfaces show this whole list. */
 export const OSTOMY_KIT_IDS: readonly number[] = [
-  8061, // New Image Two-Piece Drainable Kit (Flat, 57 mm Red)
-  8062, // New Image Two-Piece Drainable Kit (Flat, 70 mm Blue)
-  8063, // New Image Two-Piece Closed Kit (Flat, 57 mm Red)
-  8064, // SenSura Click Two-Piece Drainable Kit (Flat, 50 mm)
-  8065, // SenSura One-Piece Drainable Kit (Flat, Transparent)
-  8066, // New Image Two-Piece Urostomy Kit (Flat, 70 mm Blue)
-  8067, // SenSura Click Two-Piece Urostomy Kit (Flat, 50 mm)
-  8068, // Pouchkins Two-Piece Kit (Flat, 44 mm Green)
+  STARTER_ACCESSORY_KIT_ID,
+  SKIN_COMFORT_KIT_ID,
+  POUCH_COMFORT_KIT_ID,
 ];
 
 /** Every curated ostomy kit. Surfaces show this whole list. */

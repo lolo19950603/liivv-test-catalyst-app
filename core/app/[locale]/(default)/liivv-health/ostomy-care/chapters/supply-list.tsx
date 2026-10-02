@@ -437,7 +437,9 @@ function SupplyShop({
   if (!shelf) return null;
 
   const waiting = hydrated && system !== 'one' && system !== 'two';
-  const offers = shelf.offers.filter((offer) => !hydrated || offer.system === system);
+  const offers = shelf.offers.filter(
+    (offer) => !hydrated || !offer.system || offer.system === system,
+  );
 
   if (!offers.length) return null;
 

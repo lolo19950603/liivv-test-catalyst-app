@@ -1087,6 +1087,13 @@
         "deliverEvery": "Livrer tous les"
       }
     },
+    "Compatibility": {
+      "title": "Convient à cette taille",
+      "empty": "Rien en stock ne convient à cette taille de bride.",
+      "note": "Ces pièces partagent un couplage et une taille de bride. Plat ou convexe reste la décision de votre infirmière.",
+      "flangeSize": "Taille de la bride",
+      "withStoma": "{flange} · stomie {stoma}"
+    },
     "RelatedProducts": {
       "title": "Vous aimerez aussi",
       "noRelatedProducts": "Aucun produit associé trouvé",
@@ -1675,6 +1682,7 @@
                 }
               },
               "gapLink": "Voir comment fonctionne l’espace autour de la stomie",
+              "guideLink": "Imprimer un guide de mesure en papier (taille réelle — un écran ne mesure pas).",
               "tell": {
                 "heading": "Parlez-en à votre NSWOC (non urgent) si :",
                 "items": {
@@ -1693,7 +1701,7 @@
               "3": "Une trousse de rechange pour les sorties dès le premier jour"
             },
             "figure": {
-              "intro": "Partez de la liste que votre NSWOC vous a remise. La trousse SenSura une pièce, et les trousses vidables deux pièces New Image et SenSura Click, sont les boîtes à ouvrir pour ces systèmes.",
+              "intro": "Partez de la liste que votre NSWOC vous a remise. La poche et la barrière sont vendues seules. L’ouverture se découpe une fois la stomie mesurée.",
               "systemLegend": "Votre système",
               "starterHeading": "Fournitures de départ",
               "supplies": {
@@ -2160,6 +2168,9 @@
               "1": "Mesurez à chaque changement pendant les six à huit premières semaines après la chirurgie, puis de nouveau après un changement de poids — la taille de la stomie peut changer à mesure que le gonflement se résorbe.",
               "2": "Une ouverture trop grande expose la peau ; trop petite peut blesser la stomie.",
               "3": "Visez un ajustement serré autour du bord de la stomie pour que la sortie tombe dans la poche, et non sur la peau."
+            },
+            "figure": {
+              "guideLink": "Imprimer un guide de mesure en papier (taille réelle — un écran ne mesure pas)."
             }
           },
           "8": {
@@ -2194,7 +2205,11 @@
                   "body": "La peau découverte se trouve sur le trajet de ce qui sort de la stomie."
                 }
               },
-              "mouldable": "Les barrières modelables s’étirent à la bonne taille avec les doigts au lieu d’être découpées. Mesurez à chaque changement pendant les six à huit premières semaines après la chirurgie, puis de nouveau après un changement de poids."
+              "mouldable": "Les barrières modelables s’étirent à la bonne taille avec les doigts au lieu d’être découpées. Mesurez à chaque changement pendant les six à huit premières semaines après la chirurgie, puis de nouveau après un changement de poids.",
+              "guideHeading": "Un guide en papier à découper",
+              "guidePreview": "Pas pour mesurer. Ce dessin n’est pas à taille réelle.",
+              "guideBody": "Téléchargez la feuille et imprimez-la à 100 % (taille réelle). Vérifiez que la barre d’échelle mesure 100 mm avant de découper. Tenez un trou au-dessus de la stomie et choisissez le plus proche qui ne repose pas dessus. Votre infirmière ou votre infirmier décide de l’espace.",
+              "guidePhone": "L’écran d’un téléphone ne peut pas mesurer une stomie. Enregistrez le PDF et imprimez-le à taille réelle."
             }
           },
           "10": {
@@ -2289,6 +2304,9 @@
                   "2": "Peau qui n’a pas complètement guéri entre les changements"
                 }
               }
+            },
+            "figure": {
+              "guideLink": "Imprimer un guide de mesure en papier (taille réelle — un écran ne mesure pas)."
             }
           },
           "16": {
@@ -3245,19 +3263,30 @@
         },
         "productsLabel": "Produits pour cela",
         "productsOr": "Ou achetez ceci seul",
-        "productsNote": "Ce sont des trousses Liivv pour cette partie de la routine. Ouvrez-en une et ajustez-la avant de passer à la caisse.",
+        "productsNote": "Vendus seuls. L’ouverture se découpe une fois la stomie mesurée.",
         "shop": {
           "label": "Boutique",
           "openKit": "Ouvrir la trousse",
+          "view": "Voir",
+          "add": "Ajouter au panier",
+          "addSize": "Ajouter {size}",
+          "addBoth": "Ajouter la barrière et la poche",
+          "addBothSize": "Ajouter la barrière et la poche, {size}",
+          "adding": "Ajout…",
+          "added": "Ajouté au panier",
+          "addedBoth": "La barrière et la poche sont dans le panier",
+          "addError": "L’ajout n’a pas fonctionné. Ouvrez le produit pour réessayer.",
           "alsoSold": "Aussi vendu seul",
           "sizesLabel": "Tailles",
           "noteProducts": "Vendus seuls. L’ouverture se découpe une fois la stomie mesurée.",
+          "noteKit": "Une trousse d’extras. Retirez ce dont vous n’avez pas besoin avant de passer à la caisse.",
+          "noteMixed": "La poche et la barrière sont vendues seules. Une trousse, ce sont des extras que vous pouvez retirer avant de passer à la caisse.",
           "families": {
             "newImage": "New Image vidangeable"
           },
           "occasions": {
             "firstWeek": "La première boîte. Une poche, la barrière déjà dessus.",
-            "sameKit": "La trousse pour ces étapes.",
+            "sameKit": "La poche pour ces étapes.",
             "yourSystem": "Le système que vous avez choisi.",
             "spare": "Une rechange du même système.",
             "systems": "Des systèmes vidangeables pour commencer.",
@@ -3266,15 +3295,19 @@
             "travelSpare": "Une rechange à emporter.",
             "child": "Une barrière et une poche, à la taille d’un enfant.",
             "adultSystems": "Systèmes vidangeables pour adultes.",
-            "sameSystems": "Les mêmes systèmes pour adultes."
+            "sameSystems": "Les mêmes systèmes pour adultes.",
+            "skinComfort": "Une pellicule et une feuille pour la peau.",
+            "goBagKit": "Des extras pour la trousse de rechange."
           },
           "offers": {
             "onePiece": "La barrière est déjà sur la poche.",
-            "newImage": "Deux pièces. Deux tailles à découper.",
-            "click": "Deux pièces, avec une bride à clic.",
-            "closed": "Une poche fermée.",
-            "uroImage": "Une poche d’urostomie, New Image.",
-            "uroClick": "Une poche d’urostomie, SenSura Click."
+            "newImage": "New Image",
+            "click": "SenSura Click",
+            "closed": "New Image, fermée",
+            "uroImage": "New Image, urostomie",
+            "uroClick": "SenSura Click, urostomie",
+            "starterKit": "Dissolvant pour adhésif et lingette barrière. N’importe quelle taille d’ouverture.",
+            "skinComfort": "Une pellicule barrière et une feuille protectrice."
           },
           "names": {
             "8061": "New Image vidangeable, 57 mm",
@@ -3285,6 +3318,8 @@
             "8066": "Urostomie New Image, 70 mm",
             "8067": "Urostomie SenSura Click, 50 mm",
             "8068": "Trousse Pouchkins, 44 mm",
+            "8069": "Trousse d’accessoires de départ",
+            "8038": "Trousse confort de la peau",
             "4891": "Poche SenSura une pièce",
             "4541": "Barrière New Image",
             "4878": "Poche vidangeable New Image",
@@ -3338,6 +3373,10 @@
         "takeIn": {
           "print": "Imprimez cette liste",
           "notesHint": "La liste imprimée a de l’espace pour écrire les réponses."
+        },
+        "measuringGuide": {
+          "download": "Télécharger le PDF",
+          "print": "Imprimer"
         },
         "frDraft": "Brouillon — révision en français à venir",
         "changeRoutine": {

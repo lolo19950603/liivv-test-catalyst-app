@@ -34,6 +34,7 @@ import {
 } from './chapters-data';
 import type { FigureMeta } from './chapters-meta';
 import { FrDraftMarker, itemText, OutboundLabel, UrgentExit } from './figure-parts';
+import { measuringGuidePdf } from './measuring-guide-figure';
 
 type ChangeRoutine = Extract<FigureMeta, { kind: 'changeRoutine' }>;
 
@@ -67,6 +68,7 @@ function ChangeStep({
   index: number;
 }) {
   const t = useTranslations('OstomyCare.ui.chapter.changeRoutine');
+  const locale = useLocale();
   const step = figure.steps[index];
   const words = card.figureText?.steps.find((entry) => entry.key === step?.key);
 
@@ -88,6 +90,14 @@ function ChangeStep({
       </h4>
       <div className="oc-fig-steps-body">
         {step.lead ? <p className="oc-fig-steps-lead">{itemText(card, step.lead)}</p> : null}
+        {/* Step 1's lead is the supplies list, which already names a measuring guide. */}
+        {step.key === 1 && card.figureText?.guideLink ? (
+          <p className="oc-fig-guide-link">
+            <a download href={measuringGuidePdf(locale)}>
+              {card.figureText.guideLink}
+            </a>
+          </p>
+        ) : null}
         <ul>
           {words.items.map((item, itemIndex) => (
             <li data-systems={systemsFor(itemIndex + 1)} key={`${itemIndex}-${item}`}>

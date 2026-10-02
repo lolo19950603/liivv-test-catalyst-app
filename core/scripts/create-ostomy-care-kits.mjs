@@ -13,8 +13,10 @@
  * MATCHED-SYSTEM TABLE. WRITTEN 2026-09-29.
  * =============================================================================
  *
- * A confirmed run creates the eight kits in KIT_META (or updates them when the
- * SKU already exists). 8041-8048 were deleted from the catalogue on 2026-09-29,
+ * The eight pouch-and-barrier kits (8061-8068) were deleted on 2026-10-01.
+ * KIT_META still records them, and each one is held so a confirmed run cannot
+ * recreate them. Pouches and barriers are sold on their own. 8041-8048 were
+ * deleted from the catalogue on 2026-09-29,
  * so this script no longer hides them. 8036-8040 stay hidden; --retire-old is
  * the only path that touches them.
  *
@@ -124,7 +126,8 @@ const CHANNEL_ID = Number(process.env.BIGCOMMERCE_CHANNEL_ID || '1');
 const OWNER_CONFIRMED = false;
 
 /** Earlier invented kits to hide when --retire-old is passed. */
-const OLD_AI_KIT_IDS = [8036, 8037, 8038, 8039, 8040];
+/** 8038 is the Skin Comfort Kit and must stay visible. */
+const OLD_AI_KIT_IDS = [8036, 8037, 8039, 8040];
 
 /** 8041-8048 were deleted on 2026-09-29. Nothing left here to hide. */
 const PREVIOUS_KIT_IDS = [];
@@ -225,6 +228,11 @@ const KIT_META = {
       '</p>',
   },
 };
+
+for (const sku of Object.keys(KIT_META)) {
+  KIT_META[sku].hold =
+    'Deleted 2026-10-01. The pouch and the barrier are sold on their own.';
+}
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');

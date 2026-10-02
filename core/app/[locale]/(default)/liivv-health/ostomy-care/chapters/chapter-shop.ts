@@ -1,19 +1,49 @@
 /*
- * Which kit and which catalogue products a chapter card may show.
+ * Which catalogue products a chapter card may show.
  *
  * Clinical copy stays in chapters-meta.ts. This file is merchandising only:
  * a change to what Liivv stocks must not change what a chapter says.
- * Powder, paste, rings, wipes, convex, and belts are not in any group.
  *
- * A card is one shelf: a hero, a collection, a product rail, a spare of kits,
- * or a one-line reprise of a shelf the reader has already passed. New Image
- * 57 mm and 70 mm are sizes of one system, so they share one photo and one
- * product rail.
+ * A pouch and its barrier are two products. The reader chooses the flange
+ * size on the product page. A kit here is extras that fit any opening.
  */
+
+import { SKIN_COMFORT_KIT_ID, STARTER_ACCESSORY_KIT_ID } from '../oc-ids';
 
 export type ShopSystem = 'one' | 'two';
 
 export type ShelfKind = 'hero' | 'collection' | 'products' | 'spare' | 'reprise';
+
+export const SHOP_OCCASIONS = [
+  'firstWeek',
+  'sameKit',
+  'yourSystem',
+  'spare',
+  'systems',
+  'output',
+  'measure',
+  'travelSpare',
+  'child',
+  'adultSystems',
+  'sameSystems',
+  'skinComfort',
+  'goBagKit',
+] as const;
+
+export type ShopOccasion = (typeof SHOP_OCCASIONS)[number];
+
+export const SHOP_OFFER_LINES = [
+  'onePiece',
+  'newImage',
+  'click',
+  'closed',
+  'uroImage',
+  'uroClick',
+  'starterKit',
+  'skinComfort',
+] as const;
+
+export type ShopOfferLine = (typeof SHOP_OFFER_LINES)[number];
 
 export interface ShopOffer {
   kitIds?: number[];
@@ -21,30 +51,27 @@ export interface ShopOffer {
   /** The supply list shows this offer only after the reader picks that system. */
   system?: ShopSystem;
   /** Key under OstomyCare.ui.chapter.shop.offers. */
-  line?: string;
+  line?: ShopOfferLine;
 }
 
 export interface CardShelf {
   kind: ShelfKind;
   /** Key under OstomyCare.ui.chapter.shop.occasions. */
-  occasion: string;
+  occasion: ShopOccasion;
   offers: ShopOffer[];
 }
 
 const ONE_PIECE: ShopOffer = {
-  kitIds: [8065],
   productIds: [4891],
   system: 'one',
   line: 'onePiece',
 };
 const NEW_IMAGE: ShopOffer = {
-  kitIds: [8061, 8062],
   productIds: [4541, 4878],
   system: 'two',
   line: 'newImage',
 };
 const CLICK: ShopOffer = {
-  kitIds: [8064],
   productIds: [4583, 4438],
   system: 'two',
   line: 'click',
@@ -52,39 +79,49 @@ const CLICK: ShopOffer = {
 
 const DRAINABLE: ShopOffer[] = [ONE_PIECE, NEW_IMAGE, CLICK];
 
-const CLOSED: ShopOffer = { kitIds: [8063], productIds: [4541, 4571], line: 'closed' };
-const URO_NI: ShopOffer = { kitIds: [8066], productIds: [4541, 4581], line: 'uroImage' };
-const URO_CLICK: ShopOffer = { kitIds: [8067], productIds: [4583, 4365], line: 'uroClick' };
-const POUCHKINS: ShopOffer = { kitIds: [8068], productIds: [4899, 4968] };
-const MEASURE: ShopOffer = { kitIds: [], productIds: [4541, 4583, 4891] };
+const CLOSED: ShopOffer = { productIds: [4541, 4571], line: 'closed' };
+const URO_NI: ShopOffer = { productIds: [4541, 4581], line: 'uroImage' };
+const URO_CLICK: ShopOffer = { productIds: [4583, 4365], line: 'uroClick' };
+const POUCHKINS: ShopOffer = { productIds: [4899, 4968] };
+const MEASURE: ShopOffer = { productIds: [4541, 4583, 4891] };
+const STARTER_KIT: ShopOffer = {
+  kitIds: [STARTER_ACCESSORY_KIT_ID],
+  productIds: [],
+  line: 'starterKit',
+};
+const SKIN_KIT: ShopOffer = {
+  kitIds: [SKIN_COMFORT_KIT_ID],
+  productIds: [],
+  line: 'skinComfort',
+};
 
-/** Kits only. A spare and a reprise do not repeat the product photos. */
-function kitsOnly(offers: ShopOffer[]): ShopOffer[] {
-  return offers.map(({ kitIds, line }) => ({ kitIds: kitIds ?? [], productIds: [], line }));
+/** A spare and a reprise do not repeat the large product photos. */
+function productsOnly(offers: ShopOffer[]): ShopOffer[] {
+  return offers.map(({ productIds, line }) => ({ productIds, line }));
 }
 
 const PLACEMENTS: Record<string, Record<number, CardShelf>> = {
   'new-to-the-journey': {
     6: { kind: 'hero', occasion: 'firstWeek', offers: [ONE_PIECE] },
-    7: { kind: 'reprise', occasion: 'sameKit', offers: kitsOnly([ONE_PIECE]) },
-    8: { kind: 'collection', occasion: 'yourSystem', offers: DRAINABLE },
-    9: { kind: 'spare', occasion: 'spare', offers: kitsOnly(DRAINABLE) },
+    7: { kind: 'reprise', occasion: 'sameKit', offers: productsOnly([ONE_PIECE]) },
+    8: { kind: 'collection', occasion: 'yourSystem', offers: [...DRAINABLE, STARTER_KIT] },
+    9: { kind: 'hero', occasion: 'goBagKit', offers: [STARTER_KIT] },
   },
   'get-to-know-your-stoma': {
     4: { kind: 'collection', occasion: 'systems', offers: DRAINABLE },
+    5: { kind: 'hero', occasion: 'skinComfort', offers: [SKIN_KIT] },
     6: { kind: 'collection', occasion: 'output', offers: [CLOSED, URO_NI, URO_CLICK] },
     9: { kind: 'products', occasion: 'measure', offers: [MEASURE] },
-    22: { kind: 'spare', occasion: 'travelSpare', offers: kitsOnly(DRAINABLE) },
+    22: { kind: 'spare', occasion: 'travelSpare', offers: productsOnly(DRAINABLE) },
   },
   'everyday-liivving': {
-    // Flying with supplies. The card titled Travel & Workdays is chapter 2.
-    10: { kind: 'spare', occasion: 'travelSpare', offers: kitsOnly(DRAINABLE) },
+    10: { kind: 'spare', occasion: 'travelSpare', offers: productsOnly(DRAINABLE) },
   },
   'this-might-be-you': {
     1: { kind: 'hero', occasion: 'child', offers: [POUCHKINS] },
     2: { kind: 'collection', occasion: 'adultSystems', offers: DRAINABLE },
-    3: { kind: 'reprise', occasion: 'sameSystems', offers: kitsOnly(DRAINABLE) },
-    4: { kind: 'reprise', occasion: 'sameSystems', offers: kitsOnly(DRAINABLE) },
+    3: { kind: 'reprise', occasion: 'sameSystems', offers: productsOnly(DRAINABLE) },
+    4: { kind: 'reprise', occasion: 'sameSystems', offers: productsOnly(DRAINABLE) },
   },
 };
 

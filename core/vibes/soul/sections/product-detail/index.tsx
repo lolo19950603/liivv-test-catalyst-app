@@ -88,6 +88,10 @@ export interface ProductDetailProps<F extends Field> {
   purchaseOptions?: ProductPurchaseOptionsConfig;
   /** When set, replaces the default product options / add-to-cart form. */
   purchaseSlot?: ReactNode;
+  /** A size the catalogue does not offer as an option, shown in the options block. */
+  fixedChoice?: { label: string; value: string };
+  /** Sits under the buy box. */
+  afterForm?: ReactNode;
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -135,6 +139,8 @@ export function ProductDetail<F extends Field>({
   showPurchaseOptions = false,
   purchaseOptions,
   purchaseSlot,
+  fixedChoice,
+  afterForm,
 }: ProductDetailProps<F>) {
   return (
     <section className="@container">
@@ -254,6 +260,14 @@ export function ProductDetail<F extends Field>({
                     </Stream>
                   </div>
                   <div className="group/product-detail-form">
+                    {fixedChoice ? (
+                      <div className="mb-4">
+                        <p className="mb-2 text-sm font-medium">{fixedChoice.label}</p>
+                        <p className="rounded-lg border border-[var(--product-detail-border,hsl(var(--contrast-100)))] px-3 py-2">
+                          {fixedChoice.value}
+                        </p>
+                      </div>
+                    ) : null}
                     {purchaseSlot ? (
                       purchaseSlot
                     ) : (
@@ -303,6 +317,7 @@ export function ProductDetail<F extends Field>({
                       </Stream>
                     )}
                   </div>
+                  {afterForm}
                   <div className="group/product-description">
                     <Stream fallback={<ProductDescriptionSkeleton />} value={product.description}>
                       {(description) =>

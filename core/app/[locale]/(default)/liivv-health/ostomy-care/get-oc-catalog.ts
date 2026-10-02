@@ -16,8 +16,11 @@ import { resolveBcCdnImageUrl } from '~/lib/resolve-bc-cdn-image-url';
 import {
   HERO_FLOAT_BARRIER_ID,
   HERO_FLOAT_POUCH_ID,
+  isListedOstomyKit,
   NEW_JOURNEY_STARTER_KIT_ID,
+  POUCH_COMFORT_KIT_ID,
   SHOP_OSTOMY_CARE_CATEGORY_ID,
+  SKIN_COMFORT_KIT_ID,
 } from './oc-ids';
 
 export {
@@ -214,7 +217,13 @@ export const getOcCatalog = cache(async (locale?: string): Promise<OcCatalog> =>
     categoryEntityIds: [SHOP_OSTOMY_CARE_CATEGORY_ID],
     searchSubCategories: true,
   };
-  const featuredIds = [NEW_JOURNEY_STARTER_KIT_ID, HERO_FLOAT_POUCH_ID, HERO_FLOAT_BARRIER_ID];
+  const featuredIds = [
+    NEW_JOURNEY_STARTER_KIT_ID,
+    SKIN_COMFORT_KIT_ID,
+    POUCH_COMFORT_KIT_ID,
+    HERO_FLOAT_POUCH_ID,
+    HERO_FLOAT_BARRIER_ID,
+  ];
 
   try {
     const byId = new Map<number, OcCatalogItem>();
@@ -260,7 +269,7 @@ export const getOcCatalog = cache(async (locale?: string): Promise<OcCatalog> =>
     }
 
     const all = [...byId.values()];
-    const kits = all.filter((item) => item.isKit);
+    const kits = all.filter((item) => item.isKit && isListedOstomyKit(item.entityId));
     const products = all.filter((item) => !item.isKit);
 
     kits.sort((a, b) => {

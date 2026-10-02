@@ -35,6 +35,7 @@ export type GateId =
   | 'finder'
   | 'shelf'
   | 'gapCompare'
+  | 'measuringGuide'
   | 'partsOfSystem'
   | 'fibreClocks'
   | 'bowelReference'
@@ -73,6 +74,12 @@ export const GATED_KINDS: Partial<Record<Exclude<FigureMeta['kind'], UngateableK
    * locales, so gating the figure hides no urgent wording.
    */
   gapCompare: 'gapCompare',
+  /*
+   * The paper measuring guide, on Chapter 02 cards 7, 9 and 15. It augments
+   * each card, so on /fr the card keeps the sentences its French review
+   * already covered. What waits is the guide's own wording and the link.
+   */
+  measuringGuide: 'measuringGuide',
   /*
    * C08 on Chapter 02 card 3. It is also HELD in chapters-meta.ts, so today it
    * renders nowhere at all; this gate is what its French waits on once the

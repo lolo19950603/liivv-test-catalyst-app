@@ -28,11 +28,9 @@
  *                        add for a product with no options to choose and stock
  *                        on hand; no disposal bags are stocked today.
  *
- *   SUPPLY_KIT_LINKS     The SenSura one-piece kit, and the three drainable
- *                        two-piece kits (New Image 57 mm, New Image 70 mm,
- *                        SenSura Click 50 mm). A kit shows only after the
- *                        reader picks that system. Urostomy, closed, and
- *                        Pouchkins stay on the shop shelf.
+ *   SUPPLY_KIT_LINKS     Removed. The supply list shop is the shelf in
+ *                        chapter-shop.ts: the pouch and barrier for the system
+ *                        the reader picked, plus the starter accessory kit.
  * =============================================================================
  */
 
@@ -59,41 +57,6 @@ export const SUPPLY_COLLECTIONS: Record<CriterionKey, SupplyCollection | null> =
 
 /** Products the list may offer as a one-click add, by criterion. */
 export const SUPPLY_CART_PRODUCTS: Partial<Record<CriterionKey, number[]>> = {};
-
-export interface SupplyKitLink {
-  system: 'one' | 'two';
-  /** Message key under ui.chapter.supplyList.kits. */
-  label: 'one' | 'twoNi57' | 'twoNi70' | 'twoClick';
-  productId: number;
-  path: string;
-}
-
-export const SUPPLY_KIT_LINKS: SupplyKitLink[] = [
-  {
-    system: 'one',
-    label: 'one',
-    productId: 8065,
-    path: '/sensura-one-piece-drainable-kit-flat-transparent/',
-  },
-  {
-    system: 'two',
-    label: 'twoNi57',
-    productId: 8061,
-    path: '/new-image-two-piece-drainable-kit-flat-57-mm-red/',
-  },
-  {
-    system: 'two',
-    label: 'twoNi70',
-    productId: 8062,
-    path: '/new-image-two-piece-drainable-kit-flat-70-mm-blue/',
-  },
-  {
-    system: 'two',
-    label: 'twoClick',
-    productId: 8064,
-    path: '/sensura-click-two-piece-drainable-kit-flat-50-mm/',
-  },
-];
 
 /*
  * The only product ids the supply list's server action will ever add. Derived

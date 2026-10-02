@@ -147,7 +147,12 @@ function roomForProduct(product: OcCatalogItem): Exclude<ShopRoomId, 'all' | 'ki
 }
 
 function hasDisplayPrice(priceLabel?: string) {
-  return Boolean(priceLabel && !/(\$|CA\$)?\s*0([.,]0+)?\b/i.test(priceLabel));
+  const match = priceLabel?.match(/(\d+(?:[.,]\d+)?)/);
+  if (!match) return false;
+
+  const amount = Number(match[1].replace(',', '.'));
+
+  return amount > 0;
 }
 
 /*

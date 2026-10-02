@@ -94,6 +94,10 @@ export default async (): Promise<NextConfig> => {
     },
     experimental: {
       optimizePackageImports: ['@icons-pack/react-simple-icons'],
+      // This repo lives under OneDrive. Turbopack's dev SQLite cache then
+      // spends several minutes compacting on every cold start and holds the
+      // first page request until that write finishes.
+      turbopackFileSystemCacheForDev: false,
     },
     // Archive media is served from /public, not from serverless functions.
     // Exclude it so NFT cannot bundle ~260MB of images/videos into api/archive/*.

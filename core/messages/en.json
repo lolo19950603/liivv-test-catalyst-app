@@ -1224,6 +1224,13 @@
         "condition": "Condition"
       }
     },
+    "Compatibility": {
+      "title": "Fits with this size",
+      "empty": "Nothing in stock fits this flange size.",
+      "note": "These pieces share a coupling and a flange size. Flat or convex is still your nurse's decision.",
+      "flangeSize": "Flange size",
+      "withStoma": "{flange} · stoma {stoma}"
+    },
     "RelatedProducts": {
       "title": "You may also like",
       "noRelatedProducts": "No related products found",
@@ -1683,6 +1690,7 @@
                 }
               },
               "gapLink": "See how the gap works",
+              "guideLink": "Print a paper measuring guide (actual size — a screen cannot measure).",
               "tell": {
                 "heading": "Tell your NSWOC (not urgent) if:",
                 "items": {
@@ -1701,7 +1709,7 @@
               "3": "A go-bag for outings from day one"
             },
             "figure": {
-              "intro": "Start from the list your NSWOC gave you. The SenSura one-piece kit, and the New Image and SenSura Click drainable two-piece kits, are the boxes to open for those systems.",
+              "intro": "Start from the list your NSWOC gave you. The pouch and the barrier are sold on their own. The opening is cut after the stoma is measured.",
               "systemLegend": "Your system",
               "starterHeading": "Starter supplies",
               "supplies": {
@@ -2169,6 +2177,9 @@
               "1": "Measure at every change for the first six to eight weeks after surgery, and again after a weight change — stoma size can change as swelling settles",
               "2": "An opening that is too large exposes skin; too small can injure the stoma",
               "3": "Aim for a close fit around the stoma edge so output lands in the pouch, not on skin"
+            },
+            "figure": {
+              "guideLink": "Print a paper measuring guide (actual size — a screen cannot measure)."
             }
           },
           "8": {
@@ -2203,7 +2214,11 @@
                   "body": "The exposed skin sits in the path of output."
                 }
               },
-              "mouldable": "Mouldable barriers are stretched to size by hand instead of cut. Measure at every change for the first six to eight weeks after surgery, and again after weight change."
+              "mouldable": "Mouldable barriers are stretched to size by hand instead of cut. Measure at every change for the first six to eight weeks after surgery, and again after weight change.",
+              "guideHeading": "A paper guide you can cut",
+              "guidePreview": "Not for measuring. This picture is not actual size.",
+              "guideBody": "Download the sheet and print it at 100% (Actual size). Check that the scale bar measures 100 mm before you cut. Hold a hole over the stoma and pick the closest one that does not sit on it. Your nurse sets how much gap is right.",
+              "guidePhone": "A phone screen cannot measure a stoma. Save the PDF and print it at actual size."
             }
           },
           "10": {
@@ -2298,6 +2313,9 @@
                   "2": "Skin that has not fully healed between changes"
                 }
               }
+            },
+            "figure": {
+              "guideLink": "Print a paper measuring guide (actual size — a screen cannot measure)."
             }
           },
           "16": {
@@ -3246,19 +3264,30 @@
         },
         "productsLabel": "Products for this",
         "productsOr": "Or buy this on its own",
-        "productsNote": "These are Liivv kits for this part of the routine. Open one and adjust it before checkout.",
+        "productsNote": "Sold on their own. The opening is cut after the stoma is measured.",
         "shop": {
           "label": "Shop",
           "openKit": "Open the kit",
+          "view": "View",
+          "add": "Add to cart",
+          "addSize": "Add {size}",
+          "addBoth": "Add barrier and pouch",
+          "addBothSize": "Add barrier and pouch, {size}",
+          "adding": "Adding…",
+          "added": "Added to your cart",
+          "addedBoth": "Barrier and pouch are in your cart",
+          "addError": "That did not add. Open the product and try there.",
           "alsoSold": "Also sold on its own",
           "sizesLabel": "Sizes",
           "noteProducts": "Sold on their own. The opening is cut after the stoma is measured.",
+          "noteKit": "A kit of extras. Remove anything you do not use before checkout.",
+          "noteMixed": "The pouch and barrier are sold on their own. A kit is extras you can remove before checkout.",
           "families": {
             "newImage": "New Image drainable"
           },
           "occasions": {
             "firstWeek": "The first box. One pouch, the barrier already on it.",
-            "sameKit": "The kit for these steps.",
+            "sameKit": "The pouch for these steps.",
             "yourSystem": "The system you picked.",
             "spare": "A spare of the same system.",
             "systems": "Drainable systems you can start with.",
@@ -3267,15 +3296,19 @@
             "travelSpare": "A spare to pack.",
             "child": "A barrier and a pouch, sized for a child.",
             "adultSystems": "Adult drainable systems.",
-            "sameSystems": "The same adult systems."
+            "sameSystems": "The same adult systems.",
+            "skinComfort": "A film and a sheet for the skin.",
+            "goBagKit": "Extras for a go-bag."
           },
           "offers": {
             "onePiece": "The barrier is already on the pouch.",
-            "newImage": "Two-piece. Two cut-to-fit sizes.",
-            "click": "Two-piece, with a click flange.",
-            "closed": "A closed pouch.",
-            "uroImage": "A urostomy pouch, New Image.",
-            "uroClick": "A urostomy pouch, SenSura Click."
+            "newImage": "New Image",
+            "click": "SenSura Click",
+            "closed": "New Image, closed",
+            "uroImage": "New Image, urostomy",
+            "uroClick": "SenSura Click, urostomy",
+            "starterKit": "Adhesive remover and a barrier wipe. Any opening size.",
+            "skinComfort": "A barrier film and a protective sheet."
           },
           "names": {
             "8061": "New Image drainable, 57 mm",
@@ -3286,6 +3319,8 @@
             "8066": "New Image urostomy, 70 mm",
             "8067": "SenSura Click urostomy, 50 mm",
             "8068": "Pouchkins kit, 44 mm",
+            "8069": "Starter accessory kit",
+            "8038": "Skin comfort kit",
             "4891": "SenSura one-piece pouch",
             "4541": "New Image barrier",
             "4878": "New Image drainable pouch",
@@ -3338,6 +3373,10 @@
         "takeIn": {
           "print": "Print this list",
           "notesHint": "The printed list has space to write down answers."
+        },
+        "measuringGuide": {
+          "download": "Download the PDF",
+          "print": "Print"
         },
         "frDraft": "Draft — French review to come",
         "changeRoutine": {

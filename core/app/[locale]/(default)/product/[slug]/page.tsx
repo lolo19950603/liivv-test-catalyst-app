@@ -9,11 +9,11 @@ import { Suspense } from 'react';
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { FeaturedProductCarousel } from '@/vibes/soul/sections/featured-product-carousel';
 import {
-  FRESH_START_KIT_ID,
   isOstomyKit,
 } from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
 import { auth, getSessionCustomerAccessToken } from '~/auth';
 import { DenyAdSignals } from '~/components/analytics/deny-ad-signals';
+import { CompatibilitySection } from '~/components/ostomy-compatibility';
 import { pricesTransformer } from '~/data-transformers/prices-transformer';
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { productOptionsTransformer } from '~/data-transformers/product-options-transformer';
@@ -37,6 +37,15 @@ import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { ProductDetail } from '~/lib/makeswift/components/product-detail';
 import { Slot } from '~/lib/makeswift/slot';
 import { getRecaptchaSiteKey } from '~/lib/recaptcha';
+import {
+  allMatchIds,
+  FIXED_FLANGE_SIZES,
+  keysForProduct,
+  matchesFor,
+  optionRole,
+  type FlangeOption,
+} from '~/lib/ostomy/compatibility';
+import { getCompatibilityProducts } from '~/lib/ostomy/get-compatibility-products';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
 import { areSubscriptionsAvailable } from '~/lib/subscriptions/availability';
 import {
@@ -900,11 +909,6 @@ export default async function Product({ params, searchParams }: Props) {
                 ? { src: baseProduct.defaultImage.url, alt: baseProduct.defaultImage.altText }
                 : undefined
             }
-            includedNote={
-              baseProduct.entityId === FRESH_START_KIT_ID
-                ? curatedKitT('onePieceNote')
-                : undefined
-            }
             kitName={baseProduct.name}
             products={kitProducts}
             suggestedProducts={suggestedProducts}
@@ -917,6 +921,50 @@ export default async function Product({ params, searchParams }: Props) {
       <p className="font-medium">{curatedKitT('Errors.cartUnavailable')}</p>
     </div>
   );
+
+  const compatT = await getTranslations('Product.Compatibility');
+  const flangeOpts: FlangeOption[] = isCuratedKit
+    ? []
+    : removeEdgesAndNodes(baseProduct.productOptions).flatMap((option) => {
+        if (option.__typename !== 'MultipleChoiceOption') return [];
+
+        const role = optionRole(option.displayName);
+
+        if (!role) return [];
+
+        return [
+          {
+            role,
+            param: String(option.entityId),
+            values: removeEdgesAndNodes(option.values).map((value) => ({
+              id: String(value.entityId),
+              label: value.label,
+              isDefault: value.isDefault,
+            })),
+          },
+        ];
+      });
+  const compatKeys = isCuratedKit ? [] : keysForProduct(baseProduct.entityId);
+  const compatCatalog = await getCompatibilityProducts(allMatchIds(baseProduct.entityId), locale);
+  const compatById = new Map(compatCatalog.map((item) => [item.entityId, item]));
+  const compatGroups = compatKeys.map((key) => ({
+    key,
+    items: matchesFor(baseProduct.entityId, key).flatMap((id) => {
+      const item = compatById.get(id);
+
+      return item ? [item] : [];
+    }),
+  }));
+  const fixedSize = FIXED_FLANGE_SIZES[baseProduct.entityId];
+  const fixedChoice =
+    fixedSize && !flangeOpts.some((option) => option.role === 'size')
+      ? {
+          label: compatT('flangeSize'),
+          value: fixedSize.stoma
+            ? compatT('withStoma', { flange: fixedSize.flange, stoma: fixedSize.stoma })
+            : fixedSize.flange,
+        }
+      : undefined;
 
   return (
     <>
@@ -980,6 +1028,12 @@ export default async function Product({ params, searchParams }: Props) {
             showPurchaseOptions={isCuratedKit ? false : showPurchaseOptions}
             thumbnailLabel={t('ProductDetails.thumbnail')}
             user={streamableUser}
+            fixedChoice={fixedChoice}
+            afterForm={
+              compatGroups.length ? (
+                <CompatibilitySection groups={compatGroups} options={flangeOpts} />
+              ) : undefined
+            }
           />
         </ProductAnalyticsProvider>
       </div>

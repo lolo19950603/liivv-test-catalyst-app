@@ -32,6 +32,7 @@ import {
 } from '../../faceted-page-size';
 import { fetchFacetedSearch } from '../../fetch-faceted-search';
 
+import { CategoryScrollReset } from './_components/category-scroll-reset';
 import { CategorySearchPanel } from './_components/category-search-panel';
 import { CategoryViewed } from './_components/category-viewed';
 import { OstomyShelfExit } from './_components/ostomy-shelf-exit';
@@ -302,6 +303,7 @@ export default async function Category(props: Props) {
 
   return (
     <>
+      <CategoryScrollReset />
       {/*
         An ostomy shelf — /liivv-health/ostomy-care/shop-ostomy-care, or any of
         the Heal + Manage ostomy categories — says what the person browsing it

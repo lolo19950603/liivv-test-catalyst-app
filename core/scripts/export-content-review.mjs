@@ -861,6 +861,7 @@ function changeRoutineNotes(figure, num, locale, card) {
     `- tell-your-NSWOC list · sources: ${sourceTitles(figure.tellSources, locale)}`,
     `- Find an NSWOC link (same tab, page in ${figure.findNswocHrefLang === 'fr' ? 'French' : 'English'}) → <${figure.findNswocHref}>`,
     `- gap link, on step key ${figure.gap.step} → Chapter ${gapChapter?.num ?? '?'}, card ${figure.gap.card}`,
+    `- paper measuring guide, under the supplies lead of step 1 → ${ref(`${num}.fig.guideLink`)}`,
     ...(stored.length
       ? [`- *Stored but not rendered: step keys ${stored.join(', ')} (not in chapters-meta.ts).*`]
       : []),
@@ -1303,6 +1304,27 @@ function gapCompareNotes(figure, num, locale) {
 }
 
 /*
+ * The paper measuring guide. The holes live in the PDF at real millimetres.
+ * The page picture is not a measuring tool, and a link is not a second sheet.
+ */
+function measuringGuideNotes(figure, num, locale) {
+  if (figure.variant === 'link') {
+    return [
+      '',
+      `*One line ${ref(`${num}.fig.guideLink`)} to the paper measuring guide PDF. The holes stay on the measuring card. Nothing here is a size, and the screen is not what a reader cuts.*`,
+    ];
+  }
+
+  return [
+    '',
+    `*A paper measuring guide. The holes are drawn at real opening sizes in the PDF only (\`stoma-measuring-guide-en.pdf\` and \`stoma-measuring-guide-fr.pdf\`, from \`core/scripts/render-stoma-measuring-guide.mjs\`). On the page, ${ref(`${num}.fig.guidePreview`)} says the picture is not for measuring, and ${ref(`${num}.fig.guidePhone`)} says a phone screen cannot measure. Print opens the PDF. The page is never the thing a reader cuts.*`,
+    `- ${ref(`${num}.fig.guideHeading`)} ${ref(`${num}.fig.guideBody`)}`,
+    '- No camera measure. A phone saves the PDF and the reader prints it at actual size, then checks the 100 mm bar with a ruler.',
+    `- sources: ${sourceTitles(figure.sources, locale)}`,
+  ];
+}
+
+/*
  * The lower-fibre clocks (C11). What a reviewer cannot see from the labels:
  * which surgery each row is for, how far along the scale its bar fades, and the
  * three things the figure deliberately refuses to do.
@@ -1499,6 +1521,10 @@ function figureReviewNotes(structure, num, locale, card) {
 
     if (figure.kind === 'gapCompare') {
       lines.push(...gapCompareNotes(figure, num, locale));
+    }
+
+    if (figure.kind === 'measuringGuide') {
+      lines.push(...measuringGuideNotes(figure, num, locale));
     }
 
     if (figure.kind === 'fibreClocks') {
@@ -1945,6 +1971,7 @@ function writeShared(locale) {
     ['chapter.changeRoutine', 'Pouch change walk-through — controls', 'changeRoutine'],
     ['chapter.changeRoutine.systems', 'Pouch change walk-through — system labels', 'changeRoutine'],
     ['chapter.gap', 'Opening gap comparison — shape pair and its status line', 'gapCompare'],
+    ['chapter.measuringGuide', 'Paper measuring guide — download and print', 'measuringGuide'],
     [
       'chapter.parts',
       'Parts of a pouching system — view controls and their status lines',
@@ -2358,6 +2385,10 @@ function changeRoutineProblems(figure, text, card, at) {
     );
   }
 
+  if (typeof text?.guideLink !== 'string') {
+    problems.push(`${at} changeRoutine: no figure.guideLink`);
+  }
+
   return problems;
 }
 
@@ -2719,6 +2750,10 @@ function figureProblems(figure, text, card, at, cards) {
       problems.push(...gapCompareProblems(text, at));
       break;
 
+    case 'measuringGuide':
+      problems.push(...measuringGuideProblems(figure, text, at));
+      break;
+
     case 'fibreClocks':
       problems.push(...fibreClocksProblems(figure, text, at));
       break;
@@ -2729,6 +2764,28 @@ function figureProblems(figure, text, card, at, cards) {
 
     default:
       break;
+  }
+
+  return problems;
+}
+
+/*
+ * The paper measuring guide. The panel's four lines are the only words it
+ * adds. A link is one line and nothing else: it must not grow a second sheet.
+ */
+function measuringGuideProblems(figure, text, at) {
+  const problems = [];
+
+  if (figure.variant === 'panel') {
+    for (const key of ['guideHeading', 'guidePreview', 'guideBody', 'guidePhone']) {
+      if (typeof text?.[key] !== 'string') {
+        problems.push(`${at} measuringGuide: no figure.${key} in messages`);
+      }
+    }
+
+    if (!figure.sources?.length) problems.push(`${at} measuringGuide: no sources`);
+  } else if (typeof text?.guideLink !== 'string') {
+    problems.push(`${at} measuringGuide: no figure.guideLink in messages`);
   }
 
   return problems;
@@ -3929,6 +3986,7 @@ const FIGURE_NAMES = {
   changeRoutine: 'the pouch change walk-through',
   fibreClocks: 'the lower-fibre clocks',
   gapCompare: 'the opening gap comparison',
+  measuringGuide: 'the paper measuring guide',
   goBag: 'the go-bag link to the supply list',
   lanes: 'the who-to-ask finder',
   partsOfSystem: 'the parts of a pouching system',
