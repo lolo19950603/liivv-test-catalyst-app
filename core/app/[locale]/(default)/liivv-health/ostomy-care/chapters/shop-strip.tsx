@@ -1,7 +1,7 @@
 'use client';
 
-import { useLocale, useTranslations } from 'next-intl';
-import { useActionState, useEffect, type ReactNode } from 'react';
+import { useFormatter, useLocale, useTranslations } from 'next-intl';
+import { useActionState, useEffect, useId, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { useMiniCart } from '~/components/mini-cart/mini-cart-context';
@@ -84,8 +84,8 @@ function ShopStripBody({
   const headline = single ? null : (
     <p className="oc-merch-occasion">{t(`shop.occasions.${shelf.occasion}`)}</p>
   );
-  const hasKits = shelf.offers.some((offer) => (offer.kitIds?.length ?? 0) > 0);
-  const hasProducts = shelf.offers.some((offer) => offer.productIds.length > 0);
+  const hasKits = shelf.offers.some((entry) => (entry.kitIds?.length ?? 0) > 0);
+  const hasProducts = shelf.offers.some((entry) => entry.productIds.length > 0);
   let noteKey: 'shop.noteMixed' | 'shop.noteKit' | 'shop.noteProducts' = 'shop.noteProducts';
 
   if (hasKits && hasProducts) noteKey = 'shop.noteMixed';
@@ -132,21 +132,37 @@ function HeroOffer({
   occasion: ShopOccasion;
 }) {
   const t = useTranslations('OstomyCare.ui.chapter');
+  const cad = useCad();
   const lead = kits[0] ?? items[0];
   const companions = kits.length ? items : items.filter((item) => item.entityId !== lead?.entityId);
 
   if (!lead) return null;
 
   if (!kits.length && items.length > 1) {
+    const bundles = cartBundlesForIds(items.map((item) => item.entityId));
+
+    if (bundles.some((bundle) => bundle.kind === 'both')) {
+      return (
+        <PairBlock
+          bundles={bundles}
+          heading={t(`shop.occasions.${occasion}`)}
+          items={items}
+          line={line}
+        />
+      );
+    }
+
     return (
       <div className="oc-merch-hero is-products">
         <p className="oc-merch-occasion">{t(`shop.occasions.${occasion}`)}</p>
         {line ? <p className="oc-merch-dek">{t(`shop.offers.${line}`)}</p> : null}
-        <ProductTiles items={items} />
-        <BundleButtons bundles={cartBundlesForIds(items.map((item) => item.entityId))} />
+        <ChoiceCards items={items} />
       </div>
     );
   }
+
+  const bundle = cartBundlesForIds([lead.entityId])[0];
+  const amount = linePrice(bundle, lead.entityId);
 
   return (
     <>
@@ -156,14 +172,19 @@ function HeroOffer({
           <p className="oc-merch-occasion">{t(`shop.occasions.${occasion}`)}</p>
           {line ? <p className="oc-merch-dek">{t(`shop.offers.${line}`)}</p> : null}
           <p className="oc-merch-title">{kits.length ? offerTitle(t, kits, line) : shortName(t, lead)}</p>
-          {kits.length > 1 ? <SizeLinks kits={kits} /> : kits.length === 1 ? <SingleKit kit={kits[0]!} /> : null}
-          {!kits.length && lead.priceLabel ? <p className="oc-merch-price">{lead.priceLabel}</p> : null}
+          {kits.length > 1 ? <SizeLinks kits={kits} /> : null}
+          {!kits.length && typeof amount === 'number' ? (
+            <p className="oc-merch-price">{cad(amount)}</p>
+          ) : kits.length === 1 && kits[0]?.priceLabel ? (
+            <p className="oc-merch-price">{kits[0].priceLabel}</p>
+          ) : !kits.length && lead.priceLabel ? (
+            <p className="oc-merch-price">{lead.priceLabel}</p>
+          ) : null}
+          {!kits.length && bundle?.size ? <p className="oc-merch-spec-line">{bundle.size}</p> : null}
           <div className="oc-merch-actions">
             {kits.length === 1 ? <Cta item={kits[0]!} label={t('shop.openKit')} /> : null}
-            {!kits.length && items.length === 1 ? <Cta item={lead} label={t('shop.view')} /> : null}
-            <BundleButtons
-              bundles={cartBundlesForIds((kits.length ? kits : [lead]).map((item) => item.entityId))}
-            />
+            {!kits.length ? <Cta item={lead} label={t('shop.view')} /> : null}
+            {bundle ? <BundleButton bundle={bundle} /> : null}
           </div>
         </div>
       </div>
@@ -184,22 +205,28 @@ function CollectionShelf({ offers }: { offers: ResolvedOffer[] }) {
 
 function OfferCard({ offer }: { offer: ResolvedOffer }) {
   const t = useTranslations('OstomyCare.ui.chapter');
-  const tiles = offer.kits.length ? offer.kits : offer.items;
-  const bundles = cartBundlesForIds(tiles.map((item) => item.entityId));
-  const shared = bundles.some((bundle) => bundle.kind === 'both' || bundle.kind === 'kit');
 
-  if (!tiles.length) return null;
+  if (offer.kits.length && !offer.items.length) {
+    return (
+      <article className="oc-merch-offer">
+        {offer.line ? <p className="oc-merch-dek">{t(`shop.offers.${offer.line}`)}</p> : null}
+        {offer.kits.map((kit) => (
+          <KitRow key={kit.entityId} kit={kit} />
+        ))}
+      </article>
+    );
+  }
+
+  const bundles = cartBundlesForIds(offer.items.map((item) => item.entityId));
+
+  if (bundles.some((bundle) => bundle.kind === 'both')) {
+    return <PairBlock bundles={bundles} items={offer.items} line={offer.line} />;
+  }
 
   return (
     <article className="oc-merch-offer">
       {offer.line ? <p className="oc-merch-dek">{t(`shop.offers.${offer.line}`)}</p> : null}
-      <ProductTiles
-        cta={offer.kits.length ? t('shop.openKit') : undefined}
-        items={tiles}
-        perCardAdds={!shared}
-      />
-      {shared ? <BundleButtons bundles={bundles} /> : null}
-      {offer.kits.length && offer.items.length ? <ProductRail items={offer.items} /> : null}
+      <ChoiceCards items={offer.items} />
     </article>
   );
 }
@@ -215,14 +242,14 @@ function ProductShelf({ offers }: { offers: ResolvedOffer[] }) {
     <>
       {offers.map((offer) => {
         const bundles = cartBundlesForIds(offer.items.map((item) => item.entityId));
-        const shared = bundles.some((bundle) => bundle.kind === 'both');
 
-        return (
-          <div key={offer.key}>
-            <ProductTiles items={offer.items} perCardAdds={!shared} />
-            {shared ? <BundleButtons bundles={bundles} /> : null}
-          </div>
-        );
+        if (bundles.some((bundle) => bundle.kind === 'both')) {
+          return (
+            <PairBlock bundles={bundles} items={offer.items} key={offer.key} line={offer.line} />
+          );
+        }
+
+        return <ChoiceCards items={offer.items} key={offer.key} />;
       })}
     </>
   );
@@ -235,15 +262,11 @@ function Reprise({ offers }: { offers: ResolvedOffer[] }) {
     <ul className="oc-merch-lines">
       {offers.map((offer) => {
         const rows = offer.items.length ? offer.items : offer.kits;
+        const bundles = cartBundlesForIds(rows.map((item) => item.entityId));
 
         return (
           <li className="oc-merch-line" key={offer.key}>
-            {rows.map((item) => (
-              <ProductLine item={item} key={item.entityId} />
-            ))}
-            <BundleButtons
-              bundles={cartBundlesForIds(rows.map((item) => item.entityId))}
-            />
+            {bundles.length ? <QuietRow bundles={bundles} items={rows} /> : null}
           </li>
         );
       })}
@@ -251,10 +274,179 @@ function Reprise({ offers }: { offers: ResolvedOffer[] }) {
   );
 }
 
-function SingleKit({ kit }: { kit: OcCatalogItem }) {
-  if (!kit.priceLabel) return null;
+function PairBlock({
+  bundles,
+  heading,
+  items,
+  line,
+}: {
+  bundles: ChapterCartBundle[];
+  heading?: string;
+  items: OcCatalogItem[];
+  line?: ShopOfferLine;
+}) {
+  const t = useTranslations('OstomyCare.ui.chapter');
+  const locale = useLocale();
+  const cad = useCad();
+  const pairs = bundles.filter((bundle) => bundle.kind === 'both');
+  const [selected, setSelected] = useState(pairs[0]?.key ?? '');
+  const bundle = pairs.find((entry) => entry.key === selected) ?? pairs[0];
 
-  return <p className="oc-merch-price">{kit.priceLabel}</p>;
+  if (!bundle) return null;
+
+  const total = pairTotal(bundle);
+
+  return (
+    <article className="oc-merch-offer">
+      {heading ? <p className="oc-merch-occasion">{heading}</p> : null}
+      {line ? <p className="oc-merch-dek">{t(`shop.offers.${line}`)}</p> : null}
+      <ul className="oc-merch-well">
+        {items.map((item) => {
+          const price = linePrice(bundle, item.entityId);
+
+          return (
+            <li className="oc-merch-piece" key={item.entityId}>
+              <a className="oc-merch-piece-link" href={localeHref(item.path, locale)}>
+                {item.image ? (
+                  <img alt="" loading="lazy" src={item.image.src} />
+                ) : (
+                  <span className="oc-merch-blank" />
+                )}
+                <span className="oc-merch-name">{shortName(t, item)}</span>
+              </a>
+              {typeof price === 'number' ? (
+                <p className="oc-merch-price">{cad(price)}</p>
+              ) : item.priceLabel ? (
+                <p className="oc-merch-price">{item.priceLabel}</p>
+              ) : null}
+            </li>
+          );
+        })}
+      </ul>
+      <div className="oc-merch-buy">
+        <SizeChoice bundles={pairs} onSelect={setSelected} selected={bundle.key} />
+        {typeof total === 'number' ? (
+          <p className="oc-merch-total">
+            <span className="oc-merch-total-label">{t('shop.together')}</span>
+            <span>{cad(total)}</span>
+          </p>
+        ) : null}
+        <BundleButton bundle={bundle} key={bundle.key} />
+      </div>
+    </article>
+  );
+}
+
+function ChoiceCards({ items }: { items: OcCatalogItem[] }) {
+  const layout = items.length === 1 ? 'is-single' : items.length === 3 ? 'is-trio' : '';
+
+  return (
+    <ul className={['oc-merch-cards', layout].filter(Boolean).join(' ')}>
+      {items.map((item) => (
+        <ChoiceCard item={item} key={item.entityId} />
+      ))}
+    </ul>
+  );
+}
+
+function ChoiceCard({ item }: { item: OcCatalogItem }) {
+  const t = useTranslations('OstomyCare.ui.chapter');
+  const locale = useLocale();
+  const cad = useCad();
+  const bundles = cartBundlesForProduct(item.entityId);
+  const [selected, setSelected] = useState(bundles[0]?.key ?? '');
+  const bundle = bundles.find((entry) => entry.key === selected) ?? bundles[0];
+  const price = linePrice(bundle, item.entityId);
+
+  return (
+    <li className="oc-merch-card">
+      <a aria-hidden="true" className="oc-merch-card-photo" href={localeHref(item.path, locale)} tabIndex={-1}>
+        {item.image ? (
+          <img alt="" loading="lazy" src={item.image.src} />
+        ) : (
+          <span className="oc-merch-blank" />
+        )}
+      </a>
+      <div className="oc-merch-card-body">
+        <a className="oc-merch-name" href={localeHref(item.path, locale)}>
+          {shortName(t, item)}
+        </a>
+        {typeof price === 'number' ? (
+          <p className="oc-merch-price">{cad(price)}</p>
+        ) : item.priceLabel ? (
+          <p className="oc-merch-price">{item.priceLabel}</p>
+        ) : null}
+        {bundle ? <SizeChoice bundles={bundles} onSelect={setSelected} selected={bundle.key} /> : null}
+        {bundle ? <BundleButton bundle={bundle} key={bundle.key} /> : null}
+      </div>
+    </li>
+  );
+}
+
+function KitRow({ kit }: { kit: OcCatalogItem }) {
+  const t = useTranslations('OstomyCare.ui.chapter');
+  const bundle = cartBundlesForIds([kit.entityId])[0];
+
+  return (
+    <div className="oc-merch-kit">
+      {kit.image ? <Photo item={kit} /> : null}
+      <div className="oc-merch-copy">
+        <p className="oc-merch-title">{shortName(t, kit)}</p>
+        {kit.priceLabel ? <p className="oc-merch-price">{kit.priceLabel}</p> : null}
+        <div className="oc-merch-actions">
+          <Cta item={kit} label={t('shop.openKit')} />
+          {bundle ? <BundleButton bundle={bundle} /> : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function QuietRow({ bundles, items }: { bundles: ChapterCartBundle[]; items: OcCatalogItem[] }) {
+  const t = useTranslations('OstomyCare.ui.chapter');
+  const locale = useLocale();
+  const cad = useCad();
+  const [selected, setSelected] = useState(bundles[0]?.key ?? '');
+  const bundle = bundles.find((entry) => entry.key === selected) ?? bundles[0];
+
+  if (!bundle) return null;
+
+  const pair = bundle.kind === 'both';
+  const amount = pair ? pairTotal(bundle) : linePrice(bundle, items[0]?.entityId ?? 0);
+
+  return (
+    <div className="oc-merch-quiet">
+      <div className="oc-merch-quiet-names">
+        {items.map((item, index) => (
+          <span className="oc-merch-quiet-name" key={item.entityId}>
+            {index > 0 ? (
+              <span aria-hidden="true" className="oc-merch-dot">
+                ·
+              </span>
+            ) : null}
+            <a className="oc-merch-name" href={localeHref(item.path, locale)}>
+              {item.image ? (
+                <img alt="" className="oc-merch-thumb" height={52} src={item.image.src} width={52} />
+              ) : null}
+              <span>{shortName(t, item)}</span>
+            </a>
+          </span>
+        ))}
+      </div>
+      <SizeChoice bundles={bundles} onSelect={setSelected} selected={bundle.key} />
+      {pair && typeof amount === 'number' ? (
+        <p className="oc-merch-total">
+          <span className="oc-merch-total-label">{t('shop.together')}</span>
+          <span>{cad(amount)}</span>
+        </p>
+      ) : typeof amount === 'number' ? (
+        <p className="oc-merch-price">{cad(amount)}</p>
+      ) : bundle.kind === 'kit' && items[0]?.priceLabel ? (
+        <p className="oc-merch-price">{items[0].priceLabel}</p>
+      ) : null}
+      <BundleButton bundle={bundle} key={bundle.key} />
+    </div>
+  );
 }
 
 function SizeLinks({ kits }: { kits: OcCatalogItem[] }) {
@@ -289,19 +481,43 @@ function SizeLink({ kit }: { kit: OcCatalogItem }) {
   );
 }
 
-function ProductLine({ item }: { item: OcCatalogItem }) {
-  const locale = useLocale();
+function SizeChoice({
+  bundles,
+  onSelect,
+  selected,
+}: {
+  bundles: ChapterCartBundle[];
+  onSelect: (key: string) => void;
+  selected: string;
+}) {
   const t = useTranslations('OstomyCare.ui.chapter');
+  const name = useId();
+  const sized = bundles.filter((bundle) => bundle.size);
+
+  if (!sized.length) return null;
+
+  if (sized.length === 1) {
+    return <span className="oc-merch-size-chip is-selected">{sized[0]!.size}</span>;
+  }
 
   return (
-    <a
-      aria-label={item.priceLabel ? `${item.name}, ${item.priceLabel}` : item.name}
-      href={localeHref(item.path, locale)}
-    >
-      <span className="oc-merch-line-name">{shortName(t, item)}</span>
-      {item.priceLabel ? <span className="oc-merch-price">{item.priceLabel}</span> : null}
-      <span className="oc-merch-line-cta">{t('shop.view')}</span>
-    </a>
+    <div aria-label={t('shop.sizesLabel')} className="oc-merch-size-choices" role="radiogroup">
+      {sized.map((bundle) => (
+        <label
+          className={bundle.key === selected ? 'oc-merch-size-chip is-selected' : 'oc-merch-size-chip'}
+          key={bundle.key}
+        >
+          <input
+            checked={bundle.key === selected}
+            name={name}
+            onChange={() => onSelect(bundle.key)}
+            type="radio"
+            value={bundle.key}
+          />
+          {bundle.size}
+        </label>
+      ))}
+    </div>
   );
 }
 
@@ -336,54 +552,13 @@ function Cta({ item, label }: { item: OcCatalogItem; label: string }) {
   );
 }
 
-function ProductTiles({
-  cta,
-  items,
-  perCardAdds = false,
-}: {
-  cta?: string;
-  items: OcCatalogItem[];
-  perCardAdds?: boolean;
-}) {
-  const locale = useLocale();
-  const t = useTranslations('OstomyCare.ui.chapter');
-  const action = cta ?? t('shop.view');
-
-  const layout = items.length === 1 ? 'is-single' : items.length === 3 ? 'is-trio' : '';
-
-  return (
-    <ul className={['oc-merch-products', layout].filter(Boolean).join(' ')}>
-      {items.map((item) => (
-        <li key={item.entityId}>
-          <a
-            aria-label={item.priceLabel ? `${action}, ${item.name}, ${item.priceLabel}` : `${action}, ${item.name}`}
-            href={localeHref(item.path, locale)}
-          >
-            {item.image ? (
-              <img alt="" loading="lazy" src={item.image.src} />
-            ) : (
-              <span className="oc-merch-blank" />
-            )}
-            <span className="oc-merch-name">{shortName(t, item)}</span>
-            {item.priceLabel ? <span className="oc-merch-price">{item.priceLabel}</span> : null}
-            <span className="oc-merch-tile-cta">{action}</span>
-          </a>
-          {perCardAdds ? (
-            <BundleButtons bundles={cartBundlesForProduct(item.entityId)} />
-          ) : null}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 function ProductRail({ items }: { items: OcCatalogItem[] }) {
   const t = useTranslations('OstomyCare.ui.chapter');
 
   return (
     <div className="oc-merch-rail">
       <p className="oc-merch-rail-label">{t('shop.alsoSold')}</p>
-      <ProductTiles items={items} />
+      <ChoiceCards items={items} />
     </div>
   );
 }
@@ -413,24 +588,24 @@ function shortName(t: ChapterTranslator, item: OcCatalogItem) {
   return optionalChapterText(t, `shop.names.${item.entityId}`, item.name);
 }
 
-function bundleLabel(t: ChapterTranslator, bundle: ChapterCartBundle) {
-  if (bundle.kind === 'both' && bundle.size) return t('shop.addBothSize', { size: bundle.size });
-  if (bundle.kind === 'both') return t('shop.addBoth');
-  if (bundle.size) return t('shop.addSize', { size: bundle.size });
+function useCad() {
+  const format = useFormatter();
 
-  return t('shop.add');
+  return (value: number) => format.number(value, { style: 'currency', currency: 'CAD' });
 }
 
-function BundleButtons({ bundles }: { bundles: ChapterCartBundle[] }) {
-  if (!bundles.length) return null;
+function linePrice(bundle: ChapterCartBundle | undefined, productId: number) {
+  return bundle?.lines.find((line) => line.productEntityId === productId)?.price;
+}
 
-  return (
-    <div className="oc-merch-adds">
-      {bundles.map((bundle) => (
-        <BundleButton bundle={bundle} key={bundle.key} />
-      ))}
-    </div>
-  );
+function pairTotal(bundle: ChapterCartBundle) {
+  const prices = bundle.lines.map((line) => line.price);
+
+  if (!prices.length || prices.some((price) => typeof price !== 'number')) return undefined;
+
+  const total = prices.reduce<number>((sum, price) => sum + (price ?? 0), 0);
+
+  return Math.round(total * 100) / 100;
 }
 
 function BundleButton({ bundle }: { bundle: ChapterCartBundle }) {
@@ -449,13 +624,24 @@ function BundleButton({ bundle }: { bundle: ChapterCartBundle }) {
     openMiniCart();
   }, [openMiniCart, router, state]);
 
-  const label = bundleLabel(t, bundle);
+  const visible = bundle.kind === 'both' ? t('shop.addBoth') : t('shop.add');
+  const named =
+    bundle.kind === 'both' && bundle.size
+      ? t('shop.addBothSize', { size: bundle.size })
+      : bundle.size
+        ? t('shop.addSize', { size: bundle.size })
+        : visible;
 
   return (
     <form action={formAction}>
       <input name="bundle" type="hidden" value={bundle.key} />
-      <button className="oc-merch-cta" disabled={pending} type="submit">
-        {pending ? t('shop.adding') : label}
+      <button
+        aria-label={named === visible ? undefined : named}
+        className="oc-merch-cta"
+        disabled={pending}
+        type="submit"
+      >
+        {pending ? t('shop.adding') : visible}
       </button>
       <p className="oc-merch-add-status" role="status">
         {state.status === 'added'

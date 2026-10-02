@@ -95,7 +95,7 @@ const SKIN_KIT: ShopOffer = {
   line: 'skinComfort',
 };
 
-/** A spare and a reprise do not repeat the large product photos. */
+/** A spare and a reprise keep the photo small. The large photo stays on the hero. */
 function productsOnly(offers: ShopOffer[]): ShopOffer[] {
   return offers.map(({ productIds, line }) => ({ productIds, line }));
 }

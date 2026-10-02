@@ -3269,9 +3269,10 @@
           "openKit": "Ouvrir la trousse",
           "view": "Voir",
           "add": "Ajouter au panier",
-          "addSize": "Ajouter {size}",
+          "addSize": "Ajouter au panier, {size}",
           "addBoth": "Ajouter la barrière et la poche",
           "addBothSize": "Ajouter la barrière et la poche, {size}",
+          "together": "Ensemble",
           "adding": "Ajout…",
           "added": "Ajouté au panier",
           "addedBoth": "La barrière et la poche sont dans le panier",
@@ -3296,7 +3297,7 @@
             "child": "Une barrière et une poche, à la taille d’un enfant.",
             "adultSystems": "Systèmes vidangeables pour adultes.",
             "sameSystems": "Les mêmes systèmes pour adultes.",
-            "skinComfort": "Une pellicule et une feuille pour la peau.",
+            "skinComfort": "Une pellicule, une feuille, de la pâte et une crème pour la peau.",
             "goBagKit": "Des extras pour la trousse de rechange."
           },
           "offers": {
@@ -3306,8 +3307,8 @@
             "closed": "New Image, fermée",
             "uroImage": "New Image, urostomie",
             "uroClick": "SenSura Click, urostomie",
-            "starterKit": "Dissolvant pour adhésif et lingette barrière. N’importe quelle taille d’ouverture.",
-            "skinComfort": "Une pellicule barrière et une feuille protectrice."
+            "starterKit": "Dissolvant, lingette barrière, vaporisateur barrière et anneau. N’importe quelle taille d’ouverture.",
+            "skinComfort": "Une pellicule barrière, une feuille protectrice, de la pâte et une crème barrière."
           },
           "names": {
             "8061": "New Image vidangeable, 57 mm",
@@ -3753,6 +3754,35 @@
           "kits": "Voir les trousses",
           "chapter": "Ouvrir un chapitre"
         }
+      },
+      "shopPage": {
+        "label": "Magasin Soins de stomie",
+        "eyebrow": "La tablette",
+        "description": "Poches, barrières cutanées et le reste autour — filtrez selon ce que vous portez, la marque que vous utilisez déjà, et la taille d’ouverture.",
+        "searchLabel": "Chercher sur cette tablette",
+        "searchPlaceholder": "Chercher une poche, une barrière, une marque…",
+        "searchSubmit": "Chercher",
+        "filtersLabel": "Filtrer la tablette",
+        "kindLabel": "Ce qu’il vous faut",
+        "brandLabel": "Marque",
+        "sizeLabel": "Taille d’ouverture",
+        "systemLabel": "Système de poche",
+        "all": "Tout",
+        "pouches": "Poches",
+        "barriers": "Barrières cutanées",
+        "accessories": "Accessoires",
+        "kits": "Trousses",
+        "anyPouch": "Toutes les poches",
+        "onePiece": "Une pièce",
+        "twoPiece": "Deux pièces",
+        "allBrands": "Toutes les marques",
+        "anySize": "Toutes les tailles",
+        "cutToFit": "À découper",
+        "results": "{count, plural, =0 {Aucun produit} =1 {1 produit} other {# produits}}",
+        "clear": "Effacer les filtres",
+        "empty": "Rien ne correspond à ces filtres.",
+        "emptyAction": "Effacer les filtres et voir toute la tablette",
+        "unavailable": "La tablette ne répond pas pour le moment. Réessayez dans un instant."
       },
       "fundingPage": {
         "before2": "Demandez à votre NSWOC un résumé écrit de votre configuration actuelle, de vos tailles et de vos produits. Cela raccourcit considérablement l'inscription à l'autre extrémité.",

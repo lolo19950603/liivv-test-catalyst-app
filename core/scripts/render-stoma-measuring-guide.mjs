@@ -13,18 +13,21 @@
  * that opening, not a second measurement. A 100 mm bar is the check: if a
  * ruler does not read 100 mm, the sheet was scaled and must not be cut.
  *
- * The page is portrait US Letter and the background stays white. A full-bleed
+ * The page is landscape US Letter and the background stays white. A full-bleed
  * colour makes some printers switch to "fit" and the holes stop being true.
- * The largest openings sit on their own rows so a 76 mm disk is never scaled
- * down to fit a line of smaller ones.
+ * The largest openings sit on their own row so a 76 mm disk is never scaled
+ * down to fit a line of smaller ones. Olivia sits in the top corner; she is
+ * the mascot, not a measuring mark.
  *
  * Standard fonts only, so the file has no embedded typeface to reflow the
  * layout. WinAnsi covers the French accents used here; an em dash does not,
  * so the sentences use a hyphen.
  */
 
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -39,13 +42,21 @@ const { PDFDocument, StandardFonts, rgb } = coreRequire('pdf-lib');
 const MM = 72 / 25.4;
 const mm = (value) => value * MM;
 
-const PAGE_W = 8.5 * 72;
-const PAGE_H = 11 * 72;
-const MARGIN = mm(9);
+const PAGE_W = 11 * 72;
+const PAGE_H = 8.5 * 72;
+const MARGIN = mm(7);
 
 const INK = rgb(0x31 / 255, 0x2f / 255, 0x2f / 255);
 const SAND = rgb(0xd7 / 255, 0xcf / 255, 0xc7 / 255);
 const BLUSH = rgb(0xf3 / 255, 0xc7 / 255, 0xbe / 255);
+const CREAM = rgb(0xf5 / 255, 0xf2 / 255, 0xed / 255);
+const SAGE = rgb(0x6b / 255, 0x7f / 255, 0x5c / 255);
+const DISK = rgb(0xe7 / 255, 0xdb / 255, 0xd4 / 255);
+
+/** Visible pixels of olivia-mascot-hi.png (1024 square, transparent padding). */
+const OLIVIA_PATH = join(CORE, 'components', 'account-dashboard', 'olivia-mascot-hi.png');
+const OLIVIA_FRAME = 1024;
+const OLIVIA_CONTENT = { left: 180, top: 99, right: 840, bottom: 905 };
 
 /*
  * Trade opening sizes. The disk is drawn at `mm`, which is the size printed
@@ -74,8 +85,7 @@ const OPENINGS = [
 const ROWS = [
   [0, 1, 2, 3, 4, 5, 6, 7],
   [8, 9, 10, 11, 12],
-  [13, 14],
-  [15, 16],
+  [13, 14, 15, 16],
 ];
 
 const COPY = {
@@ -89,6 +99,7 @@ const COPY = {
       'This does not replace the guide in the box, or a measurement by an NSWOC.',
     ],
     scale: '100 mm',
+    scaleNote: 'Check this with a ruler',
     ruler: 'Length and width, for an oval stoma',
   },
   fr: {
@@ -101,6 +112,7 @@ const COPY = {
       'Ceci ne remplace pas le guide fourni dans la bo\u00eete, ni une mesure faite par une NSWOC.',
     ],
     scale: '100 mm',
+    scaleNote: 'V\u00e9rifiez avec une r\u00e8gle',
     ruler: 'Longueur et largeur, pour une stomie ovale',
   },
 };
@@ -129,105 +141,232 @@ function labelOf(opening) {
   return `${opening.inch}" (${opening.mm} mm)`;
 }
 
+function loadOliviaPng() {
+  const out = join(tmpdir(), 'liivv-olivia-guide.png');
+  const py = [
+    'from PIL import Image',
+    `im = Image.open(${JSON.stringify(OLIVIA_PATH)}).convert("RGBA")`,
+    'im.thumbnail((520, 520), Image.Resampling.LANCZOS)',
+    `im.save(${JSON.stringify(out)}, "PNG", optimize=True)`,
+  ].join('\n');
+
+  try {
+    execFileSync('python', ['-c', py], { stdio: 'pipe' });
+    return readFileSync(out);
+  } catch {
+    return readFileSync(OLIVIA_PATH);
+  }
+}
+function roundedRectPath(width, height, radius) {
+  const r = Math.min(radius, width / 2, height / 2);
+
+  return [
+    `M ${r} 0`,
+    `H ${width - r}`,
+    `Q ${width} 0 ${width} ${r}`,
+    `V ${height - r}`,
+    `Q ${width} ${height} ${width - r} ${height}`,
+    `H ${r}`,
+    `Q 0 ${height} 0 ${height - r}`,
+    `V ${r}`,
+    `Q 0 0 ${r} 0`,
+    'Z',
+  ].join(' ');
+}
+function circlesOverlap(a, b, pad = 0.4) {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+
+  return Math.hypot(dx, dy) < a.r + b.r + pad;
+}
+
 async function render(copy) {
   const doc = await PDFDocument.create();
   const page = doc.addPage([PAGE_W, PAGE_H]);
   const helv = await doc.embedFont(StandardFonts.Helvetica);
+  const helvBold = await doc.embedFont(StandardFonts.HelveticaBold);
   const times = await doc.embedFont(StandardFonts.TimesRoman);
+  const olivia = await doc.embedPng(loadOliviaPng());
 
   doc.setTitle(`Liivv - ${copy.title}`);
   doc.setAuthor('Liivv');
   doc.setSubject(copy.subject);
 
-  const innerW = PAGE_W - MARGIN * 2;
-  let y = PAGE_H - MARGIN;
+  const innerRight = PAGE_W - MARGIN;
 
-  const brandSize = 16;
-  y -= brandSize;
-  page.drawText('Liivv', {
-    x: MARGIN,
-    y,
-    size: brandSize,
-    font: times,
-    color: INK,
+  // Image box is square. The sprout and feet are inset, so the collision box
+  // is the visible character, and the transparent padding may hang past it.
+  const imageSize = 102;
+  const contentW = imageSize * ((OLIVIA_CONTENT.right - OLIVIA_CONTENT.left) / OLIVIA_FRAME);
+  const contentH = imageSize * ((OLIVIA_CONTENT.bottom - OLIVIA_CONTENT.top) / OLIVIA_FRAME);
+  const imageX = innerRight - imageSize * (OLIVIA_CONTENT.right / OLIVIA_FRAME);
+  const imageTop = PAGE_H - MARGIN;
+  const imageY = imageTop - imageSize * ((OLIVIA_FRAME - OLIVIA_CONTENT.top) / OLIVIA_FRAME);
+  const oliviaBox = {
+    left: imageX + imageSize * (OLIVIA_CONTENT.left / OLIVIA_FRAME),
+    right: imageX + imageSize * (OLIVIA_CONTENT.right / OLIVIA_FRAME),
+    top: imageY + imageSize * ((OLIVIA_FRAME - OLIVIA_CONTENT.top) / OLIVIA_FRAME),
+    bottom: imageY + imageSize * ((OLIVIA_FRAME - OLIVIA_CONTENT.bottom) / OLIVIA_FRAME),
+  };
+
+  if (Math.abs(oliviaBox.right - oliviaBox.left - contentW) > 0.5) {
+    throw new Error('Olivia content width drifted');
+  }
+  if (Math.abs(oliviaBox.top - oliviaBox.bottom - contentH) > 0.5) {
+    throw new Error('Olivia content height drifted');
+  }
+
+  const textW = oliviaBox.left - MARGIN - 18;
+  const brandSize = 17;
+  const titleSize = 11.5;
+  const textTop = PAGE_H - MARGIN;
+
+  function measureCopy(size, lead) {
+    const lines = [];
+    copy.paragraphs.forEach((paragraph, paragraphIndex) => {
+      const font = paragraphIndex === 0 ? helvBold : helv;
+      const wrapped = wrap(paragraph, font, size, textW);
+      wrapped.forEach((line, lineIndex) => {
+        lines.push({
+          line,
+          font,
+          size,
+          gap: lineIndex === wrapped.length - 1 ? lead + 1.6 : lead,
+        });
+      });
+    });
+
+    // Matches the draw order: brand, blush rule, gap, then each line.
+    let cursor = textTop - brandSize - 6 - 11;
+    for (const item of lines) cursor -= item.gap;
+    return { lines, bottom: cursor };
+  }
+
+  let bodySize = 7.6;
+  let fitted = measureCopy(bodySize, 9.3);
+  if (fitted.bottom < oliviaBox.bottom) {
+    bodySize = 7.15;
+    fitted = measureCopy(bodySize, 8.7);
+  }
+
+  const textLines = fitted.lines;
+  const textBottom = fitted.bottom;
+  const boxPadTop = 8;
+  const boxPadBottom = 8;
+  const boxBottom = textBottom - boxPadBottom;
+  const boxTop = textTop + boxPadTop;
+
+  const boxLeft = MARGIN - 8;
+  const boxWidth = textW + 16;
+  const boxHeight = boxTop - boxBottom;
+
+  page.drawSvgPath(roundedRectPath(boxWidth, boxHeight, 10), {
+    x: boxLeft,
+    y: boxTop,
+    color: CREAM,
   });
+
+  let y = textTop - brandSize;
+  page.drawText('Liivv', { x: MARGIN, y, size: brandSize, font: times, color: INK });
+
+  const brandW = times.widthOfTextAtSize('Liivv', brandSize);
+  const dotY = y + brandSize + 1.6;
+  const stem = (left, right) => MARGIN + (left + right) / 2;
+  page.drawCircle({
+    x: stem(times.widthOfTextAtSize('L', brandSize), times.widthOfTextAtSize('Li', brandSize)),
+    y: dotY,
+    size: 1.7,
+    color: SAGE,
+  });
+  page.drawCircle({
+    x: stem(times.widthOfTextAtSize('Li', brandSize), times.widthOfTextAtSize('Lii', brandSize)),
+    y: dotY,
+    size: 1.7,
+    color: BLUSH,
+  });
+
   page.drawText(copy.title, {
-    x: MARGIN + times.widthOfTextAtSize('Liivv', brandSize) + 12,
-    y: y + 1,
-    size: 13,
+    x: MARGIN + brandW + 12,
+    y: y + 2,
+    size: titleSize,
     font: helv,
     color: INK,
   });
 
-  y -= 7;
+  y -= 6;
   page.drawLine({
     start: { x: MARGIN, y },
-    end: { x: MARGIN + mm(28), y },
-    thickness: 2.2,
+    end: { x: MARGIN + mm(32), y },
+    thickness: 2.4,
     color: BLUSH,
   });
 
-  y -= 12;
-  for (const paragraph of copy.paragraphs) {
-    for (const line of wrap(paragraph, helv, 8, innerW)) {
-      page.drawText(line, { x: MARGIN, y, size: 8, font: helv, color: INK });
-      y -= 10;
-    }
-    y -= 2;
+  y -= 11;
+  for (const item of textLines) {
+    page.drawText(item.line, { x: MARGIN, y, size: item.size, font: item.font, color: INK });
+    y -= item.gap;
   }
 
-  const footerTop = MARGIN + mm(13);
-  const labelSize = 7;
-  const labelGap = 6.5;
-  const rowGap = mm(0.35);
-  const minGap = mm(1);
+  const labelSize = 6.6;
+  const labelGap = 7;
+  const minGap = mm(2.2);
+  const holeGap = mm(4);
 
   const rows = ROWS.map((indexes) => {
-    const openings = indexes.map((index) => OPENINGS[index]);
-    const cells = openings.map((opening) => {
+    const cells = indexes.map((index) => {
+      const opening = OPENINGS[index];
       const diameter = mm(opening.mm);
       const label = labelOf(opening);
       const labelW = helv.widthOfTextAtSize(label, labelSize);
 
-      return { opening, diameter, label, labelW, cell: Math.max(diameter, labelW) };
+      return { opening, diameter, label, labelW, cell: Math.max(diameter, labelW + 2) };
     });
-    const sum = cells.reduce((total, cell) => total + cell.cell, 0);
-    const gaps = cells.length - 1;
-    const gap = gaps === 0 ? 0 : Math.min(mm(8), (innerW - sum) / gaps);
-
-    if (gap < minGap - 0.01) {
-      throw new Error(`${copy.file}: a row is ${(sum + minGap * gaps - innerW).toFixed(1)}pt too wide`);
-    }
-
     const height = Math.max(...cells.map((cell) => cell.diameter)) + labelGap;
 
-    return { cells, gap, height };
+    return { cells, height };
   });
 
-  const blockHeight = rows.reduce((total, row) => total + row.height, 0) + rowGap * (rows.length - 1);
-  const room = y - footerTop;
+  const rulerY = MARGIN + 13;
+  const captionY = rulerY + 11;
+  const footerTop = captionY + 6;
+  const circleTop = Math.min(boxBottom, oliviaBox.bottom) - 8;
+  const blockHeight = rows.reduce((total, row) => total + row.height, 0);
+  const slack = circleTop - footerTop - blockHeight;
+  const bottomPad = 6;
 
-  if (blockHeight > room) {
+  if (slack < bottomPad) {
     throw new Error(
-      `${copy.file}: circles need ${blockHeight.toFixed(1)}pt and ${room.toFixed(1)}pt is free`,
+      `${copy.file}: circles need more room (${slack.toFixed(1)}pt slack, lines ${textLines.length}, block ${blockHeight.toFixed(0)})`,
     );
   }
 
-  let rowTop = y;
+  const rowGap = Math.min(mm(3.2), (slack - bottomPad) / Math.max(1, rows.length - 1));
+  let rowTop = circleTop;
+  const drawn = [];
+  const innerW = innerRight - MARGIN;
 
-  rows.forEach((row, index) => {
+  for (const row of rows) {
+    const rowBottom = rowTop - row.height;
+    const width = innerW;
+    const sum = row.cells.reduce((total, cell) => total + cell.cell, 0);
+    const gaps = row.cells.length - 1;
+    const gap = gaps === 0 ? 0 : Math.min(holeGap, (width - sum) / gaps);
+
+    if (gap < minGap - 0.01) {
+      throw new Error(`${copy.file}: a row is ${(sum + minGap * gaps - width).toFixed(1)}pt too wide`);
+    }
+
     const diameter = Math.max(...row.cells.map((cell) => cell.diameter));
-    const rowWidth =
-      row.cells.reduce((total, cell) => total + cell.cell, 0) + row.gap * (row.cells.length - 1);
-    let x = MARGIN + (innerW - rowWidth) / 2;
+    const rowWidth = sum + gap * gaps;
+    let x = MARGIN + (width - rowWidth) / 2;
 
     for (const cell of row.cells) {
       const radius = cell.diameter / 2;
       const cx = x + cell.cell / 2;
       const cy = rowTop - diameter / 2;
-      const stroke = 0.9;
+      const stroke = 0.85;
 
-      page.drawCircle({ x: cx, y: cy, size: radius, color: SAND });
+      page.drawCircle({ x: cx, y: cy, size: radius, color: DISK });
       page.drawCircle({
         x: cx,
         y: cy,
@@ -236,9 +375,8 @@ async function render(copy) {
         borderWidth: stroke,
       });
 
-      const labelW = cell.labelW;
       page.drawText(cell.label, {
-        x: cx - labelW / 2,
+        x: cx - cell.labelW / 2,
         y: cy - radius - labelGap,
         size: labelSize,
         font: helv,
@@ -249,56 +387,55 @@ async function render(copy) {
         throw new Error(`${copy.file}: ${cell.opening.mm} mm disk is not that size`);
       }
 
-      x += cell.cell + row.gap;
+      const disk = { x: cx, y: cy, r: radius, mm: cell.opening.mm };
+      for (const other of drawn) {
+        if (circlesOverlap(disk, other)) {
+          throw new Error(`${copy.file}: ${disk.mm} mm overlaps ${other.mm} mm`);
+        }
+      }
+      const nearestX = Math.max(oliviaBox.left, Math.min(cx, oliviaBox.right));
+      const nearestY = Math.max(oliviaBox.bottom, Math.min(cy, oliviaBox.top));
+      if (Math.hypot(cx - nearestX, cy - nearestY) < radius + 2) {
+        throw new Error(`${copy.file}: ${disk.mm} mm overlaps Olivia`);
+      }
+
+      drawn.push(disk);
+      x += cell.cell + gap;
     }
 
-    rowTop -= row.height + (index < rows.length - 1 ? rowGap : 0);
-  });
+    rowTop = rowBottom - rowGap;
+  }
 
-  if (rowTop < footerTop - 0.5) {
+  if (rowTop + rowGap < footerTop - 0.5) {
     throw new Error(`${copy.file}: circles overlap the scale bar`);
   }
 
-  const barY = MARGIN + mm(11);
+  const rulerLen = mm(150);
   const barLen = mm(100);
+  const barX = MARGIN + rulerLen + 22;
 
-  if (Math.abs(barLen - 100 * MM) > 0.001) {
-    throw new Error('scale bar is not 100 mm');
-  }
+  if (Math.abs(barLen - 100 * MM) > 0.001) throw new Error('scale bar is not 100 mm');
+  if (Math.abs(rulerLen - 150 * MM) > 0.001) throw new Error('ruler is not 150 mm');
+  if (barX + barLen > innerRight + 0.5) throw new Error(`${copy.file}: scale bar runs off the page`);
 
   page.drawLine({
-    start: { x: MARGIN, y: barY },
-    end: { x: MARGIN + barLen, y: barY },
-    thickness: 1.6,
-    color: INK,
-  });
-  for (const tick of [MARGIN, MARGIN + barLen]) {
-    page.drawLine({
-      start: { x: tick, y: barY - 4.5 },
-      end: { x: tick, y: barY + 4.5 },
-      thickness: 1.3,
-      color: INK,
-    });
-  }
-  page.drawText(copy.scale, {
-    x: MARGIN + barLen + 8,
-    y: barY - 3,
-    size: 8.5,
-    font: helv,
-    color: INK,
+    start: { x: MARGIN, y: footerTop },
+    end: { x: innerRight, y: footerTop },
+    thickness: 0.4,
+    color: SAND,
   });
 
-  const rulerNoteW = helv.widthOfTextAtSize(copy.ruler, 8);
   page.drawText(copy.ruler, {
-    x: PAGE_W - MARGIN - rulerNoteW,
-    y: barY - 3,
-    size: 8,
+    x: MARGIN,
+    y: captionY,
+    size: 7.5,
     font: helv,
     color: INK,
   });
-
-  const rulerY = MARGIN + mm(4.2);
-  const rulerLen = mm(150);
+  const rulerNoteW = helv.widthOfTextAtSize(copy.ruler, 7.5);
+  if (MARGIN + rulerNoteW > barX - 10) {
+    throw new Error(`${copy.file}: ruler caption runs into the scale bar`);
+  }
   page.drawLine({
     start: { x: MARGIN, y: rulerY },
     end: { x: MARGIN + rulerLen, y: rulerY },
@@ -311,8 +448,8 @@ async function render(copy) {
     const major = mark % 10 === 0;
     page.drawLine({
       start: { x, y: rulerY },
-      end: { x, y: rulerY + (major ? 7 : 3.5) },
-      thickness: 0.6,
+      end: { x, y: rulerY + (major ? 4.2 : 2.4) },
+      thickness: major ? 0.7 : 0.45,
       color: INK,
     });
 
@@ -329,9 +466,57 @@ async function render(copy) {
     }
   }
 
+  page.drawText(copy.scaleNote, {
+    x: barX,
+    y: captionY,
+    size: 7.5,
+    font: helv,
+    color: INK,
+  });
+  page.drawRectangle({
+    x: barX,
+    y: rulerY - 2.1,
+    width: barLen,
+    height: 4.2,
+    color: BLUSH,
+  });
+  page.drawLine({
+    start: { x: barX, y: rulerY },
+    end: { x: barX + barLen, y: rulerY },
+    thickness: 1.15,
+    color: INK,
+  });
+  for (const tick of [barX, barX + barLen]) {
+    page.drawLine({
+      start: { x: tick, y: rulerY - 5 },
+      end: { x: tick, y: rulerY + 5 },
+      thickness: 1.35,
+      color: INK,
+    });
+  }
+  const scaleLabelW = helv.widthOfTextAtSize(copy.scale, 8);
+  page.drawText(copy.scale, {
+    x: barX + barLen / 2 - scaleLabelW / 2,
+    y: rulerY - 15,
+    size: 8,
+    font: helv,
+    color: INK,
+  });
+
+  page.drawImage(olivia, { x: imageX, y: imageY, width: imageSize, height: imageSize });
+
   const bytes = await doc.save();
   const path = join(OUT_DIR, copy.file);
-  writeFileSync(path, bytes);
+
+  try {
+    writeFileSync(path, bytes);
+  } catch (error) {
+    if (error?.code !== 'EBUSY') throw error;
+    const fallback = path.replace(/\.pdf$/, '.next.pdf');
+    writeFileSync(fallback, bytes);
+    console.log(`${copy.file} is open, wrote ${fallback}`);
+    return { file: fallback, bytes: bytes.length };
+  }
 
   return { file: copy.file, bytes: bytes.length };
 }

@@ -20,24 +20,24 @@ const KITS = [
   {
     sku: 'KIT-OSTOMY-STARTER-ACCESSORY',
     name: 'Starter Accessory Kit',
-    componentIds: [4937, 4439],
+    componentIds: [4937, 4439, 4936, 4560],
     description:
-      '<p>Extras for a pouch change and a go-bag. Neither item depends on the size of the opening.</p><ul><li>Adhesive remover wipes, box of 50</li><li>Protective barrier wipes</li><li>Remove either item before checkout</li></ul><p>A barrier wipe is for someone whose nurse recommended one, or who already uses one.</p>',
+      '<p>Extras for a pouch change and a go-bag. None of these depend on the size of the opening.</p><ul><li>Adhesive remover wipes, box of 50</li><li>Protective barrier wipes</li><li>Cavilon no-sting barrier spray</li><li>Adapt barrier rings — choose the ring size in the kit</li><li>Remove any item before checkout</li></ul><p>A barrier wipe or spray is for someone whose nurse recommended one, or who already uses one.</p>',
   },
   {
     sku: 'KIT-OSTOMY-SKIN-COMFORT',
     name: 'Skin Comfort Kit',
-    componentIds: [8014, 4890],
+    componentIds: [8014, 4890, 4703, 4820],
     description:
-      '<p>A barrier film and a protective sheet. Both sit on the skin and fit any opening size.</p><ul><li>SKIN-PREP protective barrier wipes</li><li>Brava protective sheet, box of 10</li><li>Remove either item before checkout</li></ul><p>Add only what you need. Which of these suits your skin is a question for your NSWOC.</p>',
+      '<p>A barrier film, a protective sheet, paste, and a barrier cream. All of them sit on the skin and fit any opening size.</p><ul><li>SKIN-PREP protective barrier wipes</li><li>Brava protective sheet, box of 10</li><li>Stomahesive paste</li><li>Cavilon barrier cream</li><li>Remove any item before checkout</li></ul><p>Add only what you need. Which of these suits your skin is a question for your NSWOC.</p>',
   },
   {
     sku: 'KIT-OSTOMY-POUCH-COMFORT',
     name: 'Pouch Comfort Kit',
-    componentIds: [8012, 8016],
+    componentIds: [8012, 8016, 4406],
     revealHiddenComponents: true,
     description:
-      '<p>For odour and for output that sits at the top of the pouch. Neither item depends on the size of the opening.</p><ul><li>m9 odor eliminator drops</li><li>Adapt lubricating deodorant</li><li>Remove either item before checkout</li></ul>',
+      '<p>For odour, for output that sits at the top of the pouch, and a clamp if the pouch closes with one. None of these depend on the size of the opening.</p><ul><li>m9 odor eliminator drops</li><li>Adapt lubricating deodorant</li><li>Drainable pouch clamp, for clamp-closure pouches</li><li>Remove any item before checkout</li></ul>',
   },
 ];
 
@@ -87,9 +87,43 @@ async function findBySku(sku) {
 }
 
 async function componentPrice(id) {
-  const res = await bc(`/v3/catalog/products/${id}?include_fields=id,name,price,is_visible`);
+  const res = await bc(
+    `/v3/catalog/products/${id}?include=variants&include_fields=id,name,price,is_visible`,
+  );
+  const product = res.data;
+  const sellingPrice = await storefrontPrice(id);
 
-  return res.data;
+  // The kit total on the product page uses the storefront price, including
+  // a sale price. The catalogue base price can be a different number.
+  if (sellingPrice != null) {
+    product.price = sellingPrice;
+  } else if (product?.variants?.length === 1 && product.variants[0].price != null) {
+    product.price = product.variants[0].price;
+  }
+
+  return product;
+}
+
+async function storefrontPrice(id) {
+  const token = process.env.BIGCOMMERCE_STOREFRONT_TOKEN;
+
+  if (!token) return null;
+
+  const response = await fetch(`https://store-${STORE_HASH}.mybigcommerce.com/graphql`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query: `query($id: Int!) { site { product(entityId: $id) { prices(currencyCode: CAD) { price { value } salePrice { value } } } } }`,
+      variables: { id },
+    }),
+  });
+  const json = await response.json();
+  const prices = json.data?.site?.product?.prices;
+
+  return prices?.salePrice?.value ?? prices?.price?.value ?? null;
 }
 
 async function upsert(kit) {

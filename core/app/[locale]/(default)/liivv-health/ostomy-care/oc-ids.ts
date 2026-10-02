@@ -3,10 +3,10 @@
 /** Featured curated kit on the Ostomy Care landing — the starter accessory kit. */
 export const STARTER_ACCESSORY_KIT_ID = 8069;
 
-/** Barrier film and protective sheet. Fits any opening size. */
+/** Barrier film, protective sheet, paste, and barrier cream. Fits any opening size. */
 export const SKIN_COMFORT_KIT_ID = 8038;
 
-/** Odour drops and lubricating deodorant. Fits any opening size. */
+/** Odour drops, lubricating deodorant, and a clamp. Fits any opening size. */
 export const POUCH_COMFORT_KIT_ID = 8070;
 
 /** @deprecated Use STARTER_ACCESSORY_KIT_ID */

@@ -3,13 +3,20 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
 import { createLoader, SearchParams } from 'nuqs/server';
-import { cache } from 'react';
+import { cache, Suspense } from 'react';
 
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { createCompareLoader } from '@/vibes/soul/primitives/compare-drawer/loader';
 import { ProductsListSection } from '@/vibes/soul/sections/products-list-section';
 import { getFilterParsers } from '@/vibes/soul/sections/products-list-section/filter-parsers';
-import { isOstomyCategoryId } from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
+import {
+  isOstomyCategoryId,
+  SHOP_OSTOMY_CARE_CATEGORY_ID,
+} from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
+import {
+  OstomyShop,
+  OstomyShopFallback,
+} from '~/app/[locale]/(default)/liivv-health/ostomy-care/ostomy-shop';
 import { getSessionCustomerAccessToken } from '~/auth';
 import { DenyAdSignals } from '~/components/analytics/deny-ad-signals';
 import { facetsTransformer } from '~/data-transformers/facets-transformer';
@@ -301,6 +308,10 @@ export default async function Category(props: Props) {
     }));
   });
 
+  const isShopOstomy = categoryId === SHOP_OSTOMY_CARE_CATEGORY_ID;
+  const { defaultOutOfStockMessage, showOutOfStockMessage, showBackorderMessage } =
+    settings?.inventory ?? {};
+
   return (
     <>
       <CategoryScrollReset />
@@ -320,72 +331,91 @@ export default async function Category(props: Props) {
         label={`${category.name} top content`}
         snapshotId={`category-${categoryId}-top-content`}
       />
-      <ProductsListSection
-        breadcrumbs={breadcrumbs}
-        compareLabel={t('Compare.compare')}
-        fallbackLogo={fallbackLogo}
-        compareProducts={streamableCompareProducts}
-        emptyStateSubtitle={t('Category.Empty.subtitle')}
-        emptyStateTitle={t('Category.Empty.title')}
-        filterLabel={t('FacetedSearch.filters')}
-        filters={streamableFilters}
-        filtersPanelTitle={t('FacetedSearch.filters')}
-        maxCompareLimitMessage={t('Compare.maxCompareLimit')}
-        maxItems={MAX_COMPARE_LIMIT}
-        pageSizeDefaultValue={DEFAULT_FACETED_PAGE_SIZE}
-        pageSizeLabel={t('PageSize.show')}
-        pageSizeOptions={getFacetedPageSizeOptions((count) =>
-          t('PageSize.perPage', { count: String(count) }),
-        )}
-        paginationInfo={streamablePagination}
-        paginationLabel={t('Pagination.label')}
-        paginationNextLabel={t('Pagination.next')}
-        products={streamableProducts}
-        quickActions={quickActions}
-        rangeFilterApplyLabel={t('FacetedSearch.Range.apply')}
-        removeLabel={t('Compare.remove')}
-        resetFiltersLabel={t('FacetedSearch.resetFilters')}
-        showCompare={productComparisonsEnabled}
-        showRating={showRating}
-        sortDefaultValue="featured"
-        sortLabel={t('SortBy.sortBy')}
-        sortOptions={[
-          { value: 'featured', label: t('SortBy.featuredItems') },
-          { value: 'newest', label: t('SortBy.newestItems') },
-          { value: 'best_selling', label: t('SortBy.bestSellingItems') },
-          { value: 'a_to_z', label: t('SortBy.aToZ') },
-          { value: 'z_to_a', label: t('SortBy.zToA') },
-          { value: 'best_reviewed', label: t('SortBy.byReview') },
-          { value: 'lowest_price', label: t('SortBy.priceAscending') },
-          { value: 'highest_price', label: t('SortBy.priceDescending') },
-          { value: 'relevance', label: t('SortBy.relevance') },
-        ]}
-        sortParamName="sort"
-        searchPanel={
-          <CategorySearchPanel
-            categoryEntityId={categoryId}
-            categoryPath={category.path}
+      {isShopOstomy ? (
+        <Suspense fallback={<OstomyShopFallback />}>
+          <OstomyShop
+            breadcrumbs={breadcrumbs}
+            category={category}
+            categoryIds={analyticsCategoryIds}
             fallbackLogo={fallbackLogo}
-            searchPlaceholder={t('Category.searchPlaceholder', { categoryName: category.name })}
+            outOfStockMessage={
+              showOutOfStockMessage ? defaultOutOfStockMessage : undefined
+            }
+            quickActions={quickActions}
+            searchParams={props.searchParams}
+            showBackorderMessage={showBackorderMessage}
           />
-        }
-        title={category.name}
-        totalCount={streamableTotalCount}
-      />
+        </Suspense>
+      ) : (
+        <ProductsListSection
+          breadcrumbs={breadcrumbs}
+          compareLabel={t('Compare.compare')}
+          fallbackLogo={fallbackLogo}
+          compareProducts={streamableCompareProducts}
+          emptyStateSubtitle={t('Category.Empty.subtitle')}
+          emptyStateTitle={t('Category.Empty.title')}
+          filterLabel={t('FacetedSearch.filters')}
+          filters={streamableFilters}
+          filtersPanelTitle={t('FacetedSearch.filters')}
+          maxCompareLimitMessage={t('Compare.maxCompareLimit')}
+          maxItems={MAX_COMPARE_LIMIT}
+          pageSizeDefaultValue={DEFAULT_FACETED_PAGE_SIZE}
+          pageSizeLabel={t('PageSize.show')}
+          pageSizeOptions={getFacetedPageSizeOptions((count) =>
+            t('PageSize.perPage', { count: String(count) }),
+          )}
+          paginationInfo={streamablePagination}
+          paginationLabel={t('Pagination.label')}
+          paginationNextLabel={t('Pagination.next')}
+          products={streamableProducts}
+          quickActions={quickActions}
+          rangeFilterApplyLabel={t('FacetedSearch.Range.apply')}
+          removeLabel={t('Compare.remove')}
+          resetFiltersLabel={t('FacetedSearch.resetFilters')}
+          showCompare={productComparisonsEnabled}
+          showRating={showRating}
+          sortDefaultValue="featured"
+          sortLabel={t('SortBy.sortBy')}
+          sortOptions={[
+            { value: 'featured', label: t('SortBy.featuredItems') },
+            { value: 'newest', label: t('SortBy.newestItems') },
+            { value: 'best_selling', label: t('SortBy.bestSellingItems') },
+            { value: 'a_to_z', label: t('SortBy.aToZ') },
+            { value: 'z_to_a', label: t('SortBy.zToA') },
+            { value: 'best_reviewed', label: t('SortBy.byReview') },
+            { value: 'lowest_price', label: t('SortBy.priceAscending') },
+            { value: 'highest_price', label: t('SortBy.priceDescending') },
+            { value: 'relevance', label: t('SortBy.relevance') },
+          ]}
+          sortParamName="sort"
+          searchPanel={
+            <CategorySearchPanel
+              categoryEntityId={categoryId}
+              categoryPath={category.path}
+              fallbackLogo={fallbackLogo}
+              searchPlaceholder={t('Category.searchPlaceholder', { categoryName: category.name })}
+            />
+          }
+          title={category.name}
+          totalCount={streamableTotalCount}
+        />
+      )}
       <Slot
         label={`${category.name} bottom content`}
         snapshotId={`category-${categoryId}-bottom-content`}
       />
-      <Stream value={Streamable.all([streamableFacetedSearch, streamableSensitiveProductIds])}>
-        {([search, sensitiveProductIds]) => (
-          <CategoryViewed
-            category={category}
-            categoryIds={analyticsCategoryIds}
-            products={search.products.items}
-            sensitiveProductIds={sensitiveProductIds}
-          />
-        )}
-      </Stream>
+      {isShopOstomy ? null : (
+        <Stream value={Streamable.all([streamableFacetedSearch, streamableSensitiveProductIds])}>
+          {([search, sensitiveProductIds]) => (
+            <CategoryViewed
+              category={category}
+              categoryIds={analyticsCategoryIds}
+              products={search.products.items}
+              sensitiveProductIds={sensitiveProductIds}
+            />
+          )}
+        </Stream>
+      )}
     </>
   );
 }

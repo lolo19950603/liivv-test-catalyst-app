@@ -3767,7 +3767,7 @@
   margin: 0;
   font-size: 1.05rem;
   font-variant-numeric: tabular-nums;
-  color: var(--sage-text);
+  color: var(--ink-strong);
 }
 
 #oc-chapter .oc-merch-actions {
@@ -3811,6 +3811,23 @@
 
 #oc-chapter .oc-merch-cta.is-quiet:hover {
   background: color-mix(in srgb, var(--sage-soft) 65%, var(--paper));
+  border-color: var(--sage-deep);
+  color: var(--ink-strong);
+}
+
+#oc-chapter .oc-merch-cta:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 3px;
+}
+
+#oc-chapter .oc-merch-cta:active {
+  background: color-mix(in srgb, var(--sage-deep) 72%, var(--ink));
+  border-color: color-mix(in srgb, var(--sage-deep) 72%, var(--ink));
+  color: var(--paper);
+}
+
+#oc-chapter .oc-merch-cta.is-quiet:active {
+  background: color-mix(in srgb, var(--sage-soft) 80%, var(--paper));
   border-color: var(--sage-deep);
   color: var(--ink-strong);
 }
@@ -3912,43 +3929,154 @@
   color: var(--ink-muted);
 }
 
-#oc-chapter .oc-merch-products {
+#oc-chapter .oc-merch-spec-line {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--ink-strong);
+}
+
+#oc-chapter .oc-merch-well {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.7rem;
   margin: 0;
   padding: 0;
   list-style: none;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--paper);
+  overflow: hidden;
 }
 
-#oc-chapter .oc-merch-products > li {
+#oc-chapter .oc-merch-piece {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.35rem;
   min-width: 0;
+  padding: 0.85rem 0.9rem 1rem;
 }
 
-#oc-chapter .oc-merch-adds {
+#oc-chapter .oc-merch-piece + .oc-merch-piece {
+  border-left: 1px solid var(--line);
+}
+
+#oc-chapter .oc-merch-piece-link {
+  display: grid;
+  gap: 0.55rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+#oc-chapter .oc-merch-piece-link img,
+#oc-chapter .oc-merch-piece .oc-merch-blank,
+#oc-chapter .oc-merch-card-photo img,
+#oc-chapter .oc-merch-card-photo .oc-merch-blank {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: var(--paper);
+}
+
+#oc-chapter .oc-merch-name {
+  font-size: 0.98rem;
+  line-height: 1.3;
+  color: var(--ink-strong);
+  text-decoration: none;
+}
+
+#oc-chapter a.oc-merch-name:hover,
+#oc-chapter .oc-merch-piece-link:hover .oc-merch-name {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+#oc-chapter .oc-merch-buy {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem 0.65rem;
-  align-items: flex-start;
+  align-items: center;
+  gap: 0.65rem 0.85rem;
 }
 
-#oc-chapter .oc-merch-adds form {
+#oc-chapter .oc-merch-total {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--ink-strong);
+}
+
+#oc-chapter .oc-merch-total-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+}
+
+#oc-chapter .oc-merch-size-choices {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.4rem;
+}
+
+#oc-chapter .oc-merch-size-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  margin: 0;
+  padding: 0.35rem 0.95rem;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink-strong);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+#oc-chapter .oc-merch-size-chip input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+#oc-chapter .oc-merch-size-chip.is-selected {
+  border-color: var(--sage-deep);
+  background: color-mix(in srgb, var(--sage-soft) 70%, var(--paper));
+  cursor: default;
+}
+
+#oc-chapter .oc-merch-size-chip:hover {
+  border-color: var(--sage-deep);
+}
+
+#oc-chapter .oc-merch-size-chip:has(:focus-visible) {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 3px;
+}
+
+#oc-chapter .oc-merch form {
   display: grid;
   gap: 0.2rem;
   justify-items: start;
 }
 
-#oc-chapter .oc-merch-adds .oc-merch-cta {
+#oc-chapter .oc-merch form .oc-merch-cta {
   margin-top: 0;
   cursor: pointer;
   font: inherit;
   font-weight: 600;
 }
 
-#oc-chapter .oc-merch-adds .oc-merch-cta:disabled {
+#oc-chapter .oc-merch form .oc-merch-cta:disabled {
   opacity: 0.55;
   cursor: progress;
 }
@@ -3964,96 +4092,74 @@
   display: none;
 }
 
-#oc-chapter .oc-merch-products a {
+#oc-chapter .oc-merch-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter .oc-merch-cards.is-single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+#oc-chapter .oc-merch-cards.is-trio {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+#oc-chapter .oc-merch-card {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  width: 100%;
+  gap: 0.55rem;
   min-width: 0;
-  padding: 0.55rem 0.55rem 0.7rem;
+  height: 100%;
+  padding: 0.75rem;
   border: 1px solid var(--line);
-  border-radius: 0.95rem;
-  background: color-mix(in srgb, var(--cream) 62%, var(--paper));
+  border-radius: 1rem;
+  background: var(--paper);
+}
+
+#oc-chapter .oc-merch-card:hover {
+  border-color: color-mix(in srgb, var(--sage) 45%, var(--line));
+}
+
+#oc-chapter .oc-merch-card-photo {
+  display: block;
   color: inherit;
   text-decoration: none;
 }
 
-#oc-chapter .oc-merch-products a:hover {
-  border-color: color-mix(in srgb, var(--sage) 48%, var(--sand));
-  background: var(--paper);
+#oc-chapter .oc-merch-card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 0;
 }
 
-#oc-chapter .oc-merch-products img,
-#oc-chapter .oc-merch-products .oc-merch-blank {
-  display: block;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: contain;
-  padding: 0.45rem;
-  border: none;
-  border-radius: 0.65rem;
-  background: var(--paper);
+#oc-chapter .oc-merch-card-body form,
+#oc-chapter .oc-merch-card-body .oc-merch-name,
+#oc-chapter .oc-merch-card-body .oc-merch-price {
+  align-self: stretch;
 }
 
-#oc-chapter .oc-merch-name {
-  margin-top: 0.4rem;
-  font-size: 0.98rem;
-  line-height: 1.3;
-  color: var(--ink-strong);
-}
-
-#oc-chapter .oc-merch-products .oc-merch-price {
+#oc-chapter .oc-merch-card form {
   margin-top: auto;
-  padding-top: 0.2rem;
-  font-size: 0.95rem;
+  width: 100%;
 }
 
-#oc-chapter .oc-merch-tile-cta {
-  font-size: 0.88rem;
-  line-height: 1.3;
-  color: var(--sage-text);
+#oc-chapter .oc-merch-card .oc-merch-cta {
+  width: 100%;
 }
 
-#oc-chapter .oc-merch-products a:hover .oc-merch-tile-cta {
-  text-decoration: underline;
-}
-
-/* One product fills the row. Three share it, so the last card is not left beside an empty cell. */
-#oc-chapter .oc-merch-products.is-single {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-#oc-chapter .oc-merch-products.is-trio {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-#oc-chapter .oc-merch-products.is-single a {
+#oc-chapter .oc-merch-kit {
   display: grid;
   grid-template-columns: 8.5rem minmax(0, 1fr);
-  grid-template-rows: auto auto auto;
-  column-gap: 0.9rem;
-  row-gap: 0.12rem;
-  align-content: center;
-  padding: 0.7rem;
-}
-
-#oc-chapter .oc-merch-products.is-single img,
-#oc-chapter .oc-merch-products.is-single .oc-merch-blank {
-  grid-row: 1 / span 3;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1;
-  align-self: center;
-}
-
-#oc-chapter .oc-merch-products.is-single .oc-merch-name {
-  margin-top: 0;
-  align-self: end;
-}
-
-#oc-chapter .oc-merch-products.is-single .oc-merch-price {
-  margin-top: 0;
-  padding-top: 0;
+  gap: 0.9rem;
+  align-items: center;
 }
 
 #oc-chapter .oc-merch.is-reprise {
@@ -4076,29 +4182,72 @@
   list-style: none;
 }
 
-#oc-chapter .oc-merch-line a {
+#oc-chapter .oc-merch-line {
+  border-bottom: 1px solid var(--line);
+}
+
+#oc-chapter .oc-merch-quiet {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.25rem 0.85rem;
-  padding: 0.55rem 0;
-  border-bottom: 1px solid var(--line);
-  color: inherit;
-  text-decoration: none;
+  align-items: center;
+  gap: 0.55rem 0.9rem;
+  padding: 0.75rem 0;
 }
 
-#oc-chapter .oc-merch-line-name {
-  font-size: 1.02rem;
+#oc-chapter .oc-merch-quiet-names {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.45rem;
+  flex: 1 1 8rem;
+  min-width: 0;
 }
 
-#oc-chapter .oc-merch-line a:hover .oc-merch-line-name {
-  text-decoration: underline;
+#oc-chapter .oc-merch-quiet-names:has(.oc-merch-thumb) {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.45rem;
 }
 
-#oc-chapter .oc-merch-line-cta {
+#oc-chapter .oc-merch-quiet-names:has(.oc-merch-thumb) .oc-merch-dot {
+  display: none;
+}
+
+#oc-chapter .oc-merch-quiet-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+#oc-chapter .oc-merch-quiet .oc-merch-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+#oc-chapter .oc-merch-quiet .oc-merch-name span {
+  min-width: 0;
+}
+
+#oc-chapter .oc-merch-thumb {
+  flex: 0 0 auto;
+  width: 3.25rem;
+  height: 3.25rem;
+  object-fit: contain;
+  padding: 0.15rem;
+  border: 1px solid var(--line);
+  border-radius: 0.55rem;
+  background: var(--paper);
+}
+
+#oc-chapter .oc-merch-dot {
+  color: var(--ink-muted);
+}
+
+#oc-chapter .oc-merch-quiet form {
   margin-left: auto;
-  color: var(--sage-text);
-  font-size: 0.95rem;
 }
 
 #oc-chapter .oc-merch-note {
@@ -4125,44 +4274,41 @@
 }
 
 @media (max-width: 720px) {
-  #oc-chapter .oc-merch-hero {
+  #oc-chapter .oc-merch-hero,
+  #oc-chapter .oc-merch-kit {
     grid-template-columns: 1fr;
   }
 
-  #oc-chapter .oc-merch-products.is-trio {
-    grid-template-columns: minmax(0, 1fr);
+  #oc-chapter .oc-merch-well {
+    grid-template-columns: 1fr;
   }
 
-  #oc-chapter .oc-merch-products.is-trio a {
+  #oc-chapter .oc-merch-piece + .oc-merch-piece {
+    border-left: none;
+    border-top: 1px solid var(--line);
+  }
+
+  #oc-chapter .oc-merch-buy form,
+  #oc-chapter .oc-merch-quiet form {
+    flex: 1 1 100%;
+    margin-left: 0;
+  }
+
+  #oc-chapter .oc-merch-buy .oc-merch-cta,
+  #oc-chapter .oc-merch-quiet .oc-merch-cta {
+    width: 100%;
+  }
+
+  #oc-chapter .oc-merch-cards,
+  #oc-chapter .oc-merch-cards.is-trio {
+    grid-template-columns: 1fr;
+  }
+
+  #oc-chapter .oc-merch-card {
     display: grid;
     grid-template-columns: 7.25rem minmax(0, 1fr);
-    grid-template-rows: auto auto auto;
     column-gap: 0.75rem;
-    row-gap: 0.1rem;
-    align-content: center;
-  }
-
-  #oc-chapter .oc-merch-products.is-trio img,
-  #oc-chapter .oc-merch-products.is-trio .oc-merch-blank {
-    grid-row: 1 / span 3;
-    aspect-ratio: 1;
-    align-self: center;
-  }
-
-  #oc-chapter .oc-merch-products.is-trio .oc-merch-name {
-    margin-top: 0;
-    align-self: end;
-  }
-
-  #oc-chapter .oc-merch-products.is-trio .oc-merch-price {
-    margin-top: 0;
-    padding-top: 0;
-  }
-}
-
-@media (max-width: 380px) {
-  #oc-chapter .oc-merch-products {
-    grid-template-columns: 1fr;
+    align-items: center;
   }
 }
 
@@ -6320,12 +6466,19 @@ html[data-oc-text] #oc-chapter.is-journey .oc-journey-entry .oc-journey-entry-co
   text-decoration-color: var(--sage-deep);
 }
 
-/* Product cards are the link. The sage "View" line is the cue, not an underline on the name. */
-#oc-chapter .oc-journey-entry-copy .oc-merch-products a,
+/* Product names are the link. Reading-link underlines do not apply inside the shelf. */
+#oc-chapter .oc-journey-entry-copy .oc-merch-piece-link,
+#oc-chapter .oc-journey-entry-copy .oc-merch-card-photo,
+#oc-chapter .oc-journey-entry-copy .oc-merch a.oc-merch-name,
 #oc-chapter .oc-journey-entry-copy .oc-merch-photo,
 #oc-chapter .oc-journey-entry-copy .oc-merch-size {
-  color: inherit;
+  color: var(--ink-strong);
   text-decoration: none;
+}
+
+#oc-chapter .oc-journey-entry-copy .oc-merch a.oc-merch-name:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
 
 #oc-chapter .oc-journey-entry-copy .oc-merch-cta {

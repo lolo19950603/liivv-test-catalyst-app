@@ -3270,9 +3270,10 @@
           "openKit": "Open the kit",
           "view": "View",
           "add": "Add to cart",
-          "addSize": "Add {size}",
+          "addSize": "Add to cart, {size}",
           "addBoth": "Add barrier and pouch",
           "addBothSize": "Add barrier and pouch, {size}",
+          "together": "Together",
           "adding": "Adding…",
           "added": "Added to your cart",
           "addedBoth": "Barrier and pouch are in your cart",
@@ -3297,7 +3298,7 @@
             "child": "A barrier and a pouch, sized for a child.",
             "adultSystems": "Adult drainable systems.",
             "sameSystems": "The same adult systems.",
-            "skinComfort": "A film and a sheet for the skin.",
+            "skinComfort": "A film, a sheet, paste, and a cream for the skin.",
             "goBagKit": "Extras for a go-bag."
           },
           "offers": {
@@ -3307,8 +3308,8 @@
             "closed": "New Image, closed",
             "uroImage": "New Image, urostomy",
             "uroClick": "SenSura Click, urostomy",
-            "starterKit": "Adhesive remover and a barrier wipe. Any opening size.",
-            "skinComfort": "A barrier film and a protective sheet."
+            "starterKit": "Remover, a barrier wipe, barrier spray, and a ring. Any opening size.",
+            "skinComfort": "A barrier film, a protective sheet, paste, and a barrier cream."
           },
           "names": {
             "8061": "New Image drainable, 57 mm",
@@ -3800,6 +3801,35 @@
           "kits": "Browse curated kits",
           "chapter": "Open a chapter"
         }
+      },
+      "shopPage": {
+        "label": "Shop Ostomy Care",
+        "eyebrow": "The shelf",
+        "description": "Pouches, barriers, and the extras around them — filter by what you wear, the brand you already use, and the opening size.",
+        "searchLabel": "Search this shelf",
+        "searchPlaceholder": "Search pouches, barriers, brands…",
+        "searchSubmit": "Search",
+        "filtersLabel": "Filter the shelf",
+        "kindLabel": "What you need",
+        "brandLabel": "Brand",
+        "sizeLabel": "Opening size",
+        "systemLabel": "Pouch system",
+        "all": "All",
+        "pouches": "Pouches",
+        "barriers": "Barriers",
+        "accessories": "Accessories",
+        "kits": "Kits",
+        "anyPouch": "Any pouch",
+        "onePiece": "One-piece",
+        "twoPiece": "Two-piece",
+        "allBrands": "All brands",
+        "anySize": "Any size",
+        "cutToFit": "Cut to fit",
+        "results": "{count, plural, =0 {No products} =1 {1 product} other {# products}}",
+        "clear": "Clear filters",
+        "empty": "Nothing matches these filters.",
+        "emptyAction": "Clear filters and see the whole shelf",
+        "unavailable": "The shelf is not available right now. Try again in a moment."
       },
       "fundingPage": {
         "kicker": "Ostomy Care · Money",

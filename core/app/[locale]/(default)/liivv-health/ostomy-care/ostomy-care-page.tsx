@@ -24,6 +24,7 @@ import {
 } from './chapters/chapters-data';
 import type { OcCatalog, OcCatalogItem } from './get-oc-catalog';
 import { NEW_JOURNEY_STARTER_KIT_ID } from './oc-ids';
+import { roomForProductName } from './shop-classify';
 
 import './ostomy-care.css';
 
@@ -106,44 +107,7 @@ const FAQ_KITS_KEY = '2';
  */
 
 function roomForProduct(product: OcCatalogItem): Exclude<ShopRoomId, 'all' | 'kits'> {
-  const n = product.name.toLowerCase();
-
-  if (
-    /1-piece|one-piece|1 piece|premier one-piece|pouchkins newborn|pouchkins drainable pediatric one|activelife/.test(
-      n,
-    )
-  ) {
-    return 'onePiece';
-  }
-
-  if (
-    /2-piece|two-piece|2 piece|new image two|sensura mio click|sensura click|natura 2|sur-fit/.test(
-      n,
-    )
-  ) {
-    return 'twoPiece';
-  }
-
-  if (
-    /barrier|flange|wafer|ring|paste|powder|flextend|flexwear|ceraplus|stomahesive|eakin/.test(n) &&
-    !n.includes('pouch')
-  ) {
-    return 'barriers';
-  }
-
-  if (/belt|clamp|deodorant|odor|adapter|wipe|remover|sheet|lubricat|sponge/.test(n)) {
-    return 'accessories';
-  }
-
-  if (n.includes('pouch')) {
-    return /1-piece|one-piece|premier one|assura 1|sensura 1|sensura light 1|activelife|pouchkins/.test(
-      n,
-    )
-      ? 'onePiece'
-      : 'twoPiece';
-  }
-
-  return 'accessories';
+  return roomForProductName(product.name);
 }
 
 function hasDisplayPrice(priceLabel?: string) {
