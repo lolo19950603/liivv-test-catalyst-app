@@ -145,21 +145,6 @@ export async function OstomyShop({
 
       <div className="os-wrap os-layout">
         <aside aria-label={t('filtersLabel')} className="os-side">
-          <form action="" className="os-search" method="get" role="search">
-            <label className="os-search-label" htmlFor="ostomy-shop-search">
-              {t('searchLabel')}
-            </label>
-            <input
-              defaultValue={filters.term ?? ''}
-              id="ostomy-shop-search"
-              name="term"
-              placeholder={t('searchPlaceholder')}
-              type="search"
-            />
-            <FilterFields filters={filters} />
-            <button type="submit">{t('searchSubmit')}</button>
-          </form>
-
           <div className="os-filters">
             <FilterRow id="os-kind" label={t('kindLabel')}>
               <Chip
@@ -269,6 +254,21 @@ export async function OstomyShop({
         </aside>
 
         <div className="os-main">
+          <form action="" className="os-search" method="get" role="search">
+            <label className="os-search-label" htmlFor="ostomy-shop-search">
+              {t('searchLabel')}
+            </label>
+            <input
+              defaultValue={filters.term ?? ''}
+              id="ostomy-shop-search"
+              name="term"
+              placeholder={t('searchPlaceholder')}
+              type="search"
+            />
+            <FilterFields filters={filters} />
+            <button type="submit">{t('searchSubmit')}</button>
+          </form>
+
           <div className="os-meta">
             <p aria-live="polite" className="os-count">
               {t('results', { count: matched.length })}
