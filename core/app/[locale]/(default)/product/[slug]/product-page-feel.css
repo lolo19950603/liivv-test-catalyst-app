@@ -898,15 +898,33 @@
   flex: none;
 }
 
-.liivv-product-page-feel .liivv-kit-side-row__cta.button--sm {
-  min-height: 2rem;
-  padding-inline: 0.75rem;
-  font-size: 0.75rem;
+.liivv-product-page-feel .liivv-kit-customizer .liivv-kit-side-row__cta.button.button--sm {
+  min-height: 0;
+  height: auto;
+  padding: 0.4rem 0.7rem;
+  border: 0;
   border-radius: 0.5rem;
+  background: #312f2f;
+  color: #ffffff;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  box-shadow: none;
+  overflow: hidden;
 }
 
-.liivv-product-page-feel .liivv-kit-side-row__cta.button--sm .btn-fill {
-  border-radius: 0.5rem;
+.liivv-product-page-feel .liivv-kit-customizer .liivv-kit-side-row__cta.button.button--sm .btn-fill {
+  display: none;
+}
+
+.liivv-product-page-feel .liivv-kit-customizer .liivv-kit-side-row__cta.button.button--sm .btn-text,
+.liivv-product-page-feel .liivv-kit-customizer .liivv-kit-side-row__cta.button.button--sm svg {
+  color: #ffffff;
+}
+
+.liivv-product-page-feel .liivv-kit-customizer .liivv-kit-side-row__cta.button.button--sm:hover:not(:disabled),
+.liivv-product-page-feel .liivv-kit-customizer .liivv-kit-side-row__cta.button.button--sm:focus-visible:not(:disabled) {
+  background: #1c1b1b;
+  color: #ffffff;
 }
 
 .liivv-product-page-feel .liivv-kit-customizer__add {

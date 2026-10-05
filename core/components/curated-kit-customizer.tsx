@@ -629,11 +629,20 @@ export function CuratedKitCustomizer({
 
   const searchQuery = searchTerm.trim();
   const isSearchActive = searchQuery.length >= 2;
+  const showSearchResults = isSearchActive && searchResults.length > 0;
+  const searchStatus =
+    !isSearchActive || showSearchResults
+      ? null
+      : awaitingSearch || isSearching || settledQuery !== searchQuery
+        ? t('searching')
+        : t('searchEmpty');
 
   return (
     <div
       className={
-        isSearchActive ? 'liivv-kit-customizer liivv-kit-customizer--searching' : 'liivv-kit-customizer'
+        showSearchResults
+          ? 'liivv-kit-customizer liivv-kit-customizer--searching'
+          : 'liivv-kit-customizer'
       }
     >
       <header className="liivv-kit-customizer__intro">
@@ -646,7 +655,7 @@ export function CuratedKitCustomizer({
       <section
         aria-labelledby="kit-included-heading"
         className="liivv-kit-customizer__panel"
-        inert={isSearchActive ? true : undefined}
+        inert={showSearchResults ? true : undefined}
       >
         <div className="liivv-kit-customizer__panel-head">
           <h2 className="liivv-kit-customizer__panel-title" id="kit-included-heading">
@@ -836,11 +845,10 @@ export function CuratedKitCustomizer({
           </ul>
         )}
       </section>
-      {isSearchActive ? (
+      {showSearchResults ? (
         <div aria-label={t('searchPlaceholder')} className="liivv-kit-search__cover" role="region">
-          {searchResults.length > 0 ? (
-            <ul className="liivv-kit-side-list">
-              {searchResults.map((product) => {
+          <ul className="liivv-kit-side-list">
+            {searchResults.map((product) => {
                 const entityId = Number(product.id);
                 const inKit = Number.isFinite(entityId) && includedIds.has(entityId);
 
@@ -882,16 +890,9 @@ export function CuratedKitCustomizer({
                       </ArchiveButton>
                     )}
                   </li>
-                );
-              })}
-            </ul>
-          ) : (
-            <p className="liivv-kit-search__status">
-              {awaitingSearch || isSearching || settledQuery !== searchQuery
-                ? t('searching')
-                : t('searchEmpty')}
-            </p>
-          )}
+              );
+            })}
+          </ul>
         </div>
       ) : null}
       </div>
@@ -927,6 +928,7 @@ export function CuratedKitCustomizer({
           {searchQuery.length === 1 ? (
             <p className="liivv-kit-search__status">{t('searchHint')}</p>
           ) : null}
+          {searchStatus ? <p className="liivv-kit-search__status">{searchStatus}</p> : null}
 
           {!isSearchActive && browseSuggestions.length > 0 ? (
             <ul className="liivv-kit-side-list">
