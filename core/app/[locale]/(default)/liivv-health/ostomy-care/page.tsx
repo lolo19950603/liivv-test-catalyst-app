@@ -60,7 +60,8 @@ export default async function Page({ params }: Props) {
    * C13. The doors are rendered here, on the server, and handed to the client
    * page as a slot: the landing page component is a client component, and the
    * five links must not cost the landing a byte of client JavaScript. They took
-   * the place of the guest quiz and the kit flow demo, which did.
+   * the place of the guest quiz and the old kit walkthrough, which did. The
+   * walkthrough is rendered again from the kits section of the client page.
    */
   return <OstomyCarePage catalog={catalog} doors={<SituationDoors />} />;
 }

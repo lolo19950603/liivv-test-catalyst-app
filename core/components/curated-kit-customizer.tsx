@@ -1,15 +1,14 @@
 'use client';
 
 import { useFormatter, useTranslations } from 'next-intl';
-import { ChevronLeft, ChevronRight, Plus, Search, X } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { ChevronDown, ChevronLeft, ChevronRight, Plus, Search, X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { usePathname, useRouter } from '~/i18n/routing';
 
 import { Select } from '@/vibes/soul/form/select';
 import { PriceLabel, type Price } from '@/vibes/soul/primitives/price-label';
 import { ArchiveButton } from '@/vibes/soul/primitives/archive-button';
-import { Modal } from '@/vibes/soul/primitives/modal';
 import { toast } from '@/vibes/soul/primitives/toaster';
 import { Image } from '~/components/image';
 import { Link } from '~/components/link';
@@ -78,8 +77,18 @@ interface SelectedItem {
   variantEntityId?: number;
 }
 
+interface KitSearchHit {
+  id: string;
+  title: string;
+  href: string;
+  price?: Price;
+  image?: { src: string; alt: string };
+}
+
 interface Props {
   kitName: string;
+  /** The kit product itself, hidden from search results. */
+  kitProductEntityId: number;
   kitHref?: string;
   kitImage?: { src: string; alt: string };
   products: CuratedKitProduct[];
@@ -186,6 +195,7 @@ function KitQuantityStepper({
  */
 export function CuratedKitCustomizer({
   kitName,
+  kitProductEntityId,
   kitHref,
   kitImage,
   products: initialProducts,
@@ -212,13 +222,13 @@ export function CuratedKitCustomizer({
       ...(product.variantEntityId ? { variantEntityId: product.variantEntityId } : {}),
     })),
   );
-  const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<
-    Array<{ id: string; title: string; href: string; image?: { src: string; alt: string } }>
-  >([]);
+  const [searchResults, setSearchResults] = useState<KitSearchHit[]>([]);
+  const [awaitingSearch, setAwaitingSearch] = useState(false);
+  const [settledQuery, setSettledQuery] = useState('');
   const [isSearching, startSearchTransition] = useTransition();
   const [addingProductId, setAddingProductId] = useState<number | null>(null);
+  const [expandedOptionIds, setExpandedOptionIds] = useState<number[]>([]);
   const [kitQuantity, setKitQuantity] = useState(1);
 
   const productById = useMemo(() => {
@@ -226,6 +236,8 @@ export function CuratedKitCustomizer({
   }, [catalog]);
 
   const included = selected.filter((item) => item.quantity > 0);
+  const includedListRef = useRef<HTMLUListElement>(null);
+  const pendingScrollId = useRef<number | null>(null);
   const baseProductIds = useMemo(
     () => new Set(initialProducts.map((product) => product.productEntityId)),
     [initialProducts],
@@ -255,11 +267,15 @@ export function CuratedKitCustomizer({
     catalog[0]?.currencyCode ??
     'USD';
 
-  const visibleSuggestions = useMemo(() => {
-    const includedIds = new Set(included.map((item) => item.productEntityId));
-
-    return suggestedProducts.filter((product) => !includedIds.has(product.productEntityId));
-  }, [suggestedProducts, included]);
+  const includedIds = useMemo(
+    () => new Set(included.map((item) => item.productEntityId)),
+    [included],
+  );
+  const browseSuggestions = useMemo(
+    () =>
+      suggestedProducts.filter((product) => product.productEntityId !== kitProductEntityId),
+    [kitProductEntityId, suggestedProducts],
+  );
 
   const ensureInCatalog = useCallback((product: CuratedKitProduct) => {
     setCatalog((prev) => {
@@ -330,14 +346,26 @@ export function CuratedKitCustomizer({
 
   const addProductToKit = useCallback(
     async (productEntityId: number) => {
+      const alreadyIncluded = selected.some(
+        (item) => item.productEntityId === productEntityId && item.quantity > 0,
+      );
+
+      if (alreadyIncluded || productEntityId === kitProductEntityId) {
+        return;
+      }
+
       setAddingProductId(productEntityId);
 
       try {
         const existing = productById.get(productEntityId);
 
         if (existing) {
+          pendingScrollId.current = productEntityId;
           setQuantity(productEntityId, Math.max(1, existing.defaultQuantity));
-          setSearchOpen(false);
+          setSearchTerm('');
+          setSearchResults([]);
+          setAwaitingSearch(false);
+          setSettledQuery('');
 
           return;
         }
@@ -351,13 +379,14 @@ export function CuratedKitCustomizer({
         }
 
         ensureInCatalog(result.product);
+        pendingScrollId.current = productEntityId;
+        setSearchTerm('');
+        setSearchResults([]);
+        setAwaitingSearch(false);
+        setSettledQuery('');
         setSelected((prev) => {
           if (prev.some((item) => item.productEntityId === productEntityId && item.quantity > 0)) {
-            return prev.map((item) =>
-              item.productEntityId === productEntityId
-                ? { ...item, quantity: Math.max(1, item.quantity) }
-                : item,
-            );
+            return prev;
           }
 
           return [
@@ -372,14 +401,38 @@ export function CuratedKitCustomizer({
             },
           ];
         });
-        setSearchOpen(false);
-        toast.success(t('addedToKit'));
       } finally {
         setAddingProductId(null);
       }
     },
-    [ensureInCatalog, productById, setQuantity, t],
+    [ensureInCatalog, kitProductEntityId, productById, selected, setQuantity],
   );
+
+  useEffect(() => {
+    const productEntityId = pendingScrollId.current;
+
+    if (productEntityId == null) {
+      return;
+    }
+
+    pendingScrollId.current = null;
+
+    const list = includedListRef.current;
+    const row = list?.querySelector<HTMLElement>(`[data-kit-item="${productEntityId}"]`);
+
+    if (!list || !row) {
+      return;
+    }
+
+    const listRect = list.getBoundingClientRect();
+    const rowRect = row.getBoundingClientRect();
+
+    if (rowRect.height >= list.clientHeight) {
+      list.scrollTop += rowRect.top - listRect.top;
+    } else if (rowRect.bottom > listRect.bottom) {
+      list.scrollTop += rowRect.bottom - listRect.bottom + 8;
+    }
+  }, [included]);
 
   function handleAddKitToCart() {
     if (included.length === 0) {
@@ -528,18 +581,19 @@ export function CuratedKitCustomizer({
   }, []);
 
   useEffect(() => {
-    if (!searchOpen) {
-      return;
-    }
-
     const term = searchTerm.trim();
 
     if (term.length < 2) {
       setSearchResults([]);
+      setAwaitingSearch(false);
+      setSettledQuery('');
 
       return;
     }
 
+    setAwaitingSearch(true);
+
+    let cancelled = false;
     const timeoutId = window.setTimeout(() => {
       startSearchTransition(async () => {
         const formData = new FormData();
@@ -552,25 +606,48 @@ export function CuratedKitCustomizer({
           formData,
         );
 
-        const productsGroup = result.searchResults?.find((group) => group.type === 'products');
+        if (cancelled) {
+          return;
+        }
 
-        setSearchResults(productsGroup?.type === 'products' ? productsGroup.products : []);
+        const productsGroup = result.searchResults?.find((group) => group.type === 'products');
+        const products = productsGroup?.type === 'products' ? productsGroup.products : [];
+
+        setSearchResults(
+          products.filter((product) => Number(product.id) !== kitProductEntityId),
+        );
+        setAwaitingSearch(false);
+        setSettledQuery(term);
       });
     }, 300);
 
     return () => {
+      cancelled = true;
       window.clearTimeout(timeoutId);
     };
-  }, [searchOpen, searchTerm]);
+  }, [kitProductEntityId, searchTerm]);
+
+  const searchQuery = searchTerm.trim();
+  const isSearchActive = searchQuery.length >= 2;
 
   return (
-    <div className="liivv-kit-customizer">
+    <div
+      className={
+        isSearchActive ? 'liivv-kit-customizer liivv-kit-customizer--searching' : 'liivv-kit-customizer'
+      }
+    >
       <header className="liivv-kit-customizer__intro">
         <p className="liivv-kit-customizer__eyebrow">{t('eyebrow')}</p>
         <p className="liivv-kit-customizer__subtitle">{t('subtitle')}</p>
       </header>
 
-      <section aria-labelledby="kit-included-heading" className="liivv-kit-customizer__panel">
+      <div className="liivv-kit-customizer__sheet">
+      <div className="liivv-kit-customizer__body">
+      <section
+        aria-labelledby="kit-included-heading"
+        className="liivv-kit-customizer__panel"
+        inert={isSearchActive ? true : undefined}
+      >
         <div className="liivv-kit-customizer__panel-head">
           <h2 className="liivv-kit-customizer__panel-title" id="kit-included-heading">
             {t('includedTitle')}
@@ -584,7 +661,7 @@ export function CuratedKitCustomizer({
         {included.length === 0 ? (
           <p className="liivv-kit-customizer__empty">{t('allRemoved')}</p>
         ) : (
-          <ul className="liivv-kit-customizer__items">
+          <ul className="liivv-kit-customizer__items" ref={includedListRef}>
             {included.map((item) => {
               const product = productById.get(item.productEntityId);
 
@@ -597,16 +674,57 @@ export function CuratedKitCustomizer({
                 item.selectedOptions ?? fallbackSelectedOptions(product);
               const lineTotal = product.unitPrice * item.quantity;
               const isAddOn = !baseProductIds.has(product.productEntityId);
+              const optionChoice = (option: CuratedKitOption) =>
+                selectedOptions?.multipleChoices.find(
+                  (choice) => choice.optionEntityId === option.entityId,
+                )?.optionValueEntityId ??
+                option.values.find((value) => value.isDefault)?.entityId ??
+                option.values[0]?.entityId;
+              /*
+               * The kit locked this component to one real variant, so its
+               * options are read-only. A barrier sold as Size × Colour lets a
+               * customer pick 57 mm with the 70 mm colour — a combination that
+               * is not a variant, and on ostomy supplies a size that will not
+               * couple. Show what the kit chose instead of offering a choice
+               * that breaks it. Editable options stay on the same one-line row
+               * until the customer opens them.
+               */
+              const optionMeta = options
+                .flatMap((option) => {
+                  const currentValue = optionChoice(option);
+                  const currentLabel = option.values.find(
+                    (value) => value.entityId === currentValue,
+                  )?.label;
+
+                  if (currentLabel == null) {
+                    return [];
+                  }
+
+                  return [
+                    product.lockedByKit ? `${option.displayName} ${currentLabel}` : currentLabel,
+                  ];
+                })
+                .join(' · ');
+              const hasEditableOptions = !product.lockedByKit && options.length > 0;
+              const optionsOpen =
+                hasEditableOptions && expandedOptionIds.includes(item.productEntityId);
+              const optionsPanelId = `kit-item-options-${item.productEntityId}`;
 
               return (
-                <li className="liivv-kit-item" key={item.productEntityId}>
+                <li
+                  className={
+                    optionsOpen ? 'liivv-kit-item liivv-kit-item--stacked' : 'liivv-kit-item'
+                  }
+                  data-kit-item={item.productEntityId}
+                  key={item.productEntityId}
+                >
                   <Link className="liivv-kit-item__media" href={product.href}>
                     {product.image ? (
                       <Image
                         alt={product.image.alt}
                         className="object-cover"
                         fill
-                        sizes="80px"
+                        sizes="44px"
                         src={product.image.src}
                       />
                     ) : (
@@ -614,212 +732,289 @@ export function CuratedKitCustomizer({
                     )}
                   </Link>
 
-                  <div className="liivv-kit-item__body">
-                    <div className="liivv-kit-item__top">
-                      <div className="liivv-kit-item__copy">
-                        {isAddOn ? (
-                          <span className="liivv-kit-item__badge">{t('addedLabel')}</span>
-                        ) : null}
-                        <Link className="liivv-kit-item__title" href={product.href}>
-                          {product.title}
-                        </Link>
-                        {product.price ? (
-                          <div className="liivv-kit-item__unit-price">
-                            <PriceLabel className="text-sm" price={product.price} />
-                          </div>
-                        ) : null}
-                      </div>
-                      <p className="liivv-kit-item__line-total">
-                        {format.number(lineTotal, {
-                          style: 'currency',
-                          currency: product.currencyCode || currencyCode,
-                        })}
-                      </p>
-                    </div>
-
-                    {options.length > 0 ? (
-                      <div className="liivv-kit-item__options">
-                        {options.map((option) => {
-                          const currentValue =
-                            selectedOptions?.multipleChoices.find(
-                              (choice) => choice.optionEntityId === option.entityId,
-                            )?.optionValueEntityId ??
-                            option.values.find((value) => value.isDefault)?.entityId ??
-                            option.values[0]?.entityId;
-
-                          /*
-                           * The kit locked this component to one real variant,
-                           * so its options are read-only. Each option renders
-                           * its own Select, and a barrier sold as Size × Colour
-                           * lets a customer pick 57 mm with the 70 mm colour —
-                           * a combination that is not a variant, and on ostomy
-                           * supplies a size that will not couple. Show what the
-                           * kit chose instead of offering a choice that breaks
-                           * it; the component's own product page still sells
-                           * every variant.
-                           */
-                          if (product.lockedByKit) {
-                            const currentLabel = option.values.find(
-                              (value) => value.entityId === currentValue,
-                            )?.label;
-
-                            if (currentLabel == null) {
-                              return null;
-                            }
-
-                            return (
-                              <p className="liivv-kit-item__option-fixed" key={option.entityId}>
-                                <span className="liivv-kit-item__option-name">
-                                  {option.displayName}
-                                </span>
-                                <span className="liivv-kit-item__option-value">{currentLabel}</span>
-                              </p>
-                            );
-                          }
-
-                          return (
-                            <Select
-                              key={option.entityId}
-                              label={option.displayName}
-                              name={`option-${product.productEntityId}-${option.entityId}`}
-                              onValueChange={(value) =>
-                                setOptionValue(
-                                  product.productEntityId,
-                                  option.entityId,
-                                  Number(value),
-                                )
-                              }
-                              options={option.values.map((value) => ({
-                                label: value.label,
-                                value: String(value.entityId),
-                              }))}
-                              value={currentValue != null ? String(currentValue) : undefined}
-                              variant="rectangle"
-                            />
-                          );
-                        })}
-                      </div>
-                    ) : null}
-
-                    <div className="liivv-kit-item__actions">
-                      <KitQuantityStepper
-                        decrementLabel={t('decrement')}
-                        incrementLabel={t('increment')}
-                        onDecrement={() => setQuantity(item.productEntityId, item.quantity - 1)}
-                        onIncrement={() => setQuantity(item.productEntityId, item.quantity + 1)}
-                        quantity={item.quantity}
-                      />
-                      <button
-                        className="liivv-kit-item__remove"
-                        onClick={() => setQuantity(item.productEntityId, 0)}
-                        type="button"
-                      >
-                        <X aria-hidden size={14} strokeWidth={2} />
-                        {t('remove')}
-                      </button>
+                  <div className="liivv-kit-item__main">
+                    <div className="liivv-kit-item__copy">
+                      {isAddOn ? (
+                        <span className="liivv-kit-item__badge">{t('addedLabel')}</span>
+                      ) : null}
+                      <Link className="liivv-kit-item__title" href={product.href}>
+                        {product.title}
+                      </Link>
+                      {optionMeta && (product.lockedByKit || !optionsOpen) ? (
+                        <p className="liivv-kit-item__meta">{optionMeta}</p>
+                      ) : null}
+                      {item.quantity > 1 && product.price ? (
+                        <div className="liivv-kit-item__unit-price">
+                          <PriceLabel className="text-xs" price={product.price} />
+                        </div>
+                      ) : null}
                     </div>
                   </div>
+
+                  <div className="liivv-kit-item__rail">
+                    {hasEditableOptions ? (
+                      <button
+                        aria-controls={optionsPanelId}
+                        aria-expanded={optionsOpen}
+                        aria-label={optionsOpen ? t('collapseOptions') : t('expandOptions')}
+                        className="liivv-kit-item__expand"
+                        onClick={() =>
+                          setExpandedOptionIds((current) =>
+                            optionsOpen
+                              ? current.filter((id) => id !== item.productEntityId)
+                              : [...current, item.productEntityId],
+                          )
+                        }
+                        type="button"
+                      >
+                        <ChevronDown
+                          aria-hidden
+                          className={
+                            optionsOpen
+                              ? 'liivv-kit-item__expand-icon liivv-kit-item__expand-icon--open'
+                              : 'liivv-kit-item__expand-icon'
+                          }
+                          size={16}
+                          strokeWidth={2}
+                        />
+                      </button>
+                    ) : null}
+                    <KitQuantityStepper
+                      decrementLabel={t('decrement')}
+                      incrementLabel={t('increment')}
+                      onDecrement={() => setQuantity(item.productEntityId, item.quantity - 1)}
+                      onIncrement={() => setQuantity(item.productEntityId, item.quantity + 1)}
+                      quantity={item.quantity}
+                    />
+                    <p className="liivv-kit-item__line-total">
+                      {format.number(lineTotal, {
+                        style: 'currency',
+                        currency: product.currencyCode || currencyCode,
+                      })}
+                    </p>
+                    <button
+                      aria-label={t('remove')}
+                      className="liivv-kit-item__remove"
+                      onClick={() => setQuantity(item.productEntityId, 0)}
+                      type="button"
+                    >
+                      <X aria-hidden size={16} strokeWidth={2} />
+                    </button>
+                  </div>
+
+                  {optionsOpen ? (
+                    <div className="liivv-kit-item__options" id={optionsPanelId}>
+                      {options.map((option) => {
+                        const currentValue = optionChoice(option);
+
+                        return (
+                          <Select
+                            key={option.entityId}
+                            label={option.displayName}
+                            name={`option-${product.productEntityId}-${option.entityId}`}
+                            onValueChange={(value) =>
+                              setOptionValue(
+                                product.productEntityId,
+                                option.entityId,
+                                Number(value),
+                              )
+                            }
+                            options={option.values.map((value) => ({
+                              label: value.label,
+                              value: String(value.entityId),
+                            }))}
+                            value={currentValue != null ? String(currentValue) : undefined}
+                            variant="rectangle"
+                          />
+                        );
+                      })}
+                    </div>
+                  ) : null}
                 </li>
               );
             })}
           </ul>
         )}
       </section>
+      {isSearchActive ? (
+        <div aria-label={t('searchPlaceholder')} className="liivv-kit-search__cover" role="region">
+          {searchResults.length > 0 ? (
+            <ul className="liivv-kit-side-list">
+              {searchResults.map((product) => {
+                const entityId = Number(product.id);
+                const inKit = Number.isFinite(entityId) && includedIds.has(entityId);
 
-      {removed.length > 0 ? (
-        <section aria-labelledby="kit-removed-heading" className="liivv-kit-customizer__side">
-          <div className="liivv-kit-customizer__side-head">
-            <h3 className="liivv-kit-customizer__side-title" id="kit-removed-heading">
-              {t('removedTitle')}
-            </h3>
-            <p className="liivv-kit-customizer__side-subtitle">{t('removedSubtitle')}</p>
-          </div>
-          <ul className="liivv-kit-side-list">
-            {removed.map((product) => (
-              <li className="liivv-kit-side-row" key={product.productEntityId}>
-                <div className="liivv-kit-side-row__media">
-                  {product.image ? (
-                    <Image
-                      alt={product.image.alt}
-                      className="object-cover"
-                      fill
-                      sizes="48px"
-                      src={product.image.src}
-                    />
-                  ) : null}
-                </div>
-                <p className="liivv-kit-side-row__title">{product.title}</p>
-                <ArchiveButton
-                  className="liivv-kit-side-row__cta shrink-0"
-                  onClick={() => setQuantity(product.productEntityId, product.defaultQuantity)}
-                  size="sm"
-                  type="button"
-                  variant="secondary"
-                >
-                  {t('addBack')}
-                </ArchiveButton>
-              </li>
-            ))}
-          </ul>
-        </section>
+                return (
+                  <li className="liivv-kit-side-row" key={product.id}>
+                    <div className="liivv-kit-side-row__media">
+                      {product.image ? (
+                        <Image
+                          alt={product.image.alt}
+                          className="object-cover"
+                          fill
+                          sizes="48px"
+                          src={product.image.src}
+                        />
+                      ) : null}
+                    </div>
+                    <div className="liivv-kit-side-row__copy">
+                      <p className="liivv-kit-side-row__title">{product.title}</p>
+                      {product.price ? (
+                        <PriceLabel className="text-xs" price={product.price} />
+                      ) : null}
+                    </div>
+                    {inKit ? (
+                      <span className="liivv-kit-side-row__status">{t('inKit')}</span>
+                    ) : (
+                      <ArchiveButton
+                        className="liivv-kit-side-row__cta shrink-0"
+                        disabled={!Number.isFinite(entityId) || addingProductId === entityId}
+                        loading={addingProductId === entityId}
+                        onClick={() => {
+                          void addProductToKit(entityId);
+                        }}
+                        size="sm"
+                        type="button"
+                        variant="secondary"
+                      >
+                        <Plus aria-hidden size={14} strokeWidth={2} />
+                        {t('addProduct')}
+                      </ArchiveButton>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="liivv-kit-search__status">
+              {awaitingSearch || isSearching || settledQuery !== searchQuery
+                ? t('searching')
+                : t('searchEmpty')}
+            </p>
+          )}
+        </div>
       ) : null}
+      </div>
 
-      {visibleSuggestions.length > 0 ? (
-        <section aria-labelledby="kit-suggested-heading" className="liivv-kit-customizer__side">
-          <div className="liivv-kit-customizer__side-head">
-            <h3 className="liivv-kit-customizer__side-title" id="kit-suggested-heading">
-              {t('suggestedTitle')}
-            </h3>
-            <p className="liivv-kit-customizer__side-subtitle">{t('suggestedSubtitle')}</p>
-          </div>
-          <ul className="liivv-kit-side-list">
-            {visibleSuggestions.map((product) => (
-              <li className="liivv-kit-side-row" key={product.productEntityId}>
-                <div className="liivv-kit-side-row__media">
-                  {product.image ? (
-                    <Image
-                      alt={product.image.alt}
-                      className="object-cover"
-                      fill
-                      sizes="48px"
-                      src={product.image.src}
-                    />
-                  ) : null}
-                </div>
-                <div className="liivv-kit-side-row__copy">
+      <section aria-labelledby="kit-add-heading" className="liivv-kit-customizer__add">
+        <div className="liivv-kit-customizer__side-head">
+          <h3 className="liivv-kit-customizer__side-title" id="kit-add-heading">
+            {t('addItemsTitle')}
+          </h3>
+          <p className="liivv-kit-customizer__side-subtitle">{t('addItemsSubtitle')}</p>
+        </div>
+
+        <div className="liivv-kit-search">
+          <label className="liivv-kit-search__field">
+            <span className="sr-only">{t('searchPlaceholder')}</span>
+            <Search aria-hidden className="liivv-kit-search__icon" size={16} strokeWidth={2} />
+            <input
+              className="liivv-kit-search__input"
+              onChange={(event) => setSearchTerm(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Escape') {
+                  setSearchTerm('');
+                  setSearchResults([]);
+                  setAwaitingSearch(false);
+                  setSettledQuery('');
+                }
+              }}
+              placeholder={t('searchPlaceholder')}
+              type="search"
+              value={searchTerm}
+            />
+          </label>
+          {searchQuery.length === 1 ? (
+            <p className="liivv-kit-search__status">{t('searchHint')}</p>
+          ) : null}
+
+          {!isSearchActive && browseSuggestions.length > 0 ? (
+            <ul className="liivv-kit-side-list">
+              {browseSuggestions.map((product) => {
+                const inKit = includedIds.has(product.productEntityId);
+
+                return (
+                  <li className="liivv-kit-side-row" key={product.productEntityId}>
+                    <div className="liivv-kit-side-row__media">
+                      {product.image ? (
+                        <Image
+                          alt={product.image.alt}
+                          className="object-cover"
+                          fill
+                          sizes="48px"
+                          src={product.image.src}
+                        />
+                      ) : null}
+                    </div>
+                    <div className="liivv-kit-side-row__copy">
+                      <p className="liivv-kit-side-row__title">{product.title}</p>
+                      {product.price ? (
+                        <PriceLabel className="text-xs" price={product.price} />
+                      ) : null}
+                    </div>
+                    {inKit ? (
+                      <span className="liivv-kit-side-row__status">{t('inKit')}</span>
+                    ) : (
+                      <ArchiveButton
+                        className="liivv-kit-side-row__cta shrink-0"
+                        disabled={addingProductId === product.productEntityId}
+                        loading={addingProductId === product.productEntityId}
+                        onClick={() => {
+                          void addProductToKit(product.productEntityId);
+                        }}
+                        size="sm"
+                        type="button"
+                        variant="secondary"
+                      >
+                        <Plus aria-hidden size={14} strokeWidth={2} />
+                        {t('addProduct')}
+                      </ArchiveButton>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          ) : null}
+        </div>
+
+        {removed.length > 0 ? (
+          <div aria-labelledby="kit-removed-heading" className="liivv-kit-customizer__removed">
+            <div className="liivv-kit-customizer__side-head">
+              <h4 className="liivv-kit-customizer__side-title" id="kit-removed-heading">
+                {t('removedTitle')}
+              </h4>
+              <p className="liivv-kit-customizer__side-subtitle">{t('removedSubtitle')}</p>
+            </div>
+            <ul className="liivv-kit-side-list">
+              {removed.map((product) => (
+                <li className="liivv-kit-side-row" key={product.productEntityId}>
+                  <div className="liivv-kit-side-row__media">
+                    {product.image ? (
+                      <Image
+                        alt={product.image.alt}
+                        className="object-cover"
+                        fill
+                        sizes="48px"
+                        src={product.image.src}
+                      />
+                    ) : null}
+                  </div>
                   <p className="liivv-kit-side-row__title">{product.title}</p>
-                  {product.price ? (
-                    <PriceLabel className="text-xs" price={product.price} />
-                  ) : null}
-                </div>
-                <ArchiveButton
-                  className="liivv-kit-side-row__cta shrink-0"
-                  disabled={addingProductId === product.productEntityId}
-                  loading={addingProductId === product.productEntityId}
-                  onClick={() => {
-                    void addProductToKit(product.productEntityId);
-                  }}
-                  size="sm"
-                  type="button"
-                  variant="secondary"
-                >
-                  <Plus aria-hidden size={14} strokeWidth={2} />
-                  {t('addProduct')}
-                </ArchiveButton>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      <button
-        className="liivv-kit-customizer__search-trigger"
-        onClick={() => setSearchOpen(true)}
-        type="button"
-      >
-        <Search aria-hidden size={16} strokeWidth={2} />
-        <span>{t('searchAddProduct')}</span>
-      </button>
+                  <ArchiveButton
+                    className="liivv-kit-side-row__cta shrink-0"
+                    onClick={() => setQuantity(product.productEntityId, product.defaultQuantity)}
+                    size="sm"
+                    type="button"
+                    variant="secondary"
+                  >
+                    {t('addBack')}
+                  </ArchiveButton>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+      </section>
 
       <div className="liivv-kit-customizer__checkout">
         <div className="liivv-kit-customizer__total-row liivv-kit-customizer__qty-row">
@@ -865,76 +1060,7 @@ export function CuratedKitCustomizer({
           </ArchiveButton>
         </div>
       </div>
-
-      <Modal
-        isOpen={searchOpen}
-        setOpen={(open) => {
-          setSearchOpen(open);
-
-          if (!open) {
-            setSearchTerm('');
-            setSearchResults([]);
-          }
-        }}
-        title={t('searchModalTitle')}
-      >
-        <div className="liivv-kit-search">
-          <label className="liivv-kit-search__field">
-            <Search aria-hidden className="liivv-kit-search__icon" size={16} strokeWidth={2} />
-            <input
-              autoFocus
-              className="liivv-kit-search__input"
-              onChange={(event) => setSearchTerm(event.target.value)}
-              placeholder={t('searchPlaceholder')}
-              type="search"
-              value={searchTerm}
-            />
-          </label>
-          {isSearching ? (
-            <p className="liivv-kit-search__status">{t('searching')}</p>
-          ) : null}
-          {searchResults.length > 0 ? (
-            <ul className="liivv-kit-search__results">
-              {searchResults.map((product) => {
-                const entityId = Number(product.id);
-
-                return (
-                  <li className="liivv-kit-side-row" key={product.id}>
-                    <div className="liivv-kit-side-row__media">
-                      {product.image ? (
-                        <Image
-                          alt={product.image.alt}
-                          className="object-cover"
-                          fill
-                          sizes="48px"
-                          src={product.image.src}
-                        />
-                      ) : null}
-                    </div>
-                    <p className="liivv-kit-side-row__title">{product.title}</p>
-                    <ArchiveButton
-                      className="liivv-kit-side-row__cta shrink-0"
-                      disabled={!Number.isFinite(entityId) || addingProductId === entityId}
-                      loading={addingProductId === entityId}
-                      onClick={() => {
-                        void addProductToKit(entityId);
-                      }}
-                      size="sm"
-                      type="button"
-                      variant="secondary"
-                    >
-                      <Plus aria-hidden size={14} strokeWidth={2} />
-                      {t('addProduct')}
-                    </ArchiveButton>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : searchTerm.trim().length >= 2 && !isSearching ? (
-            <p className="liivv-kit-search__status">{t('searchEmpty')}</p>
-          ) : null}
-        </div>
-      </Modal>
+      </div>
     </div>
   );
 }

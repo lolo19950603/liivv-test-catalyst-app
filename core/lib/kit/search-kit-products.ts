@@ -24,7 +24,7 @@ const GetKitProductSearchQuery = graphql(
       site {
         search {
           searchProducts(filters: $filters) {
-            products(first: 8) {
+            products(first: 12) {
               edges {
                 node {
                   ...SearchProductFragment

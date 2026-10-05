@@ -12,6 +12,7 @@ import {
 } from 'react';
 
 import { HeroLoopVideo, RotatingHeroWord } from '~/components/health-hero';
+import { KitFlowDemo } from '~/components/kit-flow-demo/kit-flow-demo';
 import { OliviaHelpBand } from '~/components/olivia/olivia-help-band';
 import { SpecializedSubscribe } from '~/components/specialized-subscribe/specialized-subscribe';
 
@@ -336,9 +337,9 @@ function KitsCarousel({ kits, initialId }: { kits: OcCatalogItem[]; initialId?: 
 
 /*
  * `doors` is C13, rendered on the server by page.tsx and passed in as a slot.
- * It sits where the guest quiz and the kit flow demo used to, above every shop
- * surface on the page — see situation-doors.tsx for why it is not imported
- * here.
+ * It sits where the guest quiz used to, above every shop surface on the page —
+ * see situation-doors.tsx for why it is not imported here. The kit walkthrough
+ * is in the curated kits section below, with the carousel.
  */
 export function OstomyCarePage({ catalog, doors }: { catalog?: OcCatalog; doors?: ReactNode }) {
   // Chapter copy is translated, so the card list is built per render rather
@@ -398,6 +399,11 @@ export function OstomyCarePage({ catalog, doors }: { catalog?: OcCatalog; doors?
    * wherever the key is fixed, and wherever there is a value to put in.
    */
   const copy = messages.OstomyCare.ui.landingPage;
+
+  const kitSearchPool = useMemo(
+    () => shopProducts.map((product) => product.name),
+    [shopProducts],
+  );
 
   const filteredShop = useMemo(() => {
     if (shopRoom === 'kits') return allKits.slice(0, 12);
@@ -496,6 +502,35 @@ export function OstomyCarePage({ catalog, doors }: { catalog?: OcCatalog; doors?
               <h2>{t('kits.heading')}</h2>
               <p>{t('kits.body')}</p>
             </header>
+
+            <KitFlowDemo
+              badge={t('kits.featuredBadge')}
+              description={t('kits.featuredBody')}
+              fallbackImageSrc={`${IMG}/kit-products/kit-starter-accessory.jpg`}
+              kitHref={featuredKit?.path ?? SHOP_HREF}
+              kitImage={featuredKit?.image}
+              kitName={featuredKit?.name ?? 'Starter Accessory Kit'}
+              searchFallbacks={[
+                copy.kits.demo.search['1'],
+                copy.kits.demo.search['2'],
+                copy.kits.demo.search['3'],
+                copy.kits.demo.search['4'],
+                copy.kits.demo.search['5'],
+              ]}
+              searchPool={kitSearchPool}
+              steps={[
+                { id: 'customize', num: '01', ...copy.kits.demo.steps.customize },
+                { id: 'add', num: '02', ...copy.kits.demo.steps.add },
+                { id: 'cart', num: '03', ...copy.kits.demo.steps.cart },
+                { id: 'save', num: '04', ...copy.kits.demo.steps.save },
+              ]}
+              stepsLabel={copy.kits.demo.stepsLabel}
+              trayLines={[
+                { ...copy.kits.demo.tray['1'], qty: 1, price: 22, isQtyTarget: true },
+                { ...copy.kits.demo.tray['2'], qty: 1, price: 16 },
+                { ...copy.kits.demo.tray['3'], qty: 1, price: 14 },
+              ]}
+            />
 
             <KitsCarousel initialId={featuredKit?.entityId} kits={allKits} />
           </div>

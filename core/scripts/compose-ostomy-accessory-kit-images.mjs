@@ -3,7 +3,10 @@
  *
  *   node core/scripts/compose-ostomy-accessory-kit-images.mjs
  *
- * Writes JPEGs under public/archive/ostomy-care/kit-products/.
+ * Writes cutout JPEGs under public/archive/ostomy-care/kit-products/.
+ * The storefront thumbnails are the box photos kit-starter-accessory.jpg,
+ * kit-skin-comfort.jpg, and kit-pouch-comfort.jpg. This script must not
+ * replace those files.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -16,21 +19,21 @@ const OUT = join(__dirname, '../public/archive/ostomy-care/kit-products');
 
 const KITS = [
   {
-    file: 'kit-starter-accessory.jpg',
+    file: 'cutout-kit-starter-accessory.jpg',
     parts: [
       'https://cdn11.bigcommerce.com/s-nlnnk9gqdk/products/4937/images/4489/4937__1844__81708.1784636201.1280.1280.png?c=1',
       'https://cdn11.bigcommerce.com/s-nlnnk9gqdk/products/4439/images/4095/4439__1867__21851.1784636103.1280.1280.png?c=1',
     ],
   },
   {
-    file: 'kit-skin-comfort.jpg',
+    file: 'cutout-kit-skin-comfort.jpg',
     parts: [
       'https://cdn11.bigcommerce.com/s-nlnnk9gqdk/products/8014/images/5877/8014__5825__87860.1785380537.1280.1280.png?c=1',
       'https://cdn11.bigcommerce.com/s-nlnnk9gqdk/products/4890/images/4450/4890__2301__74387.1784636191.1280.1280.png?c=1',
     ],
   },
   {
-    file: 'kit-pouch-comfort.jpg',
+    file: 'cutout-kit-pouch-comfort.jpg',
     parts: [
       'https://cdn11.bigcommerce.com/s-nlnnk9gqdk/products/8012/images/5875/8012__5823__66077.1785380536.1280.1280.png?c=1',
       'https://cdn11.bigcommerce.com/s-nlnnk9gqdk/products/8016/images/5879/8016__5827__94830.1785380537.1280.1280.png?c=1',

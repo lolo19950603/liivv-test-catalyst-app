@@ -256,6 +256,12 @@
       "suggestedTitle": "Suggested add-ons",
       "suggestedSubtitle": "Popular products you can include in this kit.",
       "addProduct": "Add",
+      "addItemsTitle": "Add items",
+      "addItemsSubtitle": "Search the catalog, or start with a suggestion.",
+      "inKit": "In kit",
+      "expandOptions": "Show options",
+      "collapseOptions": "Hide options",
+      "searchHint": "Type at least 2 characters to search.",
       "searchAddProduct": "Search for more products",
       "searchModalTitle": "Add a product to your kit",
       "searchPlaceholder": "Search products…",
@@ -3298,7 +3304,7 @@
             "child": "A barrier and a pouch, sized for a child.",
             "adultSystems": "Adult drainable systems.",
             "sameSystems": "The same adult systems.",
-            "skinComfort": "A film, a sheet, paste, and a cream for the skin.",
+            "skinComfort": "A film, a sheet, paste, powder, and a cream for the skin.",
             "goBagKit": "Extras for a go-bag."
           },
           "offers": {
@@ -3308,8 +3314,8 @@
             "closed": "New Image, closed",
             "uroImage": "New Image, urostomy",
             "uroClick": "SenSura Click, urostomy",
-            "starterKit": "Remover, a barrier wipe, barrier spray, and a ring. Any opening size.",
-            "skinComfort": "A barrier film, a protective sheet, paste, and a barrier cream."
+            "starterKit": "Remover, a barrier wipe, barrier spray, scissors, medium gloves, gauze, and sanitizer. Any opening size.",
+            "skinComfort": "A barrier film, a protective sheet, paste, powder, and a barrier cream."
           },
           "names": {
             "8061": "New Image drainable, 57 mm",
@@ -3686,7 +3692,40 @@
           "customBadge": "Customizable kit",
           "featuredBody": "A calm Fresh Start edit — open it to tune quantities, add what was missing, and save your version.",
           "cardBody": "Open it to tune quantities, add what was missing, and save your version.",
-          "cta": "Customize this kit"
+          "cta": "Customize this kit",
+          "demo": {
+            "stepsLabel": "How kits work",
+            "steps": {
+              "customize": {
+                "title": "Customize",
+                "body": "Tune quantities on what’s already in your kit — keep what helps, dial back the rest."
+              },
+              "add": {
+                "title": "Add something new",
+                "body": "Missing something? Search the catalog and add it before you save."
+              },
+              "cart": {
+                "title": "Add to cart",
+                "body": "Checkout when you’re ready. Same calm flow, same discreet delivery."
+              },
+              "save": {
+                "title": "Save for later",
+                "body": "Keep this version on your account — no starting from scratch."
+              }
+            },
+            "tray": {
+              "1": { "name": "Adhesive remover wipes", "note": "Box of 50" },
+              "2": { "name": "Protective barrier wipes", "note": "Skin around the stoma" },
+              "3": { "name": "Vinyl exam gloves", "note": "Medium" }
+            },
+            "search": {
+              "1": "Sterile gauze sponges",
+              "2": "Hand sanitizer",
+              "3": "No-sting barrier spray",
+              "4": "Bandage scissors",
+              "5": "Barrier film wipes"
+            }
+          }
         },
         "shop": {
           "label": "Ostomy Essentials",

@@ -256,6 +256,12 @@
       "suggestedTitle": "Compléments suggérés",
       "suggestedSubtitle": "Produits populaires que vous pouvez inclure dans ce kit.",
       "addProduct": "Ajouter",
+      "addItemsTitle": "Ajouter des articles",
+      "addItemsSubtitle": "Recherchez dans le catalogue, ou partez d’une suggestion.",
+      "inKit": "Dans le kit",
+      "expandOptions": "Afficher les options",
+      "collapseOptions": "Masquer les options",
+      "searchHint": "Saisissez au moins 2 caractères pour rechercher.",
       "searchAddProduct": "Rechercher d’autres produits",
       "searchModalTitle": "Ajouter un produit à votre kit",
       "searchPlaceholder": "Rechercher des produits…",
@@ -3297,7 +3303,7 @@
             "child": "Une barrière et une poche, à la taille d’un enfant.",
             "adultSystems": "Systèmes vidangeables pour adultes.",
             "sameSystems": "Les mêmes systèmes pour adultes.",
-            "skinComfort": "Une pellicule, une feuille, de la pâte et une crème pour la peau.",
+            "skinComfort": "Une pellicule, une feuille, de la pâte, de la poudre et une crème pour la peau.",
             "goBagKit": "Des extras pour la trousse de rechange."
           },
           "offers": {
@@ -3307,8 +3313,8 @@
             "closed": "New Image, fermée",
             "uroImage": "New Image, urostomie",
             "uroClick": "SenSura Click, urostomie",
-            "starterKit": "Dissolvant, lingette barrière, vaporisateur barrière et anneau. N’importe quelle taille d’ouverture.",
-            "skinComfort": "Une pellicule barrière, une feuille protectrice, de la pâte et une crème barrière."
+            "starterKit": "Dissolvant, lingette barrière, vaporisateur barrière, ciseaux, gants moyens, compresses et désinfectant. N’importe quelle taille d’ouverture.",
+            "skinComfort": "Une pellicule barrière, une feuille protectrice, de la pâte, de la poudre et une crème barrière."
           },
           "names": {
             "8061": "New Image vidangeable, 57 mm",
@@ -3639,7 +3645,40 @@
           "customBadge": "Trousse personnalisable",
           "featuredBody": "Une sélection Fresh Start toute simple — ouvrez-la pour ajuster les quantités, ajouter ce qui manquait et enregistrer votre version.",
           "cardBody": "Ouvrez-la pour ajuster les quantités, ajouter ce qui manquait et enregistrer votre version.",
-          "cta": "Personnaliser cette trousse"
+          "cta": "Personnaliser cette trousse",
+          "demo": {
+            "stepsLabel": "Comment fonctionne une trousse",
+            "steps": {
+              "customize": {
+                "title": "Personnaliser",
+                "body": "Ajustez les quantités déjà dans la trousse — gardez ce qui vous aide, réduisez le reste."
+              },
+              "add": {
+                "title": "Ajouter quelque chose",
+                "body": "Il manque un article? Cherchez-le dans le catalogue et ajoutez-le avant d’enregistrer."
+              },
+              "cart": {
+                "title": "Ajouter au panier",
+                "body": "Passez à la caisse quand vous êtes prêt. Le même parcours tranquille, la même livraison discrète."
+              },
+              "save": {
+                "title": "Enregistrer pour plus tard",
+                "body": "Gardez cette version dans votre compte — sans tout recommencer."
+              }
+            },
+            "tray": {
+              "1": { "name": "Adhesive remover wipes", "note": "Boîte de 50" },
+              "2": { "name": "Protective barrier wipes", "note": "Peau autour de la stomie" },
+              "3": { "name": "Vinyl exam gloves", "note": "Moyen" }
+            },
+            "search": {
+              "1": "Sterile gauze sponges",
+              "2": "Hand sanitizer",
+              "3": "No-sting barrier spray",
+              "4": "Bandage scissors",
+              "5": "Barrier film wipes"
+            }
+          }
         },
         "shop": {
           "label": "Essentiels pour la stomie",

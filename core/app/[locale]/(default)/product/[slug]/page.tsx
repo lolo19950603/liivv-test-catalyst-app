@@ -903,6 +903,7 @@ export default async function Product({ params, searchParams }: Props) {
           fallback={<div className="py-8 text-sm text-[var(--contrast-500)]">Loading kit…</div>}
         >
           <CuratedKitCustomizer
+            kitProductEntityId={baseProduct.entityId}
             kitHref={baseProduct.path}
             kitImage={
               baseProduct.defaultImage
@@ -1020,6 +1021,8 @@ export default async function Product({ params, searchParams }: Props) {
               backorderDisplayData: streamableBackorderDisplayData,
             }}
             productId={baseProduct.entityId}
+            hidePrice={isCuratedKit}
+            pinGallery={isCuratedKit}
             purchaseOptions={isCuratedKit ? undefined : purchaseOptions}
             purchaseSlot={isCuratedKit ? curatedKitSlot : undefined}
             quantityLabel={t('ProductDetails.quantity')}

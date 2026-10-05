@@ -20,24 +20,46 @@ const KITS = [
   {
     sku: 'KIT-OSTOMY-STARTER-ACCESSORY',
     name: 'Starter Accessory Kit',
-    componentIds: [4937, 4439, 4936, 4560],
+    componentIds: [4937, 4439, 4936, 4378, 4250, 4700, 4370],
+    // One variant each. Locks the cart line so a required option does not sit open.
+    kitVariants: {
+      4937: 'RP-403120',
+      4439: 'CON37439',
+      4936: 'CAV-001',
+      4378: '701216',
+      4700: '701373',
+      4370: '700894',
+    },
     description:
-      '<p>Extras for a pouch change and a go-bag. None of these depend on the size of the opening.</p><ul><li>Adhesive remover wipes, box of 50</li><li>Protective barrier wipes</li><li>Cavilon no-sting barrier spray</li><li>Adapt barrier rings — choose the ring size in the kit</li><li>Remove any item before checkout</li></ul><p>A barrier wipe or spray is for someone whose nurse recommended one, or who already uses one.</p>',
+      '<p>Extras for a pouch change and a go-bag. None of these depend on the size of the opening.</p><ul><li>Adhesive remover wipes, box of 50</li><li>Protective barrier wipes</li><li>Cavilon no-sting barrier spray</li><li>Lister bandage scissors</li><li>Vinyl exam gloves, medium, box of 100</li><li>Sterile gauze sponges, 10&nbsp;cm, box of 100</li><li>Hand sanitizer, 540&nbsp;ml</li><li>Remove any item before checkout</li></ul><p>A barrier wipe or spray is for someone whose nurse recommended one, or who already uses one. The gloves are medium.</p>',
   },
   {
     sku: 'KIT-OSTOMY-SKIN-COMFORT',
     name: 'Skin Comfort Kit',
-    componentIds: [8014, 4890, 4703, 4820],
+    componentIds: [8014, 4890, 4703, 4610, 4820],
+    kitVariants: {
+      8014: 'SN59420425',
+      4890: '701514',
+      4703: '701490',
+      4610: '701488',
+      4820: '600070',
+    },
     description:
-      '<p>A barrier film, a protective sheet, paste, and a barrier cream. All of them sit on the skin and fit any opening size.</p><ul><li>SKIN-PREP protective barrier wipes</li><li>Brava protective sheet, box of 10</li><li>Stomahesive paste</li><li>Cavilon barrier cream</li><li>Remove any item before checkout</li></ul><p>Add only what you need. Which of these suits your skin is a question for your NSWOC.</p>',
+      '<p>A barrier film, a protective sheet, paste, powder, and a barrier cream. All of them sit on the skin and fit any opening size.</p><ul><li>SKIN-PREP protective barrier wipes</li><li>Brava protective sheet, box of 10</li><li>Stomahesive paste</li><li>Stomahesive powder, for moist skin</li><li>Cavilon barrier cream</li><li>Remove any item before checkout</li></ul><p>Add only what you need. Which of these suits your skin is a question for your NSWOC.</p>',
   },
   {
     sku: 'KIT-OSTOMY-POUCH-COMFORT',
     name: 'Pouch Comfort Kit',
-    componentIds: [8012, 8016, 4406],
+    componentIds: [8012, 8016, 4406, 4647],
     revealHiddenComponents: true,
+    kitVariants: {
+      8012: 'HOL-7715',
+      8016: 'HOL-78501',
+      4406: '702635',
+      4647: '702486',
+    },
     description:
-      '<p>For odour, for output that sits at the top of the pouch, and a clamp if the pouch closes with one. None of these depend on the size of the opening.</p><ul><li>m9 odor eliminator drops</li><li>Adapt lubricating deodorant</li><li>Drainable pouch clamp, for clamp-closure pouches</li><li>Remove any item before checkout</li></ul>',
+      '<p>For odour, for output that sits at the top of the pouch, a clamp if the pouch closes with one, and a belt if the pouch has belt tabs. None of these depend on the size of the opening.</p><ul><li>m9 odor eliminator drops</li><li>Adapt lubricating deodorant</li><li>Drainable pouch clamp, for clamp-closure pouches</li><li>Adapt ostomy belt, adjustable 58&ndash;109&nbsp;cm, for pouches with belt tabs</li><li>Remove any item before checkout</li></ul>',
   },
 ];
 
@@ -126,6 +148,26 @@ async function storefrontPrice(id) {
   return prices?.salePrice?.value ?? prices?.price?.value ?? null;
 }
 
+async function upsertCustomField(productId, fields, name, value) {
+  const field = fields.find((entry) => entry.name === name);
+
+  if (field) {
+    if (String(field.value) === value) return;
+
+    await bc(`/v3/catalog/products/${productId}/custom-fields/${field.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ name, value }),
+    });
+
+    return;
+  }
+
+  await bc(`/v3/catalog/products/${productId}/custom-fields`, {
+    method: 'POST',
+    body: JSON.stringify({ name, value }),
+  });
+}
+
 async function upsert(kit) {
   const parts = [];
 
@@ -183,6 +225,20 @@ async function upsert(kit) {
       });
     }
 
+    if (kit.kitVariants) {
+      await upsertCustomField(existing.id, fields, 'kit_variants', JSON.stringify(kit.kitVariants));
+    }
+
+    const detail = await bc(`/v3/catalog/products/${existing.id}?include=variants`);
+    const variants = detail.data?.variants || [];
+
+    if (variants.length === 1) {
+      await bc(`/v3/catalog/products/${existing.id}/variants/${variants[0].id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ price }),
+      });
+    }
+
     await bc('/v3/catalog/products/channel-assignments', {
       method: 'PUT',
       body: JSON.stringify([{ product_id: existing.id, channel_id: CHANNEL_ID }]),
@@ -205,7 +261,10 @@ async function upsert(kit) {
       related_products: kit.componentIds,
       inventory_tracking: 'none',
       is_visible: true,
-      custom_fields: [{ name: 'kit_type', value: 'curated' }],
+      custom_fields: [
+        { name: 'kit_type', value: 'curated' },
+        ...(kit.kitVariants ? [{ name: 'kit_variants', value: JSON.stringify(kit.kitVariants) }] : []),
+      ],
     }),
   });
   const productId = created.data.id;

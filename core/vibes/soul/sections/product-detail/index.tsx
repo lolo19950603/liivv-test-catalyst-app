@@ -88,6 +88,10 @@ export interface ProductDetailProps<F extends Field> {
   purchaseOptions?: ProductPurchaseOptionsConfig;
   /** When set, replaces the default product options / add-to-cart form. */
   purchaseSlot?: ReactNode;
+  /** Hides the catalog price. Curated kits show a live total in the buy box instead. */
+  hidePrice?: boolean;
+  /** Keeps the gallery in view while the buy column scrolls. */
+  pinGallery?: boolean;
   /** A size the catalogue does not offer as an option, shown in the options block. */
   fixedChoice?: { label: string; value: string };
   /** Sits under the buy box. */
@@ -139,6 +143,8 @@ export function ProductDetail<F extends Field>({
   showPurchaseOptions = false,
   purchaseOptions,
   purchaseSlot,
+  hidePrice = false,
+  pinGallery = false,
   fixedChoice,
   afterForm,
 }: ProductDetailProps<F>) {
@@ -154,7 +160,9 @@ export function ProductDetail<F extends Field>({
           {(product) =>
             product && (
               <div className="grid grid-cols-1 items-stretch gap-x-8 gap-y-8 @2xl:grid-cols-2 @5xl:gap-x-12">
-                <div className="group/product-gallery hidden @2xl:block">
+                <div
+                  className={`group/product-gallery hidden @2xl:block${pinGallery ? ' liivv-kit-gallery' : ''}`}
+                >
                   <Stream fallback={<ProductGallerySkeleton />} value={product.images}>
                     {(imagesData) => (
                       <ProductGallery
@@ -228,13 +236,15 @@ export function ProductDetail<F extends Field>({
                       </Stream>
                     </div>
                   )}
-                  <div className="group/product-price">
-                    <Stream fallback={<PriceLabelSkeleton />} value={product.price}>
-                      {(price) => (
-                        <PriceLabel className="my-3 text-xl @xl:text-2xl" price={price ?? ''} />
-                      )}
-                    </Stream>
-                  </div>
+                  {hidePrice ? null : (
+                    <div className="group/product-price">
+                      <Stream fallback={<PriceLabelSkeleton />} value={product.price}>
+                        {(price) => (
+                          <PriceLabel className="my-3 text-xl @xl:text-2xl" price={price ?? ''} />
+                        )}
+                      </Stream>
+                    </div>
+                  )}
                   <div className="group/product-gallery mb-8 @2xl:hidden">
                     <Stream fallback={<ProductGallerySkeleton />} value={product.images}>
                       {(imagesData) => (

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import './kit-flow-demo.css';
@@ -15,7 +16,7 @@ const KIT_FLOW_STEPS = [
     id: 'add',
     num: '02',
     title: 'Add something new',
-    body: 'Missing a wipe, vitamin, or comfort pick? Add it to the tray before you save.',
+    body: 'Missing something? Search the catalog and add it before you save.',
   },
   {
     id: 'cart',
@@ -27,7 +28,7 @@ const KIT_FLOW_STEPS = [
     id: 'save',
     num: '04',
     title: 'Save for later',
-    body: 'Keep your version for next month — no starting from scratch.',
+    body: 'Keep this version on your account — no starting from scratch.',
   },
 ] as const;
 
@@ -40,21 +41,30 @@ const DEFAULT_SEARCH_FALLBACKS = [
 ] as const;
 
 const EMPTY_SEARCH_POOL: string[] = [];
+const FALLBACK_UNIT_PRICES = [12, 18, 16] as const;
+const ADDED_UNIT_PRICE = 9.5;
 
-type KitPointerTarget = 'qty' | 'add' | 'search' | 'cart' | 'save';
+export type KitFlowStep = {
+  id: string;
+  num: string;
+  title: string;
+  body: string;
+};
 
 export type KitFlowTrayLine = {
   name: string;
   note: string;
   qty?: number;
-  /** Marks the line whose + control the cursor animates */
+  /** Unit price shown on the line. Illustrative — the live kit page uses catalog prices. */
+  price?: number;
+  /** Marks the line whose increase control the cursor animates */
   isQtyTarget?: boolean;
 };
 
 const DEFAULT_TRAY_LINES: KitFlowTrayLine[] = [
-  { name: 'Organic cotton pads', note: 'Starter staple', qty: 2, isQtyTarget: true },
-  { name: 'Gentle heat wrap', note: 'For cramp days', qty: 1 },
-  { name: 'Hormonal skin basics', note: 'Calm routine', qty: 1 },
+  { name: 'Organic cotton pads', note: 'Starter staple', qty: 2, price: 12, isQtyTarget: true },
+  { name: 'Gentle heat wrap', note: 'For cramp days', qty: 1, price: 18 },
+  { name: 'Hormonal skin basics', note: 'Calm routine', qty: 1, price: 16 },
 ];
 
 export type KitFlowDemoProps = {
@@ -67,7 +77,41 @@ export type KitFlowDemoProps = {
   description?: string;
   trayLines?: KitFlowTrayLine[];
   fallbackImageSrc?: string;
+  /** Instructional step pills. Defaults to English. The buy box itself uses CuratedKit messages. */
+  steps?: readonly KitFlowStep[];
+  stepsLabel?: string;
 };
+
+type KitPointerTarget = 'qty' | 'field' | 'search' | 'cart' | 'save';
+
+function money(amount: number) {
+  return `$${amount.toFixed(2)}`;
+}
+
+function thumbTone(name: string) {
+  const tones = ['#e7efe4', '#f3e6dc', '#e4eaf2', '#efe8d8', '#e8e4ef'];
+  let hash = 0;
+
+  for (const char of name) {
+    hash = (hash + char.charCodeAt(0)) % tones.length;
+  }
+
+  return tones[hash] ?? tones[0];
+}
+
+function Chevron({ dir }: { dir: 'left' | 'right' }) {
+  return (
+    <svg aria-hidden fill="none" height="14" viewBox="0 0 16 16" width="14">
+      <path
+        d={dir === 'left' ? 'M10 3.5 5.5 8 10 12.5' : 'M6 3.5 10.5 8 6 12.5'}
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.6"
+      />
+    </svg>
+  );
+}
 
 export function KitFlowDemo({
   kitName,
@@ -79,7 +123,11 @@ export function KitFlowDemo({
   description = 'A calm first-chapter edit — customize quantities, add what was missing, then save or checkout.',
   trayLines = DEFAULT_TRAY_LINES,
   fallbackImageSrc = '/archive/womens-health/door-shop-kit.jpg',
+  steps,
+  stepsLabel = 'How kits work',
 }: KitFlowDemoProps) {
+  const t = useTranslations('Faceted.CuratedKit');
+  const flowSteps = steps ?? KIT_FLOW_STEPS;
   const [step, setStep] = useState(0);
   const [hoverStep, setHoverStep] = useState<number | null>(null);
   const qtyTarget = trayLines.find((line) => line.isQtyTarget) ?? trayLines[0];
@@ -96,8 +144,8 @@ export function KitFlowDemo({
   const rootRef = useRef<HTMLDivElement>(null);
   const inViewRef = useRef(true);
   const qtyRef = useRef<HTMLSpanElement>(null);
-  const addRef = useRef<HTMLLIElement>(null);
-  const searchResultRef = useRef<HTMLLIElement>(null);
+  const fieldRef = useRef<HTMLDivElement>(null);
+  const searchResultRef = useRef<HTMLSpanElement>(null);
   const cartRef = useRef<HTMLButtonElement>(null);
   const saveRef = useRef<HTMLButtonElement>(null);
   const catalogNamesRef = useRef<string[]>([...searchFallbacks]);
@@ -125,8 +173,8 @@ export function KitFlowDemo({
     const node =
       target === 'qty'
         ? qtyRef.current
-        : target === 'add'
-          ? addRef.current
+        : target === 'field'
+          ? fieldRef.current
           : target === 'search'
             ? searchResultRef.current
             : target === 'cart'
@@ -171,7 +219,16 @@ export function KitFlowDemo({
       measurePointer(activeTarget, false);
     });
     return () => window.cancelAnimationFrame(id);
-  }, [activeTarget, searchOpen, searchHighlight, addedItem, padsCount, measurePointer, reduceMotion]);
+  }, [
+    activeTarget,
+    searchOpen,
+    searchQuery,
+    searchHighlight,
+    addedItem,
+    padsCount,
+    measurePointer,
+    reduceMotion,
+  ]);
 
   useEffect(() => {
     if (reduceMotion) {
@@ -255,26 +312,26 @@ export function KitFlowDemo({
         setStep(1);
         await wait(350);
         if (cancelled) break;
-        await aim('add');
+        await aim('field');
         if (cancelled) break;
-        await click('add');
+        await click('field');
         if (cancelled) break;
 
         setSearchOpen(true);
         setSearchQuery('');
         setSearchHighlight(false);
-        await wait(300);
+        await wait(280);
         if (cancelled) break;
 
         const product = pickProduct();
         for (let i = 1; i <= product.length; i += 1) {
           if (cancelled) break;
           setSearchQuery(product.slice(0, i));
-          await wait(48 + (i % 3) * 10);
+          await wait(42 + (i % 3) * 8);
         }
         if (cancelled) break;
 
-        await wait(250);
+        await wait(220);
         if (cancelled) break;
         setSearchHighlight(true);
         await wait(140);
@@ -322,23 +379,42 @@ export function KitFlowDemo({
     };
   }, [measurePointer, reduceMotion, qtyTarget?.qty, fallbackPick]);
 
-  const active = KIT_FLOW_STEPS[step] ?? KIT_FLOW_STEPS[0];
-  const caption = KIT_FLOW_STEPS[hoverStep ?? step] ?? active;
+  const active = flowSteps[step] ?? flowSteps[0];
+  const caption = flowSteps[hoverStep ?? step] ?? active;
   const searchResults = catalogNames
     .filter((name) => name.toLowerCase().includes(searchQuery.toLowerCase()) || searchQuery.length < 2)
     .slice(0, 4);
   const highlighted = searchResults[0] ?? addedItem ?? fallbackPick;
+  const searching = searchOpen && searchQuery.trim().length >= 2;
+  const suggestion =
+    catalogNames.find(
+      (name) => name !== addedItem && !trayLines.some((line) => line.name === name),
+    ) ?? fallbackPick;
+
+  const rows = trayLines.map((line, index) => {
+    const isTarget = Boolean(line.isQtyTarget);
+    const qty = isTarget ? padsCount : (line.qty ?? 1);
+    const unit = line.price ?? FALLBACK_UNIT_PRICES[index] ?? 12;
+
+    return { ...line, isTarget, qty, lineTotal: unit * qty };
+  });
+
+  const itemCount = rows.length + (addedItem ? 1 : 0);
+  const kitTotal =
+    rows.reduce((sum, row) => sum + row.lineTotal, 0) + (addedItem ? ADDED_UNIT_PRICE : 0);
+
+  const pressing = (target: KitPointerTarget) => activeTarget === target && pointer.clicking;
 
   return (
     <div className="kit-flow-demo" ref={rootRef}>
-      <div className="kf-flow" data-step={active.id}>
+      <div className="kf-flow" data-step={active?.id}>
         <div
-          aria-label="How kits work"
+          aria-label={stepsLabel}
           className="kf-flow-steps"
           onMouseLeave={() => setHoverStep(null)}
           role="tablist"
         >
-          {KIT_FLOW_STEPS.map((item, index) => (
+          {flowSteps.map((item, index) => (
             <div className="kf-flow-step" key={item.id}>
               <button
                 aria-selected={index === step}
@@ -356,7 +432,7 @@ export function KitFlowDemo({
                 <span className="kf-flow-num">{item.num}</span>
                 <span className="kf-flow-label">{item.title}</span>
               </button>
-              {index < KIT_FLOW_STEPS.length - 1 ? (
+              {index < flowSteps.length - 1 ? (
                 <span aria-hidden className="kf-flow-arrow">
                   →
                 </span>
@@ -366,7 +442,7 @@ export function KitFlowDemo({
         </div>
 
         <p aria-live="polite" className="kf-flow-caption">
-          <strong>{caption.title}.</strong> {caption.body}
+          <strong>{caption?.title}.</strong> {caption?.body}
         </p>
 
         <div aria-hidden className="kf-page" ref={pageRef}>
@@ -382,110 +458,171 @@ export function KitFlowDemo({
               <div className="kf-page-media">
                 <img alt={imageAlt} src={imageSrc} />
               </div>
-              <span className="kf-product-badge">{badge}</span>
-              <h3>{title}</h3>
-              <p>{description}</p>
             </div>
 
-            <div className="kf-page-tray">
-              <div className="kf-page-tray-head">
-                <h4>Your kit tray</h4>
-                <span>Live preview</span>
-              </div>
+            <div className="kf-buy">
+              <p className="kf-buy-badge">{badge}</p>
+              <h3>{title}</h3>
+              <p className="kf-buy-summary">{description}</p>
 
-              <ul className="kf-page-lines">
-                {trayLines.map((line) => {
-                  const isTarget = Boolean(line.isQtyTarget);
-                  const qty = isTarget ? padsCount : (line.qty ?? 1);
-                  return (
-                    <li
-                      className={`kf-page-line${isTarget && activeTarget === 'qty' && pointer.clicking ? ' is-pressed' : ''}`}
-                      key={line.name}
-                    >
-                      <div>
-                        <strong>{line.name}</strong>
-                        <em>{line.note}</em>
-                      </div>
-                      <div className="kf-page-qty">
-                        <span>−</span>
-                        <b>{qty}</b>
-                        {isTarget ? (
-                          <span
-                            className={`kf-page-qty-plus${activeTarget === 'qty' && pointer.clicking ? ' is-pressed' : ''}`}
-                            ref={qtyRef}
-                          >
-                            +
+              <div className="kf-sheet">
+                <section className="kf-add">
+                  <h4>{t('addItemsTitle')}</h4>
+                  <p>{t('addItemsSubtitle')}</p>
+                  <div
+                    className={`kf-search-field${pressing('field') ? ' is-pressed' : ''}${searchOpen ? ' is-active' : ''}`}
+                    ref={fieldRef}
+                  >
+                    <svg aria-hidden fill="none" height="16" viewBox="0 0 16 16" width="16">
+                      <circle cx="7" cy="7" r="4.25" stroke="currentColor" strokeWidth="1.5" />
+                      <path d="M10.2 10.2 13.5 13.5" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
+                    </svg>
+                    <span className={searchQuery ? undefined : 'is-placeholder'}>
+                      {searchQuery || t('searchPlaceholder')}
+                    </span>
+                    {searchOpen ? <i className="kf-search-caret" /> : null}
+                  </div>
+                  {searchOpen && searchQuery.trim().length === 1 ? (
+                    <p className="kf-search-hint">{t('searchHint')}</p>
+                  ) : null}
+                  {!searching ? (
+                    <div className="kf-side-row">
+                      <span className="kf-thumb" style={{ background: thumbTone(suggestion) }} />
+                      <span className="kf-side-copy">
+                        <strong>{suggestion}</strong>
+                      </span>
+                      <span className="kf-add-btn">{t('addProduct')}</span>
+                    </div>
+                  ) : null}
+                </section>
+
+                <div className="kf-sheet-body">
+                  <div className="kf-included-head">
+                    <h4>{t('includedTitle')}</h4>
+                    <span>{t('includedCount', { count: itemCount })}</span>
+                  </div>
+                  <ul className="kf-items">
+                    {rows.map((row) => (
+                      <li className="kf-item" key={row.name}>
+                        <span className="kf-thumb" style={{ background: thumbTone(row.name) }} />
+                        <span className="kf-item-copy">
+                          <strong>{row.name}</strong>
+                          <em>{row.note}</em>
+                        </span>
+                        <span className="kf-rail">
+                          <span className="kf-qty">
+                            <span>
+                              <Chevron dir="left" />
+                            </span>
+                            <b>{row.qty}</b>
+                            {row.isTarget ? (
+                              <span className={pressing('qty') ? 'is-pressed' : undefined} ref={qtyRef}>
+                                <Chevron dir="right" />
+                              </span>
+                            ) : (
+                              <span>
+                                <Chevron dir="right" />
+                              </span>
+                            )}
                           </span>
-                        ) : (
-                          <span>+</span>
-                        )}
-                      </div>
-                    </li>
-                  );
-                })}
-                {addedItem ? (
-                  <li className="kf-page-line kf-page-line--new" key={addedItem}>
-                    <div>
-                      <strong>{addedItem}</strong>
-                      <em>Just added</em>
-                    </div>
-                    <div className="kf-page-qty">
-                      <span>−</span>
-                      <b>1</b>
-                      <span>+</span>
-                    </div>
-                  </li>
-                ) : null}
-                <li
-                  className={`kf-page-line kf-page-line--add${activeTarget === 'add' && pointer.clicking ? ' is-pressed' : ''}`}
-                  ref={addRef}
-                >
-                  + Add something new
-                </li>
-              </ul>
+                          <b className="kf-line-total">{money(row.lineTotal)}</b>
+                          <span className="kf-remove">
+                            <svg aria-hidden fill="none" height="14" viewBox="0 0 16 16" width="14">
+                              <path d="M4 4 12 12M12 4 4 12" stroke="currentColor" strokeLinecap="round" strokeWidth="1.6" />
+                            </svg>
+                          </span>
+                        </span>
+                      </li>
+                    ))}
+                    {addedItem ? (
+                      <li className="kf-item kf-item--new" key={addedItem}>
+                        <span className="kf-thumb" style={{ background: thumbTone(addedItem) }} />
+                        <span className="kf-item-copy">
+                          <i>{t('addedLabel')}</i>
+                          <strong>{addedItem}</strong>
+                        </span>
+                        <span className="kf-rail">
+                          <span className="kf-qty">
+                            <span>
+                              <Chevron dir="left" />
+                            </span>
+                            <b>1</b>
+                            <span>
+                              <Chevron dir="right" />
+                            </span>
+                          </span>
+                          <b className="kf-line-total">{money(ADDED_UNIT_PRICE)}</b>
+                          <span className="kf-remove">
+                            <svg aria-hidden fill="none" height="14" viewBox="0 0 16 16" width="14">
+                              <path d="M4 4 12 12M12 4 4 12" stroke="currentColor" strokeLinecap="round" strokeWidth="1.6" />
+                            </svg>
+                          </span>
+                        </span>
+                      </li>
+                    ) : null}
+                  </ul>
 
-              <div className="kf-page-actions">
-                <button
-                  className={`kf-page-save${activeTarget === 'save' && pointer.clicking ? ' is-pressed' : ''}`}
-                  ref={saveRef}
-                  type="button"
-                >
-                  Save for later
-                </button>
-                <button
-                  className={`kf-page-cart${activeTarget === 'cart' && pointer.clicking ? ' is-pressed' : ''}`}
-                  ref={cartRef}
-                  type="button"
-                >
-                  Add to cart
-                </button>
+                  {searching ? (
+                    <div className="kf-results">
+                      {(searchQuery.length > 1 ? searchResults : catalogNames.slice(0, 3)).map((name) => {
+                        const activeResult = searchHighlight && name === highlighted;
+
+                        return (
+                          <div className={`kf-side-row${activeResult ? ' is-active' : ''}`} key={name}>
+                            <span className="kf-thumb" style={{ background: thumbTone(name) }} />
+                            <span className="kf-side-copy">
+                              <strong>{name}</strong>
+                            </span>
+                            <span
+                              className={`kf-add-btn${activeResult && pressing('search') ? ' is-pressed' : ''}`}
+                              ref={activeResult ? searchResultRef : undefined}
+                            >
+                              {t('addProduct')}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </div>
+
+                <footer className="kf-checkout">
+                  <div className="kf-total-row">
+                    <span>{t('kitQuantity')}</span>
+                    <span className="kf-qty">
+                      <span>
+                        <Chevron dir="left" />
+                      </span>
+                      <b>1</b>
+                      <span>
+                        <Chevron dir="right" />
+                      </span>
+                    </span>
+                  </div>
+                  <div className="kf-total-row">
+                    <span>{t('runningTotal')}</span>
+                    <strong>{money(kitTotal)}</strong>
+                  </div>
+                  <div className="kf-actions">
+                    <button
+                      className={`kf-cart${pressing('cart') ? ' is-pressed' : ''}`}
+                      ref={cartRef}
+                      type="button"
+                    >
+                      {t('addKitToCart')}
+                    </button>
+                    <button
+                      className={`kf-save${pressing('save') ? ' is-pressed' : ''}`}
+                      ref={saveRef}
+                      type="button"
+                    >
+                      {t('saveForLater')}
+                    </button>
+                  </div>
+                </footer>
               </div>
             </div>
           </div>
-
-          {searchOpen ? (
-            <div className="kf-search">
-              <div className="kf-search-card">
-                <p className="kf-search-label">Search the edit</p>
-                <div className="kf-search-input">
-                  <span>{searchQuery}</span>
-                  <i className="kf-search-caret" />
-                </div>
-                <ul className="kf-search-results">
-                  {(searchQuery.length > 1 ? searchResults : catalogNames.slice(0, 3)).map((name) => (
-                    <li
-                      className={searchHighlight && name === highlighted ? 'is-active' : undefined}
-                      key={name}
-                      ref={searchHighlight && name === highlighted ? searchResultRef : undefined}
-                    >
-                      {name}
-                      {searchHighlight && name === highlighted ? <em>Add</em> : null}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ) : null}
 
           {!reduceMotion && pointer.visible ? (
             <div
