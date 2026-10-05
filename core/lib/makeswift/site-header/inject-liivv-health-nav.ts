@@ -1,3 +1,4 @@
+import { SHOP_OSTOMY_CARE_CATEGORY_ID } from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
 import type { LiivvArchiveNavLink } from '~/lib/makeswift/liivv-archive-header/types';
 import {
   normalizeHidePath,
@@ -223,6 +224,79 @@ export function getDiabetesCareNav(): LiivvArchiveNavLink[] {
   return DIABETES_CARE_NAV;
 }
 
+export type CareNavSection = 'ostomy' | 'womens' | 'diabetes';
+
+/** Remembers which specialized menu to keep on a product opened from that section. */
+export const CARE_NAV_COOKIE = 'liivv-care-nav';
+
+/** Set on a product request when the product itself belongs to a care catalog. */
+export const CARE_NAV_HEADER = 'x-care-nav';
+
+/** Shop Ostomy Care lists every product in this category, kits and the rest. */
+export function careNavSectionForCategoryIds(
+  categoryIds: readonly number[],
+): CareNavSection | null {
+  if (categoryIds.includes(SHOP_OSTOMY_CARE_CATEGORY_ID)) return 'ostomy';
+
+  return null;
+}
+
+const STORE_CHROME_PREFIXES = ['/cart', '/checkout', '/account', '/login', '/register'] as const;
+
+export function careNavSectionForPath(pathname: string): CareNavSection | null {
+  if (shouldShowOstomyCareNav(pathname)) return 'ostomy';
+  if (shouldShowWomensHealthNav(pathname)) return 'womens';
+  if (shouldShowDiabetesCareNav(pathname)) return 'diabetes';
+
+  return null;
+}
+
+export function parseCareNavCookie(value: string | undefined | null): CareNavSection | null {
+  if (value === 'ostomy' || value === 'womens' || value === 'diabetes') return value;
+
+  return null;
+}
+
+/** Home and the health hub leave the specialized menu. */
+export function shouldClearCareNav(pathname: string): boolean {
+  const path = normalizeHidePath(stripLocaleFromPathname(pathname));
+
+  return path === '/' || path === LIIVV_HEALTH_HUB_PATH;
+}
+
+/** Cart, checkout, and account keep the main store menu. */
+export function isStoreChromePath(pathname: string): boolean {
+  const path = normalizeHidePath(stripLocaleFromPathname(pathname));
+
+  return STORE_CHROME_PREFIXES.some(
+    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
+  );
+}
+
+/**
+ * Specialized menu for this page. A product opened from Ostomy, Women's Health,
+ * or Diabetes Care keeps that section's menu until the reader goes home.
+ */
+export function resolveCareNavSection(
+  pathname: string,
+  remembered: CareNavSection | null,
+): CareNavSection | null {
+  const fromPath = careNavSectionForPath(pathname);
+
+  if (fromPath) return fromPath;
+  if (shouldClearCareNav(pathname) || isStoreChromePath(pathname)) return null;
+
+  return remembered;
+}
+
+export function writeCareNavCookie(section: CareNavSection) {
+  document.cookie = `${CARE_NAV_COOKIE}=${section}; path=/; samesite=lax`;
+}
+
+export function clearCareNavCookie() {
+  document.cookie = `${CARE_NAV_COOKIE}=; path=/; max-age=0; samesite=lax`;
+}
+
 export function shouldShowWomensHealthNav(pathname: string): boolean {
   return pathnameMatchesPrefix(pathname, WOMENS_HEALTH_PATH);
 }
@@ -239,17 +313,20 @@ function isExactCarePath(pathname: string, path: string): boolean {
   return normalizeHidePath(stripLocaleFromPathname(pathname)) === normalizeHidePath(path);
 }
 
-/** Back link shown on care-vertical subpages after the landing item was removed from nav. */
-export function getCareSectionBackLink(pathname: string): { href: string; label: string } | null {
-  if (shouldShowWomensHealthNav(pathname) && !isExactCarePath(pathname, WOMENS_HEALTH_PATH)) {
+/** Back link shown on care-vertical subpages, including a product opened from that section. */
+export function getCareSectionBackLink(
+  pathname: string,
+  section: CareNavSection | null = careNavSectionForPath(pathname),
+): { href: string; label: string } | null {
+  if (section === 'womens' && !isExactCarePath(pathname, WOMENS_HEALTH_PATH)) {
     return { href: WOMENS_HEALTH_PATH, label: "Back to Women's Health page" };
   }
 
-  if (shouldShowOstomyCareNav(pathname) && !isExactCarePath(pathname, OSTOMY_CARE_PATH)) {
+  if (section === 'ostomy' && !isExactCarePath(pathname, OSTOMY_CARE_PATH)) {
     return { href: OSTOMY_CARE_PATH, label: 'Back to Ostomy Care page' };
   }
 
-  if (shouldShowDiabetesCareNav(pathname) && !isExactCarePath(pathname, DIABETES_CARE_PATH)) {
+  if (section === 'diabetes' && !isExactCarePath(pathname, DIABETES_CARE_PATH)) {
     return { href: DIABETES_CARE_PATH, label: 'Back to Diabetes Care page' };
   }
 

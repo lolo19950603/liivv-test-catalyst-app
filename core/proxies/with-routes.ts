@@ -7,6 +7,10 @@ import { revalidate } from '~/client/revalidate-target';
 import { getVisitIdCookie, getVisitorIdCookie } from '~/lib/analytics/bigcommerce';
 import { sendProductViewedEvent } from '~/lib/analytics/bigcommerce/data-events';
 import { isSensitiveProduct } from '~/lib/analytics/sensitive-products';
+import {
+  CARE_NAV_HEADER,
+  careNavSectionForCategoryIds,
+} from '~/lib/makeswift/site-header/inject-liivv-health-nav';
 import { kvKey, STORE_STATUS_KEY } from '~/lib/kv/keys';
 
 import { kv } from '../lib/kv';
@@ -415,6 +419,12 @@ export const withRoutes: ProxyFactory = () => {
          */
         const knowsCategories = node.categories != null;
         const categoryIds = node.categories?.edges?.map((edge) => edge.node.entityId) ?? [];
+        const catalogSection = knowsCategories ? careNavSectionForCategoryIds(categoryIds) : null;
+
+        if (catalogSection) {
+          request.headers.set(CARE_NAV_HEADER, catalogSection);
+        }
+
         const mayRecord =
           knowsCategories && !isSensitiveProduct({ entityId: node.entityId, categoryIds });
 
@@ -466,7 +476,11 @@ export const withRoutes: ProxyFactory = () => {
 
     rewriteUrl.search = request.nextUrl.search;
 
-    return NextResponse.rewrite(rewriteUrl);
+    // Forward middleware request headers (including x-pathname) so the header
+    // can tell a product slug from the home page after this rewrite.
+    return NextResponse.rewrite(rewriteUrl, {
+      request: { headers: request.headers },
+    });
   };
 };
 

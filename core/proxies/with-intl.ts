@@ -1,6 +1,14 @@
 import createMiddleware from 'next-intl/middleware';
+import { NextResponse } from 'next/server';
 
 import { routing } from '~/i18n/routing';
+import {
+  CARE_NAV_COOKIE,
+  CARE_NAV_HEADER,
+  careNavSectionForPath,
+  parseCareNavCookie,
+  shouldClearCareNav,
+} from '~/lib/makeswift/site-header/inject-liivv-health-nav';
 
 import { type ProxyFactory } from './compose-proxies';
 
@@ -35,6 +43,18 @@ export const withIntl: ProxyFactory = (next) => {
         response?.headers.set(k, v);
       }
     });
+
+    if (response instanceof NextResponse) {
+      const section =
+        careNavSectionForPath(request.nextUrl.pathname) ??
+        parseCareNavCookie(request.headers.get(CARE_NAV_HEADER));
+
+      if (section) {
+        response.cookies.set(CARE_NAV_COOKIE, section, { path: '/', sameSite: 'lax' });
+      } else if (shouldClearCareNav(request.nextUrl.pathname)) {
+        response.cookies.set(CARE_NAV_COOKIE, '', { path: '/', maxAge: 0 });
+      }
+    }
 
     return response;
   };

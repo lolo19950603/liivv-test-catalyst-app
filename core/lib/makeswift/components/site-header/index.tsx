@@ -3,6 +3,7 @@ import { Streamable } from '@/vibes/soul/lib/streamable';
 
 import { getComponentSnapshot } from '~/lib/makeswift/client';
 
+import type { CareNavSection } from '~/lib/makeswift/site-header/inject-liivv-health-nav';
 import type { StoreCategoryNode } from '~/lib/makeswift/site-header/build-store-nav-from-categories';
 
 import type { AccountMenuLink } from '~/lib/account/account-menu-links';
@@ -20,6 +21,7 @@ type Props = {
   accountLabel?: string;
   categoryTree: Streamable<StoreCategoryNode[]>;
   initialPathname: string;
+  rememberedCareNav: CareNavSection | null;
   storeLogo: SiteHeaderContextValue['storeLogo'];
   storeLogoLabel: string;
   cartCount: Streamable<number | null>;
@@ -37,6 +39,7 @@ export const SiteHeader = async ({
   accountLabel,
   categoryTree,
   initialPathname,
+  rememberedCareNav,
   storeLogo,
   storeLogoLabel,
   cartCount,
@@ -61,6 +64,7 @@ export const SiteHeader = async ({
     accountLabel,
     categoryTree: resolvedCategoryTree,
     initialPathname,
+    rememberedCareNav,
     storeLogo,
     storeLogoLabel,
     cartCount: resolvedCartCount,

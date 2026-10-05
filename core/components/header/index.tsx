@@ -1,5 +1,5 @@
 import { getLocale, getTranslations } from 'next-intl/server';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { cache } from 'react';
 
 import { Streamable } from '@/vibes/soul/lib/streamable';
@@ -20,6 +20,11 @@ import { SiteHeader } from '~/lib/makeswift/components/site-header';
 import { resolveAccountHref } from '~/lib/makeswift/site-header/resolve-account-href';
 import { mapCategoryTreeFromStore } from '~/lib/makeswift/site-header/map-category-tree';
 import { stripLocaleFromPathname } from '~/lib/makeswift/site-header/should-hide-store-header';
+import {
+  CARE_NAV_COOKIE,
+  CARE_NAV_HEADER,
+  parseCareNavCookie,
+} from '~/lib/makeswift/site-header/inject-liivv-health-nav';
 
 import { VendorOutageNotice } from '~/components/vendor-outage-notice';
 import { isVendorOutageError, withVendorFallback } from '~/lib/vendor-outage';
@@ -83,18 +88,24 @@ const getHeaderData = cache(async () => {
 });
 
 export const Header = async () => {
-  const [locale, t, tAccount, tDashboard, data, loggedIn, requestHeaders] = await Promise.all([
-    getLocale(),
-    getTranslations('Components.Header'),
-    getTranslations('Account.Layout'),
-    getTranslations('Account.Dashboard'),
-    getHeaderData(),
-    isLoggedIn(),
-    headers(),
-  ]);
+  const [locale, t, tAccount, tDashboard, data, loggedIn, requestHeaders, cookieStore] =
+    await Promise.all([
+      getLocale(),
+      getTranslations('Components.Header'),
+      getTranslations('Account.Layout'),
+      getTranslations('Account.Dashboard'),
+      getHeaderData(),
+      isLoggedIn(),
+      headers(),
+      cookies(),
+    ]);
 
   const logo = data?.settings ? logoTransformer(data.settings) : '';
-  const requestPathname = stripLocaleFromPathname(requestHeaders.get('x-pathname') ?? '/');
+  const requestPathname = stripLocaleFromPathname(
+    requestHeaders.get('x-middleware-request-x-pathname') ??
+      requestHeaders.get('x-pathname') ??
+      '/',
+  );
   const accountHref = resolveAccountHref(loggedIn);
   const accountMenuLinks = loggedIn ? buildAccountMenuLinks((key) => tAccount(key)) : undefined;
   const storefrontUnavailable = data == null;
@@ -183,6 +194,12 @@ export const Header = async () => {
         cartCount={streamableCartCount}
         categoryTree={streamableCategoryTree}
         initialPathname={requestPathname}
+        rememberedCareNav={
+          parseCareNavCookie(
+            requestHeaders.get(`x-middleware-request-${CARE_NAV_HEADER}`) ??
+              requestHeaders.get(CARE_NAV_HEADER),
+          ) ?? parseCareNavCookie(cookieStore.get(CARE_NAV_COOKIE)?.value)
+        }
         notifications={streamableNotifications}
         storeLogo={logo}
         storeLogoLabel={t('home')}

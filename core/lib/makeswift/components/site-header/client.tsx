@@ -29,13 +29,16 @@ import {
   type MakeswiftAdditionalLinkInput,
 } from '~/lib/makeswift/site-header/map-makeswift-nav-links';
 import {
+  type CareNavSection,
+  clearCareNavCookie,
+  careNavSectionForPath,
   getCareSectionBackLink,
   getDiabetesCareNav,
   getOstomyCareNav,
   getWomensHealthNav,
-  shouldShowDiabetesCareNav,
-  shouldShowOstomyCareNav,
-  shouldShowWomensHealthNav,
+  resolveCareNavSection,
+  shouldClearCareNav,
+  writeCareNavCookie,
 } from '~/lib/makeswift/site-header/inject-liivv-health-nav';
 import { resolveStoreNavLinks } from '~/lib/makeswift/site-header/resolve-store-nav-links';
 import { resolveStoreLogo, type StoreLogo } from '~/lib/makeswift/site-header/resolve-store-logo';
@@ -56,6 +59,8 @@ export type SiteHeaderContextValue = {
   accountLabel?: string;
   categoryTree: StoreCategoryNode[];
   initialPathname: string;
+  /** Care section whose menu should follow the reader onto a product page. */
+  rememberedCareNav: CareNavSection | null;
   storeLogo: StoreLogo;
   storeLogoLabel: string;
   cartCount: number | null;
@@ -68,6 +73,7 @@ const PropsContext = createContext<SiteHeaderContextValue>({
   accountHref: ACCOUNT_LOGIN_PATH,
   categoryTree: [],
   initialPathname: '/',
+  rememberedCareNav: null,
   storeLogo: '',
   storeLogoLabel: 'Home',
   cartCount: null,
@@ -232,6 +238,30 @@ export const MakeswiftHeader = forwardRef(
     ref: Ref<HTMLDivElement>,
   ) => {
     const pathname = useStablePathname();
+    const clientPathname = usePathname() ?? '/';
+    const { rememberedCareNav } = useContext(PropsContext);
+    const [rememberedCare, setRememberedCare] = useState<CareNavSection | null>(rememberedCareNav);
+
+    useEffect(() => {
+      // The server placeholder is "/" when the public path has not arrived yet.
+      // Clearing on that placeholder forgets the section before the product URL loads.
+      if (pathname !== clientPathname) return;
+
+      const fromPath = careNavSectionForPath(pathname);
+
+      if (fromPath) {
+        setRememberedCare(fromPath);
+        writeCareNavCookie(fromPath);
+
+        return;
+      }
+
+      if (shouldClearCareNav(pathname)) {
+        setRememberedCare(null);
+        clearCareNavCookie();
+      }
+    }, [pathname, clientPathname]);
+
     const isInBuilder = useIsInBuilderAfterMount();
     const {
       accountHref,
@@ -250,9 +280,10 @@ export const MakeswiftHeader = forwardRef(
     const override = findMatchingPathConfig(pathname, pageOverrides);
     const desktopLogo = resolveStoreLogo(storeLogo, storeLogoLabel);
     const resolvedNavLinks = resolveStoreNavLinks(links, categoryTree);
-    const showWomensHealthNav = shouldShowWomensHealthNav(pathname);
-    const showOstomyCareNav = shouldShowOstomyCareNav(pathname);
-    const showDiabetesCareNav = shouldShowDiabetesCareNav(pathname);
+    const careSection = resolveCareNavSection(pathname, rememberedCare);
+    const showWomensHealthNav = careSection === 'womens';
+    const showOstomyCareNav = careSection === 'ostomy';
+    const showDiabetesCareNav = careSection === 'diabetes';
     const navLinks = showWomensHealthNav
       ? getWomensHealthNav()
       : showOstomyCareNav
@@ -289,7 +320,7 @@ export const MakeswiftHeader = forwardRef(
       : undefined;
 
     const bannerNode = combinedBanner ? <Banner {...combinedBanner} /> : null;
-    const careBack = getCareSectionBackLink(pathname);
+    const careBack = getCareSectionBackLink(pathname, careSection);
     const menuLinks = careBack
       ? [{ label: `← ${careBack.label}`, href: careBack.href }, ...navLinks]
       : navLinks;
