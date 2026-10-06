@@ -264,6 +264,21 @@ export default async (): Promise<NextConfig> => {
           destination: '/:locale/liivv-health/diabetes-care#which-diabetes',
           permanent: true,
         },
+        /*
+         * Duplicate OneTouch Verio strips (7895) were merged into 4948, and the
+         * duplicate is hidden once this is live (owner, 2026-10-06). Its old
+         * address was live, so it moves to the kept product.
+         */
+        {
+          source: '/one-touch-verio-test-strips',
+          destination: '/onetouch-verio-test-strips',
+          permanent: true,
+        },
+        {
+          source: '/:locale(en|fr)/one-touch-verio-test-strips',
+          destination: '/:locale/onetouch-verio-test-strips',
+          permanent: true,
+        },
       ];
     },
     // eslint-disable-next-line @typescript-eslint/require-await
