@@ -481,6 +481,7 @@ Facts: every number above is from Diabetes Canada guidelines (Ch8, Ch36, Ch37) o
 - **ANSWERED 2026-10-06** (owner): "Pods are stocked - Omnipod 5 Libre pairing is not yet in Canada." Built: the brand row shows Insulet's logo (Omnipod's maker; the file named `dexcom.avif` is Insulet's wordmark). The pickers already name Omnipod 5 and DASH, and Omnipod 5 with Libre 3 Plus stays "not confirmed" (`device-pairings.ts` NOT_CONFIRMED): in Canada Omnipod 5 pairs with Dexcom. Products 8090 and 8091 are still hidden in the store, so no product page is linked.
 - Applies to: LAND D6 and `BRAND_NAMES` ("Omnipod stays out until pods are listed"), the YT pickers (cards 4 and 13), and the PATHS kit list.
 - Still open: confirm pods are stocked before the name goes in the brands strip. The Omnipod 5 with Libre pairing is still unconfirmed by a Canadian source (YT E).
+- **Store update run 2026-10-06 (owner's request):** Omnipod products 8090–8096 (Omnipod 5 pods $360, DASH pods $300, PodPals and four patch listings) are now visible and buyable in category 1151.
 
 **A4. Who signs off kits?** ANSWERED: the owner.
 - **ANSWERED 2026-10-06**: unchanged. The owner signs off each kit (kits-for-review.md); no kit is listed until then (B21).
@@ -563,6 +564,7 @@ Facts: every number above is from Diabetes Canada guidelines (Ch8, Ch36, Ch37) o
   - "KIRSTY (Insulin asparte)" should read "aspart"; Lantus SoloStar's meta description is "..."; the insulin shelf category has no meta description.
   - Omnipod pods 8090–8096: make visible (A3).
   - And `COPY_SOURCE` / `SOURCE_DE_COPIE` is still stored on 18 insulin products (hidden on every page, not deleted).
+  - **Store update run 2026-10-06 (owner's request):** Baqsimi (4555) now gives 1-844-561-1254; the swab listing (4527) no longer carries the other retailer's order notice; `COPY_SOURCE` is deleted from all 18 insulin products. The other 15 descriptions above are unchanged (not yet approved). Baqsimi is now placed on Staying Safe card 3 once the catalogue cache refreshes (up to an hour).
   - How it was found, to repeat after the store fixes: the Storefront GraphQL `site.products` list (name, description, custom fields), read with `Accept-Language` en and fr, matched against `diabetes[\s_-]*express` (any case) and `866 418 3392` in any punctuation. Only Baqsimi is named in the Diabetes site's own code (`dc-ids.ts`), but shelves and search can surface any of these products.
 - Options:
   - **(default)** FAQ 5 and the insulin and glucagon tiles stay off until operations confirms.
@@ -842,6 +844,7 @@ Facts: every number above is from Diabetes Canada guidelines (Ch8, Ch36, Ch37) o
 
 **B35. Duplicate strip listing.** (NICE TO HAVE; catalog, not code)
 - **STILL OPEN 2026-10-06.** The owner says merge the duplicate listing. That is a store write in BigCommerce, not part of this build.
+- **Store update run 2026-10-06 (owner's request, after the release):** 4948 is kept at $84.98 with brand "OneTouch" (brand 250 renamed from "One Touch"; it also covers 7356), 7895's description and three photos copied onto it. The permanent redirect `/one-touch-verio-test-strips` → `/onetouch-verio-test-strips` (EN and /fr) is in `core/next.config.ts`. **Still to do:** hide 7895 once that redirect is live in production (`scratchpad/bcfix/apply.mjs`, `HIDE_DUPLICATE_REDIRECT_LIVE`).
 - Question: `/one-touch-verio-test-strips` ("One Touch Verio Test Strips", SKU WC-144766-P, from $84.99) and `/onetouch-verio-test-strips` ("OneTouch Verio Test Strips", $84.98) look like the same item. The brand is spelled "OneTouch". Merge or retire one listing in BigCommerce and correct the name.
 - Applies to: the catalog (placements are on hold, so no page copy changes).
 
