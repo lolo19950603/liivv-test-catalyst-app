@@ -1,5 +1,5 @@
 import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
-import { getFormatter } from 'next-intl/server';
+import { getFormatter, getTranslations } from 'next-intl/server';
 import { cache } from 'react';
 
 import { getSessionCustomerAccessToken } from '~/auth';
@@ -13,6 +13,7 @@ import { isCuratedKitProduct } from '~/lib/kit/is-curated-kit';
 import { resolveBcCdnImageUrl } from '~/lib/resolve-bc-cdn-image-url';
 import { pricesTransformer } from '~/data-transformers/prices-transformer';
 
+import { DIABETES_REFUSED_DESCRIPTION } from './chapters/chapter-shop';
 import {
   DAY_ONE_STARTER_KIT_ID,
   FEATURED_CGM_ID,
@@ -54,6 +55,7 @@ const DcCatalogQuery = graphql(
                   entityId
                   name
                   path
+                  description
                   defaultImage {
                     altText
                     url: urlTemplate(lossy: true)
@@ -87,6 +89,7 @@ const DcCatalogQuery = graphql(
               entityId
               name
               path
+              description
               defaultImage {
                 altText
                 url: urlTemplate(lossy: true)
@@ -125,6 +128,12 @@ export type DcCatalogItem = {
   image?: { src: string; alt: string };
   priceLabel?: string;
   isKit: boolean;
+  /*
+   * Its description names or phones another retailer
+   * (DIABETES_REFUSED_DESCRIPTION, ./chapters/chapter-shop.ts), so the landing
+   * never links it until the description is fixed in the store (B3).
+   */
+  refused?: true;
 };
 
 export type DcCatalog = {
@@ -168,6 +177,7 @@ function toItem(
     entityId: number;
     name: string;
     path: string;
+    description?: string;
     defaultImage?: { altText: string; url: string } | null;
     images?: {
       edges?: Array<{
@@ -180,6 +190,8 @@ function toItem(
     prices?: Parameters<typeof pricesTransformer>[0];
   },
   format: Awaited<ReturnType<typeof getFormatter>>,
+  /* "From $84.99" in the page language (`ui.landingPage.shop.fromPrice`). */
+  fromPrice: (price: string) => string,
 ): DcCatalogItem {
   const customFields = removeEdgesAndNodes(node.customFields ?? { edges: [] });
   const price = pricesTransformer(node.prices ?? null, format);
@@ -190,7 +202,7 @@ function toItem(
   } else if (price?.type === 'sale') {
     priceLabel = price.currentValue;
   } else if (price?.type === 'range') {
-    priceLabel = `From ${price.minValue}`;
+    priceLabel = fromPrice(price.minValue);
   }
 
   return {
@@ -200,6 +212,9 @@ function toItem(
     image: pickProductImage(node),
     priceLabel,
     isKit: isCuratedKitProduct(customFields),
+    ...(DIABETES_REFUSED_DESCRIPTION.test(node.description ?? '')
+      ? { refused: true as const }
+      : {}),
   };
 }
 
@@ -208,6 +223,8 @@ export const getDcCatalog = cache(async (locale?: string): Promise<DcCatalog> =>
   const currencyCode = await getPreferredCurrencyCode();
   const channelId = getChannelIdFromLocale(locale);
   const format = await getFormatter();
+  const shopT = await getTranslations('DiabetesCare.ui.landingPage.shop');
+  const fromPrice = (price: string) => shopT('fromPrice', { price });
   const fetchOptions = {
     ...(locale ? { headers: { 'Accept-Language': locale } } : {}),
     ...(customerAccessToken ? { cache: 'no-store' as const } : { next: { revalidate } }),
@@ -244,7 +261,7 @@ export const getDcCatalog = cache(async (locale?: string): Promise<DcCatalog> =>
         page === 0 ? removeEdgesAndNodes(response.data.site.featuredProducts ?? { edges: [] }) : [];
 
       for (const node of [...featuredNodes, ...categoryNodes]) {
-        const item = toItem(node, format);
+        const item = toItem(node, format, fromPrice);
         const existing = byId.get(node.entityId);
 
         if (!existing) {

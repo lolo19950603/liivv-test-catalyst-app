@@ -291,6 +291,12 @@ interface CheckoutFulfillmentSectionProps {
   savedPaymentMethods?: SavedPaymentMethod[];
   paymentsUnavailable?: boolean;
   paymentsUnavailableMessage?: string;
+  /*
+   * Set when the cart can't be bought online as it stands (insulin for
+   * delivery in Quebec): payment never starts, and every pay button is off
+   * with this message under it. The server refuses the order too.
+   */
+  orderBlockedMessage?: string;
 }
 
 function Chevron({ open }: { open: boolean }) {
@@ -369,6 +375,32 @@ function addressMatchesConsignment(
   );
 }
 
+interface PaymentGate {
+  paymentsUnavailable: boolean;
+  paymentsUnavailableMessage?: string;
+  shippingReady: boolean;
+  shippingRequiredMessage?: string;
+}
+
+/*
+ * The payment gate once an order block (insulin for delivery in Quebec) is
+ * applied: payment never starts, and the pay buttons, if the payment form had
+ * already loaded, are off with the block's message. Without a block the gate
+ * is exactly what it was.
+ */
+function applyOrderBlock(gate: PaymentGate, orderBlockedMessage?: string): PaymentGate {
+  if (!orderBlockedMessage) {
+    return gate;
+  }
+
+  return {
+    paymentsUnavailable: true,
+    paymentsUnavailableMessage: orderBlockedMessage,
+    shippingReady: false,
+    shippingRequiredMessage: orderBlockedMessage,
+  };
+}
+
 export function CheckoutFulfillmentSection({
   billingFormId,
   customerEmail,
@@ -392,6 +424,7 @@ export function CheckoutFulfillmentSection({
   savedPaymentMethods = [],
   paymentsUnavailable = false,
   paymentsUnavailableMessage,
+  orderBlockedMessage,
 }: CheckoutFulfillmentSectionProps) {
   const router = useRouter();
   const billingRef = useRef<HTMLFormElement>(null);
@@ -593,11 +626,21 @@ export function CheckoutFulfillmentSection({
       : shippingMethodRequiredMessage ?? shippingRequiredMessage
     : undefined;
 
+  const paymentGate = applyOrderBlock(
+    {
+      paymentsUnavailable,
+      paymentsUnavailableMessage,
+      shippingReady: paymentShippingReady,
+      shippingRequiredMessage: paymentBlockedMessage,
+    },
+    orderBlockedMessage,
+  );
+
   return (
     <CheckoutPaymentProvider
       billingFormId={billingFormId}
       initializePaymentAction={initializePaymentAction}
-      paymentsUnavailable={paymentsUnavailable}
+      paymentsUnavailable={paymentGate.paymentsUnavailable}
       prepareOrderConfirmationAction={prepareOrderConfirmationAction}
       returnUrl={returnUrl}
       shippingReady={paymentShippingReady}
@@ -631,10 +674,10 @@ export function CheckoutFulfillmentSection({
         shipToOpen={shipToOpen}
         shipToSummary={shipToSummary}
         shippingErrors={shippingErrors}
-        shippingReady={paymentShippingReady}
-        shippingRequiredMessage={paymentBlockedMessage}
-        paymentsUnavailable={paymentsUnavailable}
-        paymentsUnavailableMessage={paymentsUnavailableMessage}
+        shippingReady={paymentGate.shippingReady}
+        shippingRequiredMessage={paymentGate.shippingRequiredMessage}
+        paymentsUnavailable={paymentGate.paymentsUnavailable}
+        paymentsUnavailableMessage={paymentGate.paymentsUnavailableMessage}
         states={states}
         submitLabel={submitLabel}
         syncBillingFromShipping={syncBillingFromShipping}

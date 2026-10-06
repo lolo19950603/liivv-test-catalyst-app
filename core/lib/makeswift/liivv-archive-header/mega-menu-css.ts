@@ -333,6 +333,16 @@ ${LIIVV_HEADER_UTILITY_SHARED_CSS}
   width: auto;
   min-width: 0;
 }
+/*
+ * The fixed utilities above take no room in the header grid, so a long section
+ * menu slides under EN/FR at laptop widths. The Diabetes Care menu (four items
+ * and a back link) keeps clear of them and wraps instead.
+ */
+@media screen and (min-width: 1024px) and (max-width: 1439px) {
+  .liivv-archive-header .header__navigation:has(> nav[aria-label='Diabetes Care']) {
+    padding-inline-end: 16.5rem;
+  }
+}
 @media screen and (min-width: 640px) {
   .liivv-archive-header.diabetes-care-section-header .header__logo-link img {
     max-height: 2.75rem;

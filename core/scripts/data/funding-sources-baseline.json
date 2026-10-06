@@ -1,0 +1,1136 @@
+{
+  "note": "Written by core/scripts/check-funding-sources.mjs --update-baseline. One entry per register page the Funding & Coverage page cites (`<id>` and `<id>#fr`). Update it only after a person has re-read every page that changed and updated the copy.",
+  "updatedOn": "2026-10-06",
+  "nextCheck": "2026-11-01",
+  "pages": {
+    "ab-cgm-fact-sheet-2025": {
+      "href": "https://www.alberta.ca/system/files/hlth-continuous-glucose-monitor-coverage-for-albertans-fact-sheet.pdf",
+      "status": 200,
+      "finalUrl": "https://www.alberta.ca/system/files/hlth-continuous-glucose-monitor-coverage-for-albertans-fact-sheet.pdf",
+      "title": "Continuous glucose monitor coverage for Albertans Fact Sheet December 16, 2024",
+      "modified": [
+        "pdf 2025-12-17"
+      ],
+      "hash": "0cf247b2aecfbb53",
+      "kind": "pdf",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "ab-iptp-eligibility-2023": {
+      "href": "https://www.alberta.ca/system/files/custom_downloaded_images/health-insulin-pump-therapy-program-eligibility.pdf",
+      "status": 200,
+      "finalUrl": "https://www.alberta.ca/system/files/custom_downloaded_images/health-insulin-pump-therapy-program-eligibility.pdf",
+      "title": "Insulin Pump Therapy Program Eligibility",
+      "modified": [
+        "pdf 2023-08-29"
+      ],
+      "hash": "38ef17a667a64a66",
+      "kind": "pdf",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "ab-non-group-coverage": {
+      "href": "https://www.alberta.ca/non-group-coverage",
+      "status": 200,
+      "finalUrl": "https://www.alberta.ca/non-group-coverage",
+      "title": "Non-Group Coverage | Alberta.ca",
+      "modified": [],
+      "hash": "46a35da3d084253a",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "ab-specialized-drug-benefits": {
+      "href": "https://www.alberta.ca/specialized-drug-benefits",
+      "status": 200,
+      "finalUrl": "https://www.alberta.ca/specialized-drug-benefits",
+      "title": "Specialized drug benefits | Alberta.ca",
+      "modified": [],
+      "hash": "78b8df9b167a7d4a",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "abc-pharmacy-reference-guide": {
+      "href": "https://www.ab.bluecross.ca/pdfs/82477-ab-pharmacy-reference-guide.pdf",
+      "status": 200,
+      "finalUrl": "https://www.ab.bluecross.ca/pdfs/82477-ab-pharmacy-reference-guide.pdf",
+      "title": "BE008-08-26 Pharmacy Guide Alberta",
+      "modified": [
+        "pdf 20260619",
+        "pdf 2019-06-26"
+      ],
+      "hash": "c539a3e42d365761",
+      "kind": "pdf",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "bc-diabetes-pins": {
+      "href": "https://www2.gov.bc.ca/gov/content/health/practitioner-professional-resources/pharmacare/device-providers/diabetes-product-identification-numbers-pins",
+      "status": 200,
+      "finalUrl": "https://www2.gov.bc.ca/gov/content/health/practitioner-professional-resources/pharmacare/device-providers/diabetes-product-identification-numbers-pins",
+      "title": "Diabetes devices and supplies PINs - Province of British Columbia",
+      "modified": [
+        "meta 2026-09-17",
+        "Last updated on September 17, 2026"
+      ],
+      "hash": "f9aeb7b4eb91ccc3",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "bc-insulin-pumps": {
+      "href": "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/pharmacare-for-bc-residents/what-we-cover/diabetes-supplies/insulin-pumps-insulin-pump-supplies",
+      "status": 200,
+      "finalUrl": "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/pharmacare-for-bc-residents/what-we-cover/diabetes-supplies/insulin-pumps-insulin-pump-supplies",
+      "title": "Insulin pumps and insulin pump supplies - Province of British Columbia",
+      "modified": [
+        "meta 2026-07-15",
+        "Last updated on July 15, 2026"
+      ],
+      "hash": "4604b681473324ce",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "bc-national-pharmacare": {
+      "href": "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/pharmacare-for-bc-residents/national-pharmacare",
+      "status": 200,
+      "finalUrl": "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/pharmacare-for-bc-residents/national-pharmacare",
+      "title": "BC PharmaCare Plan NP (National Pharmacare plan) - Province of British Columbia",
+      "modified": [
+        "meta 2026-06-29",
+        "Last updated on June 29, 2026"
+      ],
+      "hash": "c870f9ba1c2d00b7",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "bc-news-diabetes-coverage-2026": {
+      "href": "https://news.gov.bc.ca/releases/2026HLTH0030-000334",
+      "status": 200,
+      "finalUrl": "https://news.gov.bc.ca/releases/2026HLTH0030-000334",
+      "title": "BC Gov News",
+      "modified": [],
+      "hash": "49d4afe109e794eb",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "bc-pharmacare-contact": {
+      "href": "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/pharmacare-for-bc-residents/contact-us",
+      "status": 200,
+      "finalUrl": "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/pharmacare-for-bc-residents/contact-us",
+      "title": "Contact BC PharmaCare - Province of British Columbia",
+      "modified": [
+        "meta 2026-08-26",
+        "Last updated on August 26, 2026"
+      ],
+      "hash": "0b45bf3ddb422062",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "bc-sa-insulin-pumps": {
+      "href": "https://www2.gov.bc.ca/gov/content/health/practitioner-professional-resources/pharmacare/programs/special-authority/limited-coverage-drugs-and-medical-supplies-insulin-pumps",
+      "status": 200,
+      "finalUrl": "https://www2.gov.bc.ca/gov/content/health/practitioner-professional-resources/pharmacare/programs/special-authority/limited-coverage-drugs-and-medical-supplies-insulin-pumps",
+      "title": "SA for Insulin Pumps - Province of British Columbia",
+      "modified": [
+        "meta 2025-12-18",
+        "Last updated on December 18, 2025"
+      ],
+      "hash": "4d7680a759072099",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "cra-dtc-how-to-apply": {
+      "href": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/segments/tax-credits-deductions-persons-disabilities/disability-tax-credit/how-apply-dtc.html",
+      "status": 200,
+      "finalUrl": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/segments/tax-credits-deductions-persons-disabilities/disability-tax-credit/how-apply-dtc.html",
+      "title": "How to apply - Disability tax credit form (DTC) - Canada.ca",
+      "modified": [
+        "meta 2025-11-28"
+      ],
+      "hash": "e922b763d0311999",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "cra-dtc-how-to-apply#fr": {
+      "href": "https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/segments/deductions-credits-impot-personnes-handicapees/credit-impot-personnes-handicapees/comment-demande-ciph.html",
+      "status": 200,
+      "finalUrl": "https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/segments/deductions-credits-impot-personnes-handicapees/credit-impot-personnes-handicapees/comment-demande-ciph.html",
+      "title": "Comment faire une demande - Formulaire de crédit d’impôt pour personnes handicapées (CIPH) - Canada.ca",
+      "modified": [
+        "meta 2025-11-28"
+      ],
+      "hash": "9b07a4c3afa7062e",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "cra-dtc-life-sustaining-therapy": {
+      "href": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/segments/tax-credits-deductions-persons-disabilities/disability-tax-credit/eligible-dtc/life-sustaining-therapy.html",
+      "status": 200,
+      "finalUrl": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/segments/tax-credits-deductions-persons-disabilities/disability-tax-credit/eligible-dtc/life-sustaining-therapy.html",
+      "title": "Life-sustaining therapy eligibility - Disability tax credit - Canada.ca",
+      "modified": [
+        "meta 2023-01-24",
+        "Date modified: 2023-01-24"
+      ],
+      "hash": "917e5d49e5322750",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "cra-dtc-life-sustaining-therapy#fr": {
+      "href": "https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/segments/deductions-credits-impot-personnes-handicapees/credit-impot-personnes-handicapees/admissible-ciph/soins.html",
+      "status": 200,
+      "finalUrl": "https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/segments/deductions-credits-impot-personnes-handicapees/credit-impot-personnes-handicapees/admissible-ciph/soins.html",
+      "title": "Soins thérapeutiques essentiels : Critères d’admissibilité - Crédit d’impôt pour personnes handicapées (CIPH) - Canada.ca",
+      "modified": [
+        "meta 2023-01-24",
+        "Date de modification : 2023-01-24"
+      ],
+      "hash": "33435f9a0983344e",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "cra-rc4064-2025": {
+      "href": "https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/rc4064/disability-related-information.html",
+      "status": 200,
+      "finalUrl": "https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/rc4064/disability-related-information.html",
+      "title": "Disability-Related Information 2025 - Canada.ca",
+      "modified": [
+        "meta 2026-01-20"
+      ],
+      "hash": "5aa1b68863d87463",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "cra-rc4064-2025#fr": {
+      "href": "https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/publications/rc4064/renseignements-relatifs-personnes-handicapees.html",
+      "status": 200,
+      "finalUrl": "https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/publications/rc4064/renseignements-relatifs-personnes-handicapees.html",
+      "title": "Renseignements relatifs aux personnes handicapées 2025 - Canada.ca",
+      "modified": [
+        "meta 2026-01-20"
+      ],
+      "hash": "bbebfc62a5ccd328",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "cra-rc4065-2025": {
+      "href": "https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/rc4065/medical-expenses.html",
+      "status": 200,
+      "finalUrl": "https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/rc4065/medical-expenses.html",
+      "title": "Medical Expenses 2025 - Canada.ca",
+      "modified": [
+        "meta 2026-01-20"
+      ],
+      "hash": "8653c33a27df903a",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "cra-rc4065-2025#fr": {
+      "href": "https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/publications/rc4065/frais-medicaux.html",
+      "status": 200,
+      "finalUrl": "https://www.canada.ca/fr/agence-revenu/services/formulaires-publications/publications/rc4065/frais-medicaux.html",
+      "title": "Frais médicaux 2025 - Canada.ca",
+      "modified": [
+        "meta 2026-01-20"
+      ],
+      "hash": "1fcf8de4b43bc5cd",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "dc-comparisons-by-province": {
+      "href": "https://www.diabetes.ca/advocacy-and-policy/advocacy-reports/comparisons-by-province-territory",
+      "status": 200,
+      "finalUrl": "https://www.diabetes.ca/advocacy-and-policy/advocacy-reports/comparisons-by-province-territory",
+      "title": "Comparisons by Province/Territory - Diabetes Canada",
+      "modified": [],
+      "hash": "c343edb10ff475bc",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "dc-ontario-monitoring-for-health": {
+      "href": "https://www.diabetes.ca/living-with-diabetes/life-with-diabetes/diabetes-and-diabetes-related-out-of-pocket-costs/ontario-monitoring-for-health-program",
+      "status": 200,
+      "finalUrl": "https://www.diabetes.ca/living-with-diabetes/life-with-diabetes/diabetes-and-diabetes-related-out-of-pocket-costs/ontario-monitoring-for-health-program",
+      "title": "Ontario Monitoring for Health Program - Diabetes Canada",
+      "modified": [],
+      "hash": "4be730ac3dd17afb",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "dc-out-of-pocket-costs-2022": {
+      "href": "https://www.diabetes.ca/living-with-diabetes/life-with-diabetes/diabetes-and-diabetes-related-out-of-pocket-costs",
+      "status": 200,
+      "finalUrl": "https://www.diabetes.ca/living-with-diabetes/life-with-diabetes/diabetes-and-diabetes-related-out-of-pocket-costs",
+      "title": "Diabetes and Diabetes-Related Out-of-Pocket Costs - Diabetes Canada",
+      "modified": [],
+      "hash": "2879bfcd0d0de877",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "esdc-rdsp-apply": {
+      "href": "https://www.canada.ca/en/employment-social-development/programs/disability/savings/apply.html",
+      "status": 200,
+      "finalUrl": "https://www.canada.ca/en/employment-social-development/programs/disability/savings/apply.html",
+      "title": "Who can open a plan and apply for grants and bonds - Canada.ca",
+      "modified": [
+        "meta 2026-07-10"
+      ],
+      "hash": "fb45e7c5039aed13",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "esdc-rdsp-apply#fr": {
+      "href": "https://www.canada.ca/fr/emploi-developpement-social/programmes/invalidite/epargne/demande.html",
+      "status": 200,
+      "finalUrl": "https://www.canada.ca/fr/emploi-developpement-social/programmes/invalidite/epargne/demande.html",
+      "title": "Qui peut ouvrir un régime et présenter une demande de subventions et de bons - Canada.ca",
+      "modified": [
+        "meta 2026-07-10"
+      ],
+      "hash": "1ab8fbd469d0c8e9",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "hc-diabetes-device-fund-2024": {
+      "href": "https://www.canada.ca/en/health-canada/news/2024/02/universal-access-to-diabetes-medications-and-diabetes-device-fund-for-devices-and-supplies.html",
+      "status": 200,
+      "finalUrl": "https://www.canada.ca/en/health-canada/news/2024/02/universal-access-to-diabetes-medications-and-diabetes-device-fund-for-devices-and-supplies.html",
+      "title": "Universal Access to Diabetes Medications, and Diabetes Device Fund for Devices and Supplies - Canada.ca",
+      "modified": [
+        "meta 2024-02-29"
+      ],
+      "hash": "aecfe3d9e4fffe4f",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "hc-pharmacare-bilateral-agreements": {
+      "href": "https://www.canada.ca/en/health-canada/corporate/transparency/health-agreements/national-pharmacare-bilateral-agreements.html",
+      "status": 200,
+      "finalUrl": "https://www.canada.ca/en/health-canada/corporate/transparency/health-agreements/national-pharmacare-bilateral-agreements.html",
+      "title": "National pharmacare bilateral agreements - Canada.ca",
+      "modified": [
+        "meta 2026-01-26"
+      ],
+      "hash": "adec7386073dca11",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "healthpei-national-pharmacare-qa": {
+      "href": "https://src.healthpei.ca/sites/src.healthpei.ca/files/PEI%20Pharmacare/National%20Pharmacare/National%20Pharmacare%20Q&A%20Residents.pdf",
+      "status": 200,
+      "finalUrl": "https://src.healthpei.ca/sites/src.healthpei.ca/files/PEI%20Pharmacare/National%20Pharmacare/National%20Pharmacare%20Q&A%20Residents.pdf",
+      "title": null,
+      "modified": [
+        "pdf 20250430",
+        "pdf 2025-04-30"
+      ],
+      "hash": "c09a0ded021e0656",
+      "kind": "pdf",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "inesss-dexcom-g6-g7-2026": {
+      "href": "https://www.inesss.qc.ca/en/themes/medicaments/drug-products-undergoing-evaluation-and-evaluated/extract-notice-to-the-minister/dexcom-g6-et-dexcom-g7-surveillance-glycemie-7935.html",
+      "status": 200,
+      "finalUrl": "https://www.inesss.qc.ca/en/themes/medicaments/drug-products-undergoing-evaluation-and-evaluated/extract-notice-to-the-minister/dexcom-g6-et-dexcom-g7-surveillance-glycemie-7935.html",
+      "title": "INESSS: Drug product: Dexcom G6 et Dexcom G7 (surveillance glycémie)",
+      "modified": [],
+      "hash": "0b55d6d0de9eb116",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "inesss-dexcom-g6-g7-2026#fr": {
+      "href": "https://www.inesss.qc.ca/thematiques/medicaments/medicaments-evaluation-aux-fins-dinscription/extrait-davis-au-ministre/dexcom-g6-et-dexcom-g7-surveillance-glycemie-7935.html",
+      "status": 200,
+      "finalUrl": "https://www.inesss.qc.ca/thematiques/medicaments/medicaments-evaluation-aux-fins-dinscription/extrait-davis-au-ministre/dexcom-g6-et-dexcom-g7-surveillance-glycemie-7935.html",
+      "title": "INESSS: Médicament: Dexcom G6 et Dexcom G7 (surveillance glycémie)",
+      "modified": [],
+      "hash": "d855592c9b470fcd",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "inesss-libre-3-plus-2026": {
+      "href": "https://www.inesss.qc.ca/en/themes/medicaments/drug-products-undergoing-evaluation-and-evaluated/extract-notice-to-the-minister/freestyle-libre-3-plus-surveillance-de-la-glycemie-7938.html",
+      "status": 200,
+      "finalUrl": "https://www.inesss.qc.ca/en/themes/medicaments/drug-products-undergoing-evaluation-and-evaluated/extract-notice-to-the-minister/freestyle-libre-3-plus-surveillance-de-la-glycemie-7938.html",
+      "title": "INESSS: Drug product: FreeStyle Libre 3 Plus (surveillance de la glycémie)",
+      "modified": [],
+      "hash": "f17765a77ac71cd8",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "inesss-libre-3-plus-2026#fr": {
+      "href": "https://www.inesss.qc.ca/thematiques/medicaments/medicaments-evaluation-aux-fins-dinscription/extrait-davis-au-ministre/freestyle-libre-3-plus-surveillance-de-la-glycemie-7938.html",
+      "status": 200,
+      "finalUrl": "https://www.inesss.qc.ca/thematiques/medicaments/medicaments-evaluation-aux-fins-dinscription/extrait-davis-au-ministre/freestyle-libre-3-plus-surveillance-de-la-glycemie-7938.html",
+      "title": "INESSS: Médicament: FreeStyle Libre 3 Plus (surveillance de la glycémie)",
+      "modified": [],
+      "hash": "8c55d17ff63cf62d",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "inesss-libre-3-plus-notice-2025-12": {
+      "href": "https://www.inesss.qc.ca/fileadmin/doc/INESSS/Inscription_medicaments/Avis_au_ministre/Janvier_2026/Avis_20251215/Chg_admin_FreeStyle_libre_3_Plus_EA_2025-12.pdf",
+      "status": 200,
+      "finalUrl": "https://www.inesss.qc.ca/fileadmin/doc/INESSS/Inscription_medicaments/Avis_au_ministre/Janvier_2026/Avis_20251215/Chg_admin_FreeStyle_libre_3_Plus_EA_2025-12.pdf",
+      "title": "Extrait d'avis au ministre sur Freestyle Libre 3 Plus",
+      "modified": [
+        "pdf 2026-01-12"
+      ],
+      "hash": "9f5d821955a1cd2b",
+      "kind": "pdf",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "isc-nihb-contact": {
+      "href": "https://www.sac-isc.gc.ca/eng/1579274812116/1579708265237",
+      "status": 200,
+      "finalUrl": "https://www.sac-isc.gc.ca/eng/1579274812116/1579708265237",
+      "title": "Contact the Non-Insured Health Benefits program",
+      "modified": [
+        "meta 2025-10-31",
+        "Date modified: 2025-10-31"
+      ],
+      "hash": "a41ad5695fe3e682",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "isc-nihb-contact#fr": {
+      "href": "https://www.sac-isc.gc.ca/fra/1579274812116/1579708265237",
+      "status": 200,
+      "finalUrl": "https://www.sac-isc.gc.ca/fra/1579274812116/1579708265237",
+      "title": "Communiquez avec le programme des Services de santé non assurés",
+      "modified": [
+        "meta 2025-10-31",
+        "Date de modification : 2025-10-31"
+      ],
+      "hash": "8dcd38e108d715d6",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "isc-nihb-eligibility": {
+      "href": "https://www.sac-isc.gc.ca/eng/1574187596083/1576511384063",
+      "status": 200,
+      "finalUrl": "https://www.sac-isc.gc.ca/eng/1574187596083/1576511384063",
+      "title": "Who is eligible for the Non-Insured Health Benefits (NIHB) program for First Nations and Inuit",
+      "modified": [
+        "meta 2026-05-28",
+        "Date modified: 2026-05-28"
+      ],
+      "hash": "61fa195df6f01114",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "isc-nihb-eligibility#fr": {
+      "href": "https://www.sac-isc.gc.ca/fra/1574187596083/1576511384063",
+      "status": 200,
+      "finalUrl": "https://www.sac-isc.gc.ca/fra/1574187596083/1576511384063",
+      "title": "Qui est admissible au Programme des services de santé non assurés (SSNA) pour les Premières Nations et les Inuit",
+      "modified": [
+        "meta 2026-05-28",
+        "Date de modification : 2026-05-28"
+      ],
+      "hash": "f79fed19fb8beb3d",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "isc-nihb-pharmacy-benefits": {
+      "href": "https://www.sac-isc.gc.ca/eng/1574784515492/1574784549876",
+      "status": 200,
+      "finalUrl": "https://www.sac-isc.gc.ca/eng/1574784515492/1574784549876",
+      "title": "Non-Insured Health Benefits program for First Nations and Inuit: Pharmacy benefits",
+      "modified": [
+        "meta 2025-10-07",
+        "Date modified: 2025-10-07"
+      ],
+      "hash": "0fe135114fb8a97f",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "isc-nihb-pharmacy-benefits#fr": {
+      "href": "https://www.sac-isc.gc.ca/fra/1574784515492/1574784549876",
+      "status": 200,
+      "finalUrl": "https://www.sac-isc.gc.ca/fra/1574784515492/1574784549876",
+      "title": "Programme des services de santé non assurés pour les Premières Nations et les Inuit : Prestations pharmaceutiques",
+      "modified": [
+        "meta 2025-10-07",
+        "Date de modification : 2025-10-07"
+      ],
+      "hash": "0b8251fb25754a31",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "isc-nihb-updates": {
+      "href": "https://www.sac-isc.gc.ca/eng/1578079214611/1578079236012",
+      "status": 200,
+      "finalUrl": "https://www.sac-isc.gc.ca/eng/1578079214611/1578079236012",
+      "title": "Non-Insured Health Benefits program updates",
+      "modified": [
+        "meta 2026-07-30",
+        "Date modified: 2026-07-30"
+      ],
+      "hash": "3e2910ef607c158d",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "isc-nihb-updates#fr": {
+      "href": "https://www.sac-isc.gc.ca/fra/1578079214611/1578079236012",
+      "status": 200,
+      "finalUrl": "https://www.sac-isc.gc.ca/fra/1578079214611/1578079236012",
+      "title": "Mises à jour du Programme des services de santé non assurés",
+      "modified": [
+        "meta 2026-07-30",
+        "Date de modification : 2026-07-30"
+      ],
+      "hash": "d5f787363236f1b4",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "mb-faq-ips": {
+      "href": "https://www.gov.mb.ca/health/pharmacare/profdocs/faq_ips.pdf",
+      "status": 200,
+      "finalUrl": "https://www.gov.mb.ca/health/pharmacare/profdocs/faq_ips.pdf",
+      "title": "FAQ - Insulin Pump Supplies",
+      "modified": [
+        "pdf 20250324",
+        "pdf 2025-03-24"
+      ],
+      "hash": "7d6c6acd87cc4915",
+      "kind": "pdf",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "mb-health-coverage": {
+      "href": "https://www.gov.mb.ca/health/mhsip/healthcoverage.html#ancillary-ten",
+      "status": 200,
+      "finalUrl": "https://www.gov.mb.ca/health/mhsip/healthcoverage.html",
+      "title": "Health Coverage | Health | Province of Manitoba",
+      "modified": [],
+      "hash": "3f3cd88e5a659e5b",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "mb-health-coverage#fr": {
+      "href": "https://www.gov.mb.ca/health/mhsip/healthcoverage.fr.html",
+      "status": 200,
+      "finalUrl": "https://www.gov.mb.ca/health/mhsip/healthcoverage.fr.html",
+      "title": "La couverture de l’assurance-maladie | Santé | Province du Manitoba",
+      "modified": [],
+      "hash": "838b6e11c8209818",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "mb-pharmacare": {
+      "href": "https://www.gov.mb.ca/health/pharmacare/index.html",
+      "status": 200,
+      "finalUrl": "https://www.gov.mb.ca/health/pharmacare/index.html",
+      "title": "Pharmacare Program | Health | Province of Manitoba",
+      "modified": [],
+      "hash": "91c65b4bb654e2f0",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "mb-pharmacare-mepp": {
+      "href": "https://www.gov.mb.ca/health/pharmacare/mepp.html",
+      "status": 200,
+      "finalUrl": "https://www.gov.mb.ca/health/pharmacare/mepp.html",
+      "title": "Manitoba Enhanced Pharmacare Program | Health | Province of Manitoba",
+      "modified": [],
+      "hash": "21c7a4f712b92b4a",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "mb-pharmacare#fr": {
+      "href": "https://www.gov.mb.ca/health/pharmacare/index.fr.html",
+      "status": 200,
+      "finalUrl": "https://www.gov.mb.ca/health/pharmacare/index.fr.html",
+      "title": "Le Régime d’assurance-médicaments | Santé | Province du Manitoba",
+      "modified": [],
+      "hash": "2d8919db6b389617",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "mb-shared-health-diabetes-care": {
+      "href": "https://sharedhealthmb.ca/patient-care/diabetes-care/",
+      "status": 200,
+      "finalUrl": "https://sharedhealthmb.ca/patient-care/diabetes-care/",
+      "title": "Diabetes Care - Shared Health",
+      "modified": [
+        "meta 2024-06-27T14:12:05+00:00"
+      ],
+      "hash": "ec9063179a436a9a",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "nb-drug-plans": {
+      "href": "https://www.gnb.ca/en/topic/health-wellness/nb-drug-plans.html",
+      "status": 200,
+      "finalUrl": "https://www.gnb.ca/en/topic/health-wellness/nb-drug-plans.html",
+      "title": "New Brunswick Drug Plans - gnb.ca",
+      "modified": [],
+      "hash": "f07311b7cdda3e54",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "nb-drug-plans#fr": {
+      "href": "https://www.gnb.ca/fr/sujet/sante-mieux-etre/regimes-medicaments-nb.html",
+      "status": 200,
+      "finalUrl": "https://www.gnb.ca/fr/sujet/sante-mieux-etre/regimes-medicaments-nb.html",
+      "title": "Régimes de médicaments du Nouveau-Brunswick - gnb.ca",
+      "modified": [],
+      "hash": "5663f39f7c851ae8",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "nb-insulin-pump-program": {
+      "href": "https://www2.gnb.ca/content/gnb/en/departments/health/patientinformation/PrimaryHealthCare/A-Comprehensive-Diabetes-Strategy-for-New-Brunswickers/TheNewBrunswickInsulinPumpProgram-IPP.html",
+      "status": 200,
+      "finalUrl": "https://www2.gnb.ca/content/gnb/en/departments/health/patientinformation/PrimaryHealthCare/A-Comprehensive-Diabetes-Strategy-for-New-Brunswickers/TheNewBrunswickInsulinPumpProgram-IPP.html",
+      "title": "The New Brunswick Insulin Pump Program (IPP)",
+      "modified": [
+        "meta 2026-05-08T10:22:23.267-03:00"
+      ],
+      "hash": "79fce4362198fa27",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "nb-insulin-pump-program#fr": {
+      "href": "https://www2.gnb.ca/content/gnb/fr/ministeres/sante/patients/SoinsDeSantePrimaires/Strategie-globale-sur-le-diabete-pour-les-Neo-Brunswickois-et-Neo-Brunswickoises/Programme-pompes-insuline-PPI-Nouveau-Brunswick.html",
+      "status": 200,
+      "finalUrl": "https://www2.gnb.ca/content/gnb/fr/ministeres/sante/patients/SoinsDeSantePrimaires/Strategie-globale-sur-le-diabete-pour-les-Neo-Brunswickois-et-Neo-Brunswickoises/Programme-pompes-insuline-PPI-Nouveau-Brunswick.html",
+      "title": "Le Programme de pompes à insuline (PPI) du Nouveau-Brunswick",
+      "modified": [
+        "meta 2026-05-07T13:00:22.809-03:00"
+      ],
+      "hash": "4f2451a999ba2b06",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "nl-cgm-program-2025": {
+      "href": "https://www.gov.nl.ca/releases/2025/health/0522n01/",
+      "status": 200,
+      "finalUrl": "https://www.gov.nl.ca/releases/2025/health/0522n01/",
+      "title": "Provincial Government Expanding Eligibility for Continuous Glucose Monitoring Program - News Releases",
+      "modified": [
+        "meta 2025-05-22T12:16:42+00:00"
+      ],
+      "hash": "9efd754bf67a5b48",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "nl-insulin-pump-program-2021": {
+      "href": "https://www.gov.nl.ca/releases/2021/health/0115n01/",
+      "status": 200,
+      "finalUrl": "https://www.gov.nl.ca/releases/2021/health/0115n01/",
+      "title": "Access to Provincial Insulin Pump Program Expanded - News Releases",
+      "modified": [
+        "meta 2021-01-15T14:05:48+00:00"
+      ],
+      "hash": "0c91328f16cdb051",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "nl-prescription-drug-program": {
+      "href": "https://www.gov.nl.ca/hcs/prescription/",
+      "status": 200,
+      "finalUrl": "https://www.gov.nl.ca/hcs/prescription/",
+      "title": "Prescription Drug Program (NLPDP) - Health and Community Services",
+      "modified": [
+        "meta 2023-03-17T13:32:49+00:00"
+      ],
+      "hash": "b774e505d402c9aa",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "nl-prescription-drug-program#fr": {
+      "href": "https://www.gov.nl.ca/hcs/prescription/index-fr/",
+      "status": 200,
+      "finalUrl": "https://www.gov.nl.ca/hcs/prescription/index-fr/",
+      "title": "Programme de médicaments sur ordonnance (NLPDP) - Health and Community Services",
+      "modified": [
+        "meta 2020-04-01T13:13:12+00:00"
+      ],
+      "hash": "c1b994a4adc1ef4e",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "nl-program-claiming-policies": {
+      "href": "https://www.gov.nl.ca/hcs/files/Program-Claiming-Policies-1.pdf",
+      "status": 200,
+      "finalUrl": "https://www.gov.nl.ca/hcs/files/Program-Claiming-Policies-1.pdf",
+      "title": null,
+      "modified": [
+        "pdf 20250820",
+        "pdf 2025-08-20"
+      ],
+      "hash": "f6d24165fee55641",
+      "kind": "pdf",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "ns-health-contacts": {
+      "href": "https://www.novascotia.ca/contact/health-and-wellness",
+      "status": 200,
+      "finalUrl": "https://www.novascotia.ca/contact/health-and-wellness",
+      "title": "Department of Health and Wellness: contacts - Government of Nova Scotia",
+      "modified": [
+        "meta 2026-09-04"
+      ],
+      "hash": "1aea35b31d1d9b8a",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "ns-insulin-pump-program": {
+      "href": "https://www.novascotia.ca/apply-funding-insulin-pump-and-supplies-insulin-pump-program",
+      "status": 200,
+      "finalUrl": "https://www.novascotia.ca/apply-funding-insulin-pump-and-supplies-insulin-pump-program",
+      "title": "Apply for funding for an insulin pump and supplies: Insulin Pump Program - Government of Nova Scotia",
+      "modified": [
+        "meta 2024-07-12"
+      ],
+      "hash": "71f7dd2908f3688a",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "ns-pharmacare": {
+      "href": "https://novascotia.ca/dhw/pharmacare/",
+      "status": 200,
+      "finalUrl": "https://novascotia.ca/dhw/pharmacare/",
+      "title": "Nova Scotia Pharmacare | novascotia.ca",
+      "modified": [],
+      "hash": "336c5d19ac1bf028",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "ns-sbgm-program": {
+      "href": "https://www.novascotia.ca/apply-sensor-based-glucose-monitoring-program",
+      "status": 200,
+      "finalUrl": "https://www.novascotia.ca/apply-sensor-based-glucose-monitoring-program",
+      "title": "Apply for the Sensor-based Glucose Monitoring Program - Government of Nova Scotia",
+      "modified": [
+        "meta 2026-04-29"
+      ],
+      "hash": "a1131317b9e3e0fb",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "nt-ehb-services": {
+      "href": "https://www.hss.gov.nt.ca/en/services/extended-health-benefits",
+      "status": 200,
+      "finalUrl": "https://www.hss.gov.nt.ca/en/services/extended-health-benefits",
+      "title": "Extended Health Benefits | Health and Social Services",
+      "modified": [],
+      "hash": "e7a5a6f67bdcf7ab",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "nt-ehb-services#fr": {
+      "href": "https://www.hss.gov.nt.ca/fr/services/r%C3%A9gime-d%E2%80%99assurance-maladie-compl%C3%A9mentaire",
+      "status": 200,
+      "finalUrl": "https://www.hss.gov.nt.ca/fr/services/r%C3%A9gime-d%E2%80%99assurance-maladie-compl%C3%A9mentaire",
+      "title": "Régime d’assurance-maladie complémentaire | Santé et Services sociaux",
+      "modified": [],
+      "hash": "459cf2e4aeba1697",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "nt-extended-health-benefits": {
+      "href": "https://www.gov.nt.ca/en/newsroom/gnwt-finalizes-new-extended-health-benefits-policy",
+      "status": 200,
+      "finalUrl": "https://www.gov.nt.ca/en/newsroom/gnwt-finalizes-new-extended-health-benefits-policy",
+      "title": "GNWT Finalizes the New Extended Health Benefits Policy | Government of Northwest Territories",
+      "modified": [],
+      "hash": "251bfd8510a81eca",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "on-diabetes-equipment-and-supplies": {
+      "href": "https://www.ontario.ca/page/get-support-for-diabetes-equipment-and-supplies",
+      "status": 200,
+      "finalUrl": "https://www.ontario.ca/page/get-support-for-diabetes-equipment-and-supplies",
+      "title": "Diabetes equipment and supplies | ontario.ca",
+      "modified": [
+        "meta 2026-09-15",
+        "Updated: September 15, 2026"
+      ],
+      "hash": "a119e9b3cdcf33b9",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "on-diabetes-equipment-and-supplies#fr": {
+      "href": "https://www.ontario.ca/fr/page/obtenez-une-aide-pour-lequipement-et-les-fournitures-pour-le-diabete",
+      "status": 200,
+      "finalUrl": "https://www.ontario.ca/fr/page/obtenez-une-aide-pour-lequipement-et-les-fournitures-pour-le-diabete",
+      "title": "Pompes à insuline et fournitures nécessaires au traitement du diabète | ontario.ca",
+      "modified": [
+        "meta 2026-09-15",
+        "Mis à jour : 15 septembre 2026"
+      ],
+      "hash": "c80616fc6495ba8f",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "on-eo-notice-cgm-2025": {
+      "href": "https://www.ontario.ca/files/2025-07/moh-executive-officer-notice-en-2025-07-23.pdf",
+      "status": 200,
+      "finalUrl": "https://www.ontario.ca/files/2025-07/moh-executive-officer-notice-en-2025-07-23.pdf",
+      "title": null,
+      "modified": [],
+      "hash": "9a2a5d9839ca31e3",
+      "kind": "pdf",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "on-odb-coverage": {
+      "href": "https://www.ontario.ca/page/get-coverage-prescription-drugs",
+      "status": 200,
+      "finalUrl": "https://www.ontario.ca/page/get-coverage-prescription-drugs",
+      "title": "Get coverage for prescription drugs | ontario.ca",
+      "modified": [
+        "meta 2026-08-18",
+        "Updated: August 18, 2026"
+      ],
+      "hash": "3849d426b629526e",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "on-odb-coverage#fr": {
+      "href": "https://www.ontario.ca/fr/page/obtenez-une-prise-en-charge-pour-vos-medicaments-dordonnance",
+      "status": 200,
+      "finalUrl": "https://www.ontario.ca/fr/page/obtenez-une-prise-en-charge-pour-vos-medicaments-dordonnance",
+      "title": "Obtenez une prise en charge pour vos médicaments d’ordonnance | ontario.ca",
+      "modified": [
+        "meta 2026-08-18",
+        "Mis à jour : 18 août 2026"
+      ],
+      "hash": "290f9d898a143968",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "on-odb-formulary-ed43-summary": {
+      "href": "https://www.ontario.ca/files/2026-01/moh-ontario-drug-benefit-odb-formulary-edition-43-summary-en-2025-11-20.pdf",
+      "status": 200,
+      "finalUrl": "https://www.ontario.ca/files/2026-01/moh-ontario-drug-benefit-odb-formulary-edition-43-summary-en-2025-11-20.pdf",
+      "title": "Ontario Drug Benefit Formulary/Comparative Drug Index Edition 43",
+      "modified": [
+        "pdf 2025-11-20"
+      ],
+      "hash": "efe71dec6cb2d981",
+      "kind": "pdf",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "on-preventing-and-living-with-diabetes": {
+      "href": "https://www.ontario.ca/page/preventing-and-living-diabetes",
+      "status": 200,
+      "finalUrl": "https://www.ontario.ca/page/preventing-and-living-diabetes",
+      "title": "Preventing and living with diabetes | ontario.ca",
+      "modified": [
+        "meta 2026-06-08",
+        "Updated: June 08, 2026"
+      ],
+      "hash": "3162ff3c4e124122",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "on-preventing-and-living-with-diabetes#fr": {
+      "href": "https://www.ontario.ca/fr/page/prevenir-le-diabete-ou-vivre-avec-cette-maladie",
+      "status": 200,
+      "finalUrl": "https://www.ontario.ca/fr/page/prevenir-le-diabete-ou-vivre-avec-cette-maladie",
+      "title": "Prévenir le diabète ou vivre avec cette maladie | ontario.ca",
+      "modified": [
+        "meta 2026-06-08",
+        "Mis à jour : 08 juin 2026"
+      ],
+      "hash": "e9ec5b101e120499",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "parl-bill-c64-pharmacare": {
+      "href": "https://www.parl.ca/legisinfo/en/bill/44-1/c-64",
+      "status": 200,
+      "finalUrl": "https://www.parl.ca/legisinfo/en/bill/44-1/c-64",
+      "title": "C-64 (44-1) - LEGISinfo - Parliament of Canada",
+      "modified": [],
+      "hash": "d1557dde3d03833b",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "parl-bill-c64-pharmacare#fr": {
+      "href": "https://www.parl.ca/legisinfo/fr/projet-de-loi/44-1/c-64",
+      "status": 200,
+      "finalUrl": "https://www.parl.ca/legisinfo/fr/projet-de-loi/44-1/c-64",
+      "title": "C-64 (44-1) - LEGISinfo - Parlement du Canada",
+      "modified": [],
+      "hash": "c20d7f955c55d523",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "pe-ipp-qa": {
+      "href": "https://www.princeedwardisland.ca/sites/default/files/publications/insulin_pump_program_questions_and_answers.pdf",
+      "status": 200,
+      "finalUrl": "https://www.princeedwardisland.ca/sites/default/files/publications/insulin_pump_program_questions_and_answers.pdf",
+      "title": null,
+      "modified": [
+        "pdf 2026-05-06"
+      ],
+      "hash": "2f2c3fb23917efd2",
+      "kind": "pdf",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "qc-insulin-pump-access-program": {
+      "href": "https://www.quebec.ca/en/health/health-issues/a-z/diabetes/insulin-pump-access-program",
+      "status": 200,
+      "finalUrl": "https://www.quebec.ca/en/health/health-issues/a-z/diabetes/insulin-pump-access-program",
+      "title": "Insulin Pump Access Program | Gouvernement du Québec",
+      "modified": [
+        "Last update: February 19, 2021"
+      ],
+      "hash": "3769026c4318a09f",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "qc-insulin-pump-access-program#fr": {
+      "href": "https://www.quebec.ca/sante/problemes-de-sante/a-z/diabete/programme-d-acces-aux-pompes-a-insuline",
+      "status": 200,
+      "finalUrl": "https://www.quebec.ca/sante/problemes-de-sante/a-z/diabete/programme-d-acces-aux-pompes-a-insuline",
+      "title": "Programme d'accès aux pompes à insuline | Gouvernement du Québec",
+      "modified": [
+        "Dernière mise à jour : 19 février 2021"
+      ],
+      "hash": "9291d942793d8d8d",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "qc-stays-outside-quebec": {
+      "href": "https://www.quebec.ca/en/health/health-system-and-services/stays-outside-quebec",
+      "status": 200,
+      "finalUrl": "https://www.quebec.ca/en/health/health-system-and-services/stays-outside-quebec",
+      "title": "Stays Outside Québec | Gouvernement du Québec",
+      "modified": [
+        "Last update: February 12, 2021"
+      ],
+      "hash": "09bc468bc2235ace",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "qc-stays-outside-quebec#fr": {
+      "href": "https://www.quebec.ca/sante/systeme-et-services-de-sante/sejours-hors-du-quebec",
+      "status": 200,
+      "finalUrl": "https://www.quebec.ca/sante/systeme-et-services-de-sante/sejours-hors-du-quebec",
+      "title": "Séjours hors du Québec | Gouvernement du Québec",
+      "modified": [
+        "Dernière mise à jour : 12 février 2021"
+      ],
+      "hash": "5d6ea1d46664bc4e",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "sk-drug-cost-assistance": {
+      "href": "https://www.saskatchewan.ca/residents/health/prescription-drug-plans-and-health-coverage/extended-benefits-and-drug-plan/drug-cost-assistance",
+      "status": 200,
+      "finalUrl": "https://www.saskatchewan.ca/residents/health/prescription-drug-plans-and-health-coverage/extended-benefits-and-drug-plan/drug-cost-assistance",
+      "title": "Drug Cost Assistance | Extended Benefits and Drug Plan | Government of Saskatchewan",
+      "modified": [],
+      "hash": "48a278999b919d09",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "sk-drug-cost-assistance#fr": {
+      "href": "https://www.saskatchewan.ca/bonjour/health-and-healthy-living/prescription-drug-plans-and-health-coverage/extended-benefits-and-drug-plan/drug-cost-assistance",
+      "status": 200,
+      "finalUrl": "https://www.saskatchewan.ca/bonjour/health-and-healthy-living/prescription-drug-plans-and-health-coverage/extended-benefits-and-drug-plan/drug-cost-assistance",
+      "title": "Aide à l’achat de médicaments | Prestations d’assurance-maladie complémentaire et Régime d’assurance-médicaments | Government of Saskatchewan",
+      "modified": [],
+      "hash": "162e97d694fbf203",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "sk-insulin-pump-program": {
+      "href": "https://www.saskatchewan.ca/residents/health/accessing-health-care-services/insulin-pump-program",
+      "status": 200,
+      "finalUrl": "https://www.saskatchewan.ca/residents/health/accessing-health-care-services/insulin-pump-program",
+      "title": "Saskatchewan Insulin Pump Program | Accessing Health Care Services in Saskatchewan | Government of Saskatchewan",
+      "modified": [],
+      "hash": "3f8124efbbf49848",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "vac-cgm-type-1": {
+      "href": "https://veterans.gc.ca/en/financial-programs-and-services/medical-costs/search-vac-treatment-benefits/diabetic-supplies-continuous-glucose-monitors-type-1-diabetes",
+      "status": 200,
+      "finalUrl": "https://veterans.gc.ca/en/financial-programs-and-services/medical-costs/search-vac-treatment-benefits/diabetic-supplies-continuous-glucose-monitors-type-1-diabetes",
+      "title": "DIABETIC SUPPLIES - CONTINUOUS GLUCOSE MONITORS - TYPE 1 DIABETES | Veterans Affairs Canada",
+      "modified": [
+        "Date modified: 2026-03-19"
+      ],
+      "hash": "ea5ccf8a9feedb3e",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "vac-cgm-type-1#fr": {
+      "href": "https://veterans.gc.ca/fr/programmes-et-services-financiers/frais-medicaux/rechercher-les-avantages-medicaux-dacc/fournitures-pour-personnes-diab-tiques-syst-mes-de-surveillance-de-la-glyc-mie-en-continu-diab-te-de",
+      "status": 200,
+      "finalUrl": "https://veterans.gc.ca/fr/programmes-et-services-financiers/frais-medicaux/rechercher-les-avantages-medicaux-dacc/fournitures-pour-personnes-diab-tiques-syst-mes-de-surveillance-de-la-glyc-mie-en-continu-diab-te-de",
+      "title": "FOURNITURES POUR PERSONNES DIAB TIQUES - SYST MES DE SURVEILLANCE DE LA GLYC MIE EN CONTINU - DIAB TE DE TYPE 1 | Anciens Combattants Canada",
+      "modified": [],
+      "hash": "8a1ce4e6b855a72a",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "vac-contact": {
+      "href": "https://www.veterans.gc.ca/en/contact-us",
+      "status": 200,
+      "finalUrl": "https://www.veterans.gc.ca/en/contact-us",
+      "title": "Contact us | Veterans Affairs Canada",
+      "modified": [
+        "Date modified: 2026-09-17"
+      ],
+      "hash": "5cf8d15739f4e004",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "vac-poc7-medical-supplies": {
+      "href": "https://www.veterans.gc.ca/en/about-vac/reports-policies-and-legislation/policies/medical-supplies-general-poc-7",
+      "status": 200,
+      "finalUrl": "https://www.veterans.gc.ca/en/about-vac/reports-policies-and-legislation/policies/medical-supplies-general-poc-7",
+      "title": "Medical Supplies – General (POC 7) | Veterans Affairs Canada",
+      "modified": [
+        "Date modified: 2024-04-19"
+      ],
+      "hash": "7b541ae9a7d159a9",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "vac-poc7-medical-supplies#fr": {
+      "href": "https://www.veterans.gc.ca/fr/propos-dacc/rapports-politiques-et-legislation/politiques/fournitures-medicales-generalites-pdc-no-7",
+      "status": 200,
+      "finalUrl": "https://www.veterans.gc.ca/fr/propos-dacc/rapports-politiques-et-legislation/politiques/fournitures-medicales-generalites-pdc-no-7",
+      "title": "Fournitures médicales – Généralités (PDC nº 7) | Anciens Combattants Canada",
+      "modified": [],
+      "hash": "996fab73d6c009fa",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-06"
+    },
+    "yt-chronic-disease-benefits": {
+      "href": "https://yukon.ca/en/health-and-wellness/care-services/get-help-costs-if-you-have-chronic-disease-or-disability",
+      "status": 403,
+      "finalUrl": "https://yukon.ca/en/health-and-wellness/care-services/get-help-costs-if-you-have-chronic-disease-or-disability",
+      "title": "Just a moment...",
+      "modified": [],
+      "hash": null,
+      "kind": "html",
+      "blocked": true,
+      "checkedOn": "2026-10-06"
+    },
+    "yt-chronic-disease-benefits#fr": {
+      "href": "https://yukon.ca/fr/sante-et-mieux-etre/services-de-soins/aides-aux-frais-associes-une-maladie-chronique-ou-une",
+      "status": 403,
+      "finalUrl": "https://yukon.ca/fr/sante-et-mieux-etre/services-de-soins/aides-aux-frais-associes-une-maladie-chronique-ou-une",
+      "title": "Just a moment...",
+      "modified": [],
+      "hash": null,
+      "kind": "html",
+      "blocked": true,
+      "checkedOn": "2026-10-06"
+    },
+    "yt-national-pharmacare": {
+      "href": "https://yukon.ca/en/health-and-wellness/care-services/learn-about-yukon-national-pharmacare-program",
+      "status": 403,
+      "finalUrl": "https://yukon.ca/en/health-and-wellness/care-services/learn-about-yukon-national-pharmacare-program",
+      "title": "Just a moment...",
+      "modified": [],
+      "hash": null,
+      "kind": "html",
+      "blocked": true,
+      "checkedOn": "2026-10-06"
+    },
+    "yt-national-pharmacare#fr": {
+      "href": "https://yukon.ca/fr/regime-assurance-medicaments-national",
+      "status": 403,
+      "finalUrl": "https://yukon.ca/fr/regime-assurance-medicaments-national",
+      "title": "Just a moment...",
+      "modified": [],
+      "hash": null,
+      "kind": "html",
+      "blocked": true,
+      "checkedOn": "2026-10-06"
+    }
+  }
+}

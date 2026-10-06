@@ -1,0 +1,198 @@
+/*
+ * What an engine funding page has that Ostomy's does not: result cards under
+ * group headings, the "partly confirmed" line, a section of short parts, a
+ * dated list, the plain list a gated checker falls back to, and the source
+ * links under a card. Layered on Ostomy's chapter-page.css and funding.css,
+ * which supply everything else; every rule is scoped under #oc-chapter and
+ * names only classes no Ostomy page renders.
+ */
+
+/*
+ * Ostomy's funding.css sets the hero's padding with a 0 side value, which
+ * overrides the chapter hero's side gutter and puts the text against the
+ * screen edge on phones. Engine sites (they set data-site) keep the gutter.
+ */
+#oc-chapter[data-site] .oc-fund-hero {
+  padding-inline: var(--pad);
+}
+
+/* ---------- the draft marker, on the dark hero ---------- */
+
+#oc-chapter .oc-fund-hero .oc-fund-draft {
+  display: inline-block;
+  margin: 0.25rem 0 0;
+}
+
+/* ---------- result cards, grouped ---------- */
+
+#oc-chapter .oc-fund-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+}
+
+#oc-chapter .oc-fund-group-heading {
+  margin: 0 0 0.6rem;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--sage-text);
+}
+
+#oc-chapter .oc-fund-card h4 {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  line-height: 1.28;
+}
+
+#oc-chapter .oc-fund-group-intro {
+  margin: -0.25rem 0 0.75rem;
+  max-width: 72ch;
+  font-size: 0.94rem;
+  color: color-mix(in srgb, var(--ink) 76%, var(--cream));
+}
+
+/* ---------- a program's phone numbers, under its words ---------- */
+
+#oc-chapter .oc-fund-phones {
+  list-style: none;
+  margin: 0.5rem 0 0.4rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.88rem;
+}
+
+#oc-chapter .oc-fund-phones a {
+  color: var(--sage-text);
+  font-weight: 600;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+}
+
+#oc-chapter .oc-fund-confirm {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--ink) 72%, var(--cream));
+}
+
+#oc-chapter .oc-fund-confirm::before {
+  content: '⚠ ';
+}
+
+/* ---------- a section of short parts (how paying works) ---------- */
+
+#oc-chapter .oc-fund-parts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+#oc-chapter .oc-fund-part {
+  padding: 1.35rem 1.4rem 1.5rem;
+  border-radius: 18px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+#oc-chapter .oc-fund-part h3 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.12rem;
+  line-height: 1.25;
+}
+
+#oc-chapter .oc-fund-part p,
+#oc-chapter .oc-fund-part li {
+  margin: 0;
+  font-size: 0.94rem;
+  color: color-mix(in srgb, var(--ink) 76%, var(--cream));
+}
+
+#oc-chapter .oc-fund-part ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+/* ---------- source links and dated lines ---------- */
+
+#oc-chapter .oc-fund-sources {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.88rem;
+}
+
+#oc-chapter .oc-fund-sources a,
+#oc-chapter .oc-fund-row-link {
+  color: var(--sage-text);
+  text-underline-offset: 2px;
+}
+
+#oc-chapter .oc-fund-row-meta {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  color: color-mix(in srgb, var(--ink) 55%, var(--cream));
+}
+
+#oc-chapter .oc-fund-changes {
+  margin: 1.5rem 0 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  max-width: 72ch;
+}
+
+#oc-chapter .oc-fund-plain {
+  max-width: 72ch;
+  margin: 1.25rem 0 0;
+}
+
+/* ---------- the checker's plain fallback (French, until its review) ---------- */
+
+#oc-chapter .oc-fund-fallback {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+#oc-chapter .oc-fund-fallback-province {
+  padding: 1.15rem 1.3rem 1.25rem;
+  border-radius: 18px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+
+#oc-chapter .oc-fund-fallback-province h3 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+}
+
+#oc-chapter .oc-fund-fallback-province ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.92rem;
+}
+
+#oc-chapter .oc-fund-fallback-province p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--ink) 72%, var(--cream));
+}

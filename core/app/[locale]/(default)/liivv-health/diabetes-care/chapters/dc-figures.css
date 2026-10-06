@@ -1,0 +1,565 @@
+/*
+ * =============================================================================
+ * DIABETES CARE — THE SITE'S OWN FIGURES
+ * =============================================================================
+ * Only what the shared stylesheet (ostomy-care/chapters/chapter-page.css) does
+ * not already draw. The Rule of 15 reuses Ostomy's walk-through
+ * (.oc-fig-steps*), its round / oval pair (.oc-fig-gap-seg, .oc-fig-gap-btn)
+ * and its print button; the ketone ladder reuses the figure palette and the
+ * urgent tokens. Every rule here is scoped under the Diabetes root, so none
+ * can reach an Ostomy page.
+ *
+ * Nodes the walk-through hides with hidden="until-found" must never be given
+ * an author `display`, or the browser stops revealing them to find-in-page:
+ * the rules below set `display` only on nodes inside a step's body, never on
+ * the body itself.
+ * =============================================================================
+ */
+
+/* ---------------------------------------------------------------------------
+ * The Rule of 15
+ * ------------------------------------------------------------------------- */
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.8rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-legend {
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+/* The last step loops back to the second, in words ("back to step 2"); the arrow is decoration. */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-loop {
+  display: inline-block;
+  margin-left: 0.25rem;
+  padding: 0 0.5rem;
+  border: 1px solid var(--sage-text);
+  border-radius: 999px;
+  color: var(--sage-text);
+  font-size: var(--text-small);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+/* The children's amounts: a plain two-column table on the step's paper. */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-child {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--sage-text);
+  border-radius: 10px;
+  background: var(--paper);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-small);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-table caption {
+  padding-bottom: 0.35rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-table th,
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-table td {
+  padding: 0.35rem 0.5rem 0.35rem 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-table thead th {
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-table tbody th {
+  font-weight: 500;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-table td {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-childnote {
+  margin: 0.45rem 0 0;
+  font-size: var(--text-small);
+  color: var(--ink-body);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-options-head {
+  margin: 0.6rem 0 0;
+  font-weight: 600;
+}
+
+/*
+ * The adult / child pair. Before the island runs (`is-ready`), and with
+ * JavaScript off, nothing is hidden: the figure is the plain list. Once it
+ * runs, "An adult" hides the children's table and the note under the list
+ * that says why honey is missing for a child (ruling C18), and "A child"
+ * hides the options marked for adults only. These are nodes inside a step's
+ * body, never the until-found body itself.
+ */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15.is-ready:not(.is-child) .dc-fig-r15-child,
+#oc-chapter[data-site='diabetes-care']
+  .dc-fig-r15.is-ready:not(.is-child)
+  .dc-fig-r15-options-note {
+  display: none;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15.is-child [data-dc-adult-only] {
+  display: none;
+}
+
+/*
+ * A line's child wording (ByAge in site-figures.tsx) shows only while "A
+ * child" is selected; the adult wording shows otherwise, including before the
+ * island runs. Titles, leads and the list heading only, never a step's body.
+ */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15:not(.is-child) [data-dc-child-only] {
+  display: none;
+}
+
+/* What follows the loop, and the automated-system line under both amounts. */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-then {
+  padding: 0.75rem 0.9rem;
+  border: 1px dashed color-mix(in srgb, var(--sage-text) 60%, transparent);
+  border-radius: 14px;
+  background: var(--paper);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-then p {
+  margin: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-then .dc-fig-r15-then-label {
+  margin-bottom: 0.2rem;
+  color: var(--sage-text);
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+/* Where to go when the loop is not working: the chapter's red flags. */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-flags {
+  margin: 0;
+  font-size: var(--text-small);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-flags a {
+  color: var(--urgent);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15-aid {
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px;
+  background: var(--sage-soft);
+  font-size: var(--text-small);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-r15 .oc-fig-print {
+  justify-self: start;
+  margin-top: 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * The target-range ruler
+ *
+ * Labelled bars over one mmol/L scale, each bar placed by --dc-from and
+ * --dc-to (percentages of the scale, set from chapters-meta.ts). The label
+ * sits above its bar so it wraps freely at any text size and on phones. The
+ * low bar takes the warning tone and fades out to the left ("below"); the
+ * others share the sage family, told apart by their labels, never by colour.
+ * The drawing is aria-hidden; the list after it is what a screen reader reads
+ * and what prints.
+ * ------------------------------------------------------------------------- */
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0.8rem 0 0;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--cream);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range .oc-fig-heading {
+  margin: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-ruler {
+  display: grid;
+  gap: 0.55rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-row {
+  display: grid;
+  gap: 0.2rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-label {
+  color: var(--ink-body);
+  font-size: var(--text-small);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-track {
+  position: relative;
+  display: block;
+  height: 0.75rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--line) 60%, var(--paper));
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-bar {
+  position: absolute;
+  inset-block: 0;
+  left: var(--dc-from);
+  right: calc(100% - var(--dc-to));
+  border-radius: 999px;
+  background: var(--dc-bar, var(--sage));
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-bar.is-open {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  background: linear-gradient(to right, transparent, var(--dc-bar, var(--sage)) 45%);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-row.is-low {
+  --dc-bar: var(--urgent);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-row.is-low .dc-fig-range-label {
+  color: var(--urgent);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-row.is-afterMeals {
+  --dc-bar: var(--sage-deep);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-row.is-timeInRange {
+  --dc-bar: repeating-linear-gradient(
+    -45deg,
+    var(--sage) 0 6px,
+    color-mix(in srgb, var(--sage) 55%, var(--paper)) 6px 12px
+  );
+}
+
+/* The scale: every 2 mmol/L, each number centred on its point. */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-axis {
+  position: relative;
+  height: 1.4rem;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 35%, transparent);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-tick {
+  position: absolute;
+  top: 0;
+  left: var(--dc-at);
+  padding-top: 0.25rem;
+  transform: translateX(-50%);
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-tick::before {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  width: 1px;
+  height: 0.3rem;
+  background: color-mix(in srgb, var(--ink) 35%, transparent);
+  content: '';
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-unit {
+  justify-self: end;
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+}
+
+/* The plain list: read by screen readers, hidden on screen, printed (below). */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-list {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-low {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-low .oc-fig-glyph {
+  flex: none;
+  color: var(--urgent);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-low a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--urgent) 60%, transparent);
+  text-underline-offset: 3px;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-range-team {
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * The ketone ladder
+ *
+ * Four tones, lowest to highest. Blood and urine rungs that call for the same
+ * action share a tone. Tone 4 is the urgent red-flag colour, and it also
+ * carries the urgent symbol and its own words, so no rung is told by colour
+ * alone. Text stays on paper or a light wash, so contrast never depends on
+ * the tone.
+ * ------------------------------------------------------------------------- */
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-ketone-wrap {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-ketone-note {
+  margin: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-ketone {
+  margin: 0;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--cream);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-ketone-for {
+  display: inline-block;
+  margin-bottom: 0.65rem;
+  padding: 0.2rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--ink) 45%, transparent);
+  border-radius: 999px;
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-ketone-ladders {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 0.8rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-ketone-head {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-ketone-order {
+  margin: 0.1rem 0 0;
+  font-size: var(--text-small);
+  color: var(--ink-muted);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-ketone-rungs {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-ketone-rung {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--line);
+  border-left: 6px solid var(--dc-rung, var(--sage));
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink-body);
+  font-size: var(--text-small);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-ketone-rung b {
+  display: block;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-ketone-rung.is-tone-1 {
+  --dc-rung: var(--sage);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-ketone-rung.is-tone-2 {
+  --dc-rung: var(--sand);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-ketone-rung.is-tone-3 {
+  --dc-rung: color-mix(in srgb, var(--blush) 70%, var(--urgent));
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-ketone-rung.is-tone-4 {
+  --dc-rung: var(--urgent);
+  border-color: color-mix(in srgb, var(--urgent) 30%, transparent);
+  border-left-color: var(--urgent);
+  background: var(--urgent-wash);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-ketone-rung.is-tone-4 .oc-fig-glyph {
+  margin-top: 0.1rem;
+  color: var(--urgent);
+}
+
+/* ---------------------------------------------------------------------------
+ * The safety ladder (the referral band)
+ *
+ * Four rungs, so the shared three-column grid would leave the last one, the
+ * emergency rung, alone on a second row. Here: stacked on phones, two by two
+ * on medium screens, one row of four on wide ones. The fourth rung (emergency
+ * care, or 911) takes the urgent accent the ketone ladder's top rung uses; its
+ * heading says so in words, so it is never told by colour alone.
+ *
+ * Staying Safe's band only (`data-chapter`): on any other chapter the fourth
+ * band card is an ordinary card, and the urgent accent there would say
+ * "emergency" about something that is not one.
+ * ------------------------------------------------------------------------- */
+
+@media (min-width: 600px) {
+  #oc-chapter[data-site='diabetes-care'][data-chapter='staying-safe'] .oc-ch-programs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1100px) {
+  #oc-chapter[data-site='diabetes-care'][data-chapter='staying-safe'] .oc-ch-programs-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+#oc-chapter[data-site='diabetes-care'][data-chapter='staying-safe']
+  .oc-ch-programs-grid
+  > .oc-ch-program:nth-child(4) {
+  border-color: color-mix(in srgb, var(--urgent) 30%, transparent);
+  border-left: 6px solid var(--urgent);
+  background: var(--urgent-wash);
+}
+
+#oc-chapter[data-site='diabetes-care'][data-chapter='staying-safe']
+  .oc-ch-programs-grid
+  > .oc-ch-program:nth-child(4)
+  h3,
+#oc-chapter[data-site='diabetes-care'][data-chapter='staying-safe']
+  .oc-ch-programs-grid
+  > .oc-ch-program:nth-child(4)
+  .oc-ch-program-index {
+  color: var(--urgent);
+}
+
+#oc-chapter[data-site='diabetes-care'][data-chapter='staying-safe']
+  .oc-ch-programs-grid
+  > .oc-ch-program:nth-child(4)
+  p {
+  color: var(--ink);
+}
+
+/*
+ * A band card's link to a chapter card (the Rule of 15, Your target ranges),
+ * in the shared link treatment. Every chapter.
+ */
+#oc-chapter[data-site='diabetes-care'] .oc-ch-program p a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--sage) 70%, transparent);
+  text-underline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Print
+ *
+ * The Rule of 15 prints whole, like Ostomy's walk-through (its until-found
+ * bodies are shown by the shared print rules), with whichever amounts are
+ * selected, and without its controls. The ladder prints as itself. The
+ * target-range ruler prints as its plain list, since bar colours do not
+ * survive most printers.
+ * ------------------------------------------------------------------------- */
+
+@media print {
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-r15-loop {
+    border-color: currentColor;
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-ketone-rung {
+    break-inside: avoid;
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-range {
+    break-inside: avoid;
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-range-ruler {
+    display: none;
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-range-list {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding-left: 1.2rem;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+}
+
+/* Phones: the two ladders stack, blood first. */
+@media (max-width: 599px) {
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-ketone {
+    padding: 0.75rem 0.8rem;
+  }
+
+  /* The "written for" label wraps here, so it takes a card corner, not a pill's. */
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-ketone-for {
+    border-radius: 10px;
+    padding: 0.3rem 0.65rem;
+  }
+}

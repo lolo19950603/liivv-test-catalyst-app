@@ -9,6 +9,10 @@ import { Suspense } from 'react';
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { FeaturedProductCarousel } from '@/vibes/soul/sections/featured-product-carousel';
 import {
+  isGlucagonProduct,
+  isInsulinProduct,
+} from '~/app/[locale]/(default)/liivv-health/diabetes-care/dc-ids';
+import {
   isOstomyKit,
 } from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
 import { auth, getSessionCustomerAccessToken } from '~/auth';
@@ -18,6 +22,7 @@ import { pricesTransformer } from '~/data-transformers/prices-transformer';
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { productOptionsTransformer } from '~/data-transformers/product-options-transformer';
 import { isSensitiveProduct } from '~/lib/analytics/sensitive-products';
+import { withoutInsulinOnFrench } from '~/lib/checkout/quebec-insulin';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import {
   CuratedKitCustomizer,
@@ -47,6 +52,7 @@ import {
 } from '~/lib/ostomy/compatibility';
 import { getCompatibilityProducts } from '~/lib/ostomy/get-compatibility-products';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
+import { isInternalCustomField } from '~/lib/storefront-custom-fields';
 import { areSubscriptionsAvailable } from '~/lib/subscriptions/availability';
 import {
   formatSubscriptionIntervalKey,
@@ -529,6 +535,12 @@ export default async function Product({ params, searchParams }: Props) {
         return false;
       }
 
+      // The catalogue's own notes (COPY_SOURCE and other import markers) —
+      // never show, on any product.
+      if (isInternalCustomField(field)) {
+        return false;
+      }
+
       // Curated kits: hide all custom fields from specs.
       if (isCuratedKit) {
         return false;
@@ -598,7 +610,11 @@ export default async function Product({ params, searchParams }: Props) {
       return [];
     }
 
-    const relatedProducts = removeEdgesAndNodes(product.relatedProducts);
+    /* Never insulin on /fr (owner answer B11; ~/lib/checkout/quebec-insulin). */
+    const relatedProducts = await withoutInsulinOnFrench(
+      removeEdgesAndNodes(product.relatedProducts),
+      locale,
+    );
 
     return productCardTransformer(relatedProducts, format);
   });
@@ -956,6 +972,41 @@ export default async function Product({ params, searchParams }: Props) {
       return item ? [item] : [];
     }),
   }));
+  /*
+   * Insulin and glucagon: a pharmacist reviews and dispenses every order, and
+   * insulin can't be ordered online for delivery in Quebec (owner answers A1,
+   * A8, B3, B11, B29; the rule is in diabetes-care/dc-ids.ts). The words are
+   * read here, on the server, because DiabetesCare is not in the browser's
+   * message bundle. Not review-gated in French: it is an operational notice,
+   * not an offer, and the checkout enforces the Quebec line either way.
+   */
+  const isInsulin = isInsulinProduct({
+    entityId: baseProduct.entityId,
+    categoryIds: removeEdgesAndNodes(baseProduct.categories).map(({ entityId }) => entityId),
+  });
+  const commerceT =
+    isInsulin || isGlucagonProduct(baseProduct.entityId)
+      ? await getTranslations('DiabetesCare.ui.commerce')
+      : null;
+  const pharmacistNotice = commerceT ? (
+    <aside className="border-t border-[var(--product-detail-border,hsl(var(--contrast-100)))] py-6 text-sm">
+      <p>{commerceT('pharmacistNotice')}</p>
+      {/* Cold-chain is said of insulin only: glucagon (Baqsimi) is kept at room temperature. */}
+      {isInsulin ? <p className="mt-2">{commerceT('insulinColdChain')}</p> : null}
+      {isInsulin ? <p className="mt-2">{commerceT('quebecInsulin')}</p> : null}
+    </aside>
+  ) : null;
+  const compatSection = compatGroups.length ? (
+    <CompatibilitySection groups={compatGroups} options={flangeOpts} />
+  ) : undefined;
+  const afterForm = pharmacistNotice ? (
+    <>
+      {pharmacistNotice}
+      {compatSection}
+    </>
+  ) : (
+    compatSection
+  );
   const fixedSize = FIXED_FLANGE_SIZES[baseProduct.entityId];
   const fixedChoice =
     fixedSize && !flangeOpts.some((option) => option.role === 'size')
@@ -1032,11 +1083,7 @@ export default async function Product({ params, searchParams }: Props) {
             thumbnailLabel={t('ProductDetails.thumbnail')}
             user={streamableUser}
             fixedChoice={fixedChoice}
-            afterForm={
-              compatGroups.length ? (
-                <CompatibilitySection groups={compatGroups} options={flangeOpts} />
-              ) : undefined
-            }
+            afterForm={afterForm}
           />
         </ProductAnalyticsProvider>
       </div>
@@ -1109,16 +1156,23 @@ export default async function Product({ params, searchParams }: Props) {
           Streamable.all([streamableProduct, streamableProductPricingAndRelatedProducts]),
         )}
       >
-        {([extendedProduct, pricingProduct]) => (
-          <>
-            <ProductSchema
-              product={{ ...extendedProduct, prices: pricingProduct?.prices ?? null }}
-            />
-            <ProductViewed
-              product={{ ...extendedProduct, prices: pricingProduct?.prices ?? null }}
-            />
-          </>
-        )}
+        {([extendedProduct, pricingProduct]) => {
+          // ProductViewed is a client component, so its props go to the browser:
+          // leave out the custom fields it never reads (one names where a
+          // product's copy was imported from).
+          const { customFields, ...viewedProduct } = extendedProduct;
+
+          return (
+            <>
+              <ProductSchema
+                product={{ ...extendedProduct, prices: pricingProduct?.prices ?? null }}
+              />
+              <ProductViewed
+                product={{ ...viewedProduct, prices: pricingProduct?.prices ?? null }}
+              />
+            </>
+          );
+        }}
       </Stream>
 
       <WishlistButtonForm

@@ -1,3 +1,4 @@
+import { SHOP_DIABETES_CARE_CATEGORY_ID } from '~/app/[locale]/(default)/liivv-health/diabetes-care/dc-ids';
 import { SHOP_OSTOMY_CARE_CATEGORY_ID } from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
 import type { LiivvArchiveNavLink } from '~/lib/makeswift/liivv-archive-header/types';
 import {
@@ -14,6 +15,7 @@ export const SHOP_WOMENS_HEALTH_PATH = '/liivv-health/womens-health/shop-womens-
 export const LIIVV_HEALTH_HUB_PATH = '/liivv-health';
 export const DIABETES_CARE_PATH = '/liivv-health/diabetes-care';
 export const SHOP_DIABETES_CARE_PATH = '/liivv-health/diabetes-care/shop-diabetes-care';
+export const DIABETES_FUNDING_PATH = '/liivv-health/diabetes-care/funding';
 export const OSTOMY_CARE_PATH = '/liivv-health/ostomy-care';
 export const SHOP_OSTOMY_CARE_PATH = '/liivv-health/ostomy-care/shop-ostomy-care';
 export const OSTOMY_FUNDING_PATH = '/liivv-health/ostomy-care/funding';
@@ -125,7 +127,44 @@ const OSTOMY_CHAPTER_LINKS = [
   },
 ] as const;
 
-const DIABETES_JOURNEY_PATH_LINKS = [
+/**
+ * Keep labels/slugs in sync with the chapter titles in
+ * `DiabetesCare.chapters` (messages/en.json) and the slugs in
+ * `app/.../diabetes-care/chapters/chapters-meta.ts`, in reading order.
+ */
+const DIABETES_CHAPTER_LINKS = [
+  {
+    label: 'New to the Journey',
+    href: `${DIABETES_CARE_PATH}/chapters/new-to-the-journey`,
+  },
+  {
+    label: 'Staying Safe',
+    href: `${DIABETES_CARE_PATH}/chapters/staying-safe`,
+  },
+  {
+    label: 'Your Tools',
+    href: `${DIABETES_CARE_PATH}/chapters/your-tools`,
+  },
+  {
+    label: 'Everyday Liivving',
+    href: `${DIABETES_CARE_PATH}/chapters/every-day-living`,
+  },
+  {
+    label: 'Know Your Type',
+    href: `${DIABETES_CARE_PATH}/chapters/know-your-type`,
+  },
+  {
+    label: 'This Might Be You',
+    href: `${DIABETES_CARE_PATH}/chapters/this-might-be-you`,
+  },
+] as const;
+
+/**
+ * The five path pages (reading lists by type), under "Your path, by type". Keep in
+ * sync with `DiabetesCare.paths.<slug>.title` and
+ * `app/.../diabetes-care/chapters/paths-meta.ts`.
+ */
+const DIABETES_PATH_LINKS = [
   {
     label: 'Type 1',
     href: `${DIABETES_CARE_PATH}/chapters/type-1`,
@@ -135,12 +174,16 @@ const DIABETES_JOURNEY_PATH_LINKS = [
     href: `${DIABETES_CARE_PATH}/chapters/type-2`,
   },
   {
-    label: 'Gestational',
+    label: 'Gestational diabetes',
     href: `${DIABETES_CARE_PATH}/chapters/gestational`,
   },
   {
     label: 'Prediabetes',
     href: `${DIABETES_CARE_PATH}/chapters/prediabetes`,
+  },
+  {
+    label: 'Less common types',
+    href: `${DIABETES_CARE_PATH}/chapters/less-common-types`,
   },
 ] as const;
 
@@ -184,28 +227,36 @@ const OSTOMY_CARE_NAV: LiivvArchiveNavLink[] = [
   },
 ];
 
+/** Same shape as OSTOMY_CARE_NAV: the shop, the chapters, Funding & Coverage. */
 const DIABETES_CARE_NAV: LiivvArchiveNavLink[] = [
   {
     label: 'Diabetes Essentials',
     href: SHOP_DIABETES_CARE_PATH,
   },
   {
-    label: 'Every Day Living',
-    href: `${DIABETES_CARE_PATH}/chapters/every-day-living`,
-  },
-  {
-    label: 'Your Diabetes Journey',
-    href: `${DIABETES_CARE_PATH}/chapters/your-diabetes-journey`,
-    compactMenu: true,
+    label: 'Chapters',
+    href: `${DIABETES_CARE_PATH}#where-are-you`,
     columns: [
       {
-        links: [...DIABETES_JOURNEY_PATH_LINKS],
+        links: [...DIABETES_CHAPTER_LINKS],
+      },
+      {
+        /*
+         * Not "Know Your Type" a second time (it is chapter 05 in the column
+         * beside): the paths' own group, opening the landing's "which
+         * diabetes?" chips (full-site review, 2026-10-06).
+         */
+        heading: {
+          label: 'Your path, by type',
+          href: `${DIABETES_CARE_PATH}#which-diabetes`,
+        },
+        links: [...DIABETES_PATH_LINKS],
       },
     ],
   },
   {
-    label: 'New to the Journey',
-    href: `${DIABETES_CARE_PATH}/chapters/new-to-the-journey`,
+    label: 'Funding & Coverage',
+    href: DIABETES_FUNDING_PATH,
   },
 ];
 
@@ -232,11 +283,16 @@ export const CARE_NAV_COOKIE = 'liivv-care-nav';
 /** Set on a product request when the product itself belongs to a care catalog. */
 export const CARE_NAV_HEADER = 'x-care-nav';
 
-/** Shop Ostomy Care lists every product in this category, kits and the rest. */
+/**
+ * Shop Ostomy Care and Shop Diabetes Care each list every product in their
+ * category, kits and the rest. Ostomy is asked first, so a product in both
+ * keeps the Ostomy menu exactly as before.
+ */
 export function careNavSectionForCategoryIds(
   categoryIds: readonly number[],
 ): CareNavSection | null {
   if (categoryIds.includes(SHOP_OSTOMY_CARE_CATEGORY_ID)) return 'ostomy';
+  if (categoryIds.includes(SHOP_DIABETES_CARE_CATEGORY_ID)) return 'diabetes';
 
   return null;
 }
@@ -327,7 +383,8 @@ export function getCareSectionBackLink(
   }
 
   if (section === 'diabetes' && !isExactCarePath(pathname, DIABETES_CARE_PATH)) {
-    return { href: DIABETES_CARE_PATH, label: 'Back to Diabetes Care page' };
+    /* Short, so the Diabetes menu fits beside the EN/FR toggle at laptop widths. */
+    return { href: DIABETES_CARE_PATH, label: 'Diabetes Care' };
   }
 
   return null;

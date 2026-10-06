@@ -5,7 +5,8 @@
  * One answer, used by every analytics emitter: does naming this product tell
  * an outside party something about a person's body?
  *
- * A pouch, a barrier or a stoma powder does. Sending "SenSura 1-Piece Drainable
+ * A pouch, a barrier or a stoma powder does, and so does a glucose sensor, a
+ * pen needle or a box of test strips. Sending "SenSura 1-Piece Drainable
  * Opaque" to an advertising and measurement platform is sending a health fact
  * about the person who viewed it, whatever the page around it says. The OPC's
  * meaningful-consent guidance treats health information as sensitive and
@@ -17,16 +18,23 @@
  * Two ways a product qualifies:
  *
  *   by shelf    it sits in one of the ostomy categories (OSTOMY_ANALYTICS_
- *               CATEGORY_IDS in oc-ids.ts) — the general rule.
- *   by id       it is a curated ostomy kit, or a product the ostomy supply
- *               list may add to a cart. These are named on ostomy surfaces, so
- *               they are covered even where categories are not known at event
- *               time (a cart line item carries no categories at all).
+ *               CATEGORY_IDS in oc-ids.ts) or one of the diabetes categories
+ *               (DIABETES_ANALYTICS_CATEGORY_IDS in dc-ids.ts) — the general
+ *               rule.
+ *   by id       it is a curated ostomy kit, a product the ostomy supply list
+ *               may add to a cart, a curated diabetes kit
+ *               (DIABETES_CURATED_KIT_IDS in dc-ids.ts), or a product a
+ *               Diabetes page places (DIABETES_PLACED_PRODUCT_IDS in
+ *               diabetes-care/chapters/chapter-shop.ts). These are named on
+ *               care surfaces, so they are covered even where categories are
+ *               not known at event time (a cart line item carries no
+ *               categories at all).
  *
- * Kits are matched against OSTOMY_KIT_IDS, every curated ostomy kit, rather
- * than the listed/withheld split: whether Liivv may *show* a kit is a
+ * Ostomy kits are matched against OSTOMY_KIT_IDS, every curated ostomy kit,
+ * rather than the listed/withheld split: whether Liivv may *show* a kit is a
  * merchandising question, and it has nothing to do with what naming one
- * reveals. All eight are ostomy kits.
+ * reveals. Every id in that list is an ostomy kit, and every id in
+ * DIABETES_CURATED_KIT_IDS is a diabetes kit.
  *
  * This file is imported by client components, so it holds no fetching and no
  * server-only code. The catalogue lookup that answers "which categories is
@@ -34,6 +42,11 @@
  * =============================================================================
  */
 
+import { isDiabetesPlacedProduct } from '~/app/[locale]/(default)/liivv-health/diabetes-care/chapters/chapter-shop';
+import {
+  isDiabetesCategoryIds,
+  isDiabetesKit,
+} from '~/app/[locale]/(default)/liivv-health/diabetes-care/dc-ids';
 import { SUPPLY_CART_ALLOWLIST } from '~/app/[locale]/(default)/liivv-health/ostomy-care/chapters/supply-list-merchandising';
 import {
   isOstomyCategoryIds,
@@ -71,7 +84,12 @@ export function categoryLineageIds(
 
 /* Product ids that are health-revealing whatever categories they are in. */
 export function isSensitiveProductId(entityId: number): boolean {
-  return OSTOMY_KIT_IDS.includes(entityId) || SUPPLY_CART_ALLOWLIST.has(entityId);
+  return (
+    OSTOMY_KIT_IDS.includes(entityId) ||
+    SUPPLY_CART_ALLOWLIST.has(entityId) ||
+    isDiabetesKit(entityId) ||
+    isDiabetesPlacedProduct(entityId)
+  );
 }
 
 /*
@@ -87,5 +105,7 @@ export function isSensitiveProduct({ entityId, categoryIds }: SensitiveProductIn
     return true;
   }
 
-  return categoryIds != null && isOstomyCategoryIds(categoryIds);
+  return (
+    categoryIds != null && (isOstomyCategoryIds(categoryIds) || isDiabetesCategoryIds(categoryIds))
+  );
 }

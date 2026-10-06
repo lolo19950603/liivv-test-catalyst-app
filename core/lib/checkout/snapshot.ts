@@ -21,6 +21,7 @@ import {
   reconcileSubscriptionLinesWithCart,
 } from './subscription-lines';
 import { assignKitIdsToCartLines, getKitSession } from '~/lib/kit';
+import { InsulinToQuebecError, shipsInsulinToQuebec } from './quebec-insulin';
 import type { CheckoutAddressSnapshot, CheckoutLineItemSnapshot, CheckoutSnapshot } from './types';
 import type { SubscriptionLineMeta } from './types';
 
@@ -182,6 +183,18 @@ export async function buildCheckoutSnapshot({
 
   const immediateShipping = sectionShippingCosts['due-today'] ?? 0;
   const shippingAddress = shippingConsignmentWithAddress?.address ?? checkout.shippingConsignments?.[0]?.address;
+
+  // Insulin can't be ordered online for delivery in Quebec (owner answers A1,
+  // B3, B11). Refused here, so no payment or order is made from this cart.
+  if (
+    await shipsInsulinToQuebec({
+      stateOrProvince: shippingAddress?.stateOrProvince,
+      productEntityIds: lineItemsWithKits.map((line) => line.productEntityId),
+    })
+  ) {
+    throw new InsulinToQuebecError();
+  }
+
   const amounts = calculateCheckoutAmounts({
     lineItems: lineItemsWithKits,
     cartSubtotal: checkout.subtotal?.value ?? 0,

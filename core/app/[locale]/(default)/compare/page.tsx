@@ -12,6 +12,7 @@ import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-id
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
+import { isInternalCustomField } from '~/lib/storefront-custom-fields';
 
 import { addToCart } from './_actions/add-to-cart';
 import { CompareAnalyticsProvider } from './_components/compare-analytics-provider';
@@ -86,7 +87,10 @@ export default async function Compare(props: Props) {
       customFields: [
         { name: t('sku'), value: product.sku },
         { name: t('weight'), value: `${product.weight?.value} ${product.weight?.unit}` },
-        ...removeEdgesAndNodes(product.customFields).map(({ name, value }) => ({ name, value })),
+        // The catalogue's own notes (COPY_SOURCE, the kit fields) are not specifications.
+        ...removeEdgesAndNodes(product.customFields)
+          .filter((field) => !isInternalCustomField(field))
+          .map(({ name, value }) => ({ name, value })),
       ],
       hasVariants: removeEdgesAndNodes(product.productOptions).length > 0,
       isPreorder: product.availabilityV2.status === 'Preorder',

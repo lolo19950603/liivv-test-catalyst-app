@@ -1,14 +1,20 @@
 /**
- * Exports every word of the ostomy microsite to Markdown for accuracy review.
+ * Exports every word of the ostomy microsite to Markdown for accuracy review,
+ * then the Diabetes Care chapters (./content-review/diabetes-care.mjs).
  *
  * Run from the repo root:
  *   node --env-file-if-exists=.env.local core/scripts/export-content-review.mjs
  *
  * Writes docs/content-review/README.md plus one file per page, per locale, under
- * docs/content-review/en and docs/content-review/fr.
+ * docs/content-review/en and docs/content-review/fr. The Diabetes pack goes to
+ * docs/content-review/diabetes-care, in the same layout.
+ *
+ * --site picks which pack: ostomy-care, diabetes-care, or all (the default).
+ * The machinery both passes share is in ./content-review/lib.mjs; the
+ * anatomy, supply-list, kit, door and disclosure checks are Ostomy's alone.
  *
  * With --check it builds every document and runs every check but writes
- * nothing and fetches nothing, and exits 1 on any failure. Run it after any
+ * nothing and fetches nothing, and exits 1 on any failure, in either pack. Run it after any
  * change to the messages or the chapter structure.
  *
  * --check also names the files in docs/content-review that no longer match
@@ -35,22 +41,71 @@
  * BIGCOMMERCE_ACCESS_TOKEN are set; without them the document shows ids.
  */
 
-import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { createRequire } from 'node:module';
-import { dirname, join, sep } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { join, sep } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-const CORE = join(HERE, '..');
-const REPO = join(CORE, '..');
-const OC = join(CORE, 'app', '[locale]', '(default)', 'liivv-health', 'ostomy-care');
-const OUT = join(REPO, 'docs', 'content-review');
+import {
+  CORE,
+  count,
+  DOCS,
+  emitTree,
+  finish,
+  FR_REVIEW_MARK,
+  heldClientProblems as heldClientProblemsFor,
+  leafPaths,
+  LIIVV_HEALTH,
+  loadTs,
+  nth,
+  ordered,
+  pad,
+  RE_REVIEW_MARK,
+  ref,
+  reReviewsPending,
+  sourceCiter,
+  sourceProblems as sourceProblemsFor,
+  staleTracker,
+  stamp,
+  writerFactory,
+} from './content-review/lib.mjs';
 
-const require = createRequire(import.meta.url);
+const OC = join(LIIVV_HEALTH, 'ostomy-care');
+const OUT = DOCS;
 
 /* Writes nothing and fetches nothing; see the header. */
 const CHECK = process.argv.includes('--check');
+
+/*
+ * Which pack to build: --site=ostomy-care, --site=diabetes-care or --site=all.
+ * Without the flag it is all, so the command the README gives still builds
+ * both packs, and `--check` still fails if either one does.
+ */
+const SITES = ['ostomy-care', 'diabetes-care'];
+const siteArg = process.argv.find(
+  (arg, i, all) => arg.startsWith('--site=') || all[i - 1] === '--site',
+);
+const SITE = siteArg === undefined ? 'all' : siteArg.replace(/^--site=/, '');
+
+if (SITE !== 'all' && !SITES.includes(SITE)) {
+  console.error(`--site must be one of ${[...SITES, 'all'].join(', ')}, not '${SITE}'`);
+  process.exit(2);
+}
+
+/* The Diabetes pass; it prints its own report and sets the exit code on any failure. */
+const exportDiabetesCare = async () => {
+  const { exportDiabetesCare: run } = await import('./content-review/diabetes-care.mjs');
+
+  await run({ check: CHECK });
+};
+
+/*
+ * Diabetes alone: everything below is the Ostomy pass, so stop before any of
+ * it runs. No Ostomy structure file is loaded, and nothing is built or written.
+ */
+if (SITE === 'diabetes-care') {
+  await exportDiabetesCare();
+  process.exit();
+}
 
 /* Node 24 strips TypeScript types natively, so the structure files load as-is. */
 const { CHAPTER_META } = await import(pathToFileURL(join(OC, 'chapters', 'chapters-meta.ts')).href);
@@ -91,9 +146,17 @@ const { HELD_CLIENT_MESSAGES } = await import(
  * the review shows what the shop band would actually link to and add, rather
  * than describing an intention. It is empty today, and the documents say so.
  */
-const { SUPPLY_CART_PRODUCTS, SUPPLY_COLLECTIONS, SUPPLY_KIT_LINKS } = await import(
+const { SUPPLY_CART_PRODUCTS, SUPPLY_COLLECTIONS } = await import(
   pathToFileURL(join(OC, 'chapters', 'supply-list-merchandising.ts')).href
 );
+/*
+ * What each chapter card sells, and what one click can add from it. These are
+ * the shelves that replaced the supply list's kit links: a card's offers in
+ * chapter-shop.ts, and the matched barrier-and-pouch buttons in
+ * chapter-cart.ts. Read here so the pack shows what a card actually offers.
+ */
+const { shelfForCard, shopIdsForChapter } = await loadTs(join(OC, 'chapters', 'chapter-shop.ts'));
+const { cartBundlesForIds } = await loadTs(join(OC, 'chapters', 'chapter-cart.ts'));
 /* The curated-kit allowlist every Ostomy Care surface filters on. */
 const { OSTOMY_KIT_IDS, OSTOMY_LISTED_KIT_IDS, OSTOMY_WITHHELD_KIT_IDS } = await import(
   pathToFileURL(join(OC, 'oc-ids.ts')).href
@@ -215,16 +278,6 @@ const HELD_REASONS = {
     "Chapter 03 card 2's second sentence has to be rewritten first, because the figure beside it would otherwise contradict it",
 };
 
-const COMMIT = execSync('git rev-parse --short HEAD', { cwd: REPO }).toString().trim();
-const TODAY = new Date().toISOString().slice(0, 10);
-
-const words = (s) => String(s).trim().split(/\s+/).filter(Boolean).length;
-const ordered = (node) =>
-  Object.keys(node ?? {})
-    .sort((a, b) => Number(a) - Number(b))
-    .map((k) => [k, node[k]]);
-const pad = (n) => String(n).padStart(2, '0');
-
 /* ------------------------------------------------------------------------- */
 /* Product names                                                              */
 /* ------------------------------------------------------------------------- */
@@ -232,8 +285,9 @@ const pad = (n) => String(n).padStart(2, '0');
 const productIds = [
   ...new Set([
     ...CHAPTER_META.flatMap((c) => c.categories.flatMap((x) => x.products ?? [])),
+    ...CHAPTER_META.flatMap((c) => shopIdsForChapter(c.slug)),
+    ...OSTOMY_KIT_IDS,
     ...Object.values(SUPPLY_CART_PRODUCTS).flatMap((ids) => ids ?? []),
-    ...SUPPLY_KIT_LINKS.map((kit) => kit.productId),
   ]),
 ];
 const productNames = {};
@@ -261,6 +315,25 @@ if (
 
 const productLabel = (id) => (productNames[id] ? `${productNames[id]} (#${id})` : `product #${id}`);
 
+/* What one click adds from these products (chapter-cart.ts), in the words the button uses. */
+const cartNote = (ids) =>
+  cartBundlesForIds(ids)
+    .map((bundle) => {
+      if (bundle.kind === 'kit') return bundle.kitName;
+      if (bundle.kind === 'both') return `barrier and pouch, ${bundle.size}`;
+
+      return bundle.size;
+    })
+    .join(', ');
+
+/* One offer on a chapter shelf: its kits and products, and what one click adds from them. */
+function offerLabel(offer) {
+  const ids = [...(offer.kitIds ?? []), ...offer.productIds];
+  const adds = cartNote(ids);
+
+  return `${ids.map(productLabel).join(' + ')}${adds ? ` (one-click add: ${adds})` : ''}`;
+}
+
 /* ------------------------------------------------------------------------- */
 /* Coverage tracking                                                          */
 /* ------------------------------------------------------------------------- */
@@ -286,7 +359,6 @@ const seen = { en: new Set(), fr: new Set() };
  * that no longer names a message fails the structure checks, so a stale flag
  * cannot linger.
  */
-const FR_REVIEW_MARK = '⚑';
 const FR_AWAITING_REVIEW = new Set([
   'chapters.new-to-the-journey.categories.1.items.2',
   'chapters.new-to-the-journey.categories.1.items.3',
@@ -468,8 +540,6 @@ const awaitsFrenchReview = (path) =>
  * Take an entry out only after that re-review. A path that no longer names a
  * string fails the structure checks, so a stale entry cannot linger.
  */
-const RE_REVIEW_MARK = '✎';
-
 /*
  * =============================================================================
  * THE LIST IS THE DIFF, NOT A LIST SOMEBODY REMEMBERED TO UPDATE
@@ -524,17 +594,7 @@ const RE_REVIEW_NOTES = {
  * Every English string that differs from the pre-build baseline, with what it
  * used to say and why. Built, not maintained.
  */
-const RE_REVIEWS_PENDING = new Map(
-  Object.entries(RE_REVIEW_BASELINE).flatMap(([path, was]) => {
-    const now = path.split('.').reduce((node, key) => node?.[key], MESSAGES.en);
-
-    if (typeof now !== 'string' || now === was) return [];
-
-    const note = RE_REVIEW_NOTES[path];
-
-    return [[path, `Was: “${was}”${note ? ` — ${note}` : ''}`]];
-  }),
-);
+const RE_REVIEWS_PENDING = reReviewsPending(RE_REVIEW_BASELINE, MESSAGES.en, RE_REVIEW_NOTES);
 
 /* The re-review entries that belong to one chapter file, in message order. */
 const reReviewsFor = (slug) =>
@@ -604,81 +664,18 @@ function reReviewRef(path, slug) {
   return rest;
 }
 
-function makeWriter(locale) {
-  const lines = [];
-  let wordCount = 0;
-  let frReviewsMarked = 0;
-  let reReviewsMarked = 0;
-
-  const take = (path, value) => {
-    seen[locale].add(path);
-    wordCount += words(value);
-  };
-
-  /* A string looked up in this locale, with a visible fallback note when missing. */
-  const text = (path) => {
-    const value = path.split('.').reduce((node, key) => node?.[key], MESSAGES[locale]);
-
-    if (typeof value === 'string') {
-      take(path, value);
-
-      let shown = value;
-
-      if (RE_REVIEWS_PENDING.has(path)) {
-        reReviewsMarked += 1;
-        shown = `${shown} ${RE_REVIEW_MARK}`;
-      }
-
-      if (locale === 'fr' && awaitsFrenchReview(path)) {
-        frReviewsMarked += 1;
-        shown = `${shown} ${FR_REVIEW_MARK}`;
-      }
-
-      return shown;
-    }
-
-    if (locale === 'fr') {
-      const english = path.split('.').reduce((node, key) => node?.[key], MESSAGES.en);
-
-      if (typeof english === 'string') {
-        return `⚠ *Missing in French — the site shows the English:* ${english}`;
-      }
-    }
-
-    return null;
-  };
-
-  return {
-    lines,
-    push: (...l) => lines.push(...l),
-    text,
-    words: () => wordCount,
-    frReviewsMarked: () => frReviewsMarked,
-    reReviewsMarked: () => reReviewsMarked,
-  };
-}
-
-const ref = (r) => `\`${r}\``;
-
-/*
- * Every string leaf under a message subtree, one line each, with a short
- * reference built from its key path. Numbered keys come out in order because
- * Object.keys lists integer keys ascending.
- */
-function emitTree(w, out, node, path, short) {
-  for (const [k, v] of Object.entries(node ?? {})) {
-    if (v && typeof v === 'object') emitTree(w, out, v, `${path}.${k}`, `${short}.${k}`);
-    else out(`- ${w.text(`${path}.${k}`)} ${ref(`${short}.${k}`)}`);
-  }
-}
+const makeWriter = writerFactory({
+  messages: MESSAGES,
+  seen,
+  reReviewsPending: RE_REVIEWS_PENDING,
+  awaitsFrenchReview,
+});
 
 function header(w, { title, route, source, locale, note }) {
   w.push(`# ${title}`);
   w.push(`**Route:** \`${locale === 'fr' ? `/fr${route}` : route}\`  `);
   w.push(`**Source:** ${source}  `);
-  w.push(
-    `**Generated:** ${TODAY} from commit \`${COMMIT}\` — do not edit this file by hand; see [README](../README.md).`,
-  );
+  w.push(`${stamp()} — do not edit this file by hand; see [README](../README.md).`);
   w.push('');
 
   if (locale === 'fr') {
@@ -755,70 +752,14 @@ const CHANGE_ROUTINE_OPEN_DECISIONS = [
  * reviewer can check a claim against the passage it came from without opening
  * the code.
  *
- * `namedSources` records what each file actually cited as it is written, rather
- * than listing every source in the register, so the table at the foot of a file
- * is that file's evidence base and nothing else.
+ * The citer (`sourceCiter` in lib.mjs) records what each file actually cited
+ * as it is written, rather than listing every source in the register, so the
+ * table at the foot of a file is that file's evidence base and nothing else.
  * =============================================================================
  */
-let namedSources = new Set();
-
-const sourceTitles = (ids, locale) =>
-  (ids ?? [])
-    .map((id) => {
-      const source = SOURCE_META[id];
-
-      if (!source) return `⚠ unknown source '${id}'`;
-
-      namedSources.add(id);
-
-      const label = locale === 'fr' && source.labelFr ? source.labelFr : source.label;
-      const publisher = SOURCE_REVIEW[id]?.publisher;
-
-      return publisher ? `${label} (${publisher})` : label;
-    })
-    .join('; ');
-
-/* How a source's kind reads in the table at the foot of a file. */
-const SOURCE_TYPE_LABEL = {
-  'canadian-patient-education': 'Canadian patient education',
-  'canadian-guideline': 'Canadian guideline or position statement',
-  'international-guideline': 'International guideline',
-  other: 'Other',
-};
-
-/*
- * The evidence base of one file: everything it cited, with who publishes it,
- * what kind of document it is, the passage the citation rests on, and the link.
- * Reviewer-only — none of this renders on a page.
- */
-function sourceTable(locale) {
-  const ids = [...namedSources].sort((a, b) =>
-    String(SOURCE_META[a]?.label ?? a).localeCompare(String(SOURCE_META[b]?.label ?? b), 'en'),
-  );
-
-  if (!ids.length) return [];
-
-  const rows = ids.map((id) => {
-    const source = SOURCE_META[id] ?? {};
-    const review = SOURCE_REVIEW[id] ?? {};
-    const label = locale === 'fr' && source.labelFr ? source.labelFr : source.label;
-    const href = locale === 'fr' && source.hrefFr ? source.hrefFr : source.href;
-    const cell = (value) => String(value ?? '⚠ missing').replace(/\|/g, '\\|');
-
-    return `| \`${id}\` | ${cell(label)} | ${cell(review.publisher)} | ${SOURCE_TYPE_LABEL[review.type] ?? cell(review.type)} | ${cell(review.locator)} | <${href}> |`;
-  });
-
-  return [
-    '## Sources named in this file',
-    '',
-    '*Everything this file cites, with who publishes it and the passage each citation rests on. Please read the publisher column: it is where a manufacturer grant, a single province or a single hospital shows. "Locator" is the reviewer-only paraphrase kept in `sources-review.ts` — it is never rendered on a page, and it is what a claim in this file should be checked against.*',
-    '',
-    '| id | Title | Publisher | Type | Locator (paraphrase of the passage cited) | Link |',
-    '|---|---|---|---|---|---|',
-    ...rows,
-    '',
-  ];
-}
+const citer = sourceCiter({ sourceMeta: SOURCE_META, sourceReview: SOURCE_REVIEW });
+const sourceTitles = citer.titles;
+const sourceTable = citer.table;
 
 /* One review line per walk-through step: what it leads with, who it is for, where it comes from. */
 function changeRoutineStepLine(step, index, num, locale) {
@@ -1211,9 +1152,22 @@ const referralLine = (ask, askKey, figures) => {
   return 'Referral chip: *none — orientation card*';
 };
 
-/* What the card offers to sell: a figure's own band, a product band, or nothing. */
-const shopLine = (shopKind, products) => {
+/* A card's shelf from chapter-shop.ts: every offer on it, and the shared line above it. */
+const shelfLine = (shelf) =>
+  `Products shown: ${shelf.offers.map(offerLabel).join('; ')} *(${shelf.kind} shelf in \`chapter-shop.ts\`, under ${ref(`shop.occasions.${shelf.occasion}`)})*`;
+
+/*
+ * What the card offers to sell: a figure's own band, a shelf, a product band,
+ * or nothing. The supply list lists its own shop in its notes; the go-bag link
+ * sits above a shelf of its own.
+ */
+const shopLine = (shopKind, products, shelf) => {
+  if (shopKind?.kind === 'goBag' && shelf) {
+    return `Shop band: **${SHOP_BAND_KINDS.goBag}** · ${shelfLine(shelf)}`;
+  }
+
   if (shopKind) return `Shop band: **${SHOP_BAND_KINDS[shopKind.kind]}**`;
+  if (shelf) return shelfLine(shelf);
   if (products.length) return `Products shown: ${products.join('; ')}`;
 
   return 'Products shown: *none*';
@@ -1255,11 +1209,26 @@ function supplyRowNote(item, index, group, num, groupName) {
   return `- **${groupName} ${index + 1}** ${ref(`${at}.label`)} · ${parts.join(' · ')}`;
 }
 
-function supplyListNotes(figure, num, locale) {
-  const kits = SUPPLY_KIT_LINKS.length
-    ? SUPPLY_KIT_LINKS.map((kit) => `${kit.system} → ${productLabel(kit.productId)} (\`${kit.path}\`)`)
+/* Which system a supply-list shop offer waits for. */
+const SHOP_SYSTEM = {
+  one: 'once one-piece is picked',
+  two: 'once two-piece is picked',
+};
+
+function supplyListNotes(figure, num, locale, slug) {
+  /*
+   * The kit links are gone. The optional shop section is this card's shelf in
+   * chapter-shop.ts: the pouch and barrier for the system the reader picked,
+   * and anything not tied to a system, shown with either.
+   */
+  const offers = shelfForCard(slug, Number(num))?.offers ?? [];
+  const shop = offers.length
+    ? offers
+        .map(
+          (offer) => `${SHOP_SYSTEM[offer.system] ?? 'with either system'} → ${offerLabel(offer)}`,
+        )
         .join('; ')
-    : 'none (K1 pending)';
+    : 'none';
 
   return [
     '',
@@ -1270,7 +1239,7 @@ function supplyListNotes(figure, num, locale) {
     ...figure.goBagItems.map((item, index) =>
       supplyRowNote(item, index, 'goBagItems', num, 'go-bag'),
     ),
-    `- kits offered at the end of the optional shop section: ${kits}`,
+    `- offered at the end of the optional shop section, from \`chapter-shop.ts\`: ${shop}`,
     ...(awaitsFrReview('supplyList', 'fr')
       ? [
           '',
@@ -1485,7 +1454,7 @@ function writeFigureCredits(out, meta, locale) {
   out('');
 }
 
-function figureReviewNotes(structure, num, locale, card) {
+function figureReviewNotes(structure, num, locale, card, slug) {
   const figures = structure.figures ?? [];
   const lines = [];
   const shown = (figure) =>
@@ -1516,7 +1485,7 @@ function figureReviewNotes(structure, num, locale, card) {
     }
 
     if (figure.kind === 'supplyList') {
-      lines.push(...supplyListNotes(figure, num, locale));
+      lines.push(...supplyListNotes(figure, num, locale, slug));
     }
 
     if (figure.kind === 'gapCompare') {
@@ -1604,6 +1573,7 @@ function writeChapter(meta, locale) {
     const group = structure.group ? w.text(`ui.chapter.groups.${structure.group}`) : null;
     const ask = structure.ask ? w.text(`ui.chapter.ask.${structure.ask}`) : null;
     const products = (structure.products ?? []).map(productLabel);
+    const shelf = shelfForCard(meta.slug, Number(num));
     /* A held figure's band is not on the page, so the card shows what it always showed. */
     const shopKind = (structure.figures ?? []).find((f) => SHOP_BAND_KINDS[f.kind] && !f.held);
 
@@ -1612,7 +1582,7 @@ function writeChapter(meta, locale) {
       [
         group ? `Group: **${group}**` : 'Group: *none*',
         referralLine(ask, structure.ask, structure.figures ?? []),
-        shopLine(shopKind, products),
+        shopLine(shopKind, products, shelf),
       ].join(' · '),
     );
     out('');
@@ -1654,7 +1624,7 @@ function writeChapter(meta, locale) {
         '',
         `*Visual figure: ${figures.map((f) => (f.held ? `${f.kind} (held: ${f.held})` : f.kind)).join(', ')}.*`,
       );
-      out(...figureReviewNotes(structure, num, locale, card));
+      out(...figureReviewNotes(structure, num, locale, card, meta.slug));
     }
 
     if (card.figure) {
@@ -1991,12 +1961,24 @@ function writeShared(locale) {
     ],
     ['chapter.supplyList', 'My supply list — labels and controls', 'supplyList'],
     ['chapter.supplyList.systems', 'My supply list — system choices', 'supplyList'],
-    ['chapter.supplyList.kits', 'My supply list — kit links', 'supplyList'],
+    [
+      'chapter.supplyList.kits',
+      'My supply list — kit link labels (stored; nothing renders them since the kit links were removed)',
+      'supplyList',
+    ],
+    ['chapter.shop', 'Chapter shelves — buttons, notes and add-to-cart'],
+    ['chapter.shop.occasions', 'Chapter shelves — the line above each shelf'],
+    ['chapter.shop.offers', 'Chapter shelves — the line under each offer'],
+    ['chapter.shop.families', 'Chapter shelves — product families'],
+    ['chapter.shop.names', 'Chapter shelves — short product names, by product id'],
+    ['chapter.shop.kitSizes', 'Chapter shelves — kit sizes, by product id'],
     ['chapter.recoveryMap', 'Recovery map — labels', 'recoveryMap'],
     ['chapter.recoveryMap.types', 'Recovery map — ostomy types', 'recoveryMap'],
     ['chapter.recoveryMap.lanes', 'Recovery map — lane labels', 'recoveryMap'],
     ['chapter.shelf', 'Resources shelf — language notes', 'shelf'],
+    ['chapter.audio', 'Chapter voice-over — player controls and status'],
     ['chapter', 'Chapter page labels'],
+    ['shopPage', 'Shop Ostomy Care shelf — search, filters and empty states'],
     ['help', 'Help band — shown on every page'],
     ['discovery', 'Discovery band'],
     ['governance', 'Byline and review notices'],
@@ -2177,16 +2159,56 @@ function writeDoors(w, out, locale) {
  */
 
 const LANDING_SECTIONS = [
-  ['hero', 'Hero', 'The word after the heading rotates through the five in `hero.words`, one every 2.6 seconds, and stops moving for a reader who has asked for reduced motion. `hero.kitsCta` is a kit surface.'],
-  ['trust', 'Trust strip', 'Four claims, scrolling. Each is a promise about the service, so each is a claim someone has to stand behind.'],
-  ['ways', 'Ways in', 'Five doors down the page, numbered 01–05 by rendered position rather than by key — the "Curated kits" one is a kit surface, and a list that jumped from 01 to 03 would be a bug.'],
-  ['kits', 'Curated kits and the carousel', 'Renders the curated kits in the ostomy catalogue. All eight are shown.'],
-  ['shop', 'The shelf', 'Live catalogue, filtered into rooms. "Curated kits" is a kit surface; the other five rooms render.'],
-  ['subscribe', 'Subscriptions band', 'The shared subscribe band, with this page\'s own words. The demo inside it is a shared component and carries its own English — see the note under this table.'],
-  ['chapters', 'Life chapters', 'The four chapter cards. Their titles and blurbs are the chapters\' own, reviewed on their own pages, so they are not repeated here.'],
-  ['care', 'Pharmacist care, and Olivia', 'The pharmacist panel and the Olivia band. Both say what the pharmacist is NOT for; please read them against Chapter 04\'s `pharmacist.body`.'],
-  ['brands', 'Preferred brands', 'Coloplast, Hollister and Convatec are named in the markup, not in the message tree: they are names. The sentence beside them is what says this is not a clinical endorsement.'],
-  ['faq', 'Questions', 'Five questions, the first open. Question 2 is a kit surface. These are the only clinical claims on this page.'],
+  [
+    'hero',
+    'Hero',
+    'The word after the heading rotates through the five in `hero.words`, one every 2.6 seconds, and stops moving for a reader who has asked for reduced motion. `hero.kitsCta` is a kit surface.',
+  ],
+  [
+    'trust',
+    'Trust strip',
+    'Four claims, scrolling. Each is a promise about the service, so each is a claim someone has to stand behind.',
+  ],
+  [
+    'ways',
+    'Ways in',
+    'Five doors down the page, numbered 01–05 by rendered position rather than by key — the "Curated kits" one is a kit surface, and a list that jumped from 01 to 03 would be a bug.',
+  ],
+  [
+    'kits',
+    'Curated kits and the carousel',
+    `Renders the curated kits in \`OSTOMY_LISTED_KIT_IDS\` (oc-ids.ts). All ${OSTOMY_LISTED_KIT_IDS.length} are shown.`,
+  ],
+  [
+    'shop',
+    'The shelf',
+    'Live catalogue, filtered into rooms. "Curated kits" is a kit surface; the other five rooms render.',
+  ],
+  [
+    'subscribe',
+    'Subscriptions band',
+    "The shared subscribe band, with this page's own words. The demo inside it is a shared component and carries its own English — see the note under this table.",
+  ],
+  [
+    'chapters',
+    'Life chapters',
+    "The four chapter cards. Their titles and blurbs are the chapters' own, reviewed on their own pages, so they are not repeated here.",
+  ],
+  [
+    'care',
+    'Pharmacist care, and Olivia',
+    "The pharmacist panel and the Olivia band. Both say what the pharmacist is NOT for; please read them against Chapter 04's `pharmacist.body`.",
+  ],
+  [
+    'brands',
+    'Preferred brands',
+    'Coloplast, Hollister and Convatec are named in the markup, not in the message tree: they are names. The sentence beside them is what says this is not a clinical endorsement.',
+  ],
+  [
+    'faq',
+    'Questions',
+    'Five questions, the first open. Question 2 is a kit surface. These are the only clinical claims on this page.',
+  ],
   ['closing', 'Closing', 'Four links out. `closing.kits` is a kit surface.'],
 ];
 
@@ -2288,7 +2310,7 @@ function writeLanding(locale) {
     note:
       locale === 'fr'
         ? 'Every word of this page is now in the message tree, so this is the French landing page in full. Until this build only the five situation doors existed in French, and that section is behind a review gate that is closed in production — which would have shipped /fr/liivv-health/ostomy-care, the entry point of the French microsite, with no French on it at all. **All of the French below is new and nobody has reviewed it.**'
-        : 'Every word of this page, from the message tree. It used to be hardcoded English in `ostomy-care-page.tsx` and had to be extracted from the component\'s source; it is ordinary copy now, and it exists in French.',
+        : "Every word of this page, from the message tree. It used to be hardcoded English in `ostomy-care-page.tsx` and had to be extracted from the component's source; it is ordinary copy now, and it exists in French.",
   });
 
   w.push(...body);
@@ -2299,10 +2321,6 @@ function writeLanding(locale) {
 /* ------------------------------------------------------------------------- */
 /* Structure checks                                                           */
 /* ------------------------------------------------------------------------- */
-
-/* The value at a numbered-key position, the way chapters-data.ts ordered() reads it. */
-const nth = (node, index) => ordered(node)[index]?.[1];
-const count = (node) => Object.keys(node ?? {}).length;
 
 /*
  * Meta arrays that chapters-data.ts pairs with numbered message keys by
@@ -2679,7 +2697,9 @@ function figureProblems(figure, text, card, at, cards) {
   const problems = [];
   const expect = (what, metaLength, messageLength) => {
     if (metaLength !== messageLength) {
-      problems.push(`${at} ${what}: ${metaLength} in chapters-meta.ts, ${messageLength} in messages`);
+      problems.push(
+        `${at} ${what}: ${metaLength} in chapters-meta.ts, ${messageLength} in messages`,
+      );
     }
   };
   const items = count(card.items);
@@ -2933,7 +2953,9 @@ function chapterProblems(meta, locale) {
   const problems = [];
   const expect = (what, metaLength, messageLength) => {
     if (metaLength !== messageLength) {
-      problems.push(`${at} ${what}: ${metaLength} in chapters-meta.ts, ${messageLength} in messages`);
+      problems.push(
+        `${at} ${what}: ${metaLength} in chapters-meta.ts, ${messageLength} in messages`,
+      );
     }
   };
 
@@ -2944,13 +2966,7 @@ function chapterProblems(meta, locale) {
 
     (structure.figures ?? []).forEach((figure) =>
       problems.push(
-        ...figureProblems(
-          figure,
-          card.figure,
-          card,
-          `${at} card ${index + 1}`,
-          chapter.categories,
-        ),
+        ...figureProblems(figure, card.figure, card, `${at} card ${index + 1}`, chapter.categories),
       ),
     );
   });
@@ -3106,67 +3122,12 @@ function bandProblems(meta, locale) {
   return problems;
 }
 
-/* Every `sources` (or `…Sources`) array anywhere in the chapter structure, with where it sits. */
-function sourceRefs(node, path, found = []) {
-  if (Array.isArray(node)) {
-    node.forEach((v, i) => sourceRefs(v, `${path}[${i}]`, found));
-  } else if (node && typeof node === 'object') {
-    Object.entries(node).forEach(([k, v]) => {
-      if (/^sources$|Sources$/.test(k) && Array.isArray(v)) found.push([`${path}.${k}`, v]);
-      else sourceRefs(v, `${path}.${k}`, found);
-    });
-  }
-
-  return found;
-}
-
-function sourceProblems() {
-  const problems = [];
-  const https = (url) => typeof url === 'string' && url.startsWith('https://');
-
-  const empty = (node, fields) => fields.filter((f) => !String(node?.[f] ?? '').trim());
-
-  Object.entries(SOURCE_META).forEach(([id, s]) => {
-    const fields = empty(s, ['label']);
-
-    if (fields.length) problems.push(`sources-meta.ts ${id}: empty ${fields.join(', ')}`);
-    if (!https(s.href)) problems.push(`sources-meta.ts ${id}: href is not https`);
-    if (s.hrefFr !== undefined && !https(s.hrefFr))
-      problems.push(`sources-meta.ts ${id}: hrefFr is not https`);
-    if (!['en', 'fr'].includes(s.hrefLang))
-      problems.push(`sources-meta.ts ${id}: hrefLang '${s.hrefLang}'`);
+const sourceProblems = () =>
+  sourceProblemsFor({
+    sourceMeta: SOURCE_META,
+    sourceReview: SOURCE_REVIEW,
+    chapterMeta: CHAPTER_META,
   });
-
-  /*
-   * The reviewer-only fields, in their own file (sources-review.ts) so they
-   * never reach a page bundle. Same ids, same order: a source that gains an
-   * entry in one file and not the other leaves a reviewer with a citation they
-   * cannot check, or a paraphrase for something nothing cites.
-   */
-  Object.keys(SOURCE_META).forEach((id) => {
-    if (!Object.hasOwn(SOURCE_REVIEW, id)) {
-      problems.push(`sources-review.ts: no entry for '${id}'`);
-
-      return;
-    }
-
-    const fields = empty(SOURCE_REVIEW[id], ['publisher', 'type', 'locator']);
-
-    if (fields.length) problems.push(`sources-review.ts ${id}: empty ${fields.join(', ')}`);
-  });
-
-  Object.keys(SOURCE_REVIEW)
-    .filter((id) => !Object.hasOwn(SOURCE_META, id))
-    .forEach((id) => problems.push(`sources-review.ts: '${id}' is not in sources-meta.ts`));
-
-  sourceRefs(CHAPTER_META, 'CHAPTER_META').forEach(([path, ids]) =>
-    ids
-      .filter((id) => !Object.hasOwn(SOURCE_META, id))
-      .forEach((id) => problems.push(`${path}: unknown source id '${id}'`)),
-  );
-
-  return problems;
-}
 
 /*
  * French review gates, as production applies them (no preview override). The
@@ -3429,8 +3390,7 @@ function anatomyMessageProblems(keys) {
     const orphans = Object.keys(node.parts ?? {})
       .filter((key) => !keys.includes(key))
       .map(
-        (key) =>
-          `${locale}.json: ui.chapter.anatomy.parts.${key} has no marker in anatomy-meta.ts`,
+        (key) => `${locale}.json: ui.chapter.anatomy.parts.${key} has no marker in anatomy-meta.ts`,
       );
 
     return [...missingKeys, ...unnamed, ...orphans];
@@ -3456,12 +3416,12 @@ function anatomyProblems() {
   }
 
   ANATOMY_PARTS.filter((part) => !inFrame(part.x) || !inFrame(part.y)).forEach((part) =>
-    problems.push(
-      `anatomy-meta.ts ${part.key}: marker ${part.x},${part.y} is outside the picture`,
-    ),
+    problems.push(`anatomy-meta.ts ${part.key}: marker ${part.x},${part.y} is outside the picture`),
   );
 
-  if (!String(BOWEL_CREDIT.licenceHref).startsWith('https://creativecommons.org/licenses/by/4.0/')) {
+  if (
+    !String(BOWEL_CREDIT.licenceHref).startsWith('https://creativecommons.org/licenses/by/4.0/')
+  ) {
     problems.push('anatomy-meta.ts: BOWEL_CREDIT.licenceHref is not the CC BY 4.0 deed');
   }
 
@@ -3522,8 +3482,8 @@ function anatomyProblems() {
 /*
  * Curated kits placed by the microsite.
  *
- * A kit id in a card band, in the supply list's kit links, or in the one-click
- * add allowlist has to be in OSTOMY_LISTED_KIT_IDS. Otherwise the page would
+ * A kit id in a card band, on a chapter shelf (chapter-shop.ts), or in the
+ * one-click add allowlist has to be in OSTOMY_LISTED_KIT_IDS. Otherwise the page would
  * render nothing while this pack told a reviewer the kit was there. It is an
  * error, not a warning: the fix is to list the kit, or to stop placing it.
  */
@@ -3547,13 +3507,24 @@ function kitProblems() {
     ),
   );
 
-  SUPPLY_KIT_LINKS.forEach((kit, index) =>
-    check(kit.productId, `supply-list-merchandising.ts SUPPLY_KIT_LINKS[${index}]`),
-  );
-
   Object.entries(SUPPLY_CART_PRODUCTS).forEach(([criterion, ids]) =>
     (ids ?? []).forEach((id) =>
       check(id, `supply-list-merchandising.ts SUPPLY_CART_PRODUCTS.${criterion}`),
+    ),
+  );
+
+  /* A shelf names its kits as kits, so one the surfaces do not list renders nothing. */
+  CHAPTER_META.forEach((meta) =>
+    meta.categories.forEach((_, index) =>
+      (shelfForCard(meta.slug, index + 1)?.offers ?? []).forEach((offer) =>
+        (offer.kitIds ?? [])
+          .filter((id) => !listed.has(id))
+          .forEach((id) =>
+            problems.push(
+              `chapter-shop.ts ${meta.slug} card ${index + 1}: kit #${id} is ${why(id)}, so nothing renders`,
+            ),
+          ),
+      ),
     ),
   );
 
@@ -3798,85 +3769,22 @@ function landingProblems() {
   return problems;
 }
 
-/*
- * =============================================================================
- * A HOLD THAT COVERS SHIPPING HAS TO STAY IN STEP WITH THE HOLDS
- * =============================================================================
- * `HELD_CLIENT_MESSAGES` in `held-messages.ts` names the message subtrees the
- * root layout keeps out of the client payload, so a held figure's unapproved
- * wording is not retrievable from the HTML of every page on the store. It is a
- * hand-written list of paths, and a hand-written list drifts, so both
- * directions are checked here.
- *
- * Grow: a figure kind that is held at every placement it has, with no entry.
- * Its copy would ship on every page while rendering on none.
- * Shrink: an entry for a kind that renders somewhere — the bowel reference is
- * held on one card and live on another — which would strip the strings a live
- * figure needs and print "MISSING_MESSAGE" on the page.
- *
- * Plus the ordinary hygiene: a path has to name something that exists in both
- * message files, or the entry removes nothing and says it removed something.
- * =============================================================================
- */
-function heldClientProblems() {
-  const placements = new Map();
-
-  for (const meta of CHAPTER_META) {
-    for (const structure of meta.categories) {
-      for (const figure of structure.figures ?? []) {
-        const seen = placements.get(figure.kind) ?? { total: 0, held: 0 };
-
-        placements.set(figure.kind, {
-          total: seen.total + 1,
-          held: seen.held + (figure.held ? 1 : 0),
-        });
-      }
-    }
-  }
-
-  const listed = new Set(HELD_CLIENT_MESSAGES.map((group) => group.kind));
-  const problems = [];
-
-  for (const [kind, { total, held }] of placements) {
-    if (held === total && !listed.has(kind)) {
-      problems.push(
-        `held-messages.ts: '${kind}' is held on all ${total} of its placements, so its copy renders nowhere and must not ship — add it to HELD_CLIENT_MESSAGES`,
-      );
-    }
-  }
-
-  for (const group of HELD_CLIENT_MESSAGES) {
-    const at = placements.get(group.kind);
-
-    if (!at) {
-      problems.push(`held-messages.ts: '${group.kind}' is not placed on any chapter`);
-    } else if (at.held < at.total) {
-      problems.push(
-        `held-messages.ts: '${group.kind}' renders on ${at.total - at.held} of its ${at.total} placements, so removing its messages would break the page — take it out of HELD_CLIENT_MESSAGES`,
-      );
-    }
-
-    for (const path of group.paths) {
-      const rest = path.replace(/^OstomyCare\./, '');
-
-      for (const locale of ['en', 'fr']) {
-        const node = rest.split('.').reduce((n, key) => n?.[key], MESSAGES[locale]);
-
-        if (node === undefined) {
-          problems.push(`held-messages.ts: '${path}' is not in ${locale}.json`);
-        }
-      }
-    }
-  }
-
-  return problems;
-}
+/* The held-message list against the holds; the reasoning is in lib.mjs. */
+const heldClientProblems = () =>
+  heldClientProblemsFor({
+    chapterMeta: CHAPTER_META,
+    heldClientMessages: HELD_CLIENT_MESSAGES,
+    messages: MESSAGES,
+    ns: 'OstomyCare',
+  });
 
 const structureProblems = [
   ...(MODULE_KINDS_SOURCE
     ? []
     : ['figures.tsx: MODULE_KINDS not found, so pinned cards go unreported']),
-  ...['en', 'fr'].flatMap((locale) => CHAPTER_META.flatMap((meta) => chapterProblems(meta, locale))),
+  ...['en', 'fr'].flatMap((locale) =>
+    CHAPTER_META.flatMap((meta) => chapterProblems(meta, locale)),
+  ),
   ...['en', 'fr'].flatMap((locale) =>
     CHAPTER_META.flatMap((meta) => recoveryMapProblems(meta, locale)),
   ),
@@ -3900,46 +3808,24 @@ const structureProblems = [
 /* ------------------------------------------------------------------------- */
 
 const results = {};
-const finish = (content) => `${content.replace(/\n{3,}/g, '\n\n').trimEnd()}\n`;
 
 /*
- * Whether the copy in docs/content-review still says what the sources say.
- *
- * Two lines are dropped from both sides before comparing. The `Generated:`
- * stamp changes on every run by design. Any line naming a product is dropped
- * because `--check` deliberately asks BigCommerce for nothing, so it prints an
- * id where a full run prints the product's name — a difference in this run, not
- * a difference in the pack.
- *
- * This reports; it never fails the run. The generated pack is rebuilt once, at
- * the end of the branch, by the export task that owns docs/content-review —
- * until then these files are expected to lag the sources, and a reviewer is
- * told which ones by the stamp inside each file.
+ * Whether the copy in docs/content-review still says what the sources say
+ * (`staleTracker` in lib.mjs says what is compared). This reports; it never
+ * fails the run. The generated pack is rebuilt once, at the end of the branch,
+ * by the export task that owns docs/content-review — until then these files
+ * are expected to lag the sources, and a reviewer is told which ones by the
+ * stamp inside each file.
  */
-const comparable = (content) =>
-  content
-    .split('\n')
-    .filter((line) => !line.startsWith('**Generated:**') && !/\(#\d|product #\d/.test(line))
-    .join('\n')
-    .trim();
-
-const staleDocs = [];
-
-const compareOnDisk = (path, built) => {
-  const have = existsSync(path) ? readFileSync(path, 'utf8') : '';
-
-  if (comparable(have) !== comparable(built)) {
-    staleDocs.push(path.slice(REPO.length + 1).split(sep).join('/'));
-  }
-};
+const { stale: staleDocs, compare: compareOnDisk } = staleTracker();
 
 /*
- * One file, with the table of everything it cited appended. `namedSources` is
+ * One file, with the table of everything it cited appended. The citer is
  * cleared first so each file's table is its own evidence base and not the
  * register in full.
  */
 const writeDoc = (locale, build) => {
-  namedSources = new Set();
+  citer.reset();
 
   const doc = build();
   const table = sourceTable(locale);
@@ -3962,22 +3848,13 @@ for (const locale of ['en', 'fr']) {
   } else {
     mkdirSync(dir, { recursive: true });
 
-    for (const doc of results[locale]) writeFileSync(join(dir, doc.file), finish(doc.content), 'utf8');
+    for (const doc of results[locale])
+      writeFileSync(join(dir, doc.file), finish(doc.content), 'utf8');
   }
 }
 
 /* Coverage: every OstomyCare string in the English file must have been emitted. */
-const allPaths = [];
-
-(function walk(node, prefix) {
-  for (const [k, v] of Object.entries(node)) {
-    const p = prefix ? `${prefix}.${k}` : k;
-
-    if (v && typeof v === 'object') walk(v, p);
-    else allPaths.push(p);
-  }
-})(MESSAGES.en, '');
-
+const allPaths = leafPaths(MESSAGES.en);
 const missing = allPaths.filter((p) => !seen.en.has(p));
 
 /* Readable names for the figure kinds that carry a hold or a French gate. */
@@ -4093,7 +3970,7 @@ const readme = [
   '# Ostomy microsite — content review',
   `**Prepared for:** Liivv management and clinical review  `,
   `**Covers:** every page of \`/liivv-health/ostomy-care\`, in English and French  `,
-  `**Generated:** ${TODAY} from commit \`${COMMIT}\``,
+  stamp(),
   '',
   "> **These files are generated from the site's own sources.** Do not edit them. Mark corrections against the reference beside each line — the change is made in the source, and the files are generated again. That way the text you approve is the text that ships, and the two cannot drift apart.",
   '',
@@ -4154,7 +4031,7 @@ const readme = [
   '',
   '- Product names, descriptions and prices, which come from BigCommerce.',
   '- The site header and navigation, managed separately.',
-  `- Kit contents. The eight matched-system kits (8061–8068) are shown on the Ostomy Care landing, the Liivv Health hub, the Shop Ostomy Care shelf, and search. Inside the chapters, a card sells with one shelf: First Week Basics is the SenSura one-piece kit and pouch 4891; the change routine points back to that kit; the supply list shows the drainable systems after one is picked, with New Image 57 mm and 70 mm as two sizes of one system; the go-bag is a spare of those kits. Your Stoma shows the drainable systems, then the closed and urostomy kits, then the cut-to-fit barriers, and a spare of the drainable kits on Travel & Workdays. Everyday Liivving shows that spare on Flying with supplies. This Might Be You shows Pouchkins on Children, the adult drainable systems once on the young-adult card, and a line back to them on pregnancy and later life. Kits 8041–8048 were deleted on 2026-09-29. The priced table was written on 2026-09-29.`,
+  `- Kit contents. The curated ostomy kits are the ${OSTOMY_KIT_IDS.length} accessory kits in \`OSTOMY_KIT_IDS\` (\`oc-ids.ts\`) — ${OSTOMY_KIT_IDS.map(productLabel).join('; ')} — shown on the Ostomy Care landing and the Shop Ostomy Care shelf. A kit is extras that fit any opening; a pouch and its barrier are two products, and the reader chooses the flange size on the product page. Inside the chapters, what a card sells is the shelf printed under its title as **Products shown**, read from \`chapter-shop.ts\`; one click adds a barrier and the pouch that fits it only where the two share a flange size (\`chapter-cart.ts\`).`,
   '',
   '## Written, but not on a page yet',
   '',
@@ -4223,4 +4100,10 @@ if (structureProblems.length) {
   console.log('\nSTRUCTURE CHECKS FAILED:');
   structureProblems.forEach((p) => console.log(`  ${p}`));
   process.exitCode = 1;
+}
+
+/* Then the Diabetes pack, unless only Ostomy was asked for. */
+if (SITE === 'all') {
+  console.log('\n— diabetes-care —');
+  await exportDiabetesCare();
 }

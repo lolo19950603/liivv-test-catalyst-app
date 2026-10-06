@@ -27,3 +27,185 @@ export const DIABETES_CURATED_KIT_IDS = [
   8059, // Blood-Sugar Nutrition Support Kit
   8060, // Newly Diagnosed: Type 2 Diabetes Starter Kit
 ] as const;
+
+/* Whether this id is one of the curated diabetes kits. */
+export function isDiabetesKit(entityId: number): boolean {
+  const kitIds: readonly number[] = DIABETES_CURATED_KIT_IDS;
+
+  return kitIds.includes(entityId);
+}
+
+/*
+ * The curated kits the Diabetes Care landing may show. None, until the owner
+ * signs a kit and its contents off (E6 and E14 in the landing's copy record;
+ * the review list is 8049, 8051, 8053, 8058 and 8060). With none listed, the
+ * landing's kits section, its hero and closing kits buttons and the "Kits"
+ * shop room all stay off. The shop shelf and search still list a kit product
+ * until it is deleted from the catalogue, as Ostomy's do.
+ */
+export const DIABETES_LISTED_KIT_IDS: readonly number[] = [];
+
+/* Whether the Diabetes Care landing may show this curated kit. */
+export function isListedDiabetesKit(entityId: number): boolean {
+  return DIABETES_LISTED_KIT_IDS.includes(entityId);
+}
+
+/*
+ * =============================================================================
+ * Insulin and glucagon: the products a pharmacist reviews and dispenses
+ * =============================================================================
+ *
+ * Owner answers of 2026-10-06: a pharmacist reviews and dispenses every
+ * insulin and glucagon order, and it ships cold-chain (A8, B3); insulin can't
+ * be ordered online for delivery in Quebec, though it can be shipped there
+ * once a pharmacist has arranged it (A1, B3, B11). Glucagon is not part of the
+ * Quebec rule.
+ *
+ * The rule, read from the BigCommerce catalogue on 2026-10-06:
+ *
+ *   insulin   every product in category 1116 Insulin, plus the two Trurapi
+ *             products filed under 1132 Injection Aids (4719 vials, 5002
+ *             cartridges)
+ *   glucagon  4555 Baqsimi, the only glucagon in the catalogue (also in 1132)
+ *
+ * A new insulin is covered once it is filed in 1116. One filed anywhere else
+ * must be added to INSULIN_PRODUCT_IDS_OUTSIDE_CATEGORY, and a new glucagon
+ * to GLUCAGON_PRODUCT_IDS, or neither the product page notice nor the Quebec
+ * checkout rule will know it.
+ *
+ * Used by the product page (the notice under the buy box) and by the checkout
+ * (core/lib/checkout/quebec-insulin.ts). A cart line carries no categories,
+ * so the checkout asks the catalogue for them by id first.
+ */
+export const INSULIN_CATEGORY_ID = 1116;
+
+/* Insulin filed outside 1116 Insulin: the two Trurapi products (1132 Injection Aids). */
+export const INSULIN_PRODUCT_IDS_OUTSIDE_CATEGORY: readonly number[] = [
+  4719, // Trurapi Vials 100U/ML 1X10ML
+  5002, // Trurapi Cartridges 100U/ML 5x3ML
+];
+
+/* Glucagon. */
+export const GLUCAGON_PRODUCT_IDS: readonly number[] = [
+  4555, // Baqsimi (glucagon nasal powder)
+];
+
+/* Whether this product is insulin, from its id and the categories it is in. */
+export function isInsulinProduct({
+  entityId,
+  categoryIds,
+}: {
+  entityId: number;
+  categoryIds: readonly number[];
+}): boolean {
+  return (
+    categoryIds.includes(INSULIN_CATEGORY_ID) ||
+    INSULIN_PRODUCT_IDS_OUTSIDE_CATEGORY.includes(entityId)
+  );
+}
+
+/* Whether this product is glucagon. */
+export function isGlucagonProduct(entityId: number): boolean {
+  return GLUCAGON_PRODUCT_IDS.includes(entityId);
+}
+
+/*
+ * Whether a shipping address's province is Quebec. Province strings are free
+ * text when BigCommerce has no match for them, so this accepts the code (QC,
+ * and the older PQ) and the name with or without its accent, in any case and
+ * with stray spaces: "QC", "qc", "Quebec", "Québec", " QUÉBEC ".
+ */
+export function isQuebecProvince(stateOrProvince: string | null | undefined): boolean {
+  if (!stateOrProvince) {
+    return false;
+  }
+
+  const plain = stateOrProvince.normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
+
+  return plain === 'qc' || plain === 'pq' || plain === 'quebec';
+}
+
+/*
+ * Whether an order may not be bought online: insulin, for delivery in Quebec.
+ * Every line counts, a kit's component lines included, since they are real
+ * cart lines. Strips, glucagon and everything else stay open to Quebec.
+ */
+export function blocksInsulinForQuebec({
+  stateOrProvince,
+  products,
+}: {
+  stateOrProvince: string | null | undefined;
+  products: ReadonlyArray<{ entityId: number; categoryIds: readonly number[] }>;
+}): boolean {
+  return isQuebecProvince(stateOrProvince) && products.some(isInsulinProduct);
+}
+
+/*
+ * =============================================================================
+ * Categories that make a product health-revealing
+ * =============================================================================
+ *
+ * Which shelves say something about a person's body rather than their taste.
+ * Diabetes products sit in two separate branches of the catalogue, the same
+ * way ostomy products do (see OSTOMY_ANALYTICS_CATEGORY_IDS in oc-ids.ts):
+ *
+ *   1151  Shop Diabetes Care             (under Liivv Health (Shop))
+ *   1027  Metabolic + Glucose Support    (Liivv Your Life > Nourish + Balance)
+ *   1050    Continuous Glucose Monitors (CGM)
+ *   1070    Glucose Meters & Test Strips
+ *   1089    Insulin Pens & Pen Needles
+ *   1116      Insulin
+ *   1124      Pen Needles & Syringes
+ *   1132      Injection Aids
+ *   1104    Insulin Pump Supplies
+ *   1111    Lancets & Lancing
+ *   1114    Diabetes Accessories
+ *   1118      Glucose Tablets & Gels
+ *   1126      Sharps Containers
+ *   1134      Insulin Cooling & Carry
+ *   1140      CGM & Pump Adhesives
+ *   1144      Pump Accessories
+ *   1147      Diabetes Aids
+ *
+ * Read from the BigCommerce category tree on 2026-10-05. Unlike the ostomy
+ * list, this one names the whole 1027 subtree and not only its root. A
+ * category page answers for its breadcrumb trail (`categoryLineageIds` in
+ * core/lib/analytics/sensitive-products.ts), so the root alone would cover the
+ * shelves. A cart line, a wishlist or a compare row does not: it is answered
+ * from the categories the product is *in*, and BigCommerce does not return
+ * their parents. Diabetes products are assigned to these sub-shelves, so each
+ * one is named here. A shelf added under 1027 later must be added to this list
+ * too, or those rows will not be covered.
+ *
+ * Used by core/lib/analytics/sensitive-products.ts. Kept here because it is a
+ * list of identifiers, and identifiers live in TS meta.
+ */
+export const DIABETES_ANALYTICS_CATEGORY_IDS: readonly number[] = [
+  SHOP_DIABETES_CARE_CATEGORY_ID,
+  1027, // Metabolic + Glucose Support
+  1050, // Continuous Glucose Monitors (CGM)
+  1070, // Glucose Meters & Test Strips
+  1089, // Insulin Pens & Pen Needles
+  1116, // Insulin
+  1124, // Pen Needles & Syringes
+  1132, // Injection Aids
+  1104, // Insulin Pump Supplies
+  1111, // Lancets & Lancing
+  1114, // Diabetes Accessories
+  1118, // Glucose Tablets & Gels
+  1126, // Sharps Containers
+  1134, // Insulin Cooling & Carry
+  1140, // CGM & Pump Adhesives
+  1144, // Pump Accessories
+  1147, // Diabetes Aids
+];
+
+/* Whether this category is one whose membership reveals something about a body. */
+export function isDiabetesCategoryId(entityId: number): boolean {
+  return DIABETES_ANALYTICS_CATEGORY_IDS.includes(entityId);
+}
+
+/* Whether any of these categories does. */
+export function isDiabetesCategoryIds(entityIds: readonly number[]): boolean {
+  return entityIds.some(isDiabetesCategoryId);
+}

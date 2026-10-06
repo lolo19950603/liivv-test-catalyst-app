@@ -9,11 +9,11 @@ import {
 } from '~/lib/analytics/ad-signals';
 
 /*
- * Render this on any page whose context is a health fact — an ostomy route, an
- * ostomy shelf, an ostomy product's page, a cart holding ostomy supplies — and
- * the advertising signals are denied for the rest of the page session. See
- * ~/lib/analytics/ad-signals for why, and for what the tag does and does not
- * say.
+ * Render this on any page whose context is a health fact — a care route (Ostomy
+ * or Diabetes Care), a care shelf, a care product's page, a cart holding care
+ * supplies — and the advertising signals are denied for the rest of the page
+ * session. See ~/lib/analytics/ad-signals for why, and for what the tag does
+ * and does not say.
  *
  * Two things happen, because a page arrives in two ways. The meta tag ships
  * with the server-rendered HTML, so the tag's very first consent command, sent

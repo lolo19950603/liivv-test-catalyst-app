@@ -1,0 +1,53 @@
+/*
+ * The specialist service's direct contact (./specialist-contact.tsx). It sits
+ * inside a pharmacist panel and takes that panel's text colour: light on the
+ * dark care panels (`is-dark`), the page's ink on a light one (`is-light`).
+ */
+
+.ms-contact {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  color: inherit;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.ms-contact li {
+  margin: 0;
+  max-width: 42ch;
+}
+
+.ms-contact a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  overflow-wrap: anywhere;
+}
+
+.ms-contact a:hover,
+.ms-contact a:focus-visible {
+  text-decoration-thickness: 2px;
+}
+
+.ms-contact .ms-contact-phone {
+  font-size: 1.12rem;
+  font-weight: 600;
+}
+
+.ms-contact.is-dark {
+  color: #f4f7f3;
+}
+
+/*
+ * The dark care panel this contact sits in (chapters, paths and the funding
+ * page): its heading takes the panel's light text, as its eyebrow and body do.
+ * Ostomy's chapter stylesheet leaves the heading in the page's dark ink, about
+ * 3:1 on the panel's green (full-site review, 2026-10-06). Scoped under
+ * `[data-site]`, which only engine pages carry, so no Ostomy page changes.
+ */
+#oc-chapter[data-site] .oc-ch-care-copy h2 {
+  color: #f4f7f3;
+}

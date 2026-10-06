@@ -25,6 +25,8 @@ export function SpecializedSubscribe({
   demoProductName,
   demoProductBlurb,
   demoProductPath,
+  manageHref = '/account/subscriptions',
+  manageLabel = 'Manage subscriptions',
 }: {
   eyebrow?: string;
   title: string;
@@ -38,6 +40,9 @@ export function SpecializedSubscribe({
   wrapClassName?: string;
   align?: 'start' | 'center';
   reveal?: boolean;
+  /* The second button, in the page locale (the defaults are the English page's). */
+  manageHref?: string;
+  manageLabel?: string;
   demoProductName: string;
   demoProductBlurb: string;
   demoProductPath: string;
@@ -74,8 +79,8 @@ export function SpecializedSubscribe({
           <a className={primaryCtaClass} href={shopHref}>
             {shopLabel}
           </a>
-          <a className={secondaryCtaClass} href="/account/subscriptions">
-            Manage subscriptions
+          <a className={secondaryCtaClass} href={manageHref}>
+            {manageLabel}
           </a>
         </div>
       </div>

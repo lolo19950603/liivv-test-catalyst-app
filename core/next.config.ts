@@ -214,13 +214,18 @@ export default async (): Promise<NextConfig> => {
           permanent: false,
         },
         {
+          source: '/:locale(en|fr)/liivv-health/diabetes-care/chapters/diabetes-essentials',
+          destination: '/:locale/liivv-health/diabetes-care/shop-diabetes-care',
+          permanent: false,
+        },
+        {
           source: '/pages/diabetes-new-to-the-journey',
           destination: '/liivv-health/diabetes-care/chapters/new-to-the-journey',
           permanent: false,
         },
         {
           source: '/pages/your-diabetes-journey',
-          destination: '/liivv-health/diabetes-care/chapters/your-diabetes-journey',
+          destination: '/liivv-health/diabetes-care#which-diabetes',
           permanent: false,
         },
         {
@@ -242,6 +247,22 @@ export default async (): Promise<NextConfig> => {
           source: '/pages/diabetes-type-2',
           destination: '/liivv-health/diabetes-care/chapters/type-2',
           permanent: false,
+        },
+        /*
+         * The Your Diabetes Journey hub was retired when the type pages became
+         * generated path pages. Its URL was live and linked, so it moves to the
+         * landing's "Which diabetes?" chips rather than disappearing; the
+         * prefixed form needs its own entry, as Ostomy's do.
+         */
+        {
+          source: '/liivv-health/diabetes-care/chapters/your-diabetes-journey',
+          destination: '/liivv-health/diabetes-care#which-diabetes',
+          permanent: true,
+        },
+        {
+          source: '/:locale(en|fr)/liivv-health/diabetes-care/chapters/your-diabetes-journey',
+          destination: '/:locale/liivv-health/diabetes-care#which-diabetes',
+          permanent: true,
         },
       ];
     },

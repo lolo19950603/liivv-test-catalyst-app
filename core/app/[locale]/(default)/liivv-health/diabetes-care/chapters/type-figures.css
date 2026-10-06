@@ -1,0 +1,456 @@
+/*
+ * =============================================================================
+ * KNOW YOUR TYPE — THE CHAPTER'S OWN FIGURES
+ * =============================================================================
+ * The clues checklist, the test glossary and the family diabetes tree
+ * (./type-figures.tsx). Only what the shared stylesheet
+ * (ostomy-care/chapters/chapter-page.css) does not already draw: they reuse its
+ * subsections, its figure heading and detail line, its ruled write-in line and
+ * its 44px print button. Every rule here is scoped under the Diabetes root, so
+ * none can reach an Ostomy page.
+ * =============================================================================
+ */
+
+/* ---------------------------------------------------------------------------
+ * The clues checklist
+ *
+ * The banner is the card's note ("Not a diagnostic tool…"). It sits above the
+ * sections in every state, never collapses and has no close control. Text
+ * stays on a light wash, so contrast never depends on the tone.
+ * ------------------------------------------------------------------------- */
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.8rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues-banner {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
+  border-left: 6px solid var(--sage-deep);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues-screen > .oc-ch-subsection:first-child {
+  margin-top: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues-set {
+  margin: 0;
+  padding: 0.7rem 0.85rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--cream);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues-legend {
+  padding: 0 0.3rem;
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+/* The tick boxes: no bullet and no rule from the shared list styling. */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues-set ul {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues-set li {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues-set li::before {
+  content: none;
+}
+
+/* A 44px target: the whole sentence is the label. */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues-tick {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  min-height: 44px;
+  padding: 0.55rem 0.35rem;
+  border-radius: 10px;
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues-tick:hover {
+  background: var(--paper);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues-tick input {
+  flex: none;
+  width: 1.3rem;
+  height: 1.3rem;
+  margin: 0.15rem 0 0;
+  accent-color: var(--sage-deep);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues-tick input:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 3px;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues-questions ol {
+  margin: 0.2rem 0 0;
+  padding-left: 1.4rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues-questions li {
+  margin-bottom: 0.4rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues-actions,
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues-actions .oc-fig-print,
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-actions .oc-fig-print {
+  margin-top: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues-clear:disabled,
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-clear:disabled {
+  color: var(--ink-muted);
+  cursor: default;
+}
+
+/* The print sheet: never on screen. It prints only through the button (below). */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-clues-sheet {
+  display: none;
+}
+
+/* ---------------------------------------------------------------------------
+ * The test glossary
+ * ------------------------------------------------------------------------- */
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-glossary {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-glossary h4 {
+  margin: 0;
+  font-size: 1.3rem;
+  line-height: 1.3;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-glossary .oc-fig-detail {
+  margin: 0;
+}
+
+/* Open all / Close all: left-aligned, without the print button's top margin (the grid gap spaces it). */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-glossary-toggle {
+  justify-self: start;
+  margin-top: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-glossary-list {
+  display: grid;
+  gap: 0.4rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-glossary details {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-glossary summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.45rem 0.85rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-glossary summary:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 2px;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-glossary details p {
+  margin: 0;
+  padding: 0 0.85rem 0.7rem;
+  font-size: var(--text-small);
+  line-height: 1.55;
+}
+
+/* ---------------------------------------------------------------------------
+ * The family diabetes tree
+ *
+ * A real table where the card is wide enough for six columns. Narrower (on
+ * phones, and beside the chapter's path on mid-width screens) each relative
+ * becomes a block: the row header, then five fields, each with its column
+ * label above it, so nothing scrolls sideways. The breakpoint is the figure's
+ * own width (a container query), not the window's. The column labels in the
+ * cells are for that layout only and are hidden from assistive technology,
+ * which reads each field by its side, row and column headers.
+ * ------------------------------------------------------------------------- */
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree {
+  container: dc-family-tree / inline-size;
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--cream);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-intro {
+  margin: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-small);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table caption {
+  padding-bottom: 0.5rem;
+  text-align: left;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table th,
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table td {
+  padding: 0.35rem 0.4rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: bottom;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table thead th {
+  color: var(--ink-muted);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table tbody th[scope='row'] {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-side th {
+  padding-top: 0.8rem;
+  color: var(--sage-text);
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-label {
+  display: none;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-input {
+  width: 100%;
+  min-width: 4.5rem;
+  min-height: 44px;
+  padding: 0.3rem 0.45rem;
+  border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-input:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 1px;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-actions .oc-fig-detail {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+@container dc-family-tree (max-width: 42rem) {
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table,
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table caption,
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table tbody,
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table tr,
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table th,
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table td {
+    display: block;
+  }
+
+  /* The column headers still label every field; on phones each cell shows its own. */
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  /* One block per relative, its fields two to a row where they fit. */
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table tbody tr:not(.dc-fig-tree-side) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr));
+    gap: 0 0.75rem;
+    margin-bottom: 0.6rem;
+    padding: 0.5rem 0.65rem;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--paper);
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table td,
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table tbody th[scope='row'] {
+    border: 0;
+    padding-inline: 0;
+    white-space: normal;
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table tbody th[scope='row'] {
+    grid-column: 1 / -1;
+  }
+
+  /* Fields in one row line up even where one label wraps and the other does not. */
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table td {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-input {
+    min-width: 0;
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-label {
+    display: block;
+    margin-bottom: 0.2rem;
+    color: var(--ink-muted);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Print
+ *
+ * The checklist's print button prints its one sheet, not the screen layout.
+ * The browser's own print prints the card as it is on screen, sheet hidden.
+ * The family tree prints on one landscape page, through a named page, so no
+ * other print on the site changes orientation. The glossary prints with every
+ * term open where the browser lets a stylesheet open a disclosure.
+ * ------------------------------------------------------------------------- */
+
+@page dc-family-tree {
+  size: landscape;
+}
+
+@media print {
+  html.oc-printing #oc-chapter[data-site='diabetes-care'] .dc-fig-clues[data-oc-printing] > * {
+    display: none;
+  }
+
+  html.oc-printing
+    #oc-chapter[data-site='diabetes-care']
+    .dc-fig-clues[data-oc-printing]
+    > .dc-fig-clues-sheet {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-clues-sheet-head {
+    margin: 0.4rem 0 0;
+    font-weight: 600;
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-clues-sheet-list {
+    display: grid;
+    gap: 0.3rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-clues-sheet-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-clues-box {
+    flex: none;
+    width: 0.95rem;
+    height: 0.95rem;
+    margin-top: 0.25rem;
+    border: 1px solid var(--ink);
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-clues-sheet-questions {
+    margin: 0.4rem 0 0;
+    padding-left: 1.3rem;
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-clues-sheet-questions li {
+    margin-bottom: 0.9rem;
+    break-inside: avoid;
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-clues-answer {
+    display: block;
+    margin-top: 0.3rem;
+    color: var(--ink-muted);
+    font-size: var(--text-small);
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-clues-banner {
+    border-left-color: currentColor;
+  }
+
+  /* Paper has no buttons, and every term prints open anyway. */
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-glossary-toggle {
+    display: none;
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-glossary details::details-content {
+    display: block;
+    content-visibility: visible;
+  }
+
+  /*
+   * A named page applies to boxes in the normal flow, and the shared print
+   * rules lift the printed figure out of it, so the page is named on the body,
+   * and only while the family tree is what is printing.
+   */
+  html.oc-printing:has(#oc-chapter[data-site='diabetes-care'] .dc-fig-tree[data-oc-printing]) body {
+    page: dc-family-tree;
+  }
+
+  html.oc-printing #oc-chapter[data-site='diabetes-care'] .dc-fig-tree[data-oc-printing] {
+    background: none;
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-actions {
+    display: none;
+  }
+
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-input {
+    min-height: 1.8rem;
+    border-width: 0 0 1px;
+    border-radius: 0;
+    background: none;
+  }
+}

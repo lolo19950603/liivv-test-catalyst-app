@@ -231,29 +231,35 @@ function diabetesLane(responses: CategoryResponses, now: Date) {
   let lead =
     'Supplies, rhythm, and a quieter place to keep everyday diabetes living on track.';
   let oliviaFocus = 'This is your diabetes corner. I stacked the useful bits up front.';
-  let storyHref = '/liivv-health/diabetes-care/chapters/your-diabetes-journey';
-  let storyLabel = 'Open your diabetes journey';
+  // The landing's type chips; the old journey hub redirects there.
+  let storyHref = '/liivv-health/diabetes-care#which-diabetes';
+  let storyLabel = 'Find your type of diabetes';
+  let storyHint = 'Each type opens its own reading list';
 
   if (path === 'type_1') {
     headline = 'Type 1 care with fewer loose ends';
     lead = 'Keep insulin tools, sensors, and backups in one calm lane — ready when the day shifts.';
     storyHref = '/liivv-health/diabetes-care/chapters/type-1';
-    storyLabel = 'Open the Type 1 chapter';
+    storyLabel = 'Open your Type 1 reading list';
+    storyHint = 'Chapters picked for this path, in order';
   } else if (path === 'type_2') {
     headline = 'Type 2 care that fits real life';
     lead = 'A steadier mix of supplies, food rhythm, and support for the hours between appointments.';
     storyHref = '/liivv-health/diabetes-care/chapters/type-2';
-    storyLabel = 'Open the Type 2 chapter';
+    storyLabel = 'Open your Type 2 reading list';
+    storyHint = 'Chapters picked for this path, in order';
   } else if (path === 'gestational') {
     headline = 'Gestational care, held with extra gentleness';
     lead = 'Short-season support for monitoring, comfort, and questions that cannot wait.';
     storyHref = '/liivv-health/diabetes-care/chapters/gestational';
-    storyLabel = 'Open gestational care';
+    storyLabel = 'Open your gestational diabetes reading list';
+    storyHint = 'Chapters picked for this path, in order';
   } else if (path === 'pre_diabetes') {
     headline = 'Prediabetes — a calmer course-correct';
     lead = 'Small, repeatable habits and the right tools before anything feels urgent.';
     storyHref = '/liivv-health/diabetes-care/chapters/prediabetes';
-    storyLabel = 'Open the prediabetes chapter';
+    storyLabel = 'Open your prediabetes reading list';
+    storyHint = 'Chapters picked for this path, in order';
   }
 
   if (stage === 'newly_diagnosed') {
@@ -262,6 +268,7 @@ function diabetesLane(responses: CategoryResponses, now: Date) {
     oliviaFocus = 'New diagnosis energy is a lot. I made this corner quieter on purpose.';
     storyHref = '/liivv-health/diabetes-care/chapters/new-to-the-journey';
     storyLabel = 'Start the new-to-the-journey chapter';
+    storyHint = 'A chapter for the first weeks after diagnosis';
   } else if (stage === 'hitting_a_wall') {
     headline = 'A reset, without starting over';
     lead = 'When the routine stops working, restock the tools and rewrite the rhythm — not the whole story.';
@@ -311,7 +318,7 @@ function diabetesLane(responses: CategoryResponses, now: Date) {
     {
       id: 'story',
       label: storyLabel,
-      hint: 'A chapter written for this path',
+      hint: storyHint,
       href: storyHref,
     },
     {

@@ -49,6 +49,7 @@ import {
   isSectionShippingReady,
 } from '~/lib/checkout/section-shipping-storage';
 import { isCheckoutSubscriptionMetadataReady } from '~/lib/checkout/subscription-metadata-readiness';
+import { shipsInsulinToQuebec } from '~/lib/checkout/quebec-insulin';
 
 import { initializePayment, prepareOrderConfirmation } from './_actions/initialize-payment';
 import {
@@ -482,6 +483,22 @@ export default async function CheckoutPage({ params }: Props) {
 
   const summaryMetadataReady = await isCheckoutSubscriptionMetadataReady(cartId);
 
+  /*
+   * Insulin can't be ordered online for delivery in Quebec (owner answers A1,
+   * B3, B11). The pay button stays off with the message under it, and
+   * buildCheckoutSnapshot() refuses the order as well. If the catalogue can't
+   * be asked, a Quebec address is held rather than let through unchecked.
+   */
+  const insulinToQuebec = await shipsInsulinToQuebec({
+    stateOrProvince: shippingConsignment?.address.stateOrProvince,
+    productEntityIds: snapshotLines.map((line) => line.productEntityId),
+  }).catch(() => true);
+  // Read on the server: DiabetesCare is not in the browser's message bundle.
+  const commerceT = await getTranslations('DiabetesCare.ui');
+  const orderBlockedMessage = insulinToQuebec
+    ? commerceT('commerce.quebecInsulinCheckout', { phone: commerceT('contact.phone') })
+    : undefined;
+
   const summarySections = buildCheckoutSummarySections({
     lines: checkoutLines,
     cartSubtotal: checkout?.subtotal?.value ?? 0,
@@ -586,6 +603,7 @@ export default async function CheckoutPage({ params }: Props) {
           paymentTitle={t('payment.title')}
           paymentsUnavailable={paymentsUnavailable}
           paymentsUnavailableMessage={paymentsUnavailableMessage}
+          orderBlockedMessage={orderBlockedMessage}
           requiresShipping={requiresShippingAddress}
           returnUrl={buildAppUrl('/checkout/success/', locale)}
           savedAddresses={savedAddresses}

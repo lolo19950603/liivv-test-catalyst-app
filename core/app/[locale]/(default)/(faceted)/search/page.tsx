@@ -13,6 +13,7 @@ import { facetsTransformer } from '~/data-transformers/facets-transformer';
 import { numberedPaginationTransformer } from '~/data-transformers/numbered-pagination-transformer';
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-ids';
+import { withoutInsulinOnFrench } from '~/lib/checkout/quebec-insulin';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 
@@ -138,7 +139,8 @@ export default async function Search(props: Props) {
     }
 
     const search = await streamableFacetedSearch;
-    const products = search.products.items;
+    /* Never insulin on /fr (owner answer B11; ~/lib/checkout/quebec-insulin). */
+    const products = await withoutInsulinOnFrench(search.products.items, locale);
 
     const { defaultOutOfStockMessage, showOutOfStockMessage, showBackorderMessage } =
       settings?.inventory ?? {};

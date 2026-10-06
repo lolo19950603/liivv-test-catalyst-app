@@ -18,13 +18,10 @@
  *
  * Two answers say a page is such a context, and either one is enough:
  *
- *   the flag    the server renders <DenyAdSignals/> (a meta tag) on the page —
- *               ostomy routes, ostomy shelves, an ostomy product's own page,
- *               and a cart that holds ostomy supplies. The server is the only
- *               side that knows the last two.
- *   the path    /liivv-health/ostomy-care/** in any locale. Belt and braces:
- *               it holds even if a page forgets the flag, and it is true
- *               before a streamed part of the page has arrived.
+ *   the flag    a <DenyAdSignals/> meta tag the server renders on care routes,
+ *               care shelves, care product pages and carts with care supplies.
+ *   the path    a care route in any locale (CARE_PATH, below). Belt and braces:
+ *               it holds if a page forgets the flag or has not streamed it yet.
  *
  * The flag is a meta tag rather than a cookie or a storage entry on purpose.
  * "This person is shopping for ostomy supplies" must not be written anywhere
@@ -46,12 +43,12 @@ export const AD_SIGNALS_META_CONTENT = 'denied';
 /**
  * Dispatched on `window` when a page that needs the denial mounts, so the
  * analytics provider hears about a context it cannot see from the path — a
- * cart whose contents changed, or an ostomy product page that streamed in
- * after the provider had already looked.
+ * cart whose contents changed, or a care product page that streamed in after
+ * the provider had already looked.
  */
 export const AD_SIGNALS_DENIED_EVENT = 'liivv:ad-signals-denied';
 
-const OSTOMY_PATH = /^\/liivv-health\/ostomy-care(?:\/|$)/;
+const CARE_PATH = /^\/liivv-health\/(?:ostomy-care|diabetes-care)(?:\/|$)/;
 
 /*
  * The path without its locale segment, so one pattern answers for every
@@ -68,13 +65,23 @@ function withoutLocale(pathname: string): string {
   return pathname;
 }
 
-/* An ostomy route: the URL alone reveals why someone is reading. */
-export function isSensitiveOstomyPath(pathname: string): boolean {
-  return OSTOMY_PATH.test(withoutLocale(pathname));
+/*
+ * A care route: the URL alone reveals why someone is reading. That is
+ * /liivv-health/ostomy-care or /liivv-health/diabetes-care, and everything
+ * under either one.
+ *
+ * The match stops at a whole segment, so /liivv-health/diabetes-care-x is not
+ * the diabetes section, and /liivv-health itself, the hub that links to every
+ * section, is not a care route either. A URL under a care section counts even
+ * when another route serves it: the Shop Diabetes Care category answers at
+ * /liivv-health/diabetes-care/shop-diabetes-care.
+ */
+export function isSensitiveCarePath(pathname: string): boolean {
+  return CARE_PATH.test(withoutLocale(pathname));
 }
 
 /*
- * Whether following this link would land on an ostomy route.
+ * Whether following this link would land on a care route.
  *
  * The href is read exactly as it was written on the anchor — it may be
  * relative, a bare fragment, or somewhere else entirely — so it is resolved
@@ -89,13 +96,17 @@ export function isSensitiveLinkHref(href: string, documentUrl: string): boolean 
       return false;
     }
 
-    return isSensitiveOstomyPath(target.pathname);
+    return isSensitiveCarePath(target.pathname);
   } catch {
     return false;
   }
 }
 
-/* Whether the server marked this document with <DenyAdSignals/>. */
+/*
+ * Whether the server marked this document with <DenyAdSignals/>. For a care
+ * product's page or a cart holding care supplies this is the only answer: the
+ * server is the only side that knows, and the path does not say.
+ */
 export function hasAdSignalsFlag(): boolean {
   if (typeof document === 'undefined') {
     return false;
@@ -118,5 +129,12 @@ export function isAdSignalDenialRequired(pathname?: string): boolean {
 
   const path = pathname ?? (typeof window === 'undefined' ? '' : window.location.pathname);
 
-  return path !== '' && isSensitiveOstomyPath(path);
+  return path !== '' && isSensitiveCarePath(path);
 }
+
+/*
+ * The older name, from when Ostomy Care was the only care section. It is the
+ * same function, so it answers for every care route and its callers need no
+ * change.
+ */
+export { isSensitiveCarePath as isSensitiveOstomyPath };

@@ -1,0 +1,403 @@
+/*
+ * =============================================================================
+ * YOUR TOOLS — THE CHAPTER'S OWN FIGURES
+ * =============================================================================
+ * The meter, sensor and pump pickers, the restock calculator and the rotation
+ * map (./tool-figures.tsx). Only what the shared stylesheet
+ * (ostomy-care/chapters/chapter-page.css) does not already draw: they reuse its
+ * figure heading and detail line, its status line and its 44px lane link.
+ * Every rule here is scoped under the Diabetes root, so none can reach an
+ * Ostomy page. Text always sits on a light wash, so its contrast never depends
+ * on a tone, and no line is told apart by colour alone.
+ * =============================================================================
+ */
+
+/* ---------------------------------------------------------------------------
+ * The pickers
+ * ------------------------------------------------------------------------- */
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-picker {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 0.8rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-picker-set {
+  margin: 0;
+  padding: 0.7rem 0.85rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--cream);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-picker-legend {
+  margin: 0;
+  padding: 0 0.3rem;
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-picker-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+/* A 44px target: the whole name is the label. */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-picker-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 44px;
+  padding: 0.35rem 0.9rem 0.35rem 0.6rem;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  cursor: pointer;
+  line-height: 1.3;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-picker-option:has(input:checked) {
+  border-color: var(--sage-deep);
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-picker-option input {
+  flex: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  accent-color: var(--sage-deep);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-picker-option input:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 3px;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-picker-name {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-picker-sub {
+  color: var(--ink-muted);
+  font-size: var(--text-small);
+  font-weight: 400;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-picker-panel {
+  padding: 0.85rem 1rem 0.9rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--sage-deep);
+  border-radius: 12px;
+  background: var(--paper);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-picker-heading {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-heading);
+  font-size: 1.12rem;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-picker-from {
+  margin-top: 0.7rem;
+}
+
+/* Before hydration and with JavaScript off: every device, each a closed disclosure. */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-picker-all {
+  display: grid;
+  gap: 0.4rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-picker-entry {
+  padding: 0 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-picker-entry > summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-picker-entry[open] {
+  padding-bottom: 0.8rem;
+}
+
+/* One device's entry: label, then what a registered page says, then its sources. */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device dt {
+  margin-top: 0.45rem;
+  color: var(--sage-text);
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device dt:first-child {
+  margin-top: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device dd {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.15rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device-list > li {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0;
+  padding: 0 0 0 0.75rem;
+  border: 0;
+  border-left: 2px solid var(--line);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device-list > li::before {
+  content: none;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device-list.is-questions > li {
+  border-left-style: dashed;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device-what {
+  font-weight: 600;
+}
+
+/* Who confirms a pairing: said in words, so the tone only repeats it. */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device-basis {
+  font-size: var(--text-small);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device-basis.is-pumpMakerOnly,
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device-basis.is-sensorMakerOnly {
+  font-style: italic;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device-caveat,
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device-age {
+  font-size: var(--text-small);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device-src {
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device-unconfirmed {
+  margin: 0.2rem 0 0;
+  color: var(--ink-muted);
+  font-size: var(--text-small);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device-list > li.dc-fig-device-unconfirmed {
+  border-left-style: dashed;
+}
+
+/* A sensor's notice: a neutral callout, never the urgent tone. */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device-notice {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0.7rem 0 0;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--cream);
+  line-height: 1.5;
+}
+
+/*
+ * A recall notice where the sensor is named outside the sensor picker: under
+ * its line in the pump picker, never in that line's muted tone, and under the
+ * calculator's preset, spaced by the calculator's own grid.
+ */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device-list .dc-fig-device-notice {
+  margin-top: 0.35rem;
+  color: var(--ink);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock .dc-fig-device-notice {
+  margin: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-device-ask {
+  margin-top: 0.6rem;
+}
+
+/* ---------------------------------------------------------------------------
+ * The restock calculator
+ * ------------------------------------------------------------------------- */
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--cream);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock-nojs {
+  margin: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock-form {
+  display: grid;
+  gap: 0.7rem 1rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock-field {
+  display: grid;
+  gap: 0.25rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock-field label {
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock-field select,
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock-field input {
+  min-height: 44px;
+  width: 100%;
+  max-width: 22rem;
+  padding: 0.4rem 0.6rem;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 35%, transparent);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock-field input[readonly] {
+  background: var(--cream);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock-field select:focus-visible,
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock-field input:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 2px;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock .oc-fig-detail {
+  margin: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock-result {
+  display: grid;
+  gap: 0.3rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock-result p {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock-result .is-invalid {
+  font-weight: 400;
+}
+
+@media (min-width: 600px) {
+  #oc-chapter[data-site='diabetes-care'] .dc-fig-restock-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: end;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * The rotation map
+ * ------------------------------------------------------------------------- */
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-rotate {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.8rem 0 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-rotate-map {
+  display: block;
+  width: 100%;
+  max-width: 26rem;
+  height: auto;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-rotate-area {
+  fill: var(--paper);
+  stroke: color-mix(in srgb, var(--ink) 30%, transparent);
+  stroke-width: 1.5;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-rotate-current {
+  fill: var(--sage-soft);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-rotate-split {
+  stroke: color-mix(in srgb, var(--ink) 30%, transparent);
+  stroke-width: 1.5;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-rotate-clear {
+  fill: var(--paper);
+  stroke: var(--ink-muted);
+  stroke-dasharray: 5 4;
+  stroke-width: 1.5;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-rotate-navel,
+#oc-chapter[data-site='diabetes-care'] .dc-fig-rotate-dot {
+  fill: var(--ink);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-rotate-label {
+  fill: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-rotate-centre {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: var(--text-small);
+}
+
+/* The key for the dashed keep-clear circle in the drawing. */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-rotate-key {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 1.5px dashed var(--ink-muted);
+  border-radius: 50%;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-rotate .oc-fig-detail {
+  margin: 0;
+}

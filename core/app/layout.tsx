@@ -23,9 +23,19 @@ export default async function RootLayout({ children }: PropsWithChildren) {
    */
   const locale = await getLocale();
 
+  /*
+   * suppressHydrationWarning: the care sites' text-size pre-paint script sets
+   * data-oc-text on <html> before React hydrates (A+ / A++), so that one
+   * attribute legitimately differs from the server render. It covers this
+   * element's own attributes only, not its children.
+   */
   return (
     <MakeswiftProvider siteVersion={siteVersion}>
-      <html className={clsx(fonts.map((f) => f.variable))} lang={locale === 'fr' ? 'fr-CA' : 'en-CA'}>
+      <html
+        className={clsx(fonts.map((f) => f.variable))}
+        lang={locale === 'fr' ? 'fr-CA' : 'en-CA'}
+        suppressHydrationWarning
+      >
         <head>
           <SiteTheme />
         </head>

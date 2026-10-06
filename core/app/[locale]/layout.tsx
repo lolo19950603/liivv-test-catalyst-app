@@ -5,7 +5,7 @@ import { getMessages, setRequestLocale } from 'next-intl/server';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { cache, PropsWithChildren } from 'react';
 
-import { withoutHeldMessages } from '~/app/[locale]/(default)/liivv-health/ostomy-care/chapters/held-messages';
+import { rootClientMessages } from '~/app/[locale]/(default)/liivv-health/_microsite/client-messages';
 import { CookieNotifications } from '~/app/notifications';
 import { Providers } from '~/app/providers';
 import { client } from '~/client';
@@ -146,14 +146,15 @@ export default async function RootLayout({ params, children }: Props) {
   return (
     <>
       {/*
-        `withoutHeldMessages` takes the copy a HELD figure owns out of what the
+        `rootClientMessages` takes the copy a HELD figure owns out of what the
         browser is given. D22 deferred scoping this payload with `pick()`, and
         the whole message tree still ships on every route — but a hold is a
         promise that nobody outside the review has seen that wording yet, and a
         render switch alone left it retrievable from the HTML of /cart and every
-        product page. See the module.
+        product page. It also leaves out the namespace of a care site added
+        after Ostomy, which only that site's own layout ships. See the module.
       */}
-      <NextIntlClientProvider locale={locale} messages={withoutHeldMessages(messages)}>
+      <NextIntlClientProvider locale={locale} messages={rootClientMessages(messages)}>
         <ConsentManager
           isCookieConsentEnabled={isCookieConsentEnabled}
           privacyPolicyUrl={privacyPolicyUrl}

@@ -1,0 +1,70 @@
+/*
+ * The engine's shop strip (./shop-strip.tsx) on top of Ostomy's `oc-merch-*`
+ * rules in chapter-page.css. Scoped under `[data-site]`, which only engine
+ * pages carry, so no rule here can reach an Ostomy page.
+ */
+
+/* A card whose shelf the catalogue left empty draws no band and no rule above it. */
+#oc-chapter[data-site] .oc-merch-slot:empty {
+  display: none;
+}
+
+/* A shelf on a path or funding page, between two sections of the page. */
+#oc-chapter[data-site] .oc-merch-band .oc-merch {
+  max-width: 72rem;
+}
+
+#oc-chapter[data-site] .oc-merch-collection {
+  margin: 0;
+}
+
+/* The notices every insulin and glucagon product page prints under its buy box. */
+#oc-chapter[data-site] .oc-merch-notice {
+  display: grid;
+  gap: 0.35rem;
+  max-width: 62ch;
+  padding: 0.75rem 0.9rem;
+  border-left: 3px solid var(--chapter-accent, var(--line));
+  background: var(--paper, transparent);
+  font-size: var(--text-small);
+  line-height: 1.45;
+  color: var(--ink-body);
+}
+
+#oc-chapter[data-site] .oc-merch-notice p {
+  margin: 0;
+}
+
+/*
+ * Narrow phones (full-site review, 2026-10-06): a card in a strip under a
+ * card is too narrow for a photo column beside the name and the button, so
+ * the button takes the card's full width under the photo, name and price, as
+ * Ostomy's strip does, and "Add to cart" or "Ajouter au panier" sits on one
+ * line. The body's own box steps aside so its parts join the card's grid.
+ */
+@media (max-width: 400px) {
+  #oc-chapter[data-site] .oc-merch-card {
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    align-items: start;
+    row-gap: 0.4rem;
+  }
+
+  #oc-chapter[data-site] .oc-merch-card-photo {
+    grid-row: span 2;
+  }
+
+  #oc-chapter[data-site] .oc-merch-card-body {
+    display: contents;
+  }
+
+  #oc-chapter[data-site] .oc-merch-card-body .oc-merch-name,
+  #oc-chapter[data-site] .oc-merch-card-body .oc-merch-price {
+    grid-column: 2;
+  }
+
+  #oc-chapter[data-site] .oc-merch-card-body > form,
+  #oc-chapter[data-site] .oc-merch-card-body > .oc-merch-cta {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}

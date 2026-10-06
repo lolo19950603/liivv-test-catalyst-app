@@ -41,6 +41,15 @@ const FREQUENCIES = ['Every week', 'Every month', 'Every 14 days', 'Every 30 day
 
 type PointerTarget = 'purchase-type' | 'frequency' | 'start-date' | 'checkout' | 'manage';
 
+const formatDemoDate = (date: Date) =>
+  date.toLocaleDateString('en-CA', { month: 'short', day: 'numeric' });
+
+/* Same day one month later, held to the month's last day (Jan 31 → Feb 28). */
+const addOneMonth = (date: Date) => {
+  const lastDay = new Date(date.getFullYear(), date.getMonth() + 2, 0).getDate();
+  return new Date(date.getFullYear(), date.getMonth() + 1, Math.min(date.getDate(), lastDay));
+};
+
 export type SubscriptionFlowDemoProps = {
   productName?: string;
   productBlurb?: string;
@@ -59,6 +68,7 @@ export function SubscriptionFlowDemo({
   const [hoverStep, setHoverStep] = useState<number | null>(null);
   const [freqIndex, setFreqIndex] = useState(1);
   const [startLabel, setStartLabel] = useState('Today');
+  const [nextLabel, setNextLabel] = useState('');
   const [reduceMotion, setReduceMotion] = useState(false);
   const [pulse, setPulse] = useState<string | null>('purchase-type');
   const [activeTarget, setActiveTarget] = useState<PointerTarget | null>(null);
@@ -198,7 +208,12 @@ export function SubscriptionFlowDemo({
         if (cancelled) break;
         await click('start-date');
         if (cancelled) break;
-        setStartLabel('Mar 18');
+        /* Two weeks from today, so the demo never shows a date already past; the
+           monthly "Next on" date in the Manage step is one month after it. */
+        const startDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+
+        setStartLabel(formatDemoDate(startDate));
+        setNextLabel(formatDemoDate(addOneMonth(startDate)));
         await wait(1100);
         if (cancelled) break;
 
@@ -351,7 +366,7 @@ export function SubscriptionFlowDemo({
             <div className={`lh-sub-manage-card${pulse === 'manage' ? ' is-pulse' : ''}`}>
               <div>
                 <strong>{productName}</strong>
-                <em>Every month · Next on Apr 18</em>
+                <em>Every month · Next on {nextLabel}</em>
               </div>
               <div className="lh-sub-manage-actions">
                 <span>Pause</span>

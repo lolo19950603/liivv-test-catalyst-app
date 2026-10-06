@@ -1,6 +1,8 @@
 /* Diabetes Care — Steady Balance / Everyday Rhythm
-   Distinct from Ostomy Care: cream/blush-forward, pill CTAs,
-   four chapter doors, shop rooms for meters/CGM — not WH float chips. */
+   Distinct from Ostomy Care: cream/blush-forward, pill CTAs, situation doors,
+   type chips and a sourced fact band, shop rooms for meters/CGM — not WH float
+   chips. Styles the shared landing (_microsite/landing), whose classes all
+   carry this site's dc- prefix. */
 
 #diabetes-care {
   --cream: #f5f2ed;
@@ -352,9 +354,21 @@
   pointer-events: none;
   z-index: 1;
   background:
-    radial-gradient(ellipse 90% 55% at 0% 22%, color-mix(in srgb, var(--ink) 92%, transparent) 0%, transparent 72%),
-    radial-gradient(ellipse 70% 48% at 12% 58%, color-mix(in srgb, var(--ink) 78%, transparent) 0%, transparent 68%),
-    radial-gradient(ellipse 55% 40% at 8% 88%, color-mix(in srgb, var(--ink) 70%, transparent) 0%, transparent 65%),
+    radial-gradient(
+      ellipse 90% 55% at 0% 22%,
+      color-mix(in srgb, var(--ink) 92%, transparent) 0%,
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 70% 48% at 12% 58%,
+      color-mix(in srgb, var(--ink) 78%, transparent) 0%,
+      transparent 68%
+    ),
+    radial-gradient(
+      ellipse 55% 40% at 8% 88%,
+      color-mix(in srgb, var(--ink) 70%, transparent) 0%,
+      transparent 65%
+    ),
     linear-gradient(
       90deg,
       var(--ink) 0%,
@@ -406,7 +420,11 @@
     width: 100%;
     height: min(42%, 180px);
     background:
-      radial-gradient(ellipse 80% 70% at 20% 100%, color-mix(in srgb, var(--ink) 85%, transparent) 0%, transparent 70%),
+      radial-gradient(
+        ellipse 80% 70% at 20% 100%,
+        color-mix(in srgb, var(--ink) 85%, transparent) 0%,
+        transparent 70%
+      ),
       linear-gradient(
         180deg,
         transparent 0%,
@@ -449,94 +467,259 @@
   opacity: 0.45;
 }
 
-#diabetes-care .guest-category-quiz {
-  padding: clamp(2.1rem, 5vw, 3.5rem) 0 calc(var(--dc-overlap) + clamp(2rem, 4.5vw, 3.25rem));
+/* ---------- SITUATION DOORS (#doors) ----------
+   Not numbered: these are situations a reader is already in. The urgent door
+   is told apart by its symbol, its rule and its second link, never by colour
+   alone. Ostomy's door rules, in this site's palette. */
+#diabetes-care .dc-situation {
+  --dc-urgent: #9a3b2c;
+  --dc-urgent-wash: color-mix(in srgb, var(--blush) 34%, var(--paper));
+
+  position: relative;
+  z-index: 2;
+  margin-top: calc(-1 * var(--dc-overlap));
+  border-radius: var(--dc-overlap) var(--dc-overlap) 0 0;
+  padding: 3.25rem 0 calc(var(--dc-overlap) + 3.5rem);
+  background: var(--cream);
 }
 
-#diabetes-care .guest-category-quiz-inner {
-  width: min(100% - (var(--pad) * 2), var(--max));
+#diabetes-care section.dc-situation[id] {
+  scroll-margin-top: calc(6.5rem + var(--dc-overlap));
 }
 
-/* ---------- PATH (ways in) ---------- */
-#diabetes-care .dc-path {
-  padding: 4.5rem 0 calc(var(--dc-overlap) + 2rem);
+#diabetes-care .dc-situation h2 {
+  margin: 0 0 1.35rem;
+  font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+  max-width: 18ch;
+}
+
+#diabetes-care .dc-situation-draft,
+#diabetes-care .dc-fr-draft {
+  width: fit-content;
+  margin: 0 0 0.9rem;
+  padding: 0.2rem 0.65rem;
+  border: 1px dashed color-mix(in srgb, currentColor 45%, transparent);
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+#diabetes-care .dc-situation-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  align-items: start;
+}
+
+#diabetes-care .dc-situation-item {
+  display: grid;
+  align-content: start;
+  gap: 0.45rem;
+}
+
+#diabetes-care .dc-situation-door {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  min-height: 44px;
+  padding: 0.95rem 1.05rem 1.05rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  text-decoration: none;
+  transition:
+    border-color 0.25s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#diabetes-care .dc-situation-door:hover {
+  border-color: var(--sage-deep);
+  transform: translateY(-2px);
+}
+
+#diabetes-care .dc-situation-door b {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: 1.12rem;
+  line-height: 1.2;
+}
+
+#diabetes-care .dc-situation-door span {
+  font-size: 0.9rem;
+  color: rgba(49, 47, 47, 0.76);
+}
+
+#diabetes-care .dc-situation-glyph {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: var(--sage-deep);
+}
+
+#diabetes-care .dc-situation-item.is-urgent .dc-situation-door {
+  border-color: color-mix(in srgb, var(--dc-urgent) 30%, transparent);
+  border-left: 4px solid var(--dc-urgent);
+  background: var(--dc-urgent-wash);
+}
+
+#diabetes-care .dc-situation-item.is-urgent .dc-situation-door b,
+#diabetes-care .dc-situation-item.is-urgent .dc-situation-glyph {
+  color: var(--dc-urgent);
+}
+
+#diabetes-care .dc-situation-item.is-urgent .dc-situation-door:hover {
+  border-color: var(--dc-urgent);
+}
+
+#diabetes-care .dc-situation-secondary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.15rem;
+  font-size: 0.88rem;
+  font-weight: 550;
+  color: var(--sage-deep);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* ---------- WHICH DIABETES? (#which-diabetes) ---------- */
+#diabetes-care .dc-types {
+  padding: 3.5rem 0 calc(var(--dc-overlap) + 3.5rem);
   background: var(--sage-soft);
 }
 
-#diabetes-care .dc-path-head {
-  margin-bottom: 2rem;
+#diabetes-care .dc-types-head {
+  max-width: 40rem;
+  margin-bottom: 1.5rem;
 }
 
-#diabetes-care .dc-path-head h2 {
+#diabetes-care .dc-types-head h2 {
   margin-top: 0.55rem;
-  font-size: clamp(1.9rem, 4vw, 2.8rem);
-  max-width: 16ch;
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
 }
 
-#diabetes-care .dc-path-list {
-  display: grid;
-  gap: 0;
-  border-left: 2px solid var(--sage-soft);
-  margin-left: 0.85rem;
-  padding-left: 1.5rem;
+#diabetes-care .dc-types-head p {
+  margin-top: 0.65rem;
+  color: rgba(42, 50, 44, 0.8);
 }
 
-#diabetes-care .dc-path-item {
-  position: relative;
+#diabetes-care .dc-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#diabetes-care .dc-chip {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 1rem 1.25rem;
-  align-items: start;
-  padding: 1.35rem 0 1.55rem;
+  gap: 0.15rem;
+  min-height: 44px;
+  padding: 0.7rem 1.15rem;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: var(--paper);
   text-decoration: none;
-  border-bottom: 1px solid var(--line);
-  transition: padding-left 0.3s ease;
+  transition:
+    border-color 0.25s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#diabetes-care .dc-path-item:last-child {
-  border-bottom: 0;
+#diabetes-care .dc-chip:hover {
+  border-color: var(--sage-deep);
+  transform: translateY(-2px);
 }
 
-#diabetes-care .dc-path-item::before {
-  content: '';
-  position: absolute;
-  left: calc(-1.5rem - 6px);
-  top: 1.65rem;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--sage);
-  box-shadow: 0 0 0 5px var(--sage-soft);
-}
-
-#diabetes-care .dc-path-item:hover {
-  padding-left: 0.35rem;
-}
-
-#diabetes-care .dc-path-num {
+#diabetes-care .dc-chip b {
   font-family: var(--font-heading);
-  font-size: 1.5rem;
-  color: var(--sage-deep);
+  font-weight: 400;
+  font-size: 1.1rem;
+  line-height: 1.2;
+}
+
+#diabetes-care .dc-chip span {
+  max-width: 24ch;
+  font-size: 0.8rem;
+  color: rgba(49, 47, 47, 0.7);
+}
+
+/* A "Sources:" line under a fact, the chips' intro or an answer. */
+#diabetes-care .dc-source-line {
+  margin-top: 0.55rem;
+  font-size: 0.78rem;
+  color: rgba(49, 47, 47, 0.68);
+}
+
+#diabetes-care .dc-source-line a {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+/* ---------- FACT BAND (#facts) ---------- */
+#diabetes-care .dc-facts {
+  padding: 3rem 0 calc(var(--dc-overlap) + 3rem);
+  background: var(--sand);
+}
+
+#diabetes-care .dc-facts-head {
+  margin-bottom: 1.5rem;
+}
+
+#diabetes-care .dc-facts-head h2 {
+  margin-top: 0.5rem;
+  font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+  max-width: 20ch;
+}
+
+#diabetes-care .dc-facts-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.85rem;
+}
+
+#diabetes-care .dc-fact {
+  padding: 1.1rem 1rem 1.2rem;
+  border-radius: var(--radius);
+  background: #fff;
+  border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  box-shadow: 0 8px 22px rgba(49, 47, 47, 0.08);
+}
+
+#diabetes-care .dc-fact strong {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  font-weight: 400;
   line-height: 1;
-}
-
-#diabetes-care .dc-path-copy h3 {
-  font-size: 1.35rem;
-  margin-bottom: 0.35rem;
-}
-
-#diabetes-care .dc-path-copy p {
-  max-width: 42ch;
-  color: rgba(42, 50, 44, 0.78);
-  font-size: 0.98rem;
-}
-
-#diabetes-care .dc-path-go {
-  align-self: center;
-  font-size: 0.85rem;
-  font-weight: 600;
   color: var(--sage-deep);
-  white-space: nowrap;
+}
+
+#diabetes-care .dc-fact > span {
+  display: block;
+  margin-top: 0.45rem;
+  font-size: 0.86rem;
+  color: rgba(49, 47, 47, 0.78);
+}
+
+@media (max-width: 900px) {
+  #diabetes-care .dc-facts-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  #diabetes-care .dc-facts-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ---------- CURATED KITS SHELF ---------- */
@@ -861,7 +1044,10 @@
   font-size: 0.86rem;
   font-weight: 550;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
 #diabetes-care .dc-filter.is-active,
@@ -885,7 +1071,9 @@
   background: var(--paper);
   border: 1px solid transparent;
   text-decoration: none;
-  transition: border-color 0.25s ease, transform 0.25s ease;
+  transition:
+    border-color 0.25s ease,
+    transform 0.25s ease;
 }
 
 #diabetes-care .dc-product:hover {
@@ -928,6 +1116,39 @@
   font-size: 0.85rem;
   font-weight: 550;
   color: rgba(42, 50, 44, 0.7);
+}
+
+/* The pharmacist-review notice on an insulin or glucagon tile. */
+#diabetes-care .dc-product-notice {
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--sage-deep);
+}
+
+/* A room's own line above its products: the Quebec line in the insulin room. */
+#diabetes-care .dc-shop-room-note {
+  max-width: 62ch;
+  margin: -0.5rem 0 1rem;
+  padding: 0.6rem 0.85rem;
+  border-left: 3px solid var(--sage-deep);
+  background: var(--paper);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+/*
+ * Phones: two products a row, so twelve tiles are six rows rather than
+ * twelve (full-site review, 2026-10-06).
+ */
+@media (max-width: 480px) {
+  #diabetes-care .dc-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  #diabetes-care .dc-product-meta {
+    padding: 0.65rem 0.7rem 0.8rem;
+  }
 }
 
 #diabetes-care .dc-shop-empty {
@@ -985,7 +1206,9 @@
   background: var(--paper);
   border: 1px solid var(--line);
   overflow: hidden;
-  transition: transform 0.3s ease, border-color 0.25s ease;
+  transition:
+    transform 0.3s ease,
+    border-color 0.25s ease;
 }
 
 #diabetes-care .dc-journey-card:hover {
@@ -1033,6 +1256,13 @@
   color: rgba(42, 50, 44, 0.72);
   font-size: 0.95rem;
   max-width: 48ch;
+}
+
+#diabetes-care .dc-journey-go {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--sage-deep);
 }
 
 @media (min-width: 900px) {
@@ -1120,6 +1350,44 @@
   color: rgba(244, 247, 243, 0.86);
 }
 
+#diabetes-care .dc-care-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.85rem;
+}
+
+#diabetes-care .dc-care-cta-note {
+  font-size: 0.85rem;
+}
+
+/* The pharmacist chat, a quieter panel under the pharmacist CDE's. */
+#diabetes-care .dc-care-chat {
+  display: grid;
+  justify-items: start;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+  padding: clamp(1.3rem, 3vw, 1.9rem);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+
+#diabetes-care .dc-care-chat h3 {
+  font-size: clamp(1.35rem, 2.4vw, 1.7rem);
+}
+
+#diabetes-care .dc-care-chat p {
+  max-width: 60ch;
+  color: rgba(42, 50, 44, 0.78);
+}
+
+/* The CDE contact in the "Speak to a CDE" panel, above the chat button. */
+#diabetes-care .dc-care-chat .ms-contact {
+  margin-bottom: 0.35rem;
+  color: var(--ink);
+}
+
 @media (max-width: 800px) {
   #diabetes-care .dc-care-panel {
     grid-template-columns: 1fr;
@@ -1166,64 +1434,39 @@
   margin-bottom: 1rem;
 }
 
+/*
+ * Every pill is the same height and colour, so a maker's name sits in the
+ * row exactly as its neighbour's logo does.
+ */
 #diabetes-care .dc-brand-pill {
-  padding: 0.7rem 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.1rem;
+  padding: 0.55rem 1.15rem;
+  border: 1px solid var(--line);
   border-radius: 12px;
-  background: var(--mist);
+  background: var(--paper);
   font-family: var(--font-heading);
   font-size: 1.15rem;
+  line-height: 1.2;
 }
 
+/* A logo pill. Every pill is white, for the logo files' own white and grey grounds. */
 #diabetes-care .dc-brand-logo {
-  height: 2.6rem;
+  padding: 0.45rem 0.9rem;
+}
+
+/*
+ * The logo files are cropped to their ink with a hair of white, so one height
+ * gives every maker the same weight in the row.
+ */
+#diabetes-care .dc-brand-logo img {
+  display: block;
   width: auto;
-  max-width: 8.5rem;
+  height: 1.75rem;
+  max-width: 9rem;
   object-fit: contain;
-  padding: 0.45rem 0.75rem;
-  background: var(--paper);
-  border-radius: 12px;
-  border: 1px solid var(--line);
-}
-
-#diabetes-care .dc-stats {
-  padding: 1.75rem 0 calc(var(--dc-overlap) + 1.5rem);
-  background: var(--sand);
-}
-
-#diabetes-care .dc-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.85rem;
-}
-
-#diabetes-care .dc-stat {
-  padding: 1.1rem 1rem 1.2rem;
-  border-radius: var(--radius);
-  background: #fff;
-  border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
-  box-shadow: 0 8px 22px rgba(49, 47, 47, 0.08);
-}
-
-#diabetes-care .dc-stat strong {
-  display: block;
-  font-family: var(--font-heading);
-  font-size: clamp(1.6rem, 3vw, 2.1rem);
-  font-weight: 400;
-  line-height: 1;
-  color: var(--sage-deep);
-}
-
-#diabetes-care .dc-stat span {
-  display: block;
-  margin-top: 0.45rem;
-  font-size: 0.86rem;
-  color: rgba(49, 47, 47, 0.72);
-}
-
-@media (max-width: 800px) {
-  #diabetes-care .dc-stats-grid {
-    grid-template-columns: 1fr 1fr;
-  }
 }
 
 #diabetes-care .dc-brand-points {
@@ -1241,90 +1484,6 @@
   content: '·';
   margin-right: 0.55rem;
   color: var(--sage);
-}
-
-/* ---------- VOICES ---------- */
-#diabetes-care .dc-voices {
-  padding: 2rem 0 calc(var(--dc-overlap) + 4rem);
-  background: var(--sage);
-  color: var(--ink);
-}
-
-#diabetes-care .dc-voices-head {
-  margin-bottom: 1.75rem;
-}
-
-#diabetes-care .dc-voices-head h2 {
-  margin-top: 0.45rem;
-  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
-}
-
-#diabetes-care .dc-voice-stack {
-  display: grid;
-  gap: 0.85rem;
-}
-
-#diabetes-care .dc-voice {
-  display: grid;
-  grid-template-columns: 4.25rem 1fr;
-  gap: 1rem;
-  padding: 1.15rem 1.2rem;
-  border-radius: var(--radius);
-  background: var(--paper);
-  border: 1px solid var(--line);
-}
-
-#diabetes-care .dc-voice.is-lead {
-  background: linear-gradient(135deg, rgba(197, 212, 196, 0.45), var(--paper) 55%);
-  border-color: rgba(111, 138, 114, 0.28);
-}
-
-#diabetes-care .dc-voice-avatar {
-  width: 4.25rem;
-  height: 4.25rem;
-  border-radius: 16px;
-  object-fit: cover;
-}
-
-#diabetes-care .dc-voice blockquote {
-  margin: 0;
-  font-family: var(--font-heading);
-  font-size: 1.15rem;
-  line-height: 1.35;
-}
-
-#diabetes-care .dc-voice-who {
-  margin-top: 0.55rem;
-  font-size: 0.86rem;
-  color: rgba(42, 50, 44, 0.68);
-}
-
-#diabetes-care .dc-voice-who strong {
-  display: block;
-  color: var(--ink);
-  font-weight: 600;
-}
-
-@media (min-width: 900px) {
-  #diabetes-care .dc-voice-stack {
-    grid-template-columns: 1.2fr 1fr;
-  }
-
-  #diabetes-care .dc-voice.is-lead {
-    grid-row: span 3;
-    grid-template-columns: 1fr;
-    align-content: start;
-    padding: 1.6rem;
-  }
-
-  #diabetes-care .dc-voice.is-lead .dc-voice-avatar {
-    width: 5.5rem;
-    height: 5.5rem;
-  }
-
-  #diabetes-care .dc-voice.is-lead blockquote {
-    font-size: 1.55rem;
-  }
 }
 
 /* ---------- FAQ ---------- */
@@ -1389,10 +1548,20 @@
   color: rgba(42, 50, 44, 0.78);
 }
 
+#diabetes-care .dc-faq details p a {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+#diabetes-care .dc-faq details .dc-source-line {
+  margin-top: 0.45rem;
+  font-size: 0.78rem;
+}
+
 /* ---------- CLOSING ---------- */
 #diabetes-care .dc-close {
   position: relative;
-  padding: 5rem var(--pad) 5.5rem;
+  padding: 5rem var(--pad) calc(var(--dc-overlap) + 5.5rem);
   overflow: hidden;
   color: #f4f7f3;
   text-align: center;
@@ -1448,6 +1617,56 @@
   margin-top: 1.6rem;
 }
 
+/* ---------- GOVERNANCE (#governance) ----------
+   Liivv's commercial interest, the machine-translation notice on /fr, and
+   every source the page names. Last on the page, after the closing. */
+#diabetes-care .dc-governance {
+  padding: 2.75rem 0 3.5rem;
+  background: var(--cream);
+  font-size: 0.88rem;
+  color: rgba(49, 47, 47, 0.8);
+}
+
+#diabetes-care .dc-governance-inner {
+  display: grid;
+  gap: 0.65rem;
+  max-width: 62rem;
+}
+
+#diabetes-care .dc-governance-review strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+#diabetes-care .dc-governance-machine,
+#diabetes-care .dc-governance-disclosure {
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+
+#diabetes-care .dc-governance-sources {
+  margin-top: 0.75rem;
+}
+
+#diabetes-care .dc-governance-sources h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+}
+
+#diabetes-care .dc-governance-sources ul {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+#diabetes-care .dc-governance a {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
 @keyframes dc-hub-orb {
   from {
     transform: translate3d(0, 0, 0) scale(1);
@@ -1482,4 +1701,3 @@
     animation: none !important;
   }
 }
-

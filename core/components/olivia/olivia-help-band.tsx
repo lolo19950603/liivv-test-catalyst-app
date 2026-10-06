@@ -21,6 +21,7 @@ export function OliviaHelpBand({
   bubble = 'Hi — I live in the corner.',
   moreLabel = 'What she can do →',
   note = 'Look for the bouncing sprout in the corner. Clinical questions still belong with a pharmacist.',
+  moreHref = '/#olivia',
   className,
 }: {
   kicker?: string;
@@ -30,6 +31,8 @@ export function OliviaHelpBand({
   bubble?: string;
   moreLabel?: string;
   note?: string;
+  /* The ghost link, in the page locale ("/fr/#olivia" on French pages). */
+  moreHref?: string;
   className?: string;
 }) {
   const rootClass = className ? `olivia-help-band ${className}` : 'olivia-help-band';
@@ -53,7 +56,7 @@ export function OliviaHelpBand({
             <button className="olivia-help-band__cta" onClick={() => openLiveChat()} type="button">
               {ctaLabel}
             </button>
-            <a className="olivia-help-band__ghost" href="/#olivia">
+            <a className="olivia-help-band__ghost" href={moreHref}>
               {moreLabel}
             </a>
           </div>

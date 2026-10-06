@@ -25,6 +25,7 @@ import { numberedPaginationTransformer } from '~/data-transformers/numbered-pagi
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-ids';
 import { categoryLineageIds, isSensitiveProduct } from '~/lib/analytics/sensitive-products';
+import { withoutInsulinOnFrench } from '~/lib/checkout/quebec-insulin';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { resolveStoreLogo } from '~/lib/makeswift/site-header/resolve-store-logo';
@@ -206,11 +207,20 @@ export default async function Category(props: Props) {
     return [...sensitive];
   });
 
+  /*
+   * The shelf's products: never insulin on /fr (owner answer B11;
+   * ~/lib/checkout/quebec-insulin).
+   */
+  const streamableListedProducts = Streamable.from(async () => {
+    const search = await streamableFacetedSearch;
+
+    return withoutInsulinOnFrench(search.products.items, locale);
+  });
+
   const streamableProducts = Streamable.from(async () => {
     const format = await getFormatter();
 
-    const search = await streamableFacetedSearch;
-    const products = search.products.items;
+    const products = await streamableListedProducts;
 
     const { defaultOutOfStockMessage, showOutOfStockMessage, showBackorderMessage } =
       settings?.inventory ?? {};
@@ -405,12 +415,12 @@ export default async function Category(props: Props) {
         snapshotId={`category-${categoryId}-bottom-content`}
       />
       {isShopOstomy ? null : (
-        <Stream value={Streamable.all([streamableFacetedSearch, streamableSensitiveProductIds])}>
-          {([search, sensitiveProductIds]) => (
+        <Stream value={Streamable.all([streamableListedProducts, streamableSensitiveProductIds])}>
+          {([listedProducts, sensitiveProductIds]) => (
             <CategoryViewed
               category={category}
               categoryIds={analyticsCategoryIds}
-              products={search.products.items}
+              products={listedProducts}
               sensitiveProductIds={sensitiveProductIds}
             />
           )}
