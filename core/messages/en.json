@@ -679,6 +679,12 @@
       "orderNumber": "Order #",
       "totalPrice": "Total",
       "viewDetails": "View Details",
+      "reorder": "Reorder",
+      "reorderViewCart": "View cart",
+      "reorderEmpty": "This order has no items that can be added to the cart.",
+      "reorderError": "We couldn't add this order to your cart. Please try again.",
+      "reorderFailed": "Could not add {names}. They may be unavailable.",
+      "reorderPartial": "{added, plural, =1 {1 item was} other {# items were}} added to your cart. Could not add {names}.",
       "EmptyState": {
         "title": "You don't have any orders",
         "cta": "Shop now"

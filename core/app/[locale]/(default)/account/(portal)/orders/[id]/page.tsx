@@ -5,6 +5,8 @@ import { Streamable } from '@/vibes/soul/lib/streamable';
 import { OrderDetailsSection } from '@/vibes/soul/sections/order-details-section';
 import { orderDetailsTransformer } from '~/data-transformers/order-details-transformer';
 
+import { reorderOrder } from '../_actions/reorder';
+
 import { getCustomerOrderDetails } from './page-data';
 
 interface Props {
@@ -20,6 +22,7 @@ export default async function OrderDetails(props: Props) {
   setRequestLocale(locale);
 
   const t = await getTranslations('Account.Orders.Details');
+  const ordersT = await getTranslations('Account.Orders');
   const format = await getFormatter();
 
   const streamableOrder = Streamable.from(async () => {
@@ -37,10 +40,13 @@ export default async function OrderDetails(props: Props) {
       order={streamableOrder}
       orderSummaryLabel={t('orderSummary')}
       prevHref="/account/orders"
+      reorderAction={reorderOrder}
+      reorderLabel={ordersT('reorder')}
       shipmentAddressLabel={t('shippingAddress')}
       shipmentMethodLabel={t('shippingMethod')}
       summaryTotalLabel={t('summaryTotal')}
       title={t('title', { orderNumber: id })}
+      viewCartLabel={ordersT('reorderViewCart')}
     />
   );
 }

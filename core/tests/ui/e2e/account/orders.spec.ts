@@ -47,4 +47,7 @@ test('Order details are displayed and use correct formatting', async ({
 
   await expect(page.getByText(orderDetails.status).first()).toBeVisible();
   await expect(page.getByRole('link', { name: productName }).first()).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: t('Account.Orders.reorder') }).first(),
+  ).toBeVisible();
 });
