@@ -1,0 +1,404 @@
+/* Twin of ostomy-care/ostomy-shop.css @f7f9ef0b (with the Poppins change of 2026-10-07) — port fixes both ways until Phase 2 */
+
+#diabetes-shop {
+  --cream: #f5f2ed;
+  --ink: #312f2f;
+  --taupe: #a89c94;
+  --sand: #d7cfc7;
+  --sage: #8ea58d;
+  --sage-deep: color-mix(in srgb, var(--sage) 62%, var(--ink));
+  --paper: #fff;
+  --line: rgba(49, 47, 47, 0.12);
+  --font-heading: var(--font-family-poppins), system-ui, sans-serif;
+  --font-body: var(--font-family-poppins), system-ui, sans-serif;
+  --pad: clamp(1rem, 2vw, 2rem);
+  --max: 96rem;
+
+  color: var(--ink);
+  background: var(--cream);
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+#diabetes-shop *,
+#diabetes-shop *::before,
+#diabetes-shop *::after {
+  box-sizing: border-box;
+}
+
+#diabetes-shop .ds-wrap {
+  width: min(100% - (var(--pad) * 2), var(--max));
+  margin-inline: auto;
+}
+
+#diabetes-shop .ds-intro {
+  padding-top: 1.75rem;
+}
+
+#diabetes-shop .ds-head {
+  max-width: 40rem;
+  padding: 1.25rem 0 0.25rem;
+}
+
+#diabetes-shop .ds-eyebrow {
+  margin: 0 0 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sage-deep);
+}
+
+#diabetes-shop h1 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(2.4rem, 5vw, 4.25rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+#diabetes-shop .ds-lead {
+  margin: 0.85rem 0 0;
+  max-width: 38rem;
+  color: color-mix(in srgb, var(--ink) 78%, white);
+  font-size: 1.05rem;
+}
+
+#diabetes-shop .ds-layout {
+  display: grid;
+  grid-template-columns: minmax(15.5rem, 17.75rem) minmax(0, 1fr);
+  gap: 1.5rem 2.25rem;
+  align-items: start;
+  margin-top: 1.5rem;
+  padding-bottom: 3.5rem;
+}
+
+#diabetes-shop .ds-side {
+  position: sticky;
+  top: 9.75rem;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  max-height: calc(100dvh - 11rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.35rem;
+  scrollbar-width: thin;
+  background: var(--cream);
+}
+
+#diabetes-shop .ds-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+#diabetes-shop .ds-search-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+#diabetes-shop .ds-search input[type='search'] {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  height: 2.75rem;
+  padding: 0 1rem;
+  border: 1px solid var(--sand);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+#diabetes-shop .ds-search input[type='search']:focus-visible,
+#diabetes-shop .ds-chip:focus-visible,
+#diabetes-shop .ds-clear:focus-visible,
+#diabetes-shop .ds-search button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+#diabetes-shop .ds-search button {
+  flex: none;
+  height: 2.75rem;
+  padding: 0 1.1rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--cream);
+  font: inherit;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+#diabetes-shop .ds-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+#diabetes-shop .ds-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+#diabetes-shop .ds-row-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--taupe);
+}
+
+#diabetes-shop .ds-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+#diabetes-shop .ds-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.5rem;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--sand);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.92rem;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+#diabetes-shop .ds-chip.is-active {
+  border-color: var(--sage-deep);
+  background: var(--sage-deep);
+  color: var(--cream);
+}
+
+#diabetes-shop .ds-chip-count {
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.72;
+}
+
+#diabetes-shop .ds-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1.15rem;
+}
+
+#diabetes-shop .ds-count {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+#diabetes-shop .ds-clear {
+  color: var(--sage-deep);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-underline-offset: 0.18em;
+}
+
+#diabetes-shop .ds-toolbar {
+  margin-left: auto;
+}
+
+#diabetes-shop .ds-results {
+  min-width: 0;
+}
+
+#diabetes-shop .ds-empty {
+  padding: 2.5rem 0 1rem;
+}
+
+#diabetes-shop .ds-empty p {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+}
+
+#diabetes-shop .ds-fallback {
+  padding: 2rem 0 3rem;
+  background: var(--cream);
+}
+
+#diabetes-shop .ds-fallback-title,
+#diabetes-shop .ds-fallback-bar,
+#diabetes-shop .ds-fallback-card,
+.ds-fallback .ds-fallback-title,
+.ds-fallback .ds-fallback-bar,
+.ds-fallback .ds-fallback-card {
+  background: color-mix(in srgb, var(--sand, #d7cfc7) 70%, white);
+  border-radius: 1rem;
+}
+
+.ds-fallback {
+  --sand: #d7cfc7;
+  padding: 2rem 0 3rem;
+  background: #f5f2ed;
+}
+
+.ds-fallback .ds-fallback-title {
+  height: 4.5rem;
+  max-width: 22rem;
+  margin-bottom: 1.5rem;
+}
+
+.ds-fallback .ds-fallback-layout {
+  display: grid;
+  grid-template-columns: minmax(15.5rem, 17.75rem) minmax(0, 1fr);
+  gap: 1.5rem 2.25rem;
+  align-items: start;
+}
+
+.ds-fallback .ds-fallback-side {
+  height: 22rem;
+  background: color-mix(in srgb, var(--sand, #d7cfc7) 70%, white);
+  border-radius: 1rem;
+}
+
+.ds-fallback .ds-fallback-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.ds-fallback .ds-fallback-card {
+  aspect-ratio: 1;
+}
+
+@media (max-width: 900px) {
+  #diabetes-shop .ds-layout,
+  .ds-fallback .ds-fallback-layout {
+    grid-template-columns: 1fr;
+  }
+
+  #diabetes-shop .ds-side {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  #diabetes-shop .ds-toolbar {
+    margin-left: 0;
+  }
+
+  .ds-fallback .ds-fallback-side {
+    height: 8rem;
+  }
+
+  .ds-fallback .ds-fallback-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Diabetes only ---------- */
+
+#diabetes-shop .ds-fr-draft {
+  display: inline-block;
+  margin: 0 0 0.6rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: var(--sand);
+  font-size: 0.78rem;
+}
+
+#diabetes-shop .ds-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* "Works with": a long list, closed until it is opened or one of its chips is on. */
+#diabetes-shop .ds-more > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+#diabetes-shop .ds-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+#diabetes-shop .ds-more > summary::after {
+  content: '+';
+  margin-left: auto;
+  color: var(--taupe);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+#diabetes-shop .ds-more[open] > summary::after {
+  content: '−';
+}
+
+#diabetes-shop .ds-more > summary:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+#diabetes-shop .ds-more .ds-row {
+  margin-top: 0.4rem;
+}
+
+/* The insulin filter's notices, above its products (English only). */
+#diabetes-shop .ds-notice {
+  margin: 0 0 1.15rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  font-size: 0.92rem;
+}
+
+#diabetes-shop .ds-notice p {
+  margin: 0;
+}
+
+#diabetes-shop .ds-notice p + p {
+  margin-top: 0.25rem;
+}
+
+/*
+ * Longer labels than Ostomy's ("Glucose tablets, gels and glucagon"): a chip
+ * wraps its words rather than pushing the column wider than the sidebar.
+ */
+#diabetes-shop .ds-chips {
+  max-width: 100%;
+}
+
+#diabetes-shop .ds-chip {
+  max-width: 100%;
+  white-space: normal;
+  line-height: 1.2;
+  text-align: left;
+}

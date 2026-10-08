@@ -44,7 +44,7 @@ export const THIS_MIGHT_BE_YOU = {
 
   heldCopy: {
     released:
-      'Released after the source check, and now in the copy: NIHB children under 2 of an eligible parent (isc-nihb-updates); the severe-low school emergency step (das-glucagon, das-low-blood-sugar, CPS); lows more likely after the birth (Ch36); caregiver distress screening (Ch18). Released by the clinical rulings of 2026-10-06: when a child’s kidney and eye checks start (2.items.9, Ch29 2025 and Ch34; C37); the end-of-life line for older adults (4.items.3, Ch37; C19); a higher folic acid dose may be needed, with no amount (1.s1.3, Ch36 and PHAC; C19). Released by the owner’s answers of 2026-10-06 (A2, B5, B9, B12): the CDE contact, the general phone line, email, hours and About page of Bayshore Express Pharmacy, in the CDE panel (`ui.contact`).',
+      'Released after the source check, and now in the copy: NIHB children under 2 of an eligible parent (isc-nihb-updates); the severe-low school emergency step (das-glucagon, das-low-blood-sugar, CPS); lows more likely after the birth (Ch36); caregiver distress screening (Ch18). Released by the clinical rulings of 2026-10-06: when a child’s kidney and eye checks start (2.items.9, Ch29 2025 and Ch34; C37); the end-of-life line for older adults (4.items.3, Ch37; C19); a higher folic acid dose may be needed, with no amount (1.s1.3, Ch36 and PHAC; C19). Released by the owner’s answers of 2026-10-06 (A2, B5, B9, B12): the CDE contact, the general phone line, email, hours and About page of Bayshore Express Pharmacy, in the CDE panel (`ui.contact`). Since owner note 5 (2026-10-07) the service is presented as Liivv’s: phone and hours only, no email, no About link.',
     items: [
       {
         topic:

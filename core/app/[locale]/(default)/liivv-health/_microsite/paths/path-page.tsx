@@ -31,14 +31,15 @@ import { useLocale } from 'next-intl';
 import type { CSSProperties } from 'react';
 
 import { DiscoveryBand, GovernanceBlock, HelpBand } from '../_components/page-furniture';
+import { SourceChip } from '../_components/source-chip';
 import { SpecialistContact } from '../_components/specialist-contact';
-import type { Citation } from '../chapters/compose';
 import { FigureGlyphs, UrgentExit } from '../chapters/figures';
 import { localeHref } from '../chapters/hrefs';
 import { TextSizeControl } from '../chapters/text-size-control';
 import type { CardShelf } from '../shop/shelves';
 import { ShopBand } from '../shop/shop-strip';
 import { useSite, useSiteT } from '../site-context';
+import type { ResolvedSource } from '../sources';
 
 import type { ComposedPath, PathGroup } from './compose';
 
@@ -99,7 +100,8 @@ export function PathPage({
   path,
   fundingHref,
   pharmacist,
-  citations,
+  sources,
+  introSources,
   disclaimer,
   frDraft,
   shelf = null,
@@ -109,8 +111,10 @@ export function PathPage({
   fundingHref: string | null;
   /** Null until the site releases the band on this path. */
   pharmacist: PathPharmacistBand | null;
-  /** Every source the page names, once each, in the page locale. */
-  citations: Citation[];
+  /** Every source the page names, once each, resolved for the page locale: the foot list. */
+  sources: ResolvedSource[];
+  /** The sources behind the intro's two paragraphs, shown under them (owner note 1). */
+  introSources: ResolvedSource[];
   disclaimer: string;
   /** The page's French is showing on a preview only because its gate is open there. */
   frDraft: boolean;
@@ -156,6 +160,7 @@ export function PathPage({
           {path.intro.body.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
+          <SourceChip className="ms-src-intro" label={path.intro.heading} sources={introSources} />
           {/*
            * The site's emergency signpost, on every path, prediabetes too.
            * Never gated and never collapsible.
@@ -252,7 +257,7 @@ export function PathPage({
 
       <DiscoveryBand />
 
-      <GovernanceBlock citations={citations} governance={{ ...site.governance, disclaimer }} />
+      <GovernanceBlock governance={{ ...site.governance, disclaimer }} sources={sources} />
     </div>
   );
 }

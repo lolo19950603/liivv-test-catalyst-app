@@ -28,6 +28,7 @@ import type { Citation } from '../chapters/compose';
 import { FigureGlyphs, UrgentExit } from '../chapters/figures';
 import { localeHref } from '../chapters/hrefs';
 import { useSite, useSiteT } from '../site-context';
+import type { ResolvedSource } from '../sources';
 
 import '../../ostomy-care/chapters/chapter-page.css';
 import '../../ostomy-care/funding/funding.css';
@@ -70,6 +71,7 @@ export function FundingPage({
   frDraft,
   closingHref,
   citations,
+  sources,
   disclaimer,
   children,
 }: {
@@ -85,8 +87,13 @@ export function FundingPage({
   frDraft: boolean;
   /** Where the closing's second button goes (`ui.fundingPage.closingCta`), unprefixed. */
   closingHref: string;
-  /** Every source the page names, once each, in the page locale. */
-  citations: Citation[];
+  /** Every source the page names, once each, in the page locale, as Ostomy lists them. */
+  citations?: Citation[];
+  /*
+   * The same, resolved and grouped, drawn in place of `citations` where given
+   * (owner note 1, 2026-10-07). Engine-only so far.
+   */
+  sources?: ResolvedSource[];
   disclaimer: string;
   children: ReactNode;
 }) {
@@ -163,7 +170,11 @@ export function FundingPage({
 
       <DiscoveryBand />
 
-      <GovernanceBlock citations={citations} governance={{ ...site.governance, disclaimer }} />
+      <GovernanceBlock
+        citations={citations}
+        governance={{ ...site.governance, disclaimer }}
+        sources={sources}
+      />
     </div>
   );
 }

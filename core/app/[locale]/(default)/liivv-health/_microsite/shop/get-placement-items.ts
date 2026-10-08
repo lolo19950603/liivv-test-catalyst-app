@@ -36,11 +36,11 @@ import type { PlacementItems } from './types';
  * A product that fails any of the three is left out, and a shelf with nothing
  * left renders nothing.
  *
- * `refuse` drops a product whose description matches it. A site passes the
- * names and numbers it must never lead a reader to (Diabetes Care: another
- * retailer's name and phone number, which some descriptions still carry),
- * so a product page that would show them is never linked from a care page
- * until its description is fixed in the store.
+ * `refuse` drops a product when it answers true for the full HTML
+ * description (links included). A site passes the names and numbers it must
+ * never lead a reader to (Diabetes Care: another retailer's name, site and
+ * phone number), so a product page that would show them is never linked from
+ * a care page until its description is fixed in the store.
  *
  * `oneClick` is true only when a reader has nothing to choose: no required
  * option or modifier, and one variant at most. Anything else is offered as a
@@ -104,8 +104,8 @@ const PAGE_SIZE = 50;
 interface PlacementOptions {
   /* "From $84.99" in the page language, for a product priced as a range. */
   fromPrice: (price: string) => string;
-  /* A product whose description matches this is never placed. */
-  refuse?: RegExp;
+  /* A product this answers true for, given its full HTML description, is never placed. */
+  refuse?: (description: string) => boolean;
 }
 
 function chunks(ids: number[]): number[][] {
@@ -158,7 +158,7 @@ export const getPlacementItems = cache(
         .forEach((node) => {
           if (!node.inventory.isInStock || node.availabilityV2.status !== 'Available') return;
 
-          if (options.refuse?.test(node.description)) return;
+          if (options.refuse?.(node.description)) return;
 
           const price = pricesTransformer(node.prices ?? null, format);
           let priceLabel: string | undefined;

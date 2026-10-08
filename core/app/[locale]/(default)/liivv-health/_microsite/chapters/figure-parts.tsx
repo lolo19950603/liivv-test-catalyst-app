@@ -11,6 +11,7 @@
  */
 
 import { useLocale } from 'next-intl';
+import type { ReactNode } from 'react';
 
 import { useSite, useSiteT } from '../site-context';
 
@@ -111,18 +112,22 @@ function useLanguageNote(hrefLang: LinkLang | undefined) {
  * as "(opens their site)", the note goes inside them instead of after them:
  * "(s’ouvre sur leur site, en anglais)". Engine-only so far: Ostomy's twin
  * always appends the note.
+ *
+ * A label may also be marked up, as a Sources entry is ("Title, Publisher
+ * (2023)", each part in its own language; ../_components/source-chip.tsx).
+ * A marked-up label always takes the note after it. Engine-only so far.
  */
 export function OutboundLabel({
   hrefLang,
   label,
 }: {
   hrefLang: LinkLang | undefined;
-  label: string;
+  label: string | ReactNode;
 }) {
   const note = useLanguageNote(hrefLang);
   const inner = note === undefined ? undefined : /^\((.+)\)$/.exec(note)?.[1];
 
-  if (inner !== undefined && label.endsWith(')')) {
+  if (inner !== undefined && typeof label === 'string' && label.endsWith(')')) {
     return <span className="oc-ch-outbound-label">{`${label.slice(0, -1)}, ${inner})`}</span>;
   }
 

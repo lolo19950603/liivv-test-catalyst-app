@@ -20,45 +20,26 @@ import type { Messages } from 'next-intl';
 import { siteChapterMessages } from '../chapters/compose';
 import { chapterHref, localeHref } from '../chapters/hrefs';
 import type { SiteConfig, SiteNs } from '../site';
+import { resolveSource, type SiteRegister } from '../sources';
 
 import type { LandingChapterCard, LandingCitation } from './types';
 
-/* One entry of a site's source register (its sources-meta.ts), as far as a page needs it. */
-export interface RegisterEntry {
-  label: string;
-  labelFr?: string;
-  href: string;
-  hrefFr?: string;
-  hrefLang: 'en' | 'fr';
-}
-
 /*
- * Published titles and links in the page locale. The French title or file is
- * used only where the publisher issues one, as on the chapters; a link to a
- * French file says so. An id missing from the register is dropped here and
- * reported by the content-review export.
+ * Published titles and links in the page locale, with their publisher and
+ * year (../sources.ts). The French title or file is used only where the
+ * publisher issues one, as on the chapters; a link to a French file says so.
+ * An id missing from the register is dropped here and reported by the
+ * content-review export; an entry kept for the review only is dropped too.
  */
 export function landingCitations(
-  register: Readonly<Record<string, RegisterEntry>>,
+  register: SiteRegister,
   ids: readonly string[],
   locale: string,
 ): LandingCitation[] {
-  const french = locale === 'fr';
-
   return ids.flatMap((id) => {
-    const source = register[id];
+    const source = resolveSource(register, id, locale);
 
-    if (!source) return [];
-
-    const fromFr = french && Boolean(source.hrefFr);
-
-    return [
-      {
-        label: french && source.labelFr ? source.labelFr : source.label,
-        href: fromFr && source.hrefFr ? source.hrefFr : source.href,
-        hrefLang: fromFr ? 'fr' : source.hrefLang,
-      },
-    ];
+    return source ? [source] : [];
   });
 }
 

@@ -46,8 +46,9 @@ export type SiteNs = Extract<keyof Messages, 'OstomyCare' | 'DiabetesCare'>;
  *
  * Shared on purpose, because they are styling hooks and store nothing: the
  * `html[data-oc-text]` attribute, the `html.oc-printing` class, the
- * `data-oc-printing` attribute and `--oc-audio-bar-h`. A page belongs to one
- * site, so both sites can use them, and the same CSS.
+ * `data-oc-printing` and `data-oc-print-path` attributes (./print) and
+ * `--oc-audio-bar-h`. A page belongs to one site, so both sites can use
+ * them, and the same CSS.
  */
 export interface SiteStorage<Prefix extends string = string> {
   textSize: `${Prefix}-text-size`;
@@ -149,20 +150,24 @@ export interface SiteFurniture {
 }
 
 /*
- * The site's specialist service, reached directly: a general phone line, an
- * email address and the service's own About page, worded in `ui.contact`.
- * Where a site sets it, every pharmacist panel the engine draws (the
- * chapters', the paths' and the landing's care band) shows these instead of a
- * request button, and the chapter panel carries the `#chapter-cde` anchor that
- * the hero's "ask" button and the lanes open. A general contact only: never a
- * named person. Ostomy has none, so nothing changes there.
+ * The site's specialist service, reached directly: a general phone line, and
+ * where the site sets them an email address and the service's own About page,
+ * worded in `ui.contact`. Where a site sets it, every pharmacist panel the
+ * engine draws (the chapters', the paths' and the landing's care band) shows
+ * these instead of a request button, and the chapter panel carries the
+ * `#chapter-cde` anchor that the hero's "ask" button and the lanes open. A
+ * general contact only: never a named person. Ostomy has none, so nothing
+ * changes there. The email and About lines render only when set: Diabetes
+ * sets the phone alone, because its service is presented as Liivv's own
+ * (owner note 5, 2026-10-07).
  */
 export interface SiteContact {
   /** The `tel:` target: digits with the country code, such as '+18445611254'. */
   tel: string;
-  email: string;
-  /** The service's About page, absolute, and its French page where the service has one. */
-  aboutHref: string;
+  /** Rendered only when set. */
+  email?: string;
+  /** The service's About page, absolute, and its French page where the service has one. Rendered only when set. */
+  aboutHref?: string;
   aboutHrefFr?: string;
 }
 

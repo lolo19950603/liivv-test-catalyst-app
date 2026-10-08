@@ -3,6 +3,7 @@
 import { clsx } from 'clsx';
 import { useState } from 'react';
 
+import { ButtonLink } from '@/vibes/soul/primitives/button-link';
 import type { Price } from '@/vibes/soul/primitives/price-label';
 import { Image } from '~/components/image';
 import { Link } from '~/components/link';
@@ -152,7 +153,7 @@ export function ArchiveCatalogProductCard({
   imageSizes = '(min-width: 42rem) 25vw, (min-width: 32rem) 33vw, (min-width: 28rem) 50vw, 100vw',
   quickActions,
 }: ArchiveCatalogProductCardProps) {
-  const { title, subtitle, price, image, href, hasVariants, sku, id } = product;
+  const { title, subtitle, price, image, href, hasVariants, sku, id, viewOnlyLabel } = product;
   const imgSrc = image?.src.trim() ?? '';
   const hasImage = imgSrc.length > 0;
   const hasLogoFallback =
@@ -237,7 +238,15 @@ export function ArchiveCatalogProductCard({
           {price != null ? <ArchiveCatalogProductCardPrice price={price} /> : null}
         </div>
 
-        {showQuickAdd && quickActions?.addToCartAction ? (
+        {showQuickAdd && viewOnlyLabel ? (
+          <div className="liivv-archive-product-card__cta mt-auto w-full pt-2">
+            <ButtonLink className="w-full" href={safeHref} size="small" variant="secondary">
+              {viewOnlyLabel}
+            </ButtonLink>
+          </div>
+        ) : null}
+
+        {showQuickAdd && !viewOnlyLabel && quickActions?.addToCartAction ? (
           <div className="liivv-archive-product-card__cta mt-auto w-full pt-2">
             <ProductCardQuickAdd
               addToCartAction={quickActions.addToCartAction}

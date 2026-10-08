@@ -18,8 +18,8 @@
   --pad: clamp(1.25rem, 4vw, 2rem);
   --max: 980px;
   --ch-overlap: 48px;
-  --font-heading: var(--font-family-dm-serif-text), Georgia, serif;
-  --font-body: var(--font-family-inter), system-ui, sans-serif;
+  --font-heading: var(--font-family-poppins), system-ui, sans-serif;
+  --font-body: var(--font-family-poppins), system-ui, sans-serif;
 
   /* Solid reading colors (~7:1+ on cream and paper) — never fade text with transparency */
   --ink-strong: #1f1d1d;
@@ -36,6 +36,13 @@
   font-family: var(--font-body);
   font-size: var(--text-body);
   font-weight: 400;
+  /*
+   * Never fake a bold: every weight these pages ask for has a real Poppins face
+   * (core/app/fonts.ts). The old serif shipped one weight, so the browser
+   * smeared the timeline's 600 band labels (owner note 8, 2026-10-07).
+   * Italic may still slant the upright face.
+   */
+  font-synthesis: style;
   line-height: 1.7;
   overflow-x: clip;
 }
@@ -1804,7 +1811,11 @@
 #oc-chapter .oc-journey-gate h2 {
   margin: 0.2rem 0 0;
   font-size: clamp(3.15rem, 9.5vw, 5.85rem);
-  line-height: 0.92;
+  /*
+   * 0.92 suited the old serif. Poppins has deeper descenders and taller
+   * ascenders, so a two-line title needs a little more than a full line.
+   */
+  line-height: 1.06;
   letter-spacing: -0.04em;
   max-width: 12ch;
 }
@@ -1875,7 +1886,7 @@
 #oc-chapter .oc-journey-band-dots a {
   flex: 0 0 auto;
   width: 1.85rem;
-  height: 1.35rem;
+  height: 1.5rem;
   border-radius: 999px 999px 70% 70%;
   display: grid;
   place-items: center;
@@ -2505,7 +2516,8 @@
   gap: 0.3rem 0.5rem;
   max-height: 4.5rem;
   font-size: var(--text-small);
-  font-weight: 550;
+  /* Medium, a real Poppins face, one step under the 600 band label. */
+  font-weight: 500;
   letter-spacing: 0.02em;
   text-transform: none;
   color: var(--ink-muted);
@@ -3147,6 +3159,13 @@
 
 #oc-chapter.is-journey .oc-journey-act {
   position: relative;
+  /*
+   * A section jump lands just under the ~140px sticky header (owner note 6).
+   * Less than a card's 12rem: the title sits at the foot of a tall gate, and
+   * at 12rem it fell below the fold of a 620px-high window. The spy's reading
+   * line is never above 12rem + 8px, so the section still counts as reached.
+   */
+  scroll-margin-top: 9rem;
   margin: 0;
   padding: 0;
   background: var(--cream);
@@ -3198,6 +3217,25 @@
 #oc-chapter.is-journey .oc-journey-act-title h2 {
   font-size: clamp(3.4rem, 11vw, 6.5rem);
   max-width: 11ch;
+  /* Room for the last line's descenders (owner note 8, 2026-10-07). */
+  padding-bottom: 0.14em;
+}
+
+/*
+ * The callout under a band's big title. Its spacing used to live on
+ * `.oc-ch-major-head .oc-journey-banner`, a header class no page has rendered
+ * since the band header became `.oc-journey-act-title`, so the callout sat
+ * flush under the title. A returning reader never saw it, because the
+ * "Continue" chip sat between them; a first-time reader saw the title's
+ * descenders run into the callout title (owner note 8, 2026-10-07). The chip
+ * already carries its own bottom margin, so the gap is not doubled after it.
+ */
+#oc-chapter.is-journey .oc-journey-act-title .oc-journey-banner {
+  margin-top: 1.5rem;
+}
+
+#oc-chapter.is-journey .oc-journey-act-title .oc-journey-continue + .oc-journey-banner {
+  margin-top: 0;
 }
 
 #oc-chapter.is-journey .oc-journey-act-frames {
@@ -3484,7 +3522,376 @@
   }
 }
 
+/*
+ * —— Bookmarks list (timeline and "On this page" sheet) ——
+ * One list in both places (journey-path.tsx `JourneyBookmarks`); amber like
+ * the bookmark tags, so it reads as the reader's own marks, not the path.
+ */
+#oc-chapter .oc-journey-marks {
+  margin: 0 0 1.1rem;
+  padding: 0.7rem 0.6rem 0.5rem 0.75rem;
+  border: 1px solid #e2b866;
+  border-radius: 1rem;
+  background: color-mix(in srgb, #fcebc4 45%, var(--paper));
+}
+
+#oc-chapter .oc-journey-marks-heading {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  color: #6b4208;
+}
+
+#oc-chapter .oc-journey-marks-list {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter .oc-journey-marks-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+#oc-chapter .oc-journey-marks-list a {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: minmax(0, 2.2rem) minmax(0, 1fr);
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.75rem;
+  color: var(--ink-body);
+  text-decoration: none;
+}
+
+#oc-chapter .oc-journey-marks-list a:hover,
+#oc-chapter .oc-journey-marks-list a:focus-visible,
+#oc-chapter .oc-journey-marks-list a.is-active {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+#oc-chapter .oc-journey-marks-title {
+  font-size: var(--text-small);
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+#oc-chapter .oc-journey-marks-remove {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: #6b4208;
+  font: inherit;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#oc-chapter .oc-journey-marks-remove:hover,
+#oc-chapter .oc-journey-marks-remove:focus-visible {
+  border-color: #e2b866;
+  background: var(--paper);
+}
+
+#oc-chapter .oc-journey-marks-empty {
+  margin: 0;
+  font-size: var(--text-small);
+  line-height: 1.45;
+  color: var(--ink-muted);
+}
+
+/*
+ * —— "On this page" button and sheet (under 1024px) ——
+ * journey-sheet.tsx. Bottom left, clear of the chat avatar on the right; above
+ * the chapter (z 58) and below the sections after it (z 70), and shown only
+ * while the chapter fills the foot of the window. Sits above Ostomy's audio
+ * bar when that is open (`--oc-audio-bar-h`).
+ */
+#oc-chapter .oc-journey-fab-wrap {
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left));
+  bottom: calc(16px + env(safe-area-inset-bottom) + var(--oc-audio-bar-h, 0px));
+  z-index: 58;
+  max-width: min(16rem, calc(100vw - 9rem));
+  transition:
+    transform 220ms ease,
+    opacity 220ms ease,
+    visibility 0s linear 0s;
+}
+
+#oc-chapter .oc-journey-fab-wrap.is-away {
+  transform: translateY(calc(100% + 2rem));
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 220ms ease,
+    opacity 220ms ease,
+    visibility 0s linear 220ms;
+}
+
+#oc-chapter .oc-journey-fab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.1rem;
+  max-width: 100%;
+  min-height: 48px;
+  padding: 0.45rem 1.15rem 0.5rem;
+  border: 2px solid var(--paper);
+  border-radius: 1.6rem;
+  background: var(--sage-deep);
+  color: var(--paper);
+  font-family: var(--font-body);
+  text-align: left;
+  box-shadow: 0 10px 28px rgba(28, 34, 30, 0.28);
+  cursor: pointer;
+}
+
+#oc-chapter .oc-journey-fab:focus-visible {
+  outline: 3px solid var(--ink-strong);
+  outline-offset: 3px;
+}
+
+#oc-chapter .oc-journey-fab-label {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+#oc-chapter .oc-journey-fab-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem 0.5rem;
+  font-size: var(--text-small);
+  font-weight: 550;
+  line-height: 1.25;
+}
+
+#oc-chapter .oc-journey-fab-saved {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0 0.5rem 0 0.4rem;
+  border-radius: 999px;
+  background: #fcebc4;
+  color: #6b4208;
+  font-weight: 700;
+}
+
+#oc-chapter .oc-journey-fab-saved::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 0.6em;
+  height: 0.85em;
+  background: #b7791f;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%);
+}
+
+#oc-chapter .oc-journey-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(28, 34, 30, 0.45);
+}
+
+#oc-chapter .oc-journey-sheet {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 91;
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  max-height: 85dvh;
+  padding-bottom: env(safe-area-inset-bottom);
+  border-radius: 24px 24px 0 0;
+  background: var(--cream);
+  color: var(--ink-body);
+  font-family: var(--font-body);
+  box-shadow: 0 -18px 48px rgba(28, 34, 30, 0.25);
+}
+
+@media (min-width: 640px) {
+  #oc-chapter .oc-journey-sheet {
+    max-width: 36rem;
+    margin-inline: auto;
+  }
+}
+
+#oc-chapter .oc-journey-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1rem 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+
+#oc-chapter .oc-journey-sheet-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+#oc-chapter .oc-journey-sheet-close {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink-strong);
+  font: inherit;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#oc-chapter .oc-journey-sheet-close:focus-visible,
+#oc-chapter .oc-journey-sheet-stops a:focus-visible {
+  outline: 3px solid var(--ink-strong);
+  outline-offset: 2px;
+}
+
+#oc-chapter .oc-journey-sheet-body {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1rem 1rem 1.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+#oc-chapter .oc-journey-sheet .oc-journey-continue,
+#oc-chapter .oc-journey-sheet .oc-journey-marks {
+  margin: 0;
+}
+
+#oc-chapter .oc-journey-sheet-stops {
+  display: grid;
+  gap: 1.25rem;
+}
+
+#oc-chapter .oc-journey-sheet-band {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.2rem 0.75rem;
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--sage-deep);
+}
+
+#oc-chapter .oc-journey-sheet-count {
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  font-weight: 550;
+  color: var(--ink-muted);
+}
+
+#oc-chapter .oc-journey-sheet-stops ol {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter .oc-journey-sheet-stops a {
+  display: grid;
+  grid-template-columns: 0.85rem minmax(0, 2rem) minmax(0, 1fr);
+  align-items: start;
+  gap: 0.5rem;
+  min-height: 48px;
+  padding: 0.6rem 0.6rem 0.6rem 0.5rem;
+  border-radius: 14px;
+  color: var(--ink-body);
+  text-decoration: none;
+}
+
+#oc-chapter .oc-journey-sheet-stops a:hover {
+  background: var(--paper);
+}
+
+#oc-chapter .oc-journey-sheet-stops a.is-active {
+  background: var(--sage-deep);
+  color: var(--paper);
+}
+
+#oc-chapter .oc-journey-sheet-stops a.is-active .oc-journey-path-num {
+  color: var(--paper);
+}
+
+#oc-chapter .oc-journey-sheet-stops a.is-saved .oc-journey-path-dot {
+  border-color: #b7791f;
+  background: #e0a526;
+}
+
+#oc-chapter .oc-journey-sheet-here {
+  display: inline-block;
+  margin-top: 0.3rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--sage-deep);
+  font-size: var(--text-small);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #oc-chapter .oc-journey-sheet[data-state='open'] {
+    animation: oc-sheet-up 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+@keyframes oc-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  #oc-chapter .oc-journey-fab-wrap {
+    display: none;
+  }
+}
+
 @media print {
+  #oc-chapter .oc-journey-fab-wrap,
+  #oc-chapter .oc-journey-sheet,
+  #oc-chapter .oc-journey-sheet-overlay,
   #oc-chapter .oc-journey-path,
   #oc-chapter .oc-journey-hud,
   #oc-chapter .oc-journey-band-dots,
@@ -4155,6 +4562,39 @@
   width: 100%;
 }
 
+/*
+ * Desktop and tablet: one card size whatever the count (owner note 4,
+ * 2026-10-07). The two- and three-column grids stretched a strip's cards to
+ * fill the column, so a lone product drew a full-width card with a photo
+ * taller than the screen and an odd last card sat alone at full width. Fixed
+ * tracks keep every card the same width, and a short row simply ends early. A
+ * single product lies on its side, photo beside name and button, as the phone
+ * layout below already does. Both sites: Ostomy's choice cards carry the same
+ * classes. The `ul` lifts these rules over `.is-single` / `.is-trio`.
+ */
+@media not all and (max-width: 720px) {
+  #oc-chapter ul.oc-merch-cards:not(.is-single) {
+    grid-template-columns: repeat(auto-fill, 10.5rem);
+    justify-content: start;
+  }
+
+  #oc-chapter ul.oc-merch-cards.is-single {
+    grid-template-columns: minmax(0, 34rem);
+  }
+
+  #oc-chapter ul.oc-merch-cards.is-single > .oc-merch-card {
+    display: grid;
+    grid-template-columns: 10rem minmax(0, 1fr);
+    column-gap: 1rem;
+    align-items: center;
+  }
+
+  #oc-chapter .oc-merch-card-photo img,
+  #oc-chapter .oc-merch-card-photo .oc-merch-blank {
+    max-height: 12rem;
+  }
+}
+
 #oc-chapter .oc-merch-kit {
   display: grid;
   grid-template-columns: 8.5rem minmax(0, 1fr);
@@ -4469,6 +4909,9 @@
   color: var(--ink-strong);
   font-weight: 500;
   line-height: 1.4;
+  /* A long French word (« réapprovisionnement ») breaks instead of running under the arrow. */
+  overflow-wrap: break-word;
+  hyphens: auto;
   text-decoration: none;
   transition: background-color 0.2s ease;
 }
@@ -6041,7 +6484,11 @@
   font: inherit;
 }
 
-/* Ruled space to write on. Paper only — see the print rules below. */
+/*
+ * Ruled space to write on, for a printed supply list. The list has no print
+ * button now, so nothing shows it; whether it gets one back is an open
+ * question (owner note 2, 2026-10-07).
+ */
 #oc-chapter .oc-fig-supply-lines {
   display: none;
 }
@@ -6132,47 +6579,10 @@
   outline-offset: 3px;
 }
 
-/* Print only the take-in card, or the supply list */
-
-@media print {
-  html.oc-printing body * {
-    visibility: hidden;
-  }
-
-  html.oc-printing [data-oc-printing],
-  html.oc-printing [data-oc-printing] * {
-    visibility: visible;
-  }
-
-  html.oc-printing [data-oc-printing] {
-    position: absolute;
-    inset: 0 auto auto 0;
-    width: 100%;
-    border: 0;
-  }
-
-  /*
-   * Controls print as nothing: a paper list has no buttons, no shop section
-   * and no "Liivv sells some options for this". What is left is the list.
-   */
-  html.oc-printing .oc-fig-print,
-  html.oc-printing .oc-fig-supply-controls,
-  html.oc-printing .oc-fig-supply-shop,
-  html.oc-printing .oc-fig-supply-carry {
-    display: none;
-  }
-
-  html.oc-printing #oc-chapter .oc-fig-supply-lines {
-    display: block;
-    margin-top: 0.8rem;
-  }
-
-  html.oc-printing #oc-chapter .oc-fig-supply-lines span {
-    display: block;
-    height: 1.6rem;
-    border-bottom: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
-  }
-}
+/*
+ * A print button prints its own element alone: ../../_microsite/print/print.css,
+ * shared by both sites since owner note 2 (2026-10-07).
+ */
 
 /* The walk-through prints whole, whatever its controls were showing. */
 @media print {
@@ -6455,8 +6865,13 @@ html[data-oc-text] #oc-chapter.is-journey .oc-journey-entry .oc-journey-entry-co
   letter-spacing: 0.12em;
 }
 
-/* Links inside reading text are always underlined */
+/*
+ * Links inside reading text are always underlined. The measuring-guide link
+ * sits in a <div>, not a <p> (a paragraph inside a paragraph breaks hydration
+ * on /fr), so it is named here to keep its underline.
+ */
 #oc-chapter p a,
+#oc-chapter .oc-fig-guide-link a,
 #oc-chapter .oc-journey-entry-copy li a,
 #oc-chapter .oc-ch-row-more a {
   color: var(--ink-strong);
@@ -7054,6 +7469,7 @@ body:has(#oc-chapter .oc-audio-bar) .live-chat-dock {
 
 #oc-chapter .oc-fig-guide-link {
   margin: 0.8rem 0 0;
+  max-width: var(--measure);
 }
 
 #oc-chapter .oc-fig-guide-link a {

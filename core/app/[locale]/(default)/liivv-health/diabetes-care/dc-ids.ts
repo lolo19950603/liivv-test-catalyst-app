@@ -36,14 +36,14 @@ export function isDiabetesKit(entityId: number): boolean {
 }
 
 /*
- * The curated kits the Diabetes Care landing may show. None, until the owner
- * signs a kit and its contents off (E6 and E14 in the landing's copy record;
- * the review list is 8049, 8051, 8053, 8058 and 8060). With none listed, the
- * landing's kits section, its hero and closing kits buttons and the "Kits"
- * shop room all stay off. The shop shelf and search still list a kit product
- * until it is deleted from the catalogue, as Ostomy's do.
+ * The curated kits the Diabetes Care landing and the Diabetes Essentials shop
+ * list. All twelve, since the owner verified them on 2026-10-07 ("Verified go
+ * ahead and publish"; A4 and E6 in the landing's copy record). A kit left off
+ * this list drops out of the landing's kits section, its "Kits" shop room and
+ * the shop's Kits filter, as Ostomy's unlisted kits do. With none listed, the
+ * landing's kits section and its hero and closing kits buttons stay off.
  */
-export const DIABETES_LISTED_KIT_IDS: readonly number[] = [];
+export const DIABETES_LISTED_KIT_IDS: readonly number[] = DIABETES_CURATED_KIT_IDS;
 
 /* Whether the Diabetes Care landing may show this curated kit. */
 export function isListedDiabetesKit(entityId: number): boolean {
@@ -108,6 +108,36 @@ export function isInsulinProduct({
 export function isGlucagonProduct(entityId: number): boolean {
   return GLUCAGON_PRODUCT_IDS.includes(entityId);
 }
+
+/*
+ * =============================================================================
+ * The Diabetes Essentials shop: filing a product the name rules get wrong
+ * =============================================================================
+ *
+ * The shop files every product by rules over its name, its BigCommerce brand
+ * and its categories (./shop-classify.ts). A product those rules file wrongly
+ * is put right here, by id, and the override wins over every rule. Brand
+ * values are the shop's brand slugs (`?brand=`); `null` means no brand.
+ *
+ * Read from the catalogue and the owner's review of 2026-10-07 (note 9):
+ *   8090, 8091  the Omnipod 5 and DASH pods carry no BigCommerce brand, and
+ *               are Omnipod (Insulet) pods
+ *   4252        a blood-collection set, not an insulin-pump supply
+ *   4775        i-Port Advance is an injection port used with pens and
+ *               syringes, not a pump accessory, so it works with no device
+ */
+export const DIABETES_BRAND_BY_ID: Readonly<Record<number, string | null>> = {
+  8090: 'omnipod',
+  8091: 'omnipod',
+};
+
+export const DIABETES_TYPE_BY_ID: Readonly<Record<number, string>> = {
+  4252: 'other',
+};
+
+export const DIABETES_WORKS_BY_ID: Readonly<Record<number, readonly string[]>> = {
+  4775: [],
+};
 
 /*
  * Whether a shipping address's province is Quebec. Province strings are free

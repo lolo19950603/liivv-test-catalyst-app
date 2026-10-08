@@ -1,7 +1,7 @@
 # Ostomy microsite — content review
 **Prepared for:** Liivv management and clinical review  
 **Covers:** every page of `/liivv-health/ostomy-care`, in English and French  
-**Generated:** 2026-10-06 from commit `3b343c6e`
+**Generated:** 2026-10-08 from commit `f7f9ef0b`
 
 > **These files are generated from the site's own sources.** Do not edit them. Mark corrections against the reference beside each line — the change is made in the source, and the files are generated again. That way the text you approve is the text that ships, and the two cannot drift apart.
 
@@ -52,14 +52,14 @@ What that means for this review. Where these files say a figure is "the same ser
 
 | File | Page | Words (EN) |
 |---|---|---|
-| [00-shared.md](en/00-shared.md) · [FR](fr/00-shared.md) | Shared interface text | 1,572 |
+| [00-shared.md](en/00-shared.md) · [FR](fr/00-shared.md) | Shared interface text | 1,619 |
 | [01-new-to-the-journey.md](en/01-new-to-the-journey.md) · [FR](fr/01-new-to-the-journey.md) | Chapter 01 — New to the Journey | 2,694 |
 | [02-get-to-know-your-stoma.md](en/02-get-to-know-your-stoma.md) · [FR](fr/02-get-to-know-your-stoma.md) | Chapter 02 — Your Stoma, and Your Fit | 3,674 |
 | [03-everyday-liivving.md](en/03-everyday-liivving.md) · [FR](fr/03-everyday-liivving.md) | Chapter 03 — Everyday Liivving | 3,565 |
 | [04-this-might-be-you.md](en/04-this-might-be-you.md) · [FR](fr/04-this-might-be-you.md) | Chapter 04 — This Might Be You | 2,705 |
 | [05-funding.md](en/05-funding.md) · [FR](fr/05-funding.md) | Funding & Coverage | 3,297 |
-| [06-landing.md](en/06-landing.md) · [FR](fr/06-landing.md) | Landing page | 1,045 |
-| | **Total** | **18,552** |
+| [06-landing.md](en/06-landing.md) · [FR](fr/06-landing.md) | Landing page | 1,047 |
+| | **Total** | **18,601** |
 
 ## What is not in these files
 
@@ -97,4 +97,4 @@ Both lists below are read out of `chapters-meta.ts` and `review-gates.ts` each t
 node --env-file-if-exists=.env.local core/scripts/export-content-review.mjs
 ```
 
-Coverage check on this run: **1383 of 1383** English strings under `OstomyCare` appear in these files.
+Coverage check on this run: **1397 of 1397** English strings under `OstomyCare` appear in these files.

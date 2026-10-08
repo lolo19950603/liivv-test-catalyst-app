@@ -1,9 +1,11 @@
 import 'server-only';
 
 import { removeEdgesAndNodes } from '@bigcommerce/catalyst-client';
+import { getTranslations } from 'next-intl/server';
 
 import {
   blocksInsulinForQuebec,
+  isGlucagonProduct,
   isInsulinProduct,
   isQuebecProvince,
 } from '~/app/[locale]/(default)/liivv-health/diabetes-care/dc-ids';
@@ -32,11 +34,15 @@ import { revalidate } from '~/client/revalidate-target';
  * =============================================================================
  */
 
-/* The message the snapshot throws with. The page shows its own, translated. */
+/*
+ * The message the snapshot throws with. The page shows its own, translated
+ * (`DiabetesCare.ui.commerce.quebecInsulinCheckout`); this English copy says
+ * the same, naming Liivv as the service (owner note 5, 2026-10-07).
+ */
 export class InsulinToQuebecError extends Error {
   constructor() {
     super(
-      'Insulin can’t be ordered online for delivery in Quebec. Remove it to continue, or call Bayshore Express Pharmacy at 1-844-561-1254 and a pharmacist will help.',
+      'Insulin can’t be ordered online for delivery in Quebec. Remove it to continue, or call Liivv at 1-844-561-1254 and a pharmacist will help.',
     );
     this.name = 'InsulinToQuebecError';
   }
@@ -126,6 +132,102 @@ export async function shipsInsulinToQuebec({
       categoryIds: categoriesById.get(entityId) ?? [],
     })),
   });
+}
+
+/*
+ * Which of these products are insulin or glucagon, from the catalogue's
+ * categories. Fails closed: if the catalogue cannot answer, every id counts.
+ */
+export async function pharmacistProductIds(entityIds: readonly number[]): Promise<Set<number>> {
+  const ids = [...new Set(entityIds)].filter((id) => Number.isInteger(id));
+
+  if (ids.length === 0) {
+    return new Set();
+  }
+
+  try {
+    const customerAccessToken = await getSessionCustomerAccessToken();
+    const pages: number[][] = [];
+
+    for (let i = 0; i < ids.length; i += PAGE_SIZE) {
+      pages.push(ids.slice(i, i + PAGE_SIZE));
+    }
+
+    const nodes = (
+      await Promise.all(
+        pages.map(async (page) => {
+          const { data } = await client.fetch({
+            document: InsulinCheckCategoriesQuery,
+            customerAccessToken,
+            variables: { entityIds: page, first: page.length },
+            fetchOptions: customerAccessToken
+              ? { cache: 'no-store' as const }
+              : { next: { revalidate } },
+          });
+
+          return removeEdgesAndNodes(data.site.products);
+        }),
+      )
+    ).flat();
+
+    const categoriesById = new Map(
+      nodes.map((node) => [
+        node.entityId,
+        removeEdgesAndNodes(node.categories).map((category) => category.entityId),
+      ]),
+    );
+
+    return new Set(
+      ids.filter(
+        (entityId) =>
+          isInsulinProduct({ entityId, categoryIds: categoriesById.get(entityId) ?? [] }) ||
+          isGlucagonProduct(entityId),
+      ),
+    );
+  } catch {
+    return new Set(ids);
+  }
+}
+
+/*
+ * Insulin and glucagon are never added to the cart from a listing (owner note
+ * 9, 2026-10-07): a pharmacist reviews every order, and the notice that says
+ * so is under the product page's buy box. Every listing that offers a
+ * one-click add — a category grid, search, a brand page, compare — passes its
+ * cards through this, and an insulin or glucagon card links its product page
+ * instead ("View product", `DiabetesCare.ui.commerce.viewProduct`). Other
+ * cards come back unchanged. Fails closed, as `pharmacistProductIds` does.
+ */
+export async function withPharmacistProductsViewOnly<T extends { id: string }>(
+  cards: readonly T[],
+): Promise<Array<T & { viewOnlyLabel?: string }>> {
+  if (cards.length === 0) {
+    return [];
+  }
+
+  const viewOnly = await pharmacistProductIds(cards.map((card) => Number(card.id)));
+
+  if (viewOnly.size === 0) {
+    return [...cards];
+  }
+
+  const t = await getTranslations('DiabetesCare.ui.commerce');
+  const viewOnlyLabel = t('viewProduct');
+
+  return cards.map((card) => (viewOnly.has(Number(card.id)) ? { ...card, viewOnlyLabel } : card));
+}
+
+/*
+ * The same for a wishlist's items (the account wishlist and a shared one):
+ * an insulin or glucagon item's card links its product page instead of
+ * offering "Add to cart". The wishlist's add action refuses them as well.
+ */
+export async function withPharmacistWishlistItemsViewOnly<T extends { product: { id: string } }>(
+  items: readonly T[],
+): Promise<Array<T & { product: T['product'] & { viewOnlyLabel?: string } }>> {
+  const products = await withPharmacistProductsViewOnly(items.map((item) => item.product));
+
+  return items.map((item, index) => ({ ...item, product: products[index] ?? item.product }));
 }
 
 /*

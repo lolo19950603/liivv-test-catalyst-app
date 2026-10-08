@@ -53,12 +53,12 @@ export const NEW_TO_THE_JOURNEY = {
   ],
 
   prePublishChecks: [
-    'Booking: "Request a call" stays held until a booking page can take the request (Microsoft Bookings, or Bayshore Express Pharmacy’s own; OPEN-QUESTIONS B6). The CDE hours, the Canada-wide scope and the hand-off to the Liivv pharmacy in the reader’s province were answered by the owner on 2026-10-06 (A1, A2, B5) and are in `11.fig.lanes.4` and `pharmacist.body`; the lane, like the panel, shows the pharmacy’s phone line, email, hours and About page from `ui.contact` (since 2026-10-06).',
+    'Booking: "Request a call" stays held until a booking page can take the request (Microsoft Bookings, or Bayshore Express Pharmacy’s own; OPEN-QUESTIONS B6). The CDE hours, the Canada-wide scope and the hand-off to the Liivv pharmacy in the reader’s province were answered by the owner on 2026-10-06 (A1, A2, B5) and are in `11.fig.lanes.4` and `pharmacist.body`; the lane, like the panel, shows the CDEs’ phone line and hours from `ui.contact` (since 2026-10-06; presented as Liivv’s Certified Diabetes Educators, with no email or About link, since owner note 5, 2026-10-07).',
   ],
 
   heldCopy: {
     released:
-      'Released by the source check, and now in the copy: what A1C measures, "over the past 2 to 3 months" (dc-checking-blood-sugar), in 3.3. The draft’s "about 3 months" was replaced with the page’s "2 to 3 months". Released by the owner’s answers of 2026-10-06 (A2, B5, B9, B12): the CDE contact, the general phone line, email, hours and About page of Bayshore Express Pharmacy, in the CDE panel and the CDE lane (`ui.contact`).',
+      'Released by the source check, and now in the copy: what A1C measures, "over the past 2 to 3 months" (dc-checking-blood-sugar), in 3.3. The draft’s "about 3 months" was replaced with the page’s "2 to 3 months". Released by the owner’s answers of 2026-10-06 (A2, B5, B9, B12): the CDE contact, the general phone line, email, hours and About page of Bayshore Express Pharmacy, in the CDE panel and the CDE lane (`ui.contact`). Since owner note 5 (2026-10-07) the service is presented as Liivv’s: phone and hours only, no email, no About link.',
     items: [
       {
         topic: 'Device maker 24/7 support lane',

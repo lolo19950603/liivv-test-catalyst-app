@@ -478,11 +478,7 @@ export function LandingPage({ setup, doors }: { setup: LandingSetup; doors?: Rea
               <span className={k('eyebrow')}>{t('types.eyebrow')}</span>
               <h2 id={k('types-heading')}>{t('types.heading')}</h2>
               <p>{t('types.body')}</p>
-              <SourceLine
-                className={k('source-line')}
-                label={t('facts.sourcesLabel')}
-                sources={setup.typesSources}
-              />
+              <SourceLine className={k('source-line')} sources={setup.typesSources} />
             </header>
             <ul aria-label={t('types.label')} className={k('chip-list')}>
               {setup.chips.map((chip) =>
@@ -516,11 +512,7 @@ export function LandingPage({ setup, doors }: { setup: LandingSetup; doors?: Rea
                 <article className={k('fact')} key={fact.key}>
                   <strong>{text.value}</strong>
                   <span>{text.label}</span>
-                  <SourceLine
-                    className={k('source-line')}
-                    label={t('facts.sourcesLabel')}
-                    sources={fact.sources}
-                  />
+                  <SourceLine className={k('source-line')} sources={fact.sources} />
                 </article>
               );
             })}
@@ -741,23 +733,45 @@ export function LandingPage({ setup, doors }: { setup: LandingSetup; doors?: Rea
             <h2>{t('brands.heading')}</h2>
             <p>{t('brands.body')}</p>
             {/*
-             * A maker's logo where the site has a file it may show, its name
+             * A brand's logo where the site has a file it may show, its name
              * as text otherwise, both in the same pill. The logo's alt text is
-             * the maker's name.
+             * the brand's name. A pill with an href is a link to the site's
+             * shop filtered to that brand (Diabetes Care, owner note 10,
+             * 2026-10-07), named "Shop <brand>" so its accessible name
+             * contains the name shown. A plain link, as the shop buttons are:
+             * the shop opens at its top.
              */}
             <div className={k('brand-row')}>
-              {setup.brands.map((brand) =>
-                brand.logo ? (
-                  <span className={`${k('brand-pill')} ${k('brand-logo')}`} key={brand.name}>
-                    {/* eslint-disable-next-line @next/next/no-img-element -- a small static logo file, shown at its own size */}
-                    <img alt={brand.name} decoding="async" loading="lazy" src={brand.logo} />
-                  </span>
+              {setup.brands.map((brand) => {
+                const className = [
+                  k('brand-pill'),
+                  brand.logo ? k('brand-logo') : null,
+                  brand.logo && brand.logoFit === 'tall' ? k('brand-logo-tall') : null,
+                ]
+                  .filter(Boolean)
+                  .join(' ');
+                const content = brand.logo ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- a small static logo file, shown at its own size
+                  <img alt={brand.name} decoding="async" loading="lazy" src={brand.logo} />
                 ) : (
-                  <span className={k('brand-pill')} key={brand.name}>
-                    {brand.name}
+                  brand.name
+                );
+
+                return brand.href ? (
+                  <a
+                    aria-label={t('brands.shop', { brand: brand.name })}
+                    className={className}
+                    href={brand.href}
+                    key={brand.name}
+                  >
+                    {content}
+                  </a>
+                ) : (
+                  <span className={className} key={brand.name}>
+                    {content}
                   </span>
-                ),
-              )}
+                );
+              })}
             </div>
             <ul className={k('brand-points')}>
               {BRAND_POINT_KEYS.map((key) => (
@@ -785,11 +799,7 @@ export function LandingPage({ setup, doors }: { setup: LandingSetup; doors?: Rea
                   <p>
                     <Answer faq={faq} text={item.a} />
                   </p>
-                  <SourceLine
-                    className={k('source-line')}
-                    label={t('facts.sourcesLabel')}
-                    sources={faq.sources}
-                  />
+                  <SourceLine className={k('source-line')} sources={faq.sources} />
                 </details>
               );
             })}

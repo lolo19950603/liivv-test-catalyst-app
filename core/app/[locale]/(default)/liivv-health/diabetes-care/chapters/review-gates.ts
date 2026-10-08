@@ -33,6 +33,15 @@
  * renders an urgentExit signpost may be gated only where the fallback still
  * shows that signpost.
  *
+ * Not a module, so never gated (owner note 1, 2026-10-07): the Sources
+ * disclosure at the foot of each card, under the referral band and under a
+ * path's intro, and the grouped "Where this comes from" list
+ * (_microsite/_components/source-chip.tsx). They are governance furniture,
+ * like the landing's source lines: sources are facts, and once the prose
+ * stopped naming its sources a French card without its disclosure would carry
+ * none. Their few words (`ui.chapter.sources`) ship as machine-drafted French
+ * under the page's draft marker, as the landing's do. Diabetes-only so far.
+ *
  * No value imports and erasable TypeScript only: the content-review export
  * loads this file directly under Node's type stripping.
  * =============================================================================
@@ -112,6 +121,13 @@ export type GateId =
    * and its emergency signpost is never behind a gate.
    */
   | 'paths'
+  /*
+   * The Diabetes Essentials shop's own French (DiabetesCare.ui.shopPage, from
+   * owner note 9, 2026-10-07): its headings, filter labels and product-type
+   * names. They ship on /fr as the landing's do; this gate decides the draft
+   * marker on previews. The products are the catalogue's.
+   */
+  | 'shop'
   /* A whole chapter's French. */
   | `chapter:${ChapterSlug}`;
 

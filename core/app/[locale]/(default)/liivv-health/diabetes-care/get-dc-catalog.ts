@@ -6,20 +6,25 @@ import { getSessionCustomerAccessToken } from '~/auth';
 import { getChannelIdFromLocale } from '~/channels.config';
 import { client } from '~/client';
 import { PricingFragment } from '~/client/fragments/pricing';
-import { graphql } from '~/client/graphql';
+import { graphql, ResultOf } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { isCuratedKitProduct } from '~/lib/kit/is-curated-kit';
 import { resolveBcCdnImageUrl } from '~/lib/resolve-bc-cdn-image-url';
 import { pricesTransformer } from '~/data-transformers/prices-transformer';
 
-import { DIABETES_REFUSED_DESCRIPTION } from './chapters/chapter-shop';
+import { namesAnotherRetailer } from './chapters/chapter-shop';
 import {
   DAY_ONE_STARTER_KIT_ID,
   FEATURED_CGM_ID,
   FEATURED_METER_ID,
+  isDiabetesKit,
+  isGlucagonProduct,
+  isInsulinProduct,
   SHOP_DIABETES_CARE_CATEGORY_ID,
 } from './dc-ids';
+import { getDiabetesEnglishNames } from './get-diabetes-shop';
+import { roomForProduct, type ShopRoom } from './shop-classify';
 
 export {
   DAY_ONE_STARTER_KIT_ID,
@@ -30,7 +35,12 @@ export {
 
 /** BigCommerce Storefront GraphQL caps product connections at 50. */
 const PAGE_SIZE = 50;
-const MAX_PAGES = 3;
+/*
+ * A runaway guard, far above the category's size (241 visible products on
+ * 2026-10-07). It was 3 pages until then, so the landing's rooms saw only the
+ * first 150 products (owner note 10); reaching the guard is logged.
+ */
+const MAX_PAGES = 20;
 
 const DcCatalogQuery = graphql(
   `
@@ -56,6 +66,13 @@ const DcCatalogQuery = graphql(
                   name
                   path
                   description
+                  categories(first: 25) {
+                    edges {
+                      node {
+                        entityId
+                      }
+                    }
+                  }
                   defaultImage {
                     altText
                     url: urlTemplate(lossy: true)
@@ -90,6 +107,13 @@ const DcCatalogQuery = graphql(
               name
               path
               description
+              categories(first: 25) {
+                edges {
+                  node {
+                    entityId
+                  }
+                }
+              }
               defaultImage {
                 altText
                 url: urlTemplate(lossy: true)
@@ -128,9 +152,14 @@ export type DcCatalogItem = {
   image?: { src: string; alt: string };
   priceLabel?: string;
   isKit: boolean;
+  /* The landing room its type puts it in (./shop-classify.ts, one scheme with the shop). */
+  room: ShopRoom;
+  /* Insulin (`isInsulinProduct`) or glucagon (`isGlucagonProduct`): never on /fr, and noticed. */
+  isInsulin: boolean;
+  isGlucagon: boolean;
   /*
-   * Its description names or phones another retailer
-   * (DIABETES_REFUSED_DESCRIPTION, ./chapters/chapter-shop.ts), so the landing
+   * Its full HTML description names, links or phones another retailer
+   * (`namesAnotherRetailer`, ./chapters/chapter-shop.ts), so the landing
    * never links it until the description is fixed in the store (B3).
    */
   refused?: true;
@@ -178,6 +207,9 @@ function toItem(
     name: string;
     path: string;
     description?: string;
+    categories?: {
+      edges?: Array<{ node: { entityId: number } } | null> | null;
+    } | null;
     defaultImage?: { altText: string; url: string } | null;
     images?: {
       edges?: Array<{
@@ -192,6 +224,8 @@ function toItem(
   format: Awaited<ReturnType<typeof getFormatter>>,
   /* "From $84.99" in the page language (`ui.landingPage.shop.fromPrice`). */
   fromPrice: (price: string) => string,
+  /* Its English name, on a French page: the filing rules read English names. */
+  englishName?: string,
 ): DcCatalogItem {
   const customFields = removeEdgesAndNodes(node.customFields ?? { edges: [] });
   const price = pricesTransformer(node.prices ?? null, format);
@@ -205,16 +239,27 @@ function toItem(
     priceLabel = fromPrice(price.minValue);
   }
 
+  const categoryIds = removeEdgesAndNodes(node.categories ?? { edges: [] }).map(
+    (category) => category.entityId,
+  );
+  const isKit = isCuratedKitProduct(customFields) || isDiabetesKit(node.entityId);
+
   return {
     entityId: node.entityId,
     name: node.name,
     path: node.path,
     image: pickProductImage(node),
     priceLabel,
-    isKit: isCuratedKitProduct(customFields),
-    ...(DIABETES_REFUSED_DESCRIPTION.test(node.description ?? '')
-      ? { refused: true as const }
-      : {}),
+    isKit,
+    room: roomForProduct({
+      entityId: node.entityId,
+      name: englishName ?? node.name,
+      categoryIds,
+      isKit,
+    }),
+    isInsulin: isInsulinProduct({ entityId: node.entityId, categoryIds }),
+    isGlucagon: isGlucagonProduct(node.entityId),
+    ...(namesAnotherRetailer(node.description) ? { refused: true as const } : {}),
   };
 }
 
@@ -225,6 +270,7 @@ export const getDcCatalog = cache(async (locale?: string): Promise<DcCatalog> =>
   const format = await getFormatter();
   const shopT = await getTranslations('DiabetesCare.ui.landingPage.shop');
   const fromPrice = (price: string) => shopT('fromPrice', { price });
+  const englishNames = locale && locale !== 'en' ? await getDiabetesEnglishNames() : null;
   const fetchOptions = {
     ...(locale ? { headers: { 'Accept-Language': locale } } : {}),
     ...(customerAccessToken ? { cache: 'no-store' as const } : { next: { revalidate } }),
@@ -240,7 +286,7 @@ export const getDcCatalog = cache(async (locale?: string): Promise<DcCatalog> =>
     let after: string | null = null;
 
     for (let page = 0; page < MAX_PAGES; page += 1) {
-      const response = await client.fetch({
+      const response: { data: ResultOf<typeof DcCatalogQuery> } = await client.fetch({
         document: DcCatalogQuery,
         customerAccessToken,
         channelId,
@@ -261,7 +307,7 @@ export const getDcCatalog = cache(async (locale?: string): Promise<DcCatalog> =>
         page === 0 ? removeEdgesAndNodes(response.data.site.featuredProducts ?? { edges: [] }) : [];
 
       for (const node of [...featuredNodes, ...categoryNodes]) {
-        const item = toItem(node, format, fromPrice);
+        const item = toItem(node, format, fromPrice, englishNames?.get(node.entityId));
         const existing = byId.get(node.entityId);
 
         if (!existing) {
@@ -273,6 +319,11 @@ export const getDcCatalog = cache(async (locale?: string): Promise<DcCatalog> =>
 
       if (!productConnection.pageInfo.hasNextPage || !productConnection.pageInfo.endCursor) {
         break;
+      }
+
+      if (page === MAX_PAGES - 1) {
+        // eslint-disable-next-line no-console
+        console.warn('[getDcCatalog] stopped at the page guard; the landing shelf is partial');
       }
 
       after = productConnection.pageInfo.endCursor;

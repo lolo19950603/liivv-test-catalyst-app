@@ -9,6 +9,11 @@ import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { createCompareLoader } from '@/vibes/soul/primitives/compare-drawer/loader';
 import { ProductsListSection } from '@/vibes/soul/sections/products-list-section';
 import { getFilterParsers } from '@/vibes/soul/sections/products-list-section/filter-parsers';
+import { SHOP_DIABETES_CARE_CATEGORY_ID } from '~/app/[locale]/(default)/liivv-health/diabetes-care/dc-ids';
+import {
+  DiabetesShop,
+  DiabetesShopFallback,
+} from '~/app/[locale]/(default)/liivv-health/diabetes-care/diabetes-shop';
 import {
   isOstomyCategoryId,
   SHOP_OSTOMY_CARE_CATEGORY_ID,
@@ -25,7 +30,10 @@ import { numberedPaginationTransformer } from '~/data-transformers/numbered-pagi
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-ids';
 import { categoryLineageIds, isSensitiveProduct } from '~/lib/analytics/sensitive-products';
-import { withoutInsulinOnFrench } from '~/lib/checkout/quebec-insulin';
+import {
+  withoutInsulinOnFrench,
+  withPharmacistProductsViewOnly,
+} from '~/lib/checkout/quebec-insulin';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { resolveStoreLogo } from '~/lib/makeswift/site-header/resolve-store-logo';
@@ -225,11 +233,17 @@ export default async function Category(props: Props) {
     const { defaultOutOfStockMessage, showOutOfStockMessage, showBackorderMessage } =
       settings?.inventory ?? {};
 
-    return productCardTransformer(
-      products,
-      format,
-      showOutOfStockMessage ? defaultOutOfStockMessage : undefined,
-      showBackorderMessage,
+    /*
+     * Insulin and glucagon link their product page, never a one-click add:
+     * the pharmacist notice is under its buy box (owner note 9, 2026-10-07).
+     */
+    return withPharmacistProductsViewOnly(
+      productCardTransformer(
+        products,
+        format,
+        showOutOfStockMessage ? defaultOutOfStockMessage : undefined,
+        showBackorderMessage,
+      ),
     );
   });
 
@@ -319,18 +333,18 @@ export default async function Category(props: Props) {
   });
 
   const isShopOstomy = categoryId === SHOP_OSTOMY_CARE_CATEGORY_ID;
+  /*
+   * Shop Diabetes Care (owner note 9, 2026-10-07): the Diabetes Essentials
+   * shelf, built like Ostomy's, in place of the stock grid.
+   */
+  const isShopDiabetes = categoryId === SHOP_DIABETES_CARE_CATEGORY_ID;
+  const ownShelf = isShopOstomy || isShopDiabetes;
   const { defaultOutOfStockMessage, showOutOfStockMessage, showBackorderMessage } =
     settings?.inventory ?? {};
 
   return (
     <>
       <CategoryScrollReset />
-      {/*
-        An ostomy shelf — /liivv-health/ostomy-care/shop-ostomy-care, or any of
-        the Heal + Manage ostomy categories — says what the person browsing it
-        is dealing with. The advertising signals go off (~/lib/analytics/ad-signals).
-      */}
-      {isSensitiveProduct({ categoryIds: analyticsCategoryIds }) && <DenyAdSignals />}
       {/*
         The same shelves, for a different reason: an ostomy shelf was the only
         ostomy URL with no route to Chapter 02's red-flag list. See
@@ -356,7 +370,22 @@ export default async function Category(props: Props) {
             showBackorderMessage={showBackorderMessage}
           />
         </Suspense>
-      ) : (
+      ) : null}
+      {isShopDiabetes ? (
+        <Suspense fallback={<DiabetesShopFallback />}>
+          <DiabetesShop
+            breadcrumbs={breadcrumbs}
+            category={category}
+            categoryIds={analyticsCategoryIds}
+            fallbackLogo={fallbackLogo}
+            outOfStockMessage={showOutOfStockMessage ? defaultOutOfStockMessage : undefined}
+            quickActions={quickActions}
+            searchParams={props.searchParams}
+            showBackorderMessage={showBackorderMessage}
+          />
+        </Suspense>
+      ) : null}
+      {ownShelf ? null : (
         <ProductsListSection
           breadcrumbs={breadcrumbs}
           compareLabel={t('Compare.compare')}
@@ -414,7 +443,7 @@ export default async function Category(props: Props) {
         label={`${category.name} bottom content`}
         snapshotId={`category-${categoryId}-bottom-content`}
       />
-      {isShopOstomy ? null : (
+      {ownShelf ? null : (
         <Stream value={Streamable.all([streamableListedProducts, streamableSensitiveProductIds])}>
           {([listedProducts, sensitiveProductIds]) => (
             <CategoryViewed
@@ -426,6 +455,18 @@ export default async function Category(props: Props) {
           )}
         </Stream>
       )}
+      {/*
+        An ostomy or diabetes shelf — /liivv-health/ostomy-care/shop-ostomy-care,
+        Shop Diabetes Care, or any shelf under them — says what the person
+        browsing it is dealing with. The advertising signals go off
+        (~/lib/analytics/ad-signals). Rendered last, outside every Suspense
+        boundary: React still hoists the tag into the first <head>, and as the
+        page's last element it is not the one Next's scroll-on-navigate
+        handler measures, so the pager and a product link open at the top
+        (owner note 11, 2026-10-07; as the first element, a zero-size tag in
+        <head>, it stopped that scroll on every health shelf).
+      */}
+      {isSensitiveProduct({ categoryIds: analyticsCategoryIds }) && <DenyAdSignals />}
     </>
   );
 }

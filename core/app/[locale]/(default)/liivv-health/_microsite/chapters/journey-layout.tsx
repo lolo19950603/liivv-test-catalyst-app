@@ -5,6 +5,7 @@
 import { useId } from 'react';
 
 import { ChapterReveal } from '../../ostomy-care/chapters/chapter-reveal';
+import { CardSources } from '../_components/source-chip';
 import { CardShop } from '../shop/card-shop';
 import { useSiteT } from '../site-context';
 
@@ -99,6 +100,9 @@ function JourneyEntry({ card, exit }: { card: CategoryCard; exit?: Chapter['urge
       <CardRoutes card={card} />
 
       <CardExit card={card} exit={exit} />
+
+      {/* Engine-only so far (owner note 1, 2026-10-07): Ostomy's twin shows no card sources. */}
+      <CardSources card={card} />
 
       {card.ask ? (
         <div className="oc-journey-foot">

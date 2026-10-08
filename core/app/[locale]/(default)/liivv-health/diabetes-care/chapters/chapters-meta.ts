@@ -246,18 +246,33 @@ export type DiabetesFigureMeta =
    */
   | { kind: 'testGlossary'; terms: Array<{ slug: string }>; sources: SourceId[] }
   /*
-   * The family diabetes tree (Know Your Type card 8), a printable table.
-   * AUGMENTS. Rows (`figure.familyTree.rows.<n>`) are grouped by side of the
-   * family; the columns are structural keys labelled from
-   * `figure.familyTree.columns.<key>`. There is no calculation, no colouring
-   * and no pattern detection, and typed answers stay in the browser tab: never
-   * stored, never sent. With JavaScript off it is the same table with blank
-   * cells, a form to fill in by hand.
+   * The family diabetes tree (Know Your Type card 8). AUGMENTS. Rows
+   * (`figure.familyTree.rows.<n>`) are grouped by side of the family; the
+   * columns are structural keys labelled from `figure.familyTree.columns.<key>`.
+   * There is no calculation, no colouring and no pattern detection, and the
+   * answers stay in the browser tab: never stored, never sent.
+   *
+   * Owner note 2 (2026-10-07): it starts closed, under its heading and intro,
+   * with one "Start my family tree" button. Started, it is "Me" and a bar of
+   * one-tap Add buttons grouped by side, one per row after the first (each
+   * person named by `figure.familyTree.people.<row>`); the rows in
+   * `repeatable` can be added more than once (brothers and sisters, children,
+   * a parent's brothers and sisters), the others once. Each person answers in
+   * one-tap choices (`figure.familyTree.answers`, and `types` for the type,
+   * whose "other" keeps a box for what the family was told). Age, type and
+   * insulin follow a Yes to diabetes; hearing loss is asked of everyone, since
+   * it is a clue on its own. At most `maxPeople` at once. It prints the
+   * people added, then blank lines for anyone else; before anyone is added, and
+   * with JavaScript off, it is the blank table of every row, a form to fill in
+   * by hand.
    */
   | {
       kind: 'familyTree';
       sides: Array<{ side: FamilySide; rows: number[] }>;
       columns: FamilyColumn[];
+      repeatable: number[];
+      types: FamilyType[];
+      maxPeople: number;
       sources: SourceId[];
     }
   /*
@@ -272,8 +287,8 @@ export type DiabetesFigureMeta =
    * nothing reads a number back, and no line places a product or links a shop.
    * With JavaScript off, every device's entry is in the page, one after
    * another. `askHref` is where the pump picker sends a question it cannot
-   * answer: the CDE panel on the same page (`#chapter-cde`, the CDEs at
-   * Bayshore Express Pharmacy), or a Liivv page, which then needs
+   * answer: the CDE panel on the same page (`#chapter-cde`, Liivv's
+   * Certified Diabetes Educators), or a Liivv page, which then needs
    * `askHrefLang`.
    */
   | { kind: 'meterMatch' }
@@ -285,9 +300,10 @@ export type DiabetesFigureMeta =
    * days to cover, how many that needs. `presets` are sensors whose "up to"
    * wear time it fills in, read from ./device-pairings.ts (grace periods are
    * never counted, R23); any other sensor is "enter the days". The limits are
-   * the largest numbers it takes. Nothing is stored, sent or compared with
-   * coverage, and there is no shop or Subscribe & save link. With JavaScript
-   * off it is the rule and a worked example (`figure.noJs`).
+   * the largest numbers it takes; `coverPresets` are the days-to-cover chips.
+   * Nothing is stored, sent or compared with coverage, and there is no shop
+   * or Subscribe & save link. With JavaScript off it is the rule and a worked
+   * example (`figure.noJs`).
    */
   | {
       kind: 'restockCalc';
@@ -295,6 +311,12 @@ export type DiabetesFigureMeta =
       maxSensors: number;
       maxDays: number;
       maxCover: number;
+      /*
+       * The days-to-cover chips (owner note 3, 2026-10-07), each labelled
+       * from `figure.coverDays`; "another number" opens the box. Periods to
+       * count, not device facts, so no register entry backs them.
+       */
+      coverPresets: number[];
     }
   /*
    * One injection area split into four zones, a week each (Your Tools card
@@ -323,6 +345,16 @@ export type FamilyColumn =
   | 'typeTold'
   | 'insulinSoon'
   | 'hearingLoss';
+
+/* The one-tap answers to the tree's yes-or-no columns, labelled from `figure.familyTree.answers.<key>`. */
+export type FamilyAnswer = 'yes' | 'no' | 'notSure';
+
+/*
+ * The tree's type choices, labelled from `figure.familyTree.types.<key>`.
+ * "other" keeps a box for the type as the family was told it (MODY, LADA,
+ * "borderline"), so a clue the chips do not name is not lost.
+ */
+export type FamilyType = 'type1' | 'type2' | 'gestational' | 'other' | 'notSure';
 
 /*
  * The engine's shapes with this site's names. A new kind goes into
@@ -384,10 +416,10 @@ export interface ChapterMeta
 const IMG = '/archive/diabetes-care';
 
 /*
- * The CDE panel at the foot of every chapter: the Certified Diabetes Educators
- * at Bayshore Express Pharmacy, the Liivv pharmacy in Markham, with its
- * general phone line, email, hours and About page (DIABETES_SITE.contact in
- * ./site.ts; owner answers A2, B5, B9, B10 and B12, 2026-10-06). The hero's
+ * The CDE panel at the foot of every chapter: Liivv's Certified Diabetes
+ * Educators, with their general phone line and hours (DIABETES_SITE.contact in
+ * ./site.ts; owner answers A2, B5, B9, B10 and B12, 2026-10-06; presented as
+ * Liivv's own service, owner note 5, 2026-10-07). The hero's
  * "ask" button and the pump picker open it on the same page. The id is the
  * engine's CONTACT_ANCHOR (_microsite/_components/specialist-contact.tsx),
  * written out because this file may not import a value. "Request a call"
@@ -691,16 +723,16 @@ export const CHAPTER_META: ChapterMeta[] = [
               { glyph: 'primaryCare', item: 2, topics: ['plan', 'medicines'] },
               // A pharmacist anywhere, not a Liivv-only lane.
               { glyph: 'service', item: 3, topics: ['medicines'] },
-              // The CDEs at Bayshore Express Pharmacy, Liivv's pharmacy: no card
-              // sentence, so its words wait on `laneExtras` on /fr. It shows the
-              // pharmacy's general line, email, hours and About page, as every
-              // CDE panel does (DIABETES_SITE.contact; B9).
+              // Liivv's Certified Diabetes Educators: no card sentence, so its
+              // words wait on `laneExtras` on /fr. It shows their general line
+              // and hours, as every CDE panel does (DIABETES_SITE.contact; B9).
+              // No source: it describes Liivv's own service, on the owner's
+              // word (owner note 5, 2026-10-07).
               {
                 glyph: 'service',
                 service: true,
                 contact: true,
                 topics: ['device', 'supplies'],
-                sources: ['bep-about'],
               },
               {
                 glyph: 'people',
@@ -1100,16 +1132,16 @@ export const CHAPTER_META: ChapterMeta[] = [
               { glyph: 'team', item: 4, topics: ['high', 'sick', 'device', 'supplies'] },
               // A pharmacist anywhere, not a Liivv-only lane.
               { glyph: 'service', item: 5, topics: ['sick', 'low'] },
-              // The CDEs at Bayshore Express Pharmacy, Liivv's pharmacy: no card
-              // sentence, so its words wait on `laneExtras` on /fr. It shows the
-              // pharmacy's general line, email, hours and About page, as every
-              // CDE panel does (DIABETES_SITE.contact; B9, C12).
+              // Liivv's Certified Diabetes Educators: no card sentence, so its
+              // words wait on `laneExtras` on /fr. It shows their general line
+              // and hours, as every CDE panel does (DIABETES_SITE.contact; B9,
+              // C12). No source: it describes Liivv's own service, on the
+              // owner's word (owner note 5, 2026-10-07).
               {
                 glyph: 'service',
                 service: true,
                 contact: true,
                 topics: ['device', 'supplies'],
-                sources: ['bep-about'],
               },
             ],
             topicKeys: ['low', 'high', 'sick', 'device', 'supplies'],
@@ -1331,6 +1363,7 @@ export const CHAPTER_META: ChapterMeta[] = [
             maxSensors: 99,
             maxDays: 30,
             maxCover: 366,
+            coverPresets: [30, 60, 90],
           },
         ],
         sources: ['isc-nihb-updates'],
@@ -1449,7 +1482,7 @@ export const CHAPTER_META: ChapterMeta[] = [
         // 13 Your pump's supplies: what fits. The "My pump" picker reads card
         // 4's pairings from the other end (./device-pairings.ts), so the two
         // cannot disagree. A question it cannot answer goes to the CDE panel
-        // on the same page (Bayshore Express Pharmacy).
+        // on the same page (Liivv's Certified Diabetes Educators).
         image: `${IMG}/chapter-everyday.png`,
         group: 'gettingInsulinIn',
         ask: 'pharmacistCde',
@@ -2247,6 +2280,12 @@ export const CHAPTER_META: ChapterMeta[] = [
               { side: 'fathers', rows: [8, 9, 10, 11] },
             ],
             columns: ['hasDiabetes', 'ageAtDiagnosis', 'typeTold', 'insulinSoon', 'hearingLoss'],
+            // Brothers and sisters, children, and each parent's brothers and
+            // sisters: one person per entry (owner note 2, 2026-10-07; the
+            // paper table keeps them as one row each, as before).
+            repeatable: [2, 3, 7, 11],
+            types: ['type1', 'type2', 'gestational', 'other', 'notSure'],
+            maxPeople: 20,
             sources: [
               'dc-cpg-ch3-classification-diagnosis',
               'diabetes-uk-mody',

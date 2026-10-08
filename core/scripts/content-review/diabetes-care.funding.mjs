@@ -34,7 +34,7 @@ export const FUNDING = {
     },
     {
       id: 'D-5 (owner, 2026-10-06, B10, B9, B6)',
-      note: '"they can take all sorts of questions and get answer internally": the CDEs at Bayshore Express Pharmacy take claim and coverage questions too, and the CDE band and "Ask a CDE" (`enough3Body`) say so. The band shows the pharmacy’s general phone line, email and hours; "Request a call" stays off until a booking page can take the request (B6). The same contact sits under "Liivv Now, Pay Later" (B10: they route questions internally).',
+      note: '"they can take all sorts of questions and get answer internally": the CDEs at Bayshore Express Pharmacy take claim and coverage questions too, and the CDE band and "Ask a CDE" (`enough3Body`) say so. The band shows the CDEs’ general phone line and hours (no email since owner note 5, 2026-10-07, which presents the service as Liivv’s); "Request a call" stays off until a booking page can take the request (B6). The same contact sits under "Liivv Now, Pay Later" (B10: they route questions internally).',
     },
     {
       id: 'D-6',
@@ -106,7 +106,7 @@ export const FUNDING = {
     'The urgent signpost uses This Might Be You’s approved pair ("Signs that need emergency care are in Staying Safe, under … Get emergency care now"), as the landing does. The record named Staying Safe’s own pair, which says "at the top of this page" and would be untrue here.',
     'The focus and vibe notes: the vibe note renders without a label. "The Liivv Vibe" is Ostomy’s word, and Diabetes Care has no label for it.',
     'The checker rules a program out for a type it does not take before it looks at therapy. The record’s sketch (A.5) checked therapy first, which showed type 1 pump programs to a type 2 reader on injections as "If you’re thinking about a pump".',
-    '"Request a call" (the CDE band and the "Can we bill your program for you?" card) renders only once the appointment page can take the request (`cdeRequestReason` in landing-meta.ts, landing D3; B6), as on the landing. Since 2026-10-06 the CDE band shows the CDE contact of Bayshore Express Pharmacy (phone, email, hours, About page) in its place.',
+    '"Request a call" (the CDE band and the "Can we bill your program for you?" card) renders only once the appointment page can take the request (`cdeRequestReason` in landing-meta.ts, landing D3; B6), as on the landing. Since 2026-10-06 the CDE band shows the CDE contact in its place: since owner note 5 (2026-10-07), the phone and hours of Liivv’s Certified Diabetes Educators.',
     '`funding.liivv.pharmacies` renders nowhere today: "Ordering from Quebec or the territories" (`whereBody`) opens with the same sentence (owner answers A1 and B11, 2026-10-06). It is kept for the checker’s Liivv cards if the owner wants it there.',
     '`funding.liivv.quebecBody` says the Insulin Pump Access Program takes receipts "as shown below". Its card is below only when the reader’s answers leave it in (type 1 or not sure, and a pump or insulin injections).',
     'On /fr while the `fundingChecker` gate is closed, the section shows each province and territory with its programs by their legal names, each linked to its official page with the date it was checked and its phone numbers, and the "still checking" line for a province with none. No question is asked there, so `toolIntro` and the pump group\'s intro are left off.',
@@ -114,6 +114,7 @@ export const FUNDING = {
     "Phone numbers (B22) render under a program's words on its card, in its federal row and in the /fr plain list, as tel: links (+1 and the ten digits; an extension is printed, and the first one is dialled after a pause, as a comma in the tel: link, since 2026-10-06). An office name is the program's own proper noun, in French only where the government prints one. The engine card part gained an optional `phones` list and a group `intro` line (_microsite/funding/checker-parts.tsx, a Diabetes-first addition to the Ostomy twin).",
     'The Yukon pump card (`yt-pump`) is partly confirmed: the National Pharmacare page states pump access and the 5-year cycle, but not who pays, how much, or how to apply (verify item 6). yukon.ca refuses plain requests, so the scheduled recheck reports its pages as blocked; they were read in a browser on 2026-10-06.',
     "The PEI pump card cites the program's questions and answers (PDF, 2026-05-06): the program's web page answers with a CAPTCHA, which nothing here tries to get past.",
+    'No products on this page. The pump-supplies strip that sat between "How paying works" and the checker (#pump-supplies, B21) was removed by the owner on 2026-10-07 (note 7), which closes D-13; the page makes no catalogue request. The same strip, "Pump supplies, by pump.", stays on Your Tools card 13.',
     "Quebec sensors (`qc-cgm`) rest on INESSS's records of the minister's decisions (RAMQ's own pages refuse requests), so the card stays partly confirmed. Corrected per the verifier: the February 4, 2026 change defines intensive insulin therapy for every CGM; it did not open coverage to type 2 in general.",
   ],
 
@@ -137,13 +138,6 @@ export const FUNDING = {
       who: 'Content',
       question:
         'Locators still to extend in sources-review.ts (facts checked live that the locator does not record yet): `dc-ontario-monitoring-for-health` (mail-in with original receipts; "no other coverage"; about 8 weeks; remove the amounts); `mb-pharmacare-mepp` (prescription needed; MAIPCP "no cost coverage"); `bc-diabetes-pins` (approved vendors; Special Authority for every CGM); `isc-nihb-updates` ("clients managing diabetes with insulin"; Guardian 4 limited use). The rows re-read on 2026-10-06 are recorded.',
-      where: [],
-    },
-    {
-      id: 'D-13',
-      who: 'Owner',
-      question:
-        'Product placement: the pump-supplies strip between "How paying works" and the checker (#pump-supplies; FUNDING_SHELF in chapter-shop.ts), live since placements resumed (B21): each pump\'s infusion set and reservoir or cartridge, and Omnipod pods once the owner makes them visible in the store. Kits stay off until the owner verifies kits-for-review.md. The owner confirms that the strip sits well beside the program cards and Liivv Now, Pay Later.',
       where: [],
     },
     {

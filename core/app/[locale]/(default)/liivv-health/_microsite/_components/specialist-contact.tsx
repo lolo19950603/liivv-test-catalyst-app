@@ -4,20 +4,22 @@
  * =============================================================================
  * THE SITE'S SPECIALIST SERVICE, REACHED DIRECTLY
  * =============================================================================
- * The general phone line, the email address, the hours and the service's own
- * About page, from the site's `contact` (../site.ts, SiteContact) and its
- * `ui.contact` words. Drawn inside a pharmacist panel in place of a request
- * button: on the chapters, the path pages, the landing's care band and the
- * funding page. It renders nothing for a site without a contact, so Ostomy's
- * pages are unchanged.
+ * The general phone line and the hours, plus an email address and the
+ * service's own About page where the site sets them, from the site's `contact`
+ * (../site.ts, SiteContact) and its `ui.contact` words. Drawn inside a
+ * pharmacist panel in place of a request button: on the chapters, the path
+ * pages, the landing's care band and the funding page. It renders nothing for
+ * a site without a contact, so Ostomy's pages are unchanged.
  *
  * A general contact only, never a named person. The phone number is dialled
  * from `contact.tel` and printed from `ui.contact.phone`, which is the same
- * number written the way the page's language writes it.
+ * number written the way the page's language writes it. Diabetes sets the
+ * phone only: its service is presented as Liivv's own (owner note 5,
+ * 2026-10-07), so there is no email line and no About link.
  *
- * The About page is an outward link, opened in the same tab like every other
- * outward link on these pages, in French on /fr where the service has a
- * French page.
+ * The About page, where a site has one, is an outward link, opened in the
+ * same tab like every other outward link on these pages, in French on /fr
+ * where the service has a French page.
  * =============================================================================
  */
 
@@ -49,15 +51,22 @@ export function SpecialistContact({ tone = 'dark' }: { tone?: 'dark' | 'light' }
       <li className="ms-contact-phone">
         <a href={`tel:${contact.tel}`}>{t('call', { phone: t('phone') })}</a>
       </li>
-      <li>
-        <a href={`mailto:${contact.email}`}>{t('email', { email: contact.email })}</a>
-      </li>
+      {contact.email !== undefined && (
+        <li>
+          <a href={`mailto:${contact.email}`}>{t('email', { email: contact.email })}</a>
+        </li>
+      )}
       <li>{t('hours')}</li>
-      <li>
-        <a href={french ? contact.aboutHrefFr : contact.aboutHref} hrefLang={french ? 'fr' : 'en'}>
-          {t('about')}
-        </a>
-      </li>
+      {contact.aboutHref !== undefined && (
+        <li>
+          <a
+            href={french ? contact.aboutHrefFr : contact.aboutHref}
+            hrefLang={french ? 'fr' : 'en'}
+          >
+            {t('about')}
+          </a>
+        </li>
+      )}
     </ul>
   );
 }

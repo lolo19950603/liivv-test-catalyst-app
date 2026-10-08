@@ -1,0 +1,124 @@
+/*
+ * A Sources disclosure and the grouped foot list (./source-chip.tsx). Its own
+ * classes (`ms-src*`), so nothing here can reach a rule Ostomy already has;
+ * it takes the colour of whatever it sits in, on a chapter card, a path
+ * intro or the landing, and the small type of the pickers' source line.
+ */
+
+.ms-src {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: inherit;
+}
+
+.ms-src-disclosure > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+}
+
+/*
+ * The words of the line run as one inline text inside this span, so on a
+ * phone a long list of publishers wraps onto further lines, each comma with
+ * its name, instead of every name becoming its own flex column and running
+ * out of the card (an ancestor clips).
+ */
+.ms-src-summary {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ms-src-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* The disclosure triangle, drawn rather than left to the browser, so it shows everywhere. */
+.ms-src-disclosure > summary::before {
+  content: '';
+  flex: none;
+  width: 0;
+  height: 0;
+  border-top: 0.32em solid transparent;
+  border-bottom: 0.32em solid transparent;
+  border-left: 0.45em solid currentColor;
+  transition: transform 0.15s ease;
+}
+
+.ms-src-disclosure[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.ms-src-disclosure > summary:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.ms-src ul,
+.ms-src-groups ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ms-src-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  overflow-wrap: anywhere;
+}
+
+.ms-src-link:hover,
+.ms-src-link:focus-visible {
+  text-decoration-thickness: 2px;
+}
+
+/* The language note keeps the entry's own size (chapter-page.css sizes it for the shelf). */
+.ms-src-link .oc-ch-shelf-lang {
+  font-size: inherit;
+}
+
+.ms-src-print {
+  display: none;
+}
+
+.ms-src-groups h3,
+.ms-src-groups h4 {
+  margin: 1rem 0 0.25rem;
+  font-size: 0.95rem;
+}
+
+.ms-src-groups .ms-src-link {
+  font-size: 0.9rem;
+}
+
+.ms-src-note {
+  margin: 1rem 0 0;
+  font-size: 0.85rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ms-src-disclosure > summary::before {
+    transition: none;
+  }
+}
+
+/* A closed disclosure does not print its list, so the plain line prints instead. */
+@media print {
+  .ms-src-disclosure {
+    display: none;
+  }
+
+  .ms-src-print {
+    display: block;
+    margin: 0.25rem 0 0;
+  }
+}

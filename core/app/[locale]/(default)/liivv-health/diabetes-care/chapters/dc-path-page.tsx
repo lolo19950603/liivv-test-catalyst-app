@@ -6,7 +6,8 @@
  * The site config, the path structure and the copy are read here, on the
  * client side, as the chapters' wrapper reads them, so none of it is
  * serialised into the page's payload twice: the server route passes only the
- * slug, the register links it resolved for the page locale, the two hrefs
+ * slug, the register entries it resolved for the page locale (the intro's,
+ * shown under the intro, and the whole page's, for the foot list), the two hrefs
  * whose release it decides, and the path's shop strip with the catalogue's
  * answer for its products (PATH_SHELVES in ./chapter-shop.ts; never on
  * prediabetes), which ShopProvider hands to the strip with this site's own
@@ -17,7 +18,7 @@
 
 import { useLocale, useMessages } from 'next-intl';
 
-import { type Citation, siteChapterMessages } from '../../_microsite/chapters/compose';
+import { siteChapterMessages } from '../../_microsite/chapters/compose';
 import { composePath } from '../../_microsite/paths/compose';
 import { PathPage } from '../../_microsite/paths/path-page';
 import type { PathWords } from '../../_microsite/paths/types';
@@ -25,6 +26,7 @@ import type { CardShelf } from '../../_microsite/shop/shelves';
 import { ShopProvider } from '../../_microsite/shop/shop-context';
 import type { PlacementItems } from '../../_microsite/shop/types';
 import { SiteProvider } from '../../_microsite/site-context';
+import type { ResolvedSource } from '../../_microsite/sources';
 
 import { addDiabetesPlacementToCart } from './_actions/add-placement';
 import { PATH_DISCLAIMER_CHAPTER, PATH_META, PATH_PHARMACIST_IMAGE } from './paths-meta';
@@ -33,15 +35,18 @@ import { DIABETES_SITE } from './site';
 
 export function DcPathPage({
   slug,
-  citations,
+  sources,
+  introSources,
   fundingHref,
   pharmacistBand,
   pharmacistHref,
   shop,
 }: {
   slug: string;
-  /* Every source the page names, once each, in the page locale. */
-  citations: Citation[];
+  /* Every source the page names, once each, resolved for the page locale. */
+  sources: ResolvedSource[];
+  /* The intro's sources, shown under it. */
+  introSources: ResolvedSource[];
   /* Already in the page locale, or null while the funding page does not exist. */
   fundingHref: string | null;
   /* Whether the pharmacist band renders on this path (its hold lifted, ./paths-meta.ts). */
@@ -77,13 +82,14 @@ export function DcPathPage({
 
   const page = (
     <PathPage
-      citations={citations}
       disclaimer={messages.chapters[PATH_DISCLAIMER_CHAPTER].governance.disclaimer}
       frDraft={showsFrDraftMarker('paths', locale)}
       fundingHref={fundingHref}
+      introSources={introSources}
       path={path}
       pharmacist={band ? { ...band, href: pharmacistHref, image: PATH_PHARMACIST_IMAGE } : null}
       shelf={shop?.shelf ?? null}
+      sources={sources}
     />
   );
 

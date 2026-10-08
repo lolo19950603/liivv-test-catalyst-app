@@ -59,13 +59,15 @@ export function MeasuringGuideFigure({
     if (!text?.guideLink) return null;
 
     return (
-      <p className="oc-fig-guide-link">
+      // A <div>, not a <p>: the French draft marker is a paragraph of its own,
+      // and a paragraph inside a paragraph breaks hydration on /fr (QA, 2026-10-08).
+      <div className="oc-fig-guide-link">
         <FrDraftMarker gate="measuringGuide" />
         <a download href={pdf}>
           <Glyph name="print" />
           {text.guideLink}
         </a>
-      </p>
+      </div>
     );
   }
 

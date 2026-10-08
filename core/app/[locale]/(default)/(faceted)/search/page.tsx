@@ -13,7 +13,10 @@ import { facetsTransformer } from '~/data-transformers/facets-transformer';
 import { numberedPaginationTransformer } from '~/data-transformers/numbered-pagination-transformer';
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-ids';
-import { withoutInsulinOnFrench } from '~/lib/checkout/quebec-insulin';
+import {
+  withoutInsulinOnFrench,
+  withPharmacistProductsViewOnly,
+} from '~/lib/checkout/quebec-insulin';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 
@@ -145,11 +148,14 @@ export default async function Search(props: Props) {
     const { defaultOutOfStockMessage, showOutOfStockMessage, showBackorderMessage } =
       settings?.inventory ?? {};
 
-    return productCardTransformer(
-      products,
-      format,
-      showOutOfStockMessage ? defaultOutOfStockMessage : undefined,
-      showBackorderMessage,
+    /* Insulin and glucagon link their product page, never a one-click add (owner note 9). */
+    return withPharmacistProductsViewOnly(
+      productCardTransformer(
+        products,
+        format,
+        showOutOfStockMessage ? defaultOutOfStockMessage : undefined,
+        showBackorderMessage,
+      ),
     );
   });
 
@@ -256,9 +262,6 @@ export default async function Search(props: Props) {
 
   return (
     <>
-      <Stream fallback={null} value={streamableDenyAdSignals}>
-        {(sensitive) => (sensitive ? <DenyAdSignals /> : null)}
-      </Stream>
       <ProductsListSection
         breadcrumbs={[
           { label: t('Search.Breadcrumbs.home'), href: '/' },
@@ -305,6 +308,14 @@ export default async function Search(props: Props) {
         title={streamableTitle}
         totalCount={streamableTotalCount}
       />
+      {/*
+        After the results, not before them: as the page's first element this
+        tag (hoisted into <head>, zero-size) stopped Next's scroll-to-top when
+        the pager changed page (owner note 11, 2026-10-07).
+      */}
+      <Stream fallback={null} value={streamableDenyAdSignals}>
+        {(sensitive) => (sensitive ? <DenyAdSignals /> : null)}
+      </Stream>
     </>
   );
 }

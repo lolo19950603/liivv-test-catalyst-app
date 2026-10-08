@@ -17,7 +17,7 @@
  */
 
 import { useLocale, useMessages, useTranslations } from 'next-intl';
-import { useCallback, useId, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import {
   CheckerProgress,
@@ -161,7 +161,6 @@ export function FundingChecker({
   const r = useTranslations('DiabetesCare.ui.fundingResults');
   const page = useTranslations('DiabetesCare.ui.fundingPage');
   const [input, setInput] = useState<CheckerInput>(EMPTY_INPUT);
-  const provinceId = useId();
   const provinceOptions = useProvinceOptions();
   const provinceWords = useProvinceWords();
   const phones = useProgramPhones();
@@ -172,10 +171,6 @@ export function FundingChecker({
   const typeLabels: Record<string, string> = funding.options.type;
   const therapyLabels: Record<string, string> = funding.options.therapy;
   const ageLabels: Record<string, string> = funding.options.age;
-
-  /* Narrows a raw select value without an assertion. */
-  const isProvinceCode = (value: string): value is ProvinceCode =>
-    PROVINCE_CODES.some((code) => code === value);
 
   const yesNoOptions: Array<{ value: YesNoUnsure; label: string }> = [
     { value: 'yes', label: t('yes') },
@@ -242,26 +237,19 @@ export function FundingChecker({
         className="oc-fund-form"
         onSubmit={(event) => event.preventDefault()}
       >
-        <div className="oc-fund-field">
-          <label htmlFor={provinceId}>{t('provinceLabel')}</label>
-          <p className="oc-fund-hint">{t('provinceHint')}</p>
-          <select
-            id={provinceId}
-            onChange={(event) => {
-              const next = event.target.value;
-
-              setInput((prev) => ({ ...prev, province: isProvinceCode(next) ? next : '' }));
-            }}
-            value={input.province}
-          >
-            <option value="">{t('provincePlaceholder')}</option>
-            {provinceOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/*
+         * One tap per province or territory, like every other question here
+         * (owner note 3, 2026-10-07): native radios, so the arrow keys move
+         * between them and the group is announced with its question.
+         */}
+        <RadioRow
+          hint={t('provinceHint')}
+          legend={t('provinceLabel')}
+          name="province"
+          onChange={(next) => setInput((prev) => ({ ...prev, province: next }))}
+          options={provinceOptions}
+          value={input.province}
+        />
 
         <RadioRow
           hint={t('typeHint')}

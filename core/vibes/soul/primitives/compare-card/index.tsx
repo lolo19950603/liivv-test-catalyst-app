@@ -78,7 +78,7 @@ export function CompareCard({
       <div className="mb-2 space-y-4 pb-4">
         <ProductCard imageSizes={imageSizes} product={product} />
         {addToCartAction &&
-          (product.hasVariants !== undefined && !product.hasVariants ? (
+          (!product.viewOnlyLabel && product.hasVariants !== undefined && !product.hasVariants ? (
             <AddToCartForm
               addToCartAction={addToCartAction}
               addToCartLabel={addToCartLabel}
@@ -88,8 +88,9 @@ export function CompareCard({
               productId={product.id}
             />
           ) : (
+            // A product never added from a listing (Product.viewOnlyLabel) links its page too.
             <ButtonLink className="w-full" href={product.href} size="medium">
-              {viewOptionsLabel}
+              {product.viewOnlyLabel ?? viewOptionsLabel}
             </ButtonLink>
           ))}
       </div>

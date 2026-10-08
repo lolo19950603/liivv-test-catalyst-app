@@ -636,12 +636,97 @@ function wholeUpTo(value: string, max: number, min = 1) {
 }
 
 /*
+ * A number box with a button either side, one less and one more (owner note
+ * 3, 2026-10-07: tap rather than type). The box stays the labelled control
+ * and can still be typed in; the buttons name what they change, and are off
+ * at the ends of the range, or with the box when a preset fills it in. From
+ * an empty or unreadable box, "one more" starts at the least the box takes
+ * (1 sensor, not 0) and "one less" at the least.
+ */
+function Stepper({
+  id,
+  label,
+  value,
+  onChange,
+  min,
+  max,
+  fixed = false,
+  less,
+  more,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (next: string) => void;
+  min: number;
+  max: number;
+  /* A preset fills the box in: read-only, and the buttons off. */
+  fixed?: boolean;
+  less: string;
+  more: string;
+}) {
+  const current = /^\d+$/.test(value.trim()) ? Number(value.trim()) : null;
+  const step = (by: 1 | -1) => {
+    if (current === null) {
+      onChange(String(by > 0 ? Math.max(min, 1) : min));
+
+      return;
+    }
+
+    onChange(String(Math.min(max, Math.max(min, current + by))));
+  };
+
+  return (
+    <div className="dc-fig-restock-field">
+      <label htmlFor={id}>{label}</label>
+      <div className="dc-fig-stepper">
+        <button
+          aria-controls={id}
+          aria-label={less}
+          disabled={fixed || (current !== null && current <= min)}
+          onClick={() => step(-1)}
+          type="button"
+        >
+          <span aria-hidden>−</span>
+        </button>
+        <input
+          id={id}
+          inputMode="numeric"
+          max={max}
+          min={min}
+          onChange={(event) => onChange(event.target.value)}
+          readOnly={fixed}
+          step={1}
+          type="number"
+          value={value}
+        />
+        <button
+          aria-controls={id}
+          aria-label={more}
+          disabled={fixed || (current !== null && current >= max)}
+          onClick={() => step(1)}
+          type="button"
+        >
+          <span aria-hidden>+</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/*
  * Your Tools card 6. Sensors you have, times the days each is worn, as days
  * and a date; with days to cover, how many sensors that takes and how many
  * more. A preset fills in its sensor's "up to" wear time (and says that a
  * grace period is not counted, and shows its sensor's recall notice where it
  * has one); "another sensor" takes the days as typed.
  * Nothing is picked at first but "another sensor", so no brand is put forward.
+ *
+ * One tap for each answer (owner note 3, 2026-10-07): the sensor is a row of
+ * radio pills, the days and the sensors are steppers, and the days to cover
+ * are chips (`figure.coverPresets`, or another number, or none). The chips
+ * are periods to count, not a device fact; the only wear times are the
+ * presets', from ./device-pairings.ts.
  *
  * Results are read out as they change. Anything that is not a whole number in
  * range shows the one line that says what is allowed, and no result. Nothing
@@ -660,6 +745,7 @@ export function RestockCalcFigure({ card, figure }: { card: CategoryCard; figure
   const [sensor, setSensor] = useState(OTHER);
   const [typedDays, setTypedDays] = useState('');
   const [have, setHave] = useState('');
+  const [coverChoice, setCoverChoice] = useState('none');
   const [cover, setCover] = useState('');
   const presets = figure.presets.flatMap((id) => {
     const known = sensorOf(id);
@@ -674,7 +760,10 @@ export function RestockCalcFigure({ card, figure }: { card: CategoryCard; figure
   /* Starting from none is a real case: then the answer is just how many to get. */
   const sensors = wholeUpTo(have, figure.maxSensors, 0);
   const each = wholeUpTo(days, figure.maxDays);
-  const coverDays = cover.trim() ? wholeUpTo(cover, figure.maxCover) : undefined;
+  const coverPreset = figure.coverPresets.find((option) => String(option) === coverChoice);
+  const typedCover =
+    coverChoice === OTHER && cover.trim() ? wholeUpTo(cover, figure.maxCover) : undefined;
+  const coverDays = coverPreset ?? typedCover;
   const invalid =
     (have.trim() !== '' && sensors === null) ||
     (days.trim() !== '' && each === null) ||
@@ -719,65 +808,89 @@ export function RestockCalcFigure({ card, figure }: { card: CategoryCard; figure
   }
 
   const field = (key: string) => `${base}-${key}`;
+  const daysLabel = text(words, 'daysLabel');
+  const haveLabel = text(words, 'haveLabel');
+  const sensorOptions = [
+    ...presets.map((candidate) => ({ value: candidate.id, label: candidate.name })),
+    { value: OTHER, label: text(words, 'otherSensor') },
+  ];
+  const coverOptions = [
+    { value: 'none', label: text(words, 'coverNone') },
+    ...figure.coverPresets.map((option) => ({
+      value: String(option),
+      label: fill(text(words, 'coverDays'), { days: option }),
+    })),
+    { value: OTHER, label: text(words, 'coverOther') },
+  ];
+  const pills = (
+    name: string,
+    legend: string,
+    options: Array<{ value: string; label: string }>,
+    value: string,
+    onChange: (next: string) => void,
+  ) => (
+    <fieldset className="dc-fig-picker-set dc-fig-restock-set">
+      <legend className="dc-fig-picker-legend">{legend}</legend>
+      <div className="dc-fig-picker-options">
+        {options.map((option) => (
+          <label className="dc-fig-picker-option" key={option.value}>
+            <input
+              checked={value === option.value}
+              name={field(name)}
+              onChange={() => onChange(option.value)}
+              type="radio"
+              value={option.value}
+            />
+            <span className="dc-fig-picker-name">{option.label}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
 
   return (
     <div className="dc-fig-restock">
       <FrDraftMarker gate="restockCalc" />
       <form className="dc-fig-restock-form" onSubmit={(event) => event.preventDefault()}>
-        <div className="dc-fig-restock-field">
-          <label htmlFor={field('sensor')}>{text(words, 'sensorLabel')}</label>
-          <select
-            id={field('sensor')}
-            onChange={(event) => setSensor(event.target.value)}
-            value={sensor}
-          >
-            {presets.map((candidate) => (
-              <option key={candidate.id} value={candidate.id}>
-                {candidate.name}
-              </option>
-            ))}
-            <option value={OTHER}>{text(words, 'otherSensor')}</option>
-          </select>
-        </div>
-        <div className="dc-fig-restock-field">
-          <label htmlFor={field('days')}>{text(words, 'daysLabel')}</label>
-          <input
-            id={field('days')}
-            inputMode="numeric"
-            max={figure.maxDays}
-            min={1}
-            onChange={(event) => setTypedDays(event.target.value)}
-            readOnly={preset !== undefined}
-            step={1}
-            type="number"
-            value={days}
-          />
-        </div>
-        <div className="dc-fig-restock-field">
-          <label htmlFor={field('have')}>{text(words, 'haveLabel')}</label>
-          <input
-            id={field('have')}
-            inputMode="numeric"
-            max={figure.maxSensors}
-            min={0}
-            onChange={(event) => setHave(event.target.value)}
-            step={1}
-            type="number"
-            value={have}
-          />
-        </div>
-        <div className="dc-fig-restock-field">
-          <label htmlFor={field('cover')}>{text(words, 'coverLabel')}</label>
-          <input
-            id={field('cover')}
-            inputMode="numeric"
-            max={figure.maxCover}
-            min={1}
-            onChange={(event) => setCover(event.target.value)}
-            step={1}
-            type="number"
-            value={cover}
-          />
+        {pills('sensor', text(words, 'sensorLabel'), sensorOptions, sensor, setSensor)}
+        <Stepper
+          fixed={preset !== undefined}
+          id={field('days')}
+          label={daysLabel}
+          less={fill(text(words, 'less'), { field: daysLabel })}
+          max={figure.maxDays}
+          min={1}
+          more={fill(text(words, 'more'), { field: daysLabel })}
+          onChange={setTypedDays}
+          value={days}
+        />
+        <Stepper
+          id={field('have')}
+          label={haveLabel}
+          less={fill(text(words, 'less'), { field: haveLabel })}
+          max={figure.maxSensors}
+          min={0}
+          more={fill(text(words, 'more'), { field: haveLabel })}
+          onChange={setHave}
+          value={have}
+        />
+        <div className="dc-fig-restock-cover">
+          {pills('cover', text(words, 'coverLabel'), coverOptions, coverChoice, setCoverChoice)}
+          {coverChoice === OTHER ? (
+            <div className="dc-fig-restock-field">
+              <label htmlFor={field('cover')}>{text(words, 'coverOtherLabel')}</label>
+              <input
+                id={field('cover')}
+                inputMode="numeric"
+                max={figure.maxCover}
+                min={1}
+                onChange={(event) => setCover(event.target.value)}
+                step={1}
+                type="number"
+                value={cover}
+              />
+            </div>
+          ) : null}
         </div>
       </form>
       {preset ? <p className="oc-fig-detail">{text(words, 'graceNote')}</p> : null}

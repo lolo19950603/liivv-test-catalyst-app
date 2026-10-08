@@ -9,8 +9,8 @@
   --blush: #f3c7be;
   --soft: #faf8f5;
   --leaf: color-mix(in srgb, var(--sage) 16%, var(--cream));
-  --font-heading: var(--font-family-dm-serif-text), Georgia, serif;
-  --font-body: var(--font-family-inter), system-ui, sans-serif;
+  --font-heading: var(--font-family-poppins), system-ui, sans-serif;
+  --font-body: var(--font-family-poppins), system-ui, sans-serif;
 
   color: var(--ink);
   background: var(--cream);

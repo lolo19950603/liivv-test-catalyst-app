@@ -9,6 +9,7 @@ import { getSessionCustomerAccessToken } from '~/auth';
 import { DenyAdSignals } from '~/components/analytics/deny-ad-signals';
 import { pricesTransformer } from '~/data-transformers/prices-transformer';
 import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-ids';
+import { withPharmacistProductsViewOnly } from '~/lib/checkout/quebec-insulin';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
@@ -73,29 +74,37 @@ export default async function Compare(props: Props) {
     const products = await getComparedProducts(productIds, currencyCode, customerAccessToken);
     const format = await getFormatter();
 
-    return products.map((product) => ({
-      id: product.entityId.toString(),
-      title: product.name,
-      href: product.path,
-      image: product.defaultImage
-        ? { src: product.defaultImage.url, alt: product.defaultImage.altText }
-        : undefined,
-      price: pricesTransformer(product.prices, format),
-      subtitle: product.brand?.name ?? undefined,
-      rating: product.reviewSummary.averageRating,
-      description: <div dangerouslySetInnerHTML={{ __html: product.description }} />,
-      customFields: [
-        { name: t('sku'), value: product.sku },
-        { name: t('weight'), value: `${product.weight?.value} ${product.weight?.unit}` },
-        // The catalogue's own notes (COPY_SOURCE, the kit fields) are not specifications.
-        ...removeEdgesAndNodes(product.customFields)
-          .filter((field) => !isInternalCustomField(field))
-          .map(({ name, value }) => ({ name, value })),
-      ],
-      hasVariants: removeEdgesAndNodes(product.productOptions).length > 0,
-      isPreorder: product.availabilityV2.status === 'Preorder',
-      disabled: product.availabilityV2.status === 'Unavailable' || !product.inventory.isInStock,
-    }));
+    /* Insulin and glucagon link their product page, never a one-click add (owner note 9). */
+    return withPharmacistProductsViewOnly(
+      products.map((product) => ({
+        id: product.entityId.toString(),
+        title: product.name,
+        href: product.path,
+        image: product.defaultImage
+          ? { src: product.defaultImage.url, alt: product.defaultImage.altText }
+          : undefined,
+        price: pricesTransformer(product.prices, format),
+        subtitle: product.brand?.name ?? undefined,
+        rating: product.reviewSummary.averageRating,
+        description: (
+          <div
+            className="liivv-catalog-html"
+            dangerouslySetInnerHTML={{ __html: product.description }}
+          />
+        ),
+        customFields: [
+          { name: t('sku'), value: product.sku },
+          { name: t('weight'), value: `${product.weight?.value} ${product.weight?.unit}` },
+          // The catalogue's own notes (COPY_SOURCE, the kit fields) are not specifications.
+          ...removeEdgesAndNodes(product.customFields)
+            .filter((field) => !isInternalCustomField(field))
+            .map(({ name, value }) => ({ name, value })),
+        ],
+        hasVariants: removeEdgesAndNodes(product.productOptions).length > 0,
+        isPreorder: product.availabilityV2.status === 'Preorder',
+        disabled: product.availabilityV2.status === 'Unavailable' || !product.inventory.isInStock,
+      })),
+    );
   });
 
   const streamableAnalyticsData = Streamable.from(async () => {
@@ -151,7 +160,6 @@ export default async function Compare(props: Props) {
 
   return (
     <CompareAnalyticsProvider data={streamableAnalyticsData}>
-      {denyAdSignals && <DenyAdSignals />}
       <CompareSection
         addToCartAction={addToCart}
         addToCartLabel={t('addToCart')}
@@ -168,6 +176,8 @@ export default async function Compare(props: Props) {
         title={t('title')}
         viewOptionsLabel={t('viewOptions')}
       />
+      {/* Last, not first, so Next's scroll-to-top on navigation works (owner note 11). */}
+      {denyAdSignals && <DenyAdSignals />}
     </CompareAnalyticsProvider>
   );
 }

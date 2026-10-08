@@ -12,6 +12,10 @@ import { getSessionCustomerAccessToken } from '~/auth';
 import { facetsTransformer } from '~/data-transformers/facets-transformer';
 import { numberedPaginationTransformer } from '~/data-transformers/numbered-pagination-transformer';
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
+import {
+  withoutInsulinOnFrench,
+  withPharmacistProductsViewOnly,
+} from '~/lib/checkout/quebec-insulin';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
@@ -145,16 +149,20 @@ export default async function Brand(props: Props) {
     const format = await getFormatter();
 
     const search = await streamableFacetedSearch;
-    const products = search.products.items;
+    /* Never insulin on /fr (owner answer B11; ~/lib/checkout/quebec-insulin). */
+    const products = await withoutInsulinOnFrench(search.products.items, locale);
 
     const { defaultOutOfStockMessage, showOutOfStockMessage, showBackorderMessage } =
       settings?.inventory ?? {};
 
-    return productCardTransformer(
-      products,
-      format,
-      showOutOfStockMessage ? defaultOutOfStockMessage : undefined,
-      showBackorderMessage,
+    /* Insulin and glucagon link their product page, never a one-click add (owner note 9). */
+    return withPharmacistProductsViewOnly(
+      productCardTransformer(
+        products,
+        format,
+        showOutOfStockMessage ? defaultOutOfStockMessage : undefined,
+        showBackorderMessage,
+      ),
     );
   });
 

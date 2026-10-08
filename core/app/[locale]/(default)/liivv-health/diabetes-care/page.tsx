@@ -13,15 +13,21 @@ import {
   uniqueCitations,
 } from '../_microsite/landing/compose';
 import { SituationDoors } from '../_microsite/landing/situation-doors';
-import type { LandingChip, LandingFaq, LandingSetup } from '../_microsite/landing/types';
+import type {
+  LandingBrand,
+  LandingChip,
+  LandingFaq,
+  LandingSetup,
+} from '../_microsite/landing/types';
 
+import { DC_REGISTER } from './chapters/dc-register';
 import { PATH_META } from './chapters/paths-meta';
 import { showsFrDraftMarker } from './chapters/review-gates';
 import { DIABETES_SITE } from './chapters/site';
-import { SOURCE_META } from './chapters/sources-meta';
 import { isListedDiabetesKit } from './dc-ids';
 import { DiabetesCarePage } from './diabetes-care-page';
 import { getDcCatalog } from './get-dc-catalog';
+import { getDiabetesShopCatalog } from './get-diabetes-shop';
 import {
   BRANDS,
   FACT_BAND,
@@ -39,7 +45,6 @@ import {
   TYPES_SOURCES,
   URGENT_EXIT_CHAPTER,
 } from './landing-meta';
-import { isInsulinOrGlucagonName, roomForProductName } from './shop-classify';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -81,7 +86,7 @@ export function generateStaticParams() {
 
 /* Where a linked phrase in an answer goes, in the page locale. */
 function linkHref(to: LandingLinkTo, locale: string) {
-  if ('source' in to) return landingCitations(SOURCE_META, [to.source], locale)[0]?.href ?? null;
+  if ('source' in to) return landingCitations(DC_REGISTER, [to.source], locale)[0]?.href ?? null;
 
   if ('tel' in to) return `tel:${to.tel}`;
 
@@ -114,13 +119,17 @@ export default async function Page({ params }: Props) {
 
   setRequestLocale(locale);
 
-  const [catalog, messages] = await Promise.all([getDcCatalog(locale), getMessages({ locale })]);
+  const [catalog, shop, messages] = await Promise.all([
+    getDcCatalog(locale),
+    getDiabetesShopCatalog(locale, 'featured'),
+    getMessages({ locale }),
+  ]);
 
   /*
-   * Kits only where the owner has listed them (dc-ids.ts): none yet. Insulin
-   * and glucagon join this page's preview, in their own room and each with
-   * the pharmacist-review notice, once operations has confirmed the review
-   * (`insulinReviewConfirmed`, landing-meta.ts). Never on /fr: insulin may not
+   * Kits where the owner has listed them (dc-ids.ts): all twelve, verified
+   * on 2026-10-07. Insulin and glucagon join this page's preview, in their
+   * own room and each with the pharmacist-review notice, once operations has
+   * confirmed the review (`insulinReviewConfirmed`, landing-meta.ts). Never on /fr: insulin may not
    * be advertised to Quebec (B11), so the French preview leaves out the room
    * and its products. The full shop still lists them.
    */
@@ -133,23 +142,38 @@ export default async function Page({ params }: Props) {
    */
   const products = catalog.products
     .filter((product) => !product.refused)
-    .filter((product) => insulinShown || !isInsulinOrGlucagonName(product.name))
-    .map((product) => ({
+    .filter((product) => insulinShown || !(product.isInsulin || product.isGlucagon))
+    .map(({ isInsulin, isGlucagon, ...product }) => ({
       ...product,
-      room: roomForProductName(product.name),
-      ...(isInsulinOrGlucagonName(product.name) ? { reviewNotice: true } : {}),
+      ...(isInsulin || isGlucagon ? { reviewNotice: true } : {}),
     }));
+
+  /*
+   * One pill per shopping brand that has something on the shelf today, each
+   * opening the Diabetes Essentials shop filtered to it (owner note 10,
+   * 2026-10-07). Read from the shop's own loader, the whole category with
+   * insulin already left out on /fr, so a pill never opens an empty shelf.
+   */
+  const stocked = new Set(shop.products.flatMap((product) => product.brand?.slug ?? []));
+  const brands = BRANDS.filter((brand) => stocked.has(brand.slug)).map(
+    (brand): LandingBrand => ({
+      name: brand.name,
+      ...(brand.logo ? { logo: brand.logo } : {}),
+      ...(brand.logoFit ? { logoFit: brand.logoFit } : {}),
+      href: localeHref(`${SHOP_DIABETES_HREF}?brand=${brand.slug}`, locale),
+    }),
+  );
 
   const chips = TYPE_CHIPS.flatMap((chip): LandingChip[] => {
     const href = chipHref(chip, locale);
 
     return href ? [{ id: chip.id, href }] : [];
   });
-  const typesSources = chips.length ? landingCitations(SOURCE_META, TYPES_SOURCES, locale) : [];
+  const typesSources = chips.length ? landingCitations(DC_REGISTER, TYPES_SOURCES, locale) : [];
 
   const facts = FACT_BAND.map((fact, index) => ({
     key: String(index + 1),
-    sources: landingCitations(SOURCE_META, fact.sources, locale),
+    sources: landingCitations(DC_REGISTER, fact.sources, locale),
   }));
 
   /*
@@ -164,7 +188,7 @@ export default async function Page({ params }: Props) {
       : [
           {
             key: String(index + 1),
-            sources: landingCitations(SOURCE_META, faq.sources, locale),
+            sources: landingCitations(DC_REGISTER, faq.sources, locale),
             links: (faq.links ?? []).map((to) => linkHref(to, locale)),
           },
         ],
@@ -200,7 +224,7 @@ export default async function Page({ params }: Props) {
       kits.find((kit) => kit.entityId === catalog.featuredKit?.entityId)?.entityId ??
       kits[0]?.entityId ??
       null,
-    brands: BRANDS,
+    brands,
     faqs,
     pageSources: uniqueCitations([
       typesSources,

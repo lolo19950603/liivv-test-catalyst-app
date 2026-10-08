@@ -14,6 +14,13 @@
  * registry are imported on the client side rather than handed down from a
  * server component, so neither is serialised into the page's payload, and the
  * registry, which holds functions, never has to be.
+ *
+ * The one thing a server route does hand down is `sources`: the register
+ * entries the page names, already resolved for the page locale (../sources.ts),
+ * so a card's Sources disclosure can look its ids up without the register
+ * itself, or any entry kept for the review only, reaching the browser. A site
+ * that passes none (Ostomy's pages do not use the engine yet) shows no
+ * per-card sources.
  * =============================================================================
  */
 
@@ -27,6 +34,7 @@ import {
 import { createContext, type ReactNode, useContext, useMemo } from 'react';
 
 import type { SiteConfig, SiteNs } from './site';
+import type { ResolvedSource } from './sources';
 
 /*
  * A site's own figures: every kind the engine does not draw itself
@@ -51,6 +59,7 @@ export interface SiteFigureRegistry<
 interface SiteContextValue {
   site: SiteConfig;
   figures?: SiteFigureRegistry;
+  sources?: Readonly<Record<string, ResolvedSource>>;
 }
 
 const SiteContext = createContext<SiteContextValue | null>(null);
@@ -58,13 +67,16 @@ const SiteContext = createContext<SiteContextValue | null>(null);
 export function SiteProvider({
   value,
   figures,
+  sources,
   children,
 }: {
   value: SiteConfig;
   figures?: SiteFigureRegistry;
+  /* The register entries this page names, resolved on the server for the page locale. */
+  sources?: Readonly<Record<string, ResolvedSource>>;
   children: ReactNode;
 }) {
-  const context = useMemo(() => ({ site: value, figures }), [value, figures]);
+  const context = useMemo(() => ({ site: value, figures, sources }), [value, figures, sources]);
 
   return <SiteContext.Provider value={context}>{children}</SiteContext.Provider>;
 }
@@ -86,6 +98,11 @@ export function useSite() {
 /* The site's own figures, or undefined for a site that has none. */
 export function useSiteFigures() {
   return useSiteContext().figures;
+}
+
+/* The resolved register entries the route handed down, or undefined where it handed none. */
+export function useSiteSources() {
+  return useSiteContext().sources;
 }
 
 /*

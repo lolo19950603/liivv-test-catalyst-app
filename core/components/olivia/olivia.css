@@ -340,7 +340,7 @@ button.olivia-chat-launcher .olivia-figure {
 
 .olivia-help-band__copy h2 {
   margin: 0 0 0.55rem !important;
-  font-family: var(--font-family-dm-serif-text), Georgia, serif !important;
+  font-family: var(--font-family-poppins), system-ui, sans-serif !important;
   font-size: clamp(1.6rem, 3vw, 2.15rem) !important;
   font-weight: 400 !important;
   line-height: 1.12 !important;
@@ -538,7 +538,7 @@ a.olivia-help-band__cta:hover {
 
 .olivia-auth__intro h1 {
   margin: 0 0 0.55rem;
-  font-family: var(--font-family-dm-serif-text), Georgia, serif;
+  font-family: var(--font-family-poppins), system-ui, sans-serif;
   font-size: clamp(2rem, 4.4vw, 3.15rem);
   font-weight: 400;
   line-height: 1.08;

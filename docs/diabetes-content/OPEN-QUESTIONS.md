@@ -482,11 +482,13 @@ Facts: every number above is from Diabetes Canada guidelines (Ch8, Ch36, Ch37) o
 - Applies to: LAND D6 and `BRAND_NAMES` ("Omnipod stays out until pods are listed"), the YT pickers (cards 4 and 13), and the PATHS kit list.
 - Still open: confirm pods are stocked before the name goes in the brands strip. The Omnipod 5 with Libre pairing is still unconfirmed by a Canadian source (YT E).
 - **Store update run 2026-10-06 (owner's request):** Omnipod products 8090–8096 (Omnipod 5 pods $360, DASH pods $300, PodPals and four patch listings) are now visible and buyable in category 1151.
+- **Built 2026-10-08 (owner notes 9 and 10, 2026-10-07):** the brand row has one Omnipod pill (the official Omnipod logo, trimmed; no separate Insulet pill), a link to the Diabetes Essentials shop filtered to Omnipod, which lists the two pod boxes (8090, 8091) under "Omnipod (Insulet)"; the PodPals, stickers and patches are under "Works with: Omnipod", with no device brand (landing.md S3, S6).
 
 **A4. Who signs off kits?** ANSWERED: the owner.
 - **ANSWERED 2026-10-06**: unchanged. The owner signs off each kit (kits-for-review.md); no kit is listed until then (B21).
 - Applies to: LAND D22, E6 and E14, and PATHS E.1.
-- Still open: signing off each kit before it is listed (8049, 8051, 8053, 8058, 8060). Product placements resumed on 2026-10-06 (B21); kits stay off until then.
+- ~~Still open: signing off each kit before it is listed (8049, 8051, 8053, 8058, 8060). Product placements resumed on 2026-10-06 (B21); kits stay off until then.~~
+- **ANSWERED 2026-10-07** (owner): "Verified go ahead and publish" — all twelve kits (8049–8060). Built 2026-10-08: `DIABETES_LISTED_KIT_IDS` lists all twelve; the landing’s kits section, its hero and closing kits buttons and its "Kits" room render, and the Diabetes Essentials shop has a Kits filter (landing.md S5, S7). Kits are still not placed on chapter cards. Still open: the kit walkthrough’s tray and search lines (E6 in the landing’s record).
 
 **A5. Is pay-later on offer?** ANSWERED 2026-10-06: yes. "Liivv Now, Pay Later", for insulin pump supplies, once customer service confirms eligibility; built on the Funding page. Its terms still wait for the owner and counsel (below).
 - **ANSWERED 2026-10-06** (owner): "Liivv Now, Pay Later (similar to Pump Now Pay Later) - only applicable to insulin pumps and yes only after being verified by our internal customer service team". Built in the funding step (funding.md G-28): `PAY_LATER` is on. "How paying works" has a third part, "Liivv Now, Pay Later" (`#pay-later`), for insulin pump supplies, Omnipod pods included, once customer service confirms eligibility, with the program's terms mirrored (three paid orders in a row first, then a $1.00 card authorization; no credit check; pay within 45 days of receiving an order or with the next order, whichever comes first; pod orders billed every 90 days; a declined card retried 3 more times, then due within 3 business days; no prepaid cards; a late payment can hold the next shipment and end eligibility) and Bayshore Express Pharmacy's general contact, which routes the question (B10). Each pump program's card ends with a pay-later line; no other card, door or path mentions it. Another company's program name is never used (the export fails on it).
@@ -566,6 +568,9 @@ Facts: every number above is from Diabetes Canada guidelines (Ch8, Ch36, Ch37) o
   - And `COPY_SOURCE` / `SOURCE_DE_COPIE` is still stored on 18 insulin products (hidden on every page, not deleted).
   - **Store update run 2026-10-06 (owner's request):** Baqsimi (4555) now gives 1-844-561-1254; the swab listing (4527) no longer carries the other retailer's order notice; `COPY_SOURCE` is deleted from all 18 insulin products. The other 15 descriptions above are unchanged (not yet approved). Baqsimi is now placed on Staying Safe card 3 once the catalogue cache refreshes (up to an hour).
   - How it was found, to repeat after the store fixes: the Storefront GraphQL `site.products` list (name, description, custom fields), read with `Accept-Language` en and fr, matched against `diabetes[\s_-]*express` (any case) and `866 418 3392` in any punctuation. Only Baqsimi is named in the Diabetes site's own code (`dc-ids.ts`), but shelves and search can surface any of these products.
+  - **Store fixes of 2026-10-07 (owner), re-read 2026-10-08:** the 15 descriptions and the French Baqsimi and swab text no longer name another retailer. A fresh Storefront read on 2026-10-08 of all 241 products in Shop Diabetes Care and all 34 on the insulin shelf (1116), EN and FR, full HTML description (links included), its words and custom fields, found none that names, links or phones another retailer. **Built 2026-10-08:** (1) `namesAnotherRetailer` (chapter-shop.ts) replaces the bare pattern in every Diabetes loader — the landing catalogue, the chapter placements and the new Diabetes Essentials shop all read the full HTML `description` (none reads `plainTextDescription`) and test it, then its words with tags removed and entities and %-escapes decoded; `DIABETES_REFUSED_DESCRIPTION` stays as the pattern and the safety net, so a product whose text regresses drops out again by itself; (2) New to the Journey card 8 links the insulin shelf again (`INSULIN_SHELF.linked`, English only, with its notices; B21). Note: the old pattern already read the HTML and caught the Toujeo PDF address; the hardening covers entity-encoded and tag-split names.
+  - **Still open (store fix):** `/apidra-prefilled-pens-5-x-3ml`, `/apidra-10ml-vial` and `/apidra-cartridges` still answer 404 in English on 2026-10-08 (local and production), and are on the insulin shelf that card 8 now links.
+  - **Owner note 9 (2026-10-07), built 2026-10-08:** insulin and glucagon are never a one-click add from any listing — the Diabetes shop, the store’s category grids (the insulin shelf included), search, brand pages and compare show "View product", which opens the product page and its pharmacist notice (`withPharmacistProductsViewOnly`, lib/checkout/quebec-insulin.ts; fails closed). The product page itself is unchanged.
 - Options:
   - **(default)** FAQ 5 and the insulin and glucagon tiles stay off until operations confirms.
 - Applies to: LAND D4, E4 and E5. NTJ E (card 8 insulin strip).
@@ -590,6 +595,7 @@ Facts: every number above is from Diabetes Canada guidelines (Ch8, Ch36, Ch37) o
 
 **B5. Pharmacist CDE licensure and credentials across provinces.**
 - **ANSWERED 2026-10-06** (owner): "The only CDE pharmacists are in Bayshore Express Pharmacy in Ontario - they can support customers across Canada - the operations from the other national pharmacies are to support dispensing and products in other provinces and territories - BEP ... has the ability to transfer to other pharmacies". Built: every CDE panel and lane says the CDEs at Bayshore Express Pharmacy answer from anywhere in Canada and pass you to the Liivv pharmacy in your province when needed. The path pages' CDE band is released (`PATH_GATES.cdeBand` on).
+- **UPDATED 2026-10-07** (owner note 5, "needs to be whitelabeled as services from Liivv"): every panel, lane, band, the meta description, trust item 1, FAQ 1 and 3 and the funding page now say "Liivv’s Certified Diabetes Educators" (FR « les éducateurs agréés en diabète de Liivv ») and "Liivv’s pharmacy in your province" (FR « la pharmacie de Liivv de votre province »); "Markham" is gone from service copy. The "pharmacists with diabetes training" option above still applies if anyone answering the line does not hold the CDE® credential (B48).
 - Options:
   - **(default)** The copy keeps "all of Canada" (A2), frames the service as pump and CGM questions, and says "Your treatment and settings stay with your diabetes team". The PATHS band is gated.
   - Name a limit if licensure doesn't cover a province.
@@ -645,6 +651,7 @@ Facts: every number above is from Diabetes Canada guidelines (Ch8, Ch36, Ch37) o
 
 **B9. The pharmacist CDE phone number.**
 - **ANSWERED 2026-10-06** (owner): the contact is "Bayshore Express Pharmacy's Pharmacists ... general contact not named individuals". Built: 1-844-561-1254 (BEP's toll-free general line, written "1 844 561-1254" on /fr; tel: link), BayshoreExpress@bayshore.ca (mailto: link), the hours and the About page link, on every CDE panel, in the two CDE lanes (Staying Safe card 11, New to the Journey card 11, which show the same contact list as the panels; SS F.8 #5, NTJ F.6 #5) and in landing FAQ 3 (the pharmacy's name links its About page; landing G #59). It is not a Diabetes Express number.
+- **UPDATED 2026-10-07** (owner note 5): the contact is the phone and the hours only, worded as Liivv’s: "Call Liivv: 1-844-561-1254" (FR « Appeler Liivv au 1 844 561-1254 »), list label "How to reach Liivv". The email (BayshoreExpress@bayshore.ca) and the "About Bayshore Express Pharmacy" link are gone from every panel, both CDE lanes and landing FAQ 3, and the register entry `bep-about` is deleted. Its record, kept here: Bayshore Express Pharmacy’s About page (EN https://bayshoreexpresspharmacy.ca/about/, modified 2023-03-22; FR /fr/a-propos-de-nous/, 2023-03-23), opened 2026-10-06: "We have Certified Diabetes Educators to provide you with excellent solutions for diabetes management"; its contact block 1-844-561-1254 (toll-free), BayshoreExpress@bayshore.ca, Monday to Friday 9 a.m. to 5 p.m. (EST), 233 Alden Rd, Markham, ON; owner answers A2, B5, B9, B10, B12 (the CDEs answer from anywhere in Canada and transfer to the Liivv pharmacy in another province; a general line, never a named person; closed on holidays). The Quebec checkout line now says "…or call Liivv at {phone}…". The doctor-fax template keeps the real pharmacy names (prescribers fax a licensed pharmacy). Open: B47–B50, B54.
 - Options:
   - **(default)** No number is printed. "Request a call" only.
   - Print the number once the owner confirms it is Liivv's own line.
@@ -713,6 +720,7 @@ Facts: every number above is from Diabetes Canada guidelines (Ch8, Ch36, Ch37) o
   - Abbott (`brand-4.avif`): this is the corporate logo, not FreeStyle Libre. Needs permission.
   - Ypsomed (`brand-5.avif`): needs permission.
 - Also confirm that each name in `BRAND_NAMES` is stocked. Omnipod is cleared (A3).
+- **Owner decision 2026-10-07:** "Yes, download the six" official logo files (Omnipod and Insulet, Tandem, MiniMed, OneTouch, Contour); Dexcom, FreeStyle Libre, Accu-Chek and mylife stay names until files are supplied. **Built 2026-10-08** (owner note 10; landing.md S6): one pill per shopping brand, matching the shop’s brand filter — Dexcom, FreeStyle Libre, Omnipod, MiniMed, Tandem, mylife, OneTouch, Contour, Accu-Chek, FreeStyle — each a link to the Diabetes Essentials shop filtered to it, shown only while that brand has products on the shelf (so "each name is stocked" now holds by itself). Logos for Omnipod (trimmed), MiniMed, Tandem, OneTouch and Contour; files and sources in logo-sources.md. Abbott’s corporate mark, the old Insulet and Ypsomed files and the mislabelled `dexcom.avif` are no longer shown. "Ypsomed" is now "mylife" (confirmed on mylife Diabetes Care Canada’s "About us" page, registered `mylife-about-ca`). Still open: B73 (files to supply, Contour’s tagline) and B74.
 - Applies to: LAND D6.
 
 **B17. Launch order and cross-links.**
@@ -747,13 +755,15 @@ Facts: every number above is from Diabetes Canada guidelines (Ch8, Ch36, Ch37) o
 **B21. When do product placements resume?**
 - **ANSWERED 2026-10-06** (owner): "Now?" — placements resume now, but kits stay off until the owner verifies kits-for-review.md. Built in this step: only the landing shelf's insulin room (B3); kit and product placements follow in the commerce step.
 - **Built 2026-10-06 (commerce step): placements are on.** The merchandising record is `diabetes-care/chapters/chapter-shop.ts`; the shop strip is the shared engine's (`_microsite/shop/`, a port of Ostomy's strip, Ostomy's own files untouched), driven by `SiteConfig.shop`. One switch, `SHOP_SWITCH.placements`, turns every strip off.
-  - Where: NTJ 8 and 10; SS 3 and 5 (never SS 2, the Rule of 15); YT 1, 2, 4–9, 11, 13, 14; EDL 2, 3, 6, 8; KYT 1, 2, 4, 7, 11–13 (never KYT 3, prediabetes); TMBY 2–4; the type-1, type-2, gestational and less-common-types paths (slot 5, never prediabetes); the funding page's pump-supplies slot. Each content file's change log lists the products card by card.
+  - Where: NTJ 8 and 10; SS 3 and 5 (never SS 2, the Rule of 15); YT 1, 2, 4–9, 11, 13, 14; EDL 2, 3, 6, 8; KYT 1, 2, 4, 7, 11–13 (never KYT 3, prediabetes); TMBY 2–4; the type-1, type-2, gestational and less-common-types paths (slot 5, never prediabetes). The funding page's pump-supplies slot was removed by the owner on 2026-10-07 (note 7); YT 13 keeps that strip. Each content file's change log lists the products card by card.
   - Insulin: never a named product. Only NTJ 8 links the insulin shelf (category 1116), with the product pages' own pharmacist and Quebec notices, on English pages only; on /fr the link, its notices and its label are left out, and the route drops anything insulin from /fr shelves (B11).
-  - **Held since 2026-10-06:** NTJ 8's insulin-shelf link (`INSULIN_SHELF.linked` in chapter-shop.ts): the shelf lists products whose descriptions name or link another retailer (B3). Card 8 keeps its pen needles, syringes and sharps container.
+  - ~~**Held since 2026-10-06:** NTJ 8's insulin-shelf link (`INSULIN_SHELF.linked` in chapter-shop.ts): the shelf lists products whose descriptions name or link another retailer (B3). Card 8 keeps its pen needles, syringes and sharps container.~~ **Switched back on 2026-10-08**, after the owner’s store fixes of 2026-10-07 and a fresh read of every product on the shelf (none names, links or phones another retailer; B3). English only, with the pharmacist, cold-chain and Quebec notices; no /fr page links it (new-to-the-journey.md F.13). The three English Apidra listings on the shelf still answer 404 (B3).
+  - **Kits (2026-10-07, owner: "Verified go ahead and publish"):** all twelve are listed on the landing and in the Diabetes Essentials shop (A4); none is placed on a chapter card.
+  - **Every Diabetes loader** (landing catalogue, chapter placements, the shop) now tests the full HTML description with `namesAnotherRetailer` (B3).
   - Glucagon: Baqsimi (4555) on SS 3 only, with the pharmacist notice.
   - Checked on every request through the catalogue: a product shows only while the store shows it, sells it and has it in stock. A product with a required option or modifier (85 diabetes products carry the required "Test" modifier) is a "Choose options" link to its page, not a one-click add. The one-click add accepts only placed ids.
   - Never linked: a product whose description names or links another retailer or gives its phone number. Today that leaves out Baqsimi (so SS 3 renders nothing), Contour Next strips (4714), Accu-Chek Softclix (4945) and the Frio Individual wallets (4812) until operations fixes those descriptions (B3).
-  - Kits: none. `DIABETES_LISTED_KIT_IDS` stays empty until the owner verifies kits-for-review.md (A4).
+  - ~~Kits: none. `DIABETES_LISTED_KIT_IDS` stays empty until the owner verifies kits-for-review.md (A4).~~ Listed since 2026-10-08 (A4).
   - Omnipod pods (8090, 8091) are on the pump-supply strips and appear the day the owner makes them visible in the store (A3).
   - Analytics: every placed id is health-revealing by id (`DIABETES_PLACED_PRODUCT_IDS` in `sensitive-products.ts`), as the Ostomy supply list's are.
 - Still open:
@@ -764,7 +774,7 @@ Facts: every number above is from Diabetes Canada guidelines (Ch8, Ch36, Ch37) o
 - Applies to:
   - SS cards 3 and 5; NTJ cards 8 and 10; YT card 6 and all cards;
   - EDL cards 2, 3, 6 and 8; KYT cards 1–13; TMBY cards 2–4;
-  - LAND (kits and shelf preview); FUND (pump-supplies slot); PATHS slot 5 (never on prediabetes).
+  - LAND (kits and shelf preview); PATHS slot 5 (never on prediabetes). FUND: none since 2026-10-07 (note 7 removed its pump-supplies slot).
 
 ### NICE TO HAVE
 
@@ -892,6 +902,7 @@ What was fixed in code that day is in each file's change log (new-to-the-journey
 - Applies to: chapter-shop.ts YT 8, EDL 8.
 
 **B43. Should every chapter list every source its cards rest on?** (NICE TO HAVE)
+- **SETTLED 2026-10-07** by owner note 1 (sources in the element): every card shows its own sources (its `sources` plus its figures’), and "Where this comes from" lists every source the page names, grouped Canadian / international / makers. `citations` stays in chapters-meta.ts for the export only.
 - Question: "Where this comes from" at the foot of each chapter is a short, hand-picked list (5 to 10 titles); the card-level sources are recorded for review but never shown. On 2026-10-06 Staying Safe's list gained the nine sources its cards rest on for a child's amounts, honey, glucagon, school and insulin storage (staying-safe.md F.10). The other chapters still list only their main sources (New to the Journey cites 5 of the 37 its cards use; Know Your Type 6 of 57).
 - Options: **(default)** the short lists, with Staying Safe's added; or every card's sources, listed under each card or at the foot of the page.
 - Applies to: every chapter's `citations` (chapters-meta.ts).
@@ -905,6 +916,202 @@ What was fixed in code that day is in each file's change log (new-to-the-journey
 - Question: Ostomy's chapter strips are compact rows (thumbnail, name, price, a full-width button on phones); Diabetes uses taller image cards, except on narrow phones, where since 2026-10-06 its cards are rows too. The Every Day Living resources shelf is the engine's twin of Ostomy's resource shelf (one box per group, a capitals org line); Ostomy's `#chapter-resources` uses one card per link, an intro line and larger spacing.
 - Options: **(default)** keep both as built; or restyle either to match Ostomy, as a design pass on the shared engine.
 - Applies to: `_microsite/shop/shop-strip.*`, `_microsite/chapters/resource-shelf.tsx`.
+
+### Added 2026-10-07, owner notes 5 and 1 (white-label CDE service; sources in the element)
+
+What was built that day is in each file's 2026-10-07 change log (new-to-the-journey.md F.9, which also holds the engine rows, staying-safe.md F.12, your-tools.md F.11, every-day-living.md F.9, know-your-type.md F.9, this-might-be-you.md F.9, paths.md H.9, landing.md, funding.md) and at the end of clinical-rulings-2026-10-06.md. These are the questions it left.
+
+**B46. Confirm that note 1 overrides your own in-sentence credit rulings.** (IMPORTANT; one line)
+- Question: rulings C5, C9, C11/K24, C16, C17, C23, C24, C32, C39 and C40 asked for a body to be credited in the sentence. Note 1 moves every credit into the card's Sources disclosure. Built that way; the clinical content of each ruling is unchanged.
+- Options: **(default)** confirm; or name a line that must keep its in-sentence credit.
+- Also for the nurse: lines that state a guideline recommendation or give clinical permission now say "Canadian guidelines…" (for example the Rule of 15 aid note "may treat a low … with less, 5 to 10 g", automated insulin delivery "preferred", the older-adult A1C targets, the alcohol lines "(2023)"); the full list is the "Canadian guidelines" rows of the change logs. Confirm the wording, or name a line to state plainly.
+- Also (2026-10-07, after verification): three lines drawn from the type 1 guideline say "For type 1, Canadian guidelines…" again, because the first rewrite lost "type 1" with the guideline’s name: automated insulin delivery preferred (Know Your Type 1.items.5), the same A1C target for children of every age (This Might Be You 2.items.1), and help with giving insulin at school and daycare (This Might Be You 3.items.9, which otherwise read as a rule for every child with diabetes). Confirm the type 1 scope, or say if the school line should apply to all children.
+- Also (2026-10-08, final fix pass for the owner review of 2026-10-07): Every Day Living card 12 ("Work and your rights") no longer names Diabetes Canada in its three position lines or its note; they state the positions plainly ("People with diabetes should be eligible for any job they’re qualified for", and so on), and the card’s Sources disclosure names the rights page. The helpline line keeps the name (it is the subject). Confirm, or say if those advocacy positions should be credited in the sentence again (every-day-living.md F.13).
+- Also (2026-10-08): two lines the first rewrite had blurred now carry their scope again: "In hospital, 20 to 50%…" (Know Your Type 13.items.2) and "International estimates suggest about 9 in 10 people with MODY…" (Know Your Type 8.items.2); and the school line asks the school rather than telling parents ("…ask for at least two staff to be trained", This Might Be You 3.items.3). Details in each file’s F.13.
+- Applies to: every chapter, the paths and the landing.
+
+**B47. The "part of the Bayshore family" line.** (NICE TO HAVE)
+- Question: note 5 asks for the services to be white-labelled as Liivv's. The landing's governance block still says "Liivv is a HelioMed company and part of the Bayshore family." (your own wording, B15). Was note 5 meant to cover it?
+- Options: **(default)** keep (a corporate-ownership disclosure, not a service claim); or remove `governance.relationship`.
+- Applies to: LAND governance block.
+
+**B48. How is 1-844-561-1254 answered, and does everyone on it hold the CDE® credential?** (IMPORTANT)
+- Question: the pages say "Call Liivv" and "Liivv's Certified Diabetes Educators". If the line is answered "Bayshore Express Pharmacy", a caller hears another name; if anyone answering is not a CDE, the label overstates.
+- Options: **(default)** keep; a Liivv greeting, menu option or number (only `contact.tel` and `ui.contact.phone` change); "Liivv's pharmacists with diabetes training" (B5's fallback).
+- Applies to: `ui.contact`, every CDE panel, lane and band, FAQ 3, the checkout's Quebec line.
+- Also (clinical re-read, 2026-10-08): the landing’s care band heading "Speak to a CDE." (« Parlez à un EAD. ») sits over "Call Liivv’s Certified Diabetes Educators, or start a chat from your Liivv account"; the chat link opens /account/virtual-care, which Ostomy’s pages call the Ontario pharmacist chat. B12’s answer ("chat can be general - speak to a CDE") allows the heading; it holds only if whoever answers the chat holds the CDE® credential. **(default, unchanged)** keep; or "Call a Liivv Certified Diabetes Educator, or chat with a Liivv pharmacist from your account" (`ui.landingPage.care.chat.*`).
+
+**B49. The store has no pharmacy disclosure.** (IMPORTANT; compliance)
+- Question: the Ontario College of Pharmacists asks an online pharmacy's website to show the bricks-and-mortar pharmacy's name, accreditation number, owner, address, phone, Designated Manager and pharmacist hours (OCP "Online Pharmacies"; the "Operating Internet Sites" policy puts it on the home page). The footer shows none of these today, before and after note 5. White-labelling the service copy makes one disclosure, in one place, more important.
+- Options: **(default)** nothing built yet; or a store-wide footer line and a `/pharmacy-information` page (EN/FR) naming each licensed pharmacy (the names and addresses are in `lib/pharmacy/pharmacy-fax.ts`), once compliance supplies the accreditation numbers, Designated Manager names and the Point of Care Symbol. Not read: O. Reg. 264/16 itself (the e-Laws page did not render). A compliance lead should confirm.
+- Applies to: the store footer (every page, Ostomy included).
+
+**B50. Old page snapshots still say "Bayshore Express Pharmacy".** (NICE TO HAVE)
+- Question: `/archive/diabetes-care.html` and `/archive/liivv-health-page.html` (public files, linked from nowhere) and `/api/archive/diabetes-care/image_with_text_overlay_7JgREg` still serve the old "Bayshore Express Pharmacy" button, and the second says "Through our partnership with Bayshore Express Pharmacy, our clinical pharmacists can legally assess your symptoms and prescribe…".
+- Options: **(default)** leave; or `noindex` or remove the `*.html` snapshots and the unused archive route. Do not move `public/archive/`: its image folders are live.
+- Applies to: `core/public/archive/*.html`, `app/api/archive/diabetes-care/[section]/route.ts`.
+
+**B51. A Liivv email address for the CDEs?** (NICE TO HAVE)
+- Question: there is no Liivv-domain inbox the CDEs read, so the email line is gone. If one is set up, setting `contact.email` brings the line back with no other change.
+- Applies to: `DIABETES_SITE.contact`.
+
+**B52. "Breakthrough T1D" or "Percée DT1" in French?** (NICE TO HAVE)
+- Question: the Sources disclosures on /fr name the publisher "Percée DT1", the name its French site uses (perceedt1.ca, read 2026-10-07). French prose that keeps the body as its subject (TrialNet, the ketone ladder's credit, the coverage map) still says "Breakthrough T1D".
+- Options: **(default)** leave the prose; or use "Percée DT1" in the French prose too.
+- Applies to: fr.json, the B lines naming Breakthrough T1D.
+
+**B53. The Tzield monograph in a Sources list.** (NICE TO HAVE)
+- Question: Know Your Type card 5's Sources list shows "TZIELD Product Monograph…, Health Canada Drug Product Database (2026)". Tzield is named in the copy already and is not insulin, so it was not hidden with the insulin monographs.
+- Options: **(default)** keep; or mark `hc-dpd-tzield-monograph-2026` review-only too.
+- Applies to: sources-meta.ts.
+
+**B54. The doctor-fax dialog's intro.** (NICE TO HAVE)
+- Question: the dialog says "request a fax to Liivv Pharmacy" (hard-coded English, so /fr sees English), while the template it fills names the real pharmacy, which it must. Suggested: "…to request a fax to Liivv's pharmacy in your province, named in the template below." Not changed: the fax flow keeps the real pharmacy names.
+- Applies to: `components/pharmacy/add-prescription-dialog.tsx`.
+
+**B55. Years and French names the register could not confirm.** (NICE TO HAVE)
+- The Sources lists show a year where the document carries one. Seven guideline chapters (10, 15, 30, 32, 35, 37, 38) and the classification appendix show none: their pages were not re-read for it on 2026-10-07. Publishers with no French name found (the Kidney Foundation, the CMA, the provincial governments other than Manitoba and Quebec, HPSA, the hemochromatosis society, the University of Exeter) show their English name on /fr, marked as English. Confirm or supply.
+
+### Added 2026-10-07, owner notes 2, 3 and 7 (printing, one-tap forms, the funding page's pump strip)
+
+What was built is in the 2026-10-07 change logs: new-to-the-journey.md F.10 (the engine's printing, for every print button on both sites), staying-safe.md F.13, your-tools.md F.12, every-day-living.md F.10, know-your-type.md F.10 (the family tree), this-might-be-you.md F.10 and funding.md ("Owner notes 7 and 3 applied"). Settled by the owner: note 7 removed the funding page's pump-supplies strip (B21's FUND slot and D-13 are closed). These are the questions it left.
+
+**B56. The family tree's questions.** (IMPORTANT; nurse)
+- Built: each person answers Diabetes? Yes / No / Not sure; after a Yes only, age when diagnosed, type as told and "Needed insulin within 2 years?"; and Hearing loss? for everyone. Brothers and sisters, children and a parent's brothers and sisters are one entry per person (the paper table, and the blank print, keep one row per relation, as before). "Me" answers the same questions.
+- Side by side, for your ruling:
+  - Type choices: **(built)** Type 1, Type 2, Gestational, Other / as told (opens a box for what the family was told, such as MODY, LADA or "borderline"), Not sure; or another list.
+  - Follow-ups after Yes only: **(built)**; or always shown.
+  - Hearing loss for everyone: **(built)**, because hearing loss in a mother's family is a MIDD clue with or without diabetes (Exeter MIDD, international); or only after a Yes.
+  - "Needed insulin within 2 years?": **(built)** kept from the reviewed table (Diabetes Canada Ch 3's "time to needing insulin"); the owner's note listed the other questions only. Keep, reword, or drop.
+  - One entry per person rather than one aggregated row per relation: **(built)**; this changes the instrument. Or keep one row per relation on screen too.
+  - "Me" asks the same questions: **(built)**; or a different set.
+  - At most 20 people at once (a note then says to add anyone else by hand on the paper): **(built)**; or another number.
+  - On paper (added 2026-10-07, after verification; corrected after a second verification the same day): the "as told" box now takes at most 60 characters, with a count under it. Any tree of up to 20 people answered with the one-tap choices prints on one portrait page (Letter and A4, English and French). With a 60-character type written in for everyone, the sources and the page address move to a second page from 15 people in French and 17 in English on Letter (18 and 20 on A4); with 60 characters and no spaces, from 11 (French) and 12 (English) on Letter, and the last relatives follow from 16 and 17. Never more than two pages, never a person split. **(built)** accept that second page; or a shorter box; or allow fewer people. Details: know-your-type.md F.10.
+- Applies to: KYT card 8 (`familyTree` in chapters-meta.ts; `figure.familyTree.*`).
+
+**B57. The restock calculator's days-to-cover chips.** (NICE TO HAVE; owner)
+- Built: None (picked at first), 30, 60 and 90 days, or Another number. They are periods to count, not device facts, so no register entry backs them.
+- Options: **(default)** keep; or other periods (for example a program's coverage period).
+- Applies to: YT card 6 (`coverPresets` in chapters-meta.ts).
+
+**B58. Ostomy's supply list has no print button.** (NICE TO HAVE; owner)
+- Question: the supply list (`ostomy-care/chapters/supply-list.tsx`) still renders ruled lines meant for paper, but nothing prints it since its button was removed; its old print rules were dead and are gone (note 2). The owner asked for "all of them" to print well.
+- Options: **(default)** leave as is; or give it a print button on the shared print path (the lines would show again), or delete the leftover lines.
+- Applies to: Ostomy chapter supply list.
+
+**B59. French for the printed sheet and the new controls.** (NICE TO HAVE; French reviewer)
+- The new words are machine-drafted: the printed sheet's header and footer (`ui.chapter.print`, both sites; never on screen, so no draft marker shows with them, as with the Sources lines), the family tree's controls and people (gate `familyTree`), the calculator's steppers and chips (gate `restockCalc`). Production shows the last two only once their gates open.
+- Also: Ostomy's button says « Imprimez cette liste », Diabetes Care's « Imprimer la liste ». Align them? A wording choice for the French review; not changed.
+- Applies to: fr.json.
+
+**B60. Print on real phones and Safari.** (IMPORTANT; engineering)
+- Measured on the dev server in Chrome's print path only (every sheet 1 page except the clues sheet, the school plan and the Rule of 15 in "A child" mode, 2 each, and the family tree's limit in B56; Letter and A4; English and French; corrected after verification, 2026-10-07). iOS Safari and Android Chrome open their print sheets without waiting; if either sends `afterprint` before it has laid the page out, it prints the whole page. Check one button in each, and Firefox and Edge on Windows, before launch.
+- Also (QA, 2026-10-08, Chrome, Letter): every print button gives 1 page in English except the clues sheet (2, as built); the family tree with 6 relatives answered prints on 1 page in both languages. In French, Know Your Type's "After the birth: my reminder" puts only its sources and the page address on a second page (English: 1 page).
+- Applies to: `_microsite/print/`.
+
+**B61. Ostomy's funding checker: pills too?** (NICE TO HAVE; owner)
+- Built: Diabetes Care's province question is 13 one-tap pills (note 3). Ostomy Care's keeps its drop-down: a port was built, then put back after verification (2026-10-07) so Ostomy's pages stay as they were in this round. The twin checkers now differ in this one control; province codes and results are the same.
+- Question: should Ostomy's province question become the same pills?
+- Options: **(default)** keep Ostomy's drop-down; or port the pills (the same `RadioRow` the Diabetes checker uses).
+- Also (QA, 2026-10-08): this drop-down is the one control on either site that is not one tap, so the QA rates owner note 3 "partly done" until you rule. Not changed in the final fix pass: the default stands until you rule.
+- Applies to: `ostomy-care/funding/funding-checker.tsx`.
+
+**B62. "Pump supplies, by pump." stays on Your Tools card 13.** (NICE TO HAVE; owner)
+- Question: note 7 removed the strip from the funding page only. Card 13 ("Your pump's supplies: what fits") keeps the same strip under the same line. Confirm that is wanted.
+- Applies to: YT card 13.
+
+### Added 2026-10-07, owner note 6 (the chapter timeline, bookmarks, phones)
+
+What was built is in new-to-the-journey.md F.11 (engine and Ostomy twin, every chapter on both sites), with a one-line entry in each other chapter file. **Settled by the build:** the "Your path" timeline now follows the reader (a stop, a bookmark or a section heading clicked in it is the one highlighted, at every window size tried, in English and French); a deep link stays on its card while the page finishes building itself (corrected after verification the same day: it is put back each time the page changes size in its first 10 seconds, and every jump lands where the card settles once it has eased in); bookmarks are listed at the top of the timeline; and windows under 1024px wide (phones, tablets, half-screen laptops) have an "On this page" button with every stop, the bookmarks and the Continue point. These are the questions it left.
+
+**B63. Which browser, device and window size did you use?** (IMPORTANT; owner)
+- Measured in Chromium only: desktop windows 1100x620 and 1280x720 (and others in the diagnosis), a phone at 390x844 and a tablet at 900x1000, emulated. Safari (iPhone, iPad, Mac) and a real phone were not tried. If note 6 was seen on one of those, tell us which, so it is checked there.
+- Applies to: every chapter page, both sites.
+
+**B64. The "On this page" button on phones and tablets.** (NICE TO HAVE; owner)
+- Built: a button at the bottom left ("On this page", "3 of 11", and the number of bookmarks when there are any), clear of Olivia at the bottom right. It shows only while the chapter's stops fill the bottom of the screen, and steps aside whenever a "Call 911" panel or a card's exit line is in the lower part of the screen, or a box is being typed in. It opens a sheet from the bottom: Continue (from the last visit), your bookmarks, then every stop by section.
+- Options: **(built)** as above; or another place or wording.
+- Also: the small dots under each section title stay (now one for every stop, including a section with a single stop). **(built)** keep them; or remove them on phones now that the sheet does their job.
+- Applies to: every chapter page under 1024px wide, both sites.
+
+**B65. French for the timeline and "On this page" words.** (NICE TO HAVE; French reviewer)
+- Machine-drafted, navigation only (no health content; the stops' titles come from each page): `ui.chapter.onThisPage` « Sur cette page », `.onThisPageProgress` « {current} sur {total} », `.pathBookmarks` « Étapes marquées ({count}) » (Ostomy: « Arrêts marqués ({count}) »), `.pathBookmarksEmpty` « Touchez « Marquer » sur une étape pour la garder ici. » (Ostomy: « … sur un arrêt pour le garder ici. »), `.pathHere` « Vous êtes ici », `.closeSheet` « Fermer », `.removeBookmarkFor` « Retirer la marque : {title} ». Ostomy also gained `saveStopFor` « Marquer : {title} » and `stopSavedFor` « Marqué : {title} », and its counts now agree in number (« 1 arrêt », « 1 marqué »).
+- Shown on /fr as navigation chrome, like the Sources words; no draft marker, because no module or clinical line is involved.
+- Applies to: fr.json, `DiabetesCare.ui.chapter` and `OstomyCare.ui.chapter`.
+
+### Added 2026-10-07, owner notes 8 and 4 and the typeface (overlap, product cards, Poppins)
+
+What was built is in new-to-the-journey.md F.12 (shared stylesheet and store fonts, every chapter on both sites), with a one-line entry in each other chapter file, paths.md, landing.md and funding.md. **Settled by the build:** no big band title touches the callout under it, on a first visit or a return, on any chapter of either site, in English or French; on desktop and tablet every product card in a strip is the same size whatever the count, and a single product lies on its side with a small photo (phones unchanged); and the whole store is set in Poppins, as the owner decided ("Poppins across the whole store"). These are the questions it left.
+
+**B66. Heading weight in Poppins.** (NICE TO HAVE; owner)
+- Built: headings kept the weight they had in the serif, Poppins Regular (400); body text is Regular, labels and buttons Medium or SemiBold, as before.
+- The brand guide shows headings in Poppins Bold or SemiBold. Options: **(built)** Regular headings, the lighter look the pages were designed with; or SemiBold (600) headings on the care sites, which reads closer to the brand guide but makes the very large band titles heavy (they would be reduced in size).
+- Applies to: every heading on Diabetes Care, Ostomy Care, Liivv Health, Women’s Health and the home page.
+
+**B67. The callout under a band’s big title.** (NICE TO HAVE; owner)
+- Built: the callout ("The right supplies, used well" and its paragraph under "Checking your glucose") now has space above it and keeps its plain look.
+- The stylesheet still holds a design for it that has not shown since 2026-09-28: a white "wash" card with soft corners and a shadow, slightly tilted. Options: **(built)** plain, with space; or bring back the card (without the tilt, which the fade-in animation removes anyway).
+- Applies to: the first band of every chapter, both sites.
+
+**B68. Product card size on desktop.** (NICE TO HAVE; owner)
+- Built: 168px wide cards (photo about 144px), four to a row in a chapter, five on a path page; one product: a 544px horizontal card with a 160px photo.
+- Options: **(built)**; or slightly larger cards (about 184px, three to a row in a chapter).
+- Applies to: every product strip in a chapter, on a path page and on Ostomy Care’s chapters.
+
+**For the other developer (not an owner question).** The fonts change reaches pages outside the care sites: the home page, Women’s Health and Clair Health now use Poppins too, and the store’s old theme file (`core/public/archive/diabetes-care-sections.css`, loaded on every page) still embeds its own Poppins (400, 500 and 700, plus italics) for the header, footer, account pages and product pages. Both are Poppins, so nothing looks different, but the old embedded copy could be dropped in favour of the one in `core/app/fonts.ts`. Nothing in Makeswift’s stored content sets a font (the theme fonts follow the code’s defaults); if an editor had picked Inter, DM Serif Text or Roboto Mono on a single element, that element now takes the font around it (Poppins), because those fonts are no longer loaded; worth a glance at any Makeswift page that was styled by hand.
+
+### Added 2026-10-07, owner notes 9, 10 and 11 (the Diabetes Essentials shop, the brand row, kits, the pager)
+
+What was built is in landing.md, the entry "Owner notes 9, 10 and 11 applied" (S1 to S10), and new-to-the-journey.md F.13. **Settled by the build:** Shop Diabetes Care is a filterable shelf like Ostomy Essentials, over the whole category (241 products; 205 on /fr, with no insulin counted or shown); Omnipod pods are under Omnipod (Insulet); insulin and glucagon are never a one-click add from any listing; the brand pills are links to the shop; all twelve kits are listed (owner: "Verified go ahead and publish"); the pager and product links open at the top of the page; the landing reads the whole catalogue, not the first 150. Decisions taken on the safe side and built, for the owner to confirm or change:
+
+**B69. Medtronic-named cases and accessories: whose are they?** (IMPORTANT; owner or buyer)
+- Built (safe default): these carry **no brand** in the shop and are found under "Works with: MiniMed": 4301 Medtronic Screen Film Kit, 4315 Medtronic Leg Pouch, 4333 Medtronic Activity Guard, 4381 Sport Case Medtronic, 4638 Medtronic Extra Belt for Leg Pouch, 4676 Neoprene Case from Medtronic, 4685 Silicone Skin Medtronic 5XX & 7XX, 4693 Holster for Paradigm series pumps, 4780 Medtronic Clip with Hinge, 4851 Belt Clip for Medtronic, 4946 Activity Guard for Paradigm insulin pumps.
+- Question: which of these does Medtronic (MiniMed) itself make? Each one confirmed goes under the MiniMed brand (one line in `DIABETES_BRAND_BY_ID`, dc-ids.ts). Tandem’s t:case, t:holster, decal and screen protectors and the mylife YpsoPump accessories are filed under their maker, by their own product names.
+
+**B70. The shop’s brand and maker names.** (NICE TO HAVE; owner)
+- Built: the brand filter names makers where a product line has one: Ultra-Fine, Nano PRO and AutoShield are **embecta** (formerly part of BD, register `embecta-contact`), SafetyGlide, Vacutainer and the BD sharps container **BD**; insulins **Novo Nordisk**, **Lilly**, **Sanofi** and **Biocon Biologics** (Semglee, Kirsty); Bayer Microlet, Ketostix and Keto-Diastix **Bayer** (their names say Bayer); Dex4, Frio, Unifine, Oracle (EZ Health) by name; FreeStyle Libre and FreeStyle (Lite, Precision) as two brands. Confirm, or name the ones you want different.
+- The store’s own brand records are still thin (234 of 268 products in the category have none, `Dex 4` and `Dex4` are two records, and there is no Dexcom, Abbott, Insulet, Tandem or mylife record). Creating them in BigCommerce (a store write) would give the store’s search and other category pages a real brand filter too; the Diabetes shop does not need it.
+
+**B71. "In stock" on the shop.** (NICE TO HAVE; owner)
+- Built: an "In stock" filter, from the storefront’s own flag. Most diabetes products are not stock-tracked in BigCommerce, so they always count as in stock: the filter does not mean "on the shelf today". Keep it, or remove it until stock is tracked.
+
+**B72. The shop’s filters on a phone.** (NICE TO HAVE; owner)
+- Built: as Ostomy Essentials, the filters sit above the products on a phone; "Works with" is closed until opened. With 22 product types and about 27 brands that is a long list (about 1,400px at 375px wide) before the first product. Options: **(built)** as Ostomy; or a "Filters" button that opens them in a panel on phones (both shops).
+
+**B73. Logo files still to supply, and Contour’s tagline.** (NICE TO HAVE; owner)
+- Built: logos for Omnipod, MiniMed, Tandem, OneTouch and Contour (the six files approved 2026-10-07, logo-sources.md); Dexcom, FreeStyle Libre, mylife, Accu-Chek and FreeStyle are names in matching pills. Supply those files (SVG, or PNG at least 112px high) and each becomes a logo with one line in `BRANDS` (landing-meta.ts).
+- `contour.png` carries the "Evolving with you" tagline, so it is shown taller; a version without the tagline from Ascensia would sit better in the row. `insulet.png` is on file but not shown: the row is by shopping brand, and Insulet’s pods are the Omnipod pill.
+- To confirm (verification, 2026-10-08): five of the six files are shown, and the Omnipod one as a trimmed copy (`omnipod-trimmed.png`: the press-kit file’s white margins cut away and scaled down, artwork unchanged; logo-sources.md). Omnipod’s press terms say the logo is not to be altered. Options: **(built)** the trimmed copy; or show the untouched `omnipod.png` (its mark then sits small in the pill, or the pill grows); and say whether `insulet.png` should appear anywhere (for example beside Omnipod as "by Insulet").
+
+**B74. The register’s "Ypsomed (mylife)" publisher name.** (NICE TO HAVE; owner)
+- The brand pill now says mylife (confirmed on mylife Diabetes Care Canada’s own "About us" page, `mylife-about-ca`). The publisher name shown under Your Tools’ pump picker sources (`ypsomed-mylife-loop`) still reads "Ypsomed (mylife)". Change it to "mylife Diabetes Care" (one line in sources-meta.ts), or keep it until the pump picker is next reviewed.
+
+### Added 2026-10-08, final fix pass for the owner review of 2026-10-07
+
+What was fixed is in the 2026-10-08 change logs: every-day-living.md F.13, know-your-type.md F.13, this-might-be-you.md F.13, staying-safe.md F.16 (Baqsimi is "View product" on its card) and new-to-the-journey.md F.14 (engine and store: shelves and wishlists never one-click-add insulin or glucagon, the timeline re-centres after a group opens, product descriptions in Poppins, the phone header, the Ostomy landing’s /fr links). These are the questions it left.
+
+**B75. Names kept in the prose as the subject, not as a credit.** (NICE TO HAVE; owner)
+- Kept, each with its source in the card’s Sources disclosure too: the airport screening authority where its own rule is stated ("The Canadian Air Transport Security Authority (CATSA) says a syringe needs its needle guard on…", Your Tools 8.items.4; "CATSA lets insulin, juice and gels through security above the 100 mL limit…", Your Tools 11.items.7); Canada’s food guide as the resource the reader uses (New to the Journey 4.items.1–2, Every Day Living 1.items.2); "Dexcom notes that not all connections are available in Canada" (a maker on its own product, Your Tools 4 and 13). Changed: "CATSA suggests keeping medicine in its labelled packaging" is now "Keep medicine in its labelled packaging" (Every Day Living 6.items.6).
+- Ostomy Care’s funding page keeps "…and the CRA’s own guidance says so" (the CRA decides the credit; its page is in the funding page’s citations).
+- Options: **(default)** keep these as subjects; or state each plainly ("At Canadian airport security, a syringe needs…", "Fill half your plate with vegetables and fruit…"), leaving the name to the Sources line.
+- Applies to: fr.json and en.json, the keys above.
+
+**B76. Ostomy Care: sources in the element (owner note 1), and a conflict found while checking.** (IMPORTANT; owner and NSWOC)
+- Ostomy cards have no Sources line of their own (only the recovery map’s stages and the page’s "Where this comes from" list), and Everyday Liivving still credits bodies in the prose: card 10 "CATSA states that ostomy paste tubes must be 100 mL or less and travel in your clear 1 L bag", "CATSA says you can request a private screening room", "Ostomy Canada is explicit that the pouch will not blow up"; card 11 "Ostomy Canada suggests roughly 15 to 30°C", "Coloplast’s instructions for use state the product must not be stored under freezing conditions"; card 14 "Ostomy Canada also advises caution" (French: « précise », « recommande »).
+- Not rewritten: none of these is in Ostomy’s register, and the name in the sentence is today the only source the reader sees, so removing it before a card can show its sources would leave the claim unsourced.
+- Checked on 2026-10-08 (Ostomy Canada, "Travel Tips", ostomycanada.ca/ostomy-lifestyle/travel-tips/, no date): it supports "The pouch will not "blow up" because the cabin is pressurized"; it says to keep supplies "in a cool spot like in a cooler (not in the trunk)" and gives **no 15 to 30°C range**; and on paste it says "Ostomy paste tubes may exceed the liquid/gel maximum but must be presented to screening officers separately", which **conflicts** with card 10’s "must be 100 mL or less and travel in your clear 1 L bag". It does not mention a private room. CATSA’s own ostomy page and Coloplast’s instructions for use were not read.
+- Side by side, for your ruling: card 10’s paste rule (100 mL, in the 1 L bag) / Ostomy Canada’s Travel Tips (may exceed the limit, shown separately).
+- Options: **(default)** leave Ostomy’s wording until its cards get Sources lines (the Diabetes chip ported to Ostomy, each source opened and registered first), then state the facts plainly; or remove the unconfirmed 15 to 30°C now.
+- Applies to: `OstomyCare.chapters.everyday-liivving.categories.10, 11, 14`, Ostomy funding `dtcPoint1`.
+
+**B77. Supplements and foot creams on the "Nutrition and wellness" shelf.** (IMPORTANT; owner and nurse)
+- Question: Diabetes Essentials’ "Nutrition and wellness" type lists blood-sugar supplements (AOR GlucoSupport, CanPrev Blood Sugar Support) and diabetic foot-pain creams, on a site backed by certified educators whose foot card says not to treat foot problems yourself.
+- Options: **(default)** keep (they are in the store’s diabetes category); or leave supplements and symptom creams off the Diabetes shelf (one rule in `shop-classify.ts`).
+- Applies to: the Diabetes Essentials shop.
+
+**For engineering (not owner questions).** The animated subscription demo (`components/subscription-flow-demo`) is English on every /fr page that shows it (both care landings, Women’s Health, the home page). A hydration warning on the two Essentials shops (React-made ids on Show / Sort by and the card forms) was seen in the 2026-10-08 QA at 1280 and 375 (and a "Hydration failed" once on the French landing), during the hour the dev server was restarting and serving a corrupt manifest. After the repair it did not come back in 18 fresh loads (both shops and the French landing, 1440, 1280 and 375 wide, twice each, 2026-10-08); not fixed in code, as no cause was found. Watch for it on the preview build.
+
+**For operations (store fixes, not owner questions).** "Nano Pro Needle Pen" (4913) shows CA$0.00 on the shelf. The three English Apidra listings still answer 404 (B3). Both are BigCommerce fixes. Found by the 2026-10-08 sweep of all 241 shelf products: "Omnipod Star Patch" (8096, `/omnipod-star-patch`, the shelf’s first card) answered 404 on the local preview although the store resolves its address (likely a stale route cache; check on the live site), and "One Touch Verio Test Strips" (7895) is still visible in the category although its address now redirects to the merged OneTouch Verio listing (hide 7895 in BigCommerce, or the shelf keeps a card that opens another product).
 
 ---
 

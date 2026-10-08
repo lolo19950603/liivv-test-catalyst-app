@@ -7,8 +7,8 @@
   --sage-deep: color-mix(in srgb, var(--sage) 62%, var(--ink));
   --paper: #fff;
   --line: rgba(49, 47, 47, 0.12);
-  --font-heading: var(--font-family-dm-serif-text), 'Iowan Old Style', Georgia, serif;
-  --font-body: var(--font-family-inter), 'Segoe UI', system-ui, sans-serif;
+  --font-heading: var(--font-family-poppins), system-ui, sans-serif;
+  --font-body: var(--font-family-poppins), system-ui, sans-serif;
   --pad: clamp(1rem, 2vw, 2rem);
   --max: 96rem;
 

@@ -35,11 +35,11 @@ export const PATHS = {
     },
     {
       id: 'Q16 (owner, 2026-10-06, A2, B5, B12)',
-      note: 'The CDEs are at Bayshore Express Pharmacy, the Liivv pharmacy in Markham, and "many HCPs can be CDEs", so every band says "Certified Diabetes Educators at Bayshore Express Pharmacy", never "pharmacist CDEs". `cdeBand` is on.',
+      note: 'The CDEs are at Bayshore Express Pharmacy, the Liivv pharmacy in Markham, and "many HCPs can be CDEs", so every band said "Certified Diabetes Educators at Bayshore Express Pharmacy", never "pharmacist CDEs"; since owner note 5 (2026-10-07) it says "Liivv’s Certified Diabetes Educators". `cdeBand` is on.',
     },
     {
       id: 'Q17 (owner, 2026-10-06, A1, B5, B11)',
-      note: 'Liivv’s pharmacies serve all of Canada, Quebec and the territories included, and Bayshore Express Pharmacy passes people to the Liivv pharmacy in their province. The bands no longer say there is no Liivv pharmacy in Quebec or the territories.',
+      note: 'Liivv’s pharmacies serve all of Canada, Quebec and the territories included, and the CDEs pass people to Liivv’s pharmacy in their province. The bands no longer say there is no Liivv pharmacy in Quebec or the territories.',
     },
     {
       id: 'Q19 (owner, 2026-10-06, B10)',
@@ -77,7 +77,7 @@ export const PATHS = {
     'Each entry shows the card’s title as its chapter holds it, "Chapter <num> · <chapter title>", the reason, and "Read the card", and links to the card’s `#card-<n>` anchor in the page locale. No title is retyped.',
     'The hero’s one button reads the list heading (`list.heading`) and jumps to the list; the record names no separate button label.',
     'The governance block carries Know Your Type’s disclaimer (`chapters.know-your-type.governance.disclaimer`, every path starts from that chapter); the record gives the paths no disclaimer of their own. It lists every source the page names, once each.',
-    'The CDE band renders on every path but Prediabetes (`cdeBand` on since 2026-10-06), with the general phone line, email, hours and About page of Bayshore Express Pharmacy (`DIABETES_SITE.contact`) in place of a button. Its "Request a call" (`cta`) renders only once the appointment page can take the request (`cdeRequestReason`, landing D3; B6).',
+    'The CDE band renders on every path but Prediabetes (`cdeBand` on since 2026-10-06), with the general phone line and hours of Liivv’s Certified Diabetes Educators (`DIABETES_SITE.contact`; owner note 5, 2026-10-07) in place of a button. Its "Request a call" (`cta`) renders only once the appointment page can take the request (`cdeRequestReason`, landing D3; B6).',
     'Less common types row 2 cites `bt1d-lada` only. The record also lists `diabetes-uk-lada`, but the reason does not name it, and an international source is cited only where the sentence names it; the Canadian page carries the whole fact.',
     'Accent and images are placeholders (Q10): every path uses `#c9dcc0`; Less common types reuses Know Your Type’s `chapter-journey.png`.',
     'The old "Your Diabetes Journey" hub (`/chapters/your-diabetes-journey`, and /fr) redirects permanently to the landing’s #which-diabetes (next.config.ts); `/pages/your-diabetes-journey` goes straight there too.',

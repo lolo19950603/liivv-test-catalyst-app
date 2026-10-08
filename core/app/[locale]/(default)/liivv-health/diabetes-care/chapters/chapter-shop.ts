@@ -20,8 +20,9 @@
  * today) is a "Choose options" link to its page, never a one-click add.
  *
  * The rules this record keeps:
- *   - SHOP_SWITCH.placements is the one switch: false and no card, path or
- *     funding page places anything.
+ *   - SHOP_SWITCH.placements is the one switch: false and no card or path
+ *     places anything. The funding page places nothing (owner note 7,
+ *     2026-10-07, removed its pump-supplies strip; card 13 keeps it).
  *   - Nothing on Staying Safe card 2 (the Rule of 15), and nothing for
  *     prediabetes: not Know Your Type card 3, not the prediabetes path.
  *   - Insulin is never a named product: only New to the Journey card 8 links
@@ -30,9 +31,12 @@
  *     Quebec delivery or advertised to Quebec (owner answer B11), so no /fr
  *     page links it, and the route drops anything insulin from /fr shelves.
  *   - Glucagon (Baqsimi, 4555) only on Staying Safe card 3, with the notice.
- *     It is something someone else gives; the card says so.
- *   - No kit: DIABETES_LISTED_KIT_IDS (../dc-ids.ts) stays empty until the
- *     owner verifies docs/diabetes-content/kits-for-review.md (A4).
+ *     It is something someone else gives; the card says so. Its card links
+ *     the product page ("View product") and is never a one-click add
+ *     (owner note 9; ./placement-items.ts, ./_actions/add-placement.ts).
+ *   - No kit on a chapter card. The owner verified all twelve kits on
+ *     2026-10-07 (A4): they are listed on the landing and in the shop
+ *     (DIABETES_LISTED_KIT_IDS, ../dc-ids.ts), not placed on cards.
  *   - Omnipod pods (8090, 8091) are named on the pump-supply shelves; the
  *     storefront returns no hidden product, so they appear the day the owner
  *     makes them visible, and not before.
@@ -54,7 +58,7 @@ import type { PathSlug } from './paths-meta';
 
 /*
  * The one switch for every product placement on the Diabetes pages: set
- * `placements` to false and no card, path or funding page places anything.
+ * `placements` to false and no card or path places anything.
  * Held in a record, as LANDING_GATES is, so either value type-checks.
  */
 export const SHOP_SWITCH: Readonly<{ placements: boolean }> = { placements: true };
@@ -62,12 +66,38 @@ export const SHOP_SWITCH: Readonly<{ placements: boolean }> = { placements: true
 export const PLACEMENTS_ON = SHOP_SWITCH.placements;
 
 /*
- * A product whose description matches is never placed: the owner's rule is
- * that nothing on these pages names or leads to another retailer, and 17
- * descriptions still did on 2026-10-06 (B3 in OPEN-QUESTIONS.md). The
- * retailer's name in any spacing, and its phone number in any punctuation.
+ * A product whose description matches is never placed or listed: the owner's
+ * rule is that nothing on these pages names or leads to another retailer.
+ * Seventeen descriptions did on 2026-10-06 (B3 in OPEN-QUESTIONS.md); none
+ * does since the store fixes of 2026-10-07, and the check stays as a safety
+ * net. The retailer's name in any spacing, and its phone number in any
+ * punctuation.
  */
 export const DIABETES_REFUSED_DESCRIPTION = /diabetes[\s_-]*express|866\D{0,3}418\D{0,3}3392/i;
+
+/*
+ * Whether a product's description names or leads to another retailer. Tested
+ * on the full HTML description the storefront returns (`description`, never
+ * `plainTextDescription`, which drops every link's address), so a link to the
+ * retailer's site counts as well as its name; then again on the words alone,
+ * with tags removed and entities and %-escapes decoded, so "Diabetes&nbsp;
+ * Express" or a name split by a tag is caught too. Every loader that lists
+ * Diabetes products asks this: the landing's catalogue, the chapters'
+ * placements and the Diabetes Essentials shop.
+ */
+export function namesAnotherRetailer(description: string | null | undefined): boolean {
+  if (!description) return false;
+
+  const words = description
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;|&#160;|&#xa0;/gi, ' ')
+    .replace(/&#(\d+);/g, (_, code: string) => String.fromCodePoint(Number(code)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, code: string) => String.fromCodePoint(parseInt(code, 16)))
+    .replace(/&amp;/gi, '&')
+    .replace(/%([0-9a-f]{2})/gi, (_, code: string) => String.fromCharCode(parseInt(code, 16)));
+
+  return DIABETES_REFUSED_DESCRIPTION.test(description) || DIABETES_REFUSED_DESCRIPTION.test(words);
+}
 
 /*
  * The insulin shelf (category 1116), linked from New to the Journey card 8
@@ -77,16 +107,21 @@ export const INSULIN_SHELF_HREF =
   '/liivv-your-life/nourish-balance/metabolic-glucose-support/insulin-pens-pen-needles/insulin';
 
 /*
- * The insulin shelf link is held (link crawl, 2026-10-06). DIABETES_REFUSED_
- * DESCRIPTION is checked only on placed products, not on a category a shelf
- * links, and the insulin shelf lists Toujeo SoloStar (packs of 3 and 5),
- * whose description links a PDF on another retailer's site, and Tresiba
- * FlexTouch (U-100 and U-200), whose description names that retailer's
- * pharmacy; three Apidra listings on it also answer 404 in English. Set `linked` to
- * true once the owner has fixed those in the store (OPEN-QUESTIONS B3); card
- * 8 then links the shelf again, with its notices, in English only.
+ * The insulin shelf link. Held from 2026-10-06 (link crawl): the shelf listed
+ * Toujeo SoloStar (packs of 3 and 5), whose description linked a PDF on
+ * another retailer's site, and Tresiba FlexTouch (U-100 and U-200), whose
+ * description named that retailer's pharmacy, and `namesAnotherRetailer` is
+ * checked only on placed products, not on a category a shelf links.
+ * Switched back on 2026-10-08: the owner had those descriptions fixed in the
+ * store on 2026-10-07, and a fresh read of every product on the shelf (34,
+ * EN and FR, full HTML description, words and custom fields) found none that
+ * names, links or phones another retailer (OPEN-QUESTIONS B3, B21). Card 8
+ * links the shelf with its pharmacist, cold-chain and Quebec notices, in
+ * English only; no /fr page links it. Three Apidra listings on the shelf
+ * still answer 404 in English (a store fix, B3). Set `linked` to false to
+ * hold the link again.
  */
-export const INSULIN_SHELF: Readonly<{ linked: boolean }> = { linked: false };
+export const INSULIN_SHELF: Readonly<{ linked: boolean }> = { linked: true };
 
 /*
  * The catalogue's names on 2026-10-06, for the review pack and the record
@@ -271,10 +306,6 @@ export const PATH_SHELVES: Partial<Record<PathSlug, CardShelf>> = {
   'less-common-types': CHECK_TOOLS,
 };
 
-/* ---------- Funding page: after "How paying works", before the checker ---------- */
-
-export const FUNDING_SHELF: CardShelf = { occasion: 'pumpSupplies', offers: PUMP_SUPPLIES };
-
 /* ---------- What the engine and the route read ---------- */
 
 export function shelfForCard(slug: string, card: number): CardShelf | undefined {
@@ -314,7 +345,6 @@ export const DIABETES_PLACED_PRODUCT_IDS: readonly number[] = [
     [
       ...Object.values(PLACEMENTS).flatMap((cards) => Object.values(cards)),
       ...Object.values(PATH_SHELVES),
-      FUNDING_SHELF,
     ].flatMap((shelf) => shelf.offers.flatMap((offer) => offer.productIds)),
   ),
 ];

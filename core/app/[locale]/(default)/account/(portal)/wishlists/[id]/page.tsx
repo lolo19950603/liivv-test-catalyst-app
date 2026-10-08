@@ -12,6 +12,7 @@ import { defaultPageInfo, pageInfoTransformer } from '~/data-transformers/page-i
 import { wishlistDetailsTransformer } from '~/data-transformers/wishlists-transformer';
 import { redirect } from '~/i18n/routing';
 import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-ids';
+import { withPharmacistWishlistItemsViewOnly } from '~/lib/checkout/quebec-insulin';
 import { isMobileUser } from '~/lib/user-agent';
 
 import { removeWishlistItem } from '../../../wishlists/_actions/remove-wishlist-item';
@@ -50,7 +51,13 @@ async function getWishlist(
     return redirect({ href: '/account/wishlists/', locale });
   }
 
-  return wishlistDetailsTransformer(wishlist, t, pt, formatter);
+  const details = wishlistDetailsTransformer(wishlist, t, pt, formatter);
+
+  // Insulin and glucagon link their product page, never "Add to cart" (owner note 9).
+  return {
+    ...details,
+    items: withPharmacistWishlistItemsViewOnly(await details.items),
+  };
 }
 
 const getAnalyticsData = async (id: string, searchParamsPromise: Promise<SearchParams>) => {
@@ -150,7 +157,6 @@ export default async function WishlistPage({ params, searchParams }: Props) {
 
   return (
     <WishlistAnalyticsProvider data={streamableAnalyticsData}>
-      {denyAdSignals && <DenyAdSignals />}
       <WishlistDetails
         action={addWishlistItemToCart}
         emptyStateText={t('emptyWishlist')}
@@ -161,6 +167,8 @@ export default async function WishlistPage({ params, searchParams }: Props) {
         removeButtonTitle={t('removeButtonTitle')}
         wishlist={Streamable.from(() => getWishlist(id, t, pt, searchParams, locale))}
       />
+      {/* Last, not first, so Next's scroll-to-top on navigation works (owner note 11). */}
+      {denyAdSignals && <DenyAdSignals />}
     </WishlistAnalyticsProvider>
   );
 }

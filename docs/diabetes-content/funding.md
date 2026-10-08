@@ -20,7 +20,7 @@ Revised draft of 2026-10-05, after the live source check in `funding.verify.md` 
 
 - **SourceIds.** Every SourceId cited exists in `diabetes-care/chapters/sources-meta.ts`. A fact whose only source is unregistered is **HELD** and stays out of section B. The proposed registrations are in section F.
 - **No competitor name and no competitor link**, in copy, code comments or commit messages. The layout (federal first, then a province picker) is generic, and no copy is reused.
-- **No product shelves or kit carousels.** One shop strip only, approved by B21 (2026-10-06): the pump-supplies strip after "How paying works", before the checker (`#pump-supplies`; see the commerce step in the change log).
+- **No product shelves or kit carousels.** No shop strip since 2026-10-07: the owner removed the pump-supplies strip that B21 had placed after "How paying works" (note 7; see the change log). Your Tools card 13 keeps it.
 - **No testimonials and no statistics.** Program amounts and quantities appear only as published by the program.
 - **Retail scope.** Nothing tells the reader which device or medicine to use or how much to take. Brand names appear only as what a program lists.
 - **Liivv facts are the owner's (2026-10-05):**
@@ -83,7 +83,7 @@ Ostomy order, with "Four ways provinces pay" replaced by "How paying works":
 10. **Pharmacist CDE band** (national, no "Available in Ontario" label), with the "Request a call" CTA → `/account/virtual-care/appointment`. No phone number.
 11. **Closing**, then `HelpBand`, `DiscoveryBand` and `GovernanceBlock`. The citations are every SourceId the page renders, resolved from the register.
 
-**Product placement:** one strip, between sections 3 and 4 (`#pump-supplies`, `FUNDING_SHELF`), built 2026-10-06 (B21; see the commerce step in the change log).
+**Product placement:** none. The strip between sections 3 and 4 (`#pump-supplies`, `FUNDING_SHELF`), built 2026-10-06 (B21), was removed by the owner on 2026-10-07 (note 7; see the change log).
 
 ### A.3 Types (`funding-data.ts`)
 
@@ -1221,6 +1221,8 @@ Still open (OPEN-QUESTIONS): the $170 grant and online orders (D-4), the ODB co-
 
 ### Commerce step: the pump-supplies strip (2026-10-06)
 
+*Removed by the owner on 2026-10-07 (note 7): see "Owner notes 7 and 3 applied" below. Kept as the record of what was built.*
+
 How a strip behaves (all chapters): the products are named in `diabetes-care/chapters/chapter-shop.ts` (owner answer B21, "Now?"), drawn by the shared engine (`_microsite/shop/`) under the card's referral chip, and read from the catalogue on every request. A product shows only while the store shows it, sells it and has it in stock, and never when its description names or links another retailer or gives its phone number (17 descriptions still do; OPEN-QUESTIONS B3). A product with a required option or modifier (85 diabetes products carry a required "Test" modifier today) gets "Choose options", a link to its page, instead of a one-click add. No kit is listed (A4). One switch, `SHOP_SWITCH.placements`, turns every strip off. Every placed id is health-revealing by id for analytics (`sensitive-products.ts`). The strip's words are `ui.chapter.shop.*` (French machine-drafted, not behind a review gate, as on Ostomy).
 
 | # | Where | Change | Why |
@@ -1247,3 +1249,28 @@ From the browser QA, the clinical and business review and the step reviews of 20
 | G-71 | Monthly recheck | Scheduled: the task "liivv-funding-recheck" runs `check-funding-sources.mjs` at 09:07 on the 1st of each month, first run 2026-11-01, and writes `docs/diabetes-content/funding-rechecks/YYYY-MM-DD.md`. It changes no copy: a CHANGED or MISSING PHRASE result is re-read and brought here by hand (B20) | K9 |
 
 Not changed (owner questions or held for a source): the "we're still checking" groups (test strips in AB, MB and QC; sensors in PE and YT; Nunavut) wait for registered official pages; PEI's Glucose Sensor Program (F-20) is still unregistered, so its pump card names it but its sensor group says "still checking"; the Quebec sensor card has no RAMQ link or phone because RAMQ's pages refuse requests; the Quebec "renewed at ≥70% wear" scope is B40; the four Yukon numbers yukon.ca blocked are B41; "Manitoba Pharmacare — continuous and flash glucose monitors" and the billing list's « Régime d’assurance-médicaments » / « Le Régime d’assurance-médicaments » stay as the governments print them (B25); the pay-later terms still wait for the owner and counsel (A5, D-26).
+
+### Owner notes 5 and 1 applied (2026-10-07)
+
+From the owner’s review of 2026-10-07 (notes 5 and 1; the diagnosis and its review are in the session record). French machine-drafted, the same change as the English, under the existing draft marker. **Note 5:** the Certified Diabetes Educators are presented as Liivv’s own service: no "Bayshore Express Pharmacy", no Markham, no email and no About link in any customer line; the contact is the phone and the hours (`DIABETES_SITE.contact` = `tel` only; the engine renders email and About only where a site sets them); register id `bep-about` deleted everywhere. The governance line "Liivv is a HelioMed company and part of the Bayshore family" stays (the owner’s own wording, B15). **Note 1:** sources are shown in the element, not named in the prose. Every card ends with a Sources disclosure (closed: up to three publishers, then "+N"; open: "Title, Publisher (year)", "(en anglais)" inside the link on /fr), built from the card’s own `sources` plus those of the figures this locale keeps; "Where this comes from" lists every card, figure, band and lane source, grouped Canadian, international, then makers. Prose now states the fact; a comparison says "In Canada…" / "International guidance…"; a line that gives clinical permission or states a guideline recommendation says "Canadian guidelines…" with the year in the disclosure. Numbers and hedges are unchanged. Every rewritten key is listed below with its new EN and FR.
+
+Also: each program card’s official-page link reads "Title, Publisher (year)" with the language note, the same format as every Sources entry; the foot list is grouped Canadian / international / makers. The CDE band and the "Liivv Now, Pay Later" contact show the phone and hours only.
+
+| # | Key | Now (EN) | Now (FR) | Why |
+|---|---|---|---|---|
+| 1 | `ui.fundingPage.cdeBody` | Liivv’s Certified Diabetes Educators answer questions from anywhere in Canada: pumps, sensors, meters, supplies, billing and claims. When needed, they pass you to Liivv’s pharmacy in your province. | Les éducateurs agréés en diabète de Liivv répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie de Liivv de votre province. | Owner note 5: the CDE service is Liivv’s (white-label) |
+| 2 | `ui.fundingPage.payLaterContact` | To ask about it, contact Liivv. We’ll pass your question to the right team. | Pour en savoir plus, communiquez avec Liivv. Nous transmettrons votre question à la bonne équipe. | Owner note 5: the CDE service is Liivv’s (white-label) |
+| 3 | `ui.fundingPage.enough3Body` | For questions about pumps, sensors, supplies, billing and claims, Liivv’s Certified Diabetes Educators can help, wherever you are in Canada. | Pour vos questions sur les pompes, les capteurs, les fournitures, la facturation et les demandes de remboursement, les éducateurs agréés en diabète de Liivv peuvent vous aider, où que vous soyez au Canada. | Owner note 5: the CDE service is Liivv’s (white-label) |
+
+### Owner notes 7 and 3 applied (2026-10-07)
+
+| # | Where | Change | Why |
+|---|---|---|---|
+| 1 | `#pump-supplies` ("Pump supplies, by pump.") | Removed from the Funding & Coverage page, EN and /fr: `funding/page.tsx` no longer fetches the strip’s products (one fewer catalogue request per render), `dc-funding-page.tsx` drops the strip, its shop provider and the `shop` prop, and `FUNDING_SHELF` is gone from `chapter-shop.ts` and from the add allowlist (the same eight ids stay allowed through Your Tools card 13, so the cart is unchanged). The page now reads paying (sand), find your coverage (sage), federal (sand), CDE (cream). `PUMP_SUPPLIES` and `shop.occasions.pumpSupplies` stay: Your Tools card 13 uses them. "Liivv Now, Pay Later" in "How paying works" is a separate offer and stays | Owner note 7 |
+| 2 | D-13 | Closed: the slot no longer exists. The review script no longer reads `FUNDING_SHELF` (`diabetes-care.mjs`; it would have thrown) and records the removal in the funding pack’s build notes | Note 7 |
+| 3 | The checker’s "Where do you live?" | 13 one-tap pills (the checker’s own `RadioRow`: native radios, arrow keys, one tab stop) instead of a drop-down; the same province codes and results. Diabetes Care only: Ostomy’s checker keeps its drop-down (a port to it was built, then put back after verification on 2026-10-07 so Ostomy’s pages stay as they were; whether to port it is OPEN-QUESTIONS B61). `provincePlaceholder` is no longer shown; the message stays | Owner note 3 |
+| 4 | Print | The page has no print button (engine printing: new-to-the-journey.md F.10) | Note 2 |
+
+### Owner decision applied: the store’s typeface (2026-10-07)
+
+The font change is in new-to-the-journey.md F.12 (F1 to F3). The page is in Poppins; measured at 1440, 768 and 375, no line of text touches another and nothing scrolls sideways. No copy changed.

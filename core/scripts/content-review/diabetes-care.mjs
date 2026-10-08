@@ -82,7 +82,7 @@ const { BASE_FIGURE_KINDS, BASE_MODULE_KINDS, BASE_WHOLE_CARD_KINDS } = await lo
   join(LIIVV_HEALTH, '_microsite', 'chapters', 'kinds.ts'),
 );
 const { CHAPTER_META } = await loadTs(join(DC, 'chapters', 'chapters-meta.ts'));
-const { SOURCE_META } = await loadTs(join(DC, 'chapters', 'sources-meta.ts'));
+const { PUBLISHERS, SOURCE_META } = await loadTs(join(DC, 'chapters', 'sources-meta.ts'));
 /* Reviewer-only: publisher, type and the paraphrase of the passage cited. */
 const { SOURCE_REVIEW } = await loadTs(join(DC, 'chapters', 'sources-review.ts'));
 const { awaitsFrReview, figureGate, GATED_KINDS, keepsFigure } = await loadTs(
@@ -335,7 +335,7 @@ const HELD_COPY = {
         cards: [7],
         why: 'Optional add from the source check, not applied (sourced: bt1d-dka-and-ketones)',
         wording:
-          '"If you use urine strips, Breakthrough T1D says to throw out a container that’s been open more than 6 months"',
+          '"If you use urine strips, throw out a container that’s been open more than 6 months"',
         check: 'bt1d-dka-and-ketones (verified)',
       },
       {
@@ -806,7 +806,7 @@ function lanesNotes(figure, num, locale) {
 
     if (lane.contact) {
       parts.push(
-        `under its words, the CDE contact of Bayshore Express Pharmacy, as on every CDE panel: phone (dials the number), email, hours and About page (\`DIABETES_SITE.contact\`, worded in ${ref('ui.contact')})`,
+        `under its words, the contact of Liivv’s Certified Diabetes Educators, as on every CDE panel: phone (dials the number) and hours (\`DIABETES_SITE.contact\`, worded in ${ref('ui.contact')})`,
       );
     }
 
@@ -1061,13 +1061,15 @@ function familyTreeNotes(figure, num, locale) {
 
   return [
     '',
-    `*The family diabetes tree, beneath the columns: a table to fill in, under ${ref(`${at}.heading`)} and ${ref(`${at}.intro`)}. It works nothing out (no risk, no colour, no pattern), and what is typed stays in the browser tab: never stored, never sent. It prints on one landscape page, with blank ruled cells where nothing was typed; with JavaScript off it is that blank form. Its controls are shared — see \`00-shared.md\`.*`,
+    `*The family diabetes tree, beneath the columns, under ${ref(`${at}.heading`)} and ${ref(`${at}.intro`)}. Since owner note 2 (2026-10-07) it starts closed, with one "Start my family tree" button; started, it is "Me" and a bar of Add buttons grouped by side, one per person below (${ref(`${at}.people`)}; brothers and sisters, children and a parent's brothers and sisters can be added more than once, the others once; at most ${figure.maxPeople} people). Each person answers in one tap: diabetes ${ref(`${at}.answers`)}; after a Yes, the age it was found, the type (${ref(`${at}.types`)}, where "other" opens a box for the type as told) and insulin within 2 years; and hearing loss, asked of everyone. It works nothing out (no risk, no colour, no pattern), and the answers stay in the browser tab: never stored, never sent. Its print button prints one portrait page: the people added, grouped by side, with their answers in words, then three blank "Anyone else" rows; before anyone is added, and with JavaScript off (in a closed disclosure), the blank table of every row below. Its controls are shared — see \`00-shared.md\`.*`,
     '',
     ...figure.sides.map(
       (group) =>
         `- ${ref(`${at}.sides.${group.side}`)}: ${group.rows.map((row) => ref(`${at}.rows.${row}`)).join(', ')}`,
     ),
     `- columns, in order: ${figure.columns.map((key) => ref(`${at}.columns.${key}`)).join(', ')}`,
+    `- added more than once: ${figure.repeatable.map((row) => ref(`${at}.people.${row}`)).join(', ')}`,
+    `- type choices, in order: ${figure.types.map((key) => ref(`${at}.types.${key}`)).join(', ')}`,
     `- sources: ${sourceTitles(figure.sources, locale)}`,
   ];
 }
@@ -1179,7 +1181,7 @@ function pumpPickerNotes(figure, num, locale) {
 
   return [
     '',
-    `*The "My pump" picker, from \`device-pairings.ts\` (checked ${DEVICES.DEVICES_CHECKED_ON}). It augments the card: the card's own sentences stay as they are. ${PICKER_NOTE} Its pairings are the sensor picker's (card 4), read from the other end, so the two cannot disagree. Each entry ends with a link to ask a CDE at Bayshore Express Pharmacy (\`pumpPicker.askCde\`), which opens the CDE panel at the foot of the same page, with the pharmacy's phone line, email, hours and About page → ${ref(figure.askHref)}. Its shared labels are in \`00-shared.md\`.*`,
+    `*The "My pump" picker, from \`device-pairings.ts\` (checked ${DEVICES.DEVICES_CHECKED_ON}). It augments the card: the card's own sentences stay as they are. ${PICKER_NOTE} Its pairings are the sensor picker's (card 4), read from the other end, so the two cannot disagree. Each entry ends with a link to reach Liivv’s Certified Diabetes Educators (\`pumpPicker.askCde\`), which opens the CDE panel at the foot of the same page, with their phone line and hours → ${ref(figure.askHref)}. Its shared labels are in \`00-shared.md\`.*`,
     '',
     ...DEVICES.PUMPS.flatMap((pump) => {
       const pairings = DEVICES.PAIRINGS.filter((pairing) => pairing.pump === pump.id);
@@ -1639,7 +1641,7 @@ function writeChapter(meta, locale) {
   out('## CDE panel', '');
   out(
     DIABETES_SITE.contact
-      ? `*The panel at the foot of the page (\`#chapter-cde\`), which the hero’s "Ask a pharmacist" button opens (${ref(meta.pharmacistHref)}). It shows the CDE contact (\`contact\` in 00-shared.md: phone, email, hours, About Bayshore Express Pharmacy) in place of a button; "Request a call" stays held (B6). Rests on the owner’s answers of 2026-10-06 and \`bep-about\`.*`
+      ? `*The panel at the foot of the page (\`#chapter-cde\`), which the hero’s "Ask a pharmacist" button opens (${ref(meta.pharmacistHref)}). It shows the CDE contact (\`contact\` in 00-shared.md: phone and hours) in place of a button; "Request a call" stays held (B6). Rests on the owner’s answers of 2026-10-06, and on owner note 5 of 2026-10-07 (the service is Liivv’s).*`
       : `*The button opens ${ref(meta.pharmacistHref)}, a Liivv page.*`,
     '',
   );
@@ -1732,6 +1734,8 @@ const SHARED_SECTIONS = {
   'chapter.roleNames': 'Role names used in generated referral lines',
   'chapter.startHere': 'Start-here map',
   'chapter.takeIn': 'Take-in card',
+  'chapter.print':
+    'Printed sheets — the header and footer every print button adds, on paper only (owner note 2, 2026-10-07): the site, a line for a name, the date printed, the card’s sources by group, and the page address',
   ruleOf15: 'The Rule of 15 — controls and labels',
   ketoneLadder: 'Ketone ladder — labels',
   cluesChecklist: 'Clues checklist — controls and print sheet',
@@ -1741,18 +1745,81 @@ const SHARED_SECTIONS = {
   pumpPicker: 'Pump picker — source line and the link to ask',
   meterMatch: 'Meter picker — source line',
   'chapter.shelf': 'Resources shelf — language notes',
+  'chapter.sources':
+    'Sources — the line under every card, path intro, landing fact and answer, and the groups of the foot list',
   'chapter.shop': 'Shop strips — buttons and the note under every strip',
   'chapter.shop.occasions': 'Shop strips — the line that heads each strip',
   'chapter.shop.offers': 'Shop strips — the lines above a group of products, and the shelf link',
   chapter: 'Chapter page labels',
   help: 'Help band — shown on every page',
   contact:
-    'Bayshore Express Pharmacy — how to reach the CDEs (every CDE panel, the landing’s care band, the funding page)',
-  commerce: 'Insulin and glucagon — the product page notice and the checkout’s Quebec line',
+    'How to reach Liivv’s Certified Diabetes Educators (every CDE panel, the landing’s care band, the funding page)',
+  commerce:
+    'Insulin and glucagon — the product page notice, the checkout’s Quebec line, and the "View product" link that replaces a one-click add on every listing (owner note 9, 2026-10-07)',
+  shopPage:
+    'Diabetes Essentials shop (Shop Diabetes Care, category 1151) — headings and filters (owner note 9, 2026-10-07; French review gate `shop`). Brand and device names are not copy: they are in diabetes-care/shop-classify.ts. On the English insulin filter the shelf repeats the three `commerce` notices above its products; the French shelf lists no insulin',
+  'shopPage.types': 'Diabetes Essentials shop — the "What you need" product types (one scheme with the landing’s shop rooms)',
   discovery: 'Discovery band',
   governance: 'Byline and review notices',
   'governance.disclosure': 'Commercial disclosure',
 };
+
+/*
+ * The register's display fields (owner note 1, 2026-10-07): every entry names
+ * a publisher in PUBLISHERS, and the group a Sources list puts it in agrees
+ * with the reviewer's type in sources-review.ts (an international type is
+ * international, an industry page is a maker's, any other type is Canadian;
+ * the type `other` may sit in either of the first two). A brand-named insulin
+ * monograph or alert is never shown (ruling C7), nor is the UncoverT1D page
+ * (C36).
+ */
+const MUST_NOT_SHOW = [
+  'hc-dpd-pm-toujeo',
+  'hc-dpd-pm-humalog',
+  'hc-dpd-pm-tresiba',
+  'hc-dpd-pm-awiqli',
+  'hc-dpd-pm-entuzity',
+  'hc-alert-humalog-200-2015',
+  'sanofi-uncovert1d-screening',
+];
+
+function registerDisplayProblems() {
+  const problems = [];
+
+  Object.entries(SOURCE_META).forEach(([id, entry]) => {
+    const publisher = PUBLISHERS[entry.publisher];
+
+    if (!publisher) {
+      problems.push(`sources-meta.ts ${id}: publisher '${entry.publisher}' is not in PUBLISHERS`);
+
+      return;
+    }
+
+    const scope = entry.scope ?? publisher.scope;
+    const type = String(SOURCE_REVIEW[id]?.type ?? '');
+    const expected = type.startsWith('international')
+      ? ['international']
+      : type === 'industry'
+        ? ['industry']
+        : type === 'other'
+          ? ['canadian', 'international']
+          : ['canadian'];
+
+    if (!expected.includes(scope)) {
+      problems.push(`sources-meta.ts ${id}: shown as ${scope}, but sources-review.ts types it ${type}`);
+    }
+
+    if (entry.year !== undefined && !(entry.year >= 1990 && entry.year <= 2030)) {
+      problems.push(`sources-meta.ts ${id}: year ${entry.year} is not a year`);
+    }
+  });
+
+  MUST_NOT_SHOW.filter((id) => SOURCE_META[id]?.display !== 'reviewOnly').forEach((id) =>
+    problems.push(`sources-meta.ts ${id}: must be display: 'reviewOnly' (rulings C7, C36)`),
+  );
+
+  return problems;
+}
 
 /* Every figure kind a chapter places. */
 const placedKinds = () =>
@@ -1776,20 +1843,24 @@ function sharedNote(path, locale) {
     return '*Held with the figure that reads it: renders on no page, in either locale, and is not sent to the browser (`held-messages.ts`).*';
   }
 
+  if (path === 'chapter.sources') {
+    return '*Owner note 1 (2026-10-07): the copy states the fact and the element names its sources. `line` is the closed Sources disclosure at the foot of every chapter card and under the referral band (up to three publishers, then `more`), the line under each path intro, and the open line under each landing fact, the type chips and each answer; it is the same message as the pickers’ `sensorPicker.sources`. Open, each entry reads "Title, Publisher (year)", with "(en anglais)" inside the link where the page it opens is English. `canadian`, `international` and `industry` head the groups of the foot list ("Where this comes from"), which lists every source the page names; `note` closes it on the chapters, paths and funding page (the landing has its own `sourcesNote`). Governance furniture: never behind a French review gate. Entries marked `display: \'reviewOnly\'` in sources-meta.ts (brand-named insulin monographs and the Humalog alert, ruling C7; the UncoverT1D page, C36) never show.*';
+  }
+
   if (path === 'contact') {
     const contact = DIABETES_SITE.contact;
 
     return contact
-      ? `*The general contact of the Certified Diabetes Educators at Bayshore Express Pharmacy, the Liivv pharmacy in Markham (owner answers A2, B5, B9, B10, B12, 2026-10-06; \`bep-about\`). Dials \`tel:${contact.tel}\`; writes to \`${contact.email}\`; the About link opens <${contact.aboutHref}>${contact.aboutHrefFr ? ` (on /fr, <${contact.aboutHrefFr}>)` : ''}, same tab. Never a named person. Shown in place of "Request a call", which stays held until a booking page can take the request (\`cdeRequestReason\` is ${LANDING_GATES.cdeRequestReason ? 'on' : 'off'}; B6).*`
+      ? `*The general contact of Liivv’s Certified Diabetes Educators (owner answers A2, B5, B9, B10, B12, 2026-10-06; presented as Liivv’s own service, owner note 5, 2026-10-07). Dials \`tel:${contact.tel}\`${contact.email ? `; writes to \`${contact.email}\`` : '; no email line (none set)'}${contact.aboutHref ? `; the About link opens <${contact.aboutHref}>${contact.aboutHrefFr ? ` (on /fr, <${contact.aboutHrefFr}>)` : ''}, same tab` : '; no About link (none set)'}. Never a named person. Shown in place of "Request a call", which stays held until a booking page can take the request (\`cdeRequestReason\` is ${LANDING_GATES.cdeRequestReason ? 'on' : 'off'}; B6).*`
       : '*No contact in site.ts: these lines render nowhere.*';
   }
 
   if (path === 'commerce') {
-    return '*Outside the Diabetes Care pages, on the store’s own pages. Read on the server and passed down, so the browser’s message bundle does not change. `pharmacistNotice` sits under the buy box of every insulin and glucagon product page, and `insulinColdChain` and `quebecInsulin` under it on insulin only (glucagon, Baqsimi, is kept at room temperature, so cold-chain is said of insulin alone, since the full-site review of 2026-10-06; insulin is category 1116 plus Trurapi 4719 and 5002; glucagon is Baqsimi 4555: `dc-ids.ts`). The same two lines print under the shop strips that need them (`notices` in chapter-shop.ts): `pharmacistNotice` under Staying Safe card 3’s glucagon strip, and all three under New to the Journey card 8’s link to the insulin shelf, on English pages only, once that link is shown again (`INSULIN_SHELF.linked`, held since 2026-10-06 while products on the shelf carry another retailer’s link or name; B3). `quebecInsulinCheckout` shows in the checkout’s payment section, under a pay button that stays off, when the cart has insulin and the shipping province is Quebec; `{phone}` is `contact.phone`. The server also refuses that order (`buildCheckoutSnapshot`). Rests on the owner’s answers of 2026-10-06 (A1, A8, B3, B11, B29) and `bep-about` for the phone. Not behind a French review gate: on /fr the French draft shows, as a notice, not an offer. Subscription renewals to Quebec are not checked (operations, OPEN-QUESTIONS B11).*';
+    return '*Outside the Diabetes Care pages, on the store’s own pages. Read on the server and passed down, so the browser’s message bundle does not change. `pharmacistNotice` sits under the buy box of every insulin and glucagon product page, and `insulinColdChain` and `quebecInsulin` under it on insulin only (glucagon, Baqsimi, is kept at room temperature, so cold-chain is said of insulin alone, since the full-site review of 2026-10-06; insulin is category 1116 plus Trurapi 4719 and 5002; glucagon is Baqsimi 4555: `dc-ids.ts`). The same two lines print under the shop strips that need them (`notices` in chapter-shop.ts): `pharmacistNotice` under Staying Safe card 3’s glucagon strip, and all three under New to the Journey card 8’s link to the insulin shelf, on English pages only, once that link is shown again (`INSULIN_SHELF.linked`, held since 2026-10-06 while products on the shelf carry another retailer’s link or name; B3). `quebecInsulinCheckout` shows in the checkout’s payment section, under a pay button that stays off, when the cart has insulin and the shipping province is Quebec; `{phone}` is `contact.phone`. The server also refuses that order (`buildCheckoutSnapshot`). Rests on the owner’s answers of 2026-10-06 (A1, A8, B3, B11, B29); the phone is the CDE line (`contact.phone`), and the line names Liivv (owner note 5, 2026-10-07). Not behind a French review gate: on /fr the French draft shows, as a notice, not an offer. Subscription renewals to Quebec are not checked (operations, OPEN-QUESTIONS B11).*';
   }
 
   if (path === 'chapter.shop') {
-    return `*Every shop strip: under a chapter card's referral chip, between a path's reading list and its funding door, and after "How paying works" on the funding page (\`chapter-shop.ts\`; owner answer B21, 2026-10-06). ${SHOP.PLACEMENTS_ON ? 'Placements are on' : 'Placements are switched off (`PLACEMENTS_ON`), so none of this renders'}. A product is shown only while the store shows it, sells it and has it in stock, and never one whose description names or links another retailer. \`add\` adds one product in one click where there is nothing to choose; a product with a required option or modifier gets \`chooseOptions\`, a link to its page, instead. \`addFor\` and \`chooseOptionsFor\` are the buttons' accessible names. No kit is listed (A4).*`;
+    return `*Every shop strip: under a chapter card's referral chip, and between a path's reading list and its funding door (\`chapter-shop.ts\`; owner answer B21, 2026-10-06). The funding page has none since the owner removed its pump-supplies strip (note 7, 2026-10-07). ${SHOP.PLACEMENTS_ON ? 'Placements are on' : 'Placements are switched off (`PLACEMENTS_ON`), so none of this renders'}. A product is shown only while the store shows it, sells it and has it in stock, and never one whose description names or links another retailer. \`add\` adds one product in one click where there is nothing to choose; a product with a required option or modifier gets \`chooseOptions\`, a link to its page, instead. \`addFor\` and \`chooseOptionsFor\` are the buttons' accessible names. No kit is listed (A4).*`;
   }
 
   if (path === 'chapter.shop.occasions') {
@@ -2267,6 +2338,34 @@ function familyTreeProblems(figure, text, at) {
     .filter((key) => typeof tree?.[key] !== 'string')
     .forEach((key) => problems.push(`${at} familyTree: no figure.familyTree.${key}`));
 
+  /* Every row names one person, for the Add buttons and each person's group. */
+  const rows = figure.sides.flatMap((group) => group.rows);
+
+  problems.push(...placedOnce(rows, count(tree?.people), at, 'familyTree people'));
+
+  figure.repeatable
+    .filter((row) => !rows.includes(row) || row === rows[0])
+    .forEach((row) => problems.push(`${at} familyTree: repeatable row ${row} is not a relative`));
+
+  [
+    ['answers', ['yes', 'no', 'notSure'], tree?.answers],
+    ['types', figure.types, tree?.types],
+  ].forEach(([what, keys, node]) => {
+    keys
+      .filter((key) => typeof node?.[key] !== 'string')
+      .forEach((key) => problems.push(`${at} familyTree: no figure.familyTree.${what}.${key}`));
+
+    Object.keys(node ?? {})
+      .filter((key) => !keys.includes(key))
+      .forEach((key) =>
+        problems.push(`${at} familyTree: ${what}.${key} is not in chapters-meta.ts`),
+      );
+  });
+
+  if (!(figure.maxPeople >= rows.length)) {
+    problems.push(`${at} familyTree: maxPeople is under the number of rows`);
+  }
+
   if (!figure.sources?.length) problems.push(`${at} familyTree: no sources`);
 
   return problems;
@@ -2415,6 +2514,9 @@ function restockCalcProblems(figure, text, at) {
       'daysLabel',
       'haveLabel',
       'coverLabel',
+      'coverNone',
+      'coverOther',
+      'coverOtherLabel',
       'graceNote',
       'invalid',
       'noJs',
@@ -2424,8 +2526,19 @@ function restockCalcProblems(figure, text, at) {
       result: ['count', 'days', 'date'],
       needMore: ['cover', 'need', 'more'],
       enough: ['cover'],
+      less: ['field'],
+      more: ['field'],
+      coverDays: ['days'],
     },
   );
+
+  if (!figure.coverPresets?.length) problems.push(`${at} restockCalc: no coverPresets`);
+
+  figure.coverPresets
+    ?.filter((days) => days > figure.maxCover)
+    .forEach((days) =>
+      problems.push(`${at} restockCalc: cover chip ${days} is over maxCover ${figure.maxCover}`),
+    );
 
   figure.presets
     .filter((id) => !deviceSensor(id)?.wear)
@@ -3290,7 +3403,7 @@ function writeLandingSection(w, out, key, locale) {
 
   if (key === 'care') {
     out(
-      `*Two panels and Olivia. The first says who answers: the Certified Diabetes Educators at Bayshore Express Pharmacy, for all of Canada (owner, A2, B5, B10). Its "Request a call" button (\`care.cde.cta\`, \`care.cde.ctaNote\`) is ${LANDING_GATES.cdeRequestReason ? 'live' : `off until \`cdeRequestReason\` is switched on (D3; B6)`}. The second, "Speak to a CDE" (\`care.chat\`), shows the pharmacy’s general phone line, email, hours and About page (\`contact\` in 00-shared.md; B9), then the existing chat button, which opens /account/virtual-care (B12: no "Available in Ontario" label). What CDE stands for is held (E13). Olivia helps with orders and restocks; she does not answer fit questions.*`,
+      `*Two panels and Olivia. The first says who answers: Liivv’s Certified Diabetes Educators, for all of Canada (owner, A2, B5, B10; owner note 5, 2026-10-07). Its "Request a call" button (\`care.cde.cta\`, \`care.cde.ctaNote\`) is ${LANDING_GATES.cdeRequestReason ? 'live' : `off until \`cdeRequestReason\` is switched on (D3; B6)`}. The second, "Speak to a CDE" (\`care.chat\`), shows the CDEs’ general phone line and hours (\`contact\` in 00-shared.md; B9), then the existing chat button, which opens /account/virtual-care (B12: no "Available in Ontario" label). What CDE stands for is held (E13). Olivia helps with orders and restocks; she does not answer fit questions.*`,
       '',
     );
     all(base);
@@ -3300,7 +3413,7 @@ function writeLandingSection(w, out, key, locale) {
 
   if (key === 'brands') {
     out(
-      `*The owner gave permission to use every current maker logo (B16, 2026-10-06). In order: ${BRANDS.map((brand) => (brand.logo ? `${brand.name} (logo \`${brand.logo.split('/').pop()}\`, alt "${brand.name}")` : `${brand.name} (text)`)).join(', ')}. A maker with no current logo file shows as its name, in a pill styled to match. \`insulet.avif\` is cropped from \`dexcom.avif\`, which is, despite its name, Insulet’s wordmark (Omnipod’s maker; pods are stocked, A3), and \`abbott.avif\` and \`ypsomed.avif\` from \`brand-4.avif\` and \`brand-5.avif\`, each cropped to its ink so one height evens the row (2026-10-06); the Dexcom file, \`brand-2.webp\`, is the older mark B16 drops, and the Medtronic mark is outdated in Canada (MiniMed). Not copy and never translated.*`,
+      `*One pill per shopping brand family, each a link to the Diabetes Essentials shop filtered to that brand (\`shop-diabetes-care?brand=<slug>\`, in the page locale; its accessible name is \`brands.shop\`), shown only while that brand has a product on the shop shelf (on /fr, counted without insulin) (owner notes 9 and 10, 2026-10-07). In order: ${BRANDS.map((brand) => `${brand.name} (\`?brand=${brand.slug}\`, ${brand.logo ? `logo \`${brand.logo.split('/').pop()}\`, alt "${brand.name}"` : 'text'})`).join(', ')}. The logo files are the six the owner approved on 2026-10-07, from each maker’s own page (docs/diabetes-content/logo-sources.md); \`omnipod-trimmed.png\` is the Omnipod file with its white margins trimmed, and the Omnipod and Contour logos (the latter with its tagline) are shown taller. A brand with no file shows as its name, in a pill styled to match. The pill says mylife, not Ypsomed: the YpsoPump’s maker is mylife Diabetes Care Canada Inc. (\`mylife-about-ca\`). Not copy and never translated.*`,
       '',
     );
     all(base);
@@ -3714,7 +3827,7 @@ function writeFundingSections(w, out, locale) {
 
   out('## How paying works (#paying)', '');
   out(
-    `*Part 1 lists the provincial drug plans Liivv bills directly (\`DIRECT_BILLING\` in funding-meta.ts; owner answers A6 and B13, 2026-10-06: each Liivv pharmacy is enrolled with its own province's plan), each by the government's own name (\`directPlan\`, French only where the government prints one), linked to the page that names it; then why Quebec is not on it, and that no federal program, territorial plan or private insurer is. Part 2 is the programs that pay you back: Liivv gives an invoice for the claim (finance team, B13) and promises no claim will be accepted. Part 3, ${FUNDING_PAY_LATER.enabled ? `"${FUNDING_PAY_LATER.name}" (owner answer A5, ${FUNDING_PAY_LATER.approvedOn}), for insulin pump supplies, Omnipod pods included, after customer service checks eligibility; its terms mirror the owner's program, it never uses another company's program name, and under it is the general contact of Bayshore Express Pharmacy (\`contact\` in 00-shared.md), which passes the question on (B10). In a province, the checker's pump group also says it once, after its intro (\`ui.fundingResults.pumpPayLater\`), as Liivv's own option, separate from any program; no program card mentions it` : 'pay-later, has no markup and no copy while `PAY_LATER.enabled` is false (E-20)'}. After it, the pump-supplies shop strip (\`#pump-supplies\`, FUNDING_SHELF in chapter-shop.ts; B21): ${shelfSummary(SHOP.FUNDING_SHELF, 'en')}.*`,
+    `*Part 1 lists the provincial drug plans Liivv bills directly (\`DIRECT_BILLING\` in funding-meta.ts; owner answers A6 and B13, 2026-10-06: each Liivv pharmacy is enrolled with its own province's plan), each by the government's own name (\`directPlan\`, French only where the government prints one), linked to the page that names it; then why Quebec is not on it, and that no federal program, territorial plan or private insurer is. Part 2 is the programs that pay you back: Liivv gives an invoice for the claim (finance team, B13) and promises no claim will be accepted. Part 3, ${FUNDING_PAY_LATER.enabled ? `"${FUNDING_PAY_LATER.name}" (owner answer A5, ${FUNDING_PAY_LATER.approvedOn}), for insulin pump supplies, Omnipod pods included, after customer service checks eligibility; its terms mirror the owner's program, it never uses another company's program name, and under it is the general contact of Bayshore Express Pharmacy (\`contact\` in 00-shared.md), which passes the question on (B10). In a province, the checker's pump group also says it once, after its intro (\`ui.fundingResults.pumpPayLater\`), as Liivv's own option, separate from any program; no program card mentions it` : 'pay-later, has no markup and no copy while `PAY_LATER.enabled` is false (E-20)'}. No shop strip follows it: the owner removed the pump-supplies strip from this page on 2026-10-07 (note 7); Your Tools card 13 keeps it.*`,
     '',
   );
   lines(FP, [
@@ -3891,7 +4004,7 @@ function writeFundingSections(w, out, locale) {
 
   out('## CDE band (#cde)', '');
   out(
-    `*National, with no "Available in Ontario" label. Under the body, the CDE contact of Bayshore Express Pharmacy (\`contact\` in 00-shared.md: phone, email, hours, About page; owner answers A2, B5, B9, B10, 2026-10-06). The "Request a call" button is ${LANDING_GATES.cdeRequestReason ? 'live' : 'off until `cdeRequestReason` is switched on (landing D3; B6)'}.*`,
+    `*National, with no "Available in Ontario" label. Under the body, the contact of Liivv’s Certified Diabetes Educators (\`contact\` in 00-shared.md: phone and hours; owner answers A2, B5, B9, B10, 2026-10-06; owner note 5, 2026-10-07). The "Request a call" button is ${LANDING_GATES.cdeRequestReason ? 'live' : 'off until `cdeRequestReason` is switched on (landing D3; B6)'}.*`,
     '',
   );
   lines(FP, ['cdeEyebrow', 'cdeHeading', 'cdeBody', 'cdeCta']);
@@ -4360,7 +4473,7 @@ function writePath(w, out, meta, locale) {
   out(
     held
       ? '*Rests on the owner’s word. **Held, and not sent to the browser**, while `cdeBand` is off (paths-meta.ts).*'
-      : `*Rests on the owner’s answers of 2026-10-06 (A1, A2, B5, B9, B10, B11) and \`bep-about\`. Renders (\`cdeBand\` is on), with the CDE contact of Bayshore Express Pharmacy under the body (\`contact\` in 00-shared.md: phone, email, hours, About page). Its "Request a call" (\`cta\`) ${LANDING_GATES.cdeRequestReason ? 'renders, opening the appointment page' : 'stays off until `cdeRequestReason` is switched on (landing D3; B6)'}.*`,
+      : `*Rests on the owner’s answers of 2026-10-06 (A1, A2, B5, B9, B10, B11), and on owner note 5 of 2026-10-07 (the service is Liivv’s). Renders (\`cdeBand\` is on), with the contact of Liivv’s Certified Diabetes Educators under the body (\`contact\` in 00-shared.md: phone and hours). Its "Request a call" (\`cta\`) ${LANDING_GATES.cdeRequestReason ? 'renders, opening the appointment page' : 'stays off until `cdeRequestReason` is switched on (landing D3; B6)'}.*`,
     '',
   );
   ['eyebrow', 'heading', 'body', 'cta'].forEach((key) => line(`${base}.pharmacist.${key}`));
@@ -4705,6 +4818,10 @@ function gateEntries() {
     'paths',
     "the five path pages' own French — it ships on /fr flagged as machine translated, so this gate decides the draft marker on previews, and whether the paths' /fr URLs are in the sitemap",
   );
+  place(
+    'shop',
+    "the Diabetes Essentials shop's own French (its headings, filter labels and product-type names) — it ships on /fr, so this gate decides only the draft marker on previews",
+  );
 
   return [...gates.entries()].map(([id, where]) => {
     const state = awaitsFrReview(id, 'fr') ? '' : ' *(signed off — live on /fr)*';
@@ -4836,6 +4953,7 @@ export async function exportDiabetesCare({ check }) {
       sourceReview: SOURCE_REVIEW,
       chapterMeta: CHAPTER_META,
     }),
+    ...registerDisplayProblems(),
     ...gateProblems(),
     ...deviceProblems(),
     ...heldClientProblems({

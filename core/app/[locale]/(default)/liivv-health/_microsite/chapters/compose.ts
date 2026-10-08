@@ -29,6 +29,7 @@
 import type { Messages } from 'next-intl';
 
 import type { GovernancePerson, SiteConfig, SiteNs } from '../site';
+import { collectSourceIds } from '../sources';
 
 import { chapterHref, localeHref } from './hrefs';
 import type {
@@ -84,6 +85,14 @@ export interface CategoryCard {
   badge?: string;
   /** Links inside the card's own sentences (meta `links`), resolved for this locale. */
   links?: CardLink[];
+  /*
+   * The register ids behind this card as this locale shows it: its own
+   * `sources`, then those of every figure it keeps. Drawn as the card's
+   * Sources disclosure where the page was handed the resolved register
+   * (owner note 1, 2026-10-07; ../_components/source-chip.tsx). Engine-only
+   * so far: Ostomy's twin shows no card sources.
+   */
+  sourceIds?: string[];
 }
 
 /*
@@ -240,12 +249,21 @@ export interface Chapter {
     heading?: string;
     /* `card`: the chapter card whose title links to it in the body (meta `programsBandCards`). */
     cards: Array<{ heading: string; body: string; links?: BandLink[]; card?: number }>;
+    /* The register ids behind the band's own sentences (meta `bandSources`). Engine-only so far. */
+    sourceIds?: string[];
   };
   /** Outward links after the band slot; absent where French-gated or fully held. */
   shelf?: Shelf;
   resources?: ResourceGroup[];
   urgent?: UrgentCallout;
   citations?: Citation[];
+  /*
+   * Every register id the page as composed names, once each, in page order:
+   * each card's and its kept figures' (the who-to-ask lanes' links
+   * included), then the referral band's. The foot list "Where this comes
+   * from" on a page that was handed the resolved register. Engine-only so far.
+   */
+  sourceIds: string[];
   governance: Governance;
   pharmacist: {
     eyebrow: string;
@@ -710,6 +728,7 @@ function composeProgramsBand(
 
   return {
     ...(words.heading === undefined ? {} : { heading: words.heading }),
+    ...(meta.bandSources?.length ? { sourceIds: meta.bandSources } : {}),
     cards: ordered(words.cards).map((card, index) => {
       const links = composeBandLinks(site, meta.programsBandLinks?.[index], card.links, locale);
       const target = meta.programsBandCards?.[index];
@@ -730,8 +749,11 @@ function composeProgramsBand(
  * publisher issues one; otherwise the English title stands in both locales,
  * which matches the page the link actually opens. One entry per link.
  *
- * A card's `sources` are for the content review and never render; the
- * governance block lists the chapter's `citations` only, as Ostomy does.
+ * Ostomy's governance block lists the chapter's `citations` only. Since owner
+ * note 1 (2026-10-07) a page handed the resolved register shows each card's
+ * `sources` in the card itself (`sourceIds`), and its foot list is every
+ * source the page names (`Chapter.sourceIds`), not the hand-kept citations,
+ * which stay for the content review.
  */
 function composeCitations(meta: EngineChapterMeta, locale: string): Citation[] | undefined {
   const all = meta.citations.map((citation) => localizedTitle(citation, locale));
@@ -791,15 +813,23 @@ function composeChapter(
   locale: string,
   groupLabels: Record<string, string>,
 ): Chapter {
+  const pageSourceIds: string[] = [];
   const categories: CategoryCard[] = ordered(messages.categories).map((card, index) => {
     const structure = meta.categories[index];
     const links = composeCardLinks(site, meta.slug, structure, card, locale);
+    const figures = composeCardFigures(site, structure, card.figure, locale);
+    const sourceIds = [
+      ...new Set([...(structure?.sources ?? []), ...collectSourceIds(figures.figures ?? [])]),
+    ];
+
+    pageSourceIds.push(...sourceIds, ...collectSourceIds(figures.figures ?? [], ['linkSources']));
 
     return {
       title: card.title,
       number: index + 1,
       image: structure?.image ?? meta.heroImage,
-      ...composeCardFigures(site, structure, card.figure, locale),
+      ...figures,
+      ...(sourceIds.length ? { sourceIds } : {}),
       ...(structure?.noteVisible ? { noteVisible: true } : {}),
       ...(structure?.ask === undefined ? {} : { ask: structure.ask }),
       ...(structure?.urgentContent ? { urgentContent: true } : {}),
@@ -885,6 +915,7 @@ function composeChapter(
           },
         }),
     ...(citations === undefined ? {} : { citations }),
+    sourceIds: [...new Set([...pageSourceIds, ...(meta.bandSources ?? [])])],
     governance: {
       author: site.governance.author,
       reviewer: site.governance.reviewer,

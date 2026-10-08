@@ -1938,6 +1938,7 @@ function writeShared(locale) {
     ['chapter.roleNames', 'Role names used in generated referral lines'],
     ['chapter.startHere', 'Start-here map'],
     ['chapter.takeIn', 'Take-in card'],
+    ['chapter.print', 'Printed take-in card — the header and footer, on paper only (2026-10-07)'],
     ['chapter.changeRoutine', 'Pouch change walk-through — controls', 'changeRoutine'],
     ['chapter.changeRoutine.systems', 'Pouch change walk-through — system labels', 'changeRoutine'],
     ['chapter.gap', 'Opening gap comparison — shape pair and its status line', 'gapCompare'],

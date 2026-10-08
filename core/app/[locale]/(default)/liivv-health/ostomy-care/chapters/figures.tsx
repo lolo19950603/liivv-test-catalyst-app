@@ -21,6 +21,8 @@ import dynamic from 'next/dynamic';
 import { useLocale, useMessages, useTranslations } from 'next-intl';
 import { useRef } from 'react';
 
+import { PrintFoot, PrintHead } from '../../_microsite/print/print-frame';
+
 import { BowelReferenceFigure } from './bowel-reference-figure';
 import { ChangeRoutineFigure } from './change-routine-figure';
 import {
@@ -379,14 +381,20 @@ function CriteriaFigure({
 /*
  * The card's own list as a card to take to an appointment. Print opens only
  * this card; the button appears after hydration so it never sits there inert.
+ * On paper it is headed by the site, a line for a name and the date, and
+ * ends with the page it came from (../../_microsite/print, owner note 2).
  */
 function TakeInFigure({ card }: { card: CategoryCard }) {
   const t = useTranslations('OstomyCare.ui.chapter.takeIn');
+  const sheet = useTranslations('OstomyCare.ui.chapter.print');
   const ref = useRef<HTMLDivElement>(null);
-  const { ready, print } = usePrintOnly(ref);
+  const { ready, print } = usePrintOnly(ref, { title: card.title });
 
   return (
     <div className="oc-fig-takein" ref={ref}>
+      {ready ? (
+        <PrintHead name={sheet('name')} printed={sheet('printed')} site={sheet('site')} />
+      ) : null}
       <p className="oc-fig-heading">{card.title}</p>
       <ol>
         {(card.items ?? []).map((item, index) => (
@@ -404,6 +412,7 @@ function TakeInFigure({ card }: { card: CategoryCard }) {
           {t('print')}
         </button>
       ) : null}
+      {ready ? <PrintFoot page={sheet('page')} /> : null}
     </div>
   );
 }

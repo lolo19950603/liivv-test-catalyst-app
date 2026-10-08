@@ -14,7 +14,7 @@
  * `intro.body.<n>`. A reason that states a fact names its sources; one that is
  * navigation names none. Every Liivv line (pay and claim, the CDE band) rests
  * on the owner's word (2026-10-05, and the answers of 2026-10-06 for the CDE
- * band, which also rests on `bep-about`).
+ * band).
  *
  * Four of the slugs were older chapter pages (type-1, type-2, gestational,
  * prediabetes) and keep their URLs; less-common-types is new. The old
@@ -47,10 +47,10 @@ export type PathSlug = 'type-1' | 'type-2' | 'gestational' | 'prediabetes' | 'le
  * (paths.md E.1). Gate 2, the owner confirming its wording (who answers, and
  * how callers in Quebec and the territories are served; Q16, Q17), is
  * `cdeBand`: on since 2026-10-06, when the owner answered A1, A2, B5, B9 and
- * B11. The CDEs at Bayshore Express Pharmacy answer from anywhere in Canada
- * and pass people to the Liivv pharmacy in their province, so the band
- * renders with their general phone line, email, hours and About page
- * (DIABETES_SITE.contact) in place of a button. Gate 1, the appointment page
+ * B11. Liivv's Certified Diabetes Educators answer from anywhere in Canada
+ * and pass people to Liivv's pharmacy in their province, so the band renders
+ * with their general phone line and hours (DIABETES_SITE.contact; owner note
+ * 5, 2026-10-07) in place of a button. Gate 1, the appointment page
  * offering the reason (`cdeRequestReason` in ../landing-meta.ts), now holds
  * only the band's "Request a call", as everywhere else (B6). While `cdeBand`
  * is off the band's words are not only not rendered but not sent to the

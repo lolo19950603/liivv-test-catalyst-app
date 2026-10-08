@@ -1,7 +1,8 @@
 import { type LineTiming, normalizeWords } from '~/lib/chapter-audio/normalize';
 
 /* Controls, decoration and navigation never hold the words being read. */
-const SKIP = 'button, svg, script, style, nav, [aria-hidden="true"], .oc-audio-bar, .oc-journey-hud';
+const SKIP =
+  'button, svg, script, style, nav, [aria-hidden="true"], .oc-audio-bar, .oc-journey-hud, .oc-journey-fab-wrap, .oc-journey-sheet';
 
 export const LINE_CLASS = 'is-audio-line';
 

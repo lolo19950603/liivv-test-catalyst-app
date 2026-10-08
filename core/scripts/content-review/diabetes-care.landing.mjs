@@ -40,7 +40,7 @@ export const LANDING = {
     },
     {
       id: 'D2 (owner, 2026-10-06, B12)',
-      note: '"chat can be general - speak to a CDE." The chat panel is now "Speak to a CDE" (`care.chat`), with no "Available in Ontario" label: the CDE contact of Bayshore Express Pharmacy (phone, email, Monday to Friday 9 a.m. to 5 p.m. Eastern except holidays, About page), then the existing chat button.',
+      note: '"chat can be general - speak to a CDE." The chat panel is now "Speak to a CDE" (`care.chat`), with no "Available in Ontario" label: the CDE contact of Bayshore Express Pharmacy (phone, email, Monday to Friday 9 a.m. to 5 p.m. Eastern except holidays, About page), then the existing chat button. Since owner note 5 (2026-10-07) it is the contact of Liivv’s Certified Diabetes Educators: phone and hours only ("By phone or chat").',
     },
     {
       id: 'D4 (owner, 2026-10-06, A8, B3, B11)',
@@ -48,7 +48,7 @@ export const LANDING = {
     },
     {
       id: 'D6 (owner, 2026-10-06, A3, B16)',
-      note: 'Permission to use every current maker logo; pods are stocked. The brand row shows the current files that exist (Abbott, Insulet, Ypsomed; alt text the maker’s name) and the other makers as names in matching pills, MiniMed in place of the outdated Medtronic mark. Omnipod, whose pods are stocked, is named in its own pill beside its maker Insulet’s logo. `dexcom.avif` turned out to be Insulet’s wordmark; the only Dexcom file, `brand-2.webp`, is the older mark B16 drops, so Dexcom shows as a name until a current file is supplied.',
+      note: 'Permission to use every current maker logo; pods are stocked. Since owner notes 9 and 10 (2026-10-07; built 2026-10-08) the row has one pill per shopping brand, matching the Diabetes Essentials shop’s brand filter, each a link to the shop filtered to it and shown only while that brand has products on the shelf: Dexcom, FreeStyle Libre, Omnipod, MiniMed, Tandem, mylife, OneTouch, Contour, Accu-Chek, FreeStyle. Logos from the six official files the owner approved (Omnipod trimmed, MiniMed, Tandem, OneTouch, Contour; docs/diabetes-content/logo-sources.md); the rest are names in matching pills. Abbott’s corporate mark, the old Insulet and Ypsomed files and the mislabelled `dexcom.avif` are no longer shown. "Ypsomed" became "mylife", confirmed on mylife Diabetes Care Canada’s "About us" page (`mylife-about-ca`).',
     },
     {
       id: 'D7 (owner, 2026-10-06, A1, B11)',
@@ -56,7 +56,7 @@ export const LANDING = {
     },
     {
       id: 'D8 (owner, 2026-10-06, B10)',
-      note: '"they can take all sorts of questions and get answer internally." FAQ 1 ends "or ask the CDEs at Bayshore Express Pharmacy", plain text, as their contact is in the care band below.',
+      note: '"they can take all sorts of questions and get answer internally." FAQ 1 ends "or ask Liivv’s Certified Diabetes Educators" (owner note 5, 2026-10-07; it named Bayshore Express Pharmacy until then), plain text, as their contact is in the care band below.',
     },
     {
       id: 'D9 (owner, 2026-10-06, B14)',
@@ -68,7 +68,7 @@ export const LANDING = {
     },
     {
       id: 'D19 (owner, 2026-10-06, A2, B5, B12)',
-      note: 'The CDEs are at Bayshore Express Pharmacy in Ontario and support customers across Canada; the pharmacies in other provinces and territories dispense, and Bayshore Express Pharmacy transfers to them. Trust item 1, the care band, FAQ 3 and the meta description name Bayshore Express Pharmacy’s Certified Diabetes Educators, with no limit by province. "Many HCPs can be CDEs", so the copy says CDE, not pharmacist CDE (the "Ask a pharmacist CDE" chip stays, ruling C33).',
+      note: 'The CDEs are at Bayshore Express Pharmacy in Ontario and support customers across Canada; the pharmacies in other provinces and territories dispense, and Bayshore Express Pharmacy transfers to them. Trust item 1, the care band, FAQ 3 and the meta description name Bayshore Express Pharmacy’s Certified Diabetes Educators, with no limit by province. "Many HCPs can be CDEs", so the copy says CDE, not pharmacist CDE (the "Ask a pharmacist CDE" chip stays, ruling C33). Owner note 5 (2026-10-07): the service is presented as Liivv’s, so those lines now say "Liivv’s Certified Diabetes Educators" and no customer-facing line names the pharmacy (the governance line "part of the Bayshore family" stays, the owner’s own wording).',
     },
     {
       id: 'D20',
@@ -81,7 +81,7 @@ export const LANDING = {
       id: 'D3',
       who: 'Owner and engineering',
       question:
-        '"Request a call" stays off (`cdeRequestReason` in landing-meta.ts): the appointment form saves nothing and offers no CDE reason, and a guest who signs in from it lands on the dashboard. The owner suggested Microsoft Bookings (B6, 2026-10-06); Bayshore Express Pharmacy’s own booking page is another option. Either could switch the button on once it can take the request. Meanwhile the care band shows the pharmacy’s phone line, email and hours (answered, B9).',
+        '"Request a call" stays off (`cdeRequestReason` in landing-meta.ts): the appointment form saves nothing and offers no CDE reason, and a guest who signs in from it lands on the dashboard. The owner suggested Microsoft Bookings (B6, 2026-10-06); Bayshore Express Pharmacy’s own booking page is another option. Either could switch the button on once it can take the request. Meanwhile the care band shows the CDEs’ phone line and hours (answered, B9; phone and hours only since owner note 5, 2026-10-07).',
       where: ['care.cde.cta', 'care.cde.ctaNote'],
     },
     {
@@ -169,11 +169,11 @@ export const LANDING = {
     },
     {
       id: 'E6',
-      item: 'Kit carousel, and the kit walkthrough’s tray and search lines',
+      item: 'The kit walkthrough’s tray and search lines (the kit carousel itself is live: the owner verified all twelve kits on 2026-10-07, and they are listed)',
       where: 'Kits section',
-      wording: 'Written from the first approved kit’s actual contents.',
+      wording: 'Written from an approved kit’s actual contents.',
       releases:
-        'The owner signs off a kit (review list: 8049, 8051, 8053, 8058, 8060) and it joins DIABETES_LISTED_KIT_IDS.',
+        'The owner picks the kit the walkthrough shows (all twelve, 8049–8060, are verified and in DIABETES_LISTED_KIT_IDS).',
     },
     {
       id: 'E7',

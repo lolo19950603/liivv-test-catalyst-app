@@ -30,7 +30,7 @@ import { DIABETES_SHOP } from './chapter-shop';
 import { CHAPTER_META, type DiabetesLaneTopic } from './chapters-meta';
 import { GLYPH_PATHS } from './glyph-paths';
 import { type GateId, isFrGated, keepsFigure, showsFrDraftMarker } from './review-gates';
-import { BEP_ABOUT_HREF, BEP_ABOUT_HREF_FR, EDUCATOR_DIRECTORY_HREF } from './sources-meta';
+import { EDUCATOR_DIRECTORY_HREF } from './sources-meta';
 
 /*
  * Nobody is credited yet. The byline, the review line and the schema's
@@ -134,25 +134,24 @@ export const DIABETES_SITE: SiteConfig = {
     disclosure: true,
   },
   /*
-   * The CDE lane (Bayshore Express Pharmacy, Liivv's pharmacy) answers
+   * The CDE lane (Liivv's Certified Diabetes Educators) answers
    * questions about pumps, sensors and supplies, never a low, a high or a sick
    * day, whatever the meta says.
    */
   serviceLaneTopics: ['device', 'supplies'] satisfies DiabetesLaneTopic[],
   /*
-   * The Certified Diabetes Educators at Bayshore Express Pharmacy, the Liivv
-   * pharmacy in Markham, Ontario: its general line and email, never a named
-   * person (owner answers A2, B5, B9, B10 and B12, 2026-10-06). The details are
-   * the pharmacy's own, from its About page (`bep-about` in ./sources-meta.ts),
-   * opened 2026-10-06. Every pharmacist panel shows these in place of "Request
-   * a call", which stays held until a booking page can take the request
-   * (`cdeRequestReason` in ../landing-meta.ts; B6).
+   * Liivv's Certified Diabetes Educators: their general line and hours, never
+   * a named person (owner answers A2, B5, B9, B10 and B12, 2026-10-06). The
+   * service is presented as Liivv's own (owner note 5, 2026-10-07), so the
+   * contact is the phone alone: no email (there is no Liivv address for it
+   * yet) and no About link to another company's page. Who staffs the line is
+   * in docs/diabetes-content/OPEN-QUESTIONS.md (B5, B9). Every pharmacist
+   * panel shows these in place of "Request a call", which stays held until a
+   * booking page can take the request (`cdeRequestReason` in
+   * ../landing-meta.ts; B6).
    */
   contact: {
     tel: '+18445611254',
-    email: 'BayshoreExpress@bayshore.ca',
-    aboutHref: BEP_ABOUT_HREF,
-    aboutHrefFr: BEP_ABOUT_HREF_FR,
   },
   /*
    * "Call 911" in each chapter's red-flag block can be tapped to dial, as the

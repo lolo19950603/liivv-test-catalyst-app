@@ -307,6 +307,62 @@
   margin: 0;
 }
 
+/* The sensor and days-to-cover pills take the whole row; the steppers sit two to a row. */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock-set,
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock-cover {
+  grid-column: 1 / -1;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock-set {
+  background: var(--paper);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock-cover {
+  display: grid;
+  gap: 0.6rem;
+}
+
+/* − [n] +: 44px buttons either side of the box. */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-stepper {
+  display: flex;
+  align-items: stretch;
+  gap: 0.4rem;
+  max-width: 22rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-restock-field .dc-fig-stepper input {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
+  text-align: center;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-stepper button {
+  flex: none;
+  width: 44px;
+  min-height: 44px;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 35%, transparent);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-stepper button:disabled {
+  color: var(--ink-muted);
+  cursor: default;
+  opacity: 0.5;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-stepper button:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 2px;
+}
+
 #oc-chapter[data-site='diabetes-care'] .dc-fig-restock-result {
   display: grid;
   gap: 0.3rem;

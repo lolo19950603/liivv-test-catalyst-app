@@ -30,8 +30,9 @@ import { type CSSProperties, useRef } from 'react';
 import type { CategoryCard, Chapter } from '../../_microsite/chapters/compose';
 import { CardText, FrDraftMarker, Glyph, itemText } from '../../_microsite/chapters/figure-parts';
 import { cardHref, localeHref } from '../../_microsite/chapters/hrefs';
+import { CardPrintFoot, CardPrintHead } from '../../_microsite/print/card-print';
+import { usePrintOnly } from '../../_microsite/print/use-print-only';
 import { type SiteFigureRegistry, useSite } from '../../_microsite/site-context';
-import { usePrintOnly } from '../../ostomy-care/chapters/use-print-only';
 
 import type { FigureMeta } from './chapters-meta';
 /* Reading a card's `figure` messages without a cast: see the file. */
@@ -197,12 +198,18 @@ function RuleOf15Amounts({ figure, words }: { figure: RuleOf15; words: unknown }
  * The last step loops back to the second, and says so in words ("back to step
  * 2"); only the arrow is decoration. After the loop, the snack, a pointer to
  * the chapter's red flags, and the automated-system line.
+ *
+ * Its print button prints the figure alone, on one sheet (owner note 2,
+ * 2026-10-07): the card's title heads it, since the figure has no heading of
+ * its own, then every step, the line after the loop, the red-flag pointer and
+ * the automated-system line, in the amounts selected; the card's sources and
+ * the page address close it (../../_microsite/print).
  */
 function RuleOf15Figure({ card, figure }: { card: CategoryCard; figure: RuleOf15 }) {
   const t = useTranslations('DiabetesCare.ui.ruleOf15');
   const { anchors } = useSite();
   const rootRef = useRef<HTMLDivElement>(null);
-  const { ready, print } = usePrintOnly(rootRef);
+  const { ready, print } = usePrintOnly(rootRef, { title: card.title });
   const words = card.figureWords;
   const titles = entry(words, 'steps');
   const bodies = entry(words, 'stepBodies');
@@ -219,6 +226,7 @@ function RuleOf15Figure({ card, figure }: { card: CategoryCard; figure: RuleOf15
 
   return (
     <div className="oc-fig-steps-wrap dc-fig-r15" ref={rootRef}>
+      {ready ? <CardPrintHead title={card.title} /> : null}
       <FrDraftMarker gate="ruleOf15" />
 
       <Controls
@@ -302,6 +310,7 @@ function RuleOf15Figure({ card, figure }: { card: CategoryCard; figure: RuleOf15
           {t('print')}
         </button>
       ) : null}
+      {ready ? <CardPrintFoot card={card} /> : null}
     </div>
   );
 }

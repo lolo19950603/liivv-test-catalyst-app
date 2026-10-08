@@ -16,9 +16,11 @@ import {
 import { HashTargetScroll } from '../../ostomy-care/_components/hash-target-scroll';
 import { ChapterReveal } from '../../ostomy-care/chapters/chapter-reveal';
 import { DiscoveryBand, GovernanceBlock, HelpBand } from '../_components/page-furniture';
+import { CardSources, SourceChip } from '../_components/source-chip';
 import { CONTACT_ANCHOR, SpecialistContact } from '../_components/specialist-contact';
 import { CardShop } from '../shop/card-shop';
-import { useSite, useSiteMessages, useSiteT } from '../site-context';
+import { useSite, useSiteMessages, useSiteSources, useSiteT } from '../site-context';
+import { lookUpSources } from '../sources';
 
 import { AskChip } from './ask-chip';
 import { CardExit, rowLayout, RowMore } from './chapter-disclosure';
@@ -48,6 +50,8 @@ import { chapterHref, localeHref } from './hrefs';
 import { JourneyGrid } from './journey-layout';
 import { JourneyContinueChip, JourneyMemoryProvider } from './journey-memory-context';
 import { JourneyBandDots, JourneyPath } from './journey-path';
+import { JourneySheet } from './journey-sheet';
+import { JourneySpyProvider } from './journey-spy';
 import { ResourceShelf } from './resource-shelf';
 import { TextSizeControl } from './text-size-control';
 
@@ -114,6 +118,9 @@ function CategoryRow({
         <CardRoutes card={card} />
 
         <CardExit card={card} exit={exit} />
+
+        {/* Engine-only so far (owner note 1, 2026-10-07): Ostomy's twin shows no card sources. */}
+        <CardSources card={card} />
 
         {card.ask ? (
           <div className="oc-ch-row-foot">
@@ -257,6 +264,7 @@ function ProgramsBand({
   exit?: Chapter['urgentExit'];
 }) {
   const t = useSiteT('ui.chapter');
+  const sources = useSiteSources();
 
   return (
     <section className="oc-ch-programs rounded-top">
@@ -292,6 +300,14 @@ function ProgramsBand({
             );
           })}
         </div>
+        {/* The band's own sentences, sourced in the band (owner note 1). Engine-only so far. */}
+        {sources && band.sourceIds ? (
+          <SourceChip
+            className="ms-src-band"
+            label={band.heading}
+            sources={lookUpSources(sources, band.sourceIds)}
+          />
+        ) : null}
       </div>
     </section>
   );
@@ -591,63 +607,67 @@ function MajorSections({ chapter }: { chapter: Chapter }) {
 
   return (
     <JourneyMemoryProvider slug={chapter.slug}>
-      <div className="oc-journey-shell is-cinema">
-        {showPath ? (
-          <div className="oc-journey-hud-slot">
-            <JourneyPath bands={pathBands} />
-          </div>
-        ) : null}
-        <div className="oc-journey-cinema">
-          {bands.map((band, index) => (
-            <section
-              className={index % 2 === 0 ? 'oc-journey-act' : 'oc-journey-act is-alt'}
-              id={index === 0 ? 'chapter-care' : band.id}
-              key={band.id}
-            >
-              <header className="oc-journey-act-title oc-journey-gate oc-journey-clearing">
-                <span aria-hidden className="oc-journey-clearing-wash" />
-                <ChapterReveal variant="clearing">
-                  <span aria-hidden className="oc-journey-gate-num">
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                  <span className="oc-ch-eyebrow">{t('pathEyebrow')}</span>
-                  <h2>{band.label}</h2>
-                  {index === 0 ? <JourneyContinueChip cards={chapter.categories} /> : null}
-                  {index === 0 ? (
-                    <div className="oc-journey-banner oc-journey-banner--wash">
-                      {chapter.introHeading ? (
-                        <h3 className="oc-journey-banner-title">
-                          {chapter.categoriesIntro.heading}
-                        </h3>
-                      ) : null}
-                      <LinkedIntroBody
-                        body={chapter.categoriesIntro.body}
-                        href={introCard ? `#card-${introCard.number}` : undefined}
-                        phrase={introCard?.title}
-                      />
-                    </div>
+      <JourneySpyProvider bands={pathBands}>
+        {/* Before the shell: it looks at what follows the shell to know when to step aside. */}
+        {showPath ? <JourneySheet /> : null}
+        <div className="oc-journey-shell is-cinema">
+          {showPath ? (
+            <div className="oc-journey-hud-slot">
+              <JourneyPath bands={pathBands} />
+            </div>
+          ) : null}
+          <div className="oc-journey-cinema">
+            {bands.map((band, index) => (
+              <section
+                className={index % 2 === 0 ? 'oc-journey-act' : 'oc-journey-act is-alt'}
+                id={index === 0 ? 'chapter-care' : band.id}
+                key={band.id}
+              >
+                <header className="oc-journey-act-title oc-journey-gate oc-journey-clearing">
+                  <span aria-hidden className="oc-journey-clearing-wash" />
+                  <ChapterReveal variant="clearing">
+                    <span aria-hidden className="oc-journey-gate-num">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span className="oc-ch-eyebrow">{t('pathEyebrow')}</span>
+                    <h2>{band.label}</h2>
+                    {index === 0 ? <JourneyContinueChip cards={chapter.categories} /> : null}
+                    {index === 0 ? (
+                      <div className="oc-journey-banner oc-journey-banner--wash">
+                        {chapter.introHeading ? (
+                          <h3 className="oc-journey-banner-title">
+                            {chapter.categoriesIntro.heading}
+                          </h3>
+                        ) : null}
+                        <LinkedIntroBody
+                          body={chapter.categoriesIntro.body}
+                          href={introCard ? `#card-${introCard.number}` : undefined}
+                          phrase={introCard?.title}
+                        />
+                      </div>
+                    ) : null}
+                    {index === 0 ? <TextSizeControl /> : null}
+                  </ChapterReveal>
+                  <JourneyBandDots cards={band.cards} label={band.label} />
+                </header>
+                <div className="oc-journey-act-frames">
+                  {index === 0 && showRail ? (
+                    <nav aria-label={t('groupJump')} className="oc-ch-rail">
+                      {labeled.map((item, itemIndex) => (
+                        <a href={itemIndex === 0 ? '#chapter-care' : `#${item.id}`} key={item.id}>
+                          {item.label}
+                          <span className="oc-ch-rail-count">{item.cards.length}</span>
+                        </a>
+                      ))}
+                    </nav>
                   ) : null}
-                  {index === 0 ? <TextSizeControl /> : null}
-                </ChapterReveal>
-                <JourneyBandDots cards={band.cards} label={band.label} />
-              </header>
-              <div className="oc-journey-act-frames">
-                {index === 0 && showRail ? (
-                  <nav aria-label={t('groupJump')} className="oc-ch-rail">
-                    {labeled.map((item, itemIndex) => (
-                      <a href={itemIndex === 0 ? '#chapter-care' : `#${item.id}`} key={item.id}>
-                        {item.label}
-                        <span className="oc-ch-rail-count">{item.cards.length}</span>
-                      </a>
-                    ))}
-                  </nav>
-                ) : null}
-                <BandCards band={band} exit={chapter.urgentExit} layout="journey" />
-              </div>
-            </section>
-          ))}
+                  <BandCards band={band} exit={chapter.urgentExit} layout="journey" />
+                </div>
+              </section>
+            ))}
+          </div>
         </div>
-      </div>
+      </JourneySpyProvider>
     </JourneyMemoryProvider>
   );
 }
@@ -716,6 +736,7 @@ export function ChapterPage({ slug }: { slug: string }) {
   const messages = useSiteMessages();
   const locale = useLocale();
   const t = useSiteT('ui.chapter');
+  const registered = useSiteSources();
   const chapters = buildChapters(
     site,
     siteChapterMessages(messages),
@@ -944,7 +965,15 @@ export function ChapterPage({ slug }: { slug: string }) {
 
       <DiscoveryBand />
 
-      <GovernanceBlock citations={chapter.citations} governance={chapter.governance} />
+      {/*
+       * A page handed the resolved register lists every source it names,
+       * grouped (owner note 1); Ostomy's lists its hand-kept citations.
+       */}
+      <GovernanceBlock
+        citations={chapter.citations}
+        governance={chapter.governance}
+        sources={registered ? lookUpSources(registered, chapter.sourceIds) : undefined}
+      />
     </div>
   );
 }

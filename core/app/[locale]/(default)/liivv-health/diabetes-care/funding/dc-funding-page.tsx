@@ -18,10 +18,10 @@
  * federal program or private insurer); for programs that pay you back, an
  * invoice for the claim, with no promise that the claim is accepted; and
  * "Liivv Now, Pay Later" for insulin pump supplies (PAY_LATER), after
- * customer service checks eligibility. The one product slot, between "How
- * paying works" and the checker, is the pump-supplies strip (FUNDING_SHELF
- * in ../chapters/chapter-shop.ts; owner answer B21), drawn only while
- * placements are on and only with what the catalogue can sell today.
+ * customer service checks eligibility. The page places no products: the
+ * pump-supplies strip that sat between "How paying works" and the checker
+ * (owner answer B21) was removed by the owner on 2026-10-07 (note 7); the
+ * same strip stays on Your Tools card 13.
  *
  * French: the page's prose ships on /fr flagged as machine translated, as the
  * landing's does (gate `funding` decides the draft marker on previews). The
@@ -38,16 +38,11 @@
 import { useLocale, useMessages, useTranslations } from 'next-intl';
 
 import { SpecialistContact } from '../../_microsite/_components/specialist-contact';
-import type { Citation } from '../../_microsite/chapters/compose';
 import { chapterHref, localeHref } from '../../_microsite/chapters/hrefs';
 import { PhoneList } from '../../_microsite/funding/checker-parts';
 import { FundingPage, FundingRow, FundingSectionHead } from '../../_microsite/funding/funding-page';
-import type { CardShelf } from '../../_microsite/shop/shelves';
-import { ShopProvider } from '../../_microsite/shop/shop-context';
-import { ShopBand } from '../../_microsite/shop/shop-strip';
-import type { PlacementItems } from '../../_microsite/shop/types';
 import { SiteProvider } from '../../_microsite/site-context';
-import { addDiabetesPlacementToCart } from '../chapters/_actions/add-placement';
+import type { ResolvedSource } from '../../_microsite/sources';
 import { isFrGated, showsFrDraftMarker } from '../chapters/review-gates';
 import { DIABETES_SITE } from '../chapters/site';
 import { URGENT_EXIT_CHAPTER } from '../landing-meta';
@@ -150,11 +145,9 @@ function FederalRow({
 function DcFundingSections({
   sources,
   cdeRequestHref,
-  shelf,
 }: {
   sources: FundingSourceLinks;
   cdeRequestHref: string | null;
-  shelf: CardShelf | null;
 }) {
   const locale = useLocale();
   const t = useTranslations('DiabetesCare.ui.fundingPage');
@@ -231,9 +224,6 @@ function DcFundingSections({
           </div>
         </div>
       </section>
-
-      {/* The pump-supplies strip: nothing renders without products to show. */}
-      {shelf ? <ShopBand id="pump-supplies" shelf={shelf} /> : null}
 
       <section className="oc-fund-tool rounded-top" id="find-your-coverage">
         <div className="oc-ch-wrap">
@@ -345,8 +335,9 @@ function DcFundingSections({
 
       {/*
        * The CDE band: national, with no "Available in Ontario" label. It shows
-       * the general contact of the CDEs at Bayshore Express Pharmacy
-       * (DIABETES_SITE.contact; owner answers A2, B5, B9, B10, 2026-10-06).
+       * the general contact of Liivv's Certified Diabetes Educators
+       * (DIABETES_SITE.contact; owner answers A2, B5, B9, B10, 2026-10-06;
+       * owner note 5, 2026-10-07).
        * "Request a call" renders only once the appointment page offers a
        * reason for it (landing-meta.ts, `cdeRequestReason`), as on the landing.
        */}
@@ -376,18 +367,15 @@ function DcFundingSections({
 
 export function DcFundingPage({
   sources,
-  citations,
+  pageSources,
   cdeRequestHref,
-  shop,
 }: {
   /* The register entries the page links to, resolved for the page locale. */
   sources: FundingSourceLinks;
-  /* Every source the page names, once each. */
-  citations: Citation[];
+  /* Every source the page names, once each, resolved: the grouped foot list (owner note 1). */
+  pageSources: ResolvedSource[];
   /* Already in the page locale, or null while the button is held. */
   cdeRequestHref: string | null;
-  /* The pump-supplies strip and its products, or null while placements are off. */
-  shop: { shelf: CardShelf; items: PlacementItems } | null;
 }) {
   const locale = useLocale();
   const messages = useMessages().DiabetesCare;
@@ -410,23 +398,13 @@ export function DcFundingPage({
     <SiteProvider value={DIABETES_SITE}>
       <FundingPage
         accent={ACCENT}
-        citations={citations}
         closingHref={chapterHref(DIABETES_SITE, 'your-tools')}
         disclaimer={messages.funding.governance.disclaimer}
         exit={exit}
         frDraft={showsFrDraftMarker('funding', locale)}
+        sources={pageSources}
       >
-        {shop ? (
-          <ShopProvider add={addDiabetesPlacementToCart} items={shop.items}>
-            <DcFundingSections
-              cdeRequestHref={cdeRequestHref}
-              shelf={shop.shelf}
-              sources={sources}
-            />
-          </ShopProvider>
-        ) : (
-          <DcFundingSections cdeRequestHref={cdeRequestHref} shelf={null} sources={sources} />
-        )}
+        <DcFundingSections cdeRequestHref={cdeRequestHref} sources={sources} />
       </FundingPage>
     </SiteProvider>
   );

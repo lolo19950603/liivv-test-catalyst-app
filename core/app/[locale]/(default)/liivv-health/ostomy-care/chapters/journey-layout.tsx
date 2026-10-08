@@ -30,7 +30,12 @@ function isModuleEntry(card: CategoryCard) {
   return isPinnedCard(card) || Boolean(card.figures?.some((figure) => MODULE_KINDS.has(figure.kind)));
 }
 
-function SaveStopButton({ number }: { number: number }) {
+/*
+ * Every card has one of these, so each is named for its card ("Bookmark:
+ * <card title>"), not only by its visible word. The name starts with that
+ * word, so a voice command using it still reaches the button.
+ */
+function SaveStopButton({ number, title }: { number: number; title: string }) {
   const t = useTranslations('OstomyCare.ui.chapter');
   const memory = useJourneyMemoryOptional();
 
@@ -40,6 +45,7 @@ function SaveStopButton({ number }: { number: number }) {
 
   return (
     <button
+      aria-label={saved ? t('stopSavedFor', { title }) : t('saveStopFor', { title })}
       aria-pressed={saved}
       className={saved ? 'oc-journey-save is-saved' : 'oc-journey-save'}
       onClick={() => memory.toggleSave(number)}
@@ -80,7 +86,7 @@ function JourneyEntry({
         </h3>
         <div className="oc-journey-entry-actions">
           <ListenStopButton stop={card.number} title={card.title} />
-          <SaveStopButton number={card.number} />
+          <SaveStopButton number={card.number} title={card.title} />
         </div>
       </header>
 

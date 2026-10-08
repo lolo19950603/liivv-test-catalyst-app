@@ -595,7 +595,10 @@ export default async function Product({ params, searchParams }: Props) {
             {
               title: t('ProductDetails.Accordions.warranty'),
               content: (
-                <div className="prose" dangerouslySetInnerHTML={{ __html: product.warranty }} />
+                <div
+                  className="liivv-catalog-html prose"
+                  dangerouslySetInnerHTML={{ __html: product.warranty }}
+                />
               ),
             },
           ]
@@ -1020,14 +1023,6 @@ export default async function Product({ params, searchParams }: Props) {
 
   return (
     <>
-      {/*
-        An ostomy product's page says what the person reading it is dealing
-        with, so the advertising signals go off (~/lib/analytics/ad-signals).
-        In the shell, ahead of everything, because the tag's first consent
-        command reads it.
-      */}
-      {baseProductIsSensitive && <DenyAdSignals />}
-
       <Slot label="Product (all products) — top" snapshotId="product-page-top-content" />
 
       <div className="liivv-product-page-feel">
@@ -1055,7 +1050,10 @@ export default async function Product({ params, searchParams }: Props) {
               id: baseProduct.entityId.toString(),
               title: baseProduct.name,
               description: (
-                <div dangerouslySetInnerHTML={{ __html: baseProduct.description }} />
+                <div
+                  className="liivv-catalog-html"
+                  dangerouslySetInnerHTML={{ __html: baseProduct.description }}
+                />
               ),
               href: baseProduct.path,
               images: streamableImages,
@@ -1135,6 +1133,18 @@ export default async function Product({ params, searchParams }: Props) {
       )}
 
       <Slot label="Product (all products) — bottom" snapshotId="product-page-bottom-content" />
+
+      {/*
+        An ostomy or diabetes product's page says what the person reading it
+        is dealing with, so the advertising signals go off
+        (~/lib/analytics/ad-signals). In the shell — outside every Stream and
+        Suspense boundary — because the tag's first consent command reads it:
+        React hoists it into the first <head> from wherever it renders. Not the
+        first element, though: there, a zero-size tag in <head>, it stopped
+        Next's scroll-to-top, so a product opened from the bottom of a shelf
+        opened scrolled down (owner note 11, 2026-10-07).
+      */}
+      {baseProductIsSensitive && <DenyAdSignals />}
 
       {/*
         The widening case, and only that: the shell above has already answered

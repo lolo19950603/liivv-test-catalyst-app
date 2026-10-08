@@ -2,156 +2,199 @@
 
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { type MouseEvent, useEffect, useId, useRef } from 'react';
 
 import { useSiteT } from '../site-context';
 
 import type { CategoryCard } from './compose';
 import { useJourneyMemoryOptional } from './journey-memory-context';
+import { type PathBand, useJourneySpyOptional } from './journey-spy';
 import { TextSizeControl } from './text-size-control';
 
-export interface PathBand {
-  id: string;
-  label: string;
-  cards: Array<{ card: CategoryCard }>;
+export type { PathBand } from './journey-spy';
+
+/* A plain left click; a modified click still opens the link its own way. */
+export function isPlainClick(event: MouseEvent) {
+  return event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
 }
 
-function useActiveCard(numbers: number[]) {
-  const [active, setActive] = useState(numbers[0] ?? 0);
+/*
+ * The reader's bookmarks, one list for the timeline and the "On this page"
+ * sheet. Stored numbers are matched to this page's own cards, so the titles
+ * are in the page's language and a number with no card here is left out
+ * (storage is per chapter, not per locale). `onPick` takes over a plain click
+ * (the sheet closes first, then jumps); without it the link is an ordinary
+ * link to the card.
+ */
+export function JourneyBookmarks({
+  heading: Heading = 'p',
+  onPick,
+  showEmpty = false,
+}: {
+  heading?: 'h3' | 'p';
+  onPick?: (number: number) => void;
+  showEmpty?: boolean;
+}) {
+  const t = useSiteT('ui.chapter');
+  const memory = useJourneyMemoryOptional();
+  const spy = useJourneySpyOptional();
+  const headingId = useId();
+  const listRef = useRef<HTMLUListElement>(null);
+  const headingRef = useRef<HTMLElement>(null);
+  const refocusRef = useRef<number | null>(null);
+  /* Where the list sits, for when removing the last bookmark takes the list away. */
+  const hostRef = useRef<HTMLElement | null>(null);
+  const saved = spy && memory ? spy.stops.filter((stop) => memory.isSaved(stop.number)) : [];
 
+  /* After a remove, keep focus in the list: the next remove button, else the heading. */
   useEffect(() => {
-    if (!numbers.length) return;
+    const index = refocusRef.current;
 
-    const nodes = numbers
-      .map((number) => document.getElementById(`card-${number}`))
-      .filter((node): node is HTMLElement => Boolean(node));
+    if (index === null) return;
 
-    if (!nodes.length) return;
+    refocusRef.current = null;
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const ratios = new Map<number, number>();
+    const buttons = listRef.current?.querySelectorAll<HTMLButtonElement>('button') ?? [];
+    const next = buttons[Math.min(index, buttons.length - 1)];
 
-    const pick = () => {
-      let best = numbers[0] ?? 0;
-      let bestRatio = -1;
+    if (next) next.focus();
+    else if (headingRef.current) headingRef.current.focus();
+    else hostRef.current?.querySelector<HTMLElement>('a[aria-current]')?.focus();
+  }, [saved.length]);
 
-      ratios.forEach((ratio, number) => {
-        if (ratio > bestRatio) {
-          bestRatio = ratio;
-          best = number;
-        }
-      });
+  if (!memory || !spy || (!saved.length && !showEmpty)) return null;
 
-      if (bestRatio <= 0) {
-        const mid = window.innerHeight * 0.4;
-        let nearest = best;
-        let dist = Number.POSITIVE_INFINITY;
+  return (
+    <section aria-labelledby={headingId} className="oc-journey-marks">
+      <Heading
+        className="oc-journey-marks-heading"
+        id={headingId}
+        ref={(node: HTMLElement | null) => {
+          headingRef.current = node;
+        }}
+        tabIndex={-1}
+      >
+        {t('pathBookmarks', { count: String(saved.length) })}
+      </Heading>
+      {saved.length ? (
+        <ul className="oc-journey-marks-list" ref={listRef}>
+          {saved.map((stop, index) => (
+            <li key={stop.number}>
+              <a
+                className={stop.number === spy.active ? 'is-active' : undefined}
+                href={`#card-${stop.number}`}
+                onClick={(event) => {
+                  if (!onPick || !isPlainClick(event)) return;
 
-        nodes.forEach((node) => {
-          const number = Number(node.id.replace('card-', ''));
-          const top = Math.abs(node.getBoundingClientRect().top - mid);
-
-          if (top < dist) {
-            dist = top;
-            nearest = number;
-          }
-        });
-
-        setActive(nearest);
-
-        return;
-      }
-
-      setActive(best);
-    };
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const number = Number(entry.target.id.replace('card-', ''));
-
-          ratios.set(number, entry.isIntersecting ? entry.intersectionRatio : 0);
-        });
-        pick();
-      },
-      {
-        root: null,
-        rootMargin: '-20% 0px -45% 0px',
-        threshold: reduced ? [0, 0.25, 0.5] : [0, 0.15, 0.35, 0.55, 0.75],
-      },
-    );
-
-    nodes.forEach((node) => observer.observe(node));
-
-    return () => observer.disconnect();
-  }, [numbers]);
-
-  return active;
+                  event.preventDefault();
+                  onPick(stop.number);
+                }}
+              >
+                <span className="oc-journey-path-num">{String(stop.number).padStart(2, '0')}</span>
+                <span className="oc-journey-marks-title">{stop.title}</span>
+              </a>
+              <button
+                aria-label={t('removeBookmarkFor', { title: stop.title })}
+                className="oc-journey-marks-remove"
+                onClick={() => {
+                  refocusRef.current = index;
+                  hostRef.current = listRef.current?.closest('nav, [role="dialog"]') ?? null;
+                  memory.toggleSave(stop.number);
+                }}
+                type="button"
+              >
+                <span aria-hidden>×</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="oc-journey-marks-empty">{t('pathBookmarksEmpty')}</p>
+      )}
+    </section>
+  );
 }
 
 /*
  * Sticky Living Trail spine (desktop) and stepping-stone dots (mobile). Spy
- * only — never hijacks scroll. Active stop follows whichever #card-N owns the
- * most of the middle of the viewport.
+ * only — never hijacks scroll. The stop being read comes from the chapter's
+ * one spy (./journey-spy.tsx).
  */
 export function JourneyPath({ bands }: { bands: PathBand[] }) {
   const t = useSiteT('ui.chapter');
   const memory = useJourneyMemoryOptional();
-  const rememberStop = memory?.rememberStop;
-  const trackProgress = memory?.trackProgress ?? false;
-  const stops = useMemo(
-    () =>
-      bands.flatMap((band) =>
-        band.cards.map(({ card }) => ({
-          bandId: band.id,
-          bandLabel: band.label,
-          number: card.number,
-          title: card.title,
-        })),
-      ),
-    [bands],
-  );
-  const numbers = useMemo(() => stops.map((stop) => stop.number), [stops]);
-  const active = useActiveCard(numbers);
-  const activeBandId = useMemo(
-    () => stops.find((stop) => stop.number === active)?.bandId ?? bands[0]?.id ?? '',
-    [active, bands, stops],
-  );
-
-  useEffect(() => {
-    if (!trackProgress || !rememberStop || !active) return;
-
-    const stop = stops.find((item) => item.number === active);
-
-    if (stop) rememberStop(stop.number, stop.title);
-  }, [active, rememberStop, stops, trackProgress]);
+  const spy = useJourneySpyOptional();
+  const active = spy?.active ?? 0;
+  const activeBandId = spy?.activeBandId ?? bands[0]?.id ?? '';
+  const hasStops = bands.some((band) => band.cards.length > 0);
 
   const navRef = useRef<HTMLElement>(null);
 
   /*
    * Keep the active stop inside the HUD's own scroll box. Scrolls the nav only —
    * scrollIntoView would move the page too.
+   *
+   * A jump into a collapsed group opens that group after the first measure, so
+   * the stop moves down while the panel grows (QA, 2026-10-08: stop 26 left
+   * below the box at 1440x900). It is centred again once the group has
+   * finished opening (its `grid-template-rows` transition) or the list has
+   * stopped changing size, for a short while after each change of stop, as the
+   * green rail below is measured.
    */
   useEffect(() => {
     const nav = navRef.current;
+    const list = nav?.querySelector<HTMLElement>('.oc-journey-path-list');
 
-    if (!nav || nav.scrollHeight <= nav.clientHeight) return;
+    if (!nav) return;
 
-    const frame = window.requestAnimationFrame(() => {
-      const link = nav.querySelector<HTMLElement>('a[aria-current="true"]');
+    let frame = 0;
+    let settle = 0;
 
-      if (!link) return;
+    const centre = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        if (nav.scrollHeight <= nav.clientHeight) return;
 
-      const navRect = nav.getBoundingClientRect();
-      const linkRect = link.getBoundingClientRect();
-      const target =
-        nav.scrollTop + (linkRect.top - navRect.top) - (nav.clientHeight - linkRect.height) / 2;
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const link = nav.querySelector<HTMLElement>('a[aria-current="true"]');
 
-      nav.scrollTo({ top: Math.max(0, target), behavior: reduced ? 'auto' : 'smooth' });
-    });
+        if (!link) return;
 
-    return () => window.cancelAnimationFrame(frame);
+        const navRect = nav.getBoundingClientRect();
+        const linkRect = link.getBoundingClientRect();
+        const target =
+          nav.scrollTop + (linkRect.top - navRect.top) - (nav.clientHeight - linkRect.height) / 2;
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        nav.scrollTo({ top: Math.max(0, target), behavior: reduced ? 'auto' : 'smooth' });
+      });
+    };
+    const onResize = () => {
+      window.clearTimeout(settle);
+      settle = window.setTimeout(centre, 120);
+    };
+    const onTransitionEnd = (event: TransitionEvent) => {
+      if (event.propertyName === 'grid-template-rows') centre();
+    };
+    const observer = new ResizeObserver(onResize);
+
+    centre();
+
+    if (list) observer.observe(list);
+
+    nav.addEventListener('transitionend', onTransitionEnd);
+
+    const stop = window.setTimeout(() => {
+      observer.disconnect();
+      nav.removeEventListener('transitionend', onTransitionEnd);
+    }, 2000);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.clearTimeout(settle);
+      window.clearTimeout(stop);
+      observer.disconnect();
+      nav.removeEventListener('transitionend', onTransitionEnd);
+    };
   }, [active, activeBandId]);
 
   const railRef = useRef<HTMLSpanElement>(null);
@@ -190,13 +233,14 @@ export function JourneyPath({ bands }: { bands: PathBand[] }) {
     };
   }, [active, activeBandId]);
 
-  if (!stops.length) return null;
+  if (!hasStops) return null;
 
   return (
     <nav aria-label={t('pathSpine')} className="oc-journey-path oc-journey-hud" ref={navRef}>
       <div className="oc-journey-path-inner">
         <p className="oc-journey-path-heading">{t('pathHeading')}</p>
         <TextSizeControl />
+        <JourneyBookmarks />
         <div className="oc-journey-path-body">
           <span aria-hidden className="oc-journey-path-rail" ref={railRef}>
             <span className="oc-journey-path-rail-fill" ref={railFillRef} />
@@ -287,10 +331,11 @@ export function JourneyBandDots({
 }) {
   const t = useSiteT('ui.chapter');
   const memory = useJourneyMemoryOptional();
-  const numbers = useMemo(() => cards.map(({ card }) => card.number), [cards]);
-  const active = useActiveCard(numbers);
+  /* Marked only while the card being read is in this band. */
+  const active = useJourneySpyOptional()?.active ?? 0;
 
-  if (cards.length < 2) return null;
+  /* A band of one card gets its dot too, or that stop has no way in here. */
+  if (!cards.length) return null;
 
   return (
     <nav aria-label={`${t('pathSpine')}: ${label}`} className="oc-journey-band-dots">

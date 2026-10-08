@@ -1,0 +1,193 @@
+/*
+ * =============================================================================
+ * PRINT ONE ELEMENT — EVERY PRINT BUTTON ON BOTH CARE SITES
+ * =============================================================================
+ * Owner note 2 (2026-10-07). The hook (./use-print-only.ts) marks the element
+ * a button prints with `data-oc-printing`, each of its ancestors with
+ * `data-oc-print-path`, and <html> with `oc-printing`. Every rule that does
+ * something here waits on `html.oc-printing`, which only the hook sets, so the
+ * browser's own Print of a whole page, and every other page of the store,
+ * print exactly as they did.
+ *
+ * - Everything off the path is `display: none`, so it takes no room: the
+ *   sheet is the element, not a page-long run of blank paper around it.
+ * - The ancestors are flattened: no position, overflow, clip, filter,
+ *   transform, padding or background. Nothing can lift the element to where
+ *   it sat on screen, cut it short (the Rule of 15 lost three of its steps)
+ *   or turn it into a picture (a filtered ancestor made Chrome print text as
+ *   a bitmap).
+ * - The element is centred at about 7 inches, the width of a Letter or A4
+ *   sheet inside its margins, and its buttons are left off the paper.
+ * - The page is named, and the name is switched on only while a button
+ *   prints, so the 0.5in margin reaches no other print. A plain `@page` rule
+ *   would stay in the document after a visit and change the margins of a
+ *   product or order page printed later.
+ *
+ * `!important` because the chapter's own rules are scoped under an id
+ * (`#oc-chapter …`) and would otherwise outrank these.
+ * =============================================================================
+ */
+
+/* The sheet's header and footer (./print-frame.tsx): only ever on a printed sheet. */
+.oc-print-only {
+  display: none !important;
+}
+
+@page oc-sheet {
+  margin: 0.5in;
+}
+
+@media print {
+  html.oc-printing body {
+    page: oc-sheet;
+  }
+
+  /*
+   * One paper size of type, whatever text size the reader picked on screen:
+   * the chapter's 1.125rem body prints at about 11pt, so a sheet fits one page.
+   */
+  html.oc-printing {
+    font-size: 13px !important;
+  }
+
+  html.oc-printing,
+  html.oc-printing body {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  html.oc-printing
+    body
+    :where(:not([data-oc-print-path]):not([data-oc-printing]):not([data-oc-printing] *)) {
+    display: none !important;
+  }
+
+  html.oc-printing [data-oc-print-path] {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    clip-path: none !important;
+    contain: none !important;
+    content-visibility: visible !important;
+    transform: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    animation: none !important;
+  }
+
+  html.oc-printing [data-oc-print-path]::before,
+  html.oc-printing [data-oc-print-path]::after {
+    display: none !important;
+  }
+
+  html.oc-printing [data-oc-printing] {
+    position: static !important;
+    inset: auto !important;
+    width: auto !important;
+    max-width: 7in !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+    filter: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    animation: none !important;
+    color: #000;
+    line-height: 1.45;
+  }
+
+  /* The take-in card's folded corner. */
+  html.oc-printing [data-oc-printing]::after {
+    display: none !important;
+  }
+
+  html.oc-printing [data-oc-printing] * {
+    filter: none !important;
+  }
+
+  /* Paper has no buttons. A figure marks any other screen-only part `data-oc-print-hide`. */
+  html.oc-printing [data-oc-printing] :is(.oc-fig-print, [data-oc-print-hide]) {
+    display: none !important;
+  }
+
+  html.oc-printing [data-oc-printing] .oc-print-only {
+    display: block !important;
+  }
+
+  html.oc-printing [data-oc-printing] :is(li, tr) {
+    break-inside: avoid;
+  }
+
+  /* The header: the site, the title where the figure has none, then a name and the date. */
+  html.oc-printing [data-oc-printing] .oc-print-head {
+    margin: 0 0 0.8rem !important;
+    padding: 0 0 0.5rem !important;
+    border-bottom: 1px solid #000;
+  }
+
+  html.oc-printing [data-oc-printing] .oc-print-head p,
+  html.oc-printing [data-oc-printing] .oc-print-foot p {
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
+  html.oc-printing [data-oc-printing] .oc-print-site {
+    font-size: 10pt;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  html.oc-printing [data-oc-printing] .oc-print-head .oc-print-title {
+    margin-top: 0.25rem !important;
+    font-size: 16pt;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  html.oc-printing [data-oc-printing] .oc-print-head .oc-print-lines {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 2.5rem;
+    margin-top: 0.6rem !important;
+    font-size: 10pt;
+  }
+
+  html.oc-printing [data-oc-printing] .oc-print-blank {
+    display: inline-block;
+    width: 3in;
+    border-bottom: 1px solid #000;
+  }
+
+  /* The footer: the card's sources, then the page it was printed from. */
+  html.oc-printing [data-oc-printing] .oc-print-foot {
+    margin: 1rem 0 0 !important;
+    padding: 0.5rem 0 0 !important;
+    border-top: 1px solid #000;
+    font-size: 8.5pt;
+    line-height: 1.4;
+    break-inside: avoid;
+  }
+
+  html.oc-printing [data-oc-printing] .oc-print-foot p + p {
+    margin-top: 0.2rem !important;
+  }
+}

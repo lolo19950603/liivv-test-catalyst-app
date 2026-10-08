@@ -15,7 +15,7 @@
  * =============================================================================
  */
 
-import type { Citation } from '../chapters/compose';
+import type { ResolvedSource } from '../sources';
 
 /* One product or curated kit on the shelf preview. */
 export interface LandingItem {
@@ -32,19 +32,24 @@ export interface LandingItem {
 }
 
 /*
- * A maker on the brand row: its name, and a logo file the site has permission
+ * A brand on the brand row: its name, and a logo file the site has permission
  * to show. Without one the name shows as text. The name is the logo's alt
- * text. Not copy, and never translated.
+ * text. Not copy, and never translated. With `href` the pill is a link (the
+ * site's shop, filtered to the brand), named by `brands.shop`.
  */
 export interface LandingBrand {
   name: string;
   logo?: string;
+  /* A logo whose mark is small in its file (a tagline, a tall shape) is shown taller. */
+  logoFit?: 'tall';
+  href?: string;
 }
 
-/* A published source, in the page locale. */
-export interface LandingCitation extends Citation {
-  hrefLang: 'en' | 'fr';
-}
+/*
+ * A published source, resolved for the page locale on the server: its title,
+ * link, publisher and year (../sources.ts). Owner note 1, 2026-10-07.
+ */
+export type LandingCitation = ResolvedSource;
 
 /* One card on the chapter rail. `word` is the chapter number already in the page language. */
 export interface LandingChapterCard {

@@ -180,8 +180,38 @@ function OfferBlock({ offer, line }: { offer: ResolvedOffer; line?: string }) {
   );
 }
 
-function ChoiceCard({ item }: { item: PlacementItem }) {
+/*
+ * The card's one button. Insulin and glucagon (`viewOnly`) link their
+ * product page, where the pharmacist notice is; otherwise a one-click add
+ * where there is nothing to choose, else "Choose options".
+ */
+function CardAction({ item, href }: { item: PlacementItem; href: string }) {
   const t = useSiteT('ui.chapter');
+  const commerce = useSiteT('ui.commerce');
+
+  if (item.viewOnly) {
+    return (
+      <a className="oc-merch-cta is-quiet" href={href}>
+        {commerce('viewProduct')}
+        <span className="sr-only"> — {item.name}</span>
+      </a>
+    );
+  }
+
+  if (item.oneClick) return <AddButton item={item} />;
+
+  return (
+    <a
+      aria-label={t('shop.chooseOptionsFor', { name: item.name })}
+      className="oc-merch-cta is-quiet"
+      href={href}
+    >
+      {t('shop.chooseOptions')}
+    </a>
+  );
+}
+
+function ChoiceCard({ item }: { item: PlacementItem }) {
   const locale = useLocale();
   /* The catalogue path without the trailing slash that costs a redirect, as on the landing. */
   const href = localeHref(item.path.replace(/(.)\/$/, '$1'), locale);
@@ -200,17 +230,7 @@ function ChoiceCard({ item }: { item: PlacementItem }) {
           {item.name}
         </a>
         {item.priceLabel ? <p className="oc-merch-price">{item.priceLabel}</p> : null}
-        {item.oneClick ? (
-          <AddButton item={item} />
-        ) : (
-          <a
-            aria-label={t('shop.chooseOptionsFor', { name: item.name })}
-            className="oc-merch-cta is-quiet"
-            href={href}
-          >
-            {t('shop.chooseOptions')}
-          </a>
-        )}
+        <CardAction href={href} item={item} />
       </div>
     </li>
   );

@@ -1,7 +1,7 @@
 # Diabetes Care microsite — content review
 **Prepared for:** Liivv management and clinical review  
 **Covers:** the landing page of `/liivv-health/diabetes-care`, the chapters the shared chapter engine serves, the Funding & Coverage page and the five path pages, in English and French  
-**Generated:** 2026-10-06 from commit `3b343c6e`
+**Generated:** 2026-10-08 from commit `f7f9ef0b`
 
 > **These files are generated from the site's own sources.** Do not edit them. Mark corrections against the reference beside each line — the change is made in the source, and the files are generated again. That way the text you approve is the text that ships, and the two cannot drift apart.
 
@@ -17,17 +17,17 @@
 
 | File | Page | Words (EN) |
 |---|---|---|
-| [00-shared.md](en/00-shared.md) · [FR](fr/00-shared.md) | Shared interface text | 1,077 |
-| [01-new-to-the-journey.md](en/01-new-to-the-journey.md) · [FR](fr/01-new-to-the-journey.md) | Chapter 01 — New to the Journey | 2,413 |
-| [02-staying-safe.md](en/02-staying-safe.md) · [FR](fr/02-staying-safe.md) | Chapter 02 — Staying Safe | 2,582 |
-| [03-your-tools.md](en/03-your-tools.md) · [FR](fr/03-your-tools.md) | Chapter 03 — Your Tools | 3,302 |
-| [04-every-day-living.md](en/04-every-day-living.md) · [FR](fr/04-every-day-living.md) | Chapter 04 — Everyday Liivving ✎ | 3,531 |
-| [05-know-your-type.md](en/05-know-your-type.md) · [FR](fr/05-know-your-type.md) | Chapter 05 — Know Your Type | 3,751 |
-| [06-this-might-be-you.md](en/06-this-might-be-you.md) · [FR](fr/06-this-might-be-you.md) | Chapter 06 — This Might Be You | 1,898 |
-| [07-landing.md](en/07-landing.md) · [FR](fr/07-landing.md) | Landing page | 1,610 |
-| [08-funding.md](en/08-funding.md) · [FR](fr/08-funding.md) | Funding & Coverage | 5,928 |
-| [09-paths.md](en/09-paths.md) · [FR](fr/09-paths.md) | Path pages | 2,926 |
-| | **Total** | **29,018** |
+| [00-shared.md](en/00-shared.md) · [FR](fr/00-shared.md) | Shared interface text | 1,329 |
+| [01-new-to-the-journey.md](en/01-new-to-the-journey.md) · [FR](fr/01-new-to-the-journey.md) | Chapter 01 — New to the Journey | 2,340 |
+| [02-staying-safe.md](en/02-staying-safe.md) · [FR](fr/02-staying-safe.md) | Chapter 02 — Staying Safe | 2,511 |
+| [03-your-tools.md](en/03-your-tools.md) · [FR](fr/03-your-tools.md) | Chapter 03 — Your Tools | 3,238 |
+| [04-every-day-living.md](en/04-every-day-living.md) · [FR](fr/04-every-day-living.md) | Chapter 04 — Everyday Liivving ✎ | 3,433 |
+| [05-know-your-type.md](en/05-know-your-type.md) · [FR](fr/05-know-your-type.md) | Chapter 05 — Know Your Type | 3,654 |
+| [06-this-might-be-you.md](en/06-this-might-be-you.md) · [FR](fr/06-this-might-be-you.md) | Chapter 06 — This Might Be You | 1,825 |
+| [07-landing.md](en/07-landing.md) · [FR](fr/07-landing.md) | Landing page | 1,552 |
+| [08-funding.md](en/08-funding.md) · [FR](fr/08-funding.md) | Funding & Coverage | 5,905 |
+| [09-paths.md](en/09-paths.md) · [FR](fr/09-paths.md) | Path pages | 2,830 |
+| | **Total** | **28,617** |
 
 ## Open with the nurse
 
@@ -36,7 +36,7 @@
 - [04-every-day-living.md](en/04-every-day-living.md): 1 open rulings (D14), 15 held items
 - [06-this-might-be-you.md](en/06-this-might-be-you.md): 1 open rulings (M9), 18 held items
 - [07-landing.md](en/07-landing.md): 11 open questions for the owner, the nurse, operations and engineering (D3, D5, D10, D12, D14, D15, D16, D18, D21, D22, D23), 8 held items
-- [08-funding.md](en/08-funding.md): 9 open questions for the owner, the nurse, operations and engineering (D-2, D-4, D-12, D-13, D-19, D-20, D-23, D-26, D-27), 9 held items, 14 sources proposed for the register
+- [08-funding.md](en/08-funding.md): 8 open questions for the owner, the nurse, operations and engineering (D-2, D-4, D-12, D-19, D-20, D-23, D-26, D-27), 9 held items, 14 sources proposed for the register
 - [09-paths.md](en/09-paths.md): 8 open questions for the owner, the nurse and content (Q3, Q4, Q8, Q9, Q10, Q15, Q18, Q21), 8 held items, 1 sources proposed for the register
 
 ## What is not in these files
@@ -67,6 +67,7 @@ On /en now, hidden on /fr until a francophone reviewer signs off the French. The
 - `funding` — the Funding & Coverage page's own French — it ships on /fr flagged as machine translated, so this gate decides the draft marker on previews, and whether the page's /fr URL is in the sitemap
 - `fundingChecker` — the funding checker — on /fr in production the section shows a plain list of each province's programs instead, each linked to its official page with the date it was checked
 - `paths` — the five path pages' own French — it ships on /fr flagged as machine translated, so this gate decides the draft marker on previews, and whether the paths' /fr URLs are in the sitemap
+- `shop` — the Diabetes Essentials shop's own French (its headings, filter labels and product-type names) — it ships on /fr, so this gate decides only the draft marker on previews
 
 `chapter:<slug>` gates are declared in `review-gates.ts`, but no page checks them today: a chapter's French shows on /fr as soon as it is in `fr.json`, as the landing's does, which is why every line of either outside the gates above is marked ⚑.
 
@@ -76,4 +77,4 @@ On /en now, hidden on /fr until a francophone reviewer signs off the French. The
 node --env-file-if-exists=.env.local core/scripts/export-content-review.mjs --site=diabetes-care
 ```
 
-Coverage check on this run: **2060 of 2060** English strings under `DiabetesCare` appear in these files.
+Coverage check on this run: **2163 of 2163** English strings under `DiabetesCare` appear in these files.

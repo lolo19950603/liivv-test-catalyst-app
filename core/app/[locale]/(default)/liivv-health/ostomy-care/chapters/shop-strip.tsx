@@ -38,7 +38,13 @@ function resolveOffers(
 
     if (!kits.length && !items.length) return [];
 
-    const key = String(offer.kitIds?.[0] ?? items[0]?.entityId);
+    /*
+     * The line as well as the first product: two offers can open with the same
+     * product (Get to Know Your Stoma card 6, the New Image barrier 4541 under
+     * "closed" and "uroImage"), and a repeated key is a React error. As the
+     * engine's twin does (QA, 2026-10-08).
+     */
+    const key = `${offer.line ?? 'offer'}-${String(offer.kitIds?.[0] ?? items[0]?.entityId)}`;
 
     return [{ key, kits, items, line: offer.line }];
   });

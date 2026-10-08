@@ -1,5 +1,6 @@
 import { clsx } from 'clsx';
 
+import { ButtonLink } from '@/vibes/soul/primitives/button-link';
 import {
   Product,
   ProductCard,
@@ -44,7 +45,13 @@ export const WishlistItemCard = ({
       key={product.id}
     >
       <ProductCard aspectRatio="3:4" product={product} showCompare={false} {...props} />
-      {callToAction && (
+      {/* A product never added from a listing (Product.viewOnlyLabel) links its page instead. */}
+      {product.viewOnlyLabel ? (
+        <ButtonLink className="flex-1" href={product.href} size="small">
+          {product.viewOnlyLabel}
+        </ButtonLink>
+      ) : null}
+      {callToAction && !product.viewOnlyLabel && (
         <WishlistItemAddToCart
           action={action}
           callToAction={callToAction}

@@ -32,6 +32,13 @@ export interface Product {
   numberOfReviews?: number;
   sku?: string;
   hasVariants?: boolean;
+  /*
+   * Set on a product that is never added from a listing (insulin and
+   * glucagon, which a pharmacist reviews: the notice is on the product page).
+   * Where a card would offer a one-click add, it links the product page with
+   * this label instead.
+   */
+  viewOnlyLabel?: string;
 }
 
 export interface ProductCardProps {

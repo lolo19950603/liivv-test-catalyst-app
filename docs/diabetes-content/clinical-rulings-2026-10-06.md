@@ -206,6 +206,8 @@ None. bt1d-dka-and-ketones, dc-hyperglycemia and dc-stay-safe-sick-days-sheet ar
 <a id="c5"></a>
 #### C5. Blood ketones of exactly 1.5 mmol/L: which rung?
 
+> **Superseded in part by owner note 1 (2026-10-07):** the ladder keeps its credit, on the figure itself ("adapted from Breakthrough T1D", `7.figure.writtenFor`); the card's sentence no longer says it. The sources are now shown in the element (each card's Sources disclosure), not named in the sentence. See "Owner note 1 (2026-10-07)" at the end of this file.
+
 **Ruling.** A reading of exactly 1.5 belongs to the higher rung. Rung 2 becomes '0.6 to under 1.5', rung 3 stays '1.5 to 3.0' and rung 4 stays 'Over 3.0'. Make the same edit in card 11 and band card 2. Keep urine 'Small' and blood rung 2 as separate rungs. Attribute the ladder as adapted from Breakthrough T1D.
 
 **Why.** Breakthrough's ranges overlap at 1.5, so any fix departs from its wording; CPG Ch10 is the one Canadian text that puts exactly 1.5 on the side of acting (≥1.5), and the card already quotes it. Ch15 and Ch41 use a strict &gt;1.5, so they show 1.5 is the action threshold but do not settle the edge; the decision rests on Ch10, consistency within card 7, and safety.
@@ -443,6 +445,8 @@ None. EDL card 3 already cites dc-cpg-ch10-physical-activity, dc-exercise-and-ac
 <a id="c9"></a>
 #### C9. Driving after a low or a severe low
 
+> **Superseded in part by owner note 1 (2026-10-07):** the commercial-driver exam stays a "should", credited to "Canadian guidelines" rather than to Diabetes Canada by name. The sources are now shown in the element (each card's Sources disclosure), not named in the sentence. See "Owner note 1 (2026-10-07)" at the end of this file.
+
 **Ruling.** Keep the default: after a low, wait at least 40 minutes and until at least 5.0 before driving. After a severe low while driving, stop right away and tell the provider and the licensing office right away; 'your provider may tell you not to drive'. Add the commercial 12-month window. Add DC's commercial medical-fitness line, with the Ch21 exam attributed to the guideline as a 'should'. Provincial reporting rules stay out (H11 stays held).
 
 **Why.** CPG Ch21's "at least 40 minutes… at least 5.0" and its key message to "immediately notify" the provider and licensing body are the most protective Canadian wording. Ch21 sets 12 months (not 6) for commercial drivers; the verifier aligned the wording with Ch21's term "commercial drivers" and attributed the medical exam to the guideline as a "should". Provincial reporting rules vary and stay out.
@@ -503,6 +507,8 @@ DiabetesCare.chapters.every-day-living.categories.8.items.7: in the existing las
 
 <a id="c11"></a>
 #### C11. Symptoms of high blood sugar while waiting for a second test
+
+> **Superseded in part by owner note 1 (2026-10-07):** KYT 2.items.8 keeps this ruling's wording without "Diabetes Canada says" (K24). The sources are now shown in the element (each card's Sources disclosure), not named in the sentence. See "Owner note 1 (2026-10-07)" at the end of this file.
 
 **Ruling.** Change 'Contact your doctor without waiting' to 'Contact your doctor or another health-care provider today, without waiting for a second test', and pin KYT card 2 open (urgentContent). It is a same-day line under the C25 rule.
 
@@ -810,6 +816,8 @@ Source: dq-all-about-injections. Add it to YT card 11 and SS card 10 if it is no
 <a id="c17"></a>
 #### C17. Sick-day medicines, and Diabetes Canada's insulin and vomiting lines
 
+> **Superseded in part by owner note 1 (2026-10-07):** the insulin line is no longer attributed to Diabetes Canada in the sentence. The sources are now shown in the element (each card's Sources disclosure), not named in the sentence. See "Owner note 1 (2026-10-07)" at the end of this file.
+
 **Ruling.**
 
 Keep (a): no class list, and the pharmacist fills in the person's list of medicines to pause.
@@ -969,6 +977,8 @@ None now. Add a pre-publish and funding-recheck schedule item: 'Dexcom G7 15 Day
 <a id="c32"></a>
 #### C32. Sharps line outside the provinces covered by the national return program (HPSA)
 
+> **Superseded in part by owner note 1 (2026-10-07):** HPSA's "never in garbage or recycling" line is a plain statement; the lines about HPSA's own program keep its name. The sources are now shown in the element (each card's Sources disclosure), not named in the sentence. See "Owner note 1 (2026-10-07)" at the end of this file.
+
 **Ruling.** Keep the default instruction: 'Elsewhere in Canada, ask your pharmacy how to return used sharps.' It applies to YT 2.items.5 and 14.items.4 and NTJ 9.items.5, each in its current live wording. HPSA's 'never in garbage or recycling' line stays attributed to HPSA. source_gap stays true: no province-wide government source covers sharps return in BC, AB, SK, NS, NL or the territories.
 
 **Why.** HPSA covers Manitoba, Ontario, Quebec, New Brunswick and PEI. No province-wide or national government source covers sharps return in BC, AB, SK, NS, NL or the territories (Nova Scotia has a pharmacy-association program; BC has only a regional Island Health listing). The line is an instruction that makes no claim, and leaving it out would give those readers no next step.
@@ -1004,6 +1014,8 @@ The existing HPSA entry was re-verified today and needs no change.
 
 <a id="c16"></a>
 #### C16. Alcohol limits, and the 2018 "don't drink if…" list
+
+> **Superseded in part by owner note 1 (2026-10-07):** the 2018 sheet is no longer attributed by name; its date stays ("Some printed sheets (2018)"), and the 2023 lines say "Canadian guidelines (2023)". The sources are now shown in the element (each card's Sources disclosure), not named in the sentence. See "Owner note 1 (2026-10-07)" at the end of this file.
 
 **Ruling.**
 
@@ -1174,6 +1186,8 @@ No new id.
 <a id="c23"></a>
 #### C23. Patient copy drawn from professional guidelines
 
+> **Superseded in part by owner note 1 (2026-10-07):** the notes no longer name Diabetes Canada's professional guideline; This Might Be You card 1 keeps "from 2018 and is being updated". The sources are now shown in the element (each card's Sources disclosure), not named in the sentence. See "Owner note 1 (2026-10-07)" at the end of this file.
+
 **Ruling.**
 
 Keep the TMBY notes and the EDL Ch18 2023 lines. Do not label anything 'Clinician guidance'.
@@ -1218,6 +1232,8 @@ None. Locator notes only:
 
 <a id="c24"></a>
 #### C24. Eye exam schedule: CPG Ch30 or the Canadian Ophthalmological Society?
+
+> **Superseded in part by owner note 1 (2026-10-07):** each body is no longer credited by name; the difference stays visible ("Canadian advice differs: the diabetes guidelines say…; eye specialists suggest…"). The sources are now shown in the element (each card's Sources disclosure), not named in the sentence. See "Owner note 1 (2026-10-07)" at the end of this file.
 
 **Ruling.**
 
@@ -1767,6 +1783,8 @@ Optional reviewer note (sources-review.ts only, not cited): phsa-lab-outpatient-
 <a id="c39"></a>
 #### C39. The modelled "71% of people with type 1 diagnosed as adults" figure
 
+> **Superseded in part by owner note 1 (2026-10-07):** "Breakthrough T1D estimates" becomes "An estimated 71%" (KYT 1.items.2, type 1 path) and "…, by one estimate." (landing fact 4), never "Canadian estimate". The sources are now shown in the element (each card's Sources disclosure), not named in the sentence. See "Owner note 1 (2026-10-07)" at the end of this file.
+
 **Ruling.** Keep it on the landing, worded as an estimate (default). Make KYT 1.items.2 and the type-1 path match: 'Breakthrough T1D estimates … people with type 1 in Canada'.
 
 **Why.** Breakthrough's Canadian facts page gives about 71% from the Type 1 Diabetes Index, which is a model. Diabetes Canada's "generally develops in childhood or adolescence, but can also develop in adulthood" differs in emphasis, not in a stated share, so there is no numeric conflict, and the figure helps counter the belief that adults don't get type 1.
@@ -1803,6 +1821,8 @@ None.
 
 <a id="c40"></a>
 #### C40. Style of the "International guidance" labels
+
+> **Superseded in part by owner note 1 (2026-10-07):** mixed cards say "International guidance…" without naming the body; the badge on KYT cards 7–10 stays. The sources are now shown in the element (each card's Sources disclosure), not named in the sentence. See "Owner note 1 (2026-10-07)" at the end of this file.
 
 **Ruling.**
 
@@ -1999,3 +2019,22 @@ None.
 ---
 
 Prepared 2026-10-06 from the research and independent verification passes. This file is the owner-facing record. The build works from a machine-readable copy of the same rulings.
+
+---
+
+## Owner note 1 (2026-10-07): sources in the element, not the prose
+
+The owner's review of 2026-10-07, note 1: the copy should not say "Diabetes Canada says…"; the source belongs in the element itself. Built the same day: every chapter card ends with a Sources disclosure (up to three publishers when closed; "Title, Publisher (year)" when open, French title and page on /fr where the publisher has one, "(en anglais)" otherwise), the referral band and each path intro have one, the landing's facts and answers name the publisher under each line, and "Where this comes from" lists every source the page names, grouped Canadian, international, then makers. 199 strings were rewritten in English and the same in French (each chapter file's 2026-10-07 change log lists them).
+
+How the copy reads now:
+- A fact is stated plainly ("5 to 10% of people with diabetes have type 1").
+- A comparison says "In Canada…" and "International guidance…" without naming a body.
+- A line that gives clinical permission or states a guideline recommendation says "Canadian guidelines…" (no organization named), and the guideline's year shows in the Sources disclosure. For the nurse to confirm line by line; the lines are in the change logs (the "Canadian guidelines" rows).
+- Numbers and hedges are unchanged.
+- Kept as written: programs, helplines and directories named as the subject (TrialNet, CATSA, NIHB, HPSA's program, the Caregiver Guide, CanScreen about itself), a maker speaking about its own product, the ketone ladder's credit on the figure, the "International guidance" badges, and the three advocacy lines on Everyday Liivving's rights card (card 12), an owner call.
+
+Rulings whose in-sentence credit this supersedes (each marked above, and on its register entry in sources-review.ts): C5, C9, C11 (with K24), C16, C17, C23, C24, C32, C39 and C40. The clinical content of each ruling (the numbers, the wording of the advice, the 2018 date of the alcohol sheet, the conflict between the eye-exam bodies) is unchanged. These were the owner's own rulings, so OPEN-QUESTIONS B46 asks her to confirm the override in one line.
+
+Brand-named insulin monographs and the 2015 Humalog alert (`hc-dpd-pm-*`, `hc-alert-humalog-200-2015`) and the UncoverT1D page are marked `display: 'reviewOnly'` in the register, so no Sources list shows them on any page, in either locale (ruling C7; C36).
+
+Update 2026-10-08 (final fix pass for the owner review of 2026-10-07): the three advocacy lines on Every Day Living’s rights card (card 12), listed above as kept, now state the positions plainly, with the rights page in the card’s Sources (every-day-living.md F.13; B46). Three lines the first rewrite had blurred carry their scope again: “In hospital, 20 to 50%…” and “International estimates suggest about 9 in 10…” (know-your-type.md F.13), and the school line (this-might-be-you.md F.13). No ruling’s clinical content changed.

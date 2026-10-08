@@ -5,12 +5,10 @@ import { locales } from '~/i18n/locales';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
 
 import { localeHref } from '../../_microsite/chapters/hrefs';
-import { landingCitations, uniqueCitations } from '../../_microsite/landing/compose';
-import { shelfProductIds } from '../../_microsite/shop/shelves';
-import { FUNDING_SHELF, PLACEMENTS_ON } from '../chapters/chapter-shop';
-import { getDiabetesPlacementItems } from '../chapters/placement-items';
+import { resolveSource, resolveSources } from '../../_microsite/sources';
+import { DC_REGISTER } from '../chapters/dc-register';
 import { DIABETES_SITE } from '../chapters/site';
-import { SOURCE_META, type SourceId } from '../chapters/sources-meta';
+import type { SourceId } from '../chapters/sources-meta';
 import { LANDING_GATES, PHARMACIST_CDE_REQUEST_HREF } from '../landing-meta';
 
 import { DcFundingPage } from './dc-funding-page';
@@ -30,6 +28,10 @@ const PATH = `${DIABETES_SITE.basePath}/funding`;
  *
  * No FAQPage or other JSON-LD, for the Ostomy funding page's reasons
  * (ostomy-care/funding/page.tsx).
+ *
+ * No products: the owner removed the pump-supplies strip from this page on
+ * 2026-10-07 (note 7), so it makes no catalogue request. The same strip stays
+ * on Your Tools card 13.
  */
 
 export function generateStaticParams() {
@@ -71,43 +73,44 @@ export default async function Page({ params }: Props) {
   setRequestLocale(locale);
 
   /*
-   * A link to a page in the other language says so inside its own text, as
+   * A program's official page is linked as every Sources entry is (owner note
+   * 1, 2026-10-07): "Title, Publisher (year)", and, where the page it opens
+   * is in the other language, the language note inside its own text, as
    * every chapter link does ("(en anglais)", `ui.chapter.shelf`), so one
    * destination is described the same way on every page.
    */
   const shelf = await getTranslations({ locale, namespace: 'DiabetesCare.ui.chapter.shelf' });
-  const withLanguage = <T extends { label: string; hrefLang: string }>(link: T): T => {
-    if (link.hrefLang === locale) return link;
-
-    return {
-      ...link,
-      label: `${link.label} ${link.hrefLang === 'fr' ? shelf('inFrench') : shelf('inEnglish')}`,
-    };
-  };
-
-  const citations = uniqueCitations([landingCitations(SOURCE_META, PAGE_SOURCE_IDS, locale)]).map(
-    withLanguage,
-  );
   const sources: FundingSourceLinks = Object.fromEntries(
     [...new Set(PAGE_SOURCE_IDS)].flatMap((id) => {
-      const [link] = landingCitations(SOURCE_META, [id], locale);
+      const source = resolveSource(DC_REGISTER, id, locale);
 
-      return link ? [[id, withLanguage(link)]] : [];
+      if (!source) return [];
+
+      const year = source.year === undefined ? '' : ` (${source.year})`;
+      const note =
+        source.hrefLang === locale
+          ? ''
+          : ` ${source.hrefLang === 'fr' ? shelf('inFrench') : shelf('inEnglish')}`;
+
+      return [
+        [
+          id,
+          {
+            label: `${source.title}, ${source.publisher}${year}${note}`,
+            href: source.href,
+            hrefLang: source.hrefLang,
+          },
+        ],
+      ];
     }),
   );
-
-  /* The pump-supplies strip after "How paying works" (../chapters/chapter-shop.ts). */
-  const items = PLACEMENTS_ON
-    ? await getDiabetesPlacementItems(shelfProductIds(FUNDING_SHELF), locale)
-    : undefined;
 
   return (
     <DcFundingPage
       cdeRequestHref={
         LANDING_GATES.cdeRequestReason ? localeHref(PHARMACIST_CDE_REQUEST_HREF, locale) : null
       }
-      citations={citations.map(({ label, href }) => ({ label, href }))}
-      shop={items ? { shelf: FUNDING_SHELF, items } : null}
+      pageSources={resolveSources(DC_REGISTER, PAGE_SOURCE_IDS, locale)}
       sources={sources}
     />
   );

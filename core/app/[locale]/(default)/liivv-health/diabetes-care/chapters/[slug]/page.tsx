@@ -14,17 +14,17 @@ import {
   getLocalizedChapter,
   textSizePrePaint,
 } from '../../../_microsite/chapters/route';
-import { landingCitations, uniqueCitations } from '../../../_microsite/landing/compose';
 import { pathSourceIds } from '../../../_microsite/paths/compose';
 import { shelfProductIds } from '../../../_microsite/shop/shelves';
+import { resolveSources } from '../../../_microsite/sources';
 import { LANDING_GATES, PHARMACIST_CDE_REQUEST_HREF } from '../../landing-meta';
 import { pathShelf, shopIdsForChapter } from '../chapter-shop';
 import { DcChapterPage } from '../dc-chapter-page';
 import { DcPathPage } from '../dc-path-page';
+import { chapterSources, DC_REGISTER } from '../dc-register';
 import { PATH_GATES, PATH_META, type PathSlug } from '../paths-meta';
 import { getDiabetesPlacementItems } from '../placement-items';
 import { DIABETES_SITE } from '../site';
-import { SOURCE_META } from '../sources-meta';
 
 interface Props {
   params: Promise<{ locale: string; slug: string }>;
@@ -93,7 +93,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  *
  * The products its cards place (../chapter-shop.ts) are read from the
  * catalogue here, for the page locale, and only those that can be bought
- * today are passed down (../placement-items.ts).
+ * today are passed down (../placement-items.ts). So are the register entries
+ * the chapter names, resolved for the page locale (../dc-register.ts), for
+ * each card's Sources disclosure and the foot list (owner note 1).
  */
 async function EngineChapter({ locale, slug }: { locale: string; slug: string }) {
   const chapter = await getLocalizedChapter(DIABETES_SITE, locale, slug);
@@ -118,7 +120,7 @@ async function EngineChapter({ locale, slug }: { locale: string; slug: string })
         type="application/ld+json"
       />
       <script dangerouslySetInnerHTML={{ __html: textSizePrePaint(DIABETES_SITE) }} />
-      <DcChapterPage items={items} slug={slug} />
+      <DcChapterPage items={items} slug={slug} sources={chapterSources(slug, locale)} />
     </>
   );
 }
@@ -141,9 +143,8 @@ async function PathRoute({ locale, slug }: { locale: string; slug: string }) {
     notFound();
   }
 
-  const citations = uniqueCitations([
-    landingCitations(SOURCE_META, pathSourceIds(meta), locale),
-  ]).map(({ label, href }) => ({ label, href }));
+  const sources = resolveSources(DC_REGISTER, pathSourceIds(meta), locale);
+  const introSources = resolveSources(DC_REGISTER, meta.introSources.flat(), locale);
   const fundingHref = LANDING_GATES.fundingPage
     ? localeHref(`${DIABETES_SITE.basePath}/funding`, locale)
     : null;
@@ -159,12 +160,13 @@ async function PathRoute({ locale, slug }: { locale: string; slug: string }) {
     <>
       <script dangerouslySetInnerHTML={{ __html: textSizePrePaint(DIABETES_SITE) }} />
       <DcPathPage
-        citations={citations}
         fundingHref={fundingHref}
+        introSources={introSources}
         pharmacistBand={pharmacistBand}
         pharmacistHref={pharmacistHref}
         shop={shelf && items ? { shelf, items } : null}
         slug={meta.slug}
+        sources={sources}
       />
     </>
   );

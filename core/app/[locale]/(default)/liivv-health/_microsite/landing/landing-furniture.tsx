@@ -16,8 +16,11 @@
 
 import { useLocale } from 'next-intl';
 
+import { SourceEntryText, SourceGroups } from '../_components/source-chip';
+import { OutboundLabel } from '../chapters/figure-parts';
 import type { GovernancePerson } from '../site';
 import { useSite, useSiteMessages, useSiteT } from '../site-context';
+import { byScope, groupByScope } from '../sources';
 
 import type { LandingCitation } from './types';
 
@@ -34,7 +37,10 @@ function formatReviewDate(iso: string) {
   });
 }
 
-/* A source's link, saying when it opens a page in the other language. */
+/*
+ * A source's link: "Title, Publisher (year)", saying inside the link text
+ * when it opens a page in the other language, as every chapter link does.
+ */
 function SourceLink({ source }: { source: LandingCitation }) {
   const locale = useLocale();
 
@@ -45,32 +51,45 @@ function SourceLink({ source }: { source: LandingCitation }) {
       rel="noopener noreferrer"
       target="_blank"
     >
-      {source.label}
+      <OutboundLabel hrefLang={source.hrefLang} label={<SourceEntryText source={source} />} />
     </a>
   );
 }
 
-/* "Sources: A; B" under a fact, the type chips' intro or an answer. Nothing when there are none. */
+/*
+ * "Source: Title, Publisher (year)" (or "Sources: A; B") under a fact, the
+ * type chips' intro or an answer, Canadian sources first. The same message as
+ * the chapters' Sources line (`ui.chapter.sources.line`), so a single source
+ * reads "Source". It stays open: the landing's facts are short, and the line
+ * is the in-element source the owner asked for (note 1, 2026-10-07). Nothing
+ * when there are none.
+ */
 export function SourceLine({
   sources,
-  label,
   className,
 }: {
   sources: LandingCitation[];
-  label: string;
   className: string;
 }) {
-  if (!sources.length) return null;
+  const t = useSiteT('ui.chapter.sources');
+  const ordered = byScope(sources);
+  const marker = '⁣';
+  const [before = '', after = ''] = t('line', { count: ordered.length, titles: marker }).split(
+    marker,
+  );
+
+  if (!ordered.length) return null;
 
   return (
     <p className={className}>
-      {label}:{' '}
-      {sources.map((source, index) => (
+      {before}
+      {ordered.map((source, index) => (
         <span key={source.href}>
           {index > 0 ? '; ' : null}
           <SourceLink source={source} />
         </span>
       ))}
+      {after}
     </p>
   );
 }
@@ -193,13 +212,7 @@ export function LandingGovernance({
           {sources.length ? (
             <div className={k('governance-sources')}>
               <h2>{t('sourcesHeading')}</h2>
-              <ul>
-                {sources.map((source) => (
-                  <li key={source.href}>
-                    <SourceLink source={source} />
-                  </li>
-                ))}
-              </ul>
+              <SourceGroups groups={groupByScope(sources)} showNote={false} />
             </div>
           ) : null}
         </div>

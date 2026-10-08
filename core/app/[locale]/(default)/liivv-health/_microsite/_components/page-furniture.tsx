@@ -22,6 +22,9 @@ import { type Citation, type Governance } from '../chapters/compose';
 import { localeHref } from '../chapters/hrefs';
 import type { GovernancePerson } from '../site';
 import { useSite, useSiteMessages, useSiteT } from '../site-context';
+import { groupByScope, type ResolvedSource } from '../sources';
+
+import { SourceGroups } from './source-chip';
 
 function formatReviewDate(iso: string) {
   const parsed = new Date(`${iso}T00:00:00Z`);
@@ -205,12 +208,46 @@ function CommercialDisclosure({ reviewed }: { reviewed: boolean }) {
   );
 }
 
+/*
+ * Where this page comes from, as every source it names (owner note 1,
+ * 2026-10-07): grouped Canadian, international, then makers, each as
+ * "Title, Publisher (year)" with its language note, and the line that citing
+ * a body is not its endorsement. Engine-only so far: Ostomy's twin lists its
+ * citations.
+ */
+function SourceFootList({ sources }: { sources: ResolvedSource[] }) {
+  const t = useSiteT('ui.governance');
+
+  return (
+    <div className="oc-ch-sources">
+      <h2>{t('sourcesHeading')}</h2>
+      <SourceGroups groups={groupByScope(sources)} />
+    </div>
+  );
+}
+
+/* The resolved foot list where the page has one, otherwise Ostomy's citations. */
+function PageSources({
+  sources,
+  citations,
+}: {
+  sources?: ResolvedSource[];
+  citations?: Citation[];
+}) {
+  if (sources) return sources.length ? <SourceFootList sources={sources} /> : null;
+
+  return citations?.length ? <SourceList citations={citations} /> : null;
+}
+
 export function GovernanceBlock({
   governance,
   citations,
+  sources,
 }: {
   governance: Governance;
   citations?: Citation[];
+  /* Every source the page names, resolved; drawn in place of `citations` where given. */
+  sources?: ResolvedSource[];
 }) {
   const t = useSiteT('ui.governance');
   const locale = useLocale();
@@ -294,7 +331,7 @@ export function GovernanceBlock({
 
           <p className="oc-ch-disclaimer">{governance.disclaimer}</p>
 
-          {citations?.length ? <SourceList citations={citations} /> : null}
+          <PageSources citations={citations} sources={sources} />
         </div>
       </div>
     </section>

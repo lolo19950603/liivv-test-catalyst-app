@@ -64,9 +64,9 @@ export type LandingGate =
    * D3. The care band's "Request a call" opens the appointment page, which
    * does not offer a CDE reason yet and saves nothing, and a guest who signs
    * in from it lands on the dashboard. Stays off: Microsoft Bookings, or
-   * Bayshore Express Pharmacy's own booking page, could switch it on later
-   * (B6). Meanwhile every CDE panel shows the pharmacy's general phone line,
-   * email and hours (DIABETES_SITE.contact).
+   * a booking page of the CDEs' own, could switch it on later (B6).
+   * Meanwhile every CDE panel shows their general phone line and hours
+   * (DIABETES_SITE.contact).
    */
   | 'cdeRequestReason'
   /*
@@ -259,8 +259,9 @@ export const FACT_BAND: Array<{ sources: SourceId[] }> = [
 /* Every item is checkable; the basis is recorded here for the export and never rendered. */
 export const TRUST_ITEMS: Array<{ basis: 'owner' | 'code' | 'page'; gate?: LandingGate }> = [
   /*
-   * The CDEs at Bayshore Express Pharmacy, for all of Canada (owner, A2 and
-   * B5, 2026-10-06; the pharmacy's own About page, `bep-about`).
+   * Liivv's Certified Diabetes Educators, for all of Canada (owner, A2 and
+   * B5, 2026-10-06; presented as Liivv's own service, owner note 5,
+   * 2026-10-07).
    */
   { basis: 'owner' },
   /*
@@ -310,12 +311,12 @@ export const SHOP_ROOMS = [
 /* ---------- 10. Care band ---------- */
 
 /*
- * Two panels. The first says who answers: the Certified Diabetes Educators at
- * Bayshore Express Pharmacy, the Liivv pharmacy in Markham, for questions from
- * anywhere in Canada (owner answers A2, B5, B10, 2026-10-06). Its "Request a
- * call" renders once a booking page can take the request (`cdeRequestReason`,
- * D3; B6). The second, "Speak to a CDE" (`care.chat`), gives the pharmacy's
- * general phone line, email, hours and About page (DIABETES_SITE.contact; B9),
+ * Two panels. The first says who answers: Liivv's Certified Diabetes
+ * Educators, for questions from anywhere in Canada (owner answers A2, B5, B10,
+ * 2026-10-06; presented as Liivv's own service, owner note 5, 2026-10-07). Its
+ * "Request a call" renders once a booking page can take the request
+ * (`cdeRequestReason`, D3; B6). The second, "Speak to a CDE" (`care.chat`),
+ * gives their general phone line and hours (DIABETES_SITE.contact; B9),
  * then the existing chat as the secondary way in. It no longer says "Available
  * in Ontario" (B12, "chat can be general - speak to a CDE").
  */
@@ -331,40 +332,62 @@ export const SHOP_DIABETES_HREF = '/liivv-health/diabetes-care/shop-diabetes-car
 /* ---------- 11. Brands (not copy, never translated) ---------- */
 
 /*
- * The owner gave permission to use every current maker logo (B16,
- * 2026-10-06). A maker shows as its logo where /archive/diabetes-care-logos
- * has a current file for it, and as its name, in a pill styled to match,
- * where it does not. A logo's alt text is the maker's name. Each name matches
- * stocked catalogue items; Omnipod pods are stocked (A3), so Omnipod, the
- * brand people know, is named in its own pill beside its maker's logo.
+ * One pill per shopping brand family, matching the Diabetes Essentials shop's
+ * brand filter slug for slug (./shop-classify.ts), and each one a link to the
+ * shop filtered to it (owner notes 9 and 10, 2026-10-07). The landing shows a
+ * pill only while that brand has something on the shelf (./page.tsx).
  *
- * The files, as opened 2026-10-06:
- *   - abbott.avif, insulet.avif and ypsomed.avif are brand-4.avif (Abbott,
- *     FreeStyle's maker), dexcom.avif (despite its name, Insulet's wordmark,
- *     Omnipod's maker) and brand-5.avif (Ypsomed, mylife's maker), each
- *     cropped to its ink with a 2-pixel white margin, so one height gives the
- *     three the same weight (full-site review, 2026-10-06). The originals stay:
- *     dexcom.avif is still a Makeswift default (archive-default-logos.ts);
- *   - brand-2.webp is a Dexcom wordmark, the older one B16 says to drop, so
- *     Dexcom shows as a name until a current Dexcom file is supplied;
- *   - brand-3.webp is the Medtronic corporate mark, outdated in Canada (now
- *     MiniMed Canada ULC), so MiniMed shows as a name.
- * No file exists for Tandem, LifeScan (OneTouch), Ascensia (Contour) or Roche
- * (Accu-Chek).
+ * Logos: the owner gave permission to use every current maker logo (B16,
+ * 2026-10-06) and approved downloading six official files (2026-10-07). They
+ * are in /archive/diabetes-care-logos, each from the maker's own Canadian or
+ * press-kit page, recorded in docs/diabetes-content/logo-sources.md:
+ *   - omnipod-trimmed.png is omnipod.png (Insulet's press kit, no tagline)
+ *     with its wide white margins trimmed and scaled to 200 px high, so the
+ *     mark fills its pill; the original stays beside it;
+ *   - contour.png carries Ascensia's "Evolving with you" tagline, so it and
+ *     the Omnipod mark are shown taller (`logoFit: 'tall'`);
+ *   - tandem.svg, minimed.png and onetouch.png as downloaded;
+ *   - insulet.png is on file but not shown: the row is by shopping brand, and
+ *     Insulet's pods are the Omnipod pill.
+ * Dexcom, FreeStyle Libre, mylife, Accu-Chek and FreeStyle stay names in
+ * pills styled to match until the owner supplies their files. The old files
+ * are no longer shown: abbott.avif (Abbott's corporate mark, not FreeStyle
+ * Libre), insulet.avif, ypsomed.avif (the maker's old name), dexcom.avif
+ * (despite its name, Insulet's wordmark; still a Makeswift default in
+ * archive-default-logos.ts), brand-2.webp (an older Dexcom mark) and
+ * brand-3.webp (the Medtronic corporate mark).
+ *
+ * mylife: the YpsoPump's maker is mylife Diabetes Care Canada Inc., which
+ * owns the mylife trademarks (its Canadian "About us" page, read 2026-10-08,
+ * `mylife-about-ca`), so the pill says mylife, not Ypsomed.
+ *
+ * A logo's alt text, and a text pill's words, are the brand's name. Names,
+ * not copy, and never translated.
  */
 const LOGOS = '/archive/diabetes-care-logos';
 
-export const BRANDS: ReadonlyArray<{ name: string; logo?: string }> = [
-  { name: 'Dexcom' },
-  { name: 'Abbott', logo: `${LOGOS}/abbott.avif` },
-  { name: 'Insulet', logo: `${LOGOS}/insulet.avif` },
-  { name: 'Omnipod' },
-  { name: 'Ypsomed', logo: `${LOGOS}/ypsomed.avif` },
-  { name: 'MiniMed' },
-  { name: 'Tandem' },
-  { name: 'OneTouch' },
-  { name: 'Contour' },
-  { name: 'Accu-Chek' },
+export interface LandingBrandMeta {
+  /* The shop's brand filter slug (`?brand=`). */
+  slug: string;
+  name: string;
+  logo?: string;
+  /* A logo whose mark is small in its file (a tagline, a tall shape) is shown taller. */
+  logoFit?: 'tall';
+  /* The register entry that backs the name, where it is not the obvious one. */
+  source?: SourceId;
+}
+
+export const BRANDS: readonly LandingBrandMeta[] = [
+  { slug: 'dexcom', name: 'Dexcom' },
+  { slug: 'freestyle-libre', name: 'FreeStyle Libre' },
+  { slug: 'omnipod', name: 'Omnipod', logo: `${LOGOS}/omnipod-trimmed.png`, logoFit: 'tall' },
+  { slug: 'minimed', name: 'MiniMed', logo: `${LOGOS}/minimed.png` },
+  { slug: 'tandem', name: 'Tandem', logo: `${LOGOS}/tandem.svg` },
+  { slug: 'mylife', name: 'mylife', source: 'mylife-about-ca' },
+  { slug: 'onetouch', name: 'OneTouch', logo: `${LOGOS}/onetouch.png` },
+  { slug: 'contour', name: 'Contour', logo: `${LOGOS}/contour.png`, logoFit: 'tall' },
+  { slug: 'accu-chek', name: 'Accu-Chek' },
+  { slug: 'freestyle', name: 'FreeStyle' },
 ];
 
 /* ---------- 12. FAQs (keys `faq.items.1..5`) ---------- */
@@ -425,26 +448,20 @@ export const FAQ_META: FaqMeta[] = [
   /*
    * 3 sensor fails. The 911 line uses Staying Safe's sourced wording
    * (`urgent.signs.1`); it stays word for word, and CPG Ch14 2023 backs it too
-   * (ruling C12, 2026-10-06). The CDE line names Bayshore Express Pharmacy,
-   * linked to its About page, dials its general line and opens its email, as
-   * every CDE panel does (C12 for the business group; B9).
+   * (ruling C12, 2026-10-06). The CDE line names Liivv's Certified Diabetes
+   * Educators and dials their general line, as every CDE panel does (C12 for
+   * the business group; B9; presented as Liivv's own service with no email or
+   * About link, owner note 5, 2026-10-07).
    */
   {
     sources: [
       'dc-technology-and-devices',
-      'bep-about',
       'bt1d-what-is-glucagon',
       'das-glucagon',
       'dc-cpg-ch14-hypoglycemia-2023',
     ],
     basis: 'owner',
-    links: [
-      { source: 'bep-about' },
-      { tel: '+18445611254' },
-      { email: 'BayshoreExpress@bayshore.ca' },
-      { tel: '911' },
-      { chapter: 'staying-safe' },
-    ],
+    links: [{ tel: '+18445611254' }, { tel: '911' }, { chapter: 'staying-safe' }],
   },
   /* 4 sharps. */
   { sources: ['hpsa-returning-medical-sharps', 'dc-getting-started-with-insulin'] },

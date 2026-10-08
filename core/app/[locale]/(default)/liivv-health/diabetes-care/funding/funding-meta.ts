@@ -1236,7 +1236,7 @@ export const PRIVATE_FIRST: Partial<Record<ProvinceCode, { program: string; sour
   PE: { program: 'pe-ipp', source: 'pe-ipp-qa' },
 };
 
-/* Where Liivv has a Bayshore pharmacy (owner, 2026-10-05). Not a billing claim. */
+/* Where Liivv has a pharmacy of its own (owner, 2026-10-05). Not a billing claim. */
 export const LIIVV_PHARMACY: Record<ProvinceCode, boolean> = {
   BC: true,
   AB: true,

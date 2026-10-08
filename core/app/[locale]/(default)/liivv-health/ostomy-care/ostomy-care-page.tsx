@@ -111,6 +111,15 @@ function roomForProduct(product: OcCatalogItem): Exclude<ShopRoomId, 'all' | 'ki
   return roomForProductName(product.name);
 }
 
+/*
+ * A catalog path ("/starter-accessory-kit/") in the page locale, without the
+ * trailing slash that costs a redirect: /fr readers stay on /fr, as the shop
+ * strip does. Ported back from the shared engine's landing (2026-10-08).
+ */
+function productHref(path: string, locale: string) {
+  return localeHref(path.replace(/(.)\/$/, '$1'), locale);
+}
+
 function hasDisplayPrice(priceLabel?: string) {
   const match = priceLabel?.match(/(\d+(?:[.,]\d+)?)/);
   if (!match) return false;
@@ -137,6 +146,7 @@ function slideDirectionClass(offset: number, shift: number) {
 
 function KitsCarousel({ kits, initialId }: { kits: OcCatalogItem[]; initialId?: number | null }) {
   const t = useTranslations('OstomyCare.ui.landingPage.kits');
+  const locale = useLocale();
   const startIndex = useMemo(() => {
     if (!initialId) return 0;
 
@@ -243,7 +253,7 @@ function KitsCarousel({ kits, initialId }: { kits: OcCatalogItem[]; initialId?: 
           )}
           <p>{isFeatured ? t('featuredBody') : t('cardBody')}</p>
           {isCenter && shift === 0 ? (
-            <a className="oc-btn oc-btn-solid" href={kit.path}>
+            <a className="oc-btn oc-btn-solid" href={productHref(kit.path, locale)}>
               {t('cta')}
             </a>
           ) : (
@@ -572,7 +582,11 @@ export function OstomyCarePage({ catalog, doors }: { catalog?: OcCatalog; doors?
 
             <div className="oc-product-grid">
               {filteredShop.map((product) => (
-                <a className="oc-product" href={product.path} key={product.entityId}>
+                <a
+                  className="oc-product"
+                  href={productHref(product.path, locale)}
+                  key={product.entityId}
+                >
                   <div className="oc-product-media">
                     {product.image ? (
                       <img alt={product.image.alt} src={product.image.src} />
@@ -608,6 +622,8 @@ export function OstomyCarePage({ catalog, doors }: { catalog?: OcCatalog; doors?
         eyebrow={t('subscribe.eyebrow')}
         features={SUBSCRIBE_FEATURE_KEYS.map((key) => copy.subscribe.features[key])}
         lead={t('subscribe.lead')}
+        manageHref={localeHref('/account/subscriptions', locale)}
+        manageLabel={t('subscribe.manageLabel')}
         primaryCtaClass="oc-btn oc-btn-solid"
         secondaryCtaClass="oc-btn oc-btn-ghost"
         shopHref={shopHref}
@@ -682,6 +698,7 @@ export function OstomyCarePage({ catalog, doors }: { catalog?: OcCatalog; doors?
               bubble={t('care.oliviaBubble')}
               ctaLabel={t('care.oliviaCta')}
               kicker={t('care.oliviaKicker')}
+              moreHref={localeHref('/#olivia', locale)}
               moreLabel={t('care.oliviaMore')}
               note={t('care.oliviaNote')}
               title={t('care.oliviaTitle')}

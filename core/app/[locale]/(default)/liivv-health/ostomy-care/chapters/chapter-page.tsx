@@ -46,6 +46,8 @@ import { JourneyGrid } from './journey-layout';
 import { JourneyContinueChip, JourneyMemoryProvider } from './journey-memory-context';
 import { ChapterAudioProvider, ListenChapterButton, ListenStopButton } from './chapter-audio-player';
 import { JourneyBandDots, JourneyPath } from './journey-path';
+import { JourneySheet } from './journey-sheet';
+import { JourneySpyProvider } from './journey-spy';
 import { TextSizeControl } from './text-size-control';
 import { RecoveryMap } from './recovery-map';
 import { ResourceShelf } from './resource-shelf';
@@ -638,68 +640,72 @@ function MajorSections({
 
   return (
     <JourneyMemoryProvider slug={chapter.slug}>
-      <div className="oc-journey-shell is-cinema">
-        {showPath ? (
-          <div className="oc-journey-hud-slot">
-            <JourneyPath bands={pathBands} />
-          </div>
-        ) : null}
-        <div className="oc-journey-cinema">
-          {bands.map((band, index) => (
-            <section
-              className={index % 2 === 0 ? 'oc-journey-act' : 'oc-journey-act is-alt'}
-              id={index === 0 ? 'chapter-care' : band.id}
-              key={band.id}
-            >
-              <header className="oc-journey-act-title oc-journey-gate oc-journey-clearing">
-                <span aria-hidden className="oc-journey-clearing-wash" />
-                <ChapterReveal variant="clearing">
-                  <span className="oc-journey-gate-num" aria-hidden>
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                  <span className="oc-ch-eyebrow">{t('pathEyebrow')}</span>
-                  <h2>{band.label}</h2>
-                  {index === 0 ? <JourneyContinueChip /> : null}
-                  {index === 0 ? (
-                    <div className="oc-journey-banner oc-journey-banner--wash">
-                      {showIntroHeading ? (
-                        <h3 className="oc-journey-banner-title">{chapter.categoriesIntro.heading}</h3>
-                      ) : null}
-                      <LinkedIntroBody
-                        body={chapter.categoriesIntro.body}
-                        href={firstWeek ? `#card-${firstWeek.number}` : undefined}
-                        phrase={firstWeek?.title}
-                      />
-                    </div>
+      <JourneySpyProvider bands={pathBands}>
+        {/* Before the shell: it looks at what follows the shell to know when to step aside. */}
+        {showPath ? <JourneySheet /> : null}
+        <div className="oc-journey-shell is-cinema">
+          {showPath ? (
+            <div className="oc-journey-hud-slot">
+              <JourneyPath bands={pathBands} />
+            </div>
+          ) : null}
+          <div className="oc-journey-cinema">
+            {bands.map((band, index) => (
+              <section
+                className={index % 2 === 0 ? 'oc-journey-act' : 'oc-journey-act is-alt'}
+                id={index === 0 ? 'chapter-care' : band.id}
+                key={band.id}
+              >
+                <header className="oc-journey-act-title oc-journey-gate oc-journey-clearing">
+                  <span aria-hidden className="oc-journey-clearing-wash" />
+                  <ChapterReveal variant="clearing">
+                    <span className="oc-journey-gate-num" aria-hidden>
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span className="oc-ch-eyebrow">{t('pathEyebrow')}</span>
+                    <h2>{band.label}</h2>
+                    {index === 0 ? <JourneyContinueChip /> : null}
+                    {index === 0 ? (
+                      <div className="oc-journey-banner oc-journey-banner--wash">
+                        {showIntroHeading ? (
+                          <h3 className="oc-journey-banner-title">{chapter.categoriesIntro.heading}</h3>
+                        ) : null}
+                        <LinkedIntroBody
+                          body={chapter.categoriesIntro.body}
+                          href={firstWeek ? `#card-${firstWeek.number}` : undefined}
+                          phrase={firstWeek?.title}
+                        />
+                      </div>
+                    ) : null}
+                    {index === 0 ? <TextSizeControl /> : null}
+                  </ChapterReveal>
+                  <JourneyBandDots cards={band.cards} label={band.label ?? ''} />
+                </header>
+                <div className="oc-journey-act-frames">
+                  {index === 0 && showRail ? (
+                    <nav aria-label={t('groupJump')} className="oc-ch-rail">
+                      {labeled.map((item, itemIndex) => (
+                        <a href={itemIndex === 0 ? '#chapter-care' : `#${item.id}`} key={item.id}>
+                          {item.label}
+                          <span className="oc-ch-rail-count">{item.cards.length}</span>
+                        </a>
+                      ))}
+                    </nav>
                   ) : null}
-                  {index === 0 ? <TextSizeControl /> : null}
-                </ChapterReveal>
-                <JourneyBandDots cards={band.cards} label={band.label ?? ''} />
-              </header>
-              <div className="oc-journey-act-frames">
-                {index === 0 && showRail ? (
-                  <nav aria-label={t('groupJump')} className="oc-ch-rail">
-                    {labeled.map((item, itemIndex) => (
-                      <a href={itemIndex === 0 ? '#chapter-care' : `#${item.id}`} key={item.id}>
-                        {item.label}
-                        <span className="oc-ch-rail-count">{item.cards.length}</span>
-                      </a>
-                    ))}
-                  </nav>
-                ) : null}
-                <BandCards
-                  band={band}
-                  exit={chapter.urgentExit}
-                  layout="journey"
-                  products={products}
-                  slug={chapter.slug}
-                  supplyItems={supplyItems}
-                />
-              </div>
-            </section>
-          ))}
+                  <BandCards
+                    band={band}
+                    exit={chapter.urgentExit}
+                    layout="journey"
+                    products={products}
+                    slug={chapter.slug}
+                    supplyItems={supplyItems}
+                  />
+                </div>
+              </section>
+            ))}
+          </div>
         </div>
-      </div>
+      </JourneySpyProvider>
     </JourneyMemoryProvider>
   );
 }

@@ -377,6 +377,14 @@ ${LIIVV_HEADER_UTILITY_SHARED_CSS}
   .liivv-archive-header .header__logo {
     max-width: calc(100vw - 13.5rem);
   }
+  /*
+   * The archive's 140px square logo puts its wordmark's dots just under the
+   * fixed EN/FR row on a phone (QA, 2026-10-08: about 3px apart). A little room
+   * above the logo keeps them apart.
+   */
+  .liivv-archive-header .header__logo-link {
+    padding-top: 0.625rem;
+  }
 }
 .liivv-archive-header .header-utility-icon-btn {
   display: inline-flex;

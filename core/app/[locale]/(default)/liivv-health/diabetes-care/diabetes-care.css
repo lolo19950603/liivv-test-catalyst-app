@@ -16,8 +16,8 @@
   --sage-soft: color-mix(in srgb, var(--sage) 40%, var(--cream));
   --paper: #fff;
   --line: rgba(49, 47, 47, 0.12);
-  --font-heading: var(--font-family-dm-serif-text), 'Iowan Old Style', Georgia, serif;
-  --font-body: var(--font-family-inter), 'Segoe UI', system-ui, sans-serif;
+  --font-heading: var(--font-family-poppins), system-ui, sans-serif;
+  --font-body: var(--font-family-poppins), system-ui, sans-serif;
   --radius: 18px;
   --radius-lg: 28px;
   --pad: clamp(1.25rem, 4vw, 2rem);
@@ -1465,8 +1465,39 @@
   display: block;
   width: auto;
   height: 1.75rem;
-  max-width: 9rem;
+  max-width: 10rem;
   object-fit: contain;
+}
+
+/*
+ * A logo whose mark is small in its file: the Omnipod mark (its tall pod
+ * shape) and Contour (its tagline under the name). Taller, in the same pill.
+ */
+#diabetes-care .dc-brand-logo-tall {
+  padding-block: 0.2rem;
+}
+
+#diabetes-care .dc-brand-logo-tall img {
+  height: 2.6rem;
+}
+
+/* A pill that opens the shop filtered to its brand (owner note 10, 2026-10-07). */
+#diabetes-care a.dc-brand-pill {
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+#diabetes-care a.dc-brand-pill:hover {
+  border-color: var(--sage);
+  box-shadow: 0 2px 10px rgba(42, 50, 44, 0.08);
+}
+
+#diabetes-care a.dc-brand-pill:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 
 #diabetes-care .dc-brand-points {

@@ -27,8 +27,9 @@ import dynamic from 'next/dynamic';
 import { useLocale } from 'next-intl';
 import { Fragment, useRef } from 'react';
 
-import { usePrintOnly } from '../../ostomy-care/chapters/use-print-only';
 import { SpecialistContact } from '../_components/specialist-contact';
+import { CardPrintFoot, CardPrintHead } from '../print/card-print';
+import { usePrintOnly } from '../print/use-print-only';
 import type { SiteKinds } from '../site';
 import { useSite, useSiteFigures, useSiteMessages, useSiteT } from '../site-context';
 
@@ -461,6 +462,11 @@ function CriteriaFigure({
  *
  * The card's note rides on the printed card, except where the meta keeps it
  * visible in the card body, so it is never shown twice.
+ *
+ * On paper (owner note 2, 2026-10-07) the card is headed by the site, a line
+ * for a name and the date, and ends with the card's sources and the page it
+ * came from (../print). The blank lines carry on the list's numbering rather
+ * than starting again at 1.
  */
 function TakeInFigure({
   figure,
@@ -471,14 +477,16 @@ function TakeInFigure({
 }) {
   const t = useSiteT('ui.chapter.takeIn');
   const ref = useRef<HTMLDivElement>(null);
-  const { ready, print } = usePrintOnly(ref);
+  const heading = card.figureText?.heading ?? card.title;
+  const { ready, print } = usePrintOnly(ref, { title: heading });
   const items = card.items ?? [];
   const labels = card.figureText?.fields ?? [];
   const fields = Array.from({ length: figure.fields ?? 0 }, (_, index) => labels[index] ?? '');
 
   return (
     <div className="oc-fig-takein" ref={ref}>
-      <p className="oc-fig-heading">{card.figureText?.heading ?? card.title}</p>
+      {ready ? <CardPrintHead /> : null}
+      <p className="oc-fig-heading">{heading}</p>
       {items.length ? (
         <ol>
           {items.map((item, index) => (
@@ -490,7 +498,7 @@ function TakeInFigure({
         </ol>
       ) : null}
       {fields.length ? (
-        <ol>
+        <ol start={items.length + 1}>
           {fields.map((label, index) => (
             <li key={`field-${index}`}>
               {label}
@@ -511,6 +519,7 @@ function TakeInFigure({
           {t('print')}
         </button>
       ) : null}
+      {ready ? <CardPrintFoot card={card} /> : null}
     </div>
   );
 }

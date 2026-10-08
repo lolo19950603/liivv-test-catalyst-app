@@ -21,6 +21,7 @@ import {
 import { defaultPageInfo, pageInfoTransformer } from '~/data-transformers/page-info-transformer';
 import { publicWishlistDetailsTransformer } from '~/data-transformers/wishlists-transformer';
 import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-ids';
+import { withPharmacistWishlistItemsViewOnly } from '~/lib/checkout/quebec-insulin';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
 import { isMobileUser } from '~/lib/user-agent';
 
@@ -53,7 +54,13 @@ async function getWishlist(
     return notFound();
   }
 
-  return publicWishlistDetailsTransformer(wishlist, t, pt, formatter);
+  const details = publicWishlistDetailsTransformer(wishlist, t, pt, formatter);
+
+  // Insulin and glucagon link their product page, never "Add to cart" (owner note 9).
+  return {
+    ...details,
+    items: withPharmacistWishlistItemsViewOnly(await details.items),
+  };
 }
 
 async function getPaginationInfo(
@@ -183,7 +190,6 @@ export default async function PublicWishlist({ params, searchParams }: Props) {
 
   return (
     <WishlistAnalyticsProvider data={streamableAnalyticsData}>
-      {denyAdSignals && <DenyAdSignals />}
       <SectionLayout>
         <Breadcrumbs breadcrumbs={Streamable.from(() => getBreadcrumbs(token, searchParams))} />
 
@@ -196,6 +202,8 @@ export default async function PublicWishlist({ params, searchParams }: Props) {
           wishlist={Streamable.from(() => getWishlist(token, t, pt, searchParams))}
         />
       </SectionLayout>
+      {/* Last, not first, so Next's scroll-to-top on navigation works (owner note 11). */}
+      {denyAdSignals && <DenyAdSignals />}
     </WishlistAnalyticsProvider>
   );
 }

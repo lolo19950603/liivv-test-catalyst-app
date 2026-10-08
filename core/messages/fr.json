@@ -3246,10 +3246,19 @@
         },
         "continueReading": "Continuer : {title}",
         "saveStop": "Marquer",
+        "saveStopFor": "Marquer : {title}",
         "stopSaved": "Marqué",
+        "stopSavedFor": "Marqué : {title}",
         "pathSavedMark": "Marqué",
-        "pathBandCount": "{count} arrêts",
-        "pathBandBookmarked": "{count} marqués",
+        "pathBandCount": "{count, plural, one {# arrêt} other {# arrêts}}",
+        "pathBandBookmarked": "{count, plural, one {# marqué} other {# marqués}}",
+        "pathBookmarks": "Arrêts marqués ({count})",
+        "pathBookmarksEmpty": "Touchez « Marquer » sur un arrêt pour le garder ici.",
+        "removeBookmarkFor": "Retirer la marque : {title}",
+        "pathHere": "Vous êtes ici",
+        "onThisPage": "Sur cette page",
+        "onThisPageProgress": "{current} sur {total}",
+        "closeSheet": "Fermer",
         "allGroups": "Tous",
         "stripPrev": "Carte précédente",
         "stripNext": "Carte suivante",
@@ -3380,6 +3389,12 @@
         "takeIn": {
           "print": "Imprimez cette liste",
           "notesHint": "La liste imprimée a de l’espace pour écrire les réponses."
+        },
+        "print": {
+          "site": "Liivv · Soins de stomie",
+          "name": "Nom :",
+          "printed": "Imprimé le",
+          "page": "Tiré de la page"
         },
         "measuringGuide": {
           "download": "Télécharger le PDF",
@@ -3703,6 +3718,7 @@
           "title": "Des poches et des barrières cutanées qui arrivent avant que vous en ayez besoin",
           "lead": "Les fournitures pour la stomie ne sont pas facultatives — et en manquer ne devrait pas faire partie de la routine. Abonnez-vous à vos produits habituels pour que le réapprovisionnement reste tranquille, discret et à temps.",
           "shopLabel": "Magasiner pour s’abonner",
+          "manageLabel": "Gérer les abonnements",
           "demoName": "Essentiels pour la stomie",
           "demoBlurb": "Poches, barrières cutanées et soins de la peau — réapprovisionnés avant que vous en manquiez.",
           "features": {
@@ -3976,6 +3992,13 @@
         "pathSavedMark": "Marqué",
         "pathBandCount": "{count, plural, one {# étape} other {# étapes}}",
         "pathBandBookmarked": "{count, plural, one {# marqué} other {# marqués}}",
+        "pathBookmarks": "Étapes marquées ({count})",
+        "pathBookmarksEmpty": "Touchez « Marquer » sur une étape pour la garder ici.",
+        "removeBookmarkFor": "Retirer la marque : {title}",
+        "pathHere": "Vous êtes ici",
+        "onThisPage": "Sur cette page",
+        "onThisPageProgress": "{current} sur {total}",
+        "closeSheet": "Fermer",
         "stripPrev": "Carte précédente",
         "stripNext": "Carte suivante",
         "stripStatus": "Carte {current} sur {total}",
@@ -4031,6 +4054,13 @@
           "print": "Imprimer la liste",
           "notesHint": "La liste imprimée a de l’espace pour écrire les réponses."
         },
+        "print": {
+          "site": "Liivv · Soins du diabète",
+          "name": "Nom :",
+          "printed": "Imprimé le",
+          "page": "Tiré de la page",
+          "sourcesGroup": "{group} : {titles}"
+        },
         "frDraft": "Brouillon — révision en français à venir",
         "shelf": {
           "inFrench": "(en français)",
@@ -4060,6 +4090,14 @@
           "school": "l’école de votre enfant"
         },
         "titleSuffix": "| Soins du diabète | Liivv",
+        "sources": {
+          "line": "{count, plural, one {Source} other {Sources}} : {titles}",
+          "more": "+{count}",
+          "canadian": "Sources canadiennes",
+          "international": "Sources internationales",
+          "industry": "Pages des fabricants",
+          "note": "Citer les conseils d’un organisme ne signifie pas que cet organisme a révisé ou approuvé cette page."
+        },
         "shop": {
           "label": "Boutique",
           "add": "Ajouter au panier",
@@ -4129,18 +4167,71 @@
         "talkBody": "Clavardez avec nous au sujet des produits, des commandes et du réapprovisionnement pendant les heures d’ouverture. Ce service ne remplace pas votre équipe de soins en diabète pour toute question clinique."
       },
       "contact": {
-        "label": "Pour joindre la Pharmacie Bayshore Express",
+        "label": "Pour joindre Liivv",
         "phone": "1 844 561-1254",
-        "call": "Appeler le {phone}",
+        "call": "Appeler Liivv au {phone}",
         "email": "Écrire à {email}",
         "hours": "Du lundi au vendredi, de 9 h à 17 h, heure de l’Est, sauf les jours fériés",
-        "about": "À propos de la Pharmacie Bayshore Express"
+        "about": "À propos de ce service"
       },
       "commerce": {
         "pharmacistNotice": "Un pharmacien vérifie et prépare chaque commande d’insuline et de glucagon, expédiée dans un emballage neutre.",
         "insulinColdChain": "L’insuline est expédiée sous chaîne du froid.",
         "quebecInsulin": "L’insuline ne peut pas être commandée en ligne pour une livraison au Québec.",
-        "quebecInsulinCheckout": "L’insuline ne peut pas être commandée en ligne pour une livraison au Québec. Retirez-la pour continuer, ou appelez la Pharmacie Bayshore Express au {phone} et un pharmacien vous aidera."
+        "quebecInsulinCheckout": "L’insuline ne peut pas être commandée en ligne pour une livraison au Québec. Retirez-la pour continuer, ou appelez Liivv au {phone} et un pharmacien vous aidera.",
+        "viewProduct": "Voir le produit"
+      },
+      "shopPage": {
+        "label": "Magasiner Soins du diabète",
+        "eyebrow": "La tablette",
+        "description": "Lecteurs, bandelettes, capteurs, aiguilles pour stylo, fournitures pour pompe et le reste autour. Filtrez selon ce qu’il vous faut, la marque que vous utilisez déjà ou l’appareil avec lequel le produit fonctionne.",
+        "searchLabel": "Chercher sur cette tablette",
+        "searchPlaceholder": "Chercher des bandelettes, des capteurs, des aiguilles, une marque…",
+        "searchSubmit": "Chercher",
+        "filtersLabel": "Filtrer la tablette",
+        "typeLabel": "Ce qu’il vous faut",
+        "brandLabel": "Marque",
+        "worksLabel": "Fonctionne avec",
+        "lengthLabel": "Longueur de l’aiguille",
+        "gaugeLabel": "Calibre",
+        "stockLabel": "Disponibilité",
+        "all": "Tout",
+        "allBrands": "Toutes les marques",
+        "anyDevice": "Tous les appareils",
+        "anyLength": "Toutes les longueurs",
+        "anyGauge": "Tous les calibres",
+        "inStock": "En stock",
+        "millimetres": "{mm} mm",
+        "gaugeValue": "{gauge} G",
+        "results": "{count, plural, =0 {Aucun produit} =1 {1 produit} other {# produits}}",
+        "clear": "Effacer les filtres",
+        "empty": "Rien ne correspond à ces filtres.",
+        "emptyAction": "Effacer les filtres et voir toute la tablette",
+        "unavailable": "La tablette ne répond pas pour le moment. Réessayez dans un instant.",
+        "types": {
+          "meters": "Lecteurs de glycémie",
+          "strips": "Bandelettes de test",
+          "lancets": "Lancettes et autopiqueurs",
+          "control": "Solution de contrôle",
+          "ketone": "Bandelettes de cétones",
+          "cgm": "Capteurs et lecteurs (SGC)",
+          "pump-supplies": "Fournitures pour pompe",
+          "pump-accessories": "Accessoires de pompe",
+          "pen-needles": "Aiguilles pour stylo",
+          "syringes": "Seringues",
+          "insulin": "Insuline",
+          "lows": "Comprimés et gels de glucose, glucagon",
+          "injection-aids": "Aides à l’injection",
+          "sharps": "Contenants pour objets pointus et tranchants",
+          "carry-cool": "Étuis et refroidissement",
+          "patches": "Timbres adhésifs et surcouches",
+          "foot": "Soins des pieds",
+          "medical-id": "Identification médicale",
+          "kids-books": "Livres pour enfants",
+          "wellness": "Nutrition et bien-être",
+          "kits": "Trousses",
+          "other": "Autres fournitures"
+        }
       },
       "discovery": {
         "eyebrow": "Également de Liivv",
@@ -4193,8 +4284,18 @@
       },
       "familyTree": {
         "print": "Imprimer l’arbre familial",
-        "clear": "Effacer le tableau",
-        "notSaved": "Rien de ce que vous tapez ici n’est enregistré ni envoyé."
+        "clear": "Effacer l’arbre",
+        "notSaved": "Rien de ce que vous tapez ici n’est enregistré ni envoyé.",
+        "start": "Commencer mon arbre familial",
+        "addHeading": "Ajouter un membre de la famille",
+        "add": "Ajouter : {person}",
+        "added": "Ajouté : {person}",
+        "remove": "Retirer",
+        "removeLabel": "Retirer : {person}",
+        "removed": "Retiré : {person}",
+        "full": "L’arbre peut contenir {max} personnes. Ajoutez les autres à la main sur la copie imprimée.",
+        "anyoneElse": "Autre personne",
+        "toldCount": "{count} sur {max} caractères"
       },
       "testGlossary": {
         "openAll": "Tout ouvrir",
@@ -4205,7 +4306,7 @@
       },
       "pumpPicker": {
         "sources": "{count, plural, one {Source} other {Sources}} : {titles}",
-        "askCde": "Comment joindre un éducateur agréé en diabète de la Pharmacie Bayshore Express"
+        "askCde": "Comment joindre les éducateurs agréés en diabète de Liivv"
       },
       "meterMatch": {
         "sources": "{count, plural, one {Source} other {Sources}} : {titles}"
@@ -4213,7 +4314,7 @@
       "landingPage": {
         "meta": {
           "title": "Soins du diabète et « Liivving » au quotidien | Liivv",
-          "description": "Des conseils sur le diabète qui citent leurs sources, des fournitures, et les éducateurs agréés en diabète de la Pharmacie Bayshore Express, la pharmacie de Liivv, pour vos questions partout au Canada."
+          "description": "Des conseils sur le diabète qui citent leurs sources, des fournitures, et les éducateurs agréés en diabète de Liivv, pour vos questions partout au Canada."
         },
         "hero": {
           "label": "Bannière Soins du diabète",
@@ -4234,7 +4335,7 @@
         "trust": {
           "label": "Pourquoi Soins du diabète de Liivv",
           "items": {
-            "1": "Des éducateurs agréés en diabète à la Pharmacie Bayshore Express, pour tout le Canada",
+            "1": "Les éducateurs agréés en diabète de Liivv, pour tout le Canada",
             "2": "Les pharmacies Liivv servent tout le Canada, y compris le Québec et les territoires",
             "3": "Des faits sur la santé présentés avec leurs sources",
             "4": "Suivi publicitaire désactivé sur ces pages"
@@ -4274,7 +4375,7 @@
           "label": "Quel diabète?",
           "eyebrow": "Votre type",
           "heading": "Quel diabète?",
-          "body": "Choisissez le vôtre pour en savoir plus. Si le vôtre n’est pas ici, ou ne semble pas correspondre, essayez Autre. Diabète Canada indique que le type peut être difficile à établir au début. Votre équipe de soins en diabète le détermine avec vous.",
+          "body": "Choisissez le vôtre pour en savoir plus. Si le vôtre n’est pas ici, ou ne semble pas correspondre, essayez Autre. Le type peut être difficile à établir au début. Votre équipe de soins en diabète le détermine avec vous.",
           "chips": {
             "type1": "Type 1",
             "type2": "Type 2",
@@ -4297,19 +4398,19 @@
           "items": {
             "1": {
               "value": "De 5 à 10 %",
-              "label": "des personnes diabétiques ont le type 1, selon Diabète Canada. Il peut aussi commencer à l’âge adulte."
+              "label": "des personnes diabétiques ont le type 1. Il peut aussi commencer à l’âge adulte."
             },
             "2": {
               "value": "De 90 à 95 %",
-              "label": "des cas de diabète au Canada sont de type 2, le type le plus courant, selon Diabète Canada. Certaines personnes qui en sont atteintes n’ont aucun symptôme."
+              "label": "des cas de diabète au Canada sont de type 2, le type le plus courant. Certaines personnes qui en sont atteintes n’ont aucun symptôme."
             },
             "3": {
               "value": "De 3 à 20 %",
-              "label": "des personnes enceintes développent un diabète gestationnel, selon leurs facteurs de risque, d’après Diabète Canada. Il disparaît habituellement après l’accouchement."
+              "label": "des personnes enceintes développent un diabète gestationnel, selon leurs facteurs de risque. Il disparaît habituellement après l’accouchement."
             },
             "4": {
               "value": "Environ 71 %",
-              "label": "des personnes atteintes du type 1 au Canada ont reçu leur diagnostic à l’âge adulte, selon une estimation de Breakthrough T1D."
+              "label": "des personnes atteintes du type 1 au Canada ont reçu leur diagnostic à l’âge adulte, selon une estimation."
             }
           },
           "sourcesLabel": "Sources"
@@ -4414,14 +4515,14 @@
           "cde": {
             "eyebrow": "Partout au Canada",
             "heading": "Pompes, capteurs, fournitures ou remboursements? Demandez à un EAD®.",
-            "body": "Les éducateurs agréés en diabète de la Pharmacie Bayshore Express, la pharmacie Liivv de Markham, en Ontario, répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie Liivv de votre province. Votre traitement et vos réglages restent l’affaire de votre équipe de soins en diabète.",
+            "body": "Les éducateurs agréés en diabète de Liivv répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie de Liivv de votre province. Votre traitement et vos réglages restent l’affaire de votre équipe de soins en diabète.",
             "cta": "Demander un appel",
             "ctaNote": "Connexion requise"
           },
           "chat": {
-            "eyebrow": "Par téléphone, par courriel ou par clavardage",
+            "eyebrow": "Par téléphone ou par clavardage",
             "heading": "Parlez à un EAD.",
-            "body": "Appelez les éducateurs agréés en diabète de la Pharmacie Bayshore Express ou écrivez-leur, ou commencez une conversation à partir de votre compte Liivv. Les questions sur vos lectures ou votre traitement reviennent à votre équipe de soins en diabète.",
+            "body": "Appelez les éducateurs agréés en diabète de Liivv, ou commencez une conversation à partir de votre compte Liivv. Les questions sur vos lectures ou votre traitement reviennent à votre équipe de soins en diabète.",
             "cta": "Commencer une conversation à partir de votre compte"
           },
           "oliviaTitle": "Olivia peut vous aider avec les commandes et le réapprovisionnement.",
@@ -4437,6 +4538,7 @@
           "eyebrow": "Pour vous repérer",
           "heading": "Des noms que vous connaissez peut-être déjà.",
           "body": "Indiquées pour qu’il soit facile de trouver les lecteurs, les capteurs et les fournitures pour pompe que vous connaissez. Une marque nommée ici n’est pas une recommandation. Votre équipe de soins en diabète vous aide à choisir.",
+          "shop": "Magasiner {brand}",
           "points": {
             "1": "Lecteurs et bandelettes",
             "2": "Capteurs",
@@ -4451,7 +4553,7 @@
           "items": {
             "1": {
               "q": "Puis-je commander mes fournitures ici, et mon régime d’assurance va-t-il payer?",
-              "a": "Vous pouvez commander sur la tablette des fournitures pour le diabète comme des lecteurs, des bandelettes, des lancettes, des aiguilles pour stylo, des capteurs et des fournitures pour pompe. Les pharmacies de Liivv servent tout le Canada, y compris le Québec et les territoires, mais l’insuline ne peut pas être commandée en ligne pour une livraison au Québec. Pour faire remplir une ordonnance, envoyez-la à partir de <link>la page Pharmacie de votre compte</link> : choisissez « Add prescription » (la page est en anglais), puis faites-la transférer de votre pharmacie actuelle ou demandez à votre médecin de la télécopier. Ce qui est couvert pour les pompes, les capteurs, les bandelettes et les aiguilles varie d’une province et d’un territoire à l’autre, et Diabète Canada <link>les compare par province et territoire</link>. La couverture change : vérifiez la date de chaque comparaison et confirmez auprès du régime de votre province ou de votre territoire. Notre pharmacie de votre province facture directement votre régime provincial d’assurance-médicaments pour ce qu’il couvre, sauf au Québec, où les commandes sont payées à titre privé. Les autres programmes paient chacun à leur façon : si l’un d’eux vous rembourse, nous pouvons vous remettre une facture pour votre demande. Vérifiez comment le vôtre paie avant de commander, ou posez la question aux éducateurs agréés en diabète de la Pharmacie Bayshore Express."
+              "a": "Vous pouvez commander sur la tablette des fournitures pour le diabète comme des lecteurs, des bandelettes, des lancettes, des aiguilles pour stylo, des capteurs et des fournitures pour pompe. Les pharmacies de Liivv servent tout le Canada, y compris le Québec et les territoires, mais l’insuline ne peut pas être commandée en ligne pour une livraison au Québec. Pour faire remplir une ordonnance, envoyez-la à partir de <link>la page Pharmacie de votre compte</link> : choisissez « Add prescription » (la page est en anglais), puis faites-la transférer de votre pharmacie actuelle ou demandez à votre médecin de la télécopier. Ce qui est couvert pour les pompes, les capteurs, les bandelettes et les aiguilles varie d’une province et d’un territoire à l’autre, et Diabète Canada <link>les compare par province et territoire</link>. La couverture change : vérifiez la date de chaque comparaison et confirmez auprès du régime de votre province ou de votre territoire. Notre pharmacie de votre province facture directement votre régime provincial d’assurance-médicaments pour ce qu’il couvre, sauf au Québec, où les commandes sont payées à titre privé. Les autres programmes paient chacun à leur façon : si l’un d’eux vous rembourse, nous pouvons vous remettre une facture pour votre demande. Vérifiez comment le vôtre paie avant de commander, ou posez la question aux éducateurs agréés en diabète de Liivv."
             },
             "2": {
               "q": "Ma commande est-elle confidentielle?",
@@ -4459,11 +4561,11 @@
             },
             "3": {
               "q": "Et si un capteur cesse de fonctionner ou se décolle trop tôt?",
-              "a": "Diabète Canada indique qu’un capteur peut mettre jusqu’à 15 minutes de plus qu’une piqûre au doigt à montrer votre glycémie, et conseille de garder un lecteur et des bandelettes en réserve. Gardez-les donc à portée de main. Les éducateurs agréés en diabète de la <link>Pharmacie Bayshore Express</link> peuvent vous aider avec vos questions sur les capteurs et les fournitures : <link>appelez le 1 844 561-1254</link> ou <link>écrivez à BayshoreExpress@bayshore.ca</link>, du lundi au vendredi, de 9 h à 17 h, heure de l’Est, sauf les jours fériés. Si une personne ne peut pas avaler, est inconsciente ou fait une convulsion, <link>appelez le 911</link>. Pour une glycémie basse, une glycémie élevée ou un jour de maladie, consultez <link>Rester en sécurité</link>."
+              "a": "Un capteur peut mettre jusqu’à 15 minutes de plus qu’une piqûre au doigt à montrer votre glycémie : gardez donc un lecteur et des bandelettes en réserve, à portée de main. Les éducateurs agréés en diabète de Liivv peuvent vous aider avec vos questions sur les capteurs et les fournitures : <link>appelez le 1 844 561-1254</link>, du lundi au vendredi, de 9 h à 17 h, heure de l’Est, sauf les jours fériés. Si une personne ne peut pas avaler, est inconsciente ou fait une convulsion, <link>appelez le 911</link>. Pour une glycémie basse, une glycémie élevée ou un jour de maladie, consultez <link>Rester en sécurité</link>."
             },
             "4": {
               "q": "Où vont les aiguilles, les lancettes et les applicateurs de capteur usagés?",
-              "a": "Dans un contenant pour objets pointus et tranchants. Au Manitoba, en Ontario, au Québec, au Nouveau-Brunswick et à l’Île-du-Prince-Édouard, l’Association pour la gestion responsable des produits de santé (HPSA) remet gratuitement des contenants pour objets pointus et tranchants aux points de collecte participants, comme les pharmacies. Quand le vôtre est plein, fermez-le hermétiquement et rapportez-le à un point de dépôt. Son programme accepte les lancettes, les embouts de stylo (aiguilles pour stylo), les seringues, les dispositifs de perfusion et les applicateurs de capteur (SGC) munis d’une aiguille. Il n’accepte pas les lecteurs de glycémie. La HPSA indique de ne jamais jeter d’objets pointus et tranchants usagés aux ordures ni au recyclage. Ailleurs au Canada, renseignez-vous auprès de votre pharmacie : Diabète Canada indique que de nombreuses pharmacies fournissent des contenants sécuritaires et résistants aux perforations."
+              "a": "Dans un contenant pour objets pointus et tranchants. Au Manitoba, en Ontario, au Québec, au Nouveau-Brunswick et à l’Île-du-Prince-Édouard, l’Association pour la gestion responsable des produits de santé (HPSA) remet gratuitement des contenants pour objets pointus et tranchants aux points de collecte participants, comme les pharmacies. Quand le vôtre est plein, fermez-le hermétiquement et rapportez-le à un point de dépôt. Son programme accepte les lancettes, les embouts de stylo (aiguilles pour stylo), les seringues, les dispositifs de perfusion et les applicateurs de capteur (SGC) munis d’une aiguille. Il n’accepte pas les lecteurs de glycémie. Ne jetez jamais d’objets pointus et tranchants usagés aux ordures ni au recyclage. Ailleurs au Canada, renseignez-vous auprès de votre pharmacie : de nombreuses pharmacies fournissent des contenants sécuritaires et résistants aux perforations."
             },
             "5": {
               "q": "Puis-je commander de l’insuline ici?",
@@ -4516,7 +4618,7 @@
           "5": "Si votre carte est refusée, nous réessayons 3 autres fois. Ensuite, le solde est dû dans les 3 jours ouvrables. Les cartes prépayées ne sont pas acceptées.",
           "6": "Un retard de paiement peut retenir votre prochaine livraison et mettre fin à votre participation au programme."
         },
-        "payLaterContact": "Pour en savoir plus, communiquez avec la Pharmacie Bayshore Express, la pharmacie Liivv de Markham, en Ontario. Elle transmettra votre question à la bonne équipe.",
+        "payLaterContact": "Pour en savoir plus, communiquez avec Liivv. Nous transmettrons votre question à la bonne équipe.",
         "toolEyebrow": "Votre situation",
         "toolHeading": "Trouvez ce qui s’applique à vous",
         "toolIntro": "Seul l’endroit où vous vivez est nécessaire. Répondez au reste si vous êtes à l’aise, et chaque réponse précise la liste.",
@@ -4554,7 +4656,7 @@
         "enough2Heading": "Comparez les provinces avec Diabète Canada",
         "enough2Body": "Diabète Canada publie des comparaisons côte à côte de ce que couvre chaque province et chaque territoire, ainsi qu’un rapport sur les frais remboursables liés au diabète. Les comparaisons pour les pompes et la surveillance du glucose datent de 2024, alors certains changements récents présentés sur cette page n’y figurent pas.",
         "enough3Heading": "Demandez à un EAD",
-        "enough3Body": "Pour vos questions sur les pompes, les capteurs, les fournitures, la facturation et les demandes de remboursement, les éducateurs agréés en diabète de la Pharmacie Bayshore Express peuvent vous aider, où que vous soyez au Canada.",
+        "enough3Body": "Pour vos questions sur les pompes, les capteurs, les fournitures, la facturation et les demandes de remboursement, les éducateurs agréés en diabète de Liivv peuvent vous aider, où que vous soyez au Canada.",
         "movingEyebrow": "Déménagement",
         "movingHeading": "Si vous changez de province",
         "movingIntro": "Les programmes de pompes et de capteurs varient d’une province à l’autre, et plusieurs exigent une évaluation par un programme de diabète local avant de couvrir quoi que ce soit.",
@@ -4566,7 +4668,7 @@
         "arrive2": "Trouvez tôt un programme d’éducation sur le diabète. Plusieurs programmes exigent qu’il vous évalue avant de payer.",
         "cdeEyebrow": "Partout au Canada",
         "cdeHeading": "Questions sur les pompes, les capteurs, la facturation ou les remboursements",
-        "cdeBody": "Les éducateurs agréés en diabète de la Pharmacie Bayshore Express, la pharmacie Liivv de Markham, en Ontario, répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie Liivv de votre province.",
+        "cdeBody": "Les éducateurs agréés en diabète de Liivv répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie de Liivv de votre province.",
         "cdeCta": "Demander un appel",
         "closingHeading": "L’argent ne devrait pas être la raison pour laquelle vous vous en passez",
         "closingBody": "Si les chiffres ne fonctionnent pas, dites-le à votre équipe de diabète. Votre programme d’éducation sur le diabète connaît peut-être des options que cette page ne couvre pas.",
@@ -4682,8 +4784,8 @@
             "title": "On vient de vous l’annoncer",
             "items": {
               "1": "Il n’y a pas de bonne façon de réagir à cette nouvelle, et rien ne presse pour tout assimiler d’un coup",
-              "2": "Diabète Canada indique que la dépression est plus fréquente chez les personnes qui vivent avec le diabète. Prendre soin de votre moral fait donc partie de prendre soin de votre diabète",
-              "3": "Les lignes directrices de Diabète Canada indiquent que les équipes de soins en diabète devraient demander à chacun, de temps à autre, s’il vit de la détresse liée au diabète, et comment vont son moral et son anxiété. Vous pouvez en parler en premier",
+              "2": "La dépression est plus fréquente chez les personnes qui vivent avec le diabète. Prendre soin de votre moral fait donc partie de prendre soin de votre diabète",
+              "3": "Les lignes directrices canadiennes indiquent que les équipes de soins en diabète devraient demander à chacun, de temps à autre, s’il vit de la détresse liée au diabète, et comment vont son moral et son anxiété. Vous pouvez en parler en premier",
               "4": "Votre équipe commencera par ce que vous devez savoir en premier. Le reste peut attendre"
             },
             "note": "Si ça ne s’améliore pas, parlez-en à votre équipe de soins en diabète ou à votre médecin. Si vous souhaitez parler à un professionnel de la santé mentale, Breakthrough T1D tient un répertoire Santé mentale + diabète (Mental Health + Diabetes Directory) de professionnels inscrits.",
@@ -4710,11 +4812,11 @@
           "2": {
             "title": "De quel diabète s’agit-il?",
             "items": {
-              "1": "Type 1 : le pancréas ne produit pas d’insuline. Selon Diabète Canada, de 5 à 10 % des personnes diabétiques ont le type 1, et il peut aussi commencer à l’âge adulte",
+              "1": "Type 1 : le pancréas ne produit pas d’insuline. De 5 à 10 % des personnes diabétiques ont le type 1, et il peut aussi commencer à l’âge adulte",
               "2": "Type 2 : le type le plus courant, de 90 à 95 % des personnes diabétiques. Il peut ne causer aucun symptôme",
               "3": "Diabète gestationnel : il apparaît pendant la grossesse, dans 3 à 20 % des grossesses. Il disparaît habituellement après l’accouchement, mais il augmente le risque de diabète de type 2 plus tard, pour vous et pour votre enfant",
               "4": "Prédiabète : une glycémie plus élevée que la normale, mais pas encore assez élevée pour qu’on parle de diabète de type 2",
-              "5": "Types moins courants : les lignes directrices de Diabète Canada mentionnent des formes moins courantes, comme le LADA (qu’elles classent dans le type 1) et le diabète monogénique, et précisent que certains cas sont difficiles à classer. Si votre type ne semble pas correspondre, parlez-en à votre équipe"
+              "5": "Types moins courants : il existe des formes moins courantes, comme le LADA (classé dans le type 1 au Canada) et le diabète monogénique, et certains cas sont difficiles à classer. Si votre type ne semble pas correspondre, parlez-en à votre équipe"
             },
             "note": "Connaître votre type comporte une fiche pour chacun, y compris les types moins courants.",
             "figure": {
@@ -4740,22 +4842,22 @@
           "3": {
             "title": "Vos cibles de glycémie",
             "items": {
-              "1": "Les cibles habituelles de Diabète Canada sont de 4,0 à 7,0 mmol/L avant les repas et de 5,0 à 10,0 deux heures après avoir mangé",
-              "2": "Si votre A1C n’est pas dans la cible, votre équipe pourrait fixer une cible plus basse après les repas, en tenant compte du risque d’hypoglycémie. Diabète Canada indique de 5,0 à 8,0",
-              "3": "L’A1C est une analyse sanguine qui montre la moyenne de votre glycémie au cours des 2 à 3 derniers mois. Elle se fait habituellement environ tous les 3 mois, et la cible habituelle de Diabète Canada est de 7,0 % ou moins",
-              "4": "Si vous utilisez un capteur, les lignes directrices de Diabète Canada reprennent des cibles internationales : pour la plupart des adultes, plus de 70 % de la journée entre 3,9 et 10,0",
+              "1": "Les cibles habituelles au Canada sont de 4,0 à 7,0 mmol/L avant les repas et de 5,0 à 10,0 deux heures après avoir mangé",
+              "2": "Si votre A1C n’est pas dans la cible, votre équipe pourrait fixer une cible plus basse après les repas, de 5,0 à 8,0, en tenant compte du risque d’hypoglycémie",
+              "3": "L’A1C est une analyse sanguine qui montre la moyenne de votre glycémie au cours des 2 à 3 derniers mois. Elle se fait habituellement environ tous les 3 mois, et la cible habituelle au Canada est de 7,0 % ou moins",
+              "4": "Si vous utilisez un capteur, les lignes directrices canadiennes reprennent les cibles internationales : pour la plupart des adultes, plus de 70 % de la journée entre 3,9 et 10,0",
               "5": "Votre équipe pourrait fixer d’autres cibles, par exemple pour les enfants, ou si vous êtes enceinte, fragile ou si vous faites souvent des hypoglycémies graves"
             },
             "note": "Inscrivez vos propres cibles sur la carte et gardez-la avec votre lecteur de glycémie. Si votre équipe vous a donné d’autres valeurs, utilisez les siennes.",
             "figure": {
               "ruler": {
-                "heading": "Les cibles habituelles de Diabète Canada, en mmol/L",
+                "heading": "Les cibles habituelles au Canada, en mmol/L",
                 "unit": "mmol/L",
                 "zones": {
                   "low": "Basse : sous 3,9",
                   "beforeMeals": "Avant les repas : de 4,0 à 7,0",
                   "afterMeals": "Deux heures après les repas : de 5,0 à 10,0",
-                  "timeInRange": "Temps dans la cible avec un capteur (lignes directrices) : de 3,9 à 10,0"
+                  "timeInRange": "Temps dans la cible avec un capteur : de 3,9 à 10,0"
                 },
                 "lowLink": "Que faire en cas de glycémie basse : la règle des 15",
                 "teamNote": "Votre équipe pourrait fixer d’autres valeurs, par exemple pour un enfant. Utilisez les siennes."
@@ -4775,9 +4877,9 @@
             "items": {
               "1": "Le Guide alimentaire canadien suggère beaucoup de légumes et de fruits, des aliments à grains entiers et des aliments protéinés, en choisissant plus souvent des protéines d’origine végétale",
               "2": "Il suggère de faire de l’eau votre boisson de choix et de limiter les aliments hautement transformés",
-              "3": "Les lignes directrices de Diabète Canada appuient plus d’une façon de manger, dont l’alimentation méditerranéenne, l’alimentation DASH et l’alimentation végétarienne. Un diététiste peut vous aider à trouver ce qui vous convient",
+              "3": "Les lignes directrices canadiennes appuient plus d’une façon de manger, dont l’alimentation méditerranéenne, l’alimentation DASH et l’alimentation végétarienne. Un diététiste peut vous aider à trouver ce qui vous convient",
               "4": "Commencez lentement, avec 5 à 10 minutes d’activité par jour, puis augmentez peu à peu",
-              "5": "Diabète Canada suggère d’en arriver à 150 minutes par semaine d’activité d’intensité modérée à élevée, par exemple 30 minutes, 5 jours par semaine",
+              "5": "Essayez d’en arriver à 150 minutes par semaine d’activité d’intensité modérée à élevée, par exemple 30 minutes, 5 jours par semaine",
               "6": "Si vous n’avez pas été actif depuis un moment, parlez-en à votre médecin avant de commencer quoi que ce soit de plus exigeant qu’une marche rapide",
               "7": "Si vous prenez de l’insuline ou d’autres médicaments qui abaissent la glycémie, ayez du sucre à action rapide sur vous quand vous êtes actif"
             },
@@ -4798,7 +4900,7 @@
             "items": {
               "1": "Demandez-lui quelle aide elle aimerait. Certaines personnes veulent de la compagnie à leurs rendez-vous, d’autres préfèrent s’en occuper seules",
               "2": "Apprenez à quoi ressemble une hypoglycémie chez elle, et où elle garde son sucre à action rapide. Les étapes sont dans <link>la règle des 15</link>, dans Rester en sécurité",
-              "3": "Si elle risque de faire une hypoglycémie grave, comme les personnes qui prennent de l’insuline, les lignes directrices de Diabète Canada indiquent que les gens de son entourage devraient apprendre à appeler le 911, et à donner du glucagon. Les signes qui demandent des soins d’urgence sont dans Rester en sécurité",
+              "3": "Si elle risque de faire une hypoglycémie grave, comme les personnes qui prennent de l’insuline, les lignes directrices canadiennes indiquent que les gens de son entourage devraient apprendre à appeler le 911, et à donner du glucagon. Les signes qui demandent des soins d’urgence sont dans Rester en sécurité",
               "4": "Si elle a le type 1, ses proches parents de 2 à 45 ans, et les autres membres de sa famille de 2 à 20 ans, peuvent se renseigner sur le dépistage gratuit offert dans le cadre de la recherche TrialNet, partout au Canada. Les détails sont dans <link>Le type 1 commence avant les symptômes</link>, dans Connaître votre type",
               "5": "Vos propres émotions comptent aussi. Si vous prenez soin d’un enfant ou d’un adolescent qui a le type 1, Breakthrough T1D offre un guide pour les proches aidants (Caregiver Guide)"
             },
@@ -4818,9 +4920,9 @@
             "title": "Ai-je besoin d’un lecteur de glycémie?",
             "items": {
               "1": "Le fait de mesurer votre glycémie à la maison, et à quelle fréquence, dépend de votre type de diabète et de votre traitement. Votre équipe vous dira ce dont vous avez besoin",
-              "2": "Si vous prenez de l’insuline plus d’une fois par jour, les lignes directrices de Diabète Canada recommandent de mesurer votre glycémie au moins 3 fois par jour",
-              "3": "Pour le type 1 traité par injections ou par pompe, les lignes directrices de Diabète Canada recommandent un capteur qui mesure en tout temps (surveillance du glucose en continu, ou SGC). Demandez à votre équipe si cela vous convient",
-              "4": "Un capteur peut avoir jusqu’à 15 minutes de retard sur votre glycémie. Diabète Canada suggère donc de garder un lecteur et des bandelettes en réserve",
+              "2": "Si vous prenez de l’insuline plus d’une fois par jour, les lignes directrices canadiennes recommandent de mesurer votre glycémie au moins 3 fois par jour",
+              "3": "Pour le type 1 traité par injections ou par pompe, les lignes directrices canadiennes recommandent un capteur qui mesure en tout temps (surveillance du glucose en continu, ou SGC). Demandez à votre équipe si cela vous convient",
+              "4": "Un capteur peut avoir jusqu’à 15 minutes de retard sur votre glycémie. Gardez donc un lecteur et des bandelettes en réserve",
               "5": "Choisir un lecteur, et les bandelettes et les lancettes qui vont avec, c’est dans Vos outils"
             },
             "note": "Certaines provinces couvrent les bandelettes et les capteurs, et la quantité dépend souvent de votre traitement. <link>Financement et couverture</link> donne les détails pour votre province.",
@@ -4840,7 +4942,7 @@
             "items": {
               "1": "À quoi sert chacun de mes médicaments, et quand dois-je le prendre?",
               "2": "Certains peuvent-ils causer une hypoglycémie? Si oui, que dois-je garder sur moi?",
-              "3": "Faut-il en suspendre certains pendant un jour de maladie? La fiche de Diabète Canada sur les jours de maladie a un espace où votre pharmacien peut l’inscrire",
+              "3": "Faut-il en suspendre certains pendant un jour de maladie? Le plan pour les jours de maladie, dans Rester en sécurité, a un espace où votre pharmacien peut l’inscrire",
               "4": "Comment dois-je conserver chacun d’eux, et combien de temps se garde-t-il une fois ouvert?",
               "5": "Quelles fournitures vont avec mes médicaments, et sont-elles couvertes par mon régime?"
             },
@@ -4849,14 +4951,14 @@
           "8": {
             "title": "Commencer l’insuline",
             "items": {
-              "1": "Diabète Canada indique que toutes les personnes qui ont le type 1, et beaucoup de celles qui ont le type 2, ont besoin d’insuline pour rester en santé",
+              "1": "Toutes les personnes qui ont le type 1, et beaucoup de celles qui ont le type 2, ont besoin d’insuline pour rester en santé",
               "2": "Il n’existe pas de plan unique pour tout le monde. Votre équipe détermine avec vous le nombre d’injections, le moment, la quantité et si une pompe vous conviendrait",
               "3": "L’insuline peut se prendre avec un stylo, une seringue ou une pompe. Les stylos sont accompagnés d’un mode d’emploi : lisez-le pour apprendre comment le vôtre fonctionne",
-              "4": "Changez d’endroit chaque fois que vous vous injectez. Diabète Canada indique que cela aide à prévenir les bosses de graisse qui peuvent nuire à l’action de l’insuline",
+              "4": "Changez d’endroit chaque fois que vous vous injectez. Cela aide à prévenir les bosses de graisse qui peuvent nuire à l’action de l’insuline",
               "5": "Utilisez un nouvel embout de stylo ou une nouvelle aiguille chaque fois, puis jetez-le dans un contenant pour objets pointus et tranchants",
-              "6": "L’insuline augmente votre risque d’hypoglycémie. Diabète Canada recommande d’avoir toujours du sucre à action rapide sur vous, à la maison comme à l’extérieur. Les étapes sont dans <link>la règle des 15</link>, dans Rester en sécurité",
+              "6": "L’insuline augmente votre risque d’hypoglycémie. Ayez toujours du sucre à action rapide sur vous, à la maison comme à l’extérieur. Les étapes sont dans <link>la règle des 15</link>, dans Rester en sécurité",
               "7": "La conservation varie d’une insuline à l’autre. Suivez le feuillet qui accompagne la vôtre, ou demandez à votre pharmacien",
-              "8": "Diabète Canada indique de jeter l’insuline qui a gelé, qui a été exposée à plus de 30 °C ou qui est périmée"
+              "8": "Jetez l’insuline qui a gelé, qui a été exposée à plus de 30 °C ou qui est périmée"
             },
             "note": "C’est la personne qui vous la prescrit qui choisit votre insuline, et il faut du temps pour ajuster votre routine. Un guide d’injection étape par étape se trouve dans Vos outils.",
             "figure": {
@@ -4873,11 +4975,11 @@
           "9": {
             "title": "Les objets pointus et tranchants dès le premier jour",
             "items": {
-              "1": "Les lancettes, les embouts de stylo et les aiguilles usagés vont dans un contenant pour objets pointus et tranchants. Diabète Canada indique que les embouts de stylo et les aiguilles sont à usage unique",
+              "1": "Les lancettes, les embouts de stylo et les aiguilles usagés vont dans un contenant pour objets pointus et tranchants. Les embouts de stylo et les aiguilles sont à usage unique",
               "2": "Les objets pointus et tranchants comprennent les lancettes, les aiguilles pour stylo, les applicateurs de capteur munis d’une aiguille, les ensembles de perfusion et les seringues",
-              "3": "Ne jetez jamais d’objets pointus et tranchants usagés aux ordures ou au recyclage, précise l’Association pour la gestion responsable des produits de santé (Health Products Stewardship Association)",
+              "3": "Ne jetez jamais d’objets pointus et tranchants usagés aux ordures ou au recyclage",
               "4": "Au Manitoba, en Ontario, au Québec, au Nouveau-Brunswick et à l’Île-du-Prince-Édouard, les pharmacies participantes remettent gratuitement des contenants pour objets pointus et tranchants et les reprennent",
-              "5": "Ailleurs au Canada, renseignez-vous auprès de votre pharmacie. Diabète Canada indique que beaucoup de pharmacies fournissent des contenants et échangent un contenant plein contre un nouveau"
+              "5": "Ailleurs au Canada, renseignez-vous auprès de votre pharmacie. Beaucoup de pharmacies fournissent des contenants et échangent un contenant plein contre un nouveau"
             },
             "note": "Demandez à votre pharmacie où rapporter un contenant plein près de chez vous.",
             "figure": {
@@ -4960,8 +5062,8 @@
                   "label": "Un pharmacien"
                 },
                 "4": {
-                  "label": "Éducateurs agréés en diabète de la Pharmacie Bayshore Express",
-                  "scope": "La pharmacie Liivv de Markham, en Ontario · partout au Canada",
+                  "label": "Éducateurs agréés en diabète de Liivv",
+                  "scope": "Liivv · partout au Canada",
                   "body": "Questions sur les pompes, les capteurs, les lecteurs et les autres fournitures pour le diabète, et sur la facturation et les demandes de remboursement."
                 },
                 "5": {
@@ -4986,26 +5088,26 @@
             },
             "2": {
               "heading": "Environ tous les 3 mois : l’A1C",
-              "body": "Les lignes directrices de Diabète Canada suggèrent une analyse d’A1C environ tous les 3 mois. Pour les adultes dont les résultats sont stables et dans la cible, votre équipe pourrait les espacer. Votre cible habituelle se trouve dans Vos cibles de glycémie."
+              "body": "Les lignes directrices canadiennes suggèrent une analyse d’A1C environ tous les 3 mois. Pour les adultes dont les résultats sont stables et dans la cible, votre équipe pourrait les espacer. Votre cible habituelle se trouve dans Vos cibles de glycémie."
             },
             "3": {
               "heading": "Les yeux",
-              "body": "Diabète Canada recommande un examen de la vue une fois par année, à moins que votre professionnel des soins de la vue ne suggère autre chose. Avec le type 2, le premier a lieu au moment du diagnostic. Avec le type 1, chez les personnes de 15 ans et plus, les examens commencent 5 ans après le diagnostic. Les enfants ont leur propre calendrier. Votre équipe vous dira quand le vôtre est prévu."
+              "body": "Faites faire un examen de la vue une fois par année, à moins que votre professionnel des soins de la vue ne suggère autre chose. Avec le type 2, le premier a lieu au moment du diagnostic. Avec le type 1, chez les personnes de 15 ans et plus, les examens commencent 5 ans après le diagnostic. Les enfants ont leur propre calendrier. Votre équipe vous dira quand le vôtre est prévu."
             },
             "4": {
               "heading": "Les reins",
-              "body": "Les lignes directrices de Diabète Canada indiquent que deux analyses, appelées RAC et DFGe, vérifient vos reins au moins une fois par année. Avec le type 2, elles commencent au moment du diagnostic. Avec le type 1, elles commencent habituellement 5 ans après le diagnostic. Les enfants ont leur propre calendrier : demandez à votre équipe."
+              "body": "Deux analyses, appelées RAC et DFGe, vérifient vos reins au moins une fois par année. Avec le type 2, elles commencent au moment du diagnostic. Avec le type 1, elles commencent habituellement 5 ans après le diagnostic. Les enfants ont leur propre calendrier : demandez à votre équipe."
             },
             "5": {
               "heading": "Les pieds",
-              "body": "Diabète Canada suggère de laver, de sécher et d’examiner vos pieds chaque jour, avec un miroir au besoin. Au moins une fois par année, votre équipe examine vos pieds nus, y compris la sensibilité et la circulation sanguine."
+              "body": "Lavez, séchez et examinez vos pieds chaque jour, avec un miroir au besoin. Au moins une fois par année, votre équipe examine vos pieds nus, y compris la sensibilité et la circulation sanguine."
             }
           }
         },
         "pharmacist": {
           "eyebrow": "Partout au Canada",
           "heading": "Questions sur vos premières fournitures",
-          "body": "Les éducateurs agréés en diabète de la Pharmacie Bayshore Express, la pharmacie Liivv de Markham, en Ontario, répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie Liivv de votre province. Votre plan et vos médicaments restent l’affaire de votre équipe de soins en diabète."
+          "body": "Les éducateurs agréés en diabète de Liivv répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie de Liivv de votre province. Votre plan et vos médicaments restent l’affaire de votre équipe de soins en diabète."
         },
         "closing": {
           "heading": "Un pas, puis le suivant",
@@ -5056,7 +5158,7 @@
           "1": {
             "title": "Connaître votre hypoglycémie",
             "items": {
-              "1": "Diabète Canada considère qu’une glycémie inférieure à 3,9 mmol/L est basse",
+              "1": "Une glycémie inférieure à 3,9 mmol/L est basse",
               "2": "Niveau 1 : sous 3,9, jusqu’à 3,0",
               "3": "Niveau 2 : sous 3,0",
               "4": "Niveau 3 : une hypoglycémie, peu importe la valeur, que vous ne pouvez pas traiter sans l’aide de quelqu’un d’autre",
@@ -5123,7 +5225,7 @@
                   "amount": "15 g"
                 }
               },
-              "childNote": "Tiré de la ligne directrice de Diabète Canada pour les enfants atteints de diabète de type 1 qui utilisent des injections, ou une pompe qui n’ajuste pas l’insuline d’elle-même. Les enfants qui utilisent un système automatisé (en boucle fermée) pourraient avoir besoin de moins. Si votre enfant a un autre type de diabète, ou utilise un système automatisé, demandez à son équipe quelle quantité donner.",
+              "childNote": "Tiré des lignes directrices canadiennes pour les enfants atteints de diabète de type 1 qui utilisent des injections, ou une pompe qui n’ajuste pas l’insuline d’elle-même. Les enfants qui utilisent un système automatisé (en boucle fermée) pourraient avoir besoin de moins. Si votre enfant a un autre type de diabète, ou utilise un système automatisé, demandez à son équipe quelle quantité donner.",
               "childSteps": {
                 "1": "Donnez la quantité selon l’âge",
                 "4": "Encore sous 3,9? Donnez de nouveau cette quantité"
@@ -5138,8 +5240,8 @@
                 "3": "Vérifiez de nouveau sa glycémie"
               },
               "childOptionsHeading": "Chacun de ces choix équivaut à 15 g de sucre à action rapide. Pour un enfant, donnez la quantité indiquée dans le tableau selon son âge :",
-              "childOptionsNote": "Le miel ne figure pas dans la liste pour les enfants. Santé Canada indique de ne donner aucune sorte de miel aux bébés de moins d’un an.",
-              "aidNote": "Vous utilisez un système automatisé d’administration d’insuline (en boucle fermée)? La ligne directrice de Diabète Canada sur le diabète de type 1 indique que les personnes de tout âge peuvent traiter une hypoglycémie qu’elles peuvent gérer elles-mêmes avec moins, soit de 5 à 10 g. Demandez à votre équipe quoi utiliser."
+              "childOptionsNote": "Le miel ne figure pas dans la liste pour les enfants. Ne donnez jamais de miel, quel qu’il soit, aux bébés de moins d’un an.",
+              "aidNote": "Vous utilisez un système automatisé d’administration d’insuline (en boucle fermée)? Les lignes directrices canadiennes sur le diabète de type 1 indiquent que les personnes de tout âge peuvent traiter une hypoglycémie qu’elles peuvent gérer elles-mêmes avec moins, soit de 5 à 10 g. Demandez à votre équipe quoi utiliser."
             }
           },
           "3": {
@@ -5148,7 +5250,7 @@
               "1": "Le glucagon sert en cas d’hypoglycémie quand la personne ne peut pas avaler, est inconsciente ou fait une convulsion. C’est quelqu’un d’autre qui le donne",
               "2": "Il existe en vaporisateur nasal ou en injection. Votre pharmacien peut vous dire lequel est disponible",
               "3": "Appelez le 911, ou demandez à quelqu’un d’appeler. Donnez le glucagon, tournez la personne sur le côté et restez avec elle. Ne lui mettez ni nourriture ni boisson dans la bouche",
-              "4": "Si une hypoglycémie nuit à la pensée ou aux mouvements de la personne, mais qu’elle peut encore avaler, la fiche de Diabète Canada indique de donner 20 g de sucre à action rapide",
+              "4": "Si une hypoglycémie nuit à la pensée ou aux mouvements de la personne, mais qu’elle peut encore avaler, donnez-lui 20 g de sucre à action rapide",
               "5": "À l’école, le personnel nommé dans le plan de soins de l’élève, et formé, donne le glucagon lorsque le plan comprend un consentement à cet effet"
             },
             "note": "Demandez à votre pharmacien de vous montrer comment fonctionne votre glucagon, et vérifiez sa date de péremption de temps en temps. Pour un enfant de moins de 4 ans, demandez à l’équipe de votre enfant quel glucagon garder."
@@ -5159,9 +5261,9 @@
               "1": "L’exercice peut continuer à faire baisser votre glycémie jusqu’à 48 heures après",
               "2": "Vérifiez votre glycémie régulièrement, surtout si vous prenez de l’insuline ou d’autres médicaments qui font baisser la glycémie",
               "3": "Si vous prenez de l’insuline ou certains comprimés pour le diabète, l’alcool peut causer une hypoglycémie jusqu’à 24 heures après avoir bu",
-              "4": "Diabète Canada suggère de manger des glucides quand vous buvez de l’alcool, et de vérifier votre glycémie avant d’aller au lit",
-              "5": "Assurez-vous qu’une personne avec vous sait qu’elle doit appeler le 911 si vous perdez connaissance, et vous donner du glucagon si vous en avez. Selon les lignes directrices de Diabète Canada, le glucagon peut être moins efficace si vous avez pris plus de 2 verres standard d’alcool au cours des dernières heures : l’appel au 911 est donc d’autant plus important",
-              "6": "Un capteur peut avoir jusqu’à 15 minutes de retard sur votre glycémie. Diabète Canada suggère de garder un lecteur de glycémie en réserve"
+              "4": "Mangez des glucides quand vous buvez de l’alcool, et vérifiez votre glycémie avant d’aller au lit",
+              "5": "Assurez-vous qu’une personne avec vous sait qu’elle doit appeler le 911 si vous perdez connaissance, et vous donner du glucagon si vous en avez. Le glucagon peut être moins efficace si vous avez pris plus de 2 verres standard d’alcool au cours des dernières heures : l’appel au 911 est donc d’autant plus important",
+              "6": "Un capteur peut avoir jusqu’à 15 minutes de retard sur votre glycémie. Gardez un lecteur de glycémie en réserve"
             },
             "note": "Demandez à votre équipe comment planifier vos médicaments en fonction de l’exercice et de l’alcool.",
             "figure": {
@@ -5179,10 +5281,10 @@
             "title": "À avoir sur soi, à porter",
             "items": {
               "1": "Ayez du sucre à action rapide sur vous quand vous êtes actif",
-              "2": "Si vous avez du glucagon, montrez aux personnes avec qui vous passez du temps comment il fonctionne. La ligne directrice de Diabète Canada indique qu’elles devraient recevoir cet enseignement",
+              "2": "Si vous avez du glucagon, montrez aux personnes avec qui vous passez du temps comment il fonctionne. Les lignes directrices canadiennes indiquent qu’elles devraient recevoir cet enseignement",
               "3": "Portez une identification médicale, comme un bracelet ou un collier",
               "4": "Pour un enfant à l’école, un plan de soins établi avant l’année scolaire couvre les soins quotidiens et les urgences, avec au moins deux membres du personnel formés",
-              "5": "Diabetes@School indique de traiter l’hypoglycémie d’un élève tout de suite, là où elle survient, et de ne pas le laisser seul",
+              "5": "Traitez l’hypoglycémie d’un élève tout de suite, là où elle survient, et ne le laissez pas seul",
               "6": "Les élèves peuvent avoir sur eux un téléphone ou une montre intelligente pour les aider à gérer leur glycémie"
             },
             "figure": {
@@ -5202,7 +5304,7 @@
           "6": {
             "title": "L’hyperglycémie",
             "items": {
-              "1": "Les cibles habituelles de Diabète Canada sont de 4,0 à 7,0 mmol/L avant les repas et de 5,0 à 10,0 deux heures après les repas. Votre équipe peut en fixer d’autres",
+              "1": "Les cibles habituelles au Canada sont de 4,0 à 7,0 mmol/L avant les repas et de 5,0 à 10,0 deux heures après les repas. Votre équipe peut en fixer d’autres",
               "2": "Les symptômes d’une glycémie élevée peuvent apparaître quand votre glycémie à jeun est de 11 ou plus",
               "3": "Si votre glycémie reste au-dessus de 14 avant les repas pendant plus de quelques repas, vérifiez vos cétones",
               "4": "Les cétones peuvent s’accumuler même quand la glycémie est proche de la normale, par exemple pendant la grossesse ou avec un type de comprimé contre le diabète appelé inhibiteur du SGLT2. Demandez à votre pharmacien si l’un de vos comprimés en est un, ou en contient un"
@@ -5215,10 +5317,10 @@
               "1": "Les cétones s’accumulent quand votre corps n’a pas assez d’insuline et commence à décomposer les graisses pour produire de l’énergie",
               "2": "Vous pouvez vérifier les cétones dans le sang ou dans l’urine. Votre équipe vous dira lequel utiliser",
               "3": "Vérifiez-les quand votre glycémie reste élevée. Avec le type 1, vérifiez-les aussi quand vous êtes malade, surtout en cas de vomissements, de douleurs au ventre ou de fièvre. Avec les autres types, vérifiez-les quand vous êtes malade si votre équipe vous l’a demandé",
-              "4": "La ligne directrice de Diabète Canada pour le diabète de type 1 indique de reporter l’exercice intense si les cétones sanguines sont de 1,5 ou plus",
+              "4": "Avec le type 1, les lignes directrices canadiennes indiquent de reporter l’exercice intense si les cétones sanguines sont de 1,5 ou plus",
               "5": "Les signes de l’acidocétose diabétique (ACD) comprennent la soif, le fait d’uriner beaucoup, des douleurs au ventre, des nausées ou des vomissements, une respiration plus profonde, une haleine qui sent le fruit, et de la fatigue, de la somnolence ou de la confusion. L’ACD demande des soins médicaux tout de suite"
             },
-            "note": "L’échelle ci-dessous est adaptée de Breakthrough T1D et a été rédigée pour le diabète de type 1. Si vous avez un autre type de diabète, demandez à votre équipe quelles valeurs utiliser. Peu importe le type, Diabète Canada indique que des cétones élevées demandent des soins médicaux tout de suite.",
+            "note": "L’échelle ci-dessous a été rédigée pour le diabète de type 1. Si vous avez un autre type de diabète, demandez à votre équipe quelles valeurs utiliser. Peu importe le type, des cétones élevées demandent des soins médicaux tout de suite.",
             "figure": {
               "writtenFor": "Rédigé pour le diabète de type 1, adapté de Breakthrough T1D",
               "blood": {
@@ -5267,23 +5369,23 @@
               "1": {
                 "heading": "Quand cela s’applique",
                 "items": {
-                  "1": "La fiche de Diabète Canada pour les jours de maladie vise les vomissements, la diarrhée, la fièvre, ou une forte chaleur ou humidité sans boire assez : tout ce qui peut vous déshydrater"
+                  "1": "Ces étapes pour les jours de maladie visent les vomissements, la diarrhée, la fièvre, ou une forte chaleur ou humidité sans boire assez : tout ce qui peut vous déshydrater"
                 }
               },
               "2": {
-                "heading": "Ce que la fiche conseille de faire",
+                "heading": "Quoi faire",
                 "items": {
                   "1": "Buvez beaucoup de liquides contenant peu de sucre, sauf si on vous a dit de limiter les liquides",
-                  "2": "Si vous ne pouvez pas manger, la fiche donne une liste d’aliments contenant 15 g de glucides à prendre à la place",
-                  "3": "Diabète Canada indique que si vous utilisez de l’insuline, vous devez continuer à la prendre quand vous êtes malade. Vérifiez votre glycémie plus souvent. La fiche indique que votre insuline pourrait devoir être ajustée; demandez donc à votre équipe comment faire"
+                  "2": "Si vous ne pouvez pas manger, prenez plutôt des aliments contenant 15 g de glucides. La fiche sur les jours de maladie, sous Sources, en donne une liste",
+                  "3": "Si vous utilisez de l’insuline, continuez à la prendre quand vous êtes malade. Vérifiez votre glycémie plus souvent. Votre insuline pourrait devoir être ajustée; demandez donc à votre équipe comment faire"
                 }
               },
               "3": {
                 "heading": "Vos médicaments les jours de maladie",
                 "items": {
-                  "1": "La fiche énumère certains médicaments à arrêter pour une courte période si vous mangez moins, ou êtes déshydraté, pendant plus de 24 heures",
-                  "2": "Savoir lesquels de vos propres médicaments sont concernés est une question pour votre pharmacien. La fiche a un espace pour qu’il les inscrive",
-                  "3": "La fiche indique de les reprendre une fois que vous mangez et buvez normalement"
+                  "1": "Certains médicaments s’arrêtent pour une courte période si vous mangez moins, ou êtes déshydraté, pendant plus de 24 heures. La fiche sur les jours de maladie, sous Sources, les énumère",
+                  "2": "Savoir lesquels de vos propres médicaments sont concernés est une question pour votre pharmacien. Le plan de cette section a un espace pour qu’il les inscrive",
+                  "3": "Reprenez-les une fois que vous mangez et buvez normalement"
                 }
               },
               "4": {
@@ -5311,7 +5413,7 @@
           "9": {
             "title": "Sous pompe : une glycémie élevée inexpliquée",
             "items": {
-              "1": "Diabète Canada suggère de garder des fournitures de réserve, comme des stylos ou des seringues d’insuline à action rapide, et d’apprendre à passer aux injections au cas où vous ne pourriez pas utiliser votre pompe",
+              "1": "Gardez des fournitures de réserve, comme des stylos ou des seringues d’insuline à action rapide, et apprenez à passer aux injections au cas où vous ne pourriez pas utiliser votre pompe",
               "2": "Si votre glycémie est élevée et que vous ne pouvez pas l’expliquer, vérifiez vos cétones et suivez l’échelle de la section Les cétones : vérifier et agir",
               "3": "Gardez une copie écrite des réglages de votre pompe dans votre trousse d’urgence"
             },
@@ -5320,11 +5422,11 @@
           "10": {
             "title": "Être prêt pour les urgences",
             "items": {
-              "1": "Diabète Canada suggère une trousse d’urgence contenant au moins une à deux semaines de fournitures",
+              "1": "Gardez une trousse d’urgence contenant au moins une à deux semaines de fournitures",
               "2": "Incluez du sucre à action rapide, du glucagon si vous en avez, des bandelettes pour les cétones et un contenant pour objets pointus et tranchants",
               "3": "Si vous utilisez une pompe, ajoutez une copie écrite de vos réglages",
-              "4": "Diabète Québec indique de garder l’insuline non ouverte au réfrigérateur, entre 2 et 8 °C. Jetez l’insuline qui a gelé, qui a été exposée à plus de 30 °C ou qui est périmée",
-              "5": "La durée de conservation d’un stylo ou d’une fiole ouverts dépend du produit. Selon Diabète Québec, la plupart se conservent jusqu’à 28 jours une fois entamés, et certains plus longtemps. Suivez le feuillet qui accompagne votre insuline"
+              "4": "Gardez l’insuline non ouverte au réfrigérateur, entre 2 et 8 °C. Jetez l’insuline qui a gelé, qui a été exposée à plus de 30 °C ou qui est périmée",
+              "5": "La durée de conservation d’un stylo ou d’une fiole ouverts dépend du produit. La plupart se conservent jusqu’à 28 jours une fois entamés, et certains plus longtemps. Suivez le feuillet qui accompagne votre insuline"
             },
             "figure": {
               "containers": {
@@ -5386,8 +5488,8 @@
                   "label": "Votre pharmacien"
                 },
                 "6": {
-                  "label": "Éducateurs agréés en diabète de la Pharmacie Bayshore Express",
-                  "scope": "La pharmacie Liivv de Markham, en Ontario · partout au Canada",
+                  "label": "Éducateurs agréés en diabète de Liivv",
+                  "scope": "Liivv · partout au Canada",
                   "body": "Questions sur les pompes, les capteurs, les lecteurs et les autres fournitures pour le diabète, et sur la facturation et les demandes de remboursement."
                 }
               }
@@ -5418,7 +5520,7 @@
         "pharmacist": {
           "eyebrow": "Partout au Canada",
           "heading": "Questions sur les pompes, les capteurs, les fournitures ou les demandes de remboursement",
-          "body": "Les éducateurs agréés en diabète de la Pharmacie Bayshore Express, la pharmacie Liivv de Markham, en Ontario, répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie Liivv de votre province. Pour une glycémie basse ou élevée en ce moment, suivez votre plan ou les étapes de cette page."
+          "body": "Les éducateurs agréés en diabète de Liivv répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie de Liivv de votre province. Pour une glycémie basse ou élevée en ce moment, suivez votre plan ou les étapes de cette page."
         },
         "closing": {
           "heading": "Un plan que vous connaissez déjà",
@@ -5462,17 +5564,17 @@
               "2": "Vous pouvez vous procurer un lecteur dans la plupart des pharmacies, ou auprès de votre éducateur en diabète",
               "3": "Une fois que vous avez un lecteur, faites-vous montrer comment l’utiliser avant de commencer à vous en servir",
               "4": "La fréquence des mesures dépend de votre plan de traitement. Votre équipe vous dira quand mesurer votre glycémie, et à quelle fréquence",
-              "5": "Même si vous utilisez un capteur, Diabète Canada suggère de garder un lecteur et des bandelettes, pour vérifier une lecture et en réserve"
+              "5": "Même si vous utilisez un capteur, gardez un lecteur et des bandelettes, pour vérifier une lecture et en réserve"
             },
             "note": "Demandez à votre pharmacien ou à votre éducateur quel lecteur vous convient. La couverture est expliquée sous Comment les fournitures sont payées, plus bas."
           },
           "2": {
             "title": "Des bandelettes, des lancettes et une solution de contrôle compatibles",
             "items": {
-              "1": "Diabète Canada suggère de demander quelles bandelettes utiliser avec votre lecteur, et si votre lecteur doit être codé pour les lire",
+              "1": "Demandez quelles bandelettes utiliser avec votre lecteur, et si votre lecteur doit être codé pour les lire",
               "2": "Les lancettes usagées vont dans un contenant pour objets pointus et tranchants. Beaucoup de pharmacies fournissent des contenants résistants à la perforation et échangent un contenant plein contre un nouveau",
               "3": "Au Manitoba, en Ontario, au Québec, au Nouveau-Brunswick et à l’Île-du-Prince-Édouard, l’Association pour la gestion responsable des produits de santé (HPSA) remet gratuitement des contenants pour objets pointus et tranchants aux points de collecte participants, comme les pharmacies",
-              "4": "La HPSA indique de ne jamais jeter d’objets pointus et tranchants aux ordures ni au recyclage",
+              "4": "Ne jetez jamais d’objets pointus et tranchants aux ordures ni au recyclage",
               "5": "Ailleurs au Canada, demandez à votre pharmacie comment rapporter vos objets pointus et tranchants usagés"
             },
             "note": "Si vous n’êtes pas certain qu’une bandelette, une lancette ou une solution de contrôle convient à votre lecteur, consultez le guide de votre lecteur ou demandez à votre pharmacien avant de l’utiliser.",
@@ -5500,7 +5602,7 @@
               "6": "Comment vérifier que votre lecteur est précis",
               "7": "Comment coder votre lecteur pour qu’il lise vos bandelettes, s’il le faut"
             },
-            "note": "Ce sont les questions que Diabète Canada suggère de poser. Remplissez les lignes avec votre pharmacien ou votre éducateur, et gardez la carte avec votre lecteur.",
+            "note": "Ce sont de bonnes questions à poser. Remplissez les lignes avec votre pharmacien ou votre éducateur, et gardez la carte avec votre lecteur.",
             "figure": {
               "heading": "Mon lecteur, et ce qui va avec",
               "fields": {
@@ -5517,7 +5619,7 @@
               "1": "Un capteur se pose sur la peau comme un petit timbre, retenu par un adhésif, avec un mince filament juste sous la peau. Il mesure le sucre dans le liquide entre vos cellules, ce qui lui permet de lire votre glycémie sans que vous ayez à vous piquer le doigt chaque fois",
               "2": "Certains capteurs ne donnent une lecture que lorsque vous les balayez avec votre téléphone. D’autres affichent votre glycémie en tout temps et peuvent émettre des alarmes en cas de glycémie basse ou élevée",
               "3": "Certains capteurs se connectent à une pompe à insuline. C’est cette connexion dont un système hybride en boucle fermée a besoin",
-              "4": "Diabète Canada indique que cette technologie ne convient pas à tout le monde, et suggère d’en parler avec votre équipe pour savoir si elle vous convient"
+              "4": "Cette technologie ne convient pas à tout le monde : parlez-en avec votre équipe pour savoir si elle vous convient"
             },
             "note": "Les fabricants mettent à jour la liste des appareils qui fonctionnent ensemble. Avant de changer de capteur ou de pompe, vérifiez auprès de votre équipe, du fabricant de votre appareil ou d’un pharmacien de Liivv qui est éducateur agréé en diabète (EAD).",
             "figure": {
@@ -5553,14 +5655,14 @@
             "title": "Porter un capteur, et le temps dans la cible",
             "items": {
               "1": "Le temps dans la cible, c’est la part de votre journée pendant laquelle votre glycémie reste dans votre plage cible",
-              "2": "Pour la plupart des gens, les lignes directrices de Diabète Canada visent plus de 70 % de la journée entre 3,9 et 10,0 mmol/L",
+              "2": "Pour la plupart des gens, les lignes directrices canadiennes visent plus de 70 % de la journée entre 3,9 et 10,0 mmol/L",
               "3": "Elles visent aussi moins de 4 % de la journée sous 3,9",
-              "4": "Breakthrough T1D indique que passer de 60 % à 65 % de la journée dans la cible ajoute environ une heure par jour dans la cible",
+              "4": "Passer de 60 % à 65 % de la journée dans la cible ajoute environ une heure par jour dans la cible",
               "5": "Les cibles peuvent être différentes pendant la grossesse, et pour les enfants, les personnes âgées et les personnes qui font souvent des hypoglycémies. C’est votre équipe qui fixe les vôtres",
               "6": "Vous pouvez partager les lectures de votre capteur à partir de votre téléphone avec votre équipe de soins en diabète, pour qu’elle voie vos tendances au fil du temps",
               "7": "Un capteur et une mesure au bout du doigt risquent davantage de différer quand vous mangez ou faites de l’exercice. Si ce que vous ressentez ne correspond pas à votre capteur, ou si vous traitez une hypoglycémie, une mesure au bout du doigt donne le résultat le plus exact"
             },
-            "note": "Certaines pages de Diabète Canada donnent une plage de 4,0 à 10,0. Si votre équipe vous a donné une plage, utilisez la sienne.",
+            "note": "Certaines sources canadiennes donnent une plage de 4,0 à 10,0. Si votre équipe vous a donné une plage, utilisez la sienne.",
             "figure": {
               "columns": {
                 "1": {
@@ -5586,6 +5688,12 @@
               "daysLabel": "Jours de port de chaque capteur",
               "haveLabel": "Capteurs que vous avez",
               "coverLabel": "Jours que vous voulez couvrir (facultatif)",
+              "less": "Un de moins : {field}",
+              "more": "Un de plus : {field}",
+              "coverNone": "Aucun",
+              "coverDays": "{days} jours",
+              "coverOther": "Un autre nombre",
+              "coverOtherLabel": "Jours à couvrir",
               "result": "{count, plural, one {# capteur dure} other {# capteurs durent}} environ {days} jours, soit jusque vers le {date}.",
               "needMore": "Pour couvrir {cover} jours, il vous en faut {need} : {more} de plus que ce que vous avez.",
               "enough": "Vous en avez assez pour couvrir {cover} jours.",
@@ -5602,10 +5710,10 @@
             "items": {
               "1": "Un stylo à insuline est déjà rempli d’insuline. Vous y mettez une nouvelle aiguille pour chaque injection",
               "2": "Il vous faut un stylo distinct pour chaque type d’insuline que vous utilisez",
-              "3": "Diabète Canada suggère des aiguilles plus courtes et plus fines. Diabète Québec suggère des aiguilles de 4, 5 ou 6 mm, pour que l’insuline n’aille pas dans le muscle",
-              "4": "Chez l’adulte, Diabète Québec indique qu’un pli cutané n’est peut-être pas nécessaire avec une aiguille de 4 mm, et qu’il faut en faire un avec une aiguille de 8 mm ou plus",
-              "5": "Diabète Canada indique d’insérer l’aiguille à 90°, d’un mouvement rapide et fluide. Avec une aiguille plus longue, de 8 ou 12 mm, vous devrez peut-être soulever doucement la peau, ou piquer à 45°",
-              "6": "S’il y a peu de gras sur vos bras, vos jambes ou votre ventre, Diabète Québec indique qu’un pli cutané peut être nécessaire même avec une aiguille de 5 ou 6 mm"
+              "3": "Des aiguilles plus courtes et plus fines sont suggérées, comme des aiguilles de 4, 5 ou 6 mm, pour que l’insuline n’aille pas dans le muscle",
+              "4": "Chez l’adulte, un pli cutané n’est peut-être pas nécessaire avec une aiguille de 4 mm. Faites-en un avec une aiguille de 8 mm ou plus",
+              "5": "Insérez l’aiguille à 90°, d’un mouvement rapide et fluide. Avec une aiguille plus longue, de 8 ou 12 mm, vous devrez peut-être soulever doucement la peau, ou piquer à 45°",
+              "6": "S’il y a peu de gras sur vos bras, vos jambes ou votre ventre, un pli cutané peut être nécessaire même avec une aiguille de 5 ou 6 mm"
             },
             "note": "Votre éducateur ou votre pharmacien peut vous montrer quelle longueur vous convient, et comment faire un pli cutané si vous en avez besoin.",
             "figure": {
@@ -5624,7 +5732,7 @@
             "items": {
               "1": "Les seringues d’aujourd’hui sont plus petites et ont des aiguilles plus fines. Elles coûtent moins cher que les stylos et les pompes",
               "2": "L’insuline existe en plus d’une concentration. La plupart est de l’U-100 (100 unités/mL). Certaines insulines sont plus concentrées, comme l’U-200, l’U-300, l’U-500 ou l’U-700, et chacune se présente dans son propre stylo",
-              "3": "Si vous utilisez une pompe, Diabète Canada suggère de garder en réserve des stylos ou des seringues d’insuline à action rapide",
+              "3": "Si vous utilisez une pompe, gardez en réserve des stylos ou des seringues d’insuline à action rapide",
               "4": "Vous prenez l’avion? L’Administration canadienne de la sûreté du transport aérien (ACSTA) indique qu’une seringue doit avoir son capuchon protecteur, et que l’insuline à laquelle elle sert doit être avec vous",
               "5": "Si votre insuline est plus concentrée que l’U-100 (l’étiquette indique 200, 300, 500 ou 700 unités/mL), n’utilisez jamais de seringue pour la retirer du stylo. Une seringue ne peut pas mesurer la dose correctement, et vous pourriez recevoir beaucoup trop d’insuline et faire une hypoglycémie grave"
             },
@@ -5655,18 +5763,18 @@
                 }
               }
             },
-            "note": "Votre stylo est accompagné d’un mode d’emploi. Diabète Canada suggère de le lire, pour savoir comment votre stylo fonctionne."
+            "note": "Votre stylo est accompagné d’un mode d’emploi. Lisez-le, pour savoir comment votre stylo fonctionne."
           },
           "10": {
             "title": "Choisir vos sites d’injection et les alterner",
             "items": {
-              "1": "Changez d’endroit chaque fois que vous vous injectez. Diabète Canada indique que cela aide à prévenir les bosses de graisse qui peuvent nuire à l’action de l’insuline",
+              "1": "Changez d’endroit chaque fois que vous vous injectez. Cela aide à prévenir les bosses de graisse qui peuvent nuire à l’action de l’insuline",
               "2": "L’insuline est absorbée le plus rapidement et le plus uniformément à partir du ventre. Restez à environ 5 cm (2 pouces), soit la largeur de trois doigts, de votre nombril",
               "3": "L’insuline est absorbée plus lentement à partir des fesses et des cuisses. L’arrière du haut du bras est difficile à atteindre seul, c’est pourquoi il n’est souvent pas suggéré",
-              "4": "Diabète Québec suggère de laisser au moins 1 à 2 cm, soit environ la largeur d’un doigt, entre les injections, et de diviser chaque région en quatre zones, en utilisant une zone pendant une semaine avant de passer à la suivante",
+              "4": "Essayez de laisser au moins 1 à 2 cm, soit environ la largeur d’un doigt, entre les injections, et de diviser chaque région en quatre zones, en utilisant une zone pendant une semaine avant de passer à la suivante",
               "5": "Examinez et palpez régulièrement vos régions d’injection pour repérer les bosses ou les creux",
               "6": "Évitez les cicatrices, les grains de beauté et tout autre changement de la peau",
-              "7": "Diabète Québec indique que l’injection dans une partie du corps que vous êtes sur le point de faire travailler peut faire agir l’insuline plus vite et faire baisser votre glycémie"
+              "7": "L’injection dans une partie du corps que vous êtes sur le point de faire travailler peut faire agir l’insuline plus vite et faire baisser votre glycémie"
             },
             "note": "Si vous trouvez une bosse ou un creux, montrez-le à votre éducateur ou à votre équipe.",
             "figure": {
@@ -5684,12 +5792,12 @@
           "11": {
             "title": "Conserver l’insuline en sécurité",
             "items": {
-              "1": "Diabète Québec indique de garder l’insuline non ouverte au réfrigérateur, entre 2 et 8 °C",
+              "1": "Gardez l’insuline non ouverte au réfrigérateur, entre 2 et 8 °C",
               "2": "Gardez l’insuline que vous utilisez à la température ambiante",
               "3": "Jetez l’insuline qui a gelé, qui a été exposée à plus de 30 °C ou qui est périmée",
-              "4": "La durée de conservation d’un stylo ou d’une fiole ouverts dépend du produit. Selon Diabète Québec, la plupart se conservent jusqu’à 28 jours une fois entamés, et certains plus longtemps. Suivez le feuillet qui accompagne votre insuline",
+              "4": "La durée de conservation d’un stylo ou d’une fiole ouverts dépend du produit. La plupart se conservent jusqu’à 28 jours une fois entamés, et certains plus longtemps. Suivez le feuillet qui accompagne votre insuline",
               "5": "Vérifiez la date de péremption avant d’ouvrir une nouvelle cartouche ou une nouvelle fiole",
-              "6": "Diabète Canada indique que l’insuline va dans votre bagage de cabine quand vous prenez l’avion, pas dans vos bagages enregistrés",
+              "6": "L’insuline va dans votre bagage de cabine quand vous prenez l’avion, pas dans vos bagages enregistrés",
               "7": "L’ACSTA laisse passer l’insuline, le jus et les gels au-delà de la limite de 100 mL au contrôle de sécurité, mais vous devez les déclarer séparément"
             },
             "figure": {
@@ -5714,8 +5822,8 @@
             "items": {
               "1": "Une pompe à insuline est un petit appareil porté à l’extérieur du corps. Elle donne de l’insuline par un petit tube sous la peau, 24 heures sur 24",
               "2": "Elle donne un petit débit régulier d’insuline entre les repas et pendant la nuit. Des doses supplémentaires peuvent être données au besoin, pour un repas ou pour faire baisser une glycémie élevée",
-              "3": "Certaines pompes se connectent à un capteur et réagissent à vos lectures. Diabète Canada appelle cela un système hybride en boucle fermée. Vous entendrez peut-être aussi parler d’administration automatisée d’insuline",
-              "4": "Pour le diabète de type 1, les lignes directrices de Diabète Canada privilégient l’administration automatisée d’insuline pour toutes les personnes qui veulent et peuvent porter et utiliser les appareils",
+              "3": "Certaines pompes se connectent à un capteur et réagissent à vos lectures. C’est ce qu’on appelle un système hybride en boucle fermée. Vous entendrez peut-être aussi parler d’administration automatisée d’insuline",
+              "4": "Pour le diabète de type 1, les lignes directrices canadiennes privilégient l’administration automatisée d’insuline pour toutes les personnes qui veulent et peuvent porter et utiliser les appareils",
               "5": "Votre équipe décide avec vous si une pompe vous convient, et établit avec vous les réglages de votre pompe"
             },
             "note": "L’aide pour payer une pompe dépend de l’endroit où vous vivez. Consultez Comment les fournitures sont payées, plus bas."
@@ -5723,10 +5831,10 @@
           "13": {
             "title": "Les fournitures de votre pompe : ce qui convient",
             "items": {
-              "1": "Diabète Canada inscrit les ensembles de perfusion et les réservoirs parmi les fournitures pour pompe à avoir en réserve",
+              "1": "Les ensembles de perfusion et les réservoirs font partie des fournitures pour pompe à avoir en réserve",
               "2": "Les sites canadiens des fabricants indiquent certains des capteurs qui fonctionnent avec leurs pompes. Le sélecteur montre ce que nous avons pu confirmer, et le précise quand nous n’avons pas pu"
             },
-            "note": "Vous ne savez pas ce qui convient à votre pompe? Ayez le modèle de votre pompe sous la main, et posez la question à un éducateur agréé en diabète de la Pharmacie Bayshore Express.",
+            "note": "Vous ne savez pas ce qui convient à votre pompe? Ayez le modèle de votre pompe sous la main, et posez la question à un éducateur agréé en diabète de Liivv.",
             "figure": {
               "legend": "Votre pompe",
               "sensors": "Capteurs avec lesquels elle fonctionne",
@@ -5751,7 +5859,7 @@
                 "cartridge": "Quelle cartouche convient",
                 "pods": "Quels pods conviennent à ce système"
               },
-              "openQuestionsLead": "Demandez au fabricant de votre pompe ou à un éducateur agréé en diabète de la Pharmacie Bayshore Express :",
+              "openQuestionsLead": "Demandez au fabricant de votre pompe ou à un éducateur agréé en diabète de Liivv :",
               "basis": {
                 "twoMakers": "Les deux fabricants nomment ce jumelage",
                 "government": "Un programme gouvernemental canadien les inscrit ensemble",
@@ -5772,7 +5880,7 @@
           "14": {
             "title": "Plan de rechange pour la pompe et changements d’ensemble de perfusion",
             "items": {
-              "1": "Diabète Canada suggère de préparer un plan de rechange pour votre pompe avant d’en avoir besoin",
+              "1": "Préparez un plan de rechange pour votre pompe avant d’en avoir besoin",
               "2": "Les fournitures de rechange comprennent des stylos ou des seringues d’insuline à action rapide, de l’insuline à action prolongée si votre équipe dit que vous en avez besoin, des ensembles de perfusion et des réservoirs supplémentaires, et des bandelettes pour les cétones ou un lecteur de cétones sanguines",
               "3": "Apprenez à passer aux injections au cas où vous ne pourriez pas utiliser votre pompe, et gardez une copie écrite des réglages de votre pompe",
               "4": "Les ensembles de perfusion et les applicateurs de capteur munis d’une aiguille usagés vont dans un contenant pour objets pointus et tranchants. Le programme de la HPSA les reprend au Manitoba, en Ontario, au Québec, au Nouveau-Brunswick et à l’Île-du-Prince-Édouard. Ailleurs, demandez à votre pharmacie"
@@ -5834,7 +5942,7 @@
         "pharmacist": {
           "eyebrow": "Partout au Canada",
           "heading": "Questions sur ce qui convient à votre pompe ou à votre capteur",
-          "body": "Les éducateurs agréés en diabète de la Pharmacie Bayshore Express, la pharmacie Liivv de Markham, en Ontario, répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie Liivv de votre province. C’est votre équipe de soins en diabète qui décide de votre traitement et de vos réglages."
+          "body": "Les éducateurs agréés en diabète de Liivv répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie de Liivv de votre province. C’est votre équipe de soins en diabète qui décide de votre traitement et de vos réglages."
         },
         "closing": {
           "heading": "Des outils que vous connaissez bien",
@@ -5874,7 +5982,7 @@
           "1": {
             "title": "Manger, sans règles strictes",
             "items": {
-              "1": "Les lignes directrices de Diabète Canada décrivent plusieurs façons de manger qui conviennent bien au diabète, dont l’alimentation méditerranéenne, l’alimentation nordique, l’alimentation DASH et l’alimentation végétarienne",
+              "1": "Les lignes directrices canadiennes décrivent plusieurs façons de manger qui conviennent bien au diabète, dont l’alimentation méditerranéenne, l’alimentation nordique, l’alimentation DASH et l’alimentation végétarienne",
               "2": "Le Guide alimentaire canadien suggère beaucoup de légumes et de fruits, d’aliments à grains entiers et d’aliments protéinés, en choisissant plus souvent des protéines d’origine végétale",
               "3": "Faites de l’eau votre boisson de choix",
               "4": "Choisissez des aliments entiers et moins transformés plus souvent que les boissons sucrées, la restauration rapide et les grains raffinés",
@@ -5899,10 +6007,10 @@
           "2": {
             "title": "Le calcul des glucides",
             "items": {
-              "1": "Les lignes directrices de Diabète Canada suggèrent d’apprendre à compter les glucides, parce que la quantité que vous mangez à la fois compte généralement",
+              "1": "Les lignes directrices canadiennes suggèrent d’apprendre à compter les glucides, parce que la quantité que vous mangez à la fois compte généralement",
               "2": "Votre corps transforme les glucides en sucre, ce qui fait monter votre glycémie. Le type et la quantité comptent tous les deux",
               "3": "On trouve des glucides dans les produits céréaliers et les féculents, les fruits, certains légumes, les légumineuses, le lait et les substituts du lait, les aliments sucrés et beaucoup d’aliments préparés. Les viandes et substituts, la plupart des légumes et les matières grasses en contiennent peu",
-              "4": "La fiche de Diabète Canada indique environ 45 à 60 g de glucides par repas et 15 à 30 g par collation pour la plupart des gens. Un diététiste ou un éducateur en diabète peut vous aider à établir vos propres objectifs",
+              "4": "Un repère courant pour la plupart des gens est d’environ 45 à 60 g de glucides par repas et 15 à 30 g par collation. Un diététiste ou un éducateur en diabète peut vous aider à établir vos propres objectifs",
               "5": "Essayez de rester à 5 g près de votre objectif à chaque repas et à chaque collation",
               "6": "Dans le tableau de la valeur nutritive, vérifiez d’abord la portion. Prenez ensuite le total des glucides et soustrayez les fibres : 36 g de glucides avec 6 g de fibres comptent pour 30 g"
             },
@@ -5925,7 +6033,7 @@
               "2": "Répartissez-les sur au moins 3 jours, sans passer plus de 2 jours de suite sans activité",
               "3": "Commencez lentement, avec 5 à 10 minutes par jour, puis augmentez peu à peu. Moins de 150 minutes a quand même des bienfaits",
               "4": "Ajoutez des exercices de musculation au moins 2 fois par semaine, avec des poids, des bandes élastiques ou le poids de votre corps. Si vous débutez, faites-vous d’abord montrer comment les faire",
-              "5": "Interrompez les longues périodes en position assise. Les lignes directrices de Diabète Canada suggèrent de vous lever brièvement toutes les 20 à 30 minutes",
+              "5": "Interrompez les longues périodes en position assise. Les lignes directrices canadiennes suggèrent de vous lever brièvement toutes les 20 à 30 minutes",
               "6": "Si vous n’avez pas été actif depuis un moment, parlez-en à votre médecin avant de commencer quoi que ce soit de plus exigeant qu’une marche rapide. Si vous avez une douleur, une pression ou un inconfort à la poitrine, ou si vous êtes beaucoup plus essoufflé que d’habitude, arrêtez l’activité et appelez le 911 immédiatement. Ce peuvent être des signes d’une crise cardiaque. Parlez-en aussi à votre médecin avant de refaire de l’exercice",
               "7": "L’exercice peut faire baisser votre glycémie jusqu’à 48 heures après. Si vous prenez de l’insuline ou d’autres médicaments qui font baisser la glycémie, vérifiez-la régulièrement et ayez du sucre à action rapide sur vous. Plus d’information dans Rester en sécurité, sous <link>Les hypoglycémies qui surprennent</link>"
             },
@@ -5947,15 +6055,15 @@
           "4": {
             "title": "L’alcool et le cannabis",
             "items": {
-              "1": "Selon les lignes directrices 2023 de Diabète Canada, si vous ne buvez pas, il est plus sain de ne pas commencer. Si vous buvez, parlez avec votre équipe de ce qui vous convient",
-              "2": "La fiche de Diabète Canada sur l’alcool indique de ne pas boire si vous êtes enceinte ou essayez de le devenir, si vous allaitez, si vous avez des antécédents personnels ou familiaux de problèmes d’alcool, si vous êtes sur le point de conduire ou de faire une activité qui demande toute votre attention, ou si vous prenez certains médicaments. Demandez à votre pharmacien ce qu’il en est des vôtres. La fiche date de 2018 : les limites de consommation qui y sont imprimées sont donc antérieures aux conseils de 2023 présentés dans cette section",
+              "1": "Selon les lignes directrices canadiennes (2023), si vous ne buvez pas, il est plus sain de ne pas commencer. Si vous buvez, parlez avec votre équipe de ce qui vous convient",
+              "2": "Ne buvez pas si vous êtes enceinte ou essayez de le devenir, si vous allaitez, si vous avez des antécédents personnels ou familiaux de problèmes d’alcool, si vous êtes sur le point de conduire ou de faire une activité qui demande toute votre attention, ou si vous prenez certains médicaments. Demandez à votre pharmacien ce qu’il en est des vôtres. La fiche de 2018 citée dans les sources de cette section donne des limites de consommation antérieures aux conseils de 2023 qui y sont présentés",
               "3": "Si vous prenez de l’insuline ou certains autres médicaments pour le diabète, une hypoglycémie peut survenir jusqu’à 24 heures après avoir bu. Mangez des glucides quand vous buvez, vérifiez votre glycémie avant d’aller au lit et assurez-vous qu’une personne avec vous sait comment vous aider, y compris appeler le 911 si vous perdez connaissance. Plus d’information dans Rester en sécurité, sous <link>Les hypoglycémies qui surprennent</link>",
               "4": "Alterner les boissons alcoolisées avec de l’eau vous aide à éviter la déshydratation",
-              "5": "Selon les lignes directrices 2023 de Diabète Canada, si vous buvez, réduire votre consommation diminue les risques pour votre santé, ce qui peut vouloir dire pas plus de 2 verres standards par semaine. Les Repères canadiens sur l’alcool et la santé (2023) indiquent qu’à 2 verres standards ou moins par semaine, vous évitez généralement les conséquences de l’alcool, que plus de 2 verres par occasion augmentent le risque de méfaits comme les blessures, et que moins, c’est mieux. Votre équipe peut vous aider si vous voulez réduire",
-              "6": "Diabète Canada ne recommande pas le cannabis à des fins récréatives aux adolescents ni aux adultes qui vivent avec le diabète. Avec le diabète de type 1, il indique de l’éviter, parce qu’il augmente le risque d’acidocétose diabétique (ACD)",
-              "7": "Si vous consommez du cannabis, les produits comestibles peuvent contenir des glucides, et le cannabis peut vous donner plus faim. Diabète Canada indique que les adultes qui en consomment devraient se voir offrir des conseils pour réduire les risques"
+              "5": "Selon les lignes directrices canadiennes (2023), si vous buvez, réduire votre consommation diminue les risques pour votre santé, ce qui peut vouloir dire pas plus de 2 verres standards par semaine. À 2 verres standards ou moins par semaine, vous évitez généralement les conséquences de l’alcool, plus de 2 verres par occasion augmentent le risque de méfaits comme les blessures, et moins, c’est mieux. Votre équipe peut vous aider si vous voulez réduire",
+              "6": "Le cannabis à des fins récréatives n’est pas recommandé aux adolescents ni aux adultes qui vivent avec le diabète. Avec le diabète de type 1, évitez-le, parce qu’il augmente le risque d’acidocétose diabétique (ACD)",
+              "7": "Si vous consommez du cannabis, les produits comestibles peuvent contenir des glucides, et le cannabis peut vous donner plus faim. Les adultes qui en consomment devraient se voir offrir des conseils pour réduire les risques"
             },
-            "note": "L’alcool et le cannabis ne sont pas des sujets à cacher à votre équipe. Diabète Canada demande aux professionnels de la santé d’en parler régulièrement, sans jugement.",
+            "note": "L’alcool et le cannabis ne sont pas des sujets à cacher à votre équipe. Vos professionnels de la santé devraient en parler avec vous régulièrement, sans jugement.",
             "figure": {
               "columns": {
                 "1": {
@@ -5970,12 +6078,12 @@
           "5": {
             "title": "Détresse, stress et sommeil",
             "items": {
-              "1": "Vivre avec le diabète peut peser lourd. Diabète Canada indique que ses exigences constantes peuvent mener à la détresse liée au diabète, à un moral bas et à l’anxiété",
-              "2": "Vous pouvez vous sentir en colère, coupable, effrayé, découragé ou abattu. Les lignes directrices de Diabète Canada décrivent ces émotions comme des réactions légitimes à une maladie de longue durée",
+              "1": "Vivre avec le diabète peut peser lourd. Ses exigences constantes peuvent mener à la détresse liée au diabète, à un moral bas et à l’anxiété",
+              "2": "Vous pouvez vous sentir en colère, coupable, effrayé, découragé ou abattu. Ce sont des réactions légitimes à une maladie de longue durée",
               "3": "La dépression est plus fréquente chez les personnes qui vivent avec le diabète, et il existe des traitements efficaces",
               "4": "Les problèmes d’alimentation, de sommeil et de stress sont fréquents aussi. Parlez-en à votre équipe",
               "5": "La peur des hypoglycémies l’est aussi. Si elle vous freine, parlez-en à votre équipe, car il existe des moyens de vous aider",
-              "6": "Les lignes directrices de Diabète Canada indiquent que toutes les personnes qui vivent avec le diabète, ainsi que les parents et les proches aidants des jeunes qui vivent avec le diabète, devraient être évalués régulièrement pour la détresse liée au diabète. Votre équipe pourrait vous demander de remplir un court questionnaire avant un rendez-vous",
+              "6": "Les lignes directrices canadiennes indiquent que toutes les personnes qui vivent avec le diabète, ainsi que les parents et les proches aidants des jeunes qui vivent avec le diabète, devraient être évalués régulièrement pour la détresse liée au diabète. Votre équipe pourrait vous demander de remplir un court questionnaire avant un rendez-vous",
               "7": "L’activité physique régulière peut réduire le stress et vous aider à vous détendre et à dormir"
             },
             "note": "Si ça ne s’améliore pas, ou si vous avez du mal à passer la journée, parlez-en à votre équipe de soins en diabète ou à votre médecin plutôt que d’attendre que ça passe.",
@@ -6002,12 +6110,12 @@
           "6": {
             "title": "Prendre l’avion avec vos fournitures pour le diabète",
             "items": {
-              "1": "Gardez l’insuline et vos fournitures dans votre bagage de cabine. Diabète Canada indique de ne pas mettre l’insuline dans vos bagages enregistrés, parce que les changements de température peuvent l’endommager",
+              "1": "Gardez l’insuline et vos fournitures dans votre bagage de cabine. Ne mettez pas l’insuline dans vos bagages enregistrés, parce que les changements de température peuvent l’endommager",
               "2": "L’insuline, ainsi que le jus ou le gel pour traiter une hypoglycémie, peuvent passer au contrôle de sécurité en quantités de plus de 100 mL. Déclarez-les séparément à l’agent de contrôle",
               "3": "Les seringues sont permises avec le capuchon de l’aiguille en place, à condition que vous ayez avec vous le médicament auquel elles servent",
-              "4": "Les pompes et les capteurs sont permis. Diabète Canada indique de ne pas les porter dans le scanner corporel et de ne pas passer une pompe dans l’appareil à rayons X. Vous pouvez plutôt demander une fouille physique, en privé si vous le souhaitez",
+              "4": "Les pompes et les capteurs sont permis. Ne les portez pas dans le scanner corporel et ne passez pas une pompe dans l’appareil à rayons X. Vous pouvez plutôt demander une fouille physique, en privé si vous le souhaitez",
               "5": "Vous n’avez pas à dire au personnel de contrôle que vous avez le diabète, et vous n’avez pas à retirer votre pompe. Dites simplement à l’agent de contrôle que vous en portez une",
-              "6": "L’ACSTA suggère de garder les médicaments dans leur emballage étiqueté. Diabète Canada suggère d’avoir une lettre de votre médecin et une liste de vos médicaments fournie par votre pharmacien",
+              "6": "Gardez les médicaments dans leur emballage étiqueté. Apportez une lettre de votre médecin et une liste de vos médicaments fournie par votre pharmacien",
               "7": "Emportez de l’insuline et des fournitures de réserve. Par temps chaud, gardez l’insuline dans un sac isotherme. Par temps froid, gardez-la près de votre corps pour qu’elle ne gèle pas"
             },
             "note": "Traverser des fuseaux horaires peut changer le moment où vous prenez votre insuline ou vos comprimés pour le diabète. Planifiez-le avec votre médecin ou votre éducateur en diabète avant de partir.",
@@ -6029,16 +6137,16 @@
             "title": "La conduite automobile",
             "items": {
               "1": "Ces conseils s’adressent aux personnes qui prennent de l’insuline, ou un comprimé pour le diabète qui peut causer des hypoglycémies",
-              "2": "Diabète Canada suggère de vérifier votre glycémie juste avant de conduire, chaque fois que vous vous sentez en hypoglycémie, et au moins toutes les 4 heures pendant que vous conduisez, ou de porter un capteur en temps réel",
+              "2": "Vérifiez votre glycémie juste avant de conduire, chaque fois que vous vous sentez en hypoglycémie, et au moins toutes les 4 heures pendant que vous conduisez, ou portez un capteur en temps réel",
               "3": "Ne commencez pas à conduire si votre glycémie est inférieure à 4,0 mmol/L",
               "4": "Après avoir traité une hypoglycémie, attendez au moins 40 minutes, et que votre glycémie soit d’au moins 5,0 mmol/L, avant de conduire",
               "5": "Si une hypoglycémie commence pendant que vous conduisez, arrêtez-vous dans un endroit sûr, retirez les clés du contact et traitez-la. L’attente de 40 minutes s’applique ici aussi",
               "6": "Gardez du sucre à action rapide à portée de main depuis le siège du conducteur, et votre lecteur de glycémie et vos fournitures avec vous",
-              "7": "Si vous ne ressentez plus les premiers signes d’une hypoglycémie, ou si vous avez eu une hypoglycémie grave au cours de la dernière année, les lignes directrices de Diabète Canada indiquent de vérifier juste avant de conduire et au moins toutes les 2 heures pendant que vous conduisez, ou de porter un capteur en temps réel",
-              "8": "Une hypoglycémie grave est une hypoglycémie pendant laquelle vous perdez connaissance ou avez besoin de l’aide d’une autre personne. Si vous en avez une pendant que vous conduisez, les lignes directrices indiquent d’arrêter de conduire immédiatement. Avisez immédiatement votre professionnel de la santé et le bureau des permis de conduire, et faites de même si vous avez eu plus d’une hypoglycémie grave pendant que vous étiez éveillé au cours des 6 derniers mois (12 mois pour les conducteurs de véhicules commerciaux). Votre professionnel de la santé pourrait vous dire de ne pas conduire",
-              "9": "Vous avez le droit d’être évalué individuellement pour un permis de conduire. Les permis relèvent de chaque province et territoire. Les bureaux des permis exigent un niveau plus élevé d’aptitude médicale pour conduire un autobus, une fourgonnette commerciale, un camion de transport ou un véhicule d’urgence. Selon les lignes directrices de Diabète Canada, les conducteurs de véhicules commerciaux devraient passer un examen médical lorsqu’ils demandent leur permis"
+              "7": "Si vous ne ressentez plus les premiers signes d’une hypoglycémie, ou si vous avez eu une hypoglycémie grave au cours de la dernière année, les lignes directrices canadiennes indiquent de vérifier juste avant de conduire et au moins toutes les 2 heures pendant que vous conduisez, ou de porter un capteur en temps réel",
+              "8": "Une hypoglycémie grave est une hypoglycémie pendant laquelle vous perdez connaissance ou avez besoin de l’aide d’une autre personne. Si vous en avez une pendant que vous conduisez, arrêtez de conduire immédiatement. Avisez immédiatement votre professionnel de la santé et le bureau des permis de conduire, et faites de même si vous avez eu plus d’une hypoglycémie grave pendant que vous étiez éveillé au cours des 6 derniers mois (12 mois pour les conducteurs de véhicules commerciaux). Votre professionnel de la santé pourrait vous dire de ne pas conduire",
+              "9": "Vous avez le droit d’être évalué individuellement pour un permis de conduire. Les permis relèvent de chaque province et territoire. Les bureaux des permis exigent un niveau plus élevé d’aptitude médicale pour conduire un autobus, une fourgonnette commerciale, un camion de transport ou un véhicule d’urgence. Selon les lignes directrices canadiennes, les conducteurs de véhicules commerciaux devraient passer un examen médical lorsqu’ils demandent leur permis"
             },
-            "note": "Diabète Canada utilise 3,9 pour une hypoglycémie dans la plupart de ses recommandations, et 4,0 pour la conduite. Cette section utilise 4,0 parce que c’est la valeur des lignes directrices sur la conduite. Si votre équipe vous a donné une valeur, utilisez la sienne.",
+            "note": "La plupart des recommandations canadiennes utilisent 3,9 pour une hypoglycémie, et 4,0 pour la conduite. Cette section utilise 4,0 parce que c’est la valeur des recommandations sur la conduite. Si votre équipe vous a donné une valeur, utilisez la sienne.",
             "figure": {
               "columns": {
                 "1": {
@@ -6089,13 +6197,13 @@
               "1": "Le diabète peut endommager les petits vaisseaux sanguins de la rétine, au fond de l’œil. C’est ce qu’on appelle la rétinopathie diabétique",
               "2": "Elle passe souvent inaperçue jusqu’à ce qu’elle touche votre vue. Les examens réguliers sont donc importants, même quand vous voyez bien",
               "3": "Un optométriste ou un ophtalmologiste fait l’examen, souvent après avoir mis des gouttes qui dilatent vos pupilles",
-              "4": "Diabète Canada recommande un examen de la vue une fois par année, à moins que votre optométriste ou votre ophtalmologiste ne vous suggère autre chose. Avec le diabète de type 2, le premier examen a lieu au moment du diagnostic. Avec le diabète de type 1, les examens annuels commencent 5 ans après le diagnostic, à partir de 15 ans. Pour un enfant de moins de 15 ans, renseignez-vous auprès de l’équipe de votre enfant",
-              "5": "La Société canadienne d’ophtalmologie suggère aussi un examen au moins une fois par année. Si vous planifiez une grossesse, Diabète Canada recommande un examen avant la grossesse et pendant la grossesse, et la Société suggère un examen au cours du premier trimestre",
+              "4": "Faites faire un examen de la vue une fois par année, à moins que votre optométriste ou votre ophtalmologiste ne vous suggère autre chose. Avec le diabète de type 2, le premier examen a lieu au moment du diagnostic. Avec le diabète de type 1, les examens annuels commencent 5 ans après le diagnostic, à partir de 15 ans. Pour un enfant de moins de 15 ans, renseignez-vous auprès de l’équipe de votre enfant",
+              "5": "Les spécialistes canadiens des yeux suggèrent aussi un examen au moins une fois par année. Si vous planifiez une grossesse, les conseils canadiens diffèrent : les lignes directrices sur le diabète recommandent un examen avant la grossesse et pendant la grossesse, et les spécialistes des yeux suggèrent un examen au cours du premier trimestre",
               "6": "Consultez immédiatement un spécialiste des yeux si vous remarquez des taches sombres, une vision floue, déformée ou double, ou de gros corps flottants. Si vous voyez soudainement des éclairs de lumière avec beaucoup de nouveaux corps flottants, ou si une partie de votre champ de vision s’obscurcit, n’attendez pas : consultez immédiatement un spécialiste des yeux, ou présentez-vous à l’urgence si ce n’est pas possible aujourd’hui. Cela peut être un signe de déchirure ou de décollement de la rétine",
               "7": "Détectée tôt, la rétinopathie peut souvent être traitée avec succès, et le traitement peut empêcher votre vue de se détériorer. La vue déjà perdue ne peut pas être rétablie, et c’est pourquoi les examens précoces sont importants",
               "8": "Garder votre glycémie, votre tension artérielle et votre cholestérol dans les valeurs cibles aide à protéger vos yeux"
             },
-            "note": "Si un examen révèle peu ou pas de dommages, les lignes directrices de Diabète Canada permettent un intervalle de 1 à 2 ans entre les examens avec le diabète de type 2. Votre professionnel des soins de la vue et votre équipe de soins en diabète établissent votre calendrier, et peuvent se communiquer vos résultats.",
+            "note": "Si un examen révèle peu ou pas de dommages, les lignes directrices canadiennes permettent un intervalle de 1 à 2 ans entre les examens avec le diabète de type 2. Votre professionnel des soins de la vue et votre équipe de soins en diabète établissent votre calendrier, et peuvent se communiquer vos résultats.",
             "figure": {
               "columns": {
                 "1": {
@@ -6117,7 +6225,7 @@
               "5": "Avec le diabète de type 2, le dépistage commence au moment du diagnostic. Avec le diabète de type 1, il commence 5 ans après le diagnostic. Ensuite, c’est une fois par année",
               "6": "Garder votre glycémie et votre tension artérielle dans les cibles, ne pas fumer et prendre vos médicaments comme prescrit aident tous à protéger vos reins",
               "7": "Si vous avez une maladie rénale, un diététiste peut vous dire si vous devez changer la quantité de protéines, de potassium, de phosphate ou de sel que vous mangez",
-              "8": "Selon les lignes directrices 2025 de Diabète Canada sur les reins, certains médicaments contre le diabète aident aussi à protéger les reins et le cœur. Demandez à votre équipe si c’est le cas du vôtre, et ne changez pas un médicament par vous-même"
+              "8": "Certains médicaments contre le diabète aident aussi à protéger les reins et le cœur. Demandez à votre équipe si c’est le cas du vôtre, et ne changez pas un médicament par vous-même"
             },
             "note": "Demandez à votre équipe vos résultats de RAC et de DFGe, et ce qu’ils signifient pour vous. Les enfants suivent leur propre calendrier : renseignez-vous auprès de l’équipe de votre enfant."
           },
@@ -6125,16 +6233,16 @@
             "title": "Votre cœur : l’ABCDE",
             "items": {
               "1": "Le diabète augmente le risque de maladie du cœur et d’AVC. Une maladie du cœur peut survenir 15 ans plus tôt que chez les personnes sans diabète",
-              "2": "Vous pouvez réduire considérablement ce risque en travaillant sur tous vos facteurs de risque avec votre équipe. Diabète Canada les résume sous le nom d’ABCDE",
+              "2": "Vous pouvez réduire considérablement ce risque en travaillant sur tous vos facteurs de risque avec votre équipe. On les résume souvent sous le nom d’ABCDE",
               "3": "L’A1C est une analyse de sang qui montre votre glycémie moyenne au fil du temps. La plupart des gens visent 7 % ou moins",
               "4": "La plupart des gens visent une tension artérielle inférieure à 130/80",
               "5": "La cible habituelle de cholestérol LDL (le « mauvais » cholestérol) est inférieure à 2,0 mmol/L",
               "6": "Certains médicaments protègent le cœur. Demandez à votre équipe si l’un d’eux vous convient",
               "7": "Une activité physique régulière et une saine alimentation",
               "8": "Le dépistage des complications au cœur, aux pieds, aux reins et aux yeux; l’arrêt du tabac, avec de l’aide si vous le souhaitez; et l’autogestion, y compris la gestion du stress",
-              "9": "Diabète Canada suggère de faire vérifier votre tension artérielle à chaque visite pour le diabète, votre A1C tous les 3 mois et votre cholestérol chaque année, ou plus souvent si vous prenez un médicament pour le réduire"
+              "9": "Faites vérifier votre tension artérielle à chaque visite pour le diabète, votre A1C tous les 3 mois et votre cholestérol chaque année, ou plus souvent si vous prenez un médicament pour le réduire"
             },
-            "note": "Vos cibles s’établissent avec votre équipe. Diabète Canada précise que les cibles d’A1C sont différentes pendant la grossesse, chez les personnes âgées et chez les enfants de 12 ans et moins.",
+            "note": "Vos cibles s’établissent avec votre équipe. Les cibles d’A1C sont différentes pendant la grossesse, chez les personnes âgées et chez les enfants de 12 ans et moins.",
             "figure": {
               "columns": {
                 "1": {
@@ -6161,14 +6269,14 @@
           "12": {
             "title": "Le travail et vos droits",
             "items": {
-              "1": "Selon la position de Diabète Canada, les personnes qui vivent avec le diabète devraient pouvoir occuper tout emploi pour lequel elles sont qualifiées",
-              "2": "Diabète Canada indique aussi que les gens devraient avoir le droit de prendre soin de leur diabète dans les lieux publics",
-              "3": "Diabète Canada indique que les personnes qui vivent avec le diabète ont droit à des soins qui favorisent la meilleure qualité de vie possible, où qu’elles soient, y compris à l’hôpital et dans les soins de longue durée",
+              "1": "Les personnes qui vivent avec le diabète devraient pouvoir occuper tout emploi pour lequel elles sont qualifiées",
+              "2": "Les personnes qui vivent avec le diabète devraient avoir le droit de prendre soin de leur diabète dans les lieux publics",
+              "3": "Les personnes qui vivent avec le diabète ont droit à des soins qui favorisent la meilleure qualité de vie possible, où qu’elles soient, y compris à l’hôpital et dans les soins de longue durée",
               "4": "Pour un permis de conduire, vous avez le droit d’être évalué individuellement. Plus d’information dans <link>La conduite automobile</link>",
               "5": "La couverture des médicaments, des fournitures et des appareils varie d’un endroit à l’autre au Canada, et vous pourriez être admissible au crédit d’impôt pour personnes handicapées",
               "6": "La ligne d’information et de soutien de Diabète Canada est le 1-800-226-8464"
             },
-            "note": "Diabète Canada publie des énoncés de position sur l’emploi, l’assurance et les soins personnels dans les lieux publics. Ils sont accessibles à partir de ses pages sur les droits."
+            "note": "Des énoncés de position sur l’emploi, l’assurance et les soins personnels dans les lieux publics sont accessibles à partir de la page sur les droits citée dans les sources de cette section."
           }
         },
         "programsBand": {
@@ -6260,7 +6368,7 @@
         "pharmacist": {
           "eyebrow": "Partout au Canada",
           "heading": "Vous voyagez avec une pompe ou un capteur?",
-          "body": "Les éducateurs agréés en diabète de la Pharmacie Bayshore Express, la pharmacie Liivv de Markham, en Ontario, répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie Liivv de votre province. Vos cibles, vos médicaments et vos examens de suivi relèvent de votre équipe de soins en diabète."
+          "body": "Les éducateurs agréés en diabète de Liivv répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie de Liivv de votre province. Vos cibles, vos médicaments et vos examens de suivi relèvent de votre équipe de soins en diabète."
         },
         "closing": {
           "heading": "Une vie, pas une liste",
@@ -6300,26 +6408,26 @@
           "1": {
             "title": "Le type 1, y compris chez l’adulte",
             "items": {
-              "1": "Selon Diabète Canada, de 5 à 10 % des personnes diabétiques ont le type 1. Dans le type 1, le pancréas ne produit pas d’insuline, alors l’insuline est prise par injection ou avec une pompe",
-              "2": "Le type 1 peut commencer à l’âge adulte. Selon une estimation de Breakthrough T1D, environ 71 % des personnes atteintes du type 1 au Canada ont reçu leur diagnostic à l’âge adulte",
-              "3": "Breakthrough T1D indique aussi que 85 % n’ont aucun lien familial avec le type 1",
+              "1": "De 5 à 10 % des personnes diabétiques ont le type 1. Dans le type 1, le pancréas ne produit pas d’insuline, alors l’insuline est prise par injection ou avec une pompe",
+              "2": "Le type 1 peut commencer à l’âge adulte. On estime qu’environ 71 % des personnes atteintes du type 1 au Canada ont reçu leur diagnostic à l’âge adulte",
+              "3": "85 % n’ont aucun lien familial avec le type 1",
               "4": "Parmi les signes que votre équipe recherche : des anticorps du type 1 dans le sang, très peu d’insuline produite par votre corps (un peptide C bas) et un risque d’acidocétose diabétique (ACD)",
-              "5": "Les lignes directrices 2025 de Diabète Canada sur le type 1 désignent l’administration automatisée d’insuline comme l’option à privilégier pour toute personne qui veut et peut l’utiliser. Sinon, elles recommandent un capteur (SGC) avec une pompe ou avec des injections"
+              "5": "Pour le type 1, les lignes directrices canadiennes désignent l’administration automatisée d’insuline comme l’option à privilégier pour toute personne qui veut et peut l’utiliser. Sinon, elles recommandent un capteur (SGC) avec une pompe ou avec des injections"
             },
             "note": "<link>Les cétones et l’ACD</link> sont abordées dans Rester en sécurité. Les noms des tests sont expliqués dans Mon type pourrait-il être différent?"
           },
           "2": {
             "title": "Le type 2",
             "items": {
-              "1": "Le type 2 est le type le plus courant. Selon Diabète Canada, de 90 à 95 % des personnes diabétiques l’ont",
+              "1": "Le type 2 est le type le plus courant. De 90 à 95 % des personnes diabétiques l’ont",
               "2": "Parmi les facteurs de risque : avoir plus de 40 ans, avoir du diabète dans sa famille, et l’origine ethnique. Le type 2 peut ne causer aucun symptôme",
-              "3": "Diabète Canada pose le diagnostic de diabète avec l’un ou l’autre de ces résultats :",
+              "3": "Au Canada, le diagnostic de diabète est posé avec l’un ou l’autre de ces résultats :",
               "4": "Une glycémie à jeun de 7,0 mmol/L ou plus",
               "5": "Une A1C de 6,5 % ou plus, chez l’adulte. Elle n’est pas utilisée quand on soupçonne un type 1",
               "6": "Une glycémie de 11,1 mmol/L ou plus, 2 heures après une boisson glucosée ou à n’importe quel moment de la journée",
               "7": "Sans symptômes, un deuxième test fait un autre jour confirme le diagnostic",
-              "8": "En présence de symptômes d’hyperglycémie, Diabète Canada indique que le diagnostic est posé sans deuxième test, et que le traitement ne doit pas être retardé. Communiquez avec votre médecin ou un autre professionnel de la santé aujourd’hui même, sans attendre un deuxième test. <link>Les signes d’urgence</link> se trouvent dans Rester en sécurité",
-              "9": "Chez les enfants et les adolescents atteints du type 2, Diabète Canada indique qu’un test d’anticorps devrait être envisagé, car jusqu’à 10 à 20 % obtiennent un résultat positif"
+              "8": "En présence de symptômes d’hyperglycémie, le diagnostic est posé sans deuxième test, et le traitement ne doit pas être retardé. Communiquez avec votre médecin ou un autre professionnel de la santé aujourd’hui même, sans attendre un deuxième test. <link>Les signes d’urgence</link> se trouvent dans Rester en sécurité",
+              "9": "Chez les enfants et les adolescents atteints du type 2, un test d’anticorps devrait être envisagé, car jusqu’à 10 à 20 % obtiennent un résultat positif"
             },
             "note": "Si votre diabète ne correspond pas au portrait habituel, consultez Mon type pourrait-il être différent?",
             "figure": {
@@ -6339,12 +6447,12 @@
           "3": {
             "title": "Le prédiabète",
             "items": {
-              "1": "Le prédiabète, c’est une glycémie au-dessus des valeurs habituelles, mais sous les seuils du diabète. Diabète Canada utilise l’un ou l’autre de ces résultats :",
+              "1": "Le prédiabète, c’est une glycémie au-dessus des valeurs habituelles, mais sous les seuils du diabète. Au Canada, on utilise l’un ou l’autre de ces résultats :",
               "2": "Une glycémie à jeun de 6,1 à 6,9 mmol/L",
               "3": "Une A1C de 6,0 à 6,4 %",
               "4": "Une glycémie de 7,8 à 11,0 mmol/L, 2 heures après une boisson glucosée",
               "5": "La page Prédiabète de Diabète Canada donne un lien vers le test CANRISK",
-              "6": "Les personnes atteintes de prédiabète ne développent pas toutes un diabète de type 2, mais Diabète Canada indique que beaucoup le font"
+              "6": "Les personnes atteintes de prédiabète ne développent pas toutes un diabète de type 2, mais beaucoup le font"
             },
             "note": "Demandez à votre médecin ce que vos résultats veulent dire pour vous, et quand refaire le test.",
             "figure": {
@@ -6366,11 +6474,11 @@
             "items": {
               "1": "Le diabète gestationnel est une glycémie élevée découverte pour la première fois pendant la grossesse. Le diabète présent avant la grossesse, de type 1 ou de type 2, a été diagnostiqué avant la conception",
               "2": "Un diabète clairement présent tôt dans la grossesse est classé à part, comme un diabète manifeste, et non comme un diabète gestationnel",
-              "3": "Si vous êtes à risque élevé, les lignes directrices de Diabète Canada prévoient un test d’A1C avant 20 semaines",
+              "3": "Si vous êtes à risque élevé, les lignes directrices canadiennes prévoient un test d’A1C avant 20 semaines",
               "4": "Le dépistage du diabète gestationnel est offert entre 24 et 28 semaines",
-              "5": "Selon Diabète Canada, le diabète gestationnel touche de 3 à 20 % des grossesses et disparaît habituellement après l’accouchement. Il augmente le risque de diabète de type 2 et de maladie du cœur plus tard",
-              "6": "Après l’accouchement, Diabète Canada recommande un test de tolérance au glucose entre 6 semaines et 6 mois",
-              "7": "Selon des lignes directrices internationales de l’Université d’Exeter, une glycémie à jeun stable de 5,5 à 8 mmol/L, avec du diabète dans la famille, peut indiquer un type monogénique appelé MODY-GCK. Si cela vous ressemble, parlez-en à votre équipe tôt dans la grossesse"
+              "5": "Le diabète gestationnel touche de 3 à 20 % des grossesses et disparaît habituellement après l’accouchement. Il augmente le risque de diabète de type 2 et de maladie du cœur plus tard",
+              "6": "Après l’accouchement, un test de tolérance au glucose est recommandé entre 6 semaines et 6 mois",
+              "7": "Selon des lignes directrices internationales, une glycémie à jeun stable de 5,5 à 8 mmol/L, avec du diabète dans la famille, peut indiquer un type monogénique appelé MODY-GCK. Si cela vous ressemble, parlez-en à votre équipe tôt dans la grossesse"
             },
             "note": "Remplissez l’aide-mémoire avec votre équipe avant l’accouchement. La grossesse avec un diabète de type 1 ou de type 2 est abordée dans C’est peut-être vous.",
             "figure": {
@@ -6385,17 +6493,17 @@
           "5": {
             "title": "Le type 1 commence avant les symptômes",
             "items": {
-              "1": "Le type 1 commence avant l’apparition des symptômes. Breakthrough T1D décrit les stades 1 et 2 comme précédant le diagnostic, et des lignes directrices internationales définissent les stades ainsi :",
+              "1": "Le type 1 commence avant l’apparition des symptômes. Les stades 1 et 2 précèdent le diagnostic, et des lignes directrices internationales définissent les stades ainsi :",
               "2": "Stade 1 : au moins deux anticorps du type 1, avec une glycémie normale",
               "3": "Stade 2 : au moins deux anticorps du type 1, avec une glycémie qui commence à dépasser la normale",
               "4": "Stade 3 : le diabète de type 1 est diagnostiqué",
-              "5": "Selon Breakthrough T1D, au moins deux anticorps qui persistent dans le temps signifient un risque élevé de type 1. Seulement 10 à 15 % des personnes qui viennent de recevoir le diagnostic ont des antécédents familiaux",
+              "5": "Au moins deux anticorps qui persistent dans le temps signifient un risque élevé de type 1. Seulement 10 à 15 % des personnes qui viennent de recevoir le diagnostic ont des antécédents familiaux",
               "6": "TrialNet offre gratuitement le dépistage aux proches de personnes atteintes du type 1, avec une trousse de piqûre au bout du doigt à utiliser à la maison ou une visite au laboratoire, partout au Canada. Les proches immédiats de 2 à 45 ans et les autres proches de 2 à 20 ans peuvent participer. Les résultats prennent de 4 à 6 semaines",
-              "7": "Breakthrough T1D mentionne aussi FEDERATE-Can, au Québec. CanScreen, un programme de recherche canadien sur le dépistage chez les nouveau-nés et les enfants, indique qu’il sera lancé à l’automne 2026 ou à l’hiver 2027",
-              "8": "Les lignes directrices 2025 de Diabète Canada sur le type 1 ne font aucune recommandation sur le dépistage",
+              "7": "Il y a aussi FEDERATE-Can, au Québec. CanScreen, un programme de recherche canadien sur le dépistage chez les nouveau-nés et les enfants, indique qu’il sera lancé à l’automne 2026 ou à l’hiver 2027",
+              "8": "Au Canada, les lignes directrices sur le type 1 (2025) ne font aucune recommandation sur le dépistage",
               "9": "Les personnes qui obtiennent un résultat positif sont suivies dans le temps. Des lignes directrices internationales indiquent qu’il faut leur enseigner, et leur rappeler, les signes du diabète et de l’ACD",
-              "10": "En mai 2025, Santé Canada a approuvé le teplizumab (Tzield) pour les personnes de 8 ans et plus au stade 2, afin de retarder le stade 3. Selon l’Agence des médicaments du Canada, dans une étude, il a retardé le stade 3 d’environ 2 ans, et il peut causer des effets secondaires, dont certains graves. L’Agence a recommandé que les régimes publics d’assurance médicaments ne le remboursent pas, et selon Diabète Canada, il n’est inscrit à aucun régime d’assurance médicaments provincial ou territorial. On peut l’obtenir à ses frais, par une assurance privée ou par un programme d’accès compassionnel",
-              "11": "Breakthrough T1D indique aussi que vous pouvez demander à votre médecin de consulter UncoverT1D, un site Web géré par Sanofi, l’entreprise qui fabrique le teplizumab, qui offre de l’information aux professionnels de la santé sur les tests à prescrire"
+              "10": "En mai 2025, Santé Canada a approuvé le teplizumab (Tzield) pour les personnes de 8 ans et plus au stade 2, afin de retarder le stade 3. Dans une étude, il a retardé le stade 3 d’environ 2 ans, et il peut causer des effets secondaires, dont certains graves. L’Agence des médicaments du Canada a recommandé que les régimes publics d’assurance médicaments ne le remboursent pas, et il n’est inscrit à aucun régime d’assurance médicaments provincial ou territorial. On peut l’obtenir à ses frais, par une assurance privée ou par un programme d’accès compassionnel",
+              "11": "Vous pouvez demander à votre médecin de consulter UncoverT1D, un site Web géré par Sanofi, l’entreprise qui fabrique le teplizumab, qui offre de l’information aux professionnels de la santé sur les tests à prescrire"
             },
             "note": "Faire ou non le dépistage, et ce que veut dire un résultat, c’est une conversation à avoir avec votre médecin. Un résultat de dépistage n’est pas un diagnostic.",
             "figure": {
@@ -6418,9 +6526,9 @@
               "1": {
                 "heading": "Pourquoi le type compte",
                 "items": {
-                  "1": "C’est votre équipe de soins en diabète qui détermine votre type. Selon Diabète Canada, certains cas sont difficiles à classer",
-                  "2": "Un consensus international de l’American Diabetes Association et de l’European Association for the Study of Diabetes a établi que plus de 40 % des personnes chez qui le type 1 apparaît après 30 ans sont d’abord traitées comme si elles avaient le type 2",
-                  "3": "Selon Diabète Canada, le bon type peut changer votre traitement. Des lignes directrices internationales ajoutent qu’il peut indiquer si un dépistage pourrait être offert à votre famille"
+                  "1": "C’est votre équipe de soins en diabète qui détermine votre type. Certains cas sont difficiles à classer",
+                  "2": "Un consensus international a établi que plus de 40 % des personnes chez qui le type 1 apparaît après 30 ans sont d’abord traitées comme si elles avaient le type 2",
+                  "3": "Le bon type peut changer votre traitement. Des lignes directrices internationales ajoutent qu’il peut indiquer si un dépistage pourrait être offert à votre famille"
                 }
               },
               "2": {
@@ -6443,7 +6551,7 @@
                   "1": "Les tests d’anticorps cherchent des signes du type 1. Des lignes directrices internationales suggèrent de commencer par les anticorps anti-GAD",
                   "2": "Un test de peptide C montre la quantité d’insuline que votre corps produit encore. Il est plus utile des mois ou des années après le diagnostic, et non pendant une glycémie très élevée",
                   "3": "Les tests génétiques cherchent les types monogéniques, comme le MODY. C’est habituellement un spécialiste qui les organise",
-                  "4": "Selon Diabète Canada, les taux d’anticorps diminuent avec le temps, et les tests ne sont pas assez précis pour être utilisés chez tout le monde. Quand le type est difficile à établir, un test positif oriente vers le type 1, mais un test négatif n’exclut pas le type 1. C’est votre équipe qui décide"
+                  "4": "Les taux d’anticorps diminuent avec le temps, et les tests ne sont pas assez précis pour être utilisés chez tout le monde. Quand le type est difficile à établir, un test positif oriente vers le type 1, mais un test négatif n’exclut pas le type 1. C’est votre équipe qui décide"
                 }
               },
               "4": {
@@ -6483,7 +6591,7 @@
                 },
                 "4": {
                   "term": "A1C",
-                  "meaning": "Un test sanguin qui reflète votre glycémie moyenne des 2 à 3 derniers mois. Diabète Canada l’utilise pour diagnostiquer le diabète et le prédiabète. Avec le diabète, on le fait habituellement environ tous les 3 mois."
+                  "meaning": "Un test sanguin qui reflète votre glycémie moyenne des 2 à 3 derniers mois. On l’utilise pour diagnostiquer le diabète et le prédiabète. Avec le diabète, on le fait habituellement environ tous les 3 mois."
                 },
                 "5": {
                   "term": "HGPO (test de tolérance au glucose)",
@@ -6505,8 +6613,8 @@
               "3": "Il est souvent d’abord diagnostiqué et traité comme un type 2",
               "4": "Un test d’anticorps, habituellement anti-GAD, le confirme. Des lignes directrices internationales indiquent qu’un test de peptide C aide à orienter le traitement",
               "5": "La plupart des personnes ont besoin d’insuline plus tôt qu’avec le type 2, et le moment varie beaucoup. Selon des lignes directrices internationales, ce besoin tend à venir plus tôt quand les taux d’anticorps sont plus élevés, ou quand il y a plus d’un anticorps",
-              "6": "Breakthrough T1D décrit un plan de type 1 adapté, qui peut comprendre certains médicaments du type 2. Des lignes directrices internationales indiquent que d’autres conviennent moins, alors parlez-en à votre équipe avant tout changement",
-              "7": "Les estimations de sa fréquence vont de 2 à 12 % du diabète chez l’adulte (un consensus international) à environ 10 % (Breakthrough T1D)"
+              "6": "Un plan de type 1 adapté peut comprendre certains médicaments du type 2. Des lignes directrices internationales indiquent que d’autres conviennent moins, alors parlez-en à votre équipe avant tout changement",
+              "7": "Les estimations de sa fréquence vont de 2 à 12 % du diabète chez l’adulte (estimation internationale) à environ 10 % (estimation canadienne)"
             },
             "note": "N’arrêtez pas et ne réduisez pas l’insuline à cause de quoi que ce soit sur cette page. Tout changement se fait avec votre spécialiste. Apportez ces questions à votre équipe. Les signes d’hypoglycémie et des cétones se trouvent dans Rester en sécurité.",
             "figure": {
@@ -6523,10 +6631,10 @@
             "title": "MODY : le diabète monogénique",
             "badge": "Lignes directrices internationales",
             "items": {
-              "1": "Le MODY est causé par une modification d’un seul gène. Diabète Canada qualifie le diabète monogénique de rare. Les estimations internationales vont de 1 à 2 % du diabète pour le MODY (Diabetes UK, Université d’Exeter) à 1 à 5 % pour l’ensemble des types monogéniques (le NIDDK des États-Unis)",
-              "2": "Selon Diabetes UK, environ 9 personnes sur 10 atteintes du MODY se font d’abord dire qu’elles ont un autre type",
+              "1": "Le MODY est causé par une modification d’un seul gène. Au Canada, le diabète monogénique est qualifié de rare. Les estimations internationales vont de 1 à 2 % du diabète pour le MODY à 1 à 5 % pour l’ensemble des types monogéniques",
+              "2": "Selon des estimations internationales, environ 9 personnes sur 10 atteintes du MODY se font d’abord dire qu’elles ont un autre type",
               "3": "Parmi les indices : un diagnostic à un jeune âge, l’absence d’obésité, l’absence d’anticorps du type 1, et un parent diabétique, sur au moins deux générations",
-              "4": "L’âge considéré comme jeune varie. Diabète Canada et Diabetes UK utilisent moins de 25 ans. D’autres lignes directrices internationales utilisent moins de 30 ans, ou 35 ans et moins. C’est votre équipe qui décide",
+              "4": "L’âge considéré comme jeune varie. Les recommandations canadiennes, et certaines recommandations internationales, utilisent moins de 25 ans. D’autres lignes directrices internationales utilisent moins de 30 ans, ou 35 ans et moins. C’est votre équipe qui décide",
               "5": "Il est confirmé par un test génétique, habituellement après des tests d’anticorps et de peptide C",
               "6": "GCK : une glycémie légèrement élevée et stable, qui ne demande habituellement aucun traitement",
               "7": "HNF1A et HNF4A : souvent traités avec des comprimés plutôt qu’avec de l’insuline. C’est un spécialiste qui décide",
@@ -6576,6 +6684,31 @@
                   "typeTold": "Type de diabète, tel qu’annoncé",
                   "insulinSoon": "Insuline nécessaire dans les 2 ans?",
                   "hearingLoss": "Perte auditive?"
+                },
+                "people": {
+                  "1": "Moi",
+                  "2": "Mon frère ou ma sœur",
+                  "3": "Mon enfant",
+                  "4": "Ma mère",
+                  "5": "La mère de ma mère",
+                  "6": "Le père de ma mère",
+                  "7": "Le frère ou la sœur de ma mère",
+                  "8": "Mon père",
+                  "9": "La mère de mon père",
+                  "10": "Le père de mon père",
+                  "11": "Le frère ou la sœur de mon père"
+                },
+                "answers": {
+                  "yes": "Oui",
+                  "no": "Non",
+                  "notSure": "Je ne sais pas"
+                },
+                "types": {
+                  "type1": "Type 1",
+                  "type2": "Type 2",
+                  "gestational": "Gestationnel",
+                  "other": "Autre / tel qu’annoncé",
+                  "notSure": "Je ne sais pas"
                 }
               }
             }
@@ -6585,8 +6718,8 @@
             "badge": "Lignes directrices internationales",
             "items": {
               "1": "Le diabète diagnostiqué avant l’âge de 6 mois est habituellement causé par un seul gène",
-              "2": "Selon Diabète Canada, tout bébé qui reçoit un diagnostic avant 6 mois devrait passer un test génétique",
-              "3": "Selon l’Université d’Exeter, il touche environ 1 naissance sur 100 000. Le NIDDK des États-Unis indique environ 1 sur 90 000, et le décrit dans les 6 à 12 premiers mois",
+              "2": "Tout bébé qui reçoit un diagnostic avant 6 mois devrait passer un test génétique",
+              "3": "Les estimations internationales sont d’environ 1 naissance sur 100 000 et d’environ 1 sur 90 000. On le décrit comme survenant dans les 6 à 12 premiers mois",
               "4": "Certaines formes sont temporaires, et d’autres durent toute la vie",
               "5": "Le résultat génétique compte. Pour les types liés aux canaux potassiques, des lignes directrices internationales indiquent qu’environ 9 personnes sur 10 peuvent passer de l’insuline à des comprimés sous la supervision d’un spécialiste, avec plus de bienfaits si le changement se fait tôt",
               "6": "Les adultes à qui l’on a dit qu’ils avaient le type 1 et qui ont reçu le diagnostic avant 6 mois devraient faire réévaluer leur diagnostic"
@@ -6624,12 +6757,12 @@
           "11": {
             "title": "Les maladies du pancréas et la surcharge en fer",
             "items": {
-              "1": "Diabète Canada mentionne les maladies du pancréas parmi les causes du diabète, notamment la pancréatite, une chirurgie ou une blessure au pancréas, une masse dans le pancréas et la fibrose kystique",
-              "2": "L’hémochromatose, quand le corps accumule trop de fer, figure sur la même liste. Selon la Société canadienne de l’hémochromatose, elle peut toucher le pancréas et mener au diabète",
-              "3": "Environ 1 Canadien sur 300 a deux copies de la modification génétique qui l’expose à ce risque. Les lignes directrices de la Colombie-Britannique indiquent que moins de 1 sur 10 d’entre eux développent la maladie",
+              "1": "Les maladies du pancréas peuvent causer le diabète, notamment la pancréatite, une chirurgie ou une blessure au pancréas, une masse dans le pancréas et la fibrose kystique",
+              "2": "L’hémochromatose, quand le corps accumule trop de fer, est une autre cause. Elle peut toucher le pancréas et mener au diabète",
+              "3": "Environ 1 Canadien sur 300 a deux copies de la modification génétique qui l’expose à ce risque. Moins de 1 sur 10 d’entre eux développent la maladie",
               "4": "Un test de fer ne fait pas partie d’une prise de sang standard, alors il faut le demander. Un test génétique confirme l’hémochromatose",
               "5": "Les proches parents, comme les parents, les frères, les sœurs et les enfants, devraient être testés",
-              "6": "Le traitement consiste à retirer du sang régulièrement (phlébotomie). La Société indique qu’il peut améliorer légèrement le diabète"
+              "6": "Le traitement consiste à retirer du sang régulièrement (phlébotomie). Il peut améliorer légèrement le diabète"
             },
             "note": "Si vous avez eu une maladie ou une chirurgie du pancréas, demandez à votre équipe ce que cela signifie pour vos soins en diabète. Les hypoglycémies et les cétones sont abordées dans Rester en sécurité.",
             "figure": {
@@ -6648,9 +6781,9 @@
             "items": {
               "1": "La fibrose kystique peut toucher le pancréas et mener au diabète, appelé diabète associé à la fibrose kystique (DAFK)",
               "2": "Il devient plus fréquent avec l’âge. Au Canada, 3,6 % des personnes atteintes de fibrose kystique de moins de 18 ans l’ont, et cette proportion atteint 58,7 % chez les adultes de plus de 35 ans",
-              "3": "Le dépistage se fait chaque année dès l’âge de 10 ans, par votre clinique de fibrose kystique. Les lignes directrices de Fibrose kystique Canada commencent par un test d’A1C et ajoutent un test de tolérance au glucose au besoin. Le test de tolérance au glucose peut être fait en premier si l’A1C n’est pas fiable dans votre cas. C’est votre clinique qui décide",
-              "4": "L’insuline est le principal traitement, et le seul médicament utilisé chez les enfants. Selon Fibrose kystique Canada, certains adultes peuvent avoir d’autres options",
-              "5": "Si vous prenez de l’insuline, demandez à votre équipe un plan en cas d’hypoglycémie. Selon les lignes directrices de Fibrose kystique Canada, les personnes sous insuline, ainsi que leur famille ou leurs proches aidants, devraient apprendre à utiliser le glucagon. Des lignes directrices internationales ajoutent que la réaction naturelle du corps à une hypoglycémie est plus faible avec la fibrose kystique",
+              "3": "Le dépistage se fait chaque année dès l’âge de 10 ans, par votre clinique de fibrose kystique. Les lignes directrices canadiennes commencent par un test d’A1C et ajoutent un test de tolérance au glucose au besoin. Le test de tolérance au glucose peut être fait en premier si l’A1C n’est pas fiable dans votre cas. C’est votre clinique qui décide",
+              "4": "L’insuline est le principal traitement, et le seul médicament utilisé chez les enfants. Certains adultes peuvent avoir d’autres options",
+              "5": "Si vous prenez de l’insuline, demandez à votre équipe un plan en cas d’hypoglycémie. Selon les lignes directrices canadiennes, les personnes sous insuline, ainsi que leur famille ou leurs proches aidants, devraient apprendre à utiliser le glucagon. Des lignes directrices internationales ajoutent que la réaction naturelle du corps à une hypoglycémie est plus faible avec la fibrose kystique",
               "6": "Pendant la grossesse, si vous n’avez pas déjà un DAFK, un test de tolérance au glucose est fait tôt, entre 12 et 16 semaines ou dès que la grossesse est confirmée. S’il est normal, il est refait entre 24 et 28 semaines",
               "7": "Après une greffe, de 25 à 50 % des personnes atteintes de fibrose kystique qui n’avaient pas de DAFK auparavant développent un diabète",
               "8": "Des examens annuels des yeux, des reins et des nerfs commencent 5 ans après le diagnostic",
@@ -6661,14 +6794,14 @@
           "13": {
             "title": "Causé par des médicaments, ou après une greffe",
             "items": {
-              "1": "Diabète Canada mentionne certains médicaments qui peuvent causer le diabète, notamment les stéroïdes, certains antipsychotiques et certains médicaments antirejet",
-              "2": "Selon les lignes directrices de Diabète Canada sur les soins à l’hôpital, de 20 à 50 % des personnes non diabétiques qui prennent des stéroïdes présentent une glycémie élevée. On peut envisager de vérifier la glycémie pendant 48 heures après le début du traitement",
+              "1": "Certains médicaments peuvent causer le diabète, notamment les stéroïdes, certains antipsychotiques et certains médicaments antirejet",
+              "2": "À l’hôpital, de 20 à 50 % des personnes non diabétiques qui prennent des stéroïdes présentent une glycémie élevée. On peut envisager de vérifier la glycémie pendant 48 heures après le début du traitement",
               "3": "Certains antipsychotiques peuvent causer une prise de poids et augmenter la glycémie et le cholestérol",
               "4": "Chez les enfants et les adolescents, le risque de diabète de type 2 est de 2 à 3 fois plus élevé, et la hausse peut apparaître dès la première année",
-              "5": "Diabète Canada recommande de vérifier le poids, la pression artérielle, la glycémie et le cholestérol avant le début du traitement, puis selon un calendrier qui diffère pour chaque vérification. Demandez à votre prescripteur quand les vôtres sont prévues",
-              "6": "Des lignes directrices internationales de l’American Diabetes Association recommandent de vérifier la glycémie avant le début d’un traitement par un inhibiteur de point de contrôle immunitaire, un type d’immunothérapie contre le cancer, et à chaque visite pendant ce traitement. Un consensus international indique que ce diabète peut se manifester par une ACD",
+              "5": "Les lignes directrices canadiennes recommandent de vérifier le poids, la pression artérielle, la glycémie et le cholestérol avant le début du traitement, puis selon un calendrier qui diffère pour chaque vérification. Demandez à votre prescripteur quand les vôtres sont prévues",
+              "6": "Des lignes directrices internationales recommandent de vérifier la glycémie avant le début d’un traitement par un inhibiteur de point de contrôle immunitaire, un type d’immunothérapie contre le cancer, et à chaque visite pendant ce traitement. Un consensus international indique que ce diabète peut se manifester par une ACD",
               "7": "Après une greffe, le risque dépend de facteurs comme la dose de stéroïdes, certaines infections et le médicament antirejet utilisé",
-              "8": "Les lignes directrices de Diabète Canada prévoient une vérification de la glycémie avant la greffe et au cours des 3 premiers mois qui suivent, et une A1C à 3 et à 12 mois, puis chaque année. Elles indiquent qu’un test de tolérance au glucose est plus sensible que l’A1C, et qu’on y a recours si l’A1C n’est pas fiable. C’est votre équipe qui décide",
+              "8": "Les lignes directrices canadiennes prévoient une vérification de la glycémie avant la greffe et au cours des 3 premiers mois qui suivent, et une A1C à 3 et à 12 mois, puis chaque année. Un test de tolérance au glucose est plus sensible que l’A1C, et on y a recours si l’A1C n’est pas fiable. C’est votre équipe qui décide",
               "9": "Selon un consensus international, de 20 à 40 % des personnes qui reçoivent une greffe de cœur, de poumon ou de foie développent un diabète",
               "10": "Connaissez <link>les signes de l’hyperglycémie et des cétones</link>. Ils se trouvent dans Rester en sécurité"
             },
@@ -6715,7 +6848,7 @@
         "pharmacist": {
           "eyebrow": "Partout au Canada",
           "heading": "Questions sur les pompes, les capteurs, les fournitures ou les demandes de remboursement",
-          "body": "Les éducateurs agréés en diabète de la Pharmacie Bayshore Express, la pharmacie Liivv de Markham, en Ontario, répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie Liivv de votre province. Les questions sur votre type, et sur les tests qui s’y rattachent, relèvent de votre équipe de soins en diabète."
+          "body": "Les éducateurs agréés en diabète de Liivv répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie de Liivv de votre province. Les questions sur votre type, et sur les tests qui s’y rattachent, relèvent de votre équipe de soins en diabète."
         },
         "closing": {
           "heading": "Connaître votre type",
@@ -6758,19 +6891,19 @@
               "1": {
                 "heading": "Avant d’essayer",
                 "items": {
-                  "1": "Les lignes directrices de Diabète Canada recommandent de planifier une grossesse avec votre équipe de soins en diabète avant de commencer à essayer",
+                  "1": "Les lignes directrices canadiennes recommandent de planifier une grossesse avec votre équipe de soins en diabète avant de commencer à essayer",
                   "2": "Leur cible d’A1C avant la conception est de 7,0 % ou moins, et de 6,5 % ou moins si on peut l’atteindre de façon sécuritaire. Votre équipe établit la vôtre",
                   "3": "Elles recommandent de commencer l’acide folique avant la conception. Avec le diabète, vous pourriez avoir besoin d’une dose plus élevée que celle habituellement conseillée : demandez à votre équipe ou à votre pharmacien combien en prendre",
                   "4": "Apportez la liste de tous vos médicaments, pour que votre équipe puisse les revoir avant que vous essayiez. Certains médicaments doivent être arrêtés ou changés avant une grossesse. N’en arrêtez aucun de vous-même",
-                  "5": "Les lignes directrices recommandent un examen des yeux et une vérification des reins avant la conception"
+                  "5": "Elles recommandent aussi un examen des yeux et une vérification des reins avant la conception"
                 }
               },
               "2": {
                 "heading": "Pendant la grossesse",
                 "items": {
                   "1": "Les cibles de glycémie sont plus strictes pendant la grossesse. Votre équipe vous donnera les vôtres",
-                  "2": "Avec le diabète de type 1, les lignes directrices de Diabète Canada recommandent un système de surveillance du glucose en continu (SGC) pendant la grossesse. Avec le diabète de type 2, demandez à votre équipe si un tel système vous convient",
-                  "3": "Les lignes directrices recommandent un autre examen des yeux au premier trimestre",
+                  "2": "Avec le diabète de type 1, les lignes directrices canadiennes recommandent un système de surveillance du glucose en continu (SGC) pendant la grossesse. Avec le diabète de type 2, demandez à votre équipe si un tel système vous convient",
+                  "3": "Elles recommandent aussi un autre examen des yeux au premier trimestre",
                   "4": "Pendant la grossesse, l’acidocétose diabétique (ACD) peut survenir même quand la glycémie est normale ou seulement un peu élevée. L’ACD demande des soins médicaux sans attendre"
                 }
               },
@@ -6778,12 +6911,12 @@
                 "heading": "Après la naissance",
                 "items": {
                   "1": "Si vous prenez de l’insuline, vos besoins diminuent rapidement après la naissance. Planifiez ce changement avec votre équipe avant l’accouchement. Les hypoglycémies sont plus probables dans les premiers jours, alors vérifiez votre glycémie plus souvent",
-                  "2": "Les lignes directrices encouragent l’allaitement",
+                  "2": "Les lignes directrices canadiennes encouragent l’allaitement",
                   "3": "Elles recommandent aussi un examen des yeux dans la première année après la naissance"
                 }
               }
             },
-            "note": "Le diabète gestationnel, qui commence pendant la grossesse, est abordé dans <link>Connaître votre type</link>. Cette section s’appuie surtout sur les lignes directrices de Diabète Canada sur la grossesse destinées aux professionnels de la santé, et sur leurs messages clés pour les personnes qui planifient une grossesse. Ces lignes directrices datent de 2018, et Diabète Canada les met à jour.",
+            "note": "Le diabète gestationnel, qui commence pendant la grossesse, est abordé dans <link>Connaître votre type</link>. Les recommandations sur la grossesse sur lesquelles s’appuie cette section datent de 2018 et sont en cours de mise à jour.",
             "figure": {
               "heading": "Avant d’essayer : mon plan",
               "fields": {
@@ -6798,11 +6931,11 @@
           "2": {
             "title": "Un enfant qui a le diabète de type 1",
             "items": {
-              "1": "Les lignes directrices de 2025 de Diabète Canada sur le diabète de type 1 fixent la même cible d’A1C pour les enfants de tous les âges : moins de 7,0 %. L’équipe de votre enfant établit la sienne",
+              "1": "Pour le type 1, les lignes directrices canadiennes fixent la même cible d’A1C pour les enfants de tous les âges : moins de 7,0 %. L’équipe de votre enfant établit la sienne",
               "2": "Les jeunes enfants prennent moins de sucre à action rapide pour traiter une hypoglycémie, selon leur âge. Les quantités se trouvent dans <link>La règle des 15</link>",
               "3": "À partir de 4 ans, le glucagon peut être un vaporisateur nasal ou une injection. Pour un enfant de moins de 4 ans, demandez à l’équipe de votre enfant quel glucagon garder",
               "4": "Vérifiez les cétones quand votre enfant est malade ou que sa glycémie reste élevée. Les valeurs se trouvent dans <link>Les cétones : vérifier et agir</link>",
-              "5": "Les lignes directrices indiquent que des suivis réguliers de la santé émotionnelle sont particulièrement utiles à l’adolescence et au début de l’âge adulte",
+              "5": "Les lignes directrices canadiennes indiquent que des suivis réguliers de la santé émotionnelle sont particulièrement utiles à l’adolescence et au début de l’âge adulte",
               "6": "Le diabète de type 1 répond au critère des soins thérapeutiques essentiels du crédit d’impôt pour personnes handicapées pour les années d’imposition 2021 et suivantes. Vous devez quand même présenter une demande avec le formulaire T2201, sur papier ou en ligne, et le médecin ou l’infirmière praticienne de votre enfant remplit sa partie",
               "7": "Une fois que l’enfant a été approuvé pour le crédit, un régime enregistré d’épargne-invalidité (REEI) peut être ouvert pour lui",
               "8": "Certains programmes provinciaux de pompes à insuline ont des règles distinctes pour les enfants. Au Québec, un enfant doit s’inscrire au programme de pompes avant l’âge de 18 ans",
@@ -6826,15 +6959,15 @@
           "3": {
             "title": "Votre enfant à l’école",
             "items": {
-              "1": "Diabète Canada indique que le plan de soins d’un élève comporte deux parties : un plan quotidien de gestion du diabète et un plan d’urgence pour le diabète",
-              "2": "Diabète Canada indique que la direction de l’école devrait travailler avec vous, votre enfant et l’équipe soignante de votre enfant pour rédiger le plan",
-              "3": "La Société canadienne de pédiatrie recommande d’en discuter avant le début de l’année scolaire, et d’avoir au moins deux membres du personnel formés",
-              "4": "Diabète Canada indique que les élèves devraient pouvoir mesurer leur glycémie, prendre leur insuline et traiter les hypoglycémies et les hyperglycémies où et quand ils en ont besoin",
-              "5": "Diabète Canada indique que les écoles devraient permettre aux élèves d’avoir un téléphone ou une montre intelligente pour les aider à gérer leur glycémie",
-              "6": "Diabetes@School indique que les hypoglycémies à l’école sont fréquentes chez les élèves qui ont le diabète de type 1. Elles ne sont pas une raison de s’alarmer, mais il faut les traiter tout de suite, là où elles surviennent",
+              "1": "Le plan de soins d’un élève comporte deux parties : un plan quotidien de gestion du diabète et un plan d’urgence pour le diabète",
+              "2": "La direction de l’école devrait travailler avec vous, votre enfant et l’équipe soignante de votre enfant pour rédiger le plan",
+              "3": "Discutez-en avec l’école avant le début de l’année scolaire, et demandez qu’au moins deux membres du personnel soient formés",
+              "4": "Les élèves devraient pouvoir mesurer leur glycémie, prendre leur insuline et traiter les hypoglycémies et les hyperglycémies où et quand ils en ont besoin",
+              "5": "Les écoles devraient permettre aux élèves d’avoir un téléphone ou une montre intelligente pour les aider à gérer leur glycémie",
+              "6": "Les hypoglycémies à l’école sont fréquentes chez les élèves qui ont le diabète de type 1. Elles ne sont pas une raison de s’alarmer, mais il faut les traiter tout de suite, là où elles surviennent",
               "7": "Ne laissez pas un élève seul si on soupçonne une hypoglycémie. S’il ne répond pas, fait une convulsion ou ne peut pas prendre de sucre par la bouche, c’est une urgence : demandez à quelqu’un d’appeler le 911, tournez-le sur le côté, restez avec lui et ne lui mettez rien dans la bouche",
               "8": "Ensuite, si le plan de soins comprend un consentement pour le glucagon, le personnel nommé dans le plan, et formé, le donne",
-              "9": "Les lignes directrices de 2025 de Diabète Canada sur le diabète de type 1 demandent qu’on aide à administrer l’insuline à l’école et en garderie partout au Canada"
+              "9": "Pour le type 1, les lignes directrices canadiennes demandent qu’on aide à administrer l’insuline à l’école et en garderie partout au Canada"
             },
             "note": "Les règles scolaires varient selon la province et le territoire, et Diabète Canada les compare. Diabetes@School, de la Société canadienne de pédiatrie et de ses partenaires, offre plus de renseignements aux familles et au personnel scolaire.",
             "figure": {
@@ -6852,15 +6985,15 @@
           "4": {
             "title": "Plus tard dans la vie",
             "items": {
-              "1": "Les lignes directrices de Diabète Canada pour les personnes âgées établissent les cibles selon l’état de santé et l’autonomie de la personne",
+              "1": "Les lignes directrices canadiennes pour les personnes âgées établissent les cibles selon l’état de santé et l’autonomie de la personne",
               "2": "Pour les personnes en bonne santé et autonomes, la cible d’A1C est de 7,0 % ou moins",
-              "3": "Pour les personnes qui prennent un médicament pouvant causer des hypoglycémies, les lignes directrices indiquent qu’une cible d’A1C moins stricte peut être envisagée : de 7,1 à 8,0 % pour les personnes fonctionnellement dépendantes, et de 7,1 à 8,5 % pour les personnes fragiles ou atteintes de démence. Votre équipe établit la vôtre. En fin de vie, les lignes directrices ne recommandent plus de mesurer l’A1C. Le but est alors d’éviter toute hypoglycémie, ainsi que les hyperglycémies qui causent des symptômes",
-              "4": "Les lignes directrices mettent fortement l’accent sur la prévention des hypoglycémies chez les personnes âgées",
-              "5": "Si les injections deviennent plus difficiles, demandez à votre équipe s’il existe des options plus simples. Les lignes directrices citent les stylos d’insuline préremplis comme un moyen de réduire les erreurs de dose",
+              "3": "Pour les personnes qui prennent un médicament pouvant causer des hypoglycémies, les lignes directrices canadiennes indiquent qu’une cible d’A1C moins stricte peut être envisagée : de 7,1 à 8,0 % pour les personnes fonctionnellement dépendantes, et de 7,1 à 8,5 % pour les personnes fragiles ou atteintes de démence. Votre équipe établit la vôtre. En fin de vie, il n’est plus recommandé de mesurer l’A1C. Le but est alors d’éviter toute hypoglycémie, ainsi que les hyperglycémies qui causent des symptômes",
+              "4": "Les lignes directrices canadiennes mettent fortement l’accent sur la prévention des hypoglycémies chez les personnes âgées",
+              "5": "Si les injections deviennent plus difficiles, demandez à votre équipe s’il existe des options plus simples. Les stylos d’insuline préremplis sont un moyen de réduire les erreurs de dose",
               "6": "Des changements de mémoire ou de réflexion peuvent rendre une nouvelle habileté, comme les injections, plus difficile à apprendre. Parlez-en à votre équipe, pour qu’elle puisse en tenir compte",
               "7": "En Ontario, les personnes de 65 ans et plus qui utilisent de l’insuline tous les jours et vivent à domicile peuvent présenter une demande au Programme d’appareils et accessoires fonctionnels pour recevoir 170 $ par année pour les seringues et les aiguilles"
             },
-            "note": "Demandez à un pharmacien de passer en revue la liste complète de vos médicaments, y compris ce que vous achetez sans ordonnance. D’autres programmes pour les aînés se trouvent dans <link>Financement et couverture</link>. Cette section s’appuie sur les lignes directrices de Diabète Canada destinées aux professionnels de la santé et sur leurs messages clés pour les personnes âgées.",
+            "note": "Demandez à un pharmacien de passer en revue la liste complète de vos médicaments, y compris ce que vous achetez sans ordonnance. D’autres programmes pour les aînés se trouvent dans <link>Financement et couverture</link>.",
             "figure": {
               "columns": {
                 "1": {
@@ -6876,13 +7009,13 @@
             "title": "Prendre soin d’une personne qui vit avec le diabète",
             "items": {
               "1": "Les choses les plus utiles à apprendre sont à quoi ressemblent une hypoglycémie et une hyperglycémie, <link>la règle des 15</link>, et quand appeler à l’aide. Tout se trouve dans Rester en sécurité",
-              "2": "Si la personne a du glucagon, demandez qu’on vous montre comment il fonctionne. Les lignes directrices de Diabète Canada indiquent que les personnes de son entourage devraient recevoir cette formation",
+              "2": "Si la personne a du glucagon, demandez qu’on vous montre comment il fonctionne. Les lignes directrices canadiennes indiquent que les personnes de son entourage devraient recevoir cette formation",
               "3": "Demandez quel type d’aide est souhaité avant de l’offrir",
               "4": "Breakthrough T1D offre un guide pour les parents et les proches aidants d’enfants et d’adolescents qui ont le diabète de type 1",
               "5": "Son Répertoire Santé mentale + diabète répertorie des professionnels de la santé mentale inscrits, pour les personnes qui vivent avec le diabète et celles qui en sont touchées",
-              "6": "Le moral bas et la peur des hypoglycémies sont fréquents avec le diabète, et les lignes directrices de Diabète Canada demandent aux équipes de les dépister"
+              "6": "Le moral bas et la peur des hypoglycémies sont fréquents avec le diabète, et les lignes directrices canadiennes demandent aux équipes de les dépister"
             },
-            "note": "Si prendre soin de l’autre vous épuise, parlez-en à votre propre médecin. Les lignes directrices de Diabète Canada indiquent que les parents et les proches aidants des jeunes qui vivent avec le diabète devraient eux aussi être évalués pour la détresse liée au diabète.",
+            "note": "Si prendre soin de l’autre vous épuise, parlez-en à votre propre médecin. Les lignes directrices canadiennes indiquent que les parents et les proches aidants des jeunes qui vivent avec le diabète devraient eux aussi être évalués pour la détresse liée au diabète.",
             "figure": {
               "columns": {
                 "1": {
@@ -6941,7 +7074,7 @@
         "pharmacist": {
           "eyebrow": "Partout au Canada",
           "heading": "Des questions sur les fournitures, peu importe pour qui vous les achetez",
-          "body": "Les éducateurs agréés en diabète de la Pharmacie Bayshore Express, la pharmacie Liivv de Markham, en Ontario, répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie Liivv de votre province. Les questions sur une grossesse, le plan d’un enfant ou un changement dans la santé d’une personne relèvent de son équipe de soins en diabète."
+          "body": "Les éducateurs agréés en diabète de Liivv répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie de Liivv de votre province. Les questions sur une grossesse, le plan d’un enfant ou un changement dans la santé d’une personne relèvent de son équipe de soins en diabète."
         },
         "closing": {
           "heading": "Le même diabète, une autre étape de la vie",
@@ -7247,8 +7380,8 @@
           "eyebrow": "Votre parcours",
           "heading": "Vivre avec le type 1",
           "body": {
-            "1": "Avec le type 1, votre pancréas ne produit pas d’insuline, alors vous prenez de l’insuline par injection ou avec une pompe. Selon Diabète Canada, de 5 à 10 % des personnes diabétiques ont le type 1, et il peut aussi commencer à l’âge adulte. Selon une estimation de Breakthrough T1D, environ 71 % des personnes atteintes du type 1 au Canada ont reçu leur diagnostic à l’âge adulte.",
-            "2": "Ce parcours réunit dans un ordre de lecture les fiches qui comptent le plus avec le type 1. Elles expliquent comment traiter une hypoglycémie et quand vérifier les cétones, présentent les capteurs, les stylos et les pompes que vous pourriez utiliser, et les moments de la vie où les détails changent. La ligne directrice 2025 de Diabète Canada sur le type 1 privilégie l’administration automatisée d’insuline pour toute personne qui veut et peut l’utiliser, alors les fiches sur les pompes et les capteurs sont ici aussi. Votre équipe décide de votre plan avec vous."
+            "1": "Avec le type 1, votre pancréas ne produit pas d’insuline, alors vous prenez de l’insuline par injection ou avec une pompe. De 5 à 10 % des personnes diabétiques ont le type 1, et il peut aussi commencer à l’âge adulte. On estime qu’environ 71 % des personnes atteintes du type 1 au Canada ont reçu leur diagnostic à l’âge adulte.",
+            "2": "Ce parcours réunit dans un ordre de lecture les fiches qui comptent le plus avec le type 1. Elles expliquent comment traiter une hypoglycémie et quand vérifier les cétones, présentent les capteurs, les stylos et les pompes que vous pourriez utiliser, et les moments de la vie où les détails changent. Les lignes directrices canadiennes privilégient l’administration automatisée d’insuline pour toute personne atteinte du type 1 qui veut et peut l’utiliser, alors les fiches sur les pompes et les capteurs sont ici aussi. Votre équipe décide de votre plan avec vous."
           }
         },
         "list": {
@@ -7273,12 +7406,12 @@
             "16": "Si vous utilisez des stylos ou des seringues",
             "17": "Pourquoi changer d’endroit à chaque injection",
             "18": "Conserver l’insuline à la maison et en voyage",
-            "19": "La ligne directrice de Diabète Canada sur le type 1 privilégie l’administration automatisée d’insuline pour toute personne qui veut et peut l’utiliser",
+            "19": "Les lignes directrices canadiennes privilégient l’administration automatisée d’insuline pour toute personne atteinte du type 1 qui veut et peut l’utiliser",
             "20": "Si vous utilisez une pompe : les ensembles de perfusion et les réservoirs qui vont avec",
             "21": "Un plan de rechange, prévu avant d’en avoir besoin",
             "22": "Si vous prenez de l’insuline aux repas, établissez cela avec votre équipe",
             "23": "L’exercice peut faire baisser votre glycémie jusqu’à 48 heures après",
-            "24": "Avec le type 1, Diabète Canada recommande d’éviter le cannabis à des fins récréatives, car il augmente le risque d’acidocétose diabétique (ACD)",
+            "24": "Avec le type 1, évitez le cannabis à des fins récréatives, car il augmente le risque d’acidocétose diabétique (ACD)",
             "25": "Ce que vous ressentez fait partie de vos soins, y compris la peur des hypoglycémies",
             "26": "Les vérifications à faire avant de conduire et pendant la conduite, si vous prenez de l’insuline",
             "27": "Avec le type 1, à partir de 15 ans : un examen des yeux chaque année, à compter de 5 ans après le diagnostic",
@@ -7298,7 +7431,7 @@
         "pharmacist": {
           "eyebrow": "Partout au Canada",
           "heading": "Questions sur les pompes et les capteurs",
-          "body": "Les éducateurs agréés en diabète de la Pharmacie Bayshore Express, la pharmacie Liivv de Markham, en Ontario, répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie Liivv de votre province. Votre plan d’insuline et les réglages de votre pompe relèvent de votre équipe de soins en diabète.",
+          "body": "Les éducateurs agréés en diabète de Liivv répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie de Liivv de votre province. Votre plan d’insuline et les réglages de votre pompe relèvent de votre équipe de soins en diabète.",
           "cta": "Demander un appel"
         }
       },
@@ -7309,8 +7442,8 @@
           "eyebrow": "Votre parcours",
           "heading": "Vivre avec le type 2",
           "body": {
-            "1": "Le type 2 est le type le plus courant. Selon Diabète Canada, de 90 à 95 % des personnes diabétiques au Canada l’ont, et il peut ne causer aucun symptôme. Le traitement est différent pour chaque personne. Selon Diabète Canada, beaucoup de personnes atteintes du type 2 ont besoin d’insuline pour rester en bonne santé. Si c’est votre cas, et à quel moment, cela se décide avec votre équipe.",
-            "2": "Ce parcours commence par les notions de base. Viennent ensuite la mesure de la glycémie à la maison et les moments où une hypoglycémie peut survenir, puis les examens qui prennent soin de vos pieds, de vos yeux, de vos reins et de votre cœur. Si votre diabète ne correspond pas au portrait habituel, lisez Mon type pourrait-il être différent? Selon Breakthrough T1D, le LADA, un type 1 qui commence lentement chez l’adulte, est souvent traité d’abord comme un type 2."
+            "1": "Le type 2 est le type le plus courant. De 90 à 95 % des personnes diabétiques au Canada l’ont, et il peut ne causer aucun symptôme. Le traitement est différent pour chaque personne. Beaucoup de personnes atteintes du type 2 ont besoin d’insuline pour rester en bonne santé. Si c’est votre cas, et à quel moment, cela se décide avec votre équipe.",
+            "2": "Ce parcours commence par les notions de base. Viennent ensuite la mesure de la glycémie à la maison et les moments où une hypoglycémie peut survenir, puis les examens qui prennent soin de vos pieds, de vos yeux, de vos reins et de votre cœur. Si votre diabète ne correspond pas au portrait habituel, lisez Mon type pourrait-il être différent? Le LADA, un type 1 qui commence lentement chez l’adulte, est souvent traité d’abord comme un type 2."
           }
         },
         "list": {
@@ -7324,7 +7457,7 @@
             "5": "De petits premiers pas, et qui peut vous aider",
             "6": "Mesurer votre glycémie à la maison ou non, et à quelle fréquence, dépend de votre traitement",
             "7": "Les questions à poser à votre pharmacien sur chacun de vos médicaments",
-            "8": "Selon Diabète Canada, beaucoup de personnes atteintes du type 2 ont besoin d’insuline. Si c’est votre cas, commencez ici",
+            "8": "Beaucoup de personnes atteintes du type 2 ont besoin d’insuline. Si c’est votre cas, commencez ici",
             "9": "Si vous prenez de l’insuline ou un comprimé qui peut causer des hypoglycémies : ce qui compte comme une hypoglycémie",
             "10": "Comment traiter une hypoglycémie, étape par étape",
             "11": "Si vous prenez de l’insuline ou certains comprimés contre le diabète, l’alcool peut causer une hypoglycémie jusqu’à 24 heures plus tard",
@@ -7355,7 +7488,7 @@
         "pharmacist": {
           "eyebrow": "Partout au Canada",
           "heading": "Questions sur les capteurs et les pompes",
-          "body": "Les éducateurs agréés en diabète de la Pharmacie Bayshore Express, la pharmacie Liivv de Markham, en Ontario, répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie Liivv de votre province. Vos médicaments et votre plan relèvent de votre équipe de soins en diabète.",
+          "body": "Les éducateurs agréés en diabète de Liivv répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie de Liivv de votre province. Vos médicaments et votre plan relèvent de votre équipe de soins en diabète.",
           "cta": "Demander un appel"
         }
       },
@@ -7366,8 +7499,8 @@
           "eyebrow": "Votre parcours",
           "heading": "Le diabète gestationnel",
           "body": {
-            "1": "Le diabète gestationnel est une glycémie élevée découverte pour la première fois pendant la grossesse. Selon Diabète Canada, il touche de 3 à 20 % des grossesses et disparaît habituellement après l’accouchement. Le dépistage est offert entre la 24e et la 28e semaine, ou plus tôt si votre risque est plus élevé. Beaucoup de personnes le gèrent par une saine alimentation et l’activité physique. Certaines ont aussi besoin d’un médicament, comme l’insuline.",
-            "2": "Il compte encore après l’accouchement. Selon Diabète Canada, il augmente le risque de type 2 plus tard, pour vous et pour votre enfant, et Diabète Canada recommande un test de tolérance au glucose entre 6 semaines et 6 mois après l’accouchement. Ce parcours couvre d’abord votre grossesse, puis le rappel pour la suite. Si vous aviez le diabète avant votre grossesse, lisez plutôt La grossesse avec un diabète de type 1 ou de type 2."
+            "1": "Le diabète gestationnel est une glycémie élevée découverte pour la première fois pendant la grossesse. Il touche de 3 à 20 % des grossesses et disparaît habituellement après l’accouchement. Le dépistage est offert entre la 24e et la 28e semaine, ou plus tôt si votre risque est plus élevé. Beaucoup de personnes le gèrent par une saine alimentation et l’activité physique. Certaines ont aussi besoin d’un médicament, comme l’insuline.",
+            "2": "Il compte encore après l’accouchement. Il augmente le risque de type 2 plus tard, pour vous et pour votre enfant, et un test de tolérance au glucose est recommandé entre 6 semaines et 6 mois après l’accouchement. Ce parcours couvre d’abord votre grossesse, puis le rappel pour la suite. Si vous aviez le diabète avant votre grossesse, lisez plutôt La grossesse avec un diabète de type 1 ou de type 2."
           }
         },
         "list": {
@@ -7392,10 +7525,10 @@
             "16": "Une alimentation adaptée à votre culture et à vos goûts, avec l’aide d’un diététiste",
             "17": "Comment lire une étiquette et compter les glucides",
             "18": "Combien d’activité viser, et comment y arriver progressivement",
-            "19": "La fiche de Diabète Canada sur l’alcool indique de ne pas boire si vous êtes enceinte, si vous essayez de le devenir ou si vous allaitez",
+            "19": "Ne buvez pas si vous êtes enceinte, si vous essayez de le devenir ou si vous allaitez",
             "20": "Ce que vous ressentez fait partie de vos soins",
-            "21": "Selon des lignes directrices internationales du Royaume-Uni, une glycémie à jeun stable de 5,5 à 8 mmol/L, avec du diabète dans la famille, peut indiquer un type monogénique. Si cela vous ressemble, parlez-en à votre équipe tôt dans la grossesse",
-            "22": "Selon Diabète Canada, le diabète gestationnel augmente le risque de maladie du cœur plus tard. Cette fiche explique les facteurs de risque"
+            "21": "Selon des lignes directrices internationales, une glycémie à jeun stable de 5,5 à 8 mmol/L, avec du diabète dans la famille, peut indiquer un type monogénique. Si cela vous ressemble, parlez-en à votre équipe tôt dans la grossesse",
+            "22": "Le diabète gestationnel augmente le risque de maladie du cœur plus tard. Cette fiche explique les facteurs de risque"
           }
         },
         "funding": {
@@ -7406,7 +7539,7 @@
         "pharmacist": {
           "eyebrow": "Partout au Canada",
           "heading": "Questions sur les capteurs et les pompes",
-          "body": "Les éducateurs agréés en diabète de la Pharmacie Bayshore Express, la pharmacie Liivv de Markham, en Ontario, répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie Liivv de votre province. Les questions sur votre grossesse relèvent de votre équipe de soins en diabète et de grossesse.",
+          "body": "Les éducateurs agréés en diabète de Liivv répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie de Liivv de votre province. Les questions sur votre grossesse relèvent de votre équipe de soins en diabète et de grossesse.",
           "cta": "Demander un appel"
         }
       },
@@ -7417,8 +7550,8 @@
           "eyebrow": "Votre parcours",
           "heading": "Le prédiabète",
           "body": {
-            "1": "Le prédiabète signifie que votre glycémie est plus élevée que la normale, mais pas assez pour parler de diabète de type 2. Selon Diabète Canada, ce ne sont pas toutes les personnes atteintes de prédiabète qui développent un diabète de type 2, mais beaucoup le font.",
-            "2": "Ce parcours s’en tient au quotidien : ce que vos chiffres veulent dire, et les fiches sur l’alimentation et l’activité physique. Si perdre du poids vous convient, Diabète Canada indique que de saines habitudes menant à une perte de 5 % de votre poids de départ peuvent retarder ou prévenir le diabète de type 2. L’activité physique régulière réduit aussi le risque, et une diététiste peut vous aider à trouver des changements qui vous conviennent. Demandez à votre médecin ce que vos chiffres signifient pour vous, et quand refaire un test."
+            "1": "Le prédiabète signifie que votre glycémie est plus élevée que la normale, mais pas assez pour parler de diabète de type 2. Ce ne sont pas toutes les personnes atteintes de prédiabète qui développent un diabète de type 2, mais beaucoup le font.",
+            "2": "Ce parcours s’en tient au quotidien : ce que vos chiffres veulent dire, et les fiches sur l’alimentation et l’activité physique. Si perdre du poids vous convient, de saines habitudes menant à une perte de 5 % de votre poids de départ peuvent retarder ou prévenir le diabète de type 2. L’activité physique régulière réduit aussi le risque, et une diététiste peut vous aider à trouver des changements qui vous conviennent. Demandez à votre médecin ce que vos chiffres signifient pour vous, et quand refaire un test."
           }
         },
         "list": {
@@ -7430,7 +7563,7 @@
             "3": "De petits premiers pas, et qui peut vous aider",
             "4": "Plus d’une façon de manger convient bien, et un diététiste peut vous aider à trouver la vôtre",
             "5": "Combien d’activité viser, et comment y arriver progressivement",
-            "6": "Diabète Canada indique que certaines complications du diabète, comme les maladies du cœur, peuvent commencer dès le prédiabète. Cette fiche s’adresse aux personnes diabétiques : demandez à votre médecin quelles parties s’appliquent à vous"
+            "6": "Certaines complications du diabète, comme les maladies du cœur, peuvent commencer dès le prédiabète. Cette fiche s’adresse aux personnes diabétiques : demandez à votre médecin quelles parties s’appliquent à vous"
           }
         },
         "funding": {
@@ -7446,8 +7579,8 @@
           "eyebrow": "Votre parcours",
           "heading": "Quand votre type est moins courant",
           "body": {
-            "1": "La plupart des gens ont le type 1 ou le type 2, mais selon Diabète Canada, certains cas sont difficiles à classer. Sa ligne directrice énumère aussi d’autres formes. Parmi elles, le LADA, un type 1 qui commence lentement chez l’adulte, et les types causés par un seul gène, comme le MODY. Le diabète peut aussi être lié au pancréas, à la fibrose kystique, à une surcharge en fer ou à certains médicaments, et il peut commencer après une greffe.",
-            "2": "Le bon type compte, car selon Diabète Canada, il peut changer votre traitement. Ce parcours commence par les indices à soulever avec votre équipe, puis donne à chaque type moins courant sa propre fiche. Les fiches qui s’appuient sur des lignes directrices internationales le précisent. N’arrêtez pas votre insuline et ne la diminuez pas à cause de quoi que ce soit ici. Tout changement se fait avec votre spécialiste."
+            "1": "La plupart des gens ont le type 1 ou le type 2, mais certains cas sont difficiles à classer, et il existe aussi d’autres formes. Parmi elles, le LADA, un type 1 qui commence lentement chez l’adulte, et les types causés par un seul gène, comme le MODY. Le diabète peut aussi être lié au pancréas, à la fibrose kystique, à une surcharge en fer ou à certains médicaments, et il peut commencer après une greffe.",
+            "2": "Le bon type compte, car il peut changer votre traitement. Ce parcours commence par les indices à soulever avec votre équipe, puis donne à chaque type moins courant sa propre fiche. Les fiches qui s’appuient sur des lignes directrices internationales le précisent. N’arrêtez pas votre insuline et ne la diminuez pas à cause de quoi que ce soit ici. Tout changement se fait avec votre spécialiste."
           }
         },
         "list": {
@@ -7462,9 +7595,9 @@
             "6": "Après une maladie ou une chirurgie du pancréas, ou avec une hémochromatose",
             "7": "Un dépistage chaque année à partir de 10 ans, par votre clinique de fibrose kystique",
             "8": "Le diabète lié aux stéroïdes, à certains antipsychotiques ou aux médicaments antirejet, ou qui commence après une greffe. La fiche traite aussi de l’immunothérapie contre le cancer",
-            "9": "Diabète Canada classe le LADA dans le type 1, alors une grande partie de cette fiche s’applique aussi au LADA",
+            "9": "Au Canada, le LADA est classé dans le type 1, alors une grande partie de cette fiche s’applique aussi au LADA",
             "10": "Si vous utilisez de l’insuline : comment traiter une hypoglycémie",
-            "11": "Selon la ligne directrice de Fibrose kystique Canada, les personnes atteintes du diabète associé à la fibrose kystique qui prennent de l’insuline, ainsi que leur famille ou leurs proches aidants, devraient apprendre à utiliser le glucagon. Il sert en cas d’hypoglycémie quand la personne ne peut pas avaler, est inconsciente ou fait une convulsion. C’est quelqu’un d’autre qui le donne, alors les gens autour de vous doivent savoir où il se trouve et comment l’utiliser",
+            "11": "Selon les lignes directrices canadiennes, les personnes atteintes du diabète associé à la fibrose kystique qui prennent de l’insuline, ainsi que leur famille ou leurs proches aidants, devraient apprendre à utiliser le glucagon. Il sert en cas d’hypoglycémie quand la personne ne peut pas avaler, est inconsciente ou fait une convulsion. C’est quelqu’un d’autre qui le donne, alors les gens autour de vous doivent savoir où il se trouve et comment l’utiliser",
             "12": "Les signes de l’acidocétose diabétique (ACD), et quand vérifier. L’échelle a été écrite pour le type 1, alors demandez à votre équipe quels chiffres utiliser",
             "13": "Qui appeler, et quand composer le 911",
             "14": "Les questions à poser à votre pharmacien, surtout si un médicament a fait monter votre glycémie",
@@ -7482,7 +7615,7 @@
         "pharmacist": {
           "eyebrow": "Partout au Canada",
           "heading": "Questions sur les pompes et les capteurs",
-          "body": "Les éducateurs agréés en diabète de la Pharmacie Bayshore Express, la pharmacie Liivv de Markham, en Ontario, répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie Liivv de votre province. Les questions sur votre type, et sur les tests pour le déterminer, relèvent de votre équipe de soins en diabète.",
+          "body": "Les éducateurs agréés en diabète de Liivv répondent aux questions de partout au Canada : pompes, capteurs, lecteurs, fournitures, facturation et demandes de remboursement. Au besoin, ils vous dirigent vers la pharmacie de Liivv de votre province. Les questions sur votre type, et sur les tests pour le déterminer, relèvent de votre équipe de soins en diabète.",
           "cta": "Demander un appel"
         }
       }

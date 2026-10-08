@@ -44,7 +44,7 @@ export const YOUR_TOOLS = {
 
   heldCopy: {
     released:
-      'Released by the owner’s answers of 2026-10-06 (A2, B5, B9, B12): the CDE contact, the general phone line, email, hours and About page of Bayshore Express Pharmacy, in the CDE panel and the CDE lane (`ui.contact`).',
+      'Released by the owner’s answers of 2026-10-06 (A2, B5, B9, B12): the CDE contact, the general phone line, email, hours and About page of Bayshore Express Pharmacy, in the CDE panel and the CDE lane (`ui.contact`). Since owner note 5 (2026-10-07) the service is presented as Liivv’s: phone and hours only, no email, no About link.',
     items: [
       {
         topic: '"A 4 mm pen needle is safest, without a skin lift" (FIT’s framing)',

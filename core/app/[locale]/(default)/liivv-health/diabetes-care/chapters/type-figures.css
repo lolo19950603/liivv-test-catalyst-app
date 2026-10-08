@@ -198,13 +198,18 @@
 /* ---------------------------------------------------------------------------
  * The family diabetes tree
  *
- * A real table where the card is wide enough for six columns. Narrower (on
+ * On screen (owner note 2, 2026-10-07): closed to its heading, intro and one
+ * Start button; started, one compact group of one-tap questions per person,
+ * then the Add bar, grouped by side of the family. Every target is 44px.
+ *
+ * The paper table (the JavaScript-off disclosure, and the printed sheet) is a
+ * real table where the figure is wide enough for six columns. Narrower (on
  * phones, and beside the chapter's path on mid-width screens) each relative
- * becomes a block: the row header, then five fields, each with its column
- * label above it, so nothing scrolls sideways. The breakpoint is the figure's
- * own width (a container query), not the window's. The column labels in the
- * cells are for that layout only and are hidden from assistive technology,
- * which reads each field by its side, row and column headers.
+ * becomes a block: the row header, then five ruled lines, each with its
+ * column label above it, so nothing scrolls sideways. The breakpoint is the
+ * figure's own width (a container query), not the window's, and print turns
+ * it off, so the sheet is always the table. The column labels in the cells
+ * are for the narrow layout only and are hidden from assistive technology.
  * ------------------------------------------------------------------------- */
 
 #oc-chapter[data-site='diabetes-care'] .dc-fig-tree {
@@ -226,11 +231,6 @@
   width: 100%;
   border-collapse: collapse;
   font-size: var(--text-small);
-}
-
-#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table caption {
-  padding-bottom: 0.5rem;
-  text-align: left;
 }
 
 #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-table th,
@@ -260,6 +260,206 @@
 
 #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-label {
   display: none;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree .oc-fig-heading,
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-paper {
+  margin: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-paper > summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-start {
+  margin-top: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-screen {
+  display: grid;
+  gap: 0.75rem;
+}
+
+/* The people: one compact card each, no bullet and no rule from the shared list styling. */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-people {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-people > li {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-people > li::before {
+  content: none;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-person {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.6rem 1.25rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0.6rem 0.85rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-person > legend {
+  padding: 0 0.3rem;
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-q {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-q > legend,
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-q > label {
+  margin-bottom: 0.25rem;
+  padding: 0;
+  color: var(--ink-muted);
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-type {
+  display: grid;
+  gap: 0.4rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* One tap: the whole pill is the label of its radio. */
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0.3rem 0.85rem 0.3rem 0.6rem;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  cursor: pointer;
+  font-size: var(--text-small);
+  line-height: 1.3;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-pill:has(input:checked) {
+  border-color: var(--sage-deep);
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-pill input {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+  accent-color: var(--sage-deep);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-pill input:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 3px;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-age {
+  max-width: 6rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-told {
+  max-width: 20rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-told-count {
+  margin: -0.2rem 0 0;
+  color: var(--ink-muted);
+  font-size: var(--text-small);
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-remove {
+  margin-top: 0;
+  margin-left: auto;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-add {
+  display: grid;
+  gap: 0.5rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-add p {
+  margin: 0;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-add-head {
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-add-head span:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 2px;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-add-side {
+  display: grid;
+  gap: 0.3rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-add-side > p {
+  color: var(--sage-text);
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-add-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-add-btn {
+  min-height: 44px;
+  padding: 0.3rem 0.85rem;
+  border: 1.5px dashed color-mix(in srgb, var(--ink) 35%, transparent);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-small);
+  cursor: pointer;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-add-btn:disabled {
+  color: var(--ink-muted);
+  cursor: default;
+  opacity: 0.6;
+}
+
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-add-btn:focus-visible,
+#oc-chapter[data-site='diabetes-care'] .dc-fig-tree-paper > summary:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 2px;
 }
 
 #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-input {
@@ -350,14 +550,14 @@
  *
  * The checklist's print button prints its one sheet, not the screen layout.
  * The browser's own print prints the card as it is on screen, sheet hidden.
- * The family tree prints on one landscape page, through a named page, so no
- * other print on the site changes orientation. The glossary prints with every
- * term open where the browser lets a stylesheet open a disclosure.
+ * The family tree's button prints its sheet, the people added or the blank
+ * table, on one portrait page (its limit is at SHEET_COMPACT_FROM in
+ * type-figures.tsx): the named landscape page it had made a whole 70-page
+ * run turn sideways (owner note 2, 2026-10-07), and the sheet fits portrait
+ * once its container query is off. The glossary prints with every
+ * term open where the browser lets a stylesheet open a disclosure. What
+ * prints, and how the sheet is laid out, is ../../_microsite/print/print.css.
  * ------------------------------------------------------------------------- */
-
-@page dc-family-tree {
-  size: landscape;
-}
 
 @media print {
   html.oc-printing #oc-chapter[data-site='diabetes-care'] .dc-fig-clues[data-oc-printing] > * {
@@ -430,27 +630,124 @@
     content-visibility: visible;
   }
 
-  /*
-   * A named page applies to boxes in the normal flow, and the shared print
-   * rules lift the printed figure out of it, so the page is named on the body,
-   * and only while the family tree is what is printing.
-   */
-  html.oc-printing:has(#oc-chapter[data-site='diabetes-care'] .dc-fig-tree[data-oc-printing]) body {
-    page: dc-family-tree;
-  }
-
+  /* The sheet is always the table: no stacked blocks at 7 inches. */
   html.oc-printing #oc-chapter[data-site='diabetes-care'] .dc-fig-tree[data-oc-printing] {
-    background: none;
+    container-type: normal;
+    gap: 0.4rem;
   }
 
-  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-actions {
-    display: none;
+  /*
+   * Fixed columns, so a long answer wraps in its own cell instead of squeezing
+   * the others: the most room for the type as told, the one answer typed in
+   * (60 characters at most, up to three lines), then the person, then
+   * "Je ne sais pas". A long name wraps. The age column is as wide as its
+   * longest heading word at 9pt ("diagnosed", "diagnostic"), so no heading
+   * runs into the next column.
+   */
+  html.oc-printing #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-sheet .dc-fig-tree-table {
+    table-layout: fixed;
+    font-size: 9pt;
   }
 
-  #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-input {
-    min-height: 1.8rem;
-    border-width: 0 0 1px;
-    border-radius: 0;
-    background: none;
+  html.oc-printing #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-sheet thead > tr > * {
+    width: 12.5%;
+  }
+
+  html.oc-printing
+    #oc-chapter[data-site='diabetes-care']
+    .dc-fig-tree-sheet
+    thead
+    > tr
+    > :first-child {
+    width: 22%;
+  }
+
+  html.oc-printing
+    #oc-chapter[data-site='diabetes-care']
+    .dc-fig-tree-sheet
+    thead
+    > tr
+    > :nth-child(3) {
+    width: 11.5%;
+  }
+
+  html.oc-printing
+    #oc-chapter[data-site='diabetes-care']
+    .dc-fig-tree-sheet
+    thead
+    > tr
+    > :nth-child(4) {
+    width: 29%;
+  }
+
+  html.oc-printing
+    #oc-chapter[data-site='diabetes-care']
+    .dc-fig-tree-sheet
+    .dc-fig-tree-table
+    tbody
+    th[scope='row'] {
+    white-space: normal;
+  }
+
+  /* A side's heading never ends a page without its first relative under it. */
+  html.oc-printing #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-sheet .dc-fig-tree-side {
+    break-after: avoid;
+  }
+
+  html.oc-printing #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-sheet th,
+  html.oc-printing #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-sheet td {
+    padding: 0.2rem 0.3rem;
+    border-bottom-color: #999;
+  }
+
+  /* A typed answer with no spaces breaks inside its own cell, never into the next. */
+  html.oc-printing #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-sheet tbody td {
+    overflow-wrap: anywhere;
+  }
+
+  /* Room to write by hand in every empty cell; the cell's own rule is the line. */
+  html.oc-printing #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-sheet .oc-fig-ruled {
+    height: 1.7rem;
+    border-bottom: 0;
+  }
+
+  /*
+   * A long tree (type-figures.tsx says when): tighter rows and a smaller
+   * footer, still a line to write on in every empty cell, so it stays one page.
+   */
+  html.oc-printing
+    #oc-chapter[data-site='diabetes-care']
+    .dc-fig-tree-sheet[data-compact]
+    .dc-fig-tree-table {
+    font-size: 8.5pt;
+    line-height: 1.2;
+  }
+
+  html.oc-printing #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-sheet[data-compact] th,
+  html.oc-printing #oc-chapter[data-site='diabetes-care'] .dc-fig-tree-sheet[data-compact] td {
+    padding: 0.05rem 0.2rem;
+  }
+
+  html.oc-printing
+    #oc-chapter[data-site='diabetes-care']
+    .dc-fig-tree-sheet[data-compact]
+    .oc-fig-ruled {
+    height: 1.15rem;
+  }
+
+  html.oc-printing
+    #oc-chapter[data-site='diabetes-care']
+    .dc-fig-tree-sheet[data-compact]
+    .dc-fig-tree-side
+    th {
+    padding-top: 0.25rem;
+  }
+
+  html.oc-printing
+    #oc-chapter[data-site='diabetes-care']
+    .dc-fig-tree-sheet[data-compact]
+    ~ .oc-print-foot {
+    font-size: 7.5pt;
+    line-height: 1.3;
   }
 }
