@@ -897,14 +897,23 @@ export function LiivvArchiveHeader({
   const closeSearch = useCallback(() => setSearchOpen(false), []);
   const closeMegaMenu = useCallback(() => setActiveMegaIndex(null), []);
 
-  const openMegaMenu = useCallback((index: number) => {
-    if (megaCloseTimerRef.current != null) {
-      clearTimeout(megaCloseTimerRef.current);
-      megaCloseTimerRef.current = null;
-    }
+  const openMegaMenu = useCallback(
+    (index: number) => {
+      // Hovering a nav item must not dismiss an open search. The drawer hides
+      // whenever a mega menu is active, so ignore hover until search closes.
+      if (searchOpen) {
+        return;
+      }
 
-    setActiveMegaIndex(index);
-  }, []);
+      if (megaCloseTimerRef.current != null) {
+        clearTimeout(megaCloseTimerRef.current);
+        megaCloseTimerRef.current = null;
+      }
+
+      setActiveMegaIndex(index);
+    },
+    [searchOpen],
+  );
 
   /** In Makeswift, nav clicks navigate the preview iframe and can hide the editor chrome. */
   const preventBuilderNavigation = useCallback(
@@ -1089,18 +1098,28 @@ export function LiivvArchiveHeader({
     const onScroll = (event: Event) => {
       const target = event.target;
 
-      if (target instanceof Element && target.closest(`#${searchPanelId}`) != null) {
+      // Carousels and other nested scrollers fire scroll events too. Only the
+      // page itself should dismiss the drawer.
+      if (
+        target !== document &&
+        target !== document.documentElement &&
+        target !== document.body
+      ) {
         return;
       }
 
-      if (!armed) {
+      const active = document.activeElement;
+
+      // Focusing the field (and the mobile keyboard) scrolls the page. That is
+      // not the reader leaving the search.
+      if (active instanceof Element && active.closest(`#${searchPanelId}`) != null) {
         originY = window.scrollY;
 
         return;
       }
 
-      if (target instanceof Element) {
-        closeSearch();
+      if (!armed) {
+        originY = window.scrollY;
 
         return;
       }

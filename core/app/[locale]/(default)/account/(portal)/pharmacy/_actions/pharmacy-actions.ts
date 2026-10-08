@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 
 import { type OnboardingCustomer } from '~/lib/account/get-session-customer';
 import { runCustomerAction } from '~/lib/action-gateway/session';
+import { carePackRegionFromProvince } from '~/lib/pharmacy/carepack-region';
 import { isTabletDosageForm, normalizeBucket } from '~/lib/pharmacy/pharmacy-mappers';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import {
@@ -16,6 +17,8 @@ import {
   updateRefillRequestPrescriptions,
 } from '~/lib/supabase/prescriptions';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
+
+import { getCustomerProvince } from '../page-data';
 
 export type PharmacyActionState = { ok?: boolean; error?: string } | null;
 
@@ -241,6 +244,15 @@ export async function pharmacyAction(
   }
 
   if (intent === 'create_carepack_request') {
+    const province = await getCustomerProvince();
+
+    if (carePackRegionFromProvince(province) === 'other') {
+      return {
+        ok: false,
+        error: 'CarePack is available in Ontario today. The rest of Canada is coming soon.',
+      };
+    }
+
     const raw = String(formData.get('payload') ?? '').trim();
 
     if (!raw) {

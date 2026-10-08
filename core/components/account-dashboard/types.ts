@@ -120,6 +120,8 @@ export interface AccountDashboardLabels {
       orderHistoryCta: string;
       carePackTitle: string;
       carePackHint: string;
+      carePackOntarioOnly: string;
+      carePackComingSoon: string;
       carePackCta: string;
       pharmacyTitle: string;
       pharmacyHint: string;

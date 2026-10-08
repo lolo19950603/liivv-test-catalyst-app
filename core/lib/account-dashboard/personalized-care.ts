@@ -9,6 +9,7 @@ import {
   resolveInitialHealthCategoriesWithRank,
   type LiivPrimaryCategoryId,
 } from '~/lib/onboarding/liiv-primary-health-category';
+import type { CarePackRegion } from '~/lib/pharmacy/carepack-region';
 
 export type CareTone = 'sage' | 'peach' | 'rose' | 'lavender' | 'sand' | 'mist';
 
@@ -220,7 +221,15 @@ function snapshotForCategory(
   return chips.slice(0, 4);
 }
 
-function diabetesLane(responses: CategoryResponses, now: Date) {
+function carePackStepHint(region: CarePackRegion): string {
+  if (region === 'other') {
+    return 'Ontario only · Rest of Canada coming soon';
+  }
+
+  return 'Ontario only · Never forget another dose';
+}
+
+function diabetesLane(responses: CategoryResponses, now: Date, carePackRegion: CarePackRegion) {
   const path = asString(responses.diabetes_path);
   const stage = asString(responses.diabetes_journey_stage);
   const management = asList(responses.diabetes_management);
@@ -324,7 +333,7 @@ function diabetesLane(responses: CategoryResponses, now: Date) {
     {
       id: 'carepack',
       label: 'Set up CarePack',
-      hint: 'Never forget another dose',
+      hint: carePackStepHint(carePackRegion),
       href: '/account/pharmacy?section=carepack',
     },
     {
@@ -777,7 +786,7 @@ function genericLane(categoryId: LiivPrimaryCategoryId, label: string, now: Date
     nextSteps[0] = {
       id: 'consult',
       label: 'Book minor ailment consulting',
-      hint: 'Ontario, 19+',
+      hint: 'Ontario',
       href: '/account/virtual-care',
     };
   }
@@ -802,9 +811,10 @@ function resolveLaneCopy(
   responses: CategoryResponses,
   now: Date,
   protections: LaneProtections,
+  carePackRegion: CarePackRegion,
 ): LaneCopy {
   if (categoryId === 'diabetes_care_everyday') {
-    return diabetesLane(responses, now);
+    return diabetesLane(responses, now, carePackRegion);
   }
 
   if (categoryId === 'ostomy_care_everyday') {
@@ -864,8 +874,10 @@ export function buildPersonalizedCareLanes(options: {
   careInterests: string[];
   healthProfileNotes: string | null | undefined;
   now?: Date;
+  carePackRegion?: CarePackRegion;
 }): PersonalizedCareLane[] {
   const now = options.now ?? new Date();
+  const carePackRegion = options.carePackRegion ?? 'unknown';
   const ranked = resolveInitialHealthCategoriesWithRank(options.careInterests);
   const responses = responsesForLanes(options.healthProfileNotes);
   const protections = protectionsFromAnswers(options.healthProfileNotes);
@@ -873,7 +885,7 @@ export function buildPersonalizedCareLanes(options: {
   return ranked.map(({ id }) => {
     const display = getPrimaryCategoryDisplay(id);
     const door = HEALTH_HUB_DOORS.find((entry) => entry.id === id);
-    const copy = resolveLaneCopy(id, display.shortLabel, responses, now, protections);
+    const copy = resolveLaneCopy(id, display.shortLabel, responses, now, protections, carePackRegion);
     const href = HUB_BY_CATEGORY[id] ?? door?.href ?? null;
     // No shop door — and so no 'Shop this path' action — when the lane's own
     // answers call for a clinician rather than a product.

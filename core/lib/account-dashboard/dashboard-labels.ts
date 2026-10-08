@@ -178,6 +178,8 @@ export function buildDashboardLabels(
         orderHistoryCta: t('wellness.actionCenter.orderHistoryCta'),
         carePackTitle: t('wellness.actionCenter.carePackTitle'),
         carePackHint: t('wellness.actionCenter.carePackHint'),
+        carePackOntarioOnly: t('wellness.actionCenter.carePackOntarioOnly'),
+        carePackComingSoon: t('wellness.actionCenter.carePackComingSoon'),
         carePackCta: t('wellness.actionCenter.carePackCta'),
         pharmacyTitle: t('wellness.actionCenter.pharmacyTitle'),
         pharmacyHint: t('wellness.actionCenter.pharmacyHint'),

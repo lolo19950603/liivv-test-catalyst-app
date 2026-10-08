@@ -16,83 +16,122 @@ export interface PathBand {
   cards: Array<{ card: CategoryCard }>;
 }
 
-function useActiveCard(numbers: number[]) {
-  const [active, setActive] = useState(numbers[0] ?? 0);
+/** Reading line, below the sticky header and inside the section gate. */
+function readingFocus() {
+  return window.innerHeight * 0.38;
+}
+
+function nearestCard(numbers: number[], focus: number) {
+  let best: number | null = null;
+  let dist = Number.POSITIVE_INFINITY;
+
+  numbers.forEach((number) => {
+    const node = document.getElementById(`card-${number}`);
+
+    if (!node) return;
+
+    const rect = node.getBoundingClientRect();
+    const gap = rect.bottom < focus ? focus - rect.bottom : rect.top > focus ? rect.top - focus : 0;
+
+    if (gap < dist) {
+      dist = gap;
+      best = number;
+    }
+  });
+
+  return best;
+}
+
+/** Last card whose top has reached the reading line, or the nearest if none have. */
+function cardAtReadingLine(numbers: number[]) {
+  const focus = readingFocus();
+
+  for (let index = numbers.length - 1; index >= 0; index -= 1) {
+    const number = numbers[index];
+
+    if (number == null) continue;
+
+    const node = document.getElementById(`card-${number}`);
+
+    if (node && node.getBoundingClientRect().top <= focus) return number;
+  }
+
+  return nearestCard(numbers, focus);
+}
+
+function sectionAnchor(band: PathBand, bands: PathBand[]) {
+  /* The first act is addressed as #chapter-care; later acts use their band id. */
+  return band.id === bands[0]?.id ? 'chapter-care' : band.id;
+}
+
+/*
+ * Section gates are about a viewport tall and are not cards. A card-only spy
+ * never hears a jump that lands on the next gate, so the timeline stays on the
+ * stop you left. Whichever section holds the reading line owns the timeline.
+ */
+function stopAtReadingLine(bands: PathBand[]) {
+  const focus = readingFocus();
+
+  for (const band of bands) {
+    const section = document.getElementById(sectionAnchor(band, bands));
+
+    if (!section) continue;
+
+    const rect = section.getBoundingClientRect();
+
+    if (rect.top > focus || rect.bottom < focus) continue;
+
+    return cardAtReadingLine(band.cards.map(({ card }) => card.number));
+  }
+
+  return nearestCard(
+    bands.flatMap((band) => band.cards.map(({ card }) => card.number)),
+    focus,
+  );
+}
+
+function useReadingStop(key: string, initial: number, pick: () => number | null) {
+  const pickRef = useRef(pick);
+
+  pickRef.current = pick;
+
+  const [active, setActive] = useState(initial);
 
   useEffect(() => {
-    if (!numbers.length) return;
+    let frame = 0;
 
-    const nodes = numbers
-      .map((number) => document.getElementById(`card-${number}`))
-      .filter((node): node is HTMLElement => Boolean(node));
+    const run = () => {
+      const next = pickRef.current();
 
-    if (!nodes.length) return;
-
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const ratios = new Map<number, number>();
-
-    const pick = () => {
-      let best = numbers[0] ?? 0;
-      let bestRatio = -1;
-
-      ratios.forEach((ratio, number) => {
-        if (ratio > bestRatio) {
-          bestRatio = ratio;
-          best = number;
-        }
-      });
-
-      if (bestRatio <= 0) {
-        const mid = window.innerHeight * 0.4;
-        let nearest = best;
-        let dist = Number.POSITIVE_INFINITY;
-
-        nodes.forEach((node) => {
-          const number = Number(node.id.replace('card-', ''));
-          const top = Math.abs(node.getBoundingClientRect().top - mid);
-
-          if (top < dist) {
-            dist = top;
-            nearest = number;
-          }
-        });
-
-        setActive(nearest);
-
-        return;
-      }
-
-      setActive(best);
+      if (next != null) setActive(next);
     };
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const number = Number(entry.target.id.replace('card-', ''));
+    const schedule = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(run);
+    };
 
-          ratios.set(number, entry.isIntersecting ? entry.intersectionRatio : 0);
-        });
-        pick();
-      },
-      {
-        root: null,
-        rootMargin: '-20% 0px -45% 0px',
-        threshold: reduced ? [0, 0.25, 0.5] : [0, 0.15, 0.35, 0.55, 0.75],
-      },
-    );
+    schedule();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('hashchange', schedule);
+    window.addEventListener('resize', schedule);
 
-    nodes.forEach((node) => observer.observe(node));
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('hashchange', schedule);
+      window.removeEventListener('resize', schedule);
+    };
+  }, [key]);
 
-    return () => observer.disconnect();
-  }, [numbers]);
-
-  return active;
+  return [active, setActive] as const;
 }
 
 /*
  * Sticky Living Trail spine (desktop) and stepping-stone dots (mobile). Spy
- * only — never hijacks scroll. Active stop follows whichever #card-N owns the
- * most of the middle of the viewport.
+ * only — never hijacks scroll. The open section is whichever act holds the
+ * reading line, including its gate, so a jump to another section moves the
+ * timeline instead of leaving it on the stop you left.
  */
 export function JourneyPath({ bands }: { bands: PathBand[] }) {
   const t = useSiteT('ui.chapter');
@@ -111,8 +150,12 @@ export function JourneyPath({ bands }: { bands: PathBand[] }) {
       ),
     [bands],
   );
-  const numbers = useMemo(() => stops.map((stop) => stop.number), [stops]);
-  const active = useActiveCard(numbers);
+  const bandKey = bands
+    .map((band) => `${band.id}:${band.cards.map(({ card }) => card.number).join('.')}`)
+    .join('|');
+  const [active, jumpTo] = useReadingStop(bandKey, stops[0]?.number ?? 0, () =>
+    stopAtReadingLine(bands),
+  );
   const activeBandId = useMemo(
     () => stops.find((stop) => stop.number === active)?.bandId ?? bands[0]?.id ?? '',
     [active, bands, stops],
@@ -135,9 +178,11 @@ export function JourneyPath({ bands }: { bands: PathBand[] }) {
   useEffect(() => {
     const nav = navRef.current;
 
-    if (!nav || nav.scrollHeight <= nav.clientHeight) return;
+    if (!nav) return;
 
-    const frame = window.requestAnimationFrame(() => {
+    const align = () => {
+      if (nav.scrollHeight <= nav.clientHeight) return;
+
       const link = nav.querySelector<HTMLElement>('a[aria-current="true"]');
 
       if (!link) return;
@@ -149,9 +194,18 @@ export function JourneyPath({ bands }: { bands: PathBand[] }) {
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       nav.scrollTo({ top: Math.max(0, target), behavior: reduced ? 'auto' : 'smooth' });
-    });
+    };
+    const onTransitionEnd = (event: TransitionEvent) => {
+      if (event.propertyName === 'grid-template-rows') align();
+    };
+    const frame = window.requestAnimationFrame(align);
 
-    return () => window.cancelAnimationFrame(frame);
+    nav.addEventListener('transitionend', onTransitionEnd);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      nav.removeEventListener('transitionend', onTransitionEnd);
+    };
   }, [active, activeBandId]);
 
   const railRef = useRef<HTMLSpanElement>(null);
@@ -219,6 +273,13 @@ export function JourneyPath({ bands }: { bands: PathBand[] }) {
                     aria-expanded={isOpen}
                     className={isOpen ? 'oc-journey-path-band is-current' : 'oc-journey-path-band'}
                     href={band.id === bands[0]?.id ? '#chapter-care' : `#${band.id}`}
+                    onClick={(event) => {
+                      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+                      const first = band.cards[0]?.card.number;
+
+                      if (first != null) jumpTo(first);
+                    }}
                   >
                     <span className="oc-journey-path-band-label">{band.label}</span>
                     <span className="oc-journey-path-band-meta">
@@ -247,6 +308,18 @@ export function JourneyPath({ bands }: { bands: PathBand[] }) {
                                   .join(' ') || undefined
                               }
                               href={`#card-${card.number}`}
+                              onClick={(event) => {
+                                if (
+                                  event.metaKey ||
+                                  event.ctrlKey ||
+                                  event.shiftKey ||
+                                  event.altKey
+                                ) {
+                                  return;
+                                }
+
+                                jumpTo(card.number);
+                              }}
                               tabIndex={isOpen ? undefined : -1}
                               title={card.title}
                             >
@@ -288,7 +361,9 @@ export function JourneyBandDots({
   const t = useSiteT('ui.chapter');
   const memory = useJourneyMemoryOptional();
   const numbers = useMemo(() => cards.map(({ card }) => card.number), [cards]);
-  const active = useActiveCard(numbers);
+  const [active, jumpTo] = useReadingStop(numbers.join(','), numbers[0] ?? 0, () =>
+    cardAtReadingLine(numbers),
+  );
 
   if (cards.length < 2) return null;
 
@@ -307,6 +382,11 @@ export function JourneyBandDots({
             }
             href={`#card-${card.number}`}
             key={card.number}
+            onClick={(event) => {
+              if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+              jumpTo(card.number);
+            }}
             title={card.title}
           >
             <span aria-hidden />

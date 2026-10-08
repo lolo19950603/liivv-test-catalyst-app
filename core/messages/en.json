@@ -492,6 +492,8 @@
           "orderHistoryCta": "View orders",
           "carePackTitle": "CarePack",
           "carePackHint": "Never forget another dose",
+          "carePackOntarioOnly": "Ontario only",
+          "carePackComingSoon": "Rest of Canada coming soon",
           "carePackCta": "Build your pack",
           "pharmacyTitle": "My Pharmacy",
           "pharmacyHint": "Manage my prescriptions",

@@ -3,7 +3,6 @@ import 'server-only';
 import { cookies } from 'next/headers';
 
 const COOKIE_NAME = 'liivv_pharmacist';
-/** Must match the BC iframe app path so the cookie is sent inside the control panel. */
 const COOKIE_PATH = '/pharmacy-admin';
 const SESSION_MS = 12 * 60 * 60 * 1000;
 
@@ -114,9 +113,8 @@ function cookieOptions(maxAgeSec: number) {
   return {
     path: COOKIE_PATH,
     httpOnly: true,
-    // Third-party iframe inside BigCommerce admin requires SameSite=None.
-    sameSite: 'none' as const,
-    secure: true,
+    sameSite: 'lax' as const,
+    secure: process.env.NODE_ENV === 'production',
     maxAge: maxAgeSec,
   };
 }

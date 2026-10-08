@@ -17,6 +17,7 @@ import {
   OstomyShop,
   OstomyShopFallback,
 } from '~/app/[locale]/(default)/liivv-health/ostomy-care/ostomy-shop';
+import { OstomyShopPageScroll } from '~/app/[locale]/(default)/liivv-health/ostomy-care/ostomy-shop-page-scroll';
 import { getSessionCustomerAccessToken } from '~/auth';
 import { DenyAdSignals } from '~/components/analytics/deny-ad-signals';
 import { facetsTransformer } from '~/data-transformers/facets-transformer';
@@ -342,20 +343,25 @@ export default async function Category(props: Props) {
         snapshotId={`category-${categoryId}-top-content`}
       />
       {isShopOstomy ? (
-        <Suspense fallback={<OstomyShopFallback />}>
-          <OstomyShop
-            breadcrumbs={breadcrumbs}
-            category={category}
-            categoryIds={analyticsCategoryIds}
-            fallbackLogo={fallbackLogo}
-            outOfStockMessage={
-              showOutOfStockMessage ? defaultOutOfStockMessage : undefined
-            }
-            quickActions={quickActions}
-            searchParams={props.searchParams}
-            showBackorderMessage={showBackorderMessage}
-          />
-        </Suspense>
+        <div id="ostomy-shop-anchor">
+          <Suspense fallback={null}>
+            <OstomyShopPageScroll />
+          </Suspense>
+          <Suspense fallback={<OstomyShopFallback />}>
+            <OstomyShop
+              breadcrumbs={breadcrumbs}
+              category={category}
+              categoryIds={analyticsCategoryIds}
+              fallbackLogo={fallbackLogo}
+              outOfStockMessage={
+                showOutOfStockMessage ? defaultOutOfStockMessage : undefined
+              }
+              quickActions={quickActions}
+              searchParams={props.searchParams}
+              showBackorderMessage={showBackorderMessage}
+            />
+          </Suspense>
+        </div>
       ) : (
         <ProductsListSection
           breadcrumbs={breadcrumbs}

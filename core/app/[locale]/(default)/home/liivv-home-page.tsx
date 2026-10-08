@@ -516,8 +516,8 @@ export function LiivvHomePage({
           <span className="eyebrow">Pharmacy</span>
           <h2>Your pharmacy, without the counter</h2>
           <p>
-            Prescriptions and refills live in one calm place. The two that change the day-to-day — CarePak and
-            Ask a pharmacist — are featured below.
+            Prescriptions and refills live in one calm place. CarePak is Ontario only for now — the rest of
+            Canada is coming soon — and Ask a pharmacist is featured below.
           </p>
         </div>
         <div className="lh-pharmacy-pair" data-reveal data-reveal-stagger>
@@ -544,13 +544,14 @@ export function LiivvHomePage({
             <img alt="" src={`${IMG}/corner-personal.png`} />
           </div>
           <div className="lh-feature-copy">
-            <span className="eyebrow">Main selling point</span>
+            <span className="eyebrow">Ontario only</span>
             <h2>CarePak — never forget another dose</h2>
             <p>
               Pre-packaged pouches for eligible tablet medications, organized by date and time, shipped every
               4 weeks. Ideal if you take multiple tablets daily — a pharmacist reviews before your first
               shipment.
             </p>
+            <p>Available in Ontario today. The rest of Canada is coming soon.</p>
             <ol className="lh-feature-steps">
               {CAREPAK_STEPS.map((step) => (
                 <li key={step}>{step}</li>
@@ -678,14 +679,16 @@ export function LiivvHomePage({
             <summary>What is Liivv Your Life?</summary>
             <p>
               Your everyday store — products and categories, plus pharmacy tools (prescriptions, refills,
-              CarePak), Ask a pharmacist in Ontario (coming soon), Olivia for store help, and subscriptions.
+              CarePak in Ontario only), Ask a pharmacist in Ontario (coming soon), Olivia for store help, and
+              subscriptions.
             </p>
           </details>
           <details>
             <summary>What is CarePak?</summary>
             <p>
               Pre-packaged pouches for eligible tablet medications, organized by date and time, shipped every
-              4 weeks. A pharmacist reviews before your first shipment. Request it from Pharmacy → CarePak.
+              4 weeks. Available in Ontario today — the rest of Canada is coming soon. A pharmacist reviews
+              before your first shipment. Request it from Pharmacy → CarePak.
             </p>
           </details>
           <details>

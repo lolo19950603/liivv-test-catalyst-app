@@ -21,6 +21,7 @@ import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-id
 
 import { SHOP_OSTOMY_HREF } from './chapters/chapters-data';
 import { getOstomyShopCatalog } from './get-ostomy-shop';
+import { OstomyShopResultsScroll } from './ostomy-shop-page-scroll';
 import {
   countShelf,
   matchesShelf,
@@ -307,6 +308,7 @@ export async function OstomyShop({
           </div>
 
           <div className="os-results" id="ostomy-shop-results">
+            <OstomyShopResultsScroll />
             {catalog.ok && visible.length > 0 ? (
               <ProductList
                 cardVariant="archive"
@@ -332,6 +334,7 @@ export async function OstomyShop({
                 info={numberedPaginationTransformer(matched.length, filters.limit, page)}
                 label={faceted('Pagination.label')}
                 nextLabel={faceted('Pagination.next')}
+                scroll={false}
               />
             ) : null}
           </div>
