@@ -18,6 +18,7 @@ import {
 } from '~/app/[locale]/(default)/account/(portal)/pharmacy/_actions/pharmacy-actions';
 import { AddPrescriptionDialog } from '~/components/pharmacy/add-prescription-dialog';
 import { OnboardingSectionHeader } from '~/components/onboarding/onboarding-section-header';
+import { carePackRegionFromProvince } from '~/lib/pharmacy/carepack-region';
 import { isTabletDosageForm } from '~/lib/pharmacy/pharmacy-mappers';
 import type {
   PharmacyCarePackRequest,
@@ -74,11 +75,13 @@ function SectionTab({
   active,
   count,
   label,
+  note,
   onClick,
 }: {
   active: boolean;
   count?: number;
   label: string;
+  note?: string;
   onClick: () => void;
 }) {
   return (
@@ -92,6 +95,13 @@ function SectionTab({
       type="button"
     >
       {label}
+      {note ? (
+        <span
+          className={`ml-1.5 text-[10px] font-semibold uppercase tracking-wide ${active ? 'text-[#4a6b4a]' : 'text-[#8a8176]'}`}
+        >
+          {note}
+        </span>
+      ) : null}
       {count !== undefined ? (
         <span className={`ml-1.5 text-xs ${active ? 'text-[#4a6b4a]' : 'text-[#9a928a]'}`}>
           ({count})
@@ -229,7 +239,14 @@ export function PharmacyDashboard({
     router.replace(`?${params.toString()}`, { scroll: false });
   };
 
+  const carePackRegion = carePackRegionFromProvince(userProvince);
+  const carePackComingSoon = carePackRegion === 'other';
+
   const openCarePackModal = (preselectedIds: string[] = []) => {
+    if (carePackComingSoon) {
+      return;
+    }
+
     setCarePackForm(emptyCarePackForm);
     setSelectedCarePackIds(preselectedIds);
     setCarePackOpen(true);
@@ -325,6 +342,9 @@ export function PharmacyDashboard({
         </div>
         <div className="rounded-xl border border-[#e8e2d8] bg-white px-4 py-3">
           <p className="text-xs font-medium uppercase tracking-wide text-[#8a8176]">CarePack</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#5a6d4d]">
+            Ontario only
+          </p>
           <p className="mt-1 text-2xl font-semibold text-[#2c2a26]">
             {activeCarePack ? 'Active' : carepackRequests.length > 0 ? 'Requested' : '—'}
           </p>
@@ -348,6 +368,7 @@ export function PharmacyDashboard({
           active={section === 'carepack'}
           count={carepackRequests.length}
           label="CarePack"
+          note="Ontario only"
           onClick={() => setSectionInUrl('carepack')}
         />
       </div>
@@ -435,7 +456,7 @@ export function PharmacyDashboard({
                           {rx.pharmacyName ?? 'Pharmacy pending'} •{' '}
                           {rx.prescribingDoctor ?? 'Doctor pending'}
                         </p>
-                        {rx.bucket === 'active' && tabletEligible ? (
+                        {rx.bucket === 'active' && tabletEligible && !carePackComingSoon ? (
                           <button
                             className="liivv-btn-secondary mt-3 px-3 py-1.5 text-xs"
                             onClick={() => openCarePackModal([rx.id])}
@@ -594,25 +615,37 @@ export function PharmacyDashboard({
       {section === 'carepack' ? (
         <>
           <div className="rounded-2xl border border-[#d8e4d8] bg-[#eef4ee] p-5 sm:p-6">
-            <h3 className="text-lg font-semibold text-[#2d4a2d]">Liivv CarePack</h3>
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-lg font-semibold text-[#2d4a2d]">Liivv CarePack</h3>
+              <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#5a6d4d]">
+                Ontario only
+              </span>
+            </div>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#5c564c]">
               Pre-packaged pouches for eligible tablet medications, organized by date and time and
               shipped every 4 weeks. Ideal if you take multiple tablets daily.
             </p>
+            {carePackComingSoon ? (
+              <p className="mt-2 max-w-2xl text-sm font-medium text-[#2d4a2d]">
+                Rest of Canada coming soon.
+              </p>
+            ) : null}
             <ul className="mt-3 space-y-1 text-sm text-[#5c564c]">
               <li>• Tablet medications only</li>
               <li>• Morning, afternoon, and evening dosing options</li>
               <li>• Pharmacist review before your first shipment</li>
             </ul>
-            <button
-              className="liivv-btn-primary mt-4 px-4 py-2.5 text-sm disabled:opacity-40"
-              disabled={tabletPrescriptions.length === 0}
-              onClick={() => openCarePackModal()}
-              type="button"
-            >
-              Request CarePack
-            </button>
-            {tabletPrescriptions.length === 0 ? (
+            {carePackComingSoon ? null : (
+              <button
+                className="liivv-btn-primary mt-4 px-4 py-2.5 text-sm disabled:opacity-40"
+                disabled={tabletPrescriptions.length === 0}
+                onClick={() => openCarePackModal()}
+                type="button"
+              >
+                Request CarePack
+              </button>
+            )}
+            {!carePackComingSoon && tabletPrescriptions.length === 0 ? (
               <p className="mt-2 text-xs text-[#8a8176]">
                 Add an active tablet prescription to request CarePack.
               </p>
@@ -621,8 +654,12 @@ export function PharmacyDashboard({
 
           {carepackRequests.length === 0 ? (
             <EmptyState
-              description="Select your tablet medications and complete a short intake form to get started."
-              title="No CarePack requests yet"
+              description={
+                carePackComingSoon
+                  ? 'CarePack is available in Ontario today. The rest of Canada is coming soon.'
+                  : 'Select your tablet medications and complete a short intake form to get started.'
+              }
+              title={carePackComingSoon ? 'Not available in your province yet' : 'No CarePack requests yet'}
             />
           ) : (
             <div className="space-y-3">
@@ -719,6 +756,9 @@ export function PharmacyDashboard({
       {carePackOpen ? (
         <Modal onClose={() => setCarePackOpen(false)} title="CarePack request">
           <div className="space-y-4 text-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#5a6d4d]">
+              Ontario only
+            </p>
             <div>
               <p className="font-medium text-[#2c2a26]">Select tablet medications</p>
               {tabletPrescriptions.length === 0 ? (

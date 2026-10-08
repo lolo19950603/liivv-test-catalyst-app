@@ -306,39 +306,3 @@ export async function synthesizeChatVoiceAction(
     },
   );
 }
-
-export type VirtualCareAppointmentActionState = { ok?: boolean; error?: string } | null;
-
-export async function virtualCareAppointmentAction(
-  _prevState: VirtualCareAppointmentActionState,
-  formData: FormData,
-): Promise<VirtualCareAppointmentActionState> {
-  return runCustomerAction(
-    { redirectTo: '/login?redirectTo=/account/virtual-care/appointment' },
-    async (customer) => {
-  const details = String(formData.get('details') ?? '').trim();
-  const preferredDate = String(formData.get('preferredDate') ?? '').trim();
-  const preferredTime = String(formData.get('preferredTime') ?? '').trim();
-
-  if (!details) {
-    return { ok: false, error: 'Please describe what the appointment is about.' };
-  }
-
-  if (!preferredDate) {
-    return { ok: false, error: 'Please choose a preferred date.' };
-  }
-
-  // Manual booking flow — staff follow up by email. Microsoft Graph integration can be added later.
-  // Do not log `details` (free-text; may contain PHI). See chat logging policy (G10).
-  console.info('[virtual-care appointment request]', {
-    customerId: customer.entityId,
-    preferredDate,
-    preferredTime,
-    detailsLength: details.length,
-  });
-
-  revalidatePath('/account/virtual-care/appointment');
-  return { ok: true };
-    },
-  );
-}

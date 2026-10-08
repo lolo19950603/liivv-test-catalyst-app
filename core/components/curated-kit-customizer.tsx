@@ -6,7 +6,6 @@ import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from
 import { useSearchParams } from 'next/navigation';
 import { usePathname, useRouter } from '~/i18n/routing';
 
-import { Select } from '@/vibes/soul/form/select';
 import { PriceLabel, type Price } from '@/vibes/soul/primitives/price-label';
 import { ArchiveButton } from '@/vibes/soul/primitives/archive-button';
 import { toast } from '@/vibes/soul/primitives/toaster';
@@ -144,6 +143,48 @@ function buildKitItemsPayload(
   });
 }
 
+function KitOptionSelect({
+  id,
+  label,
+  optionalLabel,
+  required,
+  value,
+  options,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  optionalLabel: string;
+  required: boolean;
+  value?: string;
+  options: Array<{ label: string; value: string }>;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="liivv-kit-option">
+      <label className="liivv-kit-option__label" htmlFor={id}>
+        {label}
+        {!required ? <span className="liivv-kit-option__optional">({optionalLabel})</span> : null}
+      </label>
+      <div className="liivv-kit-option__control">
+        <select
+          className="liivv-kit-option__select"
+          id={id}
+          onChange={(event) => onChange(event.currentTarget.value)}
+          value={value ?? ''}
+        >
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <ChevronDown aria-hidden className="liivv-kit-option__chevron" size={16} strokeWidth={1.5} />
+      </div>
+    </div>
+  );
+}
+
 function KitQuantityStepper({
   quantity,
   decrementLabel,
@@ -206,6 +247,7 @@ export function CuratedKitCustomizer({
   const t = useTranslations('Faceted.CuratedKit') as unknown as {
     (key: string, values?: Record<string, string | number | Date>): string;
   };
+  const optionalLabel = useTranslations('Form')('optional');
   const format = useFormatter();
   const router = useRouter();
   const { openMiniCart } = useMiniCart();
@@ -817,23 +859,24 @@ export function CuratedKitCustomizer({
                         const currentValue = optionChoice(option);
 
                         return (
-                          <Select
+                          <KitOptionSelect
+                            id={`kit-option-${product.productEntityId}-${option.entityId}`}
                             key={option.entityId}
                             label={option.displayName}
-                            name={`option-${product.productEntityId}-${option.entityId}`}
-                            onValueChange={(value) =>
+                            onChange={(value) =>
                               setOptionValue(
                                 product.productEntityId,
                                 option.entityId,
                                 Number(value),
                               )
                             }
+                            optionalLabel={optionalLabel}
                             options={option.values.map((value) => ({
                               label: value.label,
                               value: String(value.entityId),
                             }))}
+                            required={option.isRequired}
                             value={currentValue != null ? String(currentValue) : undefined}
-                            variant="rectangle"
                           />
                         );
                       })}

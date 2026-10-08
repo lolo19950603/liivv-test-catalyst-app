@@ -905,6 +905,16 @@ body.adc-portal-active main{
   gap:0.35rem;
   padding-right:3.25rem;
 }
+#${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-action-card__badge{
+  margin:0;
+  align-self:flex-start;
+  font-size:0.6875rem;
+  font-weight:600;
+  letter-spacing:0.04em;
+  line-height:1.2;
+  text-transform:uppercase;
+  color:#5a6d4d;
+}
 #${ACCOUNT_DASHBOARD_ROOT_ID} .mhd-action-card__kicker{
   margin:0;
   font-size:0.8125rem;

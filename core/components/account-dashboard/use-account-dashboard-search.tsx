@@ -112,18 +112,28 @@ export function useAccountDashboardSearch({
     const onScroll = (event: Event) => {
       const target = event.target;
 
-      if (target instanceof Element && target.closest(`#${searchPanelId}`) != null) {
+      // Carousels and other nested scrollers fire scroll events too. Only the
+      // page itself should dismiss the drawer.
+      if (
+        target !== document &&
+        target !== document.documentElement &&
+        target !== document.body
+      ) {
         return;
       }
 
-      if (!armed) {
+      const active = document.activeElement;
+
+      // Focusing the field (and the mobile keyboard) scrolls the page. That is
+      // not the reader leaving the search.
+      if (active instanceof Element && active.closest(`#${searchPanelId}`) != null) {
         originY = window.scrollY;
 
         return;
       }
 
-      if (target instanceof Element) {
-        closeSearch();
+      if (!armed) {
+        originY = window.scrollY;
 
         return;
       }

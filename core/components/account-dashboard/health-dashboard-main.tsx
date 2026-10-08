@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Link } from '~/components/link';
 import { OpenLiveChatButton } from '~/components/virtual-care/live-chat-widget';
 import type { PersonalizedCareLane } from '~/lib/account-dashboard/personalized-care';
+import type { CarePackRegion } from '~/lib/pharmacy/carepack-region';
 import type { LiivPrimaryCategoryId } from '~/lib/onboarding/liiv-primary-health-category';
 import type { HealthProfileRow } from '~/lib/supabase/health-profile';
 
@@ -29,6 +30,7 @@ export function HealthDashboardMain({
   subscriptionsHref,
   consultingHref,
   carePackHref,
+  carePackRegion,
   pharmacyHref,
   hasUnreadChatMessage,
   healthProfileComplete,
@@ -49,6 +51,7 @@ export function HealthDashboardMain({
   subscriptionsHref: string;
   consultingHref: string;
   carePackHref: string;
+  carePackRegion: CarePackRegion;
   pharmacyHref: string;
   hasUnreadChatMessage: boolean;
   healthProfileComplete: boolean;
@@ -239,8 +242,13 @@ export function HealthDashboardMain({
             variant="orders"
           />
           <ActionCard
+            badge={wellness.actionCenter.carePackOntarioOnly}
             href={carePackHref}
-            hint={wellness.actionCenter.carePackHint}
+            hint={
+              carePackRegion === 'other'
+                ? wellness.actionCenter.carePackComingSoon
+                : wellness.actionCenter.carePackHint
+            }
             icon={<IconSupplies />}
             title={wellness.actionCenter.carePackTitle}
             variant="carepack"
@@ -303,6 +311,7 @@ function ActionCard({
   href,
   variant,
   icon,
+  badge,
   kicker,
   title,
   hint,
@@ -310,6 +319,7 @@ function ActionCard({
   href: string;
   variant: 'subscription' | 'orders' | 'carepack' | 'pharmacy';
   icon: ReactNode;
+  badge?: string;
   kicker?: string;
   title: string;
   hint?: string;
@@ -320,6 +330,7 @@ function ActionCard({
         {icon}
       </span>
       <div className="mhd-action-card__content">
+        {badge ? <p className="mhd-action-card__badge">{badge}</p> : null}
         {kicker ? <p className="mhd-action-card__kicker">{kicker}</p> : null}
         <p className={kicker ? 'mhd-action-card__value' : 'mhd-action-card__title'}>{title}</p>
         {hint ? <p className="mhd-action-card__hint">{hint}</p> : null}

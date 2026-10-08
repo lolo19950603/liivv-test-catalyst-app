@@ -6,6 +6,9 @@ import { Link } from '~/components/link';
 import { OnboardingSectionHeader } from '~/components/onboarding/onboarding-section-header';
 import { OpenLiveChatButton } from '~/components/virtual-care/live-chat-widget';
 import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
+import { carePackRegionFromProvince } from '~/lib/pharmacy/carepack-region';
+
+import { getCustomerProvince } from '../pharmacy/page-data';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -27,11 +30,13 @@ export default async function VirtualCareHubPage({ params }: Props) {
 
   setRequestLocale(locale);
 
-  const customer = await getOnboardingCustomer();
+  const [customer, province] = await Promise.all([getOnboardingCustomer(), getCustomerProvince()]);
 
   if (!customer) {
     redirect('/login?redirectTo=/account/virtual-care');
   }
+
+  const carePackComingSoon = carePackRegionFromProvince(province) === 'other';
 
   const first = customer.firstName.trim();
 
@@ -88,9 +93,14 @@ export default async function VirtualCareHubPage({ params }: Props) {
           className={`${cardClass} block no-underline`}
           href="/account/pharmacy?section=carepack"
         >
-          <h2 className="text-lg font-semibold text-[#2c2a26]">CarePack</h2>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-[#5a6d4d]">
+            Ontario only
+          </p>
+          <h2 className="mt-1 text-lg font-semibold text-[#2c2a26]">CarePack</h2>
           <p className="mt-2 text-sm text-[#6b6560]">
-            Request pre-packaged medication pouches for eligible tablet prescriptions.
+            {carePackComingSoon
+              ? 'Available in Ontario today. The rest of Canada is coming soon.'
+              : 'Request pre-packaged medication pouches for eligible tablet prescriptions.'}
           </p>
           <span className="mt-4 inline-flex text-sm font-medium text-[#5a6d4d]">Continue →</span>
         </Link>

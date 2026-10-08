@@ -130,8 +130,9 @@ export function getHelpTopics(): HelpTopic[] {
       'CarePack requests',
       ['carepack', 'care pack'],
       [
+        'CarePack is available in Ontario only. The rest of Canada is coming soon.',
         'Go to Account → Pharmacy or Virtual care.',
-        'Submit a CarePack request for eligible prescriptions.',
+        'Ontario customers can submit a CarePack request for eligible tablet prescriptions.',
         'Track request status on your pharmacy dashboard.',
       ],
       `${base}/account/pharmacy`,

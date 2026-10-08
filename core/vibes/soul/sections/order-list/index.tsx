@@ -7,6 +7,8 @@ import * as Skeleton from '@/vibes/soul/primitives/skeleton';
 import { Image } from '~/components/image';
 import { Link } from '~/components/link';
 
+import { ReorderButton, type ReorderOrderAction } from './reorder-button';
+
 export interface Order {
   id: string;
   totalPrice: string;
@@ -35,6 +37,9 @@ export interface OrderListProps {
   orderNumberLabel?: string;
   totalLabel?: string;
   viewDetailsLabel?: string;
+  reorderAction?: ReorderOrderAction;
+  reorderLabel?: string;
+  viewCartLabel?: string;
   emptyStateTitle?: string;
   emptyStateActionLabel?: string;
   emptyStateActionHref?: string;
@@ -73,7 +78,7 @@ function OrderLineItemImage({ item }: { item: OrderLineItem }) {
           {item.quantity != null && item.quantity >= 1 ? (
             <span
               aria-hidden
-              className="absolute right-0 top-0 z-10 flex h-5 min-w-5 translate-x-1/4 -translate-y-1/4 items-center justify-center rounded bg-[#2b2b2b] px-1 text-[11px] font-medium leading-none text-white"
+              className="absolute right-0 top-0 z-10 flex h-5 min-w-5 -translate-y-1/4 translate-x-1/4 items-center justify-center rounded bg-[#2b2b2b] px-1 text-[11px] font-medium leading-none text-white"
             >
               {item.quantity}
             </span>
@@ -92,6 +97,9 @@ export function OrderList({
   orderNumberLabel = 'Order #',
   totalLabel = 'Total',
   viewDetailsLabel = 'View details',
+  reorderAction,
+  reorderLabel = 'Reorder',
+  viewCartLabel = 'View cart',
   emptyStateTitle = "You don't have any orders",
   emptyStateActionLabel = 'Shop now',
   emptyStateActionHref = '/',
@@ -161,12 +169,22 @@ export function OrderList({
                         </div>
                       </div>
 
-                      <Link
-                        className="order-list-view-details shrink-0 text-sm font-medium text-[var(--order-list-info,hsl(var(--foreground)))] underline-offset-4 transition hover:underline"
-                        href={order.href}
-                      >
-                        {viewDetailsLabel}
-                      </Link>
+                      <div className="flex shrink-0 items-center gap-4">
+                        {reorderAction ? (
+                          <ReorderButton
+                            action={reorderAction}
+                            label={reorderLabel}
+                            orderId={order.id}
+                            viewCartLabel={viewCartLabel}
+                          />
+                        ) : null}
+                        <Link
+                          className="order-list-view-details text-sm font-medium text-[var(--order-list-info,hsl(var(--foreground)))] underline-offset-4 transition hover:underline"
+                          href={order.href}
+                        >
+                          {viewDetailsLabel}
+                        </Link>
+                      </div>
                     </div>
 
                     {order.lineItems.length > 0 ? (
@@ -245,7 +263,12 @@ function OrderListEmptyState({
       <h2 className="text-lg font-semibold text-[var(--order-list-empty-state-title,hsl(var(--foreground)))]">
         {emptyStateTitle}
       </h2>
-      <ButtonLink className="mt-6 w-fit" href={emptyStateActionHref} size="medium" variant="primary">
+      <ButtonLink
+        className="mt-6 w-fit"
+        href={emptyStateActionHref}
+        size="medium"
+        variant="primary"
+      >
         {emptyStateActionLabel}
       </ButtonLink>
     </div>

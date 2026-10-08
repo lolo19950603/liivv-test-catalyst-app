@@ -7,8 +7,10 @@ import { getWellnessDashboardContext } from '~/lib/account-dashboard/get-wellnes
 import { buildDashboardLabels } from '~/lib/account-dashboard/dashboard-labels';
 import { buildPersonalizedCareLanes } from '~/lib/account-dashboard/personalized-care';
 import { getAccountDashboardNotifications } from '~/lib/account-notifications/get-header-notifications';
+import { carePackRegionFromProvince } from '~/lib/pharmacy/carepack-region';
 
 import { getHealthProfileStepData } from '../health-profile/page-data';
+import { getCustomerProvince } from '../pharmacy/page-data';
 
 import { getDashboardCustomer, getDashboardNextSubscriptionDate } from './page-data';
 
@@ -39,13 +41,15 @@ export default async function AccountDashboardPage({ params, searchParams }: Pro
     redirect('/login?redirectTo=/account/dashboard/');
   }
 
-  const [nextSubscriptionDate, wellness, accountNotifications, healthProfileStepData] =
+  const [nextSubscriptionDate, wellness, accountNotifications, healthProfileStepData, province] =
     await Promise.all([
       getDashboardNextSubscriptionDate(locale),
       getWellnessDashboardContext(),
       getAccountDashboardNotifications(locale),
       getHealthProfileStepData(),
+      getCustomerProvince(),
     ]);
+  const carePackRegion = carePackRegionFromProvince(province);
 
   const firstName = customer.firstName.trim();
   const lastName = customer.lastName.trim();
@@ -64,6 +68,7 @@ export default async function AccountDashboardPage({ params, searchParams }: Pro
 
   const careLanes = buildPersonalizedCareLanes({
     careInterests: wellness.careInterests,
+    carePackRegion,
     healthProfileNotes: healthProfileStepData?.initialHealthProfile?.notes,
   });
   const todayLabel = new Intl.DateTimeFormat(locale, {
@@ -75,6 +80,7 @@ export default async function AccountDashboardPage({ params, searchParams }: Pro
   return (
     <HealthDashboardMain
       carePackHref="/account/pharmacy?section=carepack"
+      carePackRegion={carePackRegion}
       consultingHref="/account/virtual-care"
       hasUnreadChatMessage={accountNotifications.hasUnreadChatMessage}
       healthCategoryLabels={wellness.healthCategoryLabels}

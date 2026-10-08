@@ -40,7 +40,7 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - admin (admin panel)
-     * - pharmacy-admin (pharmacist admin iframe inside BigCommerce + shared sign-in)
+     * - pharmacy-admin (standalone pharmacist admin; shared sign-in)
      * - sitemap.xml (sitemap route)
      * - liivv-health-sitemap.xml (App Router microsite sitemap)
      * - xmlsitemap.php (legacy sitemap route)

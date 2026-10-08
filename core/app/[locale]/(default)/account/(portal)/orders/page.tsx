@@ -4,6 +4,7 @@ import { Order, OrderList } from '@/vibes/soul/sections/order-list';
 import { ordersTransformer } from '~/data-transformers/orders-transformer';
 import { defaultPageInfo, pageInfoTransformer } from '~/data-transformers/page-info-transformer';
 
+import { reorderOrder } from './_actions/reorder';
 import { getCustomerOrders } from './page-data';
 
 interface Props {
@@ -55,8 +56,11 @@ export default async function Orders({ params, searchParams }: Props) {
       orderNumberLabel={t('orderNumber')}
       orders={getOrders(after, before)}
       paginationInfo={getPaginationInfo(after, before)}
+      reorderAction={reorderOrder}
+      reorderLabel={t('reorder')}
       title={t('title')}
       totalLabel={t('totalPrice')}
+      viewCartLabel={t('reorderViewCart')}
       viewDetailsLabel={t('viewDetails')}
     />
   );

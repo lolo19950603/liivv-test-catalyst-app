@@ -28,5 +28,8 @@ export default async function VirtualCareAppointmentPage({ params }: Props) {
     redirect('/login?redirectTo=/account/virtual-care/appointment');
   }
 
-  return <VirtualCareAppointmentClient />;
+  const configured = process.env.NEXT_PUBLIC_MICROSOFT_BOOKINGS_URL?.trim() ?? '';
+  const bookingsUrl = configured.startsWith('https://') ? configured : null;
+
+  return <VirtualCareAppointmentClient bookingsUrl={bookingsUrl} />;
 }

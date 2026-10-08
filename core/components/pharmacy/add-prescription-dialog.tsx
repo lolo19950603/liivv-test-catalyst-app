@@ -97,17 +97,42 @@ export function AddPrescriptionDialog({
         : '';
     const dosageForm = details?.forms?.[0] ? String(details.forms[0]) : '';
 
-    setMedications((prev) => [
-      ...prev,
-      {
-        clientKey: crypto.randomUUID(),
-        name: med.brandName,
-        din: med.din,
-        dosage: dosage || 'Pending',
-        dosageForm,
-        frequency: 'Pending',
-      },
-    ]);
+    setMedications((prev) => {
+      const existingIndex = prev.findIndex((row) => row.din === med.din && row.name === med.brandName);
+
+      if (existingIndex >= 0) {
+        if (!details) {
+          return prev;
+        }
+
+        const next = [...prev];
+        const current = next[existingIndex];
+
+        if (!current) {
+          return prev;
+        }
+
+        next[existingIndex] = {
+          ...current,
+          dosage: dosage || current.dosage,
+          dosageForm: dosageForm || current.dosageForm,
+        };
+
+        return next;
+      }
+
+      return [
+        ...prev,
+        {
+          clientKey: crypto.randomUUID(),
+          name: med.brandName,
+          din: med.din,
+          dosage: dosage || 'Pending',
+          dosageForm,
+          frequency: 'Pending',
+        },
+      ];
+    });
   };
 
   const submitTransfer = () => {
@@ -255,9 +280,14 @@ export function AddPrescriptionDialog({
                   medicationsBaseUrl="/api/medications"
                   onSelect={addMedicationFromSearch}
                 />
+                {medications.length === 0 ? (
+                  <p className="text-xs text-[#6b6560]">
+                    Choose a medication from the results to add it. You can add more than one before submitting.
+                  </p>
+                ) : null}
                 {medications.map((med) => (
                   <div
-                    className="flex items-center justify-between rounded-lg border border-[#e8e2d8] px-3 py-2 text-sm"
+                    className="flex items-center justify-between rounded-lg border border-[#c9d8c9] bg-[#eef4ee] px-3 py-2 text-sm"
                     key={med.clientKey}
                   >
                     <span>

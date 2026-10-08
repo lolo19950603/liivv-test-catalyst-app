@@ -4,6 +4,10 @@ import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { Badge } from '@/vibes/soul/primitives/badge';
 import { ButtonLink } from '@/vibes/soul/primitives/button-link';
 import * as Skeleton from '@/vibes/soul/primitives/skeleton';
+import {
+  ReorderButton,
+  type ReorderOrderAction,
+} from '@/vibes/soul/sections/order-list/reorder-button';
 import { Image } from '~/components/image';
 import { Link } from '~/components/link';
 
@@ -101,6 +105,9 @@ export interface OrderDetailsSectionProps {
   shipmentMethodLabel?: string;
   summaryTotalLabel?: string;
   prevHref?: string;
+  reorderAction?: ReorderOrderAction;
+  reorderLabel?: string;
+  viewCartLabel?: string;
 }
 
 // eslint-disable-next-line valid-jsdoc
@@ -136,6 +143,9 @@ export function OrderDetailsSection({
   shipmentMethodLabel,
   summaryTotalLabel,
   prevHref = '/orders',
+  reorderAction,
+  reorderLabel = 'Reorder',
+  viewCartLabel = 'View cart',
 }: OrderDetailsSectionProps) {
   return (
     <div className="font-[family-name:var(--order-details-section-font-family,var(--font-family-body))] text-[var(--order-details-text-primary,hsl(var(--foreground)))] @container">
@@ -151,14 +161,24 @@ export function OrderDetailsSection({
                   <ArrowLeft />
                 </ButtonLink>
               )}
-              <div className="space-y-1">
-                <div className="flex items-center gap-3">
-                  <h1 className="font-[family-name:var(--order-details-section-title-font-family,var(--font-family-heading))] text-4xl">
-                    {title ?? `Order #${order.id}`}
-                  </h1>
-                  <Badge variant={order.statusColor}>{order.status}</Badge>
+              <div className="flex flex-1 flex-wrap items-start justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-3">
+                    <h1 className="font-[family-name:var(--order-details-section-title-font-family,var(--font-family-heading))] text-4xl">
+                      {title ?? `Order #${order.id}`}
+                    </h1>
+                    <Badge variant={order.statusColor}>{order.status}</Badge>
+                  </div>
+                  <p className="text-base font-light">{order.date}</p>
                 </div>
-                <p className="text-base font-light">{order.date}</p>
+                {reorderAction ? (
+                  <ReorderButton
+                    action={reorderAction}
+                    label={reorderLabel}
+                    orderId={order.id}
+                    viewCartLabel={viewCartLabel}
+                  />
+                ) : null}
               </div>
             </div>
             <div className="grid @3xl:flex">

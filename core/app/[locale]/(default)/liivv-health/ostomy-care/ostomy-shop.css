@@ -220,6 +220,11 @@
   margin-left: auto;
 }
 
+#ostomy-shop-anchor,
+#ostomy-shop .os-results {
+  scroll-margin-top: 9.75rem;
+}
+
 #ostomy-shop .os-results {
   min-width: 0;
 }

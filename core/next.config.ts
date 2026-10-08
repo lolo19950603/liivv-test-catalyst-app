@@ -290,26 +290,6 @@ export default async (): Promise<NextConfig> => {
 
       return [
         {
-          source: '/pharmacy-admin',
-          headers: [
-            {
-              key: 'Content-Security-Policy',
-              value: bcAppCspHeader.replace(/\n/g, ''),
-            },
-            ...cdnLinks,
-          ],
-        },
-        {
-          source: '/pharmacy-admin/:path*',
-          headers: [
-            {
-              key: 'Content-Security-Policy',
-              value: bcAppCspHeader.replace(/\n/g, ''),
-            },
-            ...cdnLinks,
-          ],
-        },
-        {
           source: '/api/bigcommerce/app/load',
           headers: [
             {
@@ -337,7 +317,7 @@ export default async (): Promise<NextConfig> => {
           ],
         },
         {
-          source: '/((?!pharmacy-admin|api/bigcommerce/app).*)',
+          source: '/((?!api/bigcommerce/app).*)',
           headers: [
             {
               key: 'Content-Security-Policy',
