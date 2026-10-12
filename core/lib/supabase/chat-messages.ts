@@ -432,7 +432,50 @@ export type AdminConversationSummary = {
   staffJoinedAt: string | null;
   staffClosedAt: string | null;
   escalatedToPharmacistAt: string | null;
+  lastMessageBody: string | null;
+  lastMessageSender: string | null;
 };
+
+async function latestNonSystemMessageByConversation(
+  conversationIds: string[],
+): Promise<Map<string, { body: string; sender: string }>> {
+  const found = new Map<string, { body: string; sender: string }>();
+
+  if (conversationIds.length === 0) {
+    return found;
+  }
+
+  const supabase = getSupabaseClient();
+  const chunkSize = 40;
+
+  for (let index = 0; index < conversationIds.length; index += chunkSize) {
+    const chunk = conversationIds.slice(index, index + chunkSize);
+    const { data, error } = await supabase
+      .from('chat_messages')
+      .select('conversation_id, sender_type, body, created_at')
+      .in('conversation_id', chunk)
+      .order('created_at', { ascending: false })
+      .limit(chunk.length * 8);
+
+    if (error || !data) {
+      continue;
+    }
+
+    for (const row of data as Array<{
+      conversation_id: string;
+      sender_type: string;
+      body: string;
+    }>) {
+      if (found.has(row.conversation_id) || row.sender_type === 'system') {
+        continue;
+      }
+
+      found.set(row.conversation_id, { body: row.body, sender: row.sender_type });
+    }
+  }
+
+  return found;
+}
 
 export async function listConversationsForAdmin(): Promise<
   { ok: true; rows: AdminConversationSummary[] } | { ok: false; message: string }
@@ -477,9 +520,13 @@ export async function listConversationsForAdmin(): Promise<
       },
     ]),
   );
+  const lastMessageByConversation = await latestNonSystemMessageByConversation(
+    list.map((conversation) => conversation.id),
+  );
 
   const rows: AdminConversationSummary[] = list.map((c) => {
     const p = byProfile.get(c.profile_id);
+    const lastMessage = lastMessageByConversation.get(c.id);
 
     return {
       conversationId: c.id,
@@ -494,6 +541,8 @@ export async function listConversationsForAdmin(): Promise<
       staffClosedAt: (c as { staff_closed_at?: string | null }).staff_closed_at ?? null,
       escalatedToPharmacistAt:
         (c as { escalated_to_pharmacist_at?: string | null }).escalated_to_pharmacist_at ?? null,
+      lastMessageBody: lastMessage?.body ?? null,
+      lastMessageSender: lastMessage?.sender ?? null,
     };
   });
 

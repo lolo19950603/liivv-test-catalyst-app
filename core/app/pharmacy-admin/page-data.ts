@@ -21,6 +21,9 @@ import {
   listAdminCarePackQueue,
   listAdminPrescriptionQueue,
   listAdminRefillQueue,
+  listCarePackRequestsByProfileId,
+  listPrescriptionsByProfileId,
+  listRefillRequestsByProfileId,
   type AdminCarePackQueueRow,
   type AdminPrescriptionQueueRow,
   type AdminRefillQueueRow,
@@ -31,6 +34,13 @@ const UUID_RE =
 
 export type StaffTab = 'pharmacy' | 'customers' | 'chat';
 export type PharmacyQueue = 'prescription' | 'refill' | 'carepack';
+
+export type ChatPatientContext = {
+  profileId: string;
+  activePrescriptions: string[];
+  openRefills: string[];
+  carePacks: string[];
+};
 
 export type StaffPortalData = {
   supabaseReady: boolean;
@@ -58,6 +68,7 @@ export type StaffPortalData = {
   messages: ChatMessageRow[];
   hasMoreOlder: boolean;
   messagesError: string | null;
+  chatPatientContext: ChatPatientContext | null;
 };
 
 function parseTab(raw: string | undefined): StaffTab {
@@ -124,6 +135,7 @@ export const getStaffPortalData = cache(
       messages: [],
       hasMoreOlder: false,
       messagesError: null,
+      chatPatientContext: null,
     };
 
     if (!isSupabaseConfigured()) {
@@ -243,7 +255,14 @@ export const getStaffPortalData = cache(
         base.selectedConversationId = selectedId;
 
         if (selectedId) {
-          const msg = await listRecentMessagesForConversation(selectedId);
+          const selectedProfileId =
+            base.conversations.find((row) => row.conversationId === selectedId)?.profileId ?? null;
+          const [msg, patientContext] = await Promise.all([
+            listRecentMessagesForConversation(selectedId),
+            selectedProfileId && UUID_RE.test(selectedProfileId)
+              ? loadChatPatientContext(selectedProfileId)
+              : Promise.resolve(null),
+          ]);
 
           if (!msg.ok) {
             base.messagesError = msg.message;
@@ -251,6 +270,8 @@ export const getStaffPortalData = cache(
             base.messages = msg.messages;
             base.hasMoreOlder = msg.hasMoreOlder;
           }
+
+          base.chatPatientContext = patientContext;
         }
       }
     } catch (error) {
@@ -264,3 +285,50 @@ export const getStaffPortalData = cache(
     return base;
   },
 );
+
+async function loadChatPatientContext(profileId: string): Promise<ChatPatientContext | null> {
+  try {
+    const [prescriptions, refills, carePacks] = await Promise.all([
+      listPrescriptionsByProfileId(profileId),
+      listRefillRequestsByProfileId(profileId),
+      listCarePackRequestsByProfileId(profileId),
+    ]);
+    const nameById = new Map(prescriptions.map((row) => [row.id, row.medication_name]));
+    const namesFor = (ids: string[]) => {
+      const names = ids.map((id) => nameById.get(id)).filter((name): name is string => Boolean(name));
+
+      return names.length > 0 ? names.join(', ') : 'Medication pending';
+    };
+
+    return {
+      profileId,
+      activePrescriptions: prescriptions
+        .filter((row) => {
+          const approval = String(row.approval_status ?? '').toLowerCase();
+          const status = String(row.status ?? '').toLowerCase();
+
+          return approval === 'approved' || status === 'active';
+        })
+        .slice(0, 5)
+        .map((row) => row.medication_name),
+      openRefills: refills
+        .filter((row) => {
+          const status = String(row.status ?? '').toLowerCase();
+
+          return status === 'pending_review' || status === 'refill_processing';
+        })
+        .slice(0, 4)
+        .map((row) => namesFor(row.prescription_ids ?? [])),
+      carePacks: carePacks
+        .filter((row) => {
+          const status = String(row.status ?? '').toLowerCase();
+
+          return status === 'pending_review' || status === 'setup_in_progress' || status === 'active';
+        })
+        .slice(0, 3)
+        .map((row) => namesFor(row.prescription_ids ?? [])),
+    };
+  } catch {
+    return null;
+  }
+}

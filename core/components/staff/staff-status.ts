@@ -1,3 +1,23 @@
+export type StaffWorklistBucket = 'needs_review' | 'in_progress' | 'closed';
+
+const IN_PROGRESS_STATUSES = new Set(['refill_processing', 'setup_in_progress']);
+const CLOSED_STATUSES = new Set(['approved', 'active', 'completed', 'rejected', 'expired']);
+
+/** Groups existing statuses into the worklist filters. Unknown values stay in needs review. */
+export function staffWorklistBucket(value: string | null | undefined): StaffWorklistBucket {
+  const key = String(value ?? '').trim().toLowerCase();
+
+  if (IN_PROGRESS_STATUSES.has(key)) {
+    return 'in_progress';
+  }
+
+  if (CLOSED_STATUSES.has(key)) {
+    return 'closed';
+  }
+
+  return 'needs_review';
+}
+
 const STATUS_LABELS: Record<string, string> = {
   pending_review: 'Pending review',
   pending: 'Pending',
@@ -36,17 +56,17 @@ export function staffStatusBadgeClass(value: string | null | undefined): string 
   const key = String(value ?? '').trim().toLowerCase();
 
   if (key === 'approved' || key === 'active' || key === 'completed') {
-    return 'rounded-full bg-[#e8f2e8] px-2.5 py-1 text-xs font-medium text-[#2d4a2d]';
+    return 'rounded-full bg-[#b7e0b8] px-3 py-1 text-sm font-semibold text-[#145218]';
   }
 
   if (key === 'rejected' || key === 'expired') {
-    return 'rounded-full bg-[#fce8e6] px-2.5 py-1 text-xs font-medium text-[#8a2f28]';
+    return 'rounded-full bg-[#f6b8b4] px-3 py-1 text-sm font-semibold text-[#7a1d18]';
   }
 
   if (key === 'refill_processing' || key === 'setup_in_progress') {
-    return 'rounded-full bg-[#e8eef8] px-2.5 py-1 text-xs font-medium text-[#2f4a7a]';
+    return 'rounded-full bg-[#b9d4f5] px-3 py-1 text-sm font-semibold text-[#163e78]';
   }
 
   // pending_review, pending, needs_info, default
-  return 'rounded-full bg-[#fff4d6] px-2.5 py-1 text-xs font-medium text-[#9a6b00]';
+  return 'rounded-full bg-[#ffd56a] px-3 py-1 text-sm font-semibold text-[#7a4a00]';
 }

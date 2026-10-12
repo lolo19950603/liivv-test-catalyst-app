@@ -80,6 +80,7 @@ export function HealthDashboardMain({
     celebrateOnMount ? 'celebrate' : openHealthOnMount ? 'looking-health' : 'idle',
   );
   const [activeLaneId, setActiveLaneId] = useState<string | null>(careLanes[0]?.id ?? null);
+  const [lanePinned, setLanePinned] = useState(false);
   const bounceTimer = useRef<number | null>(null);
   const didAutoOpenHealth = useRef(openHealthOnMount);
 
@@ -90,6 +91,27 @@ export function HealthDashboardMain({
 
     setActiveLaneId(careLanes[0]?.id ?? null);
   }, [activeLaneId, careLanes]);
+
+  useEffect(() => {
+    if (lanePinned || sheet !== null || careLanes.length < 2) {
+      return;
+    }
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setActiveLaneId((current) => {
+        const index = careLanes.findIndex((lane) => lane.id === current);
+        const next = careLanes[(Math.max(index, 0) + 1) % careLanes.length];
+
+        return next?.id ?? current;
+      });
+    }, 8000);
+
+    return () => window.clearInterval(timer);
+  }, [careLanes, lanePinned, sheet]);
 
   useEffect(() => {
     return () => {
@@ -212,7 +234,10 @@ export function HealthDashboardMain({
         labels={wellness.care}
         lanes={careLanes}
         onEditProfile={() => openSheet('health')}
-        onSelectLane={setActiveLaneId}
+        onSelectLane={(id) => {
+          setLanePinned(true);
+          setActiveLaneId(id);
+        }}
         todayLabel={todayLabel}
       />
 
