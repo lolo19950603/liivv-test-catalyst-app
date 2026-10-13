@@ -102,7 +102,7 @@ export default async function AccountDashboardPage({ params, searchParams }: Pro
       labels={labels}
       nextSubscriptionDate={nextSubscriptionDate}
       ordersHref="/account/orders/"
-      pharmacyHref="/account/pharmacy"
+      pharmacyHref="/account/pharmacy?section=carepack"
       subscriptionsHref="/account/subscriptions/"
     />
   );

@@ -31,8 +31,8 @@ type CarePackRequestIntake = {
 function Field({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0">
-      <dt className="text-[11px] font-medium uppercase tracking-wide text-[#8a8176]">{label}</dt>
-      <dd className="mt-0.5 break-words text-sm leading-snug text-[#2c2a26]">{value}</dd>
+      <dt className="text-sm font-medium text-[#6b6560]">{label}</dt>
+      <dd className="mt-0.5 break-words text-base leading-snug text-[#2c2a26]">{value}</dd>
     </div>
   );
 }
@@ -49,9 +49,9 @@ function Section({
   return (
     <section>
       <div className="mb-2.5 flex items-baseline justify-between gap-2 border-b border-[#efe9e0] pb-1.5">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-[#8a8176]">{title}</h3>
+        <h3 className="text-sm font-semibold text-[#234028]">{title}</h3>
         {typeof count === 'number' ? (
-          <span className="text-[11px] tabular-nums text-[#8a8176]">{count}</span>
+          <span className="text-sm tabular-nums text-[#8a8176]">{count}</span>
         ) : null}
       </div>
       {children}
@@ -60,50 +60,67 @@ function Section({
 }
 
 function EmptyLine({ children }: { children: ReactNode }) {
-  return <p className="text-sm text-[#8a8176]">{children}</p>;
+  return <p className="text-base text-[#8a8176]">{children}</p>;
 }
 
 const selectClass =
-  'min-w-[9.5rem] rounded-md border border-[#c4b8a8] bg-white px-2 py-1.5 text-xs font-medium text-[#2c2a26]';
+  'min-w-[10.5rem] rounded-md border border-[#c4b8a8] bg-white px-2.5 py-2 text-base font-medium text-[#2c2a26]';
+
+export type StaffFocusRequest = {
+  kind: 'prescription' | 'refill' | 'carepack';
+  id: string;
+};
 
 export function StaffCustomerDetail({
   detail,
   formAction,
   chatHref,
   splitSections = false,
+  focusRequest = null,
 }: {
   detail: AdminCustomerDetail;
   formAction: (formData: FormData) => void;
   chatHref?: string;
   /** Two-column health / prescriptions layout (Customers tab). */
   splitSections?: boolean;
+  /** Queue selection. Its status control stays above the rest of the record. */
+  focusRequest?: StaffFocusRequest | null;
 }) {
   const { profile, health, insurances, prescriptions, refillRequests, carePackRequests, bigcommerce } =
     detail;
-  const name = profile
-    ? [profile.first_name, profile.last_name].filter(Boolean).join(' ').trim() || '—'
+  const rawName = profile
+    ? [profile.first_name, profile.last_name].filter(Boolean).join(' ')
     : bigcommerce
-      ? [bigcommerce.firstName, bigcommerce.lastName].filter(Boolean).join(' ').trim() || '—'
-      : '—';
+      ? [bigcommerce.firstName, bigcommerce.lastName].filter(Boolean).join(' ')
+      : '';
+  const name = displayPersonName(rawName) || '—';
   const email = profile?.email ?? bigcommerce?.email ?? null;
   const phone = bigcommerce?.phone ?? null;
   const bcId = profile?.bigcommerce_customer_id ?? (bigcommerce ? String(bigcommerce.id) : null);
 
   return (
-    <div className="space-y-5 text-sm">
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0 space-y-1">
-          <p className="text-lg font-semibold leading-snug text-[#2c2a26]">{name}</p>
-          {email ? <p className="break-all text-[#5c564c]">{email}</p> : null}
-          <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-[#8a8176]">
-            {phone ? <span>{phone}</span> : null}
-            {bcId ? <span>Customer ID {bcId}</span> : null}
-            {!profile ? <span>BigCommerce only — no Liivv profile</span> : null}
-          </div>
+    <div className="space-y-5 text-base">
+      {profile && focusRequest ? (
+        <PinnedRequest
+          carePackRequests={carePackRequests}
+          focusRequest={focusRequest}
+          formAction={formAction}
+          prescriptions={prescriptions}
+          profileId={profile.id}
+          refillRequests={refillRequests}
+        />
+      ) : null}
+      <header className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-[#efe9e0] bg-[#faf9f7] px-4 py-3.5">
+        <div className="min-w-0 space-y-0.5">
+          <p className="text-xl font-semibold leading-snug text-[#1c3a24]">{name}</p>
+          {email ? <p className="break-all text-[#3f3d39]">{email}</p> : null}
+          {phone ? <p className="text-[#3f3d39]">{formatPhone(phone)}</p> : null}
+          {bcId ? <p className="text-sm text-[#6b6560]">Store ID {bcId}</p> : null}
+          {!profile ? <p className="text-sm text-[#6b6560]">Store account only, no Liivv profile</p> : null}
         </div>
         {chatHref ? (
           <a
-            className="shrink-0 rounded-lg border border-[#c8d4bc] bg-[#f4f7f0] px-3 py-1.5 text-sm font-medium text-[#375a37] hover:bg-[#eaf0e4]"
+            className="shrink-0 rounded-lg border border-[#c8d4bc] bg-white px-3 py-2 text-base font-medium text-[#375a37] hover:bg-[#eaf0e4]"
             href={chatHref}
           >
             Open chat
@@ -125,13 +142,13 @@ export function StaffCustomerDetail({
                   className="rounded-lg border border-[#efe9e0] bg-[#faf9f7] px-3 py-2.5"
                   key={i}
                 >
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-[#8a8176]">
+                  <p className="text-sm font-medium text-[#6b6560]">
                     {i === 0 ? 'Primary' : `Address ${i + 1}`}
                   </p>
                   <p className="mt-1 leading-snug text-[#2c2a26]">{line || '—'}</p>
-                  {cityLine ? <p className="mt-0.5 text-xs text-[#5c564c]">{cityLine}</p> : null}
+                  {cityLine ? <p className="mt-0.5 text-sm text-[#5c564c]">{cityLine}</p> : null}
                   {addr.country ? (
-                    <p className="mt-0.5 text-xs text-[#8a8176]">{addr.country}</p>
+                    <p className="mt-0.5 text-sm text-[#8a8176]">{addr.country}</p>
                   ) : null}
                 </li>
               );
@@ -155,11 +172,13 @@ export function StaffCustomerDetail({
 
           <div className="space-y-5">
             <StaffPrescriptionsSection
+              focusId={focusRequest?.kind === 'prescription' ? focusRequest.id : undefined}
               formAction={formAction}
               prescriptions={prescriptions}
               profileId={profile.id}
             />
             <StaffRefillsSection
+              focusId={focusRequest?.kind === 'refill' ? focusRequest.id : undefined}
               formAction={formAction}
               prescriptions={prescriptions}
               profileId={profile.id}
@@ -167,6 +186,7 @@ export function StaffCustomerDetail({
             />
             <StaffCarePackSection
               carePackRequests={carePackRequests}
+              focusId={focusRequest?.kind === 'carepack' ? focusRequest.id : undefined}
               formAction={formAction}
               prescriptions={prescriptions}
               profileId={profile.id}
@@ -176,24 +196,83 @@ export function StaffCustomerDetail({
       ) : null}
 
       {detail.bigcommerceLoadError ? (
-        <p className="text-xs text-amber-800">{detail.bigcommerceLoadError}</p>
+        <p className="text-sm text-amber-800">{detail.bigcommerceLoadError}</p>
       ) : null}
     </div>
   );
+}
+
+function displayPersonName(value: string): string {
+  return value
+    .split(/\s+/)
+    .map((part) => part.replace(/([a-z])([A-Z])/g, '$1 $2'))
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function formatPhone(raw: string): string {
+  const digits = raw.replace(/\D/g, '');
+  const local = digits.length === 11 && digits.startsWith('1') ? digits.slice(1) : digits;
+
+  if (local.length !== 10) {
+    return raw.trim();
+  }
+
+  return `(${local.slice(0, 3)}) ${local.slice(3, 6)}-${local.slice(6)}`;
 }
 
 function consentDate(grantedAt: string): string {
   const when = grantedAt ? new Date(grantedAt) : null;
 
   if (!when || Number.isNaN(when.getTime())) {
-    return 'unknown date';
+    return 'an unknown date';
   }
 
-  return when.toISOString().slice(0, 10);
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Toronto',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).formatToParts(when);
+  const value = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? '';
+
+  return `${value('month')} ${value('day')}, ${value('year')}`;
 }
 
-function answerLabels(keys: string[]): string {
-  return keys.map((key) => formatHealthProfileFieldLabel(key)).join(', ');
+function displayMedicationName(name: string): string {
+  const trimmed = name.trim();
+  const letters = trimmed.replace(/[^A-Za-z]/g, '');
+  const capitals = letters.replace(/[^A-Z]/g, '').length;
+
+  if (letters.length === 0 || capitals / letters.length < 0.6) {
+    return trimmed;
+  }
+
+  return trimmed
+    .toLowerCase()
+    .replace(/(^|[\s(/-])([a-z])/g, (_match, separator: string, letter: string) => `${separator}${letter.toUpperCase()}`);
+}
+
+function tidyDetail(value: string | null | undefined): string | null {
+  const stripped = String(value ?? '')
+    .replace(/\s*[-–·]\s*pending\s*$/i, '')
+    .trim();
+
+  if (!stripped || stripped.toLowerCase() === 'pending') {
+    return null;
+  }
+
+  return stripped
+    .replace(/(\d+(?:\.\d+)?)([a-zA-Z]+)/g, (_, amount: string, unit: string) => `${amount} ${unit.toLowerCase()}`)
+    .replace(/\s+/g, ' ');
+}
+
+function prescriptionMeta(dosage: string | null | undefined, frequency: string | null | undefined): string | null {
+  const parts = [tidyDetail(dosage), tidyDetail(frequency)].filter((part): part is string => Boolean(part));
+
+  return parts.length > 0 ? parts.join(' · ') : null;
 }
 
 function consentSource(source: 'health_profile_form' | 'landing_quiz'): string {
@@ -235,35 +314,79 @@ function uncoveredNote(notes: unknown, uncoveredKeys: string[]): string {
  * safety rule that never depended on the tick, which is named whenever it is
  * actually in force so the line matches the dashboard staff would see.
  */
-function consentLine(notes: unknown): string {
+function consentFacts(notes: unknown): {
+  title: string;
+  when: string | null;
+  covers: string[];
+  uncovered: string[];
+  note: string | null;
+} {
   const consent = readHealthAnswersConsent(notes);
   const withdrawal = readHealthAnswersWithdrawalRecord(notes);
   const stored = Object.keys(getRawCategoryResponses(notes));
+  const label = (key: string) => formatHealthProfileFieldLabel(key);
 
   if (isHealthAnswersWithdrawn(notes) && withdrawal) {
-    const given = consent
-      ? ` Consent before that was given ${consentDate(consent.grantedAt)} (${consentSource(consent.source)}, ${consent.version}).`
-      : '';
+    const earlier = consent
+      ? `Earlier consent was ${consentDate(consent.grantedAt)} on the ${consentSource(consent.source)} form, version ${consent.version}.`
+      : null;
     const unused = healthAnswersSafetyReferralApplies(notes)
-      ? `No answer is used for personalization. ${SAFETY_RULE_NOTE}`
-      : 'No answer is used for personalization.';
+      ? `No answer is used for personalization. ${SAFETY_RULE_NOTE} Every answer stays on file below. Nothing was deleted.`
+      : 'No answer is used for personalization. Every answer stays on file below. Nothing was deleted.';
 
-    return `Withdrawn ${consentDate(withdrawal.withdrawnAt)} (${consentSource(withdrawal.source)}).${given} ${unused} Every answer stays on file and is listed below; nothing was deleted.`;
+    return {
+      title: 'Withdrawn',
+      when: `${consentDate(withdrawal.withdrawnAt)} · ${consentSource(withdrawal.source)}`,
+      covers: [],
+      uncovered: [],
+      note: [earlier, unused].filter(Boolean).join(' '),
+    };
   }
 
   if (!consent) {
-    return `Not recorded — answers predate the consent box, or it was never ticked. ${uncoveredNote(notes, stored)}`;
+    return {
+      title: 'Not recorded',
+      when: null,
+      covers: [],
+      uncovered: [],
+      note: `These answers predate the consent box, or it was never ticked. ${uncoveredNote(notes, stored)}`,
+    };
   }
 
   const covered = consentedAnswerKeys(notes);
   const uncovered = stored.filter((key) => !covered.includes(key));
-  const head = `Latest given ${consentDate(consent.grantedAt)} (${consentSource(consent.source)}, ${consent.version}). Covers: ${covered.length > 0 ? answerLabels(covered) : 'no answers'}.`;
 
-  if (uncovered.length === 0) {
-    return head;
-  }
+  return {
+    title: 'On file',
+    when: `${consentDate(consent.grantedAt)} · ${consentSource(consent.source)}`,
+    covers: covered.map(label),
+    uncovered: uncovered.map(label),
+    note: uncovered.length > 0 ? uncoveredNote(notes, uncovered) : null,
+  };
+}
 
-  return `${head} Not covered: ${answerLabels(uncovered)}. ${uncoveredNote(notes, uncovered)}`;
+function ConsentBlock({ notes }: { notes: unknown }) {
+  const facts = consentFacts(notes);
+
+  return (
+    <div className="rounded-lg border border-[#d5e4cf] bg-white px-3 py-2.5">
+      <p className="text-sm font-semibold text-[#234028]">Consent {facts.title.toLowerCase()}</p>
+      {facts.when ? <p className="mt-0.5 text-sm text-[#5c564c]">{facts.when}</p> : null}
+      {facts.covers.length > 0 ? (
+        <ul className="mt-2 flex flex-wrap gap-1.5">
+          {facts.covers.map((item) => (
+            <li className="rounded-full bg-[#e7f3df] px-2.5 py-0.5 text-sm text-[#1c3a24]" key={item}>
+              {item}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {facts.uncovered.length > 0 ? (
+        <p className="mt-2 text-sm text-[#5c564c]">Not covered: {facts.uncovered.join(', ')}.</p>
+      ) : null}
+      {facts.note ? <p className="mt-2 text-sm leading-snug text-[#5c564c]">{facts.note}</p> : null}
+    </div>
+  );
 }
 
 interface StaffAnswerRow {
@@ -290,9 +413,9 @@ function StaffHealthProfileRows({ health }: { health: NonNullable<AdminCustomerD
   const { rows: categoryRows, freeTextNotes } = parseHealthProfileCategoryResponses(health.notes);
   const structured: StaffAnswerRow[] = [
     health.doctor_name ? { label: 'Doctor', value: health.doctor_name } : null,
-    health.doctor_phone ? { label: 'Doctor phone', value: health.doctor_phone } : null,
+    health.doctor_phone ? { label: 'Doctor phone', value: formatPhone(health.doctor_phone) } : null,
     health.pharmacy_name ? { label: 'Pharmacy', value: health.pharmacy_name } : null,
-    health.pharmacy_phone ? { label: 'Pharmacy phone', value: health.pharmacy_phone } : null,
+    health.pharmacy_phone ? { label: 'Pharmacy phone', value: formatPhone(health.pharmacy_phone) } : null,
     health.ostomy_type ? { label: 'Ostomy type', value: health.ostomy_type } : null,
     health.ostomy_tenure ? { label: 'Ostomy journey', value: health.ostomy_tenure } : null,
     health.ostomy_preferred_brand
@@ -332,7 +455,7 @@ function StaffHealthProfileRows({ health }: { health: NonNullable<AdminCustomerD
   return (
     <dl className="grid gap-3 sm:grid-cols-2">
       <div className="min-w-0 sm:col-span-2">
-        <Field label="Consent to use health answers" value={consentLine(health.notes)} />
+        <ConsentBlock notes={health.notes} />
       </div>
       {structured.map((row) => (
         <Field key={row.label} label={answerLabel(row)} value={row.value} />
@@ -379,10 +502,12 @@ function StaffPrescriptionsSection({
   profileId,
   prescriptions,
   formAction,
+  focusId,
 }: {
   profileId: string;
   prescriptions: PrescriptionRow[];
   formAction: (formData: FormData) => void;
+  focusId?: string;
 }) {
   return (
     <Section count={prescriptions.length} title="Prescriptions">
@@ -399,14 +524,23 @@ function StaffPrescriptionsSection({
               approval === 'pending_review'
                 ? approval
                 : (rx.approval_status ?? rx.status ?? 'pending_review');
-            const meta = [rx.dosage, rx.frequency].filter(Boolean).join(' · ');
+            const meta = prescriptionMeta(rx.dosage, rx.frequency);
 
             return (
-              <li className="rounded-lg border border-[#efe9e0] bg-[#faf9f7] px-3 py-2.5" key={rx.id}>
+              <li
+                className={`rounded-lg border px-3 py-2.5 ${
+                  focusId === rx.id
+                    ? 'border-[#375a37] bg-[#f4f7f0]'
+                    : 'border-[#efe9e0] bg-[#faf9f7]'
+                }`}
+                key={rx.id}
+              >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold leading-snug text-[#2c2a26]">{rx.medication_name}</p>
-                    {meta ? <p className="mt-0.5 text-xs text-[#5c564c]">{meta}</p> : null}
+                    <p className="font-semibold leading-snug text-[#2c2a26]">
+                      {displayMedicationName(rx.medication_name)}
+                    </p>
+                    {meta ? <p className="mt-0.5 text-sm text-[#5c564c]">{meta}</p> : null}
                   </div>
                   <span className={`shrink-0 ${staffStatusBadgeClass(statusValue)}`}>
                     {formatStaffStatusLabel(statusValue)}
@@ -450,7 +584,9 @@ function medicationNamesForRequest(
   prescriptions: PrescriptionRow[],
 ): string {
   const namesById = new Map(prescriptions.map((rx) => [rx.id, rx.medication_name]));
-  const names = (prescriptionIds ?? []).map((id) => namesById.get(id) ?? 'Unknown medication');
+  const names = (prescriptionIds ?? []).map(
+    (id) => displayMedicationName(namesById.get(id) ?? 'Unknown medication'),
+  );
 
   return names.length > 0 ? names.join(', ') : 'No medications listed';
 }
@@ -460,11 +596,13 @@ function StaffRefillsSection({
   prescriptions,
   refillRequests,
   formAction,
+  focusId,
 }: {
   profileId: string;
   prescriptions: PrescriptionRow[];
   refillRequests: RefillRequestRow[];
   formAction: (formData: FormData) => void;
+  focusId?: string;
 }) {
   return (
     <Section count={refillRequests.length} title="Refill requests">
@@ -473,13 +611,20 @@ function StaffRefillsSection({
       ) : (
         <ul className="space-y-2">
           {refillRequests.map((req) => (
-            <li className="rounded-lg border border-[#efe9e0] bg-[#faf9f7] px-3 py-2.5" key={req.id}>
+            <li
+              className={`rounded-lg border px-3 py-2.5 ${
+                focusId === req.id
+                  ? 'border-[#375a37] bg-[#f4f7f0]'
+                  : 'border-[#efe9e0] bg-[#faf9f7]'
+              }`}
+              key={req.id}
+            >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="font-semibold leading-snug text-[#2c2a26]">
                     {medicationNamesForRequest(req.prescription_ids, prescriptions)}
                   </p>
-                  <p className="mt-0.5 text-xs text-[#8a8176]">Request #{req.id.slice(0, 8)}</p>
+                  <p className="mt-0.5 text-sm text-[#8a8176]">Request #{req.id.slice(0, 8)}</p>
                 </div>
                 <span className={`shrink-0 ${staffStatusBadgeClass(req.status)}`}>
                   {formatStaffStatusLabel(req.status)}
@@ -514,11 +659,13 @@ function StaffCarePackSection({
   prescriptions,
   carePackRequests,
   formAction,
+  focusId,
 }: {
   profileId: string;
   prescriptions: PrescriptionRow[];
   carePackRequests: CarePackRequestRow[];
   formAction: (formData: FormData) => void;
+  focusId?: string;
 }) {
   return (
     <Section count={carePackRequests.length} title="CarePack requests">
@@ -538,13 +685,20 @@ function StaffCarePackSection({
             }
 
             return (
-              <li className="rounded-lg border border-[#efe9e0] bg-[#faf9f7] px-3 py-2.5" key={req.id}>
+              <li
+                className={`rounded-lg border px-3 py-2.5 ${
+                  focusId === req.id
+                    ? 'border-[#375a37] bg-[#f4f7f0]'
+                    : 'border-[#efe9e0] bg-[#faf9f7]'
+                }`}
+                key={req.id}
+              >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="font-semibold leading-snug text-[#2c2a26]">
                       {medicationNamesForRequest(req.prescription_ids, prescriptions)}
                     </p>
-                    <p className="mt-0.5 text-xs text-[#8a8176]">Request #{req.id.slice(0, 8)}</p>
+                    <p className="mt-0.5 text-sm text-[#8a8176]">Request #{req.id.slice(0, 8)}</p>
                   </div>
                   <span className={`shrink-0 ${staffStatusBadgeClass(req.status)}`}>
                     {formatStaffStatusLabel(req.status)}
@@ -586,5 +740,172 @@ function StaffCarePackSection({
         </ul>
       )}
     </Section>
+  );
+}
+
+function PinnedRequest({
+  profileId,
+  prescriptions,
+  refillRequests,
+  carePackRequests,
+  focusRequest,
+  formAction,
+}: {
+  profileId: string;
+  prescriptions: PrescriptionRow[];
+  refillRequests: RefillRequestRow[];
+  carePackRequests: CarePackRequestRow[];
+  focusRequest: StaffFocusRequest;
+  formAction: (formData: FormData) => void;
+}) {
+  if (focusRequest.kind === 'prescription') {
+    const rx = prescriptions.find((row) => row.id === focusRequest.id);
+
+    if (!rx) {
+      return null;
+    }
+
+    const approval = String(rx.approval_status ?? '').toLowerCase();
+    const statusValue =
+      approval === 'approved' ||
+      approval === 'rejected' ||
+      approval === 'expired' ||
+      approval === 'pending_review'
+        ? approval
+        : (rx.approval_status ?? rx.status ?? 'pending_review');
+    const meta = prescriptionMeta(rx.dosage, rx.frequency);
+
+    return (
+      <div className="rounded-lg border border-[#c9d8c9] bg-[#f4f7f0] px-3 py-3">
+        <p className="text-sm font-semibold text-[#375a37]">
+          Selected request
+        </p>
+        <div className="mt-2 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="font-semibold text-[#2c2a26]">{displayMedicationName(rx.medication_name)}</p>
+            {meta ? <p className="mt-0.5 text-sm text-[#5c564c]">{meta}</p> : null}
+          </div>
+          <span className={`shrink-0 ${staffStatusBadgeClass(statusValue)}`}>
+            {formatStaffStatusLabel(statusValue)}
+          </span>
+        </div>
+        <form action={formAction} className="mt-2">
+          <input name="intent" type="hidden" value="prescription_set_status" />
+          <input name="profileId" type="hidden" value={profileId} />
+          <input name="prescriptionId" type="hidden" value={rx.id} />
+          <label className="sr-only" htmlFor={`rx-status-pin-${rx.id}`}>
+            Approval status
+          </label>
+          <select
+            className={selectClass}
+            defaultValue={
+              approval === 'approved' || approval === 'rejected' || approval === 'expired'
+                ? approval
+                : 'pending_review'
+            }
+            id={`rx-status-pin-${rx.id}`}
+            name="status"
+            onChange={(event) => event.currentTarget.form?.requestSubmit()}
+          >
+            <option value="pending_review">Pending review</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+            <option value="expired">Expired</option>
+          </select>
+        </form>
+      </div>
+    );
+  }
+
+  if (focusRequest.kind === 'refill') {
+    const req = refillRequests.find((row) => row.id === focusRequest.id);
+
+    if (!req) {
+      return null;
+    }
+
+    return (
+      <div className="rounded-lg border border-[#c9d8c9] bg-[#f4f7f0] px-3 py-3">
+        <p className="text-sm font-semibold text-[#375a37]">
+          Selected request
+        </p>
+        <div className="mt-2 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="font-semibold text-[#2c2a26]">
+              {medicationNamesForRequest(req.prescription_ids, prescriptions)}
+            </p>
+            <p className="mt-0.5 text-sm text-[#5c564c]">Request #{req.id.slice(0, 8)}</p>
+          </div>
+          <span className={`shrink-0 ${staffStatusBadgeClass(req.status)}`}>
+            {formatStaffStatusLabel(req.status)}
+          </span>
+        </div>
+        <form action={formAction} className="mt-2">
+          <input name="intent" type="hidden" value="refill_set_status" />
+          <input name="profileId" type="hidden" value={profileId} />
+          <input name="refillRequestId" type="hidden" value={req.id} />
+          <label className="sr-only" htmlFor={`refill-status-pin-${req.id}`}>
+            Refill status
+          </label>
+          <select
+            className={selectClass}
+            defaultValue={String(req.status ?? '').toLowerCase()}
+            id={`refill-status-pin-${req.id}`}
+            name="status"
+            onChange={(event) => event.currentTarget.form?.requestSubmit()}
+          >
+            <option value="pending_review">Pending review</option>
+            <option value="refill_processing">Refill processing</option>
+            <option value="completed">Completed</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </form>
+      </div>
+    );
+  }
+
+  const req = carePackRequests.find((row) => row.id === focusRequest.id);
+
+  if (!req) {
+    return null;
+  }
+
+  return (
+    <div className="rounded-lg border border-[#c9d8c9] bg-[#f4f7f0] px-3 py-3">
+      <p className="text-sm font-semibold text-[#375a37]">
+        Selected request
+      </p>
+      <div className="mt-2 flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-semibold text-[#2c2a26]">
+            {medicationNamesForRequest(req.prescription_ids, prescriptions)}
+          </p>
+          <p className="mt-0.5 text-sm text-[#5c564c]">Request #{req.id.slice(0, 8)}</p>
+        </div>
+        <span className={`shrink-0 ${staffStatusBadgeClass(req.status)}`}>
+          {formatStaffStatusLabel(req.status)}
+        </span>
+      </div>
+      <form action={formAction} className="mt-2">
+        <input name="intent" type="hidden" value="carepack_set_status" />
+        <input name="profileId" type="hidden" value={profileId} />
+        <input name="carePackRequestId" type="hidden" value={req.id} />
+        <label className="sr-only" htmlFor={`carepack-status-pin-${req.id}`}>
+          CarePack status
+        </label>
+        <select
+          className={selectClass}
+          defaultValue={String(req.status ?? '').toLowerCase()}
+          id={`carepack-status-pin-${req.id}`}
+          name="status"
+          onChange={(event) => event.currentTarget.form?.requestSubmit()}
+        >
+          <option value="pending_review">Pending review</option>
+          <option value="setup_in_progress">Setup in progress</option>
+          <option value="active">Active</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </form>
+    </div>
   );
 }

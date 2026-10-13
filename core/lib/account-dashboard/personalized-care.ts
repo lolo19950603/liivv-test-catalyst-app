@@ -35,7 +35,7 @@ export type CareNextStep = {
 };
 
 export type PersonalizedCareLane = {
-  id: LiivPrimaryCategoryId;
+  id: LiivPrimaryCategoryId | 'carepack';
   label: string;
   emoji: string;
   tone: CareTone;
@@ -340,7 +340,7 @@ function diabetesLane(responses: CategoryResponses, now: Date, carePackRegion: C
       id: 'pharmacy',
       label: 'My pharmacy',
       hint: 'Manage prescriptions in one place',
-      href: '/account/pharmacy',
+      href: '/account/pharmacy?section=carepack',
     },
   ];
 
@@ -778,7 +778,7 @@ function genericLane(categoryId: LiivPrimaryCategoryId, label: string, now: Date
       id: 'pharmacy',
       label: 'My pharmacy',
       hint: 'Prescriptions and CarePack',
-      href: '/account/pharmacy',
+      href: '/account/pharmacy?section=carepack',
     },
   ];
 
@@ -870,6 +870,63 @@ function protectionsFromAnswers(notes: string | null | undefined): LaneProtectio
   };
 }
 
+function carePackLane(region: CarePackRegion): PersonalizedCareLane {
+  const comingSoon = region === 'other';
+
+  return {
+    id: 'carepack',
+    label: 'CarePack',
+    emoji: '💊',
+    tone: 'peach',
+    image: null,
+    status: comingSoon ? 'coming_soon' : 'live',
+    href: '/account/pharmacy?section=carepack',
+    shopHref: null,
+    headline: 'Your medications, sorted for the month',
+    lead: 'CarePack divides eligible medications into labeled pouches. A 28-day supply ships every 4 weeks, and there is no extra charge for the packaging.',
+    tipTitle: 'Pharmacist-approved pouches',
+    tipBody:
+      'Morning, noon, evening, and bedtime pouches, each labeled with the medication, dose, date, and time.',
+    snapshot: [],
+    actions: [
+      {
+        id: 'request',
+        label: comingSoon ? 'See CarePack' : 'Request CarePack',
+        href: '/account/pharmacy?section=carepack',
+        kind: 'primary',
+      },
+    ],
+    nextSteps: [
+      {
+        id: 'request',
+        label: 'Request CarePack',
+        hint: 'A pharmacist reviews the first shipment',
+        href: '/account/pharmacy?section=carepack',
+      },
+      {
+        id: 'prescription',
+        label: 'Add a tablet prescription',
+        hint: 'Pouches are built from active tablet medications',
+        href: '/account/pharmacy?section=prescriptions',
+      },
+      {
+        id: 'pharmacy',
+        label: 'Message the pharmacy',
+        hint: 'Holds, travel, or a change after delivery',
+        href: '/account/virtual-care',
+      },
+    ],
+    oliviaLines: oliviaVoice(
+      'CarePack sorts the month into pouches, so a dose is harder to miss.',
+      [
+        'No extra charge for the packaging. You still pay your usual copay.',
+        'Vitamins and as-needed medications can travel with the pack.',
+        'I will not lecture you about pillboxes. The pouches already did the sorting.',
+      ],
+    ),
+  };
+}
+
 export function buildPersonalizedCareLanes(options: {
   careInterests: string[];
   healthProfileNotes: string | null | undefined;
@@ -882,7 +939,7 @@ export function buildPersonalizedCareLanes(options: {
   const responses = responsesForLanes(options.healthProfileNotes);
   const protections = protectionsFromAnswers(options.healthProfileNotes);
 
-  return ranked.map(({ id }) => {
+  const lanes = ranked.map(({ id }) => {
     const display = getPrimaryCategoryDisplay(id);
     const door = HEALTH_HUB_DOORS.find((entry) => entry.id === id);
     const copy = resolveLaneCopy(id, display.shortLabel, responses, now, protections, carePackRegion);
@@ -942,4 +999,10 @@ export function buildPersonalizedCareLanes(options: {
       oliviaLines: copy.oliviaLines,
     };
   });
+
+  if (lanes.length === 0) {
+    return lanes;
+  }
+
+  return [...lanes, carePackLane(carePackRegion)];
 }

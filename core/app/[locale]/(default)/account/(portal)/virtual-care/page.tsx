@@ -81,7 +81,7 @@ export default async function VirtualCareHubPage({ params }: Props) {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Link className={`${cardClass} block no-underline`} href="/account/pharmacy">
+        <Link className={`${cardClass} block no-underline`} href="/account/pharmacy?section=carepack">
           <h2 className="text-lg font-semibold text-[#2c2a26]">Pharmacy</h2>
           <p className="mt-2 text-sm text-[#6b6560]">
             Manage prescriptions, refills, and transfers.

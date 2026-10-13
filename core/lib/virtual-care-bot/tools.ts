@@ -344,7 +344,7 @@ export async function toolGetPrescriptionStatus(profileId: string) {
   const base = getAppBaseUrl();
 
   return {
-    pharmacyPageUrl: `${base}/account/pharmacy`,
+    pharmacyPageUrl: `${base}/account/pharmacy?section=prescriptions`,
     prescriptions: prescriptions.slice(0, 10).map((rx) => ({
       medication: rx.medication_name,
       status: rx.status ?? 'unknown',
