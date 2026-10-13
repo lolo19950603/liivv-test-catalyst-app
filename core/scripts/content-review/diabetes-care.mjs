@@ -1760,6 +1760,11 @@ const SHARED_SECTIONS = {
     'Diabetes Essentials shop (Shop Diabetes Care, category 1151) — headings and filters (owner note 9, 2026-10-07; French review gate `shop`). Brand and device names are not copy: they are in diabetes-care/shop-classify.ts. On the English insulin filter the shelf repeats the three `commerce` notices above its products; the French shelf lists no insulin',
   'shopPage.types': 'Diabetes Essentials shop — the "What you need" product types (one scheme with the landing’s shop rooms)',
   discovery: 'Discovery band',
+  'discovery.doors.womens_health_wellness':
+    'Discovery band — the Women’s Health card (its title and line, in the page language since the production check of 2026-10-12)',
+  'discovery.doors.ostomy_care_everyday': 'Discovery band — the Ostomy Care card',
+  'discovery.doors.diabetes_care_everyday':
+    'Discovery band — the Diabetes Care card (shown on the other sites only; kept so both sites carry the same doors)',
   governance: 'Byline and review notices',
   'governance.disclosure': 'Commercial disclosure',
 };

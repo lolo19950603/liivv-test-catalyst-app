@@ -3929,7 +3929,21 @@
         "heading": "L'ostomie est l'une des choses que nous soutenons",
         "lead": "Si quelque chose d'autre fait partie de votre quotidien — le vôtre ou celui de quelqu'un dont vous prenez soin — il y a aussi un chapitre pour cela.",
         "hubTitle": "Voir tout dans Liivv Santé",
-        "hubBody": "Onze domaines de soins, avec plus à venir."
+        "hubBody": "Onze domaines de soins, avec plus à venir.",
+        "doors": {
+          "womens_health_wellness": {
+            "title": "Santé et bien-être des femmes",
+            "body": "Rythme, chapitres et soins qui suivent le fil de votre vie."
+          },
+          "ostomy_care_everyday": {
+            "title": "Soins de stomie et « Liivving » au quotidien",
+            "body": "Fournitures, chapitres et conseils bienveillants pour chaque jour."
+          },
+          "diabetes_care_everyday": {
+            "title": "Soins du diabète et « Liivving » au quotidien",
+            "body": "Un parcours spécialisé pour bien vivre avec le diabète."
+          }
+        }
       },
       "governance": {
         "reviewedBy": "Examiné par des cliniciens",
@@ -4240,7 +4254,21 @@
         "heading": "Le diabète fait partie des soins que nous soutenons",
         "lead": "Si autre chose fait partie de votre quotidien — le vôtre ou celui d’une personne dont vous prenez soin — il y a aussi un chapitre pour cela.",
         "hubTitle": "Tout voir dans Liivv Santé",
-        "hubBody": "Onze domaines de soins, et d’autres à venir."
+        "hubBody": "Onze domaines de soins, et d’autres à venir.",
+        "doors": {
+          "womens_health_wellness": {
+            "title": "Santé et bien-être des femmes",
+            "body": "Rythme, chapitres et soins qui suivent le fil de votre vie."
+          },
+          "ostomy_care_everyday": {
+            "title": "Soins de stomie et « Liivving » au quotidien",
+            "body": "Fournitures, chapitres et conseils bienveillants pour chaque jour."
+          },
+          "diabetes_care_everyday": {
+            "title": "Soins du diabète et « Liivving » au quotidien",
+            "body": "Un parcours spécialisé pour bien vivre avec le diabète."
+          }
+        }
       },
       "governance": {
         "reviewedBy": "Révisé sur le plan clinique par",

@@ -3560,7 +3560,21 @@
         "heading": "Ostomy is one of the things we support",
         "lead": "If something else is part of your everyday — yours or someone you care for — there is a chapter for that too.",
         "hubTitle": "See everything in Liivv Health",
-        "hubBody": "Eleven areas of care, with more on the way."
+        "hubBody": "Eleven areas of care, with more on the way.",
+        "doors": {
+          "womens_health_wellness": {
+            "title": "Women's Health & Wellness",
+            "body": "Rhythm, chapters, and care that moves with your life."
+          },
+          "ostomy_care_everyday": {
+            "title": "Ostomy Care & Everyday \"Liivving\"",
+            "body": "Supplies, chapters, and kind guidance for every day."
+          },
+          "diabetes_care_everyday": {
+            "title": "Diabetes Care & Everyday \"Liivving\"",
+            "body": "A specialized journey for living well with diabetes."
+          }
+        }
       },
       "governance": {
         "reviewedBy": "Clinically reviewed by",
@@ -4246,7 +4260,21 @@
         "heading": "Diabetes is one of the things we support",
         "lead": "If something else is part of your everyday — yours or someone you care for — there is a chapter for that too.",
         "hubTitle": "See everything in Liivv Health",
-        "hubBody": "Eleven areas of care, with more on the way."
+        "hubBody": "Eleven areas of care, with more on the way.",
+        "doors": {
+          "womens_health_wellness": {
+            "title": "Women's Health & Wellness",
+            "body": "Rhythm, chapters, and care that moves with your life."
+          },
+          "ostomy_care_everyday": {
+            "title": "Ostomy Care & Everyday \"Liivving\"",
+            "body": "Supplies, chapters, and kind guidance for every day."
+          },
+          "diabetes_care_everyday": {
+            "title": "Diabetes Care & Everyday \"Liivving\"",
+            "body": "A specialized journey for living well with diabetes."
+          }
+        }
       },
       "governance": {
         "reviewedBy": "Clinically reviewed by",

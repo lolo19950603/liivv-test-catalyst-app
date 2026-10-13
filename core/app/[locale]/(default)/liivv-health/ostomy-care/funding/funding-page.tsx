@@ -27,7 +27,7 @@ import {
 import { FigureGlyphs, UrgentExit } from '../chapters/figures';
 
 import { FundingChecker } from './funding-checker';
-import { FEDERAL_LINKS } from './funding-data';
+import { FEDERAL_LINKS, medicalExpensesHref } from './funding-data';
 
 import '../chapters/chapter-page.css';
 import './funding.css';
@@ -39,6 +39,7 @@ const ACCENT_STYLE: CSSProperties & Record<string, string> = {
 
 const MODEL_ORDER = ['flat-grant', 'cost-share', 'supplies-in-kind', 'categorical'] as const;
 
+/* The CRA medical-expenses entry is swapped for its French page on /fr (`medicalExpensesHref`). */
 const CITATIONS = [
   {
     label: 'Canada Revenue Agency — Disability Tax Credit, eliminating (bowel or bladder)',
@@ -299,7 +300,11 @@ export function FundingPage() {
       <DiscoveryBand />
 
       <GovernanceBlock
-        citations={CITATIONS}
+        citations={CITATIONS.map((citation) =>
+          citation.href === FEDERAL_LINKS.medicalExpenses
+            ? { ...citation, href: medicalExpensesHref(locale) }
+            : citation,
+        )}
         governance={{
           author: CONTENT_AUTHOR,
           reviewer: CLINICAL_REVIEWER,

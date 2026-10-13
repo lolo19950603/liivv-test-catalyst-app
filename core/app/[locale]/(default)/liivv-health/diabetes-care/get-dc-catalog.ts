@@ -8,6 +8,7 @@ import { client } from '~/client';
 import { PricingFragment } from '~/client/fragments/pricing';
 import { graphql, ResultOf } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
+import { pharmacistProducts } from '~/lib/checkout/quebec-insulin';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { isCuratedKitProduct } from '~/lib/kit/is-curated-kit';
 import { resolveBcCdnImageUrl } from '~/lib/resolve-bc-cdn-image-url';
@@ -154,7 +155,10 @@ export type DcCatalogItem = {
   isKit: boolean;
   /* The landing room its type puts it in (./shop-classify.ts, one scheme with the shop). */
   room: ShopRoom;
-  /* Insulin (`isInsulinProduct`) or glucagon (`isGlucagonProduct`): never on /fr, and noticed. */
+  /*
+   * Insulin (`isInsulinProduct`) or glucagon (`isGlucagonProduct`): never on /fr, and noticed.
+   * For a kit, whether it holds either (`pharmacistProducts`, read from the kit's contents).
+   */
   isInsulin: boolean;
   isGlucagon: boolean;
   /*
@@ -330,7 +334,27 @@ export const getDcCatalog = cache(async (locale?: string): Promise<DcCatalog> =>
     }
 
     const all = [...byId.values()];
-    const kits = all.filter((item) => item.isKit);
+    /*
+     * A kit is what it holds: one holding insulin or glucagon is flagged as
+     * those are (production check, 2026-10-12: the Low-Glucose Rescue Kit
+     * holds Baqsimi).
+     */
+    const kitContents = await pharmacistProducts(
+      all.filter((item) => item.isKit).map((item) => item.entityId),
+    );
+    const kits = all
+      .filter((item) => item.isKit)
+      .map((item) => {
+        const contents = kitContents.get(item.entityId);
+
+        return contents
+          ? {
+              ...item,
+              isInsulin: item.isInsulin || contents.insulin,
+              isGlucagon: item.isGlucagon || contents.glucagon,
+            }
+          : item;
+      });
     const products = all.filter((item) => !item.isKit);
 
     kits.sort((a, b) => {

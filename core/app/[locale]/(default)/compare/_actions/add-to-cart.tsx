@@ -10,6 +10,7 @@ import { compareAddToCartFormDataSchema } from '@/vibes/soul/primitives/compare-
 import { Link } from '~/components/link';
 import { addToOrCreateCart } from '~/lib/cart';
 import { MissingCartError } from '~/lib/cart/error';
+import { pharmacistProductIds } from '~/lib/checkout/quebec-insulin';
 
 interface State {
   lastResult: SubmissionResult | null;
@@ -34,6 +35,15 @@ export const addToCart = async (
 
   const productEntityId = Number(submission.value.id);
   const quantity = 1;
+
+  // Insulin, glucagon and a kit holding either are never added from a listing
+  // (owner note 9; production check, 2026-10-12): the card links the product
+  // page, where the pharmacist notice is. This refuses a form that asks anyway.
+  if ((await pharmacistProductIds([productEntityId])).has(productEntityId)) {
+    const shop = await getTranslations('DiabetesCare.ui.chapter.shop');
+
+    return { lastResult: submission.reply({ formErrors: [shop('addError')] }) };
+  }
 
   try {
     await addToOrCreateCart({

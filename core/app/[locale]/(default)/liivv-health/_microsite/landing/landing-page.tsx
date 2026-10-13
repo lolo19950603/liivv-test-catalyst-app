@@ -125,6 +125,7 @@ function KitsCarousel({
   k: (name: string) => string;
 }) {
   const t = useSiteT('ui.landingPage.kits');
+  const shopT = useSiteT('ui.landingPage.shop');
   const locale = useLocale();
   const startIndex = useMemo(() => {
     if (!initialId) return 0;
@@ -228,6 +229,8 @@ function KitsCarousel({
             <p className={`${k('pack-price')} ${k('pack-price--spacer')}`}>&nbsp;</p>
           )}
           <p>{isFeatured ? t('featuredBody') : t('cardBody')}</p>
+          {/* A kit holding an item a pharmacist reviews says so, as that item does. */}
+          {kit.reviewNotice ? <p className={k('product-notice')}>{shopT('reviewNotice')}</p> : null}
           {isCenter && shift === 0 ? (
             <a className={`${k('btn')} ${k('btn-solid')}`} href={productHref(kit.path, locale)}>
               {t('cta')}

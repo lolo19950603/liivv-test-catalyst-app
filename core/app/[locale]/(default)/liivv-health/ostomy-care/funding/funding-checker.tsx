@@ -97,26 +97,32 @@ export function FundingChecker() {
     { value: 'unsure', label: t('notSure') },
   ];
 
-  const results = buildResults(input, programs, funding.models, {
-    nihbTitle: r('nihbTitle'),
-    nihbBody: r('nihbBody'),
-    nihbLink: r('nihbLink'),
-    noProgramTitle: (province: string) => r('noProgramTitle', { province }),
-    gatekeeperTitle: r('gatekeeperTitle'),
-    deadlinesTitle: r('deadlinesTitle'),
-    lastResortTitle: r('lastResortTitle'),
-    lastResortBody: r('lastResortBody'),
-    dtcTitle: r('dtcTitle'),
-    dtcBody: r('dtcBody'),
-    dtcLink: r('dtcLink'),
-    expensesTitle: r('expensesTitle'),
-    expensesBody: r('expensesBody'),
-    expensesLink: r('expensesLink'),
-    provisionalTitle: r('provisionalTitle'),
-    provisionalBody: r('provisionalBody'),
-    seniorTitle: r('seniorTitle'),
-    permanenceTitle: r('permanenceTitle'),
-  });
+  const results = buildResults(
+    input,
+    programs,
+    funding.models,
+    {
+      nihbTitle: r('nihbTitle'),
+      nihbBody: r('nihbBody'),
+      nihbLink: r('nihbLink'),
+      noProgramTitle: (province: string) => r('noProgramTitle', { province }),
+      gatekeeperTitle: r('gatekeeperTitle'),
+      deadlinesTitle: r('deadlinesTitle'),
+      lastResortTitle: r('lastResortTitle'),
+      lastResortBody: r('lastResortBody'),
+      dtcTitle: r('dtcTitle'),
+      dtcBody: r('dtcBody'),
+      dtcLink: r('dtcLink'),
+      expensesTitle: r('expensesTitle'),
+      expensesBody: r('expensesBody'),
+      expensesLink: r('expensesLink'),
+      provisionalTitle: r('provisionalTitle'),
+      provisionalBody: r('provisionalBody'),
+      seniorTitle: r('seniorTitle'),
+      permanenceTitle: r('permanenceTitle'),
+    },
+    locale,
+  );
 
   const ready = isCheckerReady(input);
   const progress = checkerProgress(input);

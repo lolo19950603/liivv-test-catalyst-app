@@ -63,6 +63,10 @@ export default async function Page({ params }: Props) {
     getDcCatalog(locale),
   ]);
 
+  /* A Diabetes kit holding insulin is never shown on /fr (B11; get-dc-catalog.ts). None does today. */
+  const dcKits = dcCatalog.kits.filter((kit) => locale !== 'fr' || !kit.isInsulin);
+  const dcFeaturedKit = dcKits.find((kit) => kit.entityId === dcCatalog.featuredKit?.entityId);
+
   const featuredKits: HealthHubKitCard[] = [
     ...pickKits(
       whCatalog.kits.length > 0
@@ -87,10 +91,10 @@ export default async function Page({ params }: Props) {
       2,
     ),
     ...pickKits(
-      dcCatalog.kits.length > 0
-        ? dcCatalog.featuredKit
-          ? [dcCatalog.featuredKit, ...dcCatalog.kits.filter((k) => k.entityId !== dcCatalog.featuredKit?.entityId)]
-          : dcCatalog.kits
+      dcKits.length > 0
+        ? dcFeaturedKit
+          ? [dcFeaturedKit, ...dcKits.filter((k) => k.entityId !== dcFeaturedKit.entityId)]
+          : dcKits
         : [],
       'Diabetes Care',
       '/liivv-health/diabetes-care',

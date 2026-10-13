@@ -5,14 +5,14 @@ import { getTranslations } from 'next-intl/server';
 
 import {
   blocksInsulinForQuebec,
-  isGlucagonProduct,
-  isInsulinProduct,
   isQuebecProvince,
+  pharmacistContentsOf,
 } from '~/app/[locale]/(default)/liivv-health/diabetes-care/dc-ids';
 import { getSessionCustomerAccessToken } from '~/auth';
 import { client } from '~/client';
 import { graphql } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
+import { isCuratedKitProduct } from '~/lib/kit/is-curated-kit';
 
 /*
  * =============================================================================
@@ -135,58 +135,193 @@ export async function shipsInsulinToQuebec({
 }
 
 /*
- * Which of these products are insulin or glucagon, from the catalogue's
- * categories. Fails closed: if the catalogue cannot answer, every id counts.
+ * A product's categories and custom fields: enough to say whether it is
+ * insulin or glucagon, and whether it is a curated kit (`kit_type`).
  */
-export async function pharmacistProductIds(entityIds: readonly number[]): Promise<Set<number>> {
+const PharmacistFactsQuery = graphql(`
+  query PharmacistFacts($entityIds: [Int!], $first: Int) {
+    site {
+      products(entityIds: $entityIds, first: $first) {
+        edges {
+          node {
+            entityId
+            categories(first: 25) {
+              edges {
+                node {
+                  entityId
+                }
+              }
+            }
+            customFields(first: 25) {
+              edges {
+                node {
+                  name
+                  value
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`);
+
+/* A curated kit's contents: its related products, as the kit's product page reads them. */
+const KitContentsQuery = graphql(`
+  query PharmacistKitContents($entityIds: [Int!], $first: Int) {
+    site {
+      products(entityIds: $entityIds, first: $first) {
+        edges {
+          node {
+            entityId
+            relatedProducts(first: 50) {
+              edges {
+                node {
+                  entityId
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`);
+
+/* Runs one catalogue lookup per page of ids, PAGE_SIZE at a time. */
+async function inPages<R>(
+  ids: readonly number[],
+  fetchPage: (page: number[]) => Promise<R[]>,
+): Promise<R[]> {
+  const pages: number[][] = [];
+
+  for (let i = 0; i < ids.length; i += PAGE_SIZE) {
+    pages.push(ids.slice(i, i + PAGE_SIZE));
+  }
+
+  return (await Promise.all(pages.map(fetchPage))).flat();
+}
+
+export interface PharmacistContents {
+  insulin: boolean;
+  glucagon: boolean;
+}
+
+/*
+ * Which of these products a pharmacist reviews and dispenses, and why: each
+ * one that is insulin or glucagon, or a curated kit whose contents include
+ * either (`pharmacistContentsOf`, dc-ids.ts), mapped to what it is or holds.
+ * Products that are neither are left out of the map.
+ *
+ * A kit's contents are read from the catalogue each time (its related
+ * products, which is how a curated kit stores what it holds; core/lib/kit),
+ * never from a list of kit ids, so a kit that gains or loses Baqsimi or an
+ * insulin is judged on what it holds today.
+ *
+ * Fails closed: if the catalogue cannot answer, every id counts as both.
+ */
+export async function pharmacistProducts(
+  entityIds: readonly number[],
+): Promise<Map<number, PharmacistContents>> {
   const ids = [...new Set(entityIds)].filter((id) => Number.isInteger(id));
 
   if (ids.length === 0) {
-    return new Set();
+    return new Map();
   }
 
   try {
     const customerAccessToken = await getSessionCustomerAccessToken();
-    const pages: number[][] = [];
+    const fetchOptions = customerAccessToken
+      ? { cache: 'no-store' as const }
+      : { next: { revalidate } };
+    const factsFor = async (page: number[]) => {
+      const { data } = await client.fetch({
+        document: PharmacistFactsQuery,
+        customerAccessToken,
+        variables: { entityIds: page, first: page.length },
+        fetchOptions,
+      });
 
-    for (let i = 0; i < ids.length; i += PAGE_SIZE) {
-      pages.push(ids.slice(i, i + PAGE_SIZE));
-    }
+      return removeEdgesAndNodes(data.site.products);
+    };
+    const contentsFor = async (page: number[]) => {
+      const { data } = await client.fetch({
+        document: KitContentsQuery,
+        customerAccessToken,
+        variables: { entityIds: page, first: page.length },
+        fetchOptions,
+      });
 
-    const nodes = (
-      await Promise.all(
-        pages.map(async (page) => {
-          const { data } = await client.fetch({
-            document: InsulinCheckCategoriesQuery,
-            customerAccessToken,
-            variables: { entityIds: page, first: page.length },
-            fetchOptions: customerAccessToken
-              ? { cache: 'no-store' as const }
-              : { next: { revalidate } },
-          });
+      return removeEdgesAndNodes(data.site.products);
+    };
 
-          return removeEdgesAndNodes(data.site.products);
-        }),
-      )
-    ).flat();
+    const categoriesById = new Map<number, number[]>();
+    const kitIds: number[] = [];
 
-    const categoriesById = new Map(
-      nodes.map((node) => [
+    (await inPages(ids, factsFor)).forEach((node) => {
+      categoriesById.set(
         node.entityId,
         removeEdgesAndNodes(node.categories).map((category) => category.entityId),
-      ]),
-    );
+      );
 
-    return new Set(
-      ids.filter(
-        (entityId) =>
-          isInsulinProduct({ entityId, categoryIds: categoriesById.get(entityId) ?? [] }) ||
-          isGlucagonProduct(entityId),
-      ),
-    );
+      if (isCuratedKitProduct(removeEdgesAndNodes(node.customFields))) {
+        kitIds.push(node.entityId);
+      }
+    });
+
+    const contentsByKit = new Map<number, number[]>();
+
+    if (kitIds.length > 0) {
+      (await inPages(kitIds, contentsFor)).forEach((node) => {
+        contentsByKit.set(
+          node.entityId,
+          removeEdgesAndNodes(node.relatedProducts).map((related) => related.entityId),
+        );
+      });
+
+      const unread = [...new Set([...contentsByKit.values()].flat())].filter(
+        (id) => !categoriesById.has(id),
+      );
+
+      (await inPages(unread, factsFor)).forEach((node) => {
+        categoriesById.set(
+          node.entityId,
+          removeEdgesAndNodes(node.categories).map((category) => category.entityId),
+        );
+      });
+    }
+
+    const found = new Map<number, PharmacistContents>();
+
+    ids.forEach((entityId) => {
+      const contents = pharmacistContentsOf({
+        entityId,
+        categoryIds: categoriesById.get(entityId) ?? [],
+        components: contentsByKit.get(entityId)?.map((componentId) => ({
+          entityId: componentId,
+          categoryIds: categoriesById.get(componentId) ?? [],
+        })),
+      });
+
+      if (contents.insulin || contents.glucagon) {
+        found.set(entityId, contents);
+      }
+    });
+
+    return found;
   } catch {
-    return new Set(ids);
+    return new Map(ids.map((id) => [id, { insulin: true, glucagon: true }]));
   }
+}
+
+/*
+ * Which of these products are insulin or glucagon, or a curated kit holding
+ * either (`pharmacistProducts`). Fails closed: if the catalogue cannot
+ * answer, every id counts.
+ */
+export async function pharmacistProductIds(entityIds: readonly number[]): Promise<Set<number>> {
+  return new Set((await pharmacistProducts(entityIds)).keys());
 }
 
 /*
@@ -196,7 +331,10 @@ export async function pharmacistProductIds(entityIds: readonly number[]): Promis
  * one-click add — a category grid, search, a brand page, compare — passes its
  * cards through this, and an insulin or glucagon card links its product page
  * instead ("View product", `DiabetesCare.ui.commerce.viewProduct`). Other
- * cards come back unchanged. Fails closed, as `pharmacistProductIds` does.
+ * cards come back unchanged. A curated kit holding insulin or glucagon is
+ * treated the same (production check, 2026-10-12). Fails closed, as
+ * `pharmacistProductIds` does. The listings' add actions refuse the same
+ * products, so a stale or hand-built form cannot add one either.
  */
 export async function withPharmacistProductsViewOnly<T extends { id: string }>(
   cards: readonly T[],
@@ -238,7 +376,9 @@ export async function withPharmacistWishlistItemsViewOnly<T extends { product: {
  * also like" (full-site review, 2026-10-06). English pages are unchanged.
  * Whether a French insulin product page may be opened at all is the owner's
  * question (OPEN-QUESTIONS B38). The list keeps its order; the result count
- * and the page numbers above it still count what was left off.
+ * and the page numbers above it still count what was left off. A curated kit
+ * holding insulin counts as insulin here too (`pharmacistProducts`); no kit
+ * holds any today.
  *
  * It fails closed: if the catalogue cannot say which products are insulin,
  * the French list is left empty rather than risk listing insulin.
@@ -251,48 +391,7 @@ export async function withoutInsulinOnFrench<T extends { entityId: number }>(
     return [...items];
   }
 
-  const ids = [...new Set(items.map((item) => item.entityId))];
+  const found = await pharmacistProducts(items.map((item) => item.entityId));
 
-  try {
-    const customerAccessToken = await getSessionCustomerAccessToken();
-    const pages: number[][] = [];
-
-    for (let i = 0; i < ids.length; i += PAGE_SIZE) {
-      pages.push(ids.slice(i, i + PAGE_SIZE));
-    }
-
-    const nodes = (
-      await Promise.all(
-        pages.map(async (entityIds) => {
-          const { data } = await client.fetch({
-            document: InsulinCheckCategoriesQuery,
-            customerAccessToken,
-            variables: { entityIds, first: entityIds.length },
-            fetchOptions: customerAccessToken
-              ? { cache: 'no-store' as const }
-              : { next: { revalidate } },
-          });
-
-          return removeEdgesAndNodes(data.site.products);
-        }),
-      )
-    ).flat();
-
-    const categoriesById = new Map(
-      nodes.map((node) => [
-        node.entityId,
-        removeEdgesAndNodes(node.categories).map((category) => category.entityId),
-      ]),
-    );
-
-    return items.filter(
-      (item) =>
-        !isInsulinProduct({
-          entityId: item.entityId,
-          categoryIds: categoriesById.get(item.entityId) ?? [],
-        }),
-    );
-  } catch {
-    return [];
-  }
+  return items.filter((item) => !found.get(item.entityId)?.insulin);
 }

@@ -104,6 +104,24 @@ export function JourneySheet() {
     };
   }, [container]);
 
+  /*
+   * While the sheet is open, the store header goes under it as well
+   * (`data-oc-sheet-open`, chapter-page.css). The dialog's scroll lock lets
+   * the sticky header scroll away, and its icons, which are fixed, were left
+   * floating over the dimmed page (production check, 2026-10-12). The
+   * attribute comes off however the sheet closes: Escape, the backdrop, the
+   * close button or a stop.
+   */
+  useEffect(() => {
+    if (!open) return;
+
+    const root = document.documentElement;
+
+    root.setAttribute('data-oc-sheet-open', '');
+
+    return () => root.removeAttribute('data-oc-sheet-open');
+  }, [open]);
+
   /* On open, centre the current stop inside the sheet (the page does not move). */
   useEffect(() => {
     if (!open) return;

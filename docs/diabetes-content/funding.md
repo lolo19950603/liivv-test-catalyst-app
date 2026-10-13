@@ -1274,3 +1274,12 @@ Also: each program card’s official-page link reads "Title, Publisher (year)" w
 ### Owner decision applied: the store’s typeface (2026-10-07)
 
 The font change is in new-to-the-journey.md F.12 (F1 to F3). The page is in Poppins; measured at 1440, 768 and 375, no line of text touches another and nothing scrolls sideways. No copy changed.
+
+### Production check of 2026-10-12: the CRA medical-expenses link (2026-10-12)
+
+| # | Where | Change | Why |
+|---|---|---|---|
+| 1 | Ostomy Care funding page (`ostomy-care/funding/funding-data.ts` `FEDERAL_LINKS`, `funding-checker.tsx`, `funding-page.tsx`) | The CRA eligible-medical-expenses link (the "Claim what you paid out of pocket" result card and the page's citation) pointed at `…/lines-33099-33199-eligible-medical-expenses-you-claim-tax-return.html`, which answers 404. It now points at the CRA's current page, `…/deductions-credits-expenses/lines-33099-33199-eligible-medical-expenses-you-claim-on-your-tax-return.html` ("Lines 33099 and 33199 – Eligible medical expenses you can claim on your tax return", date modified 2026-01-20), and on /fr at its own French page (`…/fr/agence-revenu/…/lignes-33099-33199-frais-medicaux-admissibles-vous-pouvez-demander-votre-declaration-revenus.html`, the page's hreflang="fr" link). Both fetched on 2026-10-12: 200, and both list "Ileostomy and colostomy pads" / « Tampons d'iléostomie ou de colostomie » as eligible, with no prescription needed. | Production check, 2026-10-12: 404 in EN and FR |
+| 2 | Diabetes Care | Not affected: the Diabetes funding page has cited RC4065 (`cra-rc4065-2025`) in place of F-26 since 2026-10-06. F-26's address in the register table above is the dead one; its current address is the one in row 1. | — |
+
+Owner question raised: the Ostomy card's wording against the CRA list (OPEN-QUESTIONS B78).

@@ -110,6 +110,31 @@ export function isGlucagonProduct(entityId: number): boolean {
 }
 
 /*
+ * Whether a product is, or contains, insulin or glucagon. A curated kit is
+ * the products it holds (its BigCommerce related products, which is how a
+ * kit stores its contents; core/lib/kit), so a kit holding Baqsimi is treated
+ * as glucagon everywhere glucagon is: "View product" on every listing, never
+ * a one-click add, and the pharmacist notice on its page (production check of
+ * 2026-10-12: the Low-Glucose Rescue Kit, 8055). A kit holding insulin is
+ * treated as insulin, so it is also left off French listings (B11) and its
+ * page carries the Quebec line. `components` is left out for a product that
+ * is not a kit. The catalogue lookup is ~/lib/checkout/quebec-insulin.ts
+ * (`pharmacistProducts`).
+ */
+export function pharmacistContentsOf(product: {
+  entityId: number;
+  categoryIds: readonly number[];
+  components?: ReadonlyArray<{ entityId: number; categoryIds: readonly number[] }>;
+}): { insulin: boolean; glucagon: boolean } {
+  const all = [product, ...(product.components ?? [])];
+
+  return {
+    insulin: all.some((item) => isInsulinProduct(item)),
+    glucagon: all.some((item) => isGlucagonProduct(item.entityId)),
+  };
+}
+
+/*
  * =============================================================================
  * The Diabetes Essentials shop: filing a product the name rules get wrong
  * =============================================================================

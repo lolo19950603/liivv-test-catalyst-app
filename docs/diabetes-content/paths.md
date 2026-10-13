@@ -800,3 +800,7 @@ Rulings whose in-sentence credit owner note 1 supersedes (2026-10-07; recorded i
 ### H.10 Owner note 4 and the store’s typeface applied (2026-10-07)
 
 The engine and font change is in new-to-the-journey.md F.12. Here: the path shop strip (slot 5) uses the same 168px cards, and a single product (Bayer Ketostix and the like) is a horizontal card instead of a 738px card with a 712px photo. The pages are in Poppins. Not yet re-measured on the path pages (see F.12). No copy changed.
+
+### H.11 Production check of 2026-10-12 (2026-10-12)
+
+The "Also from Liivv" cards at the foot of every path page were English on /fr (they read the hub's English door list). They now read `DiabetesCare.ui.discovery.doors` (new-to-the-journey.md F.15 P3); checked on `/fr/liivv-health/diabetes-care/chapters/type-1`. The phone "On this page" sheet change (P5) applies to path pages too. No copy changed.

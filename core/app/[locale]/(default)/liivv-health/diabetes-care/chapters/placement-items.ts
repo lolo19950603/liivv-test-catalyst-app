@@ -2,6 +2,8 @@ import 'server-only';
 
 import { getTranslations } from 'next-intl/server';
 
+import { pharmacistProducts } from '~/lib/checkout/quebec-insulin';
+
 import { getPlacementItems } from '../../_microsite/shop/get-placement-items';
 import type { PlacementItem, PlacementItems } from '../../_microsite/shop/types';
 import { isGlucagonProduct } from '../dc-ids';
@@ -22,7 +24,10 @@ import { namesAnotherRetailer, PLACEMENTS_ON } from './chapter-shop';
  * Insulin and glucagon are never a one-click add from a shelf (owner note 9,
  * 2026-10-07): such a card links its product page, where the pharmacist
  * notice is ("View product"), as every other listing does. Staying Safe
- * card 3's glucagon (Baqsimi) is the one placed today.
+ * card 3's glucagon (Baqsimi) is the one placed today. The catalogue is
+ * asked as well (`pharmacistProducts`), so a curated kit holding insulin or
+ * glucagon is treated the same, and one holding insulin is dropped on /fr
+ * (production check, 2026-10-12). No kit is placed today.
  *
  * `undefined` while placements are switched off, so the page renders with no
  * ShopProvider at all.
@@ -39,8 +44,11 @@ export async function getDiabetesPlacementItems(
     refuse: namesAnotherRetailer,
   });
 
+  const found = await pharmacistProducts(Object.values(items).map((item) => item.entityId));
   const viewOnly = (item: PlacementItem) =>
-    isGlucagonProduct(item.entityId) || isInsulinOrGlucagonName(item.name);
+    isGlucagonProduct(item.entityId) ||
+    isInsulinOrGlucagonName(item.name) ||
+    found.has(item.entityId);
   const marked: PlacementItems = Object.fromEntries(
     Object.entries(items).map(([id, item]) => [
       id,
@@ -52,7 +60,9 @@ export async function getDiabetesPlacementItems(
 
   return Object.fromEntries(
     Object.entries(marked).filter(
-      ([, item]) => !isInsulinOrGlucagonName(item.name) || isGlucagonProduct(item.entityId),
+      ([, item]) =>
+        !found.get(item.entityId)?.insulin &&
+        (!isInsulinOrGlucagonName(item.name) || isGlucagonProduct(item.entityId)),
     ),
   );
 }

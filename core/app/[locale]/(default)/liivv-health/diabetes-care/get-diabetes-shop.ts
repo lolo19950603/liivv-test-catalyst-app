@@ -14,6 +14,7 @@ import { FragmentOf, graphql, ResultOf } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
 import { ProductCardFragment } from '~/components/product-card/fragment';
 import { singleProductCardTransformer } from '~/data-transformers/product-card-transformer';
+import { pharmacistProducts } from '~/lib/checkout/quebec-insulin';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { isCuratedKitProduct } from '~/lib/kit/is-curated-kit';
 
@@ -57,7 +58,10 @@ import {
  *
  * Insulin and glucagon are shown (English only for insulin) as a link to
  * their product page, never a one-click add, so the pharmacist notice under
- * the buy box is always seen (`viewOnly`).
+ * the buy box is always seen (`viewOnly`). So is a curated kit whose contents
+ * include either, read from the kit itself (`pharmacistProducts`): the
+ * Low-Glucose Rescue Kit holds Baqsimi (production check, 2026-10-12). A kit
+ * holding insulin would be left off /fr, as insulin is; none does today.
  * =============================================================================
  */
 
@@ -205,7 +209,7 @@ export interface DiabetesShopProduct extends ShelfFacts {
   node: ShopNode;
   card: Product;
   entityId: number;
-  /* Insulin or glucagon: shown as a link to its page, never a one-click add. */
+  /* Insulin or glucagon, or a kit holding either: a link to its page, never a one-click add. */
   viewOnly: boolean;
 }
 
@@ -233,6 +237,7 @@ export const getDiabetesShopCatalog = cache(
 
     try {
       const byId = new Map<number, DiabetesShopProduct>();
+      const kitIds: number[] = [];
       let after: string | null = null;
 
       for (let page = 0; page < MAX_PAGES; page += 1) {
@@ -269,6 +274,8 @@ export const getDiabetesShopCatalog = cache(
             isDiabetesKit(node.entityId);
 
           if (isKit && !isListedDiabetesKit(node.entityId)) return;
+
+          if (isKit) kitIds.push(node.entityId);
 
           const optionText = removeEdgesAndNodes(node.options).flatMap((option) =>
             'values' in option
@@ -320,6 +327,21 @@ export const getDiabetesShopCatalog = cache(
 
         after = connection.pageInfo.endCursor;
       }
+
+      // A kit holding insulin or glucagon is one, wherever it is listed.
+      const kitContents = await pharmacistProducts(kitIds);
+
+      kitContents.forEach((contents, entityId) => {
+        const product = byId.get(entityId);
+
+        if (!product) return;
+
+        if (locale === 'fr' && contents.insulin) {
+          byId.delete(entityId);
+        } else {
+          byId.set(entityId, { ...product, viewOnly: true });
+        }
+      });
 
       return { ok: true, products: [...byId.values()] };
     } catch (error) {

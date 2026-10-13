@@ -22,7 +22,7 @@ import { pricesTransformer } from '~/data-transformers/prices-transformer';
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { productOptionsTransformer } from '~/data-transformers/product-options-transformer';
 import { isSensitiveProduct } from '~/lib/analytics/sensitive-products';
-import { withoutInsulinOnFrench } from '~/lib/checkout/quebec-insulin';
+import { pharmacistProducts, withoutInsulinOnFrench } from '~/lib/checkout/quebec-insulin';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import {
   CuratedKitCustomizer,
@@ -982,13 +982,22 @@ export default async function Product({ params, searchParams }: Props) {
    * read here, on the server, because DiabetesCare is not in the browser's
    * message bundle. Not review-gated in French: it is an operational notice,
    * not an offer, and the checkout enforces the Quebec line either way.
+   *
+   * A curated kit is what it holds (production check, 2026-10-12): one whose
+   * contents include glucagon (the Low-Glucose Rescue Kit holds Baqsimi) or
+   * insulin carries the same notice, and the insulin lines when it holds
+   * insulin. Read from the kit's own contents (`pharmacistProducts`).
    */
-  const isInsulin = isInsulinProduct({
-    entityId: baseProduct.entityId,
-    categoryIds: removeEdgesAndNodes(baseProduct.categories).map(({ entityId }) => entityId),
-  });
+  const kitContents = isCuratedKit
+    ? (await pharmacistProducts([baseProduct.entityId])).get(baseProduct.entityId)
+    : undefined;
+  const isInsulin =
+    isInsulinProduct({
+      entityId: baseProduct.entityId,
+      categoryIds: removeEdgesAndNodes(baseProduct.categories).map(({ entityId }) => entityId),
+    }) || Boolean(kitContents?.insulin);
   const commerceT =
-    isInsulin || isGlucagonProduct(baseProduct.entityId)
+    isInsulin || isGlucagonProduct(baseProduct.entityId) || kitContents
       ? await getTranslations('DiabetesCare.ui.commerce')
       : null;
   const pharmacistNotice = commerceT ? (

@@ -3,4 +3,4 @@
  * folder (owner note 2, 2026-10-07), so both sites print through one hook and
  * one stylesheet; this path stays so Ostomy's imports keep working.
  */
-export { usePrintOnly } from '../../_microsite/print/use-print-only';
+export { LONG_PRINT_LIST, usePrintOnly } from '../../_microsite/print/use-print-only';

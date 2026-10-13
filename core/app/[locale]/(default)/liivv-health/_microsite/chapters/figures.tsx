@@ -29,7 +29,7 @@ import { Fragment, useRef } from 'react';
 
 import { SpecialistContact } from '../_components/specialist-contact';
 import { CardPrintFoot, CardPrintHead } from '../print/card-print';
-import { usePrintOnly } from '../print/use-print-only';
+import { LONG_PRINT_LIST, usePrintOnly } from '../print/use-print-only';
 import type { SiteKinds } from '../site';
 import { useSite, useSiteFigures, useSiteMessages, useSiteT } from '../site-context';
 
@@ -466,7 +466,8 @@ function CriteriaFigure({
  * On paper (owner note 2, 2026-10-07) the card is headed by the site, a line
  * for a name and the date, and ends with the card's sources and the page it
  * came from (../print). The blank lines carry on the list's numbering rather
- * than starting again at 1.
+ * than starting again at 1. A long list prints in two columns
+ * (`LONG_PRINT_LIST`), so it stays one sheet.
  */
 function TakeInFigure({
   figure,
@@ -482,9 +483,10 @@ function TakeInFigure({
   const items = card.items ?? [];
   const labels = card.figureText?.fields ?? [];
   const fields = Array.from({ length: figure.fields ?? 0 }, (_, index) => labels[index] ?? '');
+  const long = items.length + fields.length >= LONG_PRINT_LIST;
 
   return (
-    <div className="oc-fig-takein" ref={ref}>
+    <div className="oc-fig-takein" data-oc-print-long={long ? '' : undefined} ref={ref}>
       {ready ? <CardPrintHead /> : null}
       <p className="oc-fig-heading">{heading}</p>
       {items.length ? (

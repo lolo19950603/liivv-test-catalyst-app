@@ -854,7 +854,7 @@ Facts: every number above is from Diabetes Canada guidelines (Ch8, Ch36, Ch37) o
 
 **B35. Duplicate strip listing.** (NICE TO HAVE; catalog, not code)
 - **STILL OPEN 2026-10-06.** The owner says merge the duplicate listing. That is a store write in BigCommerce, not part of this build.
-- **Store update run 2026-10-06 (owner's request, after the release):** 4948 is kept at $84.98 with brand "OneTouch" (brand 250 renamed from "One Touch"; it also covers 7356), 7895's description and three photos copied onto it. The permanent redirect `/one-touch-verio-test-strips` → `/onetouch-verio-test-strips` (EN and /fr) is in `core/next.config.ts`. **Still to do:** hide 7895 once that redirect is live in production (`scratchpad/bcfix/apply.mjs`, `HIDE_DUPLICATE_REDIRECT_LIVE`).
+- **Store update run 2026-10-06 (owner's request, after the release):** 4948 is kept at $84.98 with brand "OneTouch" (brand 250 renamed from "One Touch"; it also covers 7356), 7895's description and three photos copied onto it. The permanent redirect `/one-touch-verio-test-strips` → `/onetouch-verio-test-strips` (EN and /fr) is in `core/next.config.ts`. **Done 2026-10-08:** 7895 is hidden, after the redirect was confirmed live in production (308 to `/onetouch-verio-test-strips`, which returns 200). B35 is closed.
 - Question: `/one-touch-verio-test-strips` ("One Touch Verio Test Strips", SKU WC-144766-P, from $84.99) and `/onetouch-verio-test-strips` ("OneTouch Verio Test Strips", $84.98) look like the same item. The brand is spelled "OneTouch". Merge or retire one listing in BigCommerce and correct the name.
 - Applies to: the catalog (placements are on hold, so no page copy changes).
 
@@ -1112,6 +1112,32 @@ What was fixed is in the 2026-10-08 change logs: every-day-living.md F.13, know-
 **For engineering (not owner questions).** The animated subscription demo (`components/subscription-flow-demo`) is English on every /fr page that shows it (both care landings, Women’s Health, the home page). A hydration warning on the two Essentials shops (React-made ids on Show / Sort by and the card forms) was seen in the 2026-10-08 QA at 1280 and 375 (and a "Hydration failed" once on the French landing), during the hour the dev server was restarting and serving a corrupt manifest. After the repair it did not come back in 18 fresh loads (both shops and the French landing, 1440, 1280 and 375 wide, twice each, 2026-10-08); not fixed in code, as no cause was found. Watch for it on the preview build.
 
 **For operations (store fixes, not owner questions).** "Nano Pro Needle Pen" (4913) shows CA$0.00 on the shelf. The three English Apidra listings still answer 404 (B3). Both are BigCommerce fixes. Found by the 2026-10-08 sweep of all 241 shelf products: "Omnipod Star Patch" (8096, `/omnipod-star-patch`, the shelf’s first card) answered 404 on the local preview although the store resolves its address (likely a stale route cache; check on the live site), and "One Touch Verio Test Strips" (7895) is still visible in the category although its address now redirects to the merged OneTouch Verio listing (hide 7895 in BigCommerce, or the shelf keeps a card that opens another product).
+
+
+### Added 2026-10-12, the five fixes from the production check
+
+What was built is in the 2026-10-12 change logs: new-to-the-journey.md F.15 (engine and store), landing.md, funding.md, this-might-be-you.md F.14 and paths.md H.11. Each item below was built with the default and can be changed.
+
+**B78. Ostomy funding: "pads and supplies" against the CRA's list.** (IMPORTANT; owner and NSWOC)
+- The Ostomy card "Claim what you paid out of pocket" says "Ostomy pads and supplies are listed eligible medical expenses". The CRA's current page (Lines 33099 and 33199, date modified 2026-01-20, fetched 2026-10-12) lists "Ileostomy and colostomy pads" as eligible with no prescription; it does not name "supplies" in general, or urostomy.
+- Side by side: the card's "Ostomy pads and supplies" / the CRA's "Ileostomy and colostomy pads".
+- Options: **(default)** keep the wording, now that the link opens the CRA page that lists the item; or say "Ileostomy and colostomy pads are listed eligible medical expenses" (EN and FR).
+- Applies to: `OstomyCare.ui.results.expensesBody`.
+
+**B79. The notice on a kit that holds glucagon or insulin.** (NICE TO HAVE; owner)
+- The Low-Glucose Rescue Kit (holds Baqsimi) now shows "View product" on every listing and the standard notice under its buy box: "A pharmacist reviews and dispenses every insulin and glucagon order, shipped in plain packaging." It does not say that the kit itself holds glucagon.
+- Options: **(default)** the standard notice, unchanged; or add a line naming what the kit holds ("This kit includes glucagon (Baqsimi)."), new copy for EN and FR; or take Baqsimi out of the kit (kits-for-review.md, 8055).
+- A kit that holds insulin (none does today) would be left off every French listing, as insulin is, and its page would carry the Quebec line. Applies to: `product/[slug]/page.tsx`, `DiabetesCare.ui.commerce`.
+
+**B80. The store header while the phone "On this page" sheet is open.** (NICE TO HAVE; owner)
+- Built: the store header is hidden while the sheet is open, and comes back when it closes. Its icons take no input while the sheet is open either way.
+- Options: **(default)** hidden; or kept and dimmed with the page.
+
+**B81. French names for the other care areas.** (NICE TO HAVE; French reviewer)
+- The "Also from Liivv" cards on /fr now read « Santé et bien-être des femmes », « Soins de stomie et « Liivving » au quotidien » and « Soins du diabète et « Liivving » au quotidien », each with a one-line description. Machine-drafted, like the rest of the French; the site names are also B32.
+- Applies to: `DiabetesCare.ui.discovery.doors`, `OstomyCare.ui.discovery.doors` (fr.json).
+
+**For engineering (not owner questions).** Know Your Type card 4 ("Print this list", 10 entries) prints on 2 pages on Letter in French (1 in English). It did before this change; the long-list rule (13 entries or more) does not reach it.
 
 ---
 

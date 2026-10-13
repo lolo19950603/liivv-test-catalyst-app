@@ -96,10 +96,26 @@ export const FEDERAL_LINKS = {
   dtc: 'https://www.canada.ca/en/revenue-agency/services/tax/individuals/segments/tax-credits-deductions-persons-disabilities/disability-tax-credit/eligible-dtc/eliminating.html',
   t2201: 'https://www.canada.ca/en/revenue-agency/services/forms-publications/forms/t2201.html',
   nihb: 'https://www.sac-isc.gc.ca/eng/1579620079031/1579620259238',
+  /*
+   * CRA, "Lines 33099 and 33199 – Eligible medical expenses you can claim on
+   * your tax return" (date modified 2026-01-20). Its old address ("…-you-
+   * claim-tax-return.html") returns 404 (production check, 2026-10-12). This
+   * address and its French page (the page's own hreflang="fr" link) were
+   * fetched on 2026-10-12: both 200, and both list "Ileostomy and colostomy
+   * pads" / "Tampons d'iléostomie ou de colostomie" as eligible with no
+   * prescription needed. `medicalExpensesHref` picks the page for the locale.
+   */
   medicalExpenses:
-    'https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/lines-33099-33199-eligible-medical-expenses-you-claim-tax-return.html',
+    'https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/lines-33099-33199-eligible-medical-expenses-you-claim-on-your-tax-return.html',
+  medicalExpensesFr:
+    'https://www.canada.ca/fr/agence-revenu/services/impot/particuliers/sujets/tout-votre-declaration-revenus/declaration-revenus/remplir-declaration-revenus/deductions-credits-depenses/lignes-33099-33199-frais-medicaux-admissibles-vous-pouvez-demander-votre-declaration-revenus.html',
   rdsp: 'https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/registered-disability-savings-plan-rdsp.html',
 } as const;
+
+/* The CRA eligible-medical-expenses page in the reader's language. */
+export function medicalExpensesHref(locale: string): string {
+  return locale === 'fr' ? FEDERAL_LINKS.medicalExpensesFr : FEDERAL_LINKS.medicalExpenses;
+}
 
 /** Territories that will not pay until private coverage is exhausted. */
 const PAYER_OF_LAST_RESORT: ProvinceCode[] = ['YT', 'NT', 'NU'];
@@ -263,6 +279,7 @@ export function buildResults(
   programs: Partial<Record<ProvinceCode, ProgramFacts>>,
   models: Record<string, { label: string; blurb: string }>,
   copy: ResultCopy,
+  locale = 'en',
 ): ResultCard[] {
   const cards: ResultCard[] = [];
 
@@ -392,7 +409,7 @@ export function buildResults(
     title: copy.expensesTitle,
     body: copy.expensesBody,
     linkLabel: copy.expensesLink,
-    linkUrl: FEDERAL_LINKS.medicalExpenses,
+    linkUrl: medicalExpensesHref(locale),
     tone: 'supporting',
   });
 

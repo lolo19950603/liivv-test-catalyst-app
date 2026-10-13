@@ -876,3 +876,7 @@ The engine and font change is in new-to-the-journey.md F.12. Here: the first ban
 | Key | Was (after F.9) | Now (EN / FR) | Why |
 |---|---|---|---|
 | `categories.3.items.3` | "Talk it through before the school year starts, and have at least two staff trained" | "Talk it through with the school before the school year starts, and ask for at least two staff to be trained" / « Discutez-en avec l’école avant le début de l’année scolaire, et demandez qu’au moins deux membres du personnel soient formés » | The note-1 rewrite turned the paediatric society’s advice to schools into an order to parents (clinical re-read, 2026-10-08). Source unchanged (`cps-t1d-in-school-2015`). |
+
+### F.14 Production check of 2026-10-12: card 3 prints on one page (2026-10-12)
+
+"Print this list" on card 3 ("Our school care plan", 15 entries) ran onto a second page on Letter. A take-in list of 13 entries or more now prints in two columns, a little tighter, with the full writing line under each entry (engine change: new-to-the-journey.md F.15 P4). Measured on the local dev server: 1 page on Letter and on A4, in English and in French. Card 1 and every other print sheet print as before. No copy changed.

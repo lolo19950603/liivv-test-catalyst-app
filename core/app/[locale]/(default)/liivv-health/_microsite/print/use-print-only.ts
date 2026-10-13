@@ -89,6 +89,15 @@ function listen() {
   });
 }
 
+/*
+ * A take-in list this long or longer prints its entries in two columns
+ * (`data-oc-print-long`, ./print.css), so it stays one sheet on Letter and
+ * A4. This Might Be You card 3 (15 entries) ran onto a second page
+ * (production check, 2026-10-12); every list up to 12 entries prints as
+ * before.
+ */
+export const LONG_PRINT_LIST = 13;
+
 export function usePrintOnly<T extends HTMLElement>(
   ref: RefObject<T | null>,
   options: { title?: string } = {},

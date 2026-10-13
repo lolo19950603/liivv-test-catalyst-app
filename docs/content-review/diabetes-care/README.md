@@ -1,7 +1,7 @@
 # Diabetes Care microsite — content review
 **Prepared for:** Liivv management and clinical review  
 **Covers:** the landing page of `/liivv-health/diabetes-care`, the chapters the shared chapter engine serves, the Funding & Coverage page and the five path pages, in English and French  
-**Generated:** 2026-10-08 from commit `f7f9ef0b`
+**Generated:** 2026-10-13 from commit `943a0de6`
 
 > **These files are generated from the site's own sources.** Do not edit them. Mark corrections against the reference beside each line — the change is made in the source, and the files are generated again. That way the text you approve is the text that ships, and the two cannot drift apart.
 
@@ -17,7 +17,7 @@
 
 | File | Page | Words (EN) |
 |---|---|---|
-| [00-shared.md](en/00-shared.md) · [FR](fr/00-shared.md) | Shared interface text | 1,329 |
+| [00-shared.md](en/00-shared.md) · [FR](fr/00-shared.md) | Shared interface text | 1,368 |
 | [01-new-to-the-journey.md](en/01-new-to-the-journey.md) · [FR](fr/01-new-to-the-journey.md) | Chapter 01 — New to the Journey | 2,340 |
 | [02-staying-safe.md](en/02-staying-safe.md) · [FR](fr/02-staying-safe.md) | Chapter 02 — Staying Safe | 2,511 |
 | [03-your-tools.md](en/03-your-tools.md) · [FR](fr/03-your-tools.md) | Chapter 03 — Your Tools | 3,238 |
@@ -27,7 +27,7 @@
 | [07-landing.md](en/07-landing.md) · [FR](fr/07-landing.md) | Landing page | 1,552 |
 | [08-funding.md](en/08-funding.md) · [FR](fr/08-funding.md) | Funding & Coverage | 5,905 |
 | [09-paths.md](en/09-paths.md) · [FR](fr/09-paths.md) | Path pages | 2,830 |
-| | **Total** | **28,617** |
+| | **Total** | **28,656** |
 
 ## Open with the nurse
 
@@ -77,4 +77,4 @@ On /en now, hidden on /fr until a francophone reviewer signs off the French. The
 node --env-file-if-exists=.env.local core/scripts/export-content-review.mjs --site=diabetes-care
 ```
 
-Coverage check on this run: **2163 of 2163** English strings under `DiabetesCare` appear in these files.
+Coverage check on this run: **2169 of 2169** English strings under `DiabetesCare` appear in these files.

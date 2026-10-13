@@ -137,6 +137,25 @@
     break-inside: avoid;
   }
 
+  /*
+   * A long take-in list (`LONG_PRINT_LIST` entries or more, set by the figure
+   * as `data-oc-print-long`) prints its entries in two columns, so it stays
+   * one sheet on Letter and A4: This Might Be You card 3 (15 entries) ran
+   * onto a second page (production check, 2026-10-12), so its entries are
+   * set a little tighter too, keeping the full writing line under each. Every
+   * shorter list, and every other sheet, prints as before.
+   */
+  html.oc-printing [data-oc-printing][data-oc-print-long] ol {
+    columns: 2;
+    column-gap: 0.35in;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  html.oc-printing [data-oc-printing][data-oc-print-long] li {
+    margin-bottom: 0.45rem !important;
+  }
+
   /* The header: the site, the title where the figure has none, then a name and the date. */
   html.oc-printing [data-oc-printing] .oc-print-head {
     margin: 0 0 0.8rem !important;

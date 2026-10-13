@@ -3712,6 +3712,18 @@
   background: rgba(28, 34, 30, 0.45);
 }
 
+/*
+ * The store header goes under the open sheet too. The dialog's scroll lock
+ * lets the sticky header scroll out of view, and its icons, which are fixed,
+ * stayed bright over the dimmed page (production check, 2026-10-12). They
+ * take no input while the sheet is open (the dialog makes the page inert),
+ * and come back when it closes (journey-sheet.tsx sets the attribute). The
+ * sections' stacking (z-index 70) is left alone.
+ */
+html[data-oc-sheet-open] #liivv-site-header {
+  visibility: hidden;
+}
+
 #oc-chapter .oc-journey-sheet {
   position: fixed;
   right: 0;

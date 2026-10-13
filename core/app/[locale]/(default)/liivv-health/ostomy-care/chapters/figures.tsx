@@ -41,7 +41,7 @@ import { MeasuringGuideFigure } from './measuring-guide-figure';
 import { GLYPH_PATHS } from './glyph-paths';
 import { PartsOfSystemFigure } from './parts-of-system-figure';
 import { isFrGated } from './review-gates';
-import { usePrintOnly } from './use-print-only';
+import { LONG_PRINT_LIST, usePrintOnly } from './use-print-only';
 
 export { UrgentExit };
 
@@ -389,9 +389,11 @@ function TakeInFigure({ card }: { card: CategoryCard }) {
   const sheet = useTranslations('OstomyCare.ui.chapter.print');
   const ref = useRef<HTMLDivElement>(null);
   const { ready, print } = usePrintOnly(ref, { title: card.title });
+  /* A long list prints in two columns, so it stays one sheet (`LONG_PRINT_LIST`). */
+  const long = (card.items ?? []).length >= LONG_PRINT_LIST;
 
   return (
-    <div className="oc-fig-takein" ref={ref}>
+    <div className="oc-fig-takein" data-oc-print-long={long ? '' : undefined} ref={ref}>
       {ready ? (
         <PrintHead name={sheet('name')} printed={sheet('printed')} site={sheet('site')} />
       ) : null}

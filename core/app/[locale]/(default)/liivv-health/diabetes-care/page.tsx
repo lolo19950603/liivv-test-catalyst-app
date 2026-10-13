@@ -134,7 +134,19 @@ export default async function Page({ params }: Props) {
    * and its products. The full shop still lists them.
    */
   const insulinShown = LANDING_GATES.insulinReviewConfirmed && locale !== 'fr';
-  const kits = catalog.kits.filter((kit) => isListedDiabetesKit(kit.entityId));
+  /*
+   * A kit holding insulin or glucagon stays listed, with the same
+   * pharmacist-review notice (production check, 2026-10-12: the Low-Glucose
+   * Rescue Kit holds Baqsimi). One holding insulin is left off /fr, as
+   * insulin is (B11); none does today.
+   */
+  const kits = catalog.kits
+    .filter((kit) => isListedDiabetesKit(kit.entityId))
+    .filter((kit) => locale !== 'fr' || !kit.isInsulin)
+    .map(({ isInsulin, isGlucagon, ...kit }) => ({
+      ...kit,
+      ...(isInsulin || isGlucagon ? { reviewNotice: true } : {}),
+    }));
   /*
    * A product whose description names or phones another retailer is never
    * linked from here (`refused`, ./get-dc-catalog.ts), as on the chapters'

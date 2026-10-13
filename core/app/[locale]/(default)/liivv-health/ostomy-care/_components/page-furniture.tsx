@@ -12,7 +12,7 @@
  * spacing tokens, and `.rounded-top` behaviour from chapter-page.css.
  */
 
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale, useMessages, useTranslations } from 'next-intl';
 
 import { HEALTH_HUB_DOORS } from '../../health-hub-data';
 import {
@@ -115,6 +115,13 @@ export function HelpBand() {
  */
 export function DiscoveryBand() {
   const t = useTranslations('OstomyCare.ui.discovery');
+  /*
+   * Each door's title and line in the page language (`ui.discovery.doors`;
+   * health-hub-data.ts is English only). A door with no words there falls
+   * back to the hub's English. Same as the engine's DiscoveryBand.
+   */
+  const doorWords: Record<string, { title: string; body: string } | undefined> =
+    useMessages().OstomyCare.ui.discovery.doors;
   /* Plain <a> to other micro-sites and the hub — same rule as above. */
   const locale = useLocale();
   const others = HEALTH_HUB_DOORS.filter(
@@ -132,8 +139,10 @@ export function DiscoveryBand() {
         <div className="oc-ch-discover-grid">
           {others.map((door) => (
             <a className="oc-ch-discover-card" href={door.href ? localeHref(door.href, locale) : undefined} key={door.id}>
-              <span className="oc-ch-discover-title">{door.title}</span>
-              <span className="oc-ch-discover-body">{door.body}</span>
+              <span className="oc-ch-discover-title">
+                {doorWords[door.id]?.title ?? door.title}
+              </span>
+              <span className="oc-ch-discover-body">{doorWords[door.id]?.body ?? door.body}</span>
             </a>
           ))}
           <a className="oc-ch-discover-card is-hub" href={localeHref('/liivv-health', locale)}>

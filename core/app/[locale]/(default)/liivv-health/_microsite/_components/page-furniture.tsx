@@ -125,6 +125,14 @@ export function HelpBand() {
 export function DiscoveryBand() {
   const t = useSiteT('ui.discovery');
   const { furniture } = useSite();
+  /*
+   * Each door's title and line in the page language, from the site's own
+   * `ui.discovery.doors` (health-hub-data.ts is English only; production
+   * check, 2026-10-12, found English cards on /fr). A door with no words
+   * there falls back to the hub's English.
+   */
+  const doorWords: Record<string, { title: string; body: string } | undefined> =
+    useSiteMessages().ui.discovery.doors;
   /* Plain <a> to other micro-sites and the hub — same rule as above. */
   const locale = useLocale();
   const others = HEALTH_HUB_DOORS.filter(
@@ -146,8 +154,10 @@ export function DiscoveryBand() {
               href={door.href ? localeHref(door.href, locale) : undefined}
               key={door.id}
             >
-              <span className="oc-ch-discover-title">{door.title}</span>
-              <span className="oc-ch-discover-body">{door.body}</span>
+              <span className="oc-ch-discover-title">
+                {doorWords[door.id]?.title ?? door.title}
+              </span>
+              <span className="oc-ch-discover-body">{doorWords[door.id]?.body ?? door.body}</span>
             </a>
           ))}
           <a className="oc-ch-discover-card is-hub" href={localeHref('/liivv-health', locale)}>

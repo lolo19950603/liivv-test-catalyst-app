@@ -823,3 +823,14 @@ From the owner’s review of 2026-10-07 (notes 9, 10 and 11; the diagnosis and i
 | S10 | `chapters/chapter-shop.ts` `namesAnotherRetailer`; `get-dc-catalog.ts`; `_microsite/shop/get-placement-items.ts` | **The other-retailer check reads the full HTML description.** Every loader that lists Diabetes products (the landing catalogue, the chapter placements, the shop) reads `description` (the HTML, links included; none reads `plainTextDescription`, which drops link addresses) and asks `namesAnotherRetailer`, which tests the HTML, then the words with tags removed and entities and %-escapes decoded (so `Diabetes&nbsp;Express` or a name split by a tag counts). For the record: the old pattern already read the HTML and matched the Toujeo PDF address (`diabetesexpress.ca`), which is why Toujeo left the landing on 2026-10-06; the gap it closes is entity-encoded and tag-split names. |
 
 Messages added (EN / FR, the French machine-drafted): `ui.shopPage.*` (headings, filter labels, 22 type names), `ui.commerce.viewProduct` ("View product" / "Voir le produit"), `ui.landingPage.brands.shop` ("Shop {brand}" / "Magasiner {brand}"). Brand and device names are not copy and are never translated (`shop-classify.ts`).
+
+### Production check of 2026-10-12: kits that hold glucagon or insulin (2026-10-12)
+
+The owner reviewed the production check and said "Fix the five then commit" (2026-10-12). The engine and store change is in new-to-the-journey.md F.15 (P1, P2).
+
+| # | Where | What changed |
+|---|---|---|
+| K1 | `get-dc-catalog.ts`, `page.tsx`, `_microsite/landing/landing-page.tsx`; `liivv-health/page.tsx` | A listed kit whose contents include glucagon or insulin keeps its place in the kits section and the "Kits" room, and now carries the shop's pharmacist-review line (`shop.reviewNotice`, "A pharmacist reviews and dispenses every insulin and glucagon order.") on its tile and its carousel slide. Today that is the Low-Glucose Rescue Kit (8055, which holds Baqsimi). A kit holding insulin would be left off /fr (B11) on this page and on the Liivv Health hub; none does. Kits still link their page ("Customize this kit"); none is a one-click add. |
+| K2 | `get-diabetes-shop.ts` | On Diabetes Essentials the same kit is "View product" / "Voir le produit" in place of "Add to cart" (production showed a one-click add, EN and FR). |
+
+No copy changed; no new message keys for this part.

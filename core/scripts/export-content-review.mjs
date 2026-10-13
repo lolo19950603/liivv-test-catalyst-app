@@ -1982,6 +1982,9 @@ function writeShared(locale) {
     ['shopPage', 'Shop Ostomy Care shelf — search, filters and empty states'],
     ['help', 'Help band — shown on every page'],
     ['discovery', 'Discovery band'],
+    ['discovery.doors.womens_health_wellness', 'Discovery band — the Women’s Health card'],
+    ['discovery.doors.diabetes_care_everyday', 'Discovery band — the Diabetes Care card'],
+    ['discovery.doors.ostomy_care_everyday', 'Discovery band — the Ostomy Care card (shown on the other sites only)'],
     ['governance', 'Byline and review notices'],
   ];
 
