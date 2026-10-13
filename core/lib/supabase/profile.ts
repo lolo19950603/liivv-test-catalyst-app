@@ -10,13 +10,10 @@ export type CustomerProfileRow = {
   first_name: string | null;
   last_name: string | null;
   phone?: string | null;
-  avatar_url?: string | null;
-  onboarding_step1_completed_at: string | null;
   health_profile_completed_at: string | null;
   insurance_info_completed_at: string | null;
   care_interests: string[] | null;
   has_insurance: boolean | null;
-  auth_first_session_completed_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -94,25 +91,4 @@ export async function getCustomerProfileByBigCommerceId(
   }
 
   return data as CustomerProfileRow;
-}
-
-export async function markAuthFirstSessionCompleted(bigcommerceCustomerId: string): Promise<void> {
-  if (!isSupabaseConfigured()) {
-    return;
-  }
-
-  try {
-    const supabase = getSupabaseClient();
-    const now = new Date().toISOString();
-
-    await supabase
-      .from('profiles')
-      .update({
-        auth_first_session_completed_at: now,
-        updated_at: now,
-      })
-      .eq('bigcommerce_customer_id', bigcommerceCustomerId);
-  } catch {
-    // Non-fatal.
-  }
 }

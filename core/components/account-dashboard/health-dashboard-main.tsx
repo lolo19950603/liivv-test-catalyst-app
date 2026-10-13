@@ -73,16 +73,17 @@ export function HealthDashboardMain({
 }) {
   const { wellness } = labels;
   const router = useRouter();
+  const openIncompleteHealth = openHealthOnMount && !healthProfileComplete;
   const [sheet, setSheet] = useState<OliviaSetupSheetKind | null>(
-    openHealthOnMount ? 'health' : null,
+    openIncompleteHealth ? 'health' : null,
   );
   const [mood, setMood] = useState<OliviaMascotMood>(
-    celebrateOnMount ? 'celebrate' : openHealthOnMount ? 'looking-health' : 'idle',
+    celebrateOnMount ? 'celebrate' : openIncompleteHealth ? 'looking-health' : 'idle',
   );
   const [activeLaneId, setActiveLaneId] = useState<string | null>(careLanes[0]?.id ?? null);
   const [lanePinned, setLanePinned] = useState(false);
   const bounceTimer = useRef<number | null>(null);
-  const didAutoOpenHealth = useRef(openHealthOnMount);
+  const didAutoOpenHealth = useRef(openIncompleteHealth);
 
   useEffect(() => {
     if (careLanes.some((lane) => lane.id === activeLaneId)) {
@@ -191,7 +192,7 @@ export function HealthDashboardMain({
     setSheet(null);
     setMood('idle');
 
-    if (openHealthOnMount) {
+    if (openIncompleteHealth) {
       router.replace('/account/dashboard/', { scroll: false });
     }
   };

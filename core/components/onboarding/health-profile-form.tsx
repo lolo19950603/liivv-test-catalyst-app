@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link } from '~/components/link';
 import { OliviaCategoryMark } from './olivia-category-mark';
 import { OnboardingSubmitOverlay } from './onboarding-submit-overlay';
@@ -63,6 +63,13 @@ export function HealthProfileForm({
    * one submission over into the next.
    */
   const [consentGranted, setConsentGranted] = useState(false);
+  /**
+   * Continue and Save occupy the same button slot. The click that opens the
+   * last category re-renders that node as type="submit" before the browser
+   * finishes the click, so the form would submit mid-wizard. Only Save's own
+   * click may go through.
+   */
+  const saveRequestedRef = useRef(false);
 
   /*
    * Withdrawal. A tick already on file makes an unticked save mean something
@@ -104,29 +111,33 @@ export function HealthProfileForm({
   }, [primaryCategoryOptions]);
 
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
-    const fd = new FormData(e.currentTarget);
-    const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
-    const intent =
-      submitter?.getAttribute('name') === 'intent' ? submitter.value : '';
-    if (intent === 'save') {
-      const v = validateHealthProfileComplete(fd);
-      if (!v.ok) {
-        e.preventDefault();
-        setClientError(v.message);
-        return;
-      }
+    const requested = saveRequestedRef.current;
+    saveRequestedRef.current = false;
 
-      // The same rule the server applies, so nothing leaves the page without
-      // the tick. The server checks again; this is only the kinder message.
-      // The one submission that may go through unticked is a withdrawal, which
-      // is a decision the person is entitled to make and the server records.
-      if (!consentGranted && !consentOnFile) {
-        e.preventDefault();
-        setClientError(t('error'));
-
-        return;
-      }
+    if (!requested) {
+      e.preventDefault();
+      return;
     }
+
+    const fd = new FormData(e.currentTarget);
+    const v = validateHealthProfileComplete(fd);
+    if (!v.ok) {
+      e.preventDefault();
+      setClientError(v.message);
+      return;
+    }
+
+    // The same rule the server applies, so nothing leaves the page without
+    // the tick. The server checks again; this is only the kinder message.
+    // The one submission that may go through unticked is a withdrawal, which
+    // is a decision the person is entitled to make and the server records.
+    if (!consentGranted && !consentOnFile) {
+      e.preventDefault();
+      setClientError(t('error'));
+
+      return;
+    }
+
     setClientError(null);
   };
 
@@ -797,10 +808,19 @@ export function HealthProfileForm({
   };
 
   const shownError = clientError ?? readServerError();
+  const errorRef = useRef<HTMLDivElement>(null);
   // A withdrawal is not a failure — the person asked for it and it was written
   // down — so it is confirmed, not shown in the red band.
   const shownNotice = withdrawnNow ? t('withdraw.done') : null;
   const showSaveButton = !(selectedCategories.length > 0 && microPageIdx < selectedCategories.length);
+
+  useEffect(() => {
+    if (!shownError) {
+      return;
+    }
+
+    errorRef.current?.scrollIntoView({ block: 'nearest' });
+  }, [shownError]);
 
   if (!supabaseReady) {
     return (
@@ -833,12 +853,6 @@ export function HealthProfileForm({
             description="Update your care details. Save to return to your account home."
           />
         )}
-
-        {shownError ? (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-            {shownError}
-          </div>
-        ) : null}
 
         {shownNotice ? (
           <div
@@ -1007,6 +1021,16 @@ export function HealthProfileForm({
               </div>
             ) : null}
 
+            {shownError ? (
+              <div
+                ref={errorRef}
+                className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
+                role="alert"
+              >
+                {shownError}
+              </div>
+            ) : null}
+
             <div className="flex flex-row flex-wrap items-center gap-3">
               {embedded ? null : (
                 <Link
@@ -1032,8 +1056,10 @@ export function HealthProfileForm({
               ) : null}
               {selectedCategories.length > 0 && microPageIdx < selectedCategories.length ? (
                 <button
+                  key="health-profile-continue"
                   type="button"
-                  onClick={() => {
+                  onClick={(event) => {
+                    event.preventDefault();
                     const msg = validateCurrentMicroPage();
                     if (msg) {
                       setClientError(msg);
@@ -1050,10 +1076,14 @@ export function HealthProfileForm({
                 </button>
               ) : (
                 <button
+                  key="health-profile-save"
                   type="submit"
                   name="intent"
                   value="save"
                   disabled={isSubmitting}
+                  onClick={() => {
+                    saveRequestedRef.current = true;
+                  }}
                   className="liivv-btn-primary px-6 py-2.5 text-sm sm:min-w-[120px]"
                 >
                   {isSubmitting ? 'Saving...' : 'Save'}
