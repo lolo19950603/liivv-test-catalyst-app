@@ -3994,11 +3994,11 @@
     },
     "notices": {
       "prescription": "You need a prescription for this machine.",
-      "pressure": "Your prescriber sets your pressure. Liivv never changes or advises on settings.",
-      "centralApnea": "Standard CPAP can make central sleep apnea worse. Your sleep physician decides which machine is right for you.",
-      "bilevel": "Bilevel machines are prescribed by a sleep specialist.",
-      "asv": "For use only under a sleep specialist’s care. Not for some people with heart failure.",
-      "supplier": "You can choose any supplier for your machine and supplies."
+      "pressure": "Your settings are part of your prescription and should only be changed by trained professionals. Liivv never changes or advises on settings.",
+      "centralApnea": "Common PAP machines aren’t meant to be the only treatment for central sleep apnea, and used alone they can make it worse. Suspected central sleep apnea should be checked with an overnight test in a sleep lab.",
+      "bilevel": "Bilevel machines should only be prescribed by a sleep specialist.",
+      "asv": "This type of machine carries a serious safety concern for some people with long-term heart failure.",
+      "supplier": "In Ontario, it’s your right to choose your community respiratory therapy provider, and you don’t have to get equipment from the respiratory therapist who recommends it."
     },
     "sources": {
       "alberta": "MyHealth.Alberta.ca: Buyer’s Information for CPAP Therapy Equipment",

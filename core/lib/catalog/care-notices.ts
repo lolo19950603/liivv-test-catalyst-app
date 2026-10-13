@@ -22,24 +22,31 @@ import type { PapDeviceKind } from './prescription-devices';
  *
  *   alberta               MyHealth.Alberta.ca (Alberta Health Services),
  *                         Buyer's Information for CPAP Therapy Equipment:
- *                         use CPAP only with a prescription from your doctor;
- *                         each machine must be set for the person using it.
+ *                         "only use CPAP therapy if you have a prescription
+ *                         from your doctor"; get a prescription "for your CPAP
+ *                         therapy equipment and your settings".
  *   bcPapGuide            Government of BC, Ministry of Health, Positive
- *                         Airway Pressure (PAP) Buyer's Guide: PAP prescribed
- *                         after a physical evaluation and diagnostic testing;
- *                         APAP and BiPAP "should only be prescribed by a Sleep
- *                         Specialist"; commonly used PAP devices can make
- *                         central sleep apnea worse; settings "should only be
- *                         adjusted by trained professionals".
+ *                         Airway Pressure (PAP) Buyer's Guide: APAP and BiPAP
+ *                         "should only be prescribed by a Sleep Specialist";
+ *                         commonly used PAP devices "are not meant to be the
+ *                         only treatment for central sleep apnea" and used
+ *                         alone can make it worse; suspected central apnea is
+ *                         evaluated with an overnight sleep laboratory test;
+ *                         settings "should only be adjusted by trained
+ *                         professionals". It says nothing about ASV.
  *   healthCanadaAsvRecall Health Canada recall RA-53771, Adaptive
- *                         Servo-Ventilation therapy devices (2015-05-13): a
- *                         serious safety concern in people with symptomatic
- *                         chronic heart failure with reduced ejection fraction.
+ *                         Servo-Ventilation therapy devices (2015-05-13, now
+ *                         archived): a serious safety concern in patients with
+ *                         symptomatic, chronic heart failure with reduced left
+ *                         ventricular ejection fraction. It gives no cut-off.
  *   crto                  College of Respiratory Therapists of Ontario, What
  *                         you need to know about community respiratory
- *                         therapy: it is your right to choose your provider.
+ *                         therapy: "it is your right to choose your community
+ *                         respiratory therapy provider". Ontario only, so the
+ *                         notice says so.
  *
- * No pressure numbers and no settings advice, ever: the prescriber sets them.
+ * No pressure numbers and no settings advice, ever: settings come with the
+ * prescription and only trained professionals change them.
  * =============================================================================
  */
 
@@ -84,7 +91,7 @@ const DEVICE_NOTICE_SOURCES: Readonly<Record<DeviceNoticeId, readonly CareNotice
   pressure: ['bcPapGuide', 'alberta'],
   centralApnea: ['bcPapGuide'],
   bilevel: ['bcPapGuide'],
-  asv: ['healthCanadaAsvRecall', 'bcPapGuide'],
+  asv: ['healthCanadaAsvRecall'],
   supplier: ['crto'],
 };
 

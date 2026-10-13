@@ -3988,11 +3988,11 @@
     },
     "notices": {
       "prescription": "Cet appareil nécessite une ordonnance.",
-      "pressure": "Votre prescripteur règle votre pression. Liivv ne modifie jamais vos réglages et ne donne aucun conseil à leur sujet.",
-      "centralApnea": "Un appareil CPAP standard peut aggraver l’apnée centrale du sommeil. Votre médecin du sommeil décide quel appareil vous convient.",
-      "bilevel": "Les appareils à deux niveaux de pression sont prescrits par un spécialiste du sommeil.",
-      "asv": "À utiliser uniquement sous les soins d’un spécialiste du sommeil. Ne convient pas à certaines personnes atteintes d’insuffisance cardiaque.",
-      "supplier": "Vous pouvez choisir n’importe quel fournisseur pour votre appareil et vos fournitures."
+      "pressure": "Vos réglages font partie de votre ordonnance et ne devraient être modifiés que par des professionnels formés. Liivv ne modifie jamais vos réglages et ne donne aucun conseil à leur sujet.",
+      "centralApnea": "Les appareils PAP courants ne sont pas conçus pour être le seul traitement de l’apnée centrale du sommeil et, utilisés seuls, ils peuvent l’aggraver. Une apnée centrale soupçonnée devrait être évaluée par un test de nuit dans un laboratoire du sommeil.",
+      "bilevel": "Les appareils à deux niveaux de pression ne devraient être prescrits que par un spécialiste du sommeil.",
+      "asv": "Ce type d’appareil présente un problème de sécurité grave pour certaines personnes atteintes d’insuffisance cardiaque chronique.",
+      "supplier": "En Ontario, vous avez le droit de choisir votre fournisseur de services communautaires de thérapie respiratoire, et vous n’êtes pas tenu d’obtenir l’équipement auprès du thérapeute respiratoire qui vous le recommande."
     },
     "sources": {
       "alberta": "MyHealth.Alberta.ca : Buyer’s Information for CPAP Therapy Equipment (en anglais)",
