@@ -76,13 +76,17 @@ export interface CareNotice {
 
 type DeviceNoticeId = 'prescription' | 'pressure' | 'centralApnea' | 'bilevel' | 'asv' | 'supplier';
 
-/* Which notices each kind of device carries, in the order they are shown. */
+/*
+ * Which notices each kind of device carries, in the order they are shown.
+ * 'supplier' (choosing your provider) is about buying a machine from Liivv,
+ * so it is off while Liivv sells no machines (owner decision, 2026-10-13).
+ */
 const DEVICE_NOTICES: Readonly<Record<PapDeviceKind, readonly DeviceNoticeId[]>> = {
-  'cpap-apap': ['prescription', 'pressure', 'centralApnea', 'supplier'],
-  travel: ['prescription', 'pressure', 'centralApnea', 'supplier'],
-  bundle: ['prescription', 'pressure', 'centralApnea', 'supplier'],
-  bilevel: ['prescription', 'bilevel', 'pressure', 'supplier'],
-  asv: ['prescription', 'asv', 'pressure', 'supplier'],
+  'cpap-apap': ['prescription', 'pressure', 'centralApnea'],
+  travel: ['prescription', 'pressure', 'centralApnea'],
+  bundle: ['prescription', 'pressure', 'centralApnea'],
+  bilevel: ['prescription', 'bilevel', 'pressure'],
+  asv: ['prescription', 'asv', 'pressure'],
 };
 
 /* The sources shown on each notice. */
@@ -110,16 +114,14 @@ export async function prescriptionDeviceNotices(kind: PapDeviceKind): Promise<Ca
   }));
 }
 
-/* The words of the "Prescription required" panel that replaces a device's buy box. */
+/* The words of the "Not sold by Liivv yet" panel that replaces a device's buy box. */
 export async function prescriptionDeviceSlotCopy() {
   const t = await getTranslations('CareNotices.device');
 
   return {
     title: t('title'),
     body: t('body'),
-    howToSend: t('howToSend'),
-    sendPrescription: t('sendPrescription'),
-    bookCall: t('bookCall'),
+    shopSupplies: t('shopSupplies'),
     noticesLabel: t('noticesLabel'),
     sourcesLabel: (count: number) => t('sourcesLabel', { count }),
   };

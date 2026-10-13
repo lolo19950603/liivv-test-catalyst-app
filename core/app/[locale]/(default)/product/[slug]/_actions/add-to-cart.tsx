@@ -40,7 +40,7 @@ export const addToCart = async (
 
   // A prescription device (a CPAP, APAP, bilevel or ASV machine, or a bundle
   // or kit holding one) is never bought online (owner approval, 2026-10-12).
-  // Its page shows "Prescription required" instead of this form; this refuses
+  // Its page shows "Not sold by Liivv yet" instead of this form; this refuses
   // a stale or hand-built form that asks anyway.
   const requestedId = Number(submission.value.id);
 

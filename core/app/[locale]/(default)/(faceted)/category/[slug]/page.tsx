@@ -235,7 +235,7 @@ export default async function Category(props: Props) {
     /*
      * Insulin and glucagon link their product page, never a one-click add:
      * the pharmacist notice is under its buy box (owner note 9, 2026-10-07).
-     * So do prescription devices, whose page says "Prescription required"
+     * So do prescription devices, whose page says "Not sold by Liivv yet"
      * (owner approval, 2026-10-12).
      */
     return withViewOnlyProducts(

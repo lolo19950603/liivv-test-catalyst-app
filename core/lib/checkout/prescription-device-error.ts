@@ -5,7 +5,7 @@
 export class PrescriptionDeviceError extends Error {
   constructor() {
     super(
-      'Prescription machines can’t be bought online. Remove it to continue. To get one, send your prescription through your Liivv account and a pharmacist will contact you.',
+      'Liivv doesn’t sell CPAP or other sleep apnea machines yet. Remove it to continue.',
     );
     this.name = 'PrescriptionDeviceError';
   }

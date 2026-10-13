@@ -157,7 +157,7 @@ export async function toolAddToCart(productEntityId: number, quantity = 1) {
       ok: false,
       message:
         refusal === 'prescription-device'
-          ? 'This is a prescription machine and cannot be added to the cart or bought online. Do not give advice on machine choice or settings. Send the customer the product page link: they can send their prescription through their Liivv account (Pharmacy page) and a pharmacist will contact them, or book a call.'
+          ? 'Liivv does not sell CPAP or other sleep apnea machines yet, so this cannot be added to the cart or bought. Do not give advice on machine choice or settings, and do not suggest another store. Liivv sells masks, cushions, tubing, filters and other supplies.'
           : 'This product is reviewed by a pharmacist and cannot be added to the cart from chat. Send the customer the product page link from search_products instead.',
       cartUrl,
       productEntityId: String(productEntityId),

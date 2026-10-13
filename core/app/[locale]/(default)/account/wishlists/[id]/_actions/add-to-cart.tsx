@@ -36,7 +36,7 @@ export async function addWishlistItemToCart(prevState: State, formData: FormData
 
     // Insulin, glucagon and prescription devices are never added from a
     // listing (owner note 9; owner approval, 2026-10-12): the card links the
-    // product page, where the pharmacist notice or "Prescription required" is.
+    // product page, where the pharmacist notice or "Not sold by Liivv yet" is.
     if ((await viewOnlyProductIds([productId])).has(productId)) {
       const shop = await getTranslations('DiabetesCare.ui.chapter.shop');
 

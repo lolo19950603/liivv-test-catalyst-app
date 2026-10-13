@@ -4,11 +4,10 @@ import type { CareNotice } from '~/lib/catalog/care-notices';
 /*
  * In place of the buy box on a prescription device's product page (a CPAP,
  * APAP, bilevel or ASV machine, or a bundle or kit holding one;
- * ~/lib/catalog/prescription-devices.ts). A device is never bought online
- * (owner approval, 2026-10-12): the page says "Prescription required", sends
- * the customer to their account's Pharmacy page (Add prescription: a
- * transfer, or their prescriber's fax), offers a call, and lists the notices
- * with their sources on each (~/lib/catalog/care-notices.ts).
+ * ~/lib/catalog/prescription-devices.ts). Liivv sells no machines for now,
+ * only masks and supplies (owner decision, 2026-10-13): the page says the
+ * machine is not sold by Liivv yet, links to the masks and supplies, and lists
+ * the notices with their sources on each (~/lib/catalog/care-notices.ts).
  *
  * A server component: every word arrives as text, read on the server, so the
  * browser's message bundle does not change. Links are locale-aware.
@@ -18,6 +17,9 @@ import type { CareNotice } from '~/lib/catalog/care-notices';
  * streamed copy and a fallback copy, both hidden, beside the visible one),
  * and those copies share any id React gives them, useId's included.
  */
+/* Category 1031, Sleep Apnea + CPAP: the masks and supplies Liivv sells. */
+const SLEEP_SUPPLIES_PATH = '/liivv-your-life/sleep-breath/sleep-apnea-cpap/';
+
 export function PrescriptionDeviceSlot({
   copy,
   notices,
@@ -25,9 +27,7 @@ export function PrescriptionDeviceSlot({
   copy: {
     title: string;
     body: string;
-    howToSend: string;
-    sendPrescription: string;
-    bookCall: string;
+    shopSupplies: string;
     noticesLabel: string;
     sourcesLabel: (count: number) => string;
   };
@@ -41,15 +41,9 @@ export function PrescriptionDeviceSlot({
     >
       <h2 className="text-lg font-semibold">{copy.title}</h2>
       <p className="mt-2">{copy.body}</p>
-      <p className="mt-2 text-sm text-[var(--product-detail-secondary-text,hsl(var(--contrast-500)))]">
-        {copy.howToSend}
-      </p>
       <div className="mt-4 flex flex-wrap gap-3">
-        <ArchiveButtonLink href="/account/pharmacy" variant="primary">
-          {copy.sendPrescription}
-        </ArchiveButtonLink>
-        <ArchiveButtonLink href="/account/virtual-care/appointment" variant="secondary">
-          {copy.bookCall}
+        <ArchiveButtonLink href={SLEEP_SUPPLIES_PATH} variant="primary">
+          {copy.shopSupplies}
         </ArchiveButtonLink>
       </div>
       {notices.length > 0 ? (

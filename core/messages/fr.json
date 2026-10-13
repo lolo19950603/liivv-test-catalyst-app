@@ -3978,12 +3978,10 @@
   },
   "CareNotices": {
     "device": {
-      "title": "Ordonnance requise",
-      "body": "Cet appareil ne peut pas être acheté en ligne. Envoyez votre ordonnance depuis votre compte Liivv et un pharmacien communiquera avec vous.",
-      "howToSend": "Sur la page Pharmacie de votre compte, choisissez Ajouter une ordonnance, puis transférez-la de votre fournisseur actuel ou demandez à votre prescripteur de la télécopier.",
-      "sendPrescription": "Envoyer votre ordonnance",
-      "bookCall": "Des questions ? Réservez un appel",
-      "noticesLabel": "Avant de choisir un appareil",
+      "title": "Pas encore vendu par Liivv",
+      "body": "Liivv ne vend pas encore d’appareils CPAP ni d’autres appareils pour l’apnée du sommeil. Nous vendons des masques, des coussins, des tubulures, des filtres et d’autres fournitures.",
+      "shopSupplies": "Magasiner les masques et fournitures",
+      "noticesLabel": "À propos de ces appareils",
       "sourcesLabel": "{count, plural, one {Source :} other {Sources :}}"
     },
     "notices": {
@@ -4001,14 +3999,14 @@
       "crto": "College of Respiratory Therapists of Ontario : What you need to know about community respiratory therapy (en anglais)"
     },
     "refusals": {
-      "prescriptionDevice": "Les appareils sur ordonnance ne peuvent pas être achetés en ligne. Envoyez votre ordonnance depuis votre compte Liivv et un pharmacien communiquera avec vous.",
+      "prescriptionDevice": "Liivv ne vend pas encore d’appareils CPAP ni d’autres appareils pour l’apnée du sommeil.",
       "pharmacist": "Un pharmacien vérifie chaque commande d’insuline et de glucagon : ce produit ne peut donc pas être ajouté de cette façon. Ajoutez-le à votre panier depuis sa page produit."
     },
     "checkout": {
-      "deviceBlocked": "Les appareils sur ordonnance ne peuvent pas être achetés en ligne. Retirez-le pour continuer. Pour en obtenir un, envoyez votre ordonnance depuis votre compte Liivv et un pharmacien communiquera avec vous."
+      "deviceBlocked": "Liivv ne vend pas encore d’appareils CPAP ni d’autres appareils pour l’apnée du sommeil. Retirez-le pour continuer."
     },
     "reorder": {
-      "held": "Impossible de commander de nouveau : {names}. Les appareils sur ordonnance ne peuvent pas être achetés en ligne. Ouvrez la page de chaque produit pour envoyer votre ordonnance.",
+      "held": "Impossible de commander de nouveau : {names}. Liivv ne vend pas encore d’appareils CPAP ni d’autres appareils pour l’apnée du sommeil.",
       "added": "{added, plural, =1 {1 article a été ajouté} other {# articles ont été ajoutés}} à votre panier."
     }
   },

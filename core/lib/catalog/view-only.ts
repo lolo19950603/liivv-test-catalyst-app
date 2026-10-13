@@ -283,7 +283,7 @@ export async function pharmacistProductIds(entityIds: readonly number[]): Promis
  * glucagon (owner note 9, 2026-10-07: a pharmacist reviews every order, and
  * the notice that says so is under the product page's buy box) and
  * prescription devices (owner approval, 2026-10-12: the product page says
- * "Prescription required"). Every listing that offers a one-click add — a
+ * "Not sold by Liivv yet"). Every listing that offers a one-click add — a
  * category grid, search, a brand page, compare — passes its cards through
  * this, and a view-only card links its product page instead ("View product",
  * `DiabetesCare.ui.commerce.viewProduct`). Other cards come back unchanged. A

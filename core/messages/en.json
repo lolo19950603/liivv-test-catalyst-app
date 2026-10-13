@@ -3984,12 +3984,10 @@
   },
   "CareNotices": {
     "device": {
-      "title": "Prescription required",
-      "body": "This machine can’t be bought online. Send your prescription through your Liivv account and a pharmacist will contact you.",
-      "howToSend": "On your account’s Pharmacy page, choose Add prescription, then transfer it from your current provider or ask your prescriber to fax it.",
-      "sendPrescription": "Send your prescription",
-      "bookCall": "Questions? Book a call",
-      "noticesLabel": "Before you choose a machine",
+      "title": "Not sold by Liivv yet",
+      "body": "Liivv doesn’t sell CPAP or other sleep apnea machines yet. We sell masks, cushions, tubing, filters and other supplies.",
+      "shopSupplies": "Shop masks and supplies",
+      "noticesLabel": "About these machines",
       "sourcesLabel": "{count, plural, one {Source:} other {Sources:}}"
     },
     "notices": {
@@ -4007,14 +4005,14 @@
       "crto": "College of Respiratory Therapists of Ontario: What you need to know about community respiratory therapy"
     },
     "refusals": {
-      "prescriptionDevice": "Prescription machines can’t be bought online. Send your prescription through your Liivv account and a pharmacist will contact you.",
+      "prescriptionDevice": "Liivv doesn’t sell CPAP or other sleep apnea machines yet.",
       "pharmacist": "A pharmacist reviews every insulin and glucagon order, so it can’t be added this way. Add it to your cart from its product page."
     },
     "checkout": {
-      "deviceBlocked": "Prescription machines can’t be bought online. Remove it to continue. To get one, send your prescription through your Liivv account and a pharmacist will contact you."
+      "deviceBlocked": "Liivv doesn’t sell CPAP or other sleep apnea machines yet. Remove it to continue."
     },
     "reorder": {
-      "held": "{names} can’t be reordered: prescription machines can’t be bought online. Open each product’s page to send your prescription.",
+      "held": "{names} can’t be reordered: Liivv doesn’t sell CPAP or other sleep apnea machines yet.",
       "added": "{added, plural, =1 {1 item was} other {# items were}} added to your cart."
     }
   },

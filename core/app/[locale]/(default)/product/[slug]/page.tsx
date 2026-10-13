@@ -995,7 +995,7 @@ export default async function Product({ params, searchParams }: Props) {
    *
    * Prescription devices (a CPAP, APAP, bilevel or ASV machine, or a bundle
    * holding one; owner approval, 2026-10-12): never bought online. The buy
-   * box is replaced by "Prescription required" (PrescriptionDeviceSlot), with
+   * box is replaced by "Not sold by Liivv yet" (PrescriptionDeviceSlot), with
    * the device's notices and their sources (CareNotices, read on the server
    * and stripped from the browser's bundle).
    *
