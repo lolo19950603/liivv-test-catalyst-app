@@ -2,6 +2,7 @@ import 'server-only';
 
 import { getTranslations } from 'next-intl/server';
 
+import type { RxMaskKind } from './cpap-masks';
 import type { PapDeviceKind } from './prescription-devices';
 
 /*
@@ -10,8 +11,9 @@ import type { PapDeviceKind } from './prescription-devices';
  * =============================================================================
  * The short notices under a product page's buy box (or in place of it) for
  * products that need a professional: insulin and glucagon (a pharmacist
- * reviews and dispenses every order) and prescription devices (CPAP, APAP,
- * bilevel and ASV machines; ./prescription-devices.ts).
+ * reviews and dispenses every order), prescription devices (CPAP, APAP,
+ * bilevel and ASV machines; ./prescription-devices.ts) and complete CPAP
+ * masks (a Liivv pharmacist validates the CPAP prescription; ./cpap-masks.ts).
  *
  * Read here, on the server, and handed down as text: neither CareNotices nor
  * DiabetesCare is in the browser's message bundle (CareNotices is stripped in
@@ -159,4 +161,47 @@ export async function pharmacistNotices({
   }
 
   return notices;
+}
+
+/*
+ * The notice under a complete CPAP mask's buy box (owner ruling C26 (b),
+ * 2026-10-13; ./cpap-masks.ts): the mask needs a CPAP prescription and a
+ * Liivv pharmacist checks it before the order ships; parts for a mask the
+ * customer already has don't; and, on a child's mask, the pharmacist checks
+ * the child's prescription. The first line carries its source on the notice
+ * (MyHealth.Alberta.ca: get a prescription "for your CPAP therapy equipment").
+ * The others are how Liivv works, so they carry none. No settings words.
+ */
+export async function rxMaskNotices(kind: RxMaskKind): Promise<CareNotice[]> {
+  const t = await getTranslations('CareNotices');
+  const notices: CareNotice[] = [
+    {
+      id: 'rxMaskNotice',
+      text: t('rxMask.notice'),
+      sources: [{ id: 'alberta', label: t('sources.alberta'), href: CARE_NOTICE_SOURCES.alberta }],
+    },
+    { id: 'rxMaskParts', text: t('rxMask.partsLine'), sources: [] },
+  ];
+
+  if (kind === 'paediatric') {
+    notices.push({ id: 'rxMaskChild', text: t('rxMask.childLine'), sources: [] });
+  }
+
+  return notices;
+}
+
+/*
+ * The words around the complete-mask notice: its label, sources and the
+ * Pharmacy page link. On a child's mask, the line says to add the child's
+ * CPAP prescription (wording for the nurse to confirm, C17).
+ */
+export async function rxMaskNoticeCopy(kind: RxMaskKind = 'adult') {
+  const t = await getTranslations('CareNotices');
+
+  return {
+    label: t('rxMask.label'),
+    howTo: kind === 'paediatric' ? t('rxMask.howToChild') : t('rxMask.howTo'),
+    pharmacyLink: t('rxMask.pharmacyLink'),
+    sourcesLabel: (count: number) => t('device.sourcesLabel', { count }),
+  };
 }

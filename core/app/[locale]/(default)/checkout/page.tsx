@@ -50,8 +50,15 @@ import {
 } from '~/lib/checkout/section-shipping-storage';
 import { isCheckoutSubscriptionMetadataReady } from '~/lib/checkout/subscription-metadata-readiness';
 import { shipsInsulinToQuebec } from '~/lib/checkout/quebec-insulin';
-import { prescriptionDeviceIds } from '~/lib/catalog/view-only';
+import { rxMasksOfLines } from '~/lib/catalog/cpap-masks';
+import { viewOnlyProducts } from '~/lib/catalog/view-only';
+import type { ViewOnlyReason } from '~/lib/catalog/view-only-rules';
+import { assertRxMasksMayBePaid, RxMaskPrescriptionError } from '~/lib/checkout/checkout-gates';
+import type { RxMaskRefusalReason } from '~/lib/checkout/rx-mask-prescription-error';
+import { cpapToday } from '~/lib/pharmacy/cpap-prescription';
+import { listCpapPrescriptionsForCheckout } from '~/lib/supabase/cpap-prescriptions';
 
+import { RxMaskCheckoutNotice } from './_components/rx-mask-checkout-notice';
 import { initializePayment, prepareOrderConfirmation } from './_actions/initialize-payment';
 import {
   ensureCheckoutShippingAddress,
@@ -501,16 +508,121 @@ export default async function CheckoutPage({ params }: Props) {
    * buildCheckoutSnapshot() refuses it (PrescriptionDeviceError). Fails
    * closed: if the catalogue can't be asked, the cart is held.
    */
+  const viewOnlyLookup = await viewOnlyProducts(
+    snapshotLines.map((line) => line.productEntityId),
+    { throwOnLookupFailure: true },
+  ).then(
+    (facts) => ({ facts, failed: false }),
+    () => ({ facts: new Map<number, ViewOnlyReason>(), failed: true }),
+  );
+  const viewOnlyLines = viewOnlyLookup.facts;
   const hasPrescriptionDevice =
-    (await prescriptionDeviceIds(snapshotLines.map((line) => line.productEntityId))).size > 0;
+    viewOnlyLookup.failed || [...viewOnlyLines.values()].some((reason) => reason.device);
+
+  /*
+   * A complete CPAP mask (owner ruling C26 (b), 2026-10-13, phase 1) can't be
+   * paid for until the customer's account holds a CPAP prescription a Liivv
+   * pharmacist approved, with an expiry of today or later, and is never on
+   * Subscribe & save. Same treatment: the message under a pay button that
+   * stays off, with a link to the Pharmacy page where the prescription is
+   * sent, and buildCheckoutSnapshot() refuses it (RxMaskPrescriptionError).
+   * With one on file, the page says until when, and that a pharmacist checks
+   * the order. Fails closed: a prescription that can't be read holds the cart.
+   * If the catalogue itself can't be read, the cart is already held by the
+   * device message above, as before, and no mask message is shown: the page
+   * can't tell which lines are masks.
+   */
+  type RxMaskCheckoutState =
+    | { kind: 'none' }
+    | { kind: 'on-file'; validUntil: string }
+    | { kind: 'blocked'; reason: RxMaskRefusalReason };
+
+  const checkRxMasks = (): Promise<RxMaskCheckoutState> =>
+    assertRxMasksMayBePaid(
+      {
+        stateOrProvince: shippingConsignment?.address.stateOrProvince,
+        postalCode: shippingConsignment?.address.postalCode,
+        productEntityIds: snapshotLines.map((line) => line.productEntityId),
+        subscriptionProductEntityIds: snapshotLines
+          .filter((line) => line.isSubscription)
+          .map((line) => line.productEntityId),
+        today: cpapToday(),
+      },
+      {
+        rxMaskProducts: (ids) =>
+          Promise.resolve(
+            rxMasksOfLines(
+              snapshotLines.filter((line) => ids.includes(line.productEntityId)),
+              new Map(
+                ids.flatMap((id) => {
+                  const kind = viewOnlyLines.get(id)?.rxMask;
+
+                  return kind ? [[id, kind] as const] : [];
+                }),
+              ),
+            ),
+          ),
+        cpapPrescriptions: () => listCpapPrescriptionsForCheckout(customer?.entityId ?? 0),
+      },
+    ).then(
+      (check) =>
+        check
+          ? { kind: 'on-file' as const, validUntil: check.validUntil }
+          : { kind: 'none' as const },
+      (error: unknown) => ({
+        kind: 'blocked' as const,
+        reason: error instanceof RxMaskPrescriptionError ? error.reason : ('unavailable' as const),
+      }),
+    );
+  const rxMaskCheckout: RxMaskCheckoutState = viewOnlyLookup.failed
+    ? { kind: 'none' }
+    : await checkRxMasks();
+
   // Read on the server: DiabetesCare and CareNotices are not in the browser's message bundle.
   const commerceT = await getTranslations('DiabetesCare.ui');
   const careT = await getTranslations('CareNotices.checkout');
+  const rxMaskBlockedKeys = {
+    'no-prescription': 'rxMaskBlocked',
+    subscription: 'rxMaskSubscription',
+    unavailable: 'rxMaskUnavailable',
+  } as const;
+  const rxMaskBlockedMessage =
+    rxMaskCheckout.kind === 'blocked' ? careT(rxMaskBlockedKeys[rxMaskCheckout.reason]) : undefined;
+  let rxMaskNotice = null;
+
+  if (rxMaskCheckout.kind === 'blocked' && rxMaskBlockedMessage) {
+    rxMaskNotice = (
+      <RxMaskCheckoutNotice
+        link={
+          rxMaskCheckout.reason === 'no-prescription'
+            ? { href: '/account/pharmacy', label: careT('rxMaskPharmacyLink') }
+            : undefined
+        }
+        message={rxMaskBlockedMessage}
+        tone="blocked"
+      />
+    );
+  } else if (rxMaskCheckout.kind === 'on-file') {
+    rxMaskNotice = (
+      <RxMaskCheckoutNotice
+        message={careT('rxMaskOnFile', {
+          date: format.dateTime(new Date(`${rxMaskCheckout.validUntil}T12:00:00Z`), {
+            dateStyle: 'long',
+            timeZone: 'UTC',
+          }),
+        })}
+        tone="info"
+      />
+    );
+  }
+
   const orderBlockedMessages = [
     hasPrescriptionDevice ? careT('deviceBlocked') : undefined,
     insulinToQuebec
       ? commerceT('commerce.quebecInsulinCheckout', { phone: commerceT('contact.phone') })
       : undefined,
+    // The full mask message is in the notice above; under the pay button, a pointer to it.
+    rxMaskBlockedMessage ? careT('rxMaskPayPointer') : undefined,
   ].filter((message) => message !== undefined);
   const orderBlockedMessage =
     orderBlockedMessages.length > 0 ? orderBlockedMessages.join(' ') : undefined;
@@ -555,6 +667,7 @@ export default async function CheckoutPage({ params }: Props) {
       }}
       fulfillmentSection={
         <>
+          {rxMaskNotice}
           <CheckoutSectionShippingQuoter
             needsQuote={needsSectionShippingQuote}
             quoteKey={shippingQuoteKey}

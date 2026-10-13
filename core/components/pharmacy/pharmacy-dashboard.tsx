@@ -18,8 +18,10 @@ import {
 } from '~/app/[locale]/(default)/account/(portal)/pharmacy/_actions/pharmacy-actions';
 import { AddPrescriptionDialog } from '~/components/pharmacy/add-prescription-dialog';
 import { CarePackIntro } from '~/components/pharmacy/carepack-intro';
+import { CpapPrescriptionCard } from '~/components/pharmacy/cpap-prescription-card';
 import { OnboardingSectionHeader } from '~/components/onboarding/onboarding-section-header';
 import { carePackRegionFromProvince } from '~/lib/pharmacy/carepack-region';
+import type { CpapPrescriptionState } from '~/lib/pharmacy/cpap-prescription';
 import { isTabletDosageForm } from '~/lib/pharmacy/pharmacy-mappers';
 import type {
   PharmacyCarePackRequest,
@@ -132,6 +134,7 @@ function EmptyState({
 
 export function PharmacyDashboard({
   displayName,
+  cpapPrescription,
   prescriptions,
   supabaseReady,
   userProvince,
@@ -139,6 +142,8 @@ export function PharmacyDashboard({
   carepackRequests,
 }: {
   displayName: string;
+  /* The CPAP prescription card's state; CPAP rows are never in `prescriptions`. */
+  cpapPrescription: CpapPrescriptionState;
   prescriptions: PharmacyPrescription[];
   supabaseReady: boolean;
   userProvince: string | null;
@@ -357,6 +362,13 @@ export function PharmacyDashboard({
           <p className="mt-1 text-2xl font-semibold text-[#2c2a26]">{refillCounts.processing}</p>
         </div>
       </div>
+
+      <CpapPrescriptionCard
+        state={cpapPrescription}
+        supabaseReady={supabaseReady}
+        userFullName={displayName}
+        userProvince={userProvince}
+      />
 
       <div className="flex flex-wrap gap-1 rounded-xl border border-[#ddd4c8] bg-[#f7f4ef] p-1 text-sm">
         <SectionTab

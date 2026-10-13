@@ -1,13 +1,28 @@
 export type StaffWorklistBucket = 'needs_review' | 'in_progress' | 'closed';
 
 const IN_PROGRESS_STATUSES = new Set(['refill_processing', 'setup_in_progress']);
-const CLOSED_STATUSES = new Set(['approved', 'active', 'completed', 'rejected', 'expired']);
+const CLOSED_STATUSES = new Set([
+  'approved',
+  'active',
+  'completed',
+  'rejected',
+  'expired',
+  'signed_off',
+]);
 
-/** Groups existing statuses into the worklist filters. Unknown values stay in needs review. */
-export function staffWorklistBucket(value: string | null | undefined): StaffWorklistBucket {
+/*
+ * Groups existing statuses into the worklist filters. Unknown values stay in
+ * needs review. In the Mask orders queue (`queue` 'mask_order'), "needs info"
+ * is in progress: the pharmacist is waiting on the customer. Elsewhere it
+ * still counts as needs review, as it always has.
+ */
+export function staffWorklistBucket(
+  value: string | null | undefined,
+  queue?: string,
+): StaffWorklistBucket {
   const key = String(value ?? '').trim().toLowerCase();
 
-  if (IN_PROGRESS_STATUSES.has(key)) {
+  if (IN_PROGRESS_STATUSES.has(key) || (queue === 'mask_order' && key === 'needs_info')) {
     return 'in_progress';
   }
 
@@ -29,6 +44,8 @@ const STATUS_LABELS: Record<string, string> = {
   completed: 'Completed',
   setup_in_progress: 'Setup in progress',
   needs_info: 'Needs info',
+  awaiting_signoff: 'Awaiting sign-off',
+  signed_off: 'Signed off',
 };
 
 export function formatStaffStatusLabel(value: string | null | undefined): string {
@@ -55,7 +72,7 @@ export function formatStaffStatusLabel(value: string | null | undefined): string
 export function staffStatusBadgeClass(value: string | null | undefined): string {
   const key = String(value ?? '').trim().toLowerCase();
 
-  if (key === 'approved' || key === 'active' || key === 'completed') {
+  if (key === 'approved' || key === 'active' || key === 'completed' || key === 'signed_off') {
     return 'rounded-full bg-[#b7e0b8] px-3 py-1 text-sm font-semibold text-[#145218]';
   }
 

@@ -12,6 +12,8 @@ import { toBigCommerceOrderAddress } from './order-address';
 import { bigCommerceAdminFetch } from './rest';
 import { parseSubscriptionShippingAddressFromMetadata } from '../checkout/subscription-shipping-metadata';
 import type { CheckoutAddressSnapshot } from '../checkout/types';
+import { recordRxMaskOrderForCustomer, rxMasksInOrderLines } from '../checkout/rx-order-recording';
+import { rxCheckStaffNoteLines, rxMaskOrderRegion } from '../pharmacy/cpap-prescription';
 
 interface BigCommerceAddress {
   first_name: string;
@@ -143,11 +145,29 @@ function formatStaffNotes(input: CreateSubscriptionOrderInput): string {
   return lines.join('\n');
 }
 
+/*
+ * A renewal holding a complete CPAP mask (owner ruling C26 (b), 2026-10-13):
+ * Subscribe & save was offered on complete masks before the ruling, and those
+ * subscriptions still renew with no checkout gate before them. So the order
+ * gets the same neutral staff note as a checkout order ("RX-CHECK: pharmacist
+ * sign-off required before shipping", and "ALWAYS HOLD: QC/territory" when it
+ * applies), and it is recorded in the Mask orders queue with the CPAP
+ * prescription valid that day, or none (~/lib/checkout/rx-order-recording.ts).
+ * Resuming or reactivating one is refused (~/lib/stripe/subscriptions.ts).
+ */
+function withRxCheckNotes(notes: string, rxMaskCount: number, alwaysHold: boolean): string {
+  return rxMaskCount > 0 ? [...rxCheckStaffNoteLines(alwaysHold), '', notes].join('\n') : notes;
+}
+
 export async function createBigCommerceSubscriptionOrder(
   input: CreateSubscriptionOrderInput,
 ): Promise<number> {
   const billingAddress = await getCustomerBillingAddress(input.customerId);
   const quantity = input.quantity ?? 1;
+  const rxMasks = await rxMasksInOrderLines([
+    { productEntityId: input.productEntityId, name: input.productName },
+  ]);
+  const rxRegion = rxMaskOrderRegion(billingAddress.state, billingAddress.zip);
   const exTaxTotal = input.unitAmountExTax / 100;
   const incTaxTotal = input.unitAmountIncTax / 100;
   const { priceExTax, priceIncTax } = buildLinePricesFromTotals(quantity, exTaxTotal, incTaxTotal);
@@ -181,7 +201,7 @@ export async function createBigCommerceSubscriptionOrder(
       channel_id: getChannelId(),
       payment_method: 'Stripe',
       payment_provider_id: input.stripeSubscriptionId,
-      staff_notes: formatStaffNotes(input),
+      staff_notes: withRxCheckNotes(formatStaffNotes(input), rxMasks.size, rxRegion.alwaysHold),
       customer_message: 'Subscription order',
       subtotal_ex_tax: formatOrderAmountString(exTaxTotal),
       subtotal_inc_tax: formatOrderAmountString(incTaxTotal),
@@ -196,6 +216,15 @@ export async function createBigCommerceSubscriptionOrder(
   if (!order?.id) {
     throw new Error('BigCommerce order creation did not return an order id');
   }
+
+  await recordRxMaskOrderForCustomer({
+    bigcommerceCustomerId: input.customerId,
+    bigcommerceOrderId: order.id,
+    masks: rxMasks,
+    lines: [{ productId: input.productEntityId ?? 0, name: input.productName, quantity }],
+    region: rxRegion.region,
+    source: `subscription ${input.stripeReferenceId}`,
+  });
 
   return order.id;
 }
@@ -276,6 +305,10 @@ export async function createBigCommerceBatchedSubscriptionOrder(
 
   const exTaxTotal = input.lines.reduce((sum, line) => sum + line.unitAmountExTax, 0) / 100;
   const incTaxTotal = input.lines.reduce((sum, line) => sum + line.unitAmountIncTax, 0) / 100;
+  const rxMasks = await rxMasksInOrderLines(
+    input.lines.map((line) => ({ productEntityId: line.productEntityId, name: line.productName })),
+  );
+  const rxRegion = rxMaskOrderRegion(shippingAddress.state, shippingAddress.zip);
 
   const products = input.lines.map((line) => {
     const quantity = line.quantity;
@@ -316,7 +349,11 @@ export async function createBigCommerceBatchedSubscriptionOrder(
       channel_id: getChannelId(),
       payment_method: 'Stripe',
       payment_provider_id: paymentProviderId,
-      staff_notes: formatBatchedStaffNotes(input),
+      staff_notes: withRxCheckNotes(
+        formatBatchedStaffNotes(input),
+        rxMasks.size,
+        rxRegion.alwaysHold,
+      ),
       customer_message: 'Subscription order',
       subtotal_ex_tax: formatOrderAmountString(exTaxTotal),
       subtotal_inc_tax: formatOrderAmountString(incTaxTotal),
@@ -331,6 +368,21 @@ export async function createBigCommerceBatchedSubscriptionOrder(
   if (!order?.id) {
     throw new Error('BigCommerce order creation did not return an order id');
   }
+
+  await recordRxMaskOrderForCustomer({
+    bigcommerceCustomerId: input.customerId,
+    bigcommerceOrderId: order.id,
+    masks: rxMasks,
+    lines: input.lines
+      .filter((line) => rxMasks.has(line.productEntityId ?? 0))
+      .map((line) => ({
+        productId: line.productEntityId ?? 0,
+        name: line.productName,
+        quantity: line.quantity,
+      })),
+    region: rxRegion.region,
+    source: `subscription shipment ${input.batchStorageKey}`,
+  });
 
   return order.id;
 }

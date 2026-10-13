@@ -159,3 +159,42 @@ Fax: ${pharmacyInfo.fax}
 Thank you,
 ${fullName}`;
 }
+
+/*
+ * The request a customer copies and sends to their prescriber's office to
+ * have their CPAP prescription faxed to Liivv (owner ruling C26 (b),
+ * 2026-10-13: a Liivv pharmacist validates it before a complete CPAP mask can
+ * be bought). Same province-to-pharmacy fax map as generateFaxRequestEmail
+ * (Quebec and the territories fall back to Ontario). The pharmacy is named as
+ * Liivv Pharmacy, the customer-facing name (owner question Q15 in the C26
+ * design: whether the licensed pharmacy's own name must appear here). It asks
+ * for the CPAP prescription only, not "all my prescriptions", and names no
+ * settings. The patient's name and date of birth are left for the customer to
+ * fill in, so the prescriber's office can find the right chart when the mask
+ * is for a child (wording for the nurse to confirm, C17).
+ */
+export function generateCpapFaxRequestEmail(params: {
+  provinceLabel: string;
+  fullName: string;
+}): string {
+  const province = resolveProvinceLabel(params.provinceLabel);
+  const pharmacyInfo = provincePharmacyInfo[province] ?? DEFAULT_PHARMACY;
+  const fullName = params.fullName.trim() || 'Your Name';
+
+  return `Hello,
+
+Could you please fax a copy of the CPAP prescription for the patient below to my pharmacy? A Liivv pharmacist needs to check it before I can order a CPAP mask.
+
+Patient's name:
+Patient's date of birth:
+
+Liivv Pharmacy
+${pharmacyInfo.address},
+${pharmacyInfo.city}, ${pharmacyInfo.province}, ${pharmacyInfo.postalCode}
+
+Phone: ${pharmacyInfo.phone}
+Fax: ${pharmacyInfo.fax}
+
+Thank you,
+${fullName}`;
+}

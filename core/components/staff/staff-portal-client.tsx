@@ -10,6 +10,12 @@ import {
   type StaffActionState,
 } from '~/app/pharmacy-admin/_actions/staff-portal-actions';
 import type { PharmacyQueue, StaffPortalData, StaffTab } from '~/app/pharmacy-admin/page-data';
+import {
+  AlwaysHoldBadge,
+  ChildBadge,
+  CpapBadge,
+  MaskOrderReview,
+} from '~/components/staff/cpap-review';
 import { StaffCustomerDetail } from '~/components/staff/staff-customer-detail';
 import {
   formatStaffStatusLabel,
@@ -27,14 +33,23 @@ import {
   useChatPollRefresh,
 } from '~/components/virtual-care/use-chat-poll-refresh';
 import { isStaffJoinedToChat } from '~/lib/chat/session';
+import { isCpapPrescriptionRow } from '~/lib/pharmacy/pharmacy-mappers';
 import type { AdminConversationSummary } from '~/lib/supabase/chat-messages';
 import type {
   AdminCarePackQueueRow,
   AdminPrescriptionQueueRow,
   AdminRefillQueueRow,
 } from '~/lib/supabase/prescriptions';
+import type { AdminRxOrderCheckQueueRow } from '~/lib/supabase/rx-order-checks';
 
-type QueueRow = AdminPrescriptionQueueRow | AdminRefillQueueRow | AdminCarePackQueueRow;
+type QueueRow =
+  | AdminPrescriptionQueueRow
+  | AdminRefillQueueRow
+  | AdminCarePackQueueRow
+  | AdminRxOrderCheckQueueRow;
+
+/* Quebec and the territories: complete-mask orders there are always held (owner ruling C26). */
+const ALWAYS_HOLD_REGIONS = new Set(['QC', 'YT', 'NT', 'NU']);
 type BucketFilter = StaffWorklistBucket | 'all';
 
 const BUCKET_FILTERS: Array<{ id: BucketFilter; label: string }> = [
@@ -84,6 +99,14 @@ function rowStatus(row: QueueRow, queue: PharmacyQueue): string {
 }
 
 function rowItemLabel(row: QueueRow): string {
+  if ('bigcommerce_order_id' in row) {
+    const names = row.lines.map((line) =>
+      line.quantity > 1 ? `${line.quantity} × ${line.name}` : line.name,
+    );
+
+    return names.length > 0 ? names.join(', ') : row.product_ids.map((id) => `Product ${id}`).join(', ');
+  }
+
   if ('medication_name' in row && row.medication_name) {
     return row.medication_name;
   }
@@ -167,8 +190,8 @@ function compareQueueRows(queue: PharmacyQueue, a: QueueRow, b: QueueRow): numbe
     in_progress: 1,
     closed: 2,
   };
-  const bucketA = staffWorklistBucket(rowStatus(a, queue));
-  const bucketB = staffWorklistBucket(rowStatus(b, queue));
+  const bucketA = staffWorklistBucket(rowStatus(a, queue), queue);
+  const bucketB = staffWorklistBucket(rowStatus(b, queue), queue);
 
   if (rank[bucketA] !== rank[bucketB]) {
     return rank[bucketA] - rank[bucketB];
@@ -247,7 +270,10 @@ export function StaffPortalClient({
           (row) => staffWorklistBucket(rowStatus(row, 'prescription')) === 'needs_review',
         ).length +
         data.refillQueue.filter((row) => staffWorklistBucket(row.status) === 'needs_review').length +
-        data.carePackQueue.filter((row) => staffWorklistBucket(row.status) === 'needs_review').length
+        data.carePackQueue.filter((row) => staffWorklistBucket(row.status) === 'needs_review').length +
+        data.maskOrderQueue.filter(
+          (row) => staffWorklistBucket(row.status, 'mask_order') === 'needs_review',
+        ).length
       : null;
   const customerCount =
     tab === 'customers' && data.customerQuery.trim().length >= 2 ? data.customerSearchRows.length : null;
@@ -390,18 +416,30 @@ function PharmacyTab({
   const queue = data.pharmacyQueue;
   const [bucket, setBucket] = useState<BucketFilter>('all');
   const [query, setQuery] = useState('');
-  const queueRows =
-    queue === 'refill'
-      ? data.refillQueue
-      : queue === 'carepack'
-        ? data.carePackQueue
-        : data.prescriptionQueue;
+  const queueRowsByQueue: Record<PharmacyQueue, QueueRow[]> = {
+    prescription: data.prescriptionQueue,
+    refill: data.refillQueue,
+    carepack: data.carePackQueue,
+    mask_order: data.maskOrderQueue,
+  };
+  const queueRows = queueRowsByQueue[queue];
+  const isMaskOrders = queue === 'mask_order';
+  const selectedMaskOrder =
+    isMaskOrders && data.selectedRequestType === 'mask_order'
+      ? (data.maskOrderQueue.find((row) => row.id === data.selectedRequestId) ?? null)
+      : null;
+  const focusRequest =
+    data.selectedRequestId &&
+    data.selectedRequestType &&
+    data.selectedRequestType !== 'mask_order'
+      ? { kind: data.selectedRequestType, id: data.selectedRequestId }
+      : null;
 
   const counts = useMemo(() => {
     const next = { all: queueRows.length, needs_review: 0, in_progress: 0, closed: 0 };
 
     for (const row of queueRows) {
-      next[staffWorklistBucket(rowStatus(row, queue))] += 1;
+      next[staffWorklistBucket(rowStatus(row, queue), queue)] += 1;
     }
 
     return next;
@@ -412,7 +450,7 @@ function PharmacyTab({
 
     return [...queueRows]
       .filter((row) => {
-        if (bucket !== 'all' && staffWorklistBucket(rowStatus(row, queue)) !== bucket) {
+        if (bucket !== 'all' && staffWorklistBucket(rowStatus(row, queue), queue) !== bucket) {
           return false;
         }
 
@@ -427,8 +465,14 @@ function PharmacyTab({
           '',
         ).toLowerCase();
         const email = (row.customer?.email ?? '').toLowerCase();
+        const orderId = 'bigcommerce_order_id' in row ? String(row.bigcommerce_order_id) : '';
 
-        return name.includes(needle) || email.includes(needle) || rowItemLabel(row).toLowerCase().includes(needle);
+        return (
+          name.includes(needle) ||
+          email.includes(needle) ||
+          rowItemLabel(row).toLowerCase().includes(needle) ||
+          orderId.includes(needle)
+        );
       })
       .sort((a, b) => compareQueueRows(queue, a, b));
   }, [bucket, query, queue, queueRows]);
@@ -442,6 +486,7 @@ function PharmacyTab({
               ['prescription', 'Prescriptions', data.prescriptionQueue.length, 'bg-[#234028]'],
               ['refill', 'Refills', data.refillQueue.length, 'bg-[#1f5f8b]'],
               ['carepack', 'CarePack', data.carePackQueue.length, 'bg-[#c46b2f]'],
+              ['mask_order', 'Mask orders', data.maskOrderQueue.length, 'bg-[#7a1d18]'],
             ] as const
           ).map(([id, label, count, activeClass]) => (
             <Link
@@ -503,6 +548,9 @@ function PharmacyTab({
       {data.pharmacyQueueError ? (
         <p className="shrink-0 px-4 py-2 text-sm text-red-700">{data.pharmacyQueueError}</p>
       ) : null}
+      {isMaskOrders && data.maskOrderQueueError ? (
+        <p className="shrink-0 px-4 py-2 text-sm text-red-700">{data.maskOrderQueueError}</p>
+      ) : null}
 
       <div className="grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="min-h-0 overflow-auto">
@@ -515,7 +563,9 @@ function PharmacyTab({
               <thead className="sticky top-0 z-10 bg-[#234028] text-left text-sm uppercase tracking-wide text-[#d7efc8]">
                 <tr className="border-b border-[#e6e2dc]">
                   <th className="px-4 py-2 font-medium">Patient</th>
-                  <th className="px-3 py-2 font-medium">Medication</th>
+                  {isMaskOrders ? <th className="px-3 py-2 font-medium">Order</th> : null}
+                  <th className="px-3 py-2 font-medium">{isMaskOrders ? 'Products' : 'Medication'}</th>
+                  {isMaskOrders ? <th className="px-3 py-2 font-medium">Region</th> : null}
                   <th className="px-3 py-2 font-medium">Status</th>
                   <th className="px-3 py-2 font-medium">Age</th>
                 </tr>
@@ -559,14 +609,27 @@ function PharmacyTab({
                           </span>
                         ) : null}
                       </td>
+                      {'bigcommerce_order_id' in row ? (
+                        <td className="border-b border-[#f0eeea] px-3 py-2 align-top whitespace-nowrap tabular-nums">
+                          #{row.bigcommerce_order_id}
+                        </td>
+                      ) : null}
                       <td className="border-b border-[#f0eeea] px-3 py-2 align-top">
                         <span className="text-[#1c1b19]">{rowItemLabel(row)}</span>
-                        {queue !== 'prescription' ? (
+                        {'rx_kind' in row && isCpapPrescriptionRow(row) ? <CpapBadge /> : null}
+                        {'paediatric' in row && row.paediatric ? <ChildBadge /> : null}
+                        {queue !== 'prescription' && !isMaskOrders ? (
                           <span className="mt-0.5 block text-sm text-[#8a8176]">
                             #{row.id.slice(0, 8)}
                           </span>
                         ) : null}
                       </td>
+                      {'bigcommerce_order_id' in row ? (
+                        <td className="border-b border-[#f0eeea] px-3 py-2 align-top whitespace-nowrap">
+                          {row.region ?? '—'}
+                          {ALWAYS_HOLD_REGIONS.has(String(row.region ?? '')) ? <AlwaysHoldBadge /> : null}
+                        </td>
+                      ) : null}
                       <td className="border-b border-[#f0eeea] px-3 py-2 align-top whitespace-nowrap">
                         <span className={staffStatusBadgeClass(statusValue)}>
                           {formatStaffStatusLabel(statusValue)}
@@ -591,16 +654,17 @@ function PharmacyTab({
             {isPending ? <p className="text-sm text-[#8a8176]">Saving…</p> : null}
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
+            {selectedMaskOrder ? (
+              <div className="mb-4">
+                <MaskOrderReview formAction={formAction} row={selectedMaskOrder} />
+              </div>
+            ) : null}
             {data.pharmacyCustomerDetailError ? (
               <p className="text-sm text-red-700">{data.pharmacyCustomerDetailError}</p>
             ) : data.pharmacyCustomerDetail ? (
               <StaffCustomerDetail
                 detail={data.pharmacyCustomerDetail}
-                focusRequest={
-                  data.selectedRequestId && data.selectedRequestType
-                    ? { kind: data.selectedRequestType, id: data.selectedRequestId }
-                    : null
-                }
+                focusRequest={focusRequest}
                 formAction={formAction}
               />
             ) : (

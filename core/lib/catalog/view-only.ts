@@ -9,6 +9,7 @@ import { graphql } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
 import { isCuratedKitProduct } from '~/lib/kit/is-curated-kit';
 
+import type { RxMaskKind } from './cpap-masks';
 import {
   FAIL_CLOSED_REASON,
   type ViewOnlyCheckProduct,
@@ -22,17 +23,22 @@ import {
  * =============================================================================
  * One shared rule (./view-only-rules.ts) for every product that is never
  * added to a cart in one click from a listing, a kit or the assistant:
- * insulin and glucagon (a pharmacist reviews every order) and prescription
+ * insulin and glucagon (a pharmacist reviews every order), prescription
  * devices (CPAP, APAP, bilevel and ASV machines, never bought online;
- * ./prescription-devices.ts). A curated kit is what it holds.
+ * ./prescription-devices.ts) and complete CPAP masks (a Liivv pharmacist
+ * validates the CPAP prescription; ./cpap-masks.ts). A curated kit is what it
+ * holds.
  *
  * Every listing that offers a one-click add (category, brand, search,
  * compare, wishlist) passes its cards through `withViewOnlyProducts`; every
  * one-click add action outside the product page refuses `viewOnlyProductIds`;
- * a subscription, a reorder, the product page's own add, the checkout
- * snapshot and the checkout page refuse `prescriptionDeviceIds` only
- * (insulin and glucagon may be subscribed to and reordered: owner decision,
- * 2026-10-13; `repeatOrderRefusalFor`).
+ * a reorder, the product page's own add and the checkout refuse
+ * `prescriptionDeviceIds` (insulin, glucagon and complete masks may be
+ * reordered: owner decisions, 2026-10-13; `repeatOrderRefusalFor`); a
+ * subscription refuses devices and complete masks (`subscriptionRefusalFor`);
+ * the checkout snapshot and page also refuse a complete mask without an
+ * approved, in-date CPAP prescription (`rxMaskProducts`,
+ * ~/lib/checkout/checkout-gates.ts).
  *
  * All of it fails closed: if the catalogue cannot answer, every id counts.
  * ~/lib/checkout/quebec-insulin.ts re-exports the pharmacist names from here.
@@ -241,6 +247,23 @@ export async function prescriptionDeviceIds(
   return new Set([...found].flatMap(([id, reason]) => (reason.device ? [id] : [])));
 }
 
+/*
+ * Which of these products are, or hold, a complete CPAP mask, and whether it
+ * is a child's (./cpap-masks.ts). Products that are not are left out of the
+ * map. Fails closed (every id counts as a child's mask), or throws with
+ * `throwOnLookupFailure` (`viewOnlyProducts`).
+ */
+export async function rxMaskProducts(
+  entityIds: readonly number[],
+  options?: { throwOnLookupFailure?: boolean },
+): Promise<Map<number, RxMaskKind>> {
+  const found = await viewOnlyProducts(entityIds, options);
+
+  return new Map(
+    [...found].flatMap(([id, reason]) => (reason.rxMask ? [[id, reason.rxMask] as const] : [])),
+  );
+}
+
 export interface PharmacistContents {
   insulin: boolean;
   glucagon: boolean;
@@ -292,8 +315,10 @@ export async function pharmacistProductIds(entityIds: readonly number[]): Promis
  * add one either.
  *
  * A device card is also marked `subscribeUnavailable`, so it shows no
- * "Subscribe & save" link: its page offers no subscription. Insulin and
- * glucagon cards keep theirs (owner decision, 2026-10-13).
+ * "Subscribe & save" link: its page offers no subscription. So is a complete
+ * CPAP mask's (owner ruling C26, 2026-10-13), whose card says "View product"
+ * (`CareNotices.rxMask.listingLabel`). Insulin and glucagon cards keep
+ * their Subscribe link (owner decision, 2026-10-13).
  */
 export async function withViewOnlyProducts<T extends { id: string }>(
   cards: readonly T[],
@@ -310,6 +335,9 @@ export async function withViewOnlyProducts<T extends { id: string }>(
 
   const t = await getTranslations('DiabetesCare.ui.commerce');
   const viewOnlyLabel = t('viewProduct');
+  // Read on the server: CareNotices is not in the browser's message bundle.
+  const rxMaskT = await getTranslations('CareNotices.rxMask');
+  const rxMaskLabel = rxMaskT('listingLabel');
 
   return cards.map((card) => {
     const reason = viewOnly.get(Number(card.id));
@@ -318,8 +346,12 @@ export async function withViewOnlyProducts<T extends { id: string }>(
       return card;
     }
 
-    return reason.device
-      ? { ...card, viewOnlyLabel, subscribeUnavailable: true }
+    if (reason.device) {
+      return { ...card, viewOnlyLabel, subscribeUnavailable: true };
+    }
+
+    return reason.rxMask
+      ? { ...card, viewOnlyLabel: rxMaskLabel, subscribeUnavailable: true }
       : { ...card, viewOnlyLabel };
   });
 }
@@ -342,9 +374,26 @@ export async function withViewOnlyWishlistItems<T extends { product: { id: strin
  * on the server: CareNotices is not in the browser's message bundle.
  */
 export async function viewOnlyRefusalMessage(
-  refusal: 'prescription-device' | 'pharmacist',
+  refusal: 'prescription-device' | 'rx-mask' | 'pharmacist',
 ): Promise<string> {
   const t = await getTranslations('CareNotices.refusals');
 
-  return refusal === 'prescription-device' ? t('prescriptionDevice') : t('pharmacist');
+  if (refusal === 'prescription-device') {
+    return t('prescriptionDevice');
+  }
+
+  return refusal === 'rx-mask' ? t('rxMask') : t('pharmacist');
+}
+
+/*
+ * The message Subscribe & save shows when it refuses a product
+ * (`subscriptionRefusalFor`): a device, or a complete CPAP mask (a Liivv
+ * pharmacist checks every complete-mask order, so it is bought one time).
+ */
+export async function subscriptionRefusalMessage(
+  refusal: 'prescription-device' | 'rx-mask',
+): Promise<string> {
+  const t = await getTranslations('CareNotices.refusals');
+
+  return refusal === 'rx-mask' ? t('rxMaskSubscription') : t('prescriptionDevice');
 }

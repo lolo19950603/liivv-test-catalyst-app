@@ -1,6 +1,9 @@
 import type { ProductOptionSelection } from '~/lib/bigcommerce/product-options';
+import type { RxOrderCheckLine } from '~/lib/supabase/rx-order-checks';
 import type { KitRecord } from '~/lib/kit';
 import type { SubscriptionBillingInterval } from '~/lib/stripe/subscription-interval';
+
+import type { RxMaskOrderCheck } from './checkout-gates';
 
 export interface SubscriptionLineMeta {
   productEntityId: number;
@@ -108,4 +111,22 @@ export interface CheckoutSnapshot {
   billingAddress: CheckoutAddressSnapshot;
   shippingAddress?: CheckoutAddressSnapshot;
   shippingMethodDescription?: string;
+  /*
+   * Set when the order holds a complete CPAP mask (owner ruling C26 (b),
+   * 2026-10-13): the checkout found an approved, in-date CPAP prescription,
+   * and the paid order is recorded for a pharmacist's sign-off
+   * (~/lib/checkout/rx-order-recording.ts).
+   */
+  rxCheck?: CheckoutRxCheck;
 }
+
+/*
+ * What the snapshot keeps for the sign-off: the mask lines, whether one is a
+ * child's, and where the order ships. The snapshot is stored in KV, so the
+ * prescription and profile ids and the expiry stay out of it; the recording
+ * step reads them again from Supabase.
+ */
+export type CheckoutRxCheck = Pick<
+  RxMaskOrderCheck,
+  'productIds' | 'paediatric' | 'region' | 'alwaysHold'
+> & { lines: RxOrderCheckLine[] };

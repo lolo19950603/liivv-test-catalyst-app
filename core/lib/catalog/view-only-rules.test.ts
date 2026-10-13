@@ -18,6 +18,7 @@ import {
   FAIL_CLOSED_REASON,
   partitionViewOnly,
   repeatOrderRefusalFor,
+  subscriptionRefusalFor,
   type ViewOnlyCheckProduct,
   type ViewOnlyReason,
   viewOnlyReasonOf,
@@ -67,6 +68,16 @@ const TRURAPI: ViewOnlyCheckProduct = {
 };
 const BAQSIMI: ViewOnlyCheckProduct = { entityId: 4555, name: 'Baqsimi', categoryIds: [1132] };
 const STRIPS: ViewOnlyCheckProduct = { entityId: 4100, name: 'Test strips', categoryIds: [1070] };
+const MASK_PART: ViewOnlyCheckProduct = {
+  entityId: 4232,
+  name: 'Nasal Pillow for RespCare Aloha Nasal Pillow CPAP Mask - Large',
+  categoryIds: [1128],
+};
+const CHILD_MASK: ViewOnlyCheckProduct = {
+  entityId: 4543,
+  name: 'ResMed Pixi Pediatric Nasal CPAP Mask - Complete System',
+  categoryIds: [1136],
+};
 
 let warn: MockInstance<typeof console.warn>;
 
@@ -188,13 +199,14 @@ describe('view-only reasons', () => {
     ).toEqual({ insulin: false, glucagon: true, device: null });
   });
 
-  it('adds devices, and leaves masks and strips alone', () => {
+  it('adds devices, and leaves mask parts and strips alone', () => {
     expect(viewOnlyReasonOf(AIRSENSE_11)).toEqual({
       insulin: false,
       glucagon: false,
       device: 'cpap-apap',
     });
-    expect(viewOnlyReasonOf(MASK)).toBeNull();
+    // A complete mask is view-only since owner ruling C26 (2026-10-13); a part is not.
+    expect(viewOnlyReasonOf(MASK_PART)).toBeNull();
     expect(viewOnlyReasonOf(STRIPS)).toBeNull();
   });
 
@@ -323,6 +335,8 @@ describe('checkout gates', () => {
   const lookups = (deviceIds: number[], insulinToQuebec: boolean) => ({
     prescriptionDeviceIds: vi.fn(() => Promise.resolve(new Set(deviceIds))),
     shipsInsulinToQuebec: vi.fn(() => Promise.resolve(insulinToQuebec)),
+    rxMaskProducts: vi.fn(() => Promise.resolve(new Map<number, 'adult' | 'paediatric'>())),
+    cpapPrescriptions: vi.fn(() => Promise.resolve({ profileId: null, rows: [] })),
   });
 
   it('refuses a cart with a device line, anywhere in Canada', async () => {
@@ -369,10 +383,84 @@ describe('checkout gates', () => {
       assertCartMayBePaidOnline(
         { stateOrProvince: 'ON', productEntityIds: [4585] },
         {
+          ...lookups([], false),
           prescriptionDeviceIds: () => Promise.reject(new Error('catalogue down')),
           shipsInsulinToQuebec: () => Promise.resolve(false),
         },
       ),
     ).rejects.toThrow('catalogue down');
+  });
+});
+
+describe('complete CPAP masks (owner ruling C26, 2026-10-13)', () => {
+  it('makes a complete mask view-only, with its kind, and never a device', () => {
+    expect(viewOnlyReasonOf(MASK)).toEqual({
+      insulin: false,
+      glucagon: false,
+      device: null,
+      rxMask: 'adult',
+    });
+    expect(viewOnlyReasonOf(CHILD_MASK)?.rxMask).toBe('paediatric');
+    expect(viewOnlyReasonOf(BUNDLE_UNDER_MASKS)).toEqual({
+      insulin: false,
+      glucagon: false,
+      device: 'bundle',
+    });
+    expect(viewOnlyReasonOf(AIRMINI_HOSE)).toBeNull();
+  });
+
+  it('refuses one-click adds in the order: machine, then complete mask, then pharmacist', () => {
+    const viewOnly = new Map<number, ViewOnlyReason>([
+      [4641, { insulin: false, glucagon: false, device: 'cpap-apap' }],
+      [4585, { insulin: false, glucagon: false, device: null, rxMask: 'adult' }],
+      [9001, { insulin: true, glucagon: false, device: null }],
+      [8200, { insulin: true, glucagon: false, device: null, rxMask: 'adult' }],
+      [5555, FAIL_CLOSED_REASON],
+    ]);
+
+    expect(viewOnlyRefusalFor(4641, viewOnly)).toBe('prescription-device');
+    expect(viewOnlyRefusalFor(4585, viewOnly)).toBe('rx-mask');
+    expect(viewOnlyRefusalFor(8200, viewOnly)).toBe('rx-mask');
+    expect(viewOnlyRefusalFor(9001, viewOnly)).toBe('pharmacist');
+    expect(viewOnlyRefusalFor(5555, viewOnly)).toBe('prescription-device');
+    expect(viewOnlyRefusalFor(4232, viewOnly)).toBeNull();
+  });
+
+  it('refuses Subscribe & save for complete masks and devices, not insulin or parts', () => {
+    const viewOnly = viewOnlyMapOf([AIRSENSE_11, MASK, CHILD_MASK, INSULIN, BAQSIMI, MASK_PART]);
+
+    expect(subscriptionRefusalFor(MASK.entityId, viewOnly)).toBe('rx-mask');
+    expect(subscriptionRefusalFor(CHILD_MASK.entityId, viewOnly)).toBe('rx-mask');
+    expect(subscriptionRefusalFor(AIRSENSE_11.entityId, viewOnly)).toBe('prescription-device');
+    expect(subscriptionRefusalFor(INSULIN.entityId, viewOnly)).toBeNull();
+    expect(subscriptionRefusalFor(BAQSIMI.entityId, viewOnly)).toBeNull();
+    expect(subscriptionRefusalFor(MASK_PART.entityId, viewOnly)).toBeNull();
+    expect(subscriptionRefusalFor(5555, new Map([[5555, FAIL_CLOSED_REASON]]))).toBe(
+      'prescription-device',
+    );
+  });
+
+  it('lets a complete mask be reordered (the checkout re-checks), and still holds devices', () => {
+    const viewOnly = viewOnlyMapOf([AIRSENSE_11, MASK, CHILD_MASK]);
+
+    expect(repeatOrderRefusalFor(MASK.entityId, viewOnly)).toBeNull();
+    expect(repeatOrderRefusalFor(CHILD_MASK.entityId, viewOnly)).toBeNull();
+    expect(repeatOrderRefusalFor(AIRSENSE_11.entityId, viewOnly)).toBe('prescription-device');
+  });
+
+  it('counts a failed lookup as a child’s complete mask too', () => {
+    expect(FAIL_CLOSED_REASON.rxMask).toBe('paediatric');
+  });
+
+  it('holds a complete mask back from listings, kits and the assistant', () => {
+    const products = [MASK, MASK_PART, STRIPS];
+    const { allowed, held } = partitionViewOnly(
+      products,
+      (product) => product.entityId,
+      viewOnlyMapOf(products),
+    );
+
+    expect(allowed.map((product) => product.entityId)).toEqual([4232, 4100]);
+    expect(held.map((product) => product.entityId)).toEqual([4585]);
   });
 });

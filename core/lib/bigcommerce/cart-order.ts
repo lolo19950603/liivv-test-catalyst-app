@@ -17,6 +17,8 @@ import {
   buildSubscriptionShippingMetadata,
 } from '../checkout/subscription-shipping-metadata';
 import type { CheckoutAddressSnapshot, CheckoutSnapshot } from '../checkout/types';
+import { rxCheckOfCheckoutSnapshot } from '../checkout/rx-order-recording';
+import { rxCheckStaffNoteLines } from '../pharmacy/cpap-prescription';
 import { assignKitIdsToCartLines, formatKitPackingStaffNotes, getKitSession } from '../kit';
 import { isDeferredSubscriptionLine } from '../checkout/subscription-charge-timing';
 
@@ -89,7 +91,16 @@ export async function createBigCommerceOrderFromCheckoutSnapshot(
 
   const kitPackingNotes = formatKitPackingStaffNotes(kits);
 
+  // A complete CPAP mask: a Liivv pharmacist signs off every such order before
+  // it ships (owner ruling C26 (b), 2026-10-13), and Quebec and territory
+  // orders are always held. Neutral words only: no prescription, patient or
+  // child detail ever goes in a staff note. A snapshot built before the gate
+  // existed is judged by its lines (`rxCheckOfCheckoutSnapshot`).
+  const rxCheck = rxCheckOfCheckoutSnapshot(snapshot);
+  const rxCheckNotes = rxCheck ? [...rxCheckStaffNoteLines(rxCheck.alwaysHold), ''] : [];
+
   const staffNotes = [
+    ...rxCheckNotes,
     `Stripe payment: ${stripeReferenceId}`,
     `Checkout snapshot: ${snapshot.id}`,
     `Stripe charged: ${snapshot.amounts.immediateGrandTotal.toFixed(2)} ${snapshot.currency}`,

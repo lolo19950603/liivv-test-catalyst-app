@@ -3,6 +3,8 @@ import 'server-only';
 import type Stripe from 'stripe';
 
 import { parseVariantEntityIdFromMetadata, parseVariantLabelFromMetadata } from '~/lib/bigcommerce/product-options';
+import { isRxMaskId } from '~/lib/catalog/cpap-masks';
+import { subscriptionRefusalMessage, viewOnlyProducts } from '~/lib/catalog/view-only';
 import { buildSubscriptionShippingMetadata } from '~/lib/checkout/subscription-shipping-metadata';
 import type { CheckoutAddressSnapshot } from '~/lib/checkout/types';
 
@@ -443,6 +445,32 @@ export async function pauseCustomerSubscription({
   });
 }
 
+/*
+ * A complete CPAP mask is never on Subscribe & save (owner ruling C26 (b),
+ * 2026-10-13: a Liivv pharmacist signs off every complete-mask order, and the
+ * checkout refuses one without an approved, in-date CPAP prescription).
+ * Subscriptions made before the ruling may still hold one, so resuming or
+ * reactivating one is refused: the customer buys the mask from its product
+ * page instead. The register answers first, with no lookup; otherwise the
+ * catalogue does, and a lookup that fails refuses. Machines are left as they
+ * were (`subscriptionRefusalFor` is not used here for them).
+ */
+async function refuseCompleteMaskSubscription(metadata: Stripe.Metadata | null | undefined) {
+  const productEntityId = Number(metadata?.bigcommerce_product_id);
+
+  if (!Number.isInteger(productEntityId) || productEntityId <= 0) {
+    return;
+  }
+
+  const isCompleteMask =
+    isRxMaskId(productEntityId) ||
+    Boolean((await viewOnlyProducts([productEntityId])).get(productEntityId)?.rxMask);
+
+  if (isCompleteMask) {
+    throw new Error(await subscriptionRefusalMessage('rx-mask'));
+  }
+}
+
 export async function resumeCustomerSubscription({
   stripeCustomerId,
   subscriptionId,
@@ -462,6 +490,8 @@ export async function resumeCustomerSubscription({
   if (subscription.pause_collection == null && subscription.status !== 'paused') {
     return;
   }
+
+  await refuseCompleteMaskSubscription(subscription.metadata);
 
   await stripe.subscriptions.update(subscriptionId, {
     pause_collection: null,
@@ -522,6 +552,8 @@ export async function reactivateCustomerSubscription({
   if (customerId !== stripeCustomerId) {
     throw new Error('Subscription not found');
   }
+
+  await refuseCompleteMaskSubscription(subscription.metadata);
 
   if (
     (subscription.status === 'active' || subscription.status === 'trialing') &&

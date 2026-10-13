@@ -3,6 +3,12 @@ import { cache } from 'react';
 import { getOnboardingCustomer } from '~/lib/account/get-session-customer';
 import { getCustomerAddresses } from '~/app/[locale]/(default)/account/addresses/page-data';
 import {
+  type CpapPrescriptionState,
+  cpapPrescriptionState,
+  cpapToday,
+} from '~/lib/pharmacy/cpap-prescription';
+import {
+  isCpapPrescriptionRow,
   mapCarePackRequestRow,
   mapPrescriptionRow,
   mapRefillRequestRow,
@@ -28,6 +34,12 @@ import { isVirtualCareBotEnabled } from '~/lib/virtual-care-bot/config';
 export type PharmacyPageData = {
   displayName: string;
   supabaseReady: boolean;
+  /*
+   * The customer's CPAP prescription, for the "CPAP prescription" card
+   * (owner ruling C26 (b), 2026-10-13). CPAP rows never appear in
+   * `prescriptions` (medications), refills or CarePack.
+   */
+  cpapPrescription: CpapPrescriptionState;
   prescriptions: PharmacyPrescription[];
   refillRequests: PharmacyRefillRequest[];
   carepackRequests: PharmacyCarePackRequest[];
@@ -49,6 +61,7 @@ export const getPharmacyPageData = cache(async (): Promise<PharmacyPageData | nu
     return {
       displayName,
       supabaseReady: false,
+      cpapPrescription: { kind: 'none' },
       prescriptions: [],
       refillRequests: [],
       carepackRequests: [],
@@ -63,6 +76,7 @@ export const getPharmacyPageData = cache(async (): Promise<PharmacyPageData | nu
       return {
         displayName,
         supabaseReady: false,
+        cpapPrescription: { kind: 'none' },
         prescriptions: [],
         refillRequests: [],
         carepackRequests: [],
@@ -70,7 +84,9 @@ export const getPharmacyPageData = cache(async (): Promise<PharmacyPageData | nu
       };
     }
 
-    const rows = await listPrescriptionsByProfileId(ensured.profile.id);
+    const allRows = await listPrescriptionsByProfileId(ensured.profile.id);
+    const rows = allRows.filter((row) => !isCpapPrescriptionRow(row));
+    const cpapRows = allRows.filter((row) => isCpapPrescriptionRow(row));
     const prescriptions = rows.map((row) => mapPrescriptionRow(row));
     const refillRows = await listRefillRequestsByProfileId(ensured.profile.id);
     const carepackRows = await listCarePackRequestsByProfileId(ensured.profile.id);
@@ -78,6 +94,7 @@ export const getPharmacyPageData = cache(async (): Promise<PharmacyPageData | nu
     return {
       displayName,
       supabaseReady: true,
+      cpapPrescription: cpapPrescriptionState(cpapRows, cpapToday()),
       prescriptions,
       refillRequests: refillRows.map((row) => mapRefillRequestRow(row, prescriptions)),
       carepackRequests: carepackRows.map((row) => mapCarePackRequestRow(row, prescriptions)),
@@ -89,6 +106,7 @@ export const getPharmacyPageData = cache(async (): Promise<PharmacyPageData | nu
     return {
       displayName,
       supabaseReady: false,
+      cpapPrescription: { kind: 'none' },
       prescriptions: [],
       refillRequests: [],
       carepackRequests: [],

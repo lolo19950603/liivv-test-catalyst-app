@@ -4006,14 +4006,32 @@
     },
     "refusals": {
       "prescriptionDevice": "Liivv doesn’t sell CPAP or other sleep apnea machines yet.",
-      "pharmacist": "A pharmacist reviews every insulin and glucagon order, so it can’t be added this way. Add it to your cart from its product page."
+      "pharmacist": "A pharmacist reviews every insulin and glucagon order, so it can’t be added this way. Add it to your cart from its product page.",
+      "rxMask": "A complete mask needs a CPAP prescription that a Liivv pharmacist checks, so it can’t be added this way. Add it to your cart from its product page.",
+      "rxMaskSubscription": "A complete mask can’t be on Subscribe & save. A Liivv pharmacist checks every complete-mask order, so add it as a one-time purchase."
     },
     "checkout": {
-      "deviceBlocked": "Liivv doesn’t sell CPAP or other sleep apnea machines yet. Remove it to continue."
+      "deviceBlocked": "Liivv doesn’t sell CPAP or other sleep apnea machines yet. Remove it to continue.",
+      "rxMaskBlocked": "A complete CPAP mask needs a CPAP prescription on your account that a Liivv pharmacist has approved and that is still in date. Check its status on your Pharmacy page, or remove the mask to continue.",
+      "rxMaskUnavailable": "We can’t check your CPAP prescription right now. Try again in a few minutes.",
+      "rxMaskSubscription": "A complete CPAP mask can’t be on Subscribe & save. Remove it and add it again as a one-time purchase.",
+      "rxMaskOnFile": "Your CPAP prescription is valid until {date}. A Liivv pharmacist checks every complete-mask order before it ships.",
+      "rxMaskPharmacyLink": "Go to your Pharmacy page",
+      "rxMaskPayPointer": "Your cart has a complete CPAP mask: see the CPAP prescription note above."
     },
     "reorder": {
       "held": "{names} can’t be reordered: Liivv doesn’t sell CPAP or other sleep apnea machines yet.",
       "added": "{added, plural, =1 {1 item was} other {# items were}} added to your cart."
+    },
+    "rxMask": {
+      "label": "Prescription check",
+      "notice": "A complete mask needs a CPAP prescription. A Liivv pharmacist checks it before your order ships.",
+      "partsLine": "Parts for a mask you already have don’t need this check.",
+      "childLine": "This mask is made for children. A Liivv pharmacist checks the child’s prescription before the order ships.",
+      "howTo": "Add your CPAP prescription on your account’s Pharmacy page. You can pay for the mask once a Liivv pharmacist has approved it.",
+      "howToChild": "Add your child’s CPAP prescription on your account’s Pharmacy page. You can pay for the mask once a Liivv pharmacist has approved it.",
+      "pharmacyLink": "Go to your Pharmacy page",
+      "listingLabel": "View product"
     }
   },
   "DiabetesCare": {

@@ -18,8 +18,8 @@ import {
 } from '~/lib/checkout/subscription-lines';
 import { subscriptionLineIdentityKey } from '~/lib/checkout/subscription-line-key';
 import { addToOrCreateCart } from '~/lib/cart';
-import { viewOnlyProducts, viewOnlyRefusalMessage } from '~/lib/catalog/view-only';
-import { repeatOrderRefusalFor } from '~/lib/catalog/view-only-rules';
+import { subscriptionRefusalMessage, viewOnlyProducts } from '~/lib/catalog/view-only';
+import { subscriptionRefusalFor } from '~/lib/catalog/view-only-rules';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 
 import { areSubscriptionsAvailable } from '~/lib/subscriptions/availability';
@@ -65,17 +65,20 @@ export async function addSubscriptionProductToCart(formData: FormData): Promise<
   }
 
   // Never on a subscription: a prescription device, or a kit holding one
-  // (never bought online; owner approval, 2026-10-12). Insulin and glucagon
+  // (never bought online; owner approval, 2026-10-12), or a complete CPAP
+  // mask, or a kit holding one (a Liivv pharmacist signs off every
+  // complete-mask order; owner ruling C26, 2026-10-13). Insulin and glucagon
   // may be subscribed to (owner decision, 2026-10-13): a pharmacist reviews
   // every insulin and glucagon order, and the subscription line is a real
   // cart line, so the checkout snapshot still refuses insulin to Quebec.
-  const refusal = repeatOrderRefusalFor(
+  // Fails closed: if the catalogue can't answer, the product is refused.
+  const refusal = subscriptionRefusalFor(
     productEntityId,
     await viewOnlyProducts([productEntityId]),
   );
 
   if (refusal) {
-    throw new Error(await viewOnlyRefusalMessage(refusal));
+    throw new Error(await subscriptionRefusalMessage(refusal));
   }
 
   if (formData.get('subscriptionPriceConsent') !== '1') {

@@ -4000,14 +4000,32 @@
     },
     "refusals": {
       "prescriptionDevice": "Liivv ne vend pas encore d’appareils CPAP ni d’autres appareils pour l’apnée du sommeil.",
-      "pharmacist": "Un pharmacien vérifie chaque commande d’insuline et de glucagon : ce produit ne peut donc pas être ajouté de cette façon. Ajoutez-le à votre panier depuis sa page produit."
+      "pharmacist": "Un pharmacien vérifie chaque commande d’insuline et de glucagon : ce produit ne peut donc pas être ajouté de cette façon. Ajoutez-le à votre panier depuis sa page produit.",
+      "rxMask": "Un masque complet nécessite une ordonnance de CPAP, vérifiée par un pharmacien de Liivv. Il ne peut donc pas être ajouté de cette façon. Ajoutez-le à votre panier depuis sa page produit.",
+      "rxMaskSubscription": "Un masque complet ne peut pas faire l’objet d’un abonnement. Un pharmacien de Liivv vérifie chaque commande de masque complet : ajoutez-le plutôt comme achat unique."
     },
     "checkout": {
-      "deviceBlocked": "Liivv ne vend pas encore d’appareils CPAP ni d’autres appareils pour l’apnée du sommeil. Retirez-le pour continuer."
+      "deviceBlocked": "Liivv ne vend pas encore d’appareils CPAP ni d’autres appareils pour l’apnée du sommeil. Retirez-le pour continuer.",
+      "rxMaskBlocked": "Un masque CPAP complet nécessite une ordonnance de CPAP à votre dossier, approuvée par un pharmacien de Liivv et toujours valide. Vérifiez son statut à partir de votre page Pharmacie (la page est en anglais), ou retirez le masque pour continuer.",
+      "rxMaskUnavailable": "Nous ne pouvons pas vérifier votre ordonnance de CPAP pour le moment. Réessayez dans quelques minutes.",
+      "rxMaskSubscription": "Un masque CPAP complet ne peut pas faire l’objet d’un abonnement. Retirez-le et ajoutez-le de nouveau comme achat unique.",
+      "rxMaskOnFile": "Votre ordonnance de CPAP est valide jusqu’au {date}. Un pharmacien de Liivv vérifie chaque commande de masque complet avant son expédition.",
+      "rxMaskPharmacyLink": "Aller à votre page Pharmacie",
+      "rxMaskPayPointer": "Votre panier contient un masque CPAP complet : voyez la note sur l’ordonnance de CPAP plus haut."
     },
     "reorder": {
       "held": "Impossible de commander de nouveau : {names}. Liivv ne vend pas encore d’appareils CPAP ni d’autres appareils pour l’apnée du sommeil.",
       "added": "{added, plural, =1 {1 article a été ajouté} other {# articles ont été ajoutés}} à votre panier."
+    },
+    "rxMask": {
+      "label": "Vérification de l’ordonnance",
+      "notice": "Un masque complet nécessite une ordonnance de CPAP. Un pharmacien de Liivv la vérifie avant l’expédition de votre commande.",
+      "partsLine": "Les pièces pour un masque que vous avez déjà ne nécessitent pas cette vérification.",
+      "childLine": "Ce masque est conçu pour les enfants. Un pharmacien de Liivv vérifie l’ordonnance de l’enfant avant l’expédition de la commande.",
+      "howTo": "Ajoutez votre ordonnance de CPAP à partir de la page Pharmacie de votre compte (la page est en anglais) : choisissez « Add CPAP prescription ». Vous pourrez payer le masque une fois qu’un pharmacien de Liivv l’aura approuvée.",
+      "howToChild": "Ajoutez l’ordonnance de CPAP de votre enfant à partir de la page Pharmacie de votre compte (la page est en anglais) : choisissez « Add CPAP prescription ». Vous pourrez payer le masque une fois qu’un pharmacien de Liivv l’aura approuvée.",
+      "pharmacyLink": "Aller à votre page Pharmacie",
+      "listingLabel": "Voir le produit"
     }
   },
   "DiabetesCare": {

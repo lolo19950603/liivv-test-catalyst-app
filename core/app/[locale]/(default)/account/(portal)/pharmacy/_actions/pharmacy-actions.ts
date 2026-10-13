@@ -1,12 +1,19 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
 
 import { type OnboardingCustomer } from '~/lib/account/get-session-customer';
 import { runCustomerAction } from '~/lib/action-gateway/session';
 import { carePackRegionFromProvince } from '~/lib/pharmacy/carepack-region';
-import { isTabletDosageForm, normalizeBucket } from '~/lib/pharmacy/pharmacy-mappers';
+import { isCpapPrescriptionWaiting } from '~/lib/pharmacy/cpap-prescription';
+import {
+  isTabletDosageForm,
+  medicationPrescriptionRows,
+  normalizeBucket,
+} from '~/lib/pharmacy/pharmacy-mappers';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
+import { listCpapPrescriptionsByProfileId } from '~/lib/supabase/cpap-prescriptions';
 import {
   createCarePackRequest,
   createPrescription,
@@ -21,6 +28,29 @@ import { ensureCustomerProfile } from '~/lib/supabase/profile';
 import { getCustomerProvince } from '../page-data';
 
 export type PharmacyActionState = { ok?: boolean; error?: string } | null;
+
+/*
+ * A CPAP prescription sent from the Pharmacy page's CPAP card: by transfer
+ * from the customer's current CPAP supplier, clinic or pharmacy (name and
+ * phone), or by their prescriber's fax. The prescriber's name is optional.
+ */
+const CpapSubmissionSchema = z.object({
+  method: z.enum(['transfer', 'fax']),
+  sourceName: z.string().trim().max(160).optional().default(''),
+  sourcePhone: z.string().trim().max(40).optional().default(''),
+  prescriberName: z.string().trim().max(160).optional().default(''),
+});
+
+/* Parses JSON text, or answers undefined when it is not JSON. */
+function parseJson(raw: string): unknown {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+
+    return parsed;
+  } catch {
+    return undefined;
+  }
+}
 
 type TransferMedicationInput = {
   name: string;
@@ -70,6 +100,93 @@ export async function pharmacyAction(
   }
 
   const intent = String(formData.get('intent') ?? '');
+
+  /*
+   * A CPAP prescription, so a complete CPAP mask can be bought (owner ruling
+   * C26 (b), 2026-10-13). Saved as a prescriptions row with rx_kind 'cpap',
+   * waiting for a Liivv pharmacist, who validates it and sets its expiry in
+   * the Prescriptions queue. Two ways it reaches Liivv, as for medications:
+   * a transfer from the customer's current CPAP supplier, clinic or pharmacy,
+   * or a fax the customer asks their prescriber to send (the request they
+   * copy is generateCpapFaxRequestEmail). No upload.
+   */
+  if (intent === 'submit_cpap_prescription') {
+    const payload = formData.get('payload');
+    const parsed = CpapSubmissionSchema.safeParse(
+      typeof payload === 'string' ? parseJson(payload) : undefined,
+    );
+
+    if (!parsed.success) {
+      return { ok: false, error: 'Choose how your CPAP prescription will reach Liivv.' };
+    }
+
+    const { method, sourceName, sourcePhone, prescriberName } = parsed.data;
+
+    if (method === 'transfer' && (!sourceName || !sourcePhone)) {
+      return {
+        ok: false,
+        error: 'Enter the name and phone number of your current CPAP supplier, clinic or pharmacy.',
+      };
+    }
+
+    // One at a time: while a CPAP prescription is with a pharmacist, another
+    // would only add a second row for them to work.
+    let alreadyWaiting: boolean;
+
+    try {
+      alreadyWaiting = (await listCpapPrescriptionsByProfileId(profile.id)).some(
+        isCpapPrescriptionWaiting,
+      );
+    } catch {
+      return {
+        ok: false,
+        error: 'Your CPAP prescription could not be saved right now. Please try again later.',
+      };
+    }
+
+    if (alreadyWaiting) {
+      return {
+        ok: false,
+        error:
+          'Your CPAP prescription is already with a Liivv pharmacist. Its status is shown on this page.',
+      };
+    }
+
+    const created = await createPrescription({
+      profile_id: profile.id,
+      rx_kind: 'cpap',
+      medication_name: 'CPAP therapy',
+      din: null,
+      dosage: null,
+      dosage_form: null,
+      frequency: null,
+      quantity: null,
+      prescribing_doctor: prescriberName || null,
+      pharmacy_name: method === 'transfer' ? sourceName : null,
+      rx_number: null,
+      refills_remaining: null,
+      last_filled_date: null,
+      next_refill_date: null,
+      end_date: null,
+      status: 'pending',
+      approval_status: 'pending_review',
+      submission_method: method,
+      notes:
+        method === 'transfer'
+          ? `CPAP prescription transfer from: ${sourceName}, ${sourcePhone}`
+          : 'CPAP prescription: the customer asked their prescriber to fax it to Liivv.',
+    });
+
+    if (!created.ok) {
+      return {
+        ok: false,
+        error: 'Your CPAP prescription could not be saved right now. Please try again later.',
+      };
+    }
+
+    revalidatePath('/account/pharmacy');
+    return { ok: true };
+  }
 
   if (intent === 'transfer_prescriptions') {
     const raw = formData.get('payload');
@@ -188,7 +305,8 @@ export async function pharmacyAction(
       return { ok: false, error: 'Select at least one active prescription.' };
     }
 
-    const rows = await listPrescriptionsByProfileId(profile.id);
+    // CPAP prescriptions are never refilled: medications only.
+    const rows = medicationPrescriptionRows(await listPrescriptionsByProfileId(profile.id));
     const activeSet = new Set(
       rows.filter((row) => normalizeBucket(row) === 'active').map((row) => row.id),
     );
@@ -275,7 +393,8 @@ export async function pharmacyAction(
       return { ok: false, error: 'Select at least one active medication for CarePack.' };
     }
 
-    const rows = await listPrescriptionsByProfileId(profile.id);
+    // CPAP prescriptions never go in a CarePack: medications only.
+    const rows = medicationPrescriptionRows(await listPrescriptionsByProfileId(profile.id));
     const activeTabletSet = new Set(
       rows
         .filter((row) => normalizeBucket(row) === 'active' && isTabletDosageForm(row.dosage_form))

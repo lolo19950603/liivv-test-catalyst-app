@@ -12,7 +12,7 @@ import {
   type MedicationDetails,
   type MedicationResult,
 } from '~/components/pharmacy/dpd-medication-search-field';
-import { generateFaxRequestEmail } from '~/lib/pharmacy/pharmacy-fax';
+import { generateCpapFaxRequestEmail, generateFaxRequestEmail } from '~/lib/pharmacy/pharmacy-fax';
 
 export type TransferMedicationInput = {
   name: string;
@@ -24,20 +24,49 @@ export type TransferMedicationInput = {
 
 type TransferMedicationRow = TransferMedicationInput & { clientKey: string };
 
+/* The words and fax request that differ between the two modes. */
+const MEDICATION_DIALOG_COPY = {
+  title: 'Add prescription',
+  intro: 'Transfer from your pharmacy or request a doctor fax.',
+  faxTabLabel: 'Doctor fax',
+  faxRequest: generateFaxRequestEmail,
+};
+
+const CPAP_DIALOG_COPY = {
+  title: 'Add CPAP prescription',
+  intro:
+    'A complete CPAP mask needs a CPAP prescription: yours, or your child’s for a child’s mask. A Liivv pharmacist checks it before you can order the mask. Parts for a mask you already have don’t need it.',
+  faxTabLabel: 'Prescriber fax',
+  faxRequest: generateCpapFaxRequestEmail,
+};
+
+/*
+ * Add a prescription: a medication (transfer from a pharmacy, or a doctor fax
+ * request), or, in 'cpap' mode, a CPAP prescription so a complete CPAP mask
+ * can be bought (owner ruling C26 (b), 2026-10-13). A CPAP prescription comes
+ * by transfer from the customer's current CPAP supplier, clinic or pharmacy,
+ * or by their prescriber's fax (generateCpapFaxRequestEmail); both save a row
+ * a Liivv pharmacist validates. No upload.
+ */
 export function AddPrescriptionDialog({
   open,
   onClose,
   userProvince,
   userFullName,
   supabaseReady,
+  mode = 'medication',
 }: {
   open: boolean;
   onClose: () => void;
   userProvince: string | null;
   userFullName: string;
   supabaseReady: boolean;
+  mode?: 'medication' | 'cpap';
 }) {
+  const copy = mode === 'cpap' ? CPAP_DIALOG_COPY : MEDICATION_DIALOG_COPY;
   const [method, setMethod] = useState<'transfer' | 'fax'>('transfer');
+  const panel = `${mode}-${method}` as const;
+  const [prescriberName, setPrescriberName] = useState('');
   const [transferType, setTransferType] = useState<'all' | 'specific'>('all');
   const [pharmacyName, setPharmacyName] = useState('');
   const [pharmacyPhone, setPharmacyPhone] = useState('');
@@ -78,11 +107,11 @@ export function AddPrescriptionDialog({
 
   const faxEmail = useMemo(
     () =>
-      generateFaxRequestEmail({
+      copy.faxRequest({
         provinceLabel: userProvince ?? '',
         fullName: userFullName,
       }),
-    [userFullName, userProvince],
+    [copy, userFullName, userProvince],
   );
 
   if (!open) {
@@ -135,6 +164,24 @@ export function AddPrescriptionDialog({
     });
   };
 
+  const submitCpap = (cpapMethod: 'transfer' | 'fax') => {
+    const fd = new FormData();
+
+    fd.set('intent', 'submit_cpap_prescription');
+    fd.set(
+      'payload',
+      JSON.stringify({
+        method: cpapMethod,
+        sourceName: cpapMethod === 'transfer' ? pharmacyName : '',
+        sourcePhone: cpapMethod === 'transfer' ? pharmacyPhone : '',
+        prescriberName,
+      }),
+    );
+    startTransition(() => {
+      formAction(fd);
+    });
+  };
+
   const submitTransfer = () => {
     const fd = new FormData();
 
@@ -180,10 +227,10 @@ export function AddPrescriptionDialog({
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold text-[#2c2a26]" id={titleId}>
-              Add prescription
+              {copy.title}
             </h2>
             <p className="mt-1 text-sm text-[#6b6560]">
-              Transfer from your pharmacy or request a doctor fax.
+              {copy.intro}
             </p>
           </div>
           <button
@@ -220,12 +267,41 @@ export function AddPrescriptionDialog({
               onClick={() => setMethod(id)}
               type="button"
             >
-              {id === 'transfer' ? 'Transfer' : 'Doctor fax'}
+              {id === 'transfer' ? 'Transfer' : copy.faxTabLabel}
             </button>
           ))}
         </div>
 
-        {method === 'transfer' ? (
+        {panel === 'cpap-transfer' ? (
+          <CpapTransferPanel
+            disabled={isPending || !supabaseReady}
+            isPending={isPending}
+            onPrescriberName={setPrescriberName}
+            onSourceName={setPharmacyName}
+            onSourcePhone={setPharmacyPhone}
+            onSubmit={() => submitCpap('transfer')}
+            prescriberName={prescriberName}
+            sourceName={pharmacyName}
+            sourcePhone={pharmacyPhone}
+          />
+        ) : null}
+
+        {panel === 'cpap-fax' ? (
+          <CpapFaxPanel
+            disabled={isPending || !supabaseReady}
+            faxCopied={faxCopied}
+            faxEmail={faxEmail}
+            isPending={isPending}
+            onCopy={() => {
+              copyFaxEmail().catch(() => setFaxCopied(false));
+            }}
+            onPrescriberName={setPrescriberName}
+            onSubmit={() => submitCpap('fax')}
+            prescriberName={prescriberName}
+          />
+        ) : null}
+
+        {panel === 'medication-transfer' ? (
           <div className="mt-4 space-y-4">
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="block text-sm">
@@ -317,7 +393,7 @@ export function AddPrescriptionDialog({
           </div>
         ) : null}
 
-        {method === 'fax' ? (
+        {panel === 'medication-fax' ? (
           <div className="mt-4 space-y-3">
             <p className="text-sm text-[#6b6560]">
               Copy this email template and send it to your doctor&apos;s office to request a fax to Liivv
@@ -336,6 +412,143 @@ export function AddPrescriptionDialog({
           </div>
         ) : null}
 
+      </div>
+    </div>
+  );
+}
+
+const CPAP_INPUT_CLASS =
+  'mt-1 w-full rounded-lg border border-[#e0d9ce] px-3 py-2 text-sm focus:border-[#8a9a7b] focus:outline-none focus:ring-2 focus:ring-[#8a9a7b]/30';
+
+function PrescriberNameField({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="block text-sm">
+      <span className="font-medium text-[#2c2a26]">Prescriber’s name (optional)</span>
+      <input
+        className={CPAP_INPUT_CLASS}
+        maxLength={160}
+        onChange={(e) => onChange(e.target.value)}
+        value={value}
+      />
+    </label>
+  );
+}
+
+/* CPAP mode, Transfer: where the CPAP prescription is now. */
+function CpapTransferPanel({
+  sourceName,
+  sourcePhone,
+  prescriberName,
+  onSourceName,
+  onSourcePhone,
+  onPrescriberName,
+  disabled,
+  isPending,
+  onSubmit,
+}: {
+  sourceName: string;
+  sourcePhone: string;
+  prescriberName: string;
+  onSourceName: (value: string) => void;
+  onSourcePhone: (value: string) => void;
+  onPrescriberName: (value: string) => void;
+  disabled: boolean;
+  isPending: boolean;
+  onSubmit: () => void;
+}) {
+  const incomplete = !sourceName.trim() || !sourcePhone.trim();
+
+  return (
+    <div className="mt-4 space-y-4">
+      <p className="text-sm text-[#6b6560]">
+        Tell us where your CPAP prescription is now: the supplier, clinic or pharmacy where you got
+        your last mask or machine. A Liivv pharmacist asks them for it.
+      </p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="block text-sm">
+          <span className="font-medium text-[#2c2a26]">Current CPAP supplier, clinic or pharmacy</span>
+          <input
+            className={CPAP_INPUT_CLASS}
+            maxLength={160}
+            onChange={(e) => onSourceName(e.target.value)}
+            required
+            value={sourceName}
+          />
+        </label>
+        <label className="block text-sm">
+          <span className="font-medium text-[#2c2a26]">Their phone number</span>
+          <input
+            className={CPAP_INPUT_CLASS}
+            maxLength={40}
+            onChange={(e) => onSourcePhone(e.target.value)}
+            required
+            type="tel"
+            value={sourcePhone}
+          />
+        </label>
+      </div>
+      <PrescriberNameField onChange={onPrescriberName} value={prescriberName} />
+      <button
+        className="liivv-btn-primary inline-flex px-4 py-2.5 text-sm disabled:opacity-50"
+        disabled={disabled || incomplete}
+        onClick={onSubmit}
+        type="button"
+      >
+        {isPending ? 'Submitting…' : 'Send transfer request'}
+      </button>
+    </div>
+  );
+}
+
+/* CPAP mode, Prescriber fax: the request the customer sends to their prescriber. */
+function CpapFaxPanel({
+  faxEmail,
+  faxCopied,
+  onCopy,
+  prescriberName,
+  onPrescriberName,
+  disabled,
+  isPending,
+  onSubmit,
+}: {
+  faxEmail: string;
+  faxCopied: boolean;
+  onCopy: () => void;
+  prescriberName: string;
+  onPrescriberName: (value: string) => void;
+  disabled: boolean;
+  isPending: boolean;
+  onSubmit: () => void;
+}) {
+  return (
+    <div className="mt-4 space-y-3">
+      <p className="text-sm text-[#6b6560]">
+        Copy this request, fill in the patient’s name and date of birth (yours, or your child’s), and
+        send it to the prescriber’s office, so they fax the CPAP prescription to Liivv. Then tell us
+        you’ve sent it.
+      </p>
+      <pre className="max-h-64 overflow-auto rounded-xl border border-[#e8e2d8] bg-[#faf8f5] p-4 text-xs whitespace-pre-wrap text-[#2c2a26]">
+        {faxEmail}
+      </pre>
+      <button className="liivv-btn-secondary px-4 py-2 text-sm" onClick={onCopy} type="button">
+        {faxCopied ? 'Copied!' : 'Copy request'}
+      </button>
+      <PrescriberNameField onChange={onPrescriberName} value={prescriberName} />
+      <div>
+        <button
+          className="liivv-btn-primary inline-flex px-4 py-2.5 text-sm disabled:opacity-50"
+          disabled={disabled}
+          onClick={onSubmit}
+          type="button"
+        >
+          {isPending ? 'Saving…' : 'I’ve asked my prescriber to fax it'}
+        </button>
       </div>
     </div>
   );

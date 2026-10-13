@@ -34,6 +34,7 @@ export default async function PharmacyPage({ params }: Props) {
     <Suspense fallback={<p className="text-sm text-[#6b6560]">Loading pharmacy…</p>}>
       <PharmacyDashboard
         carepackRequests={data.carepackRequests}
+        cpapPrescription={data.cpapPrescription}
         displayName={data.displayName}
         prescriptions={data.prescriptions}
         refillRequests={data.refillRequests}

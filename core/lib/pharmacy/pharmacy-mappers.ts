@@ -42,6 +42,24 @@ export function isTabletDosageForm(dosageForm?: string | null): boolean {
   return normalized === 'tablet' || normalized.includes('tablet');
 }
 
+/*
+ * Whether this row is a CPAP prescription (rx_kind 'cpap'; owner ruling C26,
+ * 2026-10-13). A CPAP prescription is validated by a pharmacist so a complete
+ * CPAP mask can be bought; it is never a medication, so it is never listed
+ * with medications, offered for a refill, or put in a CarePack. Rows read
+ * before the CPAP migration has run carry no rx_kind and are medications.
+ */
+export function isCpapPrescriptionRow(row: Pick<PrescriptionRow, 'rx_kind'>): boolean {
+  return String(row.rx_kind ?? '').trim().toLowerCase() === 'cpap';
+}
+
+/* The rows that are medications: what refills, CarePack and the medication lists use. */
+export function medicationPrescriptionRows<T extends Pick<PrescriptionRow, 'rx_kind'>>(
+  rows: readonly T[],
+): T[] {
+  return rows.filter((row) => !isCpapPrescriptionRow(row));
+}
+
 export function normalizeBucket(row: PrescriptionRow): RxBucket {
   const status = (row.status ?? '').trim().toLowerCase();
   const approval = (row.approval_status ?? '').trim().toLowerCase();

@@ -28,12 +28,21 @@ import {
   type AdminPrescriptionQueueRow,
   type AdminRefillQueueRow,
 } from '~/lib/supabase/prescriptions';
+import {
+  type AdminRxOrderCheckQueueRow,
+  listAdminRxOrderCheckQueue,
+} from '~/lib/supabase/rx-order-checks';
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export type StaffTab = 'pharmacy' | 'customers' | 'chat';
-export type PharmacyQueue = 'prescription' | 'refill' | 'carepack';
+/*
+ * The worklist queues. 'mask_order': paid orders holding a complete CPAP mask,
+ * each waiting for a pharmacist's sign-off (owner ruling C26 (b), 2026-10-13;
+ * ~/lib/supabase/rx-order-checks.ts).
+ */
+export type PharmacyQueue = 'prescription' | 'refill' | 'carepack' | 'mask_order';
 
 export type ChatPatientContext = {
   profileId: string;
@@ -56,6 +65,9 @@ export type StaffPortalData = {
   prescriptionQueue: AdminPrescriptionQueueRow[];
   refillQueue: AdminRefillQueueRow[];
   carePackQueue: AdminCarePackQueueRow[];
+  maskOrderQueue: AdminRxOrderCheckQueueRow[];
+  /** The Mask orders queue alone could not load (for example, its migration has not run). */
+  maskOrderQueueError: string | null;
   pharmacyQueueError: string | null;
   pharmacyCustomerDetail: AdminCustomerDetail | null;
   pharmacyCustomerDetailError: string | null;
@@ -80,7 +92,7 @@ function parseTab(raw: string | undefined): StaffTab {
 }
 
 function parsePharmacyQueue(raw: string | undefined): PharmacyQueue {
-  if (raw === 'refill' || raw === 'carepack') {
+  if (raw === 'refill' || raw === 'carepack' || raw === 'mask_order') {
     return raw;
   }
 
@@ -105,7 +117,8 @@ export const getStaffPortalData = cache(
     const selectedRequestType =
       selectedRequestTypeRaw === 'refill' ||
       selectedRequestTypeRaw === 'carepack' ||
-      selectedRequestTypeRaw === 'prescription'
+      selectedRequestTypeRaw === 'prescription' ||
+      selectedRequestTypeRaw === 'mask_order'
         ? selectedRequestTypeRaw
         : null;
 
@@ -123,6 +136,8 @@ export const getStaffPortalData = cache(
       prescriptionQueue: [],
       refillQueue: [],
       carePackQueue: [],
+      maskOrderQueue: [],
+      maskOrderQueueError: null,
       pharmacyQueueError: null,
       pharmacyCustomerDetail: null,
       pharmacyCustomerDetailError: null,
@@ -180,15 +195,33 @@ export const getStaffPortalData = cache(
 
       if (adminTab === 'pharmacy') {
         try {
-          const [prescriptionQueue, refillQueue, carePackQueue] = await Promise.all([
+          const [prescriptionQueue, refillQueue, carePackQueue, maskOrders] = await Promise.all([
             listAdminPrescriptionQueue(300),
             listAdminRefillQueue(300),
             listAdminCarePackQueue(300),
+            // Loaded on its own terms: a missing rx_order_checks table (the
+            // CPAP migration not run yet) says so in this queue only.
+            listAdminRxOrderCheckQueue(300).then(
+              (rows) => ({ rows, error: null }),
+              (error: unknown) => {
+                console.error('[supabase] mask orders queue unavailable', error);
+
+                const rows: AdminRxOrderCheckQueueRow[] = [];
+
+                return {
+                  rows,
+                  error:
+                    'Mask orders could not load. If this is new, run cpap-prescriptions-migration.sql in Supabase.',
+                };
+              },
+            ),
           ]);
 
           base.prescriptionQueue = prescriptionQueue;
           base.refillQueue = refillQueue;
           base.carePackQueue = carePackQueue;
+          base.maskOrderQueue = maskOrders.rows;
+          base.maskOrderQueueError = maskOrders.error;
 
           let selectedProfileId: string | null = null;
 
@@ -199,6 +232,9 @@ export const getStaffPortalData = cache(
             } else if (selectedRequestType === 'carepack') {
               selectedProfileId =
                 carePackQueue.find((row) => row.id === selectedRequestIdRaw)?.profile_id ?? null;
+            } else if (selectedRequestType === 'mask_order') {
+              selectedProfileId =
+                maskOrders.rows.find((row) => row.id === selectedRequestIdRaw)?.profile_id ?? null;
             } else {
               selectedProfileId =
                 prescriptionQueue.find((row) => row.id === selectedRequestIdRaw)?.profile_id ?? null;

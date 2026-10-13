@@ -20,6 +20,7 @@ import { toStripeRecurring } from '~/lib/stripe/subscription-interval';
 import { claimSubscriptionOrderCreation, claimCheckoutStripeSubscriptionsCreation, getCheckoutFulfillmentOrderId, hasCheckoutStripeSubscriptions, isCheckoutFulfillmentComplete, markCheckoutFulfillmentComplete, markCheckoutStripeSubscriptionsCreated, markSubscriptionOrderCreated, releaseCheckoutStripeSubscriptionsCreation, releaseSubscriptionOrderCreation } from '~/lib/stripe/storage';
 
 import { addCheckoutBillingAddress } from './billing-address';
+import { recordRxMaskOrderForSignoff } from './rx-order-recording';
 import {
   buildCheckoutSnapshot,
   getCheckoutSnapshot,
@@ -620,6 +621,16 @@ export async function fulfillCheckoutPayment(
           console.error('Failed to save kits to customer account after order:', saveKitError);
         }
       }
+    }
+
+    // A complete CPAP mask: record the paid order for the pharmacist's
+    // sign-off. Runs for whichever caller knows the order id (the webhook and
+    // the return page race); the row is unique on the order id, and a failure
+    // is logged, never thrown. It does nothing for an order with no complete
+    // mask; a snapshot built before the gate is judged by its lines
+    // (~/lib/checkout/rx-order-recording.ts).
+    if (orderId) {
+      await recordRxMaskOrderForSignoff(snapshot, orderId);
     }
 
     const needsStripeSubscriptions = snapshot.lineItems.some((line) => line.isSubscription);

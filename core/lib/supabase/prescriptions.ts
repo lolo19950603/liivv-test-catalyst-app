@@ -2,6 +2,15 @@ import 'server-only';
 
 import { getSupabaseClient } from '~/lib/supabase/client';
 
+/*
+ * What a prescriptions row is for (core/lib/supabase/cpap-prescriptions-migration.sql):
+ * 'medication' (the default: drugs, refills and CarePack) or 'cpap' (a CPAP
+ * prescription a Liivv pharmacist validates before a complete CPAP mask can
+ * be paid for; owner ruling C26, 2026-10-13). Rows read before the migration
+ * has run carry no rx_kind and are medication.
+ */
+export type PrescriptionKind = 'medication' | 'cpap';
+
 export type PrescriptionWritable = {
   profile_id: string;
   medication_name: string;
@@ -21,6 +30,8 @@ export type PrescriptionWritable = {
   approval_status: string | null;
   submission_method: string | null;
   notes: string | null;
+  /** Left out for a medication, so inserts work before the CPAP migration has run. */
+  rx_kind?: PrescriptionKind;
 };
 
 export type PrescriptionRow = {
@@ -43,6 +54,13 @@ export type PrescriptionRow = {
   approval_status: string | null;
   submission_method: string | null;
   notes: string | null;
+  /** Missing until the CPAP migration has run (then 'medication' by default). */
+  rx_kind?: string | null;
+  /** The staff username that approved or rejected a CPAP prescription. */
+  reviewed_by?: string | null;
+  reviewed_at?: string | null;
+  /** Why a CPAP prescription was not accepted. */
+  review_reason?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -102,6 +120,105 @@ export async function listPrescriptionsByProfileId(profileId: string): Promise<P
   }
 
   return data as PrescriptionRow[];
+}
+
+/* Whether a value read from Supabase is a prescriptions row (it has its id). */
+function isPrescriptionRow(value: unknown): value is PrescriptionRow {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'id' in value &&
+    typeof value.id === 'string' &&
+    'profile_id' in value
+  );
+}
+
+/* One prescriptions row, or null when it is not there or can't be read. */
+export async function getPrescriptionById(prescriptionId: string): Promise<PrescriptionRow | null> {
+  const supabase = getSupabaseClient();
+  const result = await supabase
+    .from('prescriptions')
+    .select('*')
+    .eq('id', prescriptionId)
+    .maybeSingle();
+
+  if (result.error) {
+    return null;
+  }
+
+  const row: unknown = result.data;
+
+  return isPrescriptionRow(row) ? row : null;
+}
+
+/*
+ * A pharmacist's decision on a CPAP prescription: approved with the expiry
+ * they set, rejected with a reason, set back to pending review, or marked
+ * expired. Records who decided and when. Fails (rather than silently
+ * dropping a field) if the CPAP migration has not run.
+ *
+ * `fromStatuses` is the approval status the row must still have when it is
+ * written, so two decisions made at once can't overwrite each other: the
+ * second matches no row and is refused. 'pending_review' also matches a row
+ * with no approval status.
+ */
+export async function updateCpapPrescriptionReview(args: {
+  prescriptionId: string;
+  fromStatuses: readonly string[];
+  approval_status: 'approved' | 'rejected' | 'pending_review' | 'expired';
+  status: string;
+  end_date?: string | null;
+  review_reason?: string | null;
+  reviewed_by: string;
+}): Promise<{ ok: true } | { ok: false; message: string }> {
+  const supabase = getSupabaseClient();
+  const now = new Date().toISOString();
+  const payload: Record<string, unknown> = {
+    approval_status: args.approval_status,
+    status: args.status,
+    reviewed_by: args.reviewed_by,
+    reviewed_at: now,
+    review_reason: args.review_reason ?? null,
+    updated_at: now,
+  };
+
+  if (args.end_date !== undefined) {
+    payload.end_date = args.end_date;
+  }
+
+  const allowed = args.fromStatuses.filter((status) => /^[a-z_]+$/.test(status));
+
+  if (allowed.length === 0) {
+    return {
+      ok: false,
+      message: 'This CPAP prescription can’t be changed from its current status.',
+    };
+  }
+
+  const statusFilter = [
+    `approval_status.in.(${allowed.join(',')})`,
+    ...(allowed.includes('pending_review') ? ['approval_status.is.null'] : []),
+  ].join(',');
+  const { data, error } = await supabase
+    .from('prescriptions')
+    .update(payload)
+    .eq('id', args.prescriptionId)
+    .eq('rx_kind', 'cpap')
+    .or(statusFilter)
+    .select('id');
+
+  if (error) {
+    return { ok: false, message: error.message };
+  }
+
+  if (data.length === 0) {
+    return {
+      ok: false,
+      message: 'This CPAP prescription was already updated. Refresh to see its status.',
+    };
+  }
+
+  return { ok: true };
 }
 
 export async function createRefillRequest(args: {
@@ -298,7 +415,9 @@ function resolveMedicationNames(
   return (prescriptionIds ?? []).map((id) => namesById.get(id) ?? 'Unknown medication');
 }
 
-async function listProfileLiteByIds(profileIds: string[]): Promise<Map<string, AdminProfileLite>> {
+export async function listProfileLiteByIds(
+  profileIds: string[],
+): Promise<Map<string, AdminProfileLite>> {
   if (profileIds.length === 0) {
     return new Map();
   }

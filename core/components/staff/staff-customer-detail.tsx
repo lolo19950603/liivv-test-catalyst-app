@@ -2,7 +2,9 @@
 
 import type { ReactNode } from 'react';
 
+import { CpapBadge, CpapPrescriptionReview } from '~/components/staff/cpap-review';
 import { formatStaffStatusLabel, staffStatusBadgeClass } from '~/components/staff/staff-status';
+import { isCpapPrescriptionRow } from '~/lib/pharmacy/pharmacy-mappers';
 import {
   consentedAnswerKeys,
   healthAnswersSafetyReferralApplies,
@@ -539,6 +541,7 @@ function StaffPrescriptionsSection({
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold leading-snug text-[#2c2a26]">
                       {displayMedicationName(rx.medication_name)}
+                      {isCpapPrescriptionRow(rx) ? <CpapBadge /> : null}
                     </p>
                     {meta ? <p className="mt-0.5 text-sm text-[#5c564c]">{meta}</p> : null}
                   </div>
@@ -546,6 +549,9 @@ function StaffPrescriptionsSection({
                     {formatStaffStatusLabel(statusValue)}
                   </span>
                 </div>
+                {isCpapPrescriptionRow(rx) ? (
+                  <CpapPrescriptionReview formAction={formAction} profileId={profileId} rx={rx} />
+                ) : (
                 <form action={formAction} className="mt-2">
                   <input name="intent" type="hidden" value="prescription_set_status" />
                   <input name="profileId" type="hidden" value={profileId} />
@@ -570,6 +576,7 @@ function StaffPrescriptionsSection({
                     <option value="expired">Expired</option>
                   </select>
                 </form>
+                )}
               </li>
             );
           })}
@@ -743,6 +750,76 @@ function StaffCarePackSection({
   );
 }
 
+/* The pinned prescription request; a CPAP row gets the CPAP review (expiry required). */
+function PinnedPrescription({
+  profileId,
+  rx,
+  formAction,
+}: {
+  profileId: string;
+  rx: PrescriptionRow;
+  formAction: (formData: FormData) => void;
+}) {
+
+  const approval = String(rx.approval_status ?? '').toLowerCase();
+  const statusValue =
+    approval === 'approved' ||
+    approval === 'rejected' ||
+    approval === 'expired' ||
+    approval === 'pending_review'
+      ? approval
+      : (rx.approval_status ?? rx.status ?? 'pending_review');
+  const meta = prescriptionMeta(rx.dosage, rx.frequency);
+
+  return (
+    <div className="rounded-lg border border-[#c9d8c9] bg-[#f4f7f0] px-3 py-3">
+      <p className="text-sm font-semibold text-[#375a37]">
+        Selected request
+      </p>
+      <div className="mt-2 flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-semibold text-[#2c2a26]">
+            {displayMedicationName(rx.medication_name)}
+            {isCpapPrescriptionRow(rx) ? <CpapBadge /> : null}
+          </p>
+          {meta ? <p className="mt-0.5 text-sm text-[#5c564c]">{meta}</p> : null}
+        </div>
+        <span className={`shrink-0 ${staffStatusBadgeClass(statusValue)}`}>
+          {formatStaffStatusLabel(statusValue)}
+        </span>
+      </div>
+      {isCpapPrescriptionRow(rx) ? (
+        <CpapPrescriptionReview formAction={formAction} profileId={profileId} rx={rx} />
+      ) : (
+      <form action={formAction} className="mt-2">
+        <input name="intent" type="hidden" value="prescription_set_status" />
+        <input name="profileId" type="hidden" value={profileId} />
+        <input name="prescriptionId" type="hidden" value={rx.id} />
+        <label className="sr-only" htmlFor={`rx-status-pin-${rx.id}`}>
+          Approval status
+        </label>
+        <select
+          className={selectClass}
+          defaultValue={
+            approval === 'approved' || approval === 'rejected' || approval === 'expired'
+              ? approval
+              : 'pending_review'
+          }
+          id={`rx-status-pin-${rx.id}`}
+          name="status"
+          onChange={(event) => event.currentTarget.form?.requestSubmit()}
+        >
+          <option value="pending_review">Pending review</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+          <option value="expired">Expired</option>
+        </select>
+      </form>
+      )}
+    </div>
+  );
+}
+
 function PinnedRequest({
   profileId,
   prescriptions,
@@ -761,60 +838,7 @@ function PinnedRequest({
   if (focusRequest.kind === 'prescription') {
     const rx = prescriptions.find((row) => row.id === focusRequest.id);
 
-    if (!rx) {
-      return null;
-    }
-
-    const approval = String(rx.approval_status ?? '').toLowerCase();
-    const statusValue =
-      approval === 'approved' ||
-      approval === 'rejected' ||
-      approval === 'expired' ||
-      approval === 'pending_review'
-        ? approval
-        : (rx.approval_status ?? rx.status ?? 'pending_review');
-    const meta = prescriptionMeta(rx.dosage, rx.frequency);
-
-    return (
-      <div className="rounded-lg border border-[#c9d8c9] bg-[#f4f7f0] px-3 py-3">
-        <p className="text-sm font-semibold text-[#375a37]">
-          Selected request
-        </p>
-        <div className="mt-2 flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="font-semibold text-[#2c2a26]">{displayMedicationName(rx.medication_name)}</p>
-            {meta ? <p className="mt-0.5 text-sm text-[#5c564c]">{meta}</p> : null}
-          </div>
-          <span className={`shrink-0 ${staffStatusBadgeClass(statusValue)}`}>
-            {formatStaffStatusLabel(statusValue)}
-          </span>
-        </div>
-        <form action={formAction} className="mt-2">
-          <input name="intent" type="hidden" value="prescription_set_status" />
-          <input name="profileId" type="hidden" value={profileId} />
-          <input name="prescriptionId" type="hidden" value={rx.id} />
-          <label className="sr-only" htmlFor={`rx-status-pin-${rx.id}`}>
-            Approval status
-          </label>
-          <select
-            className={selectClass}
-            defaultValue={
-              approval === 'approved' || approval === 'rejected' || approval === 'expired'
-                ? approval
-                : 'pending_review'
-            }
-            id={`rx-status-pin-${rx.id}`}
-            name="status"
-            onChange={(event) => event.currentTarget.form?.requestSubmit()}
-          >
-            <option value="pending_review">Pending review</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-            <option value="expired">Expired</option>
-          </select>
-        </form>
-      </div>
-    );
+    return rx ? <PinnedPrescription formAction={formAction} profileId={profileId} rx={rx} /> : null;
   }
 
   if (focusRequest.kind === 'refill') {

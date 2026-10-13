@@ -21,7 +21,10 @@ import {
   reconcileSubscriptionLinesWithCart,
 } from './subscription-lines';
 import { assignKitIdsToCartLines, getKitSession } from '~/lib/kit';
-import { prescriptionDeviceIds } from '~/lib/catalog/view-only';
+import { rxMasksOfLines } from '~/lib/catalog/cpap-masks';
+import { viewOnlyProducts } from '~/lib/catalog/view-only';
+import type { ViewOnlyReason } from '~/lib/catalog/view-only-rules';
+import { listCpapPrescriptionsForCheckout } from '~/lib/supabase/cpap-prescriptions';
 import { assertCartMayBePaidOnline } from './checkout-gates';
 import { shipsInsulinToQuebec } from './quebec-insulin';
 import type { CheckoutAddressSnapshot, CheckoutLineItemSnapshot, CheckoutSnapshot } from './types';
@@ -187,20 +190,74 @@ export async function buildCheckoutSnapshot({
   const shippingAddress = shippingConsignmentWithAddress?.address ?? checkout.shippingConsignments?.[0]?.address;
 
   // A prescription device is never bought online (PrescriptionDeviceError;
-  // owner approval, 2026-10-12), and insulin can't be ordered online for
-  // delivery in Quebec (InsulinToQuebecError; owner answers A1, B3, B11).
-  // Refused here, so no payment or order is made from this cart. A kit's
-  // component lines are real lines and are checked one by one.
-  await assertCartMayBePaidOnline(
+  // owner approval, 2026-10-12), insulin can't be ordered online for
+  // delivery in Quebec (InsulinToQuebecError; owner answers A1, B3, B11), and
+  // a complete CPAP mask can't be paid for without an approved, in-date CPAP
+  // prescription on the customer's account (RxMaskPrescriptionError; owner
+  // ruling C26 (b), 2026-10-13). Refused here, so no payment or order is made
+  // from this cart. A kit's component lines are real lines and are checked
+  // one by one. The catalogue is asked once for both product rules, and any
+  // lookup failure refuses. A complete mask is also found by the register
+  // and the name rule on the cart line's own name (`rxMasksOfLines`), so a
+  // product the storefront does not return is still checked.
+  const productEntityIds = lineItemsWithKits.map((line) => line.productEntityId);
+  let viewOnlyFacts: Promise<Map<number, ViewOnlyReason>> | undefined;
+  const readViewOnlyFacts = () =>
+    (viewOnlyFacts ??= viewOnlyProducts(productEntityIds, { throwOnLookupFailure: true }));
+  const rxMaskCheck = await assertCartMayBePaidOnline(
     {
       stateOrProvince: shippingAddress?.stateOrProvince,
-      productEntityIds: lineItemsWithKits.map((line) => line.productEntityId),
+      postalCode: shippingAddress?.postalCode,
+      productEntityIds,
+      subscriptionProductEntityIds: lineItemsWithKits
+        .filter((line) => line.isSubscription)
+        .map((line) => line.productEntityId),
     },
     {
-      prescriptionDeviceIds: (ids) => prescriptionDeviceIds(ids, { throwOnLookupFailure: true }),
+      prescriptionDeviceIds: async (ids) => {
+        const facts = await readViewOnlyFacts();
+
+        return new Set(ids.filter((id) => facts.get(id)?.device));
+      },
       shipsInsulinToQuebec,
+      rxMaskProducts: async (ids) => {
+        const facts = await readViewOnlyFacts();
+        const fromCatalogue = new Map(
+          ids.flatMap((id) => {
+            const kind = facts.get(id)?.rxMask;
+
+            return kind ? [[id, kind] as const] : [];
+          }),
+        );
+
+        return rxMasksOfLines(
+          lineItemsWithKits.filter((line) => ids.includes(line.productEntityId)),
+          fromCatalogue,
+        );
+      },
+      cpapPrescriptions: () => listCpapPrescriptionsForCheckout(bigcommerceCustomerId),
     },
   );
+  // What the order carries for the pharmacist's sign-off: the complete-mask
+  // lines as ordered (name, quantity, size), never a health detail, and where
+  // it ships. The prescription and profile ids and the expiry stay out of
+  // the snapshot (it is stored in KV); the recording step reads them again.
+  const rxCheck = rxMaskCheck
+    ? {
+        productIds: rxMaskCheck.productIds,
+        paediatric: rxMaskCheck.paediatric,
+        region: rxMaskCheck.region,
+        alwaysHold: rxMaskCheck.alwaysHold,
+        lines: lineItemsWithKits
+          .filter((line) => rxMaskCheck.productIds.includes(line.productEntityId))
+          .map((line) => ({
+            productId: line.productEntityId,
+            name: line.name,
+            quantity: line.quantity,
+            ...(line.variantSubtitle ? { options: line.variantSubtitle } : {}),
+          })),
+      }
+    : undefined;
 
   const amounts = calculateCheckoutAmounts({
     lineItems: lineItemsWithKits,
@@ -234,6 +291,7 @@ export async function buildCheckoutSnapshot({
     amounts,
     lineItems: lineItemsWithKits,
     ...(kits.length > 0 ? { kits } : {}),
+    ...(rxCheck ? { rxCheck } : {}),
     sectionShipping,
     billingAddress,
     shippingAddress: shippingAddress

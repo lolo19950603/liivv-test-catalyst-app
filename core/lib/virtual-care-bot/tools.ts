@@ -19,6 +19,7 @@ import { viewOnlyProducts } from '~/lib/catalog/view-only';
 import { viewOnlyRefusalFor } from '~/lib/catalog/view-only-rules';
 import { customerAddressToSnapshot } from '~/lib/account/saved-shipping-addresses';
 import { formatShippingAddressLabel } from '~/lib/checkout/subscription-shipping-metadata';
+import { medicationPrescriptionRows } from '~/lib/pharmacy/pharmacy-mappers';
 import { areSubscriptionsAvailable } from '~/lib/subscriptions/availability';
 import {
   cancelCustomerSubscription,
@@ -41,6 +42,19 @@ import {
 
 import { formatHelpTopicsForPrompt, getHelpTopics } from './knowledge-base';
 import { getAppBaseUrl } from './config';
+
+/*
+ * What the assistant is told when it may not add a product to the cart
+ * (`viewOnlyRefusalFor`, ~/lib/catalog/view-only-rules.ts).
+ */
+const ASSISTANT_REFUSALS: Record<'prescription-device' | 'rx-mask' | 'pharmacist', string> = {
+  'prescription-device':
+    'Liivv does not sell CPAP or other sleep apnea machines yet, so this cannot be added to the cart or bought. Do not give advice on machine choice or settings, and do not suggest another store. Liivv sells masks, cushions, tubing, filters and other supplies.',
+  'rx-mask':
+    'This is a complete CPAP mask. It needs a CPAP prescription that a Liivv pharmacist validates, so it cannot be added to the cart from chat. Send the customer the product page link from search_products instead; the customer adds their CPAP prescription on the Pharmacy page of their account before checking out. Parts for a mask they already have can be added. Do not give advice on mask choice, fit or settings, and do not suggest another store.',
+  pharmacist:
+    'This product is reviewed by a pharmacist and cannot be added to the cart from chat. Send the customer the product page link from search_products instead.',
+};
 
 function formatMoney(value: number | string | undefined, currency: string | undefined): string {
   if (value == null || value === '') {
@@ -147,18 +161,17 @@ export async function toolAddToCart(productEntityId: number, quantity = 1) {
     };
   }
 
-  // Never added by the assistant: a prescription device (never bought online)
-  // or insulin or glucagon (ordered from its product page, where a pharmacist
-  // reviews it). Owner approval, 2026-10-12; ~/lib/catalog/view-only.ts.
+  // Never added by the assistant: a prescription device (never bought online),
+  // a complete CPAP mask (a Liivv pharmacist validates the CPAP prescription;
+  // owner ruling C26, 2026-10-13) or insulin or glucagon (ordered from its
+  // product page, where a pharmacist reviews it). Owner approval, 2026-10-12;
+  // ~/lib/catalog/view-only.ts.
   const refusal = viewOnlyRefusalFor(productEntityId, await viewOnlyProducts([productEntityId]));
 
   if (refusal) {
     return {
       ok: false,
-      message:
-        refusal === 'prescription-device'
-          ? 'Liivv does not sell CPAP or other sleep apnea machines yet, so this cannot be added to the cart or bought. Do not give advice on machine choice or settings, and do not suggest another store. Liivv sells masks, cushions, tubing, filters and other supplies.'
-          : 'This product is reviewed by a pharmacist and cannot be added to the cart from chat. Send the customer the product page link from search_products instead.',
+      message: ASSISTANT_REFUSALS[refusal],
       cartUrl,
       productEntityId: String(productEntityId),
     };
@@ -355,10 +368,13 @@ export async function toolGetRecentOrders(limit = 3) {
 }
 
 export async function toolGetPrescriptionStatus(profileId: string) {
-  const [prescriptions, refills] = await Promise.all([
+  const [allPrescriptions, refills] = await Promise.all([
     listPrescriptionsByProfileId(profileId),
     listRefillRequestsByProfileId(profileId),
   ]);
+  // Medications only: a CPAP prescription (owner ruling C26, 2026-10-13) is
+  // never refilled, and its status is on the account Pharmacy page.
+  const prescriptions = medicationPrescriptionRows(allPrescriptions);
 
   const base = getAppBaseUrl();
 

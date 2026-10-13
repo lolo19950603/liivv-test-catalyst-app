@@ -22,6 +22,8 @@ import {
   pharmacistNotices,
   prescriptionDeviceNotices,
   prescriptionDeviceSlotCopy,
+  rxMaskNoticeCopy,
+  rxMaskNotices,
 } from '~/lib/catalog/care-notices';
 import { viewOnlyProducts } from '~/lib/catalog/view-only';
 import { viewOnlyReasonOf } from '~/lib/catalog/view-only-rules';
@@ -79,6 +81,7 @@ import { PrescriptionDeviceSlot } from './_components/prescription-device-slot';
 import { ProductAnalyticsProvider } from './_components/product-analytics-provider';
 import { ProductSchema } from './_components/product-schema';
 import { ProductViewed } from './_components/product-viewed';
+import { RxMaskNotice } from './_components/rx-mask-notice';
 import { Reviews } from './_components/reviews';
 import { WishlistButton } from './_components/wishlist-button';
 import { WishlistButtonForm } from './_components/wishlist-button/form';
@@ -999,6 +1002,16 @@ export default async function Product({ params, searchParams }: Props) {
    * the device's notices and their sources (CareNotices, read on the server
    * and stripped from the browser's bundle).
    *
+   * Complete CPAP masks (a fit pack, starter pack, complete system, value
+   * pack with a mask, or a kit holding one; owner ruling C26 (b),
+   * 2026-10-13): the add-to-cart form stays, as for insulin, with the
+   * prescription notice under it (RxMaskNotice: a Liivv pharmacist checks the
+   * CPAP prescription before the order ships, parts don't need it, and a
+   * child's mask gets the child line). One-time purchase only: Subscribe &
+   * save is not offered, and its action refuses a stale form. The checkout
+   * refuses payment until the customer's CPAP prescription is approved and in
+   * date. Parts for a mask the customer already has are ordinary products.
+   *
    * A curated kit is what it holds (production check, 2026-10-12): read from
    * the kit's own contents (`viewOnlyProducts`). A product that is not a kit
    * is judged on its own id, name and categories, with no lookup.
@@ -1031,19 +1044,28 @@ export default async function Product({ params, searchParams }: Props) {
       notices={await prescriptionDeviceNotices(deviceKind)}
     />
   ) : null;
+  const rxMaskKind = deviceKind ? null : (viewOnlyReason?.rxMask ?? null);
+  const rxMaskNotice = rxMaskKind ? (
+    <RxMaskNotice
+      copy={await rxMaskNoticeCopy(rxMaskKind)}
+      notices={await rxMaskNotices(rxMaskKind)}
+    />
+  ) : null;
   const productPurchaseSlot = prescriptionDeviceSlot ?? (isCuratedKit ? curatedKitSlot : undefined);
-  const offerPurchaseOptions = !isCuratedKit && !deviceKind;
+  const offerPurchaseOptions = !isCuratedKit && !deviceKind && !rxMaskKind;
   const compatSection = compatGroups.length ? (
     <CompatibilitySection groups={compatGroups} options={flangeOpts} />
   ) : undefined;
-  const afterForm = pharmacistNotice ? (
-    <>
-      {pharmacistNotice}
-      {compatSection}
-    </>
-  ) : (
-    compatSection
-  );
+  const afterForm =
+    pharmacistNotice || rxMaskNotice ? (
+      <>
+        {rxMaskNotice}
+        {pharmacistNotice}
+        {compatSection}
+      </>
+    ) : (
+      compatSection
+    );
   const fixedSize = FIXED_FLANGE_SIZES[baseProduct.entityId];
   const fixedChoice =
     fixedSize && !flangeOpts.some((option) => option.role === 'size')
