@@ -3,8 +3,11 @@ import 'server-only';
 import { cache } from 'react';
 
 import {
+  ADMIN_CUSTOMER_PAGE_SIZE,
   getAdminCustomerDetail,
   getAdminCustomerDetailByBigCommerceId,
+  listProfilesPageForAdmin,
+  countProfilesForAdmin,
   searchMergedCustomersForAdmin,
   type AdminCustomerDetail,
   type AdminMergedSearchRow,
@@ -28,6 +31,11 @@ import {
   type AdminPrescriptionQueueRow,
   type AdminRefillQueueRow,
 } from '~/lib/supabase/prescriptions';
+import {
+  customerSearchMinLength,
+  parseCustomerSearchField,
+  type CustomerSearchField,
+} from '~/lib/staff/customer-search';
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -46,6 +54,12 @@ export type StaffPortalData = {
   supabaseReady: boolean;
   adminTab: StaffTab;
   customerQuery: string;
+  customerSearchField: CustomerSearchField;
+  customerDirectory: boolean;
+  customerPage: number;
+  customerPageSize: number;
+  customerTotal: number;
+  customerNavTotal: number;
   selectedProfileId: string | null;
   selectedBigCommerceId: string | null;
   customerSearchRows: AdminMergedSearchRow[];
@@ -87,6 +101,16 @@ function parsePharmacyQueue(raw: string | undefined): PharmacyQueue {
   return 'prescription';
 }
 
+function parseCustomerPage(raw: string | undefined): number {
+  const page = Number.parseInt(raw ?? '', 10);
+
+  if (!Number.isFinite(page) || page < 1) {
+    return 1;
+  }
+
+  return Math.min(page, 10_000);
+}
+
 export const getStaffPortalData = cache(
   async (searchParams: Record<string, string | string[] | undefined>): Promise<StaffPortalData> => {
     const get = (key: string) => {
@@ -97,6 +121,8 @@ export const getStaffPortalData = cache(
 
     const adminTab = parseTab(get('tab'));
     const customerQuery = get('q').trim();
+    const customerSearchField = parseCustomerSearchField(get('by'));
+    const customerPage = parseCustomerPage(get('page'));
     const selectedProfileIdRaw = get('p').trim() || null;
     const selectedBigCommerceIdRaw = get('bc').trim() || null;
     const pharmacyQueue = parsePharmacyQueue(get('queue'));
@@ -113,6 +139,12 @@ export const getStaffPortalData = cache(
       supabaseReady: isSupabaseConfigured(),
       adminTab,
       customerQuery,
+      customerSearchField,
+      customerDirectory: false,
+      customerPage: 1,
+      customerPageSize: ADMIN_CUSTOMER_PAGE_SIZE,
+      customerTotal: 0,
+      customerNavTotal: 0,
       selectedProfileId: selectedProfileIdRaw,
       selectedBigCommerceId: selectedBigCommerceIdRaw,
       customerSearchRows: [],
@@ -143,15 +175,59 @@ export const getStaffPortalData = cache(
     }
 
     try {
+      const [customerNavTotal, queues, inbox] = await Promise.all([
+        countProfilesForAdmin(),
+        Promise.all([
+          listAdminPrescriptionQueue(300),
+          listAdminRefillQueue(300),
+          listAdminCarePackQueue(300),
+        ]).then(
+          (rows) => ({ ok: true as const, rows }),
+          () => ({ ok: false as const }),
+        ),
+        listConversationsForAdmin(),
+      ]);
+
+      base.customerNavTotal = customerNavTotal;
+
+      if (queues.ok) {
+        const [prescriptionQueue, refillQueue, carePackQueue] = queues.rows;
+
+        base.prescriptionQueue = prescriptionQueue;
+        base.refillQueue = refillQueue;
+        base.carePackQueue = carePackQueue;
+      } else {
+        base.pharmacyQueueError = 'Could not load pharmacy queue right now.';
+      }
+
+      if (inbox.ok) {
+        base.conversations = inbox.rows;
+      } else if (adminTab === 'chat') {
+        base.listError = inbox.message;
+      }
+
       if (adminTab === 'customers') {
-        if (customerQuery.length >= 2) {
-          const s = await searchMergedCustomersForAdmin(customerQuery);
+        if (customerQuery.length >= customerSearchMinLength(customerSearchField)) {
+          const s = await searchMergedCustomersForAdmin(customerQuery, customerSearchField);
 
           if (!s.ok) {
             base.customerSearchError = s.message;
           } else {
             base.customerSearchRows = s.rows;
+            base.customerTotal = s.rows.length;
             base.bigcommerceSearchWarning = s.bigcommerceSearchError;
+          }
+        } else {
+          const listed = await listProfilesPageForAdmin(customerPage);
+
+          if (!listed.ok) {
+            base.customerSearchError = listed.message;
+          } else {
+            base.customerDirectory = true;
+            base.customerSearchRows = listed.rows;
+            base.customerPage = listed.page;
+            base.customerPageSize = listed.pageSize;
+            base.customerTotal = listed.total;
           }
         }
 
@@ -180,28 +256,18 @@ export const getStaffPortalData = cache(
 
       if (adminTab === 'pharmacy') {
         try {
-          const [prescriptionQueue, refillQueue, carePackQueue] = await Promise.all([
-            listAdminPrescriptionQueue(300),
-            listAdminRefillQueue(300),
-            listAdminCarePackQueue(300),
-          ]);
-
-          base.prescriptionQueue = prescriptionQueue;
-          base.refillQueue = refillQueue;
-          base.carePackQueue = carePackQueue;
-
           let selectedProfileId: string | null = null;
 
           if (selectedRequestIdRaw && UUID_RE.test(selectedRequestIdRaw)) {
             if (selectedRequestType === 'refill') {
               selectedProfileId =
-                refillQueue.find((row) => row.id === selectedRequestIdRaw)?.profile_id ?? null;
+                base.refillQueue.find((row) => row.id === selectedRequestIdRaw)?.profile_id ?? null;
             } else if (selectedRequestType === 'carepack') {
               selectedProfileId =
-                carePackQueue.find((row) => row.id === selectedRequestIdRaw)?.profile_id ?? null;
+                base.carePackQueue.find((row) => row.id === selectedRequestIdRaw)?.profile_id ?? null;
             } else {
               selectedProfileId =
-                prescriptionQueue.find((row) => row.id === selectedRequestIdRaw)?.profile_id ?? null;
+                base.prescriptionQueue.find((row) => row.id === selectedRequestIdRaw)?.profile_id ?? null;
             }
           }
 
@@ -220,14 +286,6 @@ export const getStaffPortalData = cache(
       }
 
       if (adminTab === 'chat') {
-        const listed = await listConversationsForAdmin();
-
-        if (!listed.ok) {
-          base.listError = listed.message;
-        } else {
-          base.conversations = listed.rows;
-        }
-
         let selectedId = get('c').trim() || null;
         const profileFromQuery = get('profile').trim() || null;
 

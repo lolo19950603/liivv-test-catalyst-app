@@ -9,7 +9,7 @@ import {
   staffPortalAction,
   type StaffActionState,
 } from '~/app/pharmacy-admin/_actions/staff-portal-actions';
-import type { PharmacyQueue, StaffPortalData, StaffTab } from '~/app/pharmacy-admin/page-data';
+import type { PharmacyQueue, StaffPortalData } from '~/app/pharmacy-admin/page-data';
 import { StaffCustomerDetail } from '~/components/staff/staff-customer-detail';
 import {
   formatStaffStatusLabel,
@@ -26,7 +26,13 @@ import {
   useChatBurstRefresh,
   useChatPollRefresh,
 } from '~/components/virtual-care/use-chat-poll-refresh';
-import { isStaffJoinedToChat } from '~/lib/chat/session';
+import { inboxNeedsPharmacist, isInboxClosed, isInboxOpen, isStaffJoinedToChat } from '~/lib/chat/session';
+import {
+  CUSTOMER_SEARCH_FIELDS,
+  CUSTOMER_SEARCH_GROUPS,
+  customerSearchMinLength,
+  type CustomerSearchField,
+} from '~/lib/staff/customer-search';
 import type { AdminConversationSummary } from '~/lib/supabase/chat-messages';
 import type {
   AdminCarePackQueueRow,
@@ -44,10 +50,15 @@ const BUCKET_FILTERS: Array<{ id: BucketFilter; label: string }> = [
   { id: 'closed', label: 'Closed' },
 ];
 
-const NAV: Array<{ id: StaffTab; label: string }> = [
-  { id: 'pharmacy', label: 'Queue' },
-  { id: 'customers', label: 'Customers' },
-  { id: 'chat', label: 'Inbox' },
+const SIDE_NAV: Array<
+  | { kind: 'queue'; id: PharmacyQueue; label: string }
+  | { kind: 'tab'; id: 'customers' | 'chat'; label: string }
+> = [
+  { kind: 'queue', id: 'prescription', label: 'Prescriptions' },
+  { kind: 'queue', id: 'refill', label: 'Refills' },
+  { kind: 'queue', id: 'carepack', label: 'CarePack' },
+  { kind: 'tab', id: 'customers', label: 'Customers' },
+  { kind: 'tab', id: 'chat', label: 'Inbox' },
 ];
 
 function customerName(
@@ -185,39 +196,7 @@ function compareQueueRows(queue: PharmacyQueue, a: QueueRow, b: QueueRow): numbe
 }
 
 function needsAttention(conversation: AdminConversationSummary): boolean {
-  const inChat = isStaffJoinedToChat({
-    staffJoinedAt: conversation.staffJoinedAt,
-    staffClosedAt: conversation.staffClosedAt,
-  });
-
-  if (inChat) {
-    return false;
-  }
-
-  return Boolean(conversation.escalatedToPharmacistAt) || !conversation.staffClosedAt;
-}
-
-function inboxRank(conversation: AdminConversationSummary): number {
-  const inChat = isStaffJoinedToChat({
-    staffJoinedAt: conversation.staffJoinedAt,
-    staffClosedAt: conversation.staffClosedAt,
-  });
-  const escalatedOpen =
-    Boolean(conversation.escalatedToPharmacistAt) && !inChat && !conversation.staffClosedAt;
-
-  if (escalatedOpen) {
-    return 0;
-  }
-
-  if (!inChat && !conversation.staffClosedAt) {
-    return 1;
-  }
-
-  if (inChat) {
-    return 2;
-  }
-
-  return 3;
+  return inboxNeedsPharmacist(conversation);
 }
 
 export function StaffPortalClient({
@@ -239,25 +218,33 @@ export function StaffPortalClient({
   const [chatRefreshTrigger, setChatRefreshTrigger] = useState(0);
   const staffHref = (params: Record<string, string | undefined>) => portalHref(basePath, params);
   const tab = data.adminTab;
-  const sectionTitle = NAV.find((item) => item.id === tab)?.label ?? 'Queue';
+  const sectionTitle =
+    tab === 'customers'
+      ? 'Customers'
+      : tab === 'chat'
+        ? 'Inbox'
+        : (SIDE_NAV.find((item) => item.kind === 'queue' && item.id === data.pharmacyQueue)?.label ??
+          'Prescriptions');
 
-  const queueNeedsReview =
-    tab === 'pharmacy'
-      ? data.prescriptionQueue.filter(
-          (row) => staffWorklistBucket(rowStatus(row, 'prescription')) === 'needs_review',
-        ).length +
-        data.refillQueue.filter((row) => staffWorklistBucket(row.status) === 'needs_review').length +
-        data.carePackQueue.filter((row) => staffWorklistBucket(row.status) === 'needs_review').length
-      : null;
-  const customerCount =
-    tab === 'customers' && data.customerQuery.trim().length >= 2 ? data.customerSearchRows.length : null;
-  const inboxCount =
-    tab === 'chat' ? data.conversations.filter((conversation) => needsAttention(conversation)).length : null;
-  const navCount: Record<StaffTab, number | null> = {
-    pharmacy: queueNeedsReview,
-    customers: customerCount,
-    chat: inboxCount,
-  };
+  function sideCount(item: (typeof SIDE_NAV)[number]): number {
+    if (item.kind === 'queue') {
+      if (item.id === 'refill') {
+        return data.refillQueue.length;
+      }
+
+      if (item.id === 'carepack') {
+        return data.carePackQueue.length;
+      }
+
+      return data.prescriptionQueue.length;
+    }
+
+    if (item.id === 'customers') {
+      return data.customerNavTotal;
+    }
+
+    return data.conversations.filter((conversation) => needsAttention(conversation)).length;
+  }
 
   useEffect(() => {
     if (actionState?.ok) {
@@ -276,9 +263,13 @@ export function StaffPortalClient({
           <p className="mt-1 text-lg font-semibold text-white">Pharmacist admin</p>
         </div>
         <nav aria-label="Pharmacist admin" className="flex flex-1 flex-col gap-1 px-2">
-          {NAV.map((item) => {
-            const active = tab === item.id;
-            const count = navCount[item.id];
+          {SIDE_NAV.map((item) => {
+            const active = item.kind === 'queue' ? tab === 'pharmacy' && data.pharmacyQueue === item.id : tab === item.id;
+            const count = sideCount(item);
+            const href =
+              item.kind === 'tab'
+                ? staffHref({ tab: item.id })
+                : staffHref({ queue: item.id === 'prescription' ? undefined : item.id });
 
             return (
               <Link
@@ -288,23 +279,21 @@ export function StaffPortalClient({
                     ? 'flex items-center justify-between rounded-md bg-[#d7efc8] px-3 py-2.5 text-base font-semibold text-[#1c3a24]'
                     : 'flex items-center justify-between rounded-md px-3 py-2.5 text-base text-[#e5f2e2] hover:bg-white/10'
                 }
-                href={staffHref({ tab: item.id === 'pharmacy' ? undefined : item.id })}
-                key={item.id}
+                href={href}
+                key={item.kind === 'queue' ? item.id : item.id}
               >
                 <span>{item.label}</span>
-                {count !== null ? (
-                  <span
-                    className={
-                      active
-                        ? 'rounded-full bg-[#234028] px-2 text-sm font-semibold tabular-nums text-white'
-                        : count > 0
-                          ? 'rounded-full bg-[#f0b429] px-2 text-sm font-semibold tabular-nums text-[#3a2a00]'
-                          : 'rounded-full bg-white/15 px-2 text-sm font-semibold tabular-nums text-white'
-                    }
-                  >
-                    {count}
-                  </span>
-                ) : null}
+                <span
+                  className={
+                    active
+                      ? 'rounded-full bg-[#234028] px-2 text-sm font-semibold tabular-nums text-white'
+                      : count > 0
+                        ? 'rounded-full bg-[#f0b429] px-2 text-sm font-semibold tabular-nums text-[#3a2a00]'
+                        : 'rounded-full bg-white/15 px-2 text-sm font-semibold tabular-nums text-white'
+                  }
+                >
+                  {count}
+                </span>
               </Link>
             );
           })}
@@ -437,30 +426,6 @@ function PharmacyTab({
     <div className="flex h-full min-h-0 flex-col">
       <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-[#c9dcc4] bg-white px-5 py-3">
         <div className="inline-flex rounded-md border border-[#c9dcc4] bg-[#f4faf1] p-0.5 text-base">
-          {(
-            [
-              ['prescription', 'Prescriptions', data.prescriptionQueue.length, 'bg-[#234028]'],
-              ['refill', 'Refills', data.refillQueue.length, 'bg-[#1f5f8b]'],
-              ['carepack', 'CarePack', data.carePackQueue.length, 'bg-[#c46b2f]'],
-            ] as const
-          ).map(([id, label, count, activeClass]) => (
-            <Link
-              className={
-                queue === id
-                  ? `rounded ${activeClass} px-3 py-1.5 font-semibold text-white`
-                  : 'rounded px-3 py-1.5 text-[#3f3d39] hover:bg-white'
-              }
-              href={staffHref({ tab: 'pharmacy', queue: id })}
-              key={id}
-            >
-              {label}
-              <span className={queue === id ? 'ml-1.5 text-white/80' : 'ml-1.5 text-[#5c564c]'}>
-                {count}
-              </span>
-            </Link>
-          ))}
-        </div>
-        <div className="inline-flex rounded-md border border-[#c9dcc4] bg-[#f4faf1] p-0.5 text-base">
           {BUCKET_FILTERS.map((filter) => {
             const active = bucket === filter.id;
             const activeClass =
@@ -508,7 +473,13 @@ function PharmacyTab({
         <div className="min-h-0 overflow-auto">
           {visibleRows.length === 0 ? (
             <p className="px-4 py-6 text-base text-[#6b6560]">
-              {queueRows.length === 0 ? 'Queue is empty.' : 'Nothing matches this filter.'}
+              {queueRows.length === 0
+                ? queue === 'refill'
+                  ? 'No refills.'
+                  : queue === 'carepack'
+                    ? 'No CarePack requests.'
+                    : 'No prescriptions.'
+                : 'Nothing matches this filter.'}
             </p>
           ) : (
             <table className="w-full border-collapse bg-white text-base">
@@ -625,11 +596,18 @@ function CustomersTab({
   const router = useRouter();
   const [isNavigating, startTransition] = useTransition();
   const [query, setQuery] = useState(data.customerQuery);
+  const [field, setField] = useState<CustomerSearchField>(data.customerSearchField);
   const staffHref = (params: Record<string, string | undefined>) => portalHref(basePath, params);
+  const pageCount =
+    data.customerPageSize > 0 ? Math.max(1, Math.ceil(data.customerTotal / data.customerPageSize)) : 1;
+  const rangeStart =
+    data.customerTotal === 0 ? 0 : (data.customerPage - 1) * data.customerPageSize + 1;
+  const rangeEnd = Math.min(data.customerPage * data.customerPageSize, data.customerTotal);
 
   useEffect(() => {
     setQuery(data.customerQuery);
-  }, [data.customerQuery]);
+    setField(data.customerSearchField);
+  }, [data.customerQuery, data.customerSearchField]);
 
   function navigate(href: string) {
     startTransition(() => {
@@ -637,39 +615,88 @@ function CustomersTab({
     });
   }
 
+  function searchHref(selection?: { p?: string; bc?: string }) {
+    return staffHref({
+      tab: 'customers',
+      q: data.customerQuery,
+      by: data.customerSearchField === 'smart' ? undefined : data.customerSearchField,
+      p: selection?.p,
+      bc: selection?.bc,
+    });
+  }
+
+  function directoryHref(page: number, selection?: { p?: string; bc?: string }) {
+    return staffHref({
+      tab: 'customers',
+      page: page > 1 ? String(page) : undefined,
+      p: selection?.p,
+      bc: selection?.bc,
+    });
+  }
+
   return (
-    <div className="grid h-full min-h-0 lg:grid-cols-[18rem_minmax(0,1fr)]">
+    <div className="grid h-full min-h-0 lg:grid-cols-[24rem_minmax(0,1fr)]">
       <section className="flex min-h-0 flex-col border-b border-[#e6e2dc] lg:border-b-0 lg:border-r">
         <form
-          className="flex shrink-0 gap-2 border-b border-[#e6e2dc] p-3"
+          className="flex shrink-0 flex-col gap-2 border-b border-[#e6e2dc] p-3"
           onSubmit={(event) => {
             event.preventDefault();
             const nextQuery = query.trim();
 
-            if (nextQuery.length < 2) {
+            if (nextQuery.length === 0) {
+              navigate(staffHref({ tab: 'customers' }));
               return;
             }
 
-            navigate(staffHref({ tab: 'customers', q: nextQuery }));
+            if (nextQuery.length < customerSearchMinLength(field)) {
+              return;
+            }
+
+            navigate(
+              staffHref({
+                tab: 'customers',
+                q: nextQuery,
+                by: field === 'smart' ? undefined : field,
+              }),
+            );
           }}
         >
-          <input
-            aria-label="Search customers"
-            className="min-w-0 flex-1 rounded-md border border-[#e6e2dc] px-2.5 py-1.5 text-base focus:border-[#375a37] focus:outline-none"
-            minLength={2}
-            name="q"
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Name or email"
-            required
-            value={query}
-          />
-          <button
-            className="rounded-md bg-[#375a37] px-3 py-1.5 text-base font-medium text-white disabled:opacity-60"
-            disabled={isNavigating}
-            type="submit"
-          >
-            {isNavigating ? '…' : 'Search'}
-          </button>
+            <select
+              aria-label="Search by"
+              className="w-full rounded-md border border-[#e6e2dc] bg-white px-2.5 py-1.5 text-base focus:border-[#375a37] focus:outline-none"
+              onChange={(event) => setField(event.target.value as CustomerSearchField)}
+              value={field}
+            >
+              {CUSTOMER_SEARCH_GROUPS.map((group) => (
+                <optgroup key={group} label={group}>
+                  {CUSTOMER_SEARCH_FIELDS.filter((option) => option.group === group).map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          <div className="flex gap-2">
+            <input
+              aria-label="Search customers"
+              className="min-w-0 flex-1 rounded-md border border-[#e6e2dc] px-2.5 py-1.5 text-base focus:border-[#375a37] focus:outline-none"
+              name="q"
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={
+                CUSTOMER_SEARCH_FIELDS.find((option) => option.id === field)?.placeholder ??
+                'Search customers'
+              }
+              value={query}
+            />
+            <button
+              className="rounded-md bg-[#375a37] px-3 py-1.5 text-base font-medium text-white disabled:opacity-60"
+              disabled={isNavigating}
+              type="submit"
+            >
+              {isNavigating ? '…' : 'Search'}
+            </button>
+          </div>
         </form>
         {isNavigating ? (
           <p className="px-3 py-2 text-sm text-[#8a8176]" role="status">
@@ -686,8 +713,10 @@ function CustomersTab({
           aria-busy={isNavigating}
           className={`min-h-0 flex-1 overflow-y-auto ${isNavigating ? 'pointer-events-none opacity-50' : ''}`}
         >
-          {data.customerSearchRows.length === 0 && data.customerQuery.trim().length >= 2 && !isNavigating ? (
-            <li className="px-3 py-3 text-base text-[#8a8176]">No customers found.</li>
+          {data.customerSearchRows.length === 0 && !isNavigating ? (
+            <li className="px-3 py-3 text-base text-[#8a8176]">
+              {data.customerDirectory ? 'No customers yet.' : 'No customers found.'}
+            </li>
           ) : null}
           {data.customerSearchRows.map((row) => {
             if (row.source === 'supabase') {
@@ -702,12 +731,17 @@ function CustomersTab({
                       active ? 'bg-[#f4f7f0]' : 'hover:bg-[#fafafa]'
                     }`}
                     onClick={() =>
-                      navigate(staffHref({ tab: 'customers', q: data.customerQuery, p: profile.id }))
+                      data.customerDirectory
+                        ? navigate(directoryHref(data.customerPage, { p: profile.id }))
+                        : navigate(searchHref({ p: profile.id }))
                     }
                     type="button"
                   >
                     <p className="text-base font-medium">{name}</p>
                     <p className="truncate text-sm text-[#8a8176]">{profile.email}</p>
+                    {!data.customerDirectory && row.matchLabel ? (
+                      <p className="truncate text-sm text-[#375a37]">{row.matchLabel}</p>
+                    ) : null}
                   </button>
                 </li>
               );
@@ -723,24 +757,70 @@ function CustomersTab({
                   className={`block w-full px-3 py-2.5 text-left ${
                     active ? 'bg-[#f4f7f0]' : 'hover:bg-[#fafafa]'
                   }`}
-                  onClick={() =>
-                    navigate(
-                      staffHref({
-                        tab: 'customers',
-                        q: data.customerQuery,
-                        bc: hit.bigcommerce_customer_id,
-                      }),
-                    )
-                  }
+                  onClick={() => navigate(searchHref({ bc: hit.bigcommerce_customer_id }))}
                   type="button"
                 >
                   <p className="text-base font-medium">{name}</p>
                   <p className="truncate text-sm text-[#8a8176]">{hit.email} · store only</p>
+                  {row.matchLabel ? (
+                    <p className="truncate text-sm text-[#375a37]">{row.matchLabel}</p>
+                  ) : null}
                 </button>
               </li>
             );
           })}
         </ul>
+        {data.customerDirectory && data.customerTotal > 0 ? (
+          <nav
+            aria-label="Customer pages"
+            className="flex shrink-0 flex-col gap-2 border-t border-[#e6e2dc] px-3 py-2"
+          >
+            <p className="text-center text-sm tabular-nums text-[#8a8176]">
+              {rangeStart}–{rangeEnd} of {data.customerTotal}
+            </p>
+            {pageCount > 1 ? (
+              <div className="flex items-center justify-between gap-2">
+                <button
+                  className="rounded-md border border-[#e6e2dc] px-2 py-1 text-sm text-[#375a37] disabled:opacity-40"
+                  disabled={isNavigating || data.customerPage <= 1}
+                  onClick={() =>
+                    navigate(
+                      directoryHref(data.customerPage - 1, {
+                        p: data.selectedProfileId ?? undefined,
+                        bc: data.selectedProfileId
+                          ? undefined
+                          : (data.selectedBigCommerceId ?? undefined),
+                      }),
+                    )
+                  }
+                  type="button"
+                >
+                  Previous
+                </button>
+                <p className="text-sm tabular-nums text-[#8a8176]">
+                  {data.customerPage} / {pageCount}
+                </p>
+                <button
+                  className="rounded-md border border-[#e6e2dc] px-2 py-1 text-sm text-[#375a37] disabled:opacity-40"
+                  disabled={isNavigating || data.customerPage >= pageCount}
+                  onClick={() =>
+                    navigate(
+                      directoryHref(data.customerPage + 1, {
+                        p: data.selectedProfileId ?? undefined,
+                        bc: data.selectedProfileId
+                          ? undefined
+                          : (data.selectedBigCommerceId ?? undefined),
+                      }),
+                    )
+                  }
+                  type="button"
+                >
+                  Next
+                </button>
+              </div>
+            ) : null}
+          </nav>
+        ) : null}
       </section>
 
       <section className="relative min-h-0 overflow-y-auto">
@@ -775,7 +855,7 @@ function CustomersTab({
           </div>
         ) : (
           <p className="px-4 py-6 text-base text-[#8a8176]">
-            Search and select a customer to open the record.
+            Select a customer to open the record.
           </p>
         )}
       </section>
@@ -812,10 +892,11 @@ function ChatTab({
   const conversations = useMemo(
     () =>
       [...data.conversations].sort((a, b) => {
-        const rank = inboxRank(a) - inboxRank(b);
+        const waitingA = inboxNeedsPharmacist(a) ? 0 : 1;
+        const waitingB = inboxNeedsPharmacist(b) ? 0 : 1;
 
-        if (rank !== 0) {
-          return rank;
+        if (waitingA !== waitingB) {
+          return waitingA - waitingB;
         }
 
         return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
@@ -868,8 +949,8 @@ function ChatTab({
             <div className="flex shrink-0 gap-1 border-b border-[#e6e2dc] p-2">
               {(
                 [
-                  ['open', 'Open', conversations.filter((item) => inboxRank(item) < 3).length],
-                  ['closed', 'Closed', conversations.filter((item) => inboxRank(item) === 3).length],
+                  ['open', 'Open', conversations.filter((item) => isInboxOpen(item)).length],
+                  ['closed', 'Closed', conversations.filter((item) => isInboxClosed(item)).length],
                 ] as const
               ).map(([id, label, count]) => (
                 <button
@@ -885,13 +966,17 @@ function ChatTab({
                   type="button"
                 >
                   {label}
-                  <span className="ml-1.5 tabular-nums text-[#8a8176]">{count}</span>
+                  <span
+                    className={`ml-1.5 tabular-nums ${inboxFilter === id ? 'text-white/80' : 'text-[#8a8176]'}`}
+                  >
+                    {count}
+                  </span>
                 </button>
               ))}
             </div>
             <ul className="min-h-0 flex-1 overflow-y-auto">
             {conversations.filter((item) =>
-              inboxFilter === 'closed' ? inboxRank(item) === 3 : inboxRank(item) < 3,
+              inboxFilter === 'closed' ? isInboxClosed(item) : isInboxOpen(item),
             ).length === 0 ? (
               <li className="px-3 py-4 text-base text-[#8a8176]">
                 {conversations.length === 0
@@ -902,7 +987,7 @@ function ChatTab({
               </li>
             ) : (
               conversations
-                .filter((item) => (inboxFilter === 'closed' ? inboxRank(item) === 3 : inboxRank(item) < 3))
+                .filter((item) => (inboxFilter === 'closed' ? isInboxClosed(item) : isInboxOpen(item)))
                 .map((conversation) => {
                 const name = customerName(
                   conversation.firstName,
@@ -915,13 +1000,11 @@ function ChatTab({
                   staffJoinedAt: conversation.staffJoinedAt,
                   staffClosedAt: conversation.staffClosedAt,
                 });
-                const state = conversation.escalatedToPharmacistAt && !inChat
-                  ? 'Pharmacist requested'
-                  : inChat
-                    ? 'In chat'
-                    : conversation.staffClosedAt
-                      ? 'Left chat'
-                      : 'Waiting';
+                const state = inChat
+                  ? 'In chat'
+                  : conversation.escalatedToPharmacistAt && !conversation.staffClosedAt
+                    ? 'Pharmacist requested'
+                    : 'Closed';
                 const preview = messagePreview(conversation.lastMessageSender, conversation.lastMessageBody);
                 const when = formatStaffTimestamp(conversation.updatedAt);
 
@@ -930,9 +1013,7 @@ function ChatTab({
                     ? 'text-[#9a4b00]'
                     : state === 'In chat'
                       ? 'text-[#1d6b32]'
-                      : state === 'Waiting'
-                        ? 'text-[#1f5f8b]'
-                        : 'text-[#6b6560]';
+                      : 'text-[#6b6560]';
 
                 return (
                   <li key={conversation.conversationId}>
@@ -943,7 +1024,14 @@ function ChatTab({
                       href={staffHref({ tab: 'chat', c: conversation.conversationId })}
                     >
                       <span className="flex items-baseline justify-between gap-2">
-                        <span className="truncate text-base font-semibold">{name}</span>
+                        <span className="flex min-w-0 items-center gap-2">
+                          <span className="truncate text-base font-semibold">{name}</span>
+                          {inChat && conversation.staffJoinedBy ? (
+                            <span className="shrink-0 rounded-full bg-[#234028] px-2 py-0.5 text-xs font-medium text-white">
+                              {conversation.staffJoinedBy}
+                            </span>
+                          ) : null}
+                        </span>
                         <time
                           className="shrink-0 text-sm tabular-nums text-[#5c6b5d]"
                           dateTime={conversation.updatedAt}
@@ -1029,7 +1117,7 @@ function ChatTab({
                         disabled={isPending}
                         type="submit"
                       >
-                        Leave chat
+                        Close chat
                       </button>
                     </form>
                   ) : (

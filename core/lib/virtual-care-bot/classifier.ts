@@ -9,7 +9,7 @@ const CLINICAL_PHARMACY_PATTERNS: RegExp[] = [
   /\b(pregnant|pregnancy|breastfeed|breastfeeding|nursing)\b/i,
   /\b(pain relief|fever|nausea|vomit|dizzy|dizziness|swelling|rash)\b/i,
   /\b(substitute for|alternative to).{0,40}\b(med|drug|medication|pill)\b/i,
-  /\b(talk to a pharmacist|speak to a pharmacist|pharmacist please|need a pharmacist)\b/i,
+  /\b((talk|speak|chat|connect|transfer)\s+(me\s+)?(to|with)\s+(a\s+)?pharmacist|pharmacist please|need a pharmacist|see a pharmacist)\b/i,
   /\b(will this (cure|treat|help)|does this (cure|treat))\b/i,
 ];
 
@@ -19,6 +19,44 @@ const OPERATIONAL_PHARMACY_PATTERNS: RegExp[] = [
 ];
 
 export type MessageClassification = 'store' | 'escalate_pharmacist';
+
+const AFFIRMATIVE_REPLY =
+  /^(y(es|ep|up|eah)?|sure|ok(ay)?|please|please do|go ahead|do it)([.!]|$)/i;
+
+/** Customer is asking to be connected with a pharmacist, including loose wording and typos around that request. */
+export function customerRequestsPharmacist(message: string): boolean {
+  const text = message.trim();
+
+  if (!/\bpharmacists?\b/i.test(text)) {
+    return false;
+  }
+
+  return (
+    /\b(talk|speak|chat|connect|transfer|refer|see|need|want|get|reach|call)\b/i.test(text) ||
+    /\b(again|please)\b/i.test(text)
+  );
+}
+
+export function agreesToPharmacistOffer(
+  message: string,
+  earlierMessages: Array<{ sender_type: string; body: string }>,
+): boolean {
+  if (!AFFIRMATIVE_REPLY.test(message.trim())) {
+    return false;
+  }
+
+  for (let index = earlierMessages.length - 1; index >= 0; index -= 1) {
+    const earlier = earlierMessages[index];
+
+    if (earlier.sender_type === 'customer') {
+      continue;
+    }
+
+    return earlier.sender_type === 'bot' && /\bpharmacist\b/i.test(earlier.body);
+  }
+
+  return false;
+}
 
 export function classifyCustomerMessage(message: string): MessageClassification {
   const text = message.trim();
@@ -33,6 +71,10 @@ export function classifyCustomerMessage(message: string): MessageClassification 
     return 'store';
   }
 
+  if (customerRequestsPharmacist(text)) {
+    return 'escalate_pharmacist';
+  }
+
   const isClinical = CLINICAL_PHARMACY_PATTERNS.some((pattern) => pattern.test(text));
 
   if (isClinical) {
@@ -44,3 +86,6 @@ export function classifyCustomerMessage(message: string): MessageClassification 
 
 export const PHARMACIST_ESCALATION_REPLY =
   "I can't provide medical or medication advice. I've notified a pharmacist on our team — they'll join this chat as soon as they're available.\n\nFor store questions (orders, products, or how to use your account), I'm still happy to help.";
+
+export const PHARMACIST_HANDOFF_REPLY =
+  "I've notified a pharmacist on our team — they'll join this chat as soon as they're available.";

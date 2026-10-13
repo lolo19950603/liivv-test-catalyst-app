@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 
 import { runStaffAction } from '~/lib/action-gateway/session';
-import { revalidateStaffPortalPaths } from '~/lib/staff-access';
+import { getStaffAccessContext, revalidateStaffPortalPaths } from '~/lib/staff-access';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import {
   appendStaffMessage,
@@ -221,7 +221,13 @@ export async function staffPortalAction(
   }
 
   if (intent === 'joinConversation' || intent === 'reopenConversation') {
-    const result = await joinStaffConversation(conversationId);
+    const access = await getStaffAccessContext();
+
+    if (!access) {
+      return STAFF_UNAUTHORIZED;
+    }
+
+    const result = await joinStaffConversation(conversationId, access.username);
 
     if (!result.ok) {
       return { ok: false, error: result.message };
