@@ -153,7 +153,18 @@ export function ArchiveCatalogProductCard({
   imageSizes = '(min-width: 42rem) 25vw, (min-width: 32rem) 33vw, (min-width: 28rem) 50vw, 100vw',
   quickActions,
 }: ArchiveCatalogProductCardProps) {
-  const { title, subtitle, price, image, href, hasVariants, sku, id, viewOnlyLabel } = product;
+  const {
+    title,
+    subtitle,
+    price,
+    image,
+    href,
+    hasVariants,
+    sku,
+    id,
+    viewOnlyLabel,
+    subscribeUnavailable,
+  } = product;
   const imgSrc = image?.src.trim() ?? '';
   const hasImage = imgSrc.length > 0;
   const hasLogoFallback =
@@ -164,8 +175,9 @@ export function ArchiveCatalogProductCard({
   const productTitle = title.trim() || 'Product';
 
   const showQuickAdd = quickActions?.addToCartAction != null;
-  const showOverlay =
-    (quickActions?.showWishlist === true && Boolean(sku)) || quickActions?.showSubscribe === true;
+  // No "Subscribe & save" link on a product whose page offers no subscription.
+  const showSubscribe = quickActions?.showSubscribe === true && subscribeUnavailable !== true;
+  const showOverlay = (quickActions?.showWishlist === true && Boolean(sku)) || showSubscribe;
 
   const overlayActions =
     showOverlay && quickActions ? (
@@ -185,7 +197,7 @@ export function ArchiveCatalogProductCard({
         }}
         productId={id}
         productSku={sku ?? ''}
-        showSubscribe={quickActions.showSubscribe}
+        showSubscribe={showSubscribe}
         showWishlist={Boolean(quickActions.showWishlist && sku)}
         subscribeLabel={quickActions.subscribeLabel ?? 'Subscribe & save'}
         wishlistAction={quickActions.wishlistAction}

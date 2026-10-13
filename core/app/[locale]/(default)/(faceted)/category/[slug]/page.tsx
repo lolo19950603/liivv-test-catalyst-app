@@ -31,10 +31,8 @@ import { numberedPaginationTransformer } from '~/data-transformers/numbered-pagi
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-ids';
 import { categoryLineageIds, isSensitiveProduct } from '~/lib/analytics/sensitive-products';
-import {
-  withoutInsulinOnFrench,
-  withPharmacistProductsViewOnly,
-} from '~/lib/checkout/quebec-insulin';
+import { withViewOnlyProducts } from '~/lib/catalog/view-only';
+import { withoutInsulinOnFrench } from '~/lib/checkout/quebec-insulin';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { resolveStoreLogo } from '~/lib/makeswift/site-header/resolve-store-logo';
@@ -237,8 +235,10 @@ export default async function Category(props: Props) {
     /*
      * Insulin and glucagon link their product page, never a one-click add:
      * the pharmacist notice is under its buy box (owner note 9, 2026-10-07).
+     * So do prescription devices, whose page says "Prescription required"
+     * (owner approval, 2026-10-12).
      */
-    return withPharmacistProductsViewOnly(
+    return withViewOnlyProducts(
       productCardTransformer(
         products,
         format,

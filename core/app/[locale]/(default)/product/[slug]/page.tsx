@@ -9,10 +9,6 @@ import { Suspense } from 'react';
 import { Stream, Streamable } from '@/vibes/soul/lib/streamable';
 import { FeaturedProductCarousel } from '@/vibes/soul/sections/featured-product-carousel';
 import {
-  isGlucagonProduct,
-  isInsulinProduct,
-} from '~/app/[locale]/(default)/liivv-health/diabetes-care/dc-ids';
-import {
   isOstomyKit,
 } from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
 import { auth, getSessionCustomerAccessToken } from '~/auth';
@@ -22,7 +18,14 @@ import { pricesTransformer } from '~/data-transformers/prices-transformer';
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { productOptionsTransformer } from '~/data-transformers/product-options-transformer';
 import { isSensitiveProduct } from '~/lib/analytics/sensitive-products';
-import { pharmacistProducts, withoutInsulinOnFrench } from '~/lib/checkout/quebec-insulin';
+import {
+  pharmacistNotices,
+  prescriptionDeviceNotices,
+  prescriptionDeviceSlotCopy,
+} from '~/lib/catalog/care-notices';
+import { viewOnlyProducts } from '~/lib/catalog/view-only';
+import { viewOnlyReasonOf } from '~/lib/catalog/view-only-rules';
+import { withoutInsulinOnFrench } from '~/lib/checkout/quebec-insulin';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import {
   CuratedKitCustomizer,
@@ -72,6 +75,7 @@ import './product-reviews.css';
 import { addToCart } from './_actions/add-to-cart';
 import { getMoreProductImages } from './_actions/get-more-images';
 import { submitReview } from './_actions/submit-review';
+import { PrescriptionDeviceSlot } from './_components/prescription-device-slot';
 import { ProductAnalyticsProvider } from './_components/product-analytics-provider';
 import { ProductSchema } from './_components/product-schema';
 import { ProductViewed } from './_components/product-viewed';
@@ -976,38 +980,59 @@ export default async function Product({ params, searchParams }: Props) {
     }),
   }));
   /*
+   * View-only products (~/lib/catalog/view-only.ts):
+   *
    * Insulin and glucagon: a pharmacist reviews and dispenses every order, and
    * insulin can't be ordered online for delivery in Quebec (owner answers A1,
-   * A8, B3, B11, B29; the rule is in diabetes-care/dc-ids.ts). The words are
-   * read here, on the server, because DiabetesCare is not in the browser's
-   * message bundle. Not review-gated in French: it is an operational notice,
-   * not an offer, and the checkout enforces the Quebec line either way.
+   * A8, B3, B11, B29; the rule is in diabetes-care/dc-ids.ts). The notice
+   * under the buy box is unchanged (~/lib/catalog/care-notices.ts reads the
+   * same DiabetesCare words, on the server, because DiabetesCare is not in the
+   * browser's message bundle). Not review-gated in French: it is an
+   * operational notice, not an offer, and the checkout enforces the Quebec
+   * line either way. Subscribe & save is offered as for any product (owner
+   * decision, 2026-10-13): a pharmacist reviews every insulin and glucagon
+   * order, and the checkout refuses insulin to Quebec on a subscription too.
    *
-   * A curated kit is what it holds (production check, 2026-10-12): one whose
-   * contents include glucagon (the Low-Glucose Rescue Kit holds Baqsimi) or
-   * insulin carries the same notice, and the insulin lines when it holds
-   * insulin. Read from the kit's own contents (`pharmacistProducts`).
+   * Prescription devices (a CPAP, APAP, bilevel or ASV machine, or a bundle
+   * holding one; owner approval, 2026-10-12): never bought online. The buy
+   * box is replaced by "Prescription required" (PrescriptionDeviceSlot), with
+   * the device's notices and their sources (CareNotices, read on the server
+   * and stripped from the browser's bundle).
+   *
+   * A curated kit is what it holds (production check, 2026-10-12): read from
+   * the kit's own contents (`viewOnlyProducts`). A product that is not a kit
+   * is judged on its own id, name and categories, with no lookup.
    */
-  const kitContents = isCuratedKit
-    ? (await pharmacistProducts([baseProduct.entityId])).get(baseProduct.entityId)
-    : undefined;
-  const isInsulin =
-    isInsulinProduct({
-      entityId: baseProduct.entityId,
-      categoryIds: removeEdgesAndNodes(baseProduct.categories).map(({ entityId }) => entityId),
-    }) || Boolean(kitContents?.insulin);
-  const commerceT =
-    isInsulin || isGlucagonProduct(baseProduct.entityId) || kitContents
-      ? await getTranslations('DiabetesCare.ui.commerce')
-      : null;
-  const pharmacistNotice = commerceT ? (
-    <aside className="border-t border-[var(--product-detail-border,hsl(var(--contrast-100)))] py-6 text-sm">
-      <p>{commerceT('pharmacistNotice')}</p>
-      {/* Cold-chain is said of insulin only: glucagon (Baqsimi) is kept at room temperature. */}
-      {isInsulin ? <p className="mt-2">{commerceT('insulinColdChain')}</p> : null}
-      {isInsulin ? <p className="mt-2">{commerceT('quebecInsulin')}</p> : null}
-    </aside>
+  const viewOnlyReason = isCuratedKit
+    ? ((await viewOnlyProducts([baseProduct.entityId])).get(baseProduct.entityId) ?? null)
+    : viewOnlyReasonOf({
+        entityId: baseProduct.entityId,
+        name: baseProduct.name,
+        categoryIds: removeEdgesAndNodes(baseProduct.categories).map(({ entityId }) => entityId),
+      });
+  const deviceKind = viewOnlyReason?.device ?? null;
+  const pharmacistNoticeItems = await pharmacistNotices({
+    insulin: Boolean(viewOnlyReason?.insulin),
+    glucagon: Boolean(viewOnlyReason?.glucagon),
+  });
+  const pharmacistNotice =
+    pharmacistNoticeItems.length > 0 ? (
+      <aside className="border-t border-[var(--product-detail-border,hsl(var(--contrast-100)))] py-6 text-sm">
+        {pharmacistNoticeItems.map((notice, index) => (
+          <p className={index > 0 ? 'mt-2' : undefined} key={notice.id}>
+            {notice.text}
+          </p>
+        ))}
+      </aside>
+    ) : null;
+  const prescriptionDeviceSlot = deviceKind ? (
+    <PrescriptionDeviceSlot
+      copy={await prescriptionDeviceSlotCopy()}
+      notices={await prescriptionDeviceNotices(deviceKind)}
+    />
   ) : null;
+  const productPurchaseSlot = prescriptionDeviceSlot ?? (isCuratedKit ? curatedKitSlot : undefined);
+  const offerPurchaseOptions = !isCuratedKit && !deviceKind;
   const compatSection = compatGroups.length ? (
     <CompatibilitySection groups={compatGroups} options={flangeOpts} />
   ) : undefined;
@@ -1081,12 +1106,12 @@ export default async function Product({ params, searchParams }: Props) {
             productId={baseProduct.entityId}
             hidePrice={isCuratedKit}
             pinGallery={isCuratedKit}
-            purchaseOptions={isCuratedKit ? undefined : purchaseOptions}
-            purchaseSlot={isCuratedKit ? curatedKitSlot : undefined}
+            purchaseOptions={offerPurchaseOptions ? purchaseOptions : undefined}
+            purchaseSlot={productPurchaseSlot}
             quantityLabel={t('ProductDetails.quantity')}
             recaptchaSiteKey={recaptchaSiteKey}
             reviewFormAction={submitReview}
-            showPurchaseOptions={isCuratedKit ? false : showPurchaseOptions}
+            showPurchaseOptions={offerPurchaseOptions ? showPurchaseOptions : false}
             thumbnailLabel={t('ProductDetails.thumbnail')}
             user={streamableUser}
             fixedChoice={fixedChoice}

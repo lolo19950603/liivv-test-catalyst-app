@@ -50,6 +50,7 @@ import {
 } from '~/lib/checkout/section-shipping-storage';
 import { isCheckoutSubscriptionMetadataReady } from '~/lib/checkout/subscription-metadata-readiness';
 import { shipsInsulinToQuebec } from '~/lib/checkout/quebec-insulin';
+import { prescriptionDeviceIds } from '~/lib/catalog/view-only';
 
 import { initializePayment, prepareOrderConfirmation } from './_actions/initialize-payment';
 import {
@@ -493,11 +494,26 @@ export default async function CheckoutPage({ params }: Props) {
     stateOrProvince: shippingConsignment?.address.stateOrProvince,
     productEntityIds: snapshotLines.map((line) => line.productEntityId),
   }).catch(() => true);
-  // Read on the server: DiabetesCare is not in the browser's message bundle.
+  /*
+   * A prescription device (a CPAP, APAP, bilevel or ASV machine, or a bundle
+   * holding one) can't be bought online (owner approval, 2026-10-12). Same
+   * treatment: the message under a pay button that stays off, and
+   * buildCheckoutSnapshot() refuses it (PrescriptionDeviceError). Fails
+   * closed: if the catalogue can't be asked, the cart is held.
+   */
+  const hasPrescriptionDevice =
+    (await prescriptionDeviceIds(snapshotLines.map((line) => line.productEntityId))).size > 0;
+  // Read on the server: DiabetesCare and CareNotices are not in the browser's message bundle.
   const commerceT = await getTranslations('DiabetesCare.ui');
-  const orderBlockedMessage = insulinToQuebec
-    ? commerceT('commerce.quebecInsulinCheckout', { phone: commerceT('contact.phone') })
-    : undefined;
+  const careT = await getTranslations('CareNotices.checkout');
+  const orderBlockedMessages = [
+    hasPrescriptionDevice ? careT('deviceBlocked') : undefined,
+    insulinToQuebec
+      ? commerceT('commerce.quebecInsulinCheckout', { phone: commerceT('contact.phone') })
+      : undefined,
+  ].filter((message) => message !== undefined);
+  const orderBlockedMessage =
+    orderBlockedMessages.length > 0 ? orderBlockedMessages.join(' ') : undefined;
 
   const summarySections = buildCheckoutSummarySections({
     lines: checkoutLines,

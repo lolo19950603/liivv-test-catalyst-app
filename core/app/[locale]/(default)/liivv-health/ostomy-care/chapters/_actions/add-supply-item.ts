@@ -1,6 +1,7 @@
 'use server';
 
 import { addToOrCreateCart } from '~/lib/cart';
+import { viewOnlyProductIds } from '~/lib/catalog/view-only';
 
 import { SUPPLY_CART_ALLOWLIST } from '../supply-list-merchandising';
 
@@ -19,7 +20,9 @@ import { SUPPLY_CART_ALLOWLIST } from '../supply-list-merchandising';
  *
  * The allowlist is the guard. An id that is not on it is refused before any
  * BigCommerce call, so a tampered form cannot add an arbitrary product through
- * an ostomy page.
+ * an ostomy page. A view-only product (insulin, glucagon, a prescription
+ * device; ~/lib/catalog/view-only.ts) is refused as well, as the shared
+ * placement add does (twin: ../../../_microsite/shop/add-placement.ts).
  * =============================================================================
  */
 
@@ -36,6 +39,10 @@ export async function addSupplyItemToCart(
   const productEntityId = Number.parseInt(typeof raw === 'string' ? raw : '', 10);
 
   if (!SUPPLY_CART_ALLOWLIST.has(productEntityId)) {
+    return { status: 'error' };
+  }
+
+  if ((await viewOnlyProductIds([productEntityId])).has(productEntityId)) {
     return { status: 'error' };
   }
 

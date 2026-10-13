@@ -13,10 +13,8 @@ import { facetsTransformer } from '~/data-transformers/facets-transformer';
 import { numberedPaginationTransformer } from '~/data-transformers/numbered-pagination-transformer';
 import { productCardTransformer } from '~/data-transformers/product-card-transformer';
 import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-ids';
-import {
-  withoutInsulinOnFrench,
-  withPharmacistProductsViewOnly,
-} from '~/lib/checkout/quebec-insulin';
+import { withViewOnlyProducts } from '~/lib/catalog/view-only';
+import { withoutInsulinOnFrench } from '~/lib/checkout/quebec-insulin';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 
@@ -148,8 +146,11 @@ export default async function Search(props: Props) {
     const { defaultOutOfStockMessage, showOutOfStockMessage, showBackorderMessage } =
       settings?.inventory ?? {};
 
-    /* Insulin and glucagon link their product page, never a one-click add (owner note 9). */
-    return withPharmacistProductsViewOnly(
+    /*
+     * Insulin, glucagon and prescription devices link their product page,
+     * never a one-click add (owner note 9; owner approval, 2026-10-12).
+     */
+    return withViewOnlyProducts(
       productCardTransformer(
         products,
         format,

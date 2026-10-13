@@ -34,11 +34,16 @@ export interface Product {
   hasVariants?: boolean;
   /*
    * Set on a product that is never added from a listing (insulin and
-   * glucagon, which a pharmacist reviews: the notice is on the product page).
-   * Where a card would offer a one-click add, it links the product page with
-   * this label instead.
+   * glucagon, which a pharmacist reviews: the notice is on the product page;
+   * and prescription devices, never bought online). Where a card would offer
+   * a one-click add, it links the product page with this label instead.
    */
   viewOnlyLabel?: string;
+  /*
+   * Set on a product whose page offers no subscription (a prescription
+   * device): the card shows no "Subscribe & save" link.
+   */
+  subscribeUnavailable?: boolean;
 }
 
 export interface ProductCardProps {

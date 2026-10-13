@@ -18,14 +18,17 @@
  * Two ways a product qualifies:
  *
  *   by shelf    it sits in one of the ostomy categories (OSTOMY_ANALYTICS_
- *               CATEGORY_IDS in oc-ids.ts) or one of the diabetes categories
- *               (DIABETES_ANALYTICS_CATEGORY_IDS in dc-ids.ts) — the general
- *               rule.
+ *               CATEGORY_IDS in oc-ids.ts), one of the diabetes categories
+ *               (DIABETES_ANALYTICS_CATEGORY_IDS in dc-ids.ts) or one of the
+ *               sleep apnea and CPAP categories (CPAP_ANALYTICS_CATEGORY_IDS
+ *               in ~/lib/catalog/prescription-devices.ts) — the general rule.
  *   by id       it is a curated ostomy kit, a product the ostomy supply list
  *               may add to a cart, a curated diabetes kit
  *               (DIABETES_CURATED_KIT_IDS in dc-ids.ts), or a product a
  *               Diabetes page places (DIABETES_PLACED_PRODUCT_IDS in
- *               diabetes-care/chapters/chapter-shop.ts). These are named on
+ *               diabetes-care/chapters/chapter-shop.ts), or a CPAP machine or
+ *               machine bundle (PAP_DEVICE_IDS in
+ *               ~/lib/catalog/prescription-devices.ts). These are named on
  *               care surfaces, so they are covered even where categories are
  *               not known at event time (a cart line item carries no
  *               categories at all).
@@ -52,6 +55,7 @@ import {
   isOstomyCategoryIds,
   OSTOMY_KIT_IDS,
 } from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
+import { isCpapCategoryIds, isPapDeviceId } from '~/lib/catalog/prescription-devices';
 
 export interface SensitiveProductInput {
   /** The product's entity id, where the emitter knows it. */
@@ -88,7 +92,8 @@ export function isSensitiveProductId(entityId: number): boolean {
     OSTOMY_KIT_IDS.includes(entityId) ||
     SUPPLY_CART_ALLOWLIST.has(entityId) ||
     isDiabetesKit(entityId) ||
-    isDiabetesPlacedProduct(entityId)
+    isDiabetesPlacedProduct(entityId) ||
+    isPapDeviceId(entityId)
   );
 }
 
@@ -106,6 +111,9 @@ export function isSensitiveProduct({ entityId, categoryIds }: SensitiveProductIn
   }
 
   return (
-    categoryIds != null && (isOstomyCategoryIds(categoryIds) || isDiabetesCategoryIds(categoryIds))
+    categoryIds != null &&
+    (isOstomyCategoryIds(categoryIds) ||
+      isDiabetesCategoryIds(categoryIds) ||
+      isCpapCategoryIds(categoryIds))
   );
 }

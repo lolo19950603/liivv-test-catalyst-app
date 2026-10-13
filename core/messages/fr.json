@@ -3976,6 +3976,42 @@
       }
     }
   },
+  "CareNotices": {
+    "device": {
+      "title": "Ordonnance requise",
+      "body": "Cet appareil ne peut pas être acheté en ligne. Envoyez votre ordonnance depuis votre compte Liivv et un pharmacien communiquera avec vous.",
+      "howToSend": "Sur la page Pharmacie de votre compte, choisissez Ajouter une ordonnance, puis transférez-la de votre fournisseur actuel ou demandez à votre prescripteur de la télécopier.",
+      "sendPrescription": "Envoyer votre ordonnance",
+      "bookCall": "Des questions ? Réservez un appel",
+      "noticesLabel": "Avant de choisir un appareil",
+      "sourcesLabel": "{count, plural, one {Source :} other {Sources :}}"
+    },
+    "notices": {
+      "prescription": "Cet appareil nécessite une ordonnance.",
+      "pressure": "Votre prescripteur règle votre pression. Liivv ne modifie jamais vos réglages et ne donne aucun conseil à leur sujet.",
+      "centralApnea": "Un appareil CPAP standard peut aggraver l’apnée centrale du sommeil. Votre médecin du sommeil décide quel appareil vous convient.",
+      "bilevel": "Les appareils à deux niveaux de pression sont prescrits par un spécialiste du sommeil.",
+      "asv": "À utiliser uniquement sous les soins d’un spécialiste du sommeil. Ne convient pas à certaines personnes atteintes d’insuffisance cardiaque.",
+      "supplier": "Vous pouvez choisir n’importe quel fournisseur pour votre appareil et vos fournitures."
+    },
+    "sources": {
+      "alberta": "MyHealth.Alberta.ca : Buyer’s Information for CPAP Therapy Equipment (en anglais)",
+      "bcPapGuide": "Gouvernement de la C.-B. : Positive Airway Pressure Buyer’s Guide (en anglais)",
+      "healthCanadaAsvRecall": "Santé Canada, rappel RA-53771 (2015)",
+      "crto": "College of Respiratory Therapists of Ontario : What you need to know about community respiratory therapy (en anglais)"
+    },
+    "refusals": {
+      "prescriptionDevice": "Les appareils sur ordonnance ne peuvent pas être achetés en ligne. Envoyez votre ordonnance depuis votre compte Liivv et un pharmacien communiquera avec vous.",
+      "pharmacist": "Un pharmacien vérifie chaque commande d’insuline et de glucagon : ce produit ne peut donc pas être ajouté de cette façon. Ajoutez-le à votre panier depuis sa page produit."
+    },
+    "checkout": {
+      "deviceBlocked": "Les appareils sur ordonnance ne peuvent pas être achetés en ligne. Retirez-le pour continuer. Pour en obtenir un, envoyez votre ordonnance depuis votre compte Liivv et un pharmacien communiquera avec vous."
+    },
+    "reorder": {
+      "held": "Impossible de commander de nouveau : {names}. Les appareils sur ordonnance ne peuvent pas être achetés en ligne. Ouvrez la page de chaque produit pour envoyer votre ordonnance.",
+      "added": "{added, plural, =1 {1 article a été ajouté} other {# articles ont été ajoutés}} à votre panier."
+    }
+  },
   "DiabetesCare": {
     "ui": {
       "chapter": {

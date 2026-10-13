@@ -3,6 +3,7 @@
 import 'server-only';
 
 import { addToOrCreateCart } from '~/lib/cart';
+import { viewOnlyProductIds } from '~/lib/catalog/view-only';
 
 import type { PlacementAddState } from './types';
 
@@ -17,7 +18,10 @@ import type { PlacementAddState } from './types';
  *
  * The form carries one product id and nothing else. An id that is not on the
  * allowlist is refused before any BigCommerce call, so a tampered form cannot
- * add an arbitrary product through a care page. No quantity, no "add all",
+ * add an arbitrary product through a care page. A view-only product
+ * (insulin, glucagon, a prescription device, or a kit holding one;
+ * ~/lib/catalog/view-only.ts) is refused too, whatever a site's allowlist
+ * places, before any cart call. No quantity, no "add all",
  * no message text and no analytics event: the button says what happened in
  * its own status line.
  * =============================================================================
@@ -31,6 +35,10 @@ export async function addAllowlistedProduct(
   const productEntityId = Number.parseInt(typeof raw === 'string' ? raw : '', 10);
 
   if (!allowlist.has(productEntityId)) {
+    return { status: 'error' };
+  }
+
+  if ((await viewOnlyProductIds([productEntityId])).has(productEntityId)) {
     return { status: 'error' };
   }
 

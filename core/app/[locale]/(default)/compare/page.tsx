@@ -9,7 +9,7 @@ import { getSessionCustomerAccessToken } from '~/auth';
 import { DenyAdSignals } from '~/components/analytics/deny-ad-signals';
 import { pricesTransformer } from '~/data-transformers/prices-transformer';
 import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-ids';
-import { withPharmacistProductsViewOnly } from '~/lib/checkout/quebec-insulin';
+import { withViewOnlyProducts } from '~/lib/catalog/view-only';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 import { getMakeswiftPageMetadata } from '~/lib/makeswift';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
@@ -74,8 +74,11 @@ export default async function Compare(props: Props) {
     const products = await getComparedProducts(productIds, currencyCode, customerAccessToken);
     const format = await getFormatter();
 
-    /* Insulin and glucagon link their product page, never a one-click add (owner note 9). */
-    return withPharmacistProductsViewOnly(
+    /*
+     * Insulin, glucagon and prescription devices link their product page,
+     * never a one-click add (owner note 9; owner approval, 2026-10-12).
+     */
+    return withViewOnlyProducts(
       products.map((product) => ({
         id: product.entityId.toString(),
         title: product.name,

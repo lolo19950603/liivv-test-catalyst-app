@@ -35,7 +35,8 @@
     ],
     "paths": {
       "@/vibes/*": ["./vibes/*"],
-      "~/*": ["./*"]
+      "~/*": ["./*"],
+      "vitest": ["../packages/catalyst/node_modules/vitest/dist/index.d.ts"]
     },
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },

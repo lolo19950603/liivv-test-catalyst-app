@@ -9,7 +9,7 @@ import { z } from 'zod';
 import { Link } from '~/components/link';
 import { addToOrCreateCart } from '~/lib/cart';
 import { MissingCartError } from '~/lib/cart/error';
-import { pharmacistProductIds } from '~/lib/checkout/quebec-insulin';
+import { viewOnlyProductIds } from '~/lib/catalog/view-only';
 
 interface State {
   lastResult: SubmissionResult | null;
@@ -34,9 +34,10 @@ export async function addWishlistItemToCart(prevState: State, formData: FormData
     const { productId, variantId } = schema.parse(submission.value);
     const quantity = 1;
 
-    // Insulin and glucagon are never added from a listing (owner note 9): the
-    // card links the product page, where the pharmacist notice is.
-    if ((await pharmacistProductIds([productId])).has(productId)) {
+    // Insulin, glucagon and prescription devices are never added from a
+    // listing (owner note 9; owner approval, 2026-10-12): the card links the
+    // product page, where the pharmacist notice or "Prescription required" is.
+    if ((await viewOnlyProductIds([productId])).has(productId)) {
       const shop = await getTranslations('DiabetesCare.ui.chapter.shop');
 
       return { ...prevState, lastResult: { status: 'error' }, errorMessage: shop('addError') };

@@ -13,6 +13,7 @@ import { graphql } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
 import { SearchProductFragment } from '~/components/header/_actions/fragment';
 import { searchResultsTransformer } from '~/data-transformers/search-results-transformer';
+import { viewOnlyProductIds } from '~/lib/catalog/view-only';
 import { getPreferredCurrencyCode } from '~/lib/currency';
 
 const GetKitProductSearchQuery = graphql(
@@ -95,7 +96,15 @@ export async function searchKitProducts(
       fetchOptions: customerAccessToken ? { cache: 'no-store' } : { next: { revalidate } },
     });
 
-    const products = removeEdgesAndNodes(data.site.search.searchProducts.products);
+    const found = removeEdgesAndNodes(data.site.search.searchProducts.products);
+    /*
+     * A kit never takes a view-only product: a prescription device (never
+     * bought online) or insulin or glucagon (a pharmacist reviews every
+     * order). Owner approval, 2026-10-12. They are left out of the results,
+     * failing closed: if the catalogue cannot answer, nothing is offered.
+     */
+    const viewOnly = await viewOnlyProductIds(found.map((product) => product.entityId));
+    const products = found.filter((product) => !viewOnly.has(product.entityId));
     const searchResults = await searchResultsTransformer(products, { productsOnly: true });
 
     return {

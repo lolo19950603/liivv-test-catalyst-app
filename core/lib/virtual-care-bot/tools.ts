@@ -15,6 +15,8 @@ import {
   type SaveCheckoutAddressInput,
 } from '~/app/[locale]/(default)/checkout/_actions/save-checkout-address';
 import { addToOrCreateCart } from '~/lib/cart';
+import { viewOnlyProducts } from '~/lib/catalog/view-only';
+import { viewOnlyRefusalFor } from '~/lib/catalog/view-only-rules';
 import { customerAddressToSnapshot } from '~/lib/account/saved-shipping-addresses';
 import { formatShippingAddressLabel } from '~/lib/checkout/subscription-shipping-metadata';
 import { areSubscriptionsAvailable } from '~/lib/subscriptions/availability';
@@ -142,6 +144,23 @@ export async function toolAddToCart(productEntityId: number, quantity = 1) {
       ok: false,
       message: 'Quantity must be between 1 and 50.',
       cartUrl,
+    };
+  }
+
+  // Never added by the assistant: a prescription device (never bought online)
+  // or insulin or glucagon (ordered from its product page, where a pharmacist
+  // reviews it). Owner approval, 2026-10-12; ~/lib/catalog/view-only.ts.
+  const refusal = viewOnlyRefusalFor(productEntityId, await viewOnlyProducts([productEntityId]));
+
+  if (refusal) {
+    return {
+      ok: false,
+      message:
+        refusal === 'prescription-device'
+          ? 'This is a prescription machine and cannot be added to the cart or bought online. Do not give advice on machine choice or settings. Send the customer the product page link: they can send their prescription through their Liivv account (Pharmacy page) and a pharmacist will contact them, or book a call.'
+          : 'This product is reviewed by a pharmacist and cannot be added to the cart from chat. Send the customer the product page link from search_products instead.',
+      cartUrl,
+      productEntityId: String(productEntityId),
     };
   }
 

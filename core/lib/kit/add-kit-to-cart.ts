@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { addToOrCreateCart } from '~/lib/cart';
 import { MissingCartError } from '~/lib/cart/error';
+import { prescriptionDeviceIds, viewOnlyRefusalMessage } from '~/lib/catalog/view-only';
 import { areCartKitsAvailable } from '~/lib/kit/availability';
 import { appendKitToSession, generateKitId } from '~/lib/kit';
 import { kitItemSchema } from '~/lib/kit/kit-item-schema';
@@ -56,8 +57,16 @@ export async function addKitToCart(input: AddKitToCartInput): Promise<AddKitToCa
     return { status: 'error', message: t('Errors.emptyKit') };
   }
 
-  const kitId = generateKitId();
   const { items, kitName, kitHref, kitImage } = parsed.data;
+
+  // A kit never puts a prescription device in the cart (a CPAP, APAP, bilevel
+  // or ASV machine; owner approval, 2026-10-12). The kit builder's search
+  // leaves them out; this refuses a kit that holds one anyway.
+  if ((await prescriptionDeviceIds(items.map((item) => item.productEntityId))).size > 0) {
+    return { status: 'error', message: await viewOnlyRefusalMessage('prescription-device') };
+  }
+
+  const kitId = generateKitId();
   const kitQuantity = parsed.data.quantity && parsed.data.quantity > 0 ? parsed.data.quantity : 1;
 
   try {

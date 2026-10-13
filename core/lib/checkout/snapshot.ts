@@ -21,7 +21,9 @@ import {
   reconcileSubscriptionLinesWithCart,
 } from './subscription-lines';
 import { assignKitIdsToCartLines, getKitSession } from '~/lib/kit';
-import { InsulinToQuebecError, shipsInsulinToQuebec } from './quebec-insulin';
+import { prescriptionDeviceIds } from '~/lib/catalog/view-only';
+import { assertCartMayBePaidOnline } from './checkout-gates';
+import { shipsInsulinToQuebec } from './quebec-insulin';
 import type { CheckoutAddressSnapshot, CheckoutLineItemSnapshot, CheckoutSnapshot } from './types';
 import type { SubscriptionLineMeta } from './types';
 
@@ -184,16 +186,21 @@ export async function buildCheckoutSnapshot({
   const immediateShipping = sectionShippingCosts['due-today'] ?? 0;
   const shippingAddress = shippingConsignmentWithAddress?.address ?? checkout.shippingConsignments?.[0]?.address;
 
-  // Insulin can't be ordered online for delivery in Quebec (owner answers A1,
-  // B3, B11). Refused here, so no payment or order is made from this cart.
-  if (
-    await shipsInsulinToQuebec({
+  // A prescription device is never bought online (PrescriptionDeviceError;
+  // owner approval, 2026-10-12), and insulin can't be ordered online for
+  // delivery in Quebec (InsulinToQuebecError; owner answers A1, B3, B11).
+  // Refused here, so no payment or order is made from this cart. A kit's
+  // component lines are real lines and are checked one by one.
+  await assertCartMayBePaidOnline(
+    {
       stateOrProvince: shippingAddress?.stateOrProvince,
       productEntityIds: lineItemsWithKits.map((line) => line.productEntityId),
-    })
-  ) {
-    throw new InsulinToQuebecError();
-  }
+    },
+    {
+      prescriptionDeviceIds: (ids) => prescriptionDeviceIds(ids, { throwOnLookupFailure: true }),
+      shipsInsulinToQuebec,
+    },
+  );
 
   const amounts = calculateCheckoutAmounts({
     lineItems: lineItemsWithKits,

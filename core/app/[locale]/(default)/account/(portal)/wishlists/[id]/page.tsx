@@ -12,7 +12,7 @@ import { defaultPageInfo, pageInfoTransformer } from '~/data-transformers/page-i
 import { wishlistDetailsTransformer } from '~/data-transformers/wishlists-transformer';
 import { redirect } from '~/i18n/routing';
 import { getSensitiveProductIds } from '~/lib/analytics/get-sensitive-product-ids';
-import { withPharmacistWishlistItemsViewOnly } from '~/lib/checkout/quebec-insulin';
+import { withViewOnlyWishlistItems } from '~/lib/catalog/view-only';
 import { isMobileUser } from '~/lib/user-agent';
 
 import { removeWishlistItem } from '../../../wishlists/_actions/remove-wishlist-item';
@@ -56,7 +56,7 @@ async function getWishlist(
   // Insulin and glucagon link their product page, never "Add to cart" (owner note 9).
   return {
     ...details,
-    items: withPharmacistWishlistItemsViewOnly(await details.items),
+    items: withViewOnlyWishlistItems(await details.items),
   };
 }
 

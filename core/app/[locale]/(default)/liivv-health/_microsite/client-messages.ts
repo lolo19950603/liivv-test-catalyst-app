@@ -42,6 +42,15 @@ const SITE_NAMESPACES = ['DiabetesCare'] as const;
 
 export type SiteNamespace = (typeof SITE_NAMESPACES)[number];
 
+/*
+ * Top-level namespaces no browser is given at all: read on the server only
+ * (getTranslations) and passed down as text. CareNotices holds the store's
+ * prescription-device and pharmacist notices, its checkout, reorder and
+ * cart refusals (~/lib/catalog/care-notices.ts, ~/lib/catalog/view-only.ts),
+ * so adding it changes no page's payload, Ostomy's included.
+ */
+const SERVER_ONLY_NAMESPACES = ['CareNotices'] as const;
+
 /* Removes a site's holds from the whole tree, by paths from the root. */
 export type WithoutSiteHeld = (messages: AbstractIntlMessages) => AbstractIntlMessages;
 
@@ -62,10 +71,13 @@ function withoutNamespace(messages: AbstractIntlMessages, ns: string): AbstractI
 
 /*
  * What the root layout gives the browser: everything except the site
- * namespaces, with the Ostomy holds applied exactly as before.
+ * namespaces and the server-only ones, with the Ostomy holds applied exactly
+ * as before.
  */
 export function rootClientMessages(messages: AbstractIntlMessages): AbstractIntlMessages {
-  return withoutHeldMessages(SITE_NAMESPACES.reduce(withoutNamespace, messages));
+  return withoutHeldMessages(
+    [...SITE_NAMESPACES, ...SERVER_ONLY_NAMESPACES].reduce(withoutNamespace, messages),
+  );
 }
 
 /*

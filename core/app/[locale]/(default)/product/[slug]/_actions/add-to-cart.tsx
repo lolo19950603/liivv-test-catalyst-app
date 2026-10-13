@@ -11,6 +11,7 @@ import { graphql } from '~/client/graphql';
 import { Link } from '~/components/link';
 import { addToOrCreateCart } from '~/lib/cart';
 import { MissingCartError } from '~/lib/cart/error';
+import { prescriptionDeviceIds, viewOnlyRefusalMessage } from '~/lib/catalog/view-only';
 import { addSubscriptionProductToCart } from '~/lib/stripe/add-subscription-to-cart';
 
 type CartSelectedOptionsInput = ReturnType<typeof graphql.scalar<'CartSelectedOptionsInput'>>;
@@ -35,6 +36,21 @@ export const addToCart = async (
 
   if (submission.status !== 'success') {
     return { lastResult: submission.reply(), fields: prevState.fields };
+  }
+
+  // A prescription device (a CPAP, APAP, bilevel or ASV machine, or a bundle
+  // or kit holding one) is never bought online (owner approval, 2026-10-12).
+  // Its page shows "Prescription required" instead of this form; this refuses
+  // a stale or hand-built form that asks anyway.
+  const requestedId = Number(submission.value.id);
+
+  if ((await prescriptionDeviceIds([requestedId])).has(requestedId)) {
+    return {
+      lastResult: submission.reply({
+        formErrors: [await viewOnlyRefusalMessage('prescription-device')],
+      }),
+      fields: prevState.fields,
+    };
   }
 
   const purchaseType = payload.get('purchaseType');
