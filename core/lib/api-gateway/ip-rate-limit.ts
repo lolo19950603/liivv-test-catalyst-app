@@ -99,3 +99,12 @@ export const DPD_RATE_LIMIT_WINDOW_SEC = 60;
  */
 export const MAKESWIFT_RATE_LIMIT_MAX = 600;
 export const MAKESWIFT_RATE_LIMIT_WINDOW_SEC = 60;
+
+/*
+ * Microsoft Graph change notifications for the pharmacy mailboxes (owner
+ * decision Q10, 2026-10-14): their own budget, like Makeswift, so Graph's
+ * bursts never spend the storefront's and the storefront never blocks Graph.
+ * The routes check every notification's clientState themselves.
+ */
+export const GRAPH_WEBHOOK_RATE_LIMIT_MAX = 600;
+export const GRAPH_WEBHOOK_RATE_LIMIT_WINDOW_SEC = 60;

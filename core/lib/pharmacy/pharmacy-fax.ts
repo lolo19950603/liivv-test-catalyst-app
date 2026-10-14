@@ -137,6 +137,29 @@ export function resolveProvinceLabel(provinceOrCode: string | null | undefined):
   return 'Ontario';
 }
 
+/*
+ * The provincial pharmacy's phone number for a province or territory code
+ * (or name), with the same fallback as the fax requests: Quebec, the
+ * territories and anything unknown use the Ontario pharmacy. Used by the
+ * pharmacist-message emails and the Pharmacy page (owner decision Q10,
+ * 2026-10-14), which name the pharmacy as Liivv, never by its own name.
+ */
+export function pharmacyPhoneForRegion(provinceOrCode: string | null | undefined): string {
+  const pharmacyInfo = provincePharmacyInfo[resolveProvinceLabel(provinceOrCode)] ?? DEFAULT_PHARMACY;
+
+  return pharmacyInfo.phone;
+}
+
+/* The provincial pharmacy's city and province code, for the email's legal line. */
+export function pharmacyLocationForRegion(provinceOrCode: string | null | undefined): {
+  city: string;
+  province: string;
+} {
+  const pharmacyInfo = provincePharmacyInfo[resolveProvinceLabel(provinceOrCode)] ?? DEFAULT_PHARMACY;
+
+  return { city: pharmacyInfo.city, province: pharmacyInfo.province };
+}
+
 export function generateFaxRequestEmail(params: {
   provinceLabel: string;
   fullName: string;

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Link } from '~/components/link';
 import { AddPrescriptionDialog } from '~/components/pharmacy/add-prescription-dialog';
 import type { CpapPrescriptionState } from '~/lib/pharmacy/cpap-prescription';
+import type { PharmacyContactIntake } from '~/lib/pharmacy-mail/view-types';
 
 /*
  * The account Pharmacy page's "CPAP prescription" card (owner ruling C26 (b),
@@ -92,11 +93,14 @@ export function CpapPrescriptionCard({
   supabaseReady,
   userFullName,
   userProvince,
+  contactIntake = null,
 }: {
   state: CpapPrescriptionState;
   supabaseReady: boolean;
   userFullName: string;
   userProvince: string | null;
+  /* The account email the intake's contact choice names (owner decision Q10). */
+  contactIntake?: PharmacyContactIntake | null;
 }) {
   const [open, setOpen] = useState(false);
   const status = statusOf(state);
@@ -147,6 +151,7 @@ export function CpapPrescriptionCard({
         ) : null}
       </p>
       <AddPrescriptionDialog
+        contactIntake={contactIntake}
         mode="cpap"
         onClose={() => setOpen(false)}
         open={open}

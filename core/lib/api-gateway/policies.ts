@@ -7,7 +7,9 @@ export type ApiGatewayPolicy =
   | 'dpd-public'
   | 'storefront-public'
   | 'makeswift'
-  | 'auth-public';
+  | 'auth-public'
+  | 'webhook-graph'
+  | 'cron';
 
 export type ApiGatewayMatch = {
   policy: ApiGatewayPolicy;
@@ -33,6 +35,30 @@ const rules: readonly Rule[] = [
     policy: 'webhook-bigcommerce',
     methods: ['POST'],
     match: (pathname) => pathname === '/api/bigcommerce/webhook',
+  },
+  /*
+   * Microsoft Graph change notifications for the pharmacy mailboxes (owner
+   * decision Q10, 2026-10-14). Graph POSTs notifications and, when a
+   * subscription is created, POSTs the validation handshake
+   * (?validationToken=…); GET answers the handshake too, so it can be checked
+   * by hand. No session: each route checks every notification's clientState.
+   * Without this rule the gateway would answer 404 before the routes run.
+   */
+  {
+    policy: 'webhook-graph',
+    methods: ['GET', 'POST'],
+    match: (pathname) =>
+      pathname === '/api/pharmacy-mail/notifications' || pathname === '/api/pharmacy-mail/lifecycle',
+  },
+  /*
+   * Vercel cron jobs (an HTTP GET to the production deployment). The gateway
+   * requires Authorization: Bearer <CRON_SECRET> (503 while it is unset) and
+   * the route checks it again.
+   */
+  {
+    policy: 'cron',
+    methods: ['GET'],
+    match: (pathname) => pathname.startsWith('/api/cron/'),
   },
   {
     policy: 'bc-app-handshake',

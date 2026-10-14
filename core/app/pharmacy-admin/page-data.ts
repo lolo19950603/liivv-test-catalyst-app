@@ -16,6 +16,8 @@ import {
   type AdminConversationSummary,
   type ChatMessageRow,
 } from '~/lib/supabase/chat-messages';
+import { loadStaffMailData } from '~/app/pharmacy-admin/mail-data';
+import type { StaffMailData } from '~/lib/pharmacy-mail/view-types';
 import { isSupabaseConfigured } from '~/lib/supabase/client';
 import {
   listAdminCarePackQueue,
@@ -40,9 +42,11 @@ export type StaffTab = 'pharmacy' | 'customers' | 'chat';
 /*
  * The worklist queues. 'mask_order': paid orders holding a complete CPAP mask,
  * each waiting for a pharmacist's sign-off (owner ruling C26 (b), 2026-10-13;
- * ~/lib/supabase/rx-order-checks.ts).
+ * ~/lib/supabase/rx-order-checks.ts). 'email_match': mailbox email that looks
+ * like a reply to a pharmacist but could not be matched safely, and Outlook
+ * replies flagged for the privacy officer (owner decision Q10, 2026-10-14).
  */
-export type PharmacyQueue = 'prescription' | 'refill' | 'carepack' | 'mask_order';
+export type PharmacyQueue = 'prescription' | 'refill' | 'carepack' | 'mask_order' | 'email_match';
 
 export type ChatPatientContext = {
   profileId: string;
@@ -72,7 +76,8 @@ export type StaffPortalData = {
   pharmacyCustomerDetail: AdminCustomerDetail | null;
   pharmacyCustomerDetailError: string | null;
   pharmacyQueue: PharmacyQueue;
-  selectedRequestType: PharmacyQueue | null;
+  /** The selected record's queue (never the Email to match list, which has no records). */
+  selectedRequestType: Exclude<PharmacyQueue, 'email_match'> | null;
   selectedRequestId: string | null;
   conversations: AdminConversationSummary[];
   listError: string | null;
@@ -81,6 +86,11 @@ export type StaffPortalData = {
   hasMoreOlder: boolean;
   messagesError: string | null;
   chatPatientContext: ChatPatientContext | null;
+  /*
+   * Pharmacist messages (owner decision Q10, 2026-10-14): the record panels,
+   * Replied badges, Email to match and Mail status. Null without Supabase.
+   */
+  mail: StaffMailData | null;
 };
 
 function parseTab(raw: string | undefined): StaffTab {
@@ -92,7 +102,7 @@ function parseTab(raw: string | undefined): StaffTab {
 }
 
 function parsePharmacyQueue(raw: string | undefined): PharmacyQueue {
-  if (raw === 'refill' || raw === 'carepack' || raw === 'mask_order') {
+  if (raw === 'refill' || raw === 'carepack' || raw === 'mask_order' || raw === 'email_match') {
     return raw;
   }
 
@@ -151,6 +161,7 @@ export const getStaffPortalData = cache(
       hasMoreOlder: false,
       messagesError: null,
       chatPatientContext: null,
+      mail: null,
     };
 
     if (!isSupabaseConfigured()) {
@@ -317,6 +328,9 @@ export const getStaffPortalData = cache(
       base.listError = base.listError ?? 'Health records are temporarily unavailable.';
       base.customerSearchError = base.customerSearchError ?? 'Health records are temporarily unavailable.';
     }
+
+    // Loads on its own terms and never throws (each panel reports its own failure).
+    base.mail = await loadStaffMailData(base);
 
     return base;
   },

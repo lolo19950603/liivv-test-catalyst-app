@@ -8,12 +8,39 @@ import {
   API_RATE_LIMIT_WINDOW_SEC,
   DPD_RATE_LIMIT_MAX,
   DPD_RATE_LIMIT_WINDOW_SEC,
+  GRAPH_WEBHOOK_RATE_LIMIT_MAX,
+  GRAPH_WEBHOOK_RATE_LIMIT_WINDOW_SEC,
   MAKESWIFT_RATE_LIMIT_MAX,
   MAKESWIFT_RATE_LIMIT_WINDOW_SEC,
 } from './ip-rate-limit';
-import { API_GATEWAY_HEADER, matchApiGatewayRule } from './policies';
+import { API_GATEWAY_HEADER, type ApiGatewayPolicy, matchApiGatewayRule } from './policies';
 
 type ProxyEvent = Parameters<NextProxy>[1];
+
+interface RateLimitBudget {
+  prefix: string;
+  max: number;
+  windowSec: number;
+}
+
+/*
+ * Policies settled on their own counter, BEFORE the shared budget is touched:
+ * builder traffic (Makeswift) and Microsoft Graph notifications must not be
+ * able to exhaust the storefront's 120/min, and the storefront must not be
+ * able to exhaust theirs.
+ */
+const DEDICATED_BUDGETS: Partial<Record<ApiGatewayPolicy, RateLimitBudget>> = {
+  makeswift: {
+    prefix: 'rl:makeswift',
+    max: MAKESWIFT_RATE_LIMIT_MAX,
+    windowSec: MAKESWIFT_RATE_LIMIT_WINDOW_SEC,
+  },
+  'webhook-graph': {
+    prefix: 'rl:graph',
+    max: GRAPH_WEBHOOK_RATE_LIMIT_MAX,
+    windowSec: GRAPH_WEBHOOK_RATE_LIMIT_WINDOW_SEC,
+  },
+};
 
 function passThrough(request: NextRequest, policy: string): NextResponse {
   const headers = new Headers(request.headers);
@@ -54,6 +81,69 @@ async function rateLimitResponse(
   );
 }
 
+/* Compares two strings in time that depends only on their lengths. */
+function constantTimeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+
+  let difference = 0;
+
+  for (let index = 0; index < a.length; index += 1) {
+    difference += a.charCodeAt(index) === b.charCodeAt(index) ? 0 : 1;
+  }
+
+  return difference === 0;
+}
+
+/* A shared-secret Bearer check: 503 while the secret is unset, 401 when it doesn't match. */
+function bearerCheck(request: NextRequest, secret: string | undefined, label: string): NextResponse | null {
+  const expected = secret?.trim();
+
+  if (!expected) {
+    return jsonError(503, `${label} not configured`);
+  }
+
+  const authorization = request.headers.get('authorization') ?? '';
+
+  return constantTimeEqual(authorization, `Bearer ${expected}`) ? null : jsonError(401, 'Unauthorized');
+}
+
+/* The per-policy checks that need no session: webhook signatures and shared secrets. */
+function sharedSecretCheck(policy: ApiGatewayPolicy, request: NextRequest): NextResponse | null {
+  if (policy === 'webhook-stripe') {
+    return request.headers.get('stripe-signature') ? null : jsonError(401, 'Unauthorized');
+  }
+
+  if (policy === 'webhook-bigcommerce') {
+    return bearerCheck(request, process.env.BIGCOMMERCE_WEBHOOK_SECRET, 'Webhook');
+  }
+
+  if (policy === 'cron') {
+    return bearerCheck(request, process.env.CRON_SECRET, 'Cron');
+  }
+
+  return null;
+}
+
+async function customerSessionResponse(
+  request: NextRequest,
+  event: ProxyEvent,
+  policy: ApiGatewayPolicy,
+): Promise<Response> {
+  const response = await auth(async (req) => {
+    const customerAccessToken = req.auth?.user?.customerAccessToken;
+
+    if (!customerAccessToken) {
+      return jsonError(401, 'Unauthorized');
+    }
+
+    return passThrough(req as NextRequest, policy);
+  })(request, event as never);
+
+  return response ?? jsonError(401, 'Unauthorized');
+}
+
 export async function handleApiGateway(
   request: NextRequest,
   event: ProxyEvent,
@@ -70,21 +160,17 @@ export async function handleApiGateway(
   }
 
   const { policy } = matched;
+  const dedicated = DEDICATED_BUDGETS[policy];
 
-  /*
-   * Makeswift is settled before the shared budget is touched, on its own
-   * counter: builder traffic must not be able to exhaust the storefront's
-   * 120/min, and the storefront must not be able to exhaust the builder's.
-   */
-  if (policy === 'makeswift') {
-    const makeswiftLimited = await rateLimitResponse(
+  if (dedicated) {
+    const dedicatedLimited = await rateLimitResponse(
       request,
-      'rl:makeswift',
-      MAKESWIFT_RATE_LIMIT_MAX,
-      MAKESWIFT_RATE_LIMIT_WINDOW_SEC,
+      dedicated.prefix,
+      dedicated.max,
+      dedicated.windowSec,
     );
 
-    return makeswiftLimited ?? passThrough(request, policy);
+    return dedicatedLimited ?? passThrough(request, policy);
   }
 
   const limited = await rateLimitResponse(
@@ -98,20 +184,10 @@ export async function handleApiGateway(
     return limited;
   }
 
-  if (policy === 'webhook-stripe' && !request.headers.get('stripe-signature')) {
-    return jsonError(401, 'Unauthorized');
-  }
+  const refused = sharedSecretCheck(policy, request);
 
-  if (policy === 'webhook-bigcommerce') {
-    const secret = process.env.BIGCOMMERCE_WEBHOOK_SECRET?.trim();
-
-    if (!secret) {
-      return jsonError(503, 'Webhook not configured');
-    }
-
-    if (request.headers.get('authorization') !== `Bearer ${secret}`) {
-      return jsonError(401, 'Unauthorized');
-    }
+  if (refused) {
+    return refused;
   }
 
   if (policy === 'dpd-public') {
@@ -128,17 +204,7 @@ export async function handleApiGateway(
   }
 
   if (policy === 'customer-session') {
-    const response = await auth(async (req) => {
-      const customerAccessToken = req.auth?.user?.customerAccessToken;
-
-      if (!customerAccessToken) {
-        return jsonError(401, 'Unauthorized');
-      }
-
-      return passThrough(req as NextRequest, policy);
-    })(request, event as never);
-
-    return response ?? jsonError(401, 'Unauthorized');
+    return customerSessionResponse(request, event, policy);
   }
 
   return passThrough(request, policy);

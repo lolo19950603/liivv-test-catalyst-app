@@ -12,7 +12,13 @@ import {
   type MedicationDetails,
   type MedicationResult,
 } from '~/components/pharmacy/dpd-medication-search-field';
+import {
+  type ContactChoiceValue,
+  isContactChoiceComplete,
+  PharmacyContactConsent,
+} from '~/components/pharmacy/pharmacy-contact-consent';
 import { generateCpapFaxRequestEmail, generateFaxRequestEmail } from '~/lib/pharmacy/pharmacy-fax';
+import type { PharmacyContactIntake } from '~/lib/pharmacy-mail/view-types';
 
 export type TransferMedicationInput = {
   name: string;
@@ -23,6 +29,74 @@ export type TransferMedicationInput = {
 };
 
 type TransferMedicationRow = TransferMedicationInput & { clientKey: string };
+
+type ContactIntake = PharmacyContactIntake | null | undefined;
+
+const NO_CONTACT_CHOICE: ContactChoiceValue = { mode: null, agree: false };
+
+/*
+ * The CPAP intake's "How your Liivv pharmacist can reach you" (owner decision
+ * Q10, 2026-10-14): required before a CPAP prescription is sent, once the
+ * owner has approved the consent wording (D8). Until then no email choice is
+ * offered: the customer is told the pharmacist phones. The medication dialog
+ * never shows it or waits for it.
+ */
+function CpapContactStep({
+  mode,
+  contactIntake,
+  value,
+  onChange,
+}: {
+  mode: 'medication' | 'cpap';
+  contactIntake: ContactIntake;
+  value: ContactChoiceValue;
+  onChange: (value: ContactChoiceValue) => void;
+}) {
+  if (mode !== 'cpap') {
+    return null;
+  }
+
+  if (!contactIntake?.emailOffered) {
+    return (
+      <p className="mt-4 rounded-xl border border-[#e8e2d8] bg-[#faf8f5] p-4 text-sm text-[#5c564c]">
+        If a Liivv pharmacist needs to reach you about your CPAP prescription or a mask order, they
+        will phone you at the number on your account, and their message will appear on this Pharmacy
+        page.
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-4">
+      <PharmacyContactConsent
+        accountEmail={contactIntake.accountEmail}
+        messageModeOffered={contactIntake.messageModeOffered}
+        name="cpap-intake-contact"
+        onChange={onChange}
+        value={value}
+      />
+    </div>
+  );
+}
+
+/* The CPAP send buttons wait for the dialog, Supabase and (CPAP, when offered) the contact choice. */
+function cpapSendDisabled(input: {
+  mode: 'medication' | 'cpap';
+  isPending: boolean;
+  supabaseReady: boolean;
+  contact: ContactChoiceValue;
+  emailOffered: boolean;
+}): boolean {
+  return (
+    input.isPending ||
+    !input.supabaseReady ||
+    (input.mode === 'cpap' && input.emailOffered && !isContactChoiceComplete(input.contact))
+  );
+}
+
+function contactPayload(contact: ContactChoiceValue, emailOffered: boolean) {
+  return emailOffered && contact.mode ? { mode: contact.mode, agree: contact.agree } : undefined;
+}
 
 /* The words and fax request that differ between the two modes. */
 const MEDICATION_DIALOG_COPY = {
@@ -55,6 +129,7 @@ export function AddPrescriptionDialog({
   userFullName,
   supabaseReady,
   mode = 'medication',
+  contactIntake,
 }: {
   open: boolean;
   onClose: () => void;
@@ -62,6 +137,11 @@ export function AddPrescriptionDialog({
   userFullName: string;
   supabaseReady: boolean;
   mode?: 'medication' | 'cpap';
+  /*
+   * CPAP mode: the "How your Liivv pharmacist can reach you" choice (owner
+   * decision Q10, 2026-10-14), required before the CPAP prescription is sent.
+   */
+  contactIntake?: ContactIntake;
 }) {
   const copy = mode === 'cpap' ? CPAP_DIALOG_COPY : MEDICATION_DIALOG_COPY;
   const [method, setMethod] = useState<'transfer' | 'fax'>('transfer');
@@ -77,6 +157,9 @@ export function AddPrescriptionDialog({
     pharmacyAction,
     null,
   );
+  const [contact, setContact] = useState<ContactChoiceValue>(NO_CONTACT_CHOICE);
+  const emailOffered = contactIntake?.emailOffered ?? false;
+  const cpapDisabled = cpapSendDisabled({ mode, isPending, supabaseReady, contact, emailOffered });
   const router = useRouter();
   const titleId = useId();
 
@@ -175,6 +258,7 @@ export function AddPrescriptionDialog({
         sourceName: cpapMethod === 'transfer' ? pharmacyName : '',
         sourcePhone: cpapMethod === 'transfer' ? pharmacyPhone : '',
         prescriberName,
+        contact: contactPayload(contact, emailOffered),
       }),
     );
     startTransition(() => {
@@ -272,9 +356,16 @@ export function AddPrescriptionDialog({
           ))}
         </div>
 
+        <CpapContactStep
+          contactIntake={contactIntake}
+          mode={mode}
+          onChange={setContact}
+          value={contact}
+        />
+
         {panel === 'cpap-transfer' ? (
           <CpapTransferPanel
-            disabled={isPending || !supabaseReady}
+            disabled={cpapDisabled}
             isPending={isPending}
             onPrescriberName={setPrescriberName}
             onSourceName={setPharmacyName}
@@ -288,7 +379,7 @@ export function AddPrescriptionDialog({
 
         {panel === 'cpap-fax' ? (
           <CpapFaxPanel
-            disabled={isPending || !supabaseReady}
+            disabled={cpapDisabled}
             faxCopied={faxCopied}
             faxEmail={faxEmail}
             isPending={isPending}

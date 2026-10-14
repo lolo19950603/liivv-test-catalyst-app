@@ -1,5 +1,6 @@
 'use server';
 
+import { getLocale } from 'next-intl/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
@@ -7,6 +8,13 @@ import { type OnboardingCustomer } from '~/lib/account/get-session-customer';
 import { runCustomerAction } from '~/lib/action-gateway/session';
 import { carePackRegionFromProvince } from '~/lib/pharmacy/carepack-region';
 import { isCpapPrescriptionWaiting } from '~/lib/pharmacy/cpap-prescription';
+import {
+  pharmacyEmailConsentApproved,
+  pharmacyMessageModeOffered,
+} from '~/lib/pharmacy-mail/config';
+import type { PharmacyContactChoice } from '~/lib/pharmacy-mail/consent';
+import { pharmacyRegionOf } from '~/lib/pharmacy-mail/regions';
+import { addConsent } from '~/lib/supabase/pharmacy-email-consent';
 import {
   isTabletDosageForm,
   medicationPrescriptionRows,
@@ -21,6 +29,7 @@ import {
   deleteRefillRequestById,
   getRefillRequestById,
   listPrescriptionsByProfileId,
+  setPrescriptionPharmacyRegion,
   updateRefillRequestPrescriptions,
 } from '~/lib/supabase/prescriptions';
 import { ensureCustomerProfile } from '~/lib/supabase/profile';
@@ -39,6 +48,13 @@ const CpapSubmissionSchema = z.object({
   sourceName: z.string().trim().max(160).optional().default(''),
   sourcePhone: z.string().trim().max(40).optional().default(''),
   prescriberName: z.string().trim().max(160).optional().default(''),
+  /* How the Liivv pharmacist may reach the customer (owner decision Q10). */
+  contact: z
+    .object({
+      mode: z.enum(['notice_only', 'message_by_email', 'no_email']),
+      agree: z.boolean(),
+    })
+    .optional(),
 });
 
 /* Parses JSON text, or answers undefined when it is not JSON. */
@@ -88,6 +104,169 @@ async function loadPharmacyProfile(customer: OnboardingCustomer) {
   return { profile: ensured.profile };
 }
 
+const CPAP_SAVE_ERROR = 'Your CPAP prescription could not be saved right now. Please try again later.';
+
+/*
+ * How the customer's Liivv pharmacist may reach them (owner decision Q10,
+ * 2026-10-14): required on the CPAP intake once the owner has approved the
+ * consent wording (D8); until then no choice is asked or recorded, and the
+ * pharmacist phones. An email mode needs the agreement tick naming the
+ * account email; "email me the message" only when the owner has turned that
+ * mode on (D3).
+ */
+function contactChoiceError(contact: { mode: string; agree: boolean } | undefined): string | null {
+  if (!pharmacyEmailConsentApproved()) {
+    return null;
+  }
+
+  if (!contact) {
+    return 'Choose how your Liivv pharmacist can reach you.';
+  }
+
+  if (contact.mode === 'message_by_email' && !pharmacyMessageModeOffered()) {
+    return 'Choose how your Liivv pharmacist can reach you.';
+  }
+
+  return contact.mode !== 'no_email' && !contact.agree
+    ? 'Tick the box to agree to email at your account address, or choose “Don’t email me”.'
+    : null;
+}
+
+/*
+ * After the CPAP row is saved: which provincial pharmacy received it (the
+ * same address the fax request used) and the contact choice. Both best
+ * effort: the prescription stays saved if either fails (for example before
+ * pharmacy-messages-migration.sql has run), and the pharmacist then sees
+ * "Not chosen" and the saved address's province.
+ */
+async function recordCpapIntakeExtras(
+  profile: { id: string; email?: string | null },
+  prescriptionId: string,
+  contact: { mode: PharmacyContactChoice; agree: boolean } | null,
+): Promise<void> {
+  const region = pharmacyRegionOf(await getCustomerProvince());
+  const regionSaved = await setPrescriptionPharmacyRegion(prescriptionId, region);
+
+  if (!regionSaved.ok) {
+    // eslint-disable-next-line no-console
+    console.error('[pharmacy-mail] CPAP prescription province not recorded');
+  }
+
+  if (!contact) {
+    return;
+  }
+
+  try {
+    await addConsent({
+      profileId: profile.id,
+      mode: contact.mode,
+      accountEmail: profile.email ?? null,
+      locale: await getLocale(),
+      source: 'cpap_intake',
+    });
+  } catch {
+    // eslint-disable-next-line no-console
+    console.error('[pharmacy-mail] CPAP intake contact choice not recorded');
+  }
+}
+
+/*
+ * A CPAP prescription, so a complete CPAP mask can be bought (owner ruling
+ * C26 (b), 2026-10-13). Saved as a prescriptions row with rx_kind 'cpap',
+ * waiting for a Liivv pharmacist, who validates it and sets its expiry in
+ * the Prescriptions queue. Two ways it reaches Liivv, as for medications:
+ * a transfer from the customer's current CPAP supplier, clinic or pharmacy,
+ * or a fax the customer asks their prescriber to send (the request they
+ * copy is generateCpapFaxRequestEmail). No upload.
+ */
+async function submitCpapPrescription(
+  profile: { id: string; email?: string | null },
+  formData: FormData,
+): Promise<PharmacyActionState> {
+  const payload = formData.get('payload');
+  const parsed = CpapSubmissionSchema.safeParse(
+    typeof payload === 'string' ? parseJson(payload) : undefined,
+  );
+
+  if (!parsed.success) {
+    return { ok: false, error: 'Choose how your CPAP prescription will reach Liivv.' };
+  }
+
+  const { method, sourceName, sourcePhone, prescriberName, contact } = parsed.data;
+
+  if (method === 'transfer' && (!sourceName || !sourcePhone)) {
+    return {
+      ok: false,
+      error: 'Enter the name and phone number of your current CPAP supplier, clinic or pharmacy.',
+    };
+  }
+
+  const contactError = contactChoiceError(contact);
+
+  if (contactError) {
+    return { ok: false, error: contactError };
+  }
+
+  // One at a time: while a CPAP prescription is with a pharmacist, another
+  // would only add a second row for them to work.
+  let alreadyWaiting: boolean;
+
+  try {
+    alreadyWaiting = (await listCpapPrescriptionsByProfileId(profile.id)).some(
+      isCpapPrescriptionWaiting,
+    );
+  } catch {
+    return { ok: false, error: CPAP_SAVE_ERROR };
+  }
+
+  if (alreadyWaiting) {
+    return {
+      ok: false,
+      error:
+        'Your CPAP prescription is already with a Liivv pharmacist. Its status is shown on this page.',
+    };
+  }
+
+  const created = await createPrescription({
+    profile_id: profile.id,
+    rx_kind: 'cpap',
+    medication_name: 'CPAP therapy',
+    din: null,
+    dosage: null,
+    dosage_form: null,
+    frequency: null,
+    quantity: null,
+    prescribing_doctor: prescriberName || null,
+    pharmacy_name: method === 'transfer' ? sourceName : null,
+    rx_number: null,
+    refills_remaining: null,
+    last_filled_date: null,
+    next_refill_date: null,
+    end_date: null,
+    status: 'pending',
+    approval_status: 'pending_review',
+    submission_method: method,
+    notes:
+      method === 'transfer'
+        ? `CPAP prescription transfer from: ${sourceName}, ${sourcePhone}`
+        : 'CPAP prescription: the customer asked their prescriber to fax it to Liivv.',
+  });
+
+  if (!created.ok) {
+    return { ok: false, error: CPAP_SAVE_ERROR };
+  }
+
+  await recordCpapIntakeExtras(
+    profile,
+    created.row.id,
+    pharmacyEmailConsentApproved() ? (contact ?? null) : null,
+  );
+
+  revalidatePath('/account/pharmacy');
+
+  return { ok: true };
+}
+
 export async function pharmacyAction(
   _prevState: PharmacyActionState,
   formData: FormData,
@@ -101,91 +280,8 @@ export async function pharmacyAction(
 
   const intent = String(formData.get('intent') ?? '');
 
-  /*
-   * A CPAP prescription, so a complete CPAP mask can be bought (owner ruling
-   * C26 (b), 2026-10-13). Saved as a prescriptions row with rx_kind 'cpap',
-   * waiting for a Liivv pharmacist, who validates it and sets its expiry in
-   * the Prescriptions queue. Two ways it reaches Liivv, as for medications:
-   * a transfer from the customer's current CPAP supplier, clinic or pharmacy,
-   * or a fax the customer asks their prescriber to send (the request they
-   * copy is generateCpapFaxRequestEmail). No upload.
-   */
   if (intent === 'submit_cpap_prescription') {
-    const payload = formData.get('payload');
-    const parsed = CpapSubmissionSchema.safeParse(
-      typeof payload === 'string' ? parseJson(payload) : undefined,
-    );
-
-    if (!parsed.success) {
-      return { ok: false, error: 'Choose how your CPAP prescription will reach Liivv.' };
-    }
-
-    const { method, sourceName, sourcePhone, prescriberName } = parsed.data;
-
-    if (method === 'transfer' && (!sourceName || !sourcePhone)) {
-      return {
-        ok: false,
-        error: 'Enter the name and phone number of your current CPAP supplier, clinic or pharmacy.',
-      };
-    }
-
-    // One at a time: while a CPAP prescription is with a pharmacist, another
-    // would only add a second row for them to work.
-    let alreadyWaiting: boolean;
-
-    try {
-      alreadyWaiting = (await listCpapPrescriptionsByProfileId(profile.id)).some(
-        isCpapPrescriptionWaiting,
-      );
-    } catch {
-      return {
-        ok: false,
-        error: 'Your CPAP prescription could not be saved right now. Please try again later.',
-      };
-    }
-
-    if (alreadyWaiting) {
-      return {
-        ok: false,
-        error:
-          'Your CPAP prescription is already with a Liivv pharmacist. Its status is shown on this page.',
-      };
-    }
-
-    const created = await createPrescription({
-      profile_id: profile.id,
-      rx_kind: 'cpap',
-      medication_name: 'CPAP therapy',
-      din: null,
-      dosage: null,
-      dosage_form: null,
-      frequency: null,
-      quantity: null,
-      prescribing_doctor: prescriberName || null,
-      pharmacy_name: method === 'transfer' ? sourceName : null,
-      rx_number: null,
-      refills_remaining: null,
-      last_filled_date: null,
-      next_refill_date: null,
-      end_date: null,
-      status: 'pending',
-      approval_status: 'pending_review',
-      submission_method: method,
-      notes:
-        method === 'transfer'
-          ? `CPAP prescription transfer from: ${sourceName}, ${sourcePhone}`
-          : 'CPAP prescription: the customer asked their prescriber to fax it to Liivv.',
-    });
-
-    if (!created.ok) {
-      return {
-        ok: false,
-        error: 'Your CPAP prescription could not be saved right now. Please try again later.',
-      };
-    }
-
-    revalidatePath('/account/pharmacy');
-    return { ok: true };
+    return submitCpapPrescription(profile, formData);
   }
 
   if (intent === 'transfer_prescriptions') {

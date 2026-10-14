@@ -61,6 +61,12 @@ export type PrescriptionRow = {
   reviewed_at?: string | null;
   /** Why a CPAP prescription was not accepted. */
   review_reason?: string | null;
+  /**
+   * The provincial pharmacy that received a CPAP prescription (ON, BC, …), set at
+   * intake (pharmacy-messages-migration.sql). Missing on older rows and until the
+   * migration has run.
+   */
+  pharmacy_region?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -576,4 +582,22 @@ export async function updateRefillRequestStatus(args: {
   }
 
   return { ok: true };
+}
+
+/*
+ * Records which provincial pharmacy received a CPAP prescription (owner
+ * decision Q10, 2026-10-14). Written after the row is created, and best
+ * effort: before pharmacy-messages-migration.sql has run the column is
+ * missing, and the prescription must still be saved.
+ */
+export async function setPrescriptionPharmacyRegion(
+  prescriptionId: string,
+  region: string,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const { error } = await getSupabaseClient()
+    .from('prescriptions')
+    .update({ pharmacy_region: region })
+    .eq('id', prescriptionId);
+
+  return error ? { ok: false, message: error.message } : { ok: true };
 }

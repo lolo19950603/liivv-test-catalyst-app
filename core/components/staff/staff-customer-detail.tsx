@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 
 import { CpapBadge, CpapPrescriptionReview } from '~/components/staff/cpap-review';
+import { PharmacyThreadPanel } from '~/components/staff/pharmacy-thread-panel';
 import { formatStaffStatusLabel, staffStatusBadgeClass } from '~/components/staff/staff-status';
 import { isCpapPrescriptionRow } from '~/lib/pharmacy/pharmacy-mappers';
 import {
@@ -17,6 +18,7 @@ import {
   getRawCategoryResponses,
   parseHealthProfileCategoryResponses,
 } from '~/lib/onboarding/health-profile-display';
+import { panelKey, type ThreadPanelData } from '~/lib/pharmacy-mail/view-types';
 import type { AdminCustomerDetail } from '~/lib/supabase/admin-customers';
 import type { CarePackRequestRow, PrescriptionRow, RefillRequestRow } from '~/lib/supabase/prescriptions';
 
@@ -68,6 +70,8 @@ function EmptyLine({ children }: { children: ReactNode }) {
 const selectClass =
   'min-w-[10.5rem] rounded-md border border-[#c4b8a8] bg-white px-2.5 py-2 text-base font-medium text-[#2c2a26]';
 
+const NO_PANELS: Record<string, ThreadPanelData> = {};
+
 export type StaffFocusRequest = {
   kind: 'prescription' | 'refill' | 'carepack';
   id: string;
@@ -79,8 +83,11 @@ export function StaffCustomerDetail({
   chatHref,
   splitSections = false,
   focusRequest = null,
+  mailPanels = NO_PANELS,
 }: {
   detail: AdminCustomerDetail;
+  /* "Messages with customer" panels by record (owner decision Q10, 2026-10-14). */
+  mailPanels?: Record<string, ThreadPanelData>;
   formAction: (formData: FormData) => void;
   chatHref?: string;
   /** Two-column health / prescriptions layout (Customers tab). */
@@ -107,6 +114,7 @@ export function StaffCustomerDetail({
           carePackRequests={carePackRequests}
           focusRequest={focusRequest}
           formAction={formAction}
+          mailPanels={mailPanels}
           prescriptions={prescriptions}
           profileId={profile.id}
           refillRequests={refillRequests}
@@ -176,6 +184,7 @@ export function StaffCustomerDetail({
             <StaffPrescriptionsSection
               focusId={focusRequest?.kind === 'prescription' ? focusRequest.id : undefined}
               formAction={formAction}
+              mailPanels={mailPanels}
               prescriptions={prescriptions}
               profileId={profile.id}
             />
@@ -505,11 +514,13 @@ function StaffPrescriptionsSection({
   prescriptions,
   formAction,
   focusId,
+  mailPanels,
 }: {
   profileId: string;
   prescriptions: PrescriptionRow[];
   formAction: (formData: FormData) => void;
   focusId?: string;
+  mailPanels: Record<string, ThreadPanelData>;
 }) {
   return (
     <Section count={prescriptions.length} title="Prescriptions">
@@ -550,7 +561,12 @@ function StaffPrescriptionsSection({
                   </span>
                 </div>
                 {isCpapPrescriptionRow(rx) ? (
-                  <CpapPrescriptionReview formAction={formAction} profileId={profileId} rx={rx} />
+                  <>
+                    <CpapPrescriptionReview formAction={formAction} profileId={profileId} rx={rx} />
+                    {focusId === rx.id ? null : (
+                      <PharmacyThreadPanel panel={mailPanels[panelKey('cpap_prescription', rx.id)]} />
+                    )}
+                  </>
                 ) : (
                 <form action={formAction} className="mt-2">
                   <input name="intent" type="hidden" value="prescription_set_status" />
@@ -755,10 +771,12 @@ function PinnedPrescription({
   profileId,
   rx,
   formAction,
+  mailPanels,
 }: {
   profileId: string;
   rx: PrescriptionRow;
   formAction: (formData: FormData) => void;
+  mailPanels: Record<string, ThreadPanelData>;
 }) {
 
   const approval = String(rx.approval_status ?? '').toLowerCase();
@@ -789,7 +807,10 @@ function PinnedPrescription({
         </span>
       </div>
       {isCpapPrescriptionRow(rx) ? (
-        <CpapPrescriptionReview formAction={formAction} profileId={profileId} rx={rx} />
+        <>
+          <CpapPrescriptionReview formAction={formAction} profileId={profileId} rx={rx} />
+          <PharmacyThreadPanel panel={mailPanels[panelKey('cpap_prescription', rx.id)]} />
+        </>
       ) : (
       <form action={formAction} className="mt-2">
         <input name="intent" type="hidden" value="prescription_set_status" />
@@ -827,6 +848,7 @@ function PinnedRequest({
   carePackRequests,
   focusRequest,
   formAction,
+  mailPanels,
 }: {
   profileId: string;
   prescriptions: PrescriptionRow[];
@@ -834,11 +856,14 @@ function PinnedRequest({
   carePackRequests: CarePackRequestRow[];
   focusRequest: StaffFocusRequest;
   formAction: (formData: FormData) => void;
+  mailPanels: Record<string, ThreadPanelData>;
 }) {
   if (focusRequest.kind === 'prescription') {
     const rx = prescriptions.find((row) => row.id === focusRequest.id);
 
-    return rx ? <PinnedPrescription formAction={formAction} profileId={profileId} rx={rx} /> : null;
+    return rx ? (
+      <PinnedPrescription formAction={formAction} mailPanels={mailPanels} profileId={profileId} rx={rx} />
+    ) : null;
   }
 
   if (focusRequest.kind === 'refill') {

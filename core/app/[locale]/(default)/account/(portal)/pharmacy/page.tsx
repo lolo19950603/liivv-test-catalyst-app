@@ -36,6 +36,8 @@ export default async function PharmacyPage({ params }: Props) {
         carepackRequests={data.carepackRequests}
         cpapPrescription={data.cpapPrescription}
         displayName={data.displayName}
+        pharmacyContactIntake={data.pharmacyContactIntake}
+        pharmacyMessages={data.pharmacyMessages}
         prescriptions={data.prescriptions}
         refillRequests={data.refillRequests}
         supabaseReady={data.supabaseReady}

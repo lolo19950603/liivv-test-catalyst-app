@@ -19,9 +19,14 @@ import {
 import { AddPrescriptionDialog } from '~/components/pharmacy/add-prescription-dialog';
 import { CarePackIntro } from '~/components/pharmacy/carepack-intro';
 import { CpapPrescriptionCard } from '~/components/pharmacy/cpap-prescription-card';
+import { PharmacyMessagesCard } from '~/components/pharmacy/pharmacy-messages-card';
 import { OnboardingSectionHeader } from '~/components/onboarding/onboarding-section-header';
 import { carePackRegionFromProvince } from '~/lib/pharmacy/carepack-region';
 import type { CpapPrescriptionState } from '~/lib/pharmacy/cpap-prescription';
+import type {
+  CustomerPharmacyMessagesData,
+  PharmacyContactIntake,
+} from '~/lib/pharmacy-mail/view-types';
 import { isTabletDosageForm } from '~/lib/pharmacy/pharmacy-mappers';
 import type {
   PharmacyCarePackRequest,
@@ -140,8 +145,13 @@ export function PharmacyDashboard({
   userProvince,
   refillRequests,
   carepackRequests,
+  pharmacyMessages,
+  pharmacyContactIntake,
 }: {
   displayName: string;
+  /* "Messages from your pharmacist" and the contact choice (owner decision Q10, 2026-10-14). */
+  pharmacyMessages: CustomerPharmacyMessagesData;
+  pharmacyContactIntake: PharmacyContactIntake;
   /* The CPAP prescription card's state; CPAP rows are never in `prescriptions`. */
   cpapPrescription: CpapPrescriptionState;
   prescriptions: PharmacyPrescription[];
@@ -364,10 +374,17 @@ export function PharmacyDashboard({
       </div>
 
       <CpapPrescriptionCard
+        contactIntake={pharmacyContactIntake}
         state={cpapPrescription}
         supabaseReady={supabaseReady}
         userFullName={displayName}
         userProvince={userProvince}
+      />
+
+      <PharmacyMessagesCard
+        contactIntake={pharmacyContactIntake}
+        data={pharmacyMessages}
+        supabaseReady={supabaseReady}
       />
 
       <div className="flex flex-wrap gap-1 rounded-xl border border-[#ddd4c8] bg-[#f7f4ef] p-1 text-sm">

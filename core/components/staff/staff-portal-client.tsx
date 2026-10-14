@@ -16,7 +16,10 @@ import {
   CpapBadge,
   MaskOrderReview,
 } from '~/components/staff/cpap-review';
+import { PharmacyMailStatus } from '~/components/staff/pharmacy-mail-status';
+import { PharmacyThreadPanel } from '~/components/staff/pharmacy-thread-panel';
 import { StaffCustomerDetail } from '~/components/staff/staff-customer-detail';
+import { UnmatchedMailQueue } from '~/components/staff/unmatched-mail-queue';
 import {
   formatStaffStatusLabel,
   staffStatusBadgeClass,
@@ -34,6 +37,8 @@ import {
 } from '~/components/virtual-care/use-chat-poll-refresh';
 import { isStaffJoinedToChat } from '~/lib/chat/session';
 import { isCpapPrescriptionRow } from '~/lib/pharmacy/pharmacy-mappers';
+import { PHARMACY_REGIONS, pharmacyRegionOf } from '~/lib/pharmacy-mail/regions';
+import { panelKey, type StaffMailData } from '~/lib/pharmacy-mail/view-types';
 import type { AdminConversationSummary } from '~/lib/supabase/chat-messages';
 import type {
   AdminCarePackQueueRow,
@@ -50,14 +55,165 @@ type QueueRow =
 
 /* Quebec and the territories: complete-mask orders there are always held (owner ruling C26). */
 const ALWAYS_HOLD_REGIONS = new Set(['QC', 'YT', 'NT', 'NU']);
-type BucketFilter = StaffWorklistBucket | 'all';
+/* 'replied': a CPAP prescription or mask order whose customer replied and no pharmacist has read it. */
+type BucketFilter = StaffWorklistBucket | 'all' | 'replied';
 
 const BUCKET_FILTERS: Array<{ id: BucketFilter; label: string }> = [
   { id: 'all', label: 'All' },
   { id: 'needs_review', label: 'Needs review' },
   { id: 'in_progress', label: 'In progress' },
   { id: 'closed', label: 'Closed' },
+  { id: 'replied', label: 'Customer replied' },
 ];
+
+/*
+ * The pharmacy filter (owner decision Q10, 2026-10-14): each provincial
+ * pharmacy works its own list. A CPAP prescription uses the province recorded
+ * at intake; a mask order its delivery province (Quebec and the territories:
+ * Ontario). Remembered in this browser. It applies only to CPAP
+ * prescriptions and mask orders: refills, CarePacks and medication
+ * prescriptions carry no pharmacy, so every pharmacy sees them, and the list
+ * says how many rows the filter hides.
+ */
+type RegionFilter = 'all' | 'none' | (typeof PHARMACY_REGIONS)[number];
+const REGION_FILTER_KEY = 'liivv-pharmacy-admin-region';
+
+function toRegionFilter(value: string | null): RegionFilter {
+  if (value === 'none') {
+    return 'none';
+  }
+
+  return PHARMACY_REGIONS.find((region) => region === value) ?? 'all';
+}
+
+function readRegionFilter(): RegionFilter {
+  try {
+    return toRegionFilter(window.localStorage.getItem(REGION_FILTER_KEY));
+  } catch {
+    return 'all';
+  }
+}
+
+function storeRegionFilter(value: RegionFilter): void {
+  try {
+    window.localStorage.setItem(REGION_FILTER_KEY, value);
+  } catch {
+    // Not remembered in a private window.
+  }
+}
+
+/*
+ * The pharmacy region a queue row belongs to: null when not recorded, or
+ * 'any' for a row the filter doesn't apply to (a refill, a CarePack, a
+ * medication prescription, or a CPAP row read before the migration added
+ * the column), which every pharmacy sees.
+ */
+function rowPharmacyRegion(row: QueueRow): string | null {
+  if ('bigcommerce_order_id' in row) {
+    return row.region ? pharmacyRegionOf(row.region) : null;
+  }
+
+  if (!('rx_kind' in row) || !isCpapPrescriptionRow(row) || !('pharmacy_region' in row)) {
+    return 'any';
+  }
+
+  return row.pharmacy_region || null;
+}
+
+function matchesRegion(row: QueueRow, filter: RegionFilter): boolean {
+  const region = rowPharmacyRegion(row);
+
+  if (filter === 'all' || region === 'any') {
+    return true;
+  }
+
+  return filter === 'none' ? region === null : region === filter;
+}
+
+/* Rows of the chosen bucket that only the pharmacy filter hides. */
+function countHiddenByRegion(
+  rows: readonly QueueRow[],
+  queue: PharmacyQueue,
+  bucket: BucketFilter,
+  replied: ReadonlySet<string>,
+  filter: RegionFilter,
+): number {
+  return filter === 'all'
+    ? 0
+    : rows.filter(
+        (row) => matchesBucket(row, queue, bucket, replied) && !matchesRegion(row, filter),
+      ).length;
+}
+
+function RegionFilterNote({ hidden, filter }: { hidden: number; filter: RegionFilter }) {
+  if (hidden === 0) {
+    return null;
+  }
+
+  return (
+    <p className="shrink-0 px-4 py-2 text-sm text-[#6b6560]">
+      {hidden} {hidden === 1 ? 'row is' : 'rows are'} hidden by the pharmacy filter (
+      {filter === 'none' ? 'Not recorded' : filter}). Choose “All pharmacies” to see them.
+    </p>
+  );
+}
+
+/* Records with unread customer replies, from the mail data. */
+function repliedIds(mail: StaffMailData | null): Set<string> {
+  return new Set([...(mail?.replied.prescriptionIds ?? []), ...(mail?.replied.rxOrderCheckIds ?? [])]);
+}
+
+function matchesBucket(
+  row: QueueRow,
+  queue: PharmacyQueue,
+  bucket: BucketFilter,
+  replied: ReadonlySet<string>,
+): boolean {
+  if (bucket === 'all') {
+    return true;
+  }
+
+  if (bucket === 'replied') {
+    return replied.has(row.id);
+  }
+
+  return staffWorklistBucket(rowStatus(row, queue), queue) === bucket;
+}
+
+function RepliedBadge() {
+  return (
+    <span className="ml-2 inline-flex rounded bg-[#1f5f8b] px-1.5 py-0.5 align-middle text-xs font-semibold uppercase tracking-wide text-white">
+      Replied
+    </span>
+  );
+}
+
+function emailMatchCount(mail: StaffMailData | null): number {
+  return mail ? mail.unmatched.length + mail.flagged.length : 0;
+}
+
+const NO_PANELS: StaffMailData['panels'] = {};
+
+function panelsOf(mail: StaffMailData | null): StaffMailData['panels'] {
+  return mail?.panels ?? NO_PANELS;
+}
+
+function mailStatusOf(mail: StaffMailData | null): StaffMailData['status'] | null {
+  return mail?.status ?? null;
+}
+
+/* The "Email to match" queue in place of the record list. */
+function EmailMatchBody({ mail }: { mail: StaffMailData | null }) {
+  return (
+    <div className="min-h-0 flex-1">
+      <UnmatchedMailQueue
+        error={mail?.queuesError ?? null}
+        flagged={mail?.flagged ?? []}
+        unmatched={mail?.unmatched ?? []}
+      />
+    </div>
+  );
+}
 
 const NAV: Array<{ id: StaffTab; label: string }> = [
   { id: 'pharmacy', label: 'Queue' },
@@ -341,6 +497,7 @@ export function StaffPortalClient({
         <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-[#c9dcc4] bg-white px-5">
           <h1 className="text-lg font-semibold text-[#1c3a24]">{sectionTitle}</h1>
           <div className="flex items-center gap-3">
+            <PharmacyMailStatus status={mailStatusOf(data.mail)} />
             {signedInAs ? <p className="text-base text-[#3f5c40]">{signedInAs}</p> : null}
             {signOutAction ? (
               <form action={signOutAction}>
@@ -416,12 +573,19 @@ function PharmacyTab({
   const queue = data.pharmacyQueue;
   const [bucket, setBucket] = useState<BucketFilter>('all');
   const [query, setQuery] = useState('');
+  const [regionFilter, setRegionFilter] = useState<RegionFilter>('all');
+  const replied = useMemo(() => repliedIds(data.mail), [data.mail]);
   const queueRowsByQueue: Record<PharmacyQueue, QueueRow[]> = {
     prescription: data.prescriptionQueue,
     refill: data.refillQueue,
     carepack: data.carePackQueue,
     mask_order: data.maskOrderQueue,
+    email_match: [],
   };
+
+  useEffect(() => {
+    setRegionFilter(readRegionFilter());
+  }, []);
   const queueRows = queueRowsByQueue[queue];
   const isMaskOrders = queue === 'mask_order';
   const selectedMaskOrder =
@@ -436,21 +600,22 @@ function PharmacyTab({
       : null;
 
   const counts = useMemo(() => {
-    const next = { all: queueRows.length, needs_review: 0, in_progress: 0, closed: 0 };
+    const next = { all: queueRows.length, needs_review: 0, in_progress: 0, closed: 0, replied: 0 };
 
     for (const row of queueRows) {
       next[staffWorklistBucket(rowStatus(row, queue), queue)] += 1;
+      next.replied += replied.has(row.id) ? 1 : 0;
     }
 
     return next;
-  }, [queue, queueRows]);
+  }, [queue, queueRows, replied]);
 
   const visibleRows = useMemo(() => {
     const needle = query.trim().toLowerCase();
 
     return [...queueRows]
       .filter((row) => {
-        if (bucket !== 'all' && staffWorklistBucket(rowStatus(row, queue), queue) !== bucket) {
+        if (!matchesBucket(row, queue, bucket, replied) || !matchesRegion(row, regionFilter)) {
           return false;
         }
 
@@ -475,7 +640,11 @@ function PharmacyTab({
         );
       })
       .sort((a, b) => compareQueueRows(queue, a, b));
-  }, [bucket, query, queue, queueRows]);
+  }, [bucket, query, queue, queueRows, regionFilter, replied]);
+  const hiddenByRegion = useMemo(
+    () => countHiddenByRegion(queueRows, queue, bucket, replied, regionFilter),
+    [bucket, queue, queueRows, regionFilter, replied],
+  );
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -487,6 +656,7 @@ function PharmacyTab({
               ['refill', 'Refills', data.refillQueue.length, 'bg-[#1f5f8b]'],
               ['carepack', 'CarePack', data.carePackQueue.length, 'bg-[#c46b2f]'],
               ['mask_order', 'Mask orders', data.maskOrderQueue.length, 'bg-[#7a1d18]'],
+              ['email_match', 'Email to match', emailMatchCount(data.mail), 'bg-[#1f5f8b]'],
             ] as const
           ).map(([id, label, count, activeClass]) => (
             <Link
@@ -536,6 +706,25 @@ function PharmacyTab({
             );
           })}
         </div>
+        <select
+          aria-label="Pharmacy"
+          className="rounded-md border border-[#c9dcc4] bg-white px-2.5 py-2 text-base"
+          onChange={(event) => {
+            const next = toRegionFilter(event.target.value);
+
+            setRegionFilter(next);
+            storeRegionFilter(next);
+          }}
+          value={regionFilter}
+        >
+          <option value="all">All pharmacies</option>
+          {PHARMACY_REGIONS.map((region) => (
+            <option key={region} value={region}>
+              {region}
+            </option>
+          ))}
+          <option value="none">Not recorded</option>
+        </select>
         <input
           aria-label="Filter by patient or medication"
           className="ml-auto w-full max-w-xs rounded-md border border-[#c9dcc4] bg-white px-3 py-2 text-base focus:border-[#234028] focus:outline-none"
@@ -548,10 +737,14 @@ function PharmacyTab({
       {data.pharmacyQueueError ? (
         <p className="shrink-0 px-4 py-2 text-sm text-red-700">{data.pharmacyQueueError}</p>
       ) : null}
+      <RegionFilterNote filter={regionFilter} hidden={hiddenByRegion} />
       {isMaskOrders && data.maskOrderQueueError ? (
         <p className="shrink-0 px-4 py-2 text-sm text-red-700">{data.maskOrderQueueError}</p>
       ) : null}
 
+      {queue === 'email_match' ? (
+        <EmailMatchBody mail={data.mail} />
+      ) : (
       <div className="grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="min-h-0 overflow-auto">
           {visibleRows.length === 0 ? (
@@ -618,6 +811,7 @@ function PharmacyTab({
                         <span className="text-[#1c1b19]">{rowItemLabel(row)}</span>
                         {'rx_kind' in row && isCpapPrescriptionRow(row) ? <CpapBadge /> : null}
                         {'paediatric' in row && row.paediatric ? <ChildBadge /> : null}
+                        {replied.has(row.id) ? <RepliedBadge /> : null}
                         {queue !== 'prescription' && !isMaskOrders ? (
                           <span className="mt-0.5 block text-sm text-[#8a8176]">
                             #{row.id.slice(0, 8)}
@@ -657,6 +851,7 @@ function PharmacyTab({
             {selectedMaskOrder ? (
               <div className="mb-4">
                 <MaskOrderReview formAction={formAction} row={selectedMaskOrder} />
+                <PharmacyThreadPanel panel={panelsOf(data.mail)[panelKey('mask_order', selectedMaskOrder.id)]} />
               </div>
             ) : null}
             {data.pharmacyCustomerDetailError ? (
@@ -666,6 +861,7 @@ function PharmacyTab({
                 detail={data.pharmacyCustomerDetail}
                 focusRequest={focusRequest}
                 formAction={formAction}
+                mailPanels={panelsOf(data.mail)}
               />
             ) : (
               <p className="text-base text-[#8a8176]">Select a row to open the record.</p>
@@ -673,6 +869,7 @@ function PharmacyTab({
           </div>
         </aside>
       </div>
+      )}
     </div>
   );
 }
@@ -834,6 +1031,7 @@ function CustomersTab({
               }
               detail={data.customerDetail}
               formAction={formAction}
+              mailPanels={panelsOf(data.mail)}
               splitSections
             />
           </div>
