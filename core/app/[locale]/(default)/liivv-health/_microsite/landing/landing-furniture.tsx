@@ -20,7 +20,7 @@ import { SourceEntryText, SourceGroups } from '../_components/source-chip';
 import { OutboundLabel } from '../chapters/figure-parts';
 import type { GovernancePerson } from '../site';
 import { useSite, useSiteMessages, useSiteT } from '../site-context';
-import { byScope, groupByScope } from '../sources';
+import { byScope, groupByScope, sourceKey } from '../sources';
 
 import type { LandingCitation } from './types';
 
@@ -43,6 +43,9 @@ function formatReviewDate(iso: string) {
  */
 function SourceLink({ source }: { source: LandingCitation }) {
   const locale = useLocale();
+
+  /* A held link (the register's `linkHeld`): the entry is cited, unlinked. */
+  if (!source.href) return <SourceEntryText source={source} />;
 
   return (
     <a
@@ -84,7 +87,7 @@ export function SourceLine({
     <p className={className}>
       {before}
       {ordered.map((source, index) => (
-        <span key={source.href}>
+        <span key={sourceKey(source)}>
           {index > 0 ? '; ' : null}
           <SourceLink source={source} />
         </span>
@@ -180,6 +183,15 @@ export function LandingGovernance({
     'governance' in landingCopy && 'relationship' in landingCopy.governance
       ? landingCopy.governance.relationship
       : null;
+  /*
+   * Also through `in`, at run time: a site's brand note can be held (it is
+   * then not sent to the browser at all), and only some sites word a
+   * settings note (Sleep Apnea Care: Liivv never advises on pressure).
+   */
+  const words: Record<string, string | undefined> =
+    'governance' in landingCopy ? landingCopy.governance : {};
+  const hasBrandsNote = words.brandsNote !== undefined;
+  const settingsNote = words.settingsNote ?? null;
   const locale = useLocale();
   const { byline, hasReview, disclosed } = useByline();
 
@@ -206,7 +218,8 @@ export function LandingGovernance({
             </p>
           ) : null}
 
-          <p>{landing('brandsNote')}</p>
+          {settingsNote ? <p>{settingsNote}</p> : null}
+          {hasBrandsNote ? <p>{landing('brandsNote')}</p> : null}
           <p>{landing('sourcesNote')}</p>
 
           {sources.length ? (

@@ -55,6 +55,7 @@ import {
   isOstomyCategoryIds,
   OSTOMY_KIT_IDS,
 } from '~/app/[locale]/(default)/liivv-health/ostomy-care/oc-ids';
+import { isSleepPlacedProduct } from '~/app/[locale]/(default)/liivv-health/sleep-apnea-care/chapters/chapter-shop';
 import { isCpapCategoryIds, isPapDeviceId } from '~/lib/catalog/prescription-devices';
 
 export interface SensitiveProductInput {
@@ -93,6 +94,7 @@ export function isSensitiveProductId(entityId: number): boolean {
     SUPPLY_CART_ALLOWLIST.has(entityId) ||
     isDiabetesKit(entityId) ||
     isDiabetesPlacedProduct(entityId) ||
+    isSleepPlacedProduct(entityId) ||
     isPapDeviceId(entityId)
   );
 }

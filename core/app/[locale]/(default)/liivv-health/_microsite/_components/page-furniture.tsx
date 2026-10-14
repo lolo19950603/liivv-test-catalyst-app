@@ -54,11 +54,15 @@ function formatReviewDate(iso: string) {
 export function HelpBand() {
   const t = useSiteT('ui.help');
   const { furniture } = useSite();
-  const help: Record<string, string> = useSiteMessages().ui.help;
+  /* Read through `in`: a site with no help band (`helpBand: false`) has no `ui.help`. */
+  const ui = useSiteMessages().ui;
+  const help: Record<string, string> = 'help' in ui ? ui.help : {};
   /* Plain <a>, so the /fr prefix has to be put on by hand — ../chapters/hrefs.ts.
    * A no-op on the outward links, which are absolute https:// URLs. */
   const locale = useLocale();
   const directory = furniture.directoryKey;
+
+  if (furniture.helpBand === false) return null;
 
   const cards = [
     {

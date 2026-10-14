@@ -1,0 +1,39 @@
+/*
+ * Sleep Apnea Care's Funding & Coverage page: only what the engine's funding
+ * stylesheets (Ostomy's funding.css and ../../_microsite/funding/funding-extras.css)
+ * do not already draw. Every rule is scoped under the Sleep root, so none can
+ * reach an Ostomy or Diabetes page.
+ */
+
+/* A line's sources, under the sentence they back (owner note 1). */
+#oc-chapter[data-site='sleep-apnea-care'] .sa-fund-src {
+  margin: 0.4rem 0 0;
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .oc-fund-part li .sa-fund-src {
+  margin-top: 0.2rem;
+}
+
+/* A question and the chips of the pages its hint rests on. */
+#oc-chapter[data-site='sleep-apnea-care'] .sa-fund-question .oc-fund-field {
+  margin-bottom: 0.25rem;
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-fund-question .sa-fund-src {
+  margin: 0 0 1rem;
+}
+
+/* "Check with your program first": always visible, told apart by its heading and border. */
+#oc-chapter[data-site='sleep-apnea-care'] .sa-fund-caution {
+  border-left: 5px solid color-mix(in srgb, var(--chapter-accent) 35%, var(--ink));
+}
+
+/* A program's name, under the federal row's own heading. */
+#oc-chapter[data-site='sleep-apnea-care'] .oc-fund-row-title {
+  margin: 0 0 0.4rem;
+  font-weight: 650;
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .oc-fund-row-link + .oc-fund-row-link {
+  margin-left: 1rem;
+}

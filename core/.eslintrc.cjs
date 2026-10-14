@@ -82,9 +82,10 @@ const config = {
       },
     },
     {
-      // Unit tests under lib/ run with the vitest that packages/catalyst installs
+      // Unit tests under lib/ and app/ run with the vitest that packages/catalyst installs
       // (tsconfig maps 'vitest' to it), so its package.json lists their test dependency.
-      files: ['lib/**/*.test.ts'],
+      // app/ holds the care sites' pure-function tests (sleep-apnea-care/*.test.ts).
+      files: ['lib/**/*.test.ts', 'app/**/*.test.ts'],
       rules: {
         'import/no-extraneous-dependencies': [
           'error',

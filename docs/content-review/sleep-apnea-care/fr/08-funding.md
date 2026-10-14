@@ -1,0 +1,332 @@
+# Funding & Coverage
+
+**Generated:** 2026-10-14 from commit `256c2638`
+
+## `ui.fundingPage`
+
+- Comment payer ⚑ `ui.fundingPage.kicker`
+- De l’aide pour payer la CPAP, province par province ⚑ `ui.fundingPage.title`
+- L’aide pour le coût d’un appareil et des fournitures dépend de l’endroit où vous vivez et de vos autres couvertures. Commencez par votre province, puis ajoutez ce qui s’applique à vous. ⚑ `ui.fundingPage.lead`
+- Trouvez votre couverture ⚑ `ui.fundingPage.ctaFind`
+- Programmes fédéraux et crédit d’impôt ⚑ `ui.fundingPage.ctaFederal`
+- Les programmes provinciaux pour les appareils et les fournitures, l’aide aux personnes qui reçoivent de l’aide au revenu ou de l’aide aux personnes handicapées, les prestations de santé des Premières Nations et des Inuits, Anciens Combattants Canada et le crédit d’impôt pour frais médicaux. ⚑ `ui.fundingPage.focus`
+- Simple et précis. Chaque programme renvoie à la page officielle dont il provient, avec la date de notre dernière vérification. ⚑ `ui.fundingPage.vibe`
+- Commencez ici ⚑ `ui.fundingPage.payingEyebrow`
+- Comment le paiement fonctionne ⚑ `ui.fundingPage.payingHeading`
+- Les programmes paient de différentes façons. Certains vous prêtent un appareil. Certains paient une partie du prix à une entreprise inscrite, et vous payez le reste. Certains paient un fournisseur ou vous remboursent sur présentation de reçus. Le crédit d’impôt réduit votre impôt sur le revenu. ⚑ `ui.fundingPage.payingIntro`
+- Programmes que nous facturons directement ⚑ `ui.fundingPage.directHeading`
+- Nous n’indiquons un programme ici qu’une fois que nous sommes prêts à le facturer pour vous. ⚑ `ui.fundingPage.directBody`
+- Aucun n’est indiqué pour l’instant. Vérifiez comment votre programme paie avant de commander, ou posez-nous la question. ⚑ `ui.fundingPage.directEmpty`
+- Avant d’acheter un appareil ⚑ `ui.fundingPage.buyFirstEyebrow`
+- Vérifiez d’abord auprès de votre programme ⚑ `ui.fundingPage.buyFirstHeading`
+- Certains programmes ne paieront pas un appareil que vous avez acheté avant de suivre leurs étapes. ⚑ `ui.fundingPage.buyFirstBody`
+- Le Programme d’appareils et accessoires fonctionnels de l’Ontario : si vous achetez avant que ses étapes soient terminées, vous payez le coût total ⚑ `ui.fundingPage.buyFirstItems.1`
+- La prestation de la Colombie-Britannique pour les appareils respiratoires, destinée aux personnes qui reçoivent de l’aide, ne paiera pas un appareil acheté sans approbation, sauf en cas d’urgence mettant la vie en danger ⚑ `ui.fundingPage.buyFirstItems.2`
+- Le programme SAIL de la Saskatchewan ne vous rembourse pas un appareil que vous avez acheté vous-même ⚑ `ui.fundingPage.buyFirstItems.3`
+- Votre situation ⚑ `ui.fundingPage.toolEyebrow`
+- Trouvez ce qui s’applique à vous ⚑ `ui.fundingPage.toolHeading`
+- Seul l’endroit où vous vivez est nécessaire. Répondez au reste si vous êtes à l’aise, et chaque réponse précise la liste. ⚑ `ui.fundingPage.toolIntro`
+- Fédéral ⚑ `ui.fundingPage.federalEyebrow`
+- Aide qui ne dépend pas de l’endroit où vous vivez ⚑ `ui.fundingPage.federalHeading`
+- Prestations de santé des Premières Nations et des Inuits ⚑ `ui.fundingPage.nihbHeading`
+- Anciens Combattants Canada ⚑ `ui.fundingPage.vacHeading`
+- Le crédit d’impôt pour frais médicaux ⚑ `ui.fundingPage.taxHeading`
+- Vérification en cours ⚑ `ui.fundingPage.checkingEyebrow`
+- Là où nous n’avons pas encore confirmé de programme ⚑ `ui.fundingPage.checkingHeading`
+- La Nouvelle-Écosse, l’Île-du-Prince-Édouard, Terre-Neuve-et-Labrador, le Yukon, les Territoires du Nord-Ouest et le Nunavut. Nous n’indiquons un programme qu’une fois que nous avons lu sa page officielle. Les programmes fédéraux s’appliquent quand même. ⚑ `ui.fundingPage.checkingBody`
+- Quand ce n’est pas assez ⚑ `ui.fundingPage.enoughEyebrow`
+- Si la couverture ne paie pas tout ⚑ `ui.fundingPage.enoughHeading`
+- Vérifiez d’abord votre assurance privée ⚑ `ui.fundingPage.enough1Heading`
+- Beaucoup de régimes d’assurance couvrent l’équipement CPAP prescrit par un médecin du sommeil. Votre assureur vous demandera une copie de votre ordonnance. Certains pourraient demander un test du sommeil récent. ⚑ `ui.fundingPage.enough1Body`
+- Renseignez-vous auprès de votre clinique du sommeil ⚑ `ui.fundingPage.enough2Heading`
+- L’équipe de la clinique sait quels programmes les gens de votre région utilisent, et elle aide souvent à remplir les formulaires. ⚑ `ui.fundingPage.enough2Body`
+- De l’aide pour les appareils des enfants ⚑ `ui.fundingPage.enough3Heading`
+- L’Association pulmonaire du Canada a un programme de subventions pour aider à payer les appareils CPAP pour enfants. Envoyez un courriel à info@lung.ca pour vous renseigner. ⚑ `ui.fundingPage.enough3Body`
+- L’argent ne devrait pas être la raison pour laquelle vous vous passez de traitement ⚑ `ui.fundingPage.closingHeading`
+- Si le coût pose problème, dites-le à votre médecin ou à votre clinique du sommeil. Ils connaissent peut-être de l’aide que cette page n’indique pas. ⚑ `ui.fundingPage.closingBody`
+- Commencer la CPAP → ⚑ `ui.fundingPage.closingCta`
+- Payer la CPAP au Canada : ce que couvre votre province | Liivv ⚑ `ui.fundingPage.metaTitle`
+- Programmes pour les appareils et les fournitures CPAP par province, aide aux personnes qui reçoivent de l’aide sociale, SSNA, Anciens Combattants Canada et crédit d’impôt pour frais médicaux. Chaque programme renvoie à sa page officielle. ⚑ `ui.fundingPage.metaDescription`
+
+## `ui.fundingChecker`
+
+- Trouvez ce que couvre votre province ⚑ `ui.fundingChecker.formLabel`
+- Où vivez-vous? ⚑ `ui.fundingChecker.provinceLabel`
+- La couverture change complètement à la frontière provinciale, alors c’est la seule réponse dont nous avons vraiment besoin. ⚑ `ui.fundingChecker.provinceHint`
+- Choisissez une province ou un territoire ⚑ `ui.fundingChecker.provincePlaceholder`
+- Recevez-vous de l’aide au revenu ou de l’aide aux personnes handicapées de votre province? ⚑ `ui.fundingChecker.assistanceLegend`
+- Plusieurs programmes sont réservés aux personnes qui reçoivent de l’aide. ⚑ `ui.fundingChecker.assistanceHint`
+- Êtes-vous membre des Premières Nations ou Inuit? ⚑ `ui.fundingChecker.indigenousLegend`
+- Les membres des Premières Nations et les Inuits peuvent être couverts par le programme fédéral des Services de santé non assurés (SSNA). En Colombie-Britannique, les clients de la First Nations Health Authority reçoivent plutôt leurs prestations par son entremise. ⚑ `ui.fundingChecker.indigenousHint`
+- Êtes-vous client d’Anciens Combattants Canada? ⚑ `ui.fundingChecker.veteranLegend`
+- Anciens Combattants Canada a sa propre prestation pour l’équipement respiratoire. ⚑ `ui.fundingChecker.veteranHint`
+- Avez-vous une assurance collective ou privée? ⚑ `ui.fundingChecker.privateLegend`
+- Beaucoup de programmes ne paient qu’après l’assurance privée et les autres programmes. ⚑ `ui.fundingChecker.privateHint`
+- Quel test du sommeil avez-vous passé? ⚑ `ui.fundingChecker.testLegend`
+- Certains programmes n’acceptent que certains tests. ⚑ `ui.fundingChecker.testHint`
+- Pour quoi avez-vous besoin d’aide? ⚑ `ui.fundingChecker.needLegend`
+- Certains programmes paient un appareil, mais pas les fournitures. ⚑ `ui.fundingChecker.needHint`
+- Oui ⚑ `ui.fundingChecker.yes`
+- Non ⚑ `ui.fundingChecker.no`
+- Je ne suis pas sûr ⚑ `ui.fundingChecker.notSure`
+- Recommencer ⚑ `ui.fundingChecker.startOver`
+- Choisissez l’endroit où vous vivez et nous vous montrerons les programmes qui valent la peine d’être examinés, avec un lien vers la page officielle de chacun. ⚑ `ui.fundingChecker.empty`
+- Vérifié sur la page officielle le {date} ⚑ `ui.fundingChecker.verifiedOn`
+- Partiellement confirmé. Vérifiez auprès du programme avant de compter là-dessus. ⚑ `ui.fundingChecker.confirm`
+- C’est un point de départ, pas une décision. Les programmes changent leurs montants et leurs règles, alors consultez la page officielle avant de compter sur un chiffre. Votre clinique du sommeil peut souvent vous dire ce qui est approuvé. ⚑ `ui.fundingChecker.caveat`
+- {answered} sur {total} répondues ⚑ `ui.fundingChecker.progress`
+- Répondez au reste pour préciser ⚑ `ui.fundingChecker.narrowing`
+- Toutes répondues ⚑ `ui.fundingChecker.complete`
+- Appeler {office} ⚑ `ui.fundingChecker.call`
+- Trouver votre bureau ⚑ `ui.fundingChecker.findOffice`
+
+## `ui.fundingResults`
+
+- {group} – {province} : nous vérifions encore ⚑ `ui.fundingResults.noConfirmedTitle`
+- Nous n’avons pas encore trouvé ni vérifié de programme officiel pour ceci ({province}), alors nous n’en indiquons aucun. Cela ne veut pas dire que rien n’est couvert. Renseignez-vous auprès de votre clinique du sommeil ou de votre médecin. ⚑ `ui.fundingResults.noConfirmedBody`
+- La plupart des programmes exigent d’abord un diagnostic ⚑ `ui.fundingResults.notTestedYetTitle`
+- La plupart des programmes présentés ici exigent un diagnostic d’apnée du sommeil et une ordonnance. Si vous n’avez pas encore passé de test, commencez par Est-ce l’apnée du sommeil? ⚑ `ui.fundingResults.notTestedYetBody`
+- Est-ce l’apnée du sommeil? ⚑ `ui.fundingResults.notTestedYetLink`
+- Ce programme exige une étude du sommeil de niveau 1 (un test de nuit dans un laboratoire du sommeil) dans un laboratoire du sommeil inscrit auprès de lui. Demandez à votre médecin ce que cela signifie pour vous. ⚑ `ui.fundingResults.testNote.on-adp-respiratory`
+- Une étude de niveau 3 à domicile compte si elle a été faite en Saskatchewan, à moins que SAIL ait approuvé un autre endroit. ⚑ `ui.fundingResults.testNote.sk-sail-cpap`
+- Les fournitures sont à vos frais, sauf si vous avez les Supplementary Health Benefits, ou les Family Health Benefits pour un enfant. ⚑ `ui.fundingResults.suppliesNote.sk-sail-cpap`
+- Après votre premier ensemble, compris dans la quote-part, les fournitures sont à vos frais. ⚑ `ui.fundingResults.suppliesNote.mb-misericordia-cpap`
+- Le Programme d’appareils et accessoires fonctionnels de l’Ontario ne paie pas les fournitures ⚑ `ui.fundingResults.adpNoSuppliesTitle`
+- Il ne paie pas les masques ni les harnais de remplacement. Si vous recevez des prestations du Programme ontarien de soutien aux personnes handicapées, voyez sa prestation pour les fournitures. L’assurance privée peut aussi aider. ⚑ `ui.fundingResults.adpNoSuppliesBody`
+- L’assurance privée paie habituellement en premier ⚑ `ui.fundingResults.privateFirstTitle`
+- Beaucoup de programmes présentés ici ne paient que si aucun autre programme ni aucune assurance ne le peut. Demandez à votre assureur ce qu’il couvre avant de présenter une demande à un programme. Beaucoup de régimes couvrent l’équipement prescrit par un médecin du sommeil, et vous demanderont votre ordonnance. ⚑ `ui.fundingResults.privateFirstBody`
+
+## `funding`
+
+- Colombie-Britannique ⚑ `funding.provinceLabels.BC`
+- Alberta ⚑ `funding.provinceLabels.AB`
+- Saskatchewan ⚑ `funding.provinceLabels.SK`
+- Manitoba ⚑ `funding.provinceLabels.MB`
+- Ontario ⚑ `funding.provinceLabels.ON`
+- Québec ⚑ `funding.provinceLabels.QC`
+- Nouveau-Brunswick ⚑ `funding.provinceLabels.NB`
+- Nouvelle-Écosse ⚑ `funding.provinceLabels.NS`
+- Île-du-Prince-Édouard ⚑ `funding.provinceLabels.PE`
+- Terre-Neuve-et-Labrador ⚑ `funding.provinceLabels.NL`
+- Yukon ⚑ `funding.provinceLabels.YT`
+- Territoires du Nord-Ouest ⚑ `funding.provinceLabels.NT`
+- Nunavut ⚑ `funding.provinceLabels.NU`
+- Un test de nuit dans un laboratoire du sommeil (niveau 1) ⚑ `funding.options.test.inLab`
+- Un test du sommeil à domicile (niveau 3) ⚑ `funding.options.test.home`
+- Je n’ai pas encore passé de test ⚑ `funding.options.test.notYet`
+- Je ne suis pas sûr ⚑ `funding.options.test.unsure`
+- Mon premier appareil ⚑ `funding.options.need.first`
+- Remplacer un appareil que j’ai déjà ⚑ `funding.options.need.replacement`
+- Masques, tubulures, filtres et autres fournitures ⚑ `funding.options.need.supplies`
+- Prestations de santé des Premières Nations et des Inuits ⚑ `funding.groups.nihb`
+- Anciens Combattants Canada ⚑ `funding.groups.vac`
+- Aide pour un appareil ⚑ `funding.groups.machine`
+- Aide pour les fournitures ⚑ `funding.groups.supplies`
+- Si vous avez une assurance privée ⚑ `funding.groups.privateFirst`
+- Crédit d’impôt ⚑ `funding.groups.tax`
+- Le Programme des SSNA couvre les appareils CPAP et CPAP automatiques (APAP), et les appareils à deux niveaux de pression pour certaines personnes. Il couvre aussi les masques avec harnais, les tubulures, les mentonnières et les filtres d’entrée d’air. Les limites habituelles sont d’un appareil tous les 5 ans, de 2 masques avec harnais par année pour chaque type, de 2 tubulures par année, de 2 mentonnières par année et de 14 filtres d’entrée d’air par année. Des articles supplémentaires peuvent être envisagés au cas par cas. ⚑ `funding.programs.fed-nihb-respiratory.covered`
+- Les membres des Premières Nations inscrits en vertu de la Loi sur les Indiens, les Inuits reconnus par une organisation inuite de revendication territoriale, et les enfants de moins de 2 ans dont un parent est admissible, qui vivent au Canada. Certains membres des Premières Nations et certains Inuits reçoivent plutôt leurs prestations directement de leur propre gouvernement, collectivité ou autorité sanitaire. Il vous faut un diagnostic d’apnée du sommeil avec des symptômes, une étude du sommeil interprétée par un médecin du sommeil et une ordonnance. Une étude de niveau 1, de niveau 3 (à domicile) ou de niveau 4 est acceptée. ⚑ `funding.programs.fed-nihb-respiratory.who`
+- Votre appareil nécessite une autorisation préalable avant que vous le receviez, tout comme les masques, les tubulures et les mentonnières. Votre fournisseur envoie la demande au bureau régional des SSNA de sa région. Les fournisseurs inscrits auprès du Programme des SSNA le facturent directement, alors vous ne payez pas les articles admissibles. Si vous payez vous-même, vérifiez auprès du Programme des SSNA avant d’acheter, et envoyez votre demande de remboursement dans un délai d’un an. ⚑ `funding.programs.fed-nihb-respiratory.howToApply`
+- Cela peut commencer par une location d’au plus 3 mois, ou par un achat. L’achat de l’appareil exige un test sous traitement qui montre que votre sommeil s’est amélioré. Le prix doit inclure l’ajustement du masque, l’installation, le suivi et l’enseignement. Le Programme des SSNA ne paie pas le test du sommeil lui-même. ⚑ `funding.programs.fed-nihb-respiratory.notes`
+- Les membres des Premières Nations de la Colombie-Britannique qui sont clients de la First Nations Health Authority reçoivent leurs prestations de santé de son programme Health Benefits, et non du Programme des SSNA. La liste de sa prestation pour les fournitures et l’équipement médicaux comprend les appareils CPAP, CPAP automatiques (APAP) et à deux niveaux de pression, habituellement un tous les 5 ans. Elle comprend aussi les masques avec harnais, les tubulures, les mentonnières et les filtres d’entrée d’air. ⚑ `funding.programs.bc-fnha-mse.covered`
+- Les membres des Premières Nations ayant le statut d’Indien qui vivent en Colombie-Britannique, et les bébés jusqu’à 24 mois si un parent est admissible. ⚑ `funding.programs.bc-fnha-mse.who`
+- Demandez à votre fournisseur s’il est inscrit au programme. Les fournisseurs inscrits le facturent directement. Un appareil doit d’abord être approuvé : votre fournisseur peut envoyer votre étude du sommeil, une note médicale et une soumission. Si votre fournisseur n’est pas inscrit, vous payez et demandez un remboursement. ⚑ `funding.programs.bc-fnha-mse.howToApply`
+- La prestation pour l’équipement respiratoire d’Anciens Combattants Canada comprend les appareils CPAP, CPAP automatiques (APAP) et à deux niveaux de pression (BiPAP). L’équipement et les fournitures qui peuvent être approuvés figurent dans ses grilles de prestations. ⚑ `funding.programs.fed-vac-poc9.covered`
+- Les clients admissibles d’Anciens Combattants Canada. Pour un problème de santé qui n’est pas lié à vos prestations d’invalidité, Anciens Combattants Canada peut payer ce qui reste après votre régime d’assurance maladie provincial, ou ce que ce régime ne fournit pas. ⚑ `funding.programs.fed-vac-poc9.who`
+- Anciens Combattants Canada paie l’article ou vous rembourse. Si votre fournisseur demande plus que ce qu’Anciens Combattants Canada peut payer, vous pouvez choisir un autre fournisseur ou payer la différence. Envoyez vos demandes de remboursement dans un délai de 18 mois. ⚑ `funding.programs.fed-vac-poc9.howToApply`
+- Un appareil CPAP fait partie des frais médicaux admissibles dans votre déclaration de revenus. Il faut une ordonnance. ⚑ `funding.programs.fed-cra-medical.covered`
+- Vous, ou votre époux ou conjoint de fait, pouvez demander les montants payés au cours de toute période de 12 mois se terminant dans l’année d’imposition. ⚑ `funding.programs.fed-cra-medical.who`
+- Seule la partie qui dépasse un seuil annuel compte. Pour les déclarations de 2025, ce seuil est le moins élevé de 3 % de votre revenu net ou de 2 834 $. Gardez vos reçus et votre ordonnance. Au Québec, les crédits provinciaux se demandent auprès de Revenu Québec. ⚑ `funding.programs.fed-cra-medical.howToApply`
+- Le Programme d’appareils et accessoires fonctionnels (PAAF) de l’Ontario aide à payer un appareil CPAP, CPAP automatique (APAP) ou à deux niveaux de pression (BPAP). L’ensemble de l’appareil comprend un humidificateur chauffant, un masque de base avec harnais, un étui de transport, une tubulure, des filtres et un guide d’utilisation. Le programme paie 75 % de son prix approuvé, et vous payez les 25 % restants. Si vous recevez de l’aide d’Ontario au travail, du Programme ontarien de soutien aux personnes handicapées ou de l’Aide à l’égard d’enfants qui ont un handicap grave, il paie 100 %. ⚑ `funding.programs.on-adp-respiratory.covered`
+- Les résidents de l’Ontario qui ont une carte Santé valide et qui ont besoin de l’appareil pendant 6 mois ou plus. Un médecin d’une clinique du sommeil inscrite au programme vous évalue. L’évaluation doit comprendre une étude du sommeil de niveau 1 dans un laboratoire du sommeil inscrit au programme. Votre revenu n’est pas pris en compte. ⚑ `funding.programs.on-adp-respiratory.who`
+- Suivez les étapes du programme avant d’acheter. Faites-vous évaluer, puis achetez auprès d’une entreprise inscrite au programme. L’entreprise envoie le formulaire pour vous. Le programme paie sa part à cette entreprise, et vous payez vos 25 % quand vous allez chercher l’appareil. Si vous achetez avant que les étapes soient terminées, vous payez le coût total. ⚑ `funding.programs.on-adp-respiratory.howToApply`
+- Il ne paie pas les masques ni les harnais de remplacement, les réparations ni les appareils buccaux. Le programme s’attend à ce qu’un appareil dure au moins 5 ans. Vous pouvez demander à le remplacer si vos besoins changent, ou s’il est usé, n’est plus couvert par la garantie et ne peut pas être réparé à un coût raisonnable. Les résidents des foyers de soins de longue durée peuvent obtenir du financement pour un appareil PAP. Vous n’êtes pas admissible si vous recevez déjà le même équipement, ou y êtes admissible, par la WSIB, ou par Anciens Combattants Canada en tant qu’ancien combattant du groupe « A ». ⚑ `funding.programs.on-adp-respiratory.notes`
+- Si vous recevez des prestations du Programme ontarien de soutien aux personnes handicapées (POSPH), ses Prestations obligatoires pour les nécessités spéciales peuvent couvrir les fournitures PAP de remplacement : masques, coussins et doublures de masque, interfaces avec harnais, tubulures, chambres à eau, filtres et eau distillée. Sa liste comprend aussi un appareil buccal pour l’apnée du sommeil. ⚑ `funding.programs.on-odsp-msn.covered`
+- Les bénéficiaires du POSPH et les membres de leur groupe de prestataires, ayant reçu un diagnostic d’apnée obstructive du sommeil. Un professionnel de la santé approuvé confirme le diagnostic et la durée pendant laquelle vous aurez besoin des fournitures. ⚑ `funding.programs.on-odsp-msn.who`
+- Demandez les fournitures à votre bureau du POSPH quand vous en avez besoin. Le POSPH doit d’abord approuver le besoin. Il paie un fournisseur qui lui envoie une facture, ou ajoute le montant à votre paiement mensuel. Il paie les coûts réels, d’après les reçus. L’approbation vise des articles de base au coût le plus économique. ⚑ `funding.programs.on-odsp-msn.howToApply`
+- L’appareil lui-même passe par le Programme d’appareils et accessoires fonctionnels. Le POSPH paie seulement si aucun autre programme ni aucune assurance privée ne paie le même article. ⚑ `funding.programs.on-odsp-msn.notes`
+- La Saskatchewan vous prête un appareil CPAP par l’entremise de SAIL, moyennant des frais de programme de 275 $. Ces frais couvrent le prêt et les réparations nécessaires pendant la durée de vie utile de l’appareil, soit 5 ans. Vous pouvez garder l’appareil plus longtemps s’il fonctionne encore bien. Vous payez les frais avant de recevoir l’appareil. Il n’y a pas de plan de paiement, et les frais ne sont pas remboursables. ⚑ `funding.programs.sk-sail-cpap.covered`
+- Les résidents de la Saskatchewan qui ont un numéro de services de santé valide et une apnée du sommeil modérée à grave (un IAH ou un IPR de 15 ou plus). Aussi, les enfants de moins de 18 ans qui ont besoin de la CPAP en raison d’un problème de santé. Un centre des troubles du sommeil (Sleep Disorder Centre) peut aussi la prescrire pour un besoin médical urgent, ou pour une apnée du sommeil légère avec des symptômes chez une personne qui occupe un emploi à risque élevé. SAIL ne s’adresse pas aux personnes qui reçoivent des prestations d’un autre organisme gouvernemental, comme SGI, la Workers’ Compensation Board, le Programme des SSNA ou Anciens Combattants Canada. ⚑ `funding.programs.sk-sail-cpap.who`
+- Votre médecin de famille vous dirige vers un pneumologue. Il vous faut une étude du sommeil de niveau 1 ou de niveau 3, et une étude de niveau 3 doit être faite en Saskatchewan, à moins que SAIL n’approuve autre chose. Un spécialiste du sommeil d’un centre des troubles du sommeil de la Saskatchewan (Sleep Disorders Centre) interprète les résultats et confirme le diagnostic. Un pneumologue de la Saskatchewan prescrit la CPAP, et peut présenter la demande pour vous ou vous expliquer comment le faire. ⚑ `funding.programs.sk-sail-cpap.howToApply`
+- Vous payez vos propres fournitures, comme les masques, les harnais et les filtres. Avec les Supplementary Health Benefits, ou les Family Health Benefits pour les enfants, l’appareil et les fournitures sont gratuits. SAIL ne vous rembourse pas un appareil que vous avez acheté vous-même, et n’offre pas d’appareils de voyage. Vous pouvez avoir un seul appareil SAIL à la fois. ⚑ `funding.programs.sk-sail-cpap.notes`
+- Le programme de CPAP du Manitoba aide à payer un appareil. Après un essai réussi, vous payez une quote-part de 500 $, qui comprend l’appareil, votre premier masque, des filtres, une chambre d’humidificateur et une tubulure. L’office régional de la santé paie le reste du coût de l’appareil, ainsi qu’une première consultation avec votre fournisseur, l’ajustement du masque, l’enseignement et les visites de suivi pour les problèmes de traitement. ⚑ `funding.programs.mb-misericordia-cpap.covered`
+- Les Manitobains à qui le Sleep Disorder Centre du Misericordia Health Centre a prescrit un appareil CPAP. ⚑ `funding.programs.mb-misericordia-cpap.who`
+- Apportez votre ordonnance à l’un des deux fournisseurs indiqués par le Sleep Disorder Centre. Le fournisseur procède à l’ajustement, vous montre comment utiliser l’équipement et vous offre un essai d’au moins un mois. Pour réussir l’essai, vous l’utilisez au moins 70 % des nuits, pendant 4 heures ou plus. C’est la règle du programme; votre équipe de soins du sommeil fixe votre propre objectif. ⚑ `funding.programs.mb-misericordia-cpap.howToApply`
+- Ensuite, vous payez les fournitures, la livraison et les réparations. Vous pouvez obtenir un nouvel appareil tous les 5 ans, moyennant une autre quote-part de 500 $. Si vous n’en avez pas les moyens et que vous n’avez ni l’Aide à l’emploi et au revenu ni d’assurance privée, renseignez-vous sur les circonstances exceptionnelles. ⚑ `funding.programs.mb-misericordia-cpap.notes`
+- Si vous recevez de l’aide au revenu ou de l’aide aux personnes handicapées en Colombie-Britannique, le ministère peut payer un appareil CPAP ou à deux niveaux de pression en cas d’apnée obstructive du sommeil modérée à grave. Si vous ne pouvez pas en utiliser un, il peut plutôt payer un appareil d’avancement mandibulaire. Il peut remplacer l’appareil après 5 ans, et les fournitures nécessaires à son fonctionnement après 1 an. ⚑ `funding.programs.bc-bcea-breathing.covered`
+- Les personnes qui reçoivent de l’aide au revenu ou de l’aide aux personnes handicapées et qui sont admissibles aux suppléments de santé généraux, ou qui répondent aux critères des besoins de santé mettant la vie en danger. Aucune autre ressource, comme un autre programme ou une assurance privée, ne peut payer. Il doit s’agir de l’appareil convenable le moins cher. ⚑ `funding.programs.bc-bcea-breathing.who`
+- Obtenez une soumission d’un fournisseur. Remplissez le formulaire Breathing Device Request and Justification (HR3727) avec l’ordonnance d’un médecin ou d’une infirmière praticienne et l’évaluation d’un thérapeute respiratoire. Le ministère doit l’approuver avant que vous achetiez. ⚑ `funding.programs.bc-bcea-breathing.howToApply`
+- Il ne paiera pas un appareil acheté sans approbation, sauf en cas d’urgence mettant la vie en danger. Il peut partager le coût quand l’assurance ne paie qu’une partie. ⚑ `funding.programs.bc-bcea-breathing.notes`
+- AISH peut aider à payer un appareil CPAP et des fournitures, au titre d’une prestation personnelle liée à la santé. ⚑ `funding.programs.ab-aish.covered`
+- Les clients d’AISH qui n’ont pas plus de 5 000 $ en biens non exemptés, ou qui sont en difficulté financière, qui ont besoin de la prestation, qui n’y sont admissibles par aucun autre programme ni aucune autre source, et qui répondent aux exigences propres à cette prestation. ⚑ `funding.programs.ab-aish.who`
+- Parlez à votre agent d’AISH avant d’acheter. Certaines prestations personnelles pourraient devoir être remboursées. ⚑ `funding.programs.ab-aish.howToApply`
+- Le Programme des services respiratoires du Nouveau-Brunswick couvre les appareils CPAP jusqu’à 1 800 $ et les appareils BPAP jusqu’à 3 150 $, ainsi que les masques et fournitures CPAP et BPAP. ⚑ `funding.programs.nb-sd-respiratory.covered`
+- Les clients du ministère du Développement social et les personnes à leur charge, ainsi que les personnes ayant des besoins de santé particuliers qui sont admissibles à l’assistance santé. Il vous faut une carte des Services d’assistance santé qui indique cette couverture. Pour recevoir toutes les prestations, vous ne pouvez avoir aucune autre couverture pour l’article. ⚑ `funding.programs.nb-sd-respiratory.who`
+- Utilisez le formulaire de demande CPAP ou BPAP du programme. ⚑ `funding.programs.nb-sd-respiratory.howToApply`
+- La fréquence à laquelle vous pouvez remplacer un appareil varie. Les fournitures peuvent être payées chaque mois, et les quantités sont surveillées. ⚑ `funding.programs.nb-sd-respiratory.notes`
+- En Colombie-Britannique, PharmaCare et le Medical Services Plan ne paient pas la CPAP ⚑ `funding.province.bc-not-covered.title`
+- BC PharmaCare ne couvre pas les appareils CPAP. Le Medical Services Plan de la Colombie-Britannique ne paie pas les appareils PAP ni leurs accessoires. L’assurance privée ou l’assurance maladie complémentaire couvre souvent une partie ou la totalité d’un appareil prescrit. Si vous recevez de l’aide au revenu ou de l’aide aux personnes handicapées, voyez plus bas la prestation du ministère pour les appareils respiratoires. Les membres des Premières Nations peuvent obtenir de l’aide par l’entremise de la First Nations Health Authority. ⚑ `funding.province.bc-not-covered.body`
+- En Alberta, l’assurance maladie publique ne paie pas la CPAP ⚑ `funding.province.ab-not-covered.title`
+- L’Alberta Health Care Insurance ne couvre pas l’équipement CPAP ni ses accessoires. Une assurance maladie peut le couvrir. Ces programmes peuvent aussi aider : Alberta Income Support, Special Needs Assistance for Seniors, AISH, le Programme des SSNA et Anciens Combattants Canada. ⚑ `funding.province.ab-not-covered.body`
+- Québec : nous vérifions encore ⚑ `funding.province.qc-still-checking.title`
+- Nous n’avons pas confirmé de programme public pour les appareils CPAP au Québec. Selon des chiffres publiés en 2024, 74 % des personnes ayant reçu un diagnostic d’apnée du sommeil au Québec avaient une assurance privée, et 3,1 % bénéficiaient d’une aide sociale qui couvre en partie l’appareil. Certaines personnes n’avaient aucune couverture et pouvaient seulement demander le crédit d’impôt pour frais médicaux. Nous vérifions si un programme public a vu le jour depuis. ⚑ `funding.province.qc-still-checking.body`
+- {province} : nous vérifions encore ⚑ `funding.province.stillChecking.title`
+- Nous n’avons pas encore trouvé ni vérifié de programme officiel de CPAP pour cette province ou ce territoire ({province}), alors nous n’en indiquons aucun. Cela ne veut pas dire qu’il n’y a pas d’aide. Renseignez-vous auprès de votre clinique du sommeil ou de votre médecin, et consultez les programmes fédéraux plus bas. ⚑ `funding.province.stillChecking.body`
+- Alberta Aids to Daily Living : nous vérifions encore ⚑ `funding.province.aadl.title`
+- Nous n’avons pas pu lire les règles d’Alberta Aids to Daily Living pour la CPAP, alors nous ne l’indiquons pas encore. Renseignez-vous auprès de votre clinique du sommeil ou de votre médecin. ⚑ `funding.province.aadl.body`
+- Commander chez Liivv ⚑ `funding.liivv.askUsTitle`
+- Liivv ne facture encore aucun programme directement. Quand vous nous commandez des fournitures, vous payez votre commande. Certains programmes vous remboursent sur présentation d’un reçu. D’autres paient seulement une entreprise inscrite auprès d’eux. Vérifiez comment le vôtre paie avant de commander, ou posez-nous la question. ⚑ `funding.liivv.askUsBody`
+
+## Open rulings (each ships its default until ruled)
+
+- **R-1 (C9)** — default: Manitoba's trial rule is shown as the program's condition, not a health target: "To pass the trial, you use it on at least 70% of nights, for 4 hours or more. That’s the program’s rule; your sleep team sets your own goal." The sheet's next line ("This is required to get benefit from the treatment.") is not used. Side by side: the CTS/CSS 2014 driving paper uses ≥4 h on >70% of nights over ≥30 days as a licensing measure (Ch02); Manitoba uses it as a funding trial.
+  - Alternative: Drop the numbers and say "a successful trial of at least a month"; or keep the sheet's sentence.
+  - Where: `funding.programs.mb-misericordia-cpap.howToApply`
+- **R-2 (C67)** — default: Bilevel and APAP are named as covered machines where the program lists them (ADP, NIHB, VAC, NB, BCEA, FNHA). The page never says who should use one.
+  - Alternative: Name only "CPAP machines" and say "and other PAP machines".
+  - Where: `funding.programs.fed-nihb-respiratory.covered`, `funding.programs.bc-fnha-mse.covered`, `funding.programs.fed-vac-poc9.covered`, `funding.programs.on-adp-respiratory.covered`, `funding.programs.bc-bcea-breathing.covered`, `funding.programs.nb-sd-respiratory.covered`
+- **R-3 (C68)** — default: Oral appliances are mentioned where a program funds one (ODSP's list; BCEA's mandibular advancement device if PAP isn't tolerated) and where one doesn't (ADP).
+  - Alternative: Leave oral appliances off this PAP page.
+  - Where: `funding.programs.on-odsp-msn.covered`, `funding.programs.bc-bcea-breathing.covered`, `funding.programs.on-adp-respiratory.notes`
+- **R-4 (06 R10)** — default: NIHB prior approval: the copy names the machine, masks, tubing and chin straps, and is silent on filters. Side by side: 8.1.3 "Prior approval is required for all respiratory equipment and supplies benefits." vs the 8.4.1 table "Filters, inlet … No". (Held in tree with the whole NIHB card until the partner review, ruling B1.)
+  - Alternative: Say "everything needs prior approval"; or ask NIHB.
+  - Where: `funding.programs.fed-nihb-respiratory.howToApply`
+- **R-5 (C69)** — default: CRA threshold amounts shown (2025 returns: the lesser of 3% of net income or $2,834). The recheck phrase is not set on "$2,834", so a yearly change shows as CHANGED, not MISSING.
+  - Alternative: Say only "a yearly threshold" and link.
+  - Where: `funding.programs.fed-cra-medical.howToApply`
+- **R-6 (C70)** — default: ODSP list: "Sanitizing unit" left out. The ODSP schedule lists it; Health Canada and PMRA advise against ozone/UV cleaners (Ch02, pmra-uv-ozone). Naming it could read as an endorsement.
+  - Alternative: List it as printed, with a link to Ch02's cleaner warning.
+  - Where: `funding.programs.on-odsp-msn.covered`
+- **R-7 (C71)** — default: Manitoba's at-home testing route is held (E-5): the "or its at-home testing partner" clause is out of the copy; its only source is a 2023 release about an "interim partnership agreement" whose current status is unconfirmed. mb-cpap-release-2023 backs no live line.
+  - Alternative: Restore the clause once a current gov.mb.ca or Shared Health page confirms the route.
+  - Where: `funding.programs.mb-misericordia-cpap.who`
+- **R-8 (C72)** — default: The Quebec card shows the dated INESSS facts (translated from the French-only page) with "we're checking whether a public program has started since".
+  - Alternative: Show only "we're still checking", like Nova Scotia and PEI.
+  - Where: `funding.province.qc-still-checking.body`
+- **R-9 (C65)** — default: The Canadian Lung Association's children's CPAP grant is named (the organisation is the subject, not a source named in prose), with info@lung.ca. Ch06 card 10 item 7 uses it too.
+  - Alternative: Drop it until the grant has its own page.
+  - Where: `ui.fundingPage.enough3Heading`, `ui.fundingPage.enough3Body`
+- **R-10** — default: No 911 line on this page. The urgent exit links Chapter 02's red-flag block, which owns the 911 tier (ruling C1). Never gated.
+  - Alternative: None recorded.
+  - Where: `page: urgent exit (A.2 item 2)`
+- **R-11** — default: FNHA's 30-day / 70% trial is not shown: in the Fee Supplement it is a provider attestation that names the plan administrator. Side by side: Manitoba's sheet uses the same 70% / 4-hour measure as a funding trial (R-1).
+  - Alternative: Add "Your provider gives you a 30-day trial first. That's the program's rule; your sleep team sets your own goal." (same framing as R-1).
+  - Where: `funding.programs.bc-fnha-mse.howToApply`
+- **B1 / D-13 (applied: held in tree)** — default: Ruling B1 ("default", 2026-10-13): the NIHB and FNHA cards wait on an Indigenous health partner's review. Their words (funding.programs.fed-nihb-respiratory.*, funding.programs.bc-fnha-mse.*) are in en/fr but stripped from the client and never rendered. Meanwhile the NIHB card shows its program name, "Find your office" (linking the NIHB regional offices page, nihb-contact) and the date it was checked; the FNHA card shows its name, the FNHA Health Benefits number, its official page and the date. No new words were written: section B has no "Contact your NIHB regional office" line for this page.
+  - Alternative: Show Chapter 06's 9.heldNote wording on the cards ("…is being reviewed with an Indigenous health partner… Until then, contact your NIHB regional office."), or approve a funding-page held note. Also decide whether the partner review covers ui.fundingChecker.indigenousHint, funding.groups.nihb, ui.fundingPage.nihbHeading and the FNHA sentence on the BC caution card; they are shown today because they are not cards.
+  - Where: `funding.programs.fed-nihb-respiratory`, `funding.programs.bc-fnha-mse`, `PROGRAM_META held: 'indigenousPartnerReview'`
+- **N8 (supplies-only row 42)** — default: Section B kept verbatim: "…Check how yours pays before you order, or ask us." (funding.liivv.askUsBody) and "…before you order, or ask us." (ui.fundingPage.directEmpty). There is no "ask us" route in the tree: the support band and its "Request a call" are held out of tree (Part C not live, D-7).
+  - Alternative: The supplies-only re-sort proposes dropping "or ask us" until N8 names who answers (a section B edit), or hold both lines.
+  - Where: `funding.liivv.askUsBody`, `ui.fundingPage.directEmpty`
+- **D-1 / B4** — default: Liivv bills no program directly: DIRECT_BILLING is empty, the page shows ui.fundingPage.directEmpty, and every card says how the program itself pays.
+  - Alternative: List each program once the owner confirms Liivv is a registered vendor or provider with it (ADP, NIHB/FNHA, VAC, BCEA, AISH, NB Social Development, ODSP pay-direct, the Manitoba program).
+  - Where: `ui.fundingPage.directHeading`, `ui.fundingPage.directBody`, `ui.fundingPage.directEmpty`, `DIRECT_BILLING`
+- **D-2 / B5** — default: No line says Liivv bills a private insurer, or what a Liivv receipt shows.
+  - Alternative: Add a receipt line once the owner confirms it shows what insurers and NIHB ask for (prescription, item, Canadian business, CAD).
+  - Where: `funding.liivv.askUsBody`
+- **D-3** — default: The NIHB card promises nothing about reimbursement for items bought from Liivv (NIHB requires a recognized provider).
+  - Alternative: Owner confirms whether Liivv is recognized by NIHB to dispense PAP supplies.
+  - Where: `funding.programs.fed-nihb-respiratory.howToApply`
+- **D-4** — default: ODSP card describes pay-direct only as the program's own method; no Liivv line.
+  - Alternative: Owner confirms whether Liivv can be a ministry-approved third party for MSN supplies.
+  - Where: `funding.programs.on-odsp-msn.howToApply`
+- **D-5 / B7** — default: The Quebec and still-checking cards say nothing about Liivv shipping there.
+  - Alternative: Add a Liivv line once shipping to Quebec and the territories is confirmed.
+  - Where: `funding.province.qc-still-checking`, `funding.province.stillChecking`
+- **D-6 / B13** — default: Ontario Works supplies not read; nothing said (E-4 held).
+  - Alternative: Read the OW directives and add a row if OW has a supplies benefit.
+  - Where: `PROGRAM_META (ON)`
+- **D-7 / B14** — default: No "Request a call" on this page: the support band is out of tree and the Liivv card has no link.
+  - Alternative: Confirm "Funding or coverage question" as an appointment reason on /account/virtual-care/appointment, then link it from the Liivv card.
+  - Where: `funding.liivv (askUs card)`, `ui.fundingPage.support* (out of tree)`
+- **D-9 / B16** — default: Official French program names only where printed (PAAF, POSPH and its MSN, SSNA, ACC PDC 9, NB, CRA; Manitoba's generic phrase). SAIL, BCEA, AISH, FNHA and BC PharmaCare keep their English names in French copy.
+  - Alternative: Find official French pages for the five before /fr goes live.
+  - Where: `PROGRAM_META programNameFr`, `fr.json`
+- **D-10 / B6** — default: ADP's numbers held (E-16: complaints line). NIHB shows "Find your office" (no single number). FNHA's 1-855-550-5454 is shown although the page prints it under a sentence that begins with the dental plan. CRA shows only the provinces' number. ODSP and AISH have no number ("your ODSP office", "your AISH worker").
+  - Alternative: Rule phones for the Sleep and Diabetes sites together; hold FNHA's number too if the dental-plan context is a concern.
+  - Where: `PROGRAM_META phones`, `PROVINCE_CAUTION.BC phones`
+- **D-14 / B17** — default: Monthly recheck through check-funding-sources.mjs --site=sleep-apnea-care, under the existing scheduled task (NEXT_CHECK 2026-11-13).
+  - Alternative: Confirm the scheduled task covers both sites.
+  - Where: `NEXT_CHECK`, `RECHECK_OWNER`
+- **D-15 / E4** — default: Not applied: the checker still shows the SAIL card as primary to a Saskatchewan reader who answers yes to First Nations/Inuit or veteran, although SAIL excludes people with NIHB or Veterans Affairs benefits (its who line says so). funding.md A.5 does not make the change and B has no extra line for it.
+  - Alternative: Tone 'supporting' with an extra line in that case (needs copy).
+  - Where: `buildResults (SK)`, `funding.programs.sk-sail-cpap.who`
+- **BUILD-urgent-exit-words** — default: The urgent exit uses the landing's urgent-exit chapter words (this-might-be-you: "Signs that need care right away, including a child’s breathing, are in Driving & Staying Safe, under" / "Get help now"), linked to staying-safe#red-flags, as the Diabetes funding page does. Never gated.
+  - Alternative: funding.md A.2 names chapters.staying-safe.urgentExit, but its lead says "at the top of this page", which is only true on Chapter 02.
+  - Where: `URGENT_EXIT_WORDS_CHAPTER`
+- **BUILD-still-checking-rule** — default: A group's "we're still checking" card shows only when nothing is on record for that group in the province (and no province note already says so). A program that the answers leave out is not "not found".
+  - Alternative: funding.md A.5's sketch tested the shown list, which would tell a New Brunswick reader not on assistance (or an Ontarian asking about supplies, not on ODSP) that no official program was found. A "none of the programs fits your answers" line (as Diabetes has) would need new copy.
+  - Where: `buildResults`, `ui.fundingResults.noConfirmedTitle`, `ui.fundingResults.noConfirmedBody`
+- **BUILD-buy-first-in-results** — default: In the checker's results, "Check with your program first" lists ui.fundingPage.buyFirstBody plus only the reader's province's line (Ontario item 1, BC item 2, Saskatchewan item 3); elsewhere the body alone. The page's own card (#paying, part 3) always shows all three.
+  - Alternative: Show all three lines in the results too.
+  - Where: `BUY_FIRST_ITEMS`, `ResultCopy.buyFirst`
+- **BUILD-chips-beyond-C** — default: Two chips not in the claims table: bc-bcea-breathing on the BC caution card (the claims table cites it for the card's assistance sentence, s4–5, but A.4 listed only two sources), and fed-vac-poc9 on ui.fundingChecker.veteranHint (the benefit's own page). Caution cards also carry their checked date (2026-10-13).
+  - Alternative: Keep A.4's two BC sources; leave the hint without a chip; no date on caution cards.
+  - Where: `PROVINCE_CAUTION.BC.sources`, `PAGE_SOURCES['ui.fundingChecker.veteranHint']`, `ProvinceCaution.verifiedOn`
+
+## Checks before publishing
+
+- sk-sail-cpap is a March 2023 bulletin: confirm it is still the current SAIL CPAP sheet (it is the one linked from the SAIL page today). (FUND pre-publish 1; F13)
+- mb-misericordia-cpap prints no date (footer SDC-6-24): confirm with the Sleep Disorder Centre or a gov.mb.ca page that the $500 co-pay is current. Manitoba's sleep-study guide PDF returned 404. (FUND pre-publish 2; F14)
+- on-adp-resp-manual-2024: checked 2026-10-13 (still the policy manual linked from ADP's manuals page, updated 2026-09-03); recheck monthly. (FUND pre-publish 3; F10: ADP wording unchanged on publishing day)
+- bc-pap-buyers-guide: no printed date; confirm it is still the current BC guide. (FUND pre-publish 4; F16)
+- ab-aish: the AISH pages now sit beside ADAP (Alberta Disability Assistance Program); check whether ADAP clients get the same CPAP benefit. (FUND pre-publish 5; F15)
+- NIHB benefit list (nihb-pap): effective date and supply rows unchanged. (F8)
+- BCEA replacement table (bc-bcea-breathing) unchanged. (F9)
+- Every program row's checkPhrases still on its page on publishing day: add the Sleep funding ids to check-funding-sources.mjs --site=sleep-apnea-care with its own baseline; today's script reads PROGRAM_META and PAGE_SOURCES only, so the PROVINCE_CAUTION check phrases need reading too. (F19; D-14)
+- Register hrefs that now redirect: fnha-mse, fed-vac-poc9, cra-contact, cla-sleep-apnea (use the addresses they land on). (F18)
+- Flag the CRA 404 (…-claim-tax-return.html without "on-your") to the Diabetes and Ostomy registers. (F17)
+- French names to verify before /fr ships without the draft marker: "Aide à l’égard d’enfants qui ont un handicap grave" (Ontario ACSD), "Ontario au travail", "Aide à l’emploi et au revenu" (Manitoba EIA), "carte des Services d’assistance santé" (New Brunswick Health Services card), "carte Santé" (Ontario), and whether the federal French name of the First Nations Health Authority (likely "Régie de la santé des Premières Nations") should replace the English name. (D-9, B16)
+
+## Held copy (not in the message files; ships only once released)
+
+*None of these is in the message files or the code. Each is released by the named check or ruling: the wording (or a new one) is added to docs/sleep-content/funding.md section B (and A.4 for a program row) with a change-log row, then re-extracted. The NIHB and FNHA program words are held in tree instead (ruling B1): delete the row's `held:` line after the partner review.*
+
+- **E-1 · Alberta Income Support and Special Needs Assistance for Seniors as program rows** — Named in the Alberta caution card (from MyHealth Alberta's list), but their own pages were not read.
+  - Wording: Alberta Income Support may help with CPAP equipment if you get income support. Ask your worker.
+  - Check: Read and register their alberta.ca pages.
+- **E-2 · Alberta Aids to Daily Living CPAP criteria** — open.alberta.ca returned 520 and ab.bluecross.ca 403 (2026-10-12). The page shows the "we're still checking" line instead (funding.province.aadl).
+  - Wording: —
+  - Check: Read the AADL manual.
+- **E-3 · Nova Scotia, PEI, Newfoundland and Labrador, Yukon, NWT and Nunavut programs** — No official page found or read (PEI behind a bot check). The page lists them as still checking.
+  - Wording: —
+  - Check: Find and read each official program page (B22).
+- **E-4 · Ontario Works supplies** — Not read (D-6, B13).
+  - Wording: —
+  - Check: Read the ontario.ca OW directives.
+- **E-5 · Manitoba free at-home testing, and CPAP program access after an at-home test** — The 2023 release calls it an "interim partnership agreement… at no cost to them"; current status unread; the partner is a private company (never named). The clause was removed from funding.programs.mb-misericordia-cpap.who by the source check (R-7).
+  - Wording: In Manitoba, you may be able to get a home sleep test at no cost, and still use the CPAP program. Ask your doctor.
+  - Check: A current gov.mb.ca or Shared Health page confirming the route (mb-cpap-release-2023 is verified but dated June 7, 2023).
+- **E-6 · Quebec's April 2023 CPAP reimbursement announcement** — INESSS's abstract (via INAHTA) records the announcement with terms "not yet defined"; status since May 2024 unread (RAMQ 403; BAnQ showed a CAPTCHA, not attempted further).
+  - Wording: In April 2023, Quebec announced funding to help pay for CPAP machines. Its rules weren’t set as of May 2024.
+  - Check: A quebec.ca or RAMQ page.
+- **E-7 · Saskatchewan group benefit plans** — The lead (group plans no longer pay for private CPAP purchases) is from a shared-services organisation, not the program; not fetched.
+  - Wording: —
+  - Check: A saskatchewan.ca page.
+- **E-8 · New Brunswick replacement periods** — In the Social Development Respiratory Program Policy, not read. The card says only that the period varies.
+  - Wording: —
+  - Check: Read the NB respiratory policy (2024).
+- **E-9 · ADP doesn't cover ASV** — ADP lists ASV under "We do not cover"; ASV detail waits until the Health Canada advisory is registered (Ch03). Liivv sells no machines; the ASV listing is hidden.
+  - Wording: Ontario’s program doesn’t pay for ASV machines.
+  - Check: Health Canada ASV advisory registered and the Ch03 ASV wording ruled (C21).
+- **E-10 · ODSP oral appliance amount and ADP's 3-year warranty minimum** — Warranty policy is an owner question (Part C step 7).
+  - Wording: —
+  - Check: Owner warranty policy.
+- **E-11 · Price ranges** — MyHealth Alberta: "In Canada, CPAP therapy equipment and accessories cost between $1,600 and $2,800." The file's reason ("Liivv sells machines by request") is out of date: Liivv sells no machines (N1), so the range would now be general information only (B18; supplies-only row 43).
+  - Wording: A CPAP machine and accessories usually cost $1,600 to $2,800 in Canada.
+  - Check: Owner ruling B18.
+- **E-12 · Checker privacy promise (toolIntro)** — Engineering and the privacy lead must confirm no analytics, session replay or event capture records the inputs (health, assistance, Indigenous and veteran status). Kept held by ruling B3 ("default", 2026-10-13).
+  - Wording: Nothing you enter is saved or sent anywhere. This runs in your browser.
+  - Check: Privacy sign-off (D-8, B3).
+- **E-13 · Direct billing lines** — Vendor status not confirmed (D-1, B4).
+  - Wording: We bill {program} directly.
+  - Check: Owner confirms each enrolment.
+- **E-15 · Canadian Lung Association advocacy line** — "We believe that everyone who needs CPAP treatment … should have it paid for." Advocacy, not a fact. Not for release.
+  - Wording: —
+  - Check: —
+- **E-16 · ADP phone numbers (ADP_PHONES: 416-327-8804, 1-800-268-6021, TTY 1-800-387-5559)** — Printed on the ADP page only as the complaints line ("You may make a complaint verbally if you have a physical disability that prevents you from submitting a written complaint."). The constant is commented out in funding-meta.ts.
+  - Wording: phones: [ADP_PHONES] on on-adp-respiratory
+  - Check: Owner ruling D-10 / B6, for the Sleep and Diabetes sites together.
+- **Liivv sleep support band (A.2 item 8): ui.fundingPage.supportEyebrow, supportHeading, supportBody, supportCta** — Part C service copy: the Liivv sleep support (RRT) service is not live and makes no promises (supplies-only decision; row 41). Kept out of the message files (spec 8.4).
+  - Wording: Liivv’s sleep support team · Questions about coverage and supplies · Liivv’s sleep support team can help you understand what your program needs from you and which supplies you need. · Request a call
+  - Check: Part C live, or rewritten for N8 / B14 (who answers), and D-7 (the appointment reason).

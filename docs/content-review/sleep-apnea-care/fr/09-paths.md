@@ -1,0 +1,295 @@
+# Path pages
+
+**Generated:** 2026-10-14 from commit `256c2638`
+
+## `ui.path`
+
+- Votre parcours ⚑ `ui.path.kicker`
+- Les six parcours ⚑ `ui.path.allPaths`
+- Chapitre {num} · {chapter} ⚑ `ui.path.chapterLabel`
+- Lire la fiche ⚑ `ui.path.readCard`
+- Commencez ici ⚑ `ui.path.stages.start`
+- Tests et traitements ⚑ `ui.path.stages.types`
+- Rester en sécurité ⚑ `ui.path.stages.safe`
+- Votre installation ⚑ `ui.path.stages.tools`
+- Chaque nuit, et loin de la maison ⚑ `ui.path.stages.everyday`
+- Si c’est votre cas ⚑ `ui.path.stages.season`
+- Quand appeler le 911, et les signes qui ne peuvent pas attendre au volant ou dans la respiration d’un enfant, se trouvent dans le ⚑ `ui.path.safety.lead`
+- chapitre 02 — Arrêtez-vous et agissez maintenant ⚑ `ui.path.safety.link`
+
+## `paths`
+
+- CPAP ⚑ `paths.cpap.title`
+- De votre ordonnance à vos premières semaines, puis le nettoyage, les fournitures et les voyages : les fiches qui comptent le plus avec la CPAP, dans un ordre de lecture. ⚑ `paths.cpap.heroBody`
+- Votre parcours ⚑ `paths.cpap.intro.eyebrow`
+- Vivre avec la CPAP ⚑ `paths.cpap.intro.heading`
+- La CPAP est généralement le traitement le plus efficace de l’apnée obstructive du sommeil, et le type de PAP le plus courant. Un appareil souffle de l’air dans un tube jusqu’à un masque, et ce débit d’air aide à garder vos voies respiratoires ouvertes pendant votre sommeil. Un appareil CPAP donne une seule pression constante. Un appareil APAP ajuste la pression au cours de la nuit, à mesure que votre respiration change. Il vous faut une ordonnance, et c’est votre prescripteur qui détermine vos réglages. ⚑ `paths.cpap.intro.body.1`
+- La CPAP est un traitement, pas une guérison : elle ne fonctionne que si vous l’utilisez. Vous y habituer peut prendre jusqu’à 6 semaines, et un masque bien ajusté est la clé. Ce parcours suit l’ordre dont la plupart des gens ont besoin : vos options, la conduite, votre installation et vos premières semaines, puis le nettoyage, les fournitures et les voyages. Attendez-vous à un suivi peu après le début, puis chaque année. ⚑ `paths.cpap.intro.body.2`
+- Votre liste de lecture pour la CPAP ⚑ `paths.cpap.list.heading`
+- Lisez dans l’ordre, ou allez directement à ce dont vous avez besoin aujourd’hui. Chaque fiche s’ouvre dans son propre chapitre. ⚑ `paths.cpap.list.intro`
+- Commencez ici : les deux sortes d’appareils, et qui détermine la pression ⚑ `paths.cpap.list.reasons.1`
+- Essais, garantie et retours, et comment vérifier l’homologation d’un appareil ⚑ `paths.cpap.list.reasons.2`
+- Si vous venez de recevoir vos résultats : comment un traitement est choisi ⚑ `paths.cpap.list.reasons.3`
+- L’apnée du sommeil non traitée augmente votre risque d’accident ⚑ `paths.cpap.list.reasons.4`
+- Si vous conduisez : ce que vérifient les autorités de délivrance des permis. Ce sont des mesures pour le permis de conduire, pas des cibles de santé ⚑ `paths.cpap.list.reasons.5`
+- Conduire pendant que vous vous habituez à la CPAP ⚑ `paths.cpap.list.reasons.6`
+- À quoi peut ressembler un bon départ : des suivis après environ 7 jours et à 30 et 60 jours, et un test d’oxygène pendant la nuit entre 2 et 4 semaines ⚑ `paths.cpap.list.reasons.7`
+- Ce que dit votre ordonnance. Seuls des professionnels formés devraient modifier les réglages de votre appareil ⚑ `paths.cpap.list.reasons.8`
+- Les principaux types de masques, à discuter avec votre thérapeute respiratoire ⚑ `paths.cpap.list.reasons.9`
+- Un masque bien ajusté est la clé pour utiliser la CPAP ⚑ `paths.cpap.list.reasons.10`
+- Du confort pour le nez ou la bouche secs, et l’eau à utiliser ⚑ `paths.cpap.list.reasons.11`
+- Ce qu’il faut avoir sous la main dès la première nuit ⚑ `paths.cpap.list.reasons.12`
+- S’habituer à la CPAP peut prendre jusqu’à 6 semaines. Continuez ⚑ `paths.cpap.list.reasons.13`
+- Les chiffres que votre appareil enregistre, et qui les utilise ⚑ `paths.cpap.list.reasons.14`
+- Fuites, bouche sèche, marques et plus encore. Ne changez jamais votre pression vous-même : seuls des professionnels formés devraient le faire ⚑ `paths.cpap.list.reasons.15`
+- Si ça ne fonctionne pas pour vous : qui appeler, et ce qui peut aussi aider ⚑ `paths.cpap.list.reasons.16`
+- Masques avec aimants : qui devrait vérifier d’abord ⚑ `paths.cpap.list.reasons.17`
+- Quoi faire si votre appareil ou votre masque fait l’objet d’un rappel ⚑ `paths.cpap.list.reasons.18`
+- Avant d’acheter un gadget de nettoyage pour la CPAP ⚑ `paths.cpap.list.reasons.19`
+- Votre routine de nettoyage de tous les jours ⚑ `paths.cpap.list.reasons.20`
+- Les accessoires doivent habituellement être remplacés tous les 3 à 12 mois, et les appareils tous les 3 à 5 ans ⚑ `paths.cpap.list.reasons.21`
+- Comment savoir qu’une pièce est usée ⚑ `paths.cpap.list.reasons.22`
+- Votre appareil CPAP peut aller dans votre bagage de cabine quand vous prenez l’avion ⚑ `paths.cpap.list.reasons.23`
+- Pour les personnes avec qui vous partagez votre maison ou votre lit ⚑ `paths.cpap.list.reasons.24`
+- Programmes, assurances et impôt, et les questions à poser avant d’acheter ⚑ `paths.cpap.list.reasons.25`
+- Financement et couverture ⚑ `paths.cpap.funding.heading`
+- Un appareil CPAP acheté avec une ordonnance fait partie des frais médicaux admissibles dans votre déclaration de revenus. Les programmes publics varient d’une province à l’autre. En Ontario, par exemple, le Programme d’appareils et accessoires fonctionnels paie 75 % du prix fixé par le programme pour un système PAP acheté auprès d’une entreprise inscrite au programme. Il ne paie pas les masques ni les harnais de remplacement. Si vous achetez avant d’avoir terminé ses étapes, vous payez le coût total. Certains programmes ne paient que les entreprises qu’ils inscrivent, alors demandez à votre programme comment il paie avant d’acheter. ⚑ `paths.cpap.funding.body`
+- Voyez ce qui est couvert là où vous vivez ⚑ `paths.cpap.funding.cta`
+- Deux niveaux de pression ⚑ `paths.bilevel.title`
+- Ce qu’est un appareil à deux niveaux de pression, qui le prescrit, et les fiches sur l’installation et le quotidien qui s’appliquent : dans un ordre de lecture. ⚑ `paths.bilevel.heroBody`
+- Votre parcours ⚑ `paths.bilevel.intro.eyebrow`
+- Vivre avec un appareil à deux niveaux de pression ⚑ `paths.bilevel.intro.heading`
+- Un appareil à deux niveaux de pression (BiPAP) donne une pression plus élevée quand vous inspirez et une pression plus basse quand vous expirez. Il est plus complexe que la CPAP, et c’est un spécialiste du sommeil qui devrait le prescrire. Il sert aussi pour certains autres problèmes respiratoires pendant le sommeil, quand les taux d’oxygène et de dioxyde de carbone ne s’améliorent pas avec la CPAP. Votre spécialiste du sommeil décide s’il vous convient, et pourquoi. ⚑ `paths.bilevel.intro.body.1`
+- Ce parcours commence par ce qu’est un appareil à deux niveaux de pression et quand un spécialiste l’utilise. L’apnée centrale du sommeil demande l’évaluation d’un spécialiste, parce que les appareils standards utilisés seuls peuvent l’aggraver. Viennent ensuite les fiches sur l’installation, la sécurité et le quotidien. Seuls des professionnels formés devraient modifier les réglages de votre appareil. ⚑ `paths.bilevel.intro.body.2`
+- Votre liste de lecture pour l’appareil à deux niveaux de pression ⚑ `paths.bilevel.list.heading`
+- Les fiches sur l’installation ont été écrites pour la CPAP. Demandez à votre thérapeute respiratoire quelles parties s’appliquent à votre appareil à deux niveaux de pression. ⚑ `paths.bilevel.list.intro`
+- Commencez ici : ce qu’est un appareil à deux niveaux de pression, et pourquoi un spécialiste du sommeil le prescrit ⚑ `paths.bilevel.list.reasons.1`
+- Les appareils standards utilisés seuls peuvent aggraver l’apnée centrale du sommeil. Un spécialiste décide du traitement ⚑ `paths.bilevel.list.reasons.2`
+- En quoi les deux niveaux de pression diffèrent du premier traitement habituel ⚑ `paths.bilevel.list.reasons.3`
+- Un assureur peut refuser de payer un deuxième appareil, alors renseignez-vous d’abord sur les essais ⚑ `paths.bilevel.list.reasons.4`
+- Pourquoi la somnolence et la conduite sont importantes ⚑ `paths.bilevel.list.reasons.5`
+- Si vous conduisez : ce que vérifient les autorités de délivrance des permis ⚑ `paths.bilevel.list.reasons.6`
+- Le calendrier de suivi pour toute personne qui commence avec un appareil respiratoire ⚑ `paths.bilevel.list.reasons.7`
+- Ce que dit votre ordonnance. Seuls des professionnels formés devraient modifier les réglages de votre appareil ⚑ `paths.bilevel.list.reasons.8`
+- Les types de masques, avec une note sur les coussinets narinaires pour les personnes qui utilisent un appareil à deux niveaux de pression ⚑ `paths.bilevel.list.reasons.9`
+- L’ajustement du masque, les sangles et les marques ⚑ `paths.bilevel.list.reasons.10`
+- Du confort pour le nez ou la bouche secs, et l’eau à utiliser ⚑ `paths.bilevel.list.reasons.11`
+- Les premières nuits, et comment s’y habituer ⚑ `paths.bilevel.list.reasons.12`
+- Les problèmes courants, et pourquoi vous ne changez jamais la pression vous-même ⚑ `paths.bilevel.list.reasons.13`
+- Si ça ne fonctionne pas pour vous : qui appeler, et ce qui peut aussi aider ⚑ `paths.bilevel.list.reasons.14`
+- Masques avec aimants : qui devrait vérifier d’abord ⚑ `paths.bilevel.list.reasons.15`
+- Quoi faire si votre appareil ou votre masque fait l’objet d’un rappel ⚑ `paths.bilevel.list.reasons.16`
+- Avant d’acheter un gadget de nettoyage ⚑ `paths.bilevel.list.reasons.17`
+- Votre routine de nettoyage de tous les jours ⚑ `paths.bilevel.list.reasons.18`
+- Quand remplacer les masques, la tubulure et les filtres ⚑ `paths.bilevel.list.reasons.19`
+- Certains programmes inscrivent les appareils à deux niveaux de pression séparément de la CPAP ⚑ `paths.bilevel.list.reasons.20`
+- Financement et couverture ⚑ `paths.bilevel.funding.heading`
+- La couverture des appareils à deux niveaux de pression varie d’une province à l’autre. Au Nouveau-Brunswick, par exemple, le Programme des services respiratoires de Développement social couvre les appareils à deux niveaux de pression jusqu’à 3 150 $, avec les masques et les fournitures, pour ses clients et leurs personnes à charge qui n’ont aucune autre couverture. Parlez à votre équipe de soins du sommeil de la façon de payer avant que votre appareil soit commandé. ⚑ `paths.bilevel.funding.body`
+- Voyez ce qui est couvert là où vous vivez ⚑ `paths.bilevel.funding.cta`
+- CPAP de voyage ⚑ `paths.travel-cpap.title`
+- Apporter votre traitement avec vous : les appareils de voyage, l’avion, l’alimentation électrique, et garder votre routine loin de la maison. ⚑ `paths.travel-cpap.heroBody`
+- Votre parcours ⚑ `paths.travel-cpap.intro.eyebrow`
+- La CPAP loin de la maison ⚑ `paths.travel-cpap.intro.heading`
+- L’apnée du sommeil ne prend pas de vacances. La CPAP ne fonctionne que si vous l’utilisez, alors apportez-la quand vous voyagez. Un appareil de voyage plus petit est facile à transporter, silencieux, et peut fonctionner sur batterie. Les inconvénients : la pression peut ne pas rester aussi constante, les batteries sont un coût de plus là où il n’y a pas d’alimentation électrique, et il peut ne pas humidifier l’air suffisamment. Un appareil de voyage demande quand même une ordonnance, et il doit être réglé pour vous. ⚑ `paths.travel-cpap.intro.body.1`
+- Quand vous prenez l’avion au Canada, votre appareil CPAP peut aller dans votre bagage de cabine, et son eau distillée est exemptée des limites sur les liquides au contrôle de sûreté. Vous n’avez pas besoin d’une note du médecin pour le contrôle, mais une note peut aider. L’altitude peut changer le fonctionnement de certains appareils. Si vous vivez dans des endroits beaucoup plus élevés ou plus bas que celui où votre traitement a été mis en place, ou si vous y voyagez souvent, parlez-en à votre prescripteur et à votre fournisseur d’équipement. ⚑ `paths.travel-cpap.intro.body.2`
+- Votre liste de lecture pour les voyages ⚑ `paths.travel-cpap.list.heading`
+- À lire avant d’acheter un appareil de voyage, ou avant votre prochain voyage. Chaque fiche s’ouvre dans son propre chapitre. ⚑ `paths.travel-cpap.list.intro`
+- Commencez ici : les avantages et les inconvénients, et pourquoi un appareil de voyage demande quand même une ordonnance ⚑ `paths.travel-cpap.list.reasons.1`
+- Essais, garantie et réparations avant d’acheter un deuxième appareil ⚑ `paths.travel-cpap.list.reasons.2`
+- Tout appareil PAP vendu au Canada doit avoir une homologation de Santé Canada. Vérifiez avant d’acheter ⚑ `paths.travel-cpap.list.reasons.3`
+- L’eau distillée pour votre appareil CPAP est exemptée des limites sur les liquides au contrôle de sûreté de l’aéroport ⚑ `paths.travel-cpap.list.reasons.4`
+- Quoi apporter, de l’eau distillée à un convertisseur si le courant électrique est différent à destination ⚑ `paths.travel-cpap.list.reasons.5`
+- Garder votre routine de nettoyage en voyage ⚑ `paths.travel-cpap.list.reasons.6`
+- Quand remplacer les pièces, pour ne pas en manquer en plein voyage ⚑ `paths.travel-cpap.list.reasons.7`
+- L’altitude peut changer le fonctionnement de certains appareils. Parlez-en à votre prescripteur si vous voyagez souvent beaucoup plus haut ou plus bas que chez vous ⚑ `paths.travel-cpap.list.reasons.8`
+- Les appareils de voyage peuvent ne pas humidifier l’air autant ⚑ `paths.travel-cpap.list.reasons.9`
+- Des solutions pour la bouche sèche, les fuites et l’eau dans le tube, loin de la maison ⚑ `paths.travel-cpap.list.reasons.10`
+- Pourquoi éviter les nettoyeurs à l’ozone et aux UV, même en format voyage ⚑ `paths.travel-cpap.list.reasons.11`
+- Les longs trajets en voiture, et pourquoi la somnolence compte au volant ⚑ `paths.travel-cpap.list.reasons.12`
+- Un assureur peut refuser de payer un deuxième appareil. Renseignez-vous avant d’acheter ⚑ `paths.travel-cpap.list.reasons.13`
+- Financement et couverture ⚑ `paths.travel-cpap.funding.heading`
+- Un assureur de soins de santé complémentaires peut refuser de payer un deuxième appareil, alors renseignez-vous auprès du vôtre avant d’acheter un appareil de voyage. Un appareil CPAP acheté avec une ordonnance fait partie des frais médicaux admissibles dans votre déclaration de revenus. ⚑ `paths.travel-cpap.funding.body`
+- Voyez ce qui est couvert là où vous vivez ⚑ `paths.travel-cpap.funding.cta`
+- Appareil buccal ⚑ `paths.oral-appliance.title`
+- Un appareil qui se porte dans la bouche pour l’apnée du sommeil : à qui il peut convenir, ce qu’il faut vérifier d’abord, et comment il se compare. ⚑ `paths.oral-appliance.heroBody`
+- Votre parcours ⚑ `paths.oral-appliance.intro.eyebrow`
+- Traiter l’apnée du sommeil avec un appareil buccal ⚑ `paths.oral-appliance.intro.heading`
+- Un appareil buccal se place sur vos dents du haut et du bas et avance votre mâchoire inférieure. Cela ramène votre langue vers l’avant et ouvre vos voies respiratoires. Il peut convenir à l’apnée du sommeil légère à modérée, ou aux personnes qui ne peuvent pas utiliser la CPAP ou qui n’en veulent pas. Chez les personnes pour qui il fonctionne, un appareil fait sur mesure peut fonctionner aussi bien que la CPAP, et il est souvent plus facile à tolérer. ⚑ `paths.oral-appliance.intro.body.1`
+- Tout le monde a d’abord besoin d’une évaluation médicale, pour confirmer l’apnée du sommeil et sa gravité, et votre dentiste travaille avec votre médecin. Les appareils de type « faire bouillir et mordre » ne sont pas recommandés pour traiter l’apnée du sommeil. Une fois que vous avez commencé, votre médecin peut vous envoyer passer un test du sommeil de suivi pour vérifier qu’il fonctionne. ⚑ `paths.oral-appliance.intro.body.2`
+- Votre liste de lecture pour l’appareil buccal ⚑ `paths.oral-appliance.list.heading`
+- Une courte liste. Chaque fiche s’ouvre dans son propre chapitre. ⚑ `paths.oral-appliance.list.intro`
+- Commencez ici : comment fonctionne un appareil buccal fait sur mesure, et à qui il peut convenir ⚑ `paths.oral-appliance.list.reasons.1`
+- Les appareils buccaux peuvent convenir à l’apnée du sommeil légère à modérée, alors la gravité de votre apnée compte ⚑ `paths.oral-appliance.list.reasons.2`
+- Comment votre traitement est choisi ⚑ `paths.oral-appliance.list.reasons.3`
+- Comment un appareil buccal se compare à la CPAP et aux autres options ⚑ `paths.oral-appliance.list.reasons.4`
+- Les protège-dents de type « faire bouillir et mordre » ne sont pas recommandés pour traiter l’apnée du sommeil ⚑ `paths.oral-appliance.list.reasons.5`
+- Des habitudes qui aident en plus de votre traitement ⚑ `paths.oral-appliance.list.reasons.6`
+- Un dentiste qui a de l’expérience avec les appareils buccaux, après votre évaluation médicale ⚑ `paths.oral-appliance.list.reasons.7`
+- Pourquoi la somnolence et la conduite sont importantes ⚑ `paths.oral-appliance.list.reasons.8`
+- Avec un appareil buccal, on peut vous demander une preuve que votre traitement fonctionne ⚑ `paths.oral-appliance.list.reasons.9`
+- En Ontario, le Programme d’appareils et accessoires fonctionnels ne couvre pas les appareils buccaux ⚑ `paths.oral-appliance.list.reasons.10`
+- Financement et couverture ⚑ `paths.oral-appliance.funding.heading`
+- En Ontario, le Programme d’appareils et accessoires fonctionnels ne couvre pas les appareils dentaires ou buccaux pour l’apnée du sommeil. Demandez à votre dentiste et à votre régime d’assurance ce qui est couvert avant de commencer. La page Financement et couverture présente les programmes que nous avons vérifiés, province par province. ⚑ `paths.oral-appliance.funding.body`
+- Voir les programmes ⚑ `paths.oral-appliance.funding.cta`
+- Enfants ⚑ `paths.children.title`
+- Ronflement, pauses et sommeil agité chez un enfant : les signes, comment les enfants passent les tests, et les traitements. ⚑ `paths.children.heroBody`
+- Votre parcours ⚑ `paths.children.intro.eyebrow`
+- L’apnée du sommeil chez les enfants ⚑ `paths.children.intro.heading`
+- Les enfants aussi peuvent faire de l’apnée obstructive du sommeil. Leurs voies respiratoires se ferment à répétition, en partie ou complètement, pendant leur sommeil. La nuit, les signes comprennent le ronflement, le fait de respirer seulement par la bouche, un sommeil agité et de longues pauses respiratoires. Le jour, un enfant peut être somnolent, avoir de la difficulté à se concentrer, ou être irritable ou hyperactif. Certains enfants ronflent mais ne font pas d’apnée du sommeil. ⚑ `paths.children.intro.body.1`
+- C’est une étude du sommeil qui permet de la diagnostiquer. Pour les enfants, l’étude d’une nuit en laboratoire est la norme. Un test à domicile est un deuxième choix, seulement pour les enfants de plus de 5 ans par ailleurs en bonne santé qui ne peuvent pas avoir d’étude en laboratoire, et l’oxymétrie nocturne ne devrait pas être utilisée seule. De grosses amygdales ou de grosses végétations adénoïdes sont une cause courante. Le traitement peut comprendre une chirurgie pour les enlever, un programme de perte de poids si votre enfant a un surplus de poids, des médicaments pour réduire l’enflure, ou la CPAP. L’équipe de soins du sommeil de votre enfant décide avec vous. ⚑ `paths.children.intro.body.2`
+- Votre liste de lecture pour un enfant ⚑ `paths.children.list.heading`
+- Commencez par les fiches sur les enfants. Quelques fiches ont été écrites pour les adultes : lisez leurs notes sur les enfants. ⚑ `paths.children.list.intro`
+- Commencez ici : à quoi ressemble l’apnée du sommeil chez un enfant, la nuit et le jour ⚑ `paths.children.list.reasons.1`
+- Une étude du sommeil d’une nuit en laboratoire est le test standard pour les enfants ⚑ `paths.children.list.reasons.2`
+- De grosses amygdales ou végétations adénoïdes sont une cause courante, et une chirurgie pour les enlever est l’un des traitements ⚑ `paths.children.list.reasons.3`
+- Les bases. Sa note explique en quoi c’est différent chez les enfants ⚑ `paths.children.list.reasons.4`
+- Certains enfants ronflent mais ne font pas d’apnée du sommeil ⚑ `paths.children.list.reasons.5`
+- Un test à domicile est un deuxième choix, seulement pour les enfants de plus de 5 ans par ailleurs en bonne santé qui ne peuvent pas avoir d’étude en laboratoire ⚑ `paths.children.list.reasons.6`
+- Qui appeler, y compris quand un enfant a besoin de soins d’urgence ⚑ `paths.children.list.reasons.7`
+- Si un masque chez vous contient des aimants ⚑ `paths.children.list.reasons.8`
+- La plupart des enfants ont besoin de temps pour s’habituer à la PAP. Elle s’utilise chaque nuit de sommeil, pendant les vacances et les soirées pyjama aussi ⚑ `paths.children.list.reasons.9`
+- Pour un enfant, pas trop serré : deux doigts devraient pouvoir glisser sous la sangle ⚑ `paths.children.list.reasons.10`
+- Nettoyer le masque et le harnais d’un enfant. Les instructions du fournisseur d’équipement de votre enfant passent en premier ⚑ `paths.children.list.reasons.11`
+- Pour les parents, les partenaires et les proches aidants ⚑ `paths.children.list.reasons.12`
+- Avec une aide gouvernementale ou une assurance privée, une partie du coût de la CPAP d’un enfant peut être couverte ⚑ `paths.children.list.reasons.13`
+- Financement et couverture ⚑ `paths.children.funding.heading`
+- Si vous recevez de l’aide gouvernementale ou avez une assurance privée, une partie du coût de la CPAP d’un enfant peut être couverte. La page Financement et couverture présente les programmes que nous avons vérifiés, province par province. ⚑ `paths.children.funding.body`
+- Voir les programmes ⚑ `paths.children.funding.cta`
+- Pas encore de diagnostic ⚑ `paths.not-diagnosed-yet.title`
+- Vous vous demandez si c’est l’apnée du sommeil? Les signes, comment se passent les tests, et quoi demander à votre médecin. ⚑ `paths.not-diagnosed-yet.heroBody`
+- Votre parcours ⚑ `paths.not-diagnosed-yet.intro.eyebrow`
+- Avant un diagnostic ⚑ `paths.not-diagnosed-yet.intro.heading`
+- Beaucoup de personnes qui font de l’apnée du sommeil ne le savent pas. Dans des enquêtes auprès de la population, de 86 % à 95 % des personnes ayant une apnée du sommeil importante n’avaient jamais reçu de diagnostic. Souvent, la personne qui partage votre lit ou un membre de votre famille remarque les signes en premier : un ronflement fort, ou des pauses respiratoires avec un halètement ou un étouffement. Être très somnolent pendant la journée est le signe le plus courant. ⚑ `paths.not-diagnosed-yet.intro.body.1`
+- Seule une étude du sommeil, en laboratoire ou à domicile, peut dire si vous faites de l’apnée du sommeil. Les tests à domicile ne servent pas à vérifier les personnes qui n’ont aucun symptôme. Commencez par consulter votre médecin de famille ou votre infirmière praticienne. L’apnée du sommeil non traitée augmente le risque d’accident de voiture. Si vous vous êtes assoupi au volant, ou presque, lisez d’abord « Arrêtez-vous et agissez maintenant » dans Conduire et rester en sécurité. ⚑ `paths.not-diagnosed-yet.intro.body.2`
+- Votre liste de lecture ⚑ `paths.not-diagnosed-yet.list.heading`
+- Lisez dans l’ordre, ou allez directement à ce dont vous avez besoin aujourd’hui. Rien ici ne peut vous dire si vous faites de l’apnée du sommeil. C’est le rôle d’une étude du sommeil. ⚑ `paths.not-diagnosed-yet.list.intro`
+- Commencez ici : ce qui arrive à votre respiration quand vous faites de l’apnée du sommeil ⚑ `paths.not-diagnosed-yet.list.reasons.1`
+- Souvent, la personne qui partage votre lit ou un membre de votre famille remarque les signes en premier ⚑ `paths.not-diagnosed-yet.list.reasons.2`
+- Une liste à cocher à imprimer pour votre médecin. Ce n’est pas un test ⚑ `paths.not-diagnosed-yet.list.reasons.3`
+- En 2016 et 2017, près du tiers des adultes canadiens présentaient un risque modéré ou élevé selon un questionnaire de dépistage ⚑ `paths.not-diagnosed-yet.list.reasons.4`
+- Si votre difficulté est de vous endormir ou de rester endormi ⚑ `paths.not-diagnosed-yet.list.reasons.5`
+- Quand le ronflement est une raison de consulter votre médecin ⚑ `paths.not-diagnosed-yet.list.reasons.6`
+- L’apnée du sommeil non traitée augmente le risque d’accident. Vous vous êtes assoupi au volant? Lisez d’abord « Arrêtez-vous et agissez maintenant » ⚑ `paths.not-diagnosed-yet.list.reasons.7`
+- L’autorité de délivrance des permis décide si vous pouvez conduire ⚑ `paths.not-diagnosed-yet.list.reasons.8`
+- Ce que votre médecin peut vous demander, et quoi apporter ⚑ `paths.not-diagnosed-yet.list.reasons.9`
+- Les tests à domicile ne servent pas à vérifier les personnes qui n’ont aucun symptôme ⚑ `paths.not-diagnosed-yet.list.reasons.10`
+- Comment lire le chiffre principal d’un rapport d’étude du sommeil ⚑ `paths.not-diagnosed-yet.list.reasons.11`
+- Des résultats à un plan de traitement ⚑ `paths.not-diagnosed-yet.list.reasons.12`
+- Par où commencer, et à qui poser quelles questions ⚑ `paths.not-diagnosed-yet.list.reasons.13`
+- Un premier coup d’œil aux traitements, si un test montre une apnée du sommeil ⚑ `paths.not-diagnosed-yet.list.reasons.14`
+- Financement et couverture ⚑ `paths.not-diagnosed-yet.funding.heading`
+- Certains programmes de financement ont des règles sur les tests. En Ontario, le financement d’un appareil par le Programme d’appareils et accessoires fonctionnels commence par un médecin d’une clinique du sommeil inscrite au programme. Le Programme des services de santé non assurés (SSNA) ne paie pas les tests du sommeil. Si vous pourriez avoir besoin de financement plus tard, renseignez-vous à ce sujet avant de passer vos tests. ⚑ `paths.not-diagnosed-yet.funding.body`
+- Voir les programmes ⚑ `paths.not-diagnosed-yet.funding.cta`
+
+## Held in the message files (not sent to a browser until released)
+
+- `SleepApneaCare.paths.children.list.reasons.3`
+
+## Open rulings (each ships its default until ruled)
+
+- **P1 (OPEN-QUESTIONS E7)** — default: Stage labels: the engine’s six stages are reused with this site’s labels. `types` reads "Tests and treatments" so it fits the testing cards (not-diagnosed-yet) and the options cards (oral-appliance). No engine change.
+  - Alternative: Make `PathStage` site-generic and add `testing` and `options`.
+  - Where: `ui.path.stages.start`, `ui.path.stages.types`, `ui.path.stages.safe`, `ui.path.stages.tools`, `ui.path.stages.everyday`, `ui.path.stages.season`
+- **P3 (C18; 03 R3)** — default: Bilevel comfort reason left out of the intro, because Chapter 03 has it open as R3. Side by side: bc-pap-buyers-guide, "The main reason to use BiPAP for obstructive sleep apnea is that some people find it more comfortable to breathe out against lower pressure."; cts-sdb-2011 (per Ch03 C, not re-read for the paths), "BPAP should be reserved for patients with ventilatory failure".
+  - Alternative: Add the comfort line if R3 keeps it, and re-align both pages.
+  - Where: `paths.bilevel.intro.body.1`
+- **P4 (C15)** — default: Children’s treatment list: four of AboutKidsHealth’s five treatments, with the weight loss program keeping the page’s condition ("if your child is overweight"). No order is given; "usually the first treatment" is held (section E). Side by side: akh-osa lists surgery, a weight loss program "if your child is overweight or obese", medicines, CPAP, and less second-hand smoke and pollution, with no order; cla-sleep-apnea (children’s section of an all-ages page): "The most common treatment for OSA in children is the surgical removal of the tonsils and adenoids … This is the initial treatment for most children with sleep apnea".
+  - Alternative: Rule that the Lung Association’s children’s section counts as child-specific, and add "Removing the tonsils and adenoids is often the first treatment." (held wording, section E).
+  - Where: `paths.children.intro.body.2`, `paths.children.list.reasons.3`
+- **P6a (C54)** — default: Doctor’s note for flying: "You don’t need a doctor’s note for screening, though one can help." Side by side: catsa-cpap, documentation "is not required; however, if you feel that it would help ease your screening, it should be presented to the screening officer"; cla-sleep-apnea, "bring a letter from your doctor explaining what your CPAP machine is, and that it’s medically necessary for you to use it."
+  - Alternative: Say only "Bring a letter from your doctor if you like".
+  - Where: `paths.travel-cpap.intro.body.2`
+- **P6b (C73)** — default: The insurer caution about a second machine is applied to a travel machine. bc-pap-buyers-guide: "the third-party extended health insurer may refuse to pay for a second machine" (its case is a medically different machine).
+  - Alternative: Drop the second-machine line from the travel path.
+  - Where: `paths.travel-cpap.list.reasons.2`, `paths.travel-cpap.list.reasons.13`, `paths.travel-cpap.funding.body`
+- **P7 (C62)** — default: Children’s prevalence left out of the intro. Side by side: akh-osa, "Sleep apnea affects 1 to 5 children in 100."; cla-sleep-apnea, "2 to 3% of children are likely to have sleep apnea" (Ch01 E also cites BC "1-4% of children", not re-read here).
+  - Alternative: Add AboutKidsHealth’s figure (child-specific) with its chip: "It affects 1 to 5 children in 100." (held wording, section E).
+  - Where: `paths.children.intro.body.1`
+- **P8 · owner (B4)** — default: Funding doors: Ontario examples on national pages, labelled. No Liivv billing claim: ADP pays only registered businesses, so "pay-and-claim" is not used for programs. "Some programs pay only businesses they register." on-adp-respiratory: "You must purchase your respiratory equipment (including … PAP systems) from a business that is registered with the ADP."
+  - Alternative: Owner: is Liivv registering with ADP respiratory, NIHB, VAC, BCEA, AISH, NB Social Development? (Machine requests from Ontarians on ADP moved to the SLT machine plan.)
+  - Where: `paths.cpap.funding.body`, `paths.bilevel.funding.body`, `paths.travel-cpap.funding.body`, `paths.oral-appliance.funding.body`, `paths.children.funding.body`, `paths.not-diagnosed-yet.funding.body`
+- **P9 (C74)** — default: Adult cards on the children and bilevel paths: Ch04 cards appear on `bilevel` (with the list.intro caveat) and once on `children` (Ch04 card 4, for its child fit note, which rests on akh-pap). The children path otherwise uses Ch06 card 4 (A child on CPAP) and Ch05 card 5 (Caring for a child’s CPAP).
+  - Alternative: Drop Ch04 card 4 from `children`, since Ch06 card 4 covers fit.
+  - Where: `paths.children.list.reasons.10`, `paths.bilevel.list.intro`, `PATH_META children entry Ch04 card 4`
+- **P10 (C75)** — default: The oral-appliance path includes both driving cards (Ch02 cards 1 and 3), because oral appliance users may need proof of treatment (cts-css-driving-2014).
+  - Alternative: Card 1 only.
+  - Where: `paths.oral-appliance.list.reasons.8`, `paths.oral-appliance.list.reasons.9`
+- **P11 (C12)** — default: "Then every year" on the CPAP intro, from the BC guideline ("Annual follow-up is recommended with CPAP download"), shown nationally, like Ch04 card 1’s schedule (BC buyer’s guide, "may expect").
+  - Alternative: "then over the long term" (the guideline’s other sentence).
+  - Where: `paths.cpap.intro.body.2`, `paths.cpap.list.reasons.7`
+- **P12 (C42)** — default: "Your family doctor or nurse practitioner" as the first stop. Nurse practitioner comes from BC documents: bc-pap-buyers-guide, "referring practitioner (physician or nurse practitioner)"; cla-sleep-apnea says "see your doctor"; lhf-sleep-apnea "see your healthcare providers".
+  - Alternative: "your doctor" only.
+  - Where: `paths.not-diagnosed-yet.intro.body.2`
+- **P13 (C76)** — default: List length: `cpap` has 25 entries.
+  - Alternative: Cap at about 15, with "More cards for CPAP". Safety entries never go behind it.
+  - Where: `paths.cpap.list.reasons`, `PATH_META cpap entries`
+- **P14 (C45)** — default: "Only a sleep study can tell", the same C* wording as Ch01 (4.note, 6.note); "only" is ours. cla-sleep-apnea: "The best way to diagnose … is an overnight test in a sleep laboratory".
+  - Alternative: "A sleep study is how it’s diagnosed."
+  - Where: `paths.not-diagnosed-yet.intro.body.2`
+- **C14 (01 S16; PATHS children)** — default: Follow CTS/CSS 2026: a lab study is the standard; a home test may be a second-line option for otherwise healthy children over 5 when a lab study isn’t accessible; overnight oximetry not alone. Side by side: BC guideline 2021, Appendix A, "HSAT is not recommended as it is not sensitive enough to be accurate." The CTS/CSS full guideline is blocked (403); the press release is the source read.
+  - Alternative: Keep only "For children, an overnight lab study is the standard", and send the rest to Chapter 06.
+  - Where: `paths.children.intro.body.2`, `paths.children.list.reasons.2`, `paths.children.list.reasons.6`
+- **C23 (StatCan archived)** — default: Use the archived StatCan fact sheet, with the survey years in the copy and "(archived page)" on the chip.
+  - Alternative: Drop the figure.
+  - Where: `paths.not-diagnosed-yet.list.reasons.4`
+- **E1 / 02 R12 (red-flag heading)** — default: The strip’s link and the not-diagnosed-yet pointers name Chapter 02’s heading "Stop and act now" (kept under C1). FR: "Arrêtez-vous et agissez maintenant", as the ch02 fragment.
+  - Alternative: "Get help now" now that 911 comes first (02 R12); all three strings change with Ch02’s `urgent.heading`.
+  - Where: `ui.path.safety.link`, `paths.not-diagnosed-yet.intro.body.2`, `paths.not-diagnosed-yet.list.reasons.7`
+
+## Checks before publishing
+
+- BLOCKER first: the children path’s reasons are index-matched to its entries. With the Ch06 card 3 entry commented out (ruling C6), reasons 4–13 sit one place after their entries until the integrator applies option A or B in notes.md. Check the rendered children list card by card against paths.md B.2 after the fix.
+- Every path entry points to a card that exists in its chapter (no card-?, no 0): export check 9. Card numbers are from the chapter drafts of 2026-10-13.
+- Renumbering: entry titles are read from the chapter messages, but card numbers are in paths-meta.ts. Recheck all six paths whenever a chapter adds, removes or reorders a card.
+- Ch02 heading: `ui.path.safety.link` ("Chapter 02 — Stop and act now"), `paths.not-diagnosed-yet.intro.body.2` and `list.reasons.7` must match Chapter 02’s ruled `urgent.heading` (02 R12), in English and French.
+- Funding doors link /liivv-health/sleep-apnea-care/funding. paths.md A.1 hides them until that page exists; the build marks `fundingPage` as built. Confirm the funding page ships in the same deploy.
+- Facts the linked card doesn’t repeat (source check): four † reasons state a fact that is not on the card they link to. The fact is sourced on the path itself (its chip): oral-appliance 10 (ADP doesn’t cover oral appliances; Ch06 card 10 doesn’t say so), travel-cpap 13 (insurer and a second machine; it is on Ch03 card 5, not Ch06 card 10), bilevel 20 (NB lists bilevel separately; Ch06 card 10 names VAC instead) and children 13 (AKH cost line; Ch06 card 10 has the Lung Association children’s grant). Either add the fact to the card or point the entry at the card that has it.
+- Ch02 card 7 was retitled "Cleaning the approved way" (ruling C5, 2026-10-13) after the paths were written. Its reasons still read "Before you buy a CPAP cleaning gadget" (cpap 19), "Before you buy a cleaning gadget" (bilevel 17) and "Why to skip ozone and UV cleaners, travel-size ones too" (travel-cpap 11). Travel 11 reads as a general "skip" rule, while C5 held the every-device wording (02 H16) and kept PMRA’s general lines on the card. Nurse to confirm the reason still fits the card, or point travel-cpap 11 at Ch05 card 2 ("Ozone and UV cleaners").
+- Magnets (N7): when placements turn on, the owner confirms that masks 4229, 4489 and 4884 (store text says they contain magnets, no Health Canada notice names them) stay on the cpap and bilevel strips with no badge.
+- statcan-osa-2018: the chip label carries "(archived page)" (C23; register check).
+- cts-css-peds-dx-2026: the children intro body 2 and reasons 2 and 6 rest on the CTS/CSS press release of March 24, 2026; the full guideline was not read (blocked, F7).
+- French: the whole fragment is machine translated (⚑ awaiting French review). Check the French chapter names used inside copy match the chapters’ French titles: "Conduire et rester en sécurité" (not-diagnosed-yet intro body 2) and the French Ch02 heading "Arrêtez-vous et agissez maintenant" (safety link, not-diagnosed-yet reason 7).
+
+## Held copy (not in the message files; ships only once released)
+
+*Held out of tree: none of this is in en.json, fr.json or paths-meta.ts. An item is released only by the ruling or gate named in `check`, then through the file’s change log and the nurse. "cards" are reading-list positions (list.reasons numbers) where an item belongs to a reason; [] where it belongs to a paragraph, a door or a band.*
+
+- **Liivv sleep support band (engine slot `pharmacist`) on cpap, bilevel and travel-cpap** — Part C not live; RRT licences by province not mapped (plan Part C; rrt-service.md). The site promises only what is live.
+  - Wording: eyebrow: "Liivv’s sleep support team"; heading: "Help with your setup, mask and supplies"; body: "Liivv’s sleep support team helps with setup, mask fit and supplies, once your treatment is prescribed. [Provinces and hours.] Your prescriber chooses your treatment and sets your pressure. We never change it."; cta: "Request a call". Travel variant heading: "Help before a trip".
+  - Check: Gate service:sleep-support (PATH_GATES.sleepSupportBand); owner (licence map, hours); supplies-only row 39: machine plan, or rewrite for N8.
+- **"Ask us what you need for a claim" (every funding door)** — No Liivv contact line or claim support confirmed for this site; vendor status open (P8 / B4).
+  - Wording: "Ask us what you need for your claim."
+  - Check: Owner (N8 names who answers).
+- **Accessible Transportation Regulations s.49 (travel-cpap)** — Fetched. Section 49 covers "any small assistive device that the person needs during travel" and names a cane, crutches, a communication device, an orthotic positioning device and a portable oxygen concentrator. CPAP is not named; whether a CPAP user falls under it is a legal reading.
+  - Wording: "Federal rules require airlines in Canada to let a person with a disability keep a small assistive device they need on board."
+  - Check: atpdr-s49 (registered, held items only); a CTA guide naming CPAP.
+- **Children’s prevalence (children intro)** — Sources differ (P7 / C62).
+  - Wording: "It affects 1 to 5 children in 100."
+  - Check: akh-osa; nurse rules P7.
+- **"Surgery is usually the first treatment" for children (children intro)** — Only on the Lung Association’s children’s section; AboutKidsHealth lists options with no order (P4 / C15).
+  - Wording: "Removing the tonsils and adenoids is often the first treatment."
+  - Check: A child-specific page (AboutKidsHealth, CPS) that states it.
+- **Children and auto-adjusting machines (children)** — Alberta’s adult page, children’s section: "Children should not use auto-adjustable pressure CPAP equipment." A machine-type rule for children on a non-child source. Chapters 03 and 04 hold it; Ch06 card 4’s note carries it on its own sourcing. The path does not repeat it.
+  - Wording: —
+  - Check: A child-specific Canadian source; Chapter 06 (C16).
+- **AboutKidsHealth PAP pressure and humidifier tips (children)** — Settings words: the page gives a sample pressure value and humidifier setting changes. Never on the site (owner rule).
+  - Wording: None. Never released.
+  - Check: —
+- **Bilevel funding generalisation (bilevel funding door)** — Alberta’s page says "Many people who need BPAP therapy can get government funding to help pay for the equipment." Used nationally it overstates; NB and ADP are shown instead.
+  - Wording: "Many people who need bilevel can get government funding."
+  - Check: ab-cpap-buyers-2026 (Ch03 R4; C48).
+- **Oral appliances as a tax medical expense (oral-appliance funding door)** — Not on the CRA page fetched (it lists "Dental services – paid to a medical practitioner" but no oral appliance).
+  - Wording: —
+  - Check: CRA (fed-cra-medical or another CRA page that names it).
+- **ADP 100% on OW, ODSP and ACSD; 5-year replacement (cpap funding door)** — On the page ("We cover 100% of the ADP price … if you receive financial assistance from one of these programs"), but left to the Funding page to keep the door short.
+  - Wording: —
+  - Check: on-adp-respiratory (verified); Funding page.
+- **Positional therapy, tirzepatide, adult surgery, nerve stimulation (cpap, oral-appliance)** — Held site-wide (plan Part F).
+  - Wording: —
+  - Check: Nurse ruling.
+- **Shop strips on reading-only paths; paediatric masks on any path (oral-appliance, children, not-diagnosed-yet)** — Plan Part B: no shop on these paths; paediatric masks only on a paediatric card (C17).
+  - Wording: None. Never released.
+  - Check: —
+- **Machine links on the cpap and travel-cpap strips (`cpap.shop.machinesLink`, `travel-cpap.shop.machinesLink`)** — Liivv sells no machines (ruling N1, 2026-10-13; all machines hidden in the store). Supplies-only rows 36 and 37: delete. Machine-sale copy is out of tree (spec 8.4).
+  - Wording: "See machines (prescription required)"; "See travel machines (prescription required)".
+  - Check: The SLT machine plan, and N10 ("Not sold by Liivv yet").

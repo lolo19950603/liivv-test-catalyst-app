@@ -31,7 +31,7 @@ import type { SiteShop } from './shop/shelves';
  * en.json count, so a config can never point the engine at a namespace the
  * message files do not have.
  */
-export type SiteNs = Extract<keyof Messages, 'OstomyCare' | 'DiabetesCare'>;
+export type SiteNs = Extract<keyof Messages, 'OstomyCare' | 'DiabetesCare' | 'SleepApneaCare'>;
 
 /*
  * Everything a site keeps in a reader's browser, and the one window event that
@@ -99,6 +99,22 @@ export const DIABETES_STORAGE = {
   modules: { sensorPicker: 'dc-sensor-picker-v1', pumpPicker: 'dc-pump-picker-v1' },
 } as const satisfies SiteStorage<'dc'>;
 
+/*
+ * Sleep Apnea Care's keys, the same names under `sa-`. Nothing on the Sleep
+ * pages stores anything yet: every Sleep module keeps its state in the
+ * component, for the visit only, so `modules` is empty. The audio keys are
+ * reserved, as Diabetes Care's are.
+ */
+export const SLEEP_STORAGE = {
+  textSize: 'sa-text-size',
+  textSizeEvent: 'sa-text-size-change',
+  continuePrefix: 'sa-journey-continue:',
+  savedPrefix: 'sa-journey-saved:',
+  audioRate: 'sa-audio-rate',
+  audioAuto: 'sa-audio-auto',
+  modules: {},
+} as const satisfies SiteStorage<'sa'>;
+
 /* Fragments that the engine links to, on the chapter pages and on the landing. */
 export interface SiteAnchors {
   /*
@@ -147,6 +163,12 @@ export interface SiteFurniture {
    */
   peerFinderHref?: string;
   pharmacistHref: string;
+  /*
+   * `false` leaves the help band off: a site with no sourced specialist
+   * directory, whose messages have no `ui.help` (Sleep Apnea Care). Left out,
+   * the band shows. Engine-only: Ostomy's twin has none.
+   */
+  helpBand?: false;
 }
 
 /*
@@ -253,6 +275,13 @@ export interface SiteKinds<Kind extends string = string> {
   fullWidth?: readonly Kind[];
   /** Journey entries that stay figure-led and full-stage. */
   journeyModule?: readonly Kind[];
+  /*
+   * Figures drawn after all of their card's sentences rather than after its
+   * first, for a figure whose controls use words the sentences define (Sleep
+   * Apnea Care's mask picker). The card then has no lede. Engine-only:
+   * Ostomy's twin has no such set.
+   */
+  listFirst?: readonly Kind[];
 }
 
 export interface SiteConfig<Kind extends string = string> {

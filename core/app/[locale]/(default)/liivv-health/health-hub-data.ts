@@ -3,6 +3,8 @@
  * Live verticals link through; the rest are Coming soon (no stub routes).
  */
 
+import { SLEEP_APNEA_CARE_LIVE } from './sleep-apnea-care/launch';
+
 const IMG = '/archive/liivv-home';
 
 export type HealthHubDoorStatus = 'live' | 'coming_soon';
@@ -16,6 +18,31 @@ export type HealthHubDoor = {
   href: string | null;
   status: HealthHubDoorStatus;
 };
+
+/*
+ * Sleep Apnea Care's door. The section is built but not public until the
+ * owner flips SLEEP_APNEA_CARE_LIVE (./sleep-apnea-care/launch.ts): until then
+ * the door is today's "Coming soon" one, byte for byte, and links nowhere.
+ */
+const SLEEP_DOOR: HealthHubDoor = SLEEP_APNEA_CARE_LIVE
+  ? {
+      id: 'sleep_rest',
+      label: 'Live',
+      title: 'Sleep Apnea Care & Everyday "Liivving"',
+      body: 'Plain, sourced guidance on sleep apnea and CPAP, with CPAP masks and supplies.',
+      image: `${IMG}/corner-sleep.png`,
+      href: '/liivv-health/sleep-apnea-care',
+      status: 'live',
+    }
+  : {
+      id: 'sleep_rest',
+      label: 'Coming soon',
+      title: 'Sleep & Rest',
+      body: 'Storytelling and kits for deeper, kinder rest.',
+      image: `${IMG}/corner-sleep.png`,
+      href: null,
+      status: 'coming_soon',
+    };
 
 export const HEALTH_HUB_DOORS: HealthHubDoor[] = [
   {
@@ -47,15 +74,7 @@ export const HEALTH_HUB_DOORS: HealthHubDoor[] = [
     href: '/liivv-health/diabetes-care',
     status: 'live',
   },
-  {
-    id: 'sleep_rest',
-    label: 'Coming soon',
-    title: 'Sleep & Rest',
-    body: 'Storytelling and kits for deeper, kinder rest.',
-    image: `${IMG}/corner-sleep.png`,
-    href: null,
-    status: 'coming_soon',
-  },
+  SLEEP_DOOR,
   {
     id: 'breathing_lung_health',
     label: 'Coming soon',
@@ -167,6 +186,10 @@ export const HEALTH_HUB_STORY_LINKS = [
     label: 'Diabetes Care',
     href: '/liivv-health/diabetes-care',
   },
+  /* Only once Sleep Apnea Care is public (./sleep-apnea-care/launch.ts). */
+  ...(SLEEP_APNEA_CARE_LIVE
+    ? [{ id: 'sleep', label: 'Sleep Apnea Care', href: '/liivv-health/sleep-apnea-care' }]
+    : []),
 ] as const;
 
 export type HealthHubKitCard = {

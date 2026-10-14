@@ -38,8 +38,10 @@ import type {
   EngineCategoryMeta,
   EngineChapterMeta,
   EngineFigureMeta,
+  LinkLang,
   ShelfLinkMeta,
   StartHere,
+  UrgentTierMeta,
 } from './types';
 
 export interface CategorySection {
@@ -106,6 +108,14 @@ export interface CardLink {
   start: number;
   length: number;
   href: string;
+  /*
+   * A labelled link (CardLinkMeta `label`): its own words, drawn after the
+   * sentence, or with `after` on its own line under the card's sentences.
+   * `hrefLang` is the language of the outward page it opens. Engine-only.
+   */
+  label?: string;
+  after?: true;
+  hrefLang?: LinkLang;
 }
 
 /* Figure labels, ordered. Every list is present so renderers never guard. */
@@ -213,6 +223,21 @@ export interface UrgentCallout {
   intro: string;
   signs: string[];
   action: string;
+  /*
+   * The block in tiers (ChapterMeta.urgentTiers), in render order, each sign
+   * with its sources; `signs` and `action` are then empty. Engine-only:
+   * Ostomy's twin has the flat list only.
+   */
+  tiers?: Array<{
+    key: string;
+    label: string;
+    lead?: string;
+    sourceIds: string[];
+    signs: Array<{ text: string; sourceIds: string[] }>;
+  }>;
+  note?: string;
+  /* The note's link (ChapterMeta `urgentNoteLink`), over `length` characters from `start`. */
+  noteLink?: { href: string; start: number; length: number };
 }
 
 /*
@@ -265,7 +290,12 @@ export interface Chapter {
    */
   sourceIds: string[];
   governance: Governance;
-  pharmacist: {
+  /*
+   * The care panel, and the hero's "ask" button. Absent where the chapter has
+   * none (no `pharmacist` words or no image and link in its meta). Optional
+   * engine-only: Ostomy's twin always has one.
+   */
+  pharmacist?: {
     eyebrow: string;
     heading: string;
     body: string;
@@ -342,6 +372,50 @@ const untagged = (text: string) => text.replace(LINK_TAGS, '');
  * message is its position in the untagged text. A link whose sentence is
  * missing in this locale is dropped, as a shelf link with no wording is.
  */
+function sentenceOf(link: CardLinkMeta, card: CategoryMessages) {
+  if (link.at === 'after') return undefined;
+
+  return link.at === 'note' ? card.note : card.items?.[link.at.slice('items.'.length)];
+}
+
+/* The key of a labelled link's words under `categories.<n>.links`. */
+function labelKey(link: CardLinkMeta) {
+  if (link.key !== undefined) return link.key;
+
+  return link.at === 'note' || link.at === 'after' ? link.at : link.at.slice('items.'.length);
+}
+
+/*
+ * A labelled link (CardLinkMeta `label`): its words are its own, so the
+ * sentence keeps every word and the link follows it, or stands on its own
+ * line (`after`). Missing words in this locale drop the link.
+ */
+function composeLabelledLink(
+  site: ComposeSite,
+  slug: string,
+  link: CardLinkMeta,
+  card: CategoryMessages,
+  locale: string,
+): CardLink[] {
+  const label = card.links?.[labelKey(link)];
+
+  if (!label) return [];
+
+  const href = chapterPlaceHref(site, slug, link.to, locale);
+  const outward: { hrefLang?: LinkLang } =
+    'source' in link.to ? { hrefLang: locale === 'fr' && link.to.hrefFr ? 'fr' : 'en' } : {};
+
+  if (link.at === 'after') {
+    return [{ text: '', start: 0, length: 0, href, label, after: true, ...outward }];
+  }
+
+  const raw = sentenceOf(link, card);
+
+  if (raw === undefined) return [];
+
+  return [{ text: untagged(raw), start: 0, length: 0, href, label, ...outward }];
+}
+
 function composeCardLinks(
   site: ComposeSite,
   slug: string,
@@ -350,7 +424,9 @@ function composeCardLinks(
   locale: string,
 ): CardLink[] {
   return (structure?.links ?? []).flatMap((link) => {
-    const raw = link.at === 'note' ? card.note : card.items?.[link.at.slice('items.'.length)];
+    if (link.label) return composeLabelledLink(site, slug, link, card, locale);
+
+    const raw = sentenceOf(link, card);
 
     if (raw === undefined) return [];
 
@@ -409,6 +485,10 @@ interface CategoryMessages {
   title: string;
   badge?: string;
   note?: string;
+  /* A held card's one line (CategoryMeta `heldNote`). Engine-only. */
+  heldNote?: string;
+  /* A labelled link's words (CardLinkMeta `label`), by key. Engine-only. */
+  links?: Numbered<string>;
   items?: Numbered<string>;
   sections?: Numbered<{ heading: string; note?: string; items: Numbered<string> }>;
   figure?: FigureMessages;
@@ -438,9 +518,23 @@ export interface ChapterMessages {
     body?: string;
     links: Numbered<{ title: string; org: string; body: string; note?: string }>;
   }>;
-  urgent?: { heading: string; intro: string; action: string; signs: Numbered<string> };
-  /* `cta` only where the panel has a request button: a site with a direct contact has none. */
-  pharmacist: { eyebrow: string; heading: string; body: string; cta?: string };
+  /*
+   * The red-flag block: a flat list, or (engine-only) tiers, each with its
+   * label, an optional lead and its signs, and a closing note.
+   */
+  urgent?:
+    | { heading: string; intro: string; action: string; signs: Numbered<string> }
+    | {
+        heading: string;
+        intro: string;
+        note?: string;
+        tiers: Record<string, { label: string; lead?: string; signs: Numbered<string> }>;
+      };
+  /*
+   * `cta` only where the panel has a request button: a site with a direct
+   * contact has none. Absent where the chapter has no care panel (engine-only).
+   */
+  pharmacist?: { eyebrow: string; heading: string; body: string; cta?: string };
   closing: { heading: string; body: string };
   governance: { disclaimer: string };
   startHere?: { heading?: string; pivot: string; segments: Numbered<{ label: string }> };
@@ -454,6 +548,23 @@ export interface ChapterMessages {
  */
 export function siteChapterMessages(tree: Messages[SiteNs]): Numbered<ChapterMessages> {
   return 'chapters' in tree ? tree.chapters : {};
+}
+
+/*
+ * Numbered-key object as its entries, in order, each with its number. A key
+ * that is not there (a held card stripped from the client) leaves a gap
+ * rather than renumbering what follows.
+ */
+function numberedEntries<T>(node: Numbered<T> | undefined): Array<{ key: number; value: T }> {
+  if (!node) return [];
+
+  return Object.keys(node)
+    .sort((a, b) => Number(a) - Number(b))
+    .flatMap((key) => {
+      const value = node[key];
+
+      return value === undefined ? [] : [{ key: Number(key), value }];
+    });
 }
 
 /* Numbered-key object back into an ordered array. */
@@ -721,6 +832,8 @@ function composeProgramsBand(
   meta: EngineChapterMeta,
   messages: ChapterMessages,
   locale: string,
+  /* The numbers of the cards on the page: a band card never points at a held one. */
+  live: ReadonlySet<number>,
 ): Chapter['programsBand'] {
   const words = messages.programsBand;
 
@@ -737,7 +850,7 @@ function composeProgramsBand(
         heading: card.heading,
         body: card.body,
         ...(links.length ? { links } : {}),
-        ...(typeof target === 'number' ? { card: target } : {}),
+        ...(typeof target === 'number' && live.has(target) ? { card: target } : {}),
       };
     }),
   };
@@ -781,8 +894,9 @@ function composeStartHere(
   const labels = ordered(words.segments);
   const segment = (groupKey: string, segmentIndex: number) => ({
     label: labels[segmentIndex]?.label ?? '',
+    /* By number, not position: a held card leaves a gap (CategoryMeta `held`). */
     cards: categories
-      .filter((_, cardIndex) => meta.categories[cardIndex]?.group === groupKey)
+      .filter((card) => meta.categories[card.number - 1]?.group === groupKey)
       .map((card) => ({
         number: card.number,
         title: card.title,
@@ -799,34 +913,37 @@ function composeStartHere(
 }
 
 /*
- * Compose a chapter from its structure and its translated prose.
- *
- * Images and outward URLs are index-matched to the numbered message keys. If a
- * translation adds or drops a list entry the two sides drift, so a link with no
- * URL is dropped rather than rendered as a dead card, and a missing category
- * image falls back to the chapter hero rather than rendering `undefined`.
+ * One card as this locale shows it, with the register ids it adds to the
+ * page's foot list (its own, its kept figures', and their links' pages).
  */
-function composeChapter(
-  site: ComposeSite,
-  meta: EngineChapterMeta,
-  messages: ChapterMessages,
-  locale: string,
-  groupLabels: Record<string, string>,
-): Chapter {
-  const pageSourceIds: string[] = [];
-  const categories: CategoryCard[] = ordered(messages.categories).map((card, index) => {
-    const structure = meta.categories[index];
-    const links = composeCardLinks(site, meta.slug, structure, card, locale);
-    const figures = composeCardFigures(site, structure, card.figure, locale);
-    const sourceIds = [
-      ...new Set([...(structure?.sources ?? []), ...collectSourceIds(figures.figures ?? [])]),
-    ];
+function composeCard({
+  site,
+  meta,
+  number,
+  structure,
+  card,
+  locale,
+  groupLabels,
+}: {
+  site: ComposeSite;
+  meta: EngineChapterMeta;
+  number: number;
+  structure: EngineCategoryMeta | undefined;
+  card: CategoryMessages;
+  locale: string;
+  groupLabels: Record<string, string>;
+}): { card: CategoryCard; pageSourceIds: string[] } {
+  const links = composeCardLinks(site, meta.slug, structure, card, locale);
+  const figures = composeCardFigures(site, structure, card.figure, locale);
+  const sourceIds = [
+    ...new Set([...(structure?.sources ?? []), ...collectSourceIds(figures.figures ?? [])]),
+  ];
 
-    pageSourceIds.push(...sourceIds, ...collectSourceIds(figures.figures ?? [], ['linkSources']));
-
-    return {
+  return {
+    pageSourceIds: [...sourceIds, ...collectSourceIds(figures.figures ?? [], ['linkSources'])],
+    card: {
       title: card.title,
-      number: index + 1,
+      number,
       image: structure?.image ?? meta.heroImage,
       ...figures,
       ...(sourceIds.length ? { sourceIds } : {}),
@@ -849,8 +966,183 @@ function composeChapter(
             })),
           }),
       ...(links.length ? { links } : {}),
+    },
+  };
+}
+
+/*
+ * A held card (CategoryMeta `held`): gone, or with `heldNote` its title and
+ * that one line, open, backed by the note's sources. No other message of the
+ * card is read: the client is not sent them (the site's held-messages.ts).
+ */
+function composeHeldCard(
+  meta: EngineChapterMeta,
+  number: number,
+  structure: EngineCategoryMeta,
+  card: CategoryMessages,
+  groupLabels: Record<string, string>,
+): CategoryCard | undefined {
+  if (!structure.heldNote) return undefined;
+
+  const sourceIds = [...new Set(structure.heldNote.sources)];
+
+  return {
+    title: card.title,
+    number,
+    image: structure.image || meta.heroImage,
+    noteVisible: true,
+    ...(card.heldNote === undefined ? {} : { note: card.heldNote }),
+    ...(sourceIds.length ? { sourceIds } : {}),
+    ...(structure.ask === undefined ? {} : { ask: structure.ask }),
+    ...(structure.group === undefined
+      ? {}
+      : { group: groupLabels[structure.group] ?? structure.group }),
+  };
+}
+
+/*
+ * Tiers in the meta's order, each with its words; a tier the messages carry
+ * but the meta does not list still renders, last and unsourced, so no red
+ * flag can drop out of the block.
+ */
+function urgentTierOrder(
+  meta: EngineChapterMeta,
+  tiers: Record<string, unknown>,
+): Array<UrgentTierMeta<string>> {
+  const listed = meta.urgentTiers ?? [];
+  const unlisted = Object.keys(tiers)
+    .filter((key) => !listed.some((tier) => tier.key === key))
+    .map((key) => ({ key, signs: [] }));
+
+  return [...listed, ...unlisted];
+}
+
+/*
+ * The tiered block's closing note, untagged, and its link where the meta
+ * names one: the phrase it tags, or the whole note.
+ */
+function composeUrgentNote(note: string | undefined, href: string | undefined) {
+  if (note === undefined) return {};
+
+  const text = untagged(note);
+  const open = note.indexOf(OPEN_TAG);
+  const close = note.indexOf('</link>');
+  const tagged = open >= 0 && close > open;
+  const length = tagged ? close - open - OPEN_TAG.length : text.length;
+
+  return {
+    note: text,
+    ...(href && length > 0 ? { noteLink: { href, start: tagged ? open : 0, length } } : {}),
+  };
+}
+
+/* The red-flag block, flat (Ostomy's form) or in tiers (ChapterMeta.urgentTiers). */
+function composeUrgent(
+  meta: EngineChapterMeta,
+  urgent: ChapterMessages['urgent'],
+  noteHref?: string,
+): UrgentCallout | undefined {
+  if (urgent === undefined) return undefined;
+
+  if (!('tiers' in urgent)) {
+    return {
+      heading: urgent.heading,
+      intro: urgent.intro,
+      action: urgent.action,
+      signs: ordered(urgent.signs),
     };
+  }
+
+  const tiers = urgentTierOrder(meta, urgent.tiers).flatMap((tier) => {
+    const words = urgent.tiers[tier.key];
+
+    if (!words) return [];
+
+    return [
+      {
+        key: tier.key,
+        label: words.label,
+        ...(words.lead === undefined ? {} : { lead: words.lead }),
+        sourceIds: tier.sources ?? [],
+        signs: ordered(words.signs).map((text, index) => ({
+          text,
+          sourceIds: tier.signs[index]?.sources ?? [],
+        })),
+      },
+    ];
   });
+
+  return {
+    heading: urgent.heading,
+    intro: urgent.intro,
+    action: '',
+    signs: [],
+    tiers,
+    ...composeUrgentNote(urgent.note, noteHref),
+  };
+}
+
+/* The care panel, where the chapter has its words, its image and its link. */
+function composePharmacist(
+  meta: EngineChapterMeta,
+  messages: ChapterMessages,
+  locale: string,
+): Chapter['pharmacist'] {
+  const words = messages.pharmacist;
+
+  if (!words || meta.pharmacistHref === undefined || meta.pharmacistImage === undefined) {
+    return undefined;
+  }
+
+  return {
+    eyebrow: words.eyebrow,
+    heading: words.heading,
+    body: words.body,
+    cta: words.cta ?? '',
+    href: localeHref(meta.pharmacistHref, locale),
+    image: meta.pharmacistImage,
+  };
+}
+
+/*
+ * Compose a chapter from its structure and its translated prose.
+ *
+ * Images and outward URLs are index-matched to the numbered message keys. If a
+ * translation adds or drops a list entry the two sides drift, so a link with no
+ * URL is dropped rather than rendered as a dead card, and a missing category
+ * image falls back to the chapter hero rather than rendering `undefined`.
+ */
+function composeChapter(
+  site: ComposeSite,
+  meta: EngineChapterMeta,
+  messages: ChapterMessages,
+  locale: string,
+  groupLabels: Record<string, string>,
+): Chapter {
+  const pageSourceIds: string[] = [];
+  /*
+   * By number: card <n> is meta entry <n - 1> and keeps `#card-<n>` even where
+   * a held card before it is gone (CategoryMeta `held`).
+   */
+  const categories: CategoryCard[] = numberedEntries(messages.categories).flatMap(
+    ({ key: number, value: card }): CategoryCard[] => {
+      const structure = meta.categories[number - 1];
+
+      if (structure?.held !== undefined) {
+        const held = composeHeldCard(meta, number, structure, card, groupLabels);
+
+        pageSourceIds.push(...(held?.sourceIds ?? []));
+
+        return held ? [held] : [];
+      }
+
+      const composed = composeCard({ site, meta, number, structure, card, locale, groupLabels });
+
+      pageSourceIds.push(...composed.pageSourceIds);
+
+      return [composed.card];
+    },
+  );
 
   const resources = messages.resources
     ? ordered(messages.resources).map((group, groupIndex) => ({
@@ -869,10 +1161,26 @@ function composeChapter(
       }))
     : undefined;
 
-  const programsBand = composeProgramsBand(site, meta, messages, locale);
+  const programsBand = composeProgramsBand(
+    site,
+    meta,
+    messages,
+    locale,
+    new Set(categories.map((card) => card.number)),
+  );
   const shelf = composeShelf(site, meta, messages, locale);
   const citations = composeCitations(meta, locale);
   const startHere = composeStartHere(meta, messages, categories);
+  const urgent = composeUrgent(
+    meta,
+    messages.urgent,
+    meta.urgentNoteLink
+      ? chapterPlaceHref(site, meta.slug, meta.urgentNoteLink, locale)
+      : undefined,
+  );
+  const pharmacist = composePharmacist(meta, messages, locale);
+  /* The red-flag block comes first on the page, so its sources lead the foot list. */
+  const urgentSourceIds = collectSourceIds(meta.urgentTiers ?? []);
 
   const urgentExit =
     meta.urgentExit && messages.urgentExit
@@ -904,18 +1212,9 @@ function composeChapter(
     ...(programsBand === undefined ? {} : { programsBand }),
     ...(shelf === undefined ? {} : { shelf }),
     ...(resources === undefined ? {} : { resources }),
-    ...(messages.urgent === undefined
-      ? {}
-      : {
-          urgent: {
-            heading: messages.urgent.heading,
-            intro: messages.urgent.intro,
-            action: messages.urgent.action,
-            signs: ordered(messages.urgent.signs),
-          },
-        }),
+    ...(urgent === undefined ? {} : { urgent }),
     ...(citations === undefined ? {} : { citations }),
-    sourceIds: [...new Set([...pageSourceIds, ...(meta.bandSources ?? [])])],
+    sourceIds: [...new Set([...urgentSourceIds, ...pageSourceIds, ...(meta.bandSources ?? [])])],
     governance: {
       author: site.governance.author,
       reviewer: site.governance.reviewer,
@@ -923,14 +1222,7 @@ function composeChapter(
       disclosure: site.governance.disclosure,
       disclaimer: messages.governance.disclaimer,
     },
-    pharmacist: {
-      eyebrow: messages.pharmacist.eyebrow,
-      heading: messages.pharmacist.heading,
-      body: messages.pharmacist.body,
-      cta: messages.pharmacist.cta ?? '',
-      href: localeHref(meta.pharmacistHref, locale),
-      image: meta.pharmacistImage,
-    },
+    ...(pharmacist === undefined ? {} : { pharmacist }),
     closing: messages.closing,
   };
 }

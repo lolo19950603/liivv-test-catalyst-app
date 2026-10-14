@@ -31,8 +31,11 @@ export function OliviaHelpBand({
   bubble?: string;
   moreLabel?: string;
   note?: string;
-  /* The ghost link, in the page locale ("/fr/#olivia" on French pages). */
-  moreHref?: string;
+  /*
+   * The ghost link, in the page locale ("/fr/#olivia" on French pages). `null`
+   * leaves it out, for a page whose copy words no label for it in its language.
+   */
+  moreHref?: string | null;
   className?: string;
 }) {
   const rootClass = className ? `olivia-help-band ${className}` : 'olivia-help-band';
@@ -56,9 +59,11 @@ export function OliviaHelpBand({
             <button className="olivia-help-band__cta" onClick={() => openLiveChat()} type="button">
               {ctaLabel}
             </button>
-            <a className="olivia-help-band__ghost" href={moreHref}>
-              {moreLabel}
-            </a>
+            {moreHref === null ? null : (
+              <a className="olivia-help-band__ghost" href={moreHref}>
+                {moreLabel}
+              </a>
+            )}
           </div>
           <p className="olivia-help-band__note">{note}</p>
         </div>

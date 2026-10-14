@@ -19,6 +19,12 @@ export const DIABETES_FUNDING_PATH = '/liivv-health/diabetes-care/funding';
 export const OSTOMY_CARE_PATH = '/liivv-health/ostomy-care';
 export const SHOP_OSTOMY_CARE_PATH = '/liivv-health/ostomy-care/shop-ostomy-care';
 export const OSTOMY_FUNDING_PATH = '/liivv-health/ostomy-care/funding';
+/*
+ * Sleep Apnea Care has no specialized menu yet. Its pages leave whichever one a
+ * reader carried in (a remembered Diabetes or Ostomy menu would name the wrong
+ * section), until a 'sleep' section is built behind SLEEP_APNEA_CARE_LIVE.
+ */
+export const SLEEP_APNEA_CARE_PATH = '/liivv-health/sleep-apnea-care';
 
 const CHAPTER_IMG = '/archive/womens-health';
 
@@ -313,11 +319,15 @@ export function parseCareNavCookie(value: string | undefined | null): CareNavSec
   return null;
 }
 
-/** Home and the health hub leave the specialized menu. */
+/** Home, the health hub and the sections with no menu of their own leave the specialized menu. */
 export function shouldClearCareNav(pathname: string): boolean {
   const path = normalizeHidePath(stripLocaleFromPathname(pathname));
 
-  return path === '/' || path === LIIVV_HEALTH_HUB_PATH;
+  return (
+    path === '/' ||
+    path === LIIVV_HEALTH_HUB_PATH ||
+    pathnameMatchesPrefix(pathname, SLEEP_APNEA_CARE_PATH)
+  );
 }
 
 /** Cart, checkout, and account keep the main store menu. */

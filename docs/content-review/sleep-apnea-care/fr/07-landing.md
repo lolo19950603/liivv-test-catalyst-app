@@ -1,0 +1,287 @@
+# Landing
+
+**Generated:** 2026-10-14 from commit `256c2638`
+
+## `ui.landingPage`
+
+- Soins de l’apnée du sommeil et « Liivving » au quotidien | Liivv ⚑ `ui.landingPage.meta.title`
+- Des conseils clairs et sourcés sur l’apnée du sommeil et la thérapie CPAP, avec des masques et des fournitures CPAP. ⚑ `ui.landingPage.meta.description`
+- Bannière Soins de l’apnée du sommeil ⚑ `ui.landingPage.hero.label`
+- Soins de l’apnée du sommeil ⚑ `ui.landingPage.hero.kicker`
+- Soins de l’apnée du sommeil et thérapie CPAP ⚑ `ui.landingPage.hero.heading`
+- Soins de l’apnée du sommeil et thérapie CPAP, ⚑ `ui.landingPage.hero.headingLead`
+- expliqués simplement ⚑ `ui.landingPage.hero.words.1`
+- sources à l’appui ⚑ `ui.landingPage.hero.words.2`
+- nuit après nuit ⚑ `ui.landingPage.hero.words.3`
+- à votre rythme ⚑ `ui.landingPage.hero.words.4`
+- Des conseils qui indiquent d’où ils viennent, et les masques et fournitures que vous utilisez. Votre prescripteur établit votre traitement. Nous vous aidons à vous y retrouver. ⚑ `ui.landingPage.hero.body`
+- Trouver par où commencer ⚑ `ui.landingPage.hero.cta`
+- Magasiner les masques et fournitures ⚑ `ui.landingPage.hero.shopCta`
+- Pourquoi Soins de l’apnée du sommeil de Liivv ⚑ `ui.landingPage.trust.label`
+- Des faits sur la santé présentés avec leurs sources ⚑ `ui.landingPage.trust.items.1`
+- Chaque instrument médical vérifié dans la liste des homologations de Santé Canada ⚑ `ui.landingPage.trust.items.2`
+- Suivi publicitaire désactivé sur ces pages ⚑ `ui.landingPage.trust.items.3`
+- Où en êtes-vous en ce moment? ⚑ `ui.landingPage.doors.heading`
+- Somnolence au volant, ou inquiétude en ce moment ⚑ `ui.landingPage.doors.items.1.label`
+- D’abord les signes d’alerte, puis quoi faire. En cas d’urgence médicale, composez le 911. ⚑ `ui.landingPage.doors.items.1.body`
+- Vous ne savez pas si c’est urgent? Chapitre 02 : Qui appeler ⚑ `ui.landingPage.doors.items.1.secondary`
+- Je pense que j’ai peut-être de l’apnée du sommeil ⚑ `ui.landingPage.doors.items.2.label`
+- Les signes, le déroulement des tests, et les questions à poser à votre médecin. ⚑ `ui.landingPage.doors.items.2.body`
+- Diagnostic tout récent, ou début de la thérapie CPAP ⚑ `ui.landingPage.doors.items.3.label`
+- Votre installation, vos premières nuits, et à qui poser vos questions. ⚑ `ui.landingPage.doors.items.3.body`
+- J’ai du mal avec mon masque ⚑ `ui.landingPage.doors.items.4.label`
+- Fuites, bouche sèche, marques et autres problèmes courants, et quand appeler votre thérapeute respiratoire. ⚑ `ui.landingPage.doors.items.4.body`
+- Il est temps de remplacer des fournitures ⚑ `ui.landingPage.doors.items.5.label`
+- Les signes qu’une pièce est usée, à quelle fréquence on remplace les pièces, et ce que les programmes paient. ⚑ `ui.landingPage.doors.items.5.body`
+- Voyager avec un appareil CPAP ⚑ `ui.landingPage.doors.items.6.label`
+- Prendre l’avion, le contrôle de sécurité à l’aéroport et une liste de choses à emporter. ⚑ `ui.landingPage.doors.items.6.body`
+- Comment payer ⚑ `ui.landingPage.doors.items.7.label`
+- Ce que votre province et d’autres programmes peuvent couvrir, et comment présenter une demande de remboursement. ⚑ `ui.landingPage.doors.items.7.body`
+- J’aide quelqu’un : un enfant, un ou une partenaire, ou un parent ⚑ `ui.landingPage.doors.items.8.label`
+- Les signes chez l’enfant, partager son chez-soi avec un appareil CPAP, et du soutien pour vous. ⚑ `ui.landingPage.doors.items.8.body`
+- Quelle thérapie? ⚑ `ui.landingPage.therapies.label`
+- Votre traitement ⚑ `ui.landingPage.therapies.eyebrow`
+- Quelle thérapie? ⚑ `ui.landingPage.therapies.heading`
+- Choisissez-en une pour en savoir plus. Votre médecin, votre infirmière praticienne ou infirmier praticien, ou votre spécialiste du sommeil prescrit votre traitement, après une évaluation et un test du sommeil. ⚑ `ui.landingPage.therapies.body`
+- CPAP et APAP ⚑ `ui.landingPage.therapies.chips.cpap`
+- Deux niveaux de pression ⚑ `ui.landingPage.therapies.chips.bilevel`
+- CPAP de voyage ⚑ `ui.landingPage.therapies.chips.travel`
+- Appareil buccal ⚑ `ui.landingPage.therapies.chips.oralAppliance`
+- Habitudes de vie ⚑ `ui.landingPage.therapies.chips.lifestyle`
+- Apnée centrale ⚑ `ui.landingPage.therapies.chips.central`
+- Enfants ⚑ `ui.landingPage.therapies.chips.children`
+- Le CPAP est le type de thérapie PAP le plus courant pour l’apnée obstructive du sommeil. ⚑ `ui.landingPage.therapies.hints.cpap`
+- Plus complexe que le CPAP. Un spécialiste du sommeil le prescrit. ⚑ `ui.landingPage.therapies.hints.bilevel`
+- Les appareils portatifs sont plus faciles à transporter, avec certains compromis. ⚑ `ui.landingPage.therapies.hints.travel`
+- Un appareil porté dans la bouche qui peut aider en cas d’apnée du sommeil légère à modérée, ou si vous ne pouvez pas utiliser le CPAP. ⚑ `ui.landingPage.therapies.hints.oralAppliance`
+- De saines habitudes et la perte de poids sont conseillées si vous avez un excès de poids. Elles ne suffisent pas à elles seules si vous avez de la somnolence ou si votre apnée du sommeil est modérée à sévère. ⚑ `ui.landingPage.therapies.hints.lifestyle`
+- Un autre type d’apnée du sommeil. Utilisé seul, un appareil PAP courant peut l’aggraver. ⚑ `ui.landingPage.therapies.hints.central`
+- Certains enfants ronflent, mais n’ont pas d’apnée du sommeil. ⚑ `ui.landingPage.therapies.hints.children`
+- Faits sur l’apnée du sommeil et leurs sources ⚑ `ui.landingPage.facts.label`
+- Quelques faits ⚑ `ui.landingPage.facts.eyebrow`
+- L’apnée du sommeil au Canada, en quatre chiffres. ⚑ `ui.landingPage.facts.heading`
+- 6,4 % ⚑ `ui.landingPage.facts.items.1.value`
+- des Canadiens ont déclaré qu’un professionnel de la santé leur avait diagnostiqué l’apnée du sommeil (2016–2017). ⚑ `ui.landingPage.facts.items.1.label`
+- 12,8 % ⚑ `ui.landingPage.facts.items.2.value`
+- des personnes de 60 à 79 ans ont déclaré avoir reçu ce diagnostic : trois fois plus souvent que les adultes plus jeunes (2016–2017). ⚑ `ui.landingPage.facts.items.2.label`
+- 30 % ⚑ `ui.landingPage.facts.items.3.value`
+- des adultes au Canada présentaient un risque intermédiaire ou élevé d’apnée du sommeil, selon un questionnaire de dépistage (2016–2017). ⚑ `ui.landingPage.facts.items.3.label`
+- 23 % ⚑ `ui.landingPage.facts.items.4.value`
+- des adultes à qui on avait dit qu’ils faisaient de l’apnée du sommeil ont déclaré n’avoir jamais été dirigés vers un laboratoire du sommeil pour un test de nuit (données de 2009). ⚑ `ui.landingPage.facts.items.4.label`
+- Magasiner Soins de l’apnée du sommeil ⚑ `ui.landingPage.shop.label`
+- La tablette ⚑ `ui.landingPage.shop.eyebrow`
+- Magasiner Soins de l’apnée du sommeil ⚑ `ui.landingPage.shop.heading`
+- Des masques CPAP, des coussins, des harnais, des tubulures, des filtres et d’autres fournitures de notre catalogue. {rxMaskLine} Liivv ne vend pas encore d’appareils CPAP ni d’autres appareils pour l’apnée du sommeil. ⚑ `ui.landingPage.shop.body`
+- Les pièces et les fournitures vont directement dans votre panier. Un masque complet nécessite une ordonnance de CPAP, qu’un pharmacien de Liivv vérifie avant l’expédition de votre commande. ⚑ `ui.landingPage.shop.rxMaskLine`
+- Aucun retour après la livraison. Pour des raisons d’hygiène et de sécurité, les masques et les fournitures ne peuvent pas être retournés une fois qu’ils vous sont parvenus, même s’ils n’ont pas été ouverts. Si nous vous envoyons le mauvais article, s’il arrive endommagé ou défectueux, ou s’il n’arrive pas, nous le remplacerons ou nous vous rembourserons. ⚑ `ui.landingPage.shop.returnsLine`
+- Retours et remboursements ⚑ `ui.landingPage.shop.returnsLink`
+- Masques avec aimants ⚑ `ui.landingPage.shop.magnetWarning.heading`
+- Certains masques CPAP contiennent des aimants qui peuvent avoir un effet sur certains implants métalliques, comme les stimulateurs cardiaques, chez vous ou chez une personne qui vit avec vous, qui prend soin de vous ou qui partage votre lit. Si cela pourrait s’appliquer, vérifiez auprès du fabricant du masque et de votre équipe de soins de santé avant d’en acheter ou d’en utiliser un. ⚑ `ui.landingPage.shop.magnetWarning.body`
+- Lire la mise en garde ⚑ `ui.landingPage.shop.magnetWarning.link`
+- Votre prescripteur établit la pression de votre appareil. Seuls des professionnels formés devraient la modifier. Liivv ne donne jamais de conseils sur les réglages. ⚑ `ui.landingPage.shop.settingsNotice`
+- Ouvrir la boutique complète ⚑ `ui.landingPage.shop.openShop`
+- Rayons de la boutique ⚑ `ui.landingPage.shop.filtersLabel`
+- Rien dans ce rayon pour l’instant. Essayez Tout ou un autre rayon. ⚑ `ui.landingPage.shop.empty`
+- Tout ⚑ `ui.landingPage.shop.rooms.all`
+- Masques ⚑ `ui.landingPage.shop.rooms.masks`
+- Coussins, embouts narinaires et harnais ⚑ `ui.landingPage.shop.rooms.cushions`
+- Tubulures ⚑ `ui.landingPage.shop.rooms.tubing`
+- Filtres ⚑ `ui.landingPage.shop.rooms.filters`
+- Pièces d’humidificateur ⚑ `ui.landingPage.shop.rooms.humidifier`
+- Nettoyage ⚑ `ui.landingPage.shop.rooms.cleaning`
+- Voyage ⚑ `ui.landingPage.shop.rooms.travel`
+- Vérification de l’ordonnance ⚑ `ui.landingPage.shop.badges.prescription`
+- Nommé dans un avis de Santé Canada sur les aimants : lire la mise en garde ⚑ `ui.landingPage.shop.badges.magnets`
+- Chapitres ⚑ `ui.landingPage.chapters.label`
+- Six chapitres ⚑ `ui.landingPage.chapters.eyebrow`
+- Six chapitres. Ouvrez celui qui correspond à aujourd’hui. ⚑ `ui.landingPage.chapters.heading`
+- Commencez où vous voulez. Chaque chapitre indique d’où viennent ses faits et à qui poser vos questions. ⚑ `ui.landingPage.chapters.body`
+- Vous savez déjà ce qu’il vous faut? ⚑ `ui.landingPage.chapters.skipPrompt`
+- Passer à la tablette ⚑ `ui.landingPage.chapters.skipLink`
+- Chapitre {word} ⚑ `ui.landingPage.chapters.chapterWord`
+- Ouvrir le chapitre → ⚑ `ui.landingPage.chapters.open`
+- Soins et soutien ⚑ `ui.landingPage.care.label`
+- Votre équipe de soins du sommeil ⚑ `ui.landingPage.care.sleepTeam.eyebrow`
+- Des questions sur votre traitement? ⚑ `ui.landingPage.care.sleepTeam.heading`
+- Votre médecin ou votre spécialiste du sommeil prescrit votre traitement et les réglages de votre appareil. Seuls des professionnels formés devraient les modifier. Parlez à votre médecin avant et après l’achat d’un appareil. Posez vos questions à votre équipe de soins du sommeil sur votre sommeil, votre pression ou un changement d’appareil. ⚑ `ui.landingPage.care.sleepTeam.body`
+- Rencontrez Olivia ⚑ `ui.landingPage.care.oliviaKicker`
+- Olivia peut vous aider avec les commandes et le réapprovisionnement. ⚑ `ui.landingPage.care.oliviaTitle`
+- Besoin de trouver une pièce de masque, de vérifier une commande ou de vous réapprovisionner en filtres? Olivia est la petite pousse dans le coin. Elle ne donne pas de conseils médicaux ni de conseils sur les réglages. ⚑ `ui.landingPage.care.oliviaBody`
+- Clavarder avec Olivia ⚑ `ui.landingPage.care.oliviaCta`
+- Bonjour, j’habite dans le coin. ⚑ `ui.landingPage.care.oliviaBubble`
+- Les questions sur votre traitement ou vos réglages reviennent à votre équipe de soins du sommeil. ⚑ `ui.landingPage.care.oliviaNote`
+- Marques ⚑ `ui.landingPage.brands.label`
+- Pour vous repérer ⚑ `ui.landingPage.brands.eyebrow`
+- Des noms que vous connaissez peut-être déjà. ⚑ `ui.landingPage.brands.heading`
+- Indiquées pour qu’il soit facile de trouver les masques et les fournitures que vous connaissez. Une marque nommée ici n’est pas une recommandation. Votre équipe de soins du sommeil vous aide à choisir. ⚑ `ui.landingPage.brands.body`
+- Magasiner {brand} ⚑ `ui.landingPage.brands.shop`
+- Questions fréquentes ⚑ `ui.landingPage.faq.label`
+- Des questions, avec des réponses sourcées. ⚑ `ui.landingPage.faq.heading`
+- Des notes pratiques, pas des conseils médicaux. Chaque réponse indique d’où elle vient. ⚑ `ui.landingPage.faq.note`
+- Ai-je besoin d’une ordonnance? ⚑ `ui.landingPage.faq.items.1.q`
+- Pour un appareil, oui. N’utilisez la thérapie CPAP que si vous avez une ordonnance de votre médecin ou de votre infirmière praticienne ou infirmier praticien. Votre ordonnance couvre votre équipement et vos réglages. Chaque appareil doit être réglé pour la personne qui l’utilise. Les appareils APAP et à deux niveaux de pression sont plus complexes, et c’est un spécialiste du sommeil qui devrait les prescrire. {machineLine} {rxMaskLine} Seuls des professionnels formés devraient modifier les réglages de votre appareil, et Liivv ne donne jamais de conseils à leur sujet. En Ontario, vous avez le droit de choisir votre fournisseur de services communautaires de thérapie respiratoire. ⚑ `ui.landingPage.faq.items.1.a`
+- Liivv ne vend pas encore d’appareils CPAP ni d’autres appareils pour l’apnée du sommeil. ⚑ `ui.landingPage.faq.items.1.machineLine`
+- Sur Liivv, un masque complet, y compris un masque pour enfant, nécessite une ordonnance de CPAP, qu’un pharmacien de Liivv vérifie avant l’expédition de votre commande. Les pièces et les fournitures, comme les coussins, les harnais, les tubulures et les filtres, vont directement dans votre panier. ⚑ `ui.landingPage.faq.items.1.rxMaskLine`
+- Puis-je apporter mon appareil CPAP dans l’avion? ⚑ `ui.landingPage.faq.items.2.q`
+- Oui. Un appareil CPAP est permis dans vos bagages de cabine et dans vos bagages enregistrés. Quand vous prenez l’avion, apportez-le dans vos bagages de cabine. Au contrôle de sécurité, vous pouvez soit le mettre dans un sac de plastique transparent que vous apportez pour le contrôle, soit laisser les tubes et le masque dans l’étui et ne mettre que l’unité principale dans un bac. L’eau distillée qu’il utilise est exemptée des limites sur les liquides. Vous n’avez pas besoin d’un document sur vos besoins médicaux, mais vous pouvez en montrer un à l’agent de contrôle si vous croyez que cela vous aidera. Pour une liste de choses à emporter, consultez <link>Voyager avec un appareil CPAP</link>. ⚑ `ui.landingPage.faq.items.2.a`
+- À quelle fréquence devrais-je remplacer mon masque et mon filtre? ⚑ `ui.landingPage.faq.items.3.q`
+- Suivez d’abord le manuel de votre appareil et de votre masque. Les conseils généraux varient, alors les voici côte à côte. La plupart des appareils sont remplacés tous les 3 à 5 ans, et les accessoires tous les 3 à 12 mois. Changez le filtre de l’appareil tous les 2 mois, ou au besoin. Vérifiez votre tubulure et votre harnais, et remplacez-les quand ils sont usés. Les programmes fixent aussi le maximum qu’ils couvrent. Les lignes directrices des SSNA, par exemple, prévoient jusqu’à 14 filtres d’entrée d’air par année, 2 par année pour chaque type de masque avec harnais (facial, nasal ou à embouts narinaires) et 2 par année pour la tubulure. Davantage peut être envisagé au cas par cas, avec une autorisation préalable. Si un régime paie votre équipement, vérifiez ses délais de remplacement avant de commander. Pour les signes qu’une pièce est usée, consultez <link>Il est temps de remplacer des fournitures</link>. ⚑ `ui.landingPage.faq.items.3.a`
+- Que faire si mon appareil ou mon masque fait l’objet d’un rappel? ⚑ `ui.landingPage.faq.items.4.q`
+- Chaque avis de rappel indique quoi faire : cherchez donc votre modèle sur le site <link>Rappels et avis de sécurité</link> du gouvernement du Canada. Pour le rappel de 2021 visant certains appareils Philips fabriqués avant le 26 avril 2021, la consigne était de parler à votre médecin ou à votre fournisseur d’instruments médicaux avant de cesser d’utiliser votre appareil ou de changer la façon dont vous l’utilisez. Le conseil de spécialistes canadiens, pour les personnes qui utilisaient ces appareils pour l’apnée du sommeil, était de communiquer rapidement avec leur médecin et de continuer à utiliser l’appareil entre-temps. Pour ces appareils, la consigne était aussi de cesser le nettoyage à l’ozone et aux rayons UV, et de ne nettoyer l’appareil que selon les instructions du fabricant. Certains masques contiennent des aimants qui peuvent avoir un effet sur certains implants et dispositifs métalliques, comme les stimulateurs cardiaques, chez vous ou chez une personne qui vit avec vous, qui prend soin de vous ou qui partage votre lit. Pour les masques visés par un avis de 2022, la consigne est de cesser d’utiliser le masque si une personne de ce groupe a l’un des implants énumérés. Pour les autres masques, vérifiez auprès du fabricant du masque et de votre équipe de soins de santé. Lisez la mise en garde dans <link>Conduite et sécurité</link>. ⚑ `ui.landingPage.faq.items.4.a`
+- Ma commande est-elle confidentielle? ⚑ `ui.landingPage.faq.items.5.q`
+- Sur les pages Soins de l’apnée du sommeil, sur les pages des produits CPAP et dans un panier qui contient des fournitures CPAP, nous désactivons les signaux publicitaires. Ce que vous y lisez et achetez n’est pas utilisé pour la publicité ni pour créer des auditoires publicitaires. L’adresse et le titre de la page sont exclus de nos statistiques du site, tout comme le nom des produits CPAP. ⚑ `ui.landingPage.faq.items.5.a`
+- Conclusion ⚑ `ui.landingPage.closing.label`
+- Peu importe où vous commencez ⚑ `ui.landingPage.closing.eyebrow`
+- Du repos, à votre rythme. ⚑ `ui.landingPage.closing.heading`
+- Des conseils qui citent leurs sources, et les masques et fournitures que vous utilisez. Commencez là où vous êtes. ⚑ `ui.landingPage.closing.body`
+- Magasiner Soins de l’apnée du sommeil ⚑ `ui.landingPage.closing.shop`
+- Ouvrir un chapitre ⚑ `ui.landingPage.closing.chapter`
+- À propos de cette page ⚑ `ui.landingPage.governance.label`
+- Liivv est une entreprise de HelioMed et fait partie de la famille Bayshore. ⚑ `ui.landingPage.governance.relationship`
+- Citer les conseils d’un organisme ne signifie pas que cet organisme a révisé ou approuvé cette page. ⚑ `ui.landingPage.governance.sourcesNote`
+- Les noms de marque sont indiqués pour vous aider à trouver ce que vous utilisez déjà. Liivv vend ces produits. ⚑ `ui.landingPage.governance.brandsNote`
+- Liivv ne donne jamais de conseils sur la pression ou les réglages du CPAP. Votre prescripteur les établit. ⚑ `ui.landingPage.governance.settingsNote`
+
+## Held in the message files (not sent to a browser until released)
+
+- `SleepApneaCare.ui.landingPage.trust.items.2`
+- `SleepApneaCare.ui.landingPage.trust.items.3`
+- `SleepApneaCare.ui.landingPage.faq.items.5`
+- `SleepApneaCare.ui.landingPage.shop.rxMaskLine`
+- `SleepApneaCare.ui.landingPage.faq.items.1.rxMaskLine`
+- `SleepApneaCare.ui.landingPage.shop.badges.prescription`
+- `SleepApneaCare.ui.landingPage.shop.returnsLine`
+- `SleepApneaCare.ui.landingPage.shop.returnsLink`
+- `SleepApneaCare.ui.landingPage.brands`
+- `SleepApneaCare.ui.landingPage.governance.brandsNote`
+- `SleepApneaCare.ui.landingPage.hero.headingLead`
+- `SleepApneaCare.ui.landingPage.hero.words`
+
+## Open rulings (each ships its default until ruled)
+
+- **N10** — default: Machine lines keep the current wording: “Liivv doesn’t sell CPAP or other sleep apnea machines yet.” (owner; “yet” kept everywhere until ruled).
+  - Alternative: “Liivv doesn’t sell machines” (no “yet”): “yet” reads as a promise, and the SLT has not approved the machine plan.
+  - Where: `shop.body`, `faq.items.1.machineLine`
+- **N2** — default: The page says only the N2 proposal lines it already sources: the machine line, and “Talk to your doctor before and after you buy a machine.” No retailer is named or linked.
+  - Alternative: Also link “Choosing a supplier” (Ch02 card 9) and “Paying for it” (funding page) where machines come up; decide whether door 3 (“Just diagnosed, or starting CPAP”) needs its own line.
+  - Where: `shop.body`, `faq.items.1.a`, `faq.items.1.machineLine`, `care.sleepTeam.body`
+- **N9** — default: No line saying what Liivv does and doesn’t do in the shop band.
+  - Alternative: Add “Liivv sells masks and supplies. We don’t fit masks or follow up on your therapy: your RT or sleep clinic does.” with the N6 policy (rule with C7 and C26).
+  - Where: `shop.body`
+- **D5** — default: FAQ 3 shows the BC guide’s general ranges, the CLA filter line and NIHB’s funding limits side by side, all after “Follow the manual for your machine and mask first.” No maker’s schedule on the landing (the Ch05 resupply planner adds it, labelled).
+  - Alternative: The nurse chooses another presentation of replacement cadences.
+  - Where: `faq.items.3.a`
+- **D6** — default: “NIHB’s guidelines, for example, are up to 14 inlet filters a year, 2 a year for each type of mask with headgear (face, nasal or nasal pillow), and 2 a year for tubing. More may be considered case by case, with prior approval.”
+  - Alternative: Drop the NIHB example and leave it to the Funding page. Note: NIHB 8.4.1 marks inlet filters “No” for prior approval while the page also says prior approval is required for all respiratory benefits.
+  - Where: `faq.items.3.a`
+- **D7 (C77)** — default: “Healthy habits and weight loss are advised if you carry extra weight. They aren’t enough on their own if you’re sleepy or have moderate to severe sleep apnea.”
+  - Alternative: Other plain words for the source’s “elevated BMI”.
+  - Where: `therapies.hints.lifestyle`
+- **D8 (B3 default)** — default: The privacy promise (trust item 3) and FAQ 5 stay held (gate adSignalsShipped) until the ad-signal denial is deployed and the privacy lead signs off.
+  - Alternative: Release both once signed off. Also open: whether the liivv-care-nav cookie gets a `sleep` value that the cookie notice must list.
+  - Where: `trust.items.3`, `faq.items.5`
+- **D9** — default: No landing door for the onboarding answer “natural sleep support” (no_natural).
+  - Alternative: Reword the answer, or route it to Ch01’s signpost cards.
+  - Where: `doors`
+- **D11** — default: Olivia appears in the care band with the scope written in the copy: orders and restocks, no medical or settings advice.
+  - Alternative: Leave Olivia off the Sleep pages, or reword to her actual scope.
+  - Where: `care.oliviaKicker`, `care.oliviaTitle`, `care.oliviaBody`, `care.oliviaCta`, `care.oliviaBubble`, `care.oliviaNote`
+- **D12** — default: Static `hero.heading` as the h1 (heroRotating false; headingLead and words held in tree); still placeholder image /archive/liivv-home/corner-sleep.png; no video; lavender placeholder accent.
+  - Alternative: The rotating hero (`headingLead` + `words`), a chosen image or a video, and the site palette.
+  - Where: `hero.heading`, `hero.headingLead`, `hero.words`
+- **D14 (B10)** — default: The brands strip and its governance note stay held (brandsReady false).
+  - Alternative: Owner names the brands kept after the store cleanup (Part G1), decides whether Philips Respironics stays given its recall history, records logo permissions, and removes the brands whose only catalogue products are machines (supplies-only re-sort, landing row 12: the brands of products 4599/5041 and 4991).
+  - Where: `brands`, `governance.brandsNote`
+- **D15** — default: Governance names, registrations and review date stay empty until the nurse signs off.
+  - Alternative: Owner and nurse supply them.
+  - Where: `governance`
+- **D17** — default: The C26 lines render (rxMaskGateShipped true): the checkout gate is built on this branch (commit 9acebbd7) and the section cannot launch before it deploys.
+  - Alternative: Set rxMaskGateShipped to false until the C26 flow is confirmed in production; `{rxMaskLine}` then interpolates empty and no line promises a pharmacist check.
+  - Where: `shop.rxMaskLine`, `faq.items.1.rxMaskLine`, `shop.badges.prescription`
+- **D18** — default: The returns line and link stay held (returnsPolicyPublished false) until the store’s policy page is published and legal review is done.
+  - Alternative: Owner and legal confirm scope, “even unopened”, the “for hygiene and safety” reason, cancellation before shipping, remedies, the 7-day request, refunds to the original payment method and the 15-day refund; French policy text.
+  - Where: `shop.returnsLine`, `shop.returnsLink`
+- **D19** — default: Option A: FAQ 4 keeps Health Canada’s own “stop” for the masks in the 2022 advisory (“the advice is to stop using the mask if anyone in that group has one of the listed implants”), and “check with the mask’s maker and your health care team” for other masks.
+  - Alternative: Option B (held E15): no “stop” anywhere: “What to do depends on the mask and the implant, so check with the mask’s maker and your health care team. Read the warning in <link>Driving & Staying Safe</link>.”
+  - Where: `faq.items.4.a`, `shop.magnetWarning.body`
+- **D20** — default: On the landing, only door 1 carries “In a medical emergency, call 911.”; the Olivia band has no 911 line.
+  - Alternative: Add a fixed “In a medical emergency, call 911” line beside every contact, Olivia chat, “ask us” and request-a-call surface on both care sites.
+  - Where: `doors.items.1.body`, `care.oliviaNote`
+- **BUILD-door-mask (spec 8.3)** — default: Door 4 (“Struggling with my mask”) opens Ch04 card 9, “Fix a common problem”, which is what the door’s words describe.
+  - Alternative: Ch04 card 3, “Mask types to ask your RT about” (Ch04’s own routing note).
+  - Where: `doors.items.4`
+- **BUILD-meta-description (N1, supplies-only section 6 row 1)** — default: meta.description ships as “Plain, sourced guidance on sleep apnea and CPAP, with CPAP masks and supplies.”: the final sentence “Machines by prescription.” is dropped, as the supplies-only re-sort asks, because Liivv sells no machines (N1, “Hide all 24”). No other word changed.
+  - Alternative: Section B verbatim (it would tell search results and link previews that Liivv sells machines by prescription), or a reworded description from the owner.
+  - Where: `meta.description`
+- **BUILD-french-names** — default: Section name “Soins de l’apnée du sommeil”; Ch02 title “Conduite et sécurité” in FAQ 4’s link; door labels reused as FAQ link words (“Voyager avec un appareil CPAP”, “Il est temps de remplacer des fournitures”).
+  - Alternative: The French reviewer’s choice; the chapter and chrome fragments must use the same names.
+  - Where: `meta.title`, `hero.kicker`, `shop.label`, `faq.items.2.a`, `faq.items.3.a`, `faq.items.4.a`
+
+## Checks before publishing
+
+- French: every string in this fragment is a machine translation awaiting review. The `landing` and `doors` gates stay closed (FR_REVIEWED empty, owner-only); /fr shows the governance machine-translation notice, and on /fr the doors fall back to the urgent route in Ch06’s approved urgentExit words.
+- Urgent door: never gated, renders with JS off, and its 911 sentence carries chips health811-home and hlbc-811 (ruling C1). Check the /fr fallback still gives the 911 route.
+- Ch02 (with the #red-flags block, card 6 “Masks with magnets” and card 11 “Who to call”) must be live with the landing (ruling B2, D10). FAQ 4’s second link and the shop magnet warning link point at staying-safe#card-6.
+- Re-check door bodies 2–6 and 8 against the written chapters (Ch01, Ch04 cards 9, Ch05 card 3 and segment 2, Ch06). FAQ 2 links Ch05 segment 2 (sa-group-2); FAQ 3 links Ch05 card 4 “Signs a part is worn”.
+- C26: confirm the complete-mask checkout gate is live in production before go-live (rxMaskGateShipped stays true); complete-mask tiles link the product page, never an add button; parts and supplies stay one-click.
+- Shelf: no machines or bundles, no ASV, no paediatric masks (4210, 4543, 4713), no ozone/UV cleaners, no compliance report, no description naming another retailer; the settings notice and the magnet warning always show; the magnet badge only on Health Canada catalogue-number matches (4624 waits on the nurse).
+- Store descriptions still conflict with N7: 52 visible masks say “This mask does not contain magnets, making it a safe choice…” and 18 carry a blanket magnet line (store write D19 not approved). Product pages can contradict the landing’s magnet warning until fixed.
+- Trust item 2 stays held until every listed device has a recorded MDALL licence (sweep 2026-10-13: 66 licensed, 10 uncertain).
+- Register: `hc-recall-philips-ra-76137` (page RA-62729) rename is still proposed (F3); `crto-community-rt` and `hc-recalls-safety-alerts` are registered; `statcan-osa-2018` and `phac-osa-2009` facts keep their data years in the labels.
+- Fact band: values and years exactly as the sources (6.4%, 12.8%, 30% for 2016–2017; 23% labelled 2009 data).
+- Governance block: renders `ui.governance` (chrome) plus `governance.relationship`, `sourcesNote` and `settingsNote`; `disclosure.sells` reads “Liivv sells CPAP masks and supplies.”; `governance.brandsNote` is held with the brands.
+- No other retailer, no partner name, no pressure figure or settings instruction anywhere on the page (spec 0.3 words).
+- Pre-launch: the page is noindex, nofollow and unlinked from the hub while SLEEP_APNEA_CARE_LIVE is false.
+
+## Held copy (not in the message files; ships only once released)
+
+*Nothing below is in the message files. Each item enters SleepApneaCare.ui.landingPage only when its condition is met and the owner (and nurse where named) approve the wording in a new copy pass. Held-in-tree lines (trust items 2 and 3, FAQ 5, the returns lines, the brands strip and note, the rotating hero) are listed by the export under “Held”, with their gate.*
+
+- **Trust item 4: Liivv’s sleep support team (E1, E3)** (cards 4) — The Liivv sleep support (RRT) service is not live (Part C); supplies-only re-sort row 2 moves it to the machine plan.
+  - Wording: Liivv’s sleep support team, for CPAP setup and follow-up
+  - Check: Part C live, line by line; owner confirms.
+- **Care band: the Liivv sleep support panel (E3)** — Part C is not live; the panel promises setup with “your mask and machine” and a booking call (supplies-only row 8: remove from the launch build; machine plan).
+  - Wording: Eyebrow “Liivv’s sleep support team”. Heading “Starting CPAP? Talk to Liivv’s sleep support team.” Body “Liivv’s respiratory therapists help you get set up with your mask and machine, and check in during your first weeks. Your prescriber sets your treatment and your pressure.” CTA “Book a setup call”, note “Sign-in needed”.
+  - Check: RRT licences mapped by province, setup call and follow-ups live; booking service rrt-pap-start; owner confirms.
+- **Sleep support phone number and hours (E4)** — No number or hours confirmed.
+  - Wording: “Call Liivv’s sleep support team: [number], [days], [hours] Eastern.”
+  - Check: Owner confirms the number is Liivv’s own line, and the hours.
+- **Subscribe & save band (E2)** — Resupply items not stocked; per-product subscriptions and the machine block not enforced server-side.
+  - Wording: Eyebrow “Subscribe & save”; title “Filters and cushions that arrive before you need them”; lead “Subscribe to the supplies you replace, choose how often they come, and skip or pause when life changes. Machines can’t be subscribed.”; features “Your usuals, on your schedule” / “Skip when you have extras” / “Change it in your account”.
+  - Check: Plan Part D; intervals shown match those offered (2, 3 and 6 months planned); no cadence advice. Complete masks cannot be subscribed (C26).
+- **Machine-sale copy (N1: Liivv sells no machines)** — All 24 machine products are hidden in the store (N1, “Hide all 24”); supplies-only rows 5 and 6.
+  - Wording: shop.rooms.machines “Machines (prescription required)”; shop.machinesLink title “Machines: prescription required”, body “See the machines we carry and how to request one with your prescription.”, CTA “See machines”.
+  - Check: Machine plan approved by the SLT; never before.
+- **meta.description machine sentence (N1)** — Liivv sells no machines; supplies-only row 1 says drop it.
+  - Wording: “Machines by prescription.”
+  - Check: Machine plan approved by the SLT.
+- **Prescription check before a machine ships (E5)** (cards 1) — Moved to the machine plan (2026-10-13): Liivv sells no machines.
+  - Wording: “We check your prescription before your machine ships.”
+  - Check: Machine plan.
+- **Using CPAP on board (E6)** (cards 2) — ATPDR s.49 does not name CPAP; CATSA says nothing about use on board.
+  - Wording: “If you want to use your machine on board, ask your airline before you fly.”
+  - Check: A source that covers in-flight CPAP use.
+- **Philips program status (E7)** (cards 4) — Health Canada’s 2024-07-05 update gives dates that have passed.
+  - Wording: None.
+  - Check: Ch02 decides whether to say anything.
+- **Sleep kits (E9)** — No kit signed off.
+  - Wording: None.
+  - Check: Owner signs off sleep kits (Part D). No kit contains a machine.
+- **Direct billing per program (E11)** (cards 1) — Vendor registrations not confirmed.
+  - Wording: “We bill [program] directly.”
+  - Check: Vendor registration confirmed (ADP, NIHB, VAC, BCEA, AISH).
+- **Plain packaging (E12)** (cards 5) — Operations has not confirmed it for CPAP orders.
+  - Wording: “Orders ship in plain packaging.”
+  - Check: Operations confirms.
+- **General ozone/UV cleaner warning (E13; kept held by ruling C5, “default”)** (cards 4) — Today’s sources are about the recalled Philips machines only; FAQ 4 keeps the Philips-scoped line.
+  - Wording: “Don’t use ozone or UV cleaners: clean your machine only as its instructions say.”
+  - Check: A Canadian source that advises against ozone/UV cleaners for every PAP machine, plus a nurse ruling.
+- **C26 child line and flow strings (E14; store copy, outside SleepApneaCare)** — The nurse words the child line (C17 follow-ups); the rest waits on the approved C26 design.
+  - Wording: CareNotices.rxMask.childLine and the checkout/order-status strings in c26-design.md 5.6.
+  - Check: Approved C26 build design and the nurse’s wording. Note: CareNotices.rxMask.childLine is already in core/messages and rendered by lib/catalog/care-notices.ts (committed 9acebbd7).
+- **Magnets, Option B (E15)** (cards 4) — The copy uses Option A until the nurse chooses (D19).
+  - Wording: FAQ 4 last sentences: “What to do depends on the mask and the implant, so check with the mask’s maker and your health care team. Read the warning in <link>Driving & Staying Safe</link>.” (Philips product notice B: store copy.)
+  - Check: The nurse chooses Option B.
+- **Returns policy resale line (E16; store copy)** — Removed by the N6 checker: no ruling or source backs it.
+  - Wording: “We never resell an item that has been delivered.”
+  - Check: Owner confirms the practice.

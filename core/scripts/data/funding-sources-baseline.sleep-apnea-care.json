@@ -1,0 +1,469 @@
+{
+  "note": "Written by core/scripts/check-funding-sources.mjs --update-baseline. One entry per register page the Funding & Coverage page cites (`<id>` and `<id>#fr`). Update it only after a person has re-read every page that changed and updated the copy.",
+  "updatedOn": "2026-10-14",
+  "nextCheck": "2026-11-13",
+  "pages": {
+    "ab-aish": {
+      "href": "https://www.alberta.ca/aish-what-you-get",
+      "status": 200,
+      "finalUrl": "https://www.alberta.ca/aish-what-you-get",
+      "title": "What you get with AISH | Alberta.ca",
+      "modified": [],
+      "hash": "734204a8c66b8868",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "ab-cpap-buyers-2026": {
+      "href": "https://myhealth.alberta.ca/Alberta/Pages/Buyers-Information-for-CPAP-Therapy-Equipment.aspx",
+      "status": 200,
+      "finalUrl": "https://myhealth.alberta.ca/Alberta/Pages/Buyers-Information-for-CPAP-Therapy-Equipment.aspx",
+      "title": "Buyer’s Information for CPAP Therapy Equipment",
+      "modified": [],
+      "hash": "97ad2d5aef97c72a",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "bc-bcea-breathing": {
+      "href": "https://www2.gov.bc.ca/gov/content/governments/policies-for-government/bcea-policy-and-procedure-manual/health-supplements-and-programs/medical-equipment-breathing-devices",
+      "status": 200,
+      "finalUrl": "https://www2.gov.bc.ca/gov/content/governments/policies-for-government/bcea-policy-and-procedure-manual/health-supplements-and-programs/medical-equipment-breathing-devices",
+      "title": "Medical Equipment - Breathing Devices - Province of British Columbia",
+      "modified": [
+        "meta 2026-09-10",
+        "Last updated on September 10, 2026"
+      ],
+      "hash": "42175c84f5c5f977",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "bc-income-assistance-access": {
+      "href": "https://www2.gov.bc.ca/gov/content/family-social-supports/income-assistance/access-services",
+      "status": 200,
+      "finalUrl": "https://www2.gov.bc.ca/gov/content/family-social-supports/income-assistance/access-services",
+      "title": "Access income and disability assistance services - Province of British Columbia",
+      "modified": [
+        "meta 2026-08-17",
+        "Last updated on August 17, 2026"
+      ],
+      "hash": "3a997548a82ffd25",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "bc-pap-buyers-guide": {
+      "href": "https://www2.gov.bc.ca/assets/gov/health/practitioner-pro/medical-services-plan/diagnostic-facilities/announcements/pap_buyers_guide.pdf",
+      "status": 200,
+      "finalUrl": "https://www2.gov.bc.ca/assets/gov/health/practitioner-pro/medical-services-plan/diagnostic-facilities/announcements/pap_buyers_guide.pdf",
+      "title": "Ministry of Health and",
+      "modified": [
+        "pdf 20220307",
+        "pdf 2022-03-07"
+      ],
+      "hash": "153f2718af061c19",
+      "kind": "pdf",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "bc-pharmacare-contact": {
+      "href": "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/pharmacare-for-bc-residents/contact-us",
+      "status": 200,
+      "finalUrl": "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/pharmacare-for-bc-residents/contact-us",
+      "title": "Contact BC PharmaCare - Province of British Columbia",
+      "modified": [
+        "meta 2026-08-26",
+        "Last updated on August 26, 2026"
+      ],
+      "hash": "0b45bf3ddb422062",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "bc-pharmacare-not-covered": {
+      "href": "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/pharmacare-for-bc-residents/what-we-cover",
+      "status": 200,
+      "finalUrl": "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/pharmacare-for-bc-residents/what-we-cover",
+      "title": "What BC PharmaCare covers - Province of British Columbia",
+      "modified": [
+        "meta 2026-05-22",
+        "Last updated on May 22, 2026"
+      ],
+      "hash": "8f6cffcf87b8569b",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "bcg-osa-adults-appx-e": {
+      "href": "https://www2.gov.bc.ca/assets/gov/health/practitioner-pro/bc-guidelines/appenidxe_sleepapnea-guideline-2021-v2.pdf",
+      "status": 200,
+      "finalUrl": "https://www2.gov.bc.ca/assets/gov/health/practitioner-pro/bc-guidelines/appenidxe_sleepapnea-guideline-2021-v2.pdf",
+      "title": "Print",
+      "modified": [
+        "pdf 2012-08-03"
+      ],
+      "hash": "c5831d5d8c21d446",
+      "kind": "pdf",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "cla-sleep-apnea": {
+      "href": "https://www.lung.ca/lung-diseases/sleep-apnea/",
+      "status": 200,
+      "finalUrl": "https://www.lung.ca/lung-diseases/sleep-apnea/",
+      "title": "Sleep apnea | Canadian Lung Association",
+      "modified": [
+        "meta 2026-06-02T15:02:45-04:00"
+      ],
+      "hash": "57423169a1a08244",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "cra-contact": {
+      "href": "https://www.canada.ca/en/revenue-agency/corporate/contact-information.html",
+      "status": 200,
+      "finalUrl": "https://www.canada.ca/en/revenue-agency/corporate/contact-information.html",
+      "title": "Contact the Canada Revenue Agency (CRA) - Canada.ca",
+      "modified": [
+        "meta 2026-10-07",
+        "Date modified: 2026-10-07"
+      ],
+      "hash": "83def2aa0461a0b7",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "fed-cra-medical": {
+      "href": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/lines-33099-33199-eligible-medical-expenses-you-claim-on-your-tax-return/details-medical-expenses.html",
+      "status": 200,
+      "finalUrl": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/lines-33099-33199-eligible-medical-expenses-you-claim-on-your-tax-return/details-medical-expenses.html",
+      "title": "Details of medical expenses - Canada.ca",
+      "modified": [
+        "meta 2026-01-20"
+      ],
+      "hash": "9a9e9b6a1de810b1",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "fed-vac-poc9": {
+      "href": "https://www.veterans.gc.ca/en/about-vac/reports-policies-and-legislation/policies/oxygen-therapy-and-respiratory-equipment-poc-9",
+      "status": 200,
+      "finalUrl": "https://www.veterans.gc.ca/en/about-vac/reports-policies-and-legislation/policies/oxygen-therapy-and-respiratory-equipment-poc-9",
+      "title": "Treatment Benefits Program of Choice (POC) 9 Oxygen Therapy and Respiratory Equipment Policy | Veterans Affairs Canada",
+      "modified": [
+        "Date modified: 2025-07-17"
+      ],
+      "hash": "a4e4e4ef294f8f83",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "fed-vac-poc9#fr": {
+      "href": "https://www.veterans.gc.ca/fr/propos-dacc/rapports-politiques-et-legislation/politiques/inhalotherapie-et-equipement-respiratoire-pdc-9",
+      "status": 200,
+      "finalUrl": "https://www.veterans.gc.ca/fr/propos-dacc/rapports-politiques-et-legislation/politiques/inhalotherapie-et-equipement-respiratoire-pdc-9",
+      "title": "Avantages médicaux – Programme de choix (PDC) 9 – Inhalothérapie et équipement respiratoire | Anciens Combattants Canada",
+      "modified": [],
+      "hash": "4a8903af9614cb36",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "fnha-mse": {
+      "href": "https://fnha.ca/benefits/benefits-guide/medical-supplies-and-equipment/",
+      "status": 200,
+      "finalUrl": "https://fnha.ca/benefits/benefits-guide/medical-supplies-and-equipment/",
+      "title": "Medical supplies and equipment - First Nations Health Authority (FNHA)",
+      "modified": [
+        "meta 2026-08-12T22:40:29+00:00"
+      ],
+      "hash": "6400b6bd300c0f26",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "fnha-mse-fee-2026": {
+      "href": "https://www.fnha.ca/wp-content/uploads/migrated/pdf-bin/fnha/0799.013_FNHA_MSE-FeeSupplement.pdf",
+      "status": 200,
+      "finalUrl": "https://www.fnha.ca/wp-content/uploads/migrated/pdf-bin/fnha/0799.013_FNHA_MSE-FeeSupplement.pdf",
+      "title": "FNHA Medical Supply and Equipment Fee Supplement",
+      "modified": [
+        "pdf 20260528",
+        "pdf 2026-05-28"
+      ],
+      "hash": "3350a9c5e2adf468",
+      "kind": "pdf",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "mb-misericordia-cpap": {
+      "href": "https://misericordia.mb.ca/wp-content/uploads/CPAP-information.pdf",
+      "status": 200,
+      "finalUrl": "https://misericordia.mb.ca/wp-content/uploads/CPAP-information.pdf",
+      "title": "mis_hc_horiz.eps",
+      "modified": [
+        "pdf 20240724",
+        "pdf 2009-03-30"
+      ],
+      "hash": "e7cbf59646fd4876",
+      "kind": "pdf",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "nb-sd-respiratory": {
+      "href": "https://www.gnb.ca/en/topic/family-home-community/persons-with-disabilities/respiratory.html",
+      "status": 200,
+      "finalUrl": "https://www.gnb.ca/en/topic/family-home-community/persons-with-disabilities/respiratory.html",
+      "title": "Respiratory program - gnb.ca",
+      "modified": [],
+      "hash": "3cda17edbf267be3",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "nb-sd-respiratory#fr": {
+      "href": "https://www.gnb.ca/fr/sujet/famille-foyer-collectivite/personnes-ayant-hadicap/respiratoires.html",
+      "status": 200,
+      "finalUrl": "https://www.gnb.ca/fr/sujet/famille-foyer-collectivite/personnes-ayant-hadicap/respiratoires.html",
+      "title": "Programme des services respiratoires - gnb.ca",
+      "modified": [],
+      "hash": "70ac4dc8aa735b49",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "nihb-contact": {
+      "href": "https://www.sac-isc.gc.ca/eng/1579274812116/1579708265237",
+      "status": 200,
+      "finalUrl": "https://www.sac-isc.gc.ca/eng/1579274812116/1579708265237",
+      "title": "Contact the Non-Insured Health Benefits program",
+      "modified": [
+        "meta 2025-10-31",
+        "Date modified: 2025-10-31"
+      ],
+      "hash": "a41ad5695fe3e682",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "nihb-eligibility": {
+      "href": "https://www.sac-isc.gc.ca/eng/1574187596083/1576511384063",
+      "status": 200,
+      "finalUrl": "https://www.sac-isc.gc.ca/eng/1574187596083/1576511384063",
+      "title": "Who is eligible for the Non-Insured Health Benefits (NIHB) program for First Nations and Inuit",
+      "modified": [
+        "meta 2026-05-28",
+        "Date modified: 2026-05-28"
+      ],
+      "hash": "61fa195df6f01114",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "nihb-eligibility#fr": {
+      "href": "https://www.sac-isc.gc.ca/fra/1574187596083/1576511384063",
+      "status": 200,
+      "finalUrl": "https://www.sac-isc.gc.ca/fra/1574187596083/1576511384063",
+      "title": "Qui est admissible au Programme des services de santé non assurés (SSNA) pour les Premières Nations et les Inuit",
+      "modified": [
+        "meta 2026-05-28",
+        "Date de modification : 2026-05-28"
+      ],
+      "hash": "f79fed19fb8beb3d",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "nihb-general-policies": {
+      "href": "https://www.sac-isc.gc.ca/eng/1585321312092/1585321331369",
+      "status": 200,
+      "finalUrl": "https://www.sac-isc.gc.ca/eng/1585321312092/1585321331369",
+      "title": "1.0 General policies",
+      "modified": [
+        "meta 2026-07-29",
+        "Date modified: 2026-07-29"
+      ],
+      "hash": "59f9b89d4ed8cfe6",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "nihb-pap": {
+      "href": "https://www.sac-isc.gc.ca/eng/1585323161648/1585323186650",
+      "status": 200,
+      "finalUrl": "https://www.sac-isc.gc.ca/eng/1585323161648/1585323186650",
+      "title": "8.0 Respiratory equipment and supplies benefits list",
+      "modified": [
+        "meta 2026-07-29",
+        "Date modified: 2026-07-29"
+      ],
+      "hash": "662110cf737147b8",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "nihb-pap#fr": {
+      "href": "https://www.sac-isc.gc.ca/fra/1585323161648/1585323186650",
+      "status": 200,
+      "finalUrl": "https://www.sac-isc.gc.ca/fra/1585323161648/1585323186650",
+      "title": "8.0 Liste des prestations des équipements et fournitures respiratoires",
+      "modified": [
+        "meta 2026-07-29",
+        "Date de modification : 2026-07-29"
+      ],
+      "hash": "112917a7e04d813f",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "on-adp-main": {
+      "href": "https://www.ontario.ca/page/assistive-devices-program",
+      "status": 200,
+      "finalUrl": "https://www.ontario.ca/page/assistive-devices-program",
+      "title": "Assistive Devices Program | ontario.ca",
+      "modified": [
+        "meta 2026-03-26",
+        "Updated: March 26, 2026"
+      ],
+      "hash": "961d7685893adace",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "on-adp-resp-manual-2024": {
+      "href": "https://www.ontario.ca/files/2024-11/moh-adp-policy-and-administration-manual-respiratory-equipment-2024-11-08.pdf",
+      "status": 200,
+      "finalUrl": "https://www.ontario.ca/files/2024-11/moh-adp-policy-and-administration-manual-respiratory-equipment-2024-11-08.pdf",
+      "title": "Respiratory Equipment Policy and Administration Manual",
+      "modified": [
+        "pdf 2024-07-04"
+      ],
+      "hash": "094824b6d1d409e6",
+      "kind": "pdf",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "on-adp-respiratory": {
+      "href": "https://www.ontario.ca/page/respiratory-equipment-and-supplies",
+      "status": 200,
+      "finalUrl": "https://www.ontario.ca/page/respiratory-equipment-and-supplies",
+      "title": "Respiratory equipment and supplies | ontario.ca",
+      "modified": [
+        "meta 2026-02-18",
+        "Updated: February 18, 2026"
+      ],
+      "hash": "d0247763f73e3387",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "on-adp-respiratory#fr": {
+      "href": "https://www.ontario.ca/fr/page/appareils-et-fournitures-dassistance-respiratoire",
+      "status": 200,
+      "finalUrl": "https://www.ontario.ca/fr/page/appareils-et-fournitures-dassistance-respiratoire",
+      "title": "Appareils et fournitures d’assistance respiratoire | ontario.ca",
+      "modified": [
+        "meta 2026-02-18",
+        "Mis à jour : 18 février 2026"
+      ],
+      "hash": "40eeaf649789326b",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "on-odsp-msn": {
+      "href": "https://www.ontario.ca/document/odsp-schedule-benefits-mandatory-special-necessities/respiratory-supplies",
+      "status": 200,
+      "finalUrl": "https://www.ontario.ca/document/odsp-schedule-benefits-mandatory-special-necessities/respiratory-supplies",
+      "title": "Respiratory supplies | Ontario Disability Support Program (ODSP) schedule of benefits for mandatory special necessities | ontario.ca",
+      "modified": [
+        "meta 2026-05-27",
+        "Updated: May 27, 2026"
+      ],
+      "hash": "ec623821a3dc8868",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "on-odsp-msn-directive": {
+      "href": "https://www.ontario.ca/document/ontario-disability-support-program-policy-directives-income-support/912-mandatory-special",
+      "status": 200,
+      "finalUrl": "https://www.ontario.ca/document/ontario-disability-support-program-policy-directives-income-support/912-mandatory-special",
+      "title": "9.12 — Mandatory special necessities | Ontario Disability Support Program policy directives for income support | ontario.ca",
+      "modified": [
+        "meta 2026-06-02",
+        "Updated: June 02, 2026"
+      ],
+      "hash": "49127bea20aa9cfa",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "on-odsp-msn-directive#fr": {
+      "href": "https://www.ontario.ca/fr/document/directives-du-programme-ontarien-de-soutien-aux-personnes-handicapees-concernant-le/912",
+      "status": 200,
+      "finalUrl": "https://www.ontario.ca/fr/document/directives-du-programme-ontarien-de-soutien-aux-personnes-handicapees-concernant-le/912",
+      "title": "9.12 — Prestations obligatoires pour les nécessités spéciales | Directives du Programme ontarien de soutien aux personnes handicapées concernant le soutien du revenu | ontario.ca",
+      "modified": [
+        "meta 2026-06-02",
+        "Mis à jour : 02 juin 2026"
+      ],
+      "hash": "f19f4a48d4fed3e9",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "on-odsp-msn#fr": {
+      "href": "https://www.ontario.ca/fr/document/posph-liste-prestations-necessites-speciales-obligatoires/fournitures-respiratoires",
+      "status": 200,
+      "finalUrl": "https://www.ontario.ca/fr/document/posph-liste-prestations-necessites-speciales-obligatoires/fournitures-respiratoires",
+      "title": "Fournitures respiratoires | Programme ontarien de soutien aux personnes handicapées (POSPH) Liste des prestations pour les nécessités spéciales obligatoires | ontario.ca",
+      "modified": [
+        "meta 2026-05-27",
+        "Mis à jour : 27 mai 2026"
+      ],
+      "hash": "d84f3b1ededa15ec",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "qc-inesss-osa": {
+      "href": "https://www.inesss.qc.ca/publications/repertoire-des-publications/publication/appareils-a-pression-positive-continue-pour-le-traitement-de-lapnee-obstructive-du-sommeil.html",
+      "status": 200,
+      "finalUrl": "https://www.inesss.qc.ca/publications/repertoire-des-publications/publication/appareils-a-pression-positive-continue-pour-le-traitement-de-lapnee-obstructive-du-sommeil.html",
+      "title": "INESSS: Publication: Appareils à pression positive continue pour le traitement de l'apnée obstructive du sommeil",
+      "modified": [],
+      "hash": "584a47fb3b2c7de0",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "sk-sail": {
+      "href": "https://www.saskatchewan.ca/residents/health/accessing-health-care-services/health-services-for-people-with-disabilities/sail",
+      "status": 200,
+      "finalUrl": "https://www.saskatchewan.ca/residents/health/accessing-health-care-services/health-services-for-people-with-disabilities/sail",
+      "title": "Saskatchewan Aids to Independent Living | Health Services for People with Disabilities | Government of Saskatchewan",
+      "modified": [],
+      "hash": "0540d7aae0b99265",
+      "kind": "html",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    },
+    "sk-sail-cpap": {
+      "href": "https://publications.saskatchewan.ca/api/v1/products/87731/formats/104417/download",
+      "status": 200,
+      "finalUrl": "https://publications.saskatchewan.ca/api/v1/products/87731/formats/104417/download",
+      "title": "Extended Health Benefits Info Bulletin CPAP",
+      "modified": [
+        "pdf 20230322"
+      ],
+      "hash": "91556cee2011b73d",
+      "kind": "pdf",
+      "blocked": false,
+      "checkedOn": "2026-10-14"
+    }
+  }
+}

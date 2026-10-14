@@ -12,7 +12,7 @@ import { useSiteT } from '../site-context';
 import { AskChip } from './ask-chip';
 import { CardExit, rowLayout, RowMore } from './chapter-disclosure';
 import type { CategoryCard, Chapter } from './compose';
-import { CardText } from './figure-parts';
+import { CardAfterLinks, CardText } from './figure-parts';
 import { CardFigures, CardRoutes, isPinnedCard, type KindSets, useKindSets } from './figures';
 import { useJourneyMemoryOptional } from './journey-memory-context';
 
@@ -62,7 +62,8 @@ function SaveStopButton({ number, title }: { number: number; title: string }) {
 function JourneyEntry({ card, exit }: { card: CategoryCard; exit?: Chapter['urgentExit'] }) {
   const moreId = useId();
   const sets = useKindSets();
-  const { lede, rest, noteOutside, noteInMore } = rowLayout(sets, card);
+  const { lede, listFirst, rest, noteOutside, noteInMore } = rowLayout(sets, card);
+  const more = <RowMore card={card} id={moreId} noteInMore={noteInMore} rest={rest} />;
   const moduleEntry = isModuleEntry(sets, card);
   const showMedia = !moduleEntry && Boolean(card.image);
 
@@ -87,6 +88,8 @@ function JourneyEntry({ card, exit }: { card: CategoryCard; exit?: Chapter['urge
         </p>
       ) : null}
 
+      {listFirst ? more : null}
+
       <CardFigures card={card} exit={exit} />
 
       {noteOutside && card.note ? (
@@ -95,7 +98,9 @@ function JourneyEntry({ card, exit }: { card: CategoryCard; exit?: Chapter['urge
         </p>
       ) : null}
 
-      <RowMore card={card} id={moreId} noteInMore={noteInMore} rest={rest} />
+      {listFirst ? null : more}
+
+      <CardAfterLinks card={card} />
 
       <CardRoutes card={card} />
 

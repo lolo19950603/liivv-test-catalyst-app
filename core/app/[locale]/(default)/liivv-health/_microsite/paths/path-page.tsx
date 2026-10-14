@@ -39,12 +39,25 @@ import { TextSizeControl } from '../chapters/text-size-control';
 import type { CardShelf } from '../shop/shelves';
 import { ShopBand } from '../shop/shop-strip';
 import { useSite, useSiteT } from '../site-context';
-import type { ResolvedSource } from '../sources';
+import { lookUpSources, type ResolvedSource } from '../sources';
 
 import type { ComposedPath, PathGroup } from './compose';
 
 import '../../ostomy-care/chapters/chapter-page.css';
 import './path-page.css';
+
+/*
+ * Sources shown on the elements they back, for a site that shows them there
+ * (owner note 1): each reading-list entry whose reason states a fact, and the
+ * funding door. Already resolved for the page locale. A site that passes none
+ * (Diabetes Care) lists them in the foot list only, as before.
+ */
+export interface PathChips {
+  /* The register entries the reading list names, by id. */
+  entries: Readonly<Record<string, ResolvedSource>>;
+  /* The sources behind the funding door body. */
+  funding: ResolvedSource[];
+}
 
 /*
  * The pharmacist band, once the site has released it on this path. It shows
@@ -62,7 +75,7 @@ export interface PathPharmacistBand {
   image: string;
 }
 
-function ReadingGroup({ group }: { group: PathGroup }) {
+function ReadingGroup({ group, chips }: { group: PathGroup; chips?: PathChips['entries'] }) {
   const t = useSiteT('ui.path');
   const headingId = `${group.id}-heading`;
 
@@ -73,7 +86,8 @@ function ReadingGroup({ group }: { group: PathGroup }) {
       </h3>
       <ol className="oc-path-list" start={group.entries[0]?.number}>
         {group.entries.map((entry) => (
-          <li key={entry.number}>
+          /* With its sources, the item is the card, so the chips sit inside it, under the link. */
+          <li className={chips ? 'oc-path-item' : undefined} key={entry.number}>
             <a className="oc-ch-row oc-path-entry" href={entry.href}>
               <span aria-hidden className="oc-ch-row-index">
                 {String(entry.number).padStart(2, '0')}
@@ -89,6 +103,13 @@ function ReadingGroup({ group }: { group: PathGroup }) {
                 </span>
               </span>
             </a>
+            {chips && entry.sourceIds.length ? (
+              <SourceChip
+                className="oc-path-entry-src"
+                label={entry.title}
+                sources={lookUpSources(chips, entry.sourceIds)}
+              />
+            ) : null}
           </li>
         ))}
       </ol>
@@ -105,6 +126,7 @@ export function PathPage({
   disclaimer,
   frDraft,
   shelf = null,
+  chips,
 }: {
   path: ComposedPath;
   /** The site's funding page, in the page locale, or null while it does not exist. */
@@ -120,6 +142,8 @@ export function PathPage({
   frDraft: boolean;
   /** The path's shop strip, or null for none. Its products come from the site's ShopProvider. */
   shelf?: CardShelf | null;
+  /** Sources on the entries and the funding door; omitted, they are in the foot list only. */
+  chips?: PathChips;
 }) {
   const site = useSite();
   /* These are plain <a>, so the /fr prefix has to be put on by hand — ../chapters/hrefs.ts. */
@@ -181,7 +205,7 @@ export function PathPage({
             <p>{path.list.intro}</p>
           </header>
           {path.list.groups.map((group) => (
-            <ReadingGroup group={group} key={group.id} />
+            <ReadingGroup chips={chips?.entries} group={group} key={group.id} />
           ))}
         </div>
       </section>
@@ -195,6 +219,13 @@ export function PathPage({
             <article className="oc-ch-program oc-path-door">
               <h2>{path.funding.heading}</h2>
               <p>{path.funding.body}</p>
+              {chips ? (
+                <SourceChip
+                  className="oc-path-door-src"
+                  label={path.funding.heading}
+                  sources={chips.funding}
+                />
+              ) : null}
               <a className="oc-ch-btn oc-ch-btn-soft" href={fundingHref}>
                 {path.funding.cta}
               </a>

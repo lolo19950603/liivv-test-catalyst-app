@@ -1,15 +1,18 @@
 /**
  * Exports every word of the ostomy microsite to Markdown for accuracy review,
- * then the Diabetes Care chapters (./content-review/diabetes-care.mjs).
+ * then the Diabetes Care chapters (./content-review/diabetes-care.mjs), then
+ * Sleep Apnea Care (./content-review/sleep-apnea-care.mjs).
  *
  * Run from the repo root:
  *   node --env-file-if-exists=.env.local core/scripts/export-content-review.mjs
  *
  * Writes docs/content-review/README.md plus one file per page, per locale, under
  * docs/content-review/en and docs/content-review/fr. The Diabetes pack goes to
- * docs/content-review/diabetes-care, in the same layout.
+ * docs/content-review/diabetes-care, in the same layout, and the Sleep pack to
+ * docs/content-review/sleep-apnea-care.
  *
- * --site picks which pack: ostomy-care, diabetes-care, or all (the default).
+ * --site picks which pack: ostomy-care, diabetes-care, sleep-apnea-care, or all
+ * (the default).
  * The machinery both passes share is in ./content-review/lib.mjs; the
  * anatomy, supply-list, kit, door and disclosure checks are Ostomy's alone.
  *
@@ -80,7 +83,7 @@ const CHECK = process.argv.includes('--check');
  * Without the flag it is all, so the command the README gives still builds
  * both packs, and `--check` still fails if either one does.
  */
-const SITES = ['ostomy-care', 'diabetes-care'];
+const SITES = ['ostomy-care', 'diabetes-care', 'sleep-apnea-care'];
 const siteArg = process.argv.find(
   (arg, i, all) => arg.startsWith('--site=') || all[i - 1] === '--site',
 );
@@ -98,12 +101,25 @@ const exportDiabetesCare = async () => {
   await run({ check: CHECK });
 };
 
+/* The Sleep Apnea Care pass; it prints its own report and sets the exit code on any failure. */
+const exportSleepApneaCare = async () => {
+  const { exportSleepApneaCare: run } = await import('./content-review/sleep-apnea-care.mjs');
+
+  await run({ check: CHECK });
+};
+
 /*
- * Diabetes alone: everything below is the Ostomy pass, so stop before any of
- * it runs. No Ostomy structure file is loaded, and nothing is built or written.
+ * Diabetes alone, or Sleep alone: everything below is the Ostomy pass, so stop
+ * before any of it runs. No Ostomy structure file is loaded, and nothing is
+ * built or written.
  */
 if (SITE === 'diabetes-care') {
   await exportDiabetesCare();
+  process.exit();
+}
+
+if (SITE === 'sleep-apnea-care') {
+  await exportSleepApneaCare();
   process.exit();
 }
 
@@ -4106,8 +4122,10 @@ if (structureProblems.length) {
   process.exitCode = 1;
 }
 
-/* Then the Diabetes pack, unless only Ostomy was asked for. */
+/* Then the Diabetes pack and the Sleep pack, unless only Ostomy was asked for. */
 if (SITE === 'all') {
   console.log('\n— diabetes-care —');
   await exportDiabetesCare();
+  console.log('\n— sleep-apnea-care —');
+  await exportSleepApneaCare();
 }

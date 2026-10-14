@@ -17,12 +17,24 @@
  * has opened that gate in FR_REVIEWED, and not before. Diabetes Care's path
  * pages and funding page follow the same rule under their `paths` and
  * `funding` gates.
+ *
+ * Sleep Apnea Care is built but not public: none of its URLs is listed until
+ * the owner flips SLEEP_APNEA_CARE_LIVE (sleep-apnea-care/launch.ts). Then its
+ * English pages are listed, and each /fr page once its own gate in Sleep's
+ * FR_REVIEWED is open, exactly as Diabetes Care's are.
  */
 
 import { CHAPTER_META as DIABETES_CHAPTER_META } from '~/app/[locale]/(default)/liivv-health/diabetes-care/chapters/chapters-meta';
 import { PATH_META as DIABETES_PATH_META } from '~/app/[locale]/(default)/liivv-health/diabetes-care/chapters/paths-meta';
 import { FR_REVIEWED as DIABETES_FR_REVIEWED } from '~/app/[locale]/(default)/liivv-health/diabetes-care/chapters/review-gates';
 import { CHAPTER_SLUGS } from '~/app/[locale]/(default)/liivv-health/ostomy-care/chapters/chapters-data';
+import { CHAPTER_META as SLEEP_CHAPTER_META } from '~/app/[locale]/(default)/liivv-health/sleep-apnea-care/chapters/chapters-meta';
+import { PATH_META as SLEEP_PATH_META } from '~/app/[locale]/(default)/liivv-health/sleep-apnea-care/chapters/paths-meta';
+import {
+  FR_REVIEWED as SLEEP_FR_REVIEWED,
+  type GateId as SleepGateId,
+} from '~/app/[locale]/(default)/liivv-health/sleep-apnea-care/chapters/review-gates';
+import { SLEEP_APNEA_CARE_LIVE } from '~/app/[locale]/(default)/liivv-health/sleep-apnea-care/launch';
 import { defaultLocale } from '~/i18n/locales';
 import { getMetadataAlternates } from '~/lib/seo/canonical';
 
@@ -74,6 +86,34 @@ const diabetesFundingEntries = DIABETES_FR_REVIEWED.has('funding')
     ]
   : [{ path: DIABETES_FUNDING_PATH, locale: defaultLocale }];
 
+/*
+ * Sleep Apnea Care, after every Diabetes entry: nothing at all before launch.
+ * Each page in English, and in French once its gate is open.
+ */
+const SLEEP_BASE = '/liivv-health/sleep-apnea-care';
+
+const sleepEntry = (path: string, gate: SleepGateId) =>
+  SLEEP_FR_REVIEWED.has(gate)
+    ? [
+        { path, locale: defaultLocale },
+        { path, locale: 'fr' },
+      ]
+    : [{ path, locale: defaultLocale }];
+
+const sleepEntries = SLEEP_APNEA_CARE_LIVE
+  ? [
+      ...sleepEntry(SLEEP_BASE, 'landing'),
+      ...sleepEntry(`${SLEEP_BASE}/funding`, 'funding'),
+      ...sleepEntry(`${SLEEP_BASE}/machine-guide`, 'machineGuide'),
+      ...SLEEP_CHAPTER_META.flatMap(({ slug }) =>
+        sleepEntry(`${SLEEP_BASE}/chapters/${slug}`, `chapter:${slug}`),
+      ),
+      ...SLEEP_PATH_META.flatMap(({ slug }) =>
+        sleepEntry(`${SLEEP_BASE}/chapters/${slug}`, 'paths'),
+      ),
+    ]
+  : [];
+
 function escapeXml(value: string) {
   return value
     .replace(/&/g, '&amp;')
@@ -95,6 +135,7 @@ export const GET = async () => {
     ...diabetesChapterEntries,
     ...diabetesPathEntries,
     ...diabetesFundingEntries,
+    ...sleepEntries,
   ];
 
   const urls = await Promise.all(

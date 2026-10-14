@@ -68,18 +68,21 @@ function resolveOffers(shelf: CardShelf, items: PlacementItems): ResolvedOffer[]
 
 /* The site's own words for this shelf, by key, from its message tree. */
 function useShelfWords() {
-  const shop = useSiteMessages().ui.chapter.shop;
-  const occasions: Record<string, string | undefined> = shop.occasions;
-  const offers: Record<string, string | undefined> = shop.offers;
+  const ui = useSiteMessages().ui;
+  const shop = ui.chapter.shop;
+  /* Read through `in`: a site may word no occasions or offer lines at all. */
+  const occasions: Record<string, string | undefined> = 'occasions' in shop ? shop.occasions : {};
+  const offers: Record<string, string | undefined> = 'offers' in shop ? shop.offers : {};
+  /* The notices, by key: each site words its own (`ShopNotice` in ./shelves.ts). */
+  const notices: Record<string, string | undefined> = 'commerce' in ui ? ui.commerce : {};
 
-  return { occasions, offers };
+  return { occasions, offers, notices };
 }
 
 export function ShopStrip({ shelf }: { shelf: CardShelf }) {
   const shop = useShop();
   const locale = useLocale();
   const t = useSiteT('ui.chapter');
-  const commerce = useSiteT('ui.commerce');
   const words = useShelfWords();
 
   if (!shop) return null;
@@ -125,9 +128,11 @@ export function ShopStrip({ shelf }: { shelf: CardShelf }) {
       ) : null}
       {notices.length ? (
         <div className="oc-merch-notice">
-          {notices.map((key) => (
-            <p key={key}>{commerce(key)}</p>
-          ))}
+          {notices.map((key) => {
+            const notice = words.notices[key];
+
+            return notice ? <p key={key}>{notice}</p> : null;
+          })}
         </div>
       ) : null}
       <p className="oc-merch-note">{t('shop.note')}</p>

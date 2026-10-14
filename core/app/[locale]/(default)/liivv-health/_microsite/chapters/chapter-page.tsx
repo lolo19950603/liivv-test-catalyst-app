@@ -5,6 +5,7 @@
 import { useLocale } from 'next-intl';
 import {
   type CSSProperties,
+  Fragment,
   useCallback,
   useEffect,
   useId,
@@ -34,7 +35,7 @@ import {
   siteChapterMessages,
   type UrgentCallout,
 } from './compose';
-import { CardText, FrDraftMarker, OutboundLabel } from './figure-parts';
+import { CardAfterLinks, CardText, FrDraftMarker, OutboundLabel } from './figure-parts';
 import {
   CardFigures,
   CardRoutes,
@@ -74,24 +75,18 @@ import '../../ostomy-care/chapters/chapter-page.css';
  * The referral chip (AskChip) lives in ./ask-chip.tsx.
  */
 
-function CategoryRow({
-  card,
-  index,
-  exit,
-}: {
-  card: CategoryCard;
-  index: number;
-  exit?: Chapter['urgentExit'];
-}) {
+function CategoryRow({ card, exit }: { card: CategoryCard; exit?: Chapter['urgentExit'] }) {
   const moreId = useId();
   const sets = useKindSets();
-  const { lede, rest, noteOutside, noteInMore } = rowLayout(sets, card);
+  const { lede, listFirst, rest, noteOutside, noteInMore } = rowLayout(sets, card);
+  const more = <RowMore card={card} id={moreId} noteInMore={noteInMore} rest={rest} />;
 
   return (
     <article className="oc-ch-row is-open" id={`card-${card.number}`}>
       <span aria-hidden className="oc-ch-row-thumb">
         <img alt="" loading="lazy" src={card.image} />
-        <b>{String(index + 1).padStart(2, '0')}</b>
+        {/* The card's own number: a held card before it leaves a gap, not a renumbering. */}
+        <b>{String(card.number).padStart(2, '0')}</b>
       </span>
       <div>
         <h3>
@@ -105,6 +100,8 @@ function CategoryRow({
           </p>
         ) : null}
 
+        {listFirst ? more : null}
+
         <CardFigures card={card} exit={exit} />
 
         {noteOutside && card.note ? (
@@ -113,7 +110,9 @@ function CategoryRow({
           </p>
         ) : null}
 
-        <RowMore card={card} id={moreId} noteInMore={noteInMore} rest={rest} />
+        {listFirst ? null : more}
+
+        <CardAfterLinks card={card} />
 
         <CardRoutes card={card} />
 
@@ -140,6 +139,84 @@ function CategoryRow({
  * — this is standing content, not a live announcement. Its id is the site's
  * red-flag anchor, which every urgentExit signpost points at.
  */
+/*
+ * Every "911" (the site's emergency number as written) in a line, tappable to
+ * dial. The line as it is where the site names no number.
+ */
+function Dialable({ text }: { text: string }) {
+  const { emergency } = useSite();
+
+  if (!emergency || !text.includes(emergency.written)) return text;
+
+  return text.split(emergency.written).map((part, index) => (
+    <Fragment key={index}>
+      {index > 0 ? <a href={`tel:${emergency.tel}`}>{emergency.written}</a> : null}
+      {part}
+    </Fragment>
+  ));
+}
+
+/* The tiered block's closing note, with its link where the meta names one (`urgentNoteLink`). */
+function UrgentNote({ note, link }: { note: string; link: UrgentCallout['noteLink'] }) {
+  if (!link) return note;
+
+  const end = link.start + link.length;
+
+  return (
+    <>
+      {note.slice(0, link.start)}
+      <a href={link.href}>{note.slice(link.start, end)}</a>
+      {note.slice(end)}
+    </>
+  );
+}
+
+/*
+ * The red-flag block in tiers (ChapterMeta.urgentTiers): a heading per tier,
+ * its lead, and its signs, each sign followed by the sources that back it.
+ * Standing content, like the flat block: never collapsible, never gated,
+ * complete with JavaScript off, in every locale. Engine-only.
+ */
+function UrgentTiers({ urgent }: { urgent: UrgentCallout }) {
+  const sources = useSiteSources();
+  const chip = (ids: string[], label: string) =>
+    sources && ids.length ? (
+      <SourceChip className="ms-src-urgent" label={label} sources={lookUpSources(sources, ids)} />
+    ) : null;
+
+  return (
+    <>
+      {urgent.tiers?.map((tier) => (
+        <div className="oc-ch-urgent-tier" data-tier={tier.key} key={tier.key}>
+          <h3>
+            <Dialable text={tier.label} />
+          </h3>
+          {tier.lead ? (
+            <p className="oc-ch-urgent-lead">
+              <Dialable text={tier.lead} />
+            </p>
+          ) : null}
+          <ul>
+            {tier.signs.map((sign) => (
+              <li key={sign.text}>
+                <Dialable text={sign.text} />
+                {chip(sign.sourceIds, sign.text)}
+              </li>
+            ))}
+          </ul>
+          {/* The tier's own sources follow the signs its lead introduces. */}
+          {chip(tier.sourceIds, tier.label)}
+        </div>
+      ))}
+      {urgent.note ? (
+        <p className="oc-ch-urgent-note">
+          <UrgentNote link={urgent.noteLink} note={urgent.note} />
+        </p>
+      ) : null}
+    </>
+  );
+}
+
 function UrgentBlock({ urgent }: { urgent: UrgentCallout }) {
   const { anchors, emergency } = useSite();
   /*
@@ -168,12 +245,18 @@ function UrgentBlock({ urgent }: { urgent: UrgentCallout }) {
           <div>
             <h2 id="oc-ch-urgent-heading">{urgent.heading}</h2>
             <p className="oc-ch-urgent-intro">{urgent.intro}</p>
-            <ul>
-              {urgent.signs.map((sign, i) => (
-                <li key={`${i}-${sign}`}>{sign}</li>
-              ))}
-            </ul>
-            <p className="oc-ch-urgent-action">{action}</p>
+            {urgent.tiers ? (
+              <UrgentTiers urgent={urgent} />
+            ) : (
+              <>
+                <ul>
+                  {urgent.signs.map((sign, i) => (
+                    <li key={`${i}-${sign}`}>{sign}</li>
+                  ))}
+                </ul>
+                <p className="oc-ch-urgent-action">{action}</p>
+              </>
+            )}
           </div>
         </aside>
       </div>
@@ -458,7 +541,7 @@ function CardStrip({
 
     return (
       <ChapterReveal>
-        <CategoryRow card={only.card} exit={exit} index={only.index} />
+        <CategoryRow card={only.card} exit={exit} />
       </ChapterReveal>
     );
   }
@@ -510,7 +593,7 @@ function CardStrip({
         {items.map((item) => (
           <div className="oc-ch-strip-slide" key={item.card.title}>
             <ChapterReveal>
-              <CategoryRow card={item.card} exit={exit} index={item.index} />
+              <CategoryRow card={item.card} exit={exit} />
             </ChapterReveal>
           </div>
         ))}
@@ -540,7 +623,7 @@ function BandCards({
         chunk.kind === 'full' ? (
           <div className="oc-ch-rows" key={`${band.id}-full-${chunkIndex}`}>
             {chunk.items.map((item) => (
-              <CategoryRow card={item.card} exit={exit} index={item.index} key={item.card.title} />
+              <CategoryRow card={item.card} exit={exit} key={item.card.title} />
             ))}
           </div>
         ) : (
@@ -725,6 +808,39 @@ function GroupRail({
 }
 
 /*
+ * The care panel: the site's specialist service, by its direct contact where
+ * the site has one, otherwise a request button. Only where the chapter has a
+ * panel (E-8).
+ */
+function CarePanel({ pharmacist }: { pharmacist: NonNullable<Chapter['pharmacist']> }) {
+  const site = useSite();
+
+  return (
+    <section className="oc-ch-care-cta rounded-top" id={site.contact ? CONTACT_ANCHOR : undefined}>
+      <div className="oc-ch-wrap">
+        <div className="oc-ch-care-panel">
+          <div className="oc-ch-care-media">
+            <img alt="" src={pharmacist.image} />
+          </div>
+          <div className="oc-ch-care-copy">
+            <span className="oc-ch-eyebrow">{pharmacist.eyebrow}</span>
+            <h2>{pharmacist.heading}</h2>
+            <p>{pharmacist.body}</p>
+            {site.contact ? (
+              <SpecialistContact />
+            ) : (
+              <a className="oc-ch-btn oc-ch-btn-soft" href={pharmacist.href}>
+                {pharmacist.cta}
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/*
  * A chapter of the site in SiteProvider. The site's own 'use client' wrapper
  * renders this inside the provider; the route passes only the slug, so no
  * config or copy is ever serialised into the page's payload.
@@ -808,9 +924,12 @@ export function ChapterPage({ slug }: { slug: string }) {
             <a className="oc-ch-btn oc-ch-btn-soft" href="#chapter-care">
               {t('readChapter')}
             </a>
-            <a className="oc-ch-btn oc-ch-btn-ghost-light" href={chapter.pharmacist.href}>
-              {t('askPharmacist')}
-            </a>
+            {/* Only beside a care panel (E-8): a chapter without one has no one to ask here. */}
+            {chapter.pharmacist ? (
+              <a className="oc-ch-btn oc-ch-btn-ghost-light" href={chapter.pharmacist.href}>
+                {t('askPharmacist')}
+              </a>
+            ) : null}
           </div>
           <TextSizeControl />
           <div aria-hidden className="oc-ch-progress">
@@ -887,30 +1006,7 @@ export function ChapterPage({ slug }: { slug: string }) {
        * the button, and the panel takes the anchor that the hero's button and
        * the lanes open. Without one, the panel is Ostomy's, unchanged.
        */}
-      <section
-        className="oc-ch-care-cta rounded-top"
-        id={site.contact ? CONTACT_ANCHOR : undefined}
-      >
-        <div className="oc-ch-wrap">
-          <div className="oc-ch-care-panel">
-            <div className="oc-ch-care-media">
-              <img alt="" src={chapter.pharmacist.image} />
-            </div>
-            <div className="oc-ch-care-copy">
-              <span className="oc-ch-eyebrow">{chapter.pharmacist.eyebrow}</span>
-              <h2>{chapter.pharmacist.heading}</h2>
-              <p>{chapter.pharmacist.body}</p>
-              {site.contact ? (
-                <SpecialistContact />
-              ) : (
-                <a className="oc-ch-btn oc-ch-btn-soft" href={chapter.pharmacist.href}>
-                  {chapter.pharmacist.cta}
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
+      {chapter.pharmacist ? <CarePanel pharmacist={chapter.pharmacist} /> : null}
 
       <section className="oc-ch-map rounded-top">
         <div className="oc-ch-wrap">

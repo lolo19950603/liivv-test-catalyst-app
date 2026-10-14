@@ -48,12 +48,17 @@ export function rowLayout(sets: KindSets, card: CategoryCard) {
   const wholeCard = carriesWholeCard(sets, card);
   const restyled = restylesCard(sets, card.figures);
   const carriesNote = Boolean(card.figures?.some((figure) => sets.noteCarrying.has(figure.kind)));
-  const rest = restyled ? [] : (card.items?.slice(1) ?? []);
+  /* A `listFirst` figure follows every sentence: no lede, and the whole list goes above it. */
+  const listFirst =
+    !restyled && Boolean(card.figures?.some((figure) => sets.listFirst.has(figure.kind)));
+  const items = restyled ? [] : (card.items ?? []);
+  const rest = listFirst ? items : items.slice(1);
   const noteOutside =
     !wholeCard && Boolean(card.note) && Boolean(card.noteVisible || (restyled && !carriesNote));
 
   return {
-    lede: restyled ? undefined : card.items?.[0],
+    lede: restyled || listFirst ? undefined : card.items?.[0],
+    listFirst,
     rest,
     hidden: rest.length + (wholeCard ? 0 : (card.sections?.length ?? 0)),
     noteOutside,

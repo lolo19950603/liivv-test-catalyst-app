@@ -43,9 +43,21 @@ export const itemText = (card: CategoryCard, item: number) => card.items?.[item 
  * appear in. A sentence with no link is returned as plain text.
  */
 export function CardText({ card, text }: { card: CategoryCard; text: string }) {
-  const link = card.links?.find((candidate) => candidate.text === text);
+  const link = card.links?.find((candidate) => !candidate.after && candidate.text === text);
 
   if (!link) return text;
+
+  /* A labelled link keeps the sentence whole and follows it (CardLinkMeta `label`). */
+  if (link.label !== undefined) {
+    return (
+      <>
+        {text}{' '}
+        <a className="oc-ch-card-link" href={link.href} hrefLang={link.hrefLang}>
+          <OutboundLabel hrefLang={link.hrefLang} label={link.label} />
+        </a>
+      </>
+    );
+  }
 
   const end = link.start + link.length;
 
@@ -55,6 +67,27 @@ export function CardText({ card, text }: { card: CategoryCard; text: string }) {
       <a href={link.href}>{text.slice(link.start, end)}</a>
       {text.slice(end)}
     </>
+  );
+}
+
+/*
+ * A card's labelled links that stand on their own line, under its sentences
+ * (CardLinkMeta `at: 'after'`). Nothing for a card without one.
+ * Engine-only: Ostomy's twin has none.
+ */
+export function CardAfterLinks({ card }: { card: CategoryCard }) {
+  const after = card.links?.filter((link) => link.after && link.label !== undefined) ?? [];
+
+  if (!after.length) return null;
+
+  return (
+    <p className="oc-ch-card-after">
+      {after.map((link) => (
+        <a href={link.href} hrefLang={link.hrefLang} key={link.href}>
+          <OutboundLabel hrefLang={link.hrefLang} label={link.label} />
+        </a>
+      ))}
+    </p>
   );
 }
 

@@ -44,7 +44,14 @@ export interface ShopOffer {
  * printed under the shelf only when the link shows, so a page language that
  * does not show the link does not print them either.
  */
-export type ShopNotice = 'pharmacistNotice' | 'insulinColdChain' | 'quebecInsulin';
+export type ShopNotice =
+  /* Diabetes Care */
+  | 'pharmacistNotice'
+  | 'insulinColdChain'
+  | 'quebecInsulin'
+  /* Sleep Apnea Care: the complete-mask prescription check (C26) */
+  | 'rxMaskCheck'
+  | 'rxMaskParts';
 
 export interface ShopCollectionLink {
   href: string;

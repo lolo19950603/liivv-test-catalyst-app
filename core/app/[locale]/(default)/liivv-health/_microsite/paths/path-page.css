@@ -93,6 +93,45 @@
   text-decoration: underline;
 }
 
+/*
+ * A site that shows sources on the entries (PathChips): the list item is the
+ * card, holding the entry's link and, under it, the entry's Sources line, so
+ * each line plainly belongs to its card. The link inside drops its own frame.
+ */
+#oc-chapter .oc-path-item {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+#oc-chapter .oc-path-item:hover,
+#oc-chapter .oc-path-item:focus-within {
+  border-color: color-mix(in srgb, var(--sage) 70%, var(--ink));
+  box-shadow: 0 6px 18px rgba(49, 47, 47, 0.08);
+}
+
+#oc-chapter .oc-path-item > .oc-path-entry {
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Under the entry's words, lined up with them (the row's 1.2rem padding, 46px index and 1rem gap). */
+#oc-chapter .oc-path-entry-src {
+  margin: -0.6rem 1.2rem 0 calc(2.2rem + 46px);
+  padding-bottom: 1rem;
+}
+
+@media (max-width: 599px) {
+  #oc-chapter .oc-path-entry-src {
+    margin: -0.4rem 1rem 0;
+  }
+}
+
 /* ---------- funding door ---------- */
 
 #oc-chapter .oc-path-door {

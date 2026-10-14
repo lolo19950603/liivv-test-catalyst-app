@@ -15,7 +15,10 @@ import {
 
 import { HeroLoopVideo, RotatingHeroWord } from '~/components/health-hero';
 import { OliviaHelpBand } from '~/components/olivia/olivia-help-band';
-import { SpecializedSubscribe } from '~/components/specialized-subscribe/specialized-subscribe';
+import {
+  SpecializedSubscribe,
+  type SpecializedSubscribeFeature,
+} from '~/components/specialized-subscribe/specialized-subscribe';
 
 import { HashTargetScroll } from '../../ostomy-care/_components/hash-target-scroll';
 import { SpecialistContact } from '../_components/specialist-contact';
@@ -355,6 +358,22 @@ function Answer({ text, faq }: { text: string; faq: LandingFaq }) {
 }
 
 /*
+ * Words read through `in`: every site's tree is typed together, and a site
+ * whose landing words fewer rotating words, no subscription band or no brand
+ * points (Sleep Apnea Care draws its own landing) has fewer keys.
+ */
+function useOptionalLandingWords() {
+  const copy = useSiteMessages().ui.landingPage;
+  const heroWords: Record<string, string | undefined> = 'words' in copy.hero ? copy.hero.words : {};
+  const subscribeFeatures: Record<string, SpecializedSubscribeFeature | undefined> =
+    'subscribe' in copy ? copy.subscribe.features : {};
+  const brandPoints: Record<string, string | undefined> =
+    'brands' in copy && 'points' in copy.brands ? copy.brands.points : {};
+
+  return { heroWords, subscribeFeatures, brandPoints };
+}
+
+/*
  * `doors` is rendered on the server by the site's route and passed in as a
  * slot (./situation-doors.tsx), above every shop surface on the page.
  */
@@ -380,6 +399,7 @@ export function LandingPage({ setup, doors }: { setup: LandingSetup; doors?: Rea
     'facts' in copy ? copy.facts.items : {};
   const rooms: Record<string, string | undefined> = copy.shop.rooms;
   const faqs: Record<string, { q: string; a: string } | undefined> = copy.faq.items;
+  const { heroWords, subscribeFeatures, brandPoints } = useOptionalLandingWords();
 
   const k = (name: string) => `${setup.classPrefix}${name}`;
   const { images, kits, products, shopAnchor } = setup;
@@ -429,7 +449,7 @@ export function LandingPage({ setup, doors }: { setup: LandingSetup; doors?: Rea
               {t('hero.headingLead')}{' '}
               <RotatingHeroWord
                 className={k('hero-word')}
-                words={HERO_WORD_KEYS.map((key) => copy.hero.words[key])}
+                words={HERO_WORD_KEYS.flatMap((key) => heroWords[key] ?? [])}
               />
             </h1>
             <p>{t('hero.body')}</p>
@@ -620,7 +640,7 @@ export function LandingPage({ setup, doors }: { setup: LandingSetup; doors?: Rea
         demoProductName={t('subscribe.demoName')}
         demoProductPath={setup.subscribeDemoPath}
         eyebrow={t('subscribe.eyebrow')}
-        features={SUBSCRIBE_FEATURE_KEYS.map((key) => copy.subscribe.features[key])}
+        features={SUBSCRIBE_FEATURE_KEYS.flatMap((key) => subscribeFeatures[key] ?? [])}
         lead={t('subscribe.lead')}
         manageHref={localeHref('/account/subscriptions', locale)}
         manageLabel={t('subscribe.manageLabel')}
@@ -778,7 +798,7 @@ export function LandingPage({ setup, doors }: { setup: LandingSetup; doors?: Rea
             </div>
             <ul className={k('brand-points')}>
               {BRAND_POINT_KEYS.map((key) => (
-                <li key={key}>{copy.brands.points[key]}</li>
+                <li key={key}>{brandPoints[key]}</li>
               ))}
             </ul>
           </div>

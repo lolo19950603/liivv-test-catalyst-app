@@ -30,6 +30,11 @@ export interface PathEntry {
   chapterTitle: string;
   reason: string;
   href: string;
+  /*
+   * The register ids behind the reason (the meta entry `sources`), for a
+   * site that shows them on the entry (PathPage `chips`). Engine-only.
+   */
+  sourceIds: string[];
 }
 
 /* A run of consecutive entries at the same stage. */
@@ -113,8 +118,15 @@ export function composePath({
     const chapter = chapters[entry.chapter];
     const card = chapter?.categories[String(entry.card)];
     const reason = reasons[String(index + 1)];
+    /*
+     * A card its site holds (CategoryMeta `held`) is never listed, whatever
+     * this locale's messages still carry. Its entry keeps its place in the
+     * meta, so the reasons after it still pair with their own entries by
+     * number. Engine-only: no Diabetes card is held.
+     */
+    const held = chapterMeta?.categories[entry.card - 1]?.held !== undefined;
 
-    if (!chapterMeta || !chapter || !card || reason === undefined) return [];
+    if (!chapterMeta || !chapter || !card || reason === undefined || held) return [];
 
     return [
       {
@@ -125,6 +137,7 @@ export function composePath({
         chapterTitle: chapter.title,
         reason,
         href: localeHref(cardHref(site, entry.chapter, entry.card), locale),
+        sourceIds: [...(entry.sources ?? [])],
       },
     ];
   });

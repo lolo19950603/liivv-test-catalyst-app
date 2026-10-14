@@ -35,6 +35,12 @@ export interface RegisterEntry {
   year?: number;
   scope?: SourceScope;
   display?: 'reviewOnly';
+  /*
+   * The link is held by an open ruling (its id, for the review): the entry is
+   * still cited, by title and publisher, but nothing links to `href` until
+   * the ruling lets it. Engine-only: no Diabetes entry holds its link.
+   */
+  linkHeld?: string;
 }
 
 export interface PublisherEntry {
@@ -56,6 +62,7 @@ export interface ResolvedSource {
   /** The published title: the French one on /fr where the publisher issues one. */
   title: string;
   titleLang: 'en' | 'fr';
+  /** Empty while the register holds the link (`linkHeld`): the entry is then cited unlinked. */
   href: string;
   /** The language of the page `href` opens. */
   hrefLang: 'en' | 'fr';
@@ -88,13 +95,14 @@ export function resolveSource(
   const frenchPage = french && entry.hrefFr !== undefined;
   const frenchTitle = french && entry.labelFr !== undefined;
   const frenchName = french && publisher.nameFr !== undefined;
+  const page = frenchPage && entry.hrefFr ? entry.hrefFr : entry.href;
 
   return {
     id,
     title: frenchTitle && entry.labelFr ? entry.labelFr : entry.label,
     /* A title is in the language of the page it names, unless it is the French title. */
     titleLang: frenchTitle ? 'fr' : entry.hrefLang,
-    href: frenchPage && entry.hrefFr ? entry.hrefFr : entry.href,
+    href: entry.linkHeld ? '' : page,
     hrefLang: frenchPage ? 'fr' : entry.hrefLang,
     publisher: frenchName && publisher.nameFr ? publisher.nameFr : publisher.name,
     publisherLang: frenchName ? 'fr' : (publisher.lang ?? 'en'),
@@ -102,6 +110,9 @@ export function resolveSource(
     scope: entry.scope ?? publisher.scope,
   };
 }
+
+/* What makes two entries one: the page they open, or the id of one whose link is held. */
+export const sourceKey = (source: ResolvedSource) => source.href || source.id;
 
 /* Several ids, once each by the page they open, in the order first named. */
 export function resolveSources(
@@ -114,9 +125,9 @@ export function resolveSources(
   return ids.flatMap((id) => {
     const source = resolveSource(register, id, locale);
 
-    if (!source || seen.has(source.href)) return [];
+    if (!source || seen.has(sourceKey(source))) return [];
 
-    seen.add(source.href);
+    seen.add(sourceKey(source));
 
     return [source];
   });
@@ -163,9 +174,9 @@ export function lookUpSources(
   return ids.flatMap((id) => {
     const source = map[id];
 
-    if (!source || seen.has(source.href)) return [];
+    if (!source || seen.has(sourceKey(source))) return [];
 
-    seen.add(source.href);
+    seen.add(sourceKey(source));
 
     return [source];
   });

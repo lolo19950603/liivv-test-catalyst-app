@@ -7708,5 +7708,2956 @@
         }
       }
     }
+  },
+  "SleepApneaCare": {
+    "ui": {
+      "chapter": {
+        "kicker": "Sleep Apnea Care · Chapter {word}",
+        "readChapter": "Read this chapter",
+        "askPharmacist": "Ask a pharmacist",
+        "theFocus": "The Focus",
+        "softMap": "At a glance",
+        "opensOnTheirSite": "Opens on their site ↗",
+        "resourcesEyebrow": "Outside these pages",
+        "resourcesHeading": "Where to go from here",
+        "resourcesIntro": "These are run by patient organizations, health professionals and government programs — not by Liivv. We link out because they do this better than a shop could.",
+        "pathEyebrow": "Path",
+        "allChapters": "All chapters",
+        "keepGoing": "Keep going",
+        "backToLanding": "Back to Sleep Apnea Care page",
+        "chapterNav": "Chapter navigation",
+        "groupJump": "Jump to a section",
+        "pathSpine": "Chapter path",
+        "pathHeading": "Your path",
+        "textSize": "Text size",
+        "textSizeDefault": "Default text size",
+        "textSizeLarger": "Larger text",
+        "textSizeLargest": "Largest text",
+        "continueReading": "Continue: {title}",
+        "saveStop": "Bookmark",
+        "saveStopFor": "Bookmark: {title}",
+        "stopSaved": "Bookmarked",
+        "stopSavedFor": "Bookmarked: {title}",
+        "pathSavedMark": "Bookmarked",
+        "pathBandCount": "{count, plural, one {# stop} other {# stops}}",
+        "pathBandBookmarked": "{count, plural, other {# bookmarked}}",
+        "pathBookmarks": "Bookmarks ({count})",
+        "pathBookmarksEmpty": "Tap Bookmark on any stop to keep it here.",
+        "removeBookmarkFor": "Remove bookmark: {title}",
+        "pathHere": "You are here",
+        "onThisPage": "On this page",
+        "onThisPageProgress": "{current} of {total}",
+        "closeSheet": "Close",
+        "stripPrev": "Previous card",
+        "stripNext": "Next card",
+        "stripStatus": "Card {current} of {total}",
+        "backToChapters": "Back to Sleep Apnea Care →",
+        "words": {
+          "one": "one",
+          "two": "two",
+          "three": "three",
+          "four": "four",
+          "five": "five",
+          "six": "six"
+        },
+        "crisis": {
+          "body": "Nothing here is a substitute for urgent help. If you are thinking about harming yourself, call or text 9-8-8, Canada’s Suicide Crisis Helpline, any time.",
+          "call": "Call {number}",
+          "text": "Text {number}",
+          "emergency": "Emergency: call {number}"
+        },
+        "bothNotEither": "Both, not either",
+        "takeIn": {
+          "print": "Print this list",
+          "notesHint": "The printed list has space to write down answers."
+        },
+        "print": {
+          "site": "Liivv · Sleep Apnea Care",
+          "name": "Name:",
+          "printed": "Printed on",
+          "page": "From the page",
+          "sourcesGroup": "{group}: {titles}"
+        },
+        "frDraft": "Draft — French review to come",
+        "shelf": {
+          "inFrench": "(in French)",
+          "inEnglish": "(in English)"
+        },
+        "startHere": {
+          "nav": "Chapter map",
+          "eyebrow": "Start here",
+          "heading": "Where are you right now?",
+          "who": "Who to ask",
+          "mostly": "Mostly {role}",
+          "also": "also {roles}"
+        },
+        "titleSuffix": "| Sleep Apnea Care | Liivv",
+        "sources": {
+          "line": "{count, plural, one {Source} other {Sources}}: {titles}",
+          "more": "+{count}",
+          "canadian": "Canadian sources",
+          "international": "International sources",
+          "industry": "Manufacturers’ pages",
+          "note": "Citing an organization’s guidance doesn’t mean it reviewed or endorses this page."
+        },
+        "shop": {
+          "label": "Shop",
+          "add": "Add to cart",
+          "addFor": "Add {name} to cart",
+          "adding": "Adding…",
+          "added": "Added to your cart",
+          "addError": "That did not add. Open the product and try there.",
+          "chooseOptions": "Choose options",
+          "chooseOptionsFor": "Choose options for {name}",
+          "note": "Sold by Liivv. Your sleep team or respiratory therapist can tell you which one suits you.",
+          "occasions": {
+            "masksAndSupplies": "Masks and supplies",
+            "forTheRoad": "For the road"
+          }
+        },
+        "groups": {
+          "theSigns": "The signs",
+          "gettingTested": "Getting tested",
+          "road": "Sleepiness and the road",
+          "device": "Your device, safely",
+          "machines": "Breathing machines",
+          "withoutMachine": "Without a machine",
+          "yourSetup": "Your setup",
+          "firstWeeks": "The first weeks",
+          "cleanReplace": "Clean and replace",
+          "away": "Away from home",
+          "seasonsOfLife": "Seasons of life",
+          "careAndCommunity": "Care and community"
+        },
+        "ask": {
+          "doctor": "Ask your doctor",
+          "sleepTeam": "Ask your sleep team",
+          "rrt": "Ask a respiratory therapist",
+          "urgent": "Don’t wait",
+          "provider": "Ask your equipment provider",
+          "team": "Ask your sleep team",
+          "dentist": "Ask your dentist",
+          "rt": "Ask your RT",
+          "prescriber": "Ask your prescriber",
+          "childProvider": "Ask your child’s equipment provider",
+          "childTeam": "Ask your child’s sleep team",
+          "nihb": "Ask your NIHB regional office"
+        },
+        "roleNames": {
+          "doctor": "your doctor",
+          "sleepTeam": "your sleep team",
+          "rrt": "a respiratory therapist",
+          "provider": "your equipment provider",
+          "team": "your sleep team",
+          "dentist": "your dentist",
+          "rt": "your respiratory therapist (RT)",
+          "prescriber": "your prescriber",
+          "childProvider": "your child’s equipment provider",
+          "childTeam": "your child’s sleep team",
+          "nihb": "your NIHB regional office"
+        }
+      },
+      "governance": {
+        "reviewedBy": "Clinically reviewed by",
+        "lastReviewed": "Last reviewed {date}",
+        "sourcesHeading": "Where this comes from",
+        "machineTranslated": "This page was translated automatically from English. If anything reads oddly or you are making a decision based on it, check the English version or ask your sleep team.",
+        "registration": "Registration #{number}",
+        "reviewedEnglishOnly": "The English version of this page was written and clinically reviewed by {name}. This French version is machine translated and has not been reviewed.",
+        "writtenBy": "Written by",
+        "disclosure": {
+          "sells": "Liivv sells CPAP masks and supplies.",
+          "reviewMeaning": "Clinical review means the information on this page was checked for accuracy against published sources. It is not an endorsement of any product Liivv sells, and it is not a recommendation to buy from Liivv.",
+          "notEndorsement": "Nothing on this page is an endorsement of any product Liivv sells, and nothing on it is a recommendation to buy from Liivv."
+        }
+      },
+      "discovery": {
+        "eyebrow": "Also from Liivv",
+        "heading": "Sleep apnea is one of the things we support",
+        "lead": "If something else is part of your everyday — yours or someone you care for — there is a chapter for that too.",
+        "hubTitle": "See everything in Liivv Health",
+        "hubBody": "Eleven areas of care, with more on the way.",
+        "doors": {
+          "womens_health_wellness": {
+            "title": "Women's Health & Wellness",
+            "body": "Rhythm, chapters, and care that moves with your life."
+          },
+          "ostomy_care_everyday": {
+            "title": "Ostomy Care & Everyday \"Liivving\"",
+            "body": "Supplies, chapters, and kind guidance for every day."
+          },
+          "diabetes_care_everyday": {
+            "title": "Diabetes Care & Everyday \"Liivving\"",
+            "body": "A specialized journey for living well with diabetes."
+          }
+        }
+      },
+      "commerce": {
+        "viewProduct": "View product",
+        "rxMaskCheck": "A complete mask needs a CPAP prescription. A Liivv pharmacist checks it before your order ships.",
+        "rxMaskParts": "Parts for a mask you already have don’t need this check."
+      },
+      "signsChecklist": {
+        "print": "Print my signs and questions",
+        "signsTicked": "Signs I ticked",
+        "noneTicked": "Nothing ticked: all the signs are printed, to go through with your doctor.",
+        "answer": "Answer:",
+        "clear": "Clear my ticks"
+      },
+      "landingPage": {
+        "meta": {
+          "title": "Sleep Apnea Care & Everyday \"Liivving\" | Liivv",
+          "description": "Plain, sourced guidance on sleep apnea and CPAP, with CPAP masks and supplies."
+        },
+        "hero": {
+          "label": "Sleep Apnea Care hero",
+          "kicker": "Sleep Apnea Care",
+          "heading": "Sleep apnea and CPAP care",
+          "headingLead": "Sleep apnea and CPAP care,",
+          "words": {
+            "1": "explained plainly",
+            "2": "with sources shown",
+            "3": "night by night",
+            "4": "at your pace"
+          },
+          "body": "Guidance that shows where it comes from, and the masks and supplies you use. Your prescriber sets your treatment. We help you find your way around it.",
+          "cta": "Find where to start",
+          "shopCta": "Shop masks and supplies"
+        },
+        "trust": {
+          "label": "Why Liivv Sleep Apnea Care",
+          "items": {
+            "1": "Health facts shown with their sources",
+            "2": "Every device checked against Health Canada’s licence list",
+            "3": "Ad tracking off on these pages"
+          }
+        },
+        "doors": {
+          "heading": "Where are you right now?",
+          "items": {
+            "1": {
+              "label": "Sleepy at the wheel, or worried right now",
+              "body": "Warning signs first, then what to do. In a medical emergency, call 911.",
+              "secondary": "Not sure it’s urgent? Chapter 02: Who to call"
+            },
+            "2": {
+              "label": "I think I might have sleep apnea",
+              "body": "The signs, how testing works, and questions to bring to your doctor."
+            },
+            "3": {
+              "label": "Just diagnosed, or starting CPAP",
+              "body": "Your setup, your first nights, and who to ask."
+            },
+            "4": {
+              "label": "Struggling with my mask",
+              "body": "Leaks, dry mouth, marks and other common problems, and when to call your respiratory therapist."
+            },
+            "5": {
+              "label": "Time to replace supplies",
+              "body": "Signs a part is worn, how often parts are replaced, and what programs pay for."
+            },
+            "6": {
+              "label": "Travelling with CPAP",
+              "body": "Flying, airport security and a packing list."
+            },
+            "7": {
+              "label": "Paying for it",
+              "body": "What your province and other programs may cover, and how to claim."
+            },
+            "8": {
+              "label": "Helping someone: a child, partner or parent",
+              "body": "Signs in children, sharing a home with CPAP, and support for you."
+            }
+          }
+        },
+        "therapies": {
+          "label": "Which therapy?",
+          "eyebrow": "Your treatment",
+          "heading": "Which therapy?",
+          "body": "Pick one to read about it. Your doctor, nurse practitioner or sleep specialist prescribes your treatment, after an assessment and a sleep test.",
+          "chips": {
+            "cpap": "CPAP and APAP",
+            "bilevel": "Bilevel",
+            "travel": "Travel CPAP",
+            "oralAppliance": "Oral appliance",
+            "lifestyle": "Lifestyle",
+            "central": "Central apnea",
+            "children": "Children"
+          },
+          "hints": {
+            "cpap": "CPAP is the most common type of PAP therapy for obstructive sleep apnea.",
+            "bilevel": "More complex than CPAP. A sleep specialist prescribes it.",
+            "travel": "Portable machines are easier to carry, with some trade-offs.",
+            "oralAppliance": "A mouthpiece that may help mild to moderate sleep apnea, or if you can’t use CPAP.",
+            "lifestyle": "Healthy habits and weight loss are advised if you carry extra weight. They aren’t enough on their own if you’re sleepy or have moderate to severe sleep apnea.",
+            "central": "A different kind of sleep apnea. A usual PAP machine alone can make it worse.",
+            "children": "Some children snore but don’t have sleep apnea."
+          }
+        },
+        "facts": {
+          "label": "Sleep apnea facts and their sources",
+          "eyebrow": "A few facts",
+          "heading": "Sleep apnea in Canada, in four numbers.",
+          "items": {
+            "1": {
+              "value": "6.4%",
+              "label": "of Canadians said a health professional had diagnosed them with sleep apnea (2016–2017)."
+            },
+            "2": {
+              "value": "12.8%",
+              "label": "of people aged 60 to 79 said they had been diagnosed: three times as likely as younger adults (2016–2017)."
+            },
+            "3": {
+              "value": "30%",
+              "label": "of adults in Canada were at intermediate or high risk of sleep apnea, based on a screening questionnaire (2016–2017)."
+            },
+            "4": {
+              "value": "23%",
+              "label": "of adults who had been told they have sleep apnea said they were never referred to a sleep lab for overnight testing (2009 data)."
+            }
+          }
+        },
+        "shop": {
+          "label": "Shop Sleep Apnea Care",
+          "eyebrow": "The shelf",
+          "heading": "Shop Sleep Apnea Care",
+          "body": "CPAP masks, cushions, headgear, tubing, filters and other supplies from our catalogue. {rxMaskLine} Liivv doesn’t sell CPAP or other sleep apnea machines yet.",
+          "rxMaskLine": "Parts and supplies go straight in your cart. A complete mask needs a CPAP prescription, which a Liivv pharmacist checks before your order ships.",
+          "returnsLine": "No returns once delivered. For hygiene and safety, masks and supplies can’t be returned once they reach you, even unopened. If we send the wrong item, it arrives damaged or faulty, or it doesn’t arrive, we’ll replace it or refund you.",
+          "returnsLink": "Returns and refunds",
+          "magnetWarning": {
+            "heading": "Masks with magnets",
+            "body": "Some CPAP masks have magnets that can affect certain metal implants, such as pacemakers, in you or in someone who lives with you, cares for you or shares your bed. If that might apply, check with the mask’s maker and your health care team before you buy or use one.",
+            "link": "Read the warning"
+          },
+          "settingsNotice": "Your prescriber sets your machine’s pressure. Only trained professionals should change it. Liivv never advises on settings.",
+          "openShop": "Open the full shop",
+          "filtersLabel": "Shop rooms",
+          "empty": "Nothing in this room yet. Try All or another room.",
+          "rooms": {
+            "all": "All",
+            "masks": "Masks",
+            "cushions": "Cushions, pillows and headgear",
+            "tubing": "Tubing",
+            "filters": "Filters",
+            "humidifier": "Humidifier parts",
+            "cleaning": "Cleaning",
+            "travel": "Travel"
+          },
+          "badges": {
+            "prescription": "Prescription check",
+            "magnets": "Named in a Health Canada magnet notice: read the warning"
+          }
+        },
+        "chapters": {
+          "label": "Chapters",
+          "eyebrow": "Six chapters",
+          "heading": "Six chapters. Open the one that fits today.",
+          "body": "Start anywhere. Every chapter shows where its facts come from and who to ask.",
+          "skipPrompt": "Already know what you need?",
+          "skipLink": "Skip to the shelf",
+          "chapterWord": "Chapter {word}",
+          "open": "Open chapter →"
+        },
+        "care": {
+          "label": "Care and support",
+          "sleepTeam": {
+            "eyebrow": "Your sleep team",
+            "heading": "Questions about your treatment?",
+            "body": "Your doctor or sleep specialist prescribes your treatment and your machine’s settings. Only trained professionals should change them. Talk to your doctor before and after you buy a machine. Ask your sleep team about how you’re sleeping, your pressure or changing machines."
+          },
+          "oliviaKicker": "Meet Olivia",
+          "oliviaTitle": "Olivia can help with orders and restocks.",
+          "oliviaBody": "Need to find a mask part, check an order or restock filters? Olivia is the little sprout in the corner. She doesn’t give medical advice or settings advice.",
+          "oliviaCta": "Chat with Olivia",
+          "oliviaBubble": "Hi, I live in the corner.",
+          "oliviaNote": "Questions about your treatment or settings belong with your sleep team."
+        },
+        "brands": {
+          "label": "Brands",
+          "eyebrow": "Shop context",
+          "heading": "Names you may already know.",
+          "body": "Listed so familiar masks and supplies are easy to find. A brand here isn’t a recommendation. Your sleep team helps you choose.",
+          "shop": "Shop {brand}"
+        },
+        "faq": {
+          "label": "Frequently asked questions",
+          "heading": "Questions, answered with sources.",
+          "note": "Practical notes, not medical advice. Each answer lists where it comes from.",
+          "items": {
+            "1": {
+              "q": "Do I need a prescription?",
+              "a": "For a machine, yes. Use CPAP therapy only if you have a prescription from your doctor or nurse practitioner. Your prescription covers your equipment and your settings. Each machine must be set for the person using it. APAP and bilevel machines are more complex, and a sleep specialist should prescribe them. {machineLine} {rxMaskLine} Only trained professionals should change your machine’s settings, and Liivv never advises on them. In Ontario, it’s your right to choose your community respiratory therapy provider.",
+              "machineLine": "Liivv doesn’t sell CPAP or other sleep apnea machines yet.",
+              "rxMaskLine": "On Liivv, a complete mask, including a children’s mask, needs a CPAP prescription, which a Liivv pharmacist checks before your order ships. Parts and supplies, such as cushions, headgear, tubing and filters, go straight in your cart."
+            },
+            "2": {
+              "q": "Can I take my CPAP on a plane?",
+              "a": "Yes. A CPAP machine is allowed in your carry-on and in checked baggage. Bring it as carry-on when you fly. At security, you can either put it in a clear plastic bag you bring for screening, or leave the tubes and mask in the case and put only the main unit in a bin. The distilled water it uses is exempt from the liquid limits. You don’t need a document about your medical needs, but you can show one to the screening officer if you think it will help. For a packing list, go to <link>Travelling with CPAP</link>."
+            },
+            "3": {
+              "q": "How often should I replace my mask and filter?",
+              "a": "Follow the manual for your machine and mask first. General advice differs, so here it is side by side. Most machines are replaced every 3 to 5 years, and accessories every 3 to 12 months. Change the machine’s filter every 2 months, or as needed. Check your tubing and headgear, and replace them when they’re worn. Programs also set the most they cover. NIHB’s guidelines, for example, are up to 14 inlet filters a year, 2 a year for each type of mask with headgear (face, nasal or nasal pillow), and 2 a year for tubing. More may be considered case by case, with prior approval. If a plan pays for your equipment, check its replacement time frames before you order. For signs a part is worn, go to <link>Time to replace supplies</link>."
+            },
+            "4": {
+              "q": "What if my machine or mask is recalled?",
+              "a": "Each recall notice says what to do, so look up your model on the Government of Canada’s <link>recalls and safety alerts</link> site. For the 2021 recall of some Philips machines made before April 26, 2021, the advice was to talk to your doctor or medical device provider before you stop or change how you use your machine. Canadian specialist advice for people using these machines for sleep apnea was to contact their doctor soon and keep using the machine in the meantime. For those machines, the advice was also to stop ozone and UV cleaning, and to clean the machine only as the maker’s instructions say. Some masks have magnets that can affect some metal implants and devices, such as pacemakers, in you or in someone who lives with you, cares for you or shares your bed. For the masks in one 2022 advisory, the advice is to stop using the mask if anyone in that group has one of the listed implants. For other masks, check with the mask’s maker and your health care team. Read the warning in <link>Driving & Staying Safe</link>."
+            },
+            "5": {
+              "q": "How private is my order?",
+              "a": "On Sleep Apnea Care pages, on CPAP product pages, and in a cart with CPAP supplies, we turn off advertising signals. What you read and buy there isn’t used for ads or to build ad audiences. The page address and title are left out of our site analytics, and so are the names of CPAP products."
+            }
+          }
+        },
+        "closing": {
+          "label": "Closing",
+          "eyebrow": "Wherever you’re starting",
+          "heading": "Rest, at your pace.",
+          "body": "Guidance that shows its sources, and the masks and supplies you use. Start where you are.",
+          "shop": "Shop Sleep Apnea Care",
+          "chapter": "Open a chapter"
+        },
+        "governance": {
+          "label": "About this page",
+          "relationship": "Liivv is a HelioMed company and part of the Bayshore family.",
+          "sourcesNote": "Citing an organization’s guidance doesn’t mean it reviewed or endorses this page.",
+          "brandsNote": "Brand names are shown so you can find what you already use. Liivv sells these products.",
+          "settingsNote": "Liivv never advises on CPAP pressure or settings. Your prescriber sets them."
+        }
+      },
+      "path": {
+        "kicker": "Your path",
+        "allPaths": "All six paths",
+        "chapterLabel": "Chapter {num} · {chapter}",
+        "readCard": "Read the card",
+        "stages": {
+          "start": "Start here",
+          "types": "Tests and treatments",
+          "safe": "Staying safe",
+          "tools": "Your setup",
+          "everyday": "Every night, and away",
+          "season": "If this is you"
+        },
+        "safety": {
+          "lead": "When to call 911, and signs that can’t wait at the wheel or in a child’s breathing, are in",
+          "link": "Chapter 02 — Stop and act now"
+        }
+      },
+      "fundingPage": {
+        "kicker": "Paying for it",
+        "title": "Help paying for CPAP, province by province",
+        "lead": "Help with the cost of a machine and supplies depends on where you live and what other coverage you have. Start with your province, then add what applies to you.",
+        "ctaFind": "Find your coverage",
+        "ctaFederal": "Federal programs and the tax credit",
+        "focus": "Provincial machine and supply programs, help for people on income or disability assistance, First Nations and Inuit health benefits, Veterans Affairs Canada and the medical expense tax credit.",
+        "vibe": "Plain and specific. Every program links to the official page it came from, with the date we last checked it.",
+        "payingEyebrow": "Start here",
+        "payingHeading": "How paying works",
+        "payingIntro": "Programs pay in different ways. Some lend you a machine. Some pay part of the price to a registered business, and you pay the rest. Some pay a supplier or pay you back from receipts. The tax credit lowers your income tax.",
+        "directHeading": "Programs we bill directly",
+        "directBody": "We list a program here only once we’re set up to bill it for you.",
+        "directEmpty": "None is listed yet. Check how your program pays before you order, or ask us.",
+        "buyFirstEyebrow": "Before you buy a machine",
+        "buyFirstHeading": "Check with your program first",
+        "buyFirstBody": "Some programs won’t pay for a machine you bought before you followed their steps.",
+        "buyFirstItems": {
+          "1": "Ontario’s Assistive Devices Program: if you buy before its steps are done, you pay the full cost",
+          "2": "BC’s breathing devices benefit for people on assistance won’t pay for a device bought without approval, unless it’s a life-threatening emergency",
+          "3": "Saskatchewan’s SAIL program doesn’t pay you back for a machine you bought yourself"
+        },
+        "toolEyebrow": "Your situation",
+        "toolHeading": "Find what applies to you",
+        "toolIntro": "Only where you live is needed. Answer the rest if you’re comfortable, and each answer narrows the list.",
+        "federalEyebrow": "Federal",
+        "federalHeading": "Help that doesn’t depend on where you live",
+        "nihbHeading": "First Nations and Inuit health benefits",
+        "vacHeading": "Veterans Affairs Canada",
+        "taxHeading": "The medical expense tax credit",
+        "checkingEyebrow": "Still checking",
+        "checkingHeading": "Where we haven’t confirmed a program yet",
+        "checkingBody": "Nova Scotia, Prince Edward Island, Newfoundland and Labrador, Yukon, the Northwest Territories and Nunavut. We list a program only once we’ve read its official page. Federal programs still apply.",
+        "enoughEyebrow": "When it isn’t enough",
+        "enoughHeading": "If coverage doesn’t pay for it all",
+        "enough1Heading": "Check your private insurance first",
+        "enough1Body": "Many insurance plans cover CPAP equipment prescribed by a sleep doctor. Your insurer will ask for a copy of your prescription. Some may ask for a recent sleep test.",
+        "enough2Heading": "Ask your sleep clinic",
+        "enough2Body": "They know which programs people in your area use, and they often help with the forms.",
+        "enough3Heading": "Help for children’s machines",
+        "enough3Body": "The Canadian Lung Association has a grant program to help pay for children’s CPAP machines. Email info@lung.ca to ask about it.",
+        "closingHeading": "Money shouldn’t be the reason you go without treatment",
+        "closingBody": "If the cost is a problem, tell your doctor or sleep clinic. They may know of help this page doesn’t list.",
+        "closingCta": "Starting CPAP →",
+        "metaTitle": "Paying for CPAP in Canada: what your province covers | Liivv",
+        "metaDescription": "CPAP machine and supply programs by province, help for people on assistance, NIHB, Veterans Affairs Canada and the medical expense tax credit. Every program links to its official page."
+      },
+      "fundingChecker": {
+        "formLabel": "Find what your province covers",
+        "provinceLabel": "Where do you live?",
+        "provinceHint": "Coverage changes completely at the provincial border, so this is the one answer we really need.",
+        "provincePlaceholder": "Select a province or territory",
+        "assistanceLegend": "Do you get income or disability assistance from your province?",
+        "assistanceHint": "Several programs are only for people on assistance.",
+        "indigenousLegend": "Are you First Nations or Inuit?",
+        "indigenousHint": "First Nations and Inuit may be covered by the federal Non-Insured Health Benefits program (NIHB). In BC, clients of the First Nations Health Authority get their benefits through it instead.",
+        "veteranLegend": "Are you a Veterans Affairs Canada client?",
+        "veteranHint": "Veterans Affairs Canada has its own respiratory equipment benefit.",
+        "privateLegend": "Do you have workplace or private insurance?",
+        "privateHint": "Many programs pay only after private insurance and other programs.",
+        "testLegend": "What sleep test did you have?",
+        "testHint": "Some programs accept only certain tests.",
+        "needLegend": "What do you need help with?",
+        "needHint": "Some programs pay for a machine but not supplies.",
+        "yes": "Yes",
+        "no": "No",
+        "notSure": "Not sure",
+        "startOver": "Start over",
+        "empty": "Choose where you live and we’ll show the programs worth looking at, with a link to the official page for each one.",
+        "verifiedOn": "Checked against the official page on {date}",
+        "confirm": "Partly confirmed. Check with the program before you plan around it.",
+        "caveat": "This is a starting point, not a decision. Programs change their amounts and rules, so check the official page before you plan around a number. Your sleep clinic can often tell you what gets approved.",
+        "progress": "{answered} of {total} answered",
+        "narrowing": "Answer the rest to narrow this",
+        "complete": "All answered",
+        "call": "Call {office}",
+        "findOffice": "Find your office"
+      },
+      "fundingResults": {
+        "noConfirmedTitle": "{group} in {province}: we’re still checking",
+        "noConfirmedBody": "We haven’t found and checked an official {province} program for this yet, so we aren’t listing one. That doesn’t mean nothing is covered. Ask your sleep clinic or doctor.",
+        "notTestedYetTitle": "Most programs need a diagnosis first",
+        "notTestedYetBody": "Most programs here need a sleep apnea diagnosis and a prescription. If you haven’t been tested yet, start with Is It Sleep Apnea?",
+        "notTestedYetLink": "Is It Sleep Apnea?",
+        "testNote": {
+          "on-adp-respiratory": "This program needs a Level 1 sleep study (an overnight test in a sleep lab) at a sleep lab registered with it. Ask your doctor what that means for you.",
+          "sk-sail-cpap": "A Level 3 home study counts if it was done in Saskatchewan, unless SAIL approved another location."
+        },
+        "suppliesNote": {
+          "sk-sail-cpap": "Supplies are yours to pay, unless you have Supplementary Health Benefits, or Family Health Benefits for a child.",
+          "mb-misericordia-cpap": "After your first set, which comes with the co-pay, supplies are yours to pay."
+        },
+        "adpNoSuppliesTitle": "Ontario’s Assistive Devices Program doesn’t pay for supplies",
+        "adpNoSuppliesBody": "It doesn’t pay for replacement masks or headgear. If you get the Ontario Disability Support Program, see its supplies benefit. Private insurance may also help.",
+        "privateFirstTitle": "Private insurance usually pays first",
+        "privateFirstBody": "Many programs here pay only if no other program or insurance can. Ask your insurer what it covers before you apply to a program. Many plans cover equipment prescribed by a sleep doctor, and will ask for your prescription."
+      }
+    },
+    "chapters": {
+      "is-it-sleep-apnea": {
+        "title": "Is It Sleep Apnea?",
+        "heroBody": "Snoring, gasping, always tired? Here are the signs, how testing works in Canada, and what your results mean.",
+        "focus": "The signs: what sleep apnea is, what others notice, how common it is, a checklist to take to your doctor, and two signposts, for trouble sleeping and for snoring. Getting tested: talking to your doctor, lab and home tests, reading your results, what happens next, and who to ask.",
+        "vibe": "Clear and unhurried: what to notice, and what to ask.",
+        "categoriesIntro": {
+          "eyebrow": "Notice, ask, get tested",
+          "heading": "Only a sleep study can tell",
+          "body": "This chapter helps you notice the signs and talk to your doctor about them. It can’t tell you whether you have sleep apnea. A sleep study does that."
+        },
+        "startHere": {
+          "heading": "Just wondering, or getting tested?",
+          "pivot": "Where you are",
+          "segments": {
+            "1": {
+              "label": "The signs"
+            },
+            "2": {
+              "label": "Getting tested"
+            }
+          }
+        },
+        "categories": {
+          "1": {
+            "title": "What sleep apnea is",
+            "items": {
+              "1": "Sleep apnea means short pauses in your breathing while you sleep",
+              "2": "A pause usually lasts 10 to 30 seconds. Then your brain wakes you just enough to take a breath. Most people don’t remember waking",
+              "3": "Obstructive sleep apnea is the most common type. Your airway narrows or closes while you sleep, even though your body keeps trying to breathe",
+              "4": "Central sleep apnea is less common. Your airway is open, but your brain doesn’t send the signal to breathe",
+              "5": "Untreated, sleep apnea can lead to daytime sleepiness and trouble thinking clearly. It raises the risk of car crashes, high blood pressure, heart attack and stroke",
+              "6": "Sleep apnea can be treated. Your Treatment Options covers the choices"
+            },
+            "note": "Children can have sleep apnea too. In the day, it can show up as trouble concentrating, hyperactivity or irritability. See This Might Be You.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Obstructive"
+                },
+                "2": {
+                  "heading": "Central"
+                }
+              }
+            }
+          },
+          "2": {
+            "title": "Signs others notice first",
+            "items": {
+              "1": "A bed partner or family member often notices the signs before you do",
+              "2": "Many people with sleep apnea don’t know they snore or gasp at night",
+              "3": "Loud snoring, most nights",
+              "4": "Pauses in breathing, then a gasp or a choke",
+              "5": "Restless sleep",
+              "6": "What a bed partner has seen or heard helps your doctor. If you sleep alone, your doctor can still check for signs"
+            },
+            "note": "If someone tells you they’ve noticed this, mention it to your doctor. The checklist below prints a list to take with you.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "What they may hear or see"
+                }
+              }
+            }
+          },
+          "3": {
+            "title": "How common it is",
+            "items": {
+              "1": "In 2016 and 2017, 6.4% of Canadians said a health professional had diagnosed them with sleep apnea",
+              "2": "Among people aged 60 to 79, it was 12.8%, about three times as common as in younger adults",
+              "3": "Men were twice as likely as women to report a diagnosis",
+              "4": "Women’s signs are more often tiredness or trouble sleeping, and men’s more often snoring. So sleep apnea may be missed more often in women",
+              "5": "Nearly a third of Canadian adults (30%) were at moderate or high risk, based on a short questionnaire and body measurements",
+              "6": "Many people have sleep apnea without knowing it. In population studies, 86% to 95% of people with significant sleep apnea had never been diagnosed"
+            },
+            "note": "If any of this sounds like you, the checklist below can help you talk to your doctor."
+          },
+          "4": {
+            "title": "Signs to mention to your doctor",
+            "sections": {
+              "1": {
+                "heading": "Signs vary",
+                "items": {
+                  "1": "Signs vary from person to person. Being very sleepy during the day is the most common one",
+                  "2": "Women’s signs are more often tiredness or trouble sleeping. Men’s are more often snoring"
+                }
+              },
+              "2": {
+                "heading": "Signs to mention",
+                "items": {
+                  "1": "Someone has heard you snore loudly, most nights",
+                  "2": "Someone has seen you stop breathing, gasp or choke in your sleep",
+                  "3": "You’re very sleepy during the day, and you don’t know why",
+                  "4": "You feel tired or worn out much of the time",
+                  "5": "You wake up with headaches",
+                  "6": "You wake up often in the night, or get up to pee",
+                  "7": "Your sleep doesn’t leave you feeling rested",
+                  "8": "You find it hard to concentrate or remember things",
+                  "9": "You feel irritable or low",
+                  "10": "You have high blood pressure",
+                  "11": "You’ve nodded off, or nearly, while driving"
+                }
+              },
+              "3": {
+                "heading": "Things that raise the chance",
+                "items": {
+                  "1": "Anyone of any age can get sleep apnea",
+                  "2": "It’s more likely if you’re male or over 40",
+                  "3": "It’s more likely if it runs in your family",
+                  "4": "It’s more likely with a large, thick neck or a lot of extra weight, or with large tonsils or a recessed chin"
+                }
+              }
+            },
+            "note": "Not a diagnostic tool. These are signs to mention, not a test. Having some doesn’t mean you have sleep apnea, and signs vary, so a short list doesn’t rule it out. A sleep study is how it’s diagnosed. If you’ve nodded off, or nearly, while driving, read <link>Driving & Staying Safe</link> now.",
+            "figure": {
+              "legend": "Tick any that fit you",
+              "printHeading": "Questions to bring to your doctor",
+              "questions": {
+                "1": "Could these signs be sleep apnea, or something else?",
+                "2": "Do I need a sleep study? In a lab, or at home?",
+                "3": "How long is the wait, and who will contact me?",
+                "4": "Is it safe for me to drive while I wait?",
+                "5": "Will the kind of test matter for funding later?"
+              }
+            }
+          },
+          "5": {
+            "title": "Trouble falling or staying asleep?",
+            "items": {
+              "1": "Trouble falling asleep, staying asleep or waking too early, with distress or daytime problems for 3 months or more, is called insomnia disorder",
+              "2": "Cognitive behavioural therapy for insomnia (CBT-I) is the first-line treatment, before sleeping pills",
+              "3": "CBT-I is usually 4 to 8 sessions with a trained clinician, in person or by video. Some people start with a self-guided program, online or from a book",
+              "4": "Sleepwell, a not-for-profit program led from Dalhousie University, has CBT-I tools such as a sleep diary",
+              "5": "Poor sleep can also come from sleep apnea. A sleep study may be needed if your doctor suspects it",
+              "6": "Adults aged 18 to 64 need 7 to 9 hours of sleep a night. Adults 65 and older need 7 to 8"
+            },
+            "note": "This site doesn’t cover insomnia in depth. Your doctor or nurse practitioner can assess it with you.",
+            "figure": {
+              "routes": {
+                "1": {
+                  "prompt": "If this sounds like you",
+                  "chips": {
+                    "1": "Talk to your doctor or nurse practitioner"
+                  }
+                },
+                "2": {
+                  "prompt": "To learn about CBT-I",
+                  "chips": {
+                    "1": "Sleepwell CBT-I tools (opens their site)"
+                  },
+                  "detail": "Sleepwell is a not-for-profit program led from Dalhousie University."
+                }
+              }
+            }
+          },
+          "6": {
+            "title": "More than snoring?",
+            "items": {
+              "1": "Loud snoring is a sign that your airway is partly blocked as you sleep",
+              "2": "International guidance: most people with sleep apnea snore, but not everyone who snores has sleep apnea",
+              "3": "Snoring with pauses in breathing, gasping or choking is a reason to see your doctor",
+              "4": "So is snoring along with daytime sleepiness or tiredness, especially if you also have high blood pressure",
+              "5": "Children can snore without having sleep apnea too. Signs and testing for children are in This Might Be You"
+            },
+            "note": "Only a sleep study can tell snoring from sleep apnea. The checklist above can help you talk to your doctor."
+          },
+          "7": {
+            "title": "Talking to your doctor",
+            "items": {
+              "1": "If you think you have sleep apnea, see your family doctor or nurse practitioner",
+              "2": "Expect questions about your sleep, your daytime sleepiness and your health, and a look at your nose, mouth and throat",
+              "3": "You may be asked to fill in a short questionnaire about daytime sleepiness",
+              "4": "Expect to be asked whether you drive for work or have a safety-critical job, and about any near misses at the wheel",
+              "5": "Then your doctor orders a home sleep test or refers you to a sleep clinic. How this works differs by province",
+              "6": "Waits can be long. The Canadian target (2011) is testing within 4 weeks of referral for suspected severe sleep apnea, a safety-critical job or some serious health conditions, and within 6 months for everyone",
+              "7": "In a 2009 survey, nearly 1 in 4 adults (23%) who had been told they had sleep apnea had never been referred for an overnight sleep test"
+            },
+            "note": "Funding programs can have rules about testing. In Ontario, funding for a machine through the Assistive Devices Program starts with a doctor at an ADP-registered sleep clinic. The Non-Insured Health Benefits program doesn’t pay for sleep tests. Funding & Coverage has the details for your province."
+          },
+          "8": {
+            "title": "Lab or home test?",
+            "items": {
+              "1": "An in-lab sleep study (polysomnography, or Level 1) is an overnight test in a sleep lab",
+              "2": "Small wires on your head, face, chest and legs record your brain activity, breathing and oxygen as you sleep. Staff watch through the night",
+              "3": "It’s the standard test. It can find every type of sleep apnea, and other sleep problems",
+              "4": "A home sleep apnea test is a small device you wear overnight in your own bed, after someone shows you how to put it on",
+              "5": "It records your breathing, oxygen and pulse. It can’t measure sleep, so it’s less sensitive than a lab study",
+              "6": "It checks only for obstructive sleep apnea, in adults with symptoms whose doctor thinks it’s likely",
+              "7": "Home tests aren’t for checking people who have no symptoms",
+              "8": "A negative or unclear home test doesn’t rule out sleep apnea. If your doctor still suspects it, a lab study is the next step",
+              "9": "Overnight oximetry, a clip that measures oxygen and pulse, isn’t enough on its own to diagnose sleep apnea",
+              "10": "Your doctor chooses the test. Serious heart or lung disease, a past stroke, other sleep problems, regular opioid use and some other conditions mean a home test isn’t the right test. Your doctor refers you to a sleep specialist instead"
+            },
+            "note": "For children, an overnight lab study is the standard. A home test is a second choice, only for healthy children over 5 who can’t get a lab study. More in This Might Be You.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "In a sleep lab"
+                },
+                "2": {
+                  "heading": "At home"
+                }
+              }
+            }
+          },
+          "9": {
+            "title": "Your results: the AHI",
+            "items": {
+              "1": "Your sleep study report says whether you have sleep apnea, and whether it’s mild, moderate or severe",
+              "2": "The main number is the AHI (apnea-hypopnea index): how many times an hour your breathing stops or becomes shallow",
+              "3": "Under 5 an hour is normal",
+              "4": "Mild is 5 to 14 an hour, moderate is 15 to 29, and severe is 30 or more",
+              "5": "The AHI isn’t the whole picture. Your sleep doctor also weighs your symptoms, your health and your job",
+              "6": "Treatment may be suggested even when the AHI is mild, if you’re tired or sleepy",
+              "7": "Once you’re on CPAP, the machine shows “events per hour”. It’s a useful daily guide, but not a true AHI. Ask your sleep team what yours means"
+            },
+            "note": "This scale helps you read a report, not test yourself. Your sleep doctor goes over your results with you.",
+            "figure": {
+              "scale": {
+                "heading": "AHI: breathing events per hour of sleep",
+                "unit": "an hour",
+                "zones": {
+                  "normal": "Normal: under 5",
+                  "mild": "Mild: 5 to 14",
+                  "moderate": "Moderate: 15 to 29",
+                  "severe": "Severe: 30 or more"
+                },
+                "adultsNote": "These bands are for adults (19 and over).",
+                "teamNote": "Your sleep doctor also weighs your symptoms and your health."
+              }
+            }
+          },
+          "10": {
+            "title": "What happens next",
+            "items": {
+              "1": "A sleep doctor or your own doctor reads your results, makes the diagnosis and suggests a treatment",
+              "2": "The choice depends on how severe it is, your symptoms, your health and your job",
+              "3": "CPAP is generally the most effective treatment. A machine blows a steady stream of air through a mask, to keep your airway open",
+              "4": "Other options include an oral appliance for mild to moderate sleep apnea. Healthy eating, exercise and weight loss are recommended for people who carry extra weight, but they aren’t enough on their own if you’re sleepy or your sleep apnea is moderate or severe. Your Treatment Options covers each one",
+              "5": "You need a prescription for CPAP. Your prescriber sets your settings",
+              "6": "Expect follow-up: soon after you start, to check the treatment is working, then over the long term"
+            },
+            "note": "Starting CPAP walks you through setup and the first weeks.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Your results"
+                },
+                "2": {
+                  "heading": "Your treatment"
+                }
+              }
+            }
+          },
+          "11": {
+            "title": "Who to ask",
+            "items": {
+              "1": "Your family doctor or nurse practitioner: your symptoms, a home test or a referral",
+              "2": "A sleep doctor (sleep specialist): your diagnosis, how severe it is, and your treatment",
+              "3": "A registered respiratory therapist (RRT): choosing and using your equipment, once your treatment is prescribed",
+              "4": "Sleepy at the wheel, or nodded off while driving: read Driving & Staying Safe now"
+            },
+            "note": "Not sure where to start? Start with your family doctor or nurse practitioner.",
+            "figure": {
+              "legend": "What’s your question about?",
+              "topics": {
+                "1": {
+                  "label": "My symptoms"
+                },
+                "2": {
+                  "label": "Getting tested"
+                },
+                "3": {
+                  "label": "My results"
+                },
+                "4": {
+                  "label": "Equipment"
+                },
+                "5": {
+                  "label": "Driving"
+                }
+              },
+              "fits": "Fits what you ticked",
+              "statusFitsOne": "{count} place fits what you ticked. Everyone stays listed.",
+              "statusFitsMany": "{count} places fit what you ticked. Everyone stays listed.",
+              "statusNone": "Nothing ticked. Everyone stays listed.",
+              "lanes": {
+                "1": {
+                  "label": "Your family doctor or nurse practitioner"
+                },
+                "2": {
+                  "label": "A sleep doctor"
+                },
+                "3": {
+                  "label": "A registered respiratory therapist"
+                },
+                "4": {
+                  "label": "Driving & Staying Safe",
+                  "linkLabel": "Signs that need action now"
+                }
+              }
+            }
+          }
+        },
+        "programsBand": {
+          "heading": "From first signs to a plan",
+          "cards": {
+            "1": {
+              "heading": "Notice",
+              "body": "You, or someone who sleeps near you, notices snoring, pauses or gasping, or you’re sleepy all day. The checklist helps you list what you’ve noticed."
+            },
+            "2": {
+              "heading": "Talk to your doctor",
+              "body": "Your family doctor or nurse practitioner asks about your sleep and your health, and checks your nose, mouth and throat."
+            },
+            "3": {
+              "heading": "Get tested",
+              "body": "An overnight test, in a sleep lab or at home. Your doctor chooses which."
+            },
+            "4": {
+              "heading": "Results and a plan",
+              "body": "Your report gives a severity, from mild to severe. Your doctor or sleep doctor suggests a treatment."
+            }
+          }
+        },
+        "closing": {
+          "heading": "Notice it, then ask",
+          "body": "You don’t have to work it out alone. Notice the signs, take your list to your doctor, and let a sleep study give the answer."
+        },
+        "governance": {
+          "disclaimer": "This is general information, not medical advice. It can’t tell you whether you have sleep apnea, and it doesn’t replace care from your doctor or sleep team. Only a sleep study can diagnose sleep apnea, and your prescriber decides your treatment and its settings."
+        },
+        "urgentExit": {
+          "lead": "Nodded off, or nearly, at the wheel? Signs that need action now are in",
+          "link": "Chapter 02 — Driving & Staying Safe"
+        }
+      },
+      "staying-safe": {
+        "title": "Driving & Staying Safe",
+        "heroBody": "Sleepiness and driving, who decides about your licence, and how to keep your machine and mask safe. The signs that can’t wait come first.",
+        "focus": "On the road: why sleepiness matters, who decides if you can drive, what’s checked for each licence class, and driving while treatment starts. Your device: recalls, masks with magnets, cleaning, buying safely, choosing a supplier, reporting a problem, and who to call.",
+        "vibe": "Calm and direct: clear steps for the moments that matter.",
+        "categoriesIntro": {
+          "eyebrow": "On the road, or about your device?",
+          "heading": "Safe driving, safe equipment",
+          "body": "This chapter explains the rules and the safety steps. Your doctor and your licensing authority make the decisions about driving. Only your sleep team changes your treatment."
+        },
+        "urgent": {
+          "heading": "Stop and act now",
+          "intro": "Most of this chapter can wait. These can’t.",
+          "tiers": {
+            "emergency": {
+              "label": "Call 911 now",
+              "lead": "Call 911 or your local emergency number right away for:",
+              "signs": {
+                "1": "Chest pain or discomfort, or other signs of a heart attack",
+                "2": "Signs of a stroke: a drooping face, not being able to raise both arms, or slurred or jumbled speech",
+                "3": "Trouble breathing",
+                "4": "Someone who has passed out, can’t be woken up, or is confused",
+                "5": "Anyone hurt in a crash",
+                "6": "A child with severe trouble breathing, chest pain, blue lips or fingertips, or who is confused or not responding as usual. Call 911 or go to the nearest emergency department right away"
+              }
+            },
+            "stop": {
+              "label": "Stop now, then tell your doctor",
+              "signs": {
+                "1": "You fell asleep at the wheel, or nearly did, or had a crash because you were sleepy. Stop driving now and tell your doctor. You may also need to tell your licensing authority. Don’t drive again until your sleep apnea is treated and you’re told you can"
+              }
+            },
+            "soon": {
+              "label": "Not an emergency, but don’t wait",
+              "signs": {
+                "1": "You, or someone who sleeps near you, notice pauses in breathing, gasping or choking in your sleep. Talk to your doctor or health care provider as soon as you can. If someone can’t be woken up, call 911"
+              }
+            }
+          },
+          "note": "Snoring and long pauses in breathing while a child sleeps can be signs of sleep apnea. Talk to your child’s health-care provider. <link>Chapter 06 covers children.</link>"
+        },
+        "startHere": {
+          "heading": "On the road, or about your device?",
+          "pivot": "Your question",
+          "segments": {
+            "1": {
+              "label": "Sleepiness and the road"
+            },
+            "2": {
+              "label": "Your device, safely"
+            }
+          }
+        },
+        "categories": {
+          "1": {
+            "title": "Sleepiness and driving",
+            "items": {
+              "1": "Untreated sleep apnea raises your risk of a car crash",
+              "2": "The main sign is being sleepier than expected during the day",
+              "3": "Most people with sleep apnea never have a crash. The risk is still higher",
+              "4": "Your doctor may ask your licence class, and whether your work is one where sleepiness could be a hazard",
+              "5": "Your doctor may also ask if you’ve fallen asleep at the wheel or come close in the past 5 years, and about any crashes or near misses when sleepy"
+            },
+            "note": "A driver with sleep apnea can be found fit to drive again, based on their symptoms and on showing they use their treatment. If you’ve been sleepy at the wheel, see “Stop now, then tell your doctor” at the top of this page.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Why it matters"
+                },
+                "2": {
+                  "heading": "What your doctor may ask"
+                }
+              }
+            }
+          },
+          "2": {
+            "title": "Who decides if you can drive",
+            "items": {
+              "1": "Your doctor assesses whether you’re medically fit to drive",
+              "2": "The licensing authority where you live decides whether you can hold a licence. Driving safety is a provincial matter, not a federal one",
+              "3": "How severe your sleep apnea is doesn’t decide it on its own. Sleepiness, other health conditions, medicines, your sleep schedule and past crashes count too",
+              "4": "The rules differ from province to province",
+              "5": "In Ontario, doctors and nurse practitioners must report sleep apnea that is untreated or not successfully treated, with an AHI of 30 or more and daytime sleepiness. A mandatory report leads to a licence suspension",
+              "6": "In BC, drivers with sleep apnea have a licence condition: stop driving and report any episode of sleep at the wheel to their doctor and to RoadSafetyBC"
+            },
+            "note": "AHI is the number of breathing pauses and shallow breaths per hour of sleep. Chapter 01 explains it. Ask your doctor how the rules apply to you."
+          },
+          "3": {
+            "title": "What’s checked, by licence class",
+            "items": {
+              "1": "Every class: severe sleep apnea (AHI 30 or more) rules out driving unless it’s successfully treated, or a sleep specialist finds a low risk of a sleep-related crash",
+              "2": "Every class: after a crash from falling asleep or sleepiness in the past 5 years, you must show your sleep apnea is successfully treated",
+              "3": "In BC, treatment is checked with a full download from your CPAP or bilevel machine prepared by a respiratory therapist, or with a sleep study",
+              "4": "Every class, if you use CPAP: machine records showing use of at least 4 hours a night, on more than 70% of nights, over at least 30 days",
+              "5": "Private licences: your sleep doctor or your family doctor can confirm you’re fit to drive again",
+              "6": "Commercial licences: the checks are stricter than for private drivers. Commercial drivers should ideally be seen at a sleep centre within 4 weeks of referral",
+              "7": "Commercial licences: after a crash from falling asleep, or excessive sleepiness while driving, stop driving now until sleep tests are done and treatment works"
+            },
+            "note": "These are licensing measures, not health targets. Your sleep team sets your own goal. Never change your machine’s settings to change your numbers.",
+            "figure": {
+              "tabs": {
+                "all": {
+                  "label": "Every licence class"
+                },
+                "private": {
+                  "label": "Private licences"
+                },
+                "commercial": {
+                  "label": "Commercial licences"
+                }
+              },
+              "measureNote": "These are licensing measures, not health targets. Your sleep team sets your own goal.",
+              "decides": "Your licensing authority makes the decision. Rules differ by province."
+            }
+          },
+          "4": {
+            "title": "While you start treatment",
+            "items": {
+              "1": "While treatment starts, you may be able to keep driving if you aren’t sleepy while driving and haven’t had a crash from falling asleep. Ask your doctor",
+              "2": "If you have been sleepy at the wheel or had a sleep-related crash, driving can start again once you use your treatment well and the sleepiness is gone",
+              "3": "Your machine records how many hours and days you use it. Your doctor, an insurer or a licensing authority may ask for this report",
+              "4": "Once treatment works, driving safely is your responsibility. Have your treatment reviewed from time to time by your doctor or sleep specialist, for example at least every 5 years",
+              "5": "If sleepiness at the wheel comes back, stop driving and tell your doctor"
+            },
+            "note": "Your machine’s settings are changed only by trained professionals. If your treatment isn’t working, call your sleep team."
+          },
+          "5": {
+            "title": "Recalls: what to do",
+            "items": {
+              "1": "In 2021, Philips Respironics recalled several models of CPAP and bilevel machines. Sound-reducing foam inside them could break down, and particles could get into the air you breathe",
+              "2": "If your machine is recalled, don’t stop or change your therapy before you talk to your doctor or equipment provider",
+              "3": "Don’t try to remove or replace the foam yourself",
+              "4": "Clean the machine only the way the maker’s instructions say. Ozone cleaning may make the foam break down faster",
+              "5": "Some masks with magnets have also been recalled. See the next card"
+            },
+            "note": "The maker planned to close its registration portal at the end of December 2024, and to finish its repair and replacement program in Canada by the end of June 2025. If you still use an affected machine, talk to your doctor or equipment provider."
+          },
+          "6": {
+            "title": "Masks with magnets",
+            "items": {
+              "1": "Some CPAP masks have magnets in the clips or straps that hold the headgear on",
+              "2": "Close to some metal implants and medical devices, a magnet may affect how they work or move them out of place. This could cause serious injury, or even death",
+              "3": "It matters for everyone close to the mask: you, the people you live with, caregivers and bed partners",
+              "4": "Implants that magnets may affect include pacemakers, defibrillators (ICDs), nerve stimulators (including hypoglossal nerve stimulators), brain fluid shunts, aneurysm clips, embolic coils, metal stents, implanted ports and pumps such as insulin pumps, hearing implants with a magnet such as cochlear implants, and metal in the eye. The full list is longer",
+              "5": "What to do depends on the mask and on the implant. If you, or anyone close to the mask, has an implant or metal in their body, check with the mask’s maker and with your health care team about that implant before you use a mask with magnets",
+              "6": "Some masks are named in Health Canada notices. For the masks in the 2022 public advisory, the advice is to stop using the mask if anyone close to it has one of the listed implants, and to get a mask without magnets. For an implant that isn’t on the list, keep the mask at least 15 cm (6 inches) away from it",
+              "7": "For the masks in the 2022 advisory: if no one close to the mask has a metal implant or metal object in their body, you can keep using it"
+            },
+            "note": "Not sure whether your mask has magnets? Check its instructions, or ask its maker. You can also look up your mask on the Government of Canada’s <link>recalls and safety alerts</link> site.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Who it affects"
+                },
+                "2": {
+                  "heading": "What to check"
+                }
+              }
+            }
+          },
+          "7": {
+            "title": "Cleaning the approved way",
+            "items": {
+              "1": "Clean your machine and mask only the way the maker’s instructions say",
+              "2": "For the machines in the 2021 Philips recall, the advice was to stop using cleaning methods the maker hasn’t approved, such as ozone or UV-light cleaners",
+              "3": "Ozone cleaning can speed up the breakdown of the foam inside some machines",
+              "4": "Breathing ozone may affect how well your lungs work. UV light may badly burn skin and eyes",
+              "5": "There isn’t enough evidence that all ozone and UV devices sold to kill germs are safe to use, or that they work"
+            },
+            "note": "Everyday cleaning with pure soap and warm water is in Chapter 05."
+          },
+          "8": {
+            "title": "Buying a device safely",
+            "items": {
+              "1": "Use CPAP only if you have a prescription from your doctor",
+              "2": "Auto (APAP) and bilevel machines are more complex, and should be prescribed only by a sleep specialist",
+              "3": "PAP machines sold in Canada must have a Health Canada medical device licence. You can check a device in the Medical Devices Active Licence Listing (MDALL)",
+              "4": "Buying online can mean getting a device that is unlicensed, recalled or fake",
+              "5": "Don’t buy from a website that won’t give a street address or a working phone number",
+              "6": "Second-hand equipment: make sure it’s clean and works as it should. Every machine must be set for the person using it"
+            },
+            "note": "Ask your health care provider whether a device is right for you before you buy, and follow up afterwards to check it fits and works."
+          },
+          "9": {
+            "title": "Choosing a supplier",
+            "items": {
+              "1": "Choose a supplier with a registered respiratory therapist or a registered sleep technologist to guide you",
+              "2": "A good supplier fits your mask, lets you try masks, and helps if you have trouble",
+              "3": "New users can expect follow-up at about 7 days, an overnight oxygen test at 2 to 4 weeks, and check-ins at 30 and 60 days with a review of your machine’s data",
+              "4": "In Ontario, you have the right to choose your community respiratory therapy provider. A respiratory therapist must tell you that you can choose another supplier, and that your care won’t suffer if you do",
+              "5": "Many machines store your data on servers outside Canada, where privacy laws may be different. Ask your supplier how your data is handled"
+            },
+            "note": "Bring the questions below when you choose a supplier.",
+            "figure": {
+              "heading": "Questions to ask a supplier",
+              "fields": {
+                "1": "Who will fit my mask, and are they a respiratory therapist or sleep technologist?",
+                "2": "Can I try masks, and what is your exchange policy?",
+                "3": "When will you follow up with me?",
+                "4": "Where is my machine’s data stored, and who can see it?",
+                "5": "Is this device licensed by Health Canada?"
+              }
+            }
+          },
+          "10": {
+            "title": "Reporting a device problem",
+            "items": {
+              "1": "A device problem includes a device that fails, or stops working as well as it should",
+              "2": "Everyone who has a problem with a medical device, or sees one, is strongly encouraged to report it to Health Canada",
+              "3": "Consumers can report online with Health Canada’s consumer form",
+              "4": "Your health care provider can help you report, and may add details that help the review",
+              "5": "You can also report side effects or complaints about a recalled device to Health Canada"
+            },
+            "note": "If the problem has made you unwell, call your doctor first."
+          },
+          "11": {
+            "title": "Who to call",
+            "items": {
+              "1": "Your doctor or sleep specialist: sleepiness at the wheel, fitness to drive, a recalled machine, a mask with magnets near an implant, or treatment that isn’t working",
+              "2": "Your licensing authority: questions about your licence and the rules where you live",
+              "3": "Your equipment provider: mask fit, how your equipment works, cleaning, and follow-up",
+              "4": "Health Canada: report a problem with a medical device",
+              "5": "Call 911: chest pain, signs of a stroke, trouble breathing, someone who has passed out or can’t be woken up, or anyone hurt in a crash. 911, or the nearest emergency department: a child with severe trouble breathing, chest pain, blue lips or fingertips, or who is confused or not responding as usual"
+            },
+            "figure": {
+              "legend": "What’s happening?",
+              "topics": {
+                "1": {
+                  "label": "Driving"
+                },
+                "2": {
+                  "label": "My machine or mask"
+                },
+                "3": {
+                  "label": "Magnets and implants"
+                },
+                "4": {
+                  "label": "A device problem"
+                },
+                "5": {
+                  "label": "A child’s breathing"
+                },
+                "6": {
+                  "label": "Someone needs help right now"
+                }
+              },
+              "fits": "Fits what you ticked",
+              "lanes": {
+                "1": {
+                  "label": "Your doctor or sleep specialist"
+                },
+                "2": {
+                  "label": "Your licensing authority"
+                },
+                "3": {
+                  "label": "Your equipment provider"
+                },
+                "4": {
+                  "label": "Health Canada",
+                  "linkLabel": "Report a device problem"
+                },
+                "5": {
+                  "label": "911 (for a child, 911 or the emergency department)"
+                }
+              }
+            }
+          }
+        },
+        "programsBand": {
+          "heading": "Four checks for your device",
+          "cards": {
+            "1": {
+              "heading": "Is it licensed?",
+              "body": "PAP machines sold in Canada must have a Health Canada licence. Search the device in MDALL.",
+              "links": {
+                "1": {
+                  "label": "Search MDALL"
+                }
+              }
+            },
+            "2": {
+              "heading": "Is it recalled?",
+              "body": "If it is, don’t stop or change your therapy before you talk to your doctor or equipment provider."
+            },
+            "3": {
+              "heading": "Magnets near an implant?",
+              "body": "If your mask has magnets and anyone close to you has a metal implant, check with your health care team and the mask’s maker. If a Health Canada notice for your mask says to stop using it, stop."
+            },
+            "4": {
+              "heading": "Cleaned the approved way?",
+              "body": "Clean it only the way the maker’s instructions say."
+            }
+          }
+        },
+        "closing": {
+          "heading": "Safe on the road, safe at home",
+          "body": "Use your treatment, know who decides about driving, and check your equipment: licensed, not recalled, magnets checked if anyone close to you has an implant, cleaned the approved way."
+        },
+        "governance": {
+          "disclaimer": "This is general information, not medical or legal advice. Your doctor assesses your fitness to drive, and your licensing authority decides. Only your prescriber decides your treatment and settings, and only trained professionals change them. Liivv never advises on machine settings."
+        },
+        "urgentExit": {
+          "lead": "Signs that can’t wait are at the top of this page, under",
+          "link": "Stop and act now"
+        }
+      },
+      "treatment-options": {
+        "title": "Your Treatment Options",
+        "heroBody": "A breathing machine, a mouth device, or changes to everyday habits: what each one is, who it suits, and what to ask before you choose.",
+        "focus": "Breathing machines: CPAP and APAP, bilevel, central and complex sleep apnea, travel machines, and renting, trying or buying. Without a machine: oral appliances, weight and everyday habits, comparing your options, shop fixes and new treatments, and who to ask.",
+        "vibe": "Clear and even-handed: every option, with its trade-offs.",
+        "categoriesIntro": {
+          "eyebrow": "Know your options",
+          "heading": "The right treatment is the one you can use every night",
+          "body": "Your sleep team chooses your treatment with you, based on your sleep test and your health. This chapter explains the options so you can ask good questions. Liivv never advises on machine settings. For a child, see This Might Be You."
+        },
+        "startHere": {
+          "heading": "A breathing machine, or another way?",
+          "pivot": "Your path",
+          "segments": {
+            "1": {
+              "label": "Breathing machines"
+            },
+            "2": {
+              "label": "Without a machine"
+            }
+          }
+        },
+        "categories": {
+          "1": {
+            "title": "CPAP and APAP: the usual first treatment",
+            "items": {
+              "1": "CPAP is generally the most effective treatment for obstructive sleep apnea",
+              "2": "A machine blows a steady stream of air through a tube into a mask. The air holds your airway open while you sleep",
+              "3": "CPAP gives one steady pressure all night. APAP (auto CPAP) changes the pressure through the night as your breathing changes",
+              "4": "You need a prescription. Your prescriber sets the pressure, and only trained professionals should change the machine’s settings",
+              "5": "Each machine is set for the person using it. Using a machine set for someone else could harm your health",
+              "6": "CPAP is a treatment, not a cure. It only works on the nights you use it"
+            },
+            "note": "Fixed CPAP is the main treatment. APAP is an alternative, but not for people with heart or lung disease, nerve or muscle disease, or breathing problems in sleep that aren’t only obstructive, such as central sleep apnea. APAP is more complex than CPAP, and some guidance says only a sleep specialist should prescribe it. Your prescriber decides which one you get.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Two kinds"
+                },
+                "2": {
+                  "heading": "Your prescription"
+                }
+              }
+            }
+          },
+          "2": {
+            "title": "Bilevel (BiPAP)",
+            "items": {
+              "1": "A bilevel machine gives a higher pressure when you breathe in and a lower pressure when you breathe out",
+              "2": "For obstructive sleep apnea, the main reason to use one is comfort: some people find it easier to breathe out against a lower pressure",
+              "3": "Bilevel machines are more complex than CPAP. They should be prescribed only by a sleep specialist",
+              "4": "Bilevel is also used for some other breathing problems in sleep, when oxygen and carbon dioxide levels don’t improve with CPAP",
+              "5": "Government funding may help some people pay for bilevel. Ask your sleep team, and see Paying for it"
+            },
+            "note": "Canadian guidance differs on when bilevel is used for obstructive sleep apnea. Your sleep specialist decides whether it’s right for you."
+          },
+          "3": {
+            "title": "Central and complex sleep apnea: a specialist’s call",
+            "items": {
+              "1": "In central sleep apnea, the throat and airway are normal. The brain doesn’t send the signal to breathe",
+              "2": "It is common in people with heart failure, atrial fibrillation or other heart conditions, people taking opioids, and people with some neurological conditions",
+              "3": "Standard PAP machines are not meant to be the only treatment for central sleep apnea. Used alone, they can make it worse",
+              "4": "If central sleep apnea is suspected, it should be checked with a detailed overnight sleep test in an accredited sleep lab, to find the right treatment",
+              "5": "Treating the other condition, such as heart failure, can improve central sleep apnea",
+              "6": "Some people start having central pauses after they begin CPAP. This is called complex sleep apnea, and it can happen in up to 10% of people treated with CPAP. If it happens to you, talk with your doctor about continuing PAP"
+            },
+            "note": "Some newer machines, such as adaptive servo-ventilation (ASV), are used for central sleep apnea. In 2015, Health Canada posted a Type I recall of several ASV machines: a serious safety concern was found in people with symptomatic, chronic heart failure with reduced ejection fraction, whose risk of cardiovascular death was 33.5% higher on ASV. ASV is a sleep specialist’s decision. If you have heart failure, make sure your sleep specialist knows."
+          },
+          "4": {
+            "title": "Travel machines",
+            "items": {
+              "1": "Smaller travel machines are easy to carry, quiet, and can run on batteries",
+              "2": "The trade-offs: the pressure may not stay as steady, batteries cost extra where there’s no power outlet, and they may not humidify the air enough",
+              "3": "Altitude can change how a machine works, unless it adjusts for it. Tell your provider if you live in, or often travel to, places much higher or lower than where your pressure was set",
+              "4": "Most machines can also run on a battery pack, a car adapter or a marine battery adapter",
+              "5": "A travel machine still needs a prescription, set by your prescriber for you",
+              "6": "Keep using your treatment when you travel. Flying? See Everyday Liivving for taking your machine on board"
+            },
+            "note": "Talk to your prescriber and equipment provider before you choose a travel machine, so it fits your prescription and the way you travel.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Pros"
+                },
+                "2": {
+                  "heading": "Cons"
+                }
+              }
+            }
+          },
+          "5": {
+            "title": "Renting, trying or buying",
+            "items": {
+              "1": "You can buy or rent CPAP equipment",
+              "2": "Ask about a trial. Some suppliers offer equipment trials, and some won’t take back or refund equipment once it has been used",
+              "3": "If you end up needing a different machine, an extended health insurer may refuse to pay for a second one. That’s one more reason a trial matters",
+              "4": "Look for a supplier with a registered respiratory therapist or a registered polysomnographic technologist to support you",
+              "5": "Equipment bought in Canada usually has a 3-year warranty. Ask about warranty, how long repairs take, and whether you get a loaner in the meantime",
+              "6": "Every PAP machine sold in Canada needs a Health Canada medical device licence. You can check a machine in Health Canada’s licence list",
+              "7": "A second-hand machine is hard to judge. It may not work well, and the warranty may be gone",
+              "8": "You can choose your supplier. In Ontario, respiratory therapists must tell you that you can pick another provider or product, and that your care won’t suffer if you do"
+            },
+            "note": "Whoever you buy from, online or in person: if you’re new to PAP, look for a provider who shows you how to use your equipment, teaches you about PAP therapy and checks in with you regularly. If you buy online, choose a company that asks for your prescription first. Some local providers won’t help with equipment bought online.",
+            "links": {
+              "licence": "Check a licence"
+            },
+            "figure": {
+              "containers": {
+                "1": {
+                  "label": "Before you pay"
+                },
+                "2": {
+                  "label": "Who helps you"
+                },
+                "3": {
+                  "label": "Check the machine"
+                }
+              }
+            }
+          },
+          "6": {
+            "title": "Oral appliances",
+            "items": {
+              "1": "An oral appliance fits over your teeth. It holds your lower jaw and tongue forward so they don’t block your airway",
+              "2": "It may suit mild to moderate sleep apnea, or people who can’t use or don’t want CPAP",
+              "3": "Get a medical assessment first, to confirm sleep apnea and how severe it is. Your dentist should work with your doctor",
+              "4": "See a dentist with experience fitting these devices. For people it works for, a custom device can work as well as CPAP and is often easier to put up with",
+              "5": "Adjustable devices are better than fixed ones. Devices with rigid bars or screws likely work better than ones with elastic straps",
+              "6": "Boil-and-bite devices are not recommended for treating sleep apnea. They are much less effective and more likely to cause problems",
+              "7": "Jaw or tooth pain, chewing trouble and some tooth movement can happen. Tell your dentist if it isn’t comfortable",
+              "8": "After you start, your doctor may order a follow-up sleep test to check it’s working"
+            },
+            "note": "An oral appliance is a medical treatment, not a store-bought snoring guard. Your sleep team and your dentist decide together if it’s right for you.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Before you start"
+                },
+                "2": {
+                  "heading": "What to know"
+                }
+              }
+            }
+          },
+          "7": {
+            "title": "Weight and everyday habits",
+            "items": {
+              "1": "Mild sleep apnea with overweight or obesity: lifestyle changes are the recommended treatment",
+              "2": "Mild sleep apnea without overweight: active treatment isn’t routinely recommended. But treatment should be considered if you’re tired or sleepy, even when it’s mild",
+              "3": "Healthy habits help, but on their own they aren’t enough if you’re sleepy or have moderate or severe sleep apnea",
+              "4": "Losing weight can shrink the tissue around your airway. People who lose 10% of their weight can have a 30% decrease in their symptoms",
+              "5": "Weight loss works better if you keep using your treatment while you lose weight, then get retested once you reach your goal",
+              "6": "Alcohol and sedatives (medicines that make you sleepy) can relax your throat muscles too much and let your airway close. Avoiding them may help keep it open",
+              "7": "Smoking can make your nose stuffy and irritated, which can get in the way of CPAP",
+              "8": "Lifestyle changes don’t work for everyone, and may not work forever. If your symptoms come back, see your doctor",
+              "9": "If you gain or lose 30 pounds (about 14 kg) or more, go back to your sleep specialist. Your pressure may need to be checked"
+            },
+            "note": "Habits work alongside your treatment, not instead of it, unless your sleep team says so. Don’t stop a treatment or a prescribed medicine without talking to your doctor.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Weight"
+                },
+                "2": {
+                  "heading": "Alcohol, sedatives, smoking"
+                }
+              }
+            }
+          },
+          "8": {
+            "title": "Comparing your options",
+            "items": {
+              "1": "Moderate or severe sleep apnea: CPAP is the recommended treatment. If CPAP isn’t acceptable to you, an oral appliance is recommended",
+              "2": "Mild sleep apnea: lifestyle changes if you’re overweight. CPAP or an oral appliance are also options",
+              "3": "CPAP has the largest effect on how severe sleep apnea is",
+              "4": "A jaw-advancing oral appliance has roughly a 70% chance of working in mild sleep apnea. In moderate sleep apnea it has about a 50% chance of fully working, and in severe about 40%. In moderate and severe, the chances are lower with a BMI over 35",
+              "5": "Every treatment takes getting used to. Using it every night, all night, is what makes it work",
+              "6": "Whatever you choose, follow-up continues until your breathing pauses are back to normal: fewer than 5 an hour",
+              "7": "Tongue-retaining devices are only for snoring or very mild sleep apnea"
+            },
+            "note": "Your sleep team decides with you, based on your sleep test, your health and what you can use every night.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Which fits which"
+                },
+                "2": {
+                  "heading": "How well they work"
+                }
+              }
+            }
+          },
+          "9": {
+            "title": "Shop fixes and new treatments: check first",
+            "items": {
+              "1": "Nasal strips and nasal dilators may help air flow through your nose. They don’t treat the blockage in your throat that causes sleep apnea",
+              "2": "A chin strap on its own doesn’t fix the blockage either. A badly fitted strap can push the jaw back and make the blockage worse",
+              "3": "Boil-and-bite mouthguards are not recommended for treating sleep apnea",
+              "4": "There are many experimental treatments. Before you try one, ask your sleep specialist about the risks and benefits for you"
+            },
+            "note": "Snoring can be a sign of sleep apnea. If you’re treating snoring on your own, get checked first.",
+            "links": {
+              "note": "Is It Sleep Apnea?"
+            }
+          },
+          "10": {
+            "title": "Who to ask",
+            "items": {
+              "1": "Your prescriber or sleep specialist: which treatment, which machine, and your pressure",
+              "2": "A dentist with experience in oral appliances: after your medical assessment",
+              "3": "Your equipment provider’s respiratory therapist: set-up, mask fit, and trouble getting used to your machine",
+              "4": "Your doctor: if your symptoms come back, or your weight changes by 30 pounds or more"
+            },
+            "figure": {
+              "legend": "What’s your question about?",
+              "topics": {
+                "1": {
+                  "label": "My machine"
+                },
+                "2": {
+                  "label": "My mask"
+                },
+                "3": {
+                  "label": "An oral appliance"
+                },
+                "4": {
+                  "label": "Weight and habits"
+                },
+                "5": {
+                  "label": "Supplies"
+                }
+              },
+              "fits": "Fits what you ticked",
+              "statusFitsOne": "{count} place fits what you ticked. Everyone stays listed.",
+              "statusFitsMany": "{count} places fit what you ticked. Everyone stays listed.",
+              "statusNone": "Nothing ticked. Everyone stays listed.",
+              "lanes": {
+                "1": {
+                  "label": "Your prescriber or sleep specialist"
+                },
+                "2": {
+                  "label": "A dentist with oral appliance experience"
+                },
+                "3": {
+                  "label": "Your equipment provider’s respiratory therapist"
+                },
+                "4": {
+                  "label": "Your doctor"
+                }
+              }
+            }
+          }
+        },
+        "programsBand": {
+          "heading": "Before you choose",
+          "cards": {
+            "1": {
+              "heading": "Why this treatment?",
+              "body": "Ask your prescriber why they chose it for you, and what else could work."
+            },
+            "2": {
+              "heading": "Can I try it first?",
+              "body": "Ask about trials, whether used equipment can be returned, and what your insurer will pay for."
+            },
+            "3": {
+              "heading": "Who helps me after?",
+              "body": "Look for a registered respiratory therapist or polysomnographic technologist, and check-ins in the first weeks."
+            },
+            "4": {
+              "heading": "Is it licensed?",
+              "body": "Every PAP machine sold in Canada needs a Health Canada medical device licence. You can look it up.",
+              "links": {
+                "1": {
+                  "label": "Check a licence"
+                }
+              }
+            }
+          }
+        },
+        "closing": {
+          "heading": "One step at a time",
+          "body": "Most people start with one treatment and adjust with their sleep team. Asking questions is part of getting it right."
+        },
+        "governance": {
+          "disclaimer": "This is general information, not medical advice, and it is not a substitute for care from your sleep team, doctor, dentist or respiratory therapist. Your prescriber chooses your treatment and sets your machine’s pressure. Liivv never advises on machine settings."
+        },
+        "urgentExit": {
+          "lead": "Signs that need care right away are in Driving & Staying Safe, under",
+          "link": "Stop and act now"
+        }
+      },
+      "starting-cpap": {
+        "title": "Starting CPAP",
+        "heroBody": "Getting set up and getting used to it: your prescription, your mask, water for the humidifier, the first nights, and who to call when something isn’t right.",
+        "focus": "Your setup: follow-up, your prescription, mask types, fit, the humidifier and a starter list. The first weeks: first nights, what your usage numbers mean, fixes for common problems, and what to do if it isn’t working.",
+        "vibe": "Practical and patient. Most problems have a fix, and you don’t have to solve them alone.",
+        "categoriesIntro": {
+          "eyebrow": "Set up, settle in",
+          "heading": "Your first weeks with CPAP",
+          "body": "This chapter helps you follow the plan your sleep team made with you. Your prescriber sets your pressure. Liivv never advises on settings. If your team told you something different, follow your team."
+        },
+        "startHere": {
+          "heading": "Getting set up, or getting used to it?",
+          "pivot": "Where you are",
+          "segments": {
+            "1": {
+              "label": "Your setup"
+            },
+            "2": {
+              "label": "The first weeks"
+            }
+          }
+        },
+        "categories": {
+          "1": {
+            "title": "Setup and follow-up",
+            "items": {
+              "1": "Wherever you get your equipment, online or in person, a good start includes a mask fitting, help using your machine, and someone who follows up to see how your therapy is going",
+              "2": "About 7 days in: a check on mask comfort, the airflow, leaks, how often you use it, and any feeling of being closed in",
+              "3": "At 2 to 4 weeks: an overnight oxygen test while you use CPAP, to check your oxygen level is normal on treatment",
+              "4": "At 30 and 60 days: the same questions, plus how you sleep and feel, and a look at your machine’s data to see if treatment is working",
+              "5": "After that: a follow-up at least once a year, with your machine’s data and a check of your mask and tubing"
+            },
+            "note": "This schedule comes from Canadian provincial guidance for people new to CPAP. It’s shown here for every province. Your sleep team may set a different one. If so, follow theirs.",
+            "figure": {
+              "heading": "Your first 60 days, and after",
+              "steps": {
+                "1": "Setup",
+                "2": "About 7 days",
+                "3": "2 to 4 weeks",
+                "4": "30 days",
+                "5": "60 days",
+                "6": "Every year"
+              }
+            }
+          },
+          "2": {
+            "title": "Your prescription and settings",
+            "items": {
+              "1": "You need a prescription for CPAP. It comes after a medical assessment and a sleep test",
+              "2": "Your prescription says what pressure your machine is set to. For insurance, it should also name your mask and humidifier",
+              "3": "Auto-adjusting machines (APAP) and bilevel machines are more complex. A sleep specialist should prescribe them",
+              "4": "Only trained professionals should change your machine’s settings. Don’t change them yourself",
+              "5": "A machine is set for one person. Using a machine set for someone else could harm your health",
+              "6": "Ask your prescriber about your pressure if your weight goes up or down by 30 pounds or more, or if you move to, or often travel to, a much higher or lower place. If you’re told you have central sleep apnea, talk to your doctor about whether to keep using CPAP",
+              "7": "Every CPAP machine sold in Canada must have a medical device licence. You can look a machine up in Health Canada’s online licence list",
+              "8": "In Ontario, respiratory therapists must tell you that you can choose a different provider or product"
+            },
+            "note": "Liivv never advises on pressure or settings. Questions about them go to your prescriber or your respiratory therapist."
+          },
+          "3": {
+            "title": "Mask types to ask your RT about",
+            "items": {
+              "1": "Nasal pillows sit at the openings of your nostrils",
+              "2": "A nasal mask fits over your nose",
+              "3": "A full-face mask covers your nose and mouth",
+              "4": "A child is fitted for a mask made for children (a paediatric mask), not an adult one",
+              "5": "Some masks have magnets in the clips or straps. If you, or anyone you live or sleep near, has an implant or metal device that magnets can affect, such as a pacemaker, tell your RT before you choose a mask. Already using a mask with magnets? Check with the mask’s maker and your health care team about the implant"
+            },
+            "note": "The right mask is the one that fits you and feels comfortable. It can make a big difference to how well CPAP works, and to whether you keep using it. These are general patterns, not a fitting. Try masks on with your RT.",
+            "figure": {
+              "legend": "What sounds like you?",
+              "questions": {
+                "1": "I breathe through my mouth",
+                "2": "I breathe through my nose",
+                "3": "I feel closed in easily",
+                "4": "I have a beard or moustache",
+                "5": "I move around a lot in my sleep",
+                "6": "My nose is often stuffy or blocked",
+                "7": "I don’t want anything inside my nose",
+                "8": "I have a high, narrow bridge to my nose"
+              },
+              "types": {
+                "pillows": {
+                  "label": "Nasal pillows"
+                },
+                "nasal": {
+                  "label": "Nasal mask"
+                },
+                "fullFace": {
+                  "label": "Full-face mask"
+                }
+              },
+              "reasons": {
+                "1": "A full-face mask may suit people who breathe through their mouth. So may a nasal mask with a chin strap.",
+                "2": "Nasal masks and nasal pillows may suit people who breathe mainly through their nose.",
+                "3": "Nasal pillows or a nasal mask may feel less closed in. Some people feel closed in with a full-face mask.",
+                "4": "Nasal pillows may suit people with facial hair.",
+                "5": "Nasal pillows may suit people who move around in their sleep. A chin strap may help keep a mask on.",
+                "6": "A full-face mask may suit people whose nose is often stuffy or blocked.",
+                "7": "If you don’t want anything inside your nose, a nasal mask may suit you better than pillows.",
+                "8": "With a high, narrow nose bridge, nasal pillows may leak less than other masks."
+              },
+              "askAbout": "Ask your RT about",
+              "chinStrap": "a chin strap",
+              "statusOne": "{count} mask type fits what you ticked. All three stay listed.",
+              "statusMany": "{count} mask types fit what you ticked. All three stay listed.",
+              "statusNone": "Nothing ticked. All three stay listed.",
+              "bilevelNote": "On a bilevel machine? Ask your RT whether nasal pillows suit you.",
+              "magnetNote": "Magnets: some masks have magnets in the clips or straps. Tell your RT if you, or anyone you live or sleep near, has an implant or metal device that magnets can affect, such as a pacemaker. Check with the mask’s maker and your health care team before you use a mask with magnets. More in <link>Driving & Staying Safe</link>.",
+              "privacy": "This doesn’t choose a mask for you. Nothing you tick is saved."
+            }
+          },
+          "4": {
+            "title": "Getting the fit right",
+            "items": {
+              "1": "The top of the mask sits at the bridge of your nose. The bottom sits about halfway between the bottom of your nose and your upper lip",
+              "2": "The smallest mask that fits is usually the best choice",
+              "3": "A little leak is fine, as long as it isn’t blowing into your eyes. You shouldn’t need to pull the straps very tight",
+              "4": "When you try masks, lie on your back and on each side, with the machine attached. Make sure the headgear is easy for you to use",
+              "5": "Ask about a mask trial or an exchange before you buy. Some providers don’t take returns once a mask has been used",
+              "6": "Marks should fade soon after you take the mask off. If they don’t, or your skin is sore, the straps may be too tight or the mask may not fit"
+            },
+            "note": "For a child, don’t fasten the mask and straps too tightly. You should be able to slip two fingers under the strap. If the mask doesn’t seem the right size, ask your child’s home care company or sleep team about other masks."
+          },
+          "5": {
+            "title": "Humidifier and distilled water",
+            "items": {
+              "1": "Most CPAP machines have a humidifier: a small water tank that adds moisture to the air",
+              "2": "Moist air can help with a dry mouth or throat, a stuffy nose and nosebleeds",
+              "3": "Use only distilled water. You can buy it at most grocery stores and pharmacies",
+              "4": "Put in fresh water each night. Empty the tank before you move the machine, so no water spills into it",
+              "5": "Don’t put a regular room humidifier in your bedroom. It could damage the CPAP machine’s motor",
+              "6": "Water drops or popping sounds in the tube? A heated tube helps stop water collecting. Ask your RT",
+              "7": "You may need more moisture in winter than in summer. Ask your RT, rather than changing the settings yourself"
+            },
+            "note": "Your provider will show you how to fill the water tank. Cleaning is in Everyday Liivving."
+          },
+          "6": {
+            "title": "Your starter list",
+            "items": {
+              "1": "Your machine, as prescribed, with its humidifier water chamber",
+              "2": "A mask with headgear, fitted for you",
+              "3": "Tubing, standard or heated",
+              "4": "Filters for your machine: disposable, reusable, or both",
+              "5": "A chin strap, if your mouth falls open as you sleep",
+              "6": "Distilled water"
+            },
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "From your prescription and fitting"
+                },
+                "2": {
+                  "heading": "Small parts and supplies"
+                }
+              }
+            }
+          },
+          "7": {
+            "title": "Your first nights",
+            "items": {
+              "1": "Some people sleep well with CPAP from the first night. Others need time to get used to the mask and the pressure. It can take up to 6 weeks",
+              "2": "Practise first. Wear the mask for short periods during the day, sitting up and awake, before you sleep in it",
+              "3": "Wear it the whole time you sleep, every night. You can wear it for naps too",
+              "4": "Knocking the mask off now and then is normal. Put it back on and keep your treatment going all night",
+              "5": "Many people feel less sleepy within about 2 weeks. The full benefit can take about 6 weeks",
+              "6": "A bed partner may sleep better too. They can help by learning about your treatment"
+            },
+            "note": "For a child, practise wearing the mask while they’re awake and doing a quiet activity they enjoy. Making it part of the bedtime routine, or a sticker chart, can help. More in This Might Be You."
+          },
+          "8": {
+            "title": "What your usage numbers mean",
+            "items": {
+              "1": "Your machine records how many hours you use it, and on how many days",
+              "2": "It may also show ‘events per hour’. That’s a useful daily sign of how therapy is going, but it isn’t the same as the AHI from a sleep test",
+              "3": "Your prescriber, your insurer or a licensing body may ask for this data. When you choose a machine, ask whether it stores at least 200 days of it",
+              "4": "Many machines store data on servers outside Canada, where privacy laws may be different. Ask your provider how your data is handled"
+            },
+            "note": "The measures below are used by driver licensing bodies. They are not a health target. Your sleep team sets your goal.",
+            "figure": {
+              "heading": "Usage measures used for driver’s licences",
+              "rows": {
+                "driving": {
+                  "label": "Driving, once treated",
+                  "value": "At least 4 hours a night on more than 70% of nights, over at least 30 days, from your machine’s data",
+                  "foot": "The licensing authority makes the decision. The rules for commercial drivers are stricter."
+                },
+                "severe": {
+                  "label": "Severe sleep apnea, any licence",
+                  "value": "Severe sleep apnea (AHI 30 or more) must be successfully treated, unless a sleep specialist judges the risk of a crash low. In BC, proof of treatment can be a full report of your machine’s data prepared by a respiratory therapist, or a sleep study",
+                  "foot": "The licensing authority makes the decision."
+                }
+              },
+              "always": "None of these is a goal for your health. Ask your sleep team what your goal is."
+            }
+          },
+          "9": {
+            "title": "Fix a common problem",
+            "items": {
+              "1": "Air leaking: a small leak that doesn’t blow into your eyes is fine. For more, check the fit and the size. Don’t over-tighten the straps",
+              "2": "Dry mouth: your mouth may be falling open. A chin strap can help, and your doctor can tell you whether a full-face mask suits you. A pharmacist can suggest products for a dry mouth",
+              "3": "Dry or stuffy nose: a humidifier can help. Still stuffy? See your doctor. It could be sinusitis, allergies or swelling in your nose",
+              "4": "Bloating: tell your healthcare team. They may have ideas to help",
+              "5": "Feeling closed in: practise wearing the mask while you’re awake. Nasal pillows or a nasal mask may feel less closed in than a full-face mask. Talking with a counsellor can help too",
+              "6": "Marks or sore skin: the straps may be too tight, or the mask may not fit. Wash the mask every day, and wash and dry your face before you put it on. A rash? Call your doctor",
+              "7": "Water in the tube, or popping sounds: ask your RT whether a heated tube would help. Empty the water tank before you move the machine",
+              "8": "Mask coming off at night: now and then is normal. A chin strap may help keep it on",
+              "9": "The air feels too strong, or it’s hard to breathe out: call your RT or prescriber. Don’t change the pressure or settings yourself",
+              "10": "Still sleepy, even though you use it every night: have your supplier check that your machine is working, and talk to your sleep doctor. Sleepy while driving? Go to Driving & Staying Safe"
+            },
+            "figure": {
+              "legend": "What’s going on?",
+              "chips": {
+                "1": "Air leaking",
+                "2": "Dry mouth",
+                "3": "Dry or stuffy nose",
+                "4": "Bloating",
+                "5": "Feeling closed in",
+                "6": "Marks or sore skin",
+                "7": "Water in the tube",
+                "8": "Mask coming off",
+                "9": "Air feels too strong",
+                "10": "Still sleepy"
+              },
+              "always": "Whatever the problem, don’t change your pressure or settings yourself. Call your RT or prescriber.",
+              "redFlagLink": "Urgent signs, in Driving & Staying Safe",
+              "privacy": "Nothing you pick is saved."
+            }
+          },
+          "10": {
+            "title": "If you can’t get used to it",
+            "items": {
+              "1": "It can take a few weeks, or even months, to feel comfortable with a mask. Don’t give up",
+              "2": "Go back to your RT or supplier. A different mask or a better fit often helps",
+              "3": "Talk to your sleep doctor about any medical concerns. They can suggest tips or test for other problems",
+              "4": "Feelings can make it harder to keep going. Talking with a counsellor, or support from others, can help",
+              "5": "If CPAP still doesn’t work for you, your doctor may suggest another treatment, or a sleep specialist",
+              "6": "If you stop using CPAP, your symptoms come back. Talk to your doctor before you stop"
+            },
+            "note": "Other treatments are in Your Treatment Options."
+          },
+          "11": {
+            "title": "Who to ask",
+            "items": {
+              "1": "Your prescriber or sleep doctor: your pressure and settings, symptoms, still feeling sleepy, central sleep apnea, and before you stop",
+              "2": "Your respiratory therapist (RT) or CPAP provider: mask fitting and trials, using your machine, leaks and comfort, machine checks and data reviews",
+              "3": "A health line: in BC call 8-1-1 (7-1-1 for the deaf and hard of hearing). In Alberta, call Health Link at 811, any time, day or night",
+              "4": "Very sleepy at the wheel, or worried right now: the urgent signs in Driving & Staying Safe"
+            },
+            "note": "Where it’s within their scope of practice, respiratory therapists can recommend your equipment once your prescriber has set your therapy and pressure.",
+            "figure": {
+              "legend": "What’s it about?",
+              "topics": {
+                "1": {
+                  "label": "Pressure or settings"
+                },
+                "2": {
+                  "label": "My mask"
+                },
+                "3": {
+                  "label": "My machine"
+                },
+                "4": {
+                  "label": "How I feel"
+                },
+                "5": {
+                  "label": "Something urgent"
+                }
+              },
+              "fits": "Fits what you ticked",
+              "statusFitsOne": "{count} place fits what you ticked. Everyone stays listed.",
+              "statusFitsMany": "{count} places fit what you ticked. Everyone stays listed.",
+              "statusNone": "Nothing ticked. Everyone stays listed.",
+              "lanes": {
+                "1": {
+                  "label": "Your prescriber or sleep doctor"
+                },
+                "2": {
+                  "label": "Your RT or CPAP provider"
+                },
+                "3": {
+                  "label": "A health line (BC and Alberta)"
+                },
+                "4": {
+                  "label": "Urgent signs"
+                }
+              }
+            }
+          }
+        },
+        "programsBand": {
+          "heading": "Four things to remember",
+          "cards": {
+            "1": {
+              "heading": "Prescription first",
+              "body": "CPAP needs a prescription. Your prescriber sets your pressure."
+            },
+            "2": {
+              "heading": "Settings stay with the professionals",
+              "body": "Only trained professionals change your machine’s settings. Don’t change them yourself."
+            },
+            "3": {
+              "heading": "Distilled water only",
+              "body": "Fill the humidifier with distilled water, fresh each night."
+            },
+            "4": {
+              "heading": "Keep going, and call",
+              "body": "It can take up to 6 weeks to settle in. If something isn’t right, call your RT."
+            }
+          }
+        },
+        "closing": {
+          "heading": "One night at a time",
+          "body": "Most people need some time and a few changes before CPAP feels normal. Ask for help early, keep your follow-ups, and keep going."
+        },
+        "governance": {
+          "disclaimer": "This is general information, not medical advice. It doesn’t replace care from your prescriber, sleep team or respiratory therapist. Your pressure, your settings and your follow-up are set by your team. Liivv never advises on settings."
+        },
+        "urgentExit": {
+          "lead": "Very sleepy while driving, or worried right now? The urgent signs are in Driving & Staying Safe, under",
+          "link": "Stop and act now"
+        }
+      },
+      "everyday-liivving": {
+        "title": "Everyday Liivving",
+        "heroBody": "Cleaning your equipment, replacing worn parts, understanding your machine’s data, and taking CPAP with you: on a plane, on a trip or into hospital.",
+        "focus": "Clean and replace: your cleaning routine, ozone and UV cleaners, when to replace supplies, signs a part is worn, caring for a child’s CPAP, and your machine’s data. Away from home: flying, a travel checklist, hospital stays, and who to ask.",
+        "vibe": "Practical and steady: small habits that keep treatment working.",
+        "categoriesIntro": {
+          "eyebrow": "Day to day",
+          "heading": "Small habits keep your treatment working",
+          "body": "Clean your equipment, replace parts when they wear out, and keep using your treatment wherever you sleep. Your owner’s manual comes first. This chapter puts general advice beside it. Liivv never advises on machine settings."
+        },
+        "startHere": {
+          "heading": "At home, or away?",
+          "pivot": "Your path",
+          "segments": {
+            "1": {
+              "label": "Clean and replace"
+            },
+            "2": {
+              "label": "Away from home"
+            }
+          }
+        },
+        "categories": {
+          "1": {
+            "title": "Your cleaning routine",
+            "items": {
+              "1": "Your owner’s manual comes first. It tells you how to care for your model",
+              "2": "Clean your mask every day. Wash it with pure soap and warm water",
+              "3": "Skip soaps with bleach, chlorine, alcohol, moisturizers, scents or antibacterial agents",
+              "4": "Rinse the mask in plain water. You can add plain white vinegar to the rinse water: it cuts down on smells and germs",
+              "5": "Let the mask air dry. Keep it out of direct sunlight",
+              "6": "Every week, hand wash the tubing and headgear with pure soap and warm water. Gently towel dry them, then let them air dry",
+              "7": "If you use a humidifier, use distilled water and replace the water each night. Clean the humidifier as your manual says",
+              "8": "Empty the humidifier before you move your machine, so water doesn’t spill into it",
+              "9": "Wash your face and dry it well before you put the mask on"
+            },
+            "note": "Don’t put a regular room humidifier in your bedroom: it could damage your CPAP machine’s motor. Ask your equipment provider how to keep your model clean and working well.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Every day"
+                },
+                "2": {
+                  "heading": "Every week"
+                }
+              }
+            }
+          },
+          "2": {
+            "title": "Ozone and UV cleaners",
+            "items": {
+              "1": "Clean your machine only with the methods in its instructions",
+              "2": "For the machines in the 2021 Philips recall, the advice was to stop using cleaners that use ozone or ultraviolet (UV) light, because they aren’t authorized cleaning methods",
+              "3": "In some recalled machines, ozone cleaning may make the sound-reducing foam inside break down faster",
+              "4": "Breathing in ozone from ozone-generating devices may harm how your lungs work and irritate your airways"
+            },
+            "note": "Have a machine in the Philips foam recall? Don’t stop or change how you use it on your own. Talk to your doctor or equipment provider first. Recalls are covered in Driving & Staying Safe.",
+            "links": {
+              "note": "Driving & Staying Safe"
+            }
+          },
+          "3": {
+            "title": "When to replace supplies",
+            "items": {
+              "1": "Start with your manual. Parts need replacing at different times, based on the maker’s advice and how you use them",
+              "2": "As a general range, most machines are replaced every 3 to 5 years, and accessories every 3 to 12 months",
+              "3": "The parts you replace from time to time: the mask, tubing, humidifier water chamber, chin strap and filters",
+              "4": "Change the machine’s filter every 2 months, or as needed",
+              "5": "If a plan pays for your equipment, check its replacement time frames before you order",
+              "6": "Programs set the most they will pay for over a period of time. Those limits are about funding, not a health schedule",
+              "7": "In Ontario, the Assistive Devices Program helps pay for the machine package, but not replacement masks or headgear. ODSP can cover replacement supplies for people who receive it, once the ministry approves the need"
+            },
+            "note": "Choosing a new mask? Some masks have magnets that can affect certain metal implants, such as a pacemaker or a metal stent, in you or in anyone who lives with you, cares for you or shares your bed. If that might apply, check with the mask’s maker and your health care team before you order. Read the warning in Driving & Staying Safe.",
+            "links": {
+              "note": "Driving & Staying Safe"
+            },
+            "figure": {
+              "heading": "Replacement schedules, side by side",
+              "intro": "Each column says what kind of schedule it is. Your manual comes first. A funding limit is what a program pays for, not advice on when to replace a part.",
+              "payer": {
+                "legend": "Who pays for your supplies?",
+                "options": {
+                  "nihb": "NIHB (First Nations and Inuit)",
+                  "bcea": "BC income or disability assistance",
+                  "ontario": "Ontario ADP or ODSP",
+                  "plan": "A private or work plan",
+                  "self": "I pay myself"
+                },
+                "planNote": "Private and work plans set their own limits. Check yours before you order.",
+                "selfNote": "Use your manual, then the general range.",
+                "status": "Your column is marked. Every column stays listed."
+              },
+              "schedules": {
+                "manual": {
+                  "label": "Your manual",
+                  "kind": "First",
+                  "cell": "Check your manual"
+                },
+                "general": {
+                  "label": "General range",
+                  "kind": "General guidance"
+                },
+                "nihb": {
+                  "label": "NIHB",
+                  "kind": "Funding limit"
+                },
+                "bcea": {
+                  "label": "BC assistance (BCEA)",
+                  "kind": "Funding limit"
+                },
+                "ontario": {
+                  "label": "Ontario (ADP, ODSP)",
+                  "kind": "Funding"
+                },
+                "maker": {
+                  "label": "One maker’s schedule",
+                  "kind": "Maker",
+                  "credit": "ResMed Canada tip sheet (2021). Other makers’ schedules may differ: check your own manual."
+                }
+              },
+              "rows": {
+                "mask": "Mask with headgear",
+                "cushion": "Cushions and nasal pillows",
+                "headgear": "Headgear",
+                "tubing": "Tubing",
+                "filter": "Filter (disposable)",
+                "chamber": "Humidifier water chamber",
+                "chinStrap": "Chin strap",
+                "machine": "Machine"
+              },
+              "cells": {
+                "general": {
+                  "mask": "Accessories: every 3 to 12 months",
+                  "cushion": "Accessories: every 3 to 12 months",
+                  "headgear": "When worn (accessories: every 3 to 12 months)",
+                  "tubing": "When worn (accessories: every 3 to 12 months)",
+                  "filter": "Every 2 months, or as needed",
+                  "chamber": "Accessories: every 3 to 12 months",
+                  "chinStrap": "Accessories: every 3 to 12 months",
+                  "machine": "Every 3 to 5 years"
+                },
+                "nihb": {
+                  "mask": "Up to 2 a year",
+                  "cushion": "Nasal pillows: up to 2 a year",
+                  "headgear": "Comes with the mask (up to 2 a year)",
+                  "tubing": "Up to 2 a year",
+                  "filter": "Up to 14 a year",
+                  "chamber": "Included with the machine",
+                  "chinStrap": "Up to 2 a year",
+                  "machine": "1 every 5 years"
+                },
+                "bcea": {
+                  "mask": "After 1 year",
+                  "cushion": "After 1 year",
+                  "headgear": "After 1 year",
+                  "tubing": "After 1 year",
+                  "filter": "After 1 year",
+                  "chamber": "After 1 year",
+                  "chinStrap": "After 1 year",
+                  "machine": "After 5 years"
+                },
+                "ontario": {
+                  "mask": "ADP: a basic one in the package; replacements not covered. ODSP: replacements for recipients, with approval",
+                  "cushion": "ADP: replacements not covered. ODSP: replacements for recipients, with approval",
+                  "headgear": "ADP: a basic one in the package; replacements not covered. ODSP: replacements for recipients, with approval",
+                  "tubing": "ADP: first one, in the package. ODSP: replacements for recipients, with approval",
+                  "filter": "ADP: first ones, in the package. ODSP: replacements for recipients, with approval",
+                  "chamber": "ADP: humidifier in the package. ODSP: replacements for recipients, with approval",
+                  "chinStrap": "Not listed",
+                  "machine": "ADP: expected to last at least 5 years. You can re-apply if your needs change, or if it’s worn out, out of warranty and costly to repair"
+                },
+                "maker": {
+                  "mask": "Whole mask: every 6 months",
+                  "cushion": "Silicone: every 3 months. Memory foam: every month",
+                  "headgear": "Every 3 months",
+                  "tubing": "Every 3 months",
+                  "filter": "Every month",
+                  "chamber": "Every 6 months",
+                  "chinStrap": "Not listed",
+                  "machine": "Every 5 years"
+                }
+              },
+              "perYear": "{count, plural, one {# a year} other {# a year}} is about one every {interval}.",
+              "intervalMonths": "{n, plural, one {# month} other {# months}}",
+              "intervalWeeks": "{n, plural, one {# week} other {# weeks}}",
+              "dateCalc": {
+                "label": "Last replaced (optional)",
+                "result": "{period} after {start} is {date}.",
+                "disclaimer": "This is date arithmetic only, not advice. Nothing is saved or sent."
+              },
+              "footer": "Funding limits change. Programs also ask for prior approval, a prescription or a respiratory therapist’s assessment: see Paying for it.",
+              "print": "Print this table",
+              "noJs": "Your manual comes first. General range: machines every 3 to 5 years, accessories every 3 to 12 months, filter every 2 months or as needed. Funding limits: NIHB pays for up to 2 masks, 2 tubes and 14 filters a year, and up to 1 machine every 5 years. BC assistance: accessories after 1 year, machine after 5 years. Ontario ADP: machine package only."
+            }
+          },
+          "4": {
+            "title": "Signs a part is worn",
+            "items": {
+              "1": "Check your tubing and headgear often. If they’re worn, get new ones",
+              "2": "You shouldn’t have to pull the headgear very tight to stop leaks. If you can’t get a seal without large leaks, ask your provider about a different style of mask",
+              "3": "Marks from the mask should fade soon after you take it off. If they don’t, or your skin is sore or red, the headgear may be too tight or the mask may not fit right",
+              "4": "A small leak is fine, as long as it doesn’t blow into your eyes",
+              "5": "Still sleepy even though you use CPAP every night? First make sure your equipment is working: your supplier can check it. Then talk to your sleep doctor",
+              "6": "If you gain or lose 30 pounds or more, see your doctor. Your pressure may need to be changed, and a mask may no longer meet your needs",
+              "7": "Machine not working properly? Call your provider. Equipment bought in Canada usually has a 3-year warranty. Ask about a loaner while yours is checked or repaired",
+              "8": "You can report a problem with a medical device to Health Canada"
+            },
+            "note": "Programs don’t pay to replace lost equipment or equipment damaged by misuse. Store and pack yours with care.",
+            "links": {
+              "item8": "Report a device problem"
+            },
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Mask and headgear"
+                },
+                "2": {
+                  "heading": "Machine, and you"
+                }
+              }
+            }
+          },
+          "5": {
+            "title": "Caring for a child’s CPAP",
+            "items": {
+              "1": "Your child’s equipment provider (home care company) will give you instructions for your child’s machine. Follow those first",
+              "2": "Clean your child’s mask each morning. Oils from your child’s skin can break down the mask",
+              "3": "Wash the mask by hand with warm water and a mild soap. Let it air dry: don’t dry it with a towel or tissue",
+              "4": "Wash the headgear by hand with mild soap and water once a week, and let it air dry",
+              "5": "If the mask doesn’t seem to be a good size, ask the equipment provider about other masks your child could use",
+              "6": "If an error message shows on your child’s CPAP machine, contact the equipment provider"
+            },
+            "note": "If your child is sick and you’re worried about their breathing, contact your child’s health-care provider, or have your child seen at your local emergency department."
+          },
+          "6": {
+            "title": "Your machine’s data and follow-ups",
+            "items": {
+              "1": "Many machines record how many hours you use them, pauses in your breathing, and air leaks",
+              "2": "Some send this to a phone app and to your equipment provider. Others save it to a USB stick or SD card, if you’d rather not use Wi-Fi, cellular data or Bluetooth",
+              "3": "Many machines show an “events per hour” number. It’s a useful daily sign of how well treatment is working, but it isn’t the same as a sleep test result",
+              "4": "New users may expect check-ins: about 7 days after starting, an overnight oxygen test at 2 to 4 weeks, then 30 and 60 days, with a review of the machine’s data",
+              "5": "After that, a yearly follow-up with a download of your machine’s data is recommended",
+              "6": "Ideally, you use your treatment every night, all night",
+              "7": "Your doctor, insurer or a licensing office may ask for this data. If you’ve been told not to drive, Canadian guidance looks for at least 4 hours a night on more than 70% of nights, over at least 30 days. That is a licensing measure, not a health target: your sleep team sets your goal",
+              "8": "Ask your provider how your data is shared and stored. Many machines store data on servers outside Canada, where privacy laws may be different"
+            },
+            "note": "Your sleep team reads your data and decides on any changes. Only trained professionals should change your machine’s settings. Liivv never advises on them.",
+            "links": {
+              "item6": "Starting CPAP",
+              "item7": "Driving & Staying Safe"
+            },
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "What it records"
+                },
+                "2": {
+                  "heading": "Check-ins"
+                }
+              }
+            }
+          },
+          "7": {
+            "title": "Flying with CPAP",
+            "items": {
+              "1": "Your CPAP machine is allowed in carry-on and in checked baggage. Bring it as carry-on",
+              "2": "At security, take the main unit out of its case and put it in a bin. You can put it in a clear plastic bag first: bring your own",
+              "3": "The tubes and mask can stay in the case. Screening officers won’t touch the parts that connect to the tubes",
+              "4": "The main unit may need extra screening, such as a swab test for explosives",
+              "5": "Distilled water for your machine is exempt from the 100 ml liquid limit. Keep it in its own container and show it to the screening officer",
+              "6": "You don’t need a medical document at security. If you think one would help, show it to the screening officer with your machine",
+              "7": "Look for the Family and Accessible Line at security. If you have special medical needs, you can contact CATSA at least 48 hours before your flight",
+              "8": "Tell your airline about your machine when you book. Ask about using it on board and about power",
+              "9": "The usual limit of two carry-on bags doesn’t apply to medical equipment. Check your airline’s rules too"
+            },
+            "note": "A letter from your doctor can make security go more smoothly. It should say your CPAP is needed for a medical condition, and list the model and serial number of all your equipment.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "At security"
+                },
+                "2": {
+                  "heading": "Before you fly"
+                }
+              }
+            }
+          },
+          "8": {
+            "title": "Travel checklist",
+            "items": {
+              "1": "Keep using your treatment while you’re away. Bring your CPAP everywhere you sleep",
+              "2": "Your machine, mask and tubing, in your carry-on",
+              "3": "Distilled water for the humidifier",
+              "4": "A letter from your doctor, with the model and serial number of all your equipment",
+              "5": "A converter, if the electricity is different where you’re going",
+              "6": "Going somewhere much higher or lower than home? Ask your equipment provider first: altitude can change how some machines work",
+              "7": "Your airline told about your machine when you booked"
+            },
+            "note": "Going into hospital while you’re away? Bring your machine and use it.",
+            "links": {
+              "note": "Hospital stays"
+            },
+            "figure": {
+              "heading": "Pack list",
+              "hint": "Tick as you pack. Nothing is saved.",
+              "print": "Print the list",
+              "reset": "Clear ticks"
+            }
+          },
+          "9": {
+            "title": "Hospital stays, tests and procedures",
+            "items": {
+              "1": "If you go to the hospital, bring your CPAP machine and use it",
+              "2": "Use your CPAP or dental device everywhere you sleep, including an overnight stay in hospital",
+              "3": "Before sedation or anesthesia (“going under”) for a dental procedure, a test or surgery, tell everyone looking after you that you have sleep apnea",
+              "4": "Wear a medical alert bracelet that says you have sleep apnea"
+            }
+          },
+          "10": {
+            "title": "Who to ask",
+            "items": {
+              "1": "Your equipment provider: cleaning your model, worn parts, warranty, repairs and a loaner",
+              "2": "Your prescriber or sleep doctor: still sleepy, a weight change of 30 pounds or more, or your pressure",
+              "3": "Your program or insurance plan: what it pays for, and how often",
+              "4": "CATSA and your airline: security screening, and flying with your machine",
+              "5": "Health Canada: recalls and safety alerts, and reporting a device problem"
+            },
+            "figure": {
+              "legend": "What’s your question about?",
+              "topics": {
+                "1": {
+                  "label": "Cleaning"
+                },
+                "2": {
+                  "label": "Worn or broken parts"
+                },
+                "3": {
+                  "label": "Paying for supplies"
+                },
+                "4": {
+                  "label": "Travel"
+                },
+                "5": {
+                  "label": "A recall"
+                }
+              },
+              "fits": "Fits what you ticked",
+              "statusFitsOne": "{count} place fits what you ticked. Everyone stays listed.",
+              "statusFitsMany": "{count} places fit what you ticked. Everyone stays listed.",
+              "statusNone": "Nothing ticked. Everyone stays listed.",
+              "lanes": {
+                "1": {
+                  "label": "Your equipment provider"
+                },
+                "2": {
+                  "label": "Your prescriber or sleep doctor"
+                },
+                "3": {
+                  "label": "Your program or insurance plan"
+                },
+                "4": {
+                  "label": "CATSA and your airline"
+                },
+                "5": {
+                  "label": "Health Canada",
+                  "linkLabel": "Recalls and safety alerts"
+                }
+              }
+            }
+          }
+        },
+        "programsBand": {
+          "heading": "Before you reorder",
+          "cards": {
+            "1": {
+              "heading": "Check your manual",
+              "body": "Parts need replacing at different times. Your manual has the maker’s advice for yours."
+            },
+            "2": {
+              "heading": "Check your plan",
+              "body": "If a plan pays, check its replacement time frames and limits first."
+            },
+            "3": {
+              "heading": "Check the fit",
+              "body": "Marks that don’t fade, or leaks you can’t fix? Ask your provider about a different style before you reorder the same mask."
+            },
+            "4": {
+              "heading": "Check for recalls",
+              "body": "Look up your machine and mask in the Government of Canada’s recalls and safety alerts, including masks with magnets.",
+              "links": {
+                "1": {
+                  "label": "Recalls and safety alerts"
+                }
+              }
+            }
+          }
+        },
+        "closing": {
+          "heading": "Wherever you sleep",
+          "body": "Clean, check, replace, and pack it. Treatment works on the nights you use it, at home or away."
+        },
+        "governance": {
+          "disclaimer": "This is general information, not medical advice, and it is not a substitute for care from your sleep team, doctor or respiratory therapist. Follow your equipment’s manual. Funding limits shown are what programs pay for, not health advice, and they can change. Liivv never advises on machine settings."
+        },
+        "urgentExit": {
+          "lead": "Signs that need care right away are in Driving & Staying Safe, under",
+          "link": "Stop and act now"
+        }
+      },
+      "this-might-be-you": {
+        "title": "This Might Be You",
+        "heroBody": "Sleep apnea can look different in a child or a woman, and the risk grows with age. What to watch for, how children are tested and treated, and the help you can get.",
+        "focus": "Seasons of life: signs in children, testing and treatment for children, a child on CPAP, later life, and women. Care and community: partners and household, helping someone, First Nations and Inuit coverage, and paying for it.",
+        "vibe": "Warm and practical: for the person who notices, and the person who helps.",
+        "categoriesIntro": {
+          "eyebrow": "Every stage, every home",
+          "heading": "Sleep apnea doesn’t look the same for everyone",
+          "body": "Sleep apnea can look different in children and in women, and the risk grows with age. Often it’s a parent, partner or family member who notices first. This chapter helps you know what to look for and who to ask. It is not a way to diagnose anyone."
+        },
+        "startHere": {
+          "heading": "A season of life, or someone you care for?",
+          "pivot": "Your path",
+          "segments": {
+            "1": {
+              "label": "Seasons of life"
+            },
+            "2": {
+              "label": "Care and community"
+            }
+          }
+        },
+        "categories": {
+          "1": {
+            "title": "Signs in children",
+            "items": {
+              "1": "Sleep apnea affects 1 to 5 children in 100. Some children snore but don’t have sleep apnea",
+              "2": "At night: snoring (steady, with pauses, or only in some positions), breathing only through the mouth, long pauses in breathing, waking often, and sweating",
+              "3": "Restless sleep can look like turning from side to side, jerking the legs, or sitting up to breathe better while still asleep",
+              "4": "During the day: sleepiness, especially at school or in quiet activities, trouble learning or concentrating, low energy for sports and hobbies, and irritability, hyperactivity, impulsivity or aggression",
+              "5": "The most common cause is large tonsils or adenoids. This often happens between ages 2 and 8. Extra weight, weak breathing muscles, the shape of the skull and jaw, and other health conditions can also cause it",
+              "6": "Other signs parents notice include bed-wetting, night terrors, and unusual sleep positions, such as the head tipped back or sitting up with the mouth open",
+              "7": "Finding it early matters. Untreated, it can be linked to high blood pressure, poor growth, learning difficulties and behaviour problems"
+            },
+            "note": "These signs are not a diagnosis. If you notice them, talk to your child’s doctor. Snoring and long pauses while your child sleeps are worth mentioning.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "At night"
+                },
+                "2": {
+                  "heading": "During the day"
+                }
+              }
+            }
+          },
+          "2": {
+            "title": "Testing for children",
+            "items": {
+              "1": "Start with your child’s doctor. They will usually refer your child to a sleep medicine specialist at a hospital",
+              "2": "An overnight sleep study in a sleep lab (polysomnography) is the standard test for children. There is no replacement for it at this time",
+              "3": "During the study, small wires are attached to the skin with paste and child-friendly tape. They don’t hurt. They record oxygen, breathing, heartbeat and sleep, and a sleep technologist watches through the night",
+              "4": "A home sleep test may be a second option for otherwise healthy children over 5, when a lab study is out of reach because of long waits, distance or cost",
+              "5": "Overnight oximetry (a finger sensor that measures oxygen) and questionnaires can help, but they shouldn’t be used alone to diagnose sleep apnea in children",
+              "6": "Lab studies are hard to get in many parts of Canada, and waits can delay treatment. Ask your child’s doctor what the wait is where you live"
+            },
+            "note": "Your child’s sleep specialist looks at the results to find what kind of sleep problem it is and how serious it is.",
+            "figure": {
+              "heading": "Questions to bring",
+              "fields": {
+                "1": "Which sleep test is right for my child?",
+                "2": "How long is the wait, and where is the nearest lab?",
+                "3": "What should we bring to the sleep study?",
+                "4": "Who will explain the results to us?"
+              }
+            }
+          },
+          "3": {
+            "title": "Treatment for children",
+            "items": {
+              "1": "Surgery to remove the tonsils and adenoids (adenotonsillectomy) is often the first treatment, because large tonsils and adenoids are often the cause",
+              "2": "Other treatments include a weight program if your child carries extra weight, medicines to reduce swelling in the nose or airway, and less exposure to second-hand smoke and other pollution",
+              "3": "Some children need CPAP, a machine that blows air through a mask to keep the airway open. Some still need it after other treatments",
+              "4": "After this surgery, children with sleep apnea are watched more closely in hospital. Most go home after one night. Children under 3 with other conditions, such as Down syndrome, are more likely to have breathing problems after surgery",
+              "5": "Your child may need a follow-up sleep study after treatment",
+              "6": "Once your child is home after surgery, call your child’s surgeon, clinic or doctor right away for a fever of 38.5°C or higher, vomiting that won’t stop, pain that gets worse, refusing to drink, or fresh blood in the nose or mouth",
+              "7": "If your child is bleeding or having trouble breathing, take them to the closest emergency department right away"
+            },
+            "note": "If your child has other health conditions, the sleep team may also bring in other specialists. Tonsil surgery isn’t used to treat snoring alone in children.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Other treatments"
+                },
+                "2": {
+                  "heading": "Around surgery"
+                }
+              }
+            }
+          },
+          "4": {
+            "title": "A child on CPAP",
+            "items": {
+              "1": "Your child’s sleep team follows your child’s care. A sleep study sets the pressure on the machine, and another study after starting checks that it’s working and whether the pressure needs to change",
+              "2": "Your child needs a mask made for children (a paediatric mask), fitted and tried on, not an adult mask",
+              "3": "CPAP and follow-up care are different for children. Get help from professionals who work with children",
+              "4": "Your child can practise wearing the mask for short times during the day, during a quiet activity they enjoy",
+              "5": "Most children need time to get used to it. Make it part of the bedtime routine. A sticker chart or other reward can help",
+              "6": "Don’t fasten the mask too tightly. Check your child’s face for pressure marks",
+              "7": "CPAP is for every night of sleep, including holidays, sleepovers and camping",
+              "8": "If your child is sick and you’re worried about their breathing, call your child’s health-care provider or have your child seen at your local emergency department"
+            },
+            "note": "Children’s CPAP gives one steady pressure, set by the sleep team. Auto-adjusting machines are not for children. Some masks with magnets, including a youth version of one mask, have had Health Canada warnings: see Partners and household.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Getting set up"
+                },
+                "2": {
+                  "heading": "Getting used to it"
+                }
+              }
+            }
+          },
+          "5": {
+            "title": "Later life",
+            "items": {
+              "1": "In 2016 and 2017, 12.8% of Canadians aged 60 to 79 said they had been diagnosed with sleep apnea. That’s three times the rate in adults aged 18 to 59",
+              "2": "Adults aged 40 to 79 are at higher risk than younger adults. Being over 40 is one of the risk factors",
+              "3": "As you get older, or if you gain weight, habits that helped before may stop being enough. If your symptoms come back, see your doctor",
+              "4": "If you gain or lose 30 pounds or more, see your doctor. Your treatment may need to be checked",
+              "5": "Before sedation or anesthesia, for a dental procedure, a test or surgery, tell everyone caring for you that you have sleep apnea",
+              "6": "Use your CPAP or dental device everywhere you sleep, including an overnight stay in hospital. A medical alert bracelet that says you have sleep apnea can help",
+              "7": "In Ontario, residents of long-term care homes can get Assistive Devices Program funding for a PAP machine"
+            },
+            "note": "These numbers come from a national health survey. They describe Canadians in general, not any one person.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "As you age"
+                },
+                "2": {
+                  "heading": "Hospital and care"
+                }
+              }
+            }
+          },
+          "6": {
+            "title": "Women: the signs can look different",
+            "items": {
+              "1": "In a 2016–2017 national survey, men were twice as likely as women to say they had been diagnosed with sleep apnea",
+              "2": "Men more often have the classic signs, such as loud snoring or someone seeing them stop breathing",
+              "3": "Women more often feel tired or sleepy in the day, or have trouble falling or staying asleep",
+              "4": "Because the signs differ, sleep apnea may be missed in women"
+            },
+            "note": "Always tired, or sleeping badly, and not sure why? Ask your doctor whether sleep apnea could be part of it. See Is It Sleep Apnea? for the signs."
+          },
+          "7": {
+            "title": "Partners and household",
+            "items": {
+              "1": "Bed partners and family often notice the signs first. Many people with sleep apnea don’t know they snore or gasp for breath at night",
+              "2": "Once your partner is treated, you may sleep better too",
+              "3": "Some CPAP masks have magnets in the clips or straps. Their magnetic field may affect how some metal implants and objects in the body work, or move them. Examples are pacemakers, metal stents and metal in the eye. This may cause serious injury",
+              "4": "For the masks in Health Canada’s 2022 advisory, the advice is to stop using the mask if you, anyone in your household, a caregiver or a bed partner has one of the listed implants, and to get a mask with no magnets. For other masks with magnets, check with the mask’s maker and your health care team",
+              "5": "A later Health Canada recall of other masks with magnets warned that interference could affect how an implant works or where it sits, with a risk of serious injury or death",
+              "6": "Each machine is set for the person using it. Using a machine set for someone else could harm your health"
+            },
+            "note": "Does anyone in your home have a pacemaker, defibrillator, cochlear implant, metal stent, clip or plate, or any other implant? Check whether your mask has magnets, and check with the mask’s maker and your health care team before you use it.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Sharing a bedroom"
+                },
+                "2": {
+                  "heading": "Magnets and implants"
+                }
+              }
+            }
+          },
+          "8": {
+            "title": "Helping someone",
+            "items": {
+              "1": "If someone you love snores with pauses or gasps in their sleep, and is very sleepy in the day, encourage them to see their doctor",
+              "2": "Learn about their prescribed treatment, and help them get used to it",
+              "3": "Encourage them to keep going. Getting comfortable with a mask can take a few weeks, or even months",
+              "4": "Reassure them that using CPAP doesn’t change how you feel about them",
+              "5": "Support their efforts to be active, lose weight or quit smoking",
+              "6": "Helping a parent? Before a hospital stay or sedation, make sure the care team knows they have sleep apnea, and pack their machine",
+              "7": "Women more often have tiredness or trouble sleeping as signs, so listen to how they feel, not only to how they sound"
+            },
+            "note": "Falling asleep at the wheel, or a near miss, can’t wait. See the warning signs at the top of Driving & Staying Safe.",
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Noticing"
+                },
+                "2": {
+                  "heading": "Supporting"
+                }
+              }
+            }
+          },
+          "9": {
+            "title": "First Nations and Inuit: NIHB coverage",
+            "items": {
+              "1": "The Non-Insured Health Benefits (NIHB) program covers CPAP and auto CPAP machines, masks and supplies for eligible First Nations and Inuit. Prior approval is needed",
+              "2": "You can be eligible if you live in Canada and are a First Nations person registered under the Indian Act, an Inuk recognized by an Inuit land claim organization, or a child under 2 whose parent is eligible",
+              "3": "Some people get these benefits through a First Nations or Inuit government, community or health authority instead, such as clients of the First Nations Health Authority in BC. Not sure? Contact your NIHB regional office",
+              "4": "The request needs a diagnosis of sleep apnea with symptoms, your sleep study results and a prescription. It can start with a rental of up to 3 months, or with a request to buy. Buying needs test results that show your sleep improved on the machine",
+              "5": "NIHB’s replacement guidelines allow up to: a machine every 5 years, and 2 masks with headgear, 2 tubes and 14 inlet filters a year. Each replacement needs a new prescription",
+              "6": "Equipment comes from an enrolled respiratory provider with a registered respiratory therapist, or a registered nurse trained in managing respiratory conditions, on staff. The price covers mask fitting, set-up, follow-up and teaching",
+              "7": "NIHB doesn’t cover the cost of the sleep test itself"
+            },
+            "note": "Coverage is only for goods and services you get in Canada. Show your provider your client identification so they can confirm your coverage.",
+            "heldNote": "Coverage for First Nations and Inuit is being reviewed with an Indigenous health partner and will appear here soon. Until then, contact your NIHB regional office.",
+            "links": {
+              "item2": "Who is eligible for NIHB"
+            },
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Who it’s for"
+                },
+                "2": {
+                  "heading": "How it works"
+                }
+              }
+            }
+          },
+          "10": {
+            "title": "Paying for it",
+            "items": {
+              "1": "You can claim a CPAP machine bought with a prescription as a medical expense on your income tax return",
+              "2": "Many insurance plans cover CPAP equipment prescribed by a sleep doctor. Your insurer will ask for a copy of your prescription",
+              "3": "Public coverage differs by province. For example, Alberta’s public health insurance doesn’t currently pay for CPAP equipment, while Ontario has a program that helps pay for a machine",
+              "4": "In Ontario, the Assistive Devices Program pays 75% of its price for a PAP machine, or 100% if you get Ontario Works, the Ontario Disability Support Program or Assistance for Children with Severe Disabilities. It doesn’t pay for replacement masks or headgear",
+              "5": "For Ontario’s program, you must buy from a business registered with it, and follow its steps before you buy. If you buy first, you pay the full cost",
+              "6": "Veterans Affairs Canada’s respiratory equipment benefit includes CPAP, auto CPAP and bilevel machines, for eligible clients",
+              "7": "The Canadian Lung Association has a grant program to help pay for children’s CPAP machines"
+            },
+            "note": "First Nations or Inuit? See NIHB coverage above. Keep your receipts and your prescription. Insurers ask for a copy of your prescription, and receipts support a medical expense claim on your tax return.",
+            "links": {
+              "door": "See every program, province by province"
+            },
+            "figure": {
+              "columns": {
+                "1": {
+                  "heading": "Everyone"
+                },
+                "2": {
+                  "heading": "Programs"
+                }
+              }
+            }
+          }
+        },
+        "programsBand": {
+          "heading": "Who to bring in",
+          "cards": {
+            "1": {
+              "heading": "Your child’s doctor",
+              "body": "Snoring, pauses or restless sleep in a child? Start here. See Signs in children."
+            },
+            "2": {
+              "heading": "A sleep team for children",
+              "body": "Children’s CPAP needs people who work with children. See A child on CPAP."
+            },
+            "3": {
+              "heading": "Everyone you share a home with",
+              "body": "Tell them if your mask has magnets, and ask about implants. See Partners and household."
+            },
+            "4": {
+              "heading": "Your NIHB regional office",
+              "body": "Questions about NIHB coverage go here. See First Nations and Inuit.",
+              "links": {
+                "1": {
+                  "label": "Who is eligible for NIHB"
+                }
+              }
+            }
+          }
+        },
+        "closing": {
+          "heading": "You noticed. That matters.",
+          "body": "Often it’s someone close who sees the signs first. Bringing them up with a doctor is a good next step."
+        },
+        "governance": {
+          "disclaimer": "This is general information, not medical advice, and it is not a substitute for care from your doctor, your child’s sleep team or a respiratory therapist. A prescriber chooses treatment and sets the machine’s pressure. Liivv never advises on machine settings."
+        },
+        "urgentExit": {
+          "lead": "Signs that need care right away, including a child’s breathing, are in Driving & Staying Safe, under",
+          "link": "Stop and act now"
+        }
+      }
+    },
+    "paths": {
+      "cpap": {
+        "title": "CPAP",
+        "heroBody": "From your prescription to your first weeks, then cleaning, supplies and travel: the cards that matter most with CPAP, in one order.",
+        "intro": {
+          "eyebrow": "Your path",
+          "heading": "Living with CPAP",
+          "body": {
+            "1": "CPAP is generally the most effective treatment for obstructive sleep apnea, and the most common type of PAP. A machine blows air through a tube into a mask, and the airflow helps keep your airway open while you sleep. A CPAP machine gives one steady pressure. An APAP machine adjusts the pressure through the night as your breathing changes. You need a prescription, and your prescriber sets your settings.",
+            "2": "CPAP is a treatment, not a cure: it only works when you use it. Getting used to it can take up to 6 weeks, and a good mask fit is the key. This path follows the order most people need: your options, driving, your setup and first weeks, then cleaning, supplies and travel. Expect follow-up soon after you start, then every year."
+          }
+        },
+        "list": {
+          "heading": "Your CPAP reading list",
+          "intro": "Read in order, or jump to what you need today. Each card opens in its own chapter.",
+          "reasons": {
+            "1": "Start here: the two kinds of machine, and who sets the pressure",
+            "2": "Trials, warranty and returns, and how to check a machine’s licence",
+            "3": "If you’ve just had your results: how a treatment is chosen",
+            "4": "Untreated sleep apnea raises your risk of a crash",
+            "5": "If you drive: what licensing authorities check. These are licensing measures, not health targets",
+            "6": "Driving while you get used to CPAP",
+            "7": "What a good start may look like: check-ins at about 7 days and at 30 and 60 days, and an overnight oxygen test at 2 to 4 weeks",
+            "8": "What your prescription says. Only trained professionals should change your machine’s settings",
+            "9": "The main mask types, to talk over with your respiratory therapist",
+            "10": "A good mask fit is the key to using CPAP",
+            "11": "Comfort for a dry nose or mouth, and the water to use",
+            "12": "What to have on hand from the first night",
+            "13": "Getting used to CPAP can take up to 6 weeks. Keep going",
+            "14": "The numbers your machine records, and who uses them",
+            "15": "Leaks, dry mouth, marks and more. Never change your pressure yourself: only trained professionals should",
+            "16": "If it isn’t working for you: who to call, and what else can help",
+            "17": "Masks with magnets: who should check first",
+            "18": "What to do if your machine or mask is recalled",
+            "19": "Before you buy a CPAP cleaning gadget",
+            "20": "Your everyday cleaning routine",
+            "21": "Accessories usually need replacing every 3 to 12 months, and machines every 3 to 5 years",
+            "22": "How to tell a part is worn out",
+            "23": "Your CPAP can go in your carry-on when you fly",
+            "24": "For the people you share a home or a bed with",
+            "25": "Programs, insurance and tax, and what to ask before you buy"
+          }
+        },
+        "funding": {
+          "heading": "Funding & Coverage",
+          "body": "A CPAP machine bought with a prescription is an eligible medical expense on your income tax return. Public programs differ by province. In Ontario, for example, the Assistive Devices Program pays 75% of the program’s set price for a PAP system bought from a business registered with the program. It doesn’t pay for replacement masks or headgear. If you buy before you finish its steps, you pay the full cost. Some programs pay only businesses they register, so ask your program how it pays before you buy.",
+          "cta": "See what’s covered where you live"
+        }
+      },
+      "bilevel": {
+        "title": "Bilevel",
+        "heroBody": "What bilevel is, who prescribes it, and the setup and everyday cards that apply: in one order.",
+        "intro": {
+          "eyebrow": "Your path",
+          "heading": "Living with bilevel",
+          "body": {
+            "1": "A bilevel (BiPAP) machine gives a higher pressure when you breathe in and a lower pressure when you breathe out. It’s more complex than CPAP, and a sleep specialist should prescribe it. It’s also used for some other breathing problems in sleep, when oxygen and carbon dioxide levels don’t improve with CPAP. Your sleep specialist decides whether it’s right for you, and why.",
+            "2": "This path starts with what bilevel is and when a specialist uses it. Central sleep apnea needs a specialist’s assessment, because standard machines used alone can make it worse. Then come the setup, safety and everyday cards. Only trained professionals should change your machine’s settings."
+          }
+        },
+        "list": {
+          "heading": "Your bilevel reading list",
+          "intro": "The setup cards were written for CPAP. Ask your respiratory therapist which parts apply to your bilevel machine.",
+          "reasons": {
+            "1": "Start here: what bilevel is, and why a sleep specialist prescribes it",
+            "2": "Standard machines used alone can make central sleep apnea worse. A specialist decides the treatment",
+            "3": "How bilevel differs from the usual first treatment",
+            "4": "An insurer may refuse to pay for a second machine, so ask about trials first",
+            "5": "Why sleepiness and driving matter",
+            "6": "If you drive: what licensing authorities check",
+            "7": "The follow-up schedule for anyone new to a breathing machine",
+            "8": "What your prescription says. Only trained professionals should change your machine’s settings",
+            "9": "Mask types, with a note for bilevel users on nasal pillows",
+            "10": "Mask fit, straps and marks",
+            "11": "Comfort for a dry nose or mouth, and the water to use",
+            "12": "The first nights, and getting used to it",
+            "13": "Common problems, and why you never change the pressure yourself",
+            "14": "If it isn’t working for you: who to call, and what else can help",
+            "15": "Masks with magnets: who should check first",
+            "16": "What to do if your machine or mask is recalled",
+            "17": "Before you buy a cleaning gadget",
+            "18": "Your everyday cleaning routine",
+            "19": "When masks, tubing and filters are due",
+            "20": "Some programs list bilevel machines separately from CPAP"
+          }
+        },
+        "funding": {
+          "heading": "Funding & Coverage",
+          "body": "Coverage for bilevel machines differs by province. In New Brunswick, for example, the Social Development respiratory program covers bilevel machines up to $3,150, with masks and supplies, for its clients and their dependents who have no other coverage. Talk to your sleep team about how to pay before your machine is ordered.",
+          "cta": "See what’s covered where you live"
+        }
+      },
+      "travel-cpap": {
+        "title": "Travel CPAP",
+        "heroBody": "Taking your treatment with you: travel machines, flying, power, and keeping your routine away from home.",
+        "intro": {
+          "eyebrow": "Your path",
+          "heading": "CPAP away from home",
+          "body": {
+            "1": "Sleep apnea doesn’t take a holiday. CPAP only works when you use it, so take it with you when you travel. A smaller travel machine is easy to carry, quiet, and can run on batteries. The trade-offs: the pressure may not stay as steady, batteries cost extra where there’s no power supply, and it may not humidify the air enough. A travel machine still needs a prescription, and it must be set for you.",
+            "2": "When you fly in Canada, your CPAP can go in your carry-on, and its distilled water is exempt from the liquid limits at screening. You don’t need a doctor’s note for screening, though one can help. Altitude can change how some machines work. If you live in, or often travel to, places much higher or lower than where your treatment was set up, ask your prescriber and equipment provider about it."
+          }
+        },
+        "list": {
+          "heading": "Your travel reading list",
+          "intro": "Read before you buy a travel machine, or before your next trip. Each card opens in its own chapter.",
+          "reasons": {
+            "1": "Start here: the pros and cons, and why a travel machine still needs a prescription",
+            "2": "Trials, warranty and repairs before you buy a second machine",
+            "3": "Every PAP machine sold in Canada needs a Health Canada licence. Check before you buy",
+            "4": "The distilled water for your CPAP is exempt from the liquid limits at airport screening",
+            "5": "What to pack, from distilled water to a converter if the power is different where you’re going",
+            "6": "Keeping your cleaning routine on the road",
+            "7": "When parts are due, so they don’t run out mid-trip",
+            "8": "Altitude can change how some machines work. Ask your prescriber if you often travel much higher or lower than home",
+            "9": "Travel machines may not humidify the air as much",
+            "10": "Fixes for dry mouth, leaks and water in the tube, away from home",
+            "11": "Why to skip ozone and UV cleaners, travel-size ones too",
+            "12": "Long drives, and why sleepiness matters at the wheel",
+            "13": "An insurer may refuse to pay for a second machine. Ask before you buy"
+          }
+        },
+        "funding": {
+          "heading": "Funding & Coverage",
+          "body": "An extended health insurer may refuse to pay for a second machine, so ask yours before you buy a travel machine. A CPAP machine bought with a prescription is an eligible medical expense on your income tax return.",
+          "cta": "See what’s covered where you live"
+        }
+      },
+      "oral-appliance": {
+        "title": "Oral appliance",
+        "heroBody": "A mouth device for sleep apnea: who it may suit, what to check first, and how it compares.",
+        "intro": {
+          "eyebrow": "Your path",
+          "heading": "Treating sleep apnea with an oral appliance",
+          "body": {
+            "1": "An oral appliance fits over your upper and lower teeth and moves your lower jaw forward. That brings your tongue forward and opens your airway. It may suit mild to moderate sleep apnea, or people who can’t use or don’t want CPAP. For people it works for, a custom device can work as well as CPAP and is often easier to put up with.",
+            "2": "Everyone needs a medical assessment first, to confirm sleep apnea and how severe it is, and your dentist works with your doctor. Boil-and-bite devices are not recommended for treating sleep apnea. After you start, your doctor may send you for a follow-up sleep test to check it’s working."
+          }
+        },
+        "list": {
+          "heading": "Your oral appliance reading list",
+          "intro": "A short list. Each card opens in its own chapter.",
+          "reasons": {
+            "1": "Start here: how a custom oral appliance works, and who it may suit",
+            "2": "Oral appliances may suit mild to moderate sleep apnea, so your severity matters",
+            "3": "How your treatment is chosen",
+            "4": "How an oral appliance compares with CPAP and other options",
+            "5": "Boil-and-bite mouthguards are not recommended for treating sleep apnea",
+            "6": "Habits that help alongside your treatment",
+            "7": "A dentist with oral appliance experience, after your medical assessment",
+            "8": "Why sleepiness and driving matter",
+            "9": "With an oral appliance, you may be asked for proof that your treatment works",
+            "10": "In Ontario, the Assistive Devices Program doesn’t cover oral appliances"
+          }
+        },
+        "funding": {
+          "heading": "Funding & Coverage",
+          "body": "In Ontario, the Assistive Devices Program doesn’t cover dental or oral appliances for sleep apnea. Ask your dentist and your insurance plan what’s covered before you start. Funding & Coverage lists the programs we’ve checked, province by province.",
+          "cta": "See the programs"
+        }
+      },
+      "children": {
+        "title": "Children",
+        "heroBody": "Snoring, pauses and restless sleep in a child: the signs, how children are tested, and the treatments.",
+        "intro": {
+          "eyebrow": "Your path",
+          "heading": "Sleep apnea in children",
+          "body": {
+            "1": "Children can have obstructive sleep apnea too. Their airway keeps closing, partly or completely, while they sleep. Signs at night include snoring, breathing only through the mouth, restless sleep and long pauses in breathing. In the day, a child may be sleepy, find it hard to concentrate, or be irritable or hyperactive. Some children snore but don’t have sleep apnea.",
+            "2": "A sleep study is how it’s diagnosed. For children, an overnight study in a lab is the standard. A home test is a second choice, only for otherwise healthy children over 5 who can’t get a lab study, and overnight oximetry shouldn’t be used alone. Large tonsils or adenoids are a common cause. Treatment can include surgery to remove them, a weight loss program if your child is overweight, medicines to reduce swelling, or CPAP. Your child’s sleep team decides with you."
+          }
+        },
+        "list": {
+          "heading": "Your reading list for a child",
+          "intro": "Start with the children’s cards. A few cards were written for adults: read their notes for children.",
+          "reasons": {
+            "1": "Start here: what sleep apnea looks like in a child, at night and in the day",
+            "2": "An overnight sleep study in a lab is the standard test for children",
+            "3": "Large tonsils or adenoids are a common cause, and surgery to remove them is one treatment",
+            "4": "The basics. Its note says how children differ",
+            "5": "Some children snore but don’t have sleep apnea",
+            "6": "A home test is a second choice, only for otherwise healthy children over 5 who can’t get a lab study",
+            "7": "Who to call, including when a child needs emergency care",
+            "8": "If a mask in your home has magnets",
+            "9": "Most children take time to get used to PAP. It’s for every night of sleep, holidays and sleepovers too",
+            "10": "For a child, not too tight: two fingers should slip under the strap",
+            "11": "Cleaning a child’s mask and headgear. Your child’s equipment provider’s instructions come first",
+            "12": "For parents, partners and carers",
+            "13": "With government help or private insurance, some of the cost of a child’s CPAP may be covered"
+          }
+        },
+        "funding": {
+          "heading": "Funding & Coverage",
+          "body": "If you get government assistance or have private insurance, some of the cost of a child’s CPAP may be covered. Funding & Coverage lists the programs we’ve checked, province by province.",
+          "cta": "See the programs"
+        }
+      },
+      "not-diagnosed-yet": {
+        "title": "Not diagnosed yet",
+        "heroBody": "Wondering if it’s sleep apnea? The signs, how testing works, and what to ask your doctor.",
+        "intro": {
+          "eyebrow": "Your path",
+          "heading": "Before a diagnosis",
+          "body": {
+            "1": "Many people with sleep apnea don’t know they have it. In population surveys, 86% to 95% of people with significant sleep apnea had never been diagnosed. A bed partner or family member often notices the signs first: loud snoring, or pauses in breathing with gasping or choking. Being very sleepy during the day is the most common sign.",
+            "2": "Only a sleep study can tell whether you have sleep apnea, in a lab or at home. Home tests aren’t for checking people who have no symptoms. Start by seeing your family doctor or nurse practitioner. Untreated sleep apnea raises the risk of a car crash. If you’ve nodded off at the wheel, or nearly, read Stop and act now in Driving & Staying Safe first."
+          }
+        },
+        "list": {
+          "heading": "Your reading list",
+          "intro": "Read in order, or jump to what you need today. Nothing here can tell you whether you have sleep apnea. A sleep study does that.",
+          "reasons": {
+            "1": "Start here: what happens to your breathing in sleep apnea",
+            "2": "A bed partner or family member often notices the signs first",
+            "3": "A checklist to print for your doctor. It isn’t a test",
+            "4": "In 2016 and 2017, nearly a third of Canadian adults were at moderate or high risk on a screening questionnaire",
+            "5": "If your trouble is falling asleep or staying asleep",
+            "6": "When snoring is a reason to see your doctor",
+            "7": "Untreated sleep apnea raises the risk of a crash. Nodded off at the wheel? Read Stop and act now first",
+            "8": "The licensing authority decides whether you can drive",
+            "9": "What your doctor may ask, and what to bring",
+            "10": "Home tests aren’t for checking people who have no symptoms",
+            "11": "How to read the main number on a sleep study report",
+            "12": "From results to a treatment plan",
+            "13": "Where to start, and who to ask about what",
+            "14": "A first look at the treatments, if a test shows sleep apnea"
+          }
+        },
+        "funding": {
+          "heading": "Funding & Coverage",
+          "body": "Some funding programs have rules about testing. In Ontario, funding for a machine through the Assistive Devices Program starts with a doctor at a sleep clinic registered with the program. The Non-Insured Health Benefits program doesn’t pay for sleep tests. If you may need funding later, ask about this before you’re tested.",
+          "cta": "See the programs"
+        }
+      }
+    },
+    "funding": {
+      "provinceLabels": {
+        "BC": "British Columbia",
+        "AB": "Alberta",
+        "SK": "Saskatchewan",
+        "MB": "Manitoba",
+        "ON": "Ontario",
+        "QC": "Quebec",
+        "NB": "New Brunswick",
+        "NS": "Nova Scotia",
+        "PE": "Prince Edward Island",
+        "NL": "Newfoundland and Labrador",
+        "YT": "Yukon",
+        "NT": "Northwest Territories",
+        "NU": "Nunavut"
+      },
+      "options": {
+        "test": {
+          "inLab": "An overnight test in a sleep lab (Level 1)",
+          "home": "A home sleep test (Level 3)",
+          "notYet": "I haven’t been tested yet",
+          "unsure": "Not sure"
+        },
+        "need": {
+          "first": "My first machine",
+          "replacement": "Replacing a machine I have",
+          "supplies": "Masks, tubing, filters and other supplies"
+        }
+      },
+      "groups": {
+        "nihb": "First Nations and Inuit health benefits",
+        "vac": "Veterans Affairs Canada",
+        "machine": "Help with a machine",
+        "supplies": "Help with supplies",
+        "privateFirst": "If you have private insurance",
+        "tax": "Tax credit"
+      },
+      "programs": {
+        "fed-nihb-respiratory": {
+          "covered": "NIHB covers CPAP and auto CPAP (APAP) machines, and bilevel machines for some people. It also covers masks with headgear, tubing, chin straps and inlet filters. The usual limits are one machine every 5 years, 2 masks with headgear a year for each type, 2 tubes a year, 2 chin straps a year and 14 inlet filters a year. More may be considered case by case.",
+          "who": "First Nations people registered under the Indian Act, Inuit recognized by an Inuit land claim organization, and children under 2 whose parent is eligible, living in Canada. Some First Nations and Inuit get their benefits directly from their own government, community or health authority instead. You need a diagnosis of sleep apnea with symptoms, a sleep study read by a sleep doctor and a prescription. A Level 1, Level 3 (home) or Level 4 study is accepted.",
+          "howToApply": "Your machine needs prior approval before you get it, and so do masks, tubing and chin straps. Your provider sends the request to the NIHB regional office for its region. Providers registered with NIHB bill it directly, so you don’t pay for eligible items. If you pay yourself, check with NIHB before you buy, and send your claim within a year.",
+          "notes": "It can start with a rental of up to 3 months, or with a purchase. Buying the machine needs a treatment test that shows your sleep has improved. The price must include mask fitting, set-up, follow-up and teaching. NIHB doesn’t pay for the sleep test itself."
+        },
+        "bc-fnha-mse": {
+          "covered": "First Nations people in BC who are clients of the First Nations Health Authority get their health benefits from its Health Benefits program, not NIHB. Its medical supplies and equipment benefit lists CPAP, auto CPAP (APAP) and bilevel machines, usually one every 5 years. It also lists masks with headgear, tubing, chin straps and inlet filters.",
+          "who": "First Nations people with Indian status who live in BC, and infants up to 24 months if a parent is eligible.",
+          "howToApply": "Ask your provider whether they’re registered with the program. Registered providers bill it directly. A machine needs approval first: your provider can send your sleep study, a medical note and a quote. If your provider isn’t registered, you pay and ask for a refund."
+        },
+        "fed-vac-poc9": {
+          "covered": "Veterans Affairs Canada’s respiratory equipment benefit includes CPAP, auto CPAP (APAP) and bilevel (BiPAP) machines. Equipment and supplies that may be approved are listed in its benefit grids.",
+          "who": "Eligible Veterans Affairs Canada clients. For a condition that isn’t linked to your disability benefits, it may pay what’s left after your provincial health plan, or what that plan doesn’t provide.",
+          "howToApply": "Veterans Affairs Canada pays for the item or pays you back. If your provider charges more than it can pay, you can choose another provider or pay the difference. Send claims within 18 months."
+        },
+        "fed-cra-medical": {
+          "covered": "A CPAP machine counts as an eligible medical expense on your income tax return. It needs a prescription.",
+          "who": "You, or your spouse or common-law partner, can claim amounts paid in any 12-month period ending in the tax year.",
+          "howToApply": "Only the part above a yearly threshold counts. For 2025 returns, that’s the lesser of 3% of your net income or $2,834. Keep your receipts and your prescription. In Quebec, provincial credits are claimed through Revenu Québec."
+        },
+        "on-adp-respiratory": {
+          "covered": "Ontario’s Assistive Devices Program helps pay for a CPAP, auto CPAP (APAP) or bilevel (BPAP) machine. The machine package includes a heated humidifier, a basic mask and headgear, a carrying case, tubing, filters and a user manual. The program pays 75% of its approved price, and you pay the other 25%. If you get Ontario Works, the Ontario Disability Support Program or Assistance for Children with Severe Disabilities, it pays 100%.",
+          "who": "Ontario residents with a valid health card who need the machine for 6 months or longer. A doctor at a sleep clinic registered with the program assesses you. The assessment must include a Level 1 sleep study at a sleep lab registered with the program. Your income isn’t considered.",
+          "howToApply": "Follow the program’s steps before you buy. Get assessed, then buy from a business registered with the program. The business sends in the form for you. The program pays its share to that business, and you pay your 25% when you pick up the machine. If you buy before the steps are done, you pay the full cost.",
+          "notes": "It doesn’t pay for replacement masks or headgear, repairs or oral appliances. The program expects a machine to last at least 5 years. You can apply to replace it if your needs change, or if it’s worn out, out of warranty and can’t be repaired at a reasonable cost. Residents of long-term care homes can get funding for a PAP machine. You don’t qualify if you already get, or qualify for, the same equipment through WSIB, or through Veterans Affairs Canada as a Group “A” veteran."
+        },
+        "on-odsp-msn": {
+          "covered": "If you get the Ontario Disability Support Program, its Mandatory Special Necessities benefit can cover replacement PAP supplies: masks, mask cushions and liners, interfaces with headgear, tubing, water chambers, filters and distilled water. Its list also includes an oral appliance for sleep apnea.",
+          "who": "ODSP recipients and members of their benefit unit, diagnosed with obstructive sleep apnea. An approved health care professional confirms the diagnosis and how long you’ll need the supplies.",
+          "howToApply": "Ask your ODSP office for supplies when you need them. ODSP must approve the need first. It pays a supplier who bills it, or adds the amount to your monthly payment. It pays actual costs, based on receipts. Approval is for basic items at the most economical cost.",
+          "notes": "The machine itself comes through the Assistive Devices Program. ODSP pays only if no other program or private insurance pays for the same item."
+        },
+        "sk-sail-cpap": {
+          "covered": "Saskatchewan lends you a CPAP machine through SAIL for a $275 program fee. The fee covers the loan and any repairs needed during the machine’s useful life of 5 years. You can keep the machine longer if it still works well. You pay the fee before you get the machine. There are no payment plans, and the fee isn’t refundable.",
+          "who": "Saskatchewan residents with a valid health services number and moderate to severe sleep apnea (an AHI or RDI of 15 or higher). Also children under 18 who need CPAP for a medical condition. A Sleep Disorder Centre can also prescribe it for an urgent medical need, or for mild sleep apnea with symptoms in someone who works in a high-risk job. SAIL isn’t for people who get benefits from another government agency, such as SGI, the Workers’ Compensation Board, NIHB or Veterans Affairs Canada.",
+          "howToApply": "Your family doctor refers you to a respirologist. You need a Level 1 or Level 3 sleep study, and a Level 3 study must be done in Saskatchewan unless SAIL approves otherwise. A sleep specialist at a Saskatchewan Sleep Disorders Centre reads the results and confirms the diagnosis. A Saskatchewan respirologist prescribes CPAP, and can apply for you or tell you how.",
+          "notes": "You pay for your own supplies, such as masks, headgear and filters. With Supplementary Health Benefits, or Family Health Benefits for children, the machine and supplies are free. SAIL doesn’t pay you back for a machine you bought yourself, and it doesn’t offer travel machines. You can have one SAIL machine at a time."
+        },
+        "mb-misericordia-cpap": {
+          "covered": "Manitoba’s CPAP program helps pay for a machine. After a successful trial you pay a $500 co-pay, which includes the machine, your first mask, filters, a humidifier chamber and tubing. The health authority pays the rest of the machine’s cost, plus a first consultation with your supplier, mask fitting, teaching and follow-up visits for treatment problems.",
+          "who": "Manitobans prescribed a CPAP machine by the Sleep Disorder Centre at Misericordia Health Centre.",
+          "howToApply": "Take your prescription to one of the two suppliers the Sleep Disorder Centre lists. The supplier fits you, teaches you how to use the equipment and gives you a trial of at least a month. To pass the trial, you use it on at least 70% of nights, for 4 hours or more. That’s the program’s rule; your sleep team sets your own goal.",
+          "notes": "After that, you pay for supplies, delivery and repairs. You can get a new machine every 5 years for another $500 co-pay. If you can’t afford it and have no Employment and Income Assistance or private insurance, ask about exceptional circumstances."
+        },
+        "bc-bcea-breathing": {
+          "covered": "If you get income or disability assistance in BC, the ministry may pay for a CPAP or bilevel machine for moderate to severe obstructive sleep apnea. If you can’t use one, it may pay for a mandibular advancement device instead. It may replace the machine after 5 years, and the supplies needed to run it after 1 year.",
+          "who": "People on income or disability assistance who are eligible for general health supplements, or who meet the life-threatening health needs criteria. No other resource, such as another program or private insurance, can pay. It must be the least expensive suitable device.",
+          "howToApply": "Get a quote from a supplier. Fill in the Breathing Device Request and Justification form (HR3727) with a doctor’s or nurse practitioner’s prescription and a respiratory therapist’s assessment. The ministry must approve it before you buy.",
+          "notes": "It won’t pay for a device bought without approval, unless it’s a life-threatening emergency. It may share the cost when insurance pays only part."
+        },
+        "ab-aish": {
+          "covered": "AISH may help with the cost of a CPAP device and supplies, as a health-related personal benefit.",
+          "who": "AISH clients with no more than $5,000 in non-exempt assets, or in financial hardship, who need the benefit, aren’t eligible for it through any other program or source, and meet that benefit’s own requirements.",
+          "howToApply": "Talk to your AISH worker before you buy. Some personal benefits may need to be paid back."
+        },
+        "nb-sd-respiratory": {
+          "covered": "New Brunswick’s respiratory program covers CPAP machines up to $1,800 and BPAP machines up to $3,150, and CPAP and BPAP masks and supplies.",
+          "who": "Clients of the Department of Social Development and their dependents, and people with special health needs who qualify for assisted health care. You need a Health Services card that shows this coverage. For full benefits, you can’t have any other coverage for the item.",
+          "howToApply": "Use the program’s CPAP or BPAP application form.",
+          "notes": "How often you can replace a machine varies. Supplies may be paid monthly, and quantities are monitored."
+        }
+      },
+      "province": {
+        "bc-not-covered": {
+          "title": "In BC, PharmaCare and the Medical Services Plan don’t pay for CPAP",
+          "body": "BC PharmaCare doesn’t cover CPAP machines. BC’s Medical Services Plan doesn’t pay for PAP machines or accessories. Private or extended health insurance often covers some or all of a prescribed machine. If you get income or disability assistance, see the ministry’s breathing devices benefit below. First Nations people may get help through the First Nations Health Authority."
+        },
+        "ab-not-covered": {
+          "title": "In Alberta, public health insurance doesn’t pay for CPAP",
+          "body": "Alberta Health Care Insurance doesn’t cover CPAP equipment or accessories. Health insurance may cover it. These programs may also help: Alberta Income Support, Special Needs Assistance for Seniors, AISH, NIHB and Veterans Affairs Canada."
+        },
+        "qc-still-checking": {
+          "title": "Quebec: we’re still checking",
+          "body": "We haven’t confirmed a public program for CPAP machines in Quebec. In figures published in 2024, 74% of people diagnosed with sleep apnea in Quebec had private insurance, and 3.1% had social assistance that partly covers the machine. Some had no coverage and could only claim the medical expense tax credit. We’re checking whether a public program has started since."
+        },
+        "stillChecking": {
+          "title": "{province}: we’re still checking",
+          "body": "We haven’t found and checked an official {province} program for CPAP yet, so we aren’t listing one. That doesn’t mean there’s no help. Ask your sleep clinic or doctor, and look at the federal programs below."
+        },
+        "aadl": {
+          "title": "Alberta Aids to Daily Living: we’re still checking",
+          "body": "We couldn’t read Alberta Aids to Daily Living’s rules for CPAP, so we aren’t listing it yet. Ask your sleep clinic or doctor."
+        }
+      },
+      "liivv": {
+        "askUsTitle": "Ordering from Liivv",
+        "askUsBody": "Liivv doesn’t bill any program directly yet. When you order supplies from us, you pay for your order. Some programs pay you back from a receipt. Others pay only a business registered with them. Check how yours pays before you order, or ask us."
+      }
+    },
+    "machineGuide": {
+      "title": "Common sleep apnea machines, compared",
+      "notSold": "Liivv doesn’t sell CPAP or other sleep apnea machines yet.",
+      "intro": "This guide helps you talk to your prescriber about the machines in it. It doesn’t recommend one.",
+      "cards": {
+        "1": {
+          "title": "Machine types, and who prescribes each",
+          "items": {
+            "1": "A CPAP machine blows air at one steady pressure",
+            "2": "An auto CPAP (APAP) changes the pressure through the night as your breathing pattern changes",
+            "3": "A bilevel (BiPAP) machine uses a higher pressure when you breathe in and a lower one when you breathe out",
+            "4": "Some bilevel machines are more advanced and are made for complex breathing disorders. They aren’t needed for obstructive sleep apnea. ASV is one of these (see the ASV card)",
+            "5": "Every machine needs a prescription. Some provincial guidance says auto and bilevel machines should be prescribed only by a sleep specialist",
+            "6": "Each CPAP machine must be set for the person using it, and only trained professionals should change machine settings"
+          }
+        },
+        "2": {
+          "title": "Travel machines",
+          "items": {
+            "1": "Travel machines are easier to take with you, and some run on a battery",
+            "2": "The trade-offs: pressure may not be as steady, batteries cost extra when there’s no wall power, and they may not give enough humidity",
+            "3": "Altitude can change how a machine works unless it has features that adjust for it. Talk about portability and altitude with your prescriber and your equipment supplier",
+            "4": "If you plan to use your machine on the plane, tell the airline’s reservation agent whether it uses batteries or needs onboard power",
+            "5": "When you fly, bring your machine as carry-on with a letter from your doctor, and check the type of power supply where you’re going",
+            "6": "Some travel machines take only their own masks and parts, so check before you buy a mask"
+          }
+        },
+        "3": {
+          "title": "Data and apps",
+          "items": {
+            "1": "Many machines record how many hours you use them, breathing events and mask leak",
+            "2": "Some connect to a phone app by Bluetooth, Wi-Fi or cellular, so you can track your data and send reports to your provider. Others store reports on an SD or USB card, if you’d rather not use a wireless connection",
+            "3": "Many machines store data on servers outside Canada, where privacy laws may differ. Ask your provider how they report your data and how they keep it safe"
+          },
+          "note": "The chart shows how each machine shares data."
+        },
+        "4": {
+          "title": "Recalls and safety",
+          "items": {
+            "1": "PAP machines sold in Canada must have a Health Canada medical device licence. You can look up a model in Health Canada’s Medical Devices Active Licence Listing (MDALL), and check Health Canada’s website for recalls",
+            "2": "The Philips foam recall (RA-62729) covers several Philips CPAP and bilevel machines and ventilators made before April 26, 2021. If you have one, talk to your doctor or equipment provider before you stop or change how you use it",
+            "3": "Clean it only as the maker’s instructions say. Cleaning methods that haven’t been validated, such as ozone, could add to the foam breakdown"
+          },
+          "note": "The licences in this guide were checked on 2026-10-13. Licences and recalls change, so check again before you buy.",
+          "links": {
+            "mdall": "Search MDALL",
+            "recalls": "Search recalls and safety alerts"
+          }
+        },
+        "5": {
+          "title": "Questions to ask before you buy",
+          "items": {
+            "1": "Is this the type of machine my prescriber ordered, and is it right for my condition?",
+            "2": "Does it have a Health Canada licence, and has it been recalled?",
+            "3": "Is it new or used, and is there a warranty? Equipment bought in Canada usually has a 3-year warranty and should have a CSA stamp",
+            "4": "Will the seller ask for my prescription before selling it to me?",
+            "5": "Who sets it up, follows up with me, and handles repairs?",
+            "6": "Can I try it first? Some suppliers offer trials, and some don’t give returns or refunds once equipment has been used",
+            "7": "With a second-hand machine, it can be hard to know if it works well and if any warranty is left"
+          },
+          "note": "Talk to your doctor before and after you buy."
+        },
+        "asv": {
+          "title": "ASV",
+          "items": {
+            "1": "ASV is a type of bilevel machine. Some provincial guidance says bilevel machines should be prescribed only by a sleep specialist",
+            "2": "People with suspected central sleep apnea should be checked with a detailed overnight test in a sleep lab to find the right treatment",
+            "3": "In 2015, Health Canada posted a Type I recall of several ASV machines. It names a serious safety concern for people with symptomatic, chronic heart failure with reduced left ventricular ejection fraction who are on ASV therapy: a 33.5% increased risk of cardiovascular death",
+            "4": "Ontario’s Assistive Devices Program doesn’t cover ASV"
+          }
+        }
+      },
+      "chart": {
+        "label": "Compare machines",
+        "a": {
+          "heading": "Type, prescriber and Health Canada",
+          "columns": {
+            "model": "Model (maker)",
+            "type": "Type (maker’s words)",
+            "prescriber": "Who prescribes",
+            "licence": "Health Canada licence",
+            "recall": "Health Canada recall or advisory"
+          },
+          "noRecall": "None found (a search, not proof)",
+          "adpNote": "Funding note, not a recall: Ontario’s Assistive Devices Program doesn’t cover ASV."
+        },
+        "b": {
+          "heading": "Maker facts",
+          "columns": {
+            "model": "Model",
+            "humidifier": "Humidifier",
+            "tube": "Heated tube",
+            "travel": "Travel and power",
+            "size": "Size and weight",
+            "noise": "Noise (maker’s figure)",
+            "data": "Data",
+            "masks": "Masks or tubing"
+          },
+          "notStated": "Not stated by the maker"
+        },
+        "makerLabel": "Maker",
+        "footnote": "Makers measure noise in different ways, so these figures aren’t a ranking. Licences checked 2026-10-13. “None found” means a search found nothing; it isn’t proof."
+      }
+    }
   }
 }

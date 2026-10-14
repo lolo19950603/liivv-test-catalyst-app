@@ -20,7 +20,7 @@ import type { Messages } from 'next-intl';
 import { siteChapterMessages } from '../chapters/compose';
 import { chapterHref, localeHref } from '../chapters/hrefs';
 import type { SiteConfig, SiteNs } from '../site';
-import { resolveSource, type SiteRegister } from '../sources';
+import { resolveSource, type SiteRegister, sourceKey } from '../sources';
 
 import type { LandingChapterCard, LandingCitation } from './types';
 
@@ -48,9 +48,9 @@ export function uniqueCitations(lists: ReadonlyArray<readonly LandingCitation[]>
   const seen = new Set<string>();
 
   return lists.flat().filter((citation) => {
-    if (seen.has(citation.href)) return false;
+    if (seen.has(sourceKey(citation))) return false;
 
-    seen.add(citation.href);
+    seen.add(sourceKey(citation));
 
     return true;
   });

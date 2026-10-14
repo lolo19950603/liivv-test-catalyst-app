@@ -1,12 +1,20 @@
 /**
- * Re-checks every official page behind the Diabetes Care Funding & Coverage
- * page (/liivv-health/diabetes-care/funding) against the copy taken on the
- * day its facts were last verified.
+ * Re-checks every official page behind a care site's Funding & Coverage page
+ * (/liivv-health/diabetes-care/funding, or with --site=sleep-apnea-care
+ * /liivv-health/sleep-apnea-care/funding) against the copy taken on the day
+ * its facts were last verified.
  *
  * Run from the repo root:
  *   node core/scripts/check-funding-sources.mjs
  *   node core/scripts/check-funding-sources.mjs --json
  *   node core/scripts/check-funding-sources.mjs --update-baseline
+ *   node core/scripts/check-funding-sources.mjs --site=sleep-apnea-care [--update-baseline]
+ *
+ * Each site keeps its own baseline: data/funding-sources-baseline.json for
+ * Diabetes Care (the default), data/funding-sources-baseline.sleep-apnea-care.json
+ * for Sleep Apnea Care, whose record also cites province caution cards
+ * (PROVINCE_CAUTION, their phrases checked too) and office-list pages
+ * (`contactSource`).
  *
  * For every register entry the page cites (each program's sources, the phone
  * numbers' sources, the provincial drug plans it names, the private-insurance
@@ -57,8 +65,28 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const DC = join(HERE, '..', 'app', '[locale]', '(default)', 'liivv-health', 'diabetes-care');
-const BASELINE = join(HERE, 'data', 'funding-sources-baseline.json');
+const SITES = {
+  'diabetes-care': 'funding-sources-baseline.json',
+  'sleep-apnea-care': 'funding-sources-baseline.sleep-apnea-care.json',
+};
+const SITE =
+  process.argv.find((arg) => arg.startsWith('--site='))?.slice('--site='.length) ??
+  'diabetes-care';
+
+if (!Object.hasOwn(SITES, SITE)) {
+  console.error(`Unknown --site=${SITE}. Known: ${Object.keys(SITES).join(', ')}`);
+  process.exit(2);
+}
+
+const DC = join(HERE, '..', 'app', '[locale]', '(default)', 'liivv-health', SITE);
+/*
+ * Sleep Apnea Care's phrases may also match the whole page, header and footer
+ * included (the VAC number sits in the site-wide contact line). Diabetes Care
+ * keeps its recheck to <main>, as when its baseline was taken, so a phrase that
+ * left the page body is never "found" in a site-wide header.
+ */
+const WHOLE_PAGE_PHRASES = SITE === 'sleep-apnea-care';
+const BASELINE = join(HERE, 'data', SITES[SITE]);
 
 const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36';
@@ -129,8 +157,8 @@ export function normalise(text) {
     .toLowerCase();
 }
 
-function visibleText(html) {
-  const mainHtml = /<main\b[^>]*>([\s\S]*?)<\/main>/i.exec(html)?.[1];
+function visibleText(html, whole = false) {
+  const mainHtml = whole ? undefined : /<main\b[^>]*>([\s\S]*?)<\/main>/i.exec(html)?.[1];
 
   return decodeEntities(
     (mainHtml ?? html)
@@ -260,6 +288,13 @@ async function readPage(href) {
       title: title || undefined,
       modified: modifiedMarks(html, text),
       text,
+      /*
+       * The whole page's words, header and footer included, for the phrase check
+       * only: some pages print a program's phone number in their site-wide
+       * contact line, outside <main> (Veterans Affairs Canada). The hash stays on
+       * `text`, so a re-styled header is still not a change.
+       */
+      wholeText: visibleText(html, true),
       textRead: !blocked,
       blocked,
     };
@@ -297,6 +332,7 @@ function citedSources(funding) {
     ...funding.PROGRAM_META.flatMap((meta) => [
       ...meta.sources,
       ...(meta.phones ?? []).map((phone) => phone.source),
+      ...(meta.contactSource ? [meta.contactSource] : []),
       ...(meta.checkPhrases ?? []).flatMap((entry) =>
         typeof entry === 'string' ? [] : [entry.source],
       ),
@@ -305,6 +341,14 @@ function citedSources(funding) {
     ...Object.values(funding.PRIVATE_FIRST ?? {}).map((entry) => entry.source),
     ...(funding.PAY_LATER?.sources ?? []),
     ...Object.values(funding.PAGE_SOURCES ?? {}).flat(),
+    /* Sleep Apnea Care: the province caution cards, their phones and their phrases' pages. */
+    ...Object.values(funding.PROVINCE_CAUTION ?? {}).flatMap((caution) => [
+      ...caution.sources,
+      ...(caution.phones ?? []).map((phone) => phone.source),
+      ...(caution.checkPhrases ?? []).flatMap((entry) =>
+        typeof entry === 'string' ? [] : [entry.source],
+      ),
+    ]),
   ];
 
   return [...new Set(ids.filter(Boolean))];
@@ -341,9 +385,17 @@ function compare(now, before) {
   return { verdict: changes.length ? 'CHANGED' : 'OK', changes };
 }
 
-/* Each program row's phrases, against the text of the page each one names (its first source by default). */
+/*
+ * Each program row's phrases, against the text of the page each one names (its
+ * first source by default); Sleep Apnea Care's province caution cards too.
+ */
 function phraseResults(funding, pages) {
-  return funding.PROGRAM_META.flatMap((meta) =>
+  const cautions = Object.values(funding.PROVINCE_CAUTION ?? {}).map((caution) => ({
+    ...caution,
+    id: `caution:${caution.id}`,
+  }));
+
+  return [...funding.PROGRAM_META, ...cautions].flatMap((meta) =>
     (meta.checkPhrases ?? []).map((entry) => {
       const source = typeof entry === 'string' ? meta.sources[0] : entry.source;
       const phrase = typeof entry === 'string' ? entry : entry.phrase;
@@ -357,7 +409,9 @@ function phraseResults(funding, pages) {
         source,
         phrase,
         ...(french ? { french } : {}),
-        found: normalise(page.text).includes(normalise(phrase)),
+        found:
+          normalise(page.text).includes(normalise(phrase)) ||
+          (WHOLE_PAGE_PHRASES && normalise(page.wholeText ?? '').includes(normalise(phrase))),
       };
     }),
   );
@@ -417,7 +471,9 @@ async function checkOneUrl(href) {
 
   if (dump) dumpText(dump, 'url', page);
 
-  const { text, ...rest } = page;
+  const { text, wholeText, ...rest } = page;
+
+  void wholeText;
 
   console.log(
     JSON.stringify(

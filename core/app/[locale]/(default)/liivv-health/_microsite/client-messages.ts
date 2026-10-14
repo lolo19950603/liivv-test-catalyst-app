@@ -38,7 +38,7 @@ import { withoutHeldMessages } from '../ostomy-care/chapters/held-messages';
  * under that site's layout. A site's namespace goes here the day it is added
  * to the message files, not after.
  */
-const SITE_NAMESPACES = ['DiabetesCare'] as const;
+const SITE_NAMESPACES = ['DiabetesCare', 'SleepApneaCare'] as const;
 
 export type SiteNamespace = (typeof SITE_NAMESPACES)[number];
 

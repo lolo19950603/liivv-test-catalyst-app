@@ -1,0 +1,278 @@
+/*
+ * The machine guide's own rules (./sa-machine-guide-page.tsx), on top of the
+ * shared chapter stylesheet. Every rule is scoped under the Sleep root, so
+ * none can reach an Ostomy or Diabetes page.
+ */
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-not-sold {
+  font-weight: 650;
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-intro {
+  max-width: 46rem;
+  padding: 0.5rem 0 0.25rem;
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-intro p {
+  max-width: var(--measure);
+}
+
+/* ---------- the chart ---------- */
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-chart {
+  display: grid;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+/* Grid items may shrink below the tables' width: only the scroll regions are wide. */
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-chart > *,
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table-section {
+  min-width: 0;
+  max-width: 100%;
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table-section h3 {
+  margin: 1rem 0 0.5rem;
+  font-size: clamp(1.15rem, 2.2vw, 1.35rem);
+}
+
+/*
+ * A table wider than the page scrolls inside this region; the page never
+ * scrolls sideways. A shadow at an edge says there is more that way: the
+ * paper-coloured covers move with the table (local) and hide each shadow
+ * once that edge is reached.
+ */
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background:
+    linear-gradient(to right, var(--paper) 40%, transparent) left center / 2rem 100% no-repeat local,
+    linear-gradient(to left, var(--paper) 40%, transparent) right center / 2rem 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgba(49, 47, 47, 0.22), transparent) left center /
+      0.9rem 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgba(49, 47, 47, 0.22), transparent) right center /
+      0.9rem 100% no-repeat scroll,
+    var(--paper);
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-scroll:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--chapter-accent) 35%, var(--ink));
+  outline-offset: 2px;
+}
+
+/* As wide as its columns need (each at least 9rem): five fit a desktop page, eight scroll. */
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--text-small);
+  line-height: 1.45;
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table th,
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table td {
+  padding: 0.55rem 0.6rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table thead th {
+  background: var(--cream);
+  font-weight: 650;
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table tbody th {
+  min-width: 9rem;
+  font-weight: 650;
+}
+
+/* The model stays in view while the other columns scroll past it. */
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table thead th:first-child,
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table tbody th {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  box-shadow: inset -1px 0 0 var(--line);
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table tbody th {
+  background: var(--paper);
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table a {
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-empty {
+  color: var(--ink-muted);
+  font-style: italic;
+}
+
+/* "Maker": the maker's own words or specification, never a clinical claim. */
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-maker {
+  display: inline-block;
+  margin: 0.25rem 0 0 0.4rem;
+  padding: 0 0.45rem;
+  border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  vertical-align: baseline;
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-src {
+  margin-top: 0.3rem;
+}
+
+/* Chips in a table cell wrap between words, never inside one. */
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table .ms-src,
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table .ms-src * {
+  overflow-wrap: normal;
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table td {
+  min-width: 9rem;
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-note {
+  margin: 0.25rem 0 0;
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-footnote {
+  margin: 0.5rem 0 0;
+  padding: 0.6rem 0.8rem;
+  border-left: 4px solid color-mix(in srgb, var(--chapter-accent) 35%, var(--ink));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--chapter-accent) 22%, var(--paper));
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+/* ---------- the cards ---------- */
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-card h3 {
+  margin-top: 0;
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-items {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.4rem 0 0;
+  padding-left: 1.2rem;
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-card .oc-ch-card-after {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 0.6rem 0 0;
+}
+
+#oc-chapter[data-site='sleep-apnea-care'] .sa-guide-card .oc-ch-card-after a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/*
+ * Phones: each machine is a card of its own, its model on top and each column
+ * as a labelled line, so nothing scrolls sideways and the model never leaves
+ * the view. The column names stay in the table for screen readers.
+ */
+@media (max-width: 639px) {
+  #oc-chapter[data-site='sleep-apnea-care'] .sa-guide-scroll {
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: none;
+  }
+
+  #oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table,
+  #oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table tbody,
+  #oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table tr,
+  #oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table th,
+  #oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table td {
+    display: block;
+  }
+
+  #oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  #oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table tbody {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  #oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table tr {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--paper);
+  }
+
+  #oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table tbody th {
+    position: static;
+    min-width: 0;
+    box-shadow: none;
+    background: var(--cream);
+    font-size: 1rem;
+  }
+
+  #oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table td {
+    min-width: 0;
+  }
+
+  #oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table tr > :last-child {
+    border-bottom: 0;
+  }
+
+  #oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table td::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 0.15rem;
+    color: var(--ink-muted);
+    font-size: 0.78rem;
+    font-style: normal;
+    font-weight: 650;
+  }
+}
+
+@media print {
+  #oc-chapter[data-site='sleep-apnea-care'] .sa-guide-scroll {
+    overflow: visible;
+    border: 0;
+    background: none;
+  }
+
+  /* Every column on the paper: the screen's column widths would push the right-hand ones off it. */
+  #oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+    font-size: 8pt;
+  }
+
+  #oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table th,
+  #oc-chapter[data-site='sleep-apnea-care'] .sa-guide-table td {
+    position: static;
+    width: auto;
+    min-width: 0;
+    box-shadow: none;
+    overflow-wrap: anywhere;
+  }
+}

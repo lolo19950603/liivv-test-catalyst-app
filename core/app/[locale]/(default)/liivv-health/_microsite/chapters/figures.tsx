@@ -25,12 +25,12 @@
 
 import dynamic from 'next/dynamic';
 import { useLocale } from 'next-intl';
-import { Fragment, useRef } from 'react';
+import { Fragment, type ReactNode, useRef } from 'react';
 
 import { SpecialistContact } from '../_components/specialist-contact';
 import { CardPrintFoot, CardPrintHead } from '../print/card-print';
 import { LONG_PRINT_LIST, usePrintOnly } from '../print/use-print-only';
-import type { SiteKinds } from '../site';
+import type { SiteConfig, SiteKinds } from '../site';
 import { useSite, useSiteFigures, useSiteMessages, useSiteT } from '../site-context';
 
 import type { CategoryCard, Chapter, FigureText } from './compose';
@@ -100,6 +100,8 @@ export interface KindSets {
   fullWidth: ReadonlySet<string>;
   /* Journey entries that stay figure-led and full-stage. */
   journeyModule: ReadonlySet<string>;
+  /* Figures drawn after all of their card's sentences (SiteKinds `listFirst`). Site kinds only. */
+  listFirst: ReadonlySet<string>;
 }
 
 const KIND_SETS = new WeakMap<SiteKinds, KindSets>();
@@ -122,6 +124,7 @@ export function kindSets(kinds: SiteKinds): KindSets {
     wholeCard: joined(BASE_WHOLE_CARD_KINDS, kinds.wholeCard),
     fullWidth: joined(BASE_FULL_WIDTH_KINDS, kinds.fullWidth),
     journeyModule: joined(BASE_JOURNEY_MODULE_KINDS, kinds.journeyModule),
+    listFirst: joined([], kinds.listFirst),
   };
 
   KIND_SETS.set(kinds, sets);
@@ -375,6 +378,32 @@ function CrisisStrip({
   );
 }
 
+type RouteLink = NonNullable<
+  Extract<EngineBaseFigureMeta, { kind: 'routes' }>['routes'][number]['link']
+>;
+
+/*
+ * A route whose chips are one link out (RouteLinkMeta): the publisher's French
+ * page on /fr where it has one, with the language note inside the link text.
+ * Engine-only: Ostomy's twin has none.
+ */
+function RouteChipsLink({ link, children }: { link: RouteLink; children: ReactNode }) {
+  const locale = useLocale();
+  const french = locale === 'fr' && link.hrefFr !== undefined;
+  const hrefLang = french ? 'fr' : link.hrefLang;
+
+  return (
+    <a
+      className="oc-fig-route-link"
+      href={french ? link.hrefFr : link.href}
+      hrefLang={hrefLang === locale ? undefined : hrefLang}
+      rel="noopener noreferrer"
+    >
+      <OutboundLabel hrefLang={hrefLang} label={children} />
+    </a>
+  );
+}
+
 function RoutesFigure({
   figure,
   card,
@@ -384,6 +413,17 @@ function RoutesFigure({
 }) {
   const t = useSiteT('ui.chapter');
   const routes = card.figureText?.routes ?? [];
+  const chipsOf = (route: (typeof routes)[number], index: number) =>
+    route.chips.map((chip, chipIndex) => {
+      const glyph = figure.routes[index]?.glyphs[chipIndex];
+
+      return (
+        <span className="oc-fig-chip" key={chip}>
+          {glyph ? <Glyph name={glyph} /> : null}
+          {chip}
+        </span>
+      );
+    });
 
   return (
     <div className="oc-fig-routes">
@@ -395,16 +435,13 @@ function RoutesFigure({
             <li className="oc-fig-route" key={route.prompt}>
               <p>{route.prompt}</p>
               <span className="oc-fig-chips">
-                {route.chips.map((chip, chipIndex) => {
-                  const glyph = figure.routes[index]?.glyphs[chipIndex];
-
-                  return (
-                    <span className="oc-fig-chip" key={chip}>
-                      {glyph ? <Glyph name={glyph} /> : null}
-                      {chip}
-                    </span>
-                  );
-                })}
+                {figure.routes[index]?.link ? (
+                  <RouteChipsLink link={figure.routes[index].link}>
+                    {chipsOf(route, index)}
+                  </RouteChipsLink>
+                ) : (
+                  chipsOf(route, index)
+                )}
               </span>
               {route.detail ? <p className="oc-fig-detail">{route.detail}</p> : null}
             </li>
@@ -608,6 +645,18 @@ const LanesTopics = dynamic(
 
 type LaneMeta = Extract<EngineBaseFigureMeta, { kind: 'lanes' }>['lanes'][number];
 
+/* A lane's in-site link (LaneMeta `to`): a chapter of the same site, at a card or an anchor. */
+function laneToHref(
+  basePath: SiteConfig['basePath'],
+  to: NonNullable<LaneMeta['to']>,
+  locale: string,
+) {
+  const anchor = to.anchor ? `#${to.anchor}` : '';
+  const fragment = to.card === undefined ? anchor : `#card-${to.card}`;
+
+  return localeHref(`${chapterHref({ basePath }, to.chapter)}${fragment}`, locale);
+}
+
 /*
  * What a lane can be marked for. Liivv's own service can only ever match the
  * topics the site allows it (`site.serviceLaneTopics`), whatever the data says:
@@ -689,7 +738,7 @@ function LanesFigure({
   card: CategoryCard;
   exit?: Chapter['urgentExit'];
 }) {
-  const { gates } = useSite();
+  const { gates, basePath } = useSite();
   const locale = useLocale();
   const rootRef = useRef<HTMLDivElement>(null);
   const text = card.figureText;
@@ -713,7 +762,10 @@ function LanesFigure({
   const laneOf = ({ lane, index }: { lane: LaneMeta; index: number }) => {
     /* The publisher's French page on /fr, where it has one (`hrefFr`). */
     const french = locale === 'fr' && lane.hrefFr !== undefined;
-    const target = french ? lane.hrefFr : lane.href && localeHref(lane.href, locale);
+    /* An in-site lane link (`to`, engine-only) opens in the page locale and language. */
+    const inSite = lane.to ? laneToHref(basePath, lane.to, locale) : undefined;
+    const outward = french ? lane.hrefFr : lane.href && localeHref(lane.href, locale);
+    const target = inSite ?? outward;
 
     return (
       <Lane

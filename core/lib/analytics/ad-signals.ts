@@ -48,7 +48,7 @@ export const AD_SIGNALS_META_CONTENT = 'denied';
  */
 export const AD_SIGNALS_DENIED_EVENT = 'liivv:ad-signals-denied';
 
-const CARE_PATH = /^\/liivv-health\/(?:ostomy-care|diabetes-care)(?:\/|$)/;
+const CARE_PATH = /^\/liivv-health\/(?:ostomy-care|diabetes-care|sleep-apnea-care)(?:\/|$)/;
 
 /*
  * The path without its locale segment, so one pattern answers for every
@@ -67,8 +67,10 @@ function withoutLocale(pathname: string): string {
 
 /*
  * A care route: the URL alone reveals why someone is reading. That is
- * /liivv-health/ostomy-care or /liivv-health/diabetes-care, and everything
- * under either one.
+ * /liivv-health/ostomy-care, /liivv-health/diabetes-care or
+ * /liivv-health/sleep-apnea-care, and everything under each one. Sleep Apnea
+ * Care is covered from the day it is built, before it goes live
+ * (sleep-apnea-care/launch.ts): its pages answer at their URL already.
  *
  * The match stops at a whole segment, so /liivv-health/diabetes-care-x is not
  * the diabetes section, and /liivv-health itself, the hub that links to every

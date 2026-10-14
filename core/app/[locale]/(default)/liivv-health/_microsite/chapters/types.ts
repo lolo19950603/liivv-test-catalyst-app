@@ -105,6 +105,40 @@ export interface LaneMeta<Src extends string, Glyph extends string, Topic extend
   hrefFr?: string;
   sources?: Src[];
   linkSources?: Src[];
+  /*
+   * An in-site link, in the page locale and language, to a chapter of the
+   * same site, at one of its cards or anchors. Its words are
+   * `figure.lanes.<n>.linkLabel`, gated like every lane link label
+   * (`laneExtras`). Exclusive with `href`. Engine-only: Ostomy's twin has none.
+   */
+  to?: { chapter: string; card?: number; anchor?: string };
+}
+
+/*
+ * A route whose chips are one link out (RoutesFigure): an outward page the
+ * site's register lists, opened in the publisher's French where it has one.
+ * Navigation only: the chip words are the card's own figure words, so it is
+ * never gated. `linkSources` is the page the link opens, for the review and
+ * the page's foot list. Engine-only: Ostomy's twin has none.
+ */
+export interface RouteLinkMeta<Src extends string> {
+  href: string;
+  hrefLang: LinkLang;
+  hrefFr?: string;
+  linkSources?: Src[];
+}
+
+/*
+ * One tier of a red-flag block drawn in tiers (ChapterMeta.urgentTiers). `key`
+ * names its words under `urgent.tiers` and renders as `data-tier`.
+ * `sources` back the tier's label and lead; `signs` is index-matched to
+ * `urgent.tiers.<key>.signs.<n>`, each sign with at least one source.
+ * Engine-only: Ostomy's twin has none.
+ */
+export interface UrgentTierMeta<Src extends string> {
+  key: string;
+  sources?: Src[];
+  signs: Array<{ sources: Src[] }>;
 }
 
 /*
@@ -116,8 +150,11 @@ export interface LaneMeta<Src extends string, Glyph extends string, Topic extend
 export type BaseFigureMeta<Src extends string, Glyph extends string, Topic extends string = never> =
   /* The site's crisis and emergency numbers. Augments; never collapsible, never gated. */
   | { kind: 'crisis'; numbers: readonly [CrisisLine, ...CrisisLine[]] }
-  /* Parallel routes to different kinds of help, all shown at once. Augments. */
-  | { kind: 'routes'; routes: Array<{ glyphs: Glyph[] }> }
+  /*
+   * Parallel routes to different kinds of help, all shown at once. Augments.
+   * A route's `link` makes its chips one outward link (RouteLinkMeta).
+   */
+  | { kind: 'routes'; routes: Array<{ glyphs: Glyph[]; link?: RouteLinkMeta<Src> }> }
   /* What something weighs, as labelled symbols. Augments; no body drawing. */
   | { kind: 'criteria'; glyphs: Glyph[] }
   /*
@@ -207,7 +244,20 @@ export type FigureMeta<
  * a page with JavaScript off all ignore it and show the card as usual.
  */
 export interface CardLinkMeta {
-  at: 'note' | `items.${number}`;
+  /*
+   * `'after'` is a labelled link on its own line under the card's sentences
+   * (`label` and `key` required). Engine-only: Ostomy's twin has none.
+   */
+  at: 'note' | `items.${number}` | 'after';
+  /*
+   * The link has words of its own, `categories.<n>.links.<key>`, shown as a
+   * link after the sentence (or, with `at: 'after'`, on its own line)
+   * instead of turning words of the sentence into the link. Missing in this
+   * locale, the link is dropped. Engine-only: Ostomy's twin has none.
+   */
+  label?: true;
+  /* The `links` key; defaults to 'note' or the item number. Required with `at: 'after'`. */
+  key?: string;
   /*
    * A chapter card, a chapter anchor, or one of the site's own pages under its
    * base path (`page: 'funding'` → <basePath>/funding), each in the page locale.
@@ -262,6 +312,17 @@ export interface CategoryMeta<
    * (CardLinkMeta). Engine-only so far: Ostomy's twin has none.
    */
   links?: CardLinkMeta[];
+  /*
+   * The card renders nothing until the named decision is recorded. Its
+   * number is kept: the cards after it keep theirs. Engine-only: Ostomy's
+   * twin has none.
+   */
+  held?: Hold;
+  /*
+   * With `held`: the card renders as its title and `categories.<n>.heldNote`
+   * only, backed by these sources. No other message of the card is read.
+   */
+  heldNote?: { sources: Src[] };
 }
 
 /*
@@ -354,8 +415,13 @@ export interface ChapterMeta<
   accent: string;
   /** One per numbered category in the message tree, in the same order. */
   categories: Array<CategoryMeta<Src, Ask, Glyph, SiteFig, Topic, Hold>>;
-  pharmacistImage: string;
-  pharmacistHref: string;
+  /*
+   * The care panel's image and link. Left out (with `pharmacist` in the
+   * messages), the chapter has no care panel and no "ask" button in its hero.
+   * Optional engine-only: Ostomy's twin requires both.
+   */
+  pharmacistImage?: string;
+  pharmacistHref?: string;
   /** One inner array per resource group, in message order. */
   resourceLinks: string[][];
   citations: CitationMeta[];
@@ -396,6 +462,19 @@ export interface ChapterMeta<
   bandSources?: Src[];
   /** The resources shelf, between the band slot and the pharmacist panel. */
   shelf?: ShelfMeta<Src, Glyph, Hold>;
+  /*
+   * The red-flag block as tiers, in render order (UrgentTierMeta). Requires
+   * `urgent.tiers` in the messages. Never collapsible, never gated, every
+   * locale. Engine-only: Ostomy's twin has a flat list.
+   */
+  urgentTiers?: Array<UrgentTierMeta<Src>>;
+  /*
+   * A link from the tiered block's closing note (`urgent.note`) to a card or an
+   * anchor of a chapter of the same site: the phrase the note wraps in
+   * `<link>…</link>`, or else the whole note. Navigation only, so it adds no
+   * words and no gate holds it. Engine-only: Ostomy's twin has none.
+   */
+  urgentNoteLink?: { chapter: string; card: number } | { chapter: string; anchor: string };
 }
 
 /*

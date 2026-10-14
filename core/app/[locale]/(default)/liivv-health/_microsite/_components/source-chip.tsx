@@ -33,7 +33,7 @@ import type { ReactNode } from 'react';
 import type { CategoryCard } from '../chapters/compose';
 import { OutboundLabel } from '../chapters/figure-parts';
 import { useSiteSources, useSiteT } from '../site-context';
-import { byScope, lookUpSources, type ResolvedSource } from '../sources';
+import { byScope, lookUpSources, type ResolvedSource, sourceKey } from '../sources';
 
 import './source-chip.css';
 
@@ -56,9 +56,21 @@ export function SourceEntryText({ source }: { source: ResolvedSource }) {
   );
 }
 
-/* One source as a link, in a new tab, with the language note inside the link text. */
+/*
+ * One source as a link, in a new tab, with the language note inside the link
+ * text. An entry whose link the register holds (`linkHeld`) is cited by its
+ * title and publisher, unlinked.
+ */
 export function SourceEntryLink({ source }: { source: ResolvedSource }) {
   const locale = useLocale();
+
+  if (!source.href) {
+    return (
+      <span className="ms-src-link">
+        <SourceEntryText source={source} />
+      </span>
+    );
+  }
 
   return (
     <a
@@ -148,7 +160,7 @@ export function SourceChip({
         </summary>
         <ul>
           {ordered.map((source) => (
-            <li key={source.href}>
+            <li key={sourceKey(source)}>
               <SourceEntryLink source={source} />
             </li>
           ))}
@@ -213,7 +225,7 @@ export function SourceGroups({
           <Heading>{t(group.scope)}</Heading>
           <ul>
             {group.sources.map((source) => (
-              <li key={source.href}>
+              <li key={sourceKey(source)}>
                 <SourceEntryLink source={source} />
               </li>
             ))}
