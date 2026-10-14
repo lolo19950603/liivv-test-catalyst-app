@@ -491,7 +491,7 @@ export function ClairHealthPage() {
             <p className="clair-offer-note">{copy.offer.note}</p>
           </div>
           <div className="clair-offer-media">
-            <Pic alt={copy.hero.alt} src={`${SITE}/product.webp`} />
+            <Pic alt={copy.hero.alt} src={`${SITE}/product-render.png`} />
           </div>
         </div>
       </section>
@@ -591,7 +591,7 @@ export function ClairHealthPage() {
       <section className="clair-story" data-reveal id="how-it-works">
         <div className="clair-container clair-story-grid">
           <div className="clair-story-media">
-            <Pic alt={copy.story.alt} src={`${SITE}/product.webp`} />
+            <Pic alt={copy.story.alt} src={`${SITE}/stage-everyday.jpg`} />
           </div>
           <div className="clair-story-copy">
             <span className="clair-pill">
