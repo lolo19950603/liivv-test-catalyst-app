@@ -571,7 +571,13 @@ export async function staffPortalAction(
   }
 
   if (intent === 'joinConversation' || intent === 'reopenConversation') {
-    const result = await joinStaffConversation(conversationId);
+    const access = await getStaffAccessContext();
+
+    if (!access) {
+      return STAFF_UNAUTHORIZED;
+    }
+
+    const result = await joinStaffConversation(conversationId, access.username);
 
     if (!result.ok) {
       return { ok: false, error: result.message };

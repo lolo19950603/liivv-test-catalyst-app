@@ -78,7 +78,9 @@ export const login = async (
     const ranked = resolveInitialHealthCategoriesWithRank(status?.care_interests);
     const healthComplete = Boolean(status?.health_profile_completed_at) && ranked.length > 0;
 
-    if (!healthComplete) {
+    // A missing row in this same request is not proof the profile is unfinished.
+    // The dashboard reads it again once the session is available.
+    if (status && !healthComplete) {
       href = withOpenHealthProfile(redirectTo);
     }
 

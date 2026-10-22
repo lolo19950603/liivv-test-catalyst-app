@@ -66,6 +66,12 @@ export default async function AccountDashboardPage({ params, searchParams }: Pro
     },
   );
 
+  if (openHealth === '1' && wellness.healthProfileComplete) {
+    redirect(
+      oliviaCelebrate === '1' ? '/account/dashboard/?oliviaCelebrate=1' : '/account/dashboard/',
+    );
+  }
+
   const careLanes = buildPersonalizedCareLanes({
     careInterests: wellness.careInterests,
     carePackRegion,

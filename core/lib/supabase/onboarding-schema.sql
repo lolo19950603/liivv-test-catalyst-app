@@ -8,13 +8,10 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   first_name text,
   last_name text,
   phone text,
-  avatar_url text,
-  onboarding_step1_completed_at timestamptz,
   health_profile_completed_at timestamptz,
   insurance_info_completed_at timestamptz,
   care_interests text[] DEFAULT ARRAY[]::text[],
   has_insurance boolean,
-  auth_first_session_completed_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );

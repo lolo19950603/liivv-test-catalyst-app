@@ -13,7 +13,10 @@ import { logChatOperationalError } from '~/lib/chat/logging-policy';
 
 import {
   classifyCustomerMessage,
+  agreesToPharmacistOffer,
+  customerRequestsPharmacist,
   PHARMACIST_ESCALATION_REPLY,
+  PHARMACIST_HANDOFF_REPLY,
 } from './classifier';
 import { isVirtualCareBotEnabled } from './config';
 import { generateVirtualCareBotReply } from './generate-reply';
@@ -44,24 +47,13 @@ export async function processCustomerMessageForBot({
     return escalation;
   }
 
-  if (escalation.escalatedToPharmacistAt) {
-    return { ok: true };
-  }
-
   if (isCareTeamChatActive({ staffJoinedAt, staffClosedAt })) {
     return { ok: true };
   }
 
-  const classification = classifyCustomerMessage(customerMessage);
-
-  if (classification === 'escalate_pharmacist') {
-    const escalated = await escalateConversationToPharmacist(conversationId);
-
-    if (!escalated.ok) {
-      return escalated;
-    }
-
-    return appendBotMessage(conversationId, PHARMACIST_ESCALATION_REPLY);
+  // A closed chat stays with Olivia until the customer asks for a pharmacist again.
+  if (escalation.escalatedToPharmacistAt && !staffClosedAt) {
+    return { ok: true };
   }
 
   const historyResult = await listRecentMessagesForConversation(
@@ -71,6 +63,26 @@ export async function processCustomerMessageForBot({
 
   if (!historyResult.ok) {
     return historyResult;
+  }
+
+  const classification = classifyCustomerMessage(customerMessage);
+  const handoff =
+    classification === 'escalate_pharmacist' ||
+    agreesToPharmacistOffer(customerMessage, historyResult.messages);
+
+  if (handoff) {
+    const escalated = await escalateConversationToPharmacist(conversationId);
+
+    if (!escalated.ok) {
+      return escalated;
+    }
+
+    const reply =
+      classification === 'escalate_pharmacist' && !customerRequestsPharmacist(customerMessage)
+        ? PHARMACIST_ESCALATION_REPLY
+        : PHARMACIST_HANDOFF_REPLY;
+
+    return appendBotMessage(conversationId, reply);
   }
 
   try {

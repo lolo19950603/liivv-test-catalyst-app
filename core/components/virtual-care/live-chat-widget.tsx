@@ -11,9 +11,7 @@ import {
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import {
-  getLiveChatSessionAction,
   loadOlderLiveChatMessagesAction,
-  markLiveChatReadAction,
   virtualCareChatAction,
   type LiveChatSessionPayload,
   type VirtualCareChatActionState,
@@ -482,22 +480,53 @@ export function LiveChatWidget() {
   const pathnameRef = useRef(pathname);
   const skipPathnameRefreshRef = useRef(true);
 
+  /*
+   * Session and read-receipt calls are route handlers, not Server Actions.
+   * A Server Action re-renders whatever page is open. On the sign-in page that
+   * refresh queues ahead of the login redirect, so the form stays on
+   * "Opening the door…" and the chat already looks signed in until the panel
+   * closes and the queue can drain.
+   */
   const refreshSession = useEffectEvent(async () => {
-    const session = await getLiveChatSessionAction();
+    try {
+      const response = await fetch('/api/live-chat/session', { cache: 'no-store' });
 
-    setIsLoggedIn(session.isLoggedIn);
+      if (response.status === 401) {
+        setIsLoggedIn(false);
+        setSessionReady(true);
 
-    /* Signing in inside the open chat clears the slow guest cadence, so the
-     * badge is live again the moment the panel closes. */
-    if (session.isLoggedIn) {
-      setUnreadPollSignedOut(false);
+        return;
+      }
+
+      if (!response.ok) {
+        setSessionReady(true);
+
+        return;
+      }
+
+      const session = (await response.json()) as {
+        isLoggedIn?: boolean;
+        data?: LiveChatSessionPayload | null;
+      };
+      const loggedIn = session.isLoggedIn === true;
+
+      setIsLoggedIn(loggedIn);
+
+      /* Signing in inside the open chat clears the slow guest cadence, so the
+       * badge is live again the moment the panel closes. */
+      if (loggedIn) {
+        setUnreadPollSignedOut(false);
+      }
+
+      if (session.data) {
+        setData(session.data);
+      }
+    } catch {
+      /* Leave the last good session in place. A failed poll should not flip
+       * a signed-in chat back to the guest panel. */
+    } finally {
+      setSessionReady(true);
     }
-
-    if (session.data) {
-      setData(session.data);
-    }
-
-    setSessionReady(true);
   });
 
   const refreshUnreadStaffCount = useEffectEvent(async () => {
@@ -526,7 +555,12 @@ export function LiveChatWidget() {
   });
 
   const markChatRead = useEffectEvent(async () => {
-    await markLiveChatReadAction();
+    try {
+      await fetch('/api/live-chat/read', { method: 'POST', cache: 'no-store' });
+    } catch {
+      /* The badge still clears locally; the next open retries the receipt. */
+    }
+
     setUnreadStaffCount(0);
   });
 

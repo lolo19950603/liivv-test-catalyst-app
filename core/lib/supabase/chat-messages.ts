@@ -1,10 +1,12 @@
 import 'server-only';
 
 import {
-  STAFF_JOINED_CHAT_MESSAGE,
   STAFF_LEFT_CHAT_FOLLOWUP_MESSAGE,
   STAFF_LEFT_CHAT_MESSAGE,
   isCareTeamChatActive,
+  isStaffJoinedToChat,
+  staffJoinedChatMessage,
+  staffNameFromJoinMessage,
 } from '~/lib/chat/session';
 import { getSupabaseClient } from '~/lib/supabase/client';
 
@@ -21,11 +23,11 @@ export type ChatMessageRow = {
 const MAX_BODY = 8000;
 
 export {
-  STAFF_JOINED_CHAT_MESSAGE,
   STAFF_LEFT_CHAT_FOLLOWUP_MESSAGE,
   STAFF_LEFT_CHAT_MESSAGE,
   isCareTeamChatActive,
   isStaffJoinedToChat,
+  staffJoinedChatMessage,
 };
 
 export async function getConversationByProfileId(profileId: string): Promise<
@@ -229,7 +231,12 @@ export async function escalateConversationToPharmacist(
   const now = new Date().toISOString();
   const { error } = await supabase
     .from('chat_conversations')
-    .update({ escalated_to_pharmacist_at: now, updated_at: now })
+    .update({
+      escalated_to_pharmacist_at: now,
+      staff_closed_at: null,
+      staff_joined_at: null,
+      updated_at: now,
+    })
     .eq('id', conversationId);
 
   if (error) {
@@ -432,6 +439,7 @@ export type AdminConversationSummary = {
   staffJoinedAt: string | null;
   staffClosedAt: string | null;
   escalatedToPharmacistAt: string | null;
+  staffJoinedBy: string | null;
   lastMessageBody: string | null;
   lastMessageSender: string | null;
 };
@@ -471,6 +479,50 @@ async function latestNonSystemMessageByConversation(
       }
 
       found.set(row.conversation_id, { body: row.body, sender: row.sender_type });
+    }
+  }
+
+  return found;
+}
+
+async function latestStaffJoinNameByConversation(
+  conversationIds: string[],
+): Promise<Map<string, string>> {
+  const found = new Map<string, string>();
+
+  if (conversationIds.length === 0) {
+    return found;
+  }
+
+  const supabase = getSupabaseClient();
+  const chunkSize = 40;
+
+  for (let index = 0; index < conversationIds.length; index += chunkSize) {
+    const chunk = conversationIds.slice(index, index + chunkSize);
+    const { data, error } = await supabase
+      .from('chat_messages')
+      .select('conversation_id, body, created_at')
+      .in('conversation_id', chunk)
+      .eq('sender_type', 'system')
+      .order('created_at', { ascending: false })
+      .limit(chunk.length * 12);
+
+    if (error || !data) {
+      continue;
+    }
+
+    for (const row of data as Array<{ conversation_id: string; body: string }>) {
+      if (found.has(row.conversation_id)) {
+        continue;
+      }
+
+      const name = staffNameFromJoinMessage(row.body);
+
+      if (!name) {
+        continue;
+      }
+
+      found.set(row.conversation_id, name);
     }
   }
 
@@ -520,13 +572,18 @@ export async function listConversationsForAdmin(): Promise<
       },
     ]),
   );
-  const lastMessageByConversation = await latestNonSystemMessageByConversation(
-    list.map((conversation) => conversation.id),
-  );
+  const conversationIds = list.map((conversation) => conversation.id);
+  const [lastMessageByConversation, joinNameByConversation] = await Promise.all([
+    latestNonSystemMessageByConversation(conversationIds),
+    latestStaffJoinNameByConversation(conversationIds),
+  ]);
 
   const rows: AdminConversationSummary[] = list.map((c) => {
     const p = byProfile.get(c.profile_id);
     const lastMessage = lastMessageByConversation.get(c.id);
+    const staffJoinedAt = (c as { staff_joined_at?: string | null }).staff_joined_at ?? null;
+    const staffClosedAt = (c as { staff_closed_at?: string | null }).staff_closed_at ?? null;
+    const inChat = isStaffJoinedToChat({ staffJoinedAt, staffClosedAt });
 
     return {
       conversationId: c.id,
@@ -537,10 +594,11 @@ export async function listConversationsForAdmin(): Promise<
       lastName: p?.last_name ?? null,
       updatedAt: c.updated_at,
       customerLeftAt: (c as { customer_left_at?: string | null }).customer_left_at ?? null,
-      staffJoinedAt: (c as { staff_joined_at?: string | null }).staff_joined_at ?? null,
-      staffClosedAt: (c as { staff_closed_at?: string | null }).staff_closed_at ?? null,
+      staffJoinedAt,
+      staffClosedAt,
       escalatedToPharmacistAt:
         (c as { escalated_to_pharmacist_at?: string | null }).escalated_to_pharmacist_at ?? null,
+      staffJoinedBy: inChat ? (joinNameByConversation.get(c.id) ?? null) : null,
       lastMessageBody: lastMessage?.body ?? null,
       lastMessageSender: lastMessage?.sender ?? null,
     };
@@ -632,7 +690,11 @@ export async function markStaffClosedConversation(
   const now = new Date().toISOString();
   const { error } = await supabase
     .from('chat_conversations')
-    .update({ staff_closed_at: now, updated_at: now })
+    .update({
+      staff_closed_at: now,
+      escalated_to_pharmacist_at: null,
+      updated_at: now,
+    })
     .eq('id', conversationId);
 
   if (error) {
@@ -650,6 +712,7 @@ export async function markStaffClosedConversation(
 
 export async function joinStaffConversation(
   conversationId: string,
+  staffName: string,
 ): Promise<{ ok: true } | { ok: false; message: string }> {
   const supabase = getSupabaseClient();
   const { data: convRow, error: convReadErr } = await supabase
@@ -679,11 +742,12 @@ export async function joinStaffConversation(
     return { ok: false, message: error.message };
   }
 
-  return appendSystemMessage(conversationId, STAFF_JOINED_CHAT_MESSAGE);
+  return appendSystemMessage(conversationId, staffJoinedChatMessage(staffName));
 }
 
 export async function reopenStaffConversation(
   conversationId: string,
+  staffName: string,
 ): Promise<{ ok: true } | { ok: false; message: string }> {
-  return joinStaffConversation(conversationId);
+  return joinStaffConversation(conversationId, staffName);
 }

@@ -75,16 +75,22 @@ const rules: readonly Rule[] = [
    * `rules.find` takes the first match and customer-session matches the whole
    * /api/live-chat/ prefix.
    *
-   * The unread-count route is written to answer a signed-out caller with
-   * `{ count: 0 }` — it resolves the session itself and returns that shape when
-   * there is no customer. Behind customer-session it never ran: the gateway
-   * answered every anonymous poll with 401, and the chat widget polls it from
-   * every page. Session handling belongs to the route here, not to the gateway.
+   * These routes answer a signed-out caller themselves (`{ count: 0 }`,
+   * `{ isLoggedIn: false }`, or a no-op read receipt). Behind customer-session
+   * they never ran: the gateway answered every anonymous poll with 401, and
+   * the open chat polls session from the sign-in page. Session handling
+   * belongs to the route here, not to the gateway.
    */
   {
     policy: 'customer-optional',
     methods: ['GET', 'HEAD'],
-    match: (pathname) => pathname === '/api/live-chat/unread-count',
+    match: (pathname) =>
+      pathname === '/api/live-chat/unread-count' || pathname === '/api/live-chat/session',
+  },
+  {
+    policy: 'customer-optional',
+    methods: ['POST'],
+    match: (pathname) => pathname === '/api/live-chat/read',
   },
   {
     policy: 'customer-session',

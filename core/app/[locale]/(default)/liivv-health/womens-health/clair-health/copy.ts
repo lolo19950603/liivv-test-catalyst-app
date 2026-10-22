@@ -90,23 +90,13 @@ export type ClairCopy = {
 
 const SITE = '/archive/womens-health/clair-site';
 
-const TEAM_NAMES = [
-  'Apple',
-  'Whoop',
-  'Eight Sleep',
-  'Hinge',
-  'Meta',
-  'Princeton',
-  'Mercedes-Benz',
-  'FASTR',
-  'Daydream',
-] as const;
+const TEAM_NAMES = ['Emily Kraus, MD', 'Sara Vaughn, MD', 'Roxana Daneshjou, MD, PhD'] as const;
 
 const EN: ClairCopy = {
   meta: {
     title: 'Clair | Cycle insights wearable | Liivv',
     description:
-      'Clair is a hormone-aware wellness tracker, worn like jewellery. Pre-order through Liivv. Expected to ship November 2026. Sold in Canada as a general wellness product — not licensed by Health Canada as a medical device.',
+      'Clair is a hormone-aware wellness tracker, worn like jewellery. Pre-order through Liivv. Expected to ship January 2027. Sold in Canada as a general wellness product — not licensed by Health Canada as a medical device.',
   },
   back: "← Back to Women's Health page",
   hero: {
@@ -123,12 +113,12 @@ const EN: ClairCopy = {
   offer: {
     pill: 'Available through Liivv',
     h2: 'Pre-order Clair',
-    body: 'Wear Clair like jewellery. It estimates how your body’s daily signals shift across your cycle. Expected to ship November 2026.',
+    body: 'Wear Clair like jewellery. It estimates how your body’s daily signals shift across your cycle. Expected to ship January 2027.',
     cta: 'Reserve my Clair',
-    note: 'Expected to ship November–December 2026. We’ll confirm dates as they firm up.',
+    note: 'Expected to ship January 2027. We’ll confirm dates as they firm up.',
     items: [
       { strong: 'Pre-order', label: 'through Liivv' },
-      { strong: 'Nov 2026', label: 'expected ship' },
+      { strong: 'Jan 2027', label: 'expected ship' },
       { strong: 'No labs', label: 'worn like jewellery' },
     ],
   },
@@ -140,19 +130,19 @@ const EN: ClairCopy = {
     cards: [
       {
         title: 'Training & Recovery',
-        body: 'Align training, recovery and daily movement with the shape of your cycle.',
+        body: 'Some weeks are for moving more. Some are for recovery.',
         image: `${SITE}/training.webp`,
         corner: 'tl',
       },
       {
         title: 'Energy & Sleep',
         body: 'Notice how your energy and sleep shift across your cycle.',
-        image: `${SITE}/people.webp`,
+        image: `${SITE}/stage-everyday.jpg`,
         corner: 'tr',
       },
       {
         title: 'Cycle patterns',
-        body: 'See how your body’s daily signals change from week to week.',
+        body: 'See how sleep and recovery change from week to week.',
         image: `${SITE}/product.webp`,
         corner: 'bl',
       },
@@ -201,9 +191,9 @@ const EN: ClairCopy = {
     p2: 'If you ever choose cloud backup, that choice is yours — asked clearly, not buried. We will also say plainly that lost access cannot be recovered.',
   },
   team: {
-    pill: 'The team',
+    pill: 'Advisors',
     h2: 'People behind Clair',
-    body: 'Members of the Clair team have previously worked at:',
+    body: 'Advisors to Clair. Their roles describe the people, not a regulatory evaluation of the product.',
     names: TEAM_NAMES,
   },
   faq: {
@@ -213,11 +203,27 @@ const EN: ClairCopy = {
     items: [
       {
         q: 'What is Clair?',
-        a: 'Clair is a hormone-aware wellness tracker, worn like jewellery. It estimates how your body’s daily signals shift across your cycle. Pre-order through Liivv. Expected to ship November 2026.',
+        a: 'Clair is a hormone-aware wellness tracker, worn like jewellery. It estimates how your body’s daily signals shift across your cycle. Pre-order through Liivv. Expected to ship January 2027.',
       },
       {
         q: 'How does Clair work without a blood draw?',
         a: 'Hormones influence everyday signals your body already produces. Clair reads physiological signals such as skin temperature, heart rate and heart rate variability, then estimates how those patterns compare with your own typical range. It does not measure hormone levels and it is not a hormone test.',
+      },
+      {
+        q: 'What does Clair track?',
+        a: "Sleep, recovery, activity, heart rate and heart rate variability, alongside estimates of how your body's daily signals shift across your cycle. It does not measure hormone levels and it is not a hormone test.",
+      },
+      {
+        q: 'How is Clair different from a fitness wearable?',
+        a: 'Clair is built around female physiology. It reads everyday signals such as skin temperature, heart rate and heart rate variability, then estimates how those patterns compare with your own typical range. It does not measure hormone levels.',
+      },
+      {
+        q: 'What research is behind Clair?',
+        a: 'Studies of the device people will receive are still underway. This page does not repeat performance figures. Clair has not been evaluated by Health Canada for safety or effectiveness.',
+      },
+      {
+        q: 'Does Clair work when cycles are irregular?',
+        a: 'Clair estimates patterns from physiological signals as they change, including when cycles are irregular. It does not diagnose a condition.',
       },
       {
         q: 'Is Clair a medical device?',
@@ -233,7 +239,7 @@ const EN: ClairCopy = {
       },
       {
         q: 'When does Clair ship?',
-        a: 'Clair is expected to ship around November 2026. Pre-order through Liivv and we will keep you posted as dates firm up.',
+        a: 'Clair is expected to ship around January 2027. Pre-order through Liivv and we will keep you posted as dates firm up.',
       },
       {
         q: 'Who is Liivv?',
@@ -249,7 +255,7 @@ const EN: ClairCopy = {
     kicker: 'Through Liivv',
     h2: 'Reserve your Clair',
     accent: 'Cycle insights — on your wrist.',
-    body: 'A hormone-aware wellness tracker, built around female physiology. Pre-order through Liivv. Expected to ship November 2026.',
+    body: 'A hormone-aware wellness tracker, built around female physiology. Pre-order through Liivv. Expected to ship January 2027.',
     cta: 'Reserve my Clair',
     secondary: 'See how it fits',
     tertiary: "Back to Women's Health page",
@@ -262,7 +268,7 @@ const FR: ClairCopy = {
   meta: {
     title: 'Clair | Bracelet de tendances du cycle | Liivv',
     description:
-      'Clair est un bracelet de bien-être sensible aux hormones, à porter comme un bijou. Précommandez-le chez Liivv. Expédition prévue en novembre 2026. Vendu au Canada à titre de produit de bien-être général — non homologué par Santé Canada comme instrument médical.',
+      'Clair est un bracelet de bien-être sensible aux hormones, à porter comme un bijou. Précommandez-le chez Liivv. Expédition prévue en janvier 2027. Vendu au Canada à titre de produit de bien-être général — non homologué par Santé Canada comme instrument médical.',
   },
   back: '← Retour à la page Santé des femmes',
   hero: {
@@ -279,12 +285,12 @@ const FR: ClairCopy = {
   offer: {
     pill: 'Offert chez Liivv',
     h2: 'Précommander Clair',
-    body: 'Portez Clair comme un bijou. Il estime comment les signaux quotidiens de votre corps évoluent au fil de votre cycle. Expédition prévue en novembre 2026.',
+    body: 'Portez Clair comme un bijou. Il estime comment les signaux quotidiens de votre corps évoluent au fil de votre cycle. Expédition prévue en janvier 2027.',
     cta: 'Réserver mon Clair',
-    note: 'Expédition prévue en novembre–décembre 2026. Nous confirmerons les dates à mesure qu’elles se précisent.',
+    note: 'Expédition prévue en janvier 2027. Nous confirmerons les dates à mesure qu’elles se précisent.',
     items: [
       { strong: 'Précommande', label: 'chez Liivv' },
-      { strong: 'Nov 2026', label: 'expédition prévue' },
+      { strong: 'Jan 2027', label: 'expédition prévue' },
       { strong: 'Sans labo', label: 'porté comme un bijou' },
     ],
   },
@@ -296,19 +302,19 @@ const FR: ClairCopy = {
     cards: [
       {
         title: 'Entraînement et récupération',
-        body: 'Alignez l’entraînement, la récupération et le mouvement quotidien avec la forme de votre cycle.',
+        body: 'Certaines semaines appellent plus de mouvement. D’autres, la récupération.',
         image: `${SITE}/training.webp`,
         corner: 'tl',
       },
       {
         title: 'Énergie et sommeil',
         body: 'Observez comment votre énergie et votre sommeil évoluent au fil de votre cycle.',
-        image: `${SITE}/people.webp`,
+        image: `${SITE}/stage-everyday.jpg`,
         corner: 'tr',
       },
       {
         title: 'Tendances du cycle',
-        body: 'Voyez comment les signaux quotidiens de votre corps changent d’une semaine à l’autre.',
+        body: 'Voyez comment le sommeil et la récupération évoluent d’une semaine à l’autre.',
         image: `${SITE}/product.webp`,
         corner: 'bl',
       },
@@ -357,9 +363,9 @@ const FR: ClairCopy = {
     p2: 'Si vous choisissez un jour une sauvegarde infonuagique, ce choix vous appartient — demandé clairement, sans être enfoui. Nous dirons aussi clairement que l’accès perdu ne peut pas être récupéré.',
   },
   team: {
-    pill: 'L’équipe',
+    pill: 'Conseillers',
     h2: 'Les personnes derrière Clair',
-    body: 'Des membres de l’équipe Clair ont déjà travaillé chez :',
+    body: 'Des personnes qui conseillent Clair. Leurs rôles décrivent les personnes, et non une évaluation réglementaire du produit.',
     names: TEAM_NAMES,
   },
   faq: {
@@ -369,11 +375,27 @@ const FR: ClairCopy = {
     items: [
       {
         q: 'Qu’est-ce que Clair?',
-        a: 'Clair est un bracelet de bien-être sensible aux hormones, à porter comme un bijou. Il estime comment les signaux quotidiens de votre corps évoluent au fil de votre cycle. Précommandez-le chez Liivv. Expédition prévue en novembre 2026.',
+        a: 'Clair est un bracelet de bien-être sensible aux hormones, à porter comme un bijou. Il estime comment les signaux quotidiens de votre corps évoluent au fil de votre cycle. Précommandez-le chez Liivv. Expédition prévue en janvier 2027.',
       },
       {
         q: 'Comment Clair fonctionne-t-il sans prise de sang?',
         a: 'Les hormones influencent des signaux quotidiens que votre corps produit déjà. Clair lit des signaux physiologiques tels que la température cutanée, la fréquence cardiaque et la variabilité de la fréquence cardiaque, puis estime comment ces tendances se comparent à votre plage habituelle. Il ne mesure pas les taux d’hormones et ne constitue pas un test hormonal.',
+      },
+      {
+        q: 'Que suit Clair?',
+        a: 'Le sommeil, la récupération, l’activité, la fréquence cardiaque et la variabilité de la fréquence cardiaque, avec des estimations de la façon dont les signaux quotidiens de votre corps évoluent au fil de votre cycle. Il ne mesure pas les taux d’hormones et ne constitue pas un test hormonal.',
+      },
+      {
+        q: 'En quoi Clair diffère-t-il d’un bracelet d’activité?',
+        a: 'Clair est conçu autour de la physiologie féminine. Il lit des signaux du quotidien tels que la température cutanée, la fréquence cardiaque et la variabilité de la fréquence cardiaque, puis estime comment ces tendances se comparent à votre plage habituelle. Il ne mesure pas les taux d’hormones.',
+      },
+      {
+        q: 'Quelles recherches soutiennent Clair?',
+        a: 'Des études sur l’appareil que les gens recevront sont encore en cours. Cette page ne reprend pas de chiffres de performance. Clair n’a pas été évalué par Santé Canada quant à son innocuité ou à son efficacité.',
+      },
+      {
+        q: 'Clair fonctionne-t-il lorsque les cycles sont irréguliers?',
+        a: 'Clair estime des tendances à partir de signaux physiologiques à mesure qu’ils changent, y compris lorsque les cycles sont irréguliers. Il ne sert pas à diagnostiquer un état.',
       },
       {
         q: 'Clair est-il un instrument médical?',
@@ -389,7 +411,7 @@ const FR: ClairCopy = {
       },
       {
         q: 'Quand Clair sera-t-il expédié?',
-        a: 'Clair devrait être expédié vers novembre 2026. Précommandez-le chez Liivv et nous vous tiendrons au courant à mesure que les dates se précisent.',
+        a: 'Clair devrait être expédié vers janvier 2027. Précommandez-le chez Liivv et nous vous tiendrons au courant à mesure que les dates se précisent.',
       },
       {
         q: 'Qui est Liivv?',
@@ -405,7 +427,7 @@ const FR: ClairCopy = {
     kicker: 'Chez Liivv',
     h2: 'Réservez votre Clair',
     accent: 'Les tendances du cycle — au poignet.',
-    body: 'Un bracelet de bien-être sensible aux hormones, conçu autour de la physiologie féminine. Précommandez-le chez Liivv. Expédition prévue en novembre 2026.',
+    body: 'Un bracelet de bien-être sensible aux hormones, conçu autour de la physiologie féminine. Précommandez-le chez Liivv. Expédition prévue en janvier 2027.',
     cta: 'Réserver mon Clair',
     secondary: 'Voir comment ça s’intègre',
     tertiary: 'Retour à la page Santé des femmes',

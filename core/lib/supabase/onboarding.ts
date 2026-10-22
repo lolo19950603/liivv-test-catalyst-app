@@ -4,7 +4,6 @@ import { ensureCustomerProfile } from '~/lib/supabase/profile';
 import { getSupabaseClient, isSupabaseConfigured } from '~/lib/supabase/client';
 
 export type OnboardingStatus = {
-  onboarding_step1_completed_at: string | null;
   health_profile_completed_at: string | null;
   insurance_info_completed_at: string | null;
   has_insurance: boolean | null;
@@ -22,7 +21,7 @@ export async function getOnboardingStatus(
   const { data, error } = await supabase
     .from('profiles')
     .select(
-      'onboarding_step1_completed_at, health_profile_completed_at, insurance_info_completed_at, has_insurance, care_interests',
+      'health_profile_completed_at, insurance_info_completed_at, has_insurance, care_interests',
     )
     .eq('bigcommerce_customer_id', bigcommerceCustomerId)
     .maybeSingle();
@@ -34,8 +33,6 @@ export async function getOnboardingStatus(
   const row = data as Record<string, unknown>;
 
   return {
-    onboarding_step1_completed_at:
-      (row.onboarding_step1_completed_at as string | null | undefined) ?? null,
     health_profile_completed_at:
       (row.health_profile_completed_at as string | null | undefined) ?? null,
     insurance_info_completed_at:
@@ -45,33 +42,6 @@ export async function getOnboardingStatus(
       ? (row.care_interests as string[])
       : null,
   };
-}
-
-export async function completeOnboardingStep1(customer: {
-  entityId: number;
-  firstName?: string | null;
-  lastName?: string | null;
-  email?: string | null;
-}): Promise<boolean> {
-  const ensured = await ensureCustomerProfile(customer);
-
-  if (ensured.status !== 'ok' || !isSupabaseConfigured()) {
-    return false;
-  }
-
-  const supabase = getSupabaseClient();
-  const now = new Date().toISOString();
-  const { data, error } = await supabase
-    .from('profiles')
-    .update({
-      onboarding_step1_completed_at: now,
-      updated_at: now,
-    })
-    .eq('bigcommerce_customer_id', String(customer.entityId))
-    .select('onboarding_step1_completed_at')
-    .maybeSingle();
-
-  return !error && Boolean(data?.onboarding_step1_completed_at);
 }
 
 export async function completeOnboardingStep2(
