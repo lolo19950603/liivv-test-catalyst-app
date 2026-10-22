@@ -196,7 +196,7 @@ export const REVIEW = {
     "Fact band: values and years exactly as the sources (6.4%, 12.8%, 30% for 2016–2017; 23% labelled 2009 data).",
     "Governance block: renders `ui.governance` (chrome) plus `governance.relationship`, `sourcesNote` and `settingsNote`; `disclosure.sells` reads “Liivv sells CPAP masks and supplies.”; `governance.brandsNote` is held with the brands.",
     "No other retailer, no partner name, no pressure figure or settings instruction anywhere on the page (spec 0.3 words).",
-    "Pre-launch: the page is noindex, nofollow and unlinked from the hub while SLEEP_APNEA_CARE_LIVE is false."
+    "Soft launch (2026-10-21): the hub and the header link to the page (SLEEP_APNEA_CARE_LISTED), but it stays noindex, nofollow and out of the sitemap while SLEEP_APNEA_CARE_LIVE is false."
   ],
   "heldCopy": {
     "released": "Nothing below is in the message files. Each item enters SleepApneaCare.ui.landingPage only when its condition is met and the owner (and nurse where named) approve the wording in a new copy pass. Held-in-tree lines (trust items 2 and 3, FAQ 5, the returns lines, the brands strip and note, the rotating hero) are listed by the export under “Held”, with their gate.",

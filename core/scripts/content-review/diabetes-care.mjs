@@ -1765,6 +1765,8 @@ const SHARED_SECTIONS = {
   'discovery.doors.ostomy_care_everyday': 'Discovery band — the Ostomy Care card',
   'discovery.doors.diabetes_care_everyday':
     'Discovery band — the Diabetes Care card (shown on the other sites only; kept so both sites carry the same doors)',
+  'discovery.doors.sleep_rest':
+    'Discovery band — the Sleep Apnea Care card (shown since the soft launch of 2026-10-21; the words are the hub door’s and the Sleep landing’s own title and description)',
   governance: 'Byline and review notices',
   'governance.disclosure': 'Commercial disclosure',
 };

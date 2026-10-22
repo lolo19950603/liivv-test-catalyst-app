@@ -872,7 +872,7 @@ function readme(files, locale) {
       '',
       locale === 'fr'
         ? `Every French string is a machine translation awaiting review (${FR_REVIEW_MARK}).`
-        : 'The section is not public yet: it is noindex and unlinked until the owner flips SLEEP_APNEA_CARE_LIVE.',
+        : 'The section is linked from the hub and the header since the soft launch of 2026-10-21 (SLEEP_APNEA_CARE_LISTED), but it stays noindex and out of the sitemap until the owner flips SLEEP_APNEA_CARE_LIVE.',
       '',
       ...files.map((f) => `- [${f.name}](./${f.name})`),
     ].join('\n'),

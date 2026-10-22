@@ -3573,6 +3573,10 @@
           "diabetes_care_everyday": {
             "title": "Diabetes Care & Everyday \"Liivving\"",
             "body": "A specialized journey for living well with diabetes."
+          },
+          "sleep_rest": {
+            "title": "Sleep Apnea Care & Everyday \"Liivving\"",
+            "body": "Plain, sourced guidance on sleep apnea and CPAP, with CPAP masks and supplies."
           }
         }
       },
@@ -4325,6 +4329,10 @@
           "diabetes_care_everyday": {
             "title": "Diabetes Care & Everyday \"Liivving\"",
             "body": "A specialized journey for living well with diabetes."
+          },
+          "sleep_rest": {
+            "title": "Sleep Apnea Care & Everyday \"Liivving\"",
+            "body": "Plain, sourced guidance on sleep apnea and CPAP, with CPAP masks and supplies."
           }
         }
       },

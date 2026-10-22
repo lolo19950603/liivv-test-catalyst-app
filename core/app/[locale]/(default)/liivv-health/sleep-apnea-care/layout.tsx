@@ -18,12 +18,13 @@ interface Props extends PropsWithChildren {
 }
 
 /*
- * Pre-launch: every page under /liivv-health/sleep-apnea-care — the landing,
- * the chapters, the path pages, the funding page and the machine guide —
- * is `noindex, nofollow` until the owner flips SLEEP_APNEA_CARE_LIVE
+ * Not indexed yet: every page under /liivv-health/sleep-apnea-care — the
+ * landing, the chapters, the path pages, the funding page and the machine
+ * guide — is `noindex, nofollow` until the owner flips SLEEP_APNEA_CARE_LIVE
  * (./launch.ts). The pages set no `robots` of their own, so they all inherit
- * this one. The section is reachable at its URL, but nothing links to it and
- * the sitemap leaves it out.
+ * this one. Since the soft launch (SLEEP_APNEA_CARE_LISTED, 2026-10-21) the
+ * hub and the header link to the section; that switch is deliberately not
+ * read here, and the sitemap still leaves the section out.
  */
 export const metadata: Metadata = SLEEP_APNEA_CARE_LIVE
   ? {}

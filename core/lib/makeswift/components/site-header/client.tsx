@@ -15,7 +15,10 @@ import {
 
 import { usePathname } from '~/i18n/routing';
 import { LiivvArchiveHeader } from '~/lib/makeswift/liivv-archive-header/liivv-archive-header';
-import type { LiivvArchiveHeaderLogo } from '~/lib/makeswift/liivv-archive-header/types';
+import type {
+  LiivvArchiveHeaderLogo,
+  LiivvArchiveNavLink,
+} from '~/lib/makeswift/liivv-archive-header/types';
 import type { StoreCategoryNode } from '~/lib/makeswift/site-header/build-store-nav-from-categories';
 import {
   isEmptyMakeswiftPlaceholder,
@@ -35,6 +38,7 @@ import {
   getCareSectionBackLink,
   getDiabetesCareNav,
   getOstomyCareNav,
+  getSleepApneaCareNav,
   getWomensHealthNav,
   resolveCareNavSection,
   shouldClearCareNav,
@@ -51,6 +55,21 @@ import { ARCHIVE_HEADER_SECTION_ID } from './archive-styles';
 export const LIIVV_SITE_HEADER_SECTION_ID = 'liivv-site-header';
 
 type BannerProps = ComponentPropsWithoutRef<typeof Banner>;
+
+/*
+ * Each care section's own menu and the name the nav landmark announces. The
+ * 'sleep' section only ever resolves while Sleep Apnea Care is listed
+ * (SLEEP_APNEA_CARE_LISTED, ~/lib/makeswift/site-header/inject-liivv-health-nav).
+ */
+const CARE_SECTION_NAV: Record<
+  CareNavSection,
+  { links: () => LiivvArchiveNavLink[]; ariaLabel: string }
+> = {
+  womens: { links: getWomensHealthNav, ariaLabel: "Women's Health" },
+  ostomy: { links: getOstomyCareNav, ariaLabel: 'Ostomy Care' },
+  diabetes: { links: getDiabetesCareNav, ariaLabel: 'Diabetes Care' },
+  sleep: { links: getSleepApneaCareNav, ariaLabel: 'Sleep Apnea Care' },
+};
 
 export type SiteHeaderContextValue = {
   accountHref: string;
@@ -281,16 +300,8 @@ export const MakeswiftHeader = forwardRef(
     const desktopLogo = resolveStoreLogo(storeLogo, storeLogoLabel);
     const resolvedNavLinks = resolveStoreNavLinks(links, categoryTree);
     const careSection = resolveCareNavSection(pathname, rememberedCare);
-    const showWomensHealthNav = careSection === 'womens';
-    const showOstomyCareNav = careSection === 'ostomy';
-    const showDiabetesCareNav = careSection === 'diabetes';
-    const navLinks = showWomensHealthNav
-      ? getWomensHealthNav()
-      : showOstomyCareNav
-        ? getOstomyCareNav()
-        : showDiabetesCareNav
-          ? getDiabetesCareNav()
-          : resolvedNavLinks;
+    const careNav = careSection ? CARE_SECTION_NAV[careSection] : null;
+    const navLinks = careNav ? careNav.links() : resolvedNavLinks;
 
     if (override) {
       return (
@@ -337,15 +348,7 @@ export const MakeswiftHeader = forwardRef(
         initialCartCount={cartCount}
         linksPosition={linksPosition ?? 'left'}
         logo={desktopLogo}
-        navAriaLabel={
-          showWomensHealthNav
-            ? "Women's Health"
-            : showOstomyCareNav
-              ? 'Ostomy Care'
-              : showDiabetesCareNav
-                ? 'Diabetes Care'
-                : 'Store'
-        }
+        navAriaLabel={careNav?.ariaLabel ?? 'Store'}
         navLinks={menuLinks}
         notifications={notifications}
         searchPlaceholder={searchPlaceholder}

@@ -2001,6 +2001,10 @@ function writeShared(locale) {
     ['discovery.doors.womens_health_wellness', 'Discovery band — the Women’s Health card'],
     ['discovery.doors.diabetes_care_everyday', 'Discovery band — the Diabetes Care card'],
     ['discovery.doors.ostomy_care_everyday', 'Discovery band — the Ostomy Care card (shown on the other sites only)'],
+    [
+      'discovery.doors.sleep_rest',
+      'Discovery band — the Sleep Apnea Care card (shown since the soft launch of 2026-10-21; the same words as the Diabetes Care card for it)',
+    ],
     ['governance', 'Byline and review notices'],
   ];
 

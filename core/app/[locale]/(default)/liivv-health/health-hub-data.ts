@@ -3,7 +3,7 @@
  * Live verticals link through; the rest are Coming soon (no stub routes).
  */
 
-import { SLEEP_APNEA_CARE_LIVE } from './sleep-apnea-care/launch';
+import { SLEEP_APNEA_CARE_LISTED } from './sleep-apnea-care/launch';
 
 const IMG = '/archive/liivv-home';
 
@@ -20,11 +20,13 @@ export type HealthHubDoor = {
 };
 
 /*
- * Sleep Apnea Care's door. The section is built but not public until the
- * owner flips SLEEP_APNEA_CARE_LIVE (./sleep-apnea-care/launch.ts): until then
- * the door is today's "Coming soon" one, byte for byte, and links nowhere.
+ * Sleep Apnea Care's door, live while SLEEP_APNEA_CARE_LISTED is on
+ * (./sleep-apnea-care/launch.ts; soft launch, 2026-10-21). Listing the section
+ * does not index it: its pages stay noindex and out of the sitemap until
+ * SLEEP_APNEA_CARE_LIVE. With LISTED off, the door is the old "Coming soon"
+ * one, byte for byte, and links nowhere.
  */
-const SLEEP_DOOR: HealthHubDoor = SLEEP_APNEA_CARE_LIVE
+const SLEEP_DOOR: HealthHubDoor = SLEEP_APNEA_CARE_LISTED
   ? {
       id: 'sleep_rest',
       label: 'Live',
@@ -186,8 +188,8 @@ export const HEALTH_HUB_STORY_LINKS = [
     label: 'Diabetes Care',
     href: '/liivv-health/diabetes-care',
   },
-  /* Only once Sleep Apnea Care is public (./sleep-apnea-care/launch.ts). */
-  ...(SLEEP_APNEA_CARE_LIVE
+  /* Only while Sleep Apnea Care is listed (./sleep-apnea-care/launch.ts). */
+  ...(SLEEP_APNEA_CARE_LISTED
     ? [{ id: 'sleep', label: 'Sleep Apnea Care', href: '/liivv-health/sleep-apnea-care' }]
     : []),
 ] as const;

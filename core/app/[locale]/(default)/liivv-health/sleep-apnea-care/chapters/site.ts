@@ -13,11 +13,11 @@
  * ([slug]/page.tsx) passes it to ../../_microsite/chapters/route.ts. It is
  * never a prop from a server component. ../../_microsite/site.ts says why.
  *
- * Not live yet: the section is reachable at its URL but unlinked, out of the
- * sitemap and noindex until the owner flips SLEEP_APNEA_CARE_LIVE
- * (../launch.ts). No audio, no contact line (Liivv's sleep support service,
- * Part C, is not live), no help band (no sourced specialist directory), and
- * no care panel on any chapter (E-8).
+ * Not indexed yet: the hub and the header link to the section
+ * (SLEEP_APNEA_CARE_LISTED), but it is out of the sitemap and noindex until
+ * the owner flips SLEEP_APNEA_CARE_LIVE (../launch.ts). No audio, no contact
+ * line (Liivv's sleep support service, Part C, is not live), no help band (no
+ * sourced specialist directory), and no care panel on any chapter (E-8).
  * =============================================================================
  */
 

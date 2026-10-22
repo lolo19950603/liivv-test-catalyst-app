@@ -3942,6 +3942,10 @@
           "diabetes_care_everyday": {
             "title": "Soins du diabète et « Liivving » au quotidien",
             "body": "Un parcours spécialisé pour bien vivre avec le diabète."
+          },
+          "sleep_rest": {
+            "title": "Soins de l’apnée du sommeil et « Liivving » au quotidien",
+            "body": "Des conseils clairs et sourcés sur l’apnée du sommeil et la thérapie CPAP, avec des masques et des fournitures CPAP."
           }
         }
       },
@@ -4319,6 +4323,10 @@
           "diabetes_care_everyday": {
             "title": "Soins du diabète et « Liivving » au quotidien",
             "body": "Un parcours spécialisé pour bien vivre avec le diabète."
+          },
+          "sleep_rest": {
+            "title": "Soins de l’apnée du sommeil et « Liivving » au quotidien",
+            "body": "Des conseils clairs et sourcés sur l’apnée du sommeil et la thérapie CPAP, avec des masques et des fournitures CPAP."
           }
         }
       },

@@ -335,11 +335,14 @@ ${LIIVV_HEADER_UTILITY_SHARED_CSS}
 }
 /*
  * The fixed utilities above take no room in the header grid, so a long section
- * menu slides under EN/FR at laptop widths. The Diabetes Care menu (four items
- * and a back link) keeps clear of them and wraps instead.
+ * menu slides under EN/FR at laptop widths, where a click on a menu item can
+ * land on the language toggle. The Diabetes Care, Sleep Apnea Care and Ostomy
+ * Care menus keep clear of them and wrap instead.
  */
 @media screen and (min-width: 1024px) and (max-width: 1439px) {
-  .liivv-archive-header .header__navigation:has(> nav[aria-label='Diabetes Care']) {
+  .liivv-archive-header .header__navigation:has(> nav[aria-label='Diabetes Care']),
+  .liivv-archive-header .header__navigation:has(> nav[aria-label='Sleep Apnea Care']),
+  .liivv-archive-header .header__navigation:has(> nav[aria-label='Ostomy Care']) {
     padding-inline-end: 16.5rem;
   }
 }

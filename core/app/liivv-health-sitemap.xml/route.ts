@@ -18,10 +18,12 @@
  * pages and funding page follow the same rule under their `paths` and
  * `funding` gates.
  *
- * Sleep Apnea Care is built but not public: none of its URLs is listed until
- * the owner flips SLEEP_APNEA_CARE_LIVE (sleep-apnea-care/launch.ts). Then its
- * English pages are listed, and each /fr page once its own gate in Sleep's
- * FR_REVIEWED is open, exactly as Diabetes Care's are.
+ * Sleep Apnea Care is linked from the hub and the header (soft launch,
+ * SLEEP_APNEA_CARE_LISTED) but not indexed: none of its URLs is listed until
+ * the owner flips SLEEP_APNEA_CARE_LIVE (sleep-apnea-care/launch.ts). LISTED
+ * never adds an entry here. Once LIVE, its English pages are listed, and each
+ * /fr page once its own gate in Sleep's FR_REVIEWED is open, exactly as
+ * Diabetes Care's are.
  */
 
 import { CHAPTER_META as DIABETES_CHAPTER_META } from '~/app/[locale]/(default)/liivv-health/diabetes-care/chapters/chapters-meta';
@@ -87,8 +89,9 @@ const diabetesFundingEntries = DIABETES_FR_REVIEWED.has('funding')
   : [{ path: DIABETES_FUNDING_PATH, locale: defaultLocale }];
 
 /*
- * Sleep Apnea Care, after every Diabetes entry: nothing at all before launch.
- * Each page in English, and in French once its gate is open.
+ * Sleep Apnea Care, after every Diabetes entry: nothing at all until LIVE
+ * (listing the section on the hub is not enough). Each page in English, and
+ * in French once its gate is open.
  */
 const SLEEP_BASE = '/liivv-health/sleep-apnea-care';
 
